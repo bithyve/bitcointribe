@@ -1,0 +1,25 @@
+{
+    "transaction": [
+        {
+            "logo": "https://media.licdn.com/dms/image/C560BAQHU5bz7nf-M_Q/company-logo_200_200/0?e=2159024400&v=beta&t=ivAC-2z2-I4ZTsPORM2v9hQ6VIyhQPn9wJmnOb2VORU",
+            "title": "Transfer to Vault",
+            "date": "25.06.2018",
+            "amount": "$ 109",
+            "transType": "receive"
+        },
+        {
+            "logo": "https://media.licdn.com/dms/image/C4D0BAQGipaITDiAc2Q/company-logo_200_200/0?e=2159024400&v=beta&t=w6ZC2s8Ln3dh7JTxqbSyr0_nHHEtIJh_cTt7FDefiSk",
+            "title": "Payment to Loan1",
+            "date": "07.06.2018",
+            "amount": "$ 500",
+            "transType": "sent"
+        },
+        {
+            "logo": "https://facebook.github.io/react-native/docs/assets/GettingStartedCongratulations.png",
+            "title": "Transfer Out",
+            "date": "06.06.2018",
+            "amount": "$ 120",
+            "transType": "receive"
+        }
+    ]
+}

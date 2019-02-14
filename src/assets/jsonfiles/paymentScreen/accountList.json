@@ -1,0 +1,16 @@
+{
+    "accounts": [
+        {
+            "id": 1,
+            "Name": "Daily CBP"
+        },
+        {
+            "id": 2,
+            "name": "React-Native"
+        },
+        {
+            "id": 3,
+            "name": "Swift 4.2"
+        }
+    ]
+}

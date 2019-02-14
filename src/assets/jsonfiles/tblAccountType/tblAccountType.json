@@ -1,0 +1,24 @@
+{  
+  "accountType": [
+    {
+      "id": 1,
+      "name": "Savings"
+    },
+    {
+      "id": 2,
+      "name": "Secure"
+    },
+    {
+      "id": 3,
+      "name": "Vault"
+    },
+    {
+      "id": 4,
+      "name": "Joint"
+    },
+    {
+      "id": 5,
+      "name": "UnKnown"
+    }
+  ]
+}
