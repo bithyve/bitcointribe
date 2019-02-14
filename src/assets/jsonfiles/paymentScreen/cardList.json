@@ -1,0 +1,28 @@
+{
+    "cards": [
+        {
+            "id": 1,
+            "image": "../../../assets/images/paymentScreen/bitcoin1.jpg",
+            "title": "Daily CBP",
+            "desc": "Regular Account",
+            "amount": "$ 5000.00",
+            "cardColor": "#ec2f5e"
+        },
+        {
+            "id": 2,
+            "image": "../../../assets/images/paymentScreen/bitcoin2.jpg",
+            "title": "React-Native",
+            "desc": "In Regualr Account",
+            "amount": "$ 120.00",
+            "cardColor": "#339900"
+        },
+        {
+            "id": 3,
+            "image": "../../../assets/images/paymentScreen/bitcoin1.jpg",
+            "title": "Swift 4.2",
+            "desc": "IOS New Lang",
+            "amount": "$ 200.50",
+            "cardColor": "#7993a5"
+        }  
+    ]
+}

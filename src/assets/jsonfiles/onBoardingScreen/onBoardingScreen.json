@@ -1,0 +1,22 @@
+{
+  "onBoarding": [
+    {
+      "backgroundColor": "#FFD900",
+      "image": "images.onBoardingScreen.onB1",
+      "title": "The Future of Money",
+      "subtitle": "We are passionate about open blockchains and the potential it offers for the world of finance. Contact us to know more. "
+    },  
+    {
+      "backgroundColor": "#FFD900",
+      "image": "images.onBoardingScreen.onB2",
+      "title": "How You’re Protected",
+      "subtitle": "While money needs to be smart, more importantly it needs to be secure. We are very keen to use the best industry standards in software delivery and cryptography to ensure this."
+    },
+    {   
+      "backgroundColor": "#FFD900",
+      "image": "images.onBoardingScreen.onB3",
+      "title": "Why Us?",
+      "subtitle": "If you are interested in open blockchains which are permission less and smart contracts built on them then this is where you belong. Please contact us for further details."
+    }
+  ]
+}

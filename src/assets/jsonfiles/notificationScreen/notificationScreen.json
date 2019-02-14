@@ -1,0 +1,52 @@
+{
+    "notification": [
+        {
+            "id": 1,
+            "icon": "https://facebook.github.io/react-native/docs/assets/favicon.png",
+            "title": "Programmable money on open blockchains is the future of finance. Helping companies/ individuals make #crypto & #bitcoin a part of their financial infrastructure",   
+            "desc": "Regular Account"
+        },
+        {
+            "id": 2,
+            "icon": "rupee",
+            "title": "Sent/Receive",
+            "desc": "In Regualr Account"
+        },
+        {    
+            "id": 2,
+            "icon": "user-circle",
+            "title": "Account Settings",
+            "desc": "In Regualr Account"
+        },
+        {
+            "id": 3,
+            "icon": "cog",
+            "title": "Security",
+            "desc": "IOS New Lang"
+        },
+        {
+            "id": 4,
+            "icon": "question-circle",
+            "title": "Help",
+            "desc": "IOS New Lang"
+        },
+        {
+            "id": 5,
+            "icon": "bars",
+            "title": "Invite",
+            "desc": "IOS New Lang"
+        },
+        {
+            "id": 6,
+            "icon": "university",
+            "title": "Bank Accounts",
+            "desc": "IOS New Lang"
+        },
+        {
+            "id": 7,
+            "icon": "sign-out",
+            "title": "Logout",
+            "desc": "IOS New Lang"
+        }
+    ]
+}
