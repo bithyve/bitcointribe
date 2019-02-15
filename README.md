@@ -46,3 +46,5 @@ rn-nodeify --install --hack
 Please feel free to open a pull requests and issues with bugfixes and suggestions.
 
 ## License
+
+[MIT](LICENSE)
