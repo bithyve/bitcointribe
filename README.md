@@ -22,7 +22,7 @@ All accounts are protected by a pin which is required to unlock the BitHyve Wall
 
 ## Design Considerations
 
-The various design considerations that BitHyve chose to undertake are over at [the wiki](https://github.com/thecryptobee/BitHyve Wallet/wiki/Design-Considerations)
+The various design considerations that BitHyve chose to undertake are over at [the wiki](https://github.com/thecryptobee/BitHyve-Wallet/wiki/Design-Considerations)
 
 ## Build / Local Setup
 
