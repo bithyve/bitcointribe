@@ -1,41 +1,41 @@
 import bitcoinJS, { Network } from "bitcoinjs-lib";
+import config from "react-native-config";
 
 class Config {
   public ENVIRONMENT: string;
   public NETWORK: Network;
-  public WALLET_XPUB_PATH: string = "2147483651/2147483649/";
-  public DERIVATION_BRANCH: string = "1";
-  //public TOKEN: string; //please enter your blockcypher token here; commited
-  public BREADTH: number = 5;
+  public WALLET_XPUB_PATH: string = config.BIT_WALLET_XPUB_PATH;
+  public DERIVATION_BRANCH: string = config.BIT_DERIVATION_BRANCH;
+  public TOKEN: string = config.BIT_BLOCKCYPHER_API_URLS_TOKEN;
   public BH_SERVER = {
-    DEV: "http://localhost:3000",
-    PROD: "https://prime-sign-230407.appspot.com"
+    DEV: config.BIT_API_URLS_BH_SERVER_DEV,
+    PROD: config.BIT_API_URLS_BH_SERVER_PROD
   };
   public API_URLS = {
     TESTNET: {
-      BASE: "https://api.blockcypher.com/v1/btc/test3",
-      BALANCE_CHECK: "https://testnet.blockchain.info/balance?active=",
-      UNSPENT_OUTPUTS: "https://testnet.blockchain.info/unspent?active=",
-      BROADCAST: "https://testnet-api.smartbit.com.au/v1/blockchain/pushtx",
-      TX_DECODE: "https://testnet-api.smartbit.com.au/v1/blockchain/decodetx",
+      BASE: config.BIT_API_URLS_TESTNET_BASE,
+      BALANCE_CHECK: config.BIT_API_URLS_TESTNET_BALANCE_CHECK,
+      UNSPENT_OUTPUTS: config.BIT_API_URLS_TESTNET_UNSPENT_OUTPUTS,
+      BROADCAST: config.BIT_API_URLS_TESTNET_BROADCAST,
+      TX_DECODE: config.BIT_API_URLS_TESTNET_TX_DECODE,
       TX_FETCH: {
-        URL: "https://testnet.blockchain.info/rawaddr/",
-        LIMIT: "?limit="
+        URL: config.BIT_API_URLS_TESTNET_TX_FETCH_URL,
+        LIMIT: config.BIT_API_URLS_TESTNET_TX_LIMIT
       },
       FUND: {
-        URL: "https://api.blockcypher.com/v1/btc/test3/faucet?token=",
-        TOKEN: "0d55b026eb934aa8b4de8a11bdcc16f1"
+        URL: config.BIT_API_URLS_TESTNET_FUND_URL,
+        TOKEN: config.BIT_API_URLS_TESTNET_TOKEN
       }
     },
     MAINNET: {
-      BASE: "https://api.blockcypher.com/v1/btc/main",
-      BALANCE_CHECK: "https://blockchain.info/balance?active=",
-      UNSPENT_OUTPUTS: "https://blockchain.info/unspent?active=",
-      BROADCAST: "https://api.smartbit.com.au/v1/blockchain/pushtx",
-      TX_DECODE: "https://api.smartbit.com.au/v1/blockchain/decodetx",
+      BASE: config.BIT_API_URLS_MAINNET_BASE,
+      BALANCE_CHECK: config.BIT_API_URLS_MAINNET_BALANCE_CHECK,
+      UNSPENT_OUTPUTS: config.BIT_API_URLS_MAINNET_UNSPENT_OUTPUTS,
+      BROADCAST: config.BIT_API_URLS_MAINNET_BROADCAST,
+      TX_DECODE: config.BIT_API_URLS_MAINNET_TX_DECODE,
       TX_FETCH: {
-        URL: "https://blockchain.info/rawaddr/",
-        LIMIT: "?limit="
+        URL: config.BIT_API_URLS_MAINNET_TX_FETCH_URL,
+        LIMIT: config.BIT_API_URLS_MAINNET_TX_LIMIT
       }
     }
   };
@@ -56,4 +56,4 @@ class Config {
   };
 }
 
-export default new Config("DEV");
+export default new Config(config.BIT_ENVIRONMENT);
