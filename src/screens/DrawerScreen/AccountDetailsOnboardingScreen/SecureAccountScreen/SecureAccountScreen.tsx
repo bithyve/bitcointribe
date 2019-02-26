@@ -16,11 +16,11 @@ import DropdownAlert from "react-native-dropdownalert";
 import Loader from "react-native-modal-loader";
 
 //TODO: Custome class
-import { colors, images, localDB } from "../../../../app/constants/Constants";
-var dbOpration = require("../../../../app/manager/database/DBOpration");
+import { colors, images, localDB } from "bithyve/src/app/constants/Constants";
+var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
 
 //TODO: SecureAccount
-import secureAccount from "../../../../bitcoin/services/SecureAccount";
+import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
 
 export default class SecureAccountScreen extends React.Component {
   constructor(props: any) {
@@ -81,7 +81,7 @@ export default class SecureAccountScreen extends React.Component {
               </Left>
               <Body style={{ flex: 0, alignItems: "center" }}>
                 <Title />
-              </Body>   
+              </Body>
               <Right />
             </Header>
 
@@ -91,9 +91,7 @@ export default class SecureAccountScreen extends React.Component {
                 source={images.secureAccount.secureLogo}
               />
               <Text style={styles.txtTitle}>Secure Account</Text>
-              <Text style={styles.txtNote}>
-                
-              </Text>
+              <Text style={styles.txtNote} />
             </View>
             <View style={styles.createAccountBtn}>
               <Button

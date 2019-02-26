@@ -18,13 +18,13 @@ android {
 ...
 defaultConfig { ... }
 
-  signingConfigs {
+signingConfigs {
 release {
 storeFile file("mymoney.keystore")  
  storePassword "developer"
 keyAlias "mymoney"  
  keyPassword "developer"  
- }     
+ }  
  }
 
 ===========> OR <<===============
@@ -71,8 +71,9 @@ Custom node_modules/react-native/react.gradle to solve the Duplicate file error 
     moveFunc.curry("xhdpi").call()
     moveFunc.curry("xxhdpi").call()
     moveFunc.curry("xxxhdpi").call()
-}  
-  
+
+}
+
 cd android && ./gradlew clean
 cd android
 ./gradlew assembleRelease
@@ -81,7 +82,7 @@ cd android
 1)settings.gradle (04/12/2018)
 include ':react-native-sqlite-storage'
 project(':react-native-sqlite-storage').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sqlite-storage/src/android')
-  
+
 2)android/app/build.gradle (04/12/2018)
 
 dependencies {

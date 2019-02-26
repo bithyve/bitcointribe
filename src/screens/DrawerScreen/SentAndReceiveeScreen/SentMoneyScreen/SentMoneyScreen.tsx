@@ -25,20 +25,27 @@ import Loader from "react-native-modal-loader";
 import DropdownAlert from "react-native-dropdownalert";
 
 //Custome Compontes
-import SCLAlertOk from "../../../../app/custcompontes/alert/SCLAlertOk";
-import DialogSecureAccountAuthentication from "../../../../app/custcompontes/dialog/DialogSecureAccountAuthentication";
+import SCLAlertOk from "bithyve/src/app/custcompontes/alert/SCLAlertOk";
+import DialogSecureAccountAuthentication from "bithyve/src/app/custcompontes/dialog/DialogSecureAccountAuthentication";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "../../../../app/constants/Constants";
-var dbOpration = require("../../../../app/manager/database/DBOpration");
+import {
+  colors,
+  images,
+  localDB,
+  msg,
+  errorMessage,
+  errorValidMsg
+} from "bithyve/src/app/constants/Constants";
+var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
 
 //TODO: Wallets
-import RegularAccount from "../../../../bitcoin/services/RegularAccount";
+import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
 
 //TODO: SecureAccount
-import secureAccount from "../../../../bitcoin/services/SecureAccount";
-import vaultAccount from "../../../../bitcoin/services/VaultAccount";
-import jointAccount from "../../../../bitcoin/services/JointAccount";
+import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
+import vaultAccount from "bithyve/src/bitcoin/services/VaultAccount";
+import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
 
 export default class SentMoneyScreen extends React.Component {
   constructor() {
@@ -179,7 +186,7 @@ export default class SentMoneyScreen extends React.Component {
                     status: true,
                     icon: "smile",
                     title: "Success",
-                    subtitle: "Transaction Successfully Completed.",
+                    subtitle: msg.transactionSccuess,
                     goBackStatus: true
                   }
                 ]
@@ -193,7 +200,7 @@ export default class SentMoneyScreen extends React.Component {
                     status: true,
                     icon: "frown",
                     title: "Oops",
-                    subtitle: "Transaction Not Completed.",
+                    subtitle: errorMessage.transactionFailed,
                     goBackStatus: false
                   }
                 ]
@@ -256,7 +263,7 @@ export default class SentMoneyScreen extends React.Component {
                     status: true,
                     icon: "smile",
                     title: "Success",
-                    subtitle: "Transaction Successfully Completed.",
+                    subtitle: msg.transactionSccuess,
                     goBackStatus: true
                   }
                 ]
@@ -270,7 +277,7 @@ export default class SentMoneyScreen extends React.Component {
                     status: true,
                     icon: "frown",
                     title: "Oops",
-                    subtitle: "Transaction Not Completed.",
+                    subtitle: errorMessage.transactionFailed,
                     goBackStatus: false
                   }
                 ]
@@ -286,11 +293,6 @@ export default class SentMoneyScreen extends React.Component {
 
   //TODO: func openQRCodeScanner
   async openQRCodeScanner() {
-    try {
-      AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(true));
-    } catch (error) {
-      // Error saving data
-    }
     this.props.navigation.navigate("QrcodeScannerScreen", {
       onSelect: this.onSelect
     });
@@ -346,7 +348,7 @@ export default class SentMoneyScreen extends React.Component {
                 status: true,
                 icon: "smile",
                 title: "Success",
-                subtitle: "Transaction Successfully Completed.",
+                subtitle: msg.transactionSccuess,
                 goBackStatus: true
               }
             ]
@@ -376,7 +378,7 @@ export default class SentMoneyScreen extends React.Component {
             status: true,
             icon: "frown",
             title: "Oops",
-            subtitle: "Transaction Not Completed.",
+            subtitle: errorMessage.transactionFailed,
             goBackStatus: false
           }
         ]
@@ -421,7 +423,19 @@ export default class SentMoneyScreen extends React.Component {
                 onChangeText={val => this.validation(val, "address")}
                 onChange={val => this.validation(val, "address")}
               />
-              <TouchableOpacity onPress={() => this.openQRCodeScanner()}>
+              <TouchableOpacity
+                onPress={() => {
+                  try {
+                    AsyncStorage.setItem(
+                      "flag_BackgoundApp",
+                      JSON.stringify(false)
+                    );
+                  } catch (error) {
+                    // Error saving data
+                  }
+                  this.openQRCodeScanner();
+                }}
+              >
                 <Icon
                   style={{ alignItems: "flex-end", justifyContent: "flex-end" }}
                   name="barcode"
@@ -462,7 +476,7 @@ export default class SentMoneyScreen extends React.Component {
                 this.dropdown.alertWithType(
                   "error",
                   "OH",
-                  "Please enter token."
+                  errorValidMsg.enterToken
                 );
               } else {
                 this.setState({

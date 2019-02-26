@@ -27,15 +27,20 @@ import { SkypeIndicator } from "react-native-indicators";
 import DropdownAlert from "react-native-dropdownalert";
 
 //Custome Compontes
-import SCLAlertAccountTypes from "../../../app/custcompontes/alert/SCLAlertAccountTypes";
-import ViewRecentTransaction from "../../../app/custcompontes/view/ViewRecentTransaction";
+import SCLAlertAccountTypes from "bithyve/src/app/custcompontes/alert/SCLAlertAccountTypes";
+import ViewRecentTransaction from "bithyve/src/app/custcompontes/view/ViewRecentTransaction";
 
 //TODO: Custome object
-import { colors, images, localDB } from "../../../app/constants/Constants";
-var dbOpration = require("../../../app/manager/database/DBOpration");
-var utils = require("../../../app/constants/Utils");
-import renderIf from "../../../app/constants/validation/renderIf";
-import Singleton from "../../../app/constants/Singleton";
+import {
+  colors,
+  images,
+  localDB,
+  errorMessage
+} from "bithyve/src/app/constants/Constants";
+var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
+var utils = require("bithyve/src/app/constants/Utils");
+import renderIf from "bithyve/src/app/constants/validation/renderIf";
+import Singleton from "bithyve/src/app/constants/Singleton";
 
 let isNetwork: boolean;
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
@@ -54,7 +59,7 @@ const itemWidth = slideWidth + itemHorizontalMargin * 2;
 const SLIDER_1_FIRST_ITEM = 0;
 
 //TODO: Wallets
-import RegularAccount from "../../../bitcoin/services/RegularAccount";
+import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
 
 export default class AccountsScreen extends React.Component<any, any> {
   constructor(props: any) {
@@ -413,11 +418,7 @@ export default class AccountsScreen extends React.Component<any, any> {
     if (isNetwork) {
       this.setState({ accountTypeVisible: !this.state.accountTypeVisible });
     } else {
-      this.dropdown.alertWithType(
-        "info",
-        "OH",
-        "Sorry You're Not Connected to the Internet"
-      );
+      this.dropdown.alertWithType("info", "OH", errorMessage.offline);
     }
   }
 

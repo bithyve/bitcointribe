@@ -104,3 +104,24 @@ npm run issuemodel
 
 Open android/app/build.gradle and add the following:  
  apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+
+### Android dependency 'com.android.support:support-v4' has different version for the compile (26.1.0) and runtime (27.1.1) classpath. You should manually set the same version via DependencyResolution
+
+android/build.gradle
+
+subprojects {
+project.configurations.all {
+resolutionStrategy.eachDependency { details ->
+if (details.requested.group == 'com.android.support'
+&& !details.requested.name.contains('multidex') ) {
+details.useVersion "26.1.0"
+}
+}
+}
+}
+
+### Failed to capture snapshot of input files for task ':app:preDebugBuild' property 'runtimeManifests' during up-to-date check.
+
+> The library com.google.android.gms:play-services-base is being requested by various other libraries at [[15.0.1,15.0.1]], but resolves to 16.0.1. Disable the plugin and check your dependencies tree using ./gradlew :app:dependencies.
+> add this line
+> classpath 'com.google.gms:google-services:3.2.1'

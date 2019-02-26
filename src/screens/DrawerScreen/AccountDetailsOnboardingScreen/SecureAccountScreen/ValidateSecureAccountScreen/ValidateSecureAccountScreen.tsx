@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  Image,  
+  Image,
   Platform,
   StyleSheet,
   View,
@@ -26,19 +26,20 @@ import Loader from "react-native-modal-loader";
 //TODO: Custome Pages
 import {
   colors,
-  images,    
-  localDB
-} from "../../../../../app/constants/Constants";
-var dbOpration = require("../../../../../app/manager/database/DBOpration");
+  images,
+  localDB,
+  errorMessage,
+  msg
+} from "bithyve/src/app/constants/Constants";
+var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
 const { width } = Dimensions.get("screen");
-  
-//Custome Compontes
-import SCLAlertOk from "../../../../../app/custcompontes/alert/SCLAlertOk";
-//TODO: Wallets
-import RegularAccount from "../../../../../bitcoin/services/RegularAccount";
-//TODO: SecureAccount
-import secureAccount from "../../../../../bitcoin/services/SecureAccount";
 
+//Custome Compontes
+import SCLAlertOk from "bithyve/src/app/custcompontes/alert/SCLAlertOk";
+//TODO: Wallets
+import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
+//TODO: SecureAccount
+import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
 
 export default class ValidateSecureAccountScreen extends React.Component {
   constructor(props: any) {
@@ -129,8 +130,7 @@ export default class ValidateSecureAccountScreen extends React.Component {
               status: true,
               icon: "frown",
               title: "Oops",
-              subtitle:
-                "Invalid token number.Please enter correct token number.",
+              subtitle: errorMessage.invalidToken,
               goBackStatus: false
             }
           ]
@@ -150,10 +150,10 @@ export default class ValidateSecureAccountScreen extends React.Component {
       localDB.tableName.tblAccount,
       fulldate,
       address,
-      "BTC",  
+      "BTC",
       "Secure",
       "Secure",
-      sercureData  
+      sercureData
     );
     if (resultCreateAccount) {
       this.setState({
@@ -164,7 +164,7 @@ export default class ValidateSecureAccountScreen extends React.Component {
             status: true,
             icon: "smile",
             title: "Success",
-            subtitle: "Secure account Created.",
+            subtitle: msg.successSecureAccount,
             goBackStatus: true
           }
         ]

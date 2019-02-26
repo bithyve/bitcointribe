@@ -11,10 +11,10 @@ import {
   Body
 } from "native-base";
 //Custome Compontes
-import ViewOnBoarding from "../../../app/custcompontes/view/ViewOnBoarding";
+import ViewOnBoarding from "bithyve/src/app/custcompontes/view/ViewOnBoarding";
 import Icon from "react-native-vector-icons/FontAwesome5";
 //TODO: Custome object
-import { images } from "../../../app/constants/Constants";
+import { images, msg } from "bithyve/src/app/constants/Constants";
 export default class AccountDetailsOnboardingScreen extends Component<
   any,
   any
@@ -28,7 +28,6 @@ export default class AccountDetailsOnboardingScreen extends Component<
   }
 
   //TODO: Page Life Cycle
-
   componentWillMount() {
     const { navigation } = this.props;
     const type = navigation.getParam("type");
@@ -39,23 +38,20 @@ export default class AccountDetailsOnboardingScreen extends Component<
           {
             backgroundColor: "#fff",
             image: images.accountDetailsOnBoarding.secureAccount.img1,
-            title: "",
-            subtitle:
-              "Secure your wallet with state of art the Google Authenticator based 2FA."
+            title: msg.accountDetails.secure.title1,
+            subtitle: msg.accountDetails.secure.subTitle1
           },
           {
             backgroundColor: "#fff",
             image: images.accountDetailsOnBoarding.secureAccount.img2,
-            title: "",
-            subtitle:
-              "Enter/scan the code in your Google Authenticator App and you are ready."
+            title: msg.accountDetails.secure.title2,
+            subtitle: msg.accountDetails.secure.subTitle2
           },
           {
             backgroundColor: "#fff",
             image: images.accountDetailsOnBoarding.secureAccount.img3,
-            title: "",
-            subtitle:
-              "Keep the code, MyMoneyApp pub key and the secondary mnenmonic safe and secure in a separate location."
+            title: msg.accountDetails.secure.title3,
+            subtitle: msg.accountDetails.secure.subTitle3
           }
         ],
         type: type
@@ -66,44 +62,39 @@ export default class AccountDetailsOnboardingScreen extends Component<
           {
             backgroundColor: "#fff",
             image: images.accountDetailsOnBoarding.jointAccount.img1,
-            title: "",
-            subtitle:
-              "Create a Joint Account in less than a minute with your partner/friend across the globe. Enter your name and name the account to generate a QR Code."
+            title: msg.accountDetails.joint.title1,
+            subtitle: msg.accountDetails.joint.subTitle1
           },
           {
             backgroundColor: "#fff",
             image: images.accountDetailsOnBoarding.jointAccount.img2,
-            title: "",
-            subtitle:
-              "Other party scans the QR code and sends an acknowledgement. As soon as you acknowledge your account is ready for action."
+            title: msg.accountDetails.joint.title2,
+            subtitle: msg.accountDetails.joint.subTitle2
           },
           {
             backgroundColor: "#fff",
             image: images.accountDetailsOnBoarding.jointAccount.img3,
-            title: "",   
-            subtitle:
-              "Any of you can initiate the transaction but needs to be signed by both."
+            title: msg.accountDetails.joint.title3,
+            subtitle: msg.accountDetails.joint.subTitle3
           }
         ],
         type: type
       });
     } else {
       this.setState({
-        data: [    
+        data: [
           {
             backgroundColor: "#fff",
             image: images.accountDetailsOnBoarding.vaultAccount.img1,
-            title: "",
-            subtitle:
-              "Save your funds for important occasions by locking them up for a pre-set duration."
-          },  
+            title: msg.accountDetails.vault.title1,
+            subtitle: msg.accountDetails.vault.subTitle1
+          },
           {
             backgroundColor: "#fff",
             image: images.accountDetailsOnBoarding.vaultAccount.img2,
-            title: "",
-            subtitle:
-              "Your funds are released and ready to use on the pre-set date."
-          }  
+            title: msg.accountDetails.vault.title2,
+            subtitle: msg.accountDetails.vault.subTitle2
+          }
         ],
         type: type
       });

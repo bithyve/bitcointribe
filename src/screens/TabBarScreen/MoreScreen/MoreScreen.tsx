@@ -10,7 +10,7 @@ import {
   Container,
   Header,
   Title,
-  Content,  
+  Content,
   Button,
   Left,
   Right,
@@ -21,7 +21,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import GridView from "react-native-super-grid";
 
 //TODO: Custome Pages
-import { colors, images } from "../../../app/constants/Constants";
+import { colors, images } from "bithyve/src/app/constants/Constants";
 export default class MoreScreen extends React.Component {
   constructor(props) {
     super(props);

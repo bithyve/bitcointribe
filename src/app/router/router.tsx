@@ -8,48 +8,48 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome";
 
 //OnBoarding
-import OnBoardingScreen from "../../screens/WalletScreen/OnBoardingScreen/OnBoardingScreen";
-import BackupPhraseScreen from "../../screens/WalletScreen/BackupPhraseScreen/BackupPhraseScreen";
-import VerifyBackupPhraseScreen from "../../screens/WalletScreen/VerifyBackupPhraseScreen/VerifyBackupPhraseScreen";
+import OnBoardingScreen from "bithyve/src/screens/WalletScreen/OnBoardingScreen/OnBoardingScreen";
+import BackupPhraseScreen from "bithyve/src/screens/WalletScreen/BackupPhraseScreen/BackupPhraseScreen";
+import VerifyBackupPhraseScreen from "bithyve/src/screens/WalletScreen/VerifyBackupPhraseScreen/VerifyBackupPhraseScreen";
 //Passcode
-import PasscodeScreen from "../../screens/PasscodeScreen/PasscodeScreen";
-import PasscodeConfirmScreen from "../../screens/PasscodeScreen/PasscodeConfirmScreen";
+import PasscodeScreen from "bithyve/src/screens/PasscodeScreen/PasscodeScreen";
+import PasscodeConfirmScreen from "bithyve/src/screens/PasscodeScreen/PasscodeConfirmScreen";
 
 //Tabbar Bottom
-import PaymentScreen from "../../screens/TabBarScreen/PaymentScreen/PaymentScreen";
-import AnalyticsScreen from "../../screens/TabBarScreen/AnalyticsScreen/AnalyticsScreen";
-import AccountsScreen from "../../screens/TabBarScreen/AccountsScreen/AccountsScreen";
-import CardsScreen from "../../screens/TabBarScreen/CardsScreen/CardsScreen";
-import MoreScreen from "../../screens/TabBarScreen/MoreScreen/MoreScreen";
+import PaymentScreen from "bithyve/src/screens/TabBarScreen/PaymentScreen/PaymentScreen";
+import AnalyticsScreen from "bithyve/src/screens/TabBarScreen/AnalyticsScreen/AnalyticsScreen";
+import AccountsScreen from "bithyve/src/screens/TabBarScreen/AccountsScreen/AccountsScreen";
+import CardsScreen from "bithyve/src/screens/TabBarScreen/CardsScreen/CardsScreen";
+import MoreScreen from "bithyve/src/screens/TabBarScreen/MoreScreen/MoreScreen";
 
 //Left DrawerScreen
-import AccountSettingScreen from "../../screens/DrawerScreen/AccountSettingScreen/AccountSettingScreen";
-import SecurityScreen from "../../screens/DrawerScreen/SecurityScreen/SecurityScreen";
-import HelpScreen from "../../screens/DrawerScreen/HelpScreen/HelpScreen";
-import InviteScreen from "../../screens/DrawerScreen/InviteScreen/InviteScreen";
-import BankAccountScreen from "../../screens/DrawerScreen/BankAccountScreen/BankAccountScreen";
-import LogoutScreen from "../../screens/DrawerScreen/LogoutScreen/LogoutScreen";
-import DrawerScreen from "../../screens/DrawerScreen/DrawerScreen/DrawerScreen";
-import SentAndReceiveeScreen from "../../screens/DrawerScreen/SentAndReceiveeScreen/SentAndReceiveeScreen";
-import SentMoneyScreen from "../../screens/DrawerScreen/SentAndReceiveeScreen/SentMoneyScreen/SentMoneyScreen";
-import ReceiveMoneyScreen from "../../screens/DrawerScreen/SentAndReceiveeScreen/ReceiveMoneyScreen/ReceiveMoneyScreen";
-import QrcodeScannerScreen from "../../screens/DrawerScreen/SentAndReceiveeScreen/QrcodeScannerScreen/QrcodeScannerScreen";
+import AccountSettingScreen from "bithyve/src/screens/DrawerScreen/AccountSettingScreen/AccountSettingScreen";
+import SecurityScreen from "bithyve/src/screens/DrawerScreen/SecurityScreen/SecurityScreen";
+import HelpScreen from "bithyve/src/screens/DrawerScreen/HelpScreen/HelpScreen";
+import InviteScreen from "bithyve/src/screens/DrawerScreen/InviteScreen/InviteScreen";
+import BankAccountScreen from "bithyve/src/screens/DrawerScreen/BankAccountScreen/BankAccountScreen";
+import LogoutScreen from "bithyve/src/screens/DrawerScreen/LogoutScreen/LogoutScreen";
+import DrawerScreen from "bithyve/src/screens/DrawerScreen/DrawerScreen/DrawerScreen";
+import SentAndReceiveeScreen from "bithyve/src/screens/DrawerScreen/SentAndReceiveeScreen/SentAndReceiveeScreen";
+import SentMoneyScreen from "bithyve/src/screens/DrawerScreen/SentAndReceiveeScreen/SentMoneyScreen/SentMoneyScreen";
+import ReceiveMoneyScreen from "bithyve/src/screens/DrawerScreen/SentAndReceiveeScreen/ReceiveMoneyScreen/ReceiveMoneyScreen";
+import QrcodeScannerScreen from "bithyve/src/screens/DrawerScreen/SentAndReceiveeScreen/QrcodeScannerScreen/QrcodeScannerScreen";
 
-import AccountsDetailsScreen from "../../screens/DrawerScreen/AccountsDetailsScreen/AccountsDetailsScreen";
-import RecentTransactionsScreen from "../../screens/TabBarScreen/AccountsScreen/RecentTransactionsScreen/RecentTransactionsScreen";
-import TransactionDetailsWebViewScreen from "../../screens/TabBarScreen/AccountsScreen/RecentTransactionsScreen/TransactionDetailsWebViewScreen/TransactionDetailsWebViewScreen";
+import AccountsDetailsScreen from "bithyve/src/screens/DrawerScreen/AccountsDetailsScreen/AccountsDetailsScreen";
+import RecentTransactionsScreen from "bithyve/src/screens/TabBarScreen/AccountsScreen/RecentTransactionsScreen/RecentTransactionsScreen";
+import TransactionDetailsWebViewScreen from "bithyve/src/screens/TabBarScreen/AccountsScreen/RecentTransactionsScreen/TransactionDetailsWebViewScreen/TransactionDetailsWebViewScreen";
 
 //TODO:  Account
-import AccountDetailsOnboardingScreen from "../../screens/DrawerScreen/AccountDetailsOnboardingScreen/AccountDetailsOnboardingScreen";
-import SecureAccountScreen from "../../screens/DrawerScreen/AccountDetailsOnboardingScreen/SecureAccountScreen/SecureAccountScreen";
-import SecureSecretKeyScreen from "../../screens/DrawerScreen/AccountDetailsOnboardingScreen/SecureAccountScreen/SecureSecretKeyScreen/SecureSecretKeyScreen";
-import ValidateSecureAccountScreen from "../../screens/DrawerScreen/AccountDetailsOnboardingScreen/SecureAccountScreen/ValidateSecureAccountScreen/ValidateSecureAccountScreen";
-import CreateJointAccountScreen from "../../screens/DrawerScreen/AccountDetailsOnboardingScreen/JointAccountScreen/CreateJointAccountScreen";
-import MergeConfirmJointAccountScreen from "../../screens/DrawerScreen/AccountDetailsOnboardingScreen/JointAccountScreen/MergeConfirmJointAccountScreen";
+import AccountDetailsOnboardingScreen from "bithyve/src/screens/DrawerScreen/AccountDetailsOnboardingScreen/AccountDetailsOnboardingScreen";
+import SecureAccountScreen from "bithyve/src/screens/DrawerScreen/AccountDetailsOnboardingScreen/SecureAccountScreen/SecureAccountScreen";
+import SecureSecretKeyScreen from "bithyve/src/screens/DrawerScreen/AccountDetailsOnboardingScreen/SecureAccountScreen/SecureSecretKeyScreen/SecureSecretKeyScreen";
+import ValidateSecureAccountScreen from "bithyve/src/screens/DrawerScreen/AccountDetailsOnboardingScreen/SecureAccountScreen/ValidateSecureAccountScreen/ValidateSecureAccountScreen";
+import CreateJointAccountScreen from "bithyve/src/screens/DrawerScreen/AccountDetailsOnboardingScreen/JointAccountScreen/CreateJointAccountScreen";
+import MergeConfirmJointAccountScreen from "bithyve/src/screens/DrawerScreen/AccountDetailsOnboardingScreen/JointAccountScreen/MergeConfirmJointAccountScreen";
 
-import VaultAccountScreen from "../../screens/DrawerScreen/AccountDetailsOnboardingScreen/VaultAccountScreen/VaultAccountScreen";
+import VaultAccountScreen from "bithyve/src/screens/DrawerScreen/AccountDetailsOnboardingScreen/VaultAccountScreen/VaultAccountScreen";
 //Right DrawerScreen
-import NotificationScreen from "../../screens/DrawerScreen/NotificationScreen/NotificationScreen";
+import NotificationScreen from "bithyve/src/screens/DrawerScreen/NotificationScreen/NotificationScreen";
 
 //TODO: StackNavigator
 

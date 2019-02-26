@@ -13,15 +13,19 @@ import {
   CardItem
 } from "native-base";
 import Icon from "react-native-vector-icons/FontAwesome";
-  
+
 //TODO: Custome Pages
-import { colors, images, localDB } from "../../../app/constants/Constants";
+import {
+  colors,
+  images,
+  localDB,
+  errorMessage
+} from "bithyve/src/app/constants/Constants";
 import SQLite from "react-native-sqlite-storage";
 var db = SQLite.openDatabase(localDB.dbName, "1.0", "MyMoney Database", 200000);
 
 //TODO: Wallets
-//var RegularAccount = require("../../../bitcoin/services/wallet");
-import RegularAccount from "../../../bitcoin/services/RegularAccount";
+import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
 
 export default class SentAndReceiveeScreen extends React.Component {
   constructor(props) {
@@ -64,7 +68,7 @@ export default class SentAndReceiveeScreen extends React.Component {
               privateKey: privateKeyValue
             });
           } else {
-            Alert.alert("Address not found");
+            Alert.alert(errorMessage.addressNotFound);
           }
         }
       );
@@ -139,8 +143,8 @@ export default class SentAndReceiveeScreen extends React.Component {
                     jsonData.address = this.state.addressKey;
                     this.props.navigation.push("ReceiveMoneyScreen", {
                       page: "SentAndReceiveScreen",
-                      data: jsonData    
-                    });   
+                      data: jsonData
+                    });
                   }}
                 >
                   <Text style={styles.txtButtonTitle}> RECEIVE </Text>

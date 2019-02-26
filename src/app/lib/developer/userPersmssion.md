@@ -9,6 +9,7 @@
 </array>
 </dict>  
 </array>
+
 <key>NSPhotoLibraryUsageDescription</key>
 <string>$(PRODUCT_NAME) would like access to your photo gallery</string>
   <key>NSCameraUsageDescription</key>

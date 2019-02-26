@@ -76,9 +76,12 @@ project.ext.react = [
     entryFile: "index.js"
 ]
 
-apply from: "../../node_modules/react-native/react.gradle"   
+apply from: "../../node_modules/react-native/react.gradle"
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
-  
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
+
+
+
 /**
  * Set this to true to create two separate APKs instead of one:
  *   - An APK that only works on ARM devices
@@ -94,17 +97,9 @@ def enableSeparateBuildPerCPUArchitecture = false
  */
 def enableProguardInReleaseBuilds = false
 
-
-
-
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-  
-  packagingOptions {
-    pickFirst '**/libgnustl_shared.so'
-}   
-   
 
     defaultConfig {
         applicationId "com.mymoney"
@@ -116,7 +111,9 @@ android {
             abiFilters "armeabi-v7a", "x86"
         }
     }
-    
+    packagingOptions {
+          pickFirst '**/libgnustl_shared.so'
+      }
     splits {
         abi {
             reset()
@@ -125,21 +122,20 @@ android {
             include "armeabi-v7a", "x86"
         }
     }
-
     signingConfigs {
 release {
-storeFile file("mymoney.keystore")  
+storeFile file("mymoney.keystore")
  storePassword "developer"
-keyAlias "mymoney"  
- keyPassword "developer"  
- }     
+keyAlias "mymoney"
+ keyPassword "developer"
+ }
  }
     buildTypes {
         release {
-            aaptOptions.cruncherEnabled=false // here
+          aaptOptions.cruncherEnabled=false // here
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-         signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
         }
     }
     // applicationVariants are e.g. debug, release
@@ -162,13 +158,10 @@ configurations.all {
  resolutionStrategy {
         force 'org.webkit:android-jsc:r236355'
  }
-  }  
+  }
 
 dependencies {
-    compile project(':react-native-config')
-    compile project(':react-native-keychain')
-    compile project(':react-native-inappbrowser-reborn')
-    compile project(':react-native-sqlite-storage')  
+    compile project(':react-native-fcm')
     compile project(':react-native-vector-icons')
     compile project(':react-native-udp')
     compile project(':react-native-tcp')
@@ -177,17 +170,21 @@ dependencies {
     compile project(':react-native-spinkit')
     compile project(':react-native-share')
     compile project(':react-native-randombytes')
+    compile project(':react-native-push-notification')
     compile project(':react-native-os')
-    compile project(':react-native-material-kit')
-    compile project(':react-native-image-resizer')
+    compile project(':react-native-keychain')
+    compile project(':react-native-inappbrowser-reborn')
     compile project(':react-native-image-picker')
     compile project(':react-native-gesture-handler')
     compile project(':react-native-fs')
     compile project(':react-native-device-info')
+    compile project(':react-native-config')
     compile project(':react-native-camera')
+    compile project(':react-native-sqlite-storage')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules
+      implementation 'com.google.firebase:firebase-core:16.0.1'
 }
 
 // Run this once to be able to run the application with BUCK
@@ -196,3 +193,4 @@ task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
 }
+apply plugin: 'com.google.gms.google-services'
