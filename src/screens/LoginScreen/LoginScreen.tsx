@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 //TODO: Custome Pages
-import { images } from "../../app/constants/Constants";
+import { images } from "bithyve/src/app/constants/Constants";
 
 export default class LoginScreen extends React.Component {
   constructor(props) {

@@ -22,9 +22,9 @@ import * as Animatable from "react-native-animatable";
 import Accordion from "react-native-collapsible/Accordion";
 
 //TODO: Custome Pages
-import { colors, images } from "../../../../app/constants/Constants";
-var utils = require("../../../../app/constants/Utils");
-import renderIf from "../../../../app/constants/validation/renderIf";
+import { colors, images } from "bithyve/src/app/constants/Constants";
+var utils = require("bithyve/src/app/constants/Utils");
+import renderIf from "bithyve/src/app/constants/validation/renderIf";
 
 export default class RecentTransactionsScreen extends React.Component {
   constructor(props: any) {
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,1)"
   },
   inactive: {
-    backgroundColor: "rgba(245,252,255,1)",
+    backgroundColor: "rgba(245,252,255,1)"
   },
   //view:viewHashContent
   viewHashContent: {

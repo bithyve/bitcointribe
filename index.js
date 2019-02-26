@@ -3,12 +3,11 @@ import React from "react";
 import { createAppContainer } from "react-navigation";
 import { AsyncStorage, AppState, AppRegistry, Linking } from "react-native";
 import DeepLinking from "react-native-deep-linking";
-import "./shim";
-import { name as appName } from "./app.json";
-import { createRootNavigator } from "./src/app/router/router";
-// import LaunchScreen from "../"
-import LaunchScreen from "./src/screens/LaunchScreen/LaunchScreen";
-import Singleton from "./src/app/constants/Singleton";
+import "bithyve/shim";
+import { name as appName } from "bithyve/app.json";
+import { createRootNavigator } from "bithyve/src/app/router/router";
+import LaunchScreen from "bithyve/src/screens/LaunchScreen/LaunchScreen";
+import Singleton from "bithyve/src/app/constants/Singleton";
 
 export default class MyMoney extends React.Component {
   constructor(props: any) {
@@ -29,20 +28,17 @@ export default class MyMoney extends React.Component {
       let commonData = Singleton.getInstance();
       DeepLinking.addScheme("https://");
       Linking.addEventListener("url", this.handleUrl);
-
       DeepLinking.addRoute(
-        "/mobile.cmshuawei.com/jointAccountCreate",
+        "/prime-sign-230407.appspot.com/jointAccountCreate",
         response => {
-          // bithyve://jointAccountCreate
           console.log({
             response
           });
         }
       );
       DeepLinking.addRoute(
-        "/mobile.cmshuawei.com/jointAccountCreate/:script",
+        "/prime-sign-230407.appspot.com/ja/:script",
         response => {
-          // bithyve:///jointAccountCreate/pageName
           let res = response;
           console.log({
             res
@@ -51,13 +47,17 @@ export default class MyMoney extends React.Component {
         }
       );
       DeepLinking.addRoute(
-        "/mobile.cmshuawei.com/jointAccountCreate/:pageName/:script",
+        "/prime-sign-230407.appspot.com/ja/:pageName/:script",
         response => {
-          // bithyve://jointAccountCreate/pageName/100
           console.log({
             response
           });
-          let pageName = response.pageName;
+          var pageName;
+          if (response.pageName == "mck") {
+            pageName = "MergeConfirmJointAccountScreen";
+          } else if (response.pageName == "ca") {
+            pageName = "CreateJointAccountScreen";
+          }
           commonData.setRootViewController(pageName);
           commonData.setDeepLinkingUrl(response.script);
         }
@@ -73,51 +73,83 @@ export default class MyMoney extends React.Component {
         })
         .catch(err => console.error("An error occurred", err));
     } catch (error) {
-      // Error saving data
+      console.log({
+        error
+      });
     }
   }
 
   handleUrl = ({ url }) => {
-    let uri_dec = decodeURIComponent(url);
-    Linking.canOpenURL(url).then(supported => {
-      if (supported) {
-        DeepLinking.evaluateUrl(uri_dec);
-      }
-    });
+    try {
+      let uri_dec = decodeURIComponent(url);
+      Linking.canOpenURL(url).then(supported => {
+        if (supported) {
+          DeepLinking.evaluateUrl(uri_dec);
+        }
+      });
+    } catch (e) {
+      console.log({
+        e
+      });
+    }
   };
 
   componentWillUnmount() {
-    Linking.removeEventListener("url", this.handleUrl);
-    AppState.removeEventListener("change", this._handleAppStateChange);
+    try {
+      Linking.removeEventListener("url", this.handleUrl);
+      AppState.removeEventListener("change", this._handleAppStateChange);
+    } catch (e) {
+      console.log({
+        e
+      });
+    }
   }
 
   _handleAppStateChange = async nextAppState => {
-    var status = JSON.parse(await AsyncStorage.getItem("PasscodeCreateStatus"));
-    let flag_BackgoundApp = JSON.parse(
-      await AsyncStorage.getItem("flag_BackgoundApp")
-    );
-    if (status && flag_BackgoundApp) {
-      this.setState({
-        appState: AppState.currentState
-      });
-      if (this.state.appState.match(/inactive|background/)) {
-        console.log({
-          status
-        });
+    try {
+      var status = JSON.parse(
+        await AsyncStorage.getItem("PasscodeCreateStatus")
+      );
+      let flag_BackgoundApp = JSON.parse(
+        await AsyncStorage.getItem("flag_BackgoundApp")
+      );
+      if (status && flag_BackgoundApp) {
         this.setState({
-          status: true
+          appState: AppState.currentState
         });
-        console.log("forgound = " + this.state.status, this.state.isStartPage);
+        if (this.state.appState.match(/inactive|background/)) {
+          console.log({
+            status
+          });
+          this.setState({
+            status: true
+          });
+          console.log(
+            "forgound = " + this.state.status,
+            this.state.isStartPage
+          );
+        }
       }
+    } catch (e) {
+      console.log({
+        e
+      });
     }
   };
 
   onComplited(status, pageName) {
-    this.setState({
-      status: status,
-      isStartPage: pageName
-    });
+    try {
+      this.setState({
+        status: status,
+        isStartPage: pageName
+      });
+    } catch (e) {
+      console.log({
+        e
+      });
+    }
   }
+
   render() {
     const Layout = createRootNavigator(
       this.state.status,

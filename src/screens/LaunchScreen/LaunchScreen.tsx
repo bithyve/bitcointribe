@@ -8,8 +8,9 @@ import {
   Alert
 } from "react-native";
 
-import { colors } from "../../app/constants/Constants";
-import Singleton from "../../app/constants/Singleton";
+import { colors } from "bithyve/src/app/constants/Constants";
+import Singleton from "bithyve/src/app/constants/Singleton";
+
 import * as Keychain from "react-native-keychain";
 interface Props {
   onComplited: Function;
@@ -39,7 +40,7 @@ export default class LaunchScreen extends Component<Props, any> {
       <View style={styles.container}>
         <Image
           style={styles.appLogo}
-          source={require("../../assets/images/appLogo.png")}
+          source={require("bithyve/src/assets/images/appLogo.png")}
         />
         <Text style={styles.txtAppName}>MY MONEY</Text>
       </View>

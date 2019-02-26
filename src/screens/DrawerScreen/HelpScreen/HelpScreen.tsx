@@ -9,11 +9,11 @@ import {
   Left,
   Right,
   Body,
-  Text  
+  Text
 } from "native-base";
 import Icon from "react-native-vector-icons/FontAwesome";
 //TODO: Custome Pages
-import { images } from "../../../app/constants/Constants";
+import { images } from "bithyve/src/app/constants/Constants";
 export default class HelpScreen extends React.Component {
   render() {
     return (
