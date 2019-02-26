@@ -23,10 +23,10 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import Share from "react-native-share";
 
 //TODO: Custome Pages
-import { images } from "../../../app/constants/Constants";
+import { images } from "bithyve/src/app/constants/Constants";
 
 //TODO: Wallets
-import RegularAccount from "../../../bitcoin/services/RegularAccount";
+import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
 
 export default class BackupPhraseScreen extends React.Component {
   constructor(props) {
@@ -61,12 +61,12 @@ export default class BackupPhraseScreen extends React.Component {
   onOpen() {
     this.setState({ visible: true });
   }
-  
+
   render() {
     const textSecurityKey = this.state.mnemonicValues.map((type, index) => (
       <Text key={index} style={styles.secrityChar}>
         {" "}
-        {type}{" "}   
+        {type}{" "}
       </Text>
     ));
     var numanicKey = this.state.mnemonicValues.toString();

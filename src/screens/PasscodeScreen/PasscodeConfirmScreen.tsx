@@ -10,14 +10,18 @@ import DropdownAlert from "react-native-dropdownalert";
 import Loader from "react-native-modal-loader";
 
 //TODO: Custome Pages
-import { colors, localDB } from "../../app/constants/Constants";
-var dbOpration = require("../../app/manager/database/DBOpration");
-var utils = require("../../app/constants/Utils");
-import renderIf from "../../app/constants/validation/renderIf";
-import Singleton from "../../app/constants/Singleton";
+import {
+  colors,
+  localDB,
+  errorValidMsg
+} from "bithyve/src/app/constants/Constants";
+var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
+var utils = require("bithyve/src/app/constants/Utils");
+import renderIf from "bithyve/src/app/constants/validation/renderIf";
+import Singleton from "bithyve/src/app/constants/Singleton";
 
 //TODO: RegularAccount
-import RegularAccount from "../../bitcoin/services/RegularAccount";
+import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
 
 export default class PasscodeConfirmScreen extends Component {
   constructor(props) {
@@ -57,11 +61,11 @@ export default class PasscodeConfirmScreen extends Component {
     });
   }
 
-  onCheckPincode(code) {
+  onCheckPincode(code: any) {
     this.setState({
       status: "confirm",
       pincode: code,
-      success: "Confirm your PinCode"
+      success: errorValidMsg.confirmPincode
     });
     this.flipCard();
   }
@@ -92,7 +96,7 @@ export default class PasscodeConfirmScreen extends Component {
       this.dropdown.alertWithType(
         "error",
         "Error",
-        "Oh Please enter correct password"
+        errorValidMsg.correctPassword
       );
     }
   }
@@ -103,8 +107,10 @@ export default class PasscodeConfirmScreen extends Component {
     const {
       mnemonic,
       address,
-      privateKey
+      privateKey,
+      keyPair
     } = await RegularAccount.createWallet();
+    const publicKey = keyPair.publicKey.toString("hex");
     this.setState({
       mnemonicValues: mnemonic.split(" ")
     });
@@ -126,6 +132,7 @@ export default class PasscodeConfirmScreen extends Component {
           mnemonicValue,
           priKeyValue,
           address,
+          publicKey,
           "Primary"
         );
         if (resultCreateWallet) {

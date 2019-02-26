@@ -26,8 +26,8 @@ import DatePicker from "react-native-datepicker";
 import moment from "moment";
 
 //TODO: Custome class
-import { colors, images } from "../../../app/constants/Constants";
-import renderIf from "../../../app/constants/validation/renderIf";
+import { colors, images } from "bithyve/src/app/constants/Constants";
+import renderIf from "bithyve/src/app/constants/validation/renderIf";
 
 export default class VaultAccountScreen extends React.Component {
   constructor(props) {

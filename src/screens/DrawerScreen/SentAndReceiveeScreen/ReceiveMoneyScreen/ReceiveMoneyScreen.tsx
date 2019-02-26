@@ -5,7 +5,10 @@ import {
   View,
   ImageBackground,
   Clipboard,
-  Dimensions
+  Dimensions,
+  Vibration,
+  AsyncStorage,
+  Platform
 } from "react-native";
 import {
   Container,
@@ -24,23 +27,29 @@ import QRCode from "react-native-qrcode";
 import Toast from "react-native-simple-toast";
 import Share from "react-native-share";
 import Loader from "react-native-modal-loader";
+import PushNotification from "react-native-push-notification";
 //TODO: Custome Pages
-import { colors, images, localDB } from "../../../../app/constants/Constants";
-
-var dbOpration = require("../../../../app/manager/database/DBOpration");
+import { colors, images, localDB } from "bithyve/src/app/constants/Constants";
+import Singleton from "bithyve/src/app/constants/Singleton";
+var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
+var utils = require("bithyve/src/app/constants/Utils");
+import renderIf from "bithyve/src/app/constants/validation/renderIf";
 //TODO: VaultAccount
-import jointAccount from "../../../../bitcoin/services/JointAccount";
+import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
 
 export default class ReceiveMoneyScreen extends React.Component {
   constructor(props: any) {
     super(props);
     this.state = {
       qrcodedata: "mymoney",
-      isLoading: false
+      isLoading: false,
+      securetCodeEncpUrl: Math.floor(1000 + Math.random() * 9000),
+      flag_SecuretCodeVisible: false,
+      seconds: 5
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { navigation } = this.props;
     let page = navigation.getParam("page");
     let data = navigation.getParam("data");
@@ -66,6 +75,14 @@ export default class ReceiveMoneyScreen extends React.Component {
     });
   }
 
+  componentWillUnmount() {
+    try {
+      AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(true));
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   async createJointAccount() {
     const { navigation } = this.props;
     let data = navigation.getParam("data");
@@ -87,43 +104,80 @@ export default class ReceiveMoneyScreen extends React.Component {
 
   //TODO: Func Copy they code
   click_CopyAddress = async () => {
-    await Clipboard.setString(this.state.qrcodedata);
+    const { navigation } = this.props;
+    let page = navigation.getParam("page");
+    let securetCode = this.state.securetCodeEncpUrl.toString();
+    var shareOptions: string;
+    var code = utils.encrypt(this.state.qrcodedata.toString(), securetCode);
+    code = code.split("/").join("_+_");
+    console.log({ page });
+    if (page == "CreateJointAccountScreen") {
+      shareOptions = "https://prime-sign-230407.appspot.com/ja/mck/" + code;
+    } else if (page == "MergeConfirmJointAccountScreen") {
+      shareOptions = "https://prime-sign-230407.appspot.com/ja/ca/" + code;
+    } else {
+      console.log(this.state.qrcodedata);
+      shareOptions = this.state.qrcodedata;
+    }
+    await Clipboard.setString(shareOptions);
     Toast.show("Address copyed.!", Toast.SHORT);
   };
 
   //TODO: func click_SentQrCode
   click_SentQrCode() {
-    const { navigation } = this.props;
-    let page = navigation.getParam("page");
-    var shareOptions;
-    if (page == "CreateJointAccountScreen") {
-      shareOptions = {
-        title: "Address",
-        message:
-          "https://mobile.cmshuawei.com/jointAccountCreate/MergeConfirmJointAccountScreen/" +
-          this.state.qrcodedata,
-        url: "\nhttps://bithyve.com/",
-        subject: "MyMoney" //  for email
-      };
-    } else if (page == "MergeConfirmJointAccountScreen") {
-      shareOptions = {
-        title: "Address",
-        message:
-          "https://mobile.cmshuawei.com/CreateJointAccountScreen/" +
-          this.state.qrcodedata,
-        url: "\nhttps://bithyve.com/",
-        subject: "MyMoney" //  for email
-      };
-    } else {
-      shareOptions = {
-        title: "Address",
-        message: this.state.qrcodedata,
-        url: "\nhttps://bithyve.com/",
-        subject: "MyMoney" //  for email
-      };
-    }
+    try {
+      const { navigation } = this.props;
+      let page = navigation.getParam("page");
+      let securetCode = this.state.securetCodeEncpUrl.toString();
+      var shareOptions;
+      var code = utils.encrypt(this.state.qrcodedata.toString(), securetCode);
+      code = code.split("/").join("_+_");
+      if (page == "CreateJointAccountScreen") {
+        let msg = "https://prime-sign-230407.appspot.com/ja/mck/" + code;
+        shareOptions = {
+          title: "Address",
+          message: msg,
+          url: "\nhttps://bithyve.com/",
+          subject: "MyMoney" //  for email
+        };
+      } else if (page == "MergeConfirmJointAccountScreen") {
+        let msg = "https://prime-sign-230407.appspot.com/ja/ca/" + code;
+        shareOptions = {
+          title: "Address",
+          message: msg,
+          url: "\nhttps://bithyve.com/",
+          subject: "MyMoney" //  for email
+        };
+      } else {
+        shareOptions = {
+          title: "Address",
+          message: this.state.qrcodedata,
+          url: "\nhttps://bithyve.com/",
+          subject: "MyMoney" //  for email
+        };
+      }
 
-    Share.open(shareOptions);
+      Share.open(shareOptions)
+        .then(res => {
+          console.log(res);
+          this.setState({
+            flag_SecuretCodeVisible: true
+          });
+          Vibration.vibrate(100);
+          PushNotification.localNotificationSchedule({
+            message: "Code :" + this.state.securetCodeEncpUrl,
+            date: new Date(Date.now() + 2 * 1000)
+          });
+          if (Platform.OS == "ios") {
+            AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(true));
+          }
+        })
+        .catch(err => {
+          err && console.log(err);
+        });
+    } catch (error) {
+      // Error saving data
+    }
   }
 
   render() {
@@ -177,13 +231,32 @@ export default class ReceiveMoneyScreen extends React.Component {
                   {this.state.qrcodedata}
                 </Text>
               </TouchableOpacity>
+              {renderIf(this.state.flag_SecuretCodeVisible)(
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: colors.appColor,
+                    textDecorationLine: "underline"
+                  }}
+                >
+                  Code : {this.state.securetCodeEncpUrl}
+                </Text>
+              )}
             </View>
             <View style={styles.viewShareButtonMain}>
               <View style={styles.viewSahreBtn}>
                 <Button
                   transparent
                   onPress={() => {
-                    this.click_SentQrCode();
+                    try {
+                      AsyncStorage.setItem(
+                        "flag_BackgoundApp",
+                        JSON.stringify(false)
+                      );
+                      this.click_SentQrCode();
+                    } catch (e) {
+                      console.log(e);
+                    }
                   }}
                 >
                   <Icon name="share-square" size={25} color="#ffffff" />

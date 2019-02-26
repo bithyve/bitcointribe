@@ -20,7 +20,7 @@ export default class QrcodeScannerScreen extends React.Component {
     } catch (error) {
       console.log(error);
     }
-  }   
+  }
 
   async componentWillUnmount() {
     try {
