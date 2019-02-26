@@ -12,7 +12,7 @@ build/
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
-xcuserdata
+xcuserdata   
 *.xccheckout
 *.moved-aside
 DerivedData
@@ -20,6 +20,7 @@ DerivedData
 *.ipa
 *.xcuserstate
 project.xcworkspace
+
 
 
 # Android
@@ -36,7 +37,7 @@ yarn-error.log
 
 /.env.dev
 
-   
+
 # BUCK
 buck-out/
 \.buckd/
