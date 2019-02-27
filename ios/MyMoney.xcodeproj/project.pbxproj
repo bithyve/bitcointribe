@@ -51,6 +51,7 @@
 		8B817E85221FECED00A95BBD /* libRNFIRMessaging.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B817E84221FECE300A95BBD /* libRNFIRMessaging.a */; };
 		8B817FBF2220012200A95BBD /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8B817F7A2220012100A95BBD /* GoogleService-Info.plist */; };
 		8B8312E0221EC7F200B22936 /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B8312DD221EC5EB00B22936 /* libRCTPushNotification.a */; };
+		8B87EDD922266E2E000971E7 /* libQRCode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B87ED9522266E20000971E7 /* libQRCode.a */; };
 		8EDA73BBDAD144D6B93BAE45 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E26D1FA9C5934DC69BB1ACA4 /* FontAwesome.ttf */; };
 		8FFA578A36EA4A42957BC096 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 711A5F0D511F496985707A67 /* EvilIcons.ttf */; };
 		917767AC71EBC90D6EC5AF1F /* libPods-MyMoney.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B2528B5BEE3EFE59EF780EF /* libPods-MyMoney.a */; };
@@ -547,6 +548,13 @@
 			remoteGlobalIDString = 3D05745F1DE6004600184BB4;
 			remoteInfo = "RCTPushNotification-tvOS";
 		};
+		8B87ED9422266E20000971E7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8B87ED8F22266E20000971E7 /* QrCode.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 07FD4BE520874AB3002FBD31;
+			remoteInfo = QRCode;
+		};
 		ADBDB9261DFEBF0700ED6528 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */;
@@ -629,6 +637,7 @@
 		8B817F7A2220012100A95BBD /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8B8312CD221EC4B700B22936 /* MyMoney.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = MyMoney.entitlements; path = MyMoney/MyMoney.entitlements; sourceTree = "<group>"; };
 		8B8312D7221EC5EB00B22936 /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
+		8B87ED8F22266E20000971E7 /* QrCode.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = QrCode.xcodeproj; path = "../../../../../../Desktop/react-native-lewin-qrcode/ios/QrCode.xcodeproj"; sourceTree = "<group>"; };
 		8FDFA76B4A0A4484A05CB358 /* SplashScreen.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = SplashScreen.xcodeproj; path = "../node_modules/react-native-splash-screen/ios/SplashScreen.xcodeproj"; sourceTree = "<group>"; };
 		93FFB3E547704BE6BF6B03B6 /* libRNRandomBytes-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNRandomBytes-tvOS.a"; sourceTree = "<group>"; };
 		95D16AC6563E4DC7A54E1B44 /* Roboto_medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto_medium.ttf; path = "../node_modules/native-base/Fonts/Roboto_medium.ttf"; sourceTree = "<group>"; };
@@ -676,6 +685,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B87EDD922266E2E000971E7 /* libQRCode.a in Frameworks */,
 				8B817E85221FECED00A95BBD /* libRNFIRMessaging.a in Frameworks */,
 				ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */,
 				11D1A2F320CAFA9E000508D9 /* libRCTAnimation.a in Frameworks */,
@@ -896,6 +906,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				8B87ED8F22266E20000971E7 /* QrCode.xcodeproj */,
 				8B817E7F221FECE300A95BBD /* RNFIRMessaging.xcodeproj */,
 				8B8312D7221EC5EB00B22936 /* RCTPushNotification.xcodeproj */,
 				5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */,
@@ -1188,6 +1199,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		8B87ED9022266E20000971E7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8B87ED9522266E20000971E7 /* libQRCode.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		ADBDB9201DFEBF0600ED6528 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -1290,6 +1309,10 @@
 				{
 					ProductGroup = 8B8312B0221EC36C00B22936 /* Products */;
 					ProjectRef = 1F1A8BFB5E5E4671A41125A0 /* LRDRCTSimpleToast.xcodeproj */;
+				},
+				{
+					ProductGroup = 8B87ED9022266E20000971E7 /* Products */;
+					ProjectRef = 8B87ED8F22266E20000971E7 /* QrCode.xcodeproj */;
 				},
 				{
 					ProductGroup = 00C302A81ABCB8CE00DB3ED1 /* Products */;
@@ -1900,6 +1923,13 @@
 			fileType = archive.ar;
 			path = "libRCTPushNotification-tvOS.a";
 			remoteRef = 8B8312DE221EC5EB00B22936 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8B87ED9522266E20000971E7 /* libQRCode.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libQRCode.a;
+			remoteRef = 8B87ED9422266E20000971E7 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */ = {
