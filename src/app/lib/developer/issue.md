@@ -125,3 +125,6 @@ details.useVersion "26.1.0"
 > The library com.google.android.gms:play-services-base is being requested by various other libraries at [[15.0.1,15.0.1]], but resolves to 16.0.1. Disable the plugin and check your dependencies tree using ./gradlew :app:dependencies.
 > add this line
 > classpath 'com.google.gms:google-services:3.2.1'
+
+#Cannot read property 'readerQR' of undefined  
+add this lib react-native-lewin-qrcode with xcode add lib with product in lib
