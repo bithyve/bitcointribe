@@ -6,5 +6,7 @@ target 'MyMoney' do
   #use_frameworks!
 #  pod 'Firebase'
 #  pod 'Firebase/Messaging'
+  pod 'RNViewShot', :path => '../node_modules/react-native-view-shot'
+
 end
 
