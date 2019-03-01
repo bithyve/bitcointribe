@@ -3,6 +3,8 @@ package com.mymoney;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.lewin.qrcode.QRScanReaderPackage;
+import fr.greweb.reactnativeviewshot.RNViewShotPackage;
 import com.evollu.react.fcm.FIRMessagingPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.tradle.react.UdpSocketsModule;
@@ -43,6 +45,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new QRScanReaderPackage(),
+            new RNViewShotPackage(),
             new FIRMessagingPackage(),
             new VectorIconsPackage(),
             new UdpSocketsModule(),
