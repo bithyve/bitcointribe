@@ -1,44 +1,91 @@
 import Config from "react-native-config";
 
-//Message
+//Error Messages
 var errorMessage = {
-  cancel: "CANCEL",
-  ok: "OK",
-  thanks: "Thanks",
-  logout_Title: "Logout",
-  logout_message: "Are you sure you want to logout?",
-  aLERT_Title: "Message",
-  aPI_FAILED: "Server not responding, please try after some time.",
-  internet_ErrorTitle: "No Internet",
-  fAILED_INTERNET: "No internet connection available."
+  cancel: Config.MES_ERROR_CANCEL,
+  ok: Config.MES_ERROR_OK,
+  thanks: Config.MES_ERROR_THANKS,
+  logout_Title: Config.MES_ERROR_LOGOUT,
+  logout_message: Config.MES_ERROR_LOGOUT_MESSAGE,
+  aLERT_Title: Config.MES_ERROR_ALERT_TITLE,
+  aPI_FAILED: Config.MES_ERROR_API_FAILED,
+  internet_ErrorTitle: Config.MES_ERROR_INTERNET_ERROR_TITLE,
+  fAILED_INTERNET: Config.MES_ERROR_FAILED_INTERNET,
+  offline: Config.MES_ERROR_OFFLINE,
+  initiatorSamePublicKUse: Config.MES_INITIATORSAME_PUBLIC_KUSE,
+  invalidToken: Config.MES_INVALID_TOKEN,
+  transactionFailed: Config.MES_TRAN_FAILED,
+  addressNotFound: Config.MES_ADDRESS_NOTFOUND
 };
 
+//Messages
 var msg = {
-  secretKeyMsg:
-    "Scan the above QR or enter the secret manually into your Google Authenticator"
+  secretKeyMsg: Config.MES_SECRET_KEY,
+  onBoarding: {
+    title1: Config.MES_ONBOARDING_TITLE1,
+    subTitle1: Config.MES_ONBOARDING_SUBTITLE1,
+    title2: Config.MES_ONBOARDING_TITLE2,
+    subTitle2: Config.MES_ONBOARDING_SUBTITLE2,
+    title3: Config.MES_ONBOARDING_TITLE3,
+    subTitle3: Config.MES_ONBOARDING_SUBTITLE3
+  },
+  createJoinAccount: Config.MES_CREATEJOINACCOUNT,
+  jointAccountImport: Config.MES_JOINTACCOUNTIMPORT,
+  successSecureAccount: Config.MES_SUCCESS_SECURE_ACCOUNT,
+  createVaultAccount: Config.MES_CREATEVAULTACCOUNT,
+  accountDetails: {
+    secure: {
+      title1: Config.MES_ACCOUNTDETAILS_SECURE_TITLE1,
+      subTitle1: Config.MES_ACCOUNTDETAILS_SECURE_SUBTITLE1,
+      title2: Config.MES_ACCOUNTDETAILS_SECURE_TITLE2,
+      subTitle2: Config.MES_ACCOUNTDETAILS_SECURE_SUBTITLE2,
+      title3: Config.MES_ACCOUNTDETAILS_SECURE_TITLE3,
+      subTitle3: Config.MES_ACCOUNTDETAILS_SECURE_SUBTITLE3
+    },
+    joint: {
+      title1: Config.MES_ACCOUNTDETAILS_JOINT_TITLE1,
+      subTitle1: Config.MES_ACCOUNTDETAILS_JOINT_SUBTITLE1,
+      title2: Config.MES_ACCOUNTDETAILS_JOINT_TITLE2,
+      subTitle2: Config.MES_ACCOUNTDETAILS_JOINT_SUBTITLE2,
+      title3: Config.MES_ACCOUNTDETAILS_JOINT_TITLE3,
+      subTitle3: Config.MES_ACCOUNTDETAILS_JOINT_SUBTITLE3
+    },
+    vault: {
+      title1: Config.MES_ACCOUNTDETAILS_VAULT_TITLE1,
+      subTitle1: Config.MES_ACCOUNTDETAILS_VAULT_SUBTITLE1,
+      title2: Config.MES_ACCOUNTDETAILS_VAULT_TITLE2,
+      subTitle2: Config.MES_ACCOUNTDETAILS_VAULT_SUBTITLE2
+    }
+  },
+  transactionSccuess: Config.MES_TRAS_SUCCESS,
+  amountTranSuccess: Config.MES_AMOUNT_TRNS_SUCCESS
 };
 
-//Validation Message
-var errorValidationMessage = {
-  enterCode: "Please enter code!"
+//Validation Messages
+var errorValidMsg = {
+  enterCode: Config.MES_ENTER_CODE,
+  confirmPincode: Config.MES_VALID_CONFIRMPINCODE,
+  correctPassword: Config.MES_VALID_CORRECTPASSWORD,
+  correctCode: Config.MES_VALID_CORRECTCODE,
+  enterToken: Config.MES_VALID_ENTERTOKEN,
+  logoutConfirm: Config.MES_VALID_LOGOUTCONFIRM
 };
 
 //Colors
 var colors = {
-  appColor: "#F5951D", //Config.APP_COLOR,
-  black: "#000000",
-  white: "#ffffff",
-  Saving: "#E6A620",
-  Secure: "#30A2F3",
-  Vault: "#679F37",
-  Joint: "#660000",
-  placeholder: "#5F5F5F"
+  appColor: Config.COLOR_APP,
+  black: Config.COLOR_BLACK,
+  white: Config.COLOR_WHITE,
+  Saving: Config.COLOR_SAVING,
+  Secure: Config.COLOR_SECURE,
+  Vault: Config.COLOR_VAULT,
+  Joint: Config.COLOR_VAULT,
+  placeholder: Config.COLOR_PLACEHOLDER
 };
 
 const assetsImages = "../../assets/images/";
 var images = {
   appBackgound: require(assetsImages + "icon/mainBackgoundImage.png"),
-  //appBackgound: require(assetsImages + 'icon/slideMenuImage.jpg'),
   appIcon: require(assetsImages + "appLogo.png"),
   slideMenuIcon: require(assetsImages + "icon/slideMenuImage.jpg"),
   onBoardingScreen: {
@@ -99,23 +146,15 @@ var images = {
   }
 };
 
-//Rest Full Api
-const domain = "https://bh-server-alpha.herokuapp.com/";
-var apiary = {
-  setup2fa: domain + "setup2fa",
-  validate2fasetup: domain + "validate2fasetup",
-  urlquestionAndAnswer: domain + "questionAndAnswer"
-};
-
 //Local Database
 var localDB = {
-  dbName: "MyMoney.db",
+  dbName: Config.DB_NAME,
   tableName: {
-    tblUser: "tblUser",
-    tblWallet: "tblWallet",
-    tblAccountType: "tblAccountType",
-    tblAccount: "tblAccount",
-    tblTransaction: "tblTransaction"
+    tblUser: Config.DB_TBL_USER,
+    tblWallet: Config.DB_TBL_WALLET,
+    tblAccountType: Config.DB_TBL_ACCOUNTTYPE,
+    tblAccount: Config.DB_TBL_ACCOUNT,
+    tblTransaction: Config.DB_TBL_TRANSACTION
   }
 };
 
@@ -125,9 +164,8 @@ var notification = {
 
 export {
   errorMessage,
-  errorValidationMessage,
+  errorValidMsg,
   msg,
-  apiary,
   localDB,
   colors,
   images,

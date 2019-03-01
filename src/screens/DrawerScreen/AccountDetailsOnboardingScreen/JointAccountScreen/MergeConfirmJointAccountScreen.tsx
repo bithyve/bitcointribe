@@ -27,14 +27,17 @@ import Icon from "react-native-vector-icons/FontAwesome";
 
 //TODO: Custome Pages
 //Custome Compontes
-import SCLAlertOk from "../../../../app/custcompontes/alert/SCLAlertOk";
-import { colors, images, localDB } from "../../../../app/constants/Constants";
-
-//import WalletService from "../../../../bitcoin/services/WalletService";
-var dbOpration = require("../../../../app/manager/database/DBOpration");
+import SCLAlertOk from "bithyve/src/app/custcompontes/alert/SCLAlertOk";
+import {
+  colors,
+  images,
+  localDB,
+  msg
+} from "bithyve/src/app/constants/Constants";
+var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
 
 //TODO: VaultAccount
-import jointAccount from "../../../../bitcoin/services/JointAccount";
+import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
 
 const { width } = Dimensions.get("window");
 
@@ -134,7 +137,7 @@ export default class MergeConfirmJointAccountScreen extends React.Component {
             status: true,
             icon: "smile",
             title: "Success",
-            subtitle: "Joint account Created.",
+            subtitle: msg.createJoinAccount,
             goBackStatus: true
           }
         ]

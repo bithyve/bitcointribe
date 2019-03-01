@@ -23,27 +23,34 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Loader from "react-native-modal-loader";
 
 //TODO: Custome Pages
-import { colors, images, localDB } from "../../../app/constants/Constants";
-var dbOpration = require("../../../app/manager/database/DBOpration");
-var utils = require("../../../app/constants/Utils");
-import renderIf from "../../../app/constants/validation/renderIf";
+import {
+  colors,
+  images,
+  localDB,
+  msg,
+  errorMessages,
+  errorValidMsg
+} from "bithyve/src/app/constants/Constants";
+var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
+var utils = require("bithyve/src/app/constants/Utils");
+import renderIf from "bithyve/src/app/constants/validation/renderIf";
 import moment from "moment";
 
 let isNetwork: boolean;
 //Custome Compontes
-import ViewRecentTransaction from "../../../app/custcompontes/view/ViewRecentTransaction";
-import SCLAlertTransferAccountAmount from "../../../app/custcompontes/alert/SCLAlertTransferAccountAmount";
-import SCLAlertSimpleConfirmation from "../../../app/custcompontes/alert/SCLAlertSimpleConfirmation";
-import SCLAlertOk from "../../../app/custcompontes/alert/SCLAlertOk";
-import SCLAlertJointAccountAuthoriseConfirmation from "../../../app/custcompontes/alert/SCLAlertJointAccountAuthoriseConfirmation";
-import BackButton from "../../../app/custcompontes/buttons/BackButton";
-import DialogSecureAccountAuthentication from "../../../app/custcompontes/dialog/DialogSecureAccountAuthentication";
+import ViewRecentTransaction from "bithyve/src/app/custcompontes/view/ViewRecentTransaction";
+import SCLAlertTransferAccountAmount from "bithyve/src/app/custcompontes/alert/SCLAlertTransferAccountAmount";
+import SCLAlertSimpleConfirmation from "bithyve/src/app/custcompontes/alert/SCLAlertSimpleConfirmation";
+import SCLAlertOk from "bithyve/src/app/custcompontes/alert/SCLAlertOk";
+import SCLAlertJointAccountAuthoriseConfirmation from "bithyve/src/app/custcompontes/alert/SCLAlertJointAccountAuthoriseConfirmation";
+import BackButton from "bithyve/src/app/custcompontes/buttons/BackButton";
+import DialogSecureAccountAuthentication from "bithyve/src/app/custcompontes/dialog/DialogSecureAccountAuthentication";
 
 //TODO: Wallets
-import RegularAccount from "../../../bitcoin/services/RegularAccount";
-import jointAccount from "../../../bitcoin/services/JointAccount";
-import secureAccount from "../../../bitcoin/services/SecureAccount";
-import vaultAccount from "../../../bitcoin/services/VaultAccount";
+import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
+import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
+import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
+import vaultAccount from "bithyve/src/bitcoin/services/VaultAccount";
 
 interface Props {}
 interface State {}
@@ -394,7 +401,7 @@ export default class AccountDetailsScreen extends React.Component<
               status: true,
               icon: "smile",
               title: "Success",
-              subtitle: "Transaction Successfully Completed.",
+              subtitle: msg.transactionSccuess,
               goBackStatus: true
             }
           ]
@@ -438,7 +445,7 @@ export default class AccountDetailsScreen extends React.Component<
               status: true,
               icon: "smile",
               title: "Success",
-              subtitle: "Amount Transfer successfully.",
+              subtitle: msg.amountTranSuccess,
               goBackStatus: false
             }
           ]
@@ -451,8 +458,7 @@ export default class AccountDetailsScreen extends React.Component<
               status: true,
               icon: "frown",
               title: "Oops",
-              subtitle:
-                "Invalid token number.Please enter correct token number.",
+              subtitle: errorMessages.invalidToken,
               goBackStatus: false
             }
           ]
@@ -566,7 +572,7 @@ export default class AccountDetailsScreen extends React.Component<
                     this.dropdown.alertWithType(
                       "info",
                       "OH",
-                      "Sorry You're Not Connected to the Internet"
+                      errorMessages.offline
                     );
                   }
                 }}
@@ -595,7 +601,7 @@ export default class AccountDetailsScreen extends React.Component<
                   this.dropdown.alertWithType(
                     "info",
                     "OH",
-                    "Sorry You're Not Connected to the Internet"
+                    errorMessages.offline
                   );
                 }
               }}
@@ -754,7 +760,7 @@ export default class AccountDetailsScreen extends React.Component<
                           status: true,
                           icon: "smile",
                           title: "Success",
-                          subtitle: "Amount Transfer successfully.",
+                          subtitle: msg.amountTranSuccess,
                           goBackStatus: false
                         }
                       ]
@@ -829,7 +835,7 @@ export default class AccountDetailsScreen extends React.Component<
                 this.dropdown.alertWithType(
                   "error",
                   "OH",
-                  "Please enter token."
+                  errorValidMsg.enterToken
                 );
               } else {
                 this.setState({

@@ -30,14 +30,19 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome";
 import Toast from "react-native-simple-toast";
 let flag_createJoinAccount: boolean = true;
-var dbOpration = require("../../../../app/manager/database/DBOpration");
+var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
 
 //TODO: Custome Pages
-import { colors, images, localDB } from "../../../../app/constants/Constants";
-import SCLAlertOk from "../../../../app/custcompontes/alert/SCLAlertOk";
+import {
+  colors,
+  images,
+  localDB,
+  msg
+} from "bithyve/src/app/constants/Constants";
+import SCLAlertOk from "bithyve/src/app/custcompontes/alert/SCLAlertOk";
 
 //TODO: VaultAccount
-import jointAccount from "../../../../bitcoin/services/JointAccount";
+import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
 
 const { width } = Dimensions.get("screen");
 export default class CreateJointAccountScreen extends React.Component {
@@ -77,9 +82,9 @@ export default class CreateJointAccountScreen extends React.Component {
   // }
 
   //TODO: func selfCreateJointAccount
-
   componentWillMount() {
     let qrCodeData = this.props.navigation.getParam("data");
+    console.log({ qrCodeData });
     if (qrCodeData != "") {
       this.selfCreateJointAccount(qrCodeData);
     }
@@ -138,7 +143,7 @@ export default class CreateJointAccountScreen extends React.Component {
             status: true,
             icon: "smile",
             title: "Success",
-            subtitle: "Joint account Created.",
+            subtitle: msg.createJoinAccount,
             goBackStatus: true
           }
         ]
@@ -158,7 +163,7 @@ export default class CreateJointAccountScreen extends React.Component {
     } else if (jointDetails.typ == "ack") {
       this.selfCreateJointAccount(data.barcode);
     } else if (jointDetails.typ == "imp") {
-      Toast.show("Imported succesfully", Toast.SHORT);
+      Toast.show(msg.jointAccountImport, Toast.SHORT);
     } else {
       Toast.show("Error qr code", Toast.SHORT);
     }
@@ -211,10 +216,7 @@ export default class CreateJointAccountScreen extends React.Component {
         <ImageBackground source={images.appBackgound} style={styles.container}>
           <Header transparent>
             <Left>
-              <Button
-                transparent
-                onPress={() => this.props.navigation.goBack()}
-              >
+              <Button transparent onPress={() => this.props.navigation.pop()}>
                 <Icon name="chevron-left" size={25} color="#ffffff" />
               </Button>
             </Left>
