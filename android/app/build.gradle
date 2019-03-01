@@ -161,6 +161,8 @@ configurations.all {
   }
 
 dependencies {
+    compile project(':react-native-lewin-qrcode')
+    compile project(':react-native-view-shot')
     compile project(':react-native-fcm')
     compile project(':react-native-vector-icons')
     compile project(':react-native-udp')

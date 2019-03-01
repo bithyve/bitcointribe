@@ -136,6 +136,8 @@ export default class AccountsScreen extends React.Component<any, any> {
         resultAccount.temp[this.state.cardIndexNo].address
       );
 
+      console.log({ bal });
+
       var transation: [] = [];
       var flag_noTrasation: boolean;
 
