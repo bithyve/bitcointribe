@@ -1,4 +1,8 @@
 {
   "name": "MyMoney",
-  "displayName": "MyMoney"
+  "displayName": "MyMoney",
+  "foreground": false,
+  "userInteraction": false,
+  "message": "My Notification Message",
+  "data": {}
 }

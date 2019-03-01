@@ -14,7 +14,7 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome";
 
 //TODO: Custome Pages
-import { colors, images, localDB } from "../../../app/constants/Constants";
+import { colors, images, localDB } from "bithyve/src/app/constants/Constants";
 
 export default class InviteScreen extends React.Component {
   render() {

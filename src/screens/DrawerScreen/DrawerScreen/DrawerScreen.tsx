@@ -14,12 +14,12 @@ import { Container } from "native-base";
 import { DrawerActions } from "react-navigation";
 import Icon from "react-native-vector-icons/FontAwesome";
 import SCLAlertSimpleConfirmation from "../../../app/custcompontes/alert/SCLAlertSimpleConfirmation";
-   
+
 //TODO: Custome Pages
-import { images } from "../../../app/constants/Constants";
+import { images, errorValidMsg } from "bithyve/src/app/constants/Constants";
 
 //TODO: Json Files
-import menuData from "../../../assets/jsonfiles/drawerScreen/leftMenuList.json";
+import menuData from "bithyve/src/assets/jsonfiles/drawerScreen/leftMenuList.json";
 
 class DrawerScreen extends Component {
   constructor(props: any) {
@@ -64,7 +64,7 @@ class DrawerScreen extends Component {
             status: true,
             icon: "check-circle",
             title: "Confirmation",
-            subtitle: "Are you sure you want to log out?",
+            subtitle: errorValidMsg.logoutConfirm,
             confirmTitle: "CONFIRM"
           }
         ]
@@ -146,5 +146,5 @@ const styles = StyleSheet.create({
 DrawerScreen.propTypes = {
   navigation: PropTypes.object
 };
-    
+
 export default DrawerScreen;

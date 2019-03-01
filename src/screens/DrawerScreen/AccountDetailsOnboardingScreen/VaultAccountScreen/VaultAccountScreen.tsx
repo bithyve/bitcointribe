@@ -18,17 +18,22 @@ import moment from "moment";
 import { TagSelect } from "react-native-tag-select";
 import Loader from "react-native-modal-loader";
 //Custome Compontes
-import SCLAlertOk from "../../../../app/custcompontes/alert/SCLAlertOk";
+import SCLAlertOk from "bithyve/src/app/custcompontes/alert/SCLAlertOk";
 //TODO: Custome class
-import { colors, images, localDB } from "../../../../app/constants/Constants";
-var utils = require("../../../../app/constants/Utils");
-var dbOpration = require("../../../../app/manager/database/DBOpration");
+import {
+  colors,
+  images,
+  localDB,
+  msg
+} from "bithyve/src/app/constants/Constants";
+var utils = require("bithyve/src/app/constants/Utils");
+var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
 
 //TODO: Custome Component
-import BackButton from "../../../../app/custcompontes/buttons/BackButton";
+import BackButton from "bithyve/src/app/custcompontes/buttons/BackButton";
 
 //TODO: VaultAccount
-import vaultAccount from "../../../../bitcoin/services/VaultAccount";
+import vaultAccount from "bithyve/src/bitcoin/services/VaultAccount";
 
 //TODO:flags
 let flag_SelectType: boolean = null;
@@ -124,7 +129,7 @@ export default class VaultAccountScreen extends React.Component {
             status: true,
             icon: "smile",
             title: "Success",
-            subtitle: "Vault account Created.",
+            subtitle: msg.createVaultAccount,
             goBackStatus: true
           }
         ]

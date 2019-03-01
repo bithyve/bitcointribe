@@ -11,17 +11,7 @@ export default class QrcodeScannerScreen extends React.Component {
     };
   }
 
-  onBarCodeRead(res: any) {
-    try {
-      AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(true));
-      const { navigation } = this.props;
-      navigation.goBack();
-      navigation.state.params.onSelect({ barcode: res.data });
-    } catch (error) {
-      console.log(error);
-    }
-  }   
-
+  //TODO: Page life Cycle
   async componentWillUnmount() {
     try {
       AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(true));
@@ -34,6 +24,22 @@ export default class QrcodeScannerScreen extends React.Component {
     Alert.alert("Note", "Not found barcode!");
   }
 
+  onBarCodeRead(res: any) {
+    try {
+      AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(true));
+      const { navigation } = this.props;
+      navigation.goBack();
+      navigation.state.params.onSelect({ barcode: res.data });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  onBarCodeReadByGalleryStart(res: any) {
+    console.log("read data from gallery");
+    console.log({ res });
+  }
+
   render() {
     return (
       <Container>
@@ -44,7 +50,7 @@ export default class QrcodeScannerScreen extends React.Component {
             cameraProps={{ captureAudio: false }}
             onBack={() => this.props.navigation.goBack()}
             onBarCodeReadByGalleryStart={data =>
-              this.onBarCodeRead.call(this, data)
+              this.onBarCodeReadByGalleryStart.call(this, data)
             }
             onReadBarCodeByGalleryFailure={() =>
               this.onReadBarCodeByGalleryFailure.call(this)
@@ -62,5 +68,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingTop: 20
-  }
+  },
+  barcodeScanner: {}
 });

@@ -22,9 +22,9 @@ import {
 } from "native-base";
 import Icon from "react-native-vector-icons/FontAwesome";
 //TODO: Custome Pages
-import { colors, images } from "../../../app/constants/Constants";
+import { colors, images } from "bithyve/src/app/constants/Constants";
 //TODO: Json Files
-import notificationData from "../../../assets/jsonfiles/notificationScreen/notificationScreen.json";
+import notificationData from "bithyve/src/assets/jsonfiles/notificationScreen/notificationScreen.json";
 
 export default class NotificationScreen extends React.Component {
   constructor(props) {
@@ -116,5 +116,5 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
     borderRadius: 25
-  }  
+  }
 });

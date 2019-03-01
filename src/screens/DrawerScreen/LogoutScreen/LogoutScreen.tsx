@@ -13,7 +13,7 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome";
 
 //TODO: Custome Pages
-import { colors, images } from "../../../app/constants/Constants";
+import { colors, images } from "bithyve/src/app/constants/Constants";
 
 export default class LogoutScreen extends React.Component {
   render() {

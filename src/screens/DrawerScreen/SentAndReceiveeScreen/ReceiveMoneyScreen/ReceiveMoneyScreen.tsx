@@ -5,7 +5,12 @@ import {
   View,
   ImageBackground,
   Clipboard,
-  Dimensions
+  Dimensions,
+  Vibration,
+  AsyncStorage,
+  Platform,
+  Image,
+  CameraRoll
 } from "react-native";
 import {
   Container,
@@ -18,29 +23,40 @@ import {
   Body,
   Text
 } from "native-base";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from "react-native-vector-icons/FontAwesome5";
 //import { QRCode } from "react-native-custom-qr-codes";
 import QRCode from "react-native-qrcode";
 import Toast from "react-native-simple-toast";
 import Share from "react-native-share";
 import Loader from "react-native-modal-loader";
-//TODO: Custome Pages
-import { colors, images, localDB } from "../../../../app/constants/Constants";
+import PushNotification from "react-native-push-notification";
+import ActionButton from "react-native-circular-action-menu";
+import ViewShot from "react-native-view-shot";
 
-var dbOpration = require("../../../../app/manager/database/DBOpration");
+//TODO: Custome Pages
+import { colors, images, localDB } from "bithyve/src/app/constants/Constants";
+import Singleton from "bithyve/src/app/constants/Singleton";
+var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
+var utils = require("bithyve/src/app/constants/Utils");
+import renderIf from "bithyve/src/app/constants/validation/renderIf";
 //TODO: VaultAccount
-import jointAccount from "../../../../bitcoin/services/JointAccount";
+import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
 
 export default class ReceiveMoneyScreen extends React.Component {
   constructor(props: any) {
     super(props);
     this.state = {
       qrcodedata: "mymoney",
-      isLoading: false
+      isLoading: false,
+      securetCodeEncpUrl: Math.floor(1000 + Math.random() * 9000),
+      flag_SecuretCodeVisible: false,
+      seconds: 5,
+      imageURI:
+        "https://user-images.githubusercontent.com/24726539/53616505-db68e380-3c08-11e9-814b-bbb34152430c.png"
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { navigation } = this.props;
     let page = navigation.getParam("page");
     let data = navigation.getParam("data");
@@ -66,6 +82,24 @@ export default class ReceiveMoneyScreen extends React.Component {
     });
   }
 
+  componentWillUnmount() {
+    try {
+      AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(true));
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  captureScreenFunction = () => {
+    captureScreen({
+      format: "jpg",
+      quality: 0.8
+    }).then(
+      uri => this.setState({ imageURI: uri }),
+      error => console.error("Oops, Something Went Wrong", error)
+    );
+  };
+
   async createJointAccount() {
     const { navigation } = this.props;
     let data = navigation.getParam("data");
@@ -86,44 +120,81 @@ export default class ReceiveMoneyScreen extends React.Component {
   }
 
   //TODO: Func Copy they code
-  click_CopyAddress = async () => {
-    await Clipboard.setString(this.state.qrcodedata);
+  click_CopyAddress = async (address: string) => {
+    const { navigation } = this.props;
+    let page = navigation.getParam("page");
+    let securetCode = this.state.securetCodeEncpUrl.toString();
+    var shareOptions: string;
+    var code = utils.encrypt(address.toString(), securetCode);
+    code = code.split("/").join("_+_");
+    console.log({ page });
+    if (page == "CreateJointAccountScreen") {
+      shareOptions = "https://prime-sign-230407.appspot.com/ja/mck/" + code;
+    } else if (page == "MergeConfirmJointAccountScreen") {
+      shareOptions = "https://prime-sign-230407.appspot.com/ja/ca/" + code;
+    } else {
+      console.log(address);
+      shareOptions = address;
+    }
+    await Clipboard.setString(shareOptions);
     Toast.show("Address copyed.!", Toast.SHORT);
   };
 
   //TODO: func click_SentQrCode
   click_SentQrCode() {
-    const { navigation } = this.props;
-    let page = navigation.getParam("page");
-    var shareOptions;
-    if (page == "CreateJointAccountScreen") {
-      shareOptions = {
-        title: "Address",
-        message:
-          "https://mobile.cmshuawei.com/jointAccountCreate/MergeConfirmJointAccountScreen/" +
-          this.state.qrcodedata,
-        url: "\nhttps://bithyve.com/",
-        subject: "MyMoney" //  for email
-      };
-    } else if (page == "MergeConfirmJointAccountScreen") {
-      shareOptions = {
-        title: "Address",
-        message:
-          "https://mobile.cmshuawei.com/CreateJointAccountScreen/" +
-          this.state.qrcodedata,
-        url: "\nhttps://bithyve.com/",
-        subject: "MyMoney" //  for email
-      };
-    } else {
-      shareOptions = {
-        title: "Address",
-        message: this.state.qrcodedata,
-        url: "\nhttps://bithyve.com/",
-        subject: "MyMoney" //  for email
-      };
-    }
+    try {
+      const { navigation } = this.props;
+      let page = navigation.getParam("page");
+      let securetCode = this.state.securetCodeEncpUrl.toString();
+      var shareOptions;
+      var code = utils.encrypt(this.state.qrcodedata.toString(), securetCode);
+      code = code.split("/").join("_+_");
+      if (page == "CreateJointAccountScreen") {
+        let msg = "https://prime-sign-230407.appspot.com/ja/mck/" + code;
+        shareOptions = {
+          title: "Address",
+          message: msg,
+          url: "\nhttps://bithyve.com/",
+          subject: "MyMoney" //  for email
+        };
+      } else if (page == "MergeConfirmJointAccountScreen") {
+        let msg = "https://prime-sign-230407.appspot.com/ja/ca/" + code;
+        shareOptions = {
+          title: "Address",
+          message: msg,
+          url: "\nhttps://bithyve.com/",
+          subject: "MyMoney" //  for email
+        };
+      } else {
+        shareOptions = {
+          title: "Address",
+          message: this.state.qrcodedata,
+          url: "\nhttps://bithyve.com/",
+          subject: "MyMoney" //  for email
+        };
+      }
 
-    Share.open(shareOptions);
+      Share.open(shareOptions)
+        .then(res => {
+          console.log(res);
+          this.setState({
+            flag_SecuretCodeVisible: true
+          });
+          Vibration.vibrate(100);
+          PushNotification.localNotificationSchedule({
+            message: "Code :" + this.state.securetCodeEncpUrl,
+            date: new Date(Date.now() + 2 * 1000)
+          });
+          if (Platform.OS == "ios") {
+            AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(true));
+          }
+        })
+        .catch(err => {
+          err && console.log(err);
+        });
+    } catch (error) {
+      // Error saving data
+    }
   }
 
   render() {
@@ -166,29 +237,108 @@ export default class ReceiveMoneyScreen extends React.Component {
             padder
           >
             <View style={styles.viewShowQRcode}>
-              <QRCode
-                value={this.state.qrcodedata}
-                size={Dimensions.get("screen").width - 70}
-                bgColor="black"
-                fgColor="white"
-              />
-              <TouchableOpacity onPress={() => this.click_CopyAddress()}>
+              <ViewShot
+                ref="viewShot"
+                options={{ format: "jpg", quality: 0.9 }}
+              >
+                <QRCode
+                  ref="qrcodeView"
+                  value={this.state.qrcodedata}
+                  size={Dimensions.get("screen").width - 70}
+                  bgColor="black"
+                  fgColor="white"
+                />
+              </ViewShot>
+
+              <TouchableOpacity
+                onPress={() =>
+                  this.click_CopyAddress(this.state.qrcodedata.toString())
+                }
+              >
                 <Text style={styles.txtBarcode} numberOfLines={4} note>
                   {this.state.qrcodedata}
                 </Text>
               </TouchableOpacity>
+              {renderIf(this.state.flag_SecuretCodeVisible)(
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: colors.appColor,
+                    textDecorationLine: "underline"
+                  }}
+                >
+                  Code : {this.state.securetCodeEncpUrl}
+                </Text>
+              )}
             </View>
             <View style={styles.viewShareButtonMain}>
               <View style={styles.viewSahreBtn}>
-                <Button
-                  transparent
-                  onPress={() => {
-                    this.click_SentQrCode();
-                  }}
-                >
-                  <Icon name="share-square" size={25} color="#ffffff" />
-                  <Text style={styles.titleUserName}>Share</Text>
-                </Button>
+                <ActionButton buttonColor="rgba(231,76,60,1)">
+                  <ActionButton.Item
+                    buttonColor="#9b59b6"
+                    title="New Task"
+                    onPress={() => {
+                      try {
+                        AsyncStorage.setItem(
+                          "flag_BackgoundApp",
+                          JSON.stringify(false)
+                        );
+                        this.click_SentQrCode();
+                      } catch (e) {
+                        console.log(e);
+                      }
+                    }}
+                  >
+                    <Icon name="share-square" style={styles.actionButtonIcon} />
+                  </ActionButton.Item>
+                  <ActionButton.Item
+                    buttonColor="#000"
+                    title="Notifications"
+                    onPress={() => {
+                      try {
+                        AsyncStorage.setItem(
+                          "flag_BackgoundApp",
+                          JSON.stringify(false)
+                        );
+                      } catch (e) {
+                        console.log(e);
+                      }
+                      this.refs.viewShot.capture().then(uri => {
+                        try {
+                          AsyncStorage.setItem(
+                            "flag_BackgoundApp",
+                            JSON.stringify(true)
+                          );
+                          Vibration.vibrate(100);
+                          Toast.show("Barcode capture success.!", Toast.SHORT);
+                        } catch (e) {
+                          console.log(e);
+                        }
+
+                        CameraRoll.saveImageWithTag(
+                          uri,
+                          function(result) {
+                            console.log(result);
+                          },
+                          function(error) {
+                            console.log(error);
+                          }
+                        );
+                      });
+                    }}
+                  >
+                    <Icon name="barcode" style={styles.actionButtonIcon} />
+                  </ActionButton.Item>
+                  <ActionButton.Item
+                    buttonColor="#1abc9c"
+                    title="All Tasks"
+                    onPress={() =>
+                      this.click_CopyAddress(this.state.qrcodedata.toString())
+                    }
+                  >
+                    <Icon name="copy" style={styles.actionButtonIcon} />
+                  </ActionButton.Item>
+                </ActionButton>
               </View>
             </View>
           </Content>
@@ -238,5 +388,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.appColor,
     paddingLeft: 10,
     borderRadius: 10
+  },
+  actionButtonIcon: {
+    fontSize: 20,
+    height: 22,
+    color: "white"
   }
 });

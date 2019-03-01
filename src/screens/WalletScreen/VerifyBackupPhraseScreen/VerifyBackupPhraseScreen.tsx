@@ -25,10 +25,10 @@ import GridView from "react-native-super-grid";
 import Toast from "react-native-simple-toast";
 
 //TODO: Custome Pages
-import { images } from "../../../app/constants/Constants";
+import { images } from "bithyve/src/app/constants/Constants";
 
 export default class VerifyBackupPhraseScreen extends React.Component {
-  constructor(props:any) {
+  constructor(props: any) {
     super(props);
     StatusBar.setHidden(false);
     var verifyArray = [[]];
