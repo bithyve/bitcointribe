@@ -32,6 +32,7 @@ const readTablesData = (tableName: any) => {
               data.mnemonic = utils.decrypt(data.mnemonic, passcode);
               data.dateCreated = utils.decrypt(data.dateCreated, passcode);
               data.lastUpdated = utils.decrypt(data.lastUpdated, passcode);
+              data.publicKey = utils.decrypt(data.publicKey, passcode);
               data.walletType = utils.decrypt(data.walletType, passcode);
               temp.push(data);
             } else {
@@ -337,6 +338,7 @@ const insertWallet = (
   mnemonicValue: any,
   priKeyValue: any,
   address: string,
+  publicKey: string,
   walletType: string
 ) => {
   let passcode = getPasscode();
@@ -345,12 +347,13 @@ const insertWallet = (
       txn.executeSql(
         "INSERT INTO " +
           tblName +
-          " (dateCreated,mnemonic,privateKey,address,walletType,lastUpdated) VALUES (:dateCreated,:mnemonic,:privateKey,:address,:walletType,:lastUpdated)",
+          " (dateCreated,mnemonic,privateKey,address,publicKey,walletType,lastUpdated) VALUES (:dateCreated,:mnemonic,:privateKey,:address,:publicKey,:walletType,:lastUpdated)",
         [
           utils.encrypt(fulldate.toString(), passcode),
           utils.encrypt(mnemonicValue.toString(), passcode),
           utils.encrypt(priKeyValue.toString(), passcode),
           utils.encrypt(address.toString(), passcode),
+          utils.encrypt(publicKey.toString(), passcode),
           utils.encrypt(walletType.toString(), passcode),
           utils.encrypt(fulldate.toString(), passcode)
         ]

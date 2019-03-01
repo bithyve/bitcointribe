@@ -12,7 +12,7 @@ import {
 } from "native-base";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import Loader from "react-native-modal-loader";
-import { colors, images } from "../../../../../app/constants/Constants";
+import { colors, images } from "bithyve/src/app/constants/Constants";
 export default class TransactionDetailsWebViewScreen extends Component {
   constructor(props: any) {
     super(props);

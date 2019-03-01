@@ -3,9 +3,9 @@ package com.mymoney;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
-import com.oblador.keychain.KeychainPackage;
-import com.proyecto26.inappbrowser.RNInAppBrowserPackage;
+import com.lewin.qrcode.QRScanReaderPackage;
+import fr.greweb.reactnativeviewshot.RNViewShotPackage;
+import com.evollu.react.fcm.FIRMessagingPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.tradle.react.UdpSocketsModule;
 import com.peel.react.TcpSocketsModule;
@@ -14,19 +14,22 @@ import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.react.rnspinkit.RNSpinkitPackage;
 import cl.json.RNSharePackage;
 import com.bitgo.randombytes.RandomBytesPackage;
+import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.peel.react.rnos.RNOSModule;
-import com.github.xinthink.rnmk.ReactMaterialKitPackage;
-import fr.bamlab.rnimageresizer.ImageResizerPackage;
+import com.oblador.keychain.KeychainPackage;
+import com.proyecto26.inappbrowser.RNInAppBrowserPackage;
 import com.imagepicker.ImagePickerPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.rnfs.RNFSPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
+import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import org.pgsqlite.SQLitePluginPackage;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,9 +45,9 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new ReactNativeConfigPackage(),
-            new KeychainPackage(),
-            new RNInAppBrowserPackage(),
+            new QRScanReaderPackage(),
+            new RNViewShotPackage(),
+            new FIRMessagingPackage(),
             new VectorIconsPackage(),
             new UdpSocketsModule(),
             new TcpSocketsModule(),
@@ -53,14 +56,16 @@ public class MainApplication extends Application implements ReactApplication {
             new RNSpinkitPackage(),
             new RNSharePackage(),
             new RandomBytesPackage(),
+            new ReactNativePushNotificationPackage(),
             new RNOSModule(),
-            new ReactMaterialKitPackage(),
-            new ImageResizerPackage(),
+            new KeychainPackage(),
+            new RNInAppBrowserPackage(),
             new ImagePickerPackage(),
             new RNGestureHandlerPackage(),
             new RNFSPackage(),
             new RNDeviceInfo(),
             new SQLitePluginPackage(),
+            new ReactNativeConfigPackage(),
             new RNCameraPackage()
       );
     }

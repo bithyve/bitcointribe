@@ -23,10 +23,8 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import Share from "react-native-share";
 
 //TODO: Custome Pages
-import { images } from "../../../app/constants/Constants";
-
-//TODO: Wallets
-import RegularAccount from "../../../bitcoin/services/RegularAccount";
+import { images, localDB } from "bithyve/src/app/constants/Constants";
+var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
 
 export default class BackupPhraseScreen extends React.Component {
   constructor(props) {
@@ -43,9 +41,13 @@ export default class BackupPhraseScreen extends React.Component {
   }
 
   async getWalletsData() {
-    const { mnemonic, address, keyPair } = await RegularAccount.createWallet();
+    const resultWallet = await dbOpration.readTablesData(
+      localDB.tableName.tblWallet
+    );
+    let data = resultWallet.temp;
+    let mnemonicValue = data[0].mnemonic;
     this.setState({
-      mnemonicValues: mnemonic.split(" ")
+      mnemonicValues: mnemonicValue.split(",")
     });
     console.log(this.state.mnemonicValues);
     if (this.state.mnemonicValues.length > 0) {
@@ -61,12 +63,12 @@ export default class BackupPhraseScreen extends React.Component {
   onOpen() {
     this.setState({ visible: true });
   }
-  
+
   render() {
     const textSecurityKey = this.state.mnemonicValues.map((type, index) => (
       <Text key={index} style={styles.secrityChar}>
         {" "}
-        {type}{" "}   
+        {type}{" "}
       </Text>
     ));
     var numanicKey = this.state.mnemonicValues.toString();
