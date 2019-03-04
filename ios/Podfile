@@ -8,5 +8,7 @@ target 'MyMoney' do
 #  pod 'Firebase/Messaging'
   pod 'RNViewShot', :path => '../node_modules/react-native-view-shot'
 
+  pod 'RNI18n', :path => '../node_modules/react-native-i18n'
+
 end
 

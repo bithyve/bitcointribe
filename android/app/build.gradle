@@ -162,6 +162,7 @@ configurations.all {
   }
 
 dependencies {
+    compile project(':react-native-i18n')
     compile project(':react-native-lewin-qrcode')
     compile project(':react-native-view-shot')
     compile project(':react-native-fcm')
