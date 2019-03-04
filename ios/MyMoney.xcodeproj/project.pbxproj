@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -55,6 +54,7 @@
 		8B8312E0221EC7F200B22936 /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B8312DD221EC5EB00B22936 /* libRCTPushNotification.a */; };
 		8BDE271022292BC0005B870D /* libRNViewShot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BDE270F22292BB7005B870D /* libRNViewShot.a */; };
 		8BDE271722292F22005B870D /* libRCTCameraRoll.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BDE271622292F19005B870D /* libRCTCameraRoll.a */; };
+		8BF858B6222D03B2005DDFD4 /* libRNI18n.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BF8589F222D03A8005DDFD4 /* libRNI18n.a */; };
 		8EDA73BBDAD144D6B93BAE45 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E26D1FA9C5934DC69BB1ACA4 /* FontAwesome.ttf */; };
 		8FFA578A36EA4A42957BC096 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 711A5F0D511F496985707A67 /* EvilIcons.ttf */; };
 		917767AC71EBC90D6EC5AF1F /* libPods-MyMoney.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B2528B5BEE3EFE59EF780EF /* libPods-MyMoney.a */; };
@@ -572,6 +572,20 @@
 			remoteGlobalIDString = 58B5115D1A9E6B3D00147676;
 			remoteInfo = RCTCameraRoll;
 		};
+		8BF8589E222D03A8005DDFD4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BF85866222D03A8005DDFD4 /* RNI18n.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNI18n;
+		};
+		8BF858A0222D03A8005DDFD4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BF85866222D03A8005DDFD4 /* RNI18n.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6476C4051EEAA69700B10F51;
+			remoteInfo = "RNI18n-tvOS";
+		};
 		ADBDB9261DFEBF0700ED6528 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */;
@@ -657,6 +671,9 @@
 		8B8312D7221EC5EB00B22936 /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		8BDE270A22292BB7005B870D /* RNViewShot.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNViewShot.xcodeproj; path = "../node_modules/react-native-view-shot/ios/RNViewShot.xcodeproj"; sourceTree = "<group>"; };
 		8BDE271122292F19005B870D /* RCTCameraRoll.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTCameraRoll.xcodeproj; path = "../node_modules/react-native/Libraries/CameraRoll/RCTCameraRoll.xcodeproj"; sourceTree = "<group>"; };
+		8BF85866222D03A8005DDFD4 /* RNI18n.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNI18n.xcodeproj; path = "../node_modules/react-native-i18n/ios/RNI18n.xcodeproj"; sourceTree = "<group>"; };
+		8BF858B7222D061F005DDFD4 /* en-IN */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-IN"; path = "en-IN.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		8BF858B8222D0644005DDFD4 /* hi-IN */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "hi-IN"; path = "hi-IN.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		8FDFA76B4A0A4484A05CB358 /* SplashScreen.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = SplashScreen.xcodeproj; path = "../node_modules/react-native-splash-screen/ios/SplashScreen.xcodeproj"; sourceTree = "<group>"; };
 		93674BDB030840D8B9F7ACF0 /* QrCode.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = QrCode.xcodeproj; path = "../node_modules/react-native-lewin-qrcode/ios/QrCode.xcodeproj"; sourceTree = "<group>"; };
 		93FFB3E547704BE6BF6B03B6 /* libRNRandomBytes-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNRandomBytes-tvOS.a"; sourceTree = "<group>"; };
@@ -705,6 +722,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8BF858B6222D03B2005DDFD4 /* libRNI18n.a in Frameworks */,
 				8BDE271722292F22005B870D /* libRCTCameraRoll.a in Frameworks */,
 				8BDE271022292BC0005B870D /* libRNViewShot.a in Frameworks */,
 				8B817E85221FECED00A95BBD /* libRNFIRMessaging.a in Frameworks */,
@@ -928,6 +946,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				8BF85866222D03A8005DDFD4 /* RNI18n.xcodeproj */,
 				8BDE271122292F19005B870D /* RCTCameraRoll.xcodeproj */,
 				8B817E7F221FECE300A95BBD /* RNFIRMessaging.xcodeproj */,
 				8B8312D7221EC5EB00B22936 /* RCTPushNotification.xcodeproj */,
@@ -1248,6 +1267,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		8BF85867222D03A8005DDFD4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8BF8589F222D03A8005DDFD4 /* libRNI18n.a */,
+				8BF858A1222D03A8005DDFD4 /* libRNI18n-tvOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		ADBDB9201DFEBF0600ED6528 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -1434,6 +1462,10 @@
 				{
 					ProductGroup = 8B8312A1221EC36C00B22936 /* Products */;
 					ProjectRef = 78E3042C9CB540B48ED37637 /* RNGestureHandler.xcodeproj */;
+				},
+				{
+					ProductGroup = 8BF85867222D03A8005DDFD4 /* Products */;
+					ProjectRef = 8BF85866222D03A8005DDFD4 /* RNI18n.xcodeproj */;
 				},
 				{
 					ProductGroup = 8B83124C221EC36C00B22936 /* Products */;
@@ -1995,6 +2027,20 @@
 			remoteRef = 8BDE271522292F19005B870D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		8BF8589F222D03A8005DDFD4 /* libRNI18n.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNI18n.a;
+			remoteRef = 8BF8589E222D03A8005DDFD4 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8BF858A1222D03A8005DDFD4 /* libRNI18n-tvOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libRNI18n-tvOS.a";
+			remoteRef = 8BF858A0222D03A8005DDFD4 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -2116,6 +2162,8 @@
 			isa = PBXVariantGroup;
 			children = (
 				13B07FB21A68108700A75B9A /* Base */,
+				8BF858B7222D061F005DDFD4 /* en-IN */,
+				8BF858B8222D0644005DDFD4 /* hi-IN */,
 			);
 			name = LaunchScreen.xib;
 			path = MyMoney;
@@ -2386,6 +2434,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -2442,6 +2491,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;

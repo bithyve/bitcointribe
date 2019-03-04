@@ -61,6 +61,9 @@ const SLIDER_1_FIRST_ITEM = 0;
 //TODO: Wallets
 import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 export default class AccountsScreen extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
@@ -462,7 +465,7 @@ export default class AccountsScreen extends React.Component<any, any> {
                 style={{ marginTop: 10, fontWeight: "bold", fontSize: 20 }}
                 note
               >
-                Create a wallet
+                {localization("AccountsScreen.createaWallet")}
               </Text>
             </RkCard>
           </TouchableOpacity>
@@ -560,7 +563,7 @@ export default class AccountsScreen extends React.Component<any, any> {
                   numberOfLines={1}
                   style={styles.titleUserName}
                 >
-                  My Money
+                  {localization("AccountsScreen.title")}
                 </Title>
               </Body>
               <Right>

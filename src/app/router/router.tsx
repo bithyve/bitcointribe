@@ -6,7 +6,8 @@ import {
   createBottomTabNavigator
 } from "react-navigation";
 import Icon from "react-native-vector-icons/FontAwesome";
-
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
 //OnBoarding
 import OnBoardingScreen from "bithyve/src/screens/WalletScreen/OnBoardingScreen/OnBoardingScreen";
 import BackupPhraseScreen from "bithyve/src/screens/WalletScreen/BackupPhraseScreen/BackupPhraseScreen";
@@ -166,7 +167,7 @@ const TabNavigator = createBottomTabNavigator(
     Payment: {
       screen: PaymentScreen,
       navigationOptions: {
-        tabBarLabel: "Payment",
+        tabBarLabel: localization("TabBarItem.Payment"),
         drawerLockMode: "locked-open",
         tabBarIcon: ({ tintColor }) => (
           <Icon name="credit-card" size={20} color={tintColor} />
@@ -176,7 +177,7 @@ const TabNavigator = createBottomTabNavigator(
     Analytics: {
       screen: AnalyticsScreen,
       navigationOptions: {
-        tabBarLabel: "Analytics",
+        tabBarLabel: localization("TabBarItem.Analytics"),
         tabBarIcon: ({ tintColor }) => (
           <Icon name="signal" size={20} color={tintColor} />
         )
@@ -185,7 +186,7 @@ const TabNavigator = createBottomTabNavigator(
     Accounts: {
       screen: AccountStackNavigatorRouter,
       navigationOptions: {
-        tabBarLabel: "Accounts",
+        tabBarLabel: localization("TabBarItem.Accounts"),
         tabBarIcon: ({ tintColor }) => (
           <Icon name="dollar" size={20} color={tintColor} />
         )
@@ -194,7 +195,7 @@ const TabNavigator = createBottomTabNavigator(
     Cards: {
       screen: CardsScreen,
       navigationOptions: {
-        tabBarLabel: "Cards",
+        tabBarLabel: localization("TabBarItem.Cards"),
         tabBarIcon: ({ tintColor }) => (
           <Icon name="id-card" size={20} color={tintColor} />
         )
@@ -203,14 +204,13 @@ const TabNavigator = createBottomTabNavigator(
     More: {
       screen: MoreScreen,
       navigationOptions: {
-        tabBarLabel: "More",
+        tabBarLabel: localization("TabBarItem.More"),
         tabBarIcon: ({ tintColor }) => (
           <Icon name="ellipsis-v" size={20} color={tintColor} />
         )
       }
     }
   },
-
   {
     initialRouteName: "Accounts",
     tabBarOptions: {
