@@ -17,6 +17,9 @@ import Singleton from "bithyve/src/app/constants/Singleton";
 //Custome Compontes
 import SCLAlertOk from "bithyve/src/app/custcompontes/alert/SCLAlertOk";
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 //TODO: Custome Pages
 import {
   colors,
@@ -34,12 +37,11 @@ export default class PasscodeScreen extends Component {
       mnemonicValues: [],
       status: "choice",
       pincode: "",
-      success: "Enter a PinCode",
+      success: localization("PasscodeScreen.subTitle"),
       firstName: "",
       lastName: "",
       email: "",
       mobileNo: "",
-      message: "Enter your PIN",
       flag_dialogShow: false,
       arr_OkPopupData: []
     };
@@ -68,8 +70,8 @@ export default class PasscodeScreen extends Component {
     } else {
       this.dropdown.alertWithType(
         "error",
-        "Error",
-        errorValidMsg.correctPassword
+        localization("PasscodeScreen.issuetitle"),
+        localization("PasscodeScreen.issueSubTitle")
       );
     }
   }
@@ -146,7 +148,11 @@ export default class PasscodeScreen extends Component {
       commonData.setRootViewController("TabbarBottom");
       this.setState({ flag_dialogShow: false });
     } else {
-      this.dropdown.alertWithType("error", "Error", errorValidMsg.correctCode);
+      this.dropdown.alertWithType(
+        "error",
+        localization("PasscodeScreen.issuetitle"),
+        localization("PasscodeScreen.issueSubTitle")
+      );
       this.refs.codeInputRefUrlEncp.clear();
     }
   }
@@ -155,7 +161,7 @@ export default class PasscodeScreen extends Component {
     return (
       <View style={styles.container}>
         <Text style={[styles.txtTitle, { color: "#000", fontWeight: "bold" }]}>
-          My Money
+          {localization("PasscodeScreen.title")}
         </Text>
         <Text style={{ color: "#000", marginTop: 10 }}>
           {this.state.success}

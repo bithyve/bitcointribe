@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, AsyncStorage } from "react-native";
+import { StyleSheet, AsyncStorage, ScrollView } from "react-native";
 import {
   Container,
   Header,
@@ -15,6 +15,8 @@ import ViewOnBoarding from "bithyve/src/app/custcompontes/view/ViewOnBoarding";
 import Icon from "react-native-vector-icons/FontAwesome5";
 //TODO: Custome object
 import { images, msg } from "bithyve/src/app/constants/Constants";
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
 export default class AccountDetailsOnboardingScreen extends Component<
   any,
   any
@@ -31,27 +33,29 @@ export default class AccountDetailsOnboardingScreen extends Component<
   componentWillMount() {
     const { navigation } = this.props;
     const type = navigation.getParam("type");
-
+    let dataSecure = localization("AccountDetailsOnboardingScreen.Secure");
+    let dataJoint = localization("AccountDetailsOnboardingScreen.Joint");
+    let dataVault = localization("AccountDetailsOnboardingScreen.Vault");
     if (type == "Secure") {
       this.setState({
         data: [
           {
-            backgroundColor: "#fff",
+            backgroundColor: dataSecure[0].backgroundColor,
             image: images.accountDetailsOnBoarding.secureAccount.img1,
-            title: msg.accountDetails.secure.title1,
-            subtitle: msg.accountDetails.secure.subTitle1
+            title: null, //dataSecure[0].title,
+            subtitle: dataSecure[0].subtitle
           },
           {
-            backgroundColor: "#fff",
+            backgroundColor: dataSecure[1].backgroundColor,
             image: images.accountDetailsOnBoarding.secureAccount.img2,
-            title: msg.accountDetails.secure.title2,
-            subtitle: msg.accountDetails.secure.subTitle2
+            title: null, //dataSecure[1].title,
+            subtitle: dataSecure[1].subtitle
           },
           {
-            backgroundColor: "#fff",
+            backgroundColor: dataSecure[2].backgroundColor,
             image: images.accountDetailsOnBoarding.secureAccount.img3,
-            title: msg.accountDetails.secure.title3,
-            subtitle: msg.accountDetails.secure.subTitle3
+            title: null, //dataSecure[2].title,
+            subtitle: dataSecure[2].subtitle
           }
         ],
         type: type
@@ -60,22 +64,22 @@ export default class AccountDetailsOnboardingScreen extends Component<
       this.setState({
         data: [
           {
-            backgroundColor: "#fff",
+            backgroundColor: dataJoint[0].backgroundColor,
             image: images.accountDetailsOnBoarding.jointAccount.img1,
-            title: msg.accountDetails.joint.title1,
-            subtitle: msg.accountDetails.joint.subTitle1
+            title: null,
+            subtitle: dataJoint[0].subtitle
           },
           {
-            backgroundColor: "#fff",
+            backgroundColor: dataJoint[1].backgroundColor,
             image: images.accountDetailsOnBoarding.jointAccount.img2,
-            title: msg.accountDetails.joint.title2,
-            subtitle: msg.accountDetails.joint.subTitle2
+            title: null,
+            subtitle: dataJoint[1].subtitle
           },
           {
-            backgroundColor: "#fff",
+            backgroundColor: dataJoint[2].backgroundColor,
             image: images.accountDetailsOnBoarding.jointAccount.img3,
-            title: msg.accountDetails.joint.title3,
-            subtitle: msg.accountDetails.joint.subTitle3
+            title: null,
+            subtitle: dataJoint[2].subtitle
           }
         ],
         type: type
@@ -84,16 +88,16 @@ export default class AccountDetailsOnboardingScreen extends Component<
       this.setState({
         data: [
           {
-            backgroundColor: "#fff",
+            backgroundColor: dataVault[0].backgroundColor,
             image: images.accountDetailsOnBoarding.vaultAccount.img1,
-            title: msg.accountDetails.vault.title1,
-            subtitle: msg.accountDetails.vault.subTitle1
+            title: null,
+            subtitle: dataVault[0].subtitle
           },
           {
-            backgroundColor: "#fff",
+            backgroundColor: dataVault[1].backgroundColor,
             image: images.accountDetailsOnBoarding.vaultAccount.img2,
-            title: msg.accountDetails.vault.title2,
-            subtitle: msg.accountDetails.vault.subTitle2
+            title: null,
+            subtitle: dataVault[1].subtitle
           }
         ],
         type: type
@@ -125,7 +129,7 @@ export default class AccountDetailsOnboardingScreen extends Component<
   render() {
     return (
       <Container>
-        <Content contentContainerStyle={styles.container} scrollEnabled={false}>
+        <Content contentContainerStyle={styles.container} scrollEnabled={true}>
           <Header
             transparent
             style={{ backgroundColor: "#fff", position: "relative" }}
@@ -140,11 +144,12 @@ export default class AccountDetailsOnboardingScreen extends Component<
             </Body>
             <Right />
           </Header>
-
-          <ViewOnBoarding
-            data={this.state.data}
-            click_Done={() => this.click_Done()}
-          />
+          <ScrollView>
+            <ViewOnBoarding
+              data={this.state.data}
+              click_Done={() => this.click_Done()}
+            />
+          </ScrollView>
         </Content>
       </Container>
     );

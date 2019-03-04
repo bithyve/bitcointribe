@@ -1,0 +1,130 @@
+{
+  "LaunchScreen": {
+    "title": "My Money"
+  },
+  "OnBoardingScreen": {
+    "onBoarding": [
+      {
+        "backgroundColor": "#FFFFFF",
+        "image": "images.onBoardingScreen.onB1",
+        "title": "SOUND MONEY. SIMPLIFIED",
+        "subtitle": ""
+      },
+      {
+        "backgroundColor": "#FFFFFF",
+        "image": "images.onBoardingScreen.onB2",
+        "title": "Secure",
+        "subtitle": "While money needs to be smart, more importantly it needs to be secure. We are very keen to use the best industry standards in software delivery and cryptography to ensure this."
+      },
+      {
+        "backgroundColor": "#FFFFFF",
+        "image": "images.onBoardingScreen.onB3",
+        "title": "Self-sovereign",
+        "subtitle": "Our wallets are non-custodial and a user always has the control of their keys."
+      }
+    ]
+  },
+  "PasscodeConfirmScreen": {
+    "title": "My Money",
+    "subTitle": "Enter a PinCode",
+    "subTitleConfirm": "Confirm your Pincode.",
+    "issuetitle": "Error",
+    "issueSubTitle": "Please enter correct password."
+  },
+  "PasscodeScreen": {
+    "title": "My Money",
+    "subTitle": "Enter a PinCode",
+    "issuetitle": "Error",
+    "issueSubTitle": "Please enter correct password."
+  },
+  "DrawerScreen": {
+    "menus": [
+      {
+        "id": 1,
+        "icon": "home",
+        "title": "Home",
+        "pageName": "Home",
+        "desc": "Regular Account"
+      },
+      {
+        "id": 2,
+        "icon": "cog",
+        "title": "Settings",
+        "pageName": "BackupPhraseScreen",
+        "desc": "IOS New Lang"
+      },
+      {
+        "id": 3,
+        "icon": "sign-out",
+        "title": "Logout",
+        "pageName": "LogoutScreen",
+        "desc": "IOS New Lang"
+      }
+    ]
+  },
+  "TabBarItem": {
+    "Payment": "Payment",
+    "Analytics": "Analytics",
+    "Accounts": "Accounts",
+    "Cards": "Cards",
+    "More": "More"
+  },
+  "AccountsScreen": {
+    "title": "My Money",
+    "createaWallet": "Create a wallet"
+  },
+  "ViewRecentTransaction": {
+    "noTransactions": "No Transactions"
+  },
+  "AccountDetailsOnboardingScreen": {
+    "Secure": [
+      {
+        "backgroundColor": "#ffffff",
+        "title": "",
+        "subtitle": "Secure your wallet with state of art the Google Authenticator based 2FA."
+      },
+      {
+        "backgroundColor": "#ffffff",
+        "title": "",
+        "subtitle": "Enter/scan the code in your Google Authenticator App and you are ready."
+      },
+      {
+        "backgroundColor": "#ffffff",
+        "title": "",
+        "subtitle": "Keep the code, MyMoneyApp pub key and the secondary mnenmonic safe and secure in a separate location."
+      }
+    ],
+    "Joint": [
+      {
+        "backgroundColor": "#ffffff",
+        "title": "",
+        "subtitle": "Create a Joint Account in less than a minute with your partner/friend across the globe. Enter your name and name the account to generate a QR Code."
+      },
+      {
+        "backgroundColor": "#ffffff",
+        "title": "",
+        "subtitle": "Other party scans the QR code and sends an acknowledgement. As soon as you acknowledge your account is ready for action."
+      },
+      {
+        "backgroundColor": "#ffffff",
+        "title": "",
+        "subtitle": "Any of you can initiate the transaction but needs to be signed by both."
+      }
+    ],
+    "Vault": [
+      {
+        "backgroundColor": "#ffffff",
+        "title": "",
+        "subtitle": "Save your funds for important occasions by locking them up for a pre-set duration."
+      },
+      {
+        "backgroundColor": "#ffffff",
+        "title": "",
+        "subtitle": "Your funds are released and ready to use on the pre-set date."
+      }
+    ]
+  },
+  "user_profile": {
+    "title": "Your Profile"
+  }
+}
