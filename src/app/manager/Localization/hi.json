@@ -124,6 +124,69 @@
       }
     ]
   },
+  "SecureAccountScreen": {
+    "title": "सुरक्षित खाता",
+    "btnCreateAccount": "खाता बनाएं"
+  },
+  "SecureSecretKeyScreen": {
+    "title": "गुप्त",
+    "subTitle": "उपरोक्त QR स्कैन करें या अपने Google प्रमाणक में मैन्युअल रूप से रहस्य दर्ज करें",
+    "subTitle1": "कृपया निम्न विवरण अपने पास सुरक्षित रखें क्योंकि वे सुरक्षित खाते की वसूली के लिए महत्वपूर्ण हैं (और हम इसे संग्रहीत नहीं करेंगे)।",
+    "recoveryTitle": "रिकवरी मेमोनिक:",
+    "bitHyveTitle": "बिट हाइवे Xpub:"
+  },
+  "ValidateSecureAccountScreen": {
+    "title": "सुरक्षित खाता सत्यापित करें",
+    "txtInputPlaceholder": "टोकन कुंजी दर्ज करें",
+    "btnValidation": "सत्यापन"
+  },
+  "VaultAccountScreen": {
+    "title": "तिजोरी खाता",
+    "data": [
+      {
+        "id": 1,
+        "label": "3 महीने (90 दिन)",
+        "days": 90
+      },
+      {
+        "id": 2,
+        "label": "6 महीने (180 दिन)",
+        "days": 180
+      },
+      {
+        "id": 3,
+        "label": "9 महीने (270 दिन)",
+        "days": 270
+      }
+    ],
+    "btnCreate": "सर्जन करना",
+    "pupoupTitle": "सफलता",
+    "pupoupSubTitle": "तिजोरी खाता बनाया।"
+  },
+  "CreateJointAccountScreen": {
+    "title": "संयुक्त खाता",
+    "txtInputNamePlaceholder": "अपना नाम दर्ज करें",
+    "txtInputAccountName": "खाता नाम दर्ज करें",
+    "btnInitiate": "आरंभ",
+    "or": "या",
+    "btnMerge": "मर्ज",
+    "popupTitle": "सफलता",
+    "popupBody": "संयुक्त खाता बनाया गया।"
+  },
+  "MergeConfirmJointAccountScreen": {
+    "headerTitle": "मर्ज की पुष्टि",
+    "jointbody": "क्या आप {{nameInitiate}} के साथ एक संयुक्त खाता ",
+    "jointbody1": "{{nameAccountName}} रखना चाहते हैं ?",
+    "txtInputName": "अपना नाम दर्ज करें",
+    "btnMerge": "मर्ज",
+    "popupTitle": "सफलता",
+    "popupBody": "संयुक्त खाता बनाया गया।"
+  },
+  "AccountDetailsScreen": {
+    "btnTRANSFER": "स्थानांतरण",
+    "btnSEND": "भेजें",
+    "btnRECEIVE": "प्राप्त करना"
+  },
   "user_profile": {
     "title": "Your Profile"
   }
