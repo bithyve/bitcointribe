@@ -124,6 +124,69 @@
       }
     ]
   },
+  "SecureAccountScreen": {
+    "title": "Secure Account",
+    "btnCreateAccount": "CREATE ACCOUNT"
+  },
+  "SecureSecretKeyScreen": {
+    "title": "Secret",
+    "subTitle": "Scan the above QR or enter the secret manually into your Google Authenticator",
+    "subTitle1": "Please keep the following details safe with you as they are crucial for recovery of the secure account (and we won't be storing it).",
+    "recoveryTitle": "Recovery Mnemonic:",
+    "bitHyveTitle": "BitHyve Xpub:"
+  },
+  "ValidateSecureAccountScreen": {
+    "title": "Validate Secure Account",
+    "txtInputPlaceholder": "Enter Token Key",
+    "btnValidation": "VALIDATION"
+  },
+  "VaultAccountScreen": {
+    "title": "Vault Account",
+    "data": [
+      {
+        "id": 1,
+        "label": "3 Months (90 days)",
+        "days": 90
+      },
+      {
+        "id": 2,
+        "label": "6 Months (180 days)",
+        "days": 180
+      },
+      {
+        "id": 3,
+        "label": "9 Months (270 days)",
+        "days": 270
+      }
+    ],
+    "btnCreate": "Create",
+    "pupoupTitle": "Success",
+    "pupoupSubTitle": "Vault account created."
+  },
+  "CreateJointAccountScreen": {
+    "title": "Joint Account",
+    "txtInputNamePlaceholder": "Enter your name",
+    "txtInputAccountName": "Enter account name",
+    "btnInitiate": "INITIATE",
+    "or": "OR",
+    "btnMerge": "MERGE",
+    "popupTitle": "Success",
+    "popupBody": "Joint account created."
+  },
+  "MergeConfirmJointAccountScreen": {
+    "headerTitle": "Merge Confirmation",
+    "jointbody": "Do you want to have a joint account {{nameInitiate}} , ",
+    "jointbody1": "with {{nameAccountName}} ?",
+    "txtInputName": "Enter your name",
+    "btnMerge": "MERGE",
+    "popupTitle": "Success",
+    "popupBody": "Joint account created."
+  },
+  "AccountDetailsScreen": {
+    "btnTRANSFER": "TRANSFER",
+    "btnSEND": "SEND",
+    "btnRECEIVE": "RECEIVE"
+  },
   "user_profile": {
     "title": "Your Profile"
   }
