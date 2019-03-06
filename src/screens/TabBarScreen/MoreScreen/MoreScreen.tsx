@@ -22,10 +22,13 @@ import GridView from "react-native-super-grid";
 
 //TODO: Custome Pages
 import { colors, images } from "bithyve/src/app/constants/Constants";
+
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 export default class MoreScreen extends React.Component {
   constructor(props) {
     super(props);
-    StatusBar.setBackgroundColor(colors.appColor, true);
     this.state = {
       spinner: false
     };
@@ -45,6 +48,7 @@ export default class MoreScreen extends React.Component {
   render() {
     return (
       <Container>
+        <StatusBar backgroundColor={colors.appColor} barStyle="dark-content" />
         <ImageBackground source={images.appBackgound} style={styles.container}>
           <Header transparent>
             <Left>
@@ -57,7 +61,7 @@ export default class MoreScreen extends React.Component {
             </Left>
 
             <Body style={{ flex: 0, alignItems: "center" }}>
-              <Title>My Money</Title>
+              <Title>{localization("appConfig.appName")}</Title>
             </Body>
             <Right>
               <Button transparent>
@@ -71,7 +75,7 @@ export default class MoreScreen extends React.Component {
           <Content contentContainerStyle={styles.container}>
             <GridView
               itemDimension={300}
-              items={["Show Backup Phrase"]}
+              items={[localization("MoreScreen.btnShowBackupPhrase")]}
               renderItem={item => (
                 <TouchableHighlight onPress={() => this.openPage()}>
                   <View style={[styles.itemContainer]}>

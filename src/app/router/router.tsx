@@ -24,7 +24,6 @@ import CardsScreen from "bithyve/src/screens/TabBarScreen/CardsScreen/CardsScree
 import MoreScreen from "bithyve/src/screens/TabBarScreen/MoreScreen/MoreScreen";
 
 //Left DrawerScreen
-import AccountSettingScreen from "bithyve/src/screens/DrawerScreen/AccountSettingScreen/AccountSettingScreen";
 import SecurityScreen from "bithyve/src/screens/DrawerScreen/SecurityScreen/SecurityScreen";
 import HelpScreen from "bithyve/src/screens/DrawerScreen/HelpScreen/HelpScreen";
 import InviteScreen from "bithyve/src/screens/DrawerScreen/InviteScreen/InviteScreen";
@@ -185,6 +184,7 @@ const TabNavigator = createBottomTabNavigator(
     },
     Accounts: {
       screen: AccountStackNavigatorRouter,
+
       navigationOptions: {
         tabBarLabel: localization("TabBarItem.Accounts"),
         tabBarIcon: ({ tintColor }) => (
@@ -280,10 +280,6 @@ export const createRootNavigator = (
         navigationOptions: { header: null }
       },
       //Drwaer Navigation
-      AccountSettingScreen: {
-        screen: AccountSettingScreen,
-        navigationOptions: { header: null }
-      },
       SecurityScreen: {
         screen: SecurityScreen,
         navigationOptions: { header: null }

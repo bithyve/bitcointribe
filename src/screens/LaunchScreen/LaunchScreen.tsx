@@ -48,7 +48,7 @@ export default class LaunchScreen extends Component<Props, any> {
           source={require("bithyve/src/assets/images/appLogo.png")}
         />
         <Text style={styles.txtAppName}>
-          {localization("LaunchScreen.title")}
+          {localization("appConfig.appName")}
         </Text>
       </View>
     );

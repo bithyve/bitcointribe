@@ -26,102 +26,51 @@ class RegularAccount {
     return keyPair.publicKey;
   }
 
-  public createMultiSig = (required: number, pubKeys: string[]) => {
-    if (required <= 0 || required > pubKeys.length) {
-      throw new Error("Inappropriate value for required param");
-    }
-    return this.bitcoin.generateMultiSig(required, pubKeys);
-  }
-
   public transfer = async (
     senderAddress: string,
     recipientAddress: string,
     amount: number,
     privateKey: string,
   ) => {
-    const balance = await this.bitcoin.checkBalance(senderAddress);
-    if (parseInt(balance.final_balance, 10) <= amount) {
-      // logic for fee inclusion can also be accomodated
-      throw new Error("Insufficient balance");
+    if (this.bitcoin.isValidAddress(recipientAddress)) {
+      // use decorators as they come out of experimental phase
+      const balance = await this.bitcoin.checkBalance(senderAddress);
+      console.log({ balance: balance.final_balance });
+
+      const { inputs, txb, fee } = await this.bitcoin.createTransaction(
+        senderAddress,
+        recipientAddress,
+        amount,
+      );
+      console.log("---- Transaction Created ----");
+
+      if (parseInt(balance.final_balance, 10) + fee < amount) {
+        throw new Error(
+          "Insufficient balance to compensate for transfer amount and the txn fee",
+        );
+      }
+
+      const keyPair = this.bitcoin.getKeyPair(privateKey);
+      const p2sh = this.bitcoin.getP2SH(keyPair);
+      const signedTxb = this.bitcoin.signTransaction(
+        inputs,
+        txb,
+        [keyPair],
+        p2sh.redeem.output,
+      );
+      console.log("---- Transaction Signed ----");
+
+      const txHex = signedTxb.build().toHex();
+      const res = await this.bitcoin.broadcastTransaction(txHex);
+      console.log("---- Transaction Broadcasted ----");
+      return res;
+    } else {
+      return {
+        statusCode: 400,
+        errorMessage: "Supplied recipient address is wrong.",
+      };
     }
-
-    const txnObj = await this.bitcoin.createTransaction(
-      senderAddress,
-      recipientAddress,
-      amount,
-    );
-    console.log("---- Transaction Created ----");
-
-    const keyPair = this.bitcoin.getKeyPair(privateKey);
-    const p2sh = this.bitcoin.getP2SH(keyPair);
-    const txb = this.bitcoin.signTransaction(
-      txnObj.inputs,
-      txnObj.txb,
-      [keyPair],
-      p2sh.redeem.output,
-    );
-    console.log("---- Transaction Signed ----");
-
-    const txHex = txb.build().toHex();
-    const res = await this.bitcoin.broadcastTransaction(txHex);
-    console.log("---- Transaction Broadcasted ----");
-    return res;
   }
 }
 
 export default new RegularAccount();
-
-class SmokeTest {
-  public regularAccount: RegularAccount;
-  constructor() {
-    this.regularAccount = new RegularAccount();
-  }
-
-  public testCycle = async () => {
-    // 1. Import an HD Wallet (With a pre-funded address)
-    const mnemonic =
-      "spray danger ostrich volume soldier scare shed excess jeans scheme hammer exist";
-    const { address, privateKey } = this.regularAccount.importWallet(mnemonic);
-    // 2. Fund the account (for testing transfer fxn) // Already funded
-
-    // 3. Transfer
-    const { success, txid } = await this.regularAccount.transfer(
-      address,
-      "2NFb3TpSctXBdax6pJaPaAuJG9tKzuihCrz",
-      3e4,
-      privateKey,
-    );
-
-    if (success) {
-      console.log("Transaction successful, here's the transaction ID: ", txid);
-    } else {
-      throw new Error("Transaction failed, something went wrong!");
-    }
-  }
-}
-
-////// SMOKE TEST ZONE //////
-
-// createWallet();
-
-// createWallet().then(res => {
-//   console.log('Reimporting the wallet');
-//   importWallet(res.mnemonic);
-// });
-
-// getBalance('1EVzaFkkNNXq6RJh2oywwJMn8JPiq8ikDi').then(console.log);
-// getTransactions('1EVzaFkkNNXq6RJh2oywwJMn8JPiq8ikDi').then(console.log);
-
-// console.log(
-//   createMultiSig(
-//     2,
-//     '026477115981fe981a6918a6297d9803c4dc04f328f22041bedff886bbc2962e01',
-//     '02c96db2302d19b43d4c69368babace7854cc84eb9e061cde51cfa77ca4a22b8b9'
-//   )
-// );
-
-// const ws = new WalletService();
-// ws.getTransactions("2NAtR7EZFv9aKo8jkygvioZb8NLKY9acYkd").then(console.log);
-
-// const smokeTest = new SmokeTest();
-// smokeTest.testCycle();
