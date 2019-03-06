@@ -52,6 +52,9 @@ import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
 import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
 import vaultAccount from "bithyve/src/bitcoin/services/VaultAccount";
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 interface Props {}
 interface State {}
 export default class AccountDetailsScreen extends React.Component<
@@ -583,7 +586,9 @@ export default class AccountDetailsScreen extends React.Component<
                   size={25}
                   color="#ffffff"
                 />
-                <Text style={styles.txtTile}>TRANSFER</Text>
+                <Text style={styles.txtTile}>
+                  {localization("AccountDetailsScreen.btnTRANSFER")}
+                </Text>
               </Button>
             )}
             <Button
@@ -612,7 +617,9 @@ export default class AccountDetailsScreen extends React.Component<
                 size={25}
                 color="#ffffff"
               />
-              <Text style={styles.txtTile}>Send</Text>
+              <Text style={styles.txtTile}>
+                {localization("AccountDetailsScreen.btnSEND")}
+              </Text>
             </Button>
             <Button
               style={styles.footerBtnAction}
@@ -632,7 +639,9 @@ export default class AccountDetailsScreen extends React.Component<
                 size={25}
                 color="#ffffff"
               />
-              <Text style={styles.txtTile}>Receive</Text>
+              <Text style={styles.txtTile}>
+                {localization("AccountDetailsScreen.btnRECEIVE")}
+              </Text>
             </Button>
           </View>
 

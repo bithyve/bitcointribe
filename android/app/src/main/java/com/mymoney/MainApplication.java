@@ -21,7 +21,7 @@ import com.oblador.keychain.KeychainPackage;
 import com.proyecto26.inappbrowser.RNInAppBrowserPackage;
 import com.imagepicker.ImagePickerPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
-import com.rnfs.RNFSPackage;
+import com.rnfs.RNFSPackage;   
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import org.reactnative.camera.RNCameraPackage;

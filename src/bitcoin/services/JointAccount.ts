@@ -94,35 +94,44 @@ class JointAccount {
     privateKey: string;
     scripts: any;
   }) => {
-    const balance = await this.bitcoin.checkBalance(senderAddress); // disabled due to latency
-    console.log({ balance });
-    if (parseInt(balance.final_balance, 10) <= amount + 1000) {
-      // TODO: accomodate logic for fee inclusion
-      throw new Error("Insufficient balance");
+    if (this.bitcoin.isValidAddress(recipientAddress)) {
+      const balance = await this.bitcoin.checkBalance(senderAddress);
+      console.log({ balance: balance.final_balance });
+
+      console.log("---- Creating Transaction ----");
+      const { inputs, txb, fee } = await this.bitcoin.createTransaction(
+        senderAddress,
+        recipientAddress,
+        amount,
+      );
+      console.log("---- Transaction Created ----");
+
+      if (parseInt(balance.final_balance, 10) + fee < amount) {
+        throw new Error(
+          "Insufficient balance to compensate for transfer amount and the txn fee",
+        );
+      }
+
+      const signedTxb = this.bitcoin.signTransaction(
+        inputs,
+        txb,
+        [this.bitcoin.getKeyPair(privateKey)],
+        Buffer.from(scripts.redeem, "hex"),
+        Buffer.from(scripts.witness, "hex"),
+      );
+
+      const txHex = signedTxb.buildIncomplete().toHex();
+      console.log({ txHex });
+      return {
+        statusCode: 200,
+        data: txHex,
+      };
+    } else {
+      return {
+        statusCode: 400,
+        errorMessage: "Supplied recipient address is wrong.",
+      };
     }
-
-    console.log("---- Creating Transaction ----");
-    const { inputs, txb } = await this.bitcoin.createTransaction(
-      senderAddress,
-      recipientAddress,
-      amount,
-    );
-
-    console.log("---- Transaction Created ----");
-    const signedTxb = this.bitcoin.signTransaction(
-      inputs,
-      txb,
-      [this.bitcoin.getKeyPair(privateKey)],
-      Buffer.from(scripts.redeem, "hex"),
-      Buffer.from(scripts.witness, "hex"),
-    );
-
-    const txHex = signedTxb.buildIncomplete().toHex();
-    console.log({ txHex });
-    return {
-      statusCode: 200,
-      data: txHex,
-    };
   }
 
   public recoverTxnDetails = async (txHex: string) => {
@@ -130,12 +139,8 @@ class JointAccount {
 
     const sender = this.bitcoin.fromOutputScript(
       regenTx.outs[1].script, // considering that the output remains consistent
-      this.bitcoin.network,
     );
-    const recipient = this.bitcoin.fromOutputScript(
-      regenTx.outs[0].script,
-      this.bitcoin.network,
-    );
+    const recipient = this.bitcoin.fromOutputScript(regenTx.outs[0].script);
     const amount = regenTx.outs[0].value;
 
     const recoveredInputs = await this.bitcoin.recoverInputsFromTxHex(txHex);
@@ -189,9 +194,3 @@ class JointAccount {
 }
 
 export default new JointAccount();
-
-/////////// SMOKE TEST ///////
-// const jointAccount = new JointAccount();
-// const dummyTxHex =
-//   "02000000000101dc35fa5ec0530de092961fc13afca6ade05fdaf3fa39eda5f2b2659b77afcfea01000000232200209d117d8d1fc27e5234ecdba6e86277eb015cf10aa7403631421711be5147a437ffffffff02941100000000000017a9147f1585da47b5685f80aa9f4e185dfce610bc840e872b398f000000000017a9143dedba7493dddde093bf3aa5122971926c3b60f5870500004730440220694aedda116c18a7eddfc8cc5a4570c34f6adcd5794c6c18ee3d72565e12bf930220518933e531e931885a8390806fa703594e82326de663eff9907b4e333db76e0a010069522102d3812ea3ae76b90ac4fd2b848fef2ec50ddf7100aad145690ff2adddc6512a882103fd74cc5d84670c2c824cc0baf9d54a0192381b755da4fba63d3369642ab368fa2103cf13ab640dcc69f797e3267f55eac44e06fb16fd6da3cf6b8f1a325bc15b1c3853ae00000000";
-// jointAccount.recoverTxnDetails(dummyTxHex).then(console.log);

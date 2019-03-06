@@ -208,7 +208,7 @@ export default class PasscodeConfirmScreen extends Component {
       <View style={styles.container}>
         <StatusBar backgroundColor={colors.appColor} barStyle="dark-content" />
         <Text style={[styles.txtTitle, { color: "#000", fontWeight: "bold" }]}>
-          {localization("PasscodeConfirmScreen.title")}
+          {localization("appConfig.appName")}
         </Text>
         <Text style={{ color: "#000", marginTop: 10 }}>
           {this.state.success}

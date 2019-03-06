@@ -22,6 +22,9 @@ var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
 //TODO: SecureAccount
 import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 export default class SecureAccountScreen extends React.Component {
   constructor(props: any) {
     super(props);
@@ -90,7 +93,9 @@ export default class SecureAccountScreen extends React.Component {
                 style={styles.secureLogo}
                 source={images.secureAccount.secureLogo}
               />
-              <Text style={styles.txtTitle}>Secure Account</Text>
+              <Text style={styles.txtTitle}>
+                {localization("SecureAccountScreen.title")}
+              </Text>
               <Text style={styles.txtNote} />
             </View>
             <View style={styles.createAccountBtn}>
@@ -105,7 +110,9 @@ export default class SecureAccountScreen extends React.Component {
                 }}
                 onPress={() => this.click_CreateSecureAccount()}
               >
-                <Text style={styles.txtBtnTitle}>Create Account</Text>
+                <Text style={styles.txtBtnTitle}>
+                  {localization("SecureAccountScreen.btnCreateAccount")}
+                </Text>
                 <Icon name="chevron-right" size={25} color="#ffffff" />
               </Button>
             </View>

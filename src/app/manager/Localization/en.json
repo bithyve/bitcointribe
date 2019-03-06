@@ -1,4 +1,7 @@
 {
+  "appConfig": {
+    "appName": "My Money"
+  },
   "LaunchScreen": {
     "title": "My Money"
   },
@@ -72,6 +75,14 @@
   "AccountsScreen": {
     "title": "My Money",
     "createaWallet": "Create a wallet"
+  },
+  "TransactionDetailsWebViewScreen": {
+    "headerTitle": "Transaction Details",
+    "tranType": "Transaction Type:{{transType}}",
+    "txtHash": "Hash",
+    "txtDate": "Date",
+    "txtAmount": "Amount",
+    "txtFee": "Fee"
   },
   "ViewRecentTransaction": {
     "noTransactions": "No Transactions"
@@ -187,7 +198,19 @@
     "btnSEND": "SEND",
     "btnRECEIVE": "RECEIVE"
   },
-  "user_profile": {
-    "title": "Your Profile"
+  "MoreScreen": {
+    "btnShowBackupPhrase": "Show Backup Phrase"
+  },
+  "BackupPhraseScreen": {
+    "headerTitle": "Backup Phrase",
+    "bodyMsg1": "These 12 words are they only way to restore your My Money App.",
+    "bodyMsg2": "Save them somewhere safe and secret.",
+    "btnCopy": "COPY",
+    "btnNext": "NEXT"
+  },
+  "VerifyBackupPhraseScreen": {
+    "headerTitle": "Verification",
+    "bodyMsg1": "Tap the words to put them next to each other in the correct order.",
+    "btnDone": "DONE"
   }
 }

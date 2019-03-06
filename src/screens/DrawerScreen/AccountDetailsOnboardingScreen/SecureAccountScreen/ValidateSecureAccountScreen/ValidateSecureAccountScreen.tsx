@@ -41,6 +41,9 @@ import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
 //TODO: SecureAccount
 import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 export default class ValidateSecureAccountScreen extends React.Component {
   constructor(props: any) {
     super(props);
@@ -205,11 +208,15 @@ export default class ValidateSecureAccountScreen extends React.Component {
                 style={styles.secureLogo}
                 source={images.secureAccount.validationKey}
               />
-              <Text style={styles.txtTitle}>Validate Secure Account</Text>
+              <Text style={styles.txtTitle}>
+                {localization("ValidateSecureAccountScreen.title")}
+              </Text>
               <Input
                 name={this.state.tokenKey}
                 value={this.state.tokenKey}
-                placeholder="Enter Token Key"
+                placeholder={localization(
+                  "ValidateSecureAccountScreen.txtInputPlaceholder"
+                )}
                 keyboardType={"numeric"}
                 placeholderTextColor={Platform.OS == "ios" ? "#fff" : "#000"}
                 style={styles.input}
@@ -227,7 +234,12 @@ export default class ValidateSecureAccountScreen extends React.Component {
                 disabled={this.state.validBtnStaus}
                 onPress={() => this.click_Validation()}
               >
-                <Text> VALIDATION </Text>
+                <Text>
+                  {" "}
+                  {localization(
+                    "ValidateSecureAccountScreen.btnValidation"
+                  )}{" "}
+                </Text>
               </Button>
             </View>
           </Content>
@@ -274,7 +286,7 @@ const styles = StyleSheet.create({
   },
   txtTitle: {
     fontWeight: "bold",
-    color: "#fff",
+    color: "#000000",
     fontSize: 24
   },
   //view:createAccountBtn
