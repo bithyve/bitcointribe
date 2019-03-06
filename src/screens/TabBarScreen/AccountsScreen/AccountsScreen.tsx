@@ -67,7 +67,6 @@ import { localization } from "bithyve/src/app/manager/Localization/i18n";
 export default class AccountsScreen extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
-    StatusBar.setBackgroundColor(colors.appColor, true);
     this.state = {
       isNetwork: true,
       tranDetails: [],
@@ -541,6 +540,11 @@ export default class AccountsScreen extends React.Component<any, any> {
             />
           }
         >
+          <StatusBar
+            backgroundColor={colors.appColor}
+            barStyle="dark-content"
+            translucent={true}
+          />
           <ImageBackground
             source={images.appBackgound}
             style={styles.backgroundImage}
@@ -563,7 +567,7 @@ export default class AccountsScreen extends React.Component<any, any> {
                   numberOfLines={1}
                   style={styles.titleUserName}
                 >
-                  {localization("AccountsScreen.title")}
+                  {localization("appConfig.appName")}
                 </Title>
               </Body>
               <Right>
@@ -646,7 +650,7 @@ const styles = StyleSheet.create({
     color: "#ffffff"
   },
   sliderView: {
-    flex: 2,
+    flex: Platform.OS == "ios" ? 2 : 2.4,
     paddingTop: Platform.OS === "ios" ? 20 : 0
   },
   slideMainCard: {

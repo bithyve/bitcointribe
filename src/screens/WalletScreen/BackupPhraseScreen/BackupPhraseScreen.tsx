@@ -5,7 +5,9 @@ import {
   Dimensions,
   View,
   StatusBar,
-  ImageBackground
+  ImageBackground,
+  AsyncStorage,
+  Platform
 } from "react-native";
 import {
   Container,
@@ -26,6 +28,9 @@ import Share from "react-native-share";
 import { images, localDB } from "bithyve/src/app/constants/Constants";
 var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 export default class BackupPhraseScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -38,6 +43,14 @@ export default class BackupPhraseScreen extends React.Component {
 
   componentWillMount() {
     this.getWalletsData();
+  }
+
+  componentWillUnmount() {
+    try {
+      AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(true));
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async getWalletsData() {
@@ -98,7 +111,7 @@ export default class BackupPhraseScreen extends React.Component {
                 numberOfLines={1}
                 style={styles.titleUserName}
               >
-                Backup Phrase
+                {localization("BackupPhraseScreen.headerTitle")}
               </Title>
             </Body>
             <Right />
@@ -111,10 +124,10 @@ export default class BackupPhraseScreen extends React.Component {
                 source={images.backupPhraseScreen.backupPhraseLogo}
               />
               <Text style={styles.desc}>
-                These 12 words are they only way to restore your MyMoney App.
+                {localization("BackupPhraseScreen.bodyMsg1")}
               </Text>
               <Text style={styles.desc}>
-                Save them somewhere safe and secret.
+                {localization("BackupPhraseScreen.bodyMsg2")}
               </Text>
             </View>
             <View style={styles.viewNumanicValue}>{textSecurityKey}</View>
@@ -123,7 +136,27 @@ export default class BackupPhraseScreen extends React.Component {
                 transparent
                 style={styles.btnCopy}
                 onPress={() => {
-                  Share.open(shareOptions);
+                  try {
+                    AsyncStorage.setItem(
+                      "flag_BackgoundApp",
+                      JSON.stringify(false)
+                    );
+
+                    Share.open(shareOptions)
+                      .then(res => {
+                        if (Platform.OS == "ios") {
+                          AsyncStorage.setItem(
+                            "flag_BackgoundApp",
+                            JSON.stringify(true)
+                          );
+                        }
+                      })
+                      .catch(err => {
+                        err && console.log(err);
+                      });
+                  } catch (e) {
+                    console.log(e);
+                  }
                 }}
               >
                 <Text
@@ -133,7 +166,7 @@ export default class BackupPhraseScreen extends React.Component {
                     color: "#F5951D"
                   }}
                 >
-                  Copy
+                  {localization("BackupPhraseScreen.btnCopy")}
                 </Text>
               </Button>
             </View>
@@ -154,7 +187,7 @@ export default class BackupPhraseScreen extends React.Component {
                   textAlign: "center"
                 }}
               >
-                NEXT
+                {localization("BackupPhraseScreen.btnNext")}
               </Text>
             </Button>
           </Footer>
@@ -181,6 +214,8 @@ const styles = StyleSheet.create({
     marginBottom: 20
   },
   desc: {
+    marginLeft: 5,
+    marginRight: 5,
     textAlign: "center",
     color: "gray"
   },

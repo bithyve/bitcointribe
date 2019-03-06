@@ -14,10 +14,11 @@ import Icon from "react-native-vector-icons/FontAwesome";
 //TODO: Custome Pages
 import { colors, images } from "bithyve/src/app/constants/Constants";
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
 export default class PaymentScreen extends React.Component {
   constructor(props: any) {
     super(props);
-    StatusBar.setBackgroundColor(colors.appColor, true);
     this.state = {};
   }
 
@@ -25,6 +26,10 @@ export default class PaymentScreen extends React.Component {
     return (
       <Container>
         <Content contentContainerStyle={styles.container}>
+          <StatusBar
+            backgroundColor={colors.appColor}
+            barStyle="dark-content"
+          />
           <ImageBackground
             source={images.appBackgound}
             style={styles.backgroundImage}
@@ -43,7 +48,7 @@ export default class PaymentScreen extends React.Component {
               </Left>
               <Body style={{ flex: 0, alignItems: "center" }}>
                 <Title adjustsFontSizeToFit={true} numberOfLines={1}>
-                  My Money
+                  {localization("appConfig.appName")}
                 </Title>
               </Body>
               <Right />

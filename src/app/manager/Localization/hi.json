@@ -1,4 +1,7 @@
 {
+  "appConfig": {
+    "appName": "मेरे पैसे"
+  },
   "LaunchScreen": {
     "title": "मेरे पैसे"
   },
@@ -72,6 +75,14 @@
   "AccountsScreen": {
     "title": "मेरे पैसे",
     "createaWallet": "एक बटुआ बनाएँ"
+  },
+  "TransactionDetailsWebViewScreen": {
+    "headerTitle": "लेनदेन का विवरण",
+    "tranType": "लेनदेन प्रकार:{{transType}}",
+    "txtHash": "हैश",
+    "txtDate": "दिनांक",
+    "txtAmount": "रकम",
+    "txtFee": "शुल्क"
   },
   "ViewRecentTransaction": {
     "noTransactions": "कोई लेन-देन नहीं"
@@ -187,7 +198,19 @@
     "btnSEND": "भेजें",
     "btnRECEIVE": "प्राप्त करना"
   },
-  "user_profile": {
-    "title": "Your Profile"
+  "MoreScreen": {
+    "btnShowBackupPhrase": "बैकअप वाक्यांश दिखाएँ"
+  },
+  "BackupPhraseScreen": {
+    "headerTitle": "बैकअप वाक्यांश",
+    "bodyMsg1": "ये 12 शब्द हैं वे केवल आपके My Money App को पुनर्स्थापित करने का तरीका हैं।",
+    "bodyMsg2": "उन्हें सुरक्षित और गुप्त रखें।",
+    "btnCopy": "कॉपी",
+    "btnNext": "आगामी"
+  },
+  "VerifyBackupPhraseScreen": {
+    "headerTitle": "सत्यापन",
+    "bodyMsg1": "सही क्रम में उन्हें एक दूसरे के बगल में रखने के लिए शब्दों को टैप करें।",
+    "btnDone": "किया हुआ"
   }
 }

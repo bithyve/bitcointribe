@@ -5,7 +5,8 @@ import {
   View,
   AsyncStorage,
   Dimensions,
-  Keyboard
+  Keyboard,
+  StatusBar
 } from "react-native";
 import { StackActions, NavigationActions } from "react-navigation";
 import CodeInput from "react-native-confirmation-code-input";
@@ -160,8 +161,13 @@ export default class PasscodeScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <StatusBar
+          backgroundColor={colors.appColor}
+          barStyle="dark-content"
+          translucent={true}
+        />
         <Text style={[styles.txtTitle, { color: "#000", fontWeight: "bold" }]}>
-          {localization("PasscodeScreen.title")}
+          {localization("appConfig.appName")}
         </Text>
         <Text style={{ color: "#000", marginTop: 10 }}>
           {this.state.success}
