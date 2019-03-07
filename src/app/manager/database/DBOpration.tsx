@@ -120,6 +120,12 @@ const readTableAcccountType = async (
           }
           temp.shift();
           temp.pop();
+
+          //for hide vault account and joint account
+          temp.splice(1, 1);
+          temp.splice(1, 1);
+          console.log({ temp });
+
           tx.executeSql(
             "select accountType  from " + tableName2,
             [],
@@ -141,13 +147,13 @@ const readTableAcccountType = async (
                   } else if (data2.name == "Vault") {
                     for (var i = 0; i < temp.length; i++)
                       if (temp[i].name === "Vault") {
-                        // temp.splice(i, 1);
+                        temp.splice(i, 1);
                         break;
                       }
                   } else if (data2.name == "Joint") {
                     for (var i = 0; i < temp.length; i++)
                       if (temp[i].name === "Joint") {
-                        // temp.splice(i, 1);
+                        temp.splice(i, 1);
                         break;
                       }
                   }
