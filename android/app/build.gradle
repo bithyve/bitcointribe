@@ -107,10 +107,10 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0.070319"
         ndk {
             abiFilters "armeabi-v7a", "x86"
-        }
+        }  
     }
     packagingOptions {
           pickFirst '**/libgnustl_shared.so'
