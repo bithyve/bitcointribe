@@ -1,6 +1,23 @@
 {
   "appConfig": {
-    "appName": "मेरे पैसे"
+    "appName": "मेरे पैसे",
+    "btnCancel": "रद्द करना",
+    "popUp": [
+      {
+        "amountTrnasfer": [
+          {
+            "successMsg": {
+              "title": "सफलता",
+              "subTitle": "लेनदेन सफलतापूर्वक घटक।"
+            },
+            "failedMsg": {
+              "title": "उफ़",
+              "subTitle": "लेन-देन पूरा नहीं हुआ।"
+            }
+          }
+        ]
+      }
+    ]
   },
   "LaunchScreen": {
     "title": "मेरे पैसे"
@@ -63,7 +80,12 @@
         "pageName": "LogoutScreen",
         "desc": "IOS New Lang"
       }
-    ]
+    ],
+    "LogoutConfirmPopup": {
+      "title": "पुष्टीकरण",
+      "body": "क्या आप लॉग आउट करना चाहते हैं?",
+      "btnConfirm": "की पुष्टि करें"
+    }
   },
   "TabBarItem": {
     "Payment": "भुगतान",
@@ -149,7 +171,23 @@
   "ValidateSecureAccountScreen": {
     "title": "सुरक्षित खाता सत्यापित करें",
     "txtInputPlaceholder": "टोकन कुंजी दर्ज करें",
-    "btnValidation": "सत्यापन"
+    "btnValidation": "सत्यापन",
+    "popupMsg": [
+      {
+        "success": {
+          "title": "सफलता",
+          "subTitle": "सुरक्षित खाता बनाया गया।"
+        },
+        "failed": {
+          "title": "उफ़",
+          "subTitle": "सेटअप विफल हुआ।"
+        },
+        "failedInvalidToken": {
+          "title": "उफ़",
+          "subTitle": "अमान्य टोकन नंबर। कृपया टोकन नंबर दर्ज करें।"
+        }
+      }
+    ]
   },
   "VaultAccountScreen": {
     "title": "तिजोरी खाता",
@@ -196,7 +234,32 @@
   "AccountDetailsScreen": {
     "btnTRANSFER": "स्थानांतरण",
     "btnSEND": "भेजें",
-    "btnRECEIVE": "प्राप्त करना"
+    "btnRECEIVE": "प्राप्त करना",
+    "popUpTransfer": {
+      "title": "स्थानांतरण राशि",
+      "subtitle": "{{accountName}} से",
+      "txtInpurtAmountPlaceholder": "बीटीसी राशि दर्ज करें"
+    },
+    "popUpConfirmation": {
+      "title": "पुष्टीकरण",
+      "subTitle": "क्या आप सुनिश्चित हैं कि खाते को {{accountType}} खाते में ट्रांसफ़र राशि सहेजा जा रहा है।",
+      "btnConfirm": "की पुष्टि करें"
+    }
+  },
+  "SentMoneyScreen": {
+    "headerTitle": "पैसे भेजो",
+    "txtInputAddressPlaceholder": "पता",
+    "txtInputAmountPlaceholder": "राशि (बीटीसी)",
+    "btnSend": "भेजें",
+    "secureAccountFaPopUp": {
+      "title": "नया लेन-देन",
+      "txtAmount": "रकम:",
+      "txtFee": "शुल्क:",
+      "txtRecipient": "प्राप्त करने वाला:",
+      "txttokenNoPlaceholder": "2FA गौत टोकन",
+      "btnCancel": "रद्द करना",
+      "btnSend": "भेजें"
+    }
   },
   "MoreScreen": {
     "btnShowBackupPhrase": "बैकअप वाक्यांश दिखाएँ"

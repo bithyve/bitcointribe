@@ -43,7 +43,7 @@ import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
 
 //localization
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
-
+let arr_PopupMsg = localization("ValidateSecureAccountScreen.popupMsg");
 export default class ValidateSecureAccountScreen extends React.Component {
   constructor(props: any) {
     super(props);
@@ -112,28 +112,30 @@ export default class ValidateSecureAccountScreen extends React.Component {
             this.state.data
           );
         } else {
+          let arr_failed = arr_PopupMsg[0].failed;
           this.setState({
             alertPopupData: [
               {
                 theme: "danger",
                 status: true,
                 icon: "frown",
-                title: "Oops",
-                subtitle: "Setup failed.",
+                title: arr_failed.title,
+                subtitle: arr_failed.subTitle,
                 goBackStatus: false
               }
             ]
           });
         }
       } else {
+        let arr_failedInvalidToken = arr_PopupMsg[0].failedInvalidToken;
         this.setState({
           alertPopupData: [
             {
               theme: "danger",
               status: true,
               icon: "frown",
-              title: "Oops",
-              subtitle: errorMessage.invalidToken,
+              title: arr_failedInvalidToken.title,
+              subtitle: arr_failedInvalidToken.subTitle,
               goBackStatus: false
             }
           ]
@@ -159,6 +161,7 @@ export default class ValidateSecureAccountScreen extends React.Component {
       sercureData
     );
     if (resultCreateAccount) {
+      let arr_success = arr_PopupMsg[0].success;
       this.setState({
         isLoading: false,
         alertPopupData: [
@@ -166,8 +169,8 @@ export default class ValidateSecureAccountScreen extends React.Component {
             theme: "success",
             status: true,
             icon: "smile",
-            title: "Success",
-            subtitle: msg.successSecureAccount,
+            title: arr_success.title,
+            subtitle: arr_success.subTitle,
             goBackStatus: true
           }
         ]

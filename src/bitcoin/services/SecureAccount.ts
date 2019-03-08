@@ -173,7 +173,6 @@ class SecureAccount {
     childIndex: number;
   }) => {
     if (this.bitcoin.isValidAddress(recipientAddress)) {
-    } else {
       const balance = await this.bitcoin.checkBalance(senderAddress);
       console.log({ balance: balance.final_balance });
       console.log("---- Creating Transaction ----");
@@ -228,11 +227,12 @@ class SecureAccount {
           errorMessage: err.response.data,
         };
       }
+    } else {
+      return {
+        statusCode: 400,
+        errorMessage: "Supplied recipient address is wrong.",
+      };
     }
-    return {
-      statusCode: 400,
-      errorMessage: "Supplied recipient address is wrong.",
-    };
   }
 }
 

@@ -1,6 +1,5 @@
 import Client from "bitcoin-core";
 import bitcoinJS, { Network } from "bitcoinjs-lib";
-import dotenv from "dotenv";
 import config from "react-native-config";
 
 class Config {
