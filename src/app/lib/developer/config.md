@@ -49,8 +49,41 @@ sdk.dir = /Users/developer/Library/Android/sdk
 ## Fabric to Android
 
 ```
+//build.gradle
+buildscript {
+  repositories {
+    maven { url 'https://maven.fabric.io/public' }
+  }
+  dependencies {
+    classpath 'io.fabric.tools:gradle:1.+'
+  }
+}
+
+//app/build.gradel
+
+apply plugin: 'io.fabric'
+dependencies {
+compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
+transitive = true;
+}
+}
+
+//AndroidManifest.xml
+<meta-data
+    android:name="io.fabric.ApiKey"
+    android:value="2d0b58f102661fcabd3be54e6516854e2b0983f6"
+/>
+    </application>
+
+//MainApplication.java
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 
 
-
+protected void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
++      Fabric.with(this, new Crashlytics());
+      setContentView(R.layout.activity_main);
+    }
 
 ```

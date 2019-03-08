@@ -66,9 +66,11 @@ class DrawerScreen extends Component {
           {
             status: true,
             icon: "check-circle",
-            title: "Confirmation",
-            subtitle: errorValidMsg.logoutConfirm,
-            confirmTitle: "CONFIRM"
+            title: localization("DrawerScreen.LogoutConfirmPopup.title"),
+            subtitle: localization("DrawerScreen.LogoutConfirmPopup.body"),
+            confirmTitle: localization(
+              "DrawerScreen.LogoutConfirmPopup.btnConfirm"
+            )
           }
         ]
       });
