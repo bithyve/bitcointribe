@@ -20,6 +20,13 @@ interface Props {
   click_Sent: Function;
   click_Cancel: Function;
 }
+
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+let arr_secureAccountFaPopUp = localization(
+  "SentMoneyScreen.secureAccountFaPopUp"
+);
+
 export default class DialogSecureAccountAuthentication extends Component<
   Props,
   any
@@ -48,12 +55,14 @@ export default class DialogSecureAccountAuthentication extends Component<
         <DialogContent containerStyle={styles.dialogContainerSecureAccount}>
           <View style={styles.accountTypePopUP}>
             <Text style={[styles.txtTitle, { fontSize: 20 }]}>
-              New Transaction
+              {arr_secureAccountFaPopUp.title}
             </Text>
 
             <View style={styles.viewFeeShow}>
               <View style={[styles.viewLineText]}>
-                <Text style={[styles.txtTitle, { flex: 1 }]}>Amount:</Text>
+                <Text style={[styles.txtTitle, { flex: 1 }]}>
+                  {arr_secureAccountFaPopUp.txtAmount}
+                </Text>
                 <Text
                   style={[styles.txtTitle, { flex: 1, fontWeight: "bold" }]}
                 >
@@ -64,7 +73,9 @@ export default class DialogSecureAccountAuthentication extends Component<
                 </Text>
               </View>
               <View style={[styles.viewLineText]}>
-                <Text style={[styles.txtTitle, { flex: 1 }]}>Fee:</Text>
+                <Text style={[styles.txtTitle, { flex: 1 }]}>
+                  {arr_secureAccountFaPopUp.txtFee}
+                </Text>
                 <Text
                   style={[styles.txtTitle, { flex: 1, fontWeight: "bold" }]}
                 >
@@ -76,7 +87,7 @@ export default class DialogSecureAccountAuthentication extends Component<
 
             <View style={styles.viewReceipint}>
               <Text style={[styles.txtTitle, { fontSize: 18 }]}>
-                Recipient:
+                {arr_secureAccountFaPopUp.txtRecipient}
               </Text>
               <Text
                 style={[
@@ -97,7 +108,7 @@ export default class DialogSecureAccountAuthentication extends Component<
                 autoFocus={true}
                 keyboardType={"numeric"}
                 returnKeyType={"next"}
-                placeholder="2FA gauth token"
+                placeholder={arr_secureAccountFaPopUp.txttokenNoPlaceholder}
                 placeholderTextColor="#EA4336"
                 style={styles.input2FA}
                 onChangeText={val => this.setState({ txt2FA: val })}
@@ -110,7 +121,7 @@ export default class DialogSecureAccountAuthentication extends Component<
                 danger
                 onPress={() => this.props.click_Cancel()}
               >
-                <Text>CANCEL</Text>
+                <Text>{arr_secureAccountFaPopUp.btnCancel}</Text>
               </Button>
               <Button
                 transparent
@@ -119,7 +130,7 @@ export default class DialogSecureAccountAuthentication extends Component<
                   this.props.click_Sent(this.state.txt2FA);
                 }}
               >
-                <Text>SEND</Text>
+                <Text>{arr_secureAccountFaPopUp.btnSend}</Text>
               </Button>
             </View>
           </View>

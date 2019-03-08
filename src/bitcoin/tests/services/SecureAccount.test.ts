@@ -70,7 +70,6 @@ describe("Secure Account", () => {
     const secret = "MJVGM22OGVJGC5JUNQ4GUWBTIYVXCQ3L";
     const walletID =
       "6ec8cf624cbaf486beeeecdf4af4c19db62c750827ddf205997a2fb7be83f2a744e4bf03cf4e24e7344e27b9dcfd672d979372174551bc25afa37737a1468d9d";
-    const token = authenticator.generate(secret);
 
     const multiSig = {
       scripts: {
@@ -93,6 +92,7 @@ describe("Secure Account", () => {
     if (final_balance < amount + 1000) {
       throw new Error("insufficient balance to conduct the secure transaction");
     } else {
+      const token = authenticator.generate(secret);
       const res = await secureAccount.secureTransaction({
         senderAddress: multiSig.address,
         recipientAddress: "2N4qBb5f1KyfbpHxtLM86QgbZ7qcxsFf9AL",
@@ -103,7 +103,6 @@ describe("Secure Account", () => {
         childIndex: 0,
         walletID,
       });
-
       if (res.statusCode !== 200) {
         throw new Error("transaction from secure account failed");
       } else {

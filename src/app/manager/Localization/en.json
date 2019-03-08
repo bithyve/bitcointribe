@@ -1,6 +1,27 @@
 {
   "appConfig": {
-    "appName": "My Money"
+    "appName": "My Money",
+    "btnCancel": "रद्द करना",
+    "popUp": [
+      {
+        "amountTrnasfer": [
+          {
+            "successMsg": {
+              "title": "Success",
+              "subTitle": "Transaction Successfully Component."
+            },
+            "failedMsg": {
+              "title": "Oops",
+              "subTitle": "Transaction Not Completed."
+            },
+            "failedInvalidToken": {
+              "title": "Oops",
+              "subTitle": "Invalid token number.Please enter correct token number."
+            }
+          }
+        ]
+      }
+    ]
   },
   "LaunchScreen": {
     "title": "My Money"
@@ -63,7 +84,12 @@
         "pageName": "LogoutScreen",
         "desc": "IOS New Lang"
       }
-    ]
+    ],
+    "LogoutConfirmPopup": {
+      "title": "Confirmation",
+      "body": "Are you sure you want to log out?",
+      "btnConfirm": "CONFIRM"
+    }
   },
   "TabBarItem": {
     "Payment": "Payment",
@@ -149,7 +175,23 @@
   "ValidateSecureAccountScreen": {
     "title": "Validate Secure Account",
     "txtInputPlaceholder": "Enter Token Key",
-    "btnValidation": "VALIDATION"
+    "btnValidation": "VALIDATION",
+    "popupMsg": [
+      {
+        "success": {
+          "title": "Success",
+          "subTitle": "Secure account Created."
+        },
+        "failed": {
+          "title": "Oops",
+          "subTitle": "Setup failed."
+        },
+        "failedInvalidToken": {
+          "title": "Oops",
+          "subTitle": "Invalid token number.Please enter correct token number."
+        }
+      }
+    ]
   },
   "VaultAccountScreen": {
     "title": "Vault Account",
@@ -196,7 +238,32 @@
   "AccountDetailsScreen": {
     "btnTRANSFER": "TRANSFER",
     "btnSEND": "SEND",
-    "btnRECEIVE": "RECEIVE"
+    "btnRECEIVE": "RECEIVE",
+    "popUpTransfer": {
+      "title": "TRANSFER AMOUNT",
+      "subtitle": "From {{accountName}} to",
+      "txtInpurtAmountPlaceholder": "Enter BTC Amount"
+    },
+    "popUpConfirmation": {
+      "title": "Confirmation",
+      "subTitle": "Are you sure Saving account to {{accountType}} account transfer amount.",
+      "btnConfirm": "CONFIRM"
+    }
+  },
+  "SentMoneyScreen": {
+    "headerTitle": "Send Money",
+    "txtInputAddressPlaceholder": "Address",
+    "txtInputAmountPlaceholder": "Amount(BTC)",
+    "btnSend": "SEND",
+    "secureAccountFaPopUp": {
+      "title": "New Transaction",
+      "txtAmount": "Amount:",
+      "txtFee": "Fee:",
+      "txtRecipient": "Recipient:",
+      "txttokenNoPlaceholder": "2FA gauth token",
+      "btnCancel": "CANCEL",
+      "btnSend": "SEND"
+    }
   },
   "MoreScreen": {
     "btnShowBackupPhrase": "Show Backup Phrase"
