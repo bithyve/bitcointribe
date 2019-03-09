@@ -172,189 +172,68 @@ class SecureAccount {
     walletID: string;
     childIndex: number;
   }) => {
-    // const balance = await this.bitcoin.checkBalance(senderAddress); //disabled due to latency
-    // console.log({ balance });
-    // if (parseInt(balance.final_balance, 10) <= amount + 1000) {
-    //   // TODO: accomodate logic for fee inclusion
-    //   throw new Error("Insufficient balance");
-    // }
-
-    console.log("---- Creating Transaction ----");
-    const { inputs, txb } = await this.bitcoin.createTransaction(
-      senderAddress,
-      recipientAddress,
-      amount,
-    );
-
-    console.log("---- Transaction Created ----");
-    const keyPair = this.deriveChildXKey(primaryXpriv, childIndex);
-    const signedTxb = this.bitcoin.signTransaction(
-      inputs,
-      txb,
-      [bip32.fromBase58(keyPair, this.bitcoin.network)],
-      Buffer.from(scripts.redeem, "hex"),
-      Buffer.from(scripts.witness, "hex"),
-    );
-    console.log(
-      "---- Transaction Signed by User (1st sig for 2/3 MultiSig)----",
-    );
-    const txHex = signedTxb.buildIncomplete().toHex();
-    console.log(txHex);
-
-    let res: AxiosResponse;
-    try {
-      res = await axios.post(SERVER + "/secureTranasction", {
-        walletID,
-        token,
-        txHex,
-        childIndex,
-      });
-
-      console.log(
-        "---- Transaction Signed by BH Server (2nd sig for 2/3 MultiSig)----",
+    if (this.bitcoin.isValidAddress(recipientAddress)) {
+      const balance = await this.bitcoin.checkBalance(senderAddress);
+      console.log({ balance: balance.final_balance });
+      console.log("---- Creating Transaction ----");
+      const { inputs, txb, fee } = await this.bitcoin.createTransaction(
+        senderAddress,
+        recipientAddress,
+        amount,
       );
-      console.log(res.data.txHex);
-      console.log("------ Broadcasting Transaction --------");
-      // const txHash = await this.bitcoin.broadcastLocally(data.txHex); // TODO: If API falls; globally expose the tesnet RPC (via ngRox maybe)
-      const bRes = await this.bitcoin.broadcastTransaction(res.data.txHex);
-      return bRes;
-    } catch (err) {
-      console.log("An error occured:", err);
+
+      console.log("---- Transaction Created ----");
+
+      if (parseInt(balance.final_balance, 10) + fee < amount) {
+        throw new Error(
+          "Insufficient balance to compensate for transfer amount and the txn fee",
+        );
+      }
+      const keyPair = this.deriveChildXKey(primaryXpriv, childIndex);
+      const signedTxb = this.bitcoin.signTransaction(
+        inputs,
+        txb,
+        [bip32.fromBase58(keyPair, this.bitcoin.network)],
+        Buffer.from(scripts.redeem, "hex"),
+        Buffer.from(scripts.witness, "hex"),
+      );
+      console.log(
+        "---- Transaction Signed by User (1st sig for 2/3 MultiSig)----",
+      );
+      const txHex = signedTxb.buildIncomplete().toHex();
+      console.log(txHex);
+
+      let res: AxiosResponse;
+      try {
+        res = await axios.post(SERVER + "/secureTranasction", {
+          walletID,
+          token,
+          txHex,
+          childIndex,
+        });
+
+        console.log(
+          "---- Transaction Signed by BH Server (2nd sig for 2/3 MultiSig)----",
+        );
+        console.log(res.data.txHex);
+        console.log("------ Broadcasting Transaction --------");
+        // const txHash = await this.bitcoin.broadcastLocally(data.txHex); // TODO: If API falls; globally expose the tesnet RPC (via ngRox maybe)
+        const bRes = await this.bitcoin.broadcastTransaction(res.data.txHex);
+        return bRes;
+      } catch (err) {
+        console.log("An error occured:", err);
+        return {
+          statusCode: err.response.status,
+          errorMessage: err.response.data,
+        };
+      }
+    } else {
       return {
-        statusCode: err.response.status,
-        errorMessage: err.response.data,
+        statusCode: 400,
+        errorMessage: "Supplied recipient address is wrong.",
       };
     }
   }
 }
 
 export default new SecureAccount();
-
-class SmokeTest {
-  public secureAccount: SecureAccount;
-  public primaryMnemonic =
-    "much false truck sniff extend infant pony venture path imitate tongue pluck";
-
-  constructor() {
-    this.secureAccount = new SecureAccount();
-  }
-
-  public testAssets = () => {
-    const recoveryMnemonic =
-      "frost drive safe pause come apology jungle fortune myself stable talent country";
-
-    const bhMnemonic =
-      "aware illness leaf birth raise puzzle start search vivid nephew accuse tank";
-
-    const primarySeed = bip39.mnemonicToSeed(this.primaryMnemonic);
-    const primaryRoot = bip32.fromSeed(
-      primarySeed,
-      this.secureAccount.bitcoin.network,
-    );
-
-    const hash = crypto.createHash("sha512");
-    hash.update(primarySeed);
-    const walletID = hash.digest("hex");
-    console.log({ walletID });
-
-    const recoverySeed = bip39.mnemonicToSeed(recoveryMnemonic);
-    const recoveryRoot = bip32.fromSeed(
-      recoverySeed,
-      this.secureAccount.bitcoin.network,
-    );
-
-    // to be recieved from the server while setting up the secure account
-    const bhSeed = bip39.mnemonicToSeed(bhMnemonic);
-    const bhRoot = bip32.fromSeed(bhSeed, this.secureAccount.bitcoin.network);
-    // const childBHXPub = bhRoot.derivePath(config.BH_XPUB_PATH);
-    const xpubBH = bhRoot.neutered();
-    // xpubBH.index = 1; // setting childNum to 1; as it's going to be used by the ga_recovery_tool
-    // this is the master XPub
-
-    return {
-      walletID,
-      primaryRoot,
-      recoveryRoot,
-      xpubBH: xpubBH.toBase58(),
-    };
-  }
-
-  public getTestMultiSig = (pointer: number = 0) => {
-    const assets = this.testAssets();
-    const xpubBH = bip32.fromBase58(
-      assets.xpubBH,
-      this.secureAccount.bitcoin.network,
-    ); // provided by the server
-    console.log("here");
-    const path = config.WALLET_XPUB_PATH + "/" + pointer;
-
-    const primaryChildXpriv = assets.primaryRoot.derivePath(path);
-    const recoveryChildXpriv = assets.recoveryRoot.derivePath(path);
-
-    const childXpubBH = xpubBH.derivePath("m/" + pointer);
-
-    const primaryChildPub = primaryChildXpriv.publicKey.toString("hex");
-    const recoveryChildPub = recoveryChildXpriv.publicKey.toString("hex");
-    const childPubBH = childXpubBH.publicKey.toString("hex");
-
-    const pubs = [childPubBH, primaryChildPub, recoveryChildPub];
-    console.log({ childPubBH, primaryChildPub, recoveryChildPub });
-
-    const bitcoin = new Bitcoin();
-    const multiSig = bitcoin.generateMultiSig(2, pubs);
-
-    return {
-      multiSig,
-      primaryChildXpriv: primaryChildXpriv.toBase58(), // store xpubs & xprivs in base58
-      pointer,
-      walletID: assets.walletID,
-    };
-  }
-
-  public testSecureAccountFlow = async (token?: number) => {
-    // STEP 1. Setting up a Secure Account
-    // const { data } = await this.secureAccount.setupSecureAccount(
-    //   this.primaryMnemonic,
-    // );
-    // console.log(data);
-
-    // STEP 2. Validating Secure Account Setup
-    const secret = "NEZDIY3ILJJHU4CHJFKFSODVOJYFOOLN"; // logs from step 1
-    const walletID =
-      "dd2631ee3c5a0ab4da603f3ada062ef32b3c5acccd69567d120e9830d5c94a9b4aa63c598ec96faf85f781f4ae9e34f899ed27db2b86c05d3e91399eb04d3eae";
-    // const { data } = await this.secureAccount.validateSecureAccountSetup(
-    //   token,
-    //   secret,
-    //   walletID,
-    // );
-    // console.log(data);
-
-    // STEP 3. Perform a secure transaction (pre fund the multiSig)
-
-    const multiSig = {
-      address: "2Mxtfze6MDr5biqYvATbff768mEcZkeFzkT",
-      scripts: {
-        redeem:
-          "00209d117d8d1fc27e5234ecdba6e86277eb015cf10aa7403631421711be5147a437",
-        witness:
-          "522102d3812ea3ae76b90ac4fd2b848fef2ec50ddf7100aad145690ff2adddc6512a882103fd74cc5d84670c2c824cc0baf9d54a0192381b755da4fba63d3369642ab368fa2103cf13ab640dcc69f797e3267f55eac44e06fb16fd6da3cf6b8f1a325bc15b1c3853ae",
-      },
-    };
-    const res = await this.secureAccount.secureTransaction({
-      senderAddress: multiSig.address,
-      recipientAddress: "2N4qBb5f1KyfbpHxtLM86QgbZ7qcxsFf9AL",
-      amount: 4500,
-      primaryXpriv:
-        "tprv8gC86VUCsCShN6nKpgsAXQpW8c7n1gRaeajChkira5pKZgqmdBTz9Tni3X7xE1fkbT5qEWpfuYAizFuQnUQ5nq6LiK1GCCQUJhq4t8cvfVV",
-      scripts: multiSig.scripts,
-      token,
-      childIndex: 0,
-      walletID,
-    });
-    console.log(res);
-  }
-}
-
-// ////// SMOKE TEST ZONE //////
-// const smokeTest = new SmokeTest();
-// smokeTest.testSecureAccountFlow(parseInt(process.argv[2], 10));

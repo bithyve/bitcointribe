@@ -41,6 +41,9 @@ import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
 //TODO: SecureAccount
 import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+let arr_PopupMsg = localization("ValidateSecureAccountScreen.popupMsg");
 export default class ValidateSecureAccountScreen extends React.Component {
   constructor(props: any) {
     super(props);
@@ -109,28 +112,30 @@ export default class ValidateSecureAccountScreen extends React.Component {
             this.state.data
           );
         } else {
+          let arr_failed = arr_PopupMsg[0].failed;
           this.setState({
             alertPopupData: [
               {
                 theme: "danger",
                 status: true,
                 icon: "frown",
-                title: "Oops",
-                subtitle: "Setup failed.",
+                title: arr_failed.title,
+                subtitle: arr_failed.subTitle,
                 goBackStatus: false
               }
             ]
           });
         }
       } else {
+        let arr_failedInvalidToken = arr_PopupMsg[0].failedInvalidToken;
         this.setState({
           alertPopupData: [
             {
               theme: "danger",
               status: true,
               icon: "frown",
-              title: "Oops",
-              subtitle: errorMessage.invalidToken,
+              title: arr_failedInvalidToken.title,
+              subtitle: arr_failedInvalidToken.subTitle,
               goBackStatus: false
             }
           ]
@@ -156,6 +161,7 @@ export default class ValidateSecureAccountScreen extends React.Component {
       sercureData
     );
     if (resultCreateAccount) {
+      let arr_success = arr_PopupMsg[0].success;
       this.setState({
         isLoading: false,
         alertPopupData: [
@@ -163,8 +169,8 @@ export default class ValidateSecureAccountScreen extends React.Component {
             theme: "success",
             status: true,
             icon: "smile",
-            title: "Success",
-            subtitle: msg.successSecureAccount,
+            title: arr_success.title,
+            subtitle: arr_success.subTitle,
             goBackStatus: true
           }
         ]
@@ -205,11 +211,15 @@ export default class ValidateSecureAccountScreen extends React.Component {
                 style={styles.secureLogo}
                 source={images.secureAccount.validationKey}
               />
-              <Text style={styles.txtTitle}>Validate Secure Account</Text>
+              <Text style={styles.txtTitle}>
+                {localization("ValidateSecureAccountScreen.title")}
+              </Text>
               <Input
                 name={this.state.tokenKey}
                 value={this.state.tokenKey}
-                placeholder="Enter Token Key"
+                placeholder={localization(
+                  "ValidateSecureAccountScreen.txtInputPlaceholder"
+                )}
                 keyboardType={"numeric"}
                 placeholderTextColor={Platform.OS == "ios" ? "#fff" : "#000"}
                 style={styles.input}
@@ -227,7 +237,12 @@ export default class ValidateSecureAccountScreen extends React.Component {
                 disabled={this.state.validBtnStaus}
                 onPress={() => this.click_Validation()}
               >
-                <Text> VALIDATION </Text>
+                <Text>
+                  {" "}
+                  {localization(
+                    "ValidateSecureAccountScreen.btnValidation"
+                  )}{" "}
+                </Text>
               </Button>
             </View>
           </Content>
@@ -274,7 +289,7 @@ const styles = StyleSheet.create({
   },
   txtTitle: {
     fontWeight: "bold",
-    color: "#fff",
+    color: "#000000",
     fontSize: 24
   },
   //view:createAccountBtn

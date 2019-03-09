@@ -37,6 +37,10 @@ import vaultAccount from "bithyve/src/bitcoin/services/VaultAccount";
 
 //TODO:flags
 let flag_SelectType: boolean = null;
+
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 export default class VaultAccountScreen extends React.Component {
   constructor(props: any) {
     super(props);
@@ -128,8 +132,8 @@ export default class VaultAccountScreen extends React.Component {
             theme: "success",
             status: true,
             icon: "smile",
-            title: "Success",
-            subtitle: msg.createVaultAccount,
+            title: localization("VaultAccountScreen.pupoupTitle"),
+            subtitle: localization("VaultAccountScreen.pupoupSubTitle"),
             goBackStatus: true
           }
         ]
@@ -138,11 +142,7 @@ export default class VaultAccountScreen extends React.Component {
   }
 
   render() {
-    const data = [
-      { id: 1, label: "3 Months (90 days)", days: 90 },
-      { id: 2, label: "6 Months (180 days)", days: 180 },
-      { id: 3, label: "9 Months (270 days)", days: 270 }
-    ];
+    const data = localization("VaultAccountScreen.data");
     return (
       <Container>
         <Content contentContainerStyle={styles.container} scrollEnabled={true}>
@@ -164,7 +164,9 @@ export default class VaultAccountScreen extends React.Component {
                 style={styles.secureLogo}
                 source={images.secureAccount.secureLogo}
               />
-              <Text style={styles.txtTitle}>Vault Account</Text>
+              <Text style={styles.txtTitle}>
+                {localization("VaultAccountScreen.title")}
+              </Text>
               <Text style={styles.txtLorem} />
             </View>
             <View style={styles.viewDatePicekr}>
@@ -232,7 +234,7 @@ export default class VaultAccountScreen extends React.Component {
                 disabled={this.state.flag_createBtnstatus}
                 onPress={() => this.click_createVaultAccount()}
               >
-                <Text>Create</Text>
+                <Text>{localization("VaultAccountScreen.btnCreate")}</Text>
               </Button>
             </View>
           </ImageBackground>

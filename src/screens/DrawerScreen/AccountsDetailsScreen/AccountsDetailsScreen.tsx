@@ -52,6 +52,13 @@ import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
 import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
 import vaultAccount from "bithyve/src/bitcoin/services/VaultAccount";
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+let arr_AppConfigPopPupMsg = localization("appConfig.popUp");
+let arr_amountTrnasfer = arr_AppConfigPopPupMsg[0].amountTrnasfer;
+let arr_successMsg = arr_amountTrnasfer[0].successMsg;
+let arr_failedMsg = arr_amountTrnasfer[0].failedMsg;
+let arr_failedInvalidToken = arr_amountTrnasfer[0].failedInvalidToken;
 interface Props {}
 interface State {}
 export default class AccountDetailsScreen extends React.Component<
@@ -400,8 +407,8 @@ export default class AccountDetailsScreen extends React.Component<
               theme: "success",
               status: true,
               icon: "smile",
-              title: "Success",
-              subtitle: msg.transactionSccuess,
+              title: arr_successMsg.title,
+              subtitle: arr_successMsg.subTitle,
               goBackStatus: true
             }
           ]
@@ -444,8 +451,8 @@ export default class AccountDetailsScreen extends React.Component<
               theme: "success",
               status: true,
               icon: "smile",
-              title: "Success",
-              subtitle: msg.amountTranSuccess,
+              title: arr_successMsg.title,
+              subtitle: arr_successMsg.subTitle,
               goBackStatus: false
             }
           ]
@@ -457,8 +464,8 @@ export default class AccountDetailsScreen extends React.Component<
               theme: "danger",
               status: true,
               icon: "frown",
-              title: "Oops",
-              subtitle: errorMessages.invalidToken,
+              title: arr_failedInvalidToken.title,
+              subtitle: arr_failedInvalidToken.subTitle,
               goBackStatus: false
             }
           ]
@@ -560,10 +567,12 @@ export default class AccountDetailsScreen extends React.Component<
                       transferAmountPopupDAta: [
                         {
                           status: true,
-                          subtitle:
-                            "From " +
-                            this.state.data.accountType.toLowerCase() +
-                            " to",
+                          subtitle: localization(
+                            "AccountDetailsScreen.popUpTransfer.subtitle",
+                            {
+                              accountName: this.state.data.accountType.toLowerCase()
+                            }
+                          ),
                           data: this.state.arr_transferAccountList
                         }
                       ]
@@ -583,7 +592,9 @@ export default class AccountDetailsScreen extends React.Component<
                   size={25}
                   color="#ffffff"
                 />
-                <Text style={styles.txtTile}>TRANSFER</Text>
+                <Text style={styles.txtTile}>
+                  {localization("AccountDetailsScreen.btnTRANSFER")}
+                </Text>
               </Button>
             )}
             <Button
@@ -612,7 +623,9 @@ export default class AccountDetailsScreen extends React.Component<
                 size={25}
                 color="#ffffff"
               />
-              <Text style={styles.txtTile}>Send</Text>
+              <Text style={styles.txtTile}>
+                {localization("AccountDetailsScreen.btnSEND")}
+              </Text>
             </Button>
             <Button
               style={styles.footerBtnAction}
@@ -632,7 +645,9 @@ export default class AccountDetailsScreen extends React.Component<
                 size={25}
                 color="#ffffff"
               />
-              <Text style={styles.txtTile}>Receive</Text>
+              <Text style={styles.txtTile}>
+                {localization("AccountDetailsScreen.btnRECEIVE")}
+              </Text>
             </Button>
           </View>
 
@@ -671,12 +686,16 @@ export default class AccountDetailsScreen extends React.Component<
                     {
                       status: true,
                       icon: "check-circle",
-                      title: "Confirmation",
-                      subtitle:
-                        "Are you sure Saving account to " +
-                        accountType +
-                        " account transfer amount.",
-                      confirmTitle: "CONFIRM"
+                      title: localization(
+                        "AccountDetailsScreen.popUpConfirmation.title"
+                      ),
+                      subtitle: localization(
+                        "AccountDetailsScreen.popUpConfirmation.subTitle",
+                        { accountType: accountType }
+                      ),
+                      confirmTitle: localization(
+                        "AccountDetailsScreen.popUpConfirmation.btnConfirm"
+                      )
                     }
                   ]
                 });
@@ -704,12 +723,16 @@ export default class AccountDetailsScreen extends React.Component<
                     {
                       status: true,
                       icon: "check-circle",
-                      title: "Confirmation",
-                      subtitle:
-                        "Are you sure Saving account to " +
-                        accountType +
-                        " account transfer amount.",
-                      confirmTitle: "CONFIRM"
+                      title: localization(
+                        "AccountDetailsScreen.popUpConfirmation.title"
+                      ),
+                      subtitle: localization(
+                        "AccountDetailsScreen.popUpConfirmation.subTitle",
+                        { accountType: accountType }
+                      ),
+                      confirmTitle: localization(
+                        "AccountDetailsScreen.popUpConfirmation.btnConfirm"
+                      )
                     }
                   ]
                 });
@@ -759,8 +782,8 @@ export default class AccountDetailsScreen extends React.Component<
                           theme: "success",
                           status: true,
                           icon: "smile",
-                          title: "Success",
-                          subtitle: msg.amountTranSuccess,
+                          title: arr_successMsg.title,
+                          subtitle: arr_successMsg.subTitle,
                           goBackStatus: false
                         }
                       ]
@@ -769,6 +792,7 @@ export default class AccountDetailsScreen extends React.Component<
                 } else if (this.state.selectedAccountType == "Secure") {
                   console.log("its working");
                   const transfer = this.state.securetransfer;
+                  console.log({ transfer });
                   this.setState({
                     arr_SecureAuthPopupData: [
                       {

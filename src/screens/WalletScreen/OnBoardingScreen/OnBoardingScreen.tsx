@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, StatusBar } from "react-native";
 import { StackActions, NavigationActions } from "react-navigation";
 import CreateTables from "bithyve/src/app/manager/database/CreateTables";
 import PushController from "bithyve/src/app/manager/Notification/PushController";
@@ -9,6 +9,9 @@ import ViewOnBoarding from "bithyve/src/app/custcompontes/view/ViewOnBoarding";
 import onBoardingData from "bithyve/src/assets/jsonfiles/onBoardingScreen/onBoardingScreen.json";
 //TODO: Custome object
 import { colors, images, msg } from "bithyve/src/app/constants/Constants";
+
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
 
 export default class OnBoardingScreen extends React.Component<any, any> {
   constructor(props: any) {
@@ -20,7 +23,7 @@ export default class OnBoardingScreen extends React.Component<any, any> {
 
   componentWillMount() {
     this.setState({
-      data: onBoardingData.onBoarding
+      data: localization("OnBoardingScreen.onBoarding")
     });
   }
 
@@ -40,26 +43,27 @@ export default class OnBoardingScreen extends React.Component<any, any> {
   render() {
     const data = [
       {
-        backgroundColor: "#fff",
+        backgroundColor: this.state.data[0].backgroundColor,
         image: images.onBoardingScreen.onB1,
-        title: msg.onBoarding.title1,
-        subtitle: msg.onBoarding.subTitle1
+        title: this.state.data[0].title,
+        subtitle: this.state.data[0].subtitle
       },
       {
-        backgroundColor: "#fff",
+        backgroundColor: this.state.data[1].backgroundColor,
         image: images.onBoardingScreen.onB2,
-        title: msg.onBoarding.title2,
-        subtitle: msg.onBoarding.subTitle2
+        title: this.state.data[1].title,
+        subtitle: this.state.data[2].subtitle
       },
       {
-        backgroundColor: "#fff",
+        backgroundColor: this.state.data[2].backgroundColor,
         image: images.onBoardingScreen.onB3,
-        title: msg.onBoarding.title3,
-        subtitle: msg.onBoarding.subTitle3
+        title: this.state.data[2].title,
+        subtitle: this.state.data[2].subtitle
       }
     ];
     return (
       <View style={styles.container}>
+        <StatusBar backgroundColor={colors.appColor} barStyle="dark-content" />
         <ViewOnBoarding data={data} click_Done={() => this.click_Done()} />
         <CreateTables />
         <PushController />

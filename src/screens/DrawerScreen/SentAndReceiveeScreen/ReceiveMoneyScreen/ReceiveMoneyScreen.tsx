@@ -52,7 +52,7 @@ export default class ReceiveMoneyScreen extends React.Component {
       flag_SecuretCodeVisible: false,
       seconds: 5,
       imageURI:
-        "https://user-images.githubusercontent.com/24726539/53616505-db68e380-3c08-11e9-814b-bbb34152430c.png"
+        "file://data/user/0/com.mymoney/cache/ReactNative-snapshot-image1856300205.jpg"
     };
   }
 
@@ -89,17 +89,6 @@ export default class ReceiveMoneyScreen extends React.Component {
       console.log(e);
     }
   }
-
-  captureScreenFunction = () => {
-    captureScreen({
-      format: "jpg",
-      quality: 0.8
-    }).then(
-      uri => this.setState({ imageURI: uri }),
-      error => console.error("Oops, Something Went Wrong", error)
-    );
-  };
-
   async createJointAccount() {
     const { navigation } = this.props;
     let data = navigation.getParam("data");
@@ -272,11 +261,88 @@ export default class ReceiveMoneyScreen extends React.Component {
               )}
             </View>
             <View style={styles.viewShareButtonMain}>
-              <View style={styles.viewSahreBtn}>
-                <ActionButton buttonColor="rgba(231,76,60,1)">
-                  <ActionButton.Item
-                    buttonColor="#9b59b6"
-                    title="New Task"
+              {renderIf(Platform.OS == "ios")(
+                <View style={styles.viewSahreBtn}>
+                  <ActionButton buttonColor="rgba(231,76,60,1)">
+                    <ActionButton.Item
+                      buttonColor="#9b59b6"
+                      title="New Task"
+                      onPress={() => {
+                        try {
+                          AsyncStorage.setItem(
+                            "flag_BackgoundApp",
+                            JSON.stringify(false)
+                          );
+                          this.click_SentQrCode();
+                        } catch (e) {
+                          console.log(e);
+                        }
+                      }}
+                    >
+                      <Icon
+                        name="share-square"
+                        style={styles.actionButtonIcon}
+                      />
+                    </ActionButton.Item>
+                    <ActionButton.Item
+                      buttonColor="#000"
+                      title="Notifications"
+                      onPress={() => {
+                        try {
+                          AsyncStorage.setItem(
+                            "flag_BackgoundApp",
+                            JSON.stringify(false)
+                          );
+                        } catch (e) {
+                          console.log(e);
+                        }
+                        this.refs.viewShot.capture().then(uri => {
+                          try {
+                            Vibration.vibrate(100);
+                            Toast.show(
+                              "Barcode capture success.!",
+                              Toast.SHORT
+                            );
+                          } catch (e) {
+                            console.log(e);
+                          }
+
+                          CameraRoll.saveImageWithTag(
+                            uri,
+                            function(result) {
+                              console.log(result);
+                            },
+                            function(error) {
+                              console.log(error);
+                            }
+                          );
+                        });
+                      }}
+                    >
+                      <Icon name="barcode" style={styles.actionButtonIcon} />
+                    </ActionButton.Item>
+                    <ActionButton.Item
+                      buttonColor="#1abc9c"
+                      title="All Tasks"
+                      onPress={() =>
+                        this.click_CopyAddress(this.state.qrcodedata.toString())
+                      }
+                    >
+                      <Icon name="copy" style={styles.actionButtonIcon} />
+                    </ActionButton.Item>
+                  </ActionButton>
+                </View>
+              )}
+              {renderIf(Platform.OS == "android")(
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center"
+                  }}
+                >
+                  <Button
+                    transparent
+                    style={{ margin: 4 }}
                     onPress={() => {
                       try {
                         AsyncStorage.setItem(
@@ -289,11 +355,20 @@ export default class ReceiveMoneyScreen extends React.Component {
                       }
                     }}
                   >
-                    <Icon name="share-square" style={styles.actionButtonIcon} />
-                  </ActionButton.Item>
-                  <ActionButton.Item
-                    buttonColor="#000"
-                    title="Notifications"
+                    <Icon
+                      name="share-square"
+                      size={30}
+                      color="#ffffff"
+                      style={{
+                        backgroundColor: "#9b59b6",
+                        padding: 10,
+                        borderRadius: 10
+                      }}
+                    />
+                  </Button>
+                  <Button
+                    transparent
+                    style={{ margin: 4 }}
                     onPress={() => {
                       try {
                         AsyncStorage.setItem(
@@ -314,7 +389,6 @@ export default class ReceiveMoneyScreen extends React.Component {
                         } catch (e) {
                           console.log(e);
                         }
-
                         CameraRoll.saveImageWithTag(
                           uri,
                           function(result) {
@@ -327,20 +401,42 @@ export default class ReceiveMoneyScreen extends React.Component {
                       });
                     }}
                   >
-                    <Icon name="barcode" style={styles.actionButtonIcon} />
-                  </ActionButton.Item>
-                  <ActionButton.Item
-                    buttonColor="#1abc9c"
-                    title="All Tasks"
+                    <Icon
+                      name="barcode"
+                      size={30}
+                      color="#ffffff"
+                      style={{
+                        backgroundColor: "#000000",
+                        padding: 10,
+                        borderRadius: 10
+                      }}
+                    />
+                  </Button>
+                  <Button
+                    transparent
+                    style={{ margin: 4 }}
                     onPress={() =>
                       this.click_CopyAddress(this.state.qrcodedata.toString())
                     }
                   >
-                    <Icon name="copy" style={styles.actionButtonIcon} />
-                  </ActionButton.Item>
-                </ActionButton>
-              </View>
+                    <Icon
+                      name="copy"
+                      size={30}
+                      color="#ffffff"
+                      style={{
+                        backgroundColor: "#1abc9c",
+                        padding: 10,
+                        borderRadius: 10
+                      }}
+                    />
+                  </Button>
+                </View>
+              )}
             </View>
+            <Image
+              style={{ width: 50, height: 50 }}
+              source={{ uri: this.state.imageURI }}
+            />
           </Content>
         </ImageBackground>
         <Loader loading={this.state.isLoading} color={colors.appColor} />

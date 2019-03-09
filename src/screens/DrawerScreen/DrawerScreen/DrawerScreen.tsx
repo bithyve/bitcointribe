@@ -21,6 +21,9 @@ import { images, errorValidMsg } from "bithyve/src/app/constants/Constants";
 //TODO: Json Files
 import menuData from "bithyve/src/assets/jsonfiles/drawerScreen/leftMenuList.json";
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 class DrawerScreen extends Component {
   constructor(props: any) {
     super(props);
@@ -37,7 +40,7 @@ class DrawerScreen extends Component {
   }
   getLeftMenuList() {
     this.setState({
-      menuBarList: menuData.menus
+      menuBarList: localization("DrawerScreen.menus")
     });
   }
   //TODO: Func show logout popup
@@ -63,9 +66,11 @@ class DrawerScreen extends Component {
           {
             status: true,
             icon: "check-circle",
-            title: "Confirmation",
-            subtitle: errorValidMsg.logoutConfirm,
-            confirmTitle: "CONFIRM"
+            title: localization("DrawerScreen.LogoutConfirmPopup.title"),
+            subtitle: localization("DrawerScreen.LogoutConfirmPopup.body"),
+            confirmTitle: localization(
+              "DrawerScreen.LogoutConfirmPopup.btnConfirm"
+            )
           }
         ]
       });

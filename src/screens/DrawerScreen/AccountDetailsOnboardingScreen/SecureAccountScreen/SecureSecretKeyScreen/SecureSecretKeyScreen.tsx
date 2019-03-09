@@ -27,6 +27,9 @@ import Toast from "react-native-simple-toast";
 //TODO: Custome Pages
 import { colors, images, msg } from "bithyve/src/app/constants/Constants";
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 export default class SecureSecretKeyScreen extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
@@ -116,19 +119,19 @@ export default class SecureSecretKeyScreen extends React.Component<any, any> {
                   bgColor="black"
                   fgColor="white"
                 />
-                <Text style={[styles.txtSecretKeyTitle]}>Secret</Text>
+                <Text style={[styles.txtSecretKeyTitle]}>
+                  {localization("SecureSecretKeyScreen.title")}
+                </Text>
                 <TouchableOpacity
                   onPress={() => this.click_CopySecretKey(this.state.secret)}
                 >
                   <Text>{this.state.secret}</Text>
                 </TouchableOpacity>
                 <Text style={styles.txtStaticMsg} note>
-                  {msg.secretKeyMsg}
+                  {localization("SecureSecretKeyScreen.subTitle")}
                 </Text>
                 <Text style={{ textAlign: "center", marginTop: 10 }}>
-                  Please keep the following details safe with you as they are
-                  crucial for recovery of the secure account (and we won't be
-                  storing it).
+                  {localization("SecureSecretKeyScreen.subTitle1")}
                 </Text>
                 <Text
                   style={{
@@ -138,7 +141,7 @@ export default class SecureSecretKeyScreen extends React.Component<any, any> {
                     textDecorationLine: "underline"
                   }}
                 >
-                  Recovery Mnemonic:
+                  {localization("SecureSecretKeyScreen.recoveryTitle")}
                 </Text>
                 <TouchableOpacity
                   onPress={() =>
@@ -157,7 +160,7 @@ export default class SecureSecretKeyScreen extends React.Component<any, any> {
                     textDecorationLine: "underline"
                   }}
                 >
-                  BitHyve Xpub:
+                  {localization("SecureSecretKeyScreen.bitHyveTitle")}
                 </Text>
                 <TouchableOpacity
                   onPress={() => this.click_CopySecretKey(this.state.bhXpub)}

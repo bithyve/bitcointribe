@@ -1,0 +1,283 @@
+{
+  "appConfig": {
+    "appName": "My Money",
+    "btnCancel": "रद्द करना",
+    "popUp": [
+      {
+        "amountTrnasfer": [
+          {
+            "successMsg": {
+              "title": "Success",
+              "subTitle": "Transaction Successfully Component."
+            },
+            "failedMsg": {
+              "title": "Oops",
+              "subTitle": "Transaction Not Completed."
+            },
+            "failedInvalidToken": {
+              "title": "Oops",
+              "subTitle": "Invalid token number.Please enter correct token number."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "LaunchScreen": {
+    "title": "My Money"
+  },
+  "OnBoardingScreen": {
+    "onBoarding": [
+      {
+        "backgroundColor": "#FFFFFF",
+        "image": "images.onBoardingScreen.onB1",
+        "title": "SOUND MONEY. SIMPLIFIED",
+        "subtitle": ""
+      },
+      {
+        "backgroundColor": "#FFFFFF",
+        "image": "images.onBoardingScreen.onB2",
+        "title": "Secure",
+        "subtitle": "While money needs to be smart, more importantly it needs to be secure. We are very keen to use the best industry standards in software delivery and cryptography to ensure this."
+      },
+      {
+        "backgroundColor": "#FFFFFF",
+        "image": "images.onBoardingScreen.onB3",
+        "title": "Self-sovereign",
+        "subtitle": "Our wallets are non-custodial and a user always has the control of their keys."
+      }
+    ]
+  },
+  "PasscodeConfirmScreen": {
+    "title": "My Money",
+    "subTitle": "Enter a PinCode",
+    "subTitleConfirm": "Confirm your Pincode.",
+    "issuetitle": "Error",
+    "issueSubTitle": "Please enter correct password."
+  },
+  "PasscodeScreen": {
+    "title": "My Money",
+    "subTitle": "Enter a PinCode",
+    "issuetitle": "Error",
+    "issueSubTitle": "Please enter correct password."
+  },
+  "DrawerScreen": {
+    "menus": [
+      {
+        "id": 1,
+        "icon": "home",
+        "title": "Home",
+        "pageName": "Home",
+        "desc": "Regular Account"
+      },
+      {
+        "id": 2,
+        "icon": "cog",
+        "title": "Settings",
+        "pageName": "BackupPhraseScreen",
+        "desc": "IOS New Lang"
+      },
+      {
+        "id": 3,
+        "icon": "sign-out",
+        "title": "Logout",
+        "pageName": "LogoutScreen",
+        "desc": "IOS New Lang"
+      }
+    ],
+    "LogoutConfirmPopup": {
+      "title": "Confirmation",
+      "body": "Are you sure you want to log out?",
+      "btnConfirm": "CONFIRM"
+    }
+  },
+  "TabBarItem": {
+    "Payment": "Payment",
+    "Analytics": "Analytics",
+    "Accounts": "Accounts",
+    "Cards": "Cards",
+    "More": "More"
+  },
+  "AccountsScreen": {
+    "title": "My Money",
+    "createaWallet": "Create a wallet"
+  },
+  "TransactionDetailsWebViewScreen": {
+    "headerTitle": "Transaction Details",
+    "tranType": "Transaction Type:{{transType}}",
+    "txtHash": "Hash",
+    "txtDate": "Date",
+    "txtAmount": "Amount",
+    "txtFee": "Fee"
+  },
+  "ViewRecentTransaction": {
+    "noTransactions": "No Transactions"
+  },
+  "AccountDetailsOnboardingScreen": {
+    "Secure": [
+      {
+        "backgroundColor": "#ffffff",
+        "title": "",
+        "subtitle": "Secure your wallet with state of art the Google Authenticator based 2FA."
+      },
+      {
+        "backgroundColor": "#ffffff",
+        "title": "",
+        "subtitle": "Enter/scan the code in your Google Authenticator App and you are ready."
+      },
+      {
+        "backgroundColor": "#ffffff",
+        "title": "",
+        "subtitle": "Keep the code, MyMoneyApp pub key and the secondary mnenmonic safe and secure in a separate location."
+      }
+    ],
+    "Joint": [
+      {
+        "backgroundColor": "#ffffff",
+        "title": "",
+        "subtitle": "Create a Joint Account in less than a minute with your partner/friend across the globe. Enter your name and name the account to generate a QR Code."
+      },
+      {
+        "backgroundColor": "#ffffff",
+        "title": "",
+        "subtitle": "Other party scans the QR code and sends an acknowledgement. As soon as you acknowledge your account is ready for action."
+      },
+      {
+        "backgroundColor": "#ffffff",
+        "title": "",
+        "subtitle": "Any of you can initiate the transaction but needs to be signed by both."
+      }
+    ],
+    "Vault": [
+      {
+        "backgroundColor": "#ffffff",
+        "title": "",
+        "subtitle": "Save your funds for important occasions by locking them up for a pre-set duration."
+      },
+      {
+        "backgroundColor": "#ffffff",
+        "title": "",
+        "subtitle": "Your funds are released and ready to use on the pre-set date."
+      }
+    ]
+  },
+  "SecureAccountScreen": {
+    "title": "Secure Account",
+    "btnCreateAccount": "CREATE ACCOUNT"
+  },
+  "SecureSecretKeyScreen": {
+    "title": "Secret",
+    "subTitle": "Scan the above QR or enter the secret manually into your Google Authenticator",
+    "subTitle1": "Please keep the following details safe with you as they are crucial for recovery of the secure account (and we won't be storing it).",
+    "recoveryTitle": "Recovery Mnemonic:",
+    "bitHyveTitle": "BitHyve Xpub:"
+  },
+  "ValidateSecureAccountScreen": {
+    "title": "Validate Secure Account",
+    "txtInputPlaceholder": "Enter Token Key",
+    "btnValidation": "VALIDATION",
+    "popupMsg": [
+      {
+        "success": {
+          "title": "Success",
+          "subTitle": "Secure account Created."
+        },
+        "failed": {
+          "title": "Oops",
+          "subTitle": "Setup failed."
+        },
+        "failedInvalidToken": {
+          "title": "Oops",
+          "subTitle": "Invalid token number.Please enter correct token number."
+        }
+      }
+    ]
+  },
+  "VaultAccountScreen": {
+    "title": "Vault Account",
+    "data": [
+      {
+        "id": 1,
+        "label": "3 Months (90 days)",
+        "days": 90
+      },
+      {
+        "id": 2,
+        "label": "6 Months (180 days)",
+        "days": 180
+      },
+      {
+        "id": 3,
+        "label": "9 Months (270 days)",
+        "days": 270
+      }
+    ],
+    "btnCreate": "Create",
+    "pupoupTitle": "Success",
+    "pupoupSubTitle": "Vault account created."
+  },
+  "CreateJointAccountScreen": {
+    "title": "Joint Account",
+    "txtInputNamePlaceholder": "Enter your name",
+    "txtInputAccountName": "Enter account name",
+    "btnInitiate": "INITIATE",
+    "or": "OR",
+    "btnMerge": "MERGE",
+    "popupTitle": "Success",
+    "popupBody": "Joint account created."
+  },
+  "MergeConfirmJointAccountScreen": {
+    "headerTitle": "Merge Confirmation",
+    "jointbody": "Do you want to have a joint account {{nameInitiate}} , ",
+    "jointbody1": "with {{nameAccountName}} ?",
+    "txtInputName": "Enter your name",
+    "btnMerge": "MERGE",
+    "popupTitle": "Success",
+    "popupBody": "Joint account created."
+  },
+  "AccountDetailsScreen": {
+    "btnTRANSFER": "TRANSFER",
+    "btnSEND": "SEND",
+    "btnRECEIVE": "RECEIVE",
+    "popUpTransfer": {
+      "title": "TRANSFER AMOUNT",
+      "subtitle": "From {{accountName}} to",
+      "txtInpurtAmountPlaceholder": "Enter BTC Amount"
+    },
+    "popUpConfirmation": {
+      "title": "Confirmation",
+      "subTitle": "Are you sure Saving account to {{accountType}} account transfer amount.",
+      "btnConfirm": "CONFIRM"
+    }
+  },
+  "SentMoneyScreen": {
+    "headerTitle": "Send Money",
+    "txtInputAddressPlaceholder": "Address",
+    "txtInputAmountPlaceholder": "Amount(BTC)",
+    "btnSend": "SEND",
+    "secureAccountFaPopUp": {
+      "title": "New Transaction",
+      "txtAmount": "Amount:",
+      "txtFee": "Fee:",
+      "txtRecipient": "Recipient:",
+      "txttokenNoPlaceholder": "2FA gauth token",
+      "btnCancel": "CANCEL",
+      "btnSend": "SEND"
+    }
+  },
+  "MoreScreen": {
+    "btnShowBackupPhrase": "Show Backup Phrase"
+  },
+  "BackupPhraseScreen": {
+    "headerTitle": "Backup Phrase",
+    "bodyMsg1": "These 12 words are they only way to restore your My Money App.",
+    "bodyMsg2": "Save them somewhere safe and secret.",
+    "btnCopy": "COPY",
+    "btnNext": "NEXT"
+  },
+  "VerifyBackupPhraseScreen": {
+    "headerTitle": "Verification",
+    "bodyMsg1": "Tap the words to put them next to each other in the correct order.",
+    "btnDone": "DONE"
+  }
+}

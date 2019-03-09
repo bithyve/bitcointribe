@@ -15,6 +15,9 @@ import { colors } from "../../constants/Constants";
 import renderIf from "../../constants/validation/renderIf";
 var utils = require("../../../app/constants/Utils");
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 interface Props {
   data: [];
   openRecentTrans: Function;
@@ -48,7 +51,7 @@ export default class ViewRecentTransaction extends Component<Props, any> {
               source={require("../../../assets/images/faceIcon/normalFaceIcon.png")}
             />
             <Text style={styles.txtNoTransaction} note>
-              No Transactions
+              {localization("ViewRecentTransaction.noTransactions")}
             </Text>
           </View>
         )}

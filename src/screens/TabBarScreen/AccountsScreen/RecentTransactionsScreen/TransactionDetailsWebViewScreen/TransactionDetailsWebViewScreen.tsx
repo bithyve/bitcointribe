@@ -13,6 +13,9 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome5";
 import Loader from "react-native-modal-loader";
 import { colors, images } from "bithyve/src/app/constants/Constants";
+
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
 export default class TransactionDetailsWebViewScreen extends Component {
   constructor(props: any) {
     super(props);
@@ -44,7 +47,7 @@ export default class TransactionDetailsWebViewScreen extends Component {
                 numberOfLines={1}
                 style={styles.txtAppTitle}
               >
-                Transaction Details
+                {localization("TransactionDetailsWebViewScreen.headerTitle")}
               </Title>
             </Body>
             <Right />

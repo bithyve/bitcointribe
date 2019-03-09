@@ -27,6 +27,9 @@ import Toast from "react-native-simple-toast";
 //TODO: Custome Pages
 import { images } from "bithyve/src/app/constants/Constants";
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 export default class VerifyBackupPhraseScreen extends React.Component {
   constructor(props: any) {
     super(props);
@@ -199,7 +202,7 @@ export default class VerifyBackupPhraseScreen extends React.Component {
                 numberOfLines={1}
                 style={styles.titleUserName}
               >
-                Verification
+                {localization("VerifyBackupPhraseScreen.headerTitle")}
               </Title>
             </Body>
             <Right />
@@ -212,8 +215,7 @@ export default class VerifyBackupPhraseScreen extends React.Component {
                 source={images.verifyBackupPhraseScreen.verifyBackupPhraseLogo}
               />
               <Text style={styles.desc}>
-                Tap the words to put them next to each other in the correct
-                order.
+                {localization("VerifyBackupPhraseScreen.bodyMsg1")}
               </Text>
             </View>
             <View style={styles.viewNumanicValueConfi}>
@@ -265,7 +267,7 @@ export default class VerifyBackupPhraseScreen extends React.Component {
                   textAlign: "center"
                 }}
               >
-                DONE
+                {localization("VerifyBackupPhraseScreen.btnDone")}
               </Text>
             </Button>
           </Footer>
@@ -292,6 +294,8 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   desc: {
+    marginLeft: 5,
+    marginRight: 5,
     textAlign: "center",
     color: "gray"
   },
