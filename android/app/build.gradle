@@ -1,6 +1,8 @@
 apply plugin: "com.android.application"
 
 import com.android.build.OutputFile
+apply plugin: 'io.fabric'
+
 
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
@@ -105,8 +107,9 @@ android {
         applicationId "com.mymoney"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+        multiDexEnabled true
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0.070319"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -160,7 +163,14 @@ configurations.all {
  }
   }
 
+
+
+
 dependencies {
+compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
+transitive = true;
+}
+    compile project(':react-native-i18n')
     compile project(':react-native-lewin-qrcode')
     compile project(':react-native-view-shot')
     compile project(':react-native-fcm')

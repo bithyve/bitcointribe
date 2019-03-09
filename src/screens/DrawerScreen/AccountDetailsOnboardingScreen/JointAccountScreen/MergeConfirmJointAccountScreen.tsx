@@ -41,6 +41,9 @@ import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
 
 const { width } = Dimensions.get("window");
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 export default class MergeConfirmJointAccountScreen extends React.Component {
   constructor(props: any) {
     super(props);
@@ -136,8 +139,8 @@ export default class MergeConfirmJointAccountScreen extends React.Component {
             theme: "success",
             status: true,
             icon: "smile",
-            title: "Success",
-            subtitle: msg.createJoinAccount,
+            title: localization("MergeConfirmJointAccountScreen.popupTitle"),
+            subtitle: localization("MergeConfirmJointAccountScreen.popupBody"),
             goBackStatus: true
           }
         ]
@@ -164,7 +167,7 @@ export default class MergeConfirmJointAccountScreen extends React.Component {
                 numberOfLines={1}
                 style={styles.titleUserName}
               >
-                Merge Confirmation
+                {localization("MergeConfirmJointAccountScreen.headerTitle")}
               </Title>
             </Body>
             <Right />
@@ -176,32 +179,40 @@ export default class MergeConfirmJointAccountScreen extends React.Component {
                 source={images.secureAccount.secureLogo}
               />
               <Text style={styles.txtTitle}>
-                Do you want to have a joint account, {this.state.data.wn}, with{" "}
-                {this.state.data.cn}?
+                {localization("MergeConfirmJointAccountScreen.jointbody", {
+                  nameInitiate: this.state.data.cn
+                })}
+                {localization("MergeConfirmJointAccountScreen.jointbody1", {
+                  nameAccountName: this.state.data.wn
+                })}
               </Text>
             </View>
 
             <View style={styles.viewInputValues}>
-              <Input
-                name={this.state.name}
-                value={this.state.name}
-                placeholder="Enter your name"
-                keyboardType={"default"}
-                placeholderTextColor={Platform.OS == "ios" ? "#000" : "#000"}
-                style={styles.input}
-                onChangeText={text => {
-                  this.setState({ name: text });
-                  let flag_disableValue: boolean;
-                  if (text == "" || this.state.name == "") {
-                    flag_disableValue = true;
-                  } else {
-                    flag_disableValue = false;
-                  }
-                  this.setState({
-                    flag_disableMergeBtn: flag_disableValue
-                  });
-                }}
-              />
+              <View style={{ height: 50 }}>
+                <Input
+                  name={this.state.name}
+                  value={this.state.name}
+                  placeholder={localization(
+                    "MergeConfirmJointAccountScreen.txtInputName"
+                  )}
+                  keyboardType={"default"}
+                  placeholderTextColor={Platform.OS == "ios" ? "#000" : "#000"}
+                  style={styles.input}
+                  onChangeText={text => {
+                    this.setState({ name: text });
+                    let flag_disableValue: boolean;
+                    if (text == "" || this.state.name == "") {
+                      flag_disableValue = true;
+                    } else {
+                      flag_disableValue = false;
+                    }
+                    this.setState({
+                      flag_disableMergeBtn: flag_disableValue
+                    });
+                  }}
+                />
+              </View>
               <Button
                 full
                 style={styles.btnMerge}
@@ -214,7 +225,10 @@ export default class MergeConfirmJointAccountScreen extends React.Component {
                 ]}
                 onPress={() => this.click_JointAccount()}
               >
-                <Text> Merge </Text>
+                <Text>
+                  {" "}
+                  {localization("MergeConfirmJointAccountScreen.btnMerge")}{" "}
+                </Text>
               </Button>
             </View>
           </Content>

@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground } from "react-native";
+import { StyleSheet, ImageBackground, StatusBar } from "react-native";
 import {
   Container,
   Header,
@@ -13,12 +13,16 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome";
 
 //TODO: Custome Pages
-import { images } from "bithyve/src/app/constants/Constants";
+import { images, colors } from "bithyve/src/app/constants/Constants";
+
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
 
 export default class CardsScreen extends React.Component {
   render() {
     return (
       <Container>
+        <StatusBar backgroundColor={colors.appColor} barStyle="dark-content" />
         <ImageBackground source={images.appBackgound} style={styles.container}>
           <Header transparent>
             <Left>
@@ -31,7 +35,7 @@ export default class CardsScreen extends React.Component {
             </Left>
 
             <Body style={{ flex: 0, alignItems: "center" }}>
-              <Title>My Money</Title>
+              <Title>{localization("appConfig.appName")}</Title>
             </Body>
             <Right>
               <Button transparent>

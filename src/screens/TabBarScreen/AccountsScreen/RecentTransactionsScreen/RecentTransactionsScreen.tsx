@@ -26,6 +26,9 @@ import { colors, images } from "bithyve/src/app/constants/Constants";
 var utils = require("bithyve/src/app/constants/Utils");
 import renderIf from "bithyve/src/app/constants/validation/renderIf";
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 export default class RecentTransactionsScreen extends React.Component {
   constructor(props: any) {
     super(props);
@@ -48,15 +51,15 @@ export default class RecentTransactionsScreen extends React.Component {
     }
     var temp = [
       {
-        title: "Hash",
+        title: localization("TransactionDetailsWebViewScreen.txtHash"),
         content: recentTrans.transactionHash
       },
       {
-        title: "Date",
+        title: localization("TransactionDetailsWebViewScreen.txtDate"),
         content: utils.getUnixToDateFormat(recentTrans.lastUpdated)
       },
       {
-        title: "Amount",
+        title: localization("TransactionDetailsWebViewScreen.txtAmount"),
         content: recentTrans.balance / 1e8
       },
       // {
@@ -64,7 +67,7 @@ export default class RecentTransactionsScreen extends React.Component {
       //   content: "pending"
       // },
       {
-        title: "Fee",
+        title: localization("TransactionDetailsWebViewScreen.txtFee"),
         content: recentTrans.fees / 1e8
       }
     ];
@@ -101,7 +104,10 @@ export default class RecentTransactionsScreen extends React.Component {
         style={[styles.content, isActive ? styles.active : styles.inactive]}
         transition="backgroundColor"
       >
-        {renderIf(section.title == "Hash")(
+        {renderIf(
+          section.title ==
+            localization("TransactionDetailsWebViewScreen.txtHash")
+        )(
           <TouchableOpacity
             key={section.content}
             onPress={() => this.openHashDetails([section.content])}
@@ -122,7 +128,10 @@ export default class RecentTransactionsScreen extends React.Component {
             </View>
           </TouchableOpacity>
         )}
-        {renderIf(section.title != "Hash")(
+        {renderIf(
+          section.title !=
+            localization("TransactionDetailsWebViewScreen.txtHash")
+        )(
           <Animatable.Text
             style={styles.content}
             animation={isActive ? "bounceIn" : undefined}
@@ -157,7 +166,7 @@ export default class RecentTransactionsScreen extends React.Component {
                 numberOfLines={1}
                 style={styles.titleUserName}
               >
-                Transaction Details
+                {localization("TransactionDetailsWebViewScreen.headerTitle")}
               </Title>
             </Body>
             <Right />
@@ -168,7 +177,9 @@ export default class RecentTransactionsScreen extends React.Component {
           >
             <ScrollView>
               <Text style={[styles.title]}>
-                Transaction Type : {this.state.transType}
+                {localization("TransactionDetailsWebViewScreen.tranType", {
+                  transType: this.state.transType
+                })}
               </Text>
               <Accordion
                 activeSections={activeSections}

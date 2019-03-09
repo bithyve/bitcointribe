@@ -2,7 +2,14 @@
  * Created by dungtran on 8/20/17.
  */
 import React, { Component } from "react";
-import { StyleSheet, Text, View, AsyncStorage, Animated } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  AsyncStorage,
+  Animated,
+  StatusBar
+} from "react-native";
 import { StackActions, NavigationActions } from "react-navigation";
 import CodeInput from "react-native-confirmation-code-input";
 import * as Keychain from "react-native-keychain";
@@ -23,6 +30,9 @@ import Singleton from "bithyve/src/app/constants/Singleton";
 //TODO: RegularAccount
 import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 export default class PasscodeConfirmScreen extends Component {
   constructor(props) {
     super(props);
@@ -30,7 +40,7 @@ export default class PasscodeConfirmScreen extends Component {
       mnemonicValues: [],
       status: "choice",
       pincode: "",
-      success: "Enter a PinCode",
+      success: localization("PasscodeConfirmScreen.subTitle"),
       isLoading: false
     };
     isNetwork = utils.getNetwork();
@@ -65,7 +75,7 @@ export default class PasscodeConfirmScreen extends Component {
     this.setState({
       status: "confirm",
       pincode: code,
-      success: errorValidMsg.confirmPincode
+      success: localization("PasscodeConfirmScreen.subTitleConfirm")
     });
     this.flipCard();
   }
@@ -95,8 +105,8 @@ export default class PasscodeConfirmScreen extends Component {
     } else {
       this.dropdown.alertWithType(
         "error",
-        "Error",
-        errorValidMsg.correctPassword
+        localization("PasscodeConfirmScreen.issuetitle"),
+        localization("PasscodeConfirmScreen.issueSubTitle")
       );
     }
   }
@@ -196,8 +206,9 @@ export default class PasscodeConfirmScreen extends Component {
     };
     return (
       <View style={styles.container}>
+        <StatusBar backgroundColor={colors.appColor} barStyle="dark-content" />
         <Text style={[styles.txtTitle, { color: "#000", fontWeight: "bold" }]}>
-          My Money
+          {localization("appConfig.appName")}
         </Text>
         <Text style={{ color: "#000", marginTop: 10 }}>
           {this.state.success}

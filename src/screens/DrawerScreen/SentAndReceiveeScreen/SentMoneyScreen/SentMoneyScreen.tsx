@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import {
   StyleSheet,
   ImageBackground,
@@ -47,9 +47,15 @@ import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
 import vaultAccount from "bithyve/src/bitcoin/services/VaultAccount";
 import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
 
-export default class SentMoneyScreen extends React.Component {
-  constructor() {
-    super();
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+let arr_AppConfigPopPupMsg = localization("appConfig.popUp");
+let arr_amountTrnasfer = arr_AppConfigPopPupMsg[0].amountTrnasfer;
+let arr_successMsg = arr_amountTrnasfer[0].successMsg;
+let arr_failedMsg = arr_amountTrnasfer[0].failedMsg;
+export default class SentMoneyScreen extends Component<any, any> {
+  constructor(props: any) {
+    super(props);
     this.state = {
       data: [],
       walletJSON: [],
@@ -178,19 +184,19 @@ export default class SentMoneyScreen extends React.Component {
             lastUpdateDate
           );
           if (resultUpdateTblAccount) {
-            (isLoading = false),
-              this.setState({
-                alertPopupData: [
-                  {
-                    theme: "success",
-                    status: true,
-                    icon: "smile",
-                    title: "Success",
-                    subtitle: msg.transactionSccuess,
-                    goBackStatus: true
-                  }
-                ]
-              });
+            isLoading = false;
+            this.setState({
+              alertPopupData: [
+                {
+                  theme: "success",
+                  status: true,
+                  icon: "smile",
+                  title: arr_successMsg.title,
+                  subtitle: arr_successMsg.subTitle,
+                  goBackStatus: true
+                }
+              ]
+            });
           } else {
             (isLoading = false),
               this.setState({
@@ -199,8 +205,8 @@ export default class SentMoneyScreen extends React.Component {
                     theme: "danger",
                     status: true,
                     icon: "frown",
-                    title: "Oops",
-                    subtitle: errorMessage.transactionFailed,
+                    title: arr_failedMsg.title,
+                    subtitle: arr_failedMsg.subTitle,
                     goBackStatus: false
                   }
                 ]
@@ -262,8 +268,8 @@ export default class SentMoneyScreen extends React.Component {
                     theme: "success",
                     status: true,
                     icon: "smile",
-                    title: "Success",
-                    subtitle: msg.transactionSccuess,
+                    title: arr_successMsg.title,
+                    subtitle: arr_successMsg.subTitle,
                     goBackStatus: true
                   }
                 ]
@@ -276,8 +282,8 @@ export default class SentMoneyScreen extends React.Component {
                     theme: "danger",
                     status: true,
                     icon: "frown",
-                    title: "Oops",
-                    subtitle: errorMessage.transactionFailed,
+                    title: arr_failedMsg.title,
+                    subtitle: arr_failedMsg.subTitle,
                     goBackStatus: false
                   }
                 ]
@@ -347,8 +353,8 @@ export default class SentMoneyScreen extends React.Component {
                 theme: "success",
                 status: true,
                 icon: "smile",
-                title: "Success",
-                subtitle: msg.transactionSccuess,
+                title: arr_successMsg.title,
+                subtitle: arr_successMsg.subTitle,
                 goBackStatus: true
               }
             ]
@@ -361,8 +367,8 @@ export default class SentMoneyScreen extends React.Component {
                 theme: "danger",
                 status: true,
                 icon: "frown",
-                title: "Oops",
-                subtitle: res.errorMessage,
+                title: arr_failedMsg.title,
+                subtitle: arr_failedMsg.subTitle,
                 goBackStatus: false
               }
             ]
@@ -377,8 +383,8 @@ export default class SentMoneyScreen extends React.Component {
             theme: "danger",
             status: true,
             icon: "frown",
-            title: "Oops",
-            subtitle: errorMessage.transactionFailed,
+            title: arr_failedMsg.title,
+            subtitle: arr_failedMsg.subTitle,
             goBackStatus: false
           }
         ]
@@ -406,7 +412,7 @@ export default class SentMoneyScreen extends React.Component {
                 numberOfLines={1}
                 style={styles.txtTitle}
               >
-                Send Money
+                {localization("SentMoneyScreen.headerTitle")}
               </Title>
             </Body>
             <Right />
@@ -417,7 +423,9 @@ export default class SentMoneyScreen extends React.Component {
                 name={this.state.recipientAddress}
                 value={this.state.recipientAddress}
                 keyboardType={"default"}
-                placeholder="Address"
+                placeholder={localization(
+                  "SentMoneyScreen.txtInputAddressPlaceholder"
+                )}
                 placeholderTextColor="#ffffff"
                 style={styles.input}
                 onChangeText={val => this.validation(val, "address")}
@@ -449,7 +457,9 @@ export default class SentMoneyScreen extends React.Component {
                 name={this.state.amount}
                 value={this.state.amount}
                 keyboardType={"numeric"}
-                placeholder="Amount (BTC)"
+                placeholder={localization(
+                  "SentMoneyScreen.txtInputAmountPlaceholder"
+                )}
                 placeholderTextColor="#ffffff"
                 style={styles.input}
                 onChangeText={val => this.validation(val, "amount")}
@@ -465,7 +475,7 @@ export default class SentMoneyScreen extends React.Component {
               disabled={this.state.sentBtnStatus}
               onPress={() => this.click_SentMoney()}
             >
-              <Text> SEND </Text>
+              <Text> {localization("SentMoneyScreen.btnSend")} </Text>
             </Button>
           </Content>
 
