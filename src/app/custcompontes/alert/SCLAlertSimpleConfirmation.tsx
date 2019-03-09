@@ -2,6 +2,9 @@ import React, { Component } from "react";
 import { SCLAlert, SCLAlertButton } from "react-native-scl-alert";
 import Icon from "react-native-vector-icons/FontAwesome5";
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 interface Props {
   data: [];
   click_Ok: Function;
@@ -12,7 +15,7 @@ export default class SCLAlertSimpleConfirmation extends Component<Props, any> {
     super(props);
   }
   render() {
-    return (  
+    return (
       <SCLAlert
         theme="info"
         show={this.props.data.length != 0 ? this.props.data[0].status : false}
@@ -23,7 +26,7 @@ export default class SCLAlertSimpleConfirmation extends Component<Props, any> {
             name={this.props.data.length != 0 ? this.props.data[0].icon : null}
             size={50}
             color="#fff"
-          />   
+          />
         }
         title={this.props.data.length != 0 ? this.props.data[0].title : null}
         subtitle={
@@ -34,7 +37,7 @@ export default class SCLAlertSimpleConfirmation extends Component<Props, any> {
           {this.props.data.length != 0 ? this.props.data[0].confirmTitle : null}
         </SCLAlertButton>
         <SCLAlertButton theme="info" onPress={() => this.props.click_Ok(false)}>
-          CANCEL
+          {localization("appConfig.btnCancel")}
         </SCLAlertButton>
       </SCLAlert>
     );

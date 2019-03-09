@@ -17,6 +17,9 @@ interface State {
   amount: any;
 }
 
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 export default class SCLAlertTransferAccountAmount extends Component<
   Props,
   State
@@ -32,7 +35,7 @@ export default class SCLAlertTransferAccountAmount extends Component<
     return (
       <SCLAlert
         theme="info"
-        title="TRANSFER AMOUNT"
+        title={localization("AccountDetailsScreen.popUpTransfer.title")}
         slideAnimationDuration={0}
         subtitle={
           this.props.data.length != 0 ? this.props.data[0].subtitle : false
@@ -47,7 +50,9 @@ export default class SCLAlertTransferAccountAmount extends Component<
         <TextInput
           name={this.state.amount}
           value={this.state.amount}
-          placeholder="Enter BTC Amount"
+          placeholder={localization(
+            "AccountDetailsScreen.popUpTransfer.txtInpurtAmountPlaceholder"
+          )}
           keyboardType={"numbers-and-punctuation"}
           placeholderTextColor={colors.placeholder}
           style={styles.input}

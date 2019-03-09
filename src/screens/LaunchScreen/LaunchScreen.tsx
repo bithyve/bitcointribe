@@ -5,11 +5,15 @@ import {
   Image,
   StyleSheet,
   Text,
-  Alert
+  Alert,
+  StatusBar
 } from "react-native";
 
 import { colors } from "bithyve/src/app/constants/Constants";
 import Singleton from "bithyve/src/app/constants/Singleton";
+
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
 
 import * as Keychain from "react-native-keychain";
 interface Props {
@@ -38,11 +42,14 @@ export default class LaunchScreen extends Component<Props, any> {
   render() {
     return (
       <View style={styles.container}>
+        <StatusBar backgroundColor={colors.appColor} barStyle="dark-content" />
         <Image
           style={styles.appLogo}
           source={require("bithyve/src/assets/images/appLogo.png")}
         />
-        <Text style={styles.txtAppName}>MY MONEY</Text>
+        <Text style={styles.txtAppName}>
+          {localization("appConfig.appName")}
+        </Text>
       </View>
     );
   }

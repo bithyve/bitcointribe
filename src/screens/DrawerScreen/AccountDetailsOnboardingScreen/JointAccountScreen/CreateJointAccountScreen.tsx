@@ -40,11 +40,13 @@ import {
   msg
 } from "bithyve/src/app/constants/Constants";
 import SCLAlertOk from "bithyve/src/app/custcompontes/alert/SCLAlertOk";
-
 //TODO: VaultAccount
 import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
-
 const { width } = Dimensions.get("screen");
+
+//localization
+import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 export default class CreateJointAccountScreen extends React.Component {
   constructor(props: any) {
     super(props);
@@ -142,8 +144,8 @@ export default class CreateJointAccountScreen extends React.Component {
             theme: "success",
             status: true,
             icon: "smile",
-            title: "Success",
-            subtitle: msg.createJoinAccount,
+            title: localization("CreateJointAccountScreen.popupTitle"),
+            subtitle: localization("CreateJointAccountScreen.popupBody"),
             goBackStatus: true
           }
         ]
@@ -236,29 +238,41 @@ export default class CreateJointAccountScreen extends React.Component {
                 style={styles.jointLogo}
                 source={images.secureAccount.secureLogo}
               />
-              <Text style={styles.txtTitle}>Joint Account</Text>
+              <Text style={styles.txtTitle}>
+                {localization("CreateJointAccountScreen.title")}
+              </Text>
               <Text style={styles.txtLorem} />
             </View>
 
             <View style={styles.jointAccountInput}>
-              <Input
-                name={this.state.name}
-                value={this.state.name}
-                placeholder="Enter your name"
-                keyboardType={"default"}
-                placeholderTextColor={Platform.OS == "ios" ? "#000" : "#000"}
-                style={styles.input}
-                onChangeText={text => this.validationText(text, "name")}
-              />
-              <Input
-                name={this.state.accountName}
-                value={this.state.accountName}
-                placeholder="Enter account name"
-                keyboardType={"default"}
-                placeholderTextColor={Platform.OS == "ios" ? "#000" : "#000"}
-                style={styles.input}
-                onChangeText={text => this.validationText(text, "accountName")}
-              />
+              <View style={{ height: 50 }}>
+                <Input
+                  name={this.state.name}
+                  value={this.state.name}
+                  placeholder={localization(
+                    "CreateJointAccountScreen.txtInputNamePlaceholder"
+                  )}
+                  keyboardType={"default"}
+                  placeholderTextColor={Platform.OS == "ios" ? "#000" : "#000"}
+                  style={styles.input}
+                  onChangeText={text => this.validationText(text, "name")}
+                />
+              </View>
+              <View style={{ height: 50 }}>
+                <Input
+                  name={this.state.accountName}
+                  value={this.state.accountName}
+                  placeholder={localization(
+                    "CreateJointAccountScreen.txtInputAccountName"
+                  )}
+                  keyboardType={"default"}
+                  placeholderTextColor={Platform.OS == "ios" ? "#000" : "#000"}
+                  style={styles.input}
+                  onChangeText={text =>
+                    this.validationText(text, "accountName")
+                  }
+                />
+              </View>
               <Button
                 full
                 disabled={this.state.flag_createAccountBtnStatus}
@@ -278,7 +292,9 @@ export default class CreateJointAccountScreen extends React.Component {
                   });
                 }}
               >
-                <Text style={{ color: "#ffffff" }}>Initiate</Text>
+                <Text style={{ color: "#ffffff" }}>
+                  {localization("CreateJointAccountScreen.btnInitiate")}
+                </Text>
               </Button>
               <Text
                 style={{
@@ -290,7 +306,7 @@ export default class CreateJointAccountScreen extends React.Component {
                   fontWeight: "bold"
                 }}
               >
-                OR
+                {localization("CreateJointAccountScreen.or")}
               </Text>
               <Button
                 full
@@ -303,7 +319,10 @@ export default class CreateJointAccountScreen extends React.Component {
                 ]}
                 onPress={() => this.click_openQrCodeScannerScreen()}
               >
-                <Text style={{ color: "#ffffff" }}>Merge</Text>
+                <Text style={{ color: "#ffffff" }}>
+                  {" "}
+                  {localization("CreateJointAccountScreen.btnMerge")}
+                </Text>
               </Button>
             </View>
           </Content>
@@ -354,7 +373,6 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   input: {
-    marginTop: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#000000",
     color: Platform.OS == "ios" ? "#000" : "#000"
