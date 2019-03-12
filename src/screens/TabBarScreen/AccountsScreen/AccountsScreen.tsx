@@ -25,6 +25,7 @@ import Carousel, { Pagination } from "react-native-snap-carousel";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { SkypeIndicator } from "react-native-indicators";
 import DropdownAlert from "react-native-dropdownalert";
+import moment from "moment";
 
 //Custome Compontes
 import SCLAlertAccountTypes from "bithyve/src/app/custcompontes/alert/SCLAlertAccountTypes";
@@ -81,7 +82,8 @@ export default class AccountsScreen extends React.Component<any, any> {
       isLoading: false,
       isLoading1: false,
       isNoTranstion: false,
-      cardIndexNo: 0
+      cardIndexNo: 0,
+      arr_transactionSortDate: []
     };
     this.click_openPopupAccountType = this.click_openPopupAccountType.bind(
       this
@@ -106,6 +108,13 @@ export default class AccountsScreen extends React.Component<any, any> {
 
   componentWillUnmount() {
     this.willFocusSubscription.remove();
+  }
+
+  //TODO: for sorting date wise transaction data
+  sortFunction(a: any, b: any) {
+    var dateA = new Date(a.received).getTime();
+    var dateB = new Date(b.received).getTime();
+    return dateA < dateB ? 1 : -1;
   }
 
   //TODO: func connnection_FetchData
@@ -162,6 +171,19 @@ export default class AccountsScreen extends React.Component<any, any> {
         var resultRecentTras = await RegularAccount.getTransactions(
           resultAccount.temp[this.state.cardIndexNo].address
         );
+
+        let resultRecentTransDetailsData = resultRecentTras.transactionDetails;
+        var arr_DateSort = [];
+        for (let i = 0; i < resultRecentTransDetailsData.length; i++) {
+          let sortData = resultRecentTransDetailsData[i];
+          sortData.received = new Date(
+            resultRecentTransDetailsData[i].received
+          );
+          arr_DateSort.push(sortData);
+        }
+        let result_sortData = arr_DateSort.sort(this.sortFunction);
+        resultRecentTras.transactionDetails = result_sortData;
+
         if (resultRecentTras.statusCode == 200) {
           if (resultRecentTras.transactionDetails.length > 0) {
             const resultRecentTransaction = await dbOpration.insertTblTransation(
@@ -176,6 +198,8 @@ export default class AccountsScreen extends React.Component<any, any> {
                 localDB.tableName.tblTransaction,
                 resultAccount.temp[this.state.cardIndexNo].address
               );
+
+              console.log({ resultRecentTras });
 
               if (resultRecentTras.temp.length > 0) {
                 transation = resultRecentTras.temp;
@@ -324,7 +348,18 @@ export default class AccountsScreen extends React.Component<any, any> {
           var resultRecentTras = await RegularAccount.getTransactions(
             resultAccount.temp[index].address
           );
-          console.log({ resultRecentTras });
+          let resultRecentTransDetailsData =
+            resultRecentTras.transactionDetails;
+          var arr_DateSort = [];
+          for (let i = 0; i < resultRecentTransDetailsData.length; i++) {
+            let sortData = resultRecentTransDetailsData[i];
+            sortData.received = new Date(
+              resultRecentTransDetailsData[i].received
+            );
+            arr_DateSort.push(sortData);
+          }
+          let result_sortData = arr_DateSort.sort(this.sortFunction);
+          resultRecentTras.transactionDetails = result_sortData;
           if (resultRecentTras.statusCode == 200) {
             if (resultRecentTras.transactionDetails.length > 0) {
               const resultRecentTransaction = await dbOpration.insertTblTransation(
