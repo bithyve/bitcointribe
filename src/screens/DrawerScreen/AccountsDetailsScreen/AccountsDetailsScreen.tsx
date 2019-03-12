@@ -137,6 +137,13 @@ export default class AccountDetailsScreen extends React.Component<
     }
   }
 
+  //TODO: for sorting date wise transaction data
+  sortFunction(a: any, b: any) {
+    var dateA = new Date(a.received).getTime();
+    var dateB = new Date(b.received).getTime();
+    return dateA < dateB ? 1 : -1;
+  }
+
   date_diff_indays(date1: any, date2: any) {
     try {
       let dt1 = new Date(date1);
@@ -165,6 +172,9 @@ export default class AccountDetailsScreen extends React.Component<
       var resultAccount = await dbOpration.readAccountTablesData(
         localDB.tableName.tblAccount
       );
+
+      console.log({ resultAccount });
+
       if (isNetwork) {
         //TODO: for transfer and sent btn disable and enable details
         if (
@@ -239,6 +249,18 @@ export default class AccountDetailsScreen extends React.Component<
           const resultRecentTras = await RegularAccount.getTransactions(
             navigation.getParam("data").address
           );
+          let resultRecentTransDetailsData =
+            resultRecentTras.transactionDetails;
+          var arr_DateSort = [];
+          for (let i = 0; i < resultRecentTransDetailsData.length; i++) {
+            let sortData = resultRecentTransDetailsData[i];
+            sortData.received = new Date(
+              resultRecentTransDetailsData[i].received
+            );
+            arr_DateSort.push(sortData);
+          }
+          let result_sortData = arr_DateSort.sort(this.sortFunction);
+          resultRecentTras.transactionDetails = result_sortData;
           if (resultRecentTras.statusCode == 200) {
             if (resultRecentTras.transactionDetails.length > 0) {
               const resultRecentTransaction = await dbOpration.insertTblTransation(
