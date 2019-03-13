@@ -27,7 +27,6 @@ import {
   colors,
   images,
   localDB,
-  msg,
   errorMessages,
   errorValidMsg
 } from "bithyve/src/app/constants/Constants";
@@ -137,27 +136,6 @@ export default class AccountDetailsScreen extends React.Component<
     }
   }
 
-  //TODO: for sorting date wise transaction data
-  sortFunction(a: any, b: any) {
-    var dateA = new Date(a.received).getTime();
-    var dateB = new Date(b.received).getTime();
-    return dateA < dateB ? 1 : -1;
-  }
-
-  date_diff_indays(date1: any, date2: any) {
-    try {
-      let dt1 = new Date(date1);
-      let dt2 = new Date(date2);
-      return Math.floor(
-        (Date.UTC(dt2.getFullYear(), dt2.getMonth(), dt2.getDate()) -
-          Date.UTC(dt1.getFullYear(), dt1.getMonth(), dt1.getDate())) /
-          (1000 * 60 * 60 * 24)
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   //TODO: func loadData
   async fetchloadData() {
     try {
@@ -172,14 +150,15 @@ export default class AccountDetailsScreen extends React.Component<
       var resultAccount = await dbOpration.readAccountTablesData(
         localDB.tableName.tblAccount
       );
-
-      console.log({ resultAccount });
-
+      //TODO: Account Bal checking
+      const bal = await RegularAccount.getBalance(
+        navigation.getParam("data").address
+      );
       if (isNetwork) {
         //TODO: for transfer and sent btn disable and enable details
         if (
           resultAccount.temp.length > 2 &&
-          parseFloat(this.state.data.balance) > 0
+          parseFloat(bal.final_balance / 1e8) > 0
         ) {
           var resultAccount = await dbOpration.readAccountTablesData(
             localDB.tableName.tblAccount
@@ -203,10 +182,8 @@ export default class AccountDetailsScreen extends React.Component<
             );
             var start = moment(new Date()).format("DD-MM-YYYY");
             var end = moment(validDate).format("DD-MM-YYYY");
-            let diffDays: number = parseInt(this.date_diff_indays(start, end));
-
+            let diffDays: number = parseInt(utils.date_diff_indays(start, end));
             console.log({ diffDays });
-
             if (diffDays <= 0) {
               isTransBtnStatus = false; //old code true
             }
@@ -220,7 +197,7 @@ export default class AccountDetailsScreen extends React.Component<
             flag_TransferBtn: isTransBtnStatus
           });
         }
-        if (parseFloat(this.state.data.balance) > 0) {
+        if (parseFloat(bal.final_balance / 1e8) > 0) {
           if (this.state.data.accountType != "Vault") {
             this.setState({
               flag_sentBtnDisStatus: false
@@ -232,7 +209,8 @@ export default class AccountDetailsScreen extends React.Component<
             );
             var start = moment(new Date()).format("DD-MM-YYYY");
             var end = moment(validDate).format("DD-MM-YYYY");
-            let diffDays: number = parseInt(this.date_diff_indays(start, end));
+            let diffDays: number = parseInt(utils.date_diff_indays(start, end));
+            console.log({ diffDays });
             if (diffDays <= 0) {
               this.setState({
                 flag_sentBtnDisStatus: false
@@ -240,11 +218,6 @@ export default class AccountDetailsScreen extends React.Component<
             }
           }
         }
-
-        //TODO: Account Bal checking
-        const bal = await RegularAccount.getBalance(
-          navigation.getParam("data").address
-        );
         if (bal.statusCode == 200) {
           const resultRecentTras = await RegularAccount.getTransactions(
             navigation.getParam("data").address
@@ -259,7 +232,7 @@ export default class AccountDetailsScreen extends React.Component<
             );
             arr_DateSort.push(sortData);
           }
-          let result_sortData = arr_DateSort.sort(this.sortFunction);
+          let result_sortData = arr_DateSort.sort(utils.sortFunction);
           resultRecentTras.transactionDetails = result_sortData;
           if (resultRecentTras.statusCode == 200) {
             if (resultRecentTras.transactionDetails.length > 0) {
@@ -615,7 +588,9 @@ export default class AccountDetailsScreen extends React.Component<
                   color="#ffffff"
                 />
                 <Text style={styles.txtTile}>
-                  {localization("AccountDetailsScreen.btnTRANSFER")}
+                  {localization(
+                    "AccountDetailsScreen.btnTRANSFER"
+                  ) /* TRANSFER */}
                 </Text>
               </Button>
             )}
@@ -646,7 +621,7 @@ export default class AccountDetailsScreen extends React.Component<
                 color="#ffffff"
               />
               <Text style={styles.txtTile}>
-                {localization("AccountDetailsScreen.btnSEND")}
+                {localization("AccountDetailsScreen.btnSEND") /* SEND */}
               </Text>
             </Button>
             <Button
@@ -668,7 +643,7 @@ export default class AccountDetailsScreen extends React.Component<
                 color="#ffffff"
               />
               <Text style={styles.txtTile}>
-                {localization("AccountDetailsScreen.btnRECEIVE")}
+                {localization("AccountDetailsScreen.btnRECEIVE") /* RECEIVE */}
               </Text>
             </Button>
           </View>
