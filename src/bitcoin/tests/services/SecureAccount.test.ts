@@ -85,11 +85,11 @@ describe("Secure Account", () => {
       "tprv8fgNkSX6UvNMv9DwEasxkwDfS1QP5Reubj4bcpNsB6bttqGd9A6je6GE3NUdgq6FQiVH2BhP2r4NwLjbt5L4zaA2ohht3D8NLGULmKZN3Mz";
 
     const amount = 3500;
-    const { final_balance } = await secureAccount.bitcoin.checkBalance(
+    const { balanceData } = await secureAccount.bitcoin.getBalance(
       multiSig.address,
     );
-    console.log({ final_balance });
-    if (final_balance < amount + 1000) {
+    console.log({ final_balance: balanceData.final_balance });
+    if (balanceData.final_balance < amount + 1000) {
       throw new Error("insufficient balance to conduct the secure transaction");
     } else {
       const token = authenticator.generate(secret);

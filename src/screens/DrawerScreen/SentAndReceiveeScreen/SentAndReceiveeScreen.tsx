@@ -78,10 +78,10 @@ export default class SentAndReceiveeScreen extends React.Component {
   async getAddressBal() {
     if (this.state.addressKey != "") {
       const bal = await RegularAccount.getBalance(this.state.addressKey);
-      console.log("fin bal" + bal.final_balance);
+      console.log("fin bal" + bal.balanceData.final_balance);
       this.setState({
-        finalBal: "Final Balance: " + bal.final_balance / 1e8,
-        totalRec: "Total Recieved: " + bal.total_received / 1e8
+        finalBal: "Final Balance: " + bal.balanceData.final_balance / 1e8,
+        totalRec: "Total Recieved: " + bal.balanceData.total_received / 1e8
       });
       //loaderHandler.hideLoader();
     }

@@ -179,7 +179,7 @@ export default class SentMoneyScreen extends Component<any, any> {
         if (bal) {
           const resultUpdateTblAccount = await dbOpration.updateTableData(
             localDB.tableName.tblAccount,
-            bal.final_balance / 1e8,
+            bal.balanceData.final_balance / 1e8,
             navigation.getParam("address"),
             lastUpdateDate
           );
@@ -256,7 +256,7 @@ export default class SentMoneyScreen extends Component<any, any> {
         if (bal) {
           const resultUpdateTblAccount = await dbOpration.updateTableData(
             localDB.tableName.tblAccount,
-            bal.final_balance / 1e8,
+            bal.balanceData.final_balance / 1e8,
             navigation.getParam("address"),
             lastUpdateDate
           );
@@ -341,7 +341,7 @@ export default class SentMoneyScreen extends Component<any, any> {
       if (bal) {
         const resultUpdateTblAccount = await dbOpration.updateTableData(
           localDB.tableName.tblAccount,
-          bal.final_balance / 1e8,
+          bal.balanceData.final_balance / 1e8,
           navigation.getParam("address"),
           lastUpdateDate
         );
