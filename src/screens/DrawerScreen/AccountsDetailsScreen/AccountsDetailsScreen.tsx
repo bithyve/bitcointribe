@@ -151,6 +151,7 @@ export default class AccountDetailsScreen extends React.Component<
         localDB.tableName.tblAccount
       );
       //TODO: Account Bal checking
+      console.log(navigation.getParam("data").address);
       const bal = await RegularAccount.getBalance(
         navigation.getParam("data").address
       );
@@ -158,7 +159,7 @@ export default class AccountDetailsScreen extends React.Component<
         //TODO: for transfer and sent btn disable and enable details
         if (
           resultAccount.temp.length > 2 &&
-          parseFloat(bal.final_balance / 1e8) > 0
+          parseFloat(bal.balanceData.final_balance / 1e8) > 0
         ) {
           var resultAccount = await dbOpration.readAccountTablesData(
             localDB.tableName.tblAccount
@@ -188,16 +189,14 @@ export default class AccountDetailsScreen extends React.Component<
               isTransBtnStatus = false; //old code true
             }
           }
-
           let tempData = resultAccount.temp;
           console.log({ tempData });
-
           this.setState({
             arr_transferAccountList: resultAccount.temp,
             flag_TransferBtn: isTransBtnStatus
           });
         }
-        if (parseFloat(bal.final_balance / 1e8) > 0) {
+        if (parseFloat(bal.balanceData.final_balance / 1e8) > 0) {
           if (this.state.data.accountType != "Vault") {
             this.setState({
               flag_sentBtnDisStatus: false
@@ -264,7 +263,7 @@ export default class AccountDetailsScreen extends React.Component<
             }
             const resultUpdateTblAccount = await dbOpration.updateTableData(
               localDB.tableName.tblAccount,
-              bal.final_balance / 1e8,
+              bal.balanceData.final_balance / 1e8,
               navigation.getParam("data").address,
               lastUpdateDate
             );

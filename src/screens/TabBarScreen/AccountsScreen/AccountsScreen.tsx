@@ -136,6 +136,7 @@ export default class AccountsScreen extends React.Component<any, any> {
       const bal = await RegularAccount.getBalance(
         resultAccount.temp[this.state.cardIndexNo].address
       );
+
       var transation: [] = [];
       var flag_noTrasation: boolean;
 
@@ -200,7 +201,7 @@ export default class AccountsScreen extends React.Component<any, any> {
           }
           const resultUpdateTblAccount = await dbOpration.updateTableData(
             localDB.tableName.tblAccount,
-            bal.final_balance / 1e8,
+            bal.balanceData.final_balance / 1e8,
             resultAccount.temp[0].address,
             lastUpdateDate
           );
@@ -371,7 +372,7 @@ export default class AccountsScreen extends React.Component<any, any> {
             }
             const resultUpdateTblAccount = await dbOpration.updateTableData(
               localDB.tableName.tblAccount,
-              bal.final_balance / 1e8,
+              bal.balanceData.final_balance / 1e8,
               resultAccount.temp[index].address,
               lastUpdateDate
             );

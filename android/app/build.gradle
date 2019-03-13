@@ -99,7 +99,7 @@ def enableSeparateBuildPerCPUArchitecture = false
  */
 def enableProguardInReleaseBuilds = false
 
-android {
+android {   
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
@@ -109,7 +109,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
         versionCode 1
-        versionName "1.0.0.070319"
+        versionName "1.0.0.130319"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
