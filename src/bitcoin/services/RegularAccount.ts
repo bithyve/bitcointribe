@@ -1,28 +1,34 @@
-import Bitcoin from "../utilities/Bitcoin";
+import bip39 from "bip39";
+import HDSegwitWallet from "../utilities/HDSegwitWallet";
 
 class RegularAccount {
-  public bitcoin: Bitcoin;
+  public hdWallet: HDSegwitWallet;
   constructor() {
-    this.bitcoin = new Bitcoin();
+    this.hdWallet = new HDSegwitWallet();
   }
 
   public createWallet = (passphrase?: string) =>
-    this.bitcoin.createHDWallet(passphrase)
+    this.hdWallet.generateHDWallet(this.hdWallet.mnemonic, passphrase)
 
-  public importWallet = (mnemonic: string, passphrase?: string) =>
-    this.bitcoin.generateHDWallet(mnemonic, passphrase)
+  public importWallet = (mnemonic: string, passphrase?: string) => {
+    if (bip39.validateMnemonic(mnemonic)) {
+      return this.hdWallet.generateHDWallet(mnemonic, passphrase);
+    } else {
+      throw new Error("Invalid Mnemonic");
+    }
+  }
 
   public getBalance = async (address: string) =>
-    await this.bitcoin.checkBalance(address)
+    await this.hdWallet.getBalance(address)
 
   public getTransactionDetails = async (txHash: string) =>
-    await this.bitcoin.fetchTransactionDetails(txHash)
+    await this.hdWallet.fetchTransactionDetails(txHash)
 
   public getTransactions = async (address: string) =>
-    await this.bitcoin.fetchTransactions(address)
+    await this.hdWallet.fetchTransactions(address)
 
   public getPubKey = async (privKey: string) => {
-    const keyPair = await this.bitcoin.getKeyPair(privKey);
+    const keyPair = await this.hdWallet.getKeyPair(privKey);
     return keyPair.publicKey;
   }
 
@@ -32,27 +38,27 @@ class RegularAccount {
     amount: number,
     privateKey: string,
   ) => {
-    if (this.bitcoin.isValidAddress(recipientAddress)) {
+    if (this.hdWallet.isValidAddress(recipientAddress)) {
       // use decorators as they come out of experimental phase
-      const balance = await this.bitcoin.checkBalance(senderAddress);
-      console.log({ balance: balance.final_balance });
+      const { balanceData } = await this.hdWallet.getBalance(senderAddress);
+      console.log({ balance: balanceData.final_balance });
 
-      const { inputs, txb, fee } = await this.bitcoin.createTransaction(
+      const { inputs, txb, fee } = await this.hdWallet.createTransaction(
         senderAddress,
         recipientAddress,
         amount,
       );
       console.log("---- Transaction Created ----");
 
-      if (parseInt(balance.final_balance, 10) + fee < amount) {
+      if (parseInt(balanceData.final_balance, 10) + fee < amount) {
         throw new Error(
           "Insufficient balance to compensate for transfer amount and the txn fee",
         );
       }
 
-      const keyPair = this.bitcoin.getKeyPair(privateKey);
-      const p2sh = this.bitcoin.getP2SH(keyPair);
-      const signedTxb = this.bitcoin.signTransaction(
+      const keyPair = this.hdWallet.getKeyPair(privateKey);
+      const p2sh = this.hdWallet.getP2SH(keyPair);
+      const signedTxb = this.hdWallet.signTransaction(
         inputs,
         txb,
         [keyPair],
@@ -61,7 +67,7 @@ class RegularAccount {
       console.log("---- Transaction Signed ----");
 
       const txHex = signedTxb.build().toHex();
-      const res = await this.bitcoin.broadcastTransaction(txHex);
+      const res = await this.hdWallet.broadcastTransaction(txHex);
       console.log("---- Transaction Broadcasted ----");
       return res;
     } else {

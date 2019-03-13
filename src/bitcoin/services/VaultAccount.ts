@@ -73,8 +73,8 @@ class VaultAccount {
     privateKey: string,
   ) => {
     if (this.bitcoin.isValidAddress(recipientAddress)) {
-      const balance = await this.bitcoin.checkBalance(senderAddress);
-      console.log({ balance: balance.final_balance });
+      const { balanceData } = await this.bitcoin.getBalance(senderAddress);
+      console.log({ balance: balanceData.final_balance });
 
       const { utc } = bip65.decode(lockTime);
       if (utc) {
@@ -109,7 +109,7 @@ class VaultAccount {
         0xfffffffe,
       );
       console.log("---- Transaction Created ----");
-      if (parseInt(balance.final_balance, 10) + fee <= amount) {
+      if (parseInt(balanceData.final_balance, 10) + fee <= amount) {
         throw new Error(
           "Insufficient balance to compensate for transfer amount and the txn fee",
         );
