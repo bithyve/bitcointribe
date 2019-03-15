@@ -44,6 +44,8 @@ sudo yarn install
 sudo react-native link` [known issue #2](https://github.com/thecryptobee/BitHyve-Wallet/issues/2
 sudo npm install -g rn-nodeify
 rn-nodeify --install --hack
+//android run
+npm run android-dev
 ```
 
 ## Contributing
