@@ -95,8 +95,8 @@ class JointAccount {
     scripts: any;
   }) => {
     if (this.bitcoin.isValidAddress(recipientAddress)) {
-      const balance = await this.bitcoin.checkBalance(senderAddress);
-      console.log({ balance: balance.final_balance });
+      const { balanceData } = await this.bitcoin.getBalance(senderAddress);
+      console.log({ balance: balanceData.final_balance });
 
       console.log("---- Creating Transaction ----");
       const { inputs, txb, fee } = await this.bitcoin.createTransaction(
@@ -106,7 +106,7 @@ class JointAccount {
       );
       console.log("---- Transaction Created ----");
 
-      if (parseInt(balance.final_balance, 10) + fee < amount) {
+      if (parseInt(balanceData.final_balance, 10) + fee < amount) {
         throw new Error(
           "Insufficient balance to compensate for transfer amount and the txn fee",
         );

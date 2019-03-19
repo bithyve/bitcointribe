@@ -34,10 +34,10 @@ ConnectivityTracker.init({
 const getNetwork = value => {
   return isNetwork;
 };
-  
+
 const encrypt = (data: any, password: string) => {
   let ciphertext = CryptoJS.AES.encrypt(data, password);
-  return ciphertext.toString();   
+  return ciphertext.toString();
 };
 
 const encryptAgain = (data: any, password: string) => {
@@ -57,6 +57,28 @@ const decrypt = (data: any, password: string) => {
   return str;
 };
 
+//TODO: for sorting date wise transaction data
+const sortFunction = (a: any, b: any) => {
+  var dateA = new Date(a.received).getTime();
+  var dateB = new Date(b.received).getTime();
+  return dateA < dateB ? 1 : -1;
+};
+
+//TODO: func two date diff days count
+const date_diff_indays = (date1: any, date2: any) => {
+  try {
+    let dt1 = new Date(date1);
+    let dt2 = new Date(date2);
+    return Math.floor(
+      (Date.UTC(dt2.getFullYear(), dt2.getMonth(), dt2.getDate()) -
+        Date.UTC(dt1.getFullYear(), dt1.getMonth(), dt1.getDate())) /
+        (1000 * 60 * 60 * 24)
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   getUnixTimeDate,
   getUnixToDateFormat,
@@ -64,5 +86,7 @@ module.exports = {
   getNetwork,
   encrypt,
   encryptAgain,
-  decrypt
+  decrypt,
+  sortFunction,
+  date_diff_indays
 };

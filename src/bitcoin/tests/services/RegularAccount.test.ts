@@ -27,8 +27,8 @@ describe("Regular Account", async () => {
 
   test("reflects the balance of a given address", async () => {
     const address = "2N9XSYkDMCu4q3gCuPFZUtaDceiK2sWziik";
-    const { final_balance } = await regularAccount.getBalance(address);
-    expect(final_balance).toBeTruthy();
+    const { balanceData } = await regularAccount.getBalance(address);
+    expect(balanceData.final_balance).toBeTruthy();
   });
 
   test("provides transaction details against a supplied transaction hash", async () => {

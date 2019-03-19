@@ -13,7 +13,7 @@ import {
 import { images } from "bithyve/src/app/constants/Constants";
 
 export default class LoginScreen extends React.Component {
-  constructor(props) {
+  constructor(props: any) {
     super(props);
     StatusBar.setHidden(true);
     this.state = {
