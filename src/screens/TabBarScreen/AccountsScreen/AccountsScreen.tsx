@@ -97,7 +97,6 @@ export default class AccountsScreen extends React.Component<any, any> {
     this.willFocusSubscription = this.props.navigation.addListener(
       "willFocus",
       () => {
-        console.log(this.state.cardIndexNo);
         isNetwork = utils.getNetwork();
         this.connnection_FetchData();
       }
@@ -138,8 +137,6 @@ export default class AccountsScreen extends React.Component<any, any> {
         resultAccount.temp[this.state.cardIndexNo].address
       );
 
-      console.log({ bal });
-
       var transation: [] = [];
       var flag_noTrasation: boolean;
 
@@ -162,6 +159,18 @@ export default class AccountsScreen extends React.Component<any, any> {
         var resultRecentTras = await RegularAccount.getTransactions(
           resultAccount.temp[this.state.cardIndexNo].address
         );
+
+        let resultRecentTransDetailsData = resultRecentTras.transactionDetails;
+        var arr_DateSort = [];
+        for (let i = 0; i < resultRecentTransDetailsData.length; i++) {
+          let sortData = resultRecentTransDetailsData[i];
+          sortData.received = new Date(
+            resultRecentTransDetailsData[i].received
+          );
+          arr_DateSort.push(sortData);
+        }
+        let result_sortData = arr_DateSort.sort(utils.sortFunction);
+        resultRecentTras.transactionDetails = result_sortData;
         if (resultRecentTras.statusCode == 200) {
           if (resultRecentTras.transactionDetails.length > 0) {
             const resultRecentTransaction = await dbOpration.insertTblTransation(
@@ -176,7 +185,6 @@ export default class AccountsScreen extends React.Component<any, any> {
                 localDB.tableName.tblTransaction,
                 resultAccount.temp[this.state.cardIndexNo].address
               );
-
               if (resultRecentTras.temp.length > 0) {
                 transation = resultRecentTras.temp;
                 flag_noTrasation = false;
@@ -193,7 +201,7 @@ export default class AccountsScreen extends React.Component<any, any> {
           }
           const resultUpdateTblAccount = await dbOpration.updateTableData(
             localDB.tableName.tblAccount,
-            bal.final_balance / 1e8,
+            bal.balanceData.final_balance / 1e8,
             resultAccount.temp[0].address,
             lastUpdateDate
           );
@@ -271,7 +279,6 @@ export default class AccountsScreen extends React.Component<any, any> {
 
   //TODO: func getSwapCardDetails
   async getSwapCardDetails(index: number) {
-    console.log(index);
     let isLoading1: boolean = true;
     let isNoTranstion: boolean = false;
     let tranDetails: [] = [];
@@ -296,7 +303,6 @@ export default class AccountsScreen extends React.Component<any, any> {
     }
 
     if (resultAccount.temp[index].address != "") {
-      console.log(resultAccount.temp[index].address);
       if (isNetwork) {
         const bal = await RegularAccount.getBalance(
           resultAccount.temp[index].address
@@ -320,11 +326,21 @@ export default class AccountsScreen extends React.Component<any, any> {
         // isNoTranstion = flag_noTrasation;
 
         if (bal.statusCode == 200) {
-          console.log({ bal });
           var resultRecentTras = await RegularAccount.getTransactions(
             resultAccount.temp[index].address
           );
-          console.log({ resultRecentTras });
+          let resultRecentTransDetailsData =
+            resultRecentTras.transactionDetails;
+          var arr_DateSort = [];
+          for (let i = 0; i < resultRecentTransDetailsData.length; i++) {
+            let sortData = resultRecentTransDetailsData[i];
+            sortData.received = new Date(
+              resultRecentTransDetailsData[i].received
+            );
+            arr_DateSort.push(sortData);
+          }
+          let result_sortData = arr_DateSort.sort(utils.sortFunction);
+          resultRecentTras.transactionDetails = result_sortData;
           if (resultRecentTras.statusCode == 200) {
             if (resultRecentTras.transactionDetails.length > 0) {
               const resultRecentTransaction = await dbOpration.insertTblTransation(
@@ -356,7 +372,7 @@ export default class AccountsScreen extends React.Component<any, any> {
             }
             const resultUpdateTblAccount = await dbOpration.updateTableData(
               localDB.tableName.tblAccount,
-              bal.final_balance / 1e8,
+              bal.balanceData.final_balance / 1e8,
               resultAccount.temp[index].address,
               lastUpdateDate
             );
