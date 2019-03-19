@@ -47,7 +47,6 @@ rn-nodeify --install --hack
 //android run
 npm run android-dev
 ```
-
 ## Contributing
 
 Please feel free to open a pull requests and issues with bugfixes and suggestions.
