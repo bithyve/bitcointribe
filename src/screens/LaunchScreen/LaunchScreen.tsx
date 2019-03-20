@@ -4,6 +4,7 @@ import {
   AsyncStorage,
   Image,
   StyleSheet,
+  ImageBackground,
   Text,
   Alert,
   StatusBar
@@ -42,14 +43,13 @@ export default class LaunchScreen extends Component<Props, any> {
   render() {
     return (
       <View style={styles.container}>
-        <StatusBar backgroundColor={colors.appColor} barStyle="dark-content" />
-        <Image
-          style={styles.appLogo}
-          source={require("bithyve/src/assets/images/appLogo.png")}
+        <ImageBackground
+          source={require("bithyve/src/assets/images/LaunchScrenn/lunchScreenIcon.png")}
+          style={styles.backgroundImage}
+          imageStyle={{
+            resizeMode: "cover" // works only here!
+          }}
         />
-        <Text style={styles.txtAppName}>
-          {localization("appConfig.appName")}
-        </Text>
       </View>
     );
   }
@@ -57,9 +57,7 @@ export default class LaunchScreen extends Component<Props, any> {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center"
+    flex: 1
   },
   appLogo: {
     width: 300,
@@ -71,5 +69,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 20,
     color: colors.appColor
+  },
+  backgroundImage: {
+    flex: 1
   }
 });

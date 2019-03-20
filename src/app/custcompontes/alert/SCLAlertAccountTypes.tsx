@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { FlatList } from "react-native";
 import { SCLAlert, SCLAlertButton } from "react-native-scl-alert";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 interface Props {
   status: boolean;
@@ -11,13 +11,13 @@ interface Props {
 }
 
 interface State {
-  name:string;
+  name: string;
 }
-  
+
 export default class SCLAlertAccountTypes extends Component<Props, State> {
-  constructor(props:any) {
+  constructor(props: any) {
     super(props);
-  }   
+  }
 
   render() {
     return (
@@ -30,7 +30,7 @@ export default class SCLAlertAccountTypes extends Component<Props, State> {
         slideAnimationDuration={0}
         cancellable={true}
         headerIconComponent={<Icon name="plus-circle" size={60} color="#fff" />}
-      >   
+      >
         <FlatList
           data={this.props.data.length != 0 ? this.props.data[0].data : null}
           style={{ marginTop: -80 }}
@@ -42,7 +42,7 @@ export default class SCLAlertAccountTypes extends Component<Props, State> {
               {item.name}
             </SCLAlertButton>
           )}
-          keyExtractor={(item,index) => index}
+          keyExtractor={(item, index) => index}
         />
       </SCLAlert>
     );

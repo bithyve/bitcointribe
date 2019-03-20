@@ -1,6 +1,6 @@
 {
   "appConfig": {
-    "appName": "मेरे पैसे",
+    "appName": "हेक्सा वॉलेट",
     "btnCancel": "रद्द करना",
     "popUp": [
       {
@@ -20,7 +20,7 @@
     ]
   },
   "LaunchScreen": {
-    "title": "मेरे पैसे"
+    "title": "हेक्सा वॉलेट"
   },
   "OnBoardingScreen": {
     "onBoarding": [
@@ -45,14 +45,14 @@
     ]
   },
   "PasscodeConfirmScreen": {
-    "title": "मेरे पैसे",
+    "title": "हेक्सा वॉलेट",
     "subTitle": "पिनकोड दर्ज करें",
     "subTitleConfirm": "अपने पिन कोड की पुष्टि करें।",
     "issuetitle": "त्रुटि",
     "issueSubTitle": "कृपया सही पासवर्ड दर्ज करें।"
   },
   "PasscodeScreen": {
-    "title": "मेरे पैसे",
+    "title": "हेक्सा वॉलेट",
     "subTitle": "पिनकोड दर्ज करें",
     "issuetitle": "त्रुटि",
     "issueSubTitle": "कृपया सही पासवर्ड दर्ज करें।"
@@ -95,7 +95,7 @@
     "More": "अधिक"
   },
   "AccountsScreen": {
-    "title": "मेरे पैसे",
+    "title": "हेक्सा वॉलेट",
     "createaWallet": "एक बटुआ बनाएँ"
   },
   "TransactionDetailsWebViewScreen": {
@@ -124,7 +124,7 @@
       {
         "backgroundColor": "#ffffff",
         "title": "",
-        "subtitle": "कोड, MyMoneyApp पब कुंजी और द्वितीयक mnenmonic को अलग स्थान पर सुरक्षित और सुरक्षित रखें।"
+        "subtitle": "कोड, HexaWallet पब कुंजी और द्वितीयक mnenmonic को अलग स्थान पर सुरक्षित और सुरक्षित रखें।"
       }
     ],
     "Joint": [
@@ -266,7 +266,7 @@
   },
   "BackupPhraseScreen": {
     "headerTitle": "बैकअप वाक्यांश",
-    "bodyMsg1": "ये 12 शब्द हैं वे केवल आपके My Money App को पुनर्स्थापित करने का तरीका हैं।",
+    "bodyMsg1": "ये 12 शब्द हैं वे केवल आपके Hexa Wallet App को पुनर्स्थापित करने का तरीका हैं।",
     "bodyMsg2": "उन्हें सुरक्षित और गुप्त रखें।",
     "btnCopy": "कॉपी",
     "btnNext": "आगामी"

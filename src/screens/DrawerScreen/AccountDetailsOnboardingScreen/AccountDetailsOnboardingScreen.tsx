@@ -12,7 +12,7 @@ import {
 } from "native-base";
 //Custome Compontes
 import ViewOnBoarding from "bithyve/src/app/custcompontes/view/ViewOnBoarding";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon from "react-native-vector-icons/FontAwesome";
 //TODO: Custome object
 import { images, msg } from "bithyve/src/app/constants/Constants";
 //localization

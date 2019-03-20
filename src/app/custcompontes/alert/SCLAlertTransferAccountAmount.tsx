@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { FlatList, StyleSheet, TextInput } from "react-native";
 import { SCLAlert, SCLAlertButton } from "react-native-scl-alert";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon from "react-native-vector-icons/FontAwesome";
 import DropdownAlert from "react-native-dropdownalert";
 import { colors } from "../../constants/Constants";
 interface Props {
