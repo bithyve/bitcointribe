@@ -9,7 +9,7 @@ import { createRootNavigator } from "bithyve/src/app/router/router";
 import LaunchScreen from "bithyve/src/screens/LaunchScreen/LaunchScreen";
 import Singleton from "bithyve/src/app/constants/Singleton";
 
-export default class MyMoney extends React.Component {
+export default class HexaWalletWallet extends React.Component {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -157,6 +157,7 @@ export default class MyMoney extends React.Component {
     );
     console.log("first = " + this.state.status, this.state.isStartPage);
     const AppContainer = createAppContainer(Layout);
+
     return this.state.status ? (
       <LaunchScreen
         onComplited={(status: boolean, pageName: string) =>
@@ -170,4 +171,4 @@ export default class MyMoney extends React.Component {
 }
 
 console.disableYellowBox = true;
-AppRegistry.registerComponent(appName, () => MyMoney);
+AppRegistry.registerComponent(appName, () => HexaWalletWallet);

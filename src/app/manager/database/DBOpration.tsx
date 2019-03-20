@@ -9,7 +9,12 @@ const getPasscode = () => {
   return commonData.getPasscode();
 };
 import SQLite from "react-native-sqlite-storage";
-var db = SQLite.openDatabase(localDB.dbName, "1.0", "MyMoney Database", 200000);
+var db = SQLite.openDatabase(
+  localDB.dbName,
+  "1.0",
+  "HexaWallet Database",
+  200000
+);
 //TODO: Json Files
 import accountTypeData from "../../../assets/jsonfiles/tblAccountType/tblAccountType.json";
 import { string } from "prop-types";

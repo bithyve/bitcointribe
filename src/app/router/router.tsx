@@ -6,6 +6,9 @@ import {
   createBottomTabNavigator
 } from "react-navigation";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { MultiBar, MultiBarToggle } from "react-native-multibar";
+import { FluidNavigator, Transition } from "react-navigation-fluid-transitions";
+
 //localization
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
 //OnBoarding
@@ -50,6 +53,9 @@ import MergeConfirmJointAccountScreen from "bithyve/src/screens/DrawerScreen/Acc
 import VaultAccountScreen from "bithyve/src/screens/DrawerScreen/AccountDetailsOnboardingScreen/VaultAccountScreen/VaultAccountScreen";
 //Right DrawerScreen
 import NotificationScreen from "bithyve/src/screens/DrawerScreen/NotificationScreen/NotificationScreen";
+
+//TODO: New Screen Hexa Wallet
+import WalletScreen from "bithyve/src/screens/TabBarScreen/WalletScreen/WalletScreen";
 
 //TODO: StackNavigator
 
@@ -164,12 +170,12 @@ const AccountStackNavigatorRouter = createStackNavigator(
 const TabNavigator = createBottomTabNavigator(
   {
     Payment: {
-      screen: PaymentScreen,
+      screen: WalletScreen, //PaymentScreen,
       navigationOptions: {
-        tabBarLabel: localization("TabBarItem.Payment"),
+        tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
         drawerLockMode: "locked-open",
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="credit-card" size={20} color={tintColor} />
+          <Icon name="credit-card" size={24} color={tintColor} />
         )
       }
     },
@@ -178,49 +184,77 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: localization("TabBarItem.Analytics"),
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="signal" size={20} color={tintColor} />
+          <Icon name="signal" size={24} color={tintColor} />
         )
+      }
+    },
+    MultiBar: {
+      screen: () => null,
+      navigationOptions: ({ navigation }) => ({
+        tabBarIcon: () => (
+          <MultiBarToggle
+            navigation={navigation}
+            actionSize={20}
+            routes={[
+              {
+                routeName: AccountStackNavigatorRouter,
+                color: "#FF8360",
+                icon: <Icon name="rocket" color="#333333" size={15} />
+              },
+              {
+                routeName: AccountStackNavigatorRouter,
+                color: "#E8E288",
+                icon: <Icon name="dashboard" color="#333333" size={15} />
+              },
+              {
+                routeName: AccountStackNavigatorRouter,
+                color: "#7DCE82",
+                icon: <Icon name="gears" color="#333333" size={15} />
+              }
+            ]}
+            actionSize={45}
+            toggleSize={80}
+            icon={<Icon name="plus" color="#FFFFFF" size={24} />}
+          />
+        )
+      }),
+      params: {
+        navigationDisabled: true
       }
     },
     Accounts: {
       screen: AccountStackNavigatorRouter,
-
       navigationOptions: {
         tabBarLabel: localization("TabBarItem.Accounts"),
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="dollar" size={20} color={tintColor} />
+          <Icon name="dollar" size={24} color={tintColor} />
         )
       }
     },
-    Cards: {
-      screen: CardsScreen,
-      navigationOptions: {
-        tabBarLabel: localization("TabBarItem.Cards"),
-        tabBarIcon: ({ tintColor }) => (
-          <Icon name="id-card" size={20} color={tintColor} />
-        )
-      }
-    },
+
     More: {
       screen: MoreScreen,
       navigationOptions: {
         tabBarLabel: localization("TabBarItem.More"),
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="ellipsis-v" size={20} color={tintColor} />
+          <Icon name="ellipsis-v" size={24} color={tintColor} />
         )
       }
     }
   },
   {
-    initialRouteName: "Accounts",
+    tabBarComponent: MultiBar,
+    initialRouteName: "Payment",
     tabBarOptions: {
+      showLabel: false,
       activeTintColor: colors.appColor,
       labelStyle: {
         fontSize: 12
       },
       style: {
         backgroundColor: "#ffffff"
-      }
+      },
+      tabStyle: {}
     }
   }
 );
@@ -255,6 +289,11 @@ const LeftDrawerNavigator = createDrawerNavigator(
   }
 );
 
+const Navigator = FluidNavigator({
+  screen1: { screen: WalletScreen },
+  screen2: { screen: AccountsDetailsScreen }
+});
+
 //TODO: RootNavigator
 //TODO: RootNavigator:createRootNavigator
 export const createRootNavigator = (
@@ -276,7 +315,7 @@ export const createRootNavigator = (
         navigationOptions: { header: null }
       },
       TabbarBottom: {
-        screen: LeftDrawerNavigator,
+        screen: Navigator,
         navigationOptions: { header: null }
       },
       //Drwaer Navigation
@@ -353,7 +392,7 @@ export const createRootNavigator = (
       }
     },
     {
-      initialRouteName: signedIn ? "OnBoardingNavigator" : screenName
+      initialRouteName: signedIn ? "OnBoardingNavigator" : "TabbarBottom" //screenName
       // initialRouteName: signedIn ? "OnBoardingNavigator" : "OnBoardingNavigator"
       // initialRouteName: signedIn ? "TabbarBottom" : "TabbarBottom"
     }

@@ -10,7 +10,7 @@ import {
   TextInput
 } from "react-native";
 import { Button, Text } from "native-base";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon from "react-native-vector-icons/FontAwesome";
 import Dialog, {
   SlideAnimation,
   DialogContent

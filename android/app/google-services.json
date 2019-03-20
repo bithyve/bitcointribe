@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "1009086953729",
-    "firebase_url": "https://my-money-232207.firebaseio.com",
-    "project_id": "my-money-232207",
-    "storage_bucket": "my-money-232207.appspot.com"
+    "project_number": "31441675584",
+    "firebase_url": "https://hexa-44747.firebaseio.com",
+    "project_id": "hexa-44747",
+    "storage_bucket": "hexa-44747.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1009086953729:android:d14586b62a841ccc",
+        "mobilesdk_app_id": "1:31441675584:android:92dad88b6c7e5b7b",
         "android_client_info": {
-          "package_name": "com.mymoney"
+          "package_name": "com.bithyve.hexa"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1009086953729-37mfc7kc5hob6c908a90qohmo96n1cta.apps.googleusercontent.com",
+          "client_id": "31441675584-odva3j59a0kv8sbt9scehceqlgjqqers.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDXyTTdtaruE5OulmJT52s-jTN7M1SCHRI"
+          "current_key": "AIzaSyArwgf-zRVo8vorTlTJnGJf2Rlho-pS9II"
         }
       ],
       "services": {

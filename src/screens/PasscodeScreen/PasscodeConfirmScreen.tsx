@@ -167,7 +167,7 @@ export default class PasscodeConfirmScreen extends Component {
             );
             if (resultCreateAccount) {
               try {
-                const username = "mymoney";
+                const username = "HexaWallet";
                 const password = code;
                 // Store the credentials
                 await Keychain.setGenericPassword(username, password);
@@ -207,7 +207,9 @@ export default class PasscodeConfirmScreen extends Component {
     return (
       <View style={styles.container}>
         <StatusBar backgroundColor={colors.appColor} barStyle="dark-content" />
-        <Text style={[styles.txtTitle, { color: "#000", fontWeight: "bold" }]}>
+        <Text
+          style={[styles.txtTitle, { color: "#000000", fontWeight: "bold" }]}
+        >
           {localization("appConfig.appName")}
         </Text>
         <Text style={{ color: "#000", marginTop: 10 }}>

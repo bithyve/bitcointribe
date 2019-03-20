@@ -23,7 +23,7 @@ import {
   Body,
   Text
 } from "native-base";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon from "react-native-vector-icons/FontAwesome";
 //import { QRCode } from "react-native-custom-qr-codes";
 import QRCode from "react-native-qrcode";
 import Toast from "react-native-simple-toast";
@@ -46,13 +46,13 @@ export default class ReceiveMoneyScreen extends React.Component {
   constructor(props: any) {
     super(props);
     this.state = {
-      qrcodedata: "mymoney",
+      qrcodedata: "hexa",
       isLoading: false,
       securetCodeEncpUrl: Math.floor(1000 + Math.random() * 9000),
       flag_SecuretCodeVisible: false,
       seconds: 5,
       imageURI:
-        "file://data/user/0/com.mymoney/cache/ReactNative-snapshot-image1856300205.jpg"
+        "file://data/user/0/com.bithyve.hexa/cache/ReactNative-snapshot-image1856300205.jpg"
     };
   }
 
@@ -144,7 +144,7 @@ export default class ReceiveMoneyScreen extends React.Component {
           title: "Address",
           message: msg,
           url: "\nhttps://bithyve.com/",
-          subject: "MyMoney" //  for email
+          subject: "HexaWallet" //  for email
         };
       } else if (page == "MergeConfirmJointAccountScreen") {
         let msg = "https://prime-sign-230407.appspot.com/ja/ca/" + code;
@@ -152,14 +152,14 @@ export default class ReceiveMoneyScreen extends React.Component {
           title: "Address",
           message: msg,
           url: "\nhttps://bithyve.com/",
-          subject: "MyMoney" //  for email
+          subject: "HexaWallet" //  for email
         };
       } else {
         shareOptions = {
           title: "Address",
           message: this.state.qrcodedata,
           url: "\nhttps://bithyve.com/",
-          subject: "MyMoney" //  for email
+          subject: "HexaWallet" //  for email
         };
       }
 
