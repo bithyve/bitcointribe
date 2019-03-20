@@ -10,7 +10,7 @@ import {
   TextInput
 } from "react-native";
 import { Container, Content, Button, Left, Right, Text } from "native-base";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon from "react-native-vector-icons/FontAwesome";
 import {
   MenuProvider,
   Menu,

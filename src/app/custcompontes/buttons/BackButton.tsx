@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Button } from "native-base";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 interface Props {
   click_Done: Function;

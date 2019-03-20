@@ -1,7 +1,7 @@
 {
   "appConfig": {
-    "appName": "My Money",
-    "btnCancel": "रद्द करना",
+    "appName": "Hexa Wallet",
+    "btnCancel": "CANCEL",
     "popUp": [
       {
         "amountTrnasfer": [
@@ -24,7 +24,7 @@
     ]
   },
   "LaunchScreen": {
-    "title": "My Money"
+    "title": "Hexa Wallet"
   },
   "OnBoardingScreen": {
     "onBoarding": [
@@ -49,14 +49,14 @@
     ]
   },
   "PasscodeConfirmScreen": {
-    "title": "My Money",
+    "title": "Hexa Wallet",
     "subTitle": "Enter a PinCode",
     "subTitleConfirm": "Confirm your Pincode.",
     "issuetitle": "Error",
     "issueSubTitle": "Please enter correct password."
   },
   "PasscodeScreen": {
-    "title": "My Money",
+    "title": "Hexa Wallet",
     "subTitle": "Enter a PinCode",
     "issuetitle": "Error",
     "issueSubTitle": "Please enter correct password."
@@ -99,7 +99,7 @@
     "More": "More"
   },
   "AccountsScreen": {
-    "title": "My Money",
+    "title": "Hexa Wallet",
     "createaWallet": "Create a wallet"
   },
   "TransactionDetailsWebViewScreen": {
@@ -128,7 +128,7 @@
       {
         "backgroundColor": "#ffffff",
         "title": "",
-        "subtitle": "Keep the code, MyMoneyApp pub key and the secondary mnenmonic safe and secure in a separate location."
+        "subtitle": "Keep the code, Hexa pub key and the secondary mnenmonic safe and secure in a separate location."
       }
     ],
     "Joint": [
@@ -270,7 +270,7 @@
   },
   "BackupPhraseScreen": {
     "headerTitle": "Backup Phrase",
-    "bodyMsg1": "These 12 words are they only way to restore your My Money App.",
+    "bodyMsg1": "These 12 words are they only way to restore your Hexa Wallet App.",
     "bodyMsg2": "Save them somewhere safe and secret.",
     "btnCopy": "COPY",
     "btnNext": "NEXT"

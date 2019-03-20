@@ -89,7 +89,7 @@ var images = {
   appIcon: require(assetsImages + "appLogo.png"),
   slideMenuIcon: require(assetsImages + "icon/slideMenuImage.jpg"),
   onBoardingScreen: {
-    onB1: require(assetsImages + "onBoardingScreen/onB3.png"),
+    onB1: require(assetsImages + "appLogo.png"),
     onB2: require(assetsImages + "onBoardingScreen/secureAccount.jpeg"),
     onB3: require(assetsImages + "onBoardingScreen/Selfsovereign.jpeg")
   },

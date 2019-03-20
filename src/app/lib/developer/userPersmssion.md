@@ -1,5 +1,6 @@
 ### IOS
 
+```
 <key>CFBundleURLTypes</key>
 <array>
 <dict>
@@ -7,7 +8,7 @@
 <array>
 <string>bithyve</string>
 </array>
-</dict>  
+</dict>
 </array>
 
 <key>NSPhotoLibraryUsageDescription</key>
@@ -23,10 +24,21 @@
 <string>whatsapp</string>
 <string>mailto</string>
 </array>
+```
 
 ## ANDROID
 
- <uses-permission android:name="android.permission.CAMERA" />
+````
+<uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+     <uses-permission android:name="android.permission.CAMERA" />
  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-  <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WAKE_LOCK" />
+<permission
+        android:name="com.bithyve.hexa.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.bithyve.hexa.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    ```
+````
