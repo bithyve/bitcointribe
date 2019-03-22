@@ -281,7 +281,6 @@ export default class WalletScreen extends React.Component {
         style={{
           flex: 1,
           backgroundColor: "#ffffff",
-          marginBottom: 80,
           borderRadius: 10
         }}
       >
@@ -390,9 +389,11 @@ export default class WalletScreen extends React.Component {
             backgroundColor={colors.appColor}
             barStyle="dark-content"
           />
+
+          {/* title */}
           <View
             style={{
-              flex: 0.05,
+              flex: 0.4,
               marginTop: 50,
               margin: 20
             }}
@@ -435,10 +436,11 @@ export default class WalletScreen extends React.Component {
               </View>
             </View>
           </View>
+
           {/* notificaiton box  */}
           <View
             style={{
-              flex: 0.13,
+              flex: 1,
               backgroundColor: "#8BC5E7",
               justifyContent: "center",
               margin: 20,
@@ -482,7 +484,8 @@ export default class WalletScreen extends React.Component {
               <Icon name="close" size={10} color={colors.appColor} />
             </View>
           </View>
-          <View style={{ flex: 1 }}>
+          {/*  cards */}
+          <View style={{ flex: 5 }}>
             <Carousel
               ref={c => {
                 this._carousel = c;
@@ -493,7 +496,8 @@ export default class WalletScreen extends React.Component {
               itemWidth={itemWidth}
             />
           </View>
-          <View style={{ flex: 0.2 }}>
+          {/*  tabbar bottom */}
+          <View style={{ flex: 1.1 }}>
             <TabBarWalletScreen />
           </View>
         </Content>
