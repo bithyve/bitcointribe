@@ -155,6 +155,10 @@ var images = {
         "svg/TabBarWalletScreen/icon_qrscan.svg"),
       settingIcon: require(assetsImages +
         "svg/TabBarWalletScreen/icon_settings.svg")
+    },
+    walletScreen: {
+      accountLogo: require(assetsImages +
+        "svg/WalletScreen/icon_regularaccount.svg")
     }
   }
 };

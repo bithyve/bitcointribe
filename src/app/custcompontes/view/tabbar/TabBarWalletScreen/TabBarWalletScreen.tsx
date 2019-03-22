@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import SvgImage from "react-native-remote-svg";
-import testSvg from "bithyve/src/assets/images/svg/TabBarWalletScreen/icon_wallet_selected.svg";
 
 import {
   colors,
