@@ -122,6 +122,7 @@
     "react-native-push-notification": "^3.1.2",
     "react-native-qrcode": "^0.2.7",
     "react-native-randombytes": "^3.5.1",
+    "react-native-remote-svg": "^2.0.0",
     "react-native-rsa": "^0.0.3",
     "react-native-safari-view": "^2.1.0",
     "react-native-scaling-drawer": "^1.0.1",
@@ -135,6 +136,9 @@
     "react-native-sqlite-storage": "^3.3.6",
     "react-native-super-grid": "^2.4.3",
     "react-native-svg": "^9.3.5",
+    "react-native-svg-icon": "^0.8.1",
+    "react-native-svg-image": "^2.0.1",
+    "react-native-svg-uri": "^1.2.3",
     "react-native-swipe-gestures": "^1.0.3",
     "react-native-swiper": "^1.5.13",
     "react-native-tag-select": "^2.0.0",
@@ -144,6 +148,7 @@
     "react-native-ultimate-listview": "^3.3.0",
     "react-native-vector-icons": "^6.1.0",
     "react-native-view-shot": "^2.5.0",
+    "react-native-webview": "^5.4.1",
     "react-navigation": "^3.0.0",
     "react-navigation-fluid-transitions": "^0.3.1",
     "react-navigation-transitions": "^1.0.8",
@@ -186,7 +191,7 @@
   },
   "rnpm": {
     "assets": [
-      "./src/assets/fonts/"
+      "./src/assets/fonts/*"
     ]
   },
   "react-native": {
