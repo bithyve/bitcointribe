@@ -86,12 +86,6 @@ export default class WalletScreen extends React.Component {
       isNoTranstion: false,
       cardIndexNo: 0
     };
-    // this.click_openPopupAccountType = this.click_openPopupAccountType.bind(
-    //   this
-    // );
-    // isNetwork = utils.getNetwork();
-    // let commonData = Singleton.getInstance();
-    // passcode = commonData.getPasscode();
   }
 
   //TODO: Page Life Cycle
@@ -103,6 +97,8 @@ export default class WalletScreen extends React.Component {
         this.connnection_FetchData();
       }
     );
+
+    console.log(utils.getDeviceModel());
   }
 
   //TODO: func connnection_FetchData
@@ -110,6 +106,7 @@ export default class WalletScreen extends React.Component {
     let isLoading1: boolean = true;
     let isNoTranstion: boolean = false;
     let tranDetails: [] = [];
+    let arr_AccountCardList: [] = [];
     let title: string;
     this.setState({
       isLoading: true
@@ -137,21 +134,6 @@ export default class WalletScreen extends React.Component {
 
       var transation: [] = [];
       var flag_noTrasation: boolean;
-
-      // var resultRecentTras = await dbOpration.readRecentTransactionAddressWise(
-      //   localDB.tableName.tblTransaction,
-      //   resultAccount.temp[this.state.cardIndexNo].address
-      // );
-      // console.log({ resultRecentTras });
-      // if (resultRecentTras.temp.length > 0) {
-      //   transation = resultRecentTras.temp;
-      //   flag_noTrasation = false;
-      // } else {
-      //   transation = [];
-      //   flag_noTrasation = true;
-      // }
-      // tranDetails = transation;
-      // isNoTranstion = flag_noTrasation;
 
       if (bal.statusCode == 200) {
         var resultRecentTras = await RegularAccount.getTransactions(
@@ -209,13 +191,9 @@ export default class WalletScreen extends React.Component {
             );
             if (resultAccount.temp.length > 0) {
               isLoading1 = false;
+              arr_AccountCardList = resultAccount.temp;
               this.setState({
                 accountTypeList: resultAccount.temp,
-                arr_WalletScreenCard: [
-                  {
-                    accountTypeList: resultAccount.temp
-                  }
-                ],
                 walletsData: resultWallet.temp,
                 popupData: [
                   {
@@ -255,13 +233,9 @@ export default class WalletScreen extends React.Component {
       tranDetails = transation;
       isNoTranstion = flag_noTrasation;
       isLoading1 = false;
+      arr_AccountCardList = resultAccount.temp;
       this.setState({
         accountTypeList: resultAccount.temp,
-        arr_WalletScreenCard: [
-          {
-            accountTypeList: resultAccount.temp
-          }
-        ],
         walletsData: resultWallet.temp,
         popupData: [
           {
@@ -274,12 +248,17 @@ export default class WalletScreen extends React.Component {
       });
     }
     this.setState({
-      recentTransactionData: [
+      arr_WalletScreenCard: [
         {
-          title,
-          isLoading1,
-          isNoTranstion,
-          tranDetails
+          accountTypeList: arr_AccountCardList,
+          recentTransaction: [
+            {
+              title,
+              isLoading1,
+              isNoTranstion,
+              tranDetails
+            }
+          ]
         }
       ]
     });
@@ -298,7 +277,7 @@ export default class WalletScreen extends React.Component {
             <View
               style={{
                 flex: 0.4,
-                marginTop: 50,
+                marginTop: 20,
                 margin: 20
               }}
             >
@@ -343,15 +322,19 @@ export default class WalletScreen extends React.Component {
 
             {/* notificaiton box  */}
             <View
-              style={{
-                flex: 1,
-                backgroundColor: "#8BC5E7",
-                justifyContent: "center",
-                margin: 20,
-                borderRadius: 10,
-                flexDirection: "row",
-                alignItems: "center"
-              }}
+              style={[
+                utils.getDeviceModel() == "IphoneX"
+                  ? { flex: 0.8 }
+                  : { flex: 1 },
+                {
+                  backgroundColor: "#8BC5E7",
+                  justifyContent: "center",
+                  margin: 20,
+                  borderRadius: 10,
+                  flexDirection: "row",
+                  alignItems: "center"
+                }
+              ]}
             >
               <View
                 style={{
@@ -390,10 +373,25 @@ export default class WalletScreen extends React.Component {
             </View>
             {/*  cards */}
             <View style={{ flex: 5 }}>
-              <ViewWalletScreenCards data={this.state.arr_WalletScreenCard} />
+              <ViewWalletScreenCards
+                data={this.state.arr_WalletScreenCard}
+                click_Details={(screen: string, item: any, index: any) =>
+                  this.props.navigation.push(screen, {
+                    data: item,
+                    walletsData: this.state.walletsData,
+                    indexNo: index
+                  })
+                }
+              />
             </View>
             {/*  tabbar bottom */}
-            <View style={{ flex: 1.1 }}>
+            <View
+              style={
+                utils.getDeviceModel() == "IphoneX"
+                  ? { flex: 0.9 }
+                  : { flex: 1.1 }
+              }
+            >
               <TabBarWalletScreen />
             </View>
           </SafeAreaView>
