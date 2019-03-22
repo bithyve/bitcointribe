@@ -74,6 +74,7 @@ var errorValidMsg = {
 //Colors
 var colors = {
   appColor: Config.COLOR_APP,
+  tabbarActiveColor: "#2D71B6",
   black: Config.COLOR_BLACK,
   white: Config.COLOR_WHITE,
   Saving: Config.COLOR_SAVING,
@@ -143,6 +144,18 @@ var images = {
   secureAccount: {
     secureLogo: require(assetsImages + "secureAccount/secureAccountLogo.png"),
     validationKey: require(assetsImages + "secureAccount/validationKey.png")
+  },
+  svgImages: {
+    tabBarWalletScreen: {
+      walletIcon: require(assetsImages +
+        "svg/TabBarWalletScreen/icon_wallet_selected.svg"),
+      transactionIcon: require(assetsImages +
+        "svg/TabBarWalletScreen/icon_transactions.svg"),
+      qrscanIcon: require(assetsImages +
+        "svg/TabBarWalletScreen/icon_qrscan.svg"),
+      settingIcon: require(assetsImages +
+        "svg/TabBarWalletScreen/icon_settings.svg")
+    }
   }
 };
 
