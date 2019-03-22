@@ -159,6 +159,10 @@ var images = {
     walletScreen: {
       accountLogo: require(assetsImages +
         "svg/WalletScreen/icon_regularaccount.svg")
+    },
+    viewRecentTransaction: {
+      sentIcon: require(assetsImages + "svg/WalletScreen/icon_paid.svg"),
+      receivedIcon: require(assetsImages + "svg/WalletScreen/icon_deposit.svg")
     }
   }
 };
