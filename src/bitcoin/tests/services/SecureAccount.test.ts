@@ -28,7 +28,7 @@ describe("Secure Account", () => {
         walletID,
         setupData,
         multiSig,
-        xpriv,
+        xpriv
       } = res.data;
       expect(recoveryMnemonic).toBeDefined();
       expect(xpubs).toBeDefined();
@@ -40,7 +40,7 @@ describe("Secure Account", () => {
 
       validationData = {
         secret: setupData.secret,
-        walletID,
+        walletID
       };
     }
   });
@@ -50,7 +50,7 @@ describe("Secure Account", () => {
     const res = await secureAccount.validateSecureAccountSetup(
       token,
       validationData.secret,
-      validationData.walletID,
+      validationData.walletID
     );
     if (res.statusCode !== 200) {
       throw new Error("secure account setup validation failed");
@@ -76,9 +76,9 @@ describe("Secure Account", () => {
         redeem:
           "00208e41f47589e91fc67540eda41f88c3b468a97adbdcf9ff833cbb3f740316de30",
         witness:
-          "522102d3812ea3ae76b90ac4fd2b848fef2ec50ddf7100aad145690ff2adddc6512a882102cead8265ee8e1c725191ef3c79f4d06877d57c74318bbf739f55564b76358f922103379942c29cc5cdcc5c9880c3a5cf1b7a8d6f5489832c363b50b54249bde40cb653ae",
+          "522102d3812ea3ae76b90ac4fd2b848fef2ec50ddf7100aad145690ff2adddc6512a882102cead8265ee8e1c725191ef3c79f4d06877d57c74318bbf739f55564b76358f922103379942c29cc5cdcc5c9880c3a5cf1b7a8d6f5489832c363b50b54249bde40cb653ae"
       },
-      address: "2NBn5rSGFLNYekdB1RXVFwWkHBn1JbsySFm",
+      address: "2NBn5rSGFLNYekdB1RXVFwWkHBn1JbsySFm"
     };
 
     const primaryXpriv =
@@ -86,9 +86,9 @@ describe("Secure Account", () => {
 
     const amount = 3500;
     const { balanceData } = await secureAccount.bitcoin.getBalance(
-      multiSig.address,
+      multiSig.address
     );
-    console.log({ final_balance: balanceData.final_balance });
+    //console.log({ final_balance: balanceData.final_balance });
     if (balanceData.final_balance < amount + 1000) {
       throw new Error("insufficient balance to conduct the secure transaction");
     } else {
@@ -101,7 +101,7 @@ describe("Secure Account", () => {
         scripts: multiSig.scripts,
         token,
         childIndex: 0,
-        walletID,
+        walletID
       });
       if (res.statusCode !== 200) {
         throw new Error("transaction from secure account failed");

@@ -17,7 +17,7 @@ describe("Regular Account", async () => {
       "spray danger ostrich volume soldier scare shed excess jeans scheme hammer exist";
 
     const { mnemonic, address, keyPair } = await regularAccount.importWallet(
-      dummyMnemonic,
+      dummyMnemonic
     );
 
     expect(mnemonic).toEqual(dummyMnemonic);
@@ -38,7 +38,7 @@ describe("Regular Account", async () => {
       block_hash,
       block_height,
       hash,
-      confirmations,
+      confirmations
     } = await regularAccount.getTransactionDetails(txHash);
     expect(block_hash).toBeDefined();
     expect(block_height).toBeDefined();
@@ -52,7 +52,7 @@ describe("Regular Account", async () => {
       totalTransactions,
       confirmedTransactions,
       transactionDetails,
-      address,
+      address
     } = await regularAccount.getTransactions(dummyAddress);
     expect(totalTransactions).toBeDefined();
     expect(confirmedTransactions).toBeDefined();
@@ -65,16 +65,16 @@ describe("Regular Account", async () => {
       senderAdderess: "2NAwqcZHo2DW9c8Qs9Jxaat3jHW3aqsBpFs",
       recipientAddress: "2N4qBb5f1KyfbpHxtLM86QgbZ7qcxsFf9AL",
       amount: 3500,
-      privateKey: "cR5PcKVDDXHotM8zexjr5wLkxWf7zkL2pAsPc9yaCbPgwjGrK3pc",
+      privateKey: "cR5PcKVDDXHotM8zexjr5wLkxWf7zkL2pAsPc9yaCbPgwjGrK3pc"
     };
 
     const res = await regularAccount.transfer(
       transfer.senderAdderess,
       transfer.recipientAddress,
       transfer.amount,
-      transfer.privateKey,
+      transfer.privateKey
     );
-    console.log(res);
+    //console.log(res);
     // expect(statusCode).toBe(200);
     expect(res.data.txid).toBeDefined();
   });
