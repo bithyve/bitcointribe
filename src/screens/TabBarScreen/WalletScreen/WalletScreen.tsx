@@ -8,9 +8,8 @@ import {
   StyleSheet,
   RefreshControl,
   Platform,
-  findNodeHandle
+  SafeAreaView
 } from "react-native";
-const RCTUIManager = require("NativeModules").UIManager;
 import {
   Container,
   Header,
@@ -32,6 +31,7 @@ import DropdownAlert from "react-native-dropdownalert";
 import SCLAlertAccountTypes from "bithyve/src/app/custcompontes/alert/SCLAlertAccountTypes";
 import ViewRecentTransaction from "bithyve/src/app/custcompontes/view/ViewRecentTransaction";
 import TabBarWalletScreen from "bithyve/src/app/custcompontes/view/tabbar/TabBarWalletScreen/TabBarWalletScreen";
+import ViewWalletScreenCards from "bithyve/src/app/custcompontes/view/ViewWalletScreenCards/ViewWalletScreenCards";
 
 //TODO: Custome object
 import {
@@ -73,6 +73,7 @@ export default class WalletScreen extends React.Component {
       isNetwork: true,
       tranDetails: [],
       accountTypeList: [],
+      arr_WalletScreenCard: [],
       accountTypeVisible: false,
       popupData: [],
       recentTransactionData: [],
@@ -210,6 +211,11 @@ export default class WalletScreen extends React.Component {
               isLoading1 = false;
               this.setState({
                 accountTypeList: resultAccount.temp,
+                arr_WalletScreenCard: [
+                  {
+                    accountTypeList: resultAccount.temp
+                  }
+                ],
                 walletsData: resultWallet.temp,
                 popupData: [
                   {
@@ -251,6 +257,11 @@ export default class WalletScreen extends React.Component {
       isLoading1 = false;
       this.setState({
         accountTypeList: resultAccount.temp,
+        arr_WalletScreenCard: [
+          {
+            accountTypeList: resultAccount.temp
+          }
+        ],
         walletsData: resultWallet.temp,
         popupData: [
           {
@@ -274,113 +285,6 @@ export default class WalletScreen extends React.Component {
     });
   }
 
-  _renderItem({ item, index }) {
-    return (
-      <View
-        key={"card" + index}
-        style={{
-          flex: 1,
-          backgroundColor: "#ffffff",
-          borderRadius: 10
-        }}
-      >
-        <View
-          style={{
-            flex: 0.8,
-            backgroundColor: "#F4F4F4",
-            borderTopLeftRadius: 10,
-            borderTopEndRadius: 10,
-            alignItems: "center"
-          }}
-        >
-          <View style={{ alignItems: "center" }}>
-            <View
-              style={{
-                backgroundColor: "#BC6F00",
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: 10
-              }}
-            >
-              <Icon name="rupee" size={30} color="#ffffff" />
-            </View>
-            <Text style={{ fontSize: 18, fontWeight: "bold", marginTop: 5 }}>
-              {item.accountType}
-            </Text>
-          </View>
-          {/* TOTAL DEPOSTIS and AVALABLE FOUNDS show  */}
-          <View style={{ flexDirection: "row", marginTop: 10 }}>
-            <View style={{ flex: 1, alignItems: "flex-end" }}>
-              <Text style={{ fontSize: 12, color: "gray" }}>
-                TOTAL DEPOSTIS
-              </Text>
-              <Text style={{ fontSize: 16 }}>$150,000</Text>
-            </View>
-
-            <View style={{ flex: 1, flexDirection: "row" }}>
-              <View
-                style={{
-                  height: 50,
-                  width: 1,
-                  backgroundColor: "gray",
-                  marginLeft: 5,
-                  marginRight: 5
-                }}
-              />
-              <View>
-                <Text style={{ fontSize: 12, color: "gray" }}>
-                  AVALABLE FOUNDS
-                </Text>
-                <Text style={{ fontSize: 16 }}>$150,000</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-        {/* Recent Transactions View*/}
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "#ffffff",
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-          <Text>Recent Transactions </Text>
-        </View>
-        {/* Bottom View Details Button View*/}
-        <View
-          style={{
-            flex: 0.4,
-            backgroundColor: "#ffffff",
-            borderBottomLeftRadius: 10,
-            borderBottomEndRadius: 10
-          }}
-        >
-          <Button
-            full
-            style={{
-              margin: 10,
-              borderRadius: 10,
-              backgroundColor: colors.appColor
-            }}
-            onPress={() =>
-              this.props.navigation.push("screen2", {
-                data: item,
-                walletsData: this.state.walletsData,
-                indexNo: index
-              })
-            }
-          >
-            <Text style={{ color: "#ffffff", fontSize: 16 }}>View Details</Text>
-          </Button>
-        </View>
-      </View>
-    );
-  }
-
   render() {
     return (
       <Container>
@@ -389,117 +293,110 @@ export default class WalletScreen extends React.Component {
             backgroundColor={colors.appColor}
             barStyle="dark-content"
           />
-
-          {/* title */}
-          <View
-            style={{
-              flex: 0.4,
-              marginTop: 50,
-              margin: 20
-            }}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Text
-                style={{
-                  flex: 1,
-                  color: "#ffffff",
-                  fontSize: 34,
-                  fontWeight: "bold"
-                }}
-              >
-                Wallet
-              </Text>
-              <View
-                style={{
-                  flex: 1,
-                  width: 50,
-                  height: 50,
-                  borderRadius: 50,
-                  alignSelf: "flex-end"
-                }}
-              >
-                <Button
-                  transparent
+          <SafeAreaView style={styles.container}>
+            {/* title */}
+            <View
+              style={{
+                flex: 0.4,
+                marginTop: 50,
+                margin: 20
+              }}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text
                   style={{
                     flex: 1,
-                    backgroundColor: "#ffffff",
+                    color: "#ffffff",
+                    fontSize: 34,
+                    fontWeight: "bold"
+                  }}
+                >
+                  Wallet
+                </Text>
+                <View
+                  style={{
+                    flex: 1,
                     width: 50,
                     height: 50,
                     borderRadius: 50,
-                    alignSelf: "flex-end",
-                    alignItems: "center",
-                    justifyContent: "center"
+                    alignSelf: "flex-end"
                   }}
                 >
-                  <Icon name="bell" size={15} color={colors.appColor} />
-                </Button>
+                  <Button
+                    transparent
+                    style={{
+                      flex: 1,
+                      backgroundColor: "#ffffff",
+                      width: 50,
+                      height: 50,
+                      borderRadius: 50,
+                      alignSelf: "flex-end",
+                      alignItems: "center",
+                      justifyContent: "center"
+                    }}
+                  >
+                    <Icon name="bell" size={15} color={colors.appColor} />
+                  </Button>
+                </View>
               </View>
             </View>
-          </View>
 
-          {/* notificaiton box  */}
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "#8BC5E7",
-              justifyContent: "center",
-              margin: 20,
-              borderRadius: 10,
-              flexDirection: "row",
-              alignItems: "center"
-            }}
-          >
+            {/* notificaiton box  */}
             <View
               style={{
-                backgroundColor: "#fff",
-                flex: 0.2,
-                height: 48,
-                width: 48,
-                borderRadius: 29,
-                alignItems: "center",
+                flex: 1,
+                backgroundColor: "#8BC5E7",
                 justifyContent: "center",
-                marginLeft: 5
+                margin: 20,
+                borderRadius: 10,
+                flexDirection: "row",
+                alignItems: "center"
               }}
             >
-              <Icon name="exclamation" size={15} color="red" />
+              <View
+                style={{
+                  backgroundColor: "#fff",
+                  flex: 0.2,
+                  height: 48,
+                  width: 48,
+                  borderRadius: 29,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginLeft: 5
+                }}
+              >
+                <Icon name="exclamation" size={15} color="red" />
+              </View>
+              <View style={{ flex: 1, marginLeft: 5, marginRight: 5 }}>
+                <Text>
+                  You haven't confirmed your passpharase last confiramtion was
+                  15 days ago.
+                </Text>
+              </View>
+              <View
+                style={{
+                  backgroundColor: "#fff",
+                  flex: 0.12,
+                  height: 30,
+                  width: 30,
+                  borderRadius: 15,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 5
+                }}
+              >
+                <Icon name="close" size={10} color={colors.appColor} />
+              </View>
             </View>
-            <View style={{ flex: 1, marginLeft: 5, marginRight: 5 }}>
-              <Text>
-                You haven't confirmed your passpharase last confiramtion was 15
-                days ago.
-              </Text>
+            {/*  cards */}
+            <View style={{ flex: 5 }}>
+              <ViewWalletScreenCards data={this.state.arr_WalletScreenCard} />
             </View>
-            <View
-              style={{
-                backgroundColor: "#fff",
-                flex: 0.12,
-                height: 30,
-                width: 30,
-                borderRadius: 15,
-                alignItems: "center",
-                justifyContent: "center",
-                marginRight: 5
-              }}
-            >
-              <Icon name="close" size={10} color={colors.appColor} />
+            {/*  tabbar bottom */}
+            <View style={{ flex: 1.1 }}>
+              <TabBarWalletScreen />
             </View>
-          </View>
-          {/*  cards */}
-          <View style={{ flex: 5 }}>
-            <Carousel
-              ref={c => {
-                this._carousel = c;
-              }}
-              data={this.state.accountTypeList}
-              renderItem={this._renderItem.bind(this)}
-              sliderWidth={sliderWidth}
-              itemWidth={itemWidth}
-            />
-          </View>
-          {/*  tabbar bottom */}
-          <View style={{ flex: 1.1 }}>
-            <TabBarWalletScreen />
-          </View>
+          </SafeAreaView>
         </Content>
       </Container>
     );
