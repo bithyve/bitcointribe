@@ -129,8 +129,6 @@ const readTableAcccountType = async (
           //for hide vault account and joint account
           temp.splice(1, 1);
           temp.splice(1, 1);
-          console.log({ temp });
-
           tx.executeSql(
             "select accountType  from " + tableName2,
             [],
@@ -315,7 +313,6 @@ const updateTableData = (
 //Insert tblAccountType
 const insertAccountTypeData = (tblName, txtDate) => {
   let passcode = getPasscode();
-  console.log(passcode);
   return new Promise((resolve, reject) => {
     db.transaction(function(txn) {
       if (accountTypeData) {
