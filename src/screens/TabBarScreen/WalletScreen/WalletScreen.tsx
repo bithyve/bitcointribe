@@ -26,6 +26,7 @@ import Carousel, { Pagination } from "react-native-snap-carousel";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { SkypeIndicator } from "react-native-indicators";
 import DropdownAlert from "react-native-dropdownalert";
+import Loader from "react-native-modal-loader";
 
 //Custome Compontes
 import SCLAlertAccountTypes from "bithyve/src/app/custcompontes/alert/SCLAlertAccountTypes";
@@ -86,6 +87,11 @@ export default class WalletScreen extends React.Component {
       isNoTranstion: false,
       cardIndexNo: 0
     };
+    isNetwork = utils.getNetwork();
+  }
+
+  componentWillMount() {
+    this.connnection_FetchData();
   }
 
   //TODO: Page Life Cycle
@@ -135,11 +141,13 @@ export default class WalletScreen extends React.Component {
       var transation: [] = [];
       var flag_noTrasation: boolean;
 
+      console.log({ bal });
       if (bal.statusCode == 200) {
+        console.log("bal code 200");
+        console.log(resultAccount.temp[this.state.cardIndexNo].address);
         var resultRecentTras = await RegularAccount.getTransactions(
           resultAccount.temp[this.state.cardIndexNo].address
         );
-
         let resultRecentTransDetailsData = resultRecentTras.transactionDetails;
         var arr_DateSort = [];
         for (let i = 0; i < resultRecentTransDetailsData.length; i++) {
@@ -172,6 +180,7 @@ export default class WalletScreen extends React.Component {
                 transation = [];
                 flag_noTrasation = true;
               }
+              console.log({ transation });
               tranDetails = transation;
               isNoTranstion = flag_noTrasation;
             }
@@ -207,14 +216,20 @@ export default class WalletScreen extends React.Component {
             }
           }
         } else {
-          // this.dropdown.alertWithType(
-          //   "error",
-          //   "OH",
-          //   resultRecentTras.errorMessage
-          // );
+          this.dropdown.alertWithType(
+            "error",
+            "OH",
+            resultRecentTras.errorMessage.error
+          );
+          this.setState({
+            isLoading: false
+          });
         }
       } else {
-        //  this.dropdown.alertWithType("error", "OH", bal.errorMessage);
+        this.dropdown.alertWithType("error", "OH", bal.errorMessage.error);
+        this.setState({
+          isLoading: false
+        });
       }
     } else {
       let transation: [] = [];
@@ -230,6 +245,7 @@ export default class WalletScreen extends React.Component {
         transation = [];
         flag_noTrasation = true;
       }
+      console.log({ transation });
       tranDetails = transation;
       isNoTranstion = flag_noTrasation;
       isLoading1 = false;
@@ -258,7 +274,8 @@ export default class WalletScreen extends React.Component {
               isNoTranstion,
               tranDetails
             }
-          ]
+          ],
+          isLoading: false
         }
       ]
     });
@@ -290,7 +307,7 @@ export default class WalletScreen extends React.Component {
                     fontWeight: "bold"
                   }}
                 >
-                  Wallet
+                  Hexa
                 </Text>
                 <View
                   style={{
@@ -396,6 +413,8 @@ export default class WalletScreen extends React.Component {
             </View>
           </SafeAreaView>
         </Content>
+        <Loader loading={this.state.isLoading} color={colors.appColor} />
+        <DropdownAlert ref={ref => (this.dropdown = ref)} />
       </Container>
     );
   }
