@@ -146,6 +146,7 @@ var images = {
     validationKey: require(assetsImages + "secureAccount/validationKey.png")
   },
   svgImages: {
+    back_Icon: require(assetsImages + "svg/global/icon_back.svg"),
     tabBarWalletScreen: {
       walletIcon: require(assetsImages +
         "svg/TabBarWalletScreen/icon_wallet_selected.svg"),
@@ -163,6 +164,16 @@ var images = {
     viewRecentTransaction: {
       sentIcon: require(assetsImages + "svg/WalletScreen/icon_paid.svg"),
       receivedIcon: require(assetsImages + "svg/WalletScreen/icon_deposit.svg")
+    },
+    accountDetailsScreen: {
+      accountSettingsIcon: require(assetsImages +
+        "svg/AccountDetailsScreen/icon_settings.svg"),
+      sentIcon: require(assetsImages +
+        "svg/AccountDetailsScreen/icon_paid.svg"),
+      receivedIcon: require(assetsImages +
+        "svg/AccountDetailsScreen/icon_deposit.svg"),
+      addAccount: require(assetsImages +
+        "svg/AccountDetailsScreen/icon_add.svg")
     }
   }
 };

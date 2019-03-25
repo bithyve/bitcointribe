@@ -26,25 +26,12 @@ interface Props {
   click_OpenRecentTrans: Function;
 }
 
-export default class ViewRecentTransaction extends Component<Props, any> {
+export default class ViewAccountDetailsRecentTransaction extends Component<
+  Props,
+  any
+> {
   constructor(props: any) {
     super(props);
-  }
-
-  renderHeader() {
-    return (
-      <View style={{ marginTop: 10, marginLeft: 10, marginRight: 10 }}>
-        <Text note style={{ marginBottom: 5, fontSize: 14 }}>
-          Recent Transaction
-        </Text>
-        <View
-          style={{
-            borderBottomColor: "gray",
-            borderBottomWidth: 1
-          }}
-        />
-      </View>
-    );
   }
 
   render() {
@@ -68,6 +55,17 @@ export default class ViewRecentTransaction extends Component<Props, any> {
             : null
         )(
           <View style={styles.recentTransListView}>
+            <View style={{ marginTop: 10, marginLeft: 10, marginRight: 10 }}>
+              <Text note style={{ marginBottom: 5, fontSize: 14 }}>
+                Recent Transaction
+              </Text>
+              <View
+                style={{
+                  borderBottomColor: "gray",
+                  borderBottomWidth: 1
+                }}
+              />
+            </View>
             <FlatList
               data={
                 this.props.data.length != 0
@@ -84,11 +82,11 @@ export default class ViewRecentTransaction extends Component<Props, any> {
                       height: 70
                     }}
                   >
-                    <Left style={{ flex: 0.16 }}>
+                    <Left style={{ flex: 0.13 }}>
                       {renderIf(item.transactionType == "Sent")(
                         <SvgImage
                           source={
-                            images.svgImages.viewRecentTransaction.sentIcon
+                            images.svgImages.accountDetailsScreen.sentIcon
                           }
                           style={[styles.svgImage]}
                         />
@@ -96,7 +94,7 @@ export default class ViewRecentTransaction extends Component<Props, any> {
                       {renderIf(item.transactionType == "Received")(
                         <SvgImage
                           source={
-                            images.svgImages.viewRecentTransaction.receivedIcon
+                            images.svgImages.accountDetailsScreen.receivedIcon
                           }
                           style={[styles.svgImage]}
                         />
@@ -136,7 +134,6 @@ export default class ViewRecentTransaction extends Component<Props, any> {
                   </ListItem>
                 </List>
               )}
-              ListHeaderComponent={this.renderHeader}
               keyExtractor={(item, index) => index}
             />
           </View>
