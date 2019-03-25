@@ -392,7 +392,7 @@ export const createRootNavigator = (
       }
     },
     {
-      initialRouteName: signedIn ? "OnBoardingNavigator" : screenName // "TabbarBottom" //screenName
+      initialRouteName: signedIn ? "OnBoardingNavigator" : "TabbarBottom" //screenName
       // initialRouteName: signedIn ? "OnBoardingNavigator" : "OnBoardingNavigator"
       // initialRouteName: signedIn ? "TabbarBottom" : "TabbarBottom"
     }
