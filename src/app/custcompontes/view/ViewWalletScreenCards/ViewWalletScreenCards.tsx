@@ -44,6 +44,7 @@ const SLIDER_1_FIRST_ITEM = 0;
 interface Props {
   data: [];
   click_Details: Function;
+  click_OpenRecentTrans: Function;
 }
 
 export default class ViewWalletScreenCards extends Component<Props, any> {
@@ -154,6 +155,9 @@ export default class ViewWalletScreenCards extends Component<Props, any> {
               )(
                 <ViewRecentTransaction
                   data={this.props.data[0].recentTransaction}
+                  click_OpenRecentTrans={(item: any) => {
+                    this.props.click_OpenRecentTrans(item);
+                  }}
                 />
               )}
             </View>

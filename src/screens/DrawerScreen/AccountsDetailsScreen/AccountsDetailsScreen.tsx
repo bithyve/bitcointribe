@@ -9,7 +9,16 @@ import {
   Dimensions,
   TextInput
 } from "react-native";
-import { Container, Content, Button, Left, Right, Text } from "native-base";
+import {
+  Container,
+  Content,
+  Button,
+  Left,
+  Right,
+  Text,
+  Header,
+  Body
+} from "native-base";
 import Icon from "react-native-vector-icons/FontAwesome";
 import {
   MenuProvider,
@@ -21,6 +30,7 @@ import {
 import DropdownAlert from "react-native-dropdownalert";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Loader from "react-native-modal-loader";
+import SvgImage from "react-native-remote-svg";
 
 //TODO: Custome Pages
 import {
@@ -44,6 +54,10 @@ import SCLAlertOk from "bithyve/src/app/custcompontes/alert/SCLAlertOk";
 import SCLAlertJointAccountAuthoriseConfirmation from "bithyve/src/app/custcompontes/alert/SCLAlertJointAccountAuthoriseConfirmation";
 import BackButton from "bithyve/src/app/custcompontes/buttons/BackButton";
 import DialogSecureAccountAuthentication from "bithyve/src/app/custcompontes/dialog/DialogSecureAccountAuthentication";
+
+//new ui
+import ViewAccountDetailsCard from "bithyve/src/app/custcompontes/view/ViewAccountDetailsCard/ViewAccountDetailsCard";
+import ViewAccountDetailsRecentTransaction from "bithyve/src/app/custcompontes/view/ViewAccountDetailsRecentTransaction/ViewAccountDetailsRecentTransaction";
 
 //TODO: Wallets
 import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
@@ -92,7 +106,9 @@ export default class AccountDetailsScreen extends React.Component<
       secureAmount: "",
       secureRecipientAddress: "",
       securetransfer: {},
-      selectedAccountType: ""
+      selectedAccountType: "",
+      //new State
+      arr_RecentTrnasactionData: []
     };
     isNetwork = utils.getNetwork();
     this.baseState = this.state;
@@ -310,8 +326,6 @@ export default class AccountDetailsScreen extends React.Component<
         });
       }
 
-      console.log({ tranDetails });
-
       this.setState({
         recentTransactionData: [
           {
@@ -475,7 +489,7 @@ export default class AccountDetailsScreen extends React.Component<
 
   render() {
     return (
-      <Container style={styles.container}>
+      <Container>
         <Content
           contentContainerStyle={styles.container}
           refreshControl={
@@ -485,405 +499,130 @@ export default class AccountDetailsScreen extends React.Component<
             />
           }
         >
-          <ImageBackground
-            source={images.accounts[this.state.data.accountType]}
-            style={styles[this.state.data.accountType]}
-            borderRadius={10}
-            imageStyle={{
-              resizeMode: "cover" // works only here!
-            }}
+          <Header
+            transparent
+            style={Platform.OS == "ios" ? { marginTop: 10 } : { marginTop: 0 }}
           >
-            <View style={styles.viewBackBtn}>
-              <Left>
-                <BackButton click_Done={() => this.props.navigation.goBack()} />
-              </Left>
-              {renderIf(this.state.data.accountType == "Joint")(
-                <Right>
-                  <MenuProvider>
-                    <Menu
-                      style={{
-                        marginTop: 10,
-                        color: "#ffffff",
-                        marginRight: 10
-                      }}
-                    >
-                      <MenuTrigger
-                        customStyles={{
-                          triggerText: { fontSize: 18, color: "#fff" }
-                        }}
-                        text="options"
-                      />
-                      <MenuOptions
-                        customStyles={{ optionText: styles.menuOptions }}
-                      >
-                        <MenuOption
-                          onSelect={() => {
-                            this.props.navigation.push("QrcodeScannerScreen", {
-                              onSelect: this.onSelect
-                            });
-                          }}
-                          text="Authorize Transaction"
-                        />
-                      </MenuOptions>
-                    </Menu>
-                  </MenuProvider>
-                </Right>
-              )}
-            </View>
-            <View style={styles.viewBalInfo}>
-              <Text style={[styles.txtTile, styles.txtAccountType]}>
-                {this.state.data.accountName}
-              </Text>
-              {renderIf(this.state.data.accountType == "Joint")(
-                <Text style={styles.txtTile}>Joint Account</Text>
-              )}
-              <View style={{ flexDirection: "row", marginTop: 10 }}>
-                <Text style={[styles.txtTile, styles.txtBalInfo]}>
-                  {this.state.data.balance + " "}
-                </Text>
-                <Text style={[styles.txtTile, styles.txtBalInfo]}>
-                  {this.state.data.unit}
-                </Text>
-              </View>
-            </View>
-          </ImageBackground>
-          <View style={styles.viewMainRecentTran}>
-            <ViewRecentTransaction
-              data={this.state.recentTransactionData}
-              openRecentTrans={(val: any) => this.openRecentTrans(val)}
-            />
-          </View>
-          <View style={styles.viewFooter}>
-            {renderIf(this.state.flag_TransferBtn)(
+            <Left>
               <Button
-                style={styles.footerBtnAction}
-                warning
-                onPress={() => {
-                  if (isNetwork) {
-                    this.setState({
-                      transferAmountPopupDAta: [
-                        {
-                          status: true,
-                          subtitle: localization(
-                            "AccountDetailsScreen.popUpTransfer.subtitle",
-                            {
-                              accountName: this.state.data.accountType.toLowerCase()
-                            }
-                          ),
-                          data: this.state.arr_transferAccountList
-                        }
-                      ]
-                    });
-                  } else {
-                    this.dropdown.alertWithType(
-                      "info",
-                      "OH",
-                      errorMessages.offline
-                    );
-                  }
+                transparent
+                onPress={() => this.props.navigation.goBack()}
+              >
+                <SvgImage
+                  source={images.svgImages.back_Icon}
+                  style={[styles.svgImage]}
+                />
+              </Button>
+            </Left>
+            <Right>
+              <Button
+                bordered
+                style={{
+                  height: 40,
+                  margin: 0,
+                  padding: 0,
+                  borderColor: "gray"
                 }}
               >
-                <Icon
-                  style={styles.footerBtnIcon}
-                  name="exchange-alt"
-                  size={25}
-                  color="#ffffff"
+                <SvgImage
+                  source={
+                    images.svgImages.accountDetailsScreen.accountSettingsIcon
+                  }
+                  style={[styles.svgBtnAccoutSetting]}
                 />
-                <Text style={styles.txtTile}>
-                  {localization(
-                    "AccountDetailsScreen.btnTRANSFER"
-                  ) /* TRANSFER */}
+                <Text note style={{ fontSize: 12, fontWeight: "bold" }}>
+                  Account Settings
                 </Text>
               </Button>
-            )}
-            <Button
-              warning
-              style={styles.footerBtnAction}
-              disabled={this.state.flag_sentBtnDisStatus}
-              onPress={() => {
-                if (isNetwork) {
-                  this.props.navigation.push("SentMoneyScreen", {
-                    data: this.state.data,
-                    address: this.state.data.address,
-                    waletteData: this.state.waletteData
-                  });
-                } else {
-                  this.dropdown.alertWithType(
-                    "info",
-                    "OH",
-                    errorMessages.offline
-                  );
-                }
-              }}
-            >
-              <Icon
-                style={styles.footerBtnIcon}
-                name="angle-up"
-                size={25}
-                color="#ffffff"
-              />
-              <Text style={styles.txtTile}>
-                {localization("AccountDetailsScreen.btnSEND") /* SEND */}
-              </Text>
-            </Button>
-            <Button
-              style={styles.footerBtnAction}
-              warning
-              onPress={() => {
-                let data = {};
-                data.address = this.state.data.address;
-                this.props.navigation.push("ReceiveMoneyScreen", {
-                  page: "SentAndReceiveScreen",
-                  data: data
-                });
-              }}
-            >
-              <Icon
-                style={styles.footerBtnIcon}
-                name="angle-down"
-                size={25}
-                color="#ffffff"
-              />
-              <Text style={styles.txtTile}>
-                {localization("AccountDetailsScreen.btnRECEIVE") /* RECEIVE */}
-              </Text>
-            </Button>
-          </View>
+            </Right>
+          </Header>
 
-          <SCLAlertTransferAccountAmount
-            data={this.state.transferAmountPopupDAta}
-            onRequestClose={() =>
-              this.setState({ transferAmountPopupDAta: [{ status: false }] })
-            }
-            onPress={async (accountType, amount, address, msg) => {
-              let selfAddress = this.state.data.address;
-              let privateKey = this.state.waletteData[0].privateKey;
-              console.log({
-                selfAddress,
-                privateKey,
-                accountType,
-                amount,
-                address,
-                msg
-              });
-              const transfer = {
-                senderAddress: selfAddress,
-                recipientAddress: address,
-                amount: parseFloat(amount) * 1e8,
-                privateKey
-              };
-              if (this.state.data.accountType == "Savings") {
-                this.setState({
-                  selectedAccountType: "Savings",
-                  securetransfer: transfer,
-                  transferAmountPopupDAta: [
-                    {
-                      status: false
-                    }
-                  ],
-                  confirmPopupData: [
-                    {
-                      status: true,
-                      icon: "check-circle",
-                      title: localization(
-                        "AccountDetailsScreen.popUpConfirmation.title"
-                      ),
-                      subtitle: localization(
-                        "AccountDetailsScreen.popUpConfirmation.subTitle",
-                        { accountType: accountType }
-                      ),
-                      confirmTitle: localization(
-                        "AccountDetailsScreen.popUpConfirmation.btnConfirm"
-                      )
-                    }
-                  ]
-                });
-              } else if (this.state.data.accountType == "Vault") {
-                // let additionalInfo = JSON.parse(this.state.data.additionalInfo);
-                // const locktime = additionalInfo.lockTime;
-                // const res = await vaultAccount.transfer(
-                //   transfer.senderAddress,
-                //   transfer.recipientAddress,
-                //   transfer.amount,
-                //   locktime,
-                //   transfer.privateKey
-                // );
-                // console.log({ res });
-              } else if (this.state.data.accountType == "Secure") {
-                this.setState({
-                  securetransfer: transfer,
-                  selectedAccountType: "Secure",
-                  transferAmountPopupDAta: [
-                    {
-                      status: false
-                    }
-                  ],
-                  confirmPopupData: [
-                    {
-                      status: true,
-                      icon: "check-circle",
-                      title: localization(
-                        "AccountDetailsScreen.popUpConfirmation.title"
-                      ),
-                      subtitle: localization(
-                        "AccountDetailsScreen.popUpConfirmation.subTitle",
-                        { accountType: accountType }
-                      ),
-                      confirmTitle: localization(
-                        "AccountDetailsScreen.popUpConfirmation.btnConfirm"
-                      )
-                    }
-                  ]
-                });
-              } else if (this.state.data.accountType == "Joint") {
-                this.setState({
-                  securetransfer: transfer,
-                  selectedAccountType: "Joint",
-                  transferAmountPopupDAta: [
-                    {
-                      status: false
-                    }
-                  ]
-                });
-              }
-            }}
-            onError={error => {
-              this.dropdown.alertWithType("error", "OH", error);
-            }}
-          />
-          <SCLAlertSimpleConfirmation
-            data={this.state.confirmPopupData}
-            click_Ok={async (status: boolean) => {
-              this.setState({
-                confirmPopupData: [
-                  {
-                    status: false
-                  }
-                ]
-              });
-              if (status) {
-                if (this.state.selectedAccountType == "Savings") {
-                  const transfer = this.state.securetransfer;
-                  this.setState({
-                    isLoading: true
-                  });
-                  const res = await RegularAccount.transfer(
-                    transfer.senderAddress,
-                    transfer.recipientAddress,
-                    transfer.amount,
-                    transfer.privateKey
-                  );
-                  if (res.statusCode == 200) {
-                    this.setState({
-                      isLoading: false,
-                      successOkPopupData: [
-                        {
-                          theme: "success",
-                          status: true,
-                          icon: "smile",
-                          title: arr_successMsg.title,
-                          subtitle: arr_successMsg.subTitle,
-                          goBackStatus: false
-                        }
-                      ]
-                    });
-                  }
-                } else if (this.state.selectedAccountType == "Secure") {
-                  console.log("its working");
-                  const transfer = this.state.securetransfer;
-                  console.log({ transfer });
-                  this.setState({
-                    arr_SecureAuthPopupData: [
-                      {
-                        visible: true,
-                        amount: transfer.amount,
-                        fee: "0.001",
-                        secureRecipientAddress: transfer.recipientAddress
-                      }
-                    ]
-                  });
-                } else if (this.state.selectedAccountType == "Joint") {
-                  const transfer = this.state.securetransfer;
-                  const additionalInfo = JSON.parse(
-                    this.state.data.additionalInfo
-                  );
-                  const scripts = additionalInfo.scripts;
-                  const res = await jointAccount.initJointTxn({
-                    senderAddress: transfer.senderAddress,
-                    recipientAddress: transfer.recipientAddress,
-                    amount: transfer.amount,
-                    privateKey: transfer.privateKey,
-                    scripts
-                  });
-                  this.props.navigation.push("ReceiveMoneyScreen", {
-                    page: "AccountDetailsScreen",
-                    data: res.data
-                  });
-                }
-              }
-            }}
-          />
-          <SCLAlertJointAccountAuthoriseConfirmation
-            data={this.state.arr_ConfirmJointAccountAuthorise}
-            click_Ok={(status: boolean) => {
-              if (status) {
-                this.connection_SentJointAccountMoney();
-              }
-              this.setState({
-                arr_ConfirmJointAccountAuthorise: [
-                  {
-                    status: false
-                  }
-                ]
-              });
-            }}
-          />
-          <SCLAlertOk
-            data={this.state.successOkPopupData}
-            click_Ok={(status: boolean) => {
-              this.fetchloadData();
-              this.setState({
-                successOkPopupData: [
-                  {
-                    status: false
-                  }
-                ]
-              });
-            }}
-          />
-          <DialogSecureAccountAuthentication
-            data={this.state.arr_SecureAuthPopupData}
-            click_Sent={(txt2fa: string) => {
-              if (txt2fa.length != 6) {
-                this.dropdown.alertWithType(
-                  "error",
-                  "OH",
-                  errorValidMsg.enterToken
-                );
-              } else {
-                this.setState({
-                  isLoading: true,
-                  arr_SecureAuthPopupData: [
-                    {
-                      visible: false
-                    }
-                  ]
-                });
-                this.click_SecureAccountSendMoney(txt2fa);
-              }
-            }}
-            click_Cancel={() =>
-              this.setState({
-                arr_SecureAuthPopupData: [
-                  {
-                    visible: false
-                  }
-                ]
-              })
-            }
-          />
-          <DropdownAlert ref={ref => (this.dropdown = ref)} />
-          <Loader loading={this.state.isLoading} color={colors.appColor} />
+          <View style={styles.viewaccountDetails}>
+            <ViewAccountDetailsCard />
+          </View>
+          <View style={styles.viewrecentTransaction}>
+            <ViewAccountDetailsRecentTransaction
+              data={this.state.recentTransactionData}
+            />
+          </View>
+          <View style={styles.viewAddAccountDetials}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "#54A9DE",
+                margin: 10,
+                borderRadius: 10,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginTop: 5
+                }}
+              >
+                <SvgImage
+                  source={images.svgImages.accountDetailsScreen.addAccount}
+                  style={[styles.svgTxtAddAccount]}
+                />
+                <Text
+                  style={[
+                    styles.txtWhite,
+                    { textAlign: "center", fontWeight: "bold", fontSize: 16 }
+                  ]}
+                >
+                  Add Savings Account{" "}
+                </Text>
+              </View>
+              <Text
+                style={[
+                  styles.txtWhite,
+                  { textAlign: "center", marginTop: -15 }
+                ]}
+              >
+                You can add up to four sub accounts for your main account
+              </Text>
+            </View>
+          </View>
+          <View style={styles.viewFotterButton}>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                marginLeft: 10,
+                marginRight: 10
+              }}
+            >
+              <Button
+                full
+                style={{
+                  flex: 1,
+                  backgroundColor: "#37A0DA",
+                  borderTopLeftRadius: 10,
+                  borderBottomLeftRadius: 10,
+                  borderTopRightRadius: 0,
+                  borderBottomEndRadius: 0,
+                  marginRight: 0.2
+                }}
+              >
+                <Text>Send</Text>
+              </Button>
+              <Button
+                style={{
+                  flex: 1,
+                  backgroundColor: "#0575BE",
+                  borderTopRightRadius: 10,
+                  borderBottomEndRadius: 10,
+                  borderTopLeftRadius: 0,
+                  borderBottomLeftRadius: 0,
+                  marginLeft: 0.3
+                }}
+              >
+                <Text>Receive</Text>
+              </Button>
+            </View>
+          </View>
         </Content>
       </Container>
     );
@@ -894,120 +633,36 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
-  Savings: {
-    flex: 14,
-    backgroundColor: colors.Saving,
-    width: "100%"
+  txtWhite: {
+    color: "#fff"
   },
-  Secure: {
-    flex: 14,
-    backgroundColor: colors.Secure,
-    width: "100%"
+  viewHeader: {
+    flex: 1,
+    flexDirection: "row"
   },
-  Vault: {
-    flex: 14,
-    backgroundColor: colors.Vault,
-    width: "100%"
+  viewaccountDetails: {
+    flex: 0.7,
+    margin: 10
   },
-  Joint: {
-    flex: 14,
-    backgroundColor: colors.Joint,
-    width: "100%"
-  },
-  viewBackBtn: {
-    flex: 3,
-    flexDirection: "row",
-    padding: 15,
-    marginTop: Platform.OS == "ios" ? 10 : 25
-  },
-  viewBalInfo: {
-    flex: 5,
-    flexDirection: "column",
-    padding: 15
-  },
-  //txtbal info
-  txtTile: {
-    color: "#ffffff"
-  },
-  txtTitle: {
-    color: "#ffffff"
-  },
-  txtAccountType: {
-    fontSize: 20,
-    fontWeight: "bold"
-  },
-  txtBalInfo: {
-    fontSize: 28,
-    fontWeight: "bold"
-  },
-  //view:Recent Transaction
-  viewMainRecentTran: {
-    flex: 25
-  },
-  viewTitleRecentTrans: {
-    marginLeft: 20,
-    flexDirection: "row",
-    flex: 0.2,
-    alignItems: "center"
-  },
-  txtRecentTran: {
-    fontWeight: "bold",
-    fontSize: 25,
-    marginTop: 10
-  },
-  txtTransTitle: {
-    fontWeight: "bold",
-    marginBottom: 5
-  },
-  txtAmoundRec: {
-    color: "#228B22",
-    fontWeight: "bold"
-  },
-  txtAmoundSent: {
-    color: "red",
-    fontWeight: "bold"
-  },
-  recentTransListView: {
+  viewrecentTransaction: {
     flex: 1
   },
-  //No Transaction
-  viewNoTransaction: {
-    flex: 1,
-    alignItems: "center",
-    paddingTop: 20
+  viewAddAccountDetials: {
+    flex: 0.4
   },
-  txtNoTransaction: {
-    fontSize: 20,
-    fontWeight: "bold",
-    paddingTop: 5
+  viewFotterButton: {
+    flex: 0.2
   },
-  //TODO:Fotter view
-  viewFooter: {
-    flex: 3,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center"
+  svgImage: {
+    width: 60,
+    height: 73
   },
-  txtConfimation: {
-    fontSize: 10,
-    color: "gray"
+  svgTxtAddAccount: {
+    width: 60,
+    height: 40
   },
-  //PopupMenu
-  text: {
-    fontSize: 18
-  },
-  //Fotter Button
-  footerBtnIcon: {
-    paddingLeft: 10
-  },
-  footerBtnAction: {
-    alignSelf: "center",
-    marginLeft: 2,
-    marginRight: 2
-  },
-  //menuoption
-  menuOptions: {
-    fontSize: 14,
-    marginRight: 60
+  svgBtnAccoutSetting: {
+    width: 20,
+    height: 40
   }
 });
