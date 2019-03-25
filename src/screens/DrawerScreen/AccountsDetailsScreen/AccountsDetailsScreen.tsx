@@ -60,6 +60,7 @@ let arr_failedMsg = arr_amountTrnasfer[0].failedMsg;
 let arr_failedInvalidToken = arr_amountTrnasfer[0].failedInvalidToken;
 interface Props {}
 interface State {}
+//new changes start
 export default class AccountDetailsScreen extends React.Component<
   Props,
   State
@@ -308,6 +309,8 @@ export default class AccountDetailsScreen extends React.Component<
           data: resultAccount.temp[navigation.getParam("indexNo")]
         });
       }
+
+      console.log({ tranDetails });
 
       this.setState({
         recentTransactionData: [

@@ -62,6 +62,7 @@
 		B3F9F67B6FEE4D80B62ACC40 /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CFA2D09723D49C68AF98537 /* libRNFS.a */; };
 		BA138D78E7734FCF80677AE8 /* libRNShare.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CE1C6104CB1445BA97FF7E85 /* libRNShare.a */; };
 		BA2957E528014B4095140611 /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BE3628F9CF14D3B851B2B24 /* libRNImagePicker.a */; };
+		BF6062DAA1A1447C8913B21F /* FiraSans-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3B05A7E8A35E40559C385BD3 /* FiraSans-Medium.otf */; };
 		C9901204E93144D988E24042 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 25361D4EEF9E4D7587EB82D1 /* SimpleLineIcons.ttf */; };
 		D7F0A2D337714ADD84D40FBA /* libRNI18n.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B3B81F866F19467189D63393 /* libRNI18n.a */; };
 		D88F6E3AADE04C5A8DA99241 /* FontAwesome5_Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 74CC06605FDA49549BDF0854 /* FontAwesome5_Regular.ttf */; };
@@ -71,7 +72,6 @@
 		E9B87F1E398B49CD91413B56 /* libRNSpinkit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C90EC399BC174E1BA2CED3B4 /* libRNSpinkit.a */; };
 		FA14BB39598F4A4596A3C910 /* PermanentMarker.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D4079A8F53946B2BA696478 /* PermanentMarker.ttf */; };
 		FF8FC365117742589405EEC6 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7B432A4785B3468696747BDF /* Feather.ttf */; };
-		BF6062DAA1A1447C8913B21F /* FiraSans-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3B05A7E8A35E40559C385BD3 /* FiraSans-Medium.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -638,6 +638,7 @@
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		358D8178B5E4495982112A86 /* RNCWebView.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNCWebView.xcodeproj; path = "../node_modules/react-native-webview/ios/RNCWebView.xcodeproj"; sourceTree = "<group>"; };
 		374BB3A114F848C78A78E9C2 /* UdpSockets.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = UdpSockets.xcodeproj; path = "../node_modules/react-native-udp/ios/UdpSockets.xcodeproj"; sourceTree = "<group>"; };
+		3B05A7E8A35E40559C385BD3 /* FiraSans-Medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-Medium.otf"; path = "../src/assets/fonts/fira-sans/FiraSans-Medium.otf"; sourceTree = "<group>"; };
 		3CAC60A7F4BE45BEBE074725 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/native-base/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		42D92397A5E644F0BC950A81 /* RNCamera.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNCamera.xcodeproj; path = "../node_modules/react-native-camera/ios/RNCamera.xcodeproj"; sourceTree = "<group>"; };
 		441C1CFE055D4FD7B87A80A3 /* libRNDeviceInfo-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNDeviceInfo-tvOS.a"; sourceTree = "<group>"; };
@@ -707,7 +708,6 @@
 		F364221D220E40A4A07EFF0C /* LRDRCTSimpleToast.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = LRDRCTSimpleToast.xcodeproj; path = "../node_modules/react-native-simple-toast/ios/LRDRCTSimpleToast.xcodeproj"; sourceTree = "<group>"; };
 		FAC0CBD5A88647D49BA0202A /* libRNSVG-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNSVG-tvOS.a"; sourceTree = "<group>"; };
 		FDCF69C1C94F49FBB33344A8 /* libRNI18n-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNI18n-tvOS.a"; sourceTree = "<group>"; };
-		3B05A7E8A35E40559C385BD3 /* FiraSans-Medium.otf */ = {isa = PBXFileReference; name = "FiraSans-Medium.otf"; path = "../src/assets/fonts/fira-sans/FiraSans-Medium.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
