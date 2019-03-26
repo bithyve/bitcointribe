@@ -1,4 +1,8 @@
 rootProject.name = 'HexaWalletWallet'
+include ':react-native-nested-scroll-view'
+project(':react-native-nested-scroll-view').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-nested-scroll-view/android')
+include ':react-native-collapsing-toolbar'
+project(':react-native-collapsing-toolbar').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-collapsing-toolbar/android')
 include ':react-native-webview'
 project(':react-native-webview').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-webview/android')
 include ':react-native-view-shot'

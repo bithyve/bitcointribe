@@ -8,8 +8,7 @@ import {
   StyleSheet,
   RefreshControl,
   Platform,
-  SafeAreaView,
-  FlatList
+  SafeAreaView
 } from "react-native";
 import {
   Container,
@@ -20,9 +19,7 @@ import {
   Left,
   Right,
   Body,
-  Text,
-  List,
-  ListItem
+  Text
 } from "native-base";
 import { RkCard } from "react-native-ui-kitten";
 import Carousel, { Pagination } from "react-native-snap-carousel";
@@ -30,7 +27,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { SkypeIndicator } from "react-native-indicators";
 import DropdownAlert from "react-native-dropdownalert";
 import Loader from "react-native-modal-loader";
-import SvgImage from "react-native-remote-svg";
+import { Transition } from "react-navigation-fluid-transitions";
 
 //Custome Compontes
 import SCLAlertAccountTypes from "bithyve/src/app/custcompontes/alert/SCLAlertAccountTypes";
@@ -68,10 +65,9 @@ const SLIDER_1_FIRST_ITEM = 0;
 
 //TODO: Wallets
 import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
-
 //localization
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
-export default class WalletScreen extends React.Component {
+export default class WalletScreen1 extends React.Component {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -311,105 +307,134 @@ export default class WalletScreen extends React.Component {
             backgroundColor={colors.appColor}
             barStyle="dark-content"
           />
-
-          <SafeAreaView style={styles.container}>
-            {/* title */}
-            <View
-              style={{
-                flex: 4,
-                backgroundColor: colors.appColor,
-                alignItems: "center"
-              }}
-            >
-              <Text
+          <Transition shared="logo">
+            <SafeAreaView style={styles.container}>
+              {/* title */}
+              <View
                 style={{
-                  color: "#fff",
-                  fontWeight: "bold",
-                  fontSize: 32,
-                  marginTop: 20
+                  flex: 0.4,
+                  marginTop: 20,
+                  margin: 20
                 }}
               >
-                Wallet
-              </Text>
-              <SvgImage
-                source={images.svgImages.walletScreen.walletIcon}
-                style={[styles.svgWalletIcon]}
-              />
-              <Text style={{ color: "#fff", marginTop: 10 }}>
-                Looks like your app needs a quick
-              </Text>
-              <Text style={{ color: "#fff" }}>
-                check to maintain good health
-              </Text>
-            </View>
-            {/*  cards */}
-            <View style={{ flex: 5 }}>
-              <FlatList
-                data={[
-                  { type: "Daily Wallet", name: "Anant's Savings" },
-                  {
-                    type: "Secure Wallet",
-                    name: "Anant's Savings",
-                    amount: "60,000"
-                  }
-                ]}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item }) => (
-                  <RkCard
-                    rkType="shadowed"
-                    style={{ flex: 1, margin: 10, borderRadius: 10 }}
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Text
+                    style={{
+                      flex: 1,
+                      color: "#ffffff",
+                      fontSize: 34,
+                      fontWeight: "bold"
+                    }}
                   >
-                    <View
-                      rkCardHeader
+                    Hexa
+                  </Text>
+                  <View
+                    style={{
+                      flex: 1,
+                      width: 50,
+                      height: 50,
+                      borderRadius: 50,
+                      alignSelf: "flex-end"
+                    }}
+                  >
+                    <Button
+                      transparent
                       style={{
-                        borderBottomColor: "gray",
-                        borderBottomWidth: 0.4,
-                        height: 60
+                        flex: 1,
+                        backgroundColor: "#ffffff",
+                        width: 50,
+                        height: 50,
+                        borderRadius: 50,
+                        alignSelf: "flex-end",
+                        alignItems: "center",
+                        justifyContent: "center"
                       }}
                     >
-                      <SvgImage
-                        source={require("bithyve/src/assets/images/svg/WalletScreen/lock.svg")}
-                        style={[{ flex: 0.4, width: "100%", height: 60 }]}
-                      />
-                      <Text style={{ flex: 0.9 }}>{item.type}</Text>
-                      <Button
-                        transparent
-                        style={{
-                          alignItems: "flex-end",
-                          justifyContent: "flex-end",
-                          alignSelf: "flex-end",
-                          flex: 1
-                        }}
-                      >
-                        <Text>--</Text>
-                      </Button>
-                    </View>
-                    <View rkCardContent />
-                  </RkCard>
-                )}
-                keyExtractor={(item, index) => index}
-              />
-            </View>
-            {/*  tabbar bottom */}
-            <View
-              style={[
-                utils.getDeviceModel() == "IphoneX"
-                  ? { flex: 0.9 }
-                  : { flex: 1.1 },
-                {
-                  alignItems: "flex-end",
-                  justifyContent: "flex-end"
-                }
-              ]}
-            >
-              <Button transparent style={styles.plusButtonBottom}>
-                <SvgImage
-                  source={images.svgImages.walletScreen.plusButtonBottom}
-                  style={[styles.svgImage]}
+                      <Icon name="bell" size={15} color={colors.appColor} />
+                    </Button>
+                  </View>
+                </View>
+              </View>
+
+              {/* notificaiton box  */}
+              <View
+                style={[
+                  utils.getDeviceModel() == "IphoneX"
+                    ? { flex: 0.8 }
+                    : { flex: 1 },
+                  {
+                    backgroundColor: "#8BC5E7",
+                    justifyContent: "center",
+                    margin: 20,
+                    borderRadius: 10,
+                    flexDirection: "row",
+                    alignItems: "center"
+                  }
+                ]}
+              >
+                <View
+                  style={{
+                    backgroundColor: "#fff",
+                    flex: 0.2,
+                    height: 48,
+                    width: 48,
+                    borderRadius: 29,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginLeft: 5
+                  }}
+                >
+                  <Icon name="exclamation" size={15} color="red" />
+                </View>
+                <View style={{ flex: 1, marginLeft: 5, marginRight: 5 }}>
+                  <Text>
+                    You haven't confirmed your passpharase last confiramtion was
+                    15 days ago.
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    backgroundColor: "#fff",
+                    flex: 0.12,
+                    height: 30,
+                    width: 30,
+                    borderRadius: 15,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginRight: 5
+                  }}
+                >
+                  <Icon name="close" size={10} color={colors.appColor} />
+                </View>
+              </View>
+              {/*  cards */}
+              <View style={{ flex: 5 }}>
+                <ViewWalletScreenCards
+                  data={this.state.arr_WalletScreenCard}
+                  click_Details={(screen: string, item: any, index: any) =>
+                    this.props.navigation.push(screen, {
+                      data: item,
+                      walletsData: this.state.walletsData,
+                      indexNo: index
+                    })
+                  }
+                  click_OpenRecentTrans={(val: any) =>
+                    this.openRecentTrans(val)
+                  }
                 />
-              </Button>
-            </View>
-          </SafeAreaView>
+              </View>
+              {/*  tabbar bottom */}
+              <View
+                style={
+                  utils.getDeviceModel() == "IphoneX"
+                    ? { flex: 0.9 }
+                    : { flex: 1.1 }
+                }
+              >
+                <TabBarWalletScreen /> {/*icon size -21 0 180 80*/}
+              </View>
+            </SafeAreaView>
+          </Transition>
         </Content>
         <Loader loading={this.state.isLoading} color={colors.appColor} />
         <DropdownAlert ref={ref => (this.dropdown = ref)} />
@@ -420,23 +445,11 @@ export default class WalletScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: colors.appColor
   },
   backgroundImage: {
     flex: 1,
     width: "100%"
-  },
-  plusButtonBottom: {
-    alignSelf: "flex-end",
-    marginBottom: 10,
-    marginRight: 10
-  },
-  svgImage: {
-    width: 50,
-    height: 50
-  },
-  svgWalletIcon: {
-    width: 100,
-    height: 80
   }
 });

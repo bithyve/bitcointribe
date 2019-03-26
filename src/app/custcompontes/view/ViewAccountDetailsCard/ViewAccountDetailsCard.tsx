@@ -58,9 +58,16 @@ export default class ViewAccountDetailsCard extends Component<Props, any> {
                 style={[styles.svgImage]}
               />
             </View>
-            <Text style={{ fontSize: 18, fontWeight: "bold", marginTop: 10 }}>
-              Regular Account
-            </Text>
+
+            {renderIf(
+              this.props.data.length != 0
+                ? this.props.data.accountName != ""
+                : null
+            )(
+              <Text style={{ fontSize: 18, fontWeight: "bold", marginTop: 10 }}>
+                {this.props.data.accountName}
+              </Text>
+            )}
           </View>
           {/* TOTAL DEPOSTIS and AVALABLE FOUNDS show  */}
           <View style={{ flexDirection: "row", marginTop: 20 }}>

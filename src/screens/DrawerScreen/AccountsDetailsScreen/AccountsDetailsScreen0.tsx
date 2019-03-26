@@ -32,6 +32,7 @@ import DropdownAlert from "react-native-dropdownalert";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Loader from "react-native-modal-loader";
 import SvgImage from "react-native-remote-svg";
+import { Transition } from "react-navigation-fluid-transitions";
 
 //TODO: Custome Pages
 import {
@@ -500,138 +501,141 @@ export default class AccountDetailsScreen extends React.Component<
             />
           }
         >
-          <SafeAreaView style={styles.container}>
-            <Header
-              transparent
-              style={
-                Platform.OS == "ios" ? { marginTop: 10 } : { marginTop: 0 }
-              }
-            >
-              <Left>
-                <Button
-                  transparent
-                  onPress={() => this.props.navigation.goBack()}
-                >
-                  <SvgImage
-                    source={images.svgImages.back_Icon}
-                    style={[styles.svgImage]}
-                  />
-                </Button>
-              </Left>
-              <Right>
-                <Button
-                  bordered
-                  style={{
-                    height: 40,
-                    margin: 0,
-                    padding: 0,
-                    borderColor: "gray"
-                  }}
-                >
-                  <SvgImage
-                    source={
-                      images.svgImages.accountDetailsScreen.accountSettingsIcon
-                    }
-                    style={[styles.svgBtnAccoutSetting]}
-                  />
-                  <Text note style={{ fontSize: 12, fontWeight: "bold" }}>
-                    Account Settings
-                  </Text>
-                </Button>
-              </Right>
-            </Header>
-
-            <View style={styles.viewaccountDetails}>
-              <ViewAccountDetailsCard data={this.state.data} />
-            </View>
-            <View style={styles.viewrecentTransaction}>
-              <ViewAccountDetailsRecentTransaction
-                data={this.state.recentTransactionData}
-              />
-            </View>
-            <View style={styles.viewAddAccountDetials}>
-              <View
-                style={{
-                  flex: 1,
-                  backgroundColor: "#54A9DE",
-                  margin: 10,
-                  borderRadius: 10,
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}
+          <Transition shared="logo">
+            <SafeAreaView style={styles.container}>
+              <Header
+                transparent
+                style={
+                  Platform.OS == "ios" ? { marginTop: 10 } : { marginTop: 0 }
+                }
               >
+                <Left>
+                  <Button
+                    transparent
+                    onPress={() => this.props.navigation.goBack()}
+                  >
+                    <SvgImage
+                      source={images.svgImages.back_Icon}
+                      style={[styles.svgImage]}
+                    />
+                  </Button>
+                </Left>
+                <Right>
+                  <Button
+                    bordered
+                    style={{
+                      height: 40,
+                      margin: 0,
+                      padding: 0,
+                      borderColor: "gray"
+                    }}
+                  >
+                    <SvgImage
+                      source={
+                        images.svgImages.accountDetailsScreen
+                          .accountSettingsIcon
+                      }
+                      style={[styles.svgBtnAccoutSetting]}
+                    />
+                    <Text note style={{ fontSize: 12, fontWeight: "bold" }}>
+                      Account Settings
+                    </Text>
+                  </Button>
+                </Right>
+              </Header>
+
+              <View style={styles.viewaccountDetails}>
+                <ViewAccountDetailsCard data={this.state.data} />
+              </View>
+              <View style={styles.viewrecentTransaction}>
+                <ViewAccountDetailsRecentTransaction
+                  data={this.state.recentTransactionData}
+                />
+              </View>
+              <View style={styles.viewAddAccountDetials}>
                 <View
                   style={{
-                    flexDirection: "row",
-                    marginTop: 5
+                    flex: 1,
+                    backgroundColor: "#54A9DE",
+                    margin: 10,
+                    borderRadius: 10,
+                    alignItems: "center",
+                    justifyContent: "center"
                   }}
                 >
-                  <SvgImage
-                    source={images.svgImages.accountDetailsScreen.addAccount}
-                    style={[styles.svgTxtAddAccount]}
-                  />
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      marginTop: 5
+                    }}
+                  >
+                    <SvgImage
+                      source={images.svgImages.accountDetailsScreen.addAccount}
+                      style={[styles.svgTxtAddAccount]}
+                    />
+                    <Text
+                      style={[
+                        styles.txtWhite,
+                        {
+                          textAlign: "center",
+                          fontWeight: "bold",
+                          fontSize: 16
+                        }
+                      ]}
+                    >
+                      Add Savings Account{" "}
+                    </Text>
+                  </View>
                   <Text
                     style={[
                       styles.txtWhite,
-                      {
-                        textAlign: "center",
-                        fontWeight: "bold",
-                        fontSize: 16
-                      }
+                      { textAlign: "center", marginTop: -15 }
                     ]}
                   >
-                    Add Savings Account{" "}
+                    You can add up to four sub accounts for your main account
                   </Text>
                 </View>
-                <Text
-                  style={[
-                    styles.txtWhite,
-                    { textAlign: "center", marginTop: -15 }
-                  ]}
-                >
-                  You can add up to four sub accounts for your main account
-                </Text>
               </View>
-            </View>
-            <View style={styles.viewFotterButton}>
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: "row",
-                  marginLeft: 10,
-                  marginRight: 10
-                }}
-              >
-                <Button
-                  full
+              <View style={styles.viewFotterButton}>
+                <View
                   style={{
                     flex: 1,
-                    backgroundColor: "#37A0DA",
-                    borderTopLeftRadius: 10,
-                    borderBottomLeftRadius: 10,
-                    borderTopRightRadius: 0,
-                    borderBottomEndRadius: 0,
-                    marginRight: 0.2
+                    flexDirection: "row",
+                    marginLeft: 10,
+                    marginRight: 10
                   }}
                 >
-                  <Text>Send</Text>
-                </Button>
-                <Button
-                  style={{
-                    flex: 1,
-                    backgroundColor: "#0575BE",
-                    borderTopRightRadius: 10,
-                    borderBottomEndRadius: 10,
-                    borderTopLeftRadius: 0,
-                    borderBottomLeftRadius: 0,
-                    marginLeft: 0.3
-                  }}
-                >
-                  <Text>Receive</Text>
-                </Button>
+                  <Button
+                    full
+                    style={{
+                      flex: 1,
+                      backgroundColor: "#37A0DA",
+                      borderTopLeftRadius: 10,
+                      borderBottomLeftRadius: 10,
+                      borderTopRightRadius: 0,
+                      borderBottomEndRadius: 0,
+                      marginRight: 0.2
+                    }}
+                  >
+                    <Text>Send</Text>
+                  </Button>
+                  <Button
+                    style={{
+                      flex: 1,
+                      backgroundColor: "#0575BE",
+                      borderTopRightRadius: 10,
+                      borderBottomEndRadius: 10,
+                      borderTopLeftRadius: 0,
+                      borderBottomLeftRadius: 0,
+                      marginLeft: 0.3
+                    }}
+                  >
+                    <Text>Receive</Text>
+                  </Button>
+                </View>
               </View>
-            </View>
-          </SafeAreaView>
+            </SafeAreaView>
+          </Transition>
         </Content>
       </Container>
     );
