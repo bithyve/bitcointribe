@@ -2,8 +2,6 @@ apply plugin: "com.android.application"
 
 import com.android.build.OutputFile
 apply plugin: 'io.fabric'
-
-
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
  * and bundleReleaseJsAndAssets).
@@ -81,9 +79,6 @@ project.ext.react = [
 apply from: "../../node_modules/react-native/react.gradle"
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
-
-
-
 /**
  * Set this to true to create two separate APKs instead of one:
  *   - An APK that only works on ARM devices
@@ -99,24 +94,24 @@ def enableSeparateBuildPerCPUArchitecture = false
  */
 def enableProguardInReleaseBuilds = false
 
-android {   
+android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.mymoney"
+        applicationId "com.bithyve.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
         versionCode 1
-        versionName "1.0.0.130319"
+        versionName "1.0.0.280319"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
     }
     packagingOptions {
-          pickFirst '**/libgnustl_shared.so'
-      }
+        pickFirst '**/libgnustl_shared.so'
+    }
     splits {
         abi {
             reset()
@@ -127,18 +122,17 @@ android {
     }
     signingConfigs {
 release {
-storeFile file("mymoney.keystore")
+storeFile file("hexawallet.keystore")
  storePassword "developer"
-keyAlias "mymoney"
+keyAlias "hexawallet"
  keyPassword "developer"
  }
  }
     buildTypes {
         release {
-          aaptOptions.cruncherEnabled=false // here
+              aaptOptions.cruncherEnabled=false // here
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
         }
     }
     // applicationVariants are e.g. debug, release
@@ -157,23 +151,18 @@ keyAlias "mymoney"
 }
 
 configurations.all {
-
  resolutionStrategy {
         force 'org.webkit:android-jsc:r236355'
  }
   }
 
-
-
-
 dependencies {
+    compile project(':react-native-webview')
 compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
 transitive = true;
 }
-    compile project(':react-native-i18n')
-    compile project(':react-native-lewin-qrcode')
+compile project(':react-native-sqlite-storage')
     compile project(':react-native-view-shot')
-    compile project(':react-native-fcm')
     compile project(':react-native-vector-icons')
     compile project(':react-native-udp')
     compile project(':react-native-tcp')
@@ -182,21 +171,20 @@ transitive = true;
     compile project(':react-native-spinkit')
     compile project(':react-native-share')
     compile project(':react-native-randombytes')
-    compile project(':react-native-push-notification')
     compile project(':react-native-os')
+    compile project(':react-native-lewin-qrcode')
     compile project(':react-native-keychain')
     compile project(':react-native-inappbrowser-reborn')
     compile project(':react-native-image-picker')
+    compile project(':react-native-i18n')
     compile project(':react-native-gesture-handler')
     compile project(':react-native-fs')
     compile project(':react-native-device-info')
     compile project(':react-native-config')
     compile project(':react-native-camera')
-    compile project(':react-native-sqlite-storage')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules
-      implementation 'com.google.firebase:firebase-core:16.0.1'
 }
 
 // Run this once to be able to run the application with BUCK
@@ -205,4 +193,3 @@ task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
 }
-apply plugin: 'com.google.gms.google-services'

@@ -11,25 +11,26 @@
 #import <React/RCTRootView.h>
 #import <React/RCTPushNotificationManager.h>
 #import "RCTLinkingManager.h"
-#import <UserNotifications/UserNotifications.h>
+
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   NSURL *jsCodeLocation;
-  // define UNUserNotificationCenter
   UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
   center.delegate = self;
+  [self registerForRemoteNotifications];
 
-  #ifdef DEBUG
-    jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-  #else
-    jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
-  #endif
+
+#ifdef DEBUG
+  jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+#else
+  jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+#endif
 
   RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
-                                                      moduleName:@"MyMoney"
+                                                      moduleName:@"Hexa"
                                                initialProperties:nil
                                                    launchOptions:launchOptions];
   rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
@@ -41,6 +42,7 @@
   [self.window makeKeyAndVisible];
   return YES;
 }
+
 
 /// Required to register for notifications
 - (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings
@@ -57,6 +59,7 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
+  NSLog(@"push-notification received: %@", userInfo);
   [RCTPushNotificationManager didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
 }
 // Required for the registrationError event.
@@ -68,9 +71,21 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
 {
   (NSLog(@"push-notification received: %@", notification));
-
-
   [RCTPushNotificationManager didReceiveLocalNotification:notification];
+}
+
+
+
+- (void)registerForRemoteNotifications {
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    center.delegate = self;
+    [center requestAuthorizationWithOptions:(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge) completionHandler:^(BOOL granted, NSError * _Nullable error){
+      if(!error){
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [[UIApplication sharedApplication] registerForRemoteNotifications];
+        });
+      }
+    }];
 }
 
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
@@ -79,6 +94,16 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
   [RCTPushNotificationManager didReceiveRemoteNotification:notification.request.content.userInfo fetchCompletionHandler:completionHandler];
   completionHandler(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge);
 }
+//Called to let your app know which action was selected by the user for a given notification.
+-(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void(^)())completionHandler{
+  NSLog(@"User Info : %@",response.notification.request.content.userInfo);
+   [RCTPushNotificationManager didReceiveRemoteNotification:response.notification.request.content.userInfo fetchCompletionHandler:completionHandler];
+  completionHandler();
+}
+
+
+
+
 
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url
@@ -86,7 +111,7 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
   return [RCTLinkingManager application:application openURL:url
                       sourceApplication:sourceApplication annotation:annotation];
-}   
+}
 
 // Only if your app is using [Universal Links](https://developer.apple.com/library/prerelease/ios/documentation/General/Conceptual/AppSearch/UniversalLinks.html).
 - (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity

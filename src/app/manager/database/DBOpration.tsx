@@ -9,7 +9,12 @@ const getPasscode = () => {
   return commonData.getPasscode();
 };
 import SQLite from "react-native-sqlite-storage";
-var db = SQLite.openDatabase(localDB.dbName, "1.0", "MyMoney Database", 200000);
+var db = SQLite.openDatabase(
+  localDB.dbName,
+  "1.0",
+  "HexaWallet Database",
+  200000
+);
 //TODO: Json Files
 import accountTypeData from "../../../assets/jsonfiles/tblAccountType/tblAccountType.json";
 import { string } from "prop-types";
@@ -124,8 +129,6 @@ const readTableAcccountType = async (
           //for hide vault account and joint account
           temp.splice(1, 1);
           temp.splice(1, 1);
-          console.log({ temp });
-
           tx.executeSql(
             "select accountType  from " + tableName2,
             [],
@@ -310,7 +313,6 @@ const updateTableData = (
 //Insert tblAccountType
 const insertAccountTypeData = (tblName, txtDate) => {
   let passcode = getPasscode();
-  console.log(passcode);
   return new Promise((resolve, reject) => {
     db.transaction(function(txn) {
       if (accountTypeData) {

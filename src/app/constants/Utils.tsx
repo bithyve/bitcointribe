@@ -1,6 +1,7 @@
 import moment from "moment";
 import ConnectivityTracker from "react-native-connectivity-tracker";
 let CryptoJS = require("crypto-js");
+import DeviceInfo from "react-native-device-info";
 
 //TODO: Date Format
 
@@ -79,6 +80,22 @@ const date_diff_indays = (date1: any, date2: any) => {
   }
 };
 
+const getDeviceModel = () => {
+  let model = DeviceInfo.getModel();
+  let modelName;
+  if (model == "iPhone 6s" || model == "iPhone 6") {
+    modelName = "Iphone6";
+  } else if (
+    model == "iPhone XS" ||
+    model == "iPhone XS Max" ||
+    model == "iPhone XR" ||
+    model == "iPhone X"
+  ) {
+    modelName = "IphoneX";
+  }
+  return modelName;
+};
+
 module.exports = {
   getUnixTimeDate,
   getUnixToDateFormat,
@@ -88,5 +105,6 @@ module.exports = {
   encryptAgain,
   decrypt,
   sortFunction,
-  date_diff_indays
+  date_diff_indays,
+  getDeviceModel
 };

@@ -89,7 +89,7 @@ export default class BackupPhraseScreen extends React.Component {
       title: "Numeric key",
       message: numanicKey,
       url: "\nhttps://bithyve.com/",
-      subject: "MyMoney" //  for email
+      subject: "HexaWallet" //  for email
     };
 
     return (

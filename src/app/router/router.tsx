@@ -1,11 +1,14 @@
 import React from "react";
-import { colors } from "../constants/Constants";
+import { colors, images } from "../constants/Constants";
 import {
   createStackNavigator,
   createDrawerNavigator,
   createBottomTabNavigator
 } from "react-navigation";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { StyleSheet } from "react-native";
+import SvgImage from "react-native-remote-svg";
+
 //localization
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
 //OnBoarding
@@ -50,6 +53,9 @@ import MergeConfirmJointAccountScreen from "bithyve/src/screens/DrawerScreen/Acc
 import VaultAccountScreen from "bithyve/src/screens/DrawerScreen/AccountDetailsOnboardingScreen/VaultAccountScreen/VaultAccountScreen";
 //Right DrawerScreen
 import NotificationScreen from "bithyve/src/screens/DrawerScreen/NotificationScreen/NotificationScreen";
+
+//TODO: New Screen Hexa Wallet
+import WalletScreen from "bithyve/src/screens/TabBarScreen/WalletScreen/WalletScreen";
 
 //TODO: StackNavigator
 
@@ -164,63 +170,68 @@ const AccountStackNavigatorRouter = createStackNavigator(
 const TabNavigator = createBottomTabNavigator(
   {
     Payment: {
-      screen: PaymentScreen,
+      screen: WalletScreen, //PaymentScreen,
       navigationOptions: {
-        tabBarLabel: localization("TabBarItem.Payment"),
+        tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
         drawerLockMode: "locked-open",
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="credit-card" size={20} color={tintColor} />
+          <SvgImage
+            source={images.svgImages.tabBarWalletScreen.walletIcon}
+            style={[styles.svgImage]}
+          />
         )
       }
     },
     Analytics: {
       screen: AnalyticsScreen,
       navigationOptions: {
-        tabBarLabel: localization("TabBarItem.Analytics"),
+        tabBarLabel: "Transaction", //localization("TabBarItem.Analytics"),
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="signal" size={20} color={tintColor} />
+          <SvgImage
+            source={images.svgImages.tabBarWalletScreen.transactionIcon}
+            style={styles.svgImage}
+          />
         )
       }
     },
     Accounts: {
       screen: AccountStackNavigatorRouter,
+      navigationOptions: {
+        tabBarLabel: "QR", //localization("TabBarItem.Accounts"),
+        tabBarIcon: ({ tintColor }) => (
+          <SvgImage
+            source={images.svgImages.tabBarWalletScreen.qrscanIcon}
+            style={styles.svgImage}
+          />
+        )
+      }
+    },
 
-      navigationOptions: {
-        tabBarLabel: localization("TabBarItem.Accounts"),
-        tabBarIcon: ({ tintColor }) => (
-          <Icon name="dollar" size={20} color={tintColor} />
-        )
-      }
-    },
-    Cards: {
-      screen: CardsScreen,
-      navigationOptions: {
-        tabBarLabel: localization("TabBarItem.Cards"),
-        tabBarIcon: ({ tintColor }) => (
-          <Icon name="id-card" size={20} color={tintColor} />
-        )
-      }
-    },
     More: {
       screen: MoreScreen,
       navigationOptions: {
-        tabBarLabel: localization("TabBarItem.More"),
+        tabBarLabel: "Settings", //localization("TabBarItem.More"),
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="ellipsis-v" size={20} color={tintColor} />
+          <SvgImage
+            source={images.svgImages.tabBarWalletScreen.settingIcon}
+            style={styles.svgImage}
+          />
         )
       }
     }
   },
   {
-    initialRouteName: "Accounts",
+    initialRouteName: "Payment",
     tabBarOptions: {
+      showLabel: true,
       activeTintColor: colors.appColor,
       labelStyle: {
         fontSize: 12
       },
       style: {
         backgroundColor: "#ffffff"
-      }
+      },
+      tabStyle: {}
     }
   }
 );
@@ -276,7 +287,7 @@ export const createRootNavigator = (
         navigationOptions: { header: null }
       },
       TabbarBottom: {
-        screen: LeftDrawerNavigator,
+        screen: TabNavigator,
         navigationOptions: { header: null }
       },
       //Drwaer Navigation
@@ -353,9 +364,16 @@ export const createRootNavigator = (
       }
     },
     {
-      initialRouteName: signedIn ? "OnBoardingNavigator" : screenName
+      initialRouteName: signedIn ? "OnBoardingNavigator" : screenName //"TabbarBottom"
       // initialRouteName: signedIn ? "OnBoardingNavigator" : "OnBoardingNavigator"
       // initialRouteName: signedIn ? "TabbarBottom" : "TabbarBottom"
     }
   );
 };
+
+const styles = StyleSheet.create({
+  svgImage: {
+    width: "100%",
+    height: "100%"
+  }
+});

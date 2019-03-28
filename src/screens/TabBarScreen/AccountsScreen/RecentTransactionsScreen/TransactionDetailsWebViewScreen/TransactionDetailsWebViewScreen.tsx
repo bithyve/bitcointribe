@@ -10,7 +10,7 @@ import {
   Right,
   Body
 } from "native-base";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon from "react-native-vector-icons/FontAwesome";
 import Loader from "react-native-modal-loader";
 import { colors, images } from "bithyve/src/app/constants/Constants";
 

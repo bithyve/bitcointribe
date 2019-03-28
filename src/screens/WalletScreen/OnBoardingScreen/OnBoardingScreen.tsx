@@ -1,10 +1,12 @@
 import React from "react";
-import { StyleSheet, View, Text, StatusBar } from "react-native";
+import { StyleSheet, View, Text, StatusBar, Image } from "react-native";
 import { StackActions, NavigationActions } from "react-navigation";
+import Icon from "react-native-vector-icons/Ionicons";
 import CreateTables from "bithyve/src/app/manager/database/CreateTables";
-import PushController from "bithyve/src/app/manager/Notification/PushController";
+//import PushController from "bithyve/src/app/manager/Notification/PushController";
 //Custome Compontes
 import ViewOnBoarding from "bithyve/src/app/custcompontes/view/ViewOnBoarding";
+import OnBoarding from "bithyve/src/app/custcompontes/OnBoarding/OnBoarding";
 //Json Files
 import onBoardingData from "bithyve/src/assets/jsonfiles/onBoardingScreen/onBoardingScreen.json";
 //TODO: Custome object
@@ -63,10 +65,41 @@ export default class OnBoardingScreen extends React.Component<any, any> {
     ];
     return (
       <View style={styles.container}>
-        <StatusBar backgroundColor={colors.appColor} barStyle="dark-content" />
-        <ViewOnBoarding data={data} click_Done={() => this.click_Done()} />
+        <OnBoarding click_GetStarted={() => this.click_Done()}>
+          {/* First screen */}
+          <View style={[styles.slide]}>
+            <Image
+              style={{ width: 240, height: 240 }}
+              resizeMode="contain"
+              source={data[0].image}
+            />
+            <Text style={styles.header}>{data[0].title}</Text>
+            <Text style={styles.text}>{data[0].subtitle}</Text>
+          </View>
+          {/* Second screen */}
+          <View style={[styles.slide]}>
+            <Image
+              style={{ width: 240, height: 240 }}
+              resizeMode="contain"
+              source={data[1].image}
+            />
+            <Text style={styles.header}>{data[1].title}</Text>
+            <Text style={styles.text}>{data[1].subtitle}</Text>
+          </View>
+          {/* Third screen */}
+          <View style={[styles.slide]}>
+            <Image
+              style={{ width: 240, height: 240 }}
+              resizeMode="contain"
+              source={data[2].image}
+            />
+            <Text style={styles.header}>{data[2].title}</Text>
+            <Text style={styles.text}>{data[2].subtitle}</Text>
+          </View>
+        </OnBoarding>
+
         <CreateTables />
-        <PushController />
+        {/* <PushController /> */}
       </View>
     );
   }
@@ -75,5 +108,27 @@ export default class OnBoardingScreen extends React.Component<any, any> {
 const styles = StyleSheet.create({
   container: {
     flex: 1
+  },
+  slide: {
+    flex: 1, // Take up all screen
+    justifyContent: "center", // Center vertically
+    alignItems: "center" // Center horizontally
+  },
+  // Header styles
+  header: {
+    color: "#000000",
+    fontFamily: "Avenir",
+    fontSize: 30,
+    fontWeight: "bold",
+    marginVertical: 15,
+    textAlign: "center"
+  },
+  // Text below header
+  text: {
+    color: "#000000",
+    fontFamily: "Avenir",
+    fontSize: 18,
+    marginHorizontal: 40,
+    textAlign: "center"
   }
 });
