@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, StatusBar, Image } from "react-native";
 import { StackActions, NavigationActions } from "react-navigation";
 import Icon from "react-native-vector-icons/Ionicons";
 import CreateTables from "bithyve/src/app/manager/database/CreateTables";
-import PushController from "bithyve/src/app/manager/Notification/PushController";
+//import PushController from "bithyve/src/app/manager/Notification/PushController";
 //Custome Compontes
 import ViewOnBoarding from "bithyve/src/app/custcompontes/view/ViewOnBoarding";
 import OnBoarding from "bithyve/src/app/custcompontes/OnBoarding/OnBoarding";
@@ -99,7 +99,7 @@ export default class OnBoardingScreen extends React.Component<any, any> {
         </OnBoarding>
 
         <CreateTables />
-        <PushController />
+        {/* <PushController /> */}
       </View>
     );
   }

@@ -1,12 +1,11 @@
-
 <svg
-	 viewBox="0 0 100 100">
+	 viewBox="0 -200 430 800">
 <g>
 	<g>
 		<g>
-			<circle cx="10" cy="10" r="10"/>
-			<circle cx="10" cy="40" r="10"/>
-			<circle cx="10" cy="70" r="10"/>
+			<circle cx="10" cy="10" r="10" fill="gray"/>
+			<circle cx="10" cy="40" r="10" fill="gray" />
+			<circle cx="10" cy="70" r="10" fill="gray" />
 		</g>
 	</g>
 </g>

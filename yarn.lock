@@ -7714,11 +7714,6 @@ react-native-ezswiper@^1.2.3:
   resolved "https://registry.yarnpkg.com/react-native-ezswiper/-/react-native-ezswiper-1.2.3.tgz#a255ad8dfe6ae01e071aa4ec9b367ac3d769186e"
   integrity sha512-h6vhWiEdndecytXP/LWIAey6kUTmW8FuAfCX8P5Cu40bshKBaJCcjv2zJsHm7Da7qIKm+vTgYfGnxNFwbkeC2w==
 
-react-native-fcm@^16.2.4:
-  version "16.2.4"
-  resolved "https://registry.yarnpkg.com/react-native-fcm/-/react-native-fcm-16.2.4.tgz#1ed0cf6a9712949c178ee01265cc0b98b103dfc3"
-  integrity sha512-1bUunJMz4PbnvWeFgSjdcEvSU3JIFz0T3N4b4XiyeZtF5pMEBYVx10kkWR+xF4AevPeE1+zpeiVxsa+XwcysZA==
-
 react-native-flash-message@^0.1.10:
   version "0.1.11"
   resolved "https://registry.yarnpkg.com/react-native-flash-message/-/react-native-flash-message-0.1.11.tgz#29be9e77847e6a540aee7ba46add0b9de43f52ff"
@@ -7962,11 +7957,6 @@ react-native-popup-menu@^0.14.2:
   version "0.14.2"
   resolved "https://registry.yarnpkg.com/react-native-popup-menu/-/react-native-popup-menu-0.14.2.tgz#c71e6d662ce143cdfd3a640fe22f2c54f2f54eda"
   integrity sha512-hVy9z4JLj+6/ll2UXwR2O+exzx57b0gdLbUZUY2A1hXrTGOgxDpsQ+sQBHTLeUXoSQDtZxGcunmpIc1ZjdhMHg==
-
-react-native-push-notification@^3.1.2:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/react-native-push-notification/-/react-native-push-notification-3.1.2.tgz#a6129fb2897773a19c7b42bba1b51a9a4aac7df3"
-  integrity sha512-MjjPNXb2Cw7g1D41DtVbTVuGFCAtADxb91pAEFSkQ0AZ2gIooqYkWFHBL6woc15QHhtaZS8VT2GQoyW5OWlxIg==
 
 react-native-qrcode@^0.2.7:
   version "0.2.7"

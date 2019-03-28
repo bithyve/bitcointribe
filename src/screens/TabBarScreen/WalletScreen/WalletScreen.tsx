@@ -9,7 +9,10 @@ import {
   RefreshControl,
   Platform,
   SafeAreaView,
-  FlatList
+  FlatList,
+  ScrollView,
+  Animated,
+  LayoutAnimation
 } from "react-native";
 import {
   Container,
@@ -29,7 +32,6 @@ import Carousel, { Pagination } from "react-native-snap-carousel";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { SkypeIndicator } from "react-native-indicators";
 import DropdownAlert from "react-native-dropdownalert";
-import Loader from "react-native-modal-loader";
 import SvgImage from "react-native-remote-svg";
 
 //Custome Compontes
@@ -89,330 +91,257 @@ export default class WalletScreen extends React.Component {
       isLoading: false,
       isLoading1: false,
       isNoTranstion: false,
-      cardIndexNo: 0
+      cardIndexNo: 0,
+      animationView1: 3
     };
     isNetwork = utils.getNetwork();
   }
 
   //TODO: Page Life Cycle
-  componentDidMount() {
-    try {
-      this.willFocusSubscription = this.props.navigation.addListener(
-        "willFocus",
-        () => {
-          this.connnection_FetchData();
-        }
-      );
-      console.log(utils.getDeviceModel());
-    } catch (e) {
-      console.log({ e });
-    }
+  componentWillMount() {
+    this.scrollY = new Animated.Value(0);
+    this.startHeaderHeight = 80;
+    this.endHeaderHeight = 200;
+    this.animatedHeaderHeight = this.scrollY.interpolate({
+      inputRange: [0, 500],
+      outputRange: [this.startHeaderHeight, this.endHeaderHeight],
+      extrapolate: "clamp"
+    });
   }
 
-  //TODO: func connnection_FetchData
-  async connnection_FetchData() {
-    try {
-      let isLoading1: boolean = true;
-      let isNoTranstion: boolean = false;
-      let tranDetails: [] = [];
-      let arr_AccountCardList: [] = [];
-      let title: string = "";
-      this.setState({
-        isLoading: true
-      });
-      const dateTime = Date.now();
-      const lastUpdateDate = Math.floor(dateTime / 1000);
-      const resultWallet = await dbOpration.readTablesData(
-        localDB.tableName.tblWallet
-      );
-      const resultPopUpAccountTypes = await dbOpration.readTableAcccountType(
-        localDB.tableName.tblAccountType,
-        localDB.tableName.tblAccount
-      );
-      var resultAccount = await dbOpration.readAccountTablesData(
-        localDB.tableName.tblAccount
-      );
-      if (
-        isNetwork &&
-        this.state.cardIndexNo != resultAccount.temp.length - 1
-      ) {
-        title =
-          resultAccount.temp[this.state.cardIndexNo].accountType +
-          " Recent Transactions";
-
-        const bal = await RegularAccount.getBalance(
-          resultAccount.temp[this.state.cardIndexNo].address
-        );
-
-        var transation: [] = [];
-        var flag_noTrasation: boolean;
-
-        console.log({ bal });
-        if (bal.statusCode == 200) {
-          console.log("bal code 200");
-          console.log(resultAccount.temp[this.state.cardIndexNo].address);
-          var resultRecentTras = await RegularAccount.getTransactions(
-            resultAccount.temp[this.state.cardIndexNo].address
-          );
-          let resultRecentTransDetailsData =
-            resultRecentTras.transactionDetails;
-          var arr_DateSort = [];
-          for (let i = 0; i < resultRecentTransDetailsData.length; i++) {
-            let sortData = resultRecentTransDetailsData[i];
-            sortData.received = new Date(
-              resultRecentTransDetailsData[i].received
-            );
-            arr_DateSort.push(sortData);
-          }
-          let result_sortData = arr_DateSort.sort(utils.sortFunction);
-          resultRecentTras.transactionDetails = result_sortData;
-          if (resultRecentTras.statusCode == 200) {
-            if (resultRecentTras.transactionDetails.length > 0) {
-              const resultRecentTransaction = await dbOpration.insertTblTransation(
-                localDB.tableName.tblTransaction,
-                resultRecentTras.transactionDetails,
-                resultRecentTras.address,
-                lastUpdateDate
-              );
-
-              if (resultRecentTransaction) {
-                resultRecentTras = await dbOpration.readRecentTransactionAddressWise(
-                  localDB.tableName.tblTransaction,
-                  resultAccount.temp[this.state.cardIndexNo].address
-                );
-                if (resultRecentTras.temp.length > 0) {
-                  transation = resultRecentTras.temp;
-                  flag_noTrasation = false;
-                } else {
-                  transation = [];
-                  flag_noTrasation = true;
-                }
-                console.log({ transation });
-                tranDetails = transation;
-                isNoTranstion = flag_noTrasation;
-              }
-            } else {
-              isNoTranstion = true;
-              tranDetails = [];
-            }
-            const resultUpdateTblAccount = await dbOpration.updateTableData(
-              localDB.tableName.tblAccount,
-              bal.balanceData.final_balance / 1e8,
-              resultAccount.temp[0].address,
-              lastUpdateDate
-            );
-            if (resultUpdateTblAccount) {
-              resultAccount = await dbOpration.readAccountTablesData(
-                localDB.tableName.tblAccount
-              );
-              if (resultAccount.temp.length > 0) {
-                isLoading1 = false;
-                arr_AccountCardList = resultAccount.temp;
-                this.setState({
-                  accountTypeList: resultAccount.temp,
-                  walletsData: resultWallet.temp,
-                  popupData: [
-                    {
-                      success: "success",
-                      icon: "plus-circle",
-                      data: resultPopUpAccountTypes.temp
-                    }
-                  ],
-                  isLoading: false
-                });
-              }
-            }
-          } else {
-            this.dropdown.alertWithType(
-              "error",
-              "OH",
-              resultRecentTras.errorMessage.error
-            );
-            this.setState({
-              isLoading: false
-            });
-          }
-        } else {
-          this.dropdown.alertWithType("error", "OH", bal.errorMessage.error);
-          this.setState({
-            isLoading: false
-          });
-        }
-      } else {
-        let transation: [] = [];
-        let flag_noTrasation: boolean;
-        const resultRecentTras = await dbOpration.readRecentTransactionAddressWise(
-          localDB.tableName.tblTransaction,
-          resultAccount.temp[this.state.cardIndexNo].address
-        );
-        if (resultRecentTras.temp.length > 0) {
-          transation = resultRecentTras.temp;
-          flag_noTrasation = false;
-        } else {
-          transation = [];
-          flag_noTrasation = true;
-        }
-        console.log({ transation });
-        tranDetails = transation;
-        isNoTranstion = flag_noTrasation;
-        isLoading1 = false;
-        arr_AccountCardList = resultAccount.temp;
-        this.setState({
-          accountTypeList: resultAccount.temp,
-          walletsData: resultWallet.temp,
-          popupData: [
-            {
-              success: "success",
-              icon: "plus-circle",
-              data: resultPopUpAccountTypes.temp
-            }
-          ],
-          isLoading: false
-        });
-      }
-      this.setState({
-        arr_WalletScreenCard: [
-          {
-            accountTypeList: arr_AccountCardList,
-            recentTransaction: [
-              {
-                title,
-                isLoading1,
-                isNoTranstion,
-                tranDetails
-              }
-            ],
-            isLoading: false
-          }
-        ]
-      });
-    } catch (e) {
-      console.log({ e });
-    }
-  }
-
-  //TODO: func openRecentTrans
-  openRecentTrans(item: any) {
-    console.log({ item });
-    try {
-      this.props.navigation.navigate("RecentTransactionsScreen", {
-        transationDetails: item
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  handleScroll = (event: Object) => {
+    //LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    //Animated.event([{ nativeEvent: { contentOffset: { y: this.scrollY } } }]);
+    // var value = 3;
+    // console.log(event.nativeEvent.contentOffset.y);
+    // if (event.nativeEvent.contentOffset.y == 0) {
+    //   value = 3;
+    // } else {
+    //   value = 1.5;
+    // }
+    // this.setState({
+    //   animationView1: value
+    // });
+  };
 
   render() {
     return (
       <Container>
-        <Content contentContainerStyle={styles.container}>
+        <Content scrollEnabled={false} contentContainerStyle={styles.container}>
           <StatusBar
             backgroundColor={colors.appColor}
             barStyle="dark-content"
           />
-
           <SafeAreaView style={styles.container}>
             {/* title */}
-            <View
+            <Animated.View
               style={{
-                flex: 4,
-                backgroundColor: colors.appColor,
-                alignItems: "center"
+                //  flex: this.state.animationView1,
+                height: this.animatedHeaderHeight,
+                backgroundColor: colors.appColor
               }}
             >
-              <Text
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontWeight: "bold",
+                    fontSize: 20,
+                    marginTop: 20,
+                    margin: 10
+                  }}
+                >
+                  My Wallets
+                </Text>
+              </View>
+              <View
                 style={{
-                  color: "#fff",
-                  fontWeight: "bold",
-                  fontSize: 32,
-                  marginTop: 20
+                  flexDirection: "row",
+                  alienItem: "center",
+                  justifyContent: "center",
+                  margin: 10,
+                  flex: 2,
+                  marginBottom: 20
                 }}
               >
-                Wallet
-              </Text>
-              <SvgImage
-                source={images.svgImages.walletScreen.walletIcon}
-                style={[styles.svgWalletIcon]}
-              />
-              <Text style={{ color: "#fff", marginTop: 10 }}>
-                Looks like your app needs a quick
-              </Text>
-              <Text style={{ color: "#fff" }}>
-                check to maintain good health
-              </Text>
-            </View>
+                <View
+                  style={{
+                    flex: 2.4,
+                    justifyContent: "center"
+                  }}
+                >
+                  <Text style={{ color: "#fff", marginTop: 10, fontSize: 16 }}>
+                    Looks like your app needs a quick
+                  </Text>
+                  <Text style={{ color: "#fff", fontSize: 16 }}>
+                    check to maintain good health
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flex: 1,
+                    alignItems: "flex-end",
+                    justifyContent: "flex-end"
+                  }}
+                >
+                  <SvgImage
+                    source={images.svgImages.walletScreen.walletIcon}
+                    style={[styles.svgImage]}
+                  />
+                </View>
+              </View>
+            </Animated.View>
             {/*  cards */}
-            <View style={{ flex: 5 }}>
-              <FlatList
-                data={[
-                  { type: "Daily Wallet", name: "Anant's Savings" },
-                  {
-                    type: "Secure Wallet",
-                    name: "Anant's Savings",
-                    amount: "60,000"
-                  }
-                ]}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item }) => (
-                  <RkCard
-                    rkType="shadowed"
-                    style={{ flex: 1, margin: 10, borderRadius: 10 }}
-                  >
-                    <View
-                      rkCardHeader
+            <View style={{ flex: 6, marginTop: -40 }}>
+              <ScrollView
+                scrollEventThrottle={40}
+                horizontal={false}
+                pagingEnabled={false}
+                onScroll={Animated.event([
+                  { nativeEvent: { contentOffset: { y: this.scrollY } } }
+                ])}
+              >
+                <FlatList
+                  data={[
+                    {
+                      type: "Daily Wallet",
+                      name: "Anant's Savings",
+                      amount: "60,000"
+                    },
+                    {
+                      type: "Secure Wallet",
+                      name: "Anant's Savings",
+                      amount: "60,000"
+                    },
+                    {
+                      type: "Daily Wallet",
+                      name: "Anant's Savings",
+                      amount: "60,000"
+                    },
+                    {
+                      type: "Secure Wallet",
+                      name: "Anant's Savings",
+                      amount: "60,000"
+                    }
+                  ]}
+                  showsVerticalScrollIndicator={false}
+                  renderItem={({ item }) => (
+                    <RkCard
+                      rkType="shadowed"
                       style={{
-                        borderBottomColor: "gray",
-                        borderBottomWidth: 0.4,
-                        height: 60
+                        flex: 1,
+                        margin: 10,
+                        borderRadius: 10
                       }}
                     >
-                      <SvgImage
-                        source={require("bithyve/src/assets/images/svg/WalletScreen/lock.svg")}
-                        style={[{ flex: 0.4, width: "100%", height: 60 }]}
-                      />
-                      <Text style={{ flex: 0.9 }}>{item.type}</Text>
-                      <Button
-                        transparent
+                      <View
+                        rkCardHeader
                         style={{
-                          alignItems: "flex-end",
-                          justifyContent: "flex-end",
-                          alignSelf: "flex-end",
-                          flex: 1
+                          borderBottomColor: "#F5F5F5",
+                          borderBottomWidth: 1,
+                          marginLeft: 5,
+                          marginRight: 5,
+                          height: 60
                         }}
                       >
-                        <Text>--</Text>
-                      </Button>
-                    </View>
-                    <View rkCardContent />
-                  </RkCard>
-                )}
-                keyExtractor={(item, index) => index}
-              />
-            </View>
-            {/*  tabbar bottom */}
-            <View
-              style={[
-                utils.getDeviceModel() == "IphoneX"
-                  ? { flex: 0.9 }
-                  : { flex: 1.1 },
-                {
-                  alignItems: "flex-end",
-                  justifyContent: "flex-end"
-                }
-              ]}
-            >
-              <Button transparent style={styles.plusButtonBottom}>
-                <SvgImage
-                  source={images.svgImages.walletScreen.plusButtonBottom}
-                  style={[styles.svgImage]}
+                        <SvgImage
+                          source={require("bithyve/src/assets/images/svg/WalletScreen/lock.svg")}
+                          style={[
+                            {
+                              flex: 0.6,
+                              width: "100%",
+                              height: 55
+                            }
+                          ]}
+                        />
+                        <Text
+                          style={{ flex: 2, fontSize: 16, fontWeight: "bold" }}
+                        >
+                          {item.type}
+                        </Text>
+                        <Button
+                          transparent
+                          style={{
+                            alignItems: "flex-end",
+                            justifyContent: "flex-end",
+                            alignSelf: "flex-end",
+                            flex: 1
+                          }}
+                        >
+                          <SvgImage
+                            source={require("bithyve/src/assets/images/svg/WalletScreen/menu.svg")}
+                            style={[
+                              {
+                                width: "100%",
+                                height: 55
+                              }
+                            ]}
+                          />
+                        </Button>
+                      </View>
+                      <View
+                        rkCardContent
+                        style={{
+                          flex: 1,
+                          flexDirection: "row"
+                        }}
+                      >
+                        <View style={{ flex: 1 }}>
+                          <SvgImage
+                            source={require("bithyve/src/assets/images/svg/WalletScreen/bitcoin-logo.svg")}
+                            style={[
+                              {
+                                width: "100%",
+                                height: 50
+                              }
+                            ]}
+                          />
+                        </View>
+                        <View style={{ flex: 4 }}>
+                          <Text note>Anant's Savings</Text>
+                          <Text style={{ fontWeight: "bold", fontSize: 18 }}>
+                            60,000
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: "row",
+                            alignItems: "flex-end",
+                            justifyContent: "flex-end"
+                          }}
+                        >
+                          <Button
+                            transparent
+                            primary
+                            style={{ alignSelf: "flex-end" }}
+                          >
+                            <Icon name="history" color="gray" size={15} />
+                          </Button>
+                          <Button
+                            transparent
+                            primary
+                            style={{ alignSelf: "flex-end", marginLeft: 10 }}
+                          >
+                            <Icon name="users" color="gray" size={15} />
+                          </Button>
+                        </View>
+                      </View>
+                    </RkCard>
+                  )}
+                  keyExtractor={(item, index) => index}
                 />
-              </Button>
+              </ScrollView>
             </View>
           </SafeAreaView>
         </Content>
-        <Loader loading={this.state.isLoading} color={colors.appColor} />
         <DropdownAlert ref={ref => (this.dropdown = ref)} />
+        <Button transparent style={styles.plusButtonBottom}>
+          <SvgImage
+            source={images.svgImages.walletScreen.plusButtonBottom}
+            style={[styles.svgImage]}
+          />
+        </Button>
       </Container>
     );
   }
@@ -427,16 +356,16 @@ const styles = StyleSheet.create({
     width: "100%"
   },
   plusButtonBottom: {
-    alignSelf: "flex-end",
-    marginBottom: 10,
-    marginRight: 10
+    width: 50,
+    height: 50,
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    alignSelf: "center",
+    justifyContent: "center"
   },
   svgImage: {
-    width: 50,
-    height: 50
-  },
-  svgWalletIcon: {
-    width: 100,
-    height: 80
+    width: "100%",
+    height: "100%"
   }
 });
