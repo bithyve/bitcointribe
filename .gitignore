@@ -17,9 +17,7 @@ xcuserdata
 DerivedData
 *.hmap
 *.ipa
-*.xcuserstate  
-
-
+*.xcuserstate
 
 # Android
 build/
@@ -36,7 +34,6 @@ yarn-error.log
 
 #Environment
 /.env.dev
-
 
 # BUCK
 buck-out/

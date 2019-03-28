@@ -1,11 +1,11 @@
-# MyMoneyApp
+# HexaWallet
 
 My Money App Alpha Release
 
 # System Environment
 
 ### Step 1:(NodeJS)
-  
+
 Please check nodejs environment<br />
 npm -v<br />
 (if not set to download nodejs setup and install )<br />
@@ -130,7 +130,7 @@ rn-nodeify --install --hack<br />
 
 ```javascript
 {
-"name": "MyMoney",
+"name": "HexaWallet",
 "version": "0.0.1",
 "private": true,
 "scripts": {
@@ -258,12 +258,12 @@ rn-nodeify --install --hack<br />
 <string>Your message to user when the photo library is accessed for the first time</string>
 ```
 
-## android (settings.gradle , app/build.gradle and app/src/main/java/com/mymoney/MainApplication.java)
+## android (settings.gradle , app/build.gradle and app/src/main/java/com/bithyve/hexa/MainApplication.java)
 
 1.settings.gradel
 
 ```
-rootProject.name = 'MyMoney'
+rootProject.name = 'HexaWallet'
 include ':react-native-vector-icons'
 project(':react-native-vector-icons').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-vector-icons/android')
 include ':react-native-udp'
@@ -320,10 +320,10 @@ implementation "com.facebook.react:react-native:+" // From node_modules
 }
 ```
 
-3.app/src/main/java/com/mymoney/MainApplication.java
+3.app/src/main/java/com/bithyve/hexa/MainApplication.java
 
 ```
-package com.mymoney;
+package com.bityve.hexa;
 
 import android.app.Application;
 
@@ -373,7 +373,7 @@ new RNCameraPackage()
 
 # Issue (Adnroid + ios)
 
-<img src="https://github.com/thecryptobee/MyMoneyApp/blob/master/src/assets/issuesImages/images/busyIndicatorIssue.PNG" width="270" height="420"><br/>
+<img src="https://github.com/thecryptobee/HexaWallet/blob/master/src/assets/issuesImages/images/busyIndicatorIssue.PNG" width="270" height="420"><br/>
 Update file
 /node_modules/react-native-busy-indicator/index.js
 

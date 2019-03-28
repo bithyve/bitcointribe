@@ -22,15 +22,15 @@ dependencies {
 compile project(':react-native-sqlite-storage')
 }
 
-3)android/app/src/main/java/mymoney/MainApplicaiton.java
+3)android/app/src/main/java/com/bithyve/hexa/MainApplicaiton.java
 import org.pgsqlite.SQLitePluginPackage;
 new SQLitePluginPackage(),
 ```
 
 ## Bundle id (ios and android)
 
-1.ios:com.bithyve.mymoney.staging
-2.android:com.bithyve.mymoney.staging
+1.ios:com.bithyve.hexa
+2.android:com.bithyve.hexa
 
 ## Sqlite Database file check (ios and android)
 
@@ -87,3 +87,7 @@ protected void onCreate(Bundle savedInstanceState) {
     }
 
 ```
+
+## add bundle change
+
+react-native-rename "Hexa" -b "com.bithyve.hexa"

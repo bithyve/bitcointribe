@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { SCLAlert, SCLAlertButton } from "react-native-scl-alert";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 interface Props {
   data: [];

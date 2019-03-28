@@ -2,12 +2,13 @@
 
 ### android/app
 
-sudo keytool -genkey -v -keystore mymoney.keystore -alias mymoney -keyalg RSA -keysize 2048 -validity 10000
+```
+sudo keytool -genkey -v -keystore hexawallet.keystore -alias hexawallet -keyalg RSA -keysize 2048 -validity 10000
 
 ### android/gradle.properties
 
-MYAPP_RELEASE_STORE_FILE=mymoney.keystore
-MYAPP_RELEASE_KEY_ALIAS=mymoney
+MYAPP_RELEASE_STORE_FILE=hexawallet.keystore
+MYAPP_RELEASE_KEY_ALIAS=hexawallet
 MYAPP_RELEASE_STORE_PASSWORD=developer
 MYAPP_RELEASE_KEY_PASSWORD=develoepr
 
@@ -20,11 +21,11 @@ defaultConfig { ... }
 
 signingConfigs {
 release {
-storeFile file("mymoney.keystore")  
+storeFile file("hexawallet.keystore")
  storePassword "developer"
-keyAlias "mymoney"  
- keyPassword "developer"  
- }  
+keyAlias "hexawallet"
+ keyPassword "developer"
+ }
  }
 
 ===========> OR <<===============
@@ -77,8 +78,11 @@ Custom node_modules/react-native/react.gradle to solve the Duplicate file error 
 cd android && ./gradlew clean
 cd android
 ./gradlew assembleRelease
+```
 
 #============>For sqlite <===================
+
+```
 1)settings.gradle (04/12/2018)
 include ':react-native-sqlite-storage'
 project(':react-native-sqlite-storage').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sqlite-storage/src/android')
@@ -86,14 +90,17 @@ project(':react-native-sqlite-storage').projectDir = new File(rootProject.projec
 2)android/app/build.gradle (04/12/2018)
 
 dependencies {
-compile project(':react-native-sqlite-storage')  
+compile project(':react-native-sqlite-storage')
 }
 
-3)android/app/src/main/java/mymoney/MainApplicaiton.java
+3)android/app/src/main/java/com/bithyve/hexa/MainApplicaiton.java
 import org.pgsqlite.SQLitePluginPackage;
 new SQLitePluginPackage(),
+```
 
 #==============> for BASE_MAP.Fill not a funcation <===============
+
+```
 1)package.json<br>
 dependencies {
 
@@ -130,13 +137,15 @@ dependencies {
 dependencies {
 compile fileTree(dir: "libs", include: ["*.jar"])<br>
 
-4)app/build.gradle, under android:<br>  
+4)app/build.gradle, under android:<br>
 packagingOptions {
 pickFirst '\*\*/libgnustl_shared.so'
 }
+```
 
 #===============> Swipe on drawer does not work in Android <==================
 
+```
 ### MainActivity.java in
 
 import com.facebook.react.ReactActivity;
@@ -162,3 +171,4 @@ return "Example";
 - };
 - }
   }
+```
