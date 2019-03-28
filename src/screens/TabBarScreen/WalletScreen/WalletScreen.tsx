@@ -92,8 +92,7 @@ export default class WalletScreen extends React.Component {
       isLoading1: false,
       isNoTranstion: false,
       cardIndexNo: 0,
-      scrollY: new Animated.Value(0),
-      icon_shieldIconHeight: 150
+      scrollY: new Animated.Value(0)
     };
     isNetwork = utils.getNetwork();
   }
@@ -145,14 +144,6 @@ export default class WalletScreen extends React.Component {
     });
   }
 
-  // handleScroll = (event: Object) => {
-  //   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  //   // console.log(event.nativeEvent.contentOffset.y);
-  //   Animated.event([
-  //     { nativeEvent: { contentOffset: { y: this.state.scrollY } } }
-  //   ]);
-  // };
-
   render() {
     return (
       <Container>
@@ -196,11 +187,9 @@ export default class WalletScreen extends React.Component {
                     Wallet
                   </Animated.Text>
                 </Animated.Text>
-
                 <Animated.Text
                   style={{
                     color: "#fff",
-                    marginTop: 10,
                     fontSize: 16,
                     opacity: this.animatedTextOpacity
                   }}
