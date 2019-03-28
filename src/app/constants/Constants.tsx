@@ -145,6 +145,9 @@ var images = {
     secureLogo: require(assetsImages + "secureAccount/secureAccountLogo.png"),
     validationKey: require(assetsImages + "secureAccount/validationKey.png")
   },
+  walletScreen: {
+    walletIcon: require(assetsImages + "svg/WalletScreen/Shield.png")
+  },
   svgImages: {
     back_Icon: require(assetsImages + "svg/global/icon_back.svg"),
     tabBarWalletScreen: {
