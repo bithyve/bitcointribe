@@ -22,7 +22,7 @@ import {
 } from "native-base";
 import { RkCard } from "react-native-ui-kitten";
 import Carousel, { Pagination } from "react-native-snap-carousel";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon from "react-native-vector-icons/FontAwesome";
 import { SkypeIndicator } from "react-native-indicators";
 import DropdownAlert from "react-native-dropdownalert";
 

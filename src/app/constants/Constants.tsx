@@ -74,6 +74,7 @@ var errorValidMsg = {
 //Colors
 var colors = {
   appColor: Config.COLOR_APP,
+  tabbarActiveColor: "#2D71B6",
   black: Config.COLOR_BLACK,
   white: Config.COLOR_WHITE,
   Saving: Config.COLOR_SAVING,
@@ -89,7 +90,7 @@ var images = {
   appIcon: require(assetsImages + "appLogo.png"),
   slideMenuIcon: require(assetsImages + "icon/slideMenuImage.jpg"),
   onBoardingScreen: {
-    onB1: require(assetsImages + "onBoardingScreen/onB3.png"),
+    onB1: require(assetsImages + "appLogo.png"),
     onB2: require(assetsImages + "onBoardingScreen/secureAccount.jpeg"),
     onB3: require(assetsImages + "onBoardingScreen/Selfsovereign.jpeg")
   },
@@ -143,6 +144,39 @@ var images = {
   secureAccount: {
     secureLogo: require(assetsImages + "secureAccount/secureAccountLogo.png"),
     validationKey: require(assetsImages + "secureAccount/validationKey.png")
+  },
+  svgImages: {
+    back_Icon: require(assetsImages + "svg/global/icon_back.svg"),
+    tabBarWalletScreen: {
+      walletIcon: require(assetsImages +
+        "svg/TabBarWalletScreen/icon_wallet_selected.svg"),
+      transactionIcon: require(assetsImages +
+        "svg/TabBarWalletScreen/icon_transactions.svg"),
+      qrscanIcon: require(assetsImages +
+        "svg/TabBarWalletScreen/icon_qrscan.svg"),
+      settingIcon: require(assetsImages +
+        "svg/TabBarWalletScreen/icon_settings.svg")
+    },
+    walletScreen: {
+      accountLogo: require(assetsImages +
+        "svg/WalletScreen/icon_regularaccount.svg"),
+      plusButtonBottom: require(assetsImages + "svg/WalletScreen/plus.svg"),
+      walletIcon: require(assetsImages + "svg/WalletScreen/ShieldIcon.svg")
+    },
+    viewRecentTransaction: {
+      sentIcon: require(assetsImages + "svg/WalletScreen/icon_paid.svg"),
+      receivedIcon: require(assetsImages + "svg/WalletScreen/icon_deposit.svg")
+    },
+    accountDetailsScreen: {
+      accountSettingsIcon: require(assetsImages +
+        "svg/AccountDetailsScreen/icon_settings.svg"),
+      sentIcon: require(assetsImages +
+        "svg/AccountDetailsScreen/icon_paid.svg"),
+      receivedIcon: require(assetsImages +
+        "svg/AccountDetailsScreen/icon_deposit.svg"),
+      addAccount: require(assetsImages +
+        "svg/AccountDetailsScreen/icon_add.svg")
+    }
   }
 };
 

@@ -17,7 +17,7 @@ import {
   Body,
   Text
 } from "native-base";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon from "react-native-vector-icons/FontAwesome";
 import * as Animatable from "react-native-animatable";
 import Accordion from "react-native-collapsible/Accordion";
 

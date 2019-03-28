@@ -22,7 +22,12 @@ import {
   errorMessage
 } from "bithyve/src/app/constants/Constants";
 import SQLite from "react-native-sqlite-storage";
-var db = SQLite.openDatabase(localDB.dbName, "1.0", "MyMoney Database", 200000);
+var db = SQLite.openDatabase(
+  localDB.dbName,
+  "1.0",
+  "HexaWallet Database",
+  200000
+);
 
 //TODO: Wallets
 import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
@@ -101,7 +106,7 @@ export default class SentAndReceiveeScreen extends React.Component {
               </Button>
             </Left>
             <Body style={{ flex: 0, alignItems: "center" }}>
-              <Title>My Money</Title>
+              <Title>Hexa Wallet</Title>
             </Body>
           </Header>
           <Content padder>

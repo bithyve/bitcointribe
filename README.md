@@ -1,10 +1,8 @@
-# BitHyve Wallet
+# Hexa Wallet
 
-The alpha version of BitHyve's BitHyve Wallet
+## What is Hexa Wallet?
 
-## What is BitHyve Wallet?
-
-BitHyve Wallet is a user friendly mobile bitcoin wallet that enables p2p commerce. There are various types of accounts that are supported in the BitHyve Wallet:
+Hexa Wallet is a user friendly mobile bitcoin wallet that enables p2p commerce. There are various types of accounts that are supported in the Hexa Wallet:
 
 1.  Savings Account
 
@@ -22,11 +20,11 @@ BitHyve Wallet is a user friendly mobile bitcoin wallet that enables p2p commerc
 
 - A joint account is a 2of2 multisig bitcoin wallet.
 
-All accounts are protected by a pin which is required to unlock the BitHyve Wallet. Accounts also have a seed restoration feature which can be used to import wallets from other devices or from an older version of the BitHyve Wallet wallet.
+All accounts are protected by a pin which is required to unlock the Hexa Wallet. Accounts also have a seed restoration feature which can be used to import wallets from other devices or from an older version of the Hexa Wallet wallet.
 
 ## Design Considerations
 
-The various design considerations that BitHyve chose to undertake are over at [the wiki](https://github.com/thecryptobee/BitHyve-Wallet/wiki/Design-Considerations)
+The various design considerations that Hexa chose to undertake are over at [the wiki](https://github.com/thecryptobee/Hexa-Wallet/wiki/Design-Considerations)
 
 ## Build / Local Setup
 
@@ -35,13 +33,13 @@ Prerequisites:
 - Node with npm
 - yarn
 
-After installing node and yarn, the following commands should get you started with BitHyve Wallet on your local computer
+After installing node and yarn, the following commands should get you started with Hexa Wallet on your local computer
 
 ```
-git clone https://github.com/thecryptobee/BitHyve-Wallet.git
-cd BitHyve-Wallet
+git clone https://github.com/thecryptobee/Hexa-Wallet.git
+cd Hexa-Wallet
 sudo yarn install
-sudo react-native link` [known issue #2](https://github.com/thecryptobee/BitHyve-Wallet/issues/2
+sudo react-native link` [known issue #2](https://github.com/thecryptobee/Hexa-Wallet/issues/2
 sudo npm install -g rn-nodeify
 rn-nodeify --install --hack
 
