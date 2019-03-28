@@ -3,8 +3,6 @@ package com.bithyve.hexa;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.rnnestedscrollview.RNNestedScrollViewPackage;
-import com.rncollapsingtoolbar.RNCollapsingToolbarPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import fr.greweb.reactnativeviewshot.RNViewShotPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -15,7 +13,6 @@ import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.react.rnspinkit.RNSpinkitPackage;
 import cl.json.RNSharePackage;
 import com.bitgo.randombytes.RandomBytesPackage;
-import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.peel.react.rnos.RNOSModule;
 import com.lewin.qrcode.QRScanReaderPackage;
 import com.oblador.keychain.KeychainPackage;
@@ -24,7 +21,6 @@ import com.imagepicker.ImagePickerPackage;
 import com.AlexanderZaytsev.RNI18n.RNI18nPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.rnfs.RNFSPackage;
-import com.evollu.react.fcm.FIRMessagingPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import org.reactnative.camera.RNCameraPackage;
@@ -52,8 +48,6 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
             new SQLitePluginPackage(),
           new MainReactPackage(),
-            new RNNestedScrollViewPackage(),
-            new RNCollapsingToolbarPackage(),
             new RNCWebViewPackage(),
             new RNViewShotPackage(),
             new VectorIconsPackage(),
@@ -64,7 +58,6 @@ public class MainApplication extends Application implements ReactApplication {
             new RNSpinkitPackage(),
             new RNSharePackage(),
             new RandomBytesPackage(),
-            new ReactNativePushNotificationPackage(),
             new RNOSModule(),
             new QRScanReaderPackage(),
             new KeychainPackage(),
@@ -73,7 +66,6 @@ public class MainApplication extends Application implements ReactApplication {
             new RNI18nPackage(),
             new RNGestureHandlerPackage(),
             new RNFSPackage(),
-            new FIRMessagingPackage(),
             new RNDeviceInfo(),
             new ReactNativeConfigPackage(),
             new RNCameraPackage()

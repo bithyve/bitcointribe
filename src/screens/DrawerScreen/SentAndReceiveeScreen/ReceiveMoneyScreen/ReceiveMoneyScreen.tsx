@@ -29,7 +29,7 @@ import QRCode from "react-native-qrcode";
 import Toast from "react-native-simple-toast";
 import Share from "react-native-share";
 import Loader from "react-native-modal-loader";
-import PushNotification from "react-native-push-notification";
+//import PushNotification from "react-native-push-notification";
 import ActionButton from "react-native-circular-action-menu";
 import ViewShot from "react-native-view-shot";
 
@@ -170,10 +170,10 @@ export default class ReceiveMoneyScreen extends React.Component {
             flag_SecuretCodeVisible: true
           });
           Vibration.vibrate(100);
-          PushNotification.localNotificationSchedule({
-            message: "Code :" + this.state.securetCodeEncpUrl,
-            date: new Date(Date.now() + 2 * 1000)
-          });
+          // PushNotification.localNotificationSchedule({
+          //   message: "Code :" + this.state.securetCodeEncpUrl,
+          //   date: new Date(Date.now() + 2 * 1000)
+          // });
           if (Platform.OS == "ios") {
             AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(true));
           }

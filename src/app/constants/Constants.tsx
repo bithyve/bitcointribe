@@ -161,7 +161,7 @@ var images = {
       accountLogo: require(assetsImages +
         "svg/WalletScreen/icon_regularaccount.svg"),
       plusButtonBottom: require(assetsImages + "svg/WalletScreen/plus.svg"),
-      walletIcon: require(assetsImages + "svg/WalletScreen/wallet.svg")
+      walletIcon: require(assetsImages + "svg/WalletScreen/ShieldIcon.svg")
     },
     viewRecentTransaction: {
       sentIcon: require(assetsImages + "svg/WalletScreen/icon_paid.svg"),
