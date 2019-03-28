@@ -92,37 +92,66 @@ export default class WalletScreen extends React.Component {
       isLoading1: false,
       isNoTranstion: false,
       cardIndexNo: 0,
-      animationView1: 3
+      scrollY: new Animated.Value(0),
+      icon_shieldIconHeight: 150
     };
     isNetwork = utils.getNetwork();
   }
 
   //TODO: Page Life Cycle
   componentWillMount() {
-    this.scrollY = new Animated.Value(0);
-    this.startHeaderHeight = 80;
-    this.endHeaderHeight = 200;
-    this.animatedHeaderHeight = this.scrollY.interpolate({
-      inputRange: [0, 500],
+    this.startHeaderHeight = 200;
+    this.endHeaderHeight = 100;
+    this.animatedHeaderHeight = this.state.scrollY.interpolate({
+      inputRange: [0, 100],
       outputRange: [this.startHeaderHeight, this.endHeaderHeight],
+      extrapolate: "clamp"
+    });
+
+    this.animatedScrolling = this.animatedHeaderHeight.interpolate({
+      inputRange: [this.endHeaderHeight, this.startHeaderHeight],
+      outputRange: [15, -40],
+      extrapolate: "clamp"
+    });
+
+    this.animatedAppTextSize = this.animatedHeaderHeight.interpolate({
+      inputRange: [this.endHeaderHeight, this.startHeaderHeight],
+      outputRange: [-1, 28],
+      extrapolate: "clamp"
+    });
+
+    this.animatedApp1TextSize = this.animatedHeaderHeight.interpolate({
+      inputRange: [this.endHeaderHeight, this.startHeaderHeight],
+      outputRange: [28, -1],
+      extrapolate: "clamp"
+    });
+
+    this.animatedTextOpacity = this.animatedHeaderHeight.interpolate({
+      inputRange: [this.endHeaderHeight, this.startHeaderHeight],
+      outputRange: [0, 1],
+      extrapolate: "clamp"
+    });
+
+    this.animatedShieldViewFlex = this.animatedHeaderHeight.interpolate({
+      inputRange: [this.endHeaderHeight, this.startHeaderHeight],
+      outputRange: [3, 2],
+      extrapolate: "clamp"
+    });
+
+    this.animatedShieldIconSize = this.animatedHeaderHeight.interpolate({
+      inputRange: [this.endHeaderHeight, this.startHeaderHeight],
+      outputRange: [60, 100],
       extrapolate: "clamp"
     });
   }
 
-  handleScroll = (event: Object) => {
-    //LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    //Animated.event([{ nativeEvent: { contentOffset: { y: this.scrollY } } }]);
-    // var value = 3;
-    // console.log(event.nativeEvent.contentOffset.y);
-    // if (event.nativeEvent.contentOffset.y == 0) {
-    //   value = 3;
-    // } else {
-    //   value = 1.5;
-    // }
-    // this.setState({
-    //   animationView1: value
-    // });
-  };
+  // handleScroll = (event: Object) => {
+  //   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  //   // console.log(event.nativeEvent.contentOffset.y);
+  //   Animated.event([
+  //     { nativeEvent: { contentOffset: { y: this.state.scrollY } } }
+  //   ]);
+  // };
 
   render() {
     return (
@@ -136,69 +165,81 @@ export default class WalletScreen extends React.Component {
             {/* title */}
             <Animated.View
               style={{
-                //  flex: this.state.animationView1,
                 height: this.animatedHeaderHeight,
-                backgroundColor: colors.appColor
+                backgroundColor: colors.appColor,
+                flexDirection: "row"
               }}
             >
-              <View style={{ flex: 1 }}>
-                <Text
+              <Animated.View
+                style={{
+                  marginLeft: 10,
+                  flex: 4
+                }}
+              >
+                <Animated.Text
                   style={{
                     color: "#fff",
                     fontWeight: "bold",
-                    fontSize: 20,
+                    fontSize: this.animatedAppTextSize,
                     marginTop: 20,
-                    margin: 10
+                    marginBottom: 40
                   }}
                 >
                   My Wallets
-                </Text>
-              </View>
-              <View
+                  <Animated.Text
+                    style={{
+                      color: "#fff",
+                      fontWeight: "bold",
+                      fontSize: this.animatedApp1TextSize
+                    }}
+                  >
+                    Wallet
+                  </Animated.Text>
+                </Animated.Text>
+
+                <Animated.Text
+                  style={{
+                    color: "#fff",
+                    marginTop: 10,
+                    fontSize: 16,
+                    opacity: this.animatedTextOpacity
+                  }}
+                >
+                  Looks like your app needs a quick check to maintain good
+                  health
+                </Animated.Text>
+              </Animated.View>
+
+              <Animated.View
                 style={{
-                  flexDirection: "row",
-                  alienItem: "center",
-                  justifyContent: "center",
-                  margin: 10,
-                  flex: 2,
-                  marginBottom: 20
+                  flex: this.animatedShieldViewFlex,
+                  alignItems: "flex-end",
+                  justifyContent: "center"
                 }}
               >
-                <View
-                  style={{
-                    flex: 2.4,
-                    justifyContent: "center"
-                  }}
-                >
-                  <Text style={{ color: "#fff", marginTop: 10, fontSize: 16 }}>
-                    Looks like your app needs a quick
-                  </Text>
-                  <Text style={{ color: "#fff", fontSize: 16 }}>
-                    check to maintain good health
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: "flex-end",
-                    justifyContent: "flex-end"
-                  }}
-                >
-                  <SvgImage
-                    source={images.svgImages.walletScreen.walletIcon}
-                    style={[styles.svgImage]}
-                  />
-                </View>
-              </View>
+                <Animated.Image
+                  source={images.walletScreen.walletIcon}
+                  style={[
+                    {
+                      height: this.animatedShieldIconSize,
+                      width: this.animatedShieldIconSize
+                    }
+                  ]}
+                />
+              </Animated.View>
             </Animated.View>
             {/*  cards */}
-            <View style={{ flex: 6, marginTop: -40 }}>
+            <Animated.View
+              style={{ flex: 6, marginTop: this.animatedScrolling }}
+            >
               <ScrollView
-                scrollEventThrottle={40}
+                scrollEventThrottle={16}
                 horizontal={false}
                 pagingEnabled={false}
                 onScroll={Animated.event([
-                  { nativeEvent: { contentOffset: { y: this.scrollY } } }
+                  {
+                    nativeEvent: { contentOffset: { y: this.state.scrollY } }
+                  }
                 ])}
               >
                 <FlatList
@@ -332,7 +373,7 @@ export default class WalletScreen extends React.Component {
                   keyExtractor={(item, index) => index}
                 />
               </ScrollView>
-            </View>
+            </Animated.View>
           </SafeAreaView>
         </Content>
         <DropdownAlert ref={ref => (this.dropdown = ref)} />
