@@ -28,11 +28,9 @@ import {
   ListItem
 } from "native-base";
 import { RkCard } from "react-native-ui-kitten";
-import Carousel, { Pagination } from "react-native-snap-carousel";
-import Icon from "react-native-vector-icons/FontAwesome";
-import { SkypeIndicator } from "react-native-indicators";
 import DropdownAlert from "react-native-dropdownalert";
-import SvgImage from "react-native-remote-svg";
+import { Icon } from "@up-shared/components";
+import IconFontAwe from "react-native-vector-icons/FontAwesome";
 
 //Custome Compontes
 import SCLAlertAccountTypes from "bithyve/src/app/custcompontes/alert/SCLAlertAccountTypes";
@@ -73,7 +71,7 @@ import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
 
 //localization
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
-export default class WalletScreen extends React.Component {
+export default class WalletScreenIOS extends React.Component {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -101,27 +99,22 @@ export default class WalletScreen extends React.Component {
   componentWillMount() {
     this.startHeaderHeight = 200;
     this.endHeaderHeight = 100;
+
     this.animatedHeaderHeight = this.state.scrollY.interpolate({
       inputRange: [0, 100],
       outputRange: [this.startHeaderHeight, this.endHeaderHeight],
       extrapolate: "clamp"
     });
 
-    this.animatedScrolling = this.animatedHeaderHeight.interpolate({
+    this.animatedMarginTopScrolling = this.animatedHeaderHeight.interpolate({
       inputRange: [this.endHeaderHeight, this.startHeaderHeight],
-      outputRange: [15, -40],
+      outputRange: [10, -35],
       extrapolate: "clamp"
     });
 
     this.animatedAppTextSize = this.animatedHeaderHeight.interpolate({
       inputRange: [this.endHeaderHeight, this.startHeaderHeight],
-      outputRange: [-1, 28],
-      extrapolate: "clamp"
-    });
-
-    this.animatedApp1TextSize = this.animatedHeaderHeight.interpolate({
-      inputRange: [this.endHeaderHeight, this.startHeaderHeight],
-      outputRange: [28, -1],
+      outputRange: [18, 24],
       extrapolate: "clamp"
     });
 
@@ -133,13 +126,13 @@ export default class WalletScreen extends React.Component {
 
     this.animatedShieldViewFlex = this.animatedHeaderHeight.interpolate({
       inputRange: [this.endHeaderHeight, this.startHeaderHeight],
-      outputRange: [3, 2],
+      outputRange: [2, 2],
       extrapolate: "clamp"
     });
 
     this.animatedShieldIconSize = this.animatedHeaderHeight.interpolate({
       inputRange: [this.endHeaderHeight, this.startHeaderHeight],
-      outputRange: [60, 100],
+      outputRange: [50, 70],
       extrapolate: "clamp"
     });
   }
@@ -158,7 +151,8 @@ export default class WalletScreen extends React.Component {
               style={{
                 height: this.animatedHeaderHeight,
                 backgroundColor: colors.appColor,
-                flexDirection: "row"
+                flexDirection: "row",
+                zIndex: 0
               }}
             >
               <Animated.View
@@ -173,19 +167,10 @@ export default class WalletScreen extends React.Component {
                     fontWeight: "bold",
                     fontSize: this.animatedAppTextSize,
                     marginTop: 20,
-                    marginBottom: 40
+                    marginBottom: 30
                   }}
                 >
                   My Wallets
-                  <Animated.Text
-                    style={{
-                      color: "#fff",
-                      fontWeight: "bold",
-                      fontSize: this.animatedApp1TextSize
-                    }}
-                  >
-                    Wallet
-                  </Animated.Text>
                 </Animated.Text>
                 <Animated.Text
                   style={{
@@ -219,10 +204,14 @@ export default class WalletScreen extends React.Component {
             </Animated.View>
             {/*  cards */}
             <Animated.View
-              style={{ flex: 6, marginTop: this.animatedScrolling }}
+              style={{
+                flex: 6,
+                marginTop: this.animatedMarginTopScrolling,
+                zIndex: 1
+              }}
             >
               <ScrollView
-                scrollEventThrottle={16}
+                scrollEventThrottle={40}
                 horizontal={false}
                 pagingEnabled={false}
                 onScroll={Animated.event([
@@ -267,47 +256,29 @@ export default class WalletScreen extends React.Component {
                       <View
                         rkCardHeader
                         style={{
+                          flex: 1,
                           borderBottomColor: "#F5F5F5",
-                          borderBottomWidth: 1,
-                          marginLeft: 5,
-                          marginRight: 5,
-                          height: 60
+                          borderBottomWidth: 1
                         }}
                       >
-                        <SvgImage
-                          source={require("bithyve/src/assets/images/svg/WalletScreen/lock.svg")}
-                          style={[
-                            {
-                              flex: 0.6,
-                              width: "100%",
-                              height: 55
-                            }
-                          ]}
+                        <Icon
+                          name="Daily-wallet-icon"
+                          color="#37A0DA"
+                          size={30}
                         />
+
                         <Text
-                          style={{ flex: 2, fontSize: 16, fontWeight: "bold" }}
+                          style={{
+                            flex: 2,
+                            fontSize: 16,
+                            fontWeight: "bold",
+                            marginLeft: 10
+                          }}
                         >
                           {item.type}
                         </Text>
-                        <Button
-                          transparent
-                          style={{
-                            alignItems: "flex-end",
-                            justifyContent: "flex-end",
-                            alignSelf: "flex-end",
-                            flex: 1
-                          }}
-                        >
-                          <SvgImage
-                            source={require("bithyve/src/assets/images/svg/WalletScreen/menu.svg")}
-                            style={[
-                              {
-                                width: "100%",
-                                height: 55
-                              }
-                            ]}
-                          />
-                        </Button>
+
+                        <Icon name="options-icon" color="gray" size={15} />
                       </View>
                       <View
                         rkCardContent
@@ -316,16 +287,13 @@ export default class WalletScreen extends React.Component {
                           flexDirection: "row"
                         }}
                       >
-                        <View style={{ flex: 1 }}>
-                          <SvgImage
-                            source={require("bithyve/src/assets/images/svg/WalletScreen/bitcoin-logo.svg")}
-                            style={[
-                              {
-                                width: "100%",
-                                height: 50
-                              }
-                            ]}
-                          />
+                        <View
+                          style={{
+                            flex: 1,
+                            justifyContent: "center"
+                          }}
+                        >
+                          <Icon name="dollar-icon" color="gray" size={20} />
                         </View>
                         <View style={{ flex: 4 }}>
                           <Text note>Anant's Savings</Text>
@@ -341,19 +309,15 @@ export default class WalletScreen extends React.Component {
                             justifyContent: "flex-end"
                           }}
                         >
-                          <Button
-                            transparent
-                            primary
-                            style={{ alignSelf: "flex-end" }}
-                          >
-                            <Icon name="history" color="gray" size={15} />
+                          <Button transparent>
+                            <Icon
+                              name="Time-lock-icon"
+                              color="gray"
+                              size={25}
+                            />
                           </Button>
-                          <Button
-                            transparent
-                            primary
-                            style={{ alignSelf: "flex-end", marginLeft: 10 }}
-                          >
-                            <Icon name="users" color="gray" size={15} />
+                          <Button transparent>
+                            <Icon name="Add-sig-icon" color="gray" size={20} />
                           </Button>
                         </View>
                       </View>
@@ -367,10 +331,7 @@ export default class WalletScreen extends React.Component {
         </Content>
         <DropdownAlert ref={ref => (this.dropdown = ref)} />
         <Button transparent style={styles.plusButtonBottom}>
-          <SvgImage
-            source={images.svgImages.walletScreen.plusButtonBottom}
-            style={[styles.svgImage]}
-          />
+          <IconFontAwe name="plus" size={20} color="#fff" />
         </Button>
       </Container>
     );
@@ -386,12 +347,14 @@ const styles = StyleSheet.create({
     width: "100%"
   },
   plusButtonBottom: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     position: "absolute",
     bottom: 10,
     right: 10,
     alignSelf: "center",
+    backgroundColor: colors.appColor,
     justifyContent: "center"
   },
   svgImage: {

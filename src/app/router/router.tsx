@@ -5,9 +5,8 @@ import {
   createDrawerNavigator,
   createBottomTabNavigator
 } from "react-navigation";
-import Icon from "react-native-vector-icons/FontAwesome";
-import { StyleSheet } from "react-native";
-import SvgImage from "react-native-remote-svg";
+import { StyleSheet, Platform } from "react-native";
+import { Icon } from "@up-shared/components";
 
 //localization
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
@@ -55,7 +54,8 @@ import VaultAccountScreen from "bithyve/src/screens/DrawerScreen/AccountDetailsO
 import NotificationScreen from "bithyve/src/screens/DrawerScreen/NotificationScreen/NotificationScreen";
 
 //TODO: New Screen Hexa Wallet
-import WalletScreen from "bithyve/src/screens/TabBarScreen/WalletScreen/WalletScreen";
+import WalletScreenAnroid from "bithyve/src/screens/TabBarScreen/WalletScreen/WalletScreenAnroid";
+import WalletScreenIOS from "bithyve/src/screens/TabBarScreen/WalletScreen/WalletScreenIOS";
 
 //TODO: StackNavigator
 
@@ -170,14 +170,16 @@ const AccountStackNavigatorRouter = createStackNavigator(
 const TabNavigator = createBottomTabNavigator(
   {
     Payment: {
-      screen: WalletScreen, //PaymentScreen,
+      screen: Platform.OS == "android" ? WalletScreenAnroid : WalletScreenIOS, //PaymentScreen,
       navigationOptions: {
         tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
         drawerLockMode: "locked-open",
         tabBarIcon: ({ tintColor }) => (
-          <SvgImage
-            source={images.svgImages.tabBarWalletScreen.walletIcon}
-            style={[styles.svgImage]}
+          <Icon
+            name="wallet_selected"
+            color={tintColor}
+            size={25}
+            style={Platform.OS == "android" ? { marginTop: -20 } : null}
           />
         )
       }
@@ -187,9 +189,11 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: "Transaction", //localization("TabBarItem.Analytics"),
         tabBarIcon: ({ tintColor }) => (
-          <SvgImage
-            source={images.svgImages.tabBarWalletScreen.transactionIcon}
-            style={styles.svgImage}
+          <Icon
+            name="icon_transactions"
+            color={tintColor}
+            size={25}
+            style={Platform.OS == "android" ? { marginTop: -20 } : null}
           />
         )
       }
@@ -199,9 +203,11 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: "QR", //localization("TabBarItem.Accounts"),
         tabBarIcon: ({ tintColor }) => (
-          <SvgImage
-            source={images.svgImages.tabBarWalletScreen.qrscanIcon}
-            style={styles.svgImage}
+          <Icon
+            name="qr-code"
+            color={tintColor}
+            size={25}
+            style={Platform.OS == "android" ? { marginTop: -20 } : null}
           />
         )
       }
@@ -212,9 +218,11 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: "Settings", //localization("TabBarItem.More"),
         tabBarIcon: ({ tintColor }) => (
-          <SvgImage
-            source={images.svgImages.tabBarWalletScreen.settingIcon}
-            style={styles.svgImage}
+          <Icon
+            name="more-icon"
+            color={tintColor}
+            size={25}
+            style={Platform.OS == "android" ? { marginTop: -20 } : null}
           />
         )
       }
@@ -224,6 +232,8 @@ const TabNavigator = createBottomTabNavigator(
     initialRouteName: "Payment",
     tabBarOptions: {
       showLabel: true,
+      swipeEnabled: true,
+      showIcon: true,
       activeTintColor: colors.appColor,
       labelStyle: {
         fontSize: 12
