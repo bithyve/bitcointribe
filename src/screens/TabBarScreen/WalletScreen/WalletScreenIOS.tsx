@@ -264,9 +264,8 @@ export default class WalletScreenIOS extends React.Component {
                         <Icon
                           name="Daily-wallet-icon"
                           color="#37A0DA"
-                          size={30}
+                          size={40}
                         />
-
                         <Text
                           style={{
                             flex: 2,

@@ -16,7 +16,7 @@ export default class Button extends Component {
   render({ onPress } = this.props) {
     return (
       <TouchableOpacity onPress={onPress}>
-        <View style={styles.button}>
+        <View style={this.props.style}>
           <Text style={styles.text}>{this.props.text}</Text>
         </View>
       </TouchableOpacity>
@@ -26,16 +26,7 @@ export default class Button extends Component {
 
 const styles = StyleSheet.create({
   // Button container
-  button: {
-    borderRadius: 5, // Rounded border
-    borderWidth: 2, // 2 point border widht
-    backgroundColor: "#0E7DC3",
-    borderColor: "#0E7DC3", // White colored border
-    height: 50,
-    width: Dimensions.get("screen").width / 1.2,
-    alignItems: "center",
-    justifyContent: "center"
-  },
+
   // Button text
   text: {
     color: "#FFFFFF",

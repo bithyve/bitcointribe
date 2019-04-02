@@ -3,6 +3,7 @@ package com.bithyve.hexa;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.BV.LinearGradient.LinearGradientPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import fr.greweb.reactnativeviewshot.RNViewShotPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -48,6 +49,7 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
             new SQLitePluginPackage(),
           new MainReactPackage(),
+            new LinearGradientPackage(),
             new RNCWebViewPackage(),
             new RNViewShotPackage(),
             new VectorIconsPackage(),

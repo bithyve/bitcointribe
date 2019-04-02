@@ -54,7 +54,6 @@ import VaultAccountScreen from "bithyve/src/screens/DrawerScreen/AccountDetailsO
 import NotificationScreen from "bithyve/src/screens/DrawerScreen/NotificationScreen/NotificationScreen";
 
 //TODO: New Screen Hexa Wallet
-import WalletScreenAnroid from "bithyve/src/screens/TabBarScreen/WalletScreen/WalletScreenAnroid";
 import WalletScreenIOS from "bithyve/src/screens/TabBarScreen/WalletScreen/WalletScreenIOS";
 
 //TODO: StackNavigator
@@ -170,17 +169,12 @@ const AccountStackNavigatorRouter = createStackNavigator(
 const TabNavigator = createBottomTabNavigator(
   {
     Payment: {
-      screen: Platform.OS == "android" ? WalletScreenAnroid : WalletScreenIOS, //PaymentScreen,
+      screen: WalletScreenIOS, //PaymentScreen,
       navigationOptions: {
         tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
         drawerLockMode: "locked-open",
         tabBarIcon: ({ tintColor }) => (
-          <Icon
-            name="wallet_selected"
-            color={tintColor}
-            size={25}
-            style={Platform.OS == "android" ? { marginTop: -20 } : null}
-          />
+          <Icon name="wallet" color={tintColor} size={25} />
         )
       }
     },
@@ -189,12 +183,7 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: "Transaction", //localization("TabBarItem.Analytics"),
         tabBarIcon: ({ tintColor }) => (
-          <Icon
-            name="icon_transactions"
-            color={tintColor}
-            size={25}
-            style={Platform.OS == "android" ? { marginTop: -20 } : null}
-          />
+          <Icon name="icon_transactions" color={tintColor} size={25} />
         )
       }
     },
@@ -203,12 +192,7 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: "QR", //localization("TabBarItem.Accounts"),
         tabBarIcon: ({ tintColor }) => (
-          <Icon
-            name="qr-code"
-            color={tintColor}
-            size={25}
-            style={Platform.OS == "android" ? { marginTop: -20 } : null}
-          />
+          <Icon name="qr-code" color={tintColor} size={25} />
         )
       }
     },
@@ -218,12 +202,7 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: "Settings", //localization("TabBarItem.More"),
         tabBarIcon: ({ tintColor }) => (
-          <Icon
-            name="more-icon"
-            color={tintColor}
-            size={25}
-            style={Platform.OS == "android" ? { marginTop: -20 } : null}
-          />
+          <Icon name="more-icon" color={tintColor} size={25} />
         )
       }
     }
@@ -374,8 +353,7 @@ export const createRootNavigator = (
       }
     },
     {
-      initialRouteName: signedIn ? "OnBoardingNavigator" : "TabbarBottom"
-      //  screenName
+      initialRouteName: signedIn ? "OnBoardingNavigator" : screenName //"TabbarBottom"
       // initialRouteName: signedIn ? "OnBoardingNavigator" : "OnBoardingNavigator"
       // initialRouteName: signedIn ? "TabbarBottom" : "TabbarBottom"
     }
