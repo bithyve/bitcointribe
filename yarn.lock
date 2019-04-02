@@ -7864,6 +7864,11 @@ react-native-lewin-qrcode@^1.0.1, react-native-lewin-qrcode@^1.0.2:
   resolved "https://registry.yarnpkg.com/react-native-lewin-qrcode/-/react-native-lewin-qrcode-1.0.2.tgz#360e78a9ce6ed861a9711a5a35e3b1ecffe8d452"
   integrity sha512-kjF/hEfAPrlxTviW/mZjhsKCHQ7yUJAaoV8964J5XHZtBc0JxybHsqcA2qF3JU8XyqerzITaXyb1Zf2/Zh2+OQ==
 
+react-native-linear-gradient@^2.5.4:
+  version "2.5.4"
+  resolved "https://registry.yarnpkg.com/react-native-linear-gradient/-/react-native-linear-gradient-2.5.4.tgz#dce133526f5a5510a639af94544f1ed0c984bd1e"
+  integrity sha512-FF1NhlerA4uBiS0gFIHa4FBp8/aftv4vPj14Y47lGNkYjSI94tnI6oYO3EfUxXjEyCUPiOVNKZOB9kScyjc5Ew==
+
 react-native-material-buttons@^0.5.0:
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/react-native-material-buttons/-/react-native-material-buttons-0.5.0.tgz#ab2b3e3fc3f500ca713f51e9d75978aff602152a"
