@@ -1,14 +1,10 @@
 import React from "react";
 import { StyleSheet, View, Text, StatusBar, Image } from "react-native";
 import { StackActions, NavigationActions } from "react-navigation";
-import Icon from "react-native-vector-icons/Ionicons";
 import CreateTables from "bithyve/src/app/manager/database/CreateTables";
-//import PushController from "bithyve/src/app/manager/Notification/PushController";
 //Custome Compontes
-import ViewOnBoarding from "bithyve/src/app/custcompontes/view/ViewOnBoarding";
 import OnBoarding from "bithyve/src/app/custcompontes/OnBoarding/OnBoarding";
-//Json Files
-import onBoardingData from "bithyve/src/assets/jsonfiles/onBoardingScreen/onBoardingScreen.json";
+
 //TODO: Custome object
 import { colors, images, msg } from "bithyve/src/app/constants/Constants";
 

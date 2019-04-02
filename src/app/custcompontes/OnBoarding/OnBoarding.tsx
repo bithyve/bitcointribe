@@ -7,8 +7,11 @@ import {
   View,
   Text // Container component
 } from "react-native";
-import Button from "./Button";
+import { Button } from "native-base";
+import LinearGradient from "react-native-linear-gradient";
 
+//TODO: Custome object
+import { colors, images, msg } from "bithyve/src/app/constants/Constants";
 // Detect screen width and height
 const { width, height } = Dimensions.get("window");
 
@@ -226,7 +229,7 @@ export default class OnBoarding extends Component<Props, any> {
     }
 
     return (
-      <View pointerEvents="none" style={[styles.pagination, styles.fullScreen]}>
+      <View pointerEvents="none" style={[styles.pagination]}>
         {dots}
       </View>
     );
@@ -238,20 +241,60 @@ export default class OnBoarding extends Component<Props, any> {
   renderButton = () => {
     const lastScreen = this.state.index === this.state.total - 1;
     return (
-      <View
-        pointerEvents="box-none"
-        style={[styles.buttonWrapper, styles.fullScreen]}
-      >
+      <View pointerEvents="box-none">
         {lastScreen ? (
-          // Show this button on the last screen
-          // TODO: Add a handler that would send a user to your app after onboarding is complete
-          <Button
-            text="Get Started"
-            onPress={() => this.props.click_GetStarted()}
-          />
+          <View style={{ margin: 10 }}>
+            <LinearGradient
+              colors={["#37A0DA", "#0071BC"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.btnGetStarted}
+            >
+              <Button
+                transparent
+                full
+                onPress={() => this.props.click_GetStarted()}
+              >
+                <Text style={styles.textWhite}>Get Started</Text>
+              </Button>
+            </LinearGradient>
+          </View>
         ) : (
-          // Or this one otherwise
-          <Button text="Continue" onPress={() => this.swipe()} />
+          <View style={{ flexDirection: "row" }}>
+            <View style={{ flex: 1, backgroundColor: "white" }}>
+              <Button
+                transparent
+                onPress={() => this.props.click_GetStarted()}
+                style={{ alignSelf: "flex-start", marginLeft: 20 }}
+              >
+                <Text style={[styles.btnSkipNext, { color: "gray" }]}>
+                  Skip
+                </Text>
+              </Button>
+            </View>
+
+            <View style={{ alignItems: "center", justifyContent: "center" }}>
+              {this.renderPagination()}
+            </View>
+            <View
+              style={{
+                flex: 1,
+                alignItems: "flex-end",
+                justifyContent: "flex-end",
+                backgroundColor: "white"
+              }}
+            >
+              <Button
+                transparent
+                onPress={() => this.swipe()}
+                style={{ alignSelf: "flex-end", marginRight: 20 }}
+              >
+                <Text style={[styles.btnSkipNext, { color: colors.appColor }]}>
+                  Next
+                </Text>
+              </Button>
+            </View>
+          </View>
         )}
       </View>
     );
@@ -265,9 +308,6 @@ export default class OnBoarding extends Component<Props, any> {
       <View style={[styles.container, styles.fullScreen]}>
         {/* Render screens */}
         {this.renderScrollView(children)}
-        {/* Render pagination */}
-        {this.renderPagination()}
-        {/* Render Continue or Done button */}
         {this.renderButton()}
       </View>
     );
@@ -276,11 +316,13 @@ export default class OnBoarding extends Component<Props, any> {
 const styles = StyleSheet.create({
   // Set width and height to the screen size
   fullScreen: {
+    flex: 1,
     width: width,
     height: height
   },
   // Main container
   container: {
+    flex: 1,
     backgroundColor: "transparent",
     position: "relative"
   },
@@ -290,11 +332,6 @@ const styles = StyleSheet.create({
   },
   // Pagination indicators
   pagination: {
-    position: "absolute",
-    bottom: 110,
-    left: 0,
-    right: 0,
-    flex: 1,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "flex-end",
@@ -316,18 +353,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#000000"
   },
   // Button wrapper
-  buttonWrapper: {
-    backgroundColor: "transparent",
-    flexDirection: "column",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    flex: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 40,
-    justifyContent: "flex-end",
-    alignItems: "center"
-  },
   //TODO:Button
   button: {
     borderRadius: 50, // Rounded border
@@ -338,9 +363,25 @@ const styles = StyleSheet.create({
     height: 40
   },
   // Button text
-  text: {
+  textWhite: {
     color: "#FFFFFF",
+    fontSize: 18,
+    alignSelf: "center",
     fontWeight: "bold",
     fontFamily: "Avenir"
+  },
+  //new styles
+  btnSkipNext: {
+    fontWeight: "bold",
+    fontSize: 14
+  },
+  btnGetStarted: {
+    borderRadius: 5,
+    height: 50
+  },
+  linearGradient: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderRadius: 5
   }
 });
