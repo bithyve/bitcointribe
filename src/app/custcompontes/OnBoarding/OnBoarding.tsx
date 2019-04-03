@@ -11,7 +11,7 @@ import { Button } from "native-base";
 import LinearGradient from "react-native-linear-gradient";
 
 //TODO: Custome object
-import { colors, images, msg } from "bithyve/src/app/constants/Constants";
+import { colors } from "bithyve/src/app/constants/Constants";
 // Detect screen width and height
 const { width, height } = Dimensions.get("window");
 
@@ -40,9 +40,7 @@ export default class OnBoarding extends Component<Props, any> {
     // Fisrt is screen is active
     index: 0
   };
-
   state = this.initState(this.props);
-
   /**
    * Initialize the state
    */
