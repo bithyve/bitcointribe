@@ -353,6 +353,7 @@ export const createRootNavigator = (
       }
     },
     {
+      //initialRouteName: signedIn ? "OnBoardingNavigator" : PasscodeConfirmScreen
       initialRouteName: signedIn ? "OnBoardingNavigator" : screenName //"TabbarBottom"
       // initialRouteName: signedIn ? "OnBoardingNavigator" : "OnBoardingNavigator"
       // initialRouteName: signedIn ? "TabbarBottom" : "TabbarBottom"
