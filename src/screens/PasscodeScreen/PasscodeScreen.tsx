@@ -5,18 +5,20 @@ import {
   View,
   AsyncStorage,
   Dimensions,
+  Image,
   Keyboard,
   StatusBar
 } from "react-native";
 import { StackActions, NavigationActions } from "react-navigation";
 import CodeInput from "react-native-confirmation-code-input";
-import DropdownAlert from "react-native-dropdownalert";
 import * as Keychain from "react-native-keychain";
-import Modal from "react-native-simple-modal";
-import Singleton from "bithyve/src/app/constants/Singleton";
 
-//Custome Compontes
-import SCLAlertOk from "bithyve/src/app/custcompontes/alert/SCLAlertOk";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
+//TODO: Custome Pages
+import FullLinearGradientButton from "bithyve/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+
+import Singleton from "bithyve/src/app/constants/Singleton";
 
 //localization
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
@@ -25,26 +27,30 @@ import { localization } from "bithyve/src/app/manager/Localization/i18n";
 import {
   colors,
   localDB,
+  images,
   errorMessage,
   errorValidMsg
 } from "bithyve/src/app/constants/Constants";
 import utils from "bithyve/src/app/constants/Utils";
 var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
+import renderIf from "bithyve/src/app/constants/validation/renderIf";
 
 export default class PasscodeScreen extends Component {
   constructor(props: any) {
     super(props);
     this.state = {
       mnemonicValues: [],
-      status: "choice",
+      status: false,
       pincode: "",
-      success: localization("PasscodeScreen.subTitle"),
-      firstName: "",
-      lastName: "",
-      email: "",
-      mobileNo: "",
+      success: "Passcode does not match!",
       flag_dialogShow: false,
-      arr_OkPopupData: []
+      passcodeStyle: [
+        {
+          activeColor: colors.black,
+          inactiveColor: colors.black,
+          cellBorderWidth: 0
+        }
+      ]
     };
   }
 
@@ -65,15 +71,28 @@ export default class PasscodeScreen extends Component {
     }
   };
 
-  _onFinishCheckingCode2(isValid: boolean, code: string) {
+  _onFinishCheckingCode(isValid: boolean, code: string) {
     if (isValid) {
-      this.onSuccess(code);
+      this.setState({
+        status: true,
+        passcodeStyle: [
+          {
+            activeColor: colors.black,
+            inactiveColor: colors.black,
+            cellBorderWidth: 0
+          }
+        ]
+      });
     } else {
-      this.dropdown.alertWithType(
-        "error",
-        localization("PasscodeScreen.issuetitle"),
-        localization("PasscodeScreen.issueSubTitle")
-      );
+      this.setState({
+        passcodeStyle: [
+          {
+            activeColor: "red",
+            inactiveColor: "red",
+            cellBorderWidth: 1
+          }
+        ]
+      });
     }
   }
 
@@ -96,12 +115,6 @@ export default class PasscodeScreen extends Component {
     }
   };
 
-  openModal = () => this.setState({ flag_dialogShow: true });
-
-  closeModal = () => {
-    this.setState({ flag_dialogShow: false });
-  };
-
   //TODO: func urlDecription
   async urlDecription(code: any) {
     let commonData = Singleton.getInstance();
@@ -119,18 +132,6 @@ export default class PasscodeScreen extends Component {
       if (publicKey == JsonDeepLinkingData.cpk) {
         console.log("same public key");
         Keyboard.dismiss();
-        this.setState({
-          arr_OkPopupData: [
-            {
-              theme: "danger",
-              status: true,
-              icon: "frown",
-              title: "Oops",
-              subtitle: errorMessage.initiatorSamePublicKUse,
-              goBackStatus: false
-            }
-          ]
-        });
       } else {
         const resetAction = StackActions.reset({
           index: 0, // <-- currect active route from actions array
@@ -149,11 +150,6 @@ export default class PasscodeScreen extends Component {
       commonData.setRootViewController("TabbarBottom");
       this.setState({ flag_dialogShow: false });
     } else {
-      this.dropdown.alertWithType(
-        "error",
-        localization("PasscodeScreen.issuetitle"),
-        localization("PasscodeScreen.issueSubTitle")
-      );
       this.refs.codeInputRefUrlEncp.clear();
     }
   }
@@ -161,93 +157,68 @@ export default class PasscodeScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <StatusBar
-          backgroundColor={colors.appColor}
-          barStyle="dark-content"
-          translucent={true}
-        />
-        <Text style={[styles.txtTitle, { color: "#000", fontWeight: "bold" }]}>
-          {localization("appConfig.appName")}
-        </Text>
-        <Text style={{ color: "#000", marginTop: 10 }}>
-          {this.state.success}
-        </Text>
-        <CodeInput
-          ref="codeInputRef2"
-          secureTextEntry
-          keyboardType="numeric"
-          codeLength={4}
-          activeColor={colors.black}
-          inactiveColor={colors.black}
-          className="border-circle"
-          compareWithCode={this.state.pincode}
-          cellBorderWidth={2}
-          autoFocus={true}
-          inputPosition="center"
-          space={10}
-          size={50}
-          containerStyle={{ marginTop: Dimensions.get("screen").height / 3 }}
-          codeInputStyle={{ borderWidth: 1.5 }}
-          codeInputStyle={{ fontWeight: "800" }}
-          containerStyle={styles.codeInput}
-          onFulfill={(isValid, code) =>
-            this._onFinishCheckingCode2(isValid, code)
-          }
-        />
-        <DropdownAlert ref={ref => (this.dropdown = ref)} />
-        <Modal
-          offset={10}
-          closeOnTouchOutside={false}
-          open={this.state.flag_dialogShow}
-          modalDidOpen={this.modalDidOpen}
-          modalDidClose={this.modalDidClose}
-          style={{ alignItems: "center" }}
+        <StatusBar backgroundColor={colors.appColor} barStyle="dark-content" />
+        <KeyboardAwareScrollView
+          enableAutomaticScroll
+          automaticallyAdjustContentInsets={true}
+          keyboardOpeningTime={0}
+          enableOnAndroid={true}
+          contentContainerStyle={{ flexGrow: 1 }}
         >
-          <View style={{ alignItems: "center", paddingBottom: 70 }}>
-            <Text style={{ fontSize: 20, fontWeight: "bold" }}>Enter Code</Text>
+          <View style={styles.viewAppLogo}>
+            <Image style={styles.imgAppLogo} source={images.appIcon} />
+            <Text
+              style={[{ color: "#000000", fontWeight: "bold", marginTop: 20 }]}
+            >
+              Hello, Crypto wizard
+            </Text>
+          </View>
+          <View style={styles.viewPasscode}>
+            <Text
+              style={{ marginTop: 10, fontWeight: "bold", color: "#8B8B8B" }}
+            >
+              Re - Enter Passcode{" "}
+            </Text>
             <CodeInput
-              ref="codeInputRefUrlEncp"
+              ref="codeInputRef1"
               secureTextEntry
               keyboardType="numeric"
-              codeLength={4}
-              activeColor={colors.black}
-              inactiveColor={colors.black}
-              className="border-circle"
-              cellBorderWidth={2}
+              codeLength={5}
+              compareWithCode={this.state.pincode}
+              activeColor={this.state.passcodeStyle[0].activeColor}
+              inactiveColor={this.state.passcodeStyle[0].inactiveColor}
+              className="border-box"
+              cellBorderWidth={this.state.passcodeStyle[0].cellBorderWidth}
+              compareWithCode={this.state.pincode}
               autoFocus={true}
               inputPosition="center"
               space={10}
-              size={50}
-              codeInputStyle={{ borderWidth: 1.5 }}
-              codeInputStyle={{ fontWeight: "800" }}
-              onFulfill={code => this.urlDecription(code)}
+              size={55}
+              codeInputStyle={{ borderRadius: 5, backgroundColor: "#F1F1F1" }}
+              containerStyle={{
+                alignItems: "center",
+                justifyContent: "center",
+                height: 0
+              }}
+              onFulfill={(isValid, code) =>
+                this._onFinishCheckingCode(isValid, code)
+              }
+            />
+            {renderIf(this.state.passcodeStyle[0].activeColor == "red")(
+              <Text style={{ color: "red" }}>{this.state.success}</Text>
+            )}
+          </View>
+          <View style={styles.viewBtnProceed}>
+            <FullLinearGradientButton
+              style={
+                this.state.status == true ? { opacity: 1 } : { opacity: 0.4 }
+              }
+              disabled={this.state.status == true ? false : true}
+              title="LOGIN"
+              click_Done={() => this.onSuccess(this.state.pincode)}
             />
           </View>
-        </Modal>
-        <SCLAlertOk
-          data={this.state.arr_OkPopupData}
-          click_Ok={(status: boolean) => {
-            let commonData = Singleton.getInstance();
-            this.setState({
-              arr_OkPopupData: [
-                {
-                  status: false
-                }
-              ]
-            });
-            const resetAction = StackActions.reset({
-              index: 0, // <-- currect active route from actions array
-              key: null,
-              actions: [
-                NavigationActions.navigate({
-                  routeName: "TabbarBottom"
-                })
-              ]
-            });
-            commonData.setRootViewController("TabbarBottom");
-            this.props.navigation.dispatch(resetAction);
-          }}
-        />
+        </KeyboardAwareScrollView>
       </View>
     );
   }
@@ -255,16 +226,24 @@ export default class PasscodeScreen extends Component {
 
 let styles = StyleSheet.create({
   container: {
+    flex: 1
+  },
+  viewAppLogo: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center"
+    marginTop: 50
   },
-  txtText: {
-    color: colors.appColor,
-    fontFamily: "Lalezar"
+  imgAppLogo: {
+    height: 150,
+    width: 150
   },
-  txtTitle: {
-    marginTop: 100,
-    fontSize: 40
+  viewPasscode: {
+    flex: 1,
+    alignItems: "center"
+  },
+  viewBtnProceed: {
+    flex: 3,
+    justifyContent: "flex-end",
+    marginBottom: 20
   }
 });

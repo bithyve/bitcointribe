@@ -93,7 +93,6 @@ export default class OnBoardingScreen extends React.Component<any, any> {
             <Text style={styles.text}>{data[2].subtitle}</Text>
           </View>
         </OnBoarding>
-
         <CreateTables />
         {/* <PushController /> */}
       </View>
