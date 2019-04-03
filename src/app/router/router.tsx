@@ -192,7 +192,7 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: "QR", //localization("TabBarItem.Accounts"),
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="qr-code" color={tintColor} size={25} />
+          <Icon name="qr-codes" color={tintColor} size={25} />
         )
       }
     },
