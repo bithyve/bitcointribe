@@ -1,5 +1,6 @@
 import React from "react";
-import { StyleSheet, View, Text, StatusBar, Image } from "react-native";
+import { StyleSheet, View, SafeAreaView, Image } from "react-native";
+import { Text } from "native-base";
 import { StackActions, NavigationActions } from "react-navigation";
 import CreateTables from "bithyve/src/app/manager/database/CreateTables";
 //Custome Compontes
@@ -61,40 +62,48 @@ export default class OnBoardingScreen extends React.Component<any, any> {
     ];
     return (
       <View style={styles.container}>
-        <OnBoarding click_GetStarted={() => this.click_Done()}>
-          {/* First screen */}
-          <View style={[styles.slide]}>
-            <Image
-              style={{ width: 240, height: 240 }}
-              resizeMode="contain"
-              source={data[0].image}
-            />
-            <Text style={styles.header}>{data[0].title}</Text>
-            <Text style={styles.text}>{data[0].subtitle}</Text>
-          </View>
-          {/* Second screen */}
-          <View style={[styles.slide]}>
-            <Image
-              style={{ width: 240, height: 240 }}
-              resizeMode="contain"
-              source={data[1].image}
-            />
-            <Text style={styles.header}>{data[1].title}</Text>
-            <Text style={styles.text}>{data[1].subtitle}</Text>
-          </View>
-          {/* Third screen */}
-          <View style={[styles.slide]}>
-            <Image
-              style={{ width: 240, height: 240 }}
-              resizeMode="contain"
-              source={data[2].image}
-            />
-            <Text style={styles.header}>{data[2].title}</Text>
-            <Text style={styles.text}>{data[2].subtitle}</Text>
-          </View>
-        </OnBoarding>
-        <CreateTables />
-        {/* <PushController /> */}
+        <SafeAreaView style={styles.container}>
+          <OnBoarding click_GetStarted={() => this.click_Done()}>
+            {/* First screen */}
+            <View style={[styles.slide]}>
+              <Image
+                style={{ width: 240, height: 240 }}
+                resizeMode="contain"
+                source={data[0].image}
+              />
+              <Text style={styles.header}>{data[0].title}</Text>
+              <Text note style={styles.text}>
+                {data[0].subtitle}
+              </Text>
+            </View>
+            {/* Second screen */}
+            <View style={[styles.slide]}>
+              <Image
+                style={{ width: 240, height: 240 }}
+                resizeMode="contain"
+                source={data[1].image}
+              />
+              <Text style={styles.header}>{data[1].title}</Text>
+              <Text note style={styles.text}>
+                {data[1].subtitle}
+              </Text>
+            </View>
+            {/* Third screen */}
+            <View style={[styles.slide]}>
+              <Image
+                style={{ width: 240, height: 240 }}
+                resizeMode="contain"
+                source={data[2].image}
+              />
+              <Text style={styles.header}>{data[2].title}</Text>
+              <Text note style={styles.text}>
+                {data[2].subtitle}
+              </Text>
+            </View>
+          </OnBoarding>
+          <CreateTables />
+          {/* <PushController /> */}
+        </SafeAreaView>
       </View>
     );
   }
@@ -120,7 +129,6 @@ const styles = StyleSheet.create({
   },
   // Text below header
   text: {
-    color: "#000000",
     fontFamily: "Avenir",
     fontSize: 18,
     marginHorizontal: 40,

@@ -36,8 +36,8 @@ import {
 } from "bithyve/src/app/constants/Constants";
 var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
 
-//TODO: VaultAccount
-import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
+//TODO: Bitcoin Files
+//import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
 
 const { width } = Dimensions.get("window");
 
@@ -89,33 +89,33 @@ export default class MergeConfirmJointAccountScreen extends React.Component {
 
   //this.props.navigation.navigate("AcknowledgeJointAccountScreen",{JsonString:data.barcode})
 
-  //TODO: func click_JointAccount
-  async click_JointAccount() {
-    const dateTime = Date.now();
-    const fulldate = Math.floor(dateTime / 1000);
-    const details = {
-      jointDetails: this.props.navigation.getParam("data"),
-      merger: this.state.name
-    };
-    const resultWallet = await dbOpration.readTablesData(
-      localDB.tableName.tblWallet
-    );
-    let mnemonic = resultWallet.temp[0].mnemonic.replace(/,/g, " ");
-    const restJointAccount = jointAccount.mergeJointAccount(mnemonic, details);
-    console.log({ restJointAccount });
-    this.setState({
-      ackJSON: jointAccount.ackDetails(restJointAccount.mergeJSON)
-    });
-    const additionalInfo = {
-      scripts: restJointAccount.multiSig.scripts,
-      jointData: JSON.parse(restJointAccount.mergeJSON)
-    };
-    this.connection_CreateJointAccount(
-      fulldate,
-      restJointAccount.multiSig.address,
-      additionalInfo
-    );
-  }
+  // //TODO: func click_JointAccount
+  // async click_JointAccount() {
+  //   const dateTime = Date.now();
+  //   const fulldate = Math.floor(dateTime / 1000);
+  //   const details = {
+  //     jointDetails: this.props.navigation.getParam("data"),
+  //     merger: this.state.name
+  //   };
+  //   const resultWallet = await dbOpration.readTablesData(
+  //     localDB.tableName.tblWallet
+  //   );
+  //   let mnemonic = resultWallet.temp[0].mnemonic.replace(/,/g, " ");
+  //   const restJointAccount = jointAccount.mergeJointAccount(mnemonic, details);
+  //   console.log({ restJointAccount });
+  //   this.setState({
+  //     ackJSON: jointAccount.ackDetails(restJointAccount.mergeJSON)
+  //   });
+  //   const additionalInfo = {
+  //     scripts: restJointAccount.multiSig.scripts,
+  //     jointData: JSON.parse(restJointAccount.mergeJSON)
+  //   };
+  //   this.connection_CreateJointAccount(
+  //     fulldate,
+  //     restJointAccount.multiSig.address,
+  //     additionalInfo
+  //   );
+  // }
 
   async connection_CreateJointAccount(
     fulldate: string,

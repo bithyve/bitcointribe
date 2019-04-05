@@ -1,7 +1,6 @@
 import Client from "bitcoin-core";
 import bitcoinJS, { Network } from "bitcoinjs-lib";
 import config from "react-native-config";
-
 class Config {
   public ENVIRONMENT: string;
   public NETWORK: Network;
@@ -9,10 +8,20 @@ class Config {
   public WALLET_XPUB_PATH: string = config.BIT_WALLET_XPUB_PATH;
   public DERIVATION_BRANCH: string = config.BIT_DERIVATION_BRANCH;
   public TOKEN: string = config.BIT_BLOCKCYPHER_API_URLS_TOKEN;
+  public SSS_OTP_LENGTH: string = config.BIT_SSS_OTP_LENGTH;
+  public SSS_TOTAL: number = parseInt(config.BIT_SSS_TOTAL, 10);
+  public SSS_THRESHOLD: number = parseInt(config.BIT_SSS_THRESHOLD, 10);
   public BH_SERVER = {
     DEV: config.BIT_API_URLS_BH_SERVER_DEV,
     PROD: config.BIT_API_URLS_BH_SERVER_PROD
   };
+
+  public ESPLORA_API_ENDPOINTS = {
+    TESTNET_MULTIBALANCE: config.BIT_ESPLORA_TESTNET_MULTIBALANCE,
+    MAINNET_MULTIBALANCE: config.BIT_ESPLORA_MAINNET_MULTIBALANCE
+  };
+
+  public SERVER: string;
 
   public API_URLS = {
     TESTNET: {
@@ -60,8 +69,10 @@ class Config {
   public setNetwork = (): void => {
     if (this.ENVIRONMENT === "PROD") {
       this.NETWORK = bitcoinJS.networks.bitcoin;
+      this.SERVER = this.BH_SERVER.PROD;
     } else if (this.ENVIRONMENT === "DEV") {
       this.NETWORK = bitcoinJS.networks.testnet;
+      this.SERVER = this.BH_SERVER.DEV;
     } else {
       throw new Error("Please specify an apt environment(PROD||DEV)");
     }
