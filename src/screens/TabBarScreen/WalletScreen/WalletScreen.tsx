@@ -38,6 +38,9 @@ import ViewRecentTransaction from "bithyve/src/app/custcompontes/view/ViewRecent
 import TabBarWalletScreen from "bithyve/src/app/custcompontes/view/tabbar/TabBarWalletScreen/TabBarWalletScreen";
 import ViewWalletScreenCards from "bithyve/src/app/custcompontes/view/ViewWalletScreenCards/ViewWalletScreenCards";
 
+
+
+
 //TODO: Custome object
 import {
   colors,
@@ -49,6 +52,7 @@ var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
 var utils = require("bithyve/src/app/constants/Utils");
 import renderIf from "bithyve/src/app/constants/validation/renderIf";
 import Singleton from "bithyve/src/app/constants/Singleton";
+
 
 let isNetwork: boolean;
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
@@ -66,12 +70,13 @@ const sliderWidth = viewportWidth;
 const itemWidth = slideWidth + itemHorizontalMargin * 2;
 const SLIDER_1_FIRST_ITEM = 0;
 
-//TODO: Wallets
-import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
+
+//TODO: Bitcoin Files
+import S3Service from "bithyve/src/bitcoin/services/sss/S3Service";
 
 //localization
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
-export default class WalletScreenIOS extends React.Component {
+export default class WalletScreen extends React.Component {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -94,7 +99,6 @@ export default class WalletScreenIOS extends React.Component {
     };
     isNetwork = utils.getNetwork();
   }
-
   //TODO: Page Life Cycle
   componentWillMount() {
     this.startHeaderHeight = 200;
@@ -135,6 +139,34 @@ export default class WalletScreenIOS extends React.Component {
       outputRange: [50, 70],
       extrapolate: "clamp"
     });
+  }
+
+
+
+ async  componentDidMount() {
+    const sss = new S3Service(
+      "unique issue slogan party van unfair assault warfare then rubber satisfy snack"
+    );
+    const answers = ["answer1", "answer2"];
+    const shares = sss.generateShares(answers);
+    console.log({ shares });
+    const shareIds = []
+    const transShare =[];
+    for (const share of shares) {
+      shareIds.push(sss.getShareId(share))
+      transShare.push(sss.createTransferShare(share,"demo1"))
+    }
+
+    const resUploadShare = await sss.uploadShare(transShare[0].otp);
+    console.log({shareIds});
+     console.log({transShare});
+     console.log({resUploadShare});
+
+
+    // const trnasShare = sss.createTransferShare()
+
+    //share id ,any text
+
   }
 
   render() {
@@ -234,6 +266,16 @@ export default class WalletScreenIOS extends React.Component {
                     },
                     {
                       type: "Daily Wallet",
+                      name: "Anant's Savings",
+                      amount: "60,000"
+                    },
+                    {
+                      type: "Secure Wallet",
+                      name: "Anant's Savings",
+                      amount: "60,000"
+                    },
+                    {
+                      type: "Secure Wallet",
                       name: "Anant's Savings",
                       amount: "60,000"
                     },

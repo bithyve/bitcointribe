@@ -36,10 +36,10 @@ const { width } = Dimensions.get("screen");
 
 //Custome Compontes
 import SCLAlertOk from "bithyve/src/app/custcompontes/alert/SCLAlertOk";
-//TODO: Wallets
-import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
-//TODO: SecureAccount
-import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
+
+//TODO: Bitcoin Files
+//import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
+//import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
 
 //localization
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
@@ -58,125 +58,125 @@ export default class ValidateSecureAccountScreen extends React.Component {
     };
   }
 
-  //TODO: Page Life Cycle
-  componentWillMount() {
-    const { navigation } = this.props;
-    let data = navigation.getParam("data");
-    console.log({ data });
-    this.setState({
-      data: data,
-      mnemonic: navigation.getParam("mnemonic")
-    });
-  }
-
-  //TODO: func validation
-  validation(val: any) {
-    if (val.length == 6) {
-      this.setState({
-        tokenKey: val,
-        validBtnBgColor: colors.appColor,
-        validBtnStaus: false
-      });
-    } else {
-      this.setState({
-        tokenKey: val,
-        validBtnBgColor: "gray",
-        validBtnStaus: true
-      });
-    }
-  }
-
-  //TODO: func click_Validation
-  async click_Validation() {
-    this.setState({
-      isLoading: true
-    });
-    try {
-      const dateTime = Date.now();
-      const fulldate = Math.floor(dateTime / 1000);
-      const res = await secureAccount.validateSecureAccountSetup(
-        this.state.tokenKey,
-        this.state.data.setupData.secret,
-        this.state.data.walletID
-      );
-      if (res.statusCode == 200) {
-        try {
-          AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(false));
-        } catch (error) {
-          console.log(error);
-        }
-        if (res.data.setupSuccessful) {
-          this.connection_SaveSecureAccount(
-            fulldate,
-            this.state.data.multiSig.address,
-            this.state.data
-          );
-        } else {
-          let arr_failed = arr_PopupMsg[0].failed;
-          this.setState({
-            alertPopupData: [
-              {
-                theme: "danger",
-                status: true,
-                icon: "frown",
-                title: arr_failed.title,
-                subtitle: arr_failed.subTitle,
-                goBackStatus: false
-              }
-            ]
-          });
-        }
-      } else {
-        let arr_failedInvalidToken = arr_PopupMsg[0].failedInvalidToken;
-        this.setState({
-          alertPopupData: [
-            {
-              theme: "danger",
-              status: true,
-              icon: "frown",
-              title: arr_failedInvalidToken.title,
-              subtitle: arr_failedInvalidToken.subTitle,
-              goBackStatus: false
-            }
-          ]
-        });
-      }
-      this.setState({
-        isLoading: false
-      });
-      console.log({ res });
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  async connection_SaveSecureAccount(fulldate, address, sercureData) {
-    const resultCreateAccount = await dbOpration.insertLastBeforeCreateAccount(
-      localDB.tableName.tblAccount,
-      fulldate,
-      address,
-      "BTC",
-      "Secure",
-      "Secure",
-      sercureData
-    );
-    if (resultCreateAccount) {
-      let arr_success = arr_PopupMsg[0].success;
-      this.setState({
-        isLoading: false,
-        alertPopupData: [
-          {
-            theme: "success",
-            status: true,
-            icon: "smile",
-            title: arr_success.title,
-            subtitle: arr_success.subTitle,
-            goBackStatus: true
-          }
-        ]
-      });
-    }
-  }
+  // //TODO: Page Life Cycle
+  // componentWillMount() {
+  //   const { navigation } = this.props;
+  //   let data = navigation.getParam("data");
+  //   console.log({ data });
+  //   this.setState({
+  //     data: data,
+  //     mnemonic: navigation.getParam("mnemonic")
+  //   });
+  // }
+  //
+  // //TODO: func validation
+  // validation(val: any) {
+  //   if (val.length == 6) {
+  //     this.setState({
+  //       tokenKey: val,
+  //       validBtnBgColor: colors.appColor,
+  //       validBtnStaus: false
+  //     });
+  //   } else {
+  //     this.setState({
+  //       tokenKey: val,
+  //       validBtnBgColor: "gray",
+  //       validBtnStaus: true
+  //     });
+  //   }
+  // }
+  //
+  // //TODO: func click_Validation
+  // async click_Validation() {
+  //   this.setState({
+  //     isLoading: true
+  //   });
+  //   try {
+  //     const dateTime = Date.now();
+  //     const fulldate = Math.floor(dateTime / 1000);
+  //     const res = await secureAccount.validateSecureAccountSetup(
+  //       this.state.tokenKey,
+  //       this.state.data.setupData.secret,
+  //       this.state.data.walletID
+  //     );
+  //     if (res.statusCode == 200) {
+  //       try {
+  //         AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(false));
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //       if (res.data.setupSuccessful) {
+  //         this.connection_SaveSecureAccount(
+  //           fulldate,
+  //           this.state.data.multiSig.address,
+  //           this.state.data
+  //         );
+  //       } else {
+  //         let arr_failed = arr_PopupMsg[0].failed;
+  //         this.setState({
+  //           alertPopupData: [
+  //             {
+  //               theme: "danger",
+  //               status: true,
+  //               icon: "frown",
+  //               title: arr_failed.title,
+  //               subtitle: arr_failed.subTitle,
+  //               goBackStatus: false
+  //             }
+  //           ]
+  //         });
+  //       }
+  //     } else {
+  //       let arr_failedInvalidToken = arr_PopupMsg[0].failedInvalidToken;
+  //       this.setState({
+  //         alertPopupData: [
+  //           {
+  //             theme: "danger",
+  //             status: true,
+  //             icon: "frown",
+  //             title: arr_failedInvalidToken.title,
+  //             subtitle: arr_failedInvalidToken.subTitle,
+  //             goBackStatus: false
+  //           }
+  //         ]
+  //       });
+  //     }
+  //     this.setState({
+  //       isLoading: false
+  //     });
+  //     console.log({ res });
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
+  //
+  // async connection_SaveSecureAccount(fulldate, address, sercureData) {
+  //   const resultCreateAccount = await dbOpration.insertLastBeforeCreateAccount(
+  //     localDB.tableName.tblAccount,
+  //     fulldate,
+  //     address,
+  //     "BTC",
+  //     "Secure",
+  //     "Secure",
+  //     sercureData
+  //   );
+  //   if (resultCreateAccount) {
+  //     let arr_success = arr_PopupMsg[0].success;
+  //     this.setState({
+  //       isLoading: false,
+  //       alertPopupData: [
+  //         {
+  //           theme: "success",
+  //           status: true,
+  //           icon: "smile",
+  //           title: arr_success.title,
+  //           subtitle: arr_success.subTitle,
+  //           goBackStatus: true
+  //         }
+  //       ]
+  //     });
+  //   }
+  // }
 
   render() {
     const { activeSections } = this.state;

@@ -30,21 +30,18 @@
     "onBoarding": [
       {
         "backgroundColor": "#FFFFFF",
-        "image": "images.onBoardingScreen.onB1",
-        "title": "SOUND MONEY. SIMPLIFIED",
-        "subtitle": ""
+        "title": "Create Multiple Accounts",
+        "subtitle": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod temporundefined"
       },
       {
         "backgroundColor": "#FFFFFF",
-        "image": "images.onBoardingScreen.onB2",
-        "title": "Secure",
-        "subtitle": "While money needs to be smart, more importantly it needs to be secure. We are very keen to use the best industry standards in software delivery and cryptography to ensure this."
+        "title": "Security at its Best",
+        "subtitle": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod temporundefined"
       },
       {
         "backgroundColor": "#FFFFFF",
-        "image": "images.onBoardingScreen.onB3",
-        "title": "Self-sovereign",
-        "subtitle": "Our wallets are non-custodial and a user always has the control of their keys."
+        "title": "Share your accounts with your contacts",
+        "subtitle": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod temporundefined"
       }
     ]
   },

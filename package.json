@@ -151,6 +151,7 @@
     "react-navigation": "^3.0.0",
     "readable-stream": "^1.0.33",
     "recompose": "^0.30.0",
+    "secrets.js-grempe": "^1.1.0",
     "stream-browserify": "^1.0.0",
     "string_decoder": "^0.10.31",
     "superagent": "^4.0.0",
@@ -189,7 +190,7 @@
   },
   "rnpm": {
     "assets": [
-      "src/assets/fonts"
+      "./src/assets/fonts"
     ]
   },
   "react-native": {
