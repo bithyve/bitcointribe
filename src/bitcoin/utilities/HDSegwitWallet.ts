@@ -10,18 +10,23 @@ export default class HDSegwitWallet extends Bitcoin {
   public usedAddresses: string[];
   public nextFreeAddressIndex: number;
   public nextFreeChangeAddressIndex: number;
+  public internalAddresssesCache;
+  public externalAddressesCache;
+  public addressToWIFCache;
 
-  constructor() {
+  constructor(mnemonic?: string) {
     super();
-    // this.mnemonic = bip39.generateMnemonic();
-    // //console.log({ mnemonic: this.mnemonic });
-    this.mnemonic =
-      "unique issue slogan party van unfair assault warfare then rubber satisfy snack";
-    this.nextFreeAddressIndex = 0;
-    this.nextFreeChangeAddressIndex = 0;
+    this.mnemonic = mnemonic ? mnemonic : bip39.generateMnemonic();
     this.usedAddresses = [];
     this.nextFreeAddressIndex = 0;
     this.nextFreeChangeAddressIndex = 0;
+    this.internalAddresssesCache = {}; // index => address
+    this.externalAddressesCache = {}; // index => address
+    this.addressToWIFCache = {};
+  }
+
+  public getMnemonic = () => {
+    return this.mnemonic;
   }
 
   public getXpub = () => {
@@ -36,7 +41,7 @@ export default class HDSegwitWallet extends Bitcoin {
     this.xpub = child.toBase58();
 
     return this.xpub;
-  };
+  }
 
   public getWIFbyIndex = (change: boolean, index: number) => {
     const seed = bip39.mnemonicToSeed(this.mnemonic);
@@ -45,33 +50,62 @@ export default class HDSegwitWallet extends Bitcoin {
     const child = root.derivePath(path);
 
     return child.toWIF();
-  };
+  }
 
   public getExternalWIFByIndex = (index: number) => {
     return this.getWIFbyIndex(false, index);
-  };
+  }
 
   public getInternalWIFByIndex = (index: number) => {
     return this.getWIFbyIndex(true, index);
-  };
+  }
 
   public getExternalAddressByIndex = (index: number) => {
+    if (this.externalAddressesCache[index]) {
+      return this.externalAddressesCache[index];
+    } // cache hit
+
     const node = bip32.fromBase58(this.getXpub(), this.network);
     const keyPair = node.derive(0).derive(index);
 
-    return this.getAddress(keyPair);
-  };
+    const address = this.getAddress(keyPair);
+    return (this.externalAddressesCache[index] = address);
+  }
 
   public getInternalAddressByIndex = (index: number) => {
+    if (this.internalAddresssesCache[index]) {
+      return this.internalAddresssesCache[index];
+    } // cache hit
+
     const node = bip32.fromBase58(this.getXpub(), this.network);
     const keyPair = node.derive(1).derive(index);
-
-    return this.getAddress(keyPair);
-  };
+    const address = this.getAddress(keyPair);
+    return (this.internalAddresssesCache[index] = address);
+  }
 
   public getWifForAddress = (address: string) => {
-    // TODO: Implement caching
-    // lets iterate over all addresses we have up to first unused address index
+    if (this.addressToWIFCache[address]) {
+      return this.addressToWIFCache[address];
+    } // cache hit
+
+    // fast approach, first lets iterate over all addressess we have in cache
+    for (const index of Object.keys(this.internalAddresssesCache)) {
+      if (this.getInternalAddressByIndex(parseInt(index, 10)) === address) {
+        return (this.addressToWIFCache[address] = this.getInternalWIFByIndex(
+          parseInt(index, 10),
+        ));
+      }
+    }
+
+    for (const index of Object.keys(this.externalAddressesCache)) {
+      if (this.getExternalAddressByIndex(parseInt(index, 10)) === address) {
+        return (this.addressToWIFCache[address] = this.getExternalWIFByIndex(
+          parseInt(index, 10),
+        ));
+      }
+    }
+
+    // cache miss: lets iterate over all addresses we have up to first unused address index
     for (let itr = 0; itr <= this.nextFreeChangeAddressIndex + 3; itr++) {
       const possibleAddress = this.getInternalAddressByIndex(itr);
       if (possibleAddress === address) {
@@ -86,19 +120,7 @@ export default class HDSegwitWallet extends Bitcoin {
       }
     }
     throw new Error("Could not find WIF for " + address);
-  };
-
-  public multiGetBalanceByAddress = async addresses => {
-    let bal = 0;
-    let unconfirmedBal = 0;
-    for (const addr of addresses) {
-      const { balanceData } = await this.getBalance(addr);
-      bal += balanceData.balance;
-      unconfirmedBal += balanceData.unconfirmed_balance;
-    }
-
-    return { balance: bal, unconfirmedBalance: unconfirmedBal };
-  };
+  }
 
   public getReceivingAddress = async () => {
     // looking for free external address
@@ -109,9 +131,14 @@ export default class HDSegwitWallet extends Bitcoin {
         continue;
       }
       const address = this.getExternalAddressByIndex(
-        this.nextFreeAddressIndex + itr
+        this.nextFreeAddressIndex + itr,
       );
-      const { totalTransactions } = await this.fetchTransactions(address);
+
+      this.externalAddressesCache[this.nextFreeAddressIndex + itr] = address; // updating cache just for any case
+
+      const { totalTransactions } = await this.fetchTransactionsByAddress(
+        address,
+      );
       if (totalTransactions === 0) {
         // free address found
         freeAddress = address;
@@ -123,12 +150,12 @@ export default class HDSegwitWallet extends Bitcoin {
     if (!freeAddress) {
       // giving up as we could find a free address in the above cycle
       freeAddress = this.getExternalAddressByIndex(
-        this.nextFreeAddressIndex + itr
+        this.nextFreeAddressIndex + itr,
       ); // not checking this one, it might be free
       this.nextFreeAddressIndex += itr + 1;
     }
     return freeAddress;
-  };
+  }
 
   public getChangeAddressAsync = async () => {
     // looking for free internal address
@@ -139,10 +166,15 @@ export default class HDSegwitWallet extends Bitcoin {
         continue;
       }
       const address = this.getInternalAddressByIndex(
-        this.nextFreeChangeAddressIndex + itr
+        this.nextFreeChangeAddressIndex + itr,
       );
+      this.internalAddresssesCache[
+        this.nextFreeChangeAddressIndex + itr
+      ] = address; // updating cache just for any case
 
-      const { totalTransactions } = await this.fetchTransactions(address);
+      const { totalTransactions } = await this.fetchTransactionsByAddress(
+        address,
+      );
       if (totalTransactions === 0) {
         // free address found
         freeAddress = address;
@@ -154,13 +186,13 @@ export default class HDSegwitWallet extends Bitcoin {
     if (!freeAddress) {
       // giving up as we could find a free address in the above cycle
       freeAddress = this.getInternalAddressByIndex(
-        this.nextFreeChangeAddressIndex + itr
+        this.nextFreeChangeAddressIndex + itr,
       ); // not checking this one, it might be free
       this.nextFreeChangeAddressIndex += itr + 1;
     }
 
     return freeAddress;
-  };
+  }
 
   public fetchBalance = async () => {
     try {
@@ -168,18 +200,18 @@ export default class HDSegwitWallet extends Bitcoin {
         index,
         maxUsedIndex = 0,
         minUnusedIndex = 100500100,
-        depth = 0
+        depth = 0,
       ) => {
-        //console.log({ depth });
+        console.log({ depth });
         if (depth >= 20) {
           return maxUsedIndex + 1;
         } // fail
-        const txs = await this.fetchTransactions(
-          this.getInternalAddressByIndex(index)
+        const txs = await this.fetchTransactionsByAddress(
+          this.getInternalAddressByIndex(index),
         );
-        //console.log(txs);
+        console.log(txs);
         if (txs.totalTransactions === 0) {
-          //console.log({ index });
+          console.log({ index });
           if (index === 0) {
             return 0;
           }
@@ -187,8 +219,8 @@ export default class HDSegwitWallet extends Bitcoin {
           index = Math.floor((index - maxUsedIndex) / 2 + maxUsedIndex);
         } else {
           maxUsedIndex = Math.max(maxUsedIndex, index); // set
-          const txs2 = await this.fetchTransactions(
-            this.getInternalAddressByIndex(index + 1)
+          const txs2 = await this.fetchTransactionsByAddress(
+            this.getInternalAddressByIndex(index + 1),
           );
           if (txs2.totalTransactions === 0) {
             return index + 1;
@@ -201,32 +233,32 @@ export default class HDSegwitWallet extends Bitcoin {
           index,
           maxUsedIndex,
           minUnusedIndex,
-          depth + 1
+          depth + 1,
         );
       };
-      //console.log("Executing internal binary search");
+      console.log("Executing internal binary search");
       this.nextFreeChangeAddressIndex = await binarySearchIterationForInternalAddress(
-        100
+        100,
       );
-      //console.log(this.nextFreeAddressIndex);
+      console.log(this.nextFreeAddressIndex);
 
       const binarySearchIterationForExternalAddress = async (
         index,
         maxUsedIndex = 0,
         minUnusedIndex = 100500100,
-        depth = 0
+        depth = 0,
       ) => {
-        //console.log({ depth });
+        console.log({ depth });
         if (depth >= 20) {
           return maxUsedIndex + 1;
         } // fail
-        const txs = await this.fetchTransactions(
-          this.getExternalAddressByIndex(index)
+        const txs = await this.fetchTransactionsByAddress(
+          this.getExternalAddressByIndex(index),
         );
 
-        //console.log(txs);
+        console.log(txs);
         if (txs.totalTransactions === 0) {
-          //console.log({ index });
+          console.log({ index });
           if (index === 0) {
             return 0;
           }
@@ -234,8 +266,8 @@ export default class HDSegwitWallet extends Bitcoin {
           index = Math.floor((index - maxUsedIndex) / 2 + maxUsedIndex);
         } else {
           maxUsedIndex = Math.max(maxUsedIndex, index); // set
-          const txs2 = await this.fetchTransactions(
-            this.getExternalAddressByIndex(index + 1)
+          const txs2 = await this.fetchTransactionsByAddress(
+            this.getExternalAddressByIndex(index + 1),
           );
           if (txs2.totalTransactions === 0) {
             return index + 1;
@@ -248,15 +280,15 @@ export default class HDSegwitWallet extends Bitcoin {
           index,
           maxUsedIndex,
           minUnusedIndex,
-          depth + 1
+          depth + 1,
         );
       };
 
-      //console.log("Executing external binary search");
+      console.log("Executing external binary search");
       this.nextFreeAddressIndex = await binarySearchIterationForExternalAddress(
-        100
+        100,
       );
-      //console.log(this.nextFreeAddressIndex);
+      console.log(this.nextFreeAddressIndex);
       this.usedAddresses = [];
 
       // generating all involved addresses:
@@ -267,13 +299,13 @@ export default class HDSegwitWallet extends Bitcoin {
         this.usedAddresses.push(this.getInternalAddressByIndex(itr));
       }
 
-      //console.log(this.usedAddresses);
+      console.log(this.usedAddresses);
       const res = await this.multiGetBalanceByAddress(this.usedAddresses);
       return res;
     } catch (err) {
       console.warn(err);
     }
-  };
+  }
 
   public fetchUtxo = async () => {
     if (this.usedAddresses.length === 0) {
@@ -290,6 +322,7 @@ export default class HDSegwitWallet extends Bitcoin {
     const UTXOs = [];
     // tslint:disable-next-line:forin
     for (const address of this.usedAddresses) {
+      console.log(`Fetching utxos corresponding to ${address}`);
       const utxos = await this.fetchUnspentOutputs(address);
       UTXOs.push(...utxos);
     }
@@ -321,97 +354,103 @@ export default class HDSegwitWallet extends Bitcoin {
     //   utxos.push(unspent);
     // }
     // } catch (err) {
-    //   //console.log(err);
+    //   console.log(err);
     // }
 
     // this.utxo = utxos;
-  };
+  }
+
+  public fetchTransactions = async () => {
+    if (this.usedAddresses.length === 0) {
+      // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
+      await this.fetchBalance();
+    }
+    const transactions = {
+      status: 200, // mocking for now
+      totalTransactions: 0,
+      confirmedTransactions: 0,
+      unconfirmedTransactions: 0,
+      transactionDetails: [],
+    };
+    for (const address of this.usedAddresses) {
+      console.log(`Fetching transactions corresponding to ${address}`);
+      const txns = await this.fetchTransactionsByAddress(address);
+      transactions.totalTransactions += txns.totalTransactions;
+      transactions.confirmedTransactions += txns.confirmedTransactions;
+      transactions.unconfirmedTransactions += txns.unconfirmedTransactions;
+      transactions.transactionDetails.push(...txns.transactionDetails);
+    }
+
+    return transactions;
+  }
 
   public createHDTransaction = async (
     recipientAddress: string,
     amount: number,
     nSequence?: number,
-    txnPriority?: string
+    txnPriority?: string,
   ): Promise<{ inputs: object[]; txb: TransactionBuilder; fee: number }> => {
     const inputUTXOs = await this.fetchUtxo();
-    //console.log("Input UTXOs:", inputUTXOs);
+    console.log("Input UTXOs:", inputUTXOs);
     const outputUTXOs = [{ address: recipientAddress, value: amount }];
-    //console.log("Output UTXOs:", outputUTXOs);
+    console.log("Output UTXOs:", outputUTXOs);
     const txnFee = await this.feeRatesPerByte(txnPriority);
 
     const { inputs, outputs, fee } = coinselect(
       inputUTXOs,
       outputUTXOs,
-      txnFee
+      txnFee,
     );
-    //console.log("-------Transaction--------");
-    //console.log("\tFee", fee);
-    //console.log("\tInputs:", inputs);
-    //console.log("\tOutputs:", outputs);
+    console.log("-------Transaction--------");
+    console.log("\tFee", fee);
+    console.log("\tInputs:", inputs);
+    console.log("\tOutputs:", outputs);
 
     const txb: TransactionBuilder = new bitcoinJS.TransactionBuilder(
-      this.network
+      this.network,
     );
 
-    inputs.forEach(input => txb.addInput(input.txId, input.vout, nSequence));
+    inputs.forEach((input) => txb.addInput(input.txId, input.vout, nSequence));
 
     for (const output of outputs) {
       if (!output.address) {
         output.address = await this.getChangeAddressAsync();
+        console.log(`adding the change address: ${output.address}`);
       }
-      //console.log("Added Output:", output);
+      console.log("Added Output:", output);
       txb.addOutput(output.address, output.value);
     }
 
     return {
       inputs,
       txb,
-      fee
+      fee,
     };
-  };
+  }
 
   public signHDTransaction = (
     inputs: any,
     txb: TransactionBuilder,
-    witnessScript?: any
+    witnessScript?: any,
   ): any => {
-    //console.log("------ Transaction Signing ----------");
+    console.log("------ Transaction Signing ----------");
     let vin = 0;
-    inputs.forEach(input => {
-      //console.log("Signing Input:", input);
-      const priv = this.getWifForAddress(input.address);
-      //console.log({ priv });
-      const keyPair = this.getKeyPair(priv);
-      //console.log({ keyPair });
+    inputs.forEach((input) => {
+      console.log("Signing Input:", input);
+
+      const keyPair = this.getKeyPair(this.getWifForAddress(input.address));
+      console.log({ keyPair });
       txb.sign(
         vin,
         keyPair,
         this.getP2SH(keyPair).redeem.output,
         null,
         input.value,
-        witnessScript
+        witnessScript,
       );
       vin += 1;
     });
 
     return txb;
-  };
+  }
 }
-
-// const wallet = new HDSegwitWallet();
-// wallet.fetchBalance().then((data) => {
-//   //console.log({ data });
-//   //console.log("fetching utxo");
-//   wallet.fetchUtxo();
-// });
-// wallet.getReceivingAddress().then(//console.log);
-
-const wallet = new HDSegwitWallet();
-wallet
-  .createHDTransaction("2NAwqcZHo2DW9c8Qs9Jxaat3jHW3aqsBpFs", 3500)
-  .then(res => {
-    const signedTxb = wallet.signHDTransaction(res.inputs, res.txb);
-    const txHex = signedTxb.build().toHex();
-    //console.log(txHex);
-    wallet.broadcastTransaction(txHex).then(console.log);
-  });

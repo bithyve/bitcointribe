@@ -7,10 +7,12 @@ import {
   ImageBackground,
   Text,
   Alert,
-  StatusBar
+  StatusBar,
+  Animated,
+  Easing
 } from "react-native";
 
-import { colors } from "bithyve/src/app/constants/Constants";
+import { colors, images } from "bithyve/src/app/constants/Constants";
 import Singleton from "bithyve/src/app/constants/Singleton";
 
 //localization
@@ -24,7 +26,13 @@ interface Props {
 export default class LaunchScreen extends Component<Props, any> {
   constructor(props: any) {
     super(props);
+    this.state = ({
+      centerLogo: null,
+      centerLogoOpticy:new Animated.Value(0)
+    })
+
   }
+
   async componentDidMount() {
     let commonData = Singleton.getInstance();
     let value = await AsyncStorage.getItem("PasscodeCreateStatus");
@@ -37,19 +45,38 @@ export default class LaunchScreen extends Component<Props, any> {
       } else {
         this.props.onComplited(false, "OnBoardingNavigator");
       }
-    }, 1000);
-  }
+    }, 3000);
+
+    Animated.timing(this.state.centerLogoOpticy,{
+      toValue:1,
+      duration:100,
+      easing:Easing.bounce
+    }).start();
+
+    setTimeout(()=>{
+        this.setState({centerLogo:images.LaunchScreen.hexaBaseCard})
+    },1000);
+    setTimeout(()=> {
+        this.setState({centerLogo:images.LaunchScreen.hexaLogo})
+    },2000);
+}
 
   render() {
+    const animatedOpcity = {opacity:this.state.centerLogoOpticy}
     return (
       <View style={styles.container}>
         <ImageBackground
-          source={require("bithyve/src/assets/images/LaunchScrenn/lunchScreenIcon.png")}
+          source={images.LaunchScreen.img1}
           style={styles.backgroundImage}
           imageStyle={{
             resizeMode: "cover" // works only here!
           }}
-        />
+        >
+          <Animated.Image
+            source={this.state.centerLogo}
+            style={[animatedOpcity,{ height: 200, width: 200 }]}
+          />
+        </ImageBackground>
       </View>
     );
   }
@@ -59,18 +86,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
-  appLogo: {
-    width: 300,
-    height: 300,
-    borderRadius: 150
-  },
-  txtAppName: {
-    fontSize: 40,
-    fontWeight: "bold",
-    marginTop: 20,
-    color: colors.appColor
-  },
   backgroundImage: {
-    flex: 1
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center"
   }
 });

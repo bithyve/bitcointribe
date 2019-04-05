@@ -58,8 +58,8 @@ const sliderWidth = viewportWidth;
 const itemWidth = slideWidth + itemHorizontalMargin * 2;
 const SLIDER_1_FIRST_ITEM = 0;
 
-//TODO: Wallets
-import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
+//TODO: Bitcoin Files
+//import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
 
 //localization
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
@@ -98,7 +98,7 @@ export default class AccountsScreen extends React.Component<any, any> {
       "willFocus",
       () => {
         isNetwork = utils.getNetwork();
-        this.connnection_FetchData();
+        //  this.connnection_FetchData();
       }
     );
   }
@@ -107,331 +107,331 @@ export default class AccountsScreen extends React.Component<any, any> {
     this.willFocusSubscription.remove();
   }
 
-  //TODO: func connnection_FetchData
-  async connnection_FetchData() {
-    let isLoading1: boolean = true;
-    let isNoTranstion: boolean = false;
-    let tranDetails: [] = [];
-    let title: string;
-    this.setState({
-      isLoading: true
-    });
-    const dateTime = Date.now();
-    const lastUpdateDate = Math.floor(dateTime / 1000);
-    const resultWallet = await dbOpration.readTablesData(
-      localDB.tableName.tblWallet
-    );
-    const resultPopUpAccountTypes = await dbOpration.readTableAcccountType(
-      localDB.tableName.tblAccountType,
-      localDB.tableName.tblAccount
-    );
-    var resultAccount = await dbOpration.readAccountTablesData(
-      localDB.tableName.tblAccount
-    );
-    if (isNetwork && this.state.cardIndexNo != resultAccount.temp.length - 1) {
-      title =
-        resultAccount.temp[this.state.cardIndexNo].accountType +
-        " Recent Transactions";
-
-      const bal = await RegularAccount.getBalance(
-        resultAccount.temp[this.state.cardIndexNo].address
-      );
-
-      var transation: [] = [];
-      var flag_noTrasation: boolean;
-
-      // var resultRecentTras = await dbOpration.readRecentTransactionAddressWise(
-      //   localDB.tableName.tblTransaction,
-      //   resultAccount.temp[this.state.cardIndexNo].address
-      // );
-      // console.log({ resultRecentTras });
-      // if (resultRecentTras.temp.length > 0) {
-      //   transation = resultRecentTras.temp;
-      //   flag_noTrasation = false;
-      // } else {
-      //   transation = [];
-      //   flag_noTrasation = true;
-      // }
-      // tranDetails = transation;
-      // isNoTranstion = flag_noTrasation;
-
-      if (bal.statusCode == 200) {
-        var resultRecentTras = await RegularAccount.getTransactions(
-          resultAccount.temp[this.state.cardIndexNo].address
-        );
-
-        let resultRecentTransDetailsData = resultRecentTras.transactionDetails;
-        var arr_DateSort = [];
-        for (let i = 0; i < resultRecentTransDetailsData.length; i++) {
-          let sortData = resultRecentTransDetailsData[i];
-          sortData.received = new Date(
-            resultRecentTransDetailsData[i].received
-          );
-          arr_DateSort.push(sortData);
-        }
-        let result_sortData = arr_DateSort.sort(utils.sortFunction);
-        resultRecentTras.transactionDetails = result_sortData;
-        if (resultRecentTras.statusCode == 200) {
-          if (resultRecentTras.transactionDetails.length > 0) {
-            const resultRecentTransaction = await dbOpration.insertTblTransation(
-              localDB.tableName.tblTransaction,
-              resultRecentTras.transactionDetails,
-              resultRecentTras.address,
-              lastUpdateDate
-            );
-
-            if (resultRecentTransaction) {
-              resultRecentTras = await dbOpration.readRecentTransactionAddressWise(
-                localDB.tableName.tblTransaction,
-                resultAccount.temp[this.state.cardIndexNo].address
-              );
-              if (resultRecentTras.temp.length > 0) {
-                transation = resultRecentTras.temp;
-                flag_noTrasation = false;
-              } else {
-                transation = [];
-                flag_noTrasation = true;
-              }
-              tranDetails = transation;
-              isNoTranstion = flag_noTrasation;
-            }
-          } else {
-            isNoTranstion = true;
-            tranDetails = [];
-          }
-          const resultUpdateTblAccount = await dbOpration.updateTableData(
-            localDB.tableName.tblAccount,
-            bal.balanceData.final_balance / 1e8,
-            resultAccount.temp[0].address,
-            lastUpdateDate
-          );
-          if (resultUpdateTblAccount) {
-            resultAccount = await dbOpration.readAccountTablesData(
-              localDB.tableName.tblAccount
-            );
-            if (resultAccount.temp.length > 0) {
-              isLoading1 = false;
-              this.setState({
-                accountTypeList: resultAccount.temp,
-                walletsData: resultWallet.temp,
-                popupData: [
-                  {
-                    success: "success",
-                    icon: "plus-circle",
-                    data: resultPopUpAccountTypes.temp
-                  }
-                ],
-                isLoading: false
-              });
-            }
-          }
-        } else {
-          this.dropdown.alertWithType(
-            "error",
-            "OH",
-            resultRecentTras.errorMessage
-          );
-        }
-      } else {
-        this.dropdown.alertWithType("error", "OH", bal.errorMessage);
-      }
-    } else {
-      let transation: [] = [];
-      let flag_noTrasation: boolean;
-      const resultRecentTras = await dbOpration.readRecentTransactionAddressWise(
-        localDB.tableName.tblTransaction,
-        resultAccount.temp[this.state.cardIndexNo].address
-      );
-      if (resultRecentTras.temp.length > 0) {
-        transation = resultRecentTras.temp;
-        flag_noTrasation = false;
-      } else {
-        transation = [];
-        flag_noTrasation = true;
-      }
-      tranDetails = transation;
-      isNoTranstion = flag_noTrasation;
-      isLoading1 = false;
-      this.setState({
-        accountTypeList: resultAccount.temp,
-        walletsData: resultWallet.temp,
-        popupData: [
-          {
-            success: "success",
-            icon: "plus-circle",
-            data: resultPopUpAccountTypes.temp
-          }
-        ],
-        isLoading: false
-      });
-    }
-    this.setState({
-      recentTransactionData: [
-        {
-          title,
-          isLoading1,
-          isNoTranstion,
-          tranDetails
-        }
-      ]
-    });
-  }
-
-  //TODO: func getSwapCardDetails
-  async getSwapCardDetails(index: number) {
-    let isLoading1: boolean = true;
-    let isNoTranstion: boolean = false;
-    let tranDetails: [] = [];
-    let title: string;
-    isNetwork = utils.getNetwork();
-    isLoading1 = true;
-    this.setState({
-      cardIndexNo: index
-    });
-    this.setState({ slider1ActiveSlide: index });
-    const dateTime = Date.now();
-    const lastUpdateDate = Math.floor(dateTime / 1000);
-    var resultAccount = await dbOpration.readAccountTablesData(
-      localDB.tableName.tblAccount
-    );
-
-    if (resultAccount.temp[index].accountType != "UnKnown") {
-      title = resultAccount.temp[index].accountType + " Recent Transactions";
-    } else {
-      this.setState({ accountTypeVisible: !this.state.accountTypeVisible });
-      title = "";
-    }
-
-    if (resultAccount.temp[index].address != "") {
-      if (isNetwork) {
-        const bal = await RegularAccount.getBalance(
-          resultAccount.temp[index].address
-        );
-        let transation: [] = [];
-        let flag_noTrasation: boolean;
-
-        // var resultRecentTras = await dbOpration.readRecentTransactionAddressWise(
-        //   localDB.tableName.tblTransaction,
-        //   resultAccount.temp[index].address
-        // );
-
-        // if (resultRecentTras.temp.length > 0) {
-        //   transation = resultRecentTras.temp;
-        //   flag_noTrasation = false;
-        // } else {
-        //   transation = [];
-        //   flag_noTrasation = true;
-        // }
-        // tranDetails = transation;
-        // isNoTranstion = flag_noTrasation;
-
-        if (bal.statusCode == 200) {
-          var resultRecentTras = await RegularAccount.getTransactions(
-            resultAccount.temp[index].address
-          );
-          let resultRecentTransDetailsData =
-            resultRecentTras.transactionDetails;
-          var arr_DateSort = [];
-          for (let i = 0; i < resultRecentTransDetailsData.length; i++) {
-            let sortData = resultRecentTransDetailsData[i];
-            sortData.received = new Date(
-              resultRecentTransDetailsData[i].received
-            );
-            arr_DateSort.push(sortData);
-          }
-          let result_sortData = arr_DateSort.sort(utils.sortFunction);
-          resultRecentTras.transactionDetails = result_sortData;
-          if (resultRecentTras.statusCode == 200) {
-            if (resultRecentTras.transactionDetails.length > 0) {
-              const resultRecentTransaction = await dbOpration.insertTblTransation(
-                localDB.tableName.tblTransaction,
-                resultRecentTras.transactionDetails,
-                resultRecentTras.address,
-                lastUpdateDate
-              );
-              if (resultRecentTransaction) {
-                let transation: [] = [];
-                let flag_noTrasation: boolean;
-                resultRecentTras = await dbOpration.readRecentTransactionAddressWise(
-                  localDB.tableName.tblTransaction,
-                  resultAccount.temp[index].address
-                );
-                if (resultRecentTras.temp.length > 0) {
-                  transation = resultRecentTras.temp;
-                  flag_noTrasation = false;
-                } else {
-                  transation = [];
-                  flag_noTrasation = true;
-                }
-                tranDetails = transation;
-                isNoTranstion = flag_noTrasation;
-              }
-            } else {
-              isNoTranstion = true;
-              tranDetails = [];
-            }
-            const resultUpdateTblAccount = await dbOpration.updateTableData(
-              localDB.tableName.tblAccount,
-              bal.balanceData.final_balance / 1e8,
-              resultAccount.temp[index].address,
-              lastUpdateDate
-            );
-            if (resultUpdateTblAccount) {
-              resultAccount = await dbOpration.readAccountTablesData(
-                localDB.tableName.tblAccount
-              );
-              isLoading1 = false;
-              this.setState({
-                accountTypeList: resultAccount.temp
-              });
-            }
-          } else {
-            this.dropdown.alertWithType(
-              "error",
-              "OH",
-              resultRecentTras.errorMessage
-            );
-          }
-        } else {
-          this.dropdown.alertWithType("error", "OH", bal.errorMessage);
-        }
-      } else {
-        isLoading1 = false;
-        let transation: [] = [];
-        let flag_noTrasation: boolean;
-        const resultRecentTras = await dbOpration.readRecentTransactionAddressWise(
-          localDB.tableName.tblTransaction,
-          resultAccount.temp[index].address
-        );
-        if (resultRecentTras.temp.length > 0) {
-          transation = resultRecentTras.temp;
-          flag_noTrasation = false;
-        } else {
-          transation = [];
-          flag_noTrasation = true;
-        }
-        tranDetails = transation;
-        isNoTranstion = flag_noTrasation;
-
-        this.setState({
-          accountTypeList: resultAccount.temp
-        });
-      }
-    } else {
-      (isNoTranstion = true), (tranDetails = []), (isLoading1 = false);
-    }
-
-    this.setState({
-      recentTransactionData: [
-        {
-          title,
-          isLoading1,
-          isNoTranstion,
-          tranDetails
-        }
-      ]
-    });
-  }
+  // //TODO: func connnection_FetchData
+  // async connnection_FetchData() {
+  //   let isLoading1: boolean = true;
+  //   let isNoTranstion: boolean = false;
+  //   let tranDetails: [] = [];
+  //   let title: string;
+  //   this.setState({
+  //     isLoading: true
+  //   });
+  //   const dateTime = Date.now();
+  //   const lastUpdateDate = Math.floor(dateTime / 1000);
+  //   const resultWallet = await dbOpration.readTablesData(
+  //     localDB.tableName.tblWallet
+  //   );
+  //   const resultPopUpAccountTypes = await dbOpration.readTableAcccountType(
+  //     localDB.tableName.tblAccountType,
+  //     localDB.tableName.tblAccount
+  //   );
+  //   var resultAccount = await dbOpration.readAccountTablesData(
+  //     localDB.tableName.tblAccount
+  //   );
+  //   if (isNetwork && this.state.cardIndexNo != resultAccount.temp.length - 1) {
+  //     title =
+  //       resultAccount.temp[this.state.cardIndexNo].accountType +
+  //       " Recent Transactions";
+  //
+  //     const bal = await RegularAccount.getBalance(
+  //       resultAccount.temp[this.state.cardIndexNo].address
+  //     );
+  //
+  //     var transation: [] = [];
+  //     var flag_noTrasation: boolean;
+  //
+  //     // var resultRecentTras = await dbOpration.readRecentTransactionAddressWise(
+  //     //   localDB.tableName.tblTransaction,
+  //     //   resultAccount.temp[this.state.cardIndexNo].address
+  //     // );
+  //     // console.log({ resultRecentTras });
+  //     // if (resultRecentTras.temp.length > 0) {
+  //     //   transation = resultRecentTras.temp;
+  //     //   flag_noTrasation = false;
+  //     // } else {
+  //     //   transation = [];
+  //     //   flag_noTrasation = true;
+  //     // }
+  //     // tranDetails = transation;
+  //     // isNoTranstion = flag_noTrasation;
+  //
+  //     if (bal.statusCode == 200) {
+  //       var resultRecentTras = await RegularAccount.getTransactions(
+  //         resultAccount.temp[this.state.cardIndexNo].address
+  //       );
+  //
+  //       let resultRecentTransDetailsData = resultRecentTras.transactionDetails;
+  //       var arr_DateSort = [];
+  //       for (let i = 0; i < resultRecentTransDetailsData.length; i++) {
+  //         let sortData = resultRecentTransDetailsData[i];
+  //         sortData.received = new Date(
+  //           resultRecentTransDetailsData[i].received
+  //         );
+  //         arr_DateSort.push(sortData);
+  //       }
+  //       let result_sortData = arr_DateSort.sort(utils.sortFunction);
+  //       resultRecentTras.transactionDetails = result_sortData;
+  //       if (resultRecentTras.statusCode == 200) {
+  //         if (resultRecentTras.transactionDetails.length > 0) {
+  //           const resultRecentTransaction = await dbOpration.insertTblTransation(
+  //             localDB.tableName.tblTransaction,
+  //             resultRecentTras.transactionDetails,
+  //             resultRecentTras.address,
+  //             lastUpdateDate
+  //           );
+  //
+  //           if (resultRecentTransaction) {
+  //             resultRecentTras = await dbOpration.readRecentTransactionAddressWise(
+  //               localDB.tableName.tblTransaction,
+  //               resultAccount.temp[this.state.cardIndexNo].address
+  //             );
+  //             if (resultRecentTras.temp.length > 0) {
+  //               transation = resultRecentTras.temp;
+  //               flag_noTrasation = false;
+  //             } else {
+  //               transation = [];
+  //               flag_noTrasation = true;
+  //             }
+  //             tranDetails = transation;
+  //             isNoTranstion = flag_noTrasation;
+  //           }
+  //         } else {
+  //           isNoTranstion = true;
+  //           tranDetails = [];
+  //         }
+  //         const resultUpdateTblAccount = await dbOpration.updateTableData(
+  //           localDB.tableName.tblAccount,
+  //           bal.balanceData.final_balance / 1e8,
+  //           resultAccount.temp[0].address,
+  //           lastUpdateDate
+  //         );
+  //         if (resultUpdateTblAccount) {
+  //           resultAccount = await dbOpration.readAccountTablesData(
+  //             localDB.tableName.tblAccount
+  //           );
+  //           if (resultAccount.temp.length > 0) {
+  //             isLoading1 = false;
+  //             this.setState({
+  //               accountTypeList: resultAccount.temp,
+  //               walletsData: resultWallet.temp,
+  //               popupData: [
+  //                 {
+  //                   success: "success",
+  //                   icon: "plus-circle",
+  //                   data: resultPopUpAccountTypes.temp
+  //                 }
+  //               ],
+  //               isLoading: false
+  //             });
+  //           }
+  //         }
+  //       } else {
+  //         this.dropdown.alertWithType(
+  //           "error",
+  //           "OH",
+  //           resultRecentTras.errorMessage
+  //         );
+  //       }
+  //     } else {
+  //       this.dropdown.alertWithType("error", "OH", bal.errorMessage);
+  //     }
+  //   } else {
+  //     let transation: [] = [];
+  //     let flag_noTrasation: boolean;
+  //     const resultRecentTras = await dbOpration.readRecentTransactionAddressWise(
+  //       localDB.tableName.tblTransaction,
+  //       resultAccount.temp[this.state.cardIndexNo].address
+  //     );
+  //     if (resultRecentTras.temp.length > 0) {
+  //       transation = resultRecentTras.temp;
+  //       flag_noTrasation = false;
+  //     } else {
+  //       transation = [];
+  //       flag_noTrasation = true;
+  //     }
+  //     tranDetails = transation;
+  //     isNoTranstion = flag_noTrasation;
+  //     isLoading1 = false;
+  //     this.setState({
+  //       accountTypeList: resultAccount.temp,
+  //       walletsData: resultWallet.temp,
+  //       popupData: [
+  //         {
+  //           success: "success",
+  //           icon: "plus-circle",
+  //           data: resultPopUpAccountTypes.temp
+  //         }
+  //       ],
+  //       isLoading: false
+  //     });
+  //   }
+  //   this.setState({
+  //     recentTransactionData: [
+  //       {
+  //         title,
+  //         isLoading1,
+  //         isNoTranstion,
+  //         tranDetails
+  //       }
+  //     ]
+  //   });
+  // }
+  //
+  // //TODO: func getSwapCardDetails
+  // async getSwapCardDetails(index: number) {
+  //   let isLoading1: boolean = true;
+  //   let isNoTranstion: boolean = false;
+  //   let tranDetails: [] = [];
+  //   let title: string;
+  //   isNetwork = utils.getNetwork();
+  //   isLoading1 = true;
+  //   this.setState({
+  //     cardIndexNo: index
+  //   });
+  //   this.setState({ slider1ActiveSlide: index });
+  //   const dateTime = Date.now();
+  //   const lastUpdateDate = Math.floor(dateTime / 1000);
+  //   var resultAccount = await dbOpration.readAccountTablesData(
+  //     localDB.tableName.tblAccount
+  //   );
+  //
+  //   if (resultAccount.temp[index].accountType != "UnKnown") {
+  //     title = resultAccount.temp[index].accountType + " Recent Transactions";
+  //   } else {
+  //     this.setState({ accountTypeVisible: !this.state.accountTypeVisible });
+  //     title = "";
+  //   }
+  //
+  //   if (resultAccount.temp[index].address != "") {
+  //     if (isNetwork) {
+  //       const bal = await RegularAccount.getBalance(
+  //         resultAccount.temp[index].address
+  //       );
+  //       let transation: [] = [];
+  //       let flag_noTrasation: boolean;
+  //
+  //       // var resultRecentTras = await dbOpration.readRecentTransactionAddressWise(
+  //       //   localDB.tableName.tblTransaction,
+  //       //   resultAccount.temp[index].address
+  //       // );
+  //
+  //       // if (resultRecentTras.temp.length > 0) {
+  //       //   transation = resultRecentTras.temp;
+  //       //   flag_noTrasation = false;
+  //       // } else {
+  //       //   transation = [];
+  //       //   flag_noTrasation = true;
+  //       // }
+  //       // tranDetails = transation;
+  //       // isNoTranstion = flag_noTrasation;
+  //
+  //       if (bal.statusCode == 200) {
+  //         var resultRecentTras = await RegularAccount.getTransactions(
+  //           resultAccount.temp[index].address
+  //         );
+  //         let resultRecentTransDetailsData =
+  //           resultRecentTras.transactionDetails;
+  //         var arr_DateSort = [];
+  //         for (let i = 0; i < resultRecentTransDetailsData.length; i++) {
+  //           let sortData = resultRecentTransDetailsData[i];
+  //           sortData.received = new Date(
+  //             resultRecentTransDetailsData[i].received
+  //           );
+  //           arr_DateSort.push(sortData);
+  //         }
+  //         let result_sortData = arr_DateSort.sort(utils.sortFunction);
+  //         resultRecentTras.transactionDetails = result_sortData;
+  //         if (resultRecentTras.statusCode == 200) {
+  //           if (resultRecentTras.transactionDetails.length > 0) {
+  //             const resultRecentTransaction = await dbOpration.insertTblTransation(
+  //               localDB.tableName.tblTransaction,
+  //               resultRecentTras.transactionDetails,
+  //               resultRecentTras.address,
+  //               lastUpdateDate
+  //             );
+  //             if (resultRecentTransaction) {
+  //               let transation: [] = [];
+  //               let flag_noTrasation: boolean;
+  //               resultRecentTras = await dbOpration.readRecentTransactionAddressWise(
+  //                 localDB.tableName.tblTransaction,
+  //                 resultAccount.temp[index].address
+  //               );
+  //               if (resultRecentTras.temp.length > 0) {
+  //                 transation = resultRecentTras.temp;
+  //                 flag_noTrasation = false;
+  //               } else {
+  //                 transation = [];
+  //                 flag_noTrasation = true;
+  //               }
+  //               tranDetails = transation;
+  //               isNoTranstion = flag_noTrasation;
+  //             }
+  //           } else {
+  //             isNoTranstion = true;
+  //             tranDetails = [];
+  //           }
+  //           const resultUpdateTblAccount = await dbOpration.updateTableData(
+  //             localDB.tableName.tblAccount,
+  //             bal.balanceData.final_balance / 1e8,
+  //             resultAccount.temp[index].address,
+  //             lastUpdateDate
+  //           );
+  //           if (resultUpdateTblAccount) {
+  //             resultAccount = await dbOpration.readAccountTablesData(
+  //               localDB.tableName.tblAccount
+  //             );
+  //             isLoading1 = false;
+  //             this.setState({
+  //               accountTypeList: resultAccount.temp
+  //             });
+  //           }
+  //         } else {
+  //           this.dropdown.alertWithType(
+  //             "error",
+  //             "OH",
+  //             resultRecentTras.errorMessage
+  //           );
+  //         }
+  //       } else {
+  //         this.dropdown.alertWithType("error", "OH", bal.errorMessage);
+  //       }
+  //     } else {
+  //       isLoading1 = false;
+  //       let transation: [] = [];
+  //       let flag_noTrasation: boolean;
+  //       const resultRecentTras = await dbOpration.readRecentTransactionAddressWise(
+  //         localDB.tableName.tblTransaction,
+  //         resultAccount.temp[index].address
+  //       );
+  //       if (resultRecentTras.temp.length > 0) {
+  //         transation = resultRecentTras.temp;
+  //         flag_noTrasation = false;
+  //       } else {
+  //         transation = [];
+  //         flag_noTrasation = true;
+  //       }
+  //       tranDetails = transation;
+  //       isNoTranstion = flag_noTrasation;
+  //
+  //       this.setState({
+  //         accountTypeList: resultAccount.temp
+  //       });
+  //     }
+  //   } else {
+  //     (isNoTranstion = true), (tranDetails = []), (isLoading1 = false);
+  //   }
+  //
+  //   this.setState({
+  //     recentTransactionData: [
+  //       {
+  //         title,
+  //         isLoading1,
+  //         isNoTranstion,
+  //         tranDetails
+  //       }
+  //     ]
+  //   });
+  // }
 
   //TODO: func click_openPopupAccountType
   click_openPopupAccountType() {

@@ -30,8 +30,8 @@ var utils = require("bithyve/src/app/constants/Utils");
 import renderIf from "bithyve/src/app/constants/validation/renderIf";
 import Singleton from "bithyve/src/app/constants/Singleton";
 
-//TODO: RegularAccount
-import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
+//TODO: Bitcoin Files
+//import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
 
 //localization
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
@@ -90,87 +90,17 @@ export default class PasscodeConfirmScreen extends Component {
     try {
       let commonData = Singleton.getInstance();
       commonData.setPasscode(this.state.pincode);
-      const {
-        mnemonic,
-        address,
-        privateKey,
-        keyPair
-      } = await RegularAccount.createWallet();
-      const publicKey = keyPair.publicKey.toString("hex");
-      this.setState({
-        mnemonicValues: mnemonic.split(" ")
+      const username = "HexaWallet";
+      const password = this.state.pincode;
+      // Store the credentials
+      await Keychain.setGenericPassword(username, password);
+      AsyncStorage.setItem("PasscodeCreateStatus", JSON.stringify(true));
+      const resetAction = StackActions.reset({
+        index: 0, // <-- currect active route from actions array
+        key: null,
+        actions: [NavigationActions.navigate({ routeName: "TabbarBottom" })]
       });
-      if (this.state.mnemonicValues.length > 0) {
-        //mnemonic key
-        var mnemonicValue = this.state.mnemonicValues;
-        var priKeyValue = privateKey;
-        //User Details Data
-        const dateTime = Date.now();
-        const fulldate = Math.floor(dateTime / 1000);
-        const resultAccountType = await dbOpration.insertAccountTypeData(
-          localDB.tableName.tblAccountType,
-          fulldate
-        );
-        if (resultAccountType) {
-          const resultCreateWallet = await dbOpration.insertWallet(
-            localDB.tableName.tblWallet,
-            fulldate,
-            mnemonicValue,
-            priKeyValue,
-            address,
-            publicKey,
-            "Primary"
-          );
-          if (resultCreateWallet) {
-            const resultCreateAccountSaving = await dbOpration.insertCreateAccount(
-              localDB.tableName.tblAccount,
-              fulldate,
-              address,
-              "BTC",
-              "Savings",
-              "Savings",
-              ""
-            );
-            if (resultCreateAccountSaving) {
-              const resultCreateAccount = await dbOpration.insertCreateAccount(
-                localDB.tableName.tblAccount,
-                fulldate,
-                "",
-                "",
-                "UnKnown",
-                "UnKnown",
-                ""
-              );
-              if (resultCreateAccount) {
-                try {
-                  const username = "HexaWallet";
-                  const password = this.state.pincode;
-                  // Store the credentials
-                  await Keychain.setGenericPassword(username, password);
-                  AsyncStorage.setItem(
-                    "PasscodeCreateStatus",
-                    JSON.stringify(true)
-                  );
-                } catch (error) {
-                  // Error saving data
-                }
-                this.setState({
-                  success: "Ok"
-                  //isLoading: false
-                });
-                const resetAction = StackActions.reset({
-                  index: 0, // <-- currect active route from actions array
-                  key: null,
-                  actions: [
-                    NavigationActions.navigate({ routeName: "TabbarBottom" })
-                  ]
-                });
-                this.props.navigation.dispatch(resetAction);
-              }
-            }
-          }
-        }
-      }
+      this.props.navigation.dispatch(resetAction);
     } catch (e) {
       console.log({ e });
     }

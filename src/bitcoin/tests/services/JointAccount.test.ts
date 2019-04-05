@@ -1,6 +1,7 @@
-import jointAccount from "../../services/JointAccount";
+import JointAccount from "../../services/accounts/JointAccount";
 
 describe("Joint Account", () => {
+  let jointAccount: JointAccount;
   let initDetails: string;
   let mergeDetails: string;
   let ackDetails: string;
@@ -13,6 +14,7 @@ describe("Joint Account", () => {
   let txHex: string;
   beforeAll(async () => {
     jest.setTimeout(50000);
+    jointAccount = new JointAccount();
     creatorMnemonic =
       "image shell scatter purchase health bridge verify mirror abstract rhythm list bid";
     mergerMnemonic =
@@ -28,7 +30,7 @@ describe("Joint Account", () => {
   test("inititates the creation of joint account (cretor's end)", async () => {
     const details = {
       creator: "Matt",
-      walletName: "ST. Funding"
+      walletName: "ST. Funding",
     };
 
     initDetails = jointAccount.initiateJointAccount(creatorMnemonic, details);
@@ -44,12 +46,12 @@ describe("Joint Account", () => {
   test("merges an initiated joint account (merger's end)", async () => {
     const details = {
       jointDetails: initDetails,
-      merger: "Ken"
+      merger: "Ken",
     };
 
     const { multiSig, mergeJSON } = jointAccount.mergeJointAccount(
       mergerMnemonic,
-      details
+      details,
     );
     mergeDetails = mergeJSON;
     const { scripts, address } = multiSig;
@@ -75,11 +77,11 @@ describe("Joint Account", () => {
 
   test("completes an initiated joint account (creator's end)", () => {
     const details = {
-      jointDetails: ackDetails
+      jointDetails: ackDetails,
     };
     const { multiSig, creationJSON } = jointAccount.createInitiatedJointAccount(
       creatorMnemonic,
-      details
+      details,
     );
     creationDetails = creationJSON;
 
@@ -91,7 +93,7 @@ describe("Joint Account", () => {
     expect(add).toEqual(jointMultiSig.address);
     expect(typ).toEqual("imp");
     expect(cpk).toEqual(initiationDetails.cpk);
-    //console.log({ address: jointMultiSig.address });
+    console.log({ address: jointMultiSig.address });
   });
 
   test("inititates a transaction from a (pre-funded) joint account (txn construction and signing)", async () => {
@@ -100,10 +102,10 @@ describe("Joint Account", () => {
       recipientAddress: "2N4qBb5f1KyfbpHxtLM86QgbZ7qcxsFf9AL",
       amount: 4500,
       privateKey: creatorPriv,
-      scripts: jointMultiSig.scripts
+      scripts: jointMultiSig.scripts,
     });
 
-    if (res.statusCode === 200) {
+    if (res.status === 200) {
       txHex = res.data;
       expect(txHex).toBeDefined();
     } else {
@@ -113,11 +115,11 @@ describe("Joint Account", () => {
 
   test("finalizes an initiated transaction from the joint account (2nd signature provisioning and broadcasting)", async () => {
     const res = await jointAccount.authorizeJointTxn(txHex, mergerPriv);
-    if (res.statusCode !== 200) {
+    if (res.status !== 200) {
       throw new Error("finalization of the joint transaction failed");
     } else {
       const { txid } = res.data;
-      //console.log({ txid });
+      console.log({ txid });
       expect(txid).toBeDefined();
     }
   });

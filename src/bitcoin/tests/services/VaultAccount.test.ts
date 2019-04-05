@@ -1,8 +1,9 @@
 import bip65 from "bip65";
 import { ECPair } from "bitcoinjs-lib";
-import vaultAccount from "../../services/VaultAccount";
+import VaultAccount from "../../services/accounts/VaultAccount";
 
 describe("Vault Account", async () => {
+  let vaultAccount: VaultAccount;
   let mnemonic: string;
   let keyPair: ECPair;
   let vaultLockTime: number;
@@ -10,6 +11,7 @@ describe("Vault Account", async () => {
   let vaultAddress: string;
   beforeAll(async () => {
     jest.setTimeout(50000);
+    vaultAccount = new VaultAccount();
     const res = await vaultAccount.bitcoin.createHDWallet();
     mnemonic = res.mnemonic;
     keyPair = res.keyPair;
@@ -72,7 +74,7 @@ describe("Vault Account", async () => {
       transfer.privateKey,
     );
 
-    if (res.statusCode !== 200) {
+    if (res.status !== 200) {
       throw new Error("transaction from vault account failed");
     } else {
       expect(res.data.txid).toBeDefined();
@@ -105,7 +107,7 @@ describe("Vault Account", async () => {
       transfer.lockTime,
       transfer.privateKey,
     );
-    if (res.statusCode !== 200) {
+    if (res.status !== 200) {
       throw new Error("transaction from vault account failed");
     } else {
       expect(res.data.txid).toBeDefined();

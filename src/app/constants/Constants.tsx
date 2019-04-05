@@ -89,10 +89,18 @@ var images = {
   appBackgound: require(assetsImages + "icon/mainBackgoundImage.png"),
   appIcon: require(assetsImages + "appLogo.png"),
   slideMenuIcon: require(assetsImages + "icon/slideMenuImage.jpg"),
+  LaunchScreen: {
+    img1: require(assetsImages + "LaunchScrenn/screenbackground.png"),
+    img2: require(assetsImages + "LaunchScrenn/screenbackground1.png"),
+    img3: require(assetsImages + "LaunchScrenn/screenbackground2.png"),
+    hexaBaseCard: require(assetsImages + "LaunchScrenn/hexa_basecard.png"),
+    hexaLogo: require(assetsImages + "LaunchScrenn/hexalogo.png")  
+  },
   onBoardingScreen: {
-    onB1: require(assetsImages + "appLogo.png"),
-    onB2: require(assetsImages + "onBoardingScreen/secureAccount.jpeg"),
-    onB3: require(assetsImages + "onBoardingScreen/Selfsovereign.jpeg")
+    onB1: require(assetsImages +
+      "onBoardingScreen/illustration_multipleaccounts.png"),
+    onB2: require(assetsImages + "onBoardingScreen/illustration_security.png"),
+    onB3: require(assetsImages + "onBoardingScreen/illustration_share.png")
   },
   loginScreen: {
     backgoundImage: require(assetsImages + "loginscreen/loginBackgound.jpg"),
