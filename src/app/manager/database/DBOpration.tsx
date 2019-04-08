@@ -345,6 +345,9 @@ const insertWallet = (
   walletType: string
 ) => {
   let passcode = getPasscode();
+
+  console.log( { tblName, fulldate, mnemonicValue } );
+
   return new Promise( ( resolve, reject ) => {
     db.transaction( function ( txn ) {
       txn.executeSql(
