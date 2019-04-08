@@ -6,11 +6,12 @@
   "license": "ISC",
   "scripts": {
     "compile": "tsc",
-    "prepare": "cp -r -f ./src/app/lib/IssueFiles/Buffer/index.js ./node_modules/bip32/index.js && cp -r -f ./src/app/lib/IssueFiles/Model/index.js ./node_modules/source-map-support/source-map-support.js && cp -r -f ./src/app/lib/IssueFiles/slideMenuAndroid/MainActivity.java ./android/app/src/main/java/com/bithyve/hexa/MainActivity.java && cp -r -f ./src/app/lib/IssueFiles/qrcodeimagereader/ScannerMask.js  ./node_modules/react-native-barcode-scanners/src/ScannerMask.js && rn-nodeify --install --hack  &&  react-native link",
+    "prepare": "cp -r -f ./src/app/lib/IssueFiles/Buffer/index.js ./node_modules/bip32/index.js && cp -r -f ./src/app/lib/IssueFiles/Model/index.js ./node_modules/source-map-support/source-map-support.js && cp -r -f ./src/app/lib/IssueFiles/slideMenuAndroid/MainActivity.java ./android/app/src/main/java/com/bithyve/hexa/MainActivity.java && cp -r -f ./src/app/lib/IssueFiles/qrcodeimagereader/ScannerMask.js  ./node_modules/react-native-barcode-scanners/src/ScannerMask.js &&  cp -r -f ./src/app/lib/IssueFiles/Passcode/ConfirmationCodeInput.js ./node_modules/react-native-confirmation-code-input/components/ConfirmationCodeInput.js  && rn-nodeify --install --hack  &&  react-native link",
     "issuemodel": "cp -r -f .src/app/lib/IssueFiles/Model/index.js ./node_modules/source-map-support/source-map-support.js",
     "issueBuffer": "cp -r -f ./src/app/lib/IssueFiles/Buffer/index.js ./node_modules/bip32/index.js",
     "issueSlideMenuAndroid": "cp -r -f ./src/app/lib/IssueFiles/slideMenuAndroid/MainActivity.java ./android/app/src/main/java/com/bithyve/hexa/MainActivity.java",
     "issueQrcodeImageCode": "cp -r -f ./src/app/lib/IssueFiles/qrcodeimagereader/ScannerMask.js  ./node_modules/react-native-barcode-scanners/src/ScannerMask.js",
+    "issuePasscodeUI": "cp -r -f ./src/app/lib/IssueFiles/Passcode/ConfirmationCodeInput.js ./node_modules/react-native-confirmation-code-input/components/ConfirmationCodeInput.js",
     "compDatePickerVaultAccountScreenIOS": "cp -r -f ./src/assets/custComp/vaultAccountDatePickerView/index.js ./node_modules/react-native-datepicker/datepicker.js",
     "compSCLSubtitlenumberOfTextIncrement": "cp -r -f ./src/app/lib/IssueFiles/Alert/SclAlertSubtitle/subtitle.js ./node_modules/react-native-scl-alert/src/components/SCLAlertSubtitle.js",
     "start": "node node_modules/react-native/local-cli/cli.js start",
