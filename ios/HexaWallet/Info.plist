@@ -21,7 +21,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.1.280319</string>
+	<string>1.0.1.050419</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
@@ -66,8 +66,10 @@
 	<string>$(PRODUCT_NAME) would like to save photos to your photo gallery</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>$(PRODUCT_NAME) would like access to your photo gallery</string>
+  <key>UIViewControllerBasedStatusBarAppearance</key>
+  <string>YES</string>
 	<key>UIAppFonts</key>
-	<array>
+  <array>
 		<string>PermanentMarker.ttf</string>
 		<string>TomaSans.ttf</string>
 		<string>AntDesign.ttf</string>
