@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, SafeAreaView, Image } from "react-native";
+import { StyleSheet, View, SafeAreaView, Image, StatusBar } from "react-native";
 import { Text } from "native-base";
 import { StackActions, NavigationActions } from "react-navigation";
 import CreateTables from "bithyve/src/app/manager/database/CreateTables";
@@ -13,103 +13,104 @@ import { colors, images, msg } from "bithyve/src/app/constants/Constants";
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
 
 export default class OnBoardingScreen extends React.Component<any, any> {
-  constructor(props: any) {
-    super(props);
+  constructor ( props: any ) {
+    super( props );
     this.state = {
       data: []
     };
   }
 
   componentWillMount() {
-    this.setState({
-      data: localization("OnBoardingScreen.onBoarding")
-    });
+    this.setState( {
+      data: localization( "OnBoardingScreen.onBoarding" )
+    } );
   }
 
   //TODO: func click_Done
   click_Done() {
-    console.log("click");
-    const resetAction = StackActions.reset({
+    console.log( "click" );
+    const resetAction = StackActions.reset( {
       index: 0, // <-- currect active route from actions array
       key: null,
       actions: [
-        NavigationActions.navigate({ routeName: "PasscodeConfirmScreen" })
+        NavigationActions.navigate( { routeName: "PasscodeConfirmScreen" } )
       ]
-    });
-    this.props.navigation.dispatch(resetAction);
+    } );
+    this.props.navigation.dispatch( resetAction );
   }
 
   render() {
     const data = [
       {
-        backgroundColor: this.state.data[0].backgroundColor,
+        backgroundColor: this.state.data[ 0 ].backgroundColor,
         image: images.onBoardingScreen.onB1,
-        title: this.state.data[0].title,
-        subtitle: this.state.data[0].subtitle
+        title: this.state.data[ 0 ].title,
+        subtitle: this.state.data[ 0 ].subtitle
       },
       {
-        backgroundColor: this.state.data[1].backgroundColor,
+        backgroundColor: this.state.data[ 1 ].backgroundColor,
         image: images.onBoardingScreen.onB2,
-        title: this.state.data[1].title,
-        subtitle: this.state.data[2].subtitle
+        title: this.state.data[ 1 ].title,
+        subtitle: this.state.data[ 2 ].subtitle
       },
       {
-        backgroundColor: this.state.data[2].backgroundColor,
+        backgroundColor: this.state.data[ 2 ].backgroundColor,
         image: images.onBoardingScreen.onB3,
-        title: this.state.data[2].title,
-        subtitle: this.state.data[2].subtitle
+        title: this.state.data[ 2 ].title,
+        subtitle: this.state.data[ 2 ].subtitle
       }
     ];
     return (
-      <View style={styles.container}>
-        <SafeAreaView style={styles.container}>
-          <OnBoarding click_GetStarted={() => this.click_Done()}>
-            {/* First screen */}
-            <View style={[styles.slide]}>
+      <View style={ styles.container }>
+        <StatusBar backgroundColor={ colors.white } barStyle="dark-content" />
+        <SafeAreaView style={ styles.container }>
+          <OnBoarding click_GetStarted={ () => this.click_Done() }>
+            {/* First screen */ }
+            <View style={ [ styles.slide ] }>
               <Image
-                style={{ width: 240, height: 240 }}
+                style={ { width: 240, height: 240 } }
                 resizeMode="contain"
-                source={data[0].image}
+                source={ data[ 0 ].image }
               />
-              <Text style={styles.header}>{data[0].title}</Text>
-              <Text note style={styles.text}>
-                {data[0].subtitle}
+              <Text style={ styles.header }>{ data[ 0 ].title }</Text>
+              <Text note style={ styles.text }>
+                { data[ 0 ].subtitle }
               </Text>
             </View>
-            {/* Second screen */}
-            <View style={[styles.slide]}>
+            {/* Second screen */ }
+            <View style={ [ styles.slide ] }>
               <Image
-                style={{ width: 240, height: 240 }}
+                style={ { width: 240, height: 240 } }
                 resizeMode="contain"
-                source={data[1].image}
+                source={ data[ 1 ].image }
               />
-              <Text style={styles.header}>{data[1].title}</Text>
-              <Text note style={styles.text}>
-                {data[1].subtitle}
+              <Text style={ styles.header }>{ data[ 1 ].title }</Text>
+              <Text note style={ styles.text }>
+                { data[ 1 ].subtitle }
               </Text>
             </View>
-            {/* Third screen */}
-            <View style={[styles.slide]}>
+            {/* Third screen */ }
+            <View style={ [ styles.slide ] }>
               <Image
-                style={{ width: 240, height: 240 }}
+                style={ { width: 240, height: 240 } }
                 resizeMode="contain"
-                source={data[2].image}
+                source={ data[ 2 ].image }
               />
-              <Text style={styles.header}>{data[2].title}</Text>
-              <Text note style={styles.text}>
-                {data[2].subtitle}
+              <Text style={ styles.header }>{ data[ 2 ].title }</Text>
+              <Text note style={ styles.text }>
+                { data[ 2 ].subtitle }
               </Text>
             </View>
           </OnBoarding>
           <CreateTables />
-          {/* <PushController /> */}
+          {/* <PushController /> */ }
         </SafeAreaView>
       </View>
     );
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1
   },
@@ -134,4 +135,4 @@ const styles = StyleSheet.create({
     marginHorizontal: 40,
     textAlign: "center"
   }
-});
+} );

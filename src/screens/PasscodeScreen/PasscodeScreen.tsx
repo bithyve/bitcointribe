@@ -32,12 +32,12 @@ import {
   errorValidMsg
 } from "bithyve/src/app/constants/Constants";
 import utils from "bithyve/src/app/constants/Utils";
-var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
+var dbOpration = require( "bithyve/src/app/manager/database/DBOpration" );
 import renderIf from "bithyve/src/app/constants/validation/renderIf";
 
 export default class PasscodeScreen extends Component {
-  constructor(props: any) {
-    super(props);
+  constructor ( props: any ) {
+    super( props );
     this.state = {
       mnemonicValues: [],
       status: false,
@@ -61,19 +61,19 @@ export default class PasscodeScreen extends Component {
 
   retrieveData = async () => {
     try {
-      AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(true));
+      AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
       const credentials = await Keychain.getGenericPassword();
-      this.setState({
+      this.setState( {
         pincode: credentials.password
-      });
-    } catch (error) {
-      console.log(error);
+      } );
+    } catch ( error ) {
+      console.log( error );
     }
   };
 
-  _onFinishCheckingCode(isValid: boolean, code: string) {
-    if (isValid) {
-      this.setState({
+  _onFinishCheckingCode( isValid: boolean, code: string ) {
+    if ( isValid ) {
+      this.setState( {
         status: true,
         passcodeStyle: [
           {
@@ -82,9 +82,9 @@ export default class PasscodeScreen extends Component {
             cellBorderWidth: 0
           }
         ]
-      });
+      } );
     } else {
-      this.setState({
+      this.setState( {
         passcodeStyle: [
           {
             activeColor: "red",
@@ -92,63 +92,63 @@ export default class PasscodeScreen extends Component {
             cellBorderWidth: 1
           }
         ]
-      });
+      } );
     }
   }
 
-  onSuccess = (code: string) => {
+  onSuccess = ( code: string ) => {
     let commonData = Singleton.getInstance();
     let pageName = commonData.getRootViewController();
-    if (pageName == "TabbarBottom") {
-      const resetAction = StackActions.reset({
+    if ( pageName == "TabbarBottom" ) {
+      const resetAction = StackActions.reset( {
         index: 0, // <-- currect active route from actions array
         key: null,
         actions: [
-          NavigationActions.navigate({
+          NavigationActions.navigate( {
             routeName: pageName
-          })
+          } )
         ]
-      });
-      this.props.navigation.dispatch(resetAction);
+      } );
+      this.props.navigation.dispatch( resetAction );
     } else {
-      this.setState({ flag_dialogShow: true });
+      this.setState( { flag_dialogShow: true } );
     }
   };
 
   //TODO: func urlDecription
-  async urlDecription(code: any) {
+  async urlDecription( code: any ) {
     let commonData = Singleton.getInstance();
     let pageName = commonData.getRootViewController();
     var script = commonData.getDeepLinkingUrl();
-    script = script.split("_+_").join("/");
-    let deepLinkingUrl = utils.decrypt(script, code.toString());
-    if (deepLinkingUrl) {
+    script = script.split( "_+_" ).join( "/" );
+    let deepLinkingUrl = utils.decrypt( script, code.toString() );
+    if ( deepLinkingUrl ) {
       const resultWallet = await dbOpration.readTablesData(
         localDB.tableName.tblWallet
       );
-      console.log({ resultWallet });
-      let publicKey = resultWallet.temp[0].publicKey;
-      let JsonDeepLinkingData = JSON.parse(deepLinkingUrl);
-      if (publicKey == JsonDeepLinkingData.cpk) {
-        console.log("same public key");
+      console.log( { resultWallet } );
+      let publicKey = resultWallet.temp[ 0 ].publicKey;
+      let JsonDeepLinkingData = JSON.parse( deepLinkingUrl );
+      if ( publicKey == JsonDeepLinkingData.cpk ) {
+        console.log( "same public key" );
         Keyboard.dismiss();
       } else {
-        const resetAction = StackActions.reset({
+        const resetAction = StackActions.reset( {
           index: 0, // <-- currect active route from actions array
           key: null,
           actions: [
-            NavigationActions.navigate({
+            NavigationActions.navigate( {
               routeName: pageName,
               params: {
                 data: deepLinkingUrl
               }
-            })
+            } )
           ]
-        });
-        this.props.navigation.dispatch(resetAction);
+        } );
+        this.props.navigation.dispatch( resetAction );
       }
-      commonData.setRootViewController("TabbarBottom");
-      this.setState({ flag_dialogShow: false });
+      commonData.setRootViewController( "TabbarBottom" );
+      this.setState( { flag_dialogShow: false } );
     } else {
       this.refs.codeInputRefUrlEncp.clear();
     }
@@ -156,66 +156,66 @@ export default class PasscodeScreen extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <StatusBar backgroundColor={colors.appColor} barStyle="dark-content" />
+      <View style={ styles.container }>
+        <StatusBar backgroundColor={ colors.white } barStyle="dark-content" />
         <KeyboardAwareScrollView
           enableAutomaticScroll
-          automaticallyAdjustContentInsets={true}
-          keyboardOpeningTime={0}
-          enableOnAndroid={true}
-          contentContainerStyle={{ flexGrow: 1 }}
+          automaticallyAdjustContentInsets={ true }
+          keyboardOpeningTime={ 0 }
+          enableOnAndroid={ true }
+          contentContainerStyle={ { flexGrow: 1 } }
         >
-          <View style={styles.viewAppLogo}>
-            <Image style={styles.imgAppLogo} source={images.appIcon} />
+          <View style={ styles.viewAppLogo }>
+            <Image style={ styles.imgAppLogo } source={ images.appIcon } />
             <Text
-              style={[{ color: "#000000", fontWeight: "bold", marginTop: 20 }]}
+              style={ [ { color: "#000000", fontWeight: "bold", marginTop: 20 } ] }
             >
               Hello, Crypto wizard
             </Text>
           </View>
-          <View style={styles.viewPasscode}>
+          <View style={ styles.viewPasscode }>
             <Text
-              style={{ marginTop: 10, fontWeight: "bold", color: "#8B8B8B" }}
+              style={ { marginTop: 10, fontWeight: "bold", color: "#8B8B8B" } }
             >
-              Re - Enter Passcode{" "}
+              Re - Enter Passcode{ " " }
             </Text>
             <CodeInput
               ref="codeInputRef1"
               secureTextEntry
               keyboardType="numeric"
-              codeLength={5}
-              compareWithCode={this.state.pincode}
-              activeColor={this.state.passcodeStyle[0].activeColor}
-              inactiveColor={this.state.passcodeStyle[0].inactiveColor}
+              codeLength={ 5 }
+              compareWithCode={ this.state.pincode }
+              activeColor={ this.state.passcodeStyle[ 0 ].activeColor }
+              inactiveColor={ this.state.passcodeStyle[ 0 ].inactiveColor }
               className="border-box"
-              cellBorderWidth={this.state.passcodeStyle[0].cellBorderWidth}
-              compareWithCode={this.state.pincode}
-              autoFocus={true}
+              cellBorderWidth={ this.state.passcodeStyle[ 0 ].cellBorderWidth }
+              compareWithCode={ this.state.pincode }
+              autoFocus={ true }
               inputPosition="center"
-              space={10}
-              size={55}
-              codeInputStyle={{ borderRadius: 5, backgroundColor: "#F1F1F1" }}
-              containerStyle={{
+              space={ 10 }
+              size={ 55 }
+              codeInputStyle={ { borderRadius: 5, backgroundColor: "#F1F1F1" } }
+              containerStyle={ {
                 alignItems: "center",
                 justifyContent: "center",
                 height: 0
-              }}
-              onFulfill={(isValid, code) =>
-                this._onFinishCheckingCode(isValid, code)
+              } }
+              onFulfill={ ( isValid, code ) =>
+                this._onFinishCheckingCode( isValid, code )
               }
             />
-            {renderIf(this.state.passcodeStyle[0].activeColor == "red")(
-              <Text style={{ color: "red" }}>{this.state.success}</Text>
-            )}
+            { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
+              <Text style={ { color: "red" } }>{ this.state.success }</Text>
+            ) }
           </View>
-          <View style={styles.viewBtnProceed}>
+          <View style={ styles.viewBtnProceed }>
             <FullLinearGradientButton
               style={
                 this.state.status == true ? { opacity: 1 } : { opacity: 0.4 }
               }
-              disabled={this.state.status == true ? false : true}
+              disabled={ this.state.status == true ? false : true }
               title="LOGIN"
-              click_Done={() => this.onSuccess(this.state.pincode)}
+              click_Done={ () => this.onSuccess( this.state.pincode ) }
             />
           </View>
         </KeyboardAwareScrollView>
@@ -224,7 +224,7 @@ export default class PasscodeScreen extends Component {
   }
 }
 
-let styles = StyleSheet.create({
+let styles = StyleSheet.create( {
   container: {
     flex: 1
   },
@@ -246,4 +246,4 @@ let styles = StyleSheet.create({
     justifyContent: "flex-end",
     marginBottom: 20
   }
-});
+} );

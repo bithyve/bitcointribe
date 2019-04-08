@@ -116,6 +116,7 @@ export default class SSS {
       if (!res.data.share) {
         return { status: 400, err: res.data.err };
       }
+
       return { status: res.status, otpEncryptedShare: res.data.share };
     } catch (err) {
       console.log(err);
@@ -176,7 +177,7 @@ export default class SSS {
     }
   }
 
-  public validateDecryption = (decryptedShare, existingShares?: any[]) => {
+  public validateDecryption = (decryptedShare, existingShares?: any[] = []) => {
     if (decryptedShare.meta.walletID === this.getWalletId(this.mnemonic)) {
       throw new Error("You're not allowed to be your own trusted party");
     }

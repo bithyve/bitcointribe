@@ -164,7 +164,7 @@ const TabNavigator = createBottomTabNavigator(
         drawerLockMode: "locked-open",
         tabBarIcon: ({ tintColor }) => (
           <Icon name="wallet" color={tintColor} size={25} />
-        )
+        )     
       }
     },
     Analytics: {

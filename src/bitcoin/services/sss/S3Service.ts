@@ -55,10 +55,10 @@ export default class S3Service {
   public createQRShare = (encryptedShare: string, tag: string) =>
     this.sss.addMeta(encryptedShare, tag);
 
-  public uploadShare = (otpEncryptedShare: string) => {
+  public uploadShare = async (otpEncryptedShare: string) => {
     const messageId = this.sss.generateMessageID();
     return this.sss.uploadShare(otpEncryptedShare, messageId);
-  };
+  };s
 
   public downloadShare = async (messageId: string) => {
     const { otpEncryptedShare } = await this.sss.downloadShare(messageId);
