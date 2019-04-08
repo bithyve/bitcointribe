@@ -25,20 +25,24 @@ import {
   errorValidMsg,
   images
 } from "bithyve/src/app/constants/Constants";
-var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
-var utils = require("bithyve/src/app/constants/Utils");
+var dbOpration = require( "bithyve/src/app/manager/database/DBOpration" );
+var utils = require( "bithyve/src/app/constants/Utils" );
 import renderIf from "bithyve/src/app/constants/validation/renderIf";
 import Singleton from "bithyve/src/app/constants/Singleton";
 
 //TODO: Bitcoin Files
 //import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
 
-//localization
+
+//TODO: Local Varible    
+let isNetwork: Boolean;
+
+//TODO: Localization   
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
 
 export default class PasscodeConfirmScreen extends Component {
-  constructor(props: any) {
-    super(props);
+  constructor ( props: any ) {
+    super( props );
     this.state = {
       mnemonicValues: [],
       status: false,
@@ -55,15 +59,15 @@ export default class PasscodeConfirmScreen extends Component {
     isNetwork = utils.getNetwork();
   }
 
-  onCheckPincode(code: any) {
-    this.setState({
+  onCheckPincode( code: any ) {
+    this.setState( {
       pincode: code
-    });
+    } );
   }
 
-  _onFinishCheckingCode2(isValid, code) {
-    if (isValid) {
-      this.setState({
+  _onFinishCheckingCode2( isValid: boolean, code: any ) {
+    if ( isValid ) {
+      this.setState( {
         status: true,
         passcodeSecoundStyle: [
           {
@@ -72,9 +76,9 @@ export default class PasscodeConfirmScreen extends Component {
             cellBorderWidth: 0
           }
         ]
-      });
+      } );
     } else {
-      this.setState({
+      this.setState( {
         passcodeSecoundStyle: [
           {
             activeColor: "red",
@@ -82,52 +86,52 @@ export default class PasscodeConfirmScreen extends Component {
             cellBorderWidth: 1
           }
         ]
-      });
+      } );
     }
   }
 
   saveData = async () => {
     try {
       let commonData = Singleton.getInstance();
-      commonData.setPasscode(this.state.pincode);
+      commonData.setPasscode( this.state.pincode );
       const username = "HexaWallet";
       const password = this.state.pincode;
       // Store the credentials
-      await Keychain.setGenericPassword(username, password);
-      AsyncStorage.setItem("PasscodeCreateStatus", JSON.stringify(true));
-      const resetAction = StackActions.reset({
+      await Keychain.setGenericPassword( username, password );
+      AsyncStorage.setItem( "PasscodeCreateStatus", JSON.stringify( true ) );
+      const resetAction = StackActions.reset( {
         index: 0, // <-- currect active route from actions array
         key: null,
-        actions: [NavigationActions.navigate({ routeName: "TabbarBottom" })]
-      });
-      this.props.navigation.dispatch(resetAction);
-    } catch (e) {
-      console.log({ e });
+        actions: [ NavigationActions.navigate( { routeName: "TabbarBottom" } ) ]
+      } );
+      this.props.navigation.dispatch( resetAction );
+    } catch ( e ) {
+      console.log( { e } );
     }
   };
 
   render() {
     return (
-      <View style={styles.container}>
-        <StatusBar backgroundColor={colors.appColor} barStyle="dark-content" />
+      <View style={ styles.container }>
+        <StatusBar backgroundColor={ colors.white } barStyle="dark-content" />
         <KeyboardAwareScrollView
           enableAutomaticScroll
-          automaticallyAdjustContentInsets={true}
-          keyboardOpeningTime={0}
-          enableOnAndroid={true}
-          contentContainerStyle={{ flexGrow: 1 }}
+          automaticallyAdjustContentInsets={ true }
+          keyboardOpeningTime={ 0 }
+          enableOnAndroid={ true }
+          contentContainerStyle={ { flexGrow: 1 } }
         >
-          <View style={styles.viewAppLogo}>
-            <Image style={styles.imgAppLogo} source={images.appIcon} />
+          <View style={ styles.viewAppLogo }>
+            <Image style={ styles.imgAppLogo } source={ images.appIcon } />
             <Text
-              style={[{ color: "#000000", fontWeight: "bold", marginTop: 20 }]}
+              style={ [ { color: "#000000", fontWeight: "bold", marginTop: 20 } ] }
             >
               Hello, Crypto wizard
             </Text>
           </View>
-          <View style={styles.viewFirstPasscode}>
+          <View style={ styles.viewFirstPasscode }>
             <Text
-              style={{ marginTop: 10, fontWeight: "bold", color: "#8B8B8B" }}
+              style={ { marginTop: 10, fontWeight: "bold", color: "#8B8B8B" } }
               note
             >
               Create Passcode
@@ -136,71 +140,71 @@ export default class PasscodeConfirmScreen extends Component {
               ref="codeInputRef"
               secureTextEntry
               keyboardType="numeric"
-              codeLength={5}
-              activeColor={colors.black}
-              inactiveColor={colors.black}
+              codeLength={ 5 }
+              activeColor={ colors.black }
+              inactiveColor={ colors.black }
               className="border-box"
-              cellBorderWidth={0}
-              autoFocus={true}
+              cellBorderWidth={ 0 }
+              autoFocus={ true }
               inputPosition="center"
-              space={10}
-              size={55}
-              containerStyle={{
+              space={ 10 }
+              size={ 55 }
+              containerStyle={ {
                 alignItems: "center",
                 justifyContent: "center",
                 height: 0
-              }}
-              codeInputStyle={{
+              } }
+              codeInputStyle={ {
                 borderRadius: 5,
                 backgroundColor: "#F1F1F1"
-              }}
-              onFulfill={code => this.onCheckPincode(code)}
+              } }
+              onFulfill={ code => this.onCheckPincode( code ) }
             />
           </View>
-          <View style={styles.viewSecoundPasscode}>
+          <View style={ styles.viewSecoundPasscode }>
             <Text
-              style={{ marginTop: 10, fontWeight: "bold", color: "#8B8B8B" }}
+              style={ { marginTop: 10, fontWeight: "bold", color: "#8B8B8B" } }
             >
-              Re - Enter Passcode{" "}
+              Re - Enter Passcode{ " " }
             </Text>
             <CodeInput
               ref="codeInputRef1"
               secureTextEntry
               keyboardType="numeric"
-              codeLength={5}
-              activeColor={this.state.passcodeSecoundStyle[0].activeColor}
-              inactiveColor={this.state.passcodeSecoundStyle[0].inactiveColor}
+              codeLength={ 5 }
+              activeColor={ this.state.passcodeSecoundStyle[ 0 ].activeColor }
+              inactiveColor={ this.state.passcodeSecoundStyle[ 0 ].inactiveColor }
               className="border-box"
               cellBorderWidth={
-                this.state.passcodeSecoundStyle[0].cellBorderWidth
+                this.state.passcodeSecoundStyle[ 0 ].cellBorderWidth
               }
-              compareWithCode={this.state.pincode}
-              autoFocus={false}
+              compareWithCode={ this.state.pincode }
+              autoFocus={ false }
               inputPosition="center"
-              space={10}
-              size={55}
-              codeInputStyle={{ borderRadius: 5, backgroundColor: "#F1F1F1" }}
-              containerStyle={{
+              space={ 10 }
+              size={ 55 }
+              codeInputStyle={ { borderRadius: 5, backgroundColor: "#F1F1F1" } }
+              containerStyle={ {
                 alignItems: "center",
                 justifyContent: "center",
                 height: 0
-              }}
-              onFulfill={(isValid, code) =>
-                this._onFinishCheckingCode2(isValid, code)
+              } }
+              onFulfill={ ( isValid, code ) =>
+                this._onFinishCheckingCode2( isValid, code )
               }
             />
-            {renderIf(this.state.passcodeSecoundStyle[0].activeColor == "red")(
-              <Text style={{ color: "red" }}>{this.state.success}</Text>
-            )}
+            { renderIf( this.state.passcodeSecoundStyle[ 0 ].activeColor == "red" )(
+              <Text style={ { color: "red" } }>{ this.state.success }</Text>
+            ) }
           </View>
-          <View style={styles.viewBtnProceed}>
+          <View style={ styles.viewBtnProceed }>
             <FullLinearGradientButton
               style={
                 this.state.status == true ? { opacity: 1 } : { opacity: 0.4 }
               }
-              disabled={this.state.status == true ? false : true}
+              disabled={ this.state.status == true ? false : true }
               title="PROCEED"
-              click_Done={() => this.saveData(this.state.pincode)}
+              click_Done={ () => this.saveData( this.state.pincode ) }
             />
           </View>
         </KeyboardAwareScrollView>
@@ -209,7 +213,7 @@ export default class PasscodeConfirmScreen extends Component {
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1
   },
@@ -233,4 +237,4 @@ const styles = StyleSheet.create({
     height: 150,
     width: 150
   }
-});
+} );

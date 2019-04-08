@@ -3,6 +3,7 @@ import HDSegwitWallet from "../../utilities/HDSegwitWallet";
 
 export default class RegularAccount {
   public hdWallet: HDSegwitWallet;
+
   constructor(mnemonic?: string) {
     if (mnemonic) {
       if (bip39.validateMnemonic(mnemonic)) {
@@ -14,6 +15,8 @@ export default class RegularAccount {
       this.hdWallet = new HDSegwitWallet();
     }
   }
+
+  public getMnemonic = () => this.hdWallet.getMnemonic();
 
   public getAddress = async () => await this.hdWallet.getReceivingAddress();
 

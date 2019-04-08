@@ -131,6 +131,7 @@ keyAlias "hexawallet"
     buildTypes {
         release {
               aaptOptions.cruncherEnabled=false // here
+              signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }

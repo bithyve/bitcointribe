@@ -24,57 +24,58 @@ interface Props {
 }
 
 export default class LaunchScreen extends Component<Props, any> {
-  constructor(props: any) {
-    super(props);
-    this.state = ({
+  constructor ( props: any ) {
+    super( props );
+    this.state = ( {
       centerLogo: null,
-      centerLogoOpticy:new Animated.Value(0)
-    })
+      centerLogoOpticy: new Animated.Value( 0 )
+    } )
 
   }
 
   async componentDidMount() {
     let commonData = Singleton.getInstance();
-    let value = await AsyncStorage.getItem("PasscodeCreateStatus");
-    let status = JSON.parse(value);
+    let value = await AsyncStorage.getItem( "PasscodeCreateStatus" );
+    let status = JSON.parse( value );
     const credentials = await Keychain.getGenericPassword();
-    commonData.setPasscode(credentials.password);
-    setTimeout(() => {
-      if (status) {
-        this.props.onComplited(false, "PasscodeScreen");
+    commonData.setPasscode( credentials.password );
+    setTimeout( () => {
+      if ( status ) {
+        this.props.onComplited( false, "PasscodeScreen" );
       } else {
-        this.props.onComplited(false, "OnBoardingNavigator");
+        this.props.onComplited( false, "OnBoardingNavigator" );
       }
-    }, 3000);
+    }, 3000 );
 
-    Animated.timing(this.state.centerLogoOpticy,{
-      toValue:1,
-      duration:100,
-      easing:Easing.bounce
-    }).start();
+    Animated.timing( this.state.centerLogoOpticy, {
+      toValue: 1,
+      duration: 100,
+      easing: Easing.bounce
+    } ).start();
 
-    setTimeout(()=>{
-        this.setState({centerLogo:images.LaunchScreen.hexaBaseCard})
-    },1000);
-    setTimeout(()=> {
-        this.setState({centerLogo:images.LaunchScreen.hexaLogo})
-    },2000);
-}
+    setTimeout( () => {
+      this.setState( { centerLogo: images.LaunchScreen.hexaBaseCard } )
+    }, 1000 );
+    setTimeout( () => {
+      this.setState( { centerLogo: images.LaunchScreen.hexaLogo } )
+    }, 2000 );
+  }
 
   render() {
-    const animatedOpcity = {opacity:this.state.centerLogoOpticy}
+    const animatedOpcity = { opacity: this.state.centerLogoOpticy }
     return (
-      <View style={styles.container}>
+      <View style={ styles.container }>
+        <StatusBar hidden />
         <ImageBackground
-          source={images.LaunchScreen.img1}
-          style={styles.backgroundImage}
-          imageStyle={{
+          source={ images.LaunchScreen.img1 }
+          style={ styles.backgroundImage }
+          imageStyle={ {
             resizeMode: "cover" // works only here!
-          }}
+          } }
         >
           <Animated.Image
-            source={this.state.centerLogo}
-            style={[animatedOpcity,{ height: 200, width: 200 }]}
+            source={ this.state.centerLogo }
+            style={ [ animatedOpcity, { height: 200, width: 200 } ] }
           />
         </ImageBackground>
       </View>
@@ -82,7 +83,7 @@ export default class LaunchScreen extends Component<Props, any> {
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1
   },
@@ -91,4 +92,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center"
   }
-});
+} );
