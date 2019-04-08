@@ -33,6 +33,7 @@ import { Icon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
 
 //Custome Compontes
+import CustomeStatusBar from "bithyve/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import SCLAlertAccountTypes from "bithyve/src/app/custcompontes/alert/SCLAlertAccountTypes";
 import ViewRecentTransaction from "bithyve/src/app/custcompontes/view/ViewRecentTransaction";
 import TabBarWalletScreen from "bithyve/src/app/custcompontes/view/tabbar/TabBarWalletScreen/TabBarWalletScreen";
@@ -172,17 +173,7 @@ export default class WalletScreen extends React.Component {
     return (
       <Container>
         <Content scrollEnabled={ false } contentContainerStyle={ styles.container }>
-          <View
-            style={ {
-              backgroundColor: colors.appColor,
-              height: Platform.OS === 'ios' ? 20 : StatusBar.currentHeight,
-            } }>
-            <StatusBar
-              barStyle="light-content"
-              backgroundColor={ colors.appColor }
-              translucent={ false }
-            />
-          </View>
+          <CustomeStatusBar />
           <SafeAreaView style={ styles.container }>
             {/* title */ }
             <Animated.View
