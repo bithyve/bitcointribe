@@ -16,6 +16,7 @@ import * as Keychain from "react-native-keychain";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //TODO: Custome Pages
+import CustomeStatusBar from "bithyve/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "bithyve/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 
 import Singleton from "bithyve/src/app/constants/Singleton";
@@ -157,7 +158,7 @@ export default class PasscodeScreen extends Component {
   render() {
     return (
       <View style={ styles.container }>
-        <StatusBar backgroundColor={ colors.white } barStyle="dark-content" />
+        <CustomeStatusBar backgroundColor={ colors.white } barStyle="dark-content" />
         <KeyboardAwareScrollView
           enableAutomaticScroll
           automaticallyAdjustContentInsets={ true }

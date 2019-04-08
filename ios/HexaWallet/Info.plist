@@ -66,10 +66,10 @@
 	<string>$(PRODUCT_NAME) would like to save photos to your photo gallery</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>$(PRODUCT_NAME) would like access to your photo gallery</string>
-  <key>UIViewControllerBasedStatusBarAppearance</key>
-  <string>YES</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
 	<key>UIAppFonts</key>
-  <array>
+	<array>
 		<string>PermanentMarker.ttf</string>
 		<string>TomaSans.ttf</string>
 		<string>AntDesign.ttf</string>
@@ -103,7 +103,5 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
-	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
 </dict>
 </plist>

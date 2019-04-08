@@ -168,12 +168,11 @@ export default class WalletScreen extends React.Component {
   //   const decryptedStorageShare = await sss.decryptOTPEncShare(otpEncryptedShare, messageId, otp);
   //   console.log({ decryptedStorageShare })
   // }
-
   render() {
     return (
       <Container>
         <Content scrollEnabled={ false } contentContainerStyle={ styles.container }>
-          <CustomeStatusBar />
+          <CustomeStatusBar backgroundColor={ colors.appColor } barStyle="light-content" />
           <SafeAreaView style={ styles.container }>
             {/* title */ }
             <Animated.View

@@ -3,7 +3,9 @@ import { StyleSheet, View, SafeAreaView, Image, StatusBar } from "react-native";
 import { Text } from "native-base";
 import { StackActions, NavigationActions } from "react-navigation";
 import CreateTables from "bithyve/src/app/manager/database/CreateTables";
+
 //Custome Compontes
+import CustomeStatusBar from "bithyve/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import OnBoarding from "bithyve/src/app/custcompontes/OnBoarding/OnBoarding";
 
 //TODO: Custome object
@@ -62,7 +64,7 @@ export default class OnBoardingScreen extends React.Component<any, any> {
     ];
     return (
       <View style={ styles.container }>
-        <StatusBar backgroundColor={ colors.white } barStyle="dark-content" />
+        <CustomeStatusBar backgroundColor={ colors.white } barStyle="dark-content" />
         <SafeAreaView style={ styles.container }>
           <OnBoarding click_GetStarted={ () => this.click_Done() }>
             {/* First screen */ }

@@ -16,6 +16,7 @@ import * as Keychain from "react-native-keychain";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //TODO: Custome Pages
+import CustomeStatusBar from "bithyve/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "bithyve/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 
 //TODO: Custome Object
@@ -113,13 +114,11 @@ export default class PasscodeConfirmScreen extends Component {
   render() {
     return (
       <View style={ styles.container }>
-        <StatusBar backgroundColor={ colors.white } barStyle="dark-content" />
+        <CustomeStatusBar backgroundColor={ colors.white } barStyle="dark-content" />
         <KeyboardAwareScrollView
-          enableAutomaticScroll
-          automaticallyAdjustContentInsets={ true }
-          keyboardOpeningTime={ 0 }
-          enableOnAndroid={ true }
-          contentContainerStyle={ { flexGrow: 1 } }
+          enableOnAndroid
+          extraScrollHeight={ 40 }
+          contentContainerStyle={ { flexGrow: 1, } }
         >
           <View style={ styles.viewAppLogo }>
             <Image style={ styles.imgAppLogo } source={ images.appIcon } />
@@ -152,7 +151,7 @@ export default class PasscodeConfirmScreen extends Component {
               containerStyle={ {
                 alignItems: "center",
                 justifyContent: "center",
-                height: 0
+                height: Platform.OS == "ios" ? 0 : 40,
               } }
               codeInputStyle={ {
                 borderRadius: 5,
@@ -187,7 +186,7 @@ export default class PasscodeConfirmScreen extends Component {
               containerStyle={ {
                 alignItems: "center",
                 justifyContent: "center",
-                height: 0
+                height: Platform.OS == "ios" ? 0 : 40,
               } }
               onFulfill={ ( isValid, code ) =>
                 this._onFinishCheckingCode2( isValid, code )
@@ -231,7 +230,8 @@ const styles = StyleSheet.create( {
     alignItems: "center"
   },
   viewBtnProceed: {
-    flex: 0.2
+    flex: 0.2,
+    marginTop: 20
   },
   imgAppLogo: {
     height: 150,
