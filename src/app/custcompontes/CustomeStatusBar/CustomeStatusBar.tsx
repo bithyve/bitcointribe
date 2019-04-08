@@ -4,8 +4,6 @@ import {
     Platform,
     StatusBar
 } from "react-native";
-
-
 //TODO: Custome object
 import {
     colors
@@ -17,17 +15,16 @@ export default class CustomeStatusBar extends Component<any, any> {
     constructor ( props: any ) {
         super( props );
     }
-
     render() {
         return (
             <View
                 style={ {
-                    backgroundColor: colors.appColor,
+                    backgroundColor: this.props.backgroundColor,
                     height: Platform.OS === 'ios' ? utils.getStatusBarHeight() : StatusBar.currentHeight,
                 } }>
                 <StatusBar
-                    barStyle="light-content"
-                    backgroundColor={ colors.appColor }
+                    barStyle={ this.props.barStyle }
+                    backgroundColor={ this.props.backgroundColor }
                     translucent={ false }
                 />
             </View>
