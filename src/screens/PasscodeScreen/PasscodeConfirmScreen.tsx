@@ -14,10 +14,11 @@ import { StackActions, NavigationActions } from "react-navigation";
 import CodeInput from "react-native-confirmation-code-input";
 import * as Keychain from "react-native-keychain";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-
+import Loader from "bithyve/src/app/custcompontes/Loader/ModelLoader";
 //TODO: Custome Pages
 import CustomeStatusBar from "bithyve/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "bithyve/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import bip39 from "bip39";
 
 //TODO: Custome Object
 import {
@@ -32,7 +33,6 @@ import renderIf from "bithyve/src/app/constants/validation/renderIf";
 import Singleton from "bithyve/src/app/constants/Singleton";
 
 //TODO: Bitcoin Files
-//import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
 
 
 //TODO: Local Varible    
@@ -40,6 +40,7 @@ let isNetwork: Boolean;
 
 //TODO: Localization   
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
+
 
 export default class PasscodeConfirmScreen extends Component {
   constructor ( props: any ) {
@@ -55,7 +56,8 @@ export default class PasscodeConfirmScreen extends Component {
           inactiveColor: colors.black,
           cellBorderWidth: 0
         }
-      ]
+      ],
+      isLoading: false
     };
     isNetwork = utils.getNetwork();
   }
@@ -93,19 +95,67 @@ export default class PasscodeConfirmScreen extends Component {
 
   saveData = async () => {
     try {
+      this.setState( {
+        isLoading: true
+      } )
+      let code = this.state.pincode;
       let commonData = Singleton.getInstance();
-      commonData.setPasscode( this.state.pincode );
-      const username = "HexaWallet";
-      const password = this.state.pincode;
-      // Store the credentials
-      await Keychain.setGenericPassword( username, password );
-      AsyncStorage.setItem( "PasscodeCreateStatus", JSON.stringify( true ) );
-      const resetAction = StackActions.reset( {
-        index: 0, // <-- currect active route from actions array
-        key: null,
-        actions: [ NavigationActions.navigate( { routeName: "TabbarBottom" } ) ]
-      } );
-      this.props.navigation.dispatch( resetAction );
+      commonData.setPasscode( code );
+      var mnemonic = bip39.generateMnemonic();
+      mnemonic = mnemonic.split( " " );
+      console.log( { mnemonic } );
+
+      const dateTime = Date.now();
+      const fulldate = Math.floor( dateTime / 1000 );
+      const resultCreateWallet = await dbOpration.insertWallet(
+        localDB.tableName.tblWallet,
+        fulldate,
+        mnemonic,
+        "",
+        "",
+        "",
+        "Primary"
+      );
+      console.log( { resultCreateWallet } );
+
+      if ( resultCreateWallet ) {
+        const resultCreateDailyWallet = await dbOpration.insertCreateAccount(
+          localDB.tableName.tblAccount,
+          fulldate,
+          "",
+          "BTC",
+          "Daily Wallet",
+          "Daily Wallet",
+          ""
+        );
+        console.log( { resultCreateDailyWallet } );
+
+        if ( resultCreateDailyWallet ) {
+          try {
+            const username = "HexaWallet";
+            const password = code;
+            // Store the credentials
+            await Keychain.setGenericPassword( username, password );
+            AsyncStorage.setItem(
+              "PasscodeCreateStatus",
+              JSON.stringify( true )
+            );
+          } catch ( error ) {
+            // Error saving data
+          }
+          this.setState( {
+            isLoading: false
+          } );
+          const resetAction = StackActions.reset( {
+            index: 0, // <-- currect active route from actions array
+            key: null,
+            actions: [
+              NavigationActions.navigate( { routeName: "TabbarBottom" } )
+            ]
+          } );
+          this.props.navigation.dispatch( resetAction );
+        }
+      }
     } catch ( e ) {
       console.log( { e } );
     }
@@ -207,6 +257,7 @@ export default class PasscodeConfirmScreen extends Component {
             />
           </View>
         </KeyboardAwareScrollView>
+        <Loader loading={ this.state.isLoading } color={ colors.appColor } size={ 60 } />
       </View>
     );
   }
