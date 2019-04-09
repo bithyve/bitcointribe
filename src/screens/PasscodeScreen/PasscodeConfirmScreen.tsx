@@ -99,6 +99,8 @@ export default class PasscodeConfirmScreen extends Component {
         isLoading: true
       } )
       let code = this.state.pincode;
+      console.log( { code } );
+
       let commonData = Singleton.getInstance();
       commonData.setPasscode( code );
       var mnemonic = bip39.generateMnemonic();
@@ -117,7 +119,6 @@ export default class PasscodeConfirmScreen extends Component {
         "Primary"
       );
       console.log( { resultCreateWallet } );
-
       if ( resultCreateWallet ) {
         const resultCreateDailyWallet = await dbOpration.insertCreateAccount(
           localDB.tableName.tblAccount,
@@ -243,16 +244,15 @@ export default class PasscodeConfirmScreen extends Component {
               }
             />
             { renderIf( this.state.passcodeSecoundStyle[ 0 ].activeColor == "red" )(
-              <Text style={ { color: "red" } }>{ this.state.success }</Text>
+              <Text style={ { color: "red", marginTop: 44 } }>{ this.state.success }</Text>
             ) }
           </View>
           <View style={ styles.viewBtnProceed }>
             <FullLinearGradientButton
               style={
-                this.state.status == true ? { opacity: 1 } : { opacity: 0.4 }
-              }
+                this.state.status == true ? { opacity: 1 } : { opacity: 0.4 },{ borderRadius: 5}}
               disabled={ this.state.status == true ? false : true }
-              title="PROCEED"
+            title="PROCEED"
               click_Done={ () => this.saveData( this.state.pincode ) }
             />
           </View>

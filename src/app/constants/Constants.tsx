@@ -102,6 +102,11 @@ var images = {
     onB2: require( assetsImages + "onBoardingScreen/illustration_security.png" ),
     onB3: require( assetsImages + "onBoardingScreen/illustration_share.png" )
   },
+  WalletSetupScreen: {
+    WalletScreen: {
+      backgoundImage: require( assetsImages + "SetUpWallet/background.png" )
+    }
+  },
   loginScreen: {
     backgoundImage: require( assetsImages + "loginscreen/loginBackgound.jpg" ),
     faceIdImage: require( assetsImages + "loginscreen/faceid.png" )
@@ -155,39 +160,6 @@ var images = {
   },
   walletScreen: {
     "shield": require( assetsImages + "WalletScreen/red_icon_sheild_background.png" )
-  },
-  svgImages: {
-    back_Icon: require( assetsImages + "svg/global/icon_back.svg" ),
-    tabBarWalletScreen: {
-      walletIcon: require( assetsImages +
-        "svg/TabBarWalletScreen/icon_wallet_selected.svg" ),
-      transactionIcon: require( assetsImages +
-        "svg/TabBarWalletScreen/icon_transactions.svg" ),
-      qrscanIcon: require( assetsImages +
-        "svg/TabBarWalletScreen/icon_qrscan.svg" ),
-      settingIcon: require( assetsImages +
-        "svg/TabBarWalletScreen/icon_settings.svg" )
-    },
-    walletScreen: {
-      accountLogo: require( assetsImages +
-        "svg/WalletScreen/icon_regularaccount.svg" ),
-      plusButtonBottom: require( assetsImages + "svg/WalletScreen/plus.svg" ),
-      walletIcon: require( assetsImages + "svg/WalletScreen/ShieldIcon.svg" )
-    },
-    viewRecentTransaction: {
-      sentIcon: require( assetsImages + "svg/WalletScreen/icon_paid.svg" ),
-      receivedIcon: require( assetsImages + "svg/WalletScreen/icon_deposit.svg" )
-    },
-    accountDetailsScreen: {
-      accountSettingsIcon: require( assetsImages +
-        "svg/AccountDetailsScreen/icon_settings.svg" ),
-      sentIcon: require( assetsImages +
-        "svg/AccountDetailsScreen/icon_paid.svg" ),
-      receivedIcon: require( assetsImages +
-        "svg/AccountDetailsScreen/icon_deposit.svg" ),
-      addAccount: require( assetsImages +
-        "svg/AccountDetailsScreen/icon_add.svg" )
-    }
   }
 };
 

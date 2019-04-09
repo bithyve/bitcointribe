@@ -31,13 +31,13 @@ export default class CreateTables extends Component {
       txn.executeSql(
         "CREATE TABLE IF NOT EXISTS " +
         localDB.tableName.tblAccount +
-        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,address TEXT,balance TEXT,unit TEXT,accountName TEXT,accountType TEXT,additionalInfo TEXT,lastUpdated TEXT,FOREIGN KEY(accountType) REFERENCES tblAccountType(name))",
+        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,address TEXT,balance TEXT,unit TEXT,accountName TEXT,accountType TEXT,additionalInfo TEXT,lastUpdated TEXT)",
         []
       );
       txn.executeSql(
         "CREATE TABLE IF NOT EXISTS " +
         localDB.tableName.tblTransaction +
-        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,accountAddress TEXT,transactionHash TEXT,balance INTEGER,unit TEXT,fees INTEGER,transactionType TEXT,confirmationType TEXT,lastUpdated TEXT,FOREIGN KEY(accountAddress) REFERENCES tblAccount(address))",
+        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,accountAddress TEXT,transactionHash TEXT,balance INTEGER,unit TEXT,fees INTEGER,transactionType TEXT,confirmationType TEXT,lastUpdated TEXT)",
         []
       );
       console.log( "create database." );

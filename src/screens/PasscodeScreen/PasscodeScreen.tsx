@@ -4,6 +4,7 @@ import {
   Text,
   View,
   AsyncStorage,
+  Platform,
   Dimensions,
   Image,
   Keyboard,
@@ -199,23 +200,24 @@ export default class PasscodeScreen extends Component {
               containerStyle={ {
                 alignItems: "center",
                 justifyContent: "center",
-                height: 0
+                height: Platform.OS == "ios" ? 0 : 40,
               } }
               onFulfill={ ( isValid, code ) =>
                 this._onFinishCheckingCode( isValid, code )
               }
             />
             { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
-              <Text style={ { color: "red" } }>{ this.state.success }</Text>
+              <Text style={ { color: "red", marginTop: 44 } }>{ this.state.success }</Text>
             ) }
           </View>
           <View style={ styles.viewBtnProceed }>
             <FullLinearGradientButton
               style={
-                this.state.status == true ? { opacity: 1 } : { opacity: 0.4 }
-              }
+                this.state.status == true ? { opacity: 1 } : { opacity: 0.4 },
+            { borderRadius: 5}
+          }
               disabled={ this.state.status == true ? false : true }
-              title="LOGIN"
+            title="LOGIN"
               click_Done={ () => this.onSuccess( this.state.pincode ) }
             />
           </View>
