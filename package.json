@@ -117,6 +117,7 @@
     "react-native-multibar": "^0.0.6",
     "react-native-onboarding-swiper": "^1.0.0",
     "react-native-os": "^1.2.2",
+    "react-native-pagination": "^1.5.5",
     "react-native-pin-code": "^0.5.3",
     "react-native-popup-dialog": "^0.16.3",
     "react-native-popup-menu": "^0.14.2",
@@ -191,7 +192,7 @@
   },
   "rnpm": {
     "assets": [
-      "./src/assets/fonts"
+      "./src/assets/fonts/"
     ]
   },
   "react-native": {

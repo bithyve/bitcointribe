@@ -5,6 +5,7 @@ import {
   Dimensions,
   StatusBar,
   TouchableOpacity,
+  TouchableHighlight,
   StyleSheet,
   RefreshControl,
   Platform,
@@ -82,13 +83,15 @@ export default class WalletScreen extends React.Component {
     super( props );
     this.state = {
       isNetwork: true,
+      arr_wallets: [],
+      arr_accounts: [],
       tranDetails: [],
       accountTypeList: [],
       arr_WalletScreenCard: [],
       accountTypeVisible: false,
       popupData: [],
       recentTransactionData: [],
-      walletsData: [],
+
       slider1ActiveSlide: SLIDER_1_FIRST_ITEM,
       isOpen: false,
       refreshing: false,
@@ -102,9 +105,16 @@ export default class WalletScreen extends React.Component {
   }
   //TODO: Page Life Cycle
   componentWillMount() {
+    this.willFocusSubscription = this.props.navigation.addListener(
+      "willFocus",
+      () => {
+        isNetwork = utils.getNetwork();
+        this.connnection_FetchData();
+      }
+    );
+    //TODO: Animation View
     this.startHeaderHeight = 200;
     this.endHeaderHeight = 100;
-
     this.animatedHeaderHeight = this.state.scrollY.interpolate( {
       inputRange: [ 0, 100 ],
       outputRange: [ this.startHeaderHeight, this.endHeaderHeight ],
@@ -142,7 +152,29 @@ export default class WalletScreen extends React.Component {
     } );
   }
 
+  componentWillUnmount() {
+    this.willFocusSubscription.remove();
+  }
 
+
+
+  //TODO: func connnection_FetchData
+  async connnection_FetchData() {
+    const dateTime = Date.now();
+    const lastUpdateDate = Math.floor( dateTime / 1000 );
+    const resultWallet = await dbOpration.readTablesData(
+      localDB.tableName.tblWallet
+    );
+    const resAccount = await dbOpration.readTablesData(
+      localDB.tableName.tblAccount
+    );
+    console.log( { resAccount } );
+
+    this.setState( {
+      arr_wallets: resultWallet.temp,
+      arr_accounts: resAccount.temp
+    } );
+  }
 
   // async  componentDidMount() {
   //   const sss = new S3Service(
@@ -167,7 +199,9 @@ export default class WalletScreen extends React.Component {
   //   console.log({ downloadedOTPEncShare: otpEncryptedShare })
   //   const decryptedStorageShare = await sss.decryptOTPEncShare(otpEncryptedShare, messageId, otp);
   //   console.log({ decryptedStorageShare })
-  // }
+  // }  
+
+
   render() {
     return (
       <Container>
@@ -219,15 +253,21 @@ export default class WalletScreen extends React.Component {
                   justifyContent: "center"
                 } }
               >
-                <Animated.Image
-                  source={ images.walletScreen.shield }
-                  style={ [
-                    {
-                      height: this.animatedShieldIconSize,
-                      width: this.animatedShieldIconSize
-                    }
-                  ] }
-                />
+                <TouchableHighlight onPress={ () =>
+                  this.props.navigation.push( "WalletSetUpScreen", {
+                    walletsData: this.state.arr_wallets,
+                  } )
+                }>
+                  <Animated.Image
+                    source={ images.walletScreen.shield }
+                    style={ [
+                      {
+                        height: this.animatedShieldIconSize,
+                        width: this.animatedShieldIconSize
+                      }
+                    ] }
+                  />
+                </TouchableHighlight>
               </Animated.View>
             </Animated.View>
             {/*  cards */ }
@@ -240,6 +280,7 @@ export default class WalletScreen extends React.Component {
             >
               <ScrollView
                 scrollEventThrottle={ 40 }
+                contentContainerStyle={ { flex: 0 } }
                 horizontal={ false }
                 pagingEnabled={ false }
                 onScroll={ Animated.event( [
@@ -249,38 +290,7 @@ export default class WalletScreen extends React.Component {
                 ] ) }
               >
                 <FlatList
-                  data={ [
-                    {
-                      type: "Daily Wallet",
-                      name: "Anant's Savings",
-                      amount: "60,000"
-                    },
-                    {
-                      type: "Secure Wallet",
-                      name: "Anant's Savings",
-                      amount: "60,000"
-                    },
-                    {
-                      type: "Daily Wallet",
-                      name: "Anant's Savings",
-                      amount: "60,000"
-                    },
-                    {
-                      type: "Secure Wallet",
-                      name: "Anant's Savings",
-                      amount: "60,000"
-                    },
-                    {
-                      type: "Secure Wallet",
-                      name: "Anant's Savings",
-                      amount: "60,000"
-                    },
-                    {
-                      type: "Secure Wallet",
-                      name: "Anant's Savings",
-                      amount: "60,000"
-                    }
-                  ] }
+                  data={ this.state.arr_accounts }
                   showsVerticalScrollIndicator={ false }
                   renderItem={ ( { item } ) => (
                     <RkCard
@@ -312,7 +322,7 @@ export default class WalletScreen extends React.Component {
                             marginLeft: 10
                           } }
                         >
-                          { item.type }
+                          { item.accountName }
                         </Text>
 
                         <Icon name="icon_more" color="gray" size={ 15 } />

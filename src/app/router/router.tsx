@@ -57,6 +57,9 @@ import PasscodeConfirmScreen from "bithyve/src/screens/PasscodeScreen/PasscodeCo
 //TODO: New Screen Hexa Wallet
 import WalletScreen from "bithyve/src/screens/TabBarScreen/WalletScreen/WalletScreen";
 
+//TODO: Wallet SetUp Screen
+import WalletSetupScreens from "../../screens/DrawerScreen/WalletSetupScreens/WalletSetupScreens";
+
 //TODO: StackNavigator
 
 //TODO: StackNavigator:ONBoarding
@@ -153,6 +156,21 @@ const OnBoardingRouter = createStackNavigator(
 //   }
 // );
 
+
+//TODO: StackNavigator:WalletSetupStackNavigatorRouter
+const WalletSetupStackNavigatorRouter = createStackNavigator(
+  {
+    WalletSetupScreens: {
+      screen: WalletSetupScreens,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "WalletSetupScreens"
+  }
+);
+
+
 //TODO: TabNavigator
 //TODO: TabNavigator:TabNavigator
 const TabNavigator = createBottomTabNavigator(
@@ -162,17 +180,17 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
         drawerLockMode: "locked-open",
-        tabBarIcon: ({ tintColor }) => (
-          <Icon name="wallet" color={tintColor} size={25} />
-        )     
+        tabBarIcon: ( { tintColor } ) => (
+          <Icon name="wallet" color={ tintColor } size={ 25 } />
+        )
       }
     },
     Analytics: {
       screen: WalletScreen,
       navigationOptions: {
         tabBarLabel: "Transaction", //localization("TabBarItem.Analytics"),
-        tabBarIcon: ({ tintColor }) => (
-          <Icon name="icon_transactions" color={tintColor} size={25} />
+        tabBarIcon: ( { tintColor } ) => (
+          <Icon name="icon_transactions" color={ tintColor } size={ 25 } />
         )
       }
     },
@@ -180,8 +198,8 @@ const TabNavigator = createBottomTabNavigator(
       screen: WalletScreen,
       navigationOptions: {
         tabBarLabel: "QR", //localization("TabBarItem.Accounts"),
-        tabBarIcon: ({ tintColor }) => (
-          <Icon name="qr-codes" color={tintColor} size={25} />
+        tabBarIcon: ( { tintColor } ) => (
+          <Icon name="qr-codes" color={ tintColor } size={ 25 } />
         )
       }
     },
@@ -190,8 +208,8 @@ const TabNavigator = createBottomTabNavigator(
       screen: WalletScreen,
       navigationOptions: {
         tabBarLabel: "Settings", //localization("TabBarItem.More"),
-        tabBarIcon: ({ tintColor }) => (
-          <Icon name="more-icon" color={tintColor} size={25} />
+        tabBarIcon: ( { tintColor } ) => (
+          <Icon name="more-icon" color={ tintColor } size={ 25 } />
         )
       }
     }
@@ -200,7 +218,7 @@ const TabNavigator = createBottomTabNavigator(
     initialRouteName: "Payment",
     tabBarOptions: {
       showLabel: true,
-      swipeEnabled: true,
+      //swipeEnabled: true,
       showIcon: true,
       activeTintColor: colors.appColor,
       labelStyle: {
@@ -216,33 +234,33 @@ const TabNavigator = createBottomTabNavigator(
 
 //TODO: DrawerNavigator
 //TODO: DrawerNavigator:LeftDrawerNavigator
-const LeftDrawerNavigator = createDrawerNavigator(
-  {
-    Home: {
-      screen: TabNavigator,
-      navigationOptions: {
-        drawerLabel: "Home",
-        drawerIcon: ({ tintColor }) => <Icon name="home" size={17} />
-      }
-    }
-  },
+// const LeftDrawerNavigator = createDrawerNavigator(
+//   {
+//     Home: {
+//       screen: TabNavigator,
+//       navigationOptions: {
+//         drawerLabel: "Home",
+//         drawerIcon: ( { tintColor } ) => <Icon name="home" size={ 17 } />
+//       }
+//     }
+//   },
 
-  {
-    initialRouteName: "Home",
-    //  contentComponent: DrawerScreen,
-    drawerPosition: "left",
-    drawerOpenRoute: "DrawerOpen",
-    drawerCloseRoute: "DrawerClose",
-    drawerToggleRoute: "DrawerToggle",
-    contentOptions: {
-      activeTintColor: "#e91e63",
-      style: {
-        flex: 1,
-        paddingTop: 15
-      }
-    }
-  }
-);
+//   {
+//     initialRouteName: "Home",
+//     //  contentComponent: DrawerScreen,
+//     drawerPosition: "left",
+//     drawerOpenRoute: "DrawerOpen",
+//     drawerCloseRoute: "DrawerClose",
+//     drawerToggleRoute: "DrawerToggle",
+//     contentOptions: {
+//       activeTintColor: "#e91e63",
+//       style: {
+//         flex: 1,
+//         paddingTop: 15
+//       }
+//     }
+//   }
+// );
 
 //TODO: RootNavigator
 //TODO: RootNavigator:createRootNavigator
@@ -266,6 +284,10 @@ export const createRootNavigator = (
       },
       TabbarBottom: {
         screen: TabNavigator,
+        navigationOptions: { header: null }
+      },
+      WalletSetUpScreen: {
+        screen: WalletSetupStackNavigatorRouter,
         navigationOptions: { header: null }
       }
       //Drwaer Navigation
@@ -343,16 +365,16 @@ export const createRootNavigator = (
     },
     {
       //initialRouteName: signedIn ? "OnBoardingNavigator" : PasscodeConfirmScreen
-      initialRouteName: signedIn ? "OnBoardingNavigator" : screenName //"TabbarBottom"
+      initialRouteName: signedIn ? "OnBoardingNavigator" : screenName //"TabbarBottom" //
       // initialRouteName: signedIn ? "OnBoardingNavigator" : "OnBoardingNavigator"
       // initialRouteName: signedIn ? "TabbarBottom" : "TabbarBottom"
     }
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   svgImage: {
     width: "100%",
     height: "100%"
   }
-});
+} );
