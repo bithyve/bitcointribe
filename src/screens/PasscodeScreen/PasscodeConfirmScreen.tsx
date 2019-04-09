@@ -71,6 +71,7 @@ export default class PasscodeConfirmScreen extends Component {
   _onFinishCheckingCode2( isValid: boolean, code: any ) {
     if ( isValid ) {
       this.setState( {
+        pincode: code,
         status: true,
         passcodeSecoundStyle: [
           {
@@ -95,30 +96,26 @@ export default class PasscodeConfirmScreen extends Component {
 
   saveData = async () => {
     try {
+
       this.setState( {
         isLoading: true
       } )
       let code = this.state.pincode;
-      console.log( { code } );
-
       let commonData = Singleton.getInstance();
       commonData.setPasscode( code );
-      var mnemonic = bip39.generateMnemonic();
-      mnemonic = mnemonic.split( " " );
-      console.log( { mnemonic } );
-
+      let mnemonic = bip39.generateMnemonic();
+      let mnemonicValue = mnemonic.split( " " );
       const dateTime = Date.now();
       const fulldate = Math.floor( dateTime / 1000 );
       const resultCreateWallet = await dbOpration.insertWallet(
         localDB.tableName.tblWallet,
         fulldate,
-        mnemonic,
+        mnemonicValue,
         "",
         "",
         "",
         "Primary"
       );
-      console.log( { resultCreateWallet } );
       if ( resultCreateWallet ) {
         const resultCreateDailyWallet = await dbOpration.insertCreateAccount(
           localDB.tableName.tblAccount,
@@ -130,7 +127,6 @@ export default class PasscodeConfirmScreen extends Component {
           ""
         );
         console.log( { resultCreateDailyWallet } );
-
         if ( resultCreateDailyWallet ) {
           try {
             const username = "HexaWallet";
@@ -253,7 +249,7 @@ export default class PasscodeConfirmScreen extends Component {
                 this.state.status == true ? { opacity: 1 } : { opacity: 0.4 },{ borderRadius: 5}}
               disabled={ this.state.status == true ? false : true }
             title="PROCEED"
-              click_Done={ () => this.saveData( this.state.pincode ) }
+              click_Done={ () => this.saveData() }
             />
           </View>
         </KeyboardAwareScrollView>
