@@ -60,6 +60,7 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                         <Text note style={ { marginTop: 20, textAlign: "center" } }>To Set up you need to select two secret questions</Text>
                     </View>
                     <View style={ styles.viewInputFiled }>
+
                         <View>
                             <Picker
                                 renderHeader={ backAction =>
@@ -78,7 +79,8 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                                 iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -30 } } /> }
                                 selectedValue={ this.state.selected }
                                 onValueChange={ this.onValueChange.bind( this ) }
-                                rounded style={ styles.itemQuestionPicker }
+                                rounded
+                                style={ styles.itemQuestionPicker }
                             >
                                 { itemList }
                             </Picker>

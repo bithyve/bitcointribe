@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform } from "react-native";
 import {
     Container,
     Header,
@@ -37,37 +37,38 @@ import { colors, images, localDB } from "bithyve/src/app/constants/Constants";
 export default class WalletSetupScreens extends React.Component<any, any> {
     render() {
         return (
-
             <Container>
-                <CustomeStatusBar backgroundColor={ colors.white } barStyle="dark-content" />
-                <Header transparent>
-                    <Left>
+                <Content
+                    contentContainerStyle={ styles.container }
+                >
+                    <CustomeStatusBar backgroundColor={ colors.white } barStyle="dark-content" />
+                    <View style={ { marginLeft: 10 } }>
                         <Button
                             transparent
                             onPress={ () => this.props.navigation.pop() }
                         >
-                            <Icon name="icon_back" size={ 25 } color="#000000" />
-                            <Text style={ { color: "#000000", alignSelf: "center", fontSize: 25, marginLeft: 5, fontFamily: "FiraSans-Medium" } }>Set up your wallet</Text>
+                            <Icon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
+                            <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Set up your wallet</Text>
                         </Button>
-                    </Left>
-                </Header>
-                <KeyboardAwareScrollView
-                    enableOnAndroid
-                    extraScrollHeight={ 40 }
-                    contentContainerStyle={ { flexGrow: 1, } }
-                >
-                    <Tabs>
-                        <Tab heading={ <TabHeading  ><Text>Wallet Name</Text></TabHeading> } >
-                            <WalletNameScreen />
-                        </Tab>
-                        <Tab heading={ <TabHeading><Text>1 Question</Text></TabHeading> }>
-                            <FirstSecretQuestionScreen />
-                        </Tab>
-                        <Tab heading={ <TabHeading><Text>2 Question</Text></TabHeading> }>
-                            <SecondSecretQuestion />
-                        </Tab>
-                    </Tabs>
-                </KeyboardAwareScrollView>
+                    </View>
+                    <KeyboardAwareScrollView
+                        enableOnAndroid
+                        extraScrollHeight={ 40 }
+                        contentContainerStyle={ { flexGrow: 1, } }
+                    >
+                        <Tabs>
+                            <Tab heading={ <TabHeading  ><Text>Wallet Name</Text></TabHeading> } >
+                                <WalletNameScreen />
+                            </Tab>
+                            <Tab heading={ <TabHeading><Text>1 Question</Text></TabHeading> }>
+                                <FirstSecretQuestionScreen />
+                            </Tab>
+                            <Tab heading={ <TabHeading><Text>2 Question</Text></TabHeading> }>
+                                <SecondSecretQuestion />
+                            </Tab>
+                        </Tabs>
+                    </KeyboardAwareScrollView>
+                </Content>
             </Container >
         );
     }
@@ -76,7 +77,7 @@ export default class WalletSetupScreens extends React.Component<any, any> {
 const styles = StyleSheet.create( {
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#F8F8F8",
     },
     viewPagination: {
         flex: 2,
