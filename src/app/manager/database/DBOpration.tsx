@@ -37,7 +37,18 @@ const readTablesData = ( tableName: any ) => {
               data.publicKey = utils.decrypt( data.publicKey, passcode );
               data.walletType = utils.decrypt( data.walletType, passcode );
               temp.push( data );
-            } else {
+            } else if ( tableName == "tblAccount" ) {
+              data.id = data.id;
+              data.address = utils.decrypt( data.address, passcode );
+              data.balance = utils.decrypt( data.balance, passcode );
+              data.unit = utils.decrypt( data.unit, passcode );
+              data.accountName = utils.decrypt( data.accountName, passcode );
+              data.accountType = utils.decrypt( data.accountType, passcode );
+              data.additionalInfo = utils.decrypt( data.additionalInfo, passcode );
+              data.lastUpdated = utils.decrypt( data.lastUpdated, passcode );
+              temp.push( data );
+            }
+            else {
               temp.push( data );
             }
           }
