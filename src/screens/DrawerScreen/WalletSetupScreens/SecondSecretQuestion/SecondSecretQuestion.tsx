@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View } from "react-native";
+import { StyleSheet, ImageBackground, View, Dimensions, Platform } from "react-native";
 import {
     Container,
     Header,
@@ -64,7 +64,7 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                         <Text note style={ { marginTop: 20, textAlign: "center" } }>To Set up you need to select two secret questions</Text>
                     </View>
                     <View style={ styles.viewInputFiled }>
-                        <View>
+                        <View style={ styles.itemQuestionPicker }>
                             <Picker
                                 renderHeader={ backAction =>
                                     <Header style={ { backgroundColor: "#ffffff" } }>
@@ -82,7 +82,6 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                                 iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -30 } } /> }
                                 selectedValue={ this.state.selected }
                                 onValueChange={ this.onValueChange.bind( this ) }
-                                rounded style={ styles.itemQuestionPicker }
                             >
                                 { itemList }
                             </Picker>
@@ -122,6 +121,7 @@ const styles = StyleSheet.create( {
         margin: 10
     },
     itemInputWalletName: {
+        width: Dimensions.get( 'screen' ).width / 1.07,
         borderWidth: 0,
         borderRadius: 10,
         shadowOffset: { width: 2, height: 2 },
@@ -132,10 +132,8 @@ const styles = StyleSheet.create( {
         height: 50
     },
     itemQuestionPicker: {
-        width: 350,
-        marginLeft: 20,
-        marginRight: 20,
-        borderWidth: 0,
+        width: Dimensions.get( 'screen' ).width / 1.07,
+        borderWidth: Platform.OS == "ios" ? 0 : 0.1,
         borderRadius: 10,
         shadowOffset: { width: 2, height: 2 },
         shadowColor: 'black',

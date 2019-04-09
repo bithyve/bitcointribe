@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View } from "react-native";
+import { StyleSheet, ImageBackground, View, Platform, Dimensions } from "react-native";
 import {
     Container,
     Header,
@@ -23,6 +23,7 @@ import CustomeStatusBar from "bithyve/src/app/custcompontes/CustomeStatusBar/Cus
 import FullLinearGradientButton from "bithyve/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 //TODO: Custome Object
 import { colors, images, localDB } from "bithyve/src/app/constants/Constants";
+import renderIf from "bithyve/src/app/constants/validation/renderIf";
 
 export default class FirstSecretQuestionScreen extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -61,7 +62,7 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                     </View>
                     <View style={ styles.viewInputFiled }>
 
-                        <View>
+                        <View style={ styles.itemQuestionPicker }>
                             <Picker
                                 renderHeader={ backAction =>
                                     <Header style={ { backgroundColor: "#ffffff" } }>
@@ -79,12 +80,12 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                                 iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -30 } } /> }
                                 selectedValue={ this.state.selected }
                                 onValueChange={ this.onValueChange.bind( this ) }
-                                rounded
-                                style={ styles.itemQuestionPicker }
                             >
                                 { itemList }
                             </Picker>
                         </View>
+
+
                         <Item rounded style={ styles.itemInputWalletName }>
                             <Input placeholder='Write your answer here' placeholderTextColor="#B7B7B7" />
                         </Item>
@@ -121,6 +122,7 @@ const styles = StyleSheet.create( {
         margin: 10
     },
     itemInputWalletName: {
+        width: Dimensions.get( 'screen' ).width / 1.07,
         borderWidth: 0,
         borderRadius: 10,
         shadowOffset: { width: 2, height: 2 },
@@ -131,10 +133,8 @@ const styles = StyleSheet.create( {
         height: 50
     },
     itemQuestionPicker: {
-        width: 350,
-        marginLeft: 20,
-        marginRight: 20,
-        borderWidth: 0,
+        width: Dimensions.get( 'screen' ).width / 1.07,
+        borderWidth: Platform.OS == "ios" ? 0 : 0.1,
         borderRadius: 10,
         shadowOffset: { width: 2, height: 2 },
         shadowColor: 'black',
