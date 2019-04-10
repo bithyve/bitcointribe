@@ -1,8 +1,4 @@
 {
-  "name": "HexaWallet",
-  "displayName": "HexaWallet",
-  "foreground": false,
-  "userInteraction": false,
-  "message": "My Notification Message",
-  "data": {}
+  "name": "bithyve",
+  "displayName": "bithyve"
 }

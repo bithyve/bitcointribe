@@ -17,7 +17,7 @@ import {
 import { Icon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Pagination, { PagiIcon, Dot } from 'react-native-pagination';
+
 
 //TODO: Custome Pages
 import CustomeStatusBar from "bithyve/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
