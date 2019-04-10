@@ -59,6 +59,9 @@ import WalletScreen from "bithyve/src/screens/TabBarScreen/WalletScreen/WalletSc
 
 //TODO: Wallet SetUp Screen
 import WalletSetupScreens from "../../screens/DrawerScreen/WalletSetupScreens/WalletSetupScreens";
+import WalletNameScreen from "../../screens/DrawerScreen/WalletSetupScreens/WalletNameScreen/WalletNameScreen";
+import FirstSecretQuestionScreen from "../../screens/DrawerScreen/WalletSetupScreens/FirstSecretQuestionScreen/FirstSecretQuestionScreen";
+import SecondSecretQuestion from "../../screens/DrawerScreen/WalletSetupScreens/SecondSecretQuestion/SecondSecretQuestion";
 
 //TODO: StackNavigator
 
@@ -160,13 +163,21 @@ const OnBoardingRouter = createStackNavigator(
 //TODO: StackNavigator:WalletSetupStackNavigatorRouter
 const WalletSetupStackNavigatorRouter = createStackNavigator(
   {
-    WalletSetupScreens: {
-      screen: WalletSetupScreens,
+    WalletNameScreen: {
+      screen: WalletNameScreen,
+      navigationOptions: { header: null }
+    },
+    FirstSecretQuestionScreen: {
+      screen: FirstSecretQuestionScreen,
+      navigationOptions: { header: null }
+    },
+    SecondSecretQuestion: {
+      screen: SecondSecretQuestion,
       navigationOptions: { header: null }
     }
   },
   {
-    initialRouteName: "WalletSetupScreens"
+    initialRouteName: "WalletNameScreen"
   }
 );
 
@@ -365,16 +376,10 @@ export const createRootNavigator = (
     },
     {
       //initialRouteName: signedIn ? "OnBoardingNavigator" : PasscodeConfirmScreen
-      initialRouteName: signedIn ? "OnBoardingNavigator" : "TabbarBottom" //screenName //
+      initialRouteName: signedIn ? "OnBoardingNavigator" : screenName //"TabbarBottom" //
       // initialRouteName: signedIn ? "OnBoardingNavigator" : "OnBoardingNavigator"
       // initialRouteName: signedIn ? "TabbarBottom" : "TabbarBottom"
     }
   );
 };
 
-const styles = StyleSheet.create( {
-  svgImage: {
-    width: "100%",
-    height: "100%"
-  }
-} );

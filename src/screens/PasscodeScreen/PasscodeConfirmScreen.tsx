@@ -18,7 +18,7 @@ import Loader from "bithyve/src/app/custcompontes/Loader/ModelLoader";
 //TODO: Custome Pages
 import CustomeStatusBar from "bithyve/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "bithyve/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import bip39 from "bip39";
+
 
 //TODO: Custome Object
 import {
@@ -42,11 +42,11 @@ let isNetwork: Boolean;
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
 
 
-export default class PasscodeConfirmScreen extends Component {
+export default class PasscodeConfirmScreen extends Component<any, any> {
   constructor ( props: any ) {
     super( props );
     this.state = {
-      mnemonicValues: [],
+      mnemonicValues: "",
       status: false,
       pincode: "",
       success: "Passcode does not match!",
@@ -61,6 +61,14 @@ export default class PasscodeConfirmScreen extends Component {
     };
     isNetwork = utils.getNetwork();
   }
+
+  // async componentDidMount() {
+  //   // let mnemonic = await utils.getMnemonic();
+  //   // alert( { mnemonic } );
+  //   this.setState( {
+  //     mnemonicValues: utils.getMnemonic()
+  //   } );
+  // }
 
   onCheckPincode( code: any ) {
     this.setState( {
@@ -77,7 +85,7 @@ export default class PasscodeConfirmScreen extends Component {
           {
             activeColor: colors.black,
             inactiveColor: colors.black,
-            cellBorderWidth: 0
+            cellBorderWidth: 0,
           }
         ]
       } );
@@ -96,27 +104,26 @@ export default class PasscodeConfirmScreen extends Component {
 
   saveData = async () => {
     try {
-
       this.setState( {
         isLoading: true
       } )
       let code = this.state.pincode;
       let commonData = Singleton.getInstance();
       commonData.setPasscode( code );
-      let mnemonic = bip39.generateMnemonic();
-      let mnemonicValue = mnemonic.split( " " );
+      let mnemonic = this.state.mnemonicValues;
       const dateTime = Date.now();
       const fulldate = Math.floor( dateTime / 1000 );
       const resultCreateWallet = await dbOpration.insertWallet(
         localDB.tableName.tblWallet,
         fulldate,
-        mnemonicValue,
+        mnemonic,
         "",
         "",
         "",
         "Primary"
       );
       if ( resultCreateWallet ) {
+
         const resultCreateDailyWallet = await dbOpration.insertCreateAccount(
           localDB.tableName.tblAccount,
           fulldate,
@@ -151,7 +158,11 @@ export default class PasscodeConfirmScreen extends Component {
             ]
           } );
           this.props.navigation.dispatch( resetAction );
+        } else {
+          alert( 'issue' );
         }
+      } else {
+        alert( 'issue 1' );
       }
     } catch ( e ) {
       console.log( { e } );
@@ -161,7 +172,7 @@ export default class PasscodeConfirmScreen extends Component {
   render() {
     return (
       <View style={ styles.container }>
-        <CustomeStatusBar backgroundColor={ colors.white } barStyle="dark-content" />
+        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ true } barStyle="dark-content" />
         <KeyboardAwareScrollView
           enableOnAndroid
           extraScrollHeight={ 40 }
@@ -245,10 +256,10 @@ export default class PasscodeConfirmScreen extends Component {
           </View>
           <View style={ styles.viewBtnProceed }>
             <FullLinearGradientButton
-              style={
-                this.state.status == true ? { opacity: 1 } : { opacity: 0.4 },{ borderRadius: 5}}
+              style={ [
+                this.state.status == true ? { opacity: 1 } : { opacity: 0.4 }, { borderRadius: 5 } ] }
               disabled={ this.state.status == true ? false : true }
-            title="PROCEED"
+              title="PROCEED"
               click_Done={ () => this.saveData() }
             />
           </View>

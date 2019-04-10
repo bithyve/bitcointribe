@@ -159,7 +159,7 @@ export default class PasscodeScreen extends Component {
   render() {
     return (
       <View style={ styles.container }>
-        <CustomeStatusBar backgroundColor={ colors.white } barStyle="dark-content" />
+        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ true } barStyle="dark-content" />
         <KeyboardAwareScrollView
           enableAutomaticScroll
           automaticallyAdjustContentInsets={ true }
@@ -212,12 +212,11 @@ export default class PasscodeScreen extends Component {
           </View>
           <View style={ styles.viewBtnProceed }>
             <FullLinearGradientButton
-              style={
+              style={ [
                 this.state.status == true ? { opacity: 1 } : { opacity: 0.4 },
-            { borderRadius: 5}
-          }
+                { borderRadius: 5 } ] }
               disabled={ this.state.status == true ? false : true }
-            title="LOGIN"
+              title="LOGIN"
               click_Done={ () => this.onSuccess( this.state.pincode ) }
             />
           </View>
