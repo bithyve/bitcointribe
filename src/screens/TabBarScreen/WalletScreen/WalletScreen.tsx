@@ -206,7 +206,7 @@ export default class WalletScreen extends React.Component {
     return (
       <Container>
         <Content scrollEnabled={ false } contentContainerStyle={ styles.container }>
-          <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
+          <CustomeStatusBar backgroundColor={ colors.appColor } barStyle="light-content" />
           <SafeAreaView style={ styles.container }>
             {/* title */ }
             <Animated.View

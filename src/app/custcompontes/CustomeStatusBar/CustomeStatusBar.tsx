@@ -20,25 +20,14 @@ export default class CustomeStatusBar extends Component<any, any> {
             <View
                 style={ {
                     backgroundColor: this.props.backgroundColor,
-                    height: Platform.OS === 'ios' && this.props.flagShowStatusBar == true ? utils.getStatusBarHeight() : 0,
+                    height: Platform.OS === 'ios' ? utils.getStatusBarHeight() : 0,
                 } }>
                 <StatusBar
                     barStyle={ this.props.barStyle }
                     backgroundColor={ this.props.backgroundColor }
-                    translucent={ true }
+                    translucent={ false }
                 />
             </View>
-            // <View
-            //     style={ {
-            //         backgroundColor: this.props.backgroundColor,
-            //         height: Platform.OS === 'ios' && this.props.flagShowStatusBar == true ? utils.getStatusBarHeight() : 0,
-            //     } }>
-            //     <StatusBar
-            //         barStyle={ this.props.barStyle }
-            //         backgroundColor={ this.props.backgroundColor }
-            //         translucent={ true }
-            //     />
-            // </View>
         );
     }
 }

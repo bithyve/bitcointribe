@@ -2,7 +2,7 @@ import moment from "moment";
 import ConnectivityTracker from "react-native-connectivity-tracker";
 let CryptoJS = require( "crypto-js" );
 import DeviceInfo from "react-native-device-info";
-import bip39 from "bip39";
+
 //TODO: Date Format
 
 const getUnixTimeDate = date => {
@@ -114,11 +114,6 @@ const getStatusBarHeight = () => {
   return height;
 }
 
-const getMnemonic = () => {
-  let mnemonic = bip39.generateMnemonic();
-  return mnemonic.split( " " );
-}
-
 module.exports = {
   getUnixTimeDate,
   getUnixToDateFormat,
@@ -130,6 +125,5 @@ module.exports = {
   sortFunction,
   date_diff_indays,
   getDeviceModel,
-  getStatusBarHeight,
-  getMnemonic
+  getStatusBarHeight
 };
