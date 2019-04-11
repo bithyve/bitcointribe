@@ -34,11 +34,11 @@ import { Icon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
 
 //Custome Compontes
-import CustomeStatusBar from "bithyve/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import SCLAlertAccountTypes from "bithyve/src/app/custcompontes/alert/SCLAlertAccountTypes";
-import ViewRecentTransaction from "bithyve/src/app/custcompontes/view/ViewRecentTransaction";
-import TabBarWalletScreen from "bithyve/src/app/custcompontes/view/tabbar/TabBarWalletScreen/TabBarWalletScreen";
-import ViewWalletScreenCards from "bithyve/src/app/custcompontes/view/ViewWalletScreenCards/ViewWalletScreenCards";
+import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import SCLAlertAccountTypes from "HexaWallet/src/app/custcompontes/alert/SCLAlertAccountTypes";
+import ViewRecentTransaction from "HexaWallet/src/app/custcompontes/view/ViewRecentTransaction";
+import TabBarWalletScreen from "HexaWallet/src/app/custcompontes/view/tabbar/TabBarWalletScreen/TabBarWalletScreen";
+import ViewWalletScreenCards from "HexaWallet/src/app/custcompontes/view/ViewWalletScreenCards/ViewWalletScreenCards";
 
 
 
@@ -49,11 +49,11 @@ import {
   images,
   localDB,
   errorMessage
-} from "bithyve/src/app/constants/Constants";
-var dbOpration = require( "bithyve/src/app/manager/database/DBOpration" );
-var utils = require( "bithyve/src/app/constants/Utils" );
-import renderIf from "bithyve/src/app/constants/validation/renderIf";
-import Singleton from "bithyve/src/app/constants/Singleton";
+} from "HexaWallet/src/app/constants/Constants";
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var utils = require( "HexaWallet/src/app/constants/Utils" );
+import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+import Singleton from "HexaWallet/src/app/constants/Singleton";
 
 
 let isNetwork: boolean;
@@ -72,9 +72,9 @@ const sliderWidth = viewportWidth;
 const itemWidth = slideWidth + itemHorizontalMargin * 2;
 const SLIDER_1_FIRST_ITEM = 0;
 
-
 //TODO: Bitcoin Files
-import S3Service from "bithyve/src/bitcoin/services/sss/S3Service";
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+
 
 //localization
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
@@ -155,8 +155,7 @@ export default class WalletScreen extends React.Component {
   componentWillUnmount() {
     this.willFocusSubscription.remove();
   }
-
-
+  
 
   //TODO: func connnection_FetchData
   async connnection_FetchData() {
@@ -176,30 +175,7 @@ export default class WalletScreen extends React.Component {
     } );
   }
 
-  // async  componentDidMount() {
-  //   const sss = new S3Service(
-  //     "unique issue slogan party van unfair assault warfare then rubber satisfy snack"
-  //   );
-  //   const answers = ["answer1", "answer2"];
-  //   const encryptedShares = sss.generateShares(answers);
-  //   console.log({ encryptedShares });
-  //   const shareIds = []
-  //   const transShare = [];
-  //   for (const share of encryptedShares) {
-  //     shareIds.push(sss.getShareId(share))
-  //     transShare.push(sss.createTransferShare(share, "demo1"))
-  //   }
-  //   console.log({ shareIds })
-  //   const { share, otp } = sss.createTransferShare(encryptedShares[0], "dummyUser")
-  //   console.log({ otpEncryptedShare: share, otp })
-  //   const { messageId, success } = await sss.uploadShare(share);
-  //   console.log({ otpEncryptedShare: share, messageId, success })
-  //   // Trusted party
-  //   const otpEncryptedShare = await sss.downloadShare(messageId)
-  //   console.log({ downloadedOTPEncShare: otpEncryptedShare })
-  //   const decryptedStorageShare = await sss.decryptOTPEncShare(otpEncryptedShare, messageId, otp);
-  //   console.log({ decryptedStorageShare })
-  // }  
+
 
 
   render() {
@@ -255,7 +231,7 @@ export default class WalletScreen extends React.Component {
               >
                 <TouchableHighlight onPress={ () =>
                   this.props.navigation.push( "WalletSetUpScreen", {
-                    walletsData: this.state.arr_wallets,
+                    walletDetails: this.state.arr_wallets,
                   } )
                 }>
                   <Animated.Image

@@ -14,10 +14,11 @@ import { StackActions, NavigationActions } from "react-navigation";
 import CodeInput from "react-native-confirmation-code-input";
 import * as Keychain from "react-native-keychain";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Loader from "bithyve/src/app/custcompontes/Loader/ModelLoader";
+
 //TODO: Custome Pages
-import CustomeStatusBar from "bithyve/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "bithyve/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 
 
 //TODO: Custome Object
@@ -26,11 +27,11 @@ import {
   localDB,
   errorValidMsg,
   images
-} from "bithyve/src/app/constants/Constants";
-var dbOpration = require( "bithyve/src/app/manager/database/DBOpration" );
-var utils = require( "bithyve/src/app/constants/Utils" );
-import renderIf from "bithyve/src/app/constants/validation/renderIf";
-import Singleton from "bithyve/src/app/constants/Singleton";
+} from "HexaWallet/src/app/constants/Constants";
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var utils = require( "HexaWallet/src/app/constants/Utils" );
+import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+import Singleton from "HexaWallet/src/app/constants/Singleton";
 
 //TODO: Bitcoin Files
 
@@ -39,7 +40,7 @@ import Singleton from "bithyve/src/app/constants/Singleton";
 let isNetwork: Boolean;
 
 //TODO: Localization   
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 
 export default class PasscodeConfirmScreen extends Component<any, any> {
@@ -110,7 +111,8 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
       let code = this.state.pincode;
       let commonData = Singleton.getInstance();
       commonData.setPasscode( code );
-      let mnemonic = this.state.mnemonicValues;
+      let mnemonic = [ "silent", "useless", "panic", "cousin", "page", "black", "abandon", "ticket", "hand", "minor", "stand", "excite" ]; //await utils.getMnemonic(); //this.state.mnemonicValues;
+      console.log( { mnemonic } );
       const dateTime = Date.now();
       const fulldate = Math.floor( dateTime / 1000 );
       const resultCreateWallet = await dbOpration.insertWallet(
@@ -123,7 +125,6 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
         "Primary"
       );
       if ( resultCreateWallet ) {
-
         const resultCreateDailyWallet = await dbOpration.insertCreateAccount(
           localDB.tableName.tblAccount,
           fulldate,
