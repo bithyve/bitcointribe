@@ -12,7 +12,8 @@ import {
     Right,
     Body,
     Text,
-    Tab, Tabs, TabHeading
+    Tab, Tabs, TabHeading,
+    Segment
 } from "native-base";
 import { Icon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
@@ -20,9 +21,9 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 
 //TODO: Custome Pages
-import CustomeStatusBar from "bithyve/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "bithyve/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-
+import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import WalletSetUpScrolling from "HexaWallet/src/app/custcompontes/OnBoarding/WalletSetUpScrolling/WalletSetUpScrolling";
 
 
 import WalletNameScreen from "./WalletNameScreen/WalletNameScreen";
@@ -30,7 +31,7 @@ import FirstSecretQuestionScreen from "./FirstSecretQuestionScreen/FirstSecretQu
 import SecondSecretQuestion from "./SecondSecretQuestion/SecondSecretQuestion";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "bithyve/src/app/constants/Constants";
+import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 
 
 
@@ -38,11 +39,9 @@ export default class WalletSetupScreens extends React.Component<any, any> {
     render() {
         return (
             <Container>
-                <Content
-                    contentContainerStyle={ styles.container }
-                >
-                    <CustomeStatusBar backgroundColor={ colors.white } barStyle="dark-content" />
-                    <View style={ { marginLeft: 10 } }>
+                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
+                    <View style={ { marginLeft: 10, marginTop: 15 } }>
                         <Button
                             transparent
                             onPress={ () => this.props.navigation.pop() }
@@ -51,24 +50,15 @@ export default class WalletSetupScreens extends React.Component<any, any> {
                             <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Set up your wallet</Text>
                         </Button>
                     </View>
-                    <KeyboardAwareScrollView
-                        enableOnAndroid
-                        extraScrollHeight={ 40 }
-                        contentContainerStyle={ { flexGrow: 1, } }
-                    >
-                        <Tabs>
-                            <Tab heading={ <TabHeading  ><Text>Wallet Name</Text></TabHeading> } >
-                                <WalletNameScreen />
-                            </Tab>
-                            <Tab heading={ <TabHeading><Text>1 Question</Text></TabHeading> }>
-                                <FirstSecretQuestionScreen />
-                            </Tab>
-                            <Tab heading={ <TabHeading><Text>2 Question</Text></TabHeading> }>
-                                <SecondSecretQuestion />
-                            </Tab>
-                        </Tabs>
-                    </KeyboardAwareScrollView>
-                </Content>
+                    <WalletSetUpScrolling click_GetStarted={ () => this.click_Done() }>
+                        {/* First screen */ }
+                        <WalletNameScreen />
+                        {/* Second screen */ }
+                        <FirstSecretQuestionScreen />
+                        {/* Third screen */ }
+                        <FirstSecretQuestionScreen />
+                    </WalletSetUpScrolling>
+                </ImageBackground>
             </Container >
         );
     }

@@ -9,15 +9,15 @@ import { StyleSheet, Platform } from "react-native";
 import { Icon } from "@up-shared/components";
 
 //localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 //OnBoarding
-import OnBoardingScreen from "bithyve/src/screens/WalletScreen/OnBoardingScreen/OnBoardingScreen";
+import OnBoardingScreen from "HexaWallet/src/screens/WalletScreen/OnBoardingScreen/OnBoardingScreen";
 
 // import BackupPhraseScreen from "bithyve/src/screens/WalletScreen/BackupPhraseScreen/BackupPhraseScreen";
 // import VerifyBackupPhraseScreen from "bithyve/src/screens/WalletScreen/VerifyBackupPhraseScreen/VerifyBackupPhraseScreen";
 // //Passcode
-import PasscodeScreen from "bithyve/src/screens/PasscodeScreen/PasscodeScreen";
-import PasscodeConfirmScreen from "bithyve/src/screens/PasscodeScreen/PasscodeConfirmScreen";
+import PasscodeScreen from "HexaWallet/src/screens/PasscodeScreen/PasscodeScreen";
+import PasscodeConfirmScreen from "HexaWallet/src/screens/PasscodeScreen/PasscodeConfirmScreen";
 //
 // //Tabbar Bottom
 // import PaymentScreen from "bithyve/src/screens/TabBarScreen/PaymentScreen/PaymentScreen";
@@ -55,7 +55,7 @@ import PasscodeConfirmScreen from "bithyve/src/screens/PasscodeScreen/PasscodeCo
 // import NotificationScreen from "bithyve/src/screens/DrawerScreen/NotificationScreen/NotificationScreen";
 
 //TODO: New Screen Hexa Wallet
-import WalletScreen from "bithyve/src/screens/TabBarScreen/WalletScreen/WalletScreen";
+import WalletScreen from "HexaWallet/src/screens/TabBarScreen/WalletScreen/WalletScreen";
 
 //TODO: Wallet SetUp Screen
 import WalletSetupScreens from "../../screens/DrawerScreen/WalletSetupScreens/WalletSetupScreens";

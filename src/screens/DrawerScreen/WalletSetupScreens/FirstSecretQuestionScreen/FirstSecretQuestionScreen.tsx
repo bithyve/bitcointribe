@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, Platform, Dimensions } from "react-native";
+import { StyleSheet, ImageBackground, View, Platform, Dimensions, SafeAreaView } from "react-native";
 import {
     Container,
     Header,
@@ -20,15 +20,11 @@ import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //TODO: Custome Pages
-import CustomeStatusBar from "bithyve/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "bithyve/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 //TODO: Custome Object
-import { colors, images, localDB } from "bithyve/src/app/constants/Constants";
-import renderIf from "bithyve/src/app/constants/validation/renderIf";
-
-var localFirstAnswer = "";
-var localSecoundAnswer = "";
-
+import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 export default class FirstSecretQuestionScreen extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props );
@@ -61,18 +57,20 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
 
     //TODO: func check_CorrectAnswer
     check_CorrectAnswer() {
-        let firstAns = localFirstAnswer;
-        let secoundAns = localSecoundAnswer;
-        //console.log( { firstAns, secoundAns } );
-        if ( firstAns == secoundAns && firstAns.length >= 6 ) {
-            this.setState( {
-                flag_ConfirmDisableBtn: false
-            } )
-        } else {
-            this.setState( {
-                flag_ConfirmDisableBtn: true
-            } )
-        }
+        setTimeout( () => {
+            let firstAns = this.state.firstAnswer;
+            let secoundAns = this.state.secoundAnswer;
+            if ( firstAns == secoundAns && firstAns.length >= 6 ) {
+                this.setState( {
+                    flag_ConfirmDisableBtn: false
+                } )
+            } else {
+                this.setState( {
+                    flag_ConfirmDisableBtn: true
+                } )
+            }
+        }, 100 );
+
     }
 
 
@@ -82,11 +80,17 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
         let answer = this.state.secoundAnswer;
         let walletName = this.props.navigation.getParam( "walletName" );
         let arr_QuestionList = this.state.arr_QuestionList;
+        for ( var i = 0; i < arr_QuestionList.length; i++ )
+            if ( arr_QuestionList[ i ].item === question ) {
+                arr_QuestionList.splice( i, 1 );
+                break;
+            }
         this.props.navigation.push( "SecondSecretQuestion", {
             walletName,
             question,
             answer,
-            arr_QuestionList
+            arr_QuestionList,
+            walletDetails: this.props.navigation.getParam( "walletDetails" )
         } );
     }
     render() {
@@ -95,100 +99,96 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
         ) );
         return (
             <View style={ styles.container }>
-                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                    <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                    <View style={ { marginLeft: 10, marginTop: 15 } }>
-                        <Button
-                            transparent
-                            onPress={ () => this.props.navigation.pop() }
+                <SafeAreaView style={ styles.container }>
+                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
+                        <View style={ { marginLeft: 10, marginTop: 15 } }>
+                            <Button
+                                transparent
+                                onPress={ () => this.props.navigation.pop() }
+                            >
+                                <CustIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
+                                <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Set up your wallet</Text>
+                            </Button>
+                        </View>
+                        <KeyboardAwareScrollView
+                            enableOnAndroid
+                            extraScrollHeight={ 40 }
+                            contentContainerStyle={ { flexGrow: 1, } }
                         >
-                            <CustIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                            <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Set up your wallet</Text>
-                        </Button>
-                    </View>
-                    <KeyboardAwareScrollView
-                        enableOnAndroid
-                        extraScrollHeight={ 40 }
-                        contentContainerStyle={ { flexGrow: 1, } }
-                    >
-                        <View style={ styles.viewPagination }>
-                            <Text style={ { fontWeight: "bold", fontFamily: "FiraSans-Medium", fontSize: 22, textAlign: "center" } }>Step 2: Select first secret question</Text>
-                            <Text note style={ { marginTop: 20, textAlign: "center" } }>To Set up you need to select two secret questions</Text>
-                        </View>
-                        <View style={ styles.viewInputFiled }>
-
-                            <View style={ styles.itemQuestionPicker }>
-                                <Picker
-                                    renderHeader={ backAction =>
-                                        <Header style={ { backgroundColor: "#ffffff" } }>
-                                            <Left>
-                                                <Button transparent onPress={ backAction }>
-                                                    <Icon name="arrow-back" style={ { color: "#000" } } />
-                                                </Button>
-                                            </Left>
-                                            <Body style={ { flex: 3 } }>
-                                                <Title style={ { color: "#000" } }>Select Question</Title>
-                                            </Body>
-                                            <Right />
-                                        </Header> }
-                                    mode="dropdown"
-                                    iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -30 } } /> }
-                                    selectedValue={ this.state.firstQuestion }
-                                    onValueChange={ this.onValueChange.bind( this ) }
-                                >
-                                    { itemList }
-                                </Picker>
+                            <View style={ styles.viewPagination }>
+                                <Text style={ { fontWeight: "bold", fontFamily: "FiraSans-Medium", fontSize: 22, textAlign: "center" } }>Step 2: Select first secret question</Text>
+                                <Text note style={ { marginTop: 20, textAlign: "center" } }>To Set up you need to select two secret questions</Text>
                             </View>
+                            <View style={ styles.viewInputFiled }>
+
+                                <View style={ styles.itemQuestionPicker }>
+                                    <Picker
+                                        renderHeader={ backAction =>
+                                            <Header style={ { backgroundColor: "#ffffff" } }>
+                                                <Left>
+                                                    <Button transparent onPress={ backAction }>
+                                                        <Icon name="arrow-back" style={ { color: "#000" } } />
+                                                    </Button>
+                                                </Left>
+                                                <Body style={ { flex: 3 } }>
+                                                    <Title style={ { color: "#000" } }>Select Question</Title>
+                                                </Body>
+                                                <Right />
+                                            </Header> }
+                                        mode="dropdown"
+                                        iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -10 } } /> }
+                                        selectedValue={ this.state.firstQuestion }
+                                        onValueChange={ this.onValueChange.bind( this ) }
+                                    >
+                                        { itemList }
+                                    </Picker>
+                                </View>
 
 
-                            <Item rounded style={ styles.itemInputWalletName }>
-                                <Input
-                                    secureTextEntry
-                                    keyboardType="default"
-                                    autoCapitalize='sentences'
-                                    placeholder='Write your answer here'
-                                    placeholderTextColor="#B7B7B7"
-                                    onChangeText={ ( val ) => {
-                                        localFirstAnswer = val;
-                                        this.setState( {
-                                            firstAnswer: val
-                                        } )
-                                    } }
-                                    onKeyPress={ () => {
-                                        this.check_CorrectAnswer()
-                                    } }
-                                    onSubmitEditing={ () => {
-                                        this.check_CorrectAnswer()
-                                    } }
-                                />
-                            </Item>
-                            <Item rounded style={ styles.itemInputWalletName }>
-                                <Input
-                                    keyboardType="default"
-                                    autoCapitalize='none'
-                                    placeholder='Confirm answer'
-                                    placeholderTextColor="#B7B7B7"
-                                    onChangeText={ ( val ) => {
-                                        localSecoundAnswer = val;
-                                        this.setState( {
-                                            secoundAnswer: val
-                                        } )
-                                    } }
-                                    onKeyPress={ () => {
-                                        this.check_CorrectAnswer()
-                                    } }
-                                    onSubmitEditing={ () => {
-                                        this.check_CorrectAnswer()
-                                    } }
-                                />
-                            </Item>
-                        </View>
-                        <View style={ styles.viewProcedBtn }>
-                            <Text note style={ { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } } numberOfLines={ 1 }>Make sure you don’t select questions, answers to </Text>
-                            <FullLinearGradientButton title="Confirm & Select Second Question" disabled={ this.state.flag_ConfirmDisableBtn } style={ [ this.state.flag_ConfirmDisableBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } click_Done={ () => this.click_FirstQuestion() } />
-                        </View>
-                    </KeyboardAwareScrollView>
-                </ImageBackground>
+                                <Item rounded style={ styles.itemInputWalletName }>
+                                    <Input
+                                        secureTextEntry
+                                        keyboardType="default"
+                                        autoCapitalize='sentences'
+                                        placeholder='Write your answer here'
+                                        placeholderTextColor="#B7B7B7"
+                                        onChangeText={ ( val ) => {
+                                            this.setState( {
+                                                firstAnswer: val
+                                            } )
+                                        } }
+                                        onKeyPress={ () =>
+                                            this.check_CorrectAnswer()
+                                        }
+
+                                    />
+                                </Item>
+                                <Item rounded style={ styles.itemInputWalletName }>
+                                    <Input
+                                        keyboardType="default"
+                                        autoCapitalize='none'
+                                        placeholder='Confirm answer'
+                                        placeholderTextColor="#B7B7B7"
+                                        onChangeText={ ( val ) => {
+                                            this.setState( {
+                                                secoundAnswer: val
+                                            } )
+                                        } }
+                                        onKeyPress={ () =>
+                                            this.check_CorrectAnswer()
+                                        }
+
+                                    />
+                                </Item>
+                            </View>
+                            <View style={ styles.viewProcedBtn }>
+                                <Text note style={ { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } } numberOfLines={ 1 }>Make sure you don’t select questions, answers to </Text>
+                                <FullLinearGradientButton title="Confirm & Select Second Question" disabled={ this.state.flag_ConfirmDisableBtn } style={ [ this.state.flag_ConfirmDisableBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } click_Done={ () => this.click_FirstQuestion() } />
+                            </View>
+                        </KeyboardAwareScrollView>
+                    </ImageBackground>
+                </SafeAreaView>
             </View>
 
         );

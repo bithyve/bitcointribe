@@ -144,7 +144,7 @@ pickFirst '\*\*/libgnustl_shared.so'
 ```
 
 #===============> Swipe on drawer does not work in Android <==================
-
+  
 ```
 ### MainActivity.java in
 

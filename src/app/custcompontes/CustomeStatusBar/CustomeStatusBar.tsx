@@ -7,8 +7,8 @@ import {
 //TODO: Custome object
 import {
     colors
-} from "bithyve/src/app/constants/Constants";
-var utils = require( "bithyve/src/app/constants/Utils" );
+} from "HexaWallet/src/app/constants/Constants";
+var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 
 export default class CustomeStatusBar extends Component<any, any> {

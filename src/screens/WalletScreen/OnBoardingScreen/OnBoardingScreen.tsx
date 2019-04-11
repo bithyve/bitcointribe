@@ -2,17 +2,17 @@ import React from "react";
 import { StyleSheet, View, SafeAreaView, Image, StatusBar } from "react-native";
 import { Text } from "native-base";
 import { StackActions, NavigationActions } from "react-navigation";
-import CreateTables from "bithyve/src/app/manager/database/CreateTables";
+import CreateTables from "HexaWallet/src/app/manager/database/CreateTables";
 
 //Custome Compontes
-import CustomeStatusBar from "bithyve/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import OnBoarding from "bithyve/src/app/custcompontes/OnBoarding/OnBoarding";
+import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import OnBoarding from "HexaWallet/src/app/custcompontes/OnBoarding/OnBoarding";
 
 //TODO: Custome object
-import { colors, images, msg } from "bithyve/src/app/constants/Constants";
+import { colors, images, msg } from "HexaWallet/src/app/constants/Constants";
 
-//localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+//localization 
+import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 export default class OnBoardingScreen extends React.Component<any, any> {
   constructor ( props: any ) {
