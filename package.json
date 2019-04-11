@@ -1,5 +1,5 @@
 {
-  "name": "bithyve",
+  "name": "HexaWallet",
   "version": "0.0.1",
   "private": true,
   "author": "Bithyve",
@@ -11,7 +11,6 @@
     "issueBuffer": "cp -r -f ./src/app/lib/IssueFiles/Buffer/index.js ./node_modules/bip32/index.js",
     "issueSlideMenuAndroid": "cp -r -f ./src/app/lib/IssueFiles/slideMenuAndroid/MainActivity.java ./android/app/src/main/java/com/bithyve/hexa/MainActivity.java",
     "issueQrcodeImageCode": "cp -r -f ./src/app/lib/IssueFiles/qrcodeimagereader/ScannerMask.js  ./node_modules/react-native-barcode-scanners/src/ScannerMask.js",
-    "issuePasscodeUI": "cp -r -f ./src/app/lib/IssueFiles/Passcode/ConfirmationCodeInput.js ./node_modules/react-native-confirmation-code-input/components/ConfirmationCodeInput.js",
     "compDatePickerVaultAccountScreenIOS": "cp -r -f ./src/assets/custComp/vaultAccountDatePickerView/index.js ./node_modules/react-native-datepicker/datepicker.js",
     "compSCLSubtitlenumberOfTextIncrement": "cp -r -f ./src/app/lib/IssueFiles/Alert/SclAlertSubtitle/subtitle.js ./node_modules/react-native-scl-alert/src/components/SCLAlertSubtitle.js",
     "start": "node node_modules/react-native/local-cli/cli.js start",
@@ -42,7 +41,7 @@
     "axios": "^0.18.0",
     "babel-preset-react-native": "^4.0.1",
     "backbone-events-standalone": "^0.2.7",
-    "bip39": "^2.5.0",
+    "bip39": "2.5.0",
     "bip65": "^1.0.3",
     "bitcoin-core": "^2.0.0",
     "bitcoinjs-lib": "^4.0.2",
@@ -69,8 +68,8 @@
     "punycode": "^1.4.1",
     "qrcode": "^1.3.2",
     "querystring-es3": "^0.2.1",
-    "react": "16.8.3",
-    "react-native": "0.59.4",
+    "react": "16.6.3",
+    "react-native": "0.57.8",
     "react-native-animatable": "^1.3.1",
     "react-native-barcode-builder": "^1.0.5",
     "react-native-barcode-scanners": "^1.0.4",
@@ -117,7 +116,6 @@
     "react-native-multibar": "^0.0.6",
     "react-native-onboarding-swiper": "^1.0.0",
     "react-native-os": "^1.2.2",
-    "react-native-pagination": "^1.5.5",
     "react-native-pin-code": "^0.5.3",
     "react-native-popup-dialog": "^0.16.3",
     "react-native-popup-menu": "^0.14.2",
@@ -145,7 +143,7 @@
     "react-native-tag-select": "^2.0.0",
     "react-native-tcp": "^3.2.1",
     "react-native-udp": "^2.3.1",
-    "react-native-ui-kitten": "^3.1.2",
+    "react-native-ui-kitten": "3.1.2",
     "react-native-ultimate-listview": "^3.3.0",
     "react-native-vector-icons": "^6.1.0",
     "react-native-view-shot": "^2.5.0",
@@ -164,6 +162,10 @@
     "vm-browserify": "0.0.4"
   },
   "devDependencies": {
+    "@babel/plugin-syntax-export-namespace-from": "^7.2.0",
+    "@types/react": "^16.7.18",
+    "@types/react-native": "^0.57.20",
+    "babel-jest": "23.6.0",
     "eslint": "^5.9.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-babel": "^5.3.0",
@@ -171,22 +173,15 @@
     "eslint-plugin-node": "^8.0.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-react": "^7.12.2",
+    "jest": "23.6.0",
+    "metro-react-native-babel-preset": "0.51.1",
     "prettier-eslint-cli": "^4.7.1",
     "react-devtools-core": "3.4.2",
     "react-native-typescript-transformer": "^1.2.11",
+    "react-test-renderer": "16.6.3",
     "rn-nodeify": "^10.0.1",
     "ts-node": "^7.0.1",
-    "@babel/core": "^7.4.3",
-    "@babel/runtime": "^7.4.3",
-    "@types/jest": "^24.0.11",
-    "@types/react": "^16.8.13",
-    "@types/react-native": "^0.57.42",
-    "@types/react-test-renderer": "^16.8.1",
-    "babel-jest": "^24.7.1",
-    "jest": "^24.7.1",
-    "metro-react-native-babel-preset": "^0.53.1",
-    "react-test-renderer": "16.8.3",
-    "typescript": "^3.4.3"
+    "typescript": "^3.2.2"
   },
   "jest": {
     "preset": "react-native"
@@ -196,7 +191,7 @@
   },
   "rnpm": {
     "assets": [
-      "./src/assets/fonts/"
+      "./src/assets/fonts/*"
     ]
   },
   "react-native": {

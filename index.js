@@ -3,13 +3,13 @@ import React from "react";
 import { createAppContainer } from "react-navigation";
 import { AsyncStorage, AppState, AppRegistry, Linking, StatusBar } from "react-native";
 import DeepLinking from "react-native-deep-linking";
-import "bithyve/shim";
-import { name as appName } from "bithyve/app.json";
-import { createRootNavigator } from "bithyve/src/app/router/router";
-import LaunchScreen from "bithyve/src/screens/LaunchScreen/LaunchScreen";
-import Singleton from "bithyve/src/app/constants/Singleton";
+import "HexaWallet/shim";
+import { name as appName } from "HexaWallet/app.json";
+import { createRootNavigator } from "HexaWallet/src/app/router/router";
+import LaunchScreen from "HexaWallet/src/screens/LaunchScreen/LaunchScreen";
+import Singleton from "HexaWallet/src/app/constants/Singleton";
 
-export default class HexaWalletWallet extends React.Component
+export default class HexaWalletWalletWallet extends React.Component
 {
   constructor ( props: any )
   {
@@ -201,4 +201,4 @@ export default class HexaWalletWallet extends React.Component
 }
 
 console.disableYellowBox = true;
-AppRegistry.registerComponent( appName, () => HexaWalletWallet );
+AppRegistry.registerComponent( appName, () => HexaWalletWalletWallet );

@@ -12,11 +12,11 @@ import {
   Easing
 } from "react-native";
 
-import { colors, images } from "bithyve/src/app/constants/Constants";
-import Singleton from "bithyve/src/app/constants/Singleton";
+import { colors, images } from "HexaWallet/src/app/constants/Constants";
+import Singleton from "HexaWallet/src/app/constants/Singleton";
 
 //localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 import * as Keychain from "react-native-keychain";
 interface Props {

@@ -12,7 +12,7 @@ import { Button } from "native-base";
 import LinearGradient from "react-native-linear-gradient";
 
 //TODO: Custome object
-import { colors } from "bithyve/src/app/constants/Constants";
+import { colors } from "HexaWallet/src/app/constants/Constants";
 // Detect screen width and height
 const { width, height } = Dimensions.get( "window" );
 

@@ -17,13 +17,13 @@ import * as Keychain from "react-native-keychain";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //TODO: Custome Pages
-import CustomeStatusBar from "bithyve/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "bithyve/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 
-import Singleton from "bithyve/src/app/constants/Singleton";
+import Singleton from "HexaWallet/src/app/constants/Singleton";
 
 //localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 //TODO: Custome Pages
 import {
@@ -32,10 +32,10 @@ import {
   images,
   errorMessage,
   errorValidMsg
-} from "bithyve/src/app/constants/Constants";
-import utils from "bithyve/src/app/constants/Utils";
-var dbOpration = require( "bithyve/src/app/manager/database/DBOpration" );
-import renderIf from "bithyve/src/app/constants/validation/renderIf";
+} from "HexaWallet/src/app/constants/Constants";
+import utils from "HexaWallet/src/app/constants/Utils";
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
 export default class PasscodeScreen extends Component {
   constructor ( props: any ) {

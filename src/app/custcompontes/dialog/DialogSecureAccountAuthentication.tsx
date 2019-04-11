@@ -21,8 +21,8 @@ interface Props {
   click_Cancel: Function;
 }
 
-//localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+//localization  
+import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 let arr_secureAccountFaPopUp = localization(
   "SentMoneyScreen.secureAccountFaPopUp"
 );
@@ -30,9 +30,9 @@ let arr_secureAccountFaPopUp = localization(
 export default class DialogSecureAccountAuthentication extends Component<
   Props,
   any
-> {
-  constructor(props: any) {
-    super(props);
+  > {
+  constructor ( props: any ) {
+    super( props );
     this.state = {
       txt2FA: ""
     };
@@ -41,96 +41,96 @@ export default class DialogSecureAccountAuthentication extends Component<
   render() {
     return (
       <Dialog
-        width={Dimensions.get("screen").width - 30}
+        width={ Dimensions.get( "screen" ).width - 30 }
         visible={
-          this.props.data.length != 0 ? this.props.data[0].visible : false
+          this.props.data.length != 0 ? this.props.data[ 0 ].visible : false
         }
         dialogAnimation={
-          new SlideAnimation({
+          new SlideAnimation( {
             slideFrom: "bottom"
-          })
+          } )
         }
-        dialogStyle={styles.dialogSecureAccount}
+        dialogStyle={ styles.dialogSecureAccount }
       >
-        <DialogContent containerStyle={styles.dialogContainerSecureAccount}>
-          <View style={styles.accountTypePopUP}>
-            <Text style={[styles.txtTitle, { fontSize: 20 }]}>
-              {arr_secureAccountFaPopUp.title}
+        <DialogContent containerStyle={ styles.dialogContainerSecureAccount }>
+          <View style={ styles.accountTypePopUP }>
+            <Text style={ [ styles.txtTitle, { fontSize: 20 } ] }>
+              { arr_secureAccountFaPopUp.title }
             </Text>
 
-            <View style={styles.viewFeeShow}>
-              <View style={[styles.viewLineText]}>
-                <Text style={[styles.txtTitle, { flex: 1 }]}>
-                  {arr_secureAccountFaPopUp.txtAmount}
+            <View style={ styles.viewFeeShow }>
+              <View style={ [ styles.viewLineText ] }>
+                <Text style={ [ styles.txtTitle, { flex: 1 } ] }>
+                  { arr_secureAccountFaPopUp.txtAmount }
                 </Text>
                 <Text
-                  style={[styles.txtTitle, { flex: 1, fontWeight: "bold" }]}
+                  style={ [ styles.txtTitle, { flex: 1, fontWeight: "bold" } ] }
                 >
-                  ${" "}
-                  {this.props.data.length != 0
-                    ? this.props.data[0].amount
-                    : null}
+                  ${ " " }
+                  { this.props.data.length != 0
+                    ? this.props.data[ 0 ].amount
+                    : null }
                 </Text>
               </View>
-              <View style={[styles.viewLineText]}>
-                <Text style={[styles.txtTitle, { flex: 1 }]}>
-                  {arr_secureAccountFaPopUp.txtFee}
+              <View style={ [ styles.viewLineText ] }>
+                <Text style={ [ styles.txtTitle, { flex: 1 } ] }>
+                  { arr_secureAccountFaPopUp.txtFee }
                 </Text>
                 <Text
-                  style={[styles.txtTitle, { flex: 1, fontWeight: "bold" }]}
+                  style={ [ styles.txtTitle, { flex: 1, fontWeight: "bold" } ] }
                 >
-                  ${" "}
-                  {this.props.data.length != 0 ? this.props.data[0].fee : null}
+                  ${ " " }
+                  { this.props.data.length != 0 ? this.props.data[ 0 ].fee : null }
                 </Text>
               </View>
             </View>
 
-            <View style={styles.viewReceipint}>
-              <Text style={[styles.txtTitle, { fontSize: 18 }]}>
-                {arr_secureAccountFaPopUp.txtRecipient}
+            <View style={ styles.viewReceipint }>
+              <Text style={ [ styles.txtTitle, { fontSize: 18 } ] }>
+                { arr_secureAccountFaPopUp.txtRecipient }
               </Text>
               <Text
-                style={[
+                style={ [
                   styles.txtTitle,
                   { textAlign: "center", fontSize: 18, fontWeight: "bold" }
-                ]}
+                ] }
               >
-                {this.props.data.length != 0
-                  ? this.props.data[0].secureRecipientAddress
-                  : null}
+                { this.props.data.length != 0
+                  ? this.props.data[ 0 ].secureRecipientAddress
+                  : null }
               </Text>
             </View>
-            <View style={styles.view2FaInput}>
+            <View style={ styles.view2FaInput }>
               <TextInput
-                name={this.state.txt2FA}
-                value={this.state.txt2FA}
+                name={ this.state.txt2FA }
+                value={ this.state.txt2FA }
                 ref="txtInpAccountBal"
-                autoFocus={true}
-                keyboardType={"numeric"}
-                returnKeyType={"next"}
-                placeholder={arr_secureAccountFaPopUp.txttokenNoPlaceholder}
+                autoFocus={ true }
+                keyboardType={ "numeric" }
+                returnKeyType={ "next" }
+                placeholder={ arr_secureAccountFaPopUp.txttokenNoPlaceholder }
                 placeholderTextColor="#EA4336"
-                style={styles.input2FA}
-                onChangeText={val => this.setState({ txt2FA: val })}
-                onChange={val => this.setState({ txt2FA: val })}
+                style={ styles.input2FA }
+                onChangeText={ val => this.setState( { txt2FA: val } ) }
+                onChange={ val => this.setState( { txt2FA: val } ) }
               />
             </View>
-            <View style={styles.viewBtn}>
+            <View style={ styles.viewBtn }>
               <Button
                 transparent
                 danger
-                onPress={() => this.props.click_Cancel()}
+                onPress={ () => this.props.click_Cancel() }
               >
-                <Text>{arr_secureAccountFaPopUp.btnCancel}</Text>
+                <Text>{ arr_secureAccountFaPopUp.btnCancel }</Text>
               </Button>
               <Button
                 transparent
                 danger
-                onPress={() => {
-                  this.props.click_Sent(this.state.txt2FA);
-                }}
+                onPress={ () => {
+                  this.props.click_Sent( this.state.txt2FA );
+                } }
               >
-                <Text>{arr_secureAccountFaPopUp.btnSend}</Text>
+                <Text>{ arr_secureAccountFaPopUp.btnSend }</Text>
               </Button>
             </View>
           </View>
@@ -140,7 +140,7 @@ export default class DialogSecureAccountAuthentication extends Component<
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   txtTile: {
     color: "#ffffff"
   },
@@ -181,4 +181,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-end"
   }
-});
+} );
