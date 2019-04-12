@@ -159,7 +159,8 @@ var images = {
     validationKey: require( assetsImages + "secureAccount/validationKey.png" )
   },
   walletScreen: {
-    "shield": require( assetsImages + "WalletScreen/red_icon_sheild_background.png" )
+    "shield_1": require( assetsImages + "WalletScreen/shield_1.png" ),
+    "shield_2": require( assetsImages + "WalletScreen/shield_2.png" ),
   }
 };
 
@@ -171,7 +172,8 @@ var localDB = {
     tblWallet: Config.DB_TBL_WALLET,
     tblAccountType: Config.DB_TBL_ACCOUNTTYPE,
     tblAccount: Config.DB_TBL_ACCOUNT,
-    tblTransaction: Config.DB_TBL_TRANSACTION
+    tblTransaction: Config.DB_TBL_TRANSACTION,
+    tblSSSDetails: Config.DB_TBL_SSSDETAILS
   }
 };
 

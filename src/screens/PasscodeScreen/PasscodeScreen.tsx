@@ -20,22 +20,23 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 
+//TODO: Custome Object
+import {
+  colors,
+  images,
+  localDB,
+  errorMessage
+} from "HexaWallet/src/app/constants/Constants";
+import utils from "HexaWallet/src/app/constants/Utils";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
-//TODO: Custome Pages
-import {
-  colors,
-  localDB,
-  images,
-  errorMessage,
-  errorValidMsg
-} from "HexaWallet/src/app/constants/Constants";
-import utils from "HexaWallet/src/app/constants/Utils";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+
+
 
 export default class PasscodeScreen extends Component {
   constructor ( props: any ) {
@@ -63,6 +64,10 @@ export default class PasscodeScreen extends Component {
 
   retrieveData = async () => {
     try {
+      const resultWallet = await dbOpration.readTablesData(
+        localDB.tableName.tblWallet
+      );
+      await utils.setWalletDetails( resultWallet.temp );
       AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
       const credentials = await Keychain.getGenericPassword();
       this.setState( {
@@ -101,6 +106,7 @@ export default class PasscodeScreen extends Component {
   onSuccess = ( code: string ) => {
     let commonData = Singleton.getInstance();
     let pageName = commonData.getRootViewController();
+
     if ( pageName == "TabbarBottom" ) {
       const resetAction = StackActions.reset( {
         index: 0, // <-- currect active route from actions array

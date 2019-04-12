@@ -1,14 +1,24 @@
 export default class Singleton {
+  //In future use redux (singleton same redux but redux adv.)
   static myInstance = null;
   public passcode: string = "";
   public rootViewController: string = "TabbarBottom";
   public deepLinkingUrl: string = "";
 
+
+
+  //Wallet Details
+  public walletDetails: any;
+
+  //Setup your wallet screen
+  public setupWallet = {};
+
+
   /**
    * @returns {Singleton}
    */
   static getInstance() {
-    if (Singleton.myInstance == null) {
+    if ( Singleton.myInstance == null ) {
       Singleton.myInstance = new Singleton();
     }
     return this.myInstance;
@@ -18,21 +28,37 @@ export default class Singleton {
   getPasscode() {
     return this.passcode;
   }
-  setPasscode(code: string) {
+  setPasscode( code: string ) {
     this.passcode = code;
   }
   //TODO: rootViewController
   getRootViewController() {
     return this.rootViewController;
   }
-  setRootViewController(controller: string) {
+  setRootViewController( controller: string ) {
     this.rootViewController = controller;
   }
   //TODO: deepLinkingUrl
   getDeepLinkingUrl() {
     return this.deepLinkingUrl;
   }
-  setDeepLinkingUrl(url: string) {
+  setDeepLinkingUrl( url: string ) {
     this.deepLinkingUrl = url;
+  }
+
+  //Wallet Details
+  getWalletDetails() {
+    return this.walletDetails;
+  }
+
+  setWalletDetails( url: string ) {
+    this.walletDetails = url;
+  }
+
+  getSetupWallet() {
+    return this.setupWallet;
+  }
+  setSetupWallet( url: string ) {
+    this.setupWallet = url;
   }
 }
