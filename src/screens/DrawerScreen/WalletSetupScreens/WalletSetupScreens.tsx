@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView } from "react-native";
 import {
     Container,
     Header,
@@ -39,26 +39,28 @@ export default class WalletSetupScreens extends React.Component<any, any> {
     render() {
         return (
             <Container>
-                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                    <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                    <View style={ { marginLeft: 10, marginTop: 15 } }>
-                        <Button
-                            transparent
-                            onPress={ () => this.props.navigation.pop() }
-                        >
-                            <Icon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                            <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Set up your wallet</Text>
-                        </Button>
-                    </View>
-                    <WalletSetUpScrolling click_GetStarted={ () => this.click_Done() }>
-                        {/* First screen */ }
-                        <WalletNameScreen />
-                        {/* Second screen */ }
-                        <FirstSecretQuestionScreen />
-                        {/* Third screen */ }
-                        <FirstSecretQuestionScreen />
-                    </WalletSetUpScrolling>
-                </ImageBackground>
+                <SafeAreaView style={ styles.container }>
+                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
+                        <View style={ { marginLeft: 10, marginTop: 15 } }>
+                            <Button
+                                transparent
+                                onPress={ () => this.props.navigation.pop() }
+                            >
+                                <Icon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
+                                <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Set up your wallet</Text>
+                            </Button>
+                        </View>
+                        <WalletSetUpScrolling click_GetStarted={ () => this.click_Done() }>
+                            {/* First screen */ }
+                            <WalletNameScreen />
+                            {/* Second screen */ }
+                            <FirstSecretQuestionScreen />
+                            {/* Third screen */ }
+                            <FirstSecretQuestionScreen />
+                        </WalletSetUpScrolling>
+                    </ImageBackground>
+                </SafeAreaView>
             </Container >
         );
     }
