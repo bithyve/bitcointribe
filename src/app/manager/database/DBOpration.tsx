@@ -39,6 +39,7 @@ const readTablesData = ( tableName: any ) => {
               temp.push( data );
             } else if ( tableName == "tblAccount" ) {
               data.id = data.id;
+              data.dateCreated = utils.decrypt( data.dateCreated, passcode );
               data.address = utils.decrypt( data.address, passcode );
               data.balance = utils.decrypt( data.balance, passcode );
               data.unit = utils.decrypt( data.unit, passcode );
@@ -52,6 +53,8 @@ const readTablesData = ( tableName: any ) => {
               temp.push( data );
             }
           }
+          resolve( { temp } );
+        } else {
           resolve( { temp } );
         }
       } );
@@ -316,7 +319,7 @@ const updateTableData = (
 
 //TODO: Insert
 
-//Insert tblAccountType
+//TODO: insert Account Type
 const insertAccountTypeData = ( tblName, txtDate ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
@@ -344,7 +347,7 @@ const insertAccountTypeData = ( tblName, txtDate ) => {
   } );
 };
 
-//insert:tblWallet
+//TODO:  insert tblWallet
 
 const insertWallet = (
   tblName: string,
@@ -380,7 +383,7 @@ const insertWallet = (
   } );
 };
 
-//insert: tblAccount Only First Time
+//TODO: insert tblAccount Only First Time
 const insertCreateAccount = (
   tblName: string,
   date: string,
@@ -414,6 +417,7 @@ const insertCreateAccount = (
   } );
 };
 
+//TODO: insert Last Before Create Account
 const insertLastBeforeCreateAccount = (
   tblName: string,
   fulldate: string,
@@ -455,6 +459,9 @@ const insertLastBeforeCreateAccount = (
   } );
 };
 
+
+
+//TODO: insdrt Transaction
 const insertTblTransation = (
   tblName: string,
   transactionDetails: any,
@@ -523,6 +530,41 @@ const insertTblTransation = (
   } );
 };
 
+
+
+//TODO: insert SSS Details
+const insertSSSShareAndShareId = (
+  tblName: string,
+  fulldate: string,
+  share: any,
+  shareId: any,
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    db.transaction( function ( txn ) {
+      for ( let i = 0; i < share.length; i++ ) {
+        txn.executeSql(
+          "INSERT INTO " +
+          tblName +
+          "(dateCreated,share,shareId) VALUES (:dateCreated,:share,:shareId)",
+          [
+            utils.encrypt(
+              fulldate.toString(),
+              passcode
+            ),
+            utils.encrypt( share[ i ].toString(), passcode ),
+            utils.encrypt( shareId[ i ].toString(), passcode ),
+            utils.encrypt( fulldate.toString(), passcode )
+          ]
+        );
+      }
+      resolve( true );
+    } );
+  } );
+};
+
+
+
 module.exports = {
   readTablesData,
   readAccountTablesData,
@@ -533,5 +575,6 @@ module.exports = {
   insertCreateAccount,
   insertLastBeforeCreateAccount,
   insertTblTransation,
-  updateTableData
+  updateTableData,
+  insertSSSShareAndShareId
 };

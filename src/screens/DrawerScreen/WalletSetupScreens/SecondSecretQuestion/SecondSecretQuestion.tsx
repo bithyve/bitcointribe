@@ -26,7 +26,8 @@ import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
-
+var utils = require( "HexaWallet/src/app/constants/Utils" );
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
@@ -36,20 +37,28 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         super( props );
         this.state = {
             selected: "",
+            data: [],
             arr_QuestionList: [],
             firstAnswer: "",
             secoundAnswer: "",
             flag_ConfirmDisableBtn: true,
             flag_Loading: false
         };
+        window.EventBus.on( "swipeScreen", this.loadQuestionList );
+        this.loadQuestionList = this.loadQuestionList.bind( this );
     }
 
-    componentWillMount() {
-        let questionList = this.props.navigation.getParam( "arr_QuestionList" );
-        this.setState( {
-            selected: questionList[ 0 ].item,
-            arr_QuestionList: questionList
-        } )
+    loadQuestionList = async () => {
+        let resWalletData = await utils.getSetupWallet();
+        if ( resWalletData.arr_QuestionList != undefined ) {
+            console.log( resWalletData.arr_QuestionList );
+            this.setState( {
+                data: resWalletData,
+                arr_QuestionList: resWalletData.arr_QuestionList,
+                selected: resWalletData.arr_QuestionList[ 0 ].item
+            } )
+        }
+
     }
 
     onValueChange( value: string ) {
@@ -57,7 +66,6 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
             selected: value
         } );
     }
-
 
     //TODO: func check_CorrectAnswer
     check_CorrectAnswer() {
@@ -74,46 +82,69 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                 } )
             }
         }, 100 );
-
     }
     //TODO: func click_Confirm
     async click_Confirm() {
         this.setState( {
             flag_Loading: true
         } )
-        let walletDetails = this.props.navigation.getParam( "walletDetails" );
-        let walletName = this.props.navigation.getParam( "walletName" );
-        let firstAnswer = this.props.navigation.getParam( "answer" );
+        const dateTime = Date.now();
+        const fulldate = Math.floor( dateTime / 1000 );
+        let data = this.state.data;
+        let walletDetails = utils.getWalletDetails();
+        let walletName = data.walletName;
+        let firstAnswer = data.answer;
         let secoundAnser = this.state.secoundAnswer;
-        console.log( { walletDetails, firstAnswer, secoundAnser } );
         const sss = new S3Service(
             walletDetails[ 0 ].mnemonic
         );
         const answers = [ firstAnswer, secoundAnser ];
         const encryptedShares = sss.generateShares( answers );
-        console.log( { encryptedShares } );
+        //console.log( { encryptedShares } );
         const shareIds = []
         const transShare = [];
         for ( const share of encryptedShares ) {
             shareIds.push( sss.getShareId( share ) )
             transShare.push( sss.createTransferShare( share, walletName ) )
         }
-        console.log( { shareIds } )
-        const { share, otp } = sss.createTransferShare( encryptedShares[ 0 ], walletName )
-        console.log( { otpEncryptedShare: share, otp } )
-        const { messageId, success } = await sss.uploadShare( share );
-        console.log( { otpEncryptedShare: share, messageId, success } )
-        // Trusted party
-        const otpEncryptedShare = await sss.downloadShare( messageId )
-        console.log( { downloadedOTPEncShare: otpEncryptedShare } )
-        const decryptedStorageShare = await sss.decryptOTPEncShare( otpEncryptedShare, messageId, otp );
-        console.log( { decryptedStorageShare } )
-        if ( decryptedStorageShare != null ) {
-            this.setState( {
-                flag_Loading: false
-            } )
-            this.props.navigation.navigate( "TabbarBottom" );
+        if ( shareIds != null ) {
+            const resultSSSShareIdInserted = await dbOpration.insertSSSShareAndShareId(
+                localDB.tableName.tblSSSDetails,
+                fulldate,
+                encryptedShares,
+                shareIds
+            );
+            if ( resultSSSShareIdInserted ) {
+                const resultCreatAccount = await dbOpration.insertCreateAccount(
+                    localDB.tableName.tblAccount,
+                    fulldate,
+                    "",
+                    "BTC",
+                    walletName,
+                    "Wallet",
+                    ""
+                );
+                if ( resultCreatAccount ) {
+                    this.setState( {
+                        flag_Loading: false
+                    } )
+                    this.props.prevScreen();
+                }
+            }
         }
+        //console.log( { shareIds});
+        // const { share, otp } = sss.createTransferShare( encryptedShares[ 0 ], walletName )
+        // console.log( { otpEncryptedShare: share, otp } )
+        // const { messageId, success } = await sss.uploadShare( share );
+        // console.log( { otpEncryptedShare: share, messageId, success } )
+        // // Trusted party
+        // const otpEncryptedShare = await sss.downloadShare( messageId )
+        // console.log( { downloadedOTPEncShare: otpEncryptedShare } )
+        // const decryptedStorageShare = await sss.decryptOTPEncShare( otpEncryptedShare, messageId, otp );
+        // console.log( { decryptedStorageShare } )
+
+
+
     }
 
     render() {
@@ -122,93 +153,79 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         ) );
         return (
             <View style={ styles.container }>
-                <SafeAreaView style={ styles.container }>
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.props.navigation.pop() }
+                <KeyboardAwareScrollView
+                    enableOnAndroid
+                    extraScrollHeight={ 40 }
+                    contentContainerStyle={ { flexGrow: 1, } }
+                >
+                    <View style={ styles.viewPagination }>
+                        <Text style={ { fontWeight: "bold", fontFamily: "FiraSans-Medium", fontSize: 22, textAlign: "center" } }>Step 3: Select second secret question</Text>
+                        <Text note style={ { marginTop: 20, textAlign: "center" } }>To Set up you need to select two secret questions</Text>
+                    </View>
+                    <View style={ styles.viewInputFiled }>
+                        <View style={ styles.itemQuestionPicker }>
+                            <Picker
+                                renderHeader={ backAction =>
+                                    <Header style={ { backgroundColor: "#ffffff" } }>
+                                        <Left>
+                                            <Button transparent onPress={ backAction }>
+                                                <Icon name="arrow-back" style={ { color: "#000" } } />
+                                            </Button>
+                                        </Left>
+                                        <Body style={ { flex: 3 } }>
+                                            <Title style={ { color: "#000" } }>Select Question</Title>
+                                        </Body>
+                                        <Right />
+                                    </Header> }
+                                mode="dropdown"
+                                iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -10 } } /> }
+                                selectedValue={ this.state.selected }
+                                onValueChange={ this.onValueChange.bind( this ) }
                             >
-                                <CustIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Set up your wallet</Text>
-                            </Button>
+                                { itemList }
+                            </Picker>
                         </View>
-                        <KeyboardAwareScrollView
-                            enableOnAndroid
-                            extraScrollHeight={ 40 }
-                            contentContainerStyle={ { flexGrow: 1, } }
-                        >
-                            <View style={ styles.viewPagination }>
-                                <Text style={ { fontWeight: "bold", fontFamily: "FiraSans-Medium", fontSize: 22, textAlign: "center" } }>Step 3: Select second secret question</Text>
-                                <Text note style={ { marginTop: 20, textAlign: "center" } }>To Set up you need to select two secret questions</Text>
-                            </View>
-                            <View style={ styles.viewInputFiled }>
-                                <View style={ styles.itemQuestionPicker }>
-                                    <Picker
-                                        renderHeader={ backAction =>
-                                            <Header style={ { backgroundColor: "#ffffff" } }>
-                                                <Left>
-                                                    <Button transparent onPress={ backAction }>
-                                                        <Icon name="arrow-back" style={ { color: "#000" } } />
-                                                    </Button>
-                                                </Left>
-                                                <Body style={ { flex: 3 } }>
-                                                    <Title style={ { color: "#000" } }>Select Question</Title>
-                                                </Body>
-                                                <Right />
-                                            </Header> }
-                                        mode="dropdown"
-                                        iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -10 } } /> }
-                                        selectedValue={ this.state.selected }
-                                        onValueChange={ this.onValueChange.bind( this ) }
-                                    >
-                                        { itemList }
-                                    </Picker>
-                                </View>
-                                <Item rounded style={ styles.itemInputWalletName }>
-                                    <Input
-                                        secureTextEntry
-                                        keyboardType="default"
-                                        autoCapitalize='sentences'
-                                        placeholder='Write your answer here'
-                                        placeholderTextColor="#B7B7B7"
-                                        onChangeText={ ( val ) => {
-                                            this.setState( {
-                                                firstAnswer: val
-                                            } )
-                                        } }
-                                        onKeyPress={ () =>
-                                            this.check_CorrectAnswer()
-                                        }
-                                    />
-                                </Item>
-                                <Item rounded style={ styles.itemInputWalletName }>
-                                    <Input
-                                        keyboardType="default"
-                                        autoCapitalize='none'
-                                        placeholder='Confirm answer'
-                                        placeholderTextColor="#B7B7B7"
-                                        onChangeText={ ( val ) => {
-                                            this.setState( {
-                                                secoundAnswer: val
-                                            } )
-                                        } }
-                                        onKeyPress={ () =>
-                                            this.check_CorrectAnswer()
-                                        }
+                        <Item rounded style={ styles.itemInputWalletName }>
+                            <Input
+                                secureTextEntry
+                                keyboardType="default"
+                                autoCapitalize='sentences'
+                                placeholder='Write your answer here'
+                                placeholderTextColor="#B7B7B7"
+                                onChangeText={ ( val ) => {
+                                    this.setState( {
+                                        firstAnswer: val
+                                    } )
+                                } }
+                                onKeyPress={ () =>
+                                    this.check_CorrectAnswer()
+                                }
+                            />
+                        </Item>
+                        <Item rounded style={ styles.itemInputWalletName }>
+                            <Input
+                                keyboardType="default"
+                                autoCapitalize='none'
+                                placeholder='Confirm answer'
+                                placeholderTextColor="#B7B7B7"
+                                onChangeText={ ( val ) => {
+                                    this.setState( {
+                                        secoundAnswer: val
+                                    } )
+                                } }
+                                onKeyPress={ () =>
+                                    this.check_CorrectAnswer()
+                                }
 
-                                    />
-                                </Item>
-                            </View>
-                            <View style={ styles.viewProcedBtn }>
-                                <Text note style={ { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } } numberOfLines={ 1 }>Make sure you don’t select questions, answers to </Text>
-                                <FullLinearGradientButton title="Confirm & Proceed" disabled={ this.state.flag_ConfirmDisableBtn } style={ [ this.state.flag_ConfirmDisableBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } click_Done={ () => this.click_Confirm() } />
-                            </View>
-                        </KeyboardAwareScrollView>
-                        <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 60 } />
-                    </ImageBackground>
-                </SafeAreaView>
+                            />
+                        </Item>
+                    </View>
+                    <View style={ styles.viewProcedBtn }>
+                        <Text note style={ { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } } numberOfLines={ 1 }>Make sure you don’t select questions, answers to </Text>
+                        <FullLinearGradientButton title="Confirm & Proceed" disabled={ this.state.flag_ConfirmDisableBtn } style={ [ this.state.flag_ConfirmDisableBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } click_Done={ () => this.click_Confirm() } />
+                    </View>
+                </KeyboardAwareScrollView>
+                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 60 } />
             </View>
         );
     }
@@ -217,7 +234,7 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
 const styles = StyleSheet.create( {
     container: {
         flex: 1,
-        backgroundColor: "#FCFCFC",
+        backgroundColor: "transparent",
     },
     viewPagination: {
         flex: 2,

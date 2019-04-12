@@ -51,13 +51,13 @@ export default class WalletSetupScreens extends React.Component<any, any> {
                                 <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Set up your wallet</Text>
                             </Button>
                         </View>
-                        <WalletSetUpScrolling click_GetStarted={ () => this.click_Done() }>
+                        <WalletSetUpScrolling >
                             {/* First screen */ }
                             <WalletNameScreen />
                             {/* Second screen */ }
                             <FirstSecretQuestionScreen />
                             {/* Third screen */ }
-                            <FirstSecretQuestionScreen />
+                            <SecondSecretQuestion prevScreen={ () => this.props.navigation.pop() } />
                         </WalletSetUpScrolling>
                     </ImageBackground>
                 </SafeAreaView>

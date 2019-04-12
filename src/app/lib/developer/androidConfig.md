@@ -172,3 +172,17 @@ return "Example";
 - }
   }
 ```
+
+#===============> app/build.gradle files <==================
+
+project.ext.react = [
+    entryFile: "index.js"   
+]
+
+project.ext.vectoricons = [  
+    iconFontNames: [ 'icomoon.ttf' ] // Name of the font files you want to copy
+]   
+
+apply from: "../../node_modules/react-native/react.gradle"
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"

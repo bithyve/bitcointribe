@@ -40,6 +40,12 @@ export default class CreateTables extends Component {
         " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,accountAddress TEXT,transactionHash TEXT,balance INTEGER,unit TEXT,fees INTEGER,transactionType TEXT,confirmationType TEXT,lastUpdated TEXT)",
         []
       );
+      txn.executeSql(
+        "CREATE TABLE IF NOT EXISTS " +
+        localDB.tableName.tblSSSDetails +
+        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,share TEXT,shareId TEXT,keeperInfo TEXT,transferMethod TEXT,sharedDate TEXT,acceptedDate TEXT,lastSuccessfulCheck TEXT)",
+        []
+      );
       console.log( "create database." );
     } );
   }

@@ -8,8 +8,12 @@ import {
     Text,
     StatusBar
 } from "react-native";
-import { Button } from "native-base";
-import LinearGradient from "react-native-linear-gradient";
+
+//TODO: NsNotification
+import BackboneEvents from "backbone-events-standalone";
+// global event bus
+window.EventBus = BackboneEvents.mixin( {} );
+
 
 //TODO: Custome object
 import { colors } from "HexaWallet/src/app/constants/Constants";
@@ -21,6 +25,13 @@ interface Props {
 }
 
 export default class WalletSetUpScrolling extends Component<Props, any> {
+
+    constructor ( props: any ) {
+        super( props )
+        window.EventBus.on( "swipeScreen", this.swipeScreen );
+        this.swipeScreen = this.swipeScreen.bind( this );
+    }
+
     // Props for ScrollView component
     static defaultProps = {
         // Arrange screens horizontally
@@ -70,6 +81,14 @@ export default class WalletSetUpScrolling extends Component<Props, any> {
 
         return state;
     }
+
+
+
+
+    swipeScreen = () => {
+        this.swipe()
+    };
+
 
     /**
      * Scroll begin handler
@@ -177,6 +196,7 @@ export default class WalletSetUpScrolling extends Component<Props, any> {
             } );
         }
     };
+
 
     /**
      * Render ScrollView component
