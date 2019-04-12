@@ -163,8 +163,8 @@ const OnBoardingRouter = createStackNavigator(
 //TODO: StackNavigator:WalletSetupStackNavigatorRouter
 const WalletSetupStackNavigatorRouter = createStackNavigator(
   {
-    WalletNameScreen: {
-      screen: WalletNameScreen,
+    WalletSetupScreens: {
+      screen: WalletSetupScreens,
       navigationOptions: { header: null }
     },
     FirstSecretQuestionScreen: {
@@ -177,7 +177,7 @@ const WalletSetupStackNavigatorRouter = createStackNavigator(
     }
   },
   {
-    initialRouteName: "WalletNameScreen"
+    initialRouteName: "WalletSetupScreens"
   }
 );
 
@@ -192,7 +192,7 @@ const TabNavigator = createBottomTabNavigator(
         tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
         drawerLockMode: "locked-open",
         tabBarIcon: ( { tintColor } ) => (
-          <Icon name="wallet" color={ tintColor } size={ 25 } />
+          <Icon name="wallet" color={ tintColor } size={ 22 } />
         )
       }
     },
@@ -201,7 +201,7 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: "Transaction", //localization("TabBarItem.Analytics"),
         tabBarIcon: ( { tintColor } ) => (
-          <Icon name="icon_transactions" color={ tintColor } size={ 25 } />
+          <Icon name="icon_transactions" color={ tintColor } size={ 22 } />
         )
       }
     },
@@ -210,7 +210,7 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: "QR", //localization("TabBarItem.Accounts"),
         tabBarIcon: ( { tintColor } ) => (
-          <Icon name="qr-codes" color={ tintColor } size={ 25 } />
+          <Icon name="qr-codes" color={ tintColor } size={ 22 } />
         )
       }
     },
@@ -220,7 +220,7 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: "Settings", //localization("TabBarItem.More"),
         tabBarIcon: ( { tintColor } ) => (
-          <Icon name="more-icon" color={ tintColor } size={ 25 } />
+          <Icon name="more-icon" color={ tintColor } size={ 22 } />
         )
       }
     }
@@ -233,7 +233,7 @@ const TabNavigator = createBottomTabNavigator(
       showIcon: true,
       activeTintColor: colors.appColor,
       labelStyle: {
-        fontSize: 12
+        fontSize: 11
       },
       style: {
         backgroundColor: "#ffffff"
@@ -376,7 +376,7 @@ export const createRootNavigator = (
     },
     {
       //initialRouteName: signedIn ? "OnBoardingNavigator" : PasscodeConfirmScreen
-      initialRouteName: signedIn ? "OnBoardingNavigator" : screenName //"TabbarBottom" //
+      initialRouteName: signedIn ? "OnBoardingNavigator" : "TabbarBottom" //screenName //
       // initialRouteName: signedIn ? "OnBoardingNavigator" : "OnBoardingNavigator"
       // initialRouteName: signedIn ? "TabbarBottom" : "TabbarBottom"
     }

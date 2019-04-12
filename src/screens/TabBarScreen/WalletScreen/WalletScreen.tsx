@@ -155,7 +155,7 @@ export default class WalletScreen extends React.Component {
   componentWillUnmount() {
     this.willFocusSubscription.remove();
   }
-  
+
 
   //TODO: func connnection_FetchData
   async connnection_FetchData() {
@@ -195,7 +195,7 @@ export default class WalletScreen extends React.Component {
             >
               <Animated.View
                 style={ {
-                  marginLeft: 10,
+                  marginLeft: 20,
                   flex: 4
                 } }
               >
@@ -225,6 +225,7 @@ export default class WalletScreen extends React.Component {
               <Animated.View
                 style={ {
                   flex: this.animatedShieldViewFlex,
+                  marginRight: 10,
                   alignItems: "flex-end",
                   justifyContent: "center"
                 } }
@@ -316,7 +317,7 @@ export default class WalletScreen extends React.Component {
                             justifyContent: "center"
                           } }
                         >
-                          <Icon name="icon_bitcoin" color="gray" size={ 20 } />
+                          <Icon name="icon_bitcoin" color="gray" size={ 40 } />
                         </View>
                         <View style={ { flex: 4 } }>
                           <Text note>Anant's Savings</Text>
