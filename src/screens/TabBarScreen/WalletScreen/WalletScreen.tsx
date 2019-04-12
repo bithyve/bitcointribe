@@ -34,6 +34,7 @@ import { Icon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
 
 //Custome Compontes
+import ViewShieldIcons from "HexaWallet/src/app/custcompontes/View/ViewShieldIcons/ViewShieldIcons";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import SCLAlertAccountTypes from "HexaWallet/src/app/custcompontes/alert/SCLAlertAccountTypes";
 import ViewRecentTransaction from "HexaWallet/src/app/custcompontes/view/ViewRecentTransaction";
@@ -55,12 +56,10 @@ var utils = require( "HexaWallet/src/app/constants/Utils" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 
-
 let isNetwork: boolean;
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
   "window"
 );
-
 function wp( percentage: number ) {
   const value = ( percentage * viewportWidth ) / 100;
   return Math.round( value );
@@ -77,7 +76,7 @@ import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 
 //localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 export default class WalletScreen extends React.Component {
   constructor ( props: any ) {
     super( props );
@@ -85,21 +84,14 @@ export default class WalletScreen extends React.Component {
       isNetwork: true,
       arr_wallets: [],
       arr_accounts: [],
-      tranDetails: [],
-      accountTypeList: [],
-      arr_WalletScreenCard: [],
-      accountTypeVisible: false,
-      popupData: [],
-      recentTransactionData: [],
+      arr_SSSDetails: [],
 
-      slider1ActiveSlide: SLIDER_1_FIRST_ITEM,
-      isOpen: false,
-      refreshing: false,
-      isLoading: false,
-      isLoading1: false,
-      isNoTranstion: false,
-      cardIndexNo: 0,
-      scrollY: new Animated.Value( 0 )
+      //Shiled Icons
+      shiledIconPer: 1,
+      scrollY: new Animated.Value( 0 ),
+
+      //custome comp
+      arr_CustShiledIcon: []
     };
     isNetwork = utils.getNetwork();
   }
@@ -159,16 +151,41 @@ export default class WalletScreen extends React.Component {
 
   //TODO: func connnection_FetchData
   async connnection_FetchData() {
-    const dateTime = Date.now();
-    const lastUpdateDate = Math.floor( dateTime / 1000 );
     const resultWallet = await dbOpration.readTablesData(
       localDB.tableName.tblWallet
     );
+    await utils.setWalletDetails( resultWallet.temp );
     const resAccount = await dbOpration.readTablesData(
       localDB.tableName.tblAccount
     );
-    console.log( { resAccount } );
-
+    const resSSSDetails = await dbOpration.readTablesData(
+      localDB.tableName.tblSSSDetails
+    );
+    if ( resSSSDetails.temp.length == 0 ) {
+      this.setState( {
+        shiledIconPer: 1,
+        arr_CustShiledIcon: [
+          {
+            "title": "Looks like your app needs a quick check to maintain good health",
+            "image": "shield_1",
+            "imageHeight": this.animatedShieldIconSize,
+            "imageWidth": this.animatedShieldIconSize
+          }
+        ]
+      } )
+    } else {
+      this.setState( {
+        shiledIconPer: 3,
+        arr_CustShiledIcon: [
+          {
+            "title": "Your wallet is not secure, some Information about backup comes here. Click on the icon to backup",
+            "image": "shield_2",
+            "imageHeight": this.animatedShieldIconSize,
+            "imageWidth": this.animatedShieldIconSize
+          }
+        ]
+      } )
+    }
     this.setState( {
       arr_wallets: resultWallet.temp,
       arr_accounts: resAccount.temp
@@ -184,7 +201,7 @@ export default class WalletScreen extends React.Component {
         <Content scrollEnabled={ false } contentContainerStyle={ styles.container }>
           <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
           <SafeAreaView style={ styles.container }>
-            {/* title */ }
+            {/* Top View Animation */ }
             <Animated.View
               style={ {
                 height: this.animatedHeaderHeight,
@@ -217,8 +234,7 @@ export default class WalletScreen extends React.Component {
                     opacity: this.animatedTextOpacity
                   } }
                 >
-                  Looks like your app needs a quick check to maintain good
-                  health
+                  { this.state.arr_CustShiledIcon.length != 0 ? this.state.arr_CustShiledIcon[ 0 ].title : "" }
                 </Animated.Text>
               </Animated.View>
 
@@ -230,21 +246,13 @@ export default class WalletScreen extends React.Component {
                   justifyContent: "center"
                 } }
               >
-                <TouchableHighlight onPress={ () =>
-                  this.props.navigation.push( "WalletSetUpScreen", {
-                    walletDetails: this.state.arr_wallets,
-                  } )
-                }>
-                  <Animated.Image
-                    source={ images.walletScreen.shield }
-                    style={ [
-                      {
-                        height: this.animatedShieldIconSize,
-                        width: this.animatedShieldIconSize
-                      }
-                    ] }
-                  />
-                </TouchableHighlight>
+                <ViewShieldIcons data={ this.state.arr_CustShiledIcon } click_Image={ () => {
+                  if ( this.state.shiledIconPer == 1 ) {
+                    this.props.navigation.push( "WalletSetUpScreen" )
+                  } else {
+                    alert( 'working' )
+                  }
+                } } />
               </Animated.View>
             </Animated.View>
             {/*  cards */ }

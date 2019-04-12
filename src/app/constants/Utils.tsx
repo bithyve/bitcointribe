@@ -3,6 +3,7 @@ import ConnectivityTracker from "react-native-connectivity-tracker";
 let CryptoJS = require( "crypto-js" );
 import DeviceInfo from "react-native-device-info";
 import bip39 from "bip39";
+import Singleton from "HexaWallet/src/app/constants/Singleton";
 //TODO: Date Format
 
 const getUnixTimeDate = date => {
@@ -114,9 +115,34 @@ const getStatusBarHeight = () => {
   return height;
 }
 
+
+
 const getMnemonic = () => {
   let mnemonic = bip39.generateMnemonic();
   return mnemonic.split( " " );
+}
+
+//Get and Set WalletDetails
+const getWalletDetails = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getWalletDetails();
+}
+const setWalletDetails = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setWalletDetails( value );
+  return true;
+}
+//Get and Set SetupWallet
+const getSetupWallet = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getSetupWallet();
+}
+
+
+const setSetupWallet = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setSetupWallet( value );
+  return true;
 }
 
 module.exports = {
@@ -131,5 +157,9 @@ module.exports = {
   date_diff_indays,
   getDeviceModel,
   getStatusBarHeight,
-  getMnemonic
+  getMnemonic,
+  getWalletDetails,
+  setWalletDetails,
+  getSetupWallet,
+  setSetupWallet
 };
