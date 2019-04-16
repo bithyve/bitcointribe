@@ -30,17 +30,14 @@ import {
 } from "native-base";
 import { RkCard } from "react-native-ui-kitten";
 import DropdownAlert from "react-native-dropdownalert";
-import { Icon } from "@up-shared/components";
+import { SvgIcon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
 
 //Custome Compontes
 import ViewShieldIcons from "HexaWallet/src/app/custcompontes/View/ViewShieldIcons/ViewShieldIcons";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import SCLAlertAccountTypes from "HexaWallet/src/app/custcompontes/alert/SCLAlertAccountTypes";
-import ViewRecentTransaction from "HexaWallet/src/app/custcompontes/view/ViewRecentTransaction";
-import TabBarWalletScreen from "HexaWallet/src/app/custcompontes/view/tabbar/TabBarWalletScreen/TabBarWalletScreen";
-import ViewWalletScreenCards from "HexaWallet/src/app/custcompontes/view/ViewWalletScreenCards/ViewWalletScreenCards";
-
+import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
+import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model/ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
 
 
 
@@ -77,6 +74,8 @@ import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
+
+
 export default class WalletScreen extends React.Component {
   constructor ( props: any ) {
     super( props );
@@ -91,7 +90,11 @@ export default class WalletScreen extends React.Component {
       scrollY: new Animated.Value( 0 ),
 
       //custome comp
-      arr_CustShiledIcon: []
+      arr_CustShiledIcon: [],
+
+      //Model 
+      arr_ModelBackupYourWallet: [],
+      arr_ModelFindYourTrustedContacts: []
     };
     isNetwork = utils.getNetwork();
   }
@@ -130,25 +133,20 @@ export default class WalletScreen extends React.Component {
       outputRange: [ 0, 1 ],
       extrapolate: "clamp"
     } );
-
     this.animatedShieldViewFlex = this.animatedHeaderHeight.interpolate( {
       inputRange: [ this.endHeaderHeight, this.startHeaderHeight ],
       outputRange: [ 2, 2 ],
       extrapolate: "clamp"
     } );
-
     this.animatedShieldIconSize = this.animatedHeaderHeight.interpolate( {
       inputRange: [ this.endHeaderHeight, this.startHeaderHeight ],
       outputRange: [ 50, 70 ],
       extrapolate: "clamp"
     } );
   }
-
   componentWillUnmount() {
     this.willFocusSubscription.remove();
   }
-
-
   //TODO: func connnection_FetchData
   async connnection_FetchData() {
     const resultWallet = await dbOpration.readTablesData(
@@ -161,6 +159,9 @@ export default class WalletScreen extends React.Component {
     const resSSSDetails = await dbOpration.readTablesData(
       localDB.tableName.tblSSSDetails
     );
+
+    console.log( { resSSSDetails } );
+
     if ( resSSSDetails.temp.length == 0 ) {
       this.setState( {
         shiledIconPer: 1,
@@ -250,7 +251,13 @@ export default class WalletScreen extends React.Component {
                   if ( this.state.shiledIconPer == 1 ) {
                     this.props.navigation.push( "WalletSetUpScreen" )
                   } else {
-                    alert( 'working' )
+                    this.setState( {
+                      arr_ModelBackupYourWallet: [
+                        {
+                          modalVisible: true,
+                        }
+                      ]
+                    } )
                   }
                 } } />
               </Animated.View>
@@ -294,7 +301,7 @@ export default class WalletScreen extends React.Component {
                           borderBottomWidth: 1
                         } }
                       >
-                        <Icon
+                        <SvgIcon
                           name="icon_dailywallet"
                           color="#37A0DA"
                           size={ 40 }
@@ -310,7 +317,7 @@ export default class WalletScreen extends React.Component {
                           { item.accountName }
                         </Text>
 
-                        <Icon name="icon_more" color="gray" size={ 15 } />
+                        <SvgIcon name="icon_more" color="gray" size={ 15 } />
                       </View>
                       <View
                         rkCardContent
@@ -325,7 +332,7 @@ export default class WalletScreen extends React.Component {
                             justifyContent: "center"
                           } }
                         >
-                          <Icon name="icon_bitcoin" color="gray" size={ 40 } />
+                          <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
                         </View>
                         <View style={ { flex: 4 } }>
                           <Text note>Anant's Savings</Text>
@@ -342,14 +349,14 @@ export default class WalletScreen extends React.Component {
                           } }
                         >
                           <Button transparent>
-                            <Icon
+                            <SvgIcon
                               name="icon_timelock"
                               color="gray"
                               size={ 25 }
                             />
                           </Button>
                           <Button transparent>
-                            <Icon name="icon_multisig" color="gray" size={ 20 } />
+                            <SvgIcon name="icon_multisig" color="gray" size={ 20 } />
                           </Button>
                         </View>
                       </View>
@@ -365,6 +372,54 @@ export default class WalletScreen extends React.Component {
         <Button transparent style={ styles.plusButtonBottom }>
           <IconFontAwe name="plus" size={ 20 } color="#fff" />
         </Button>
+        <ModelBackupYourWallet data={ this.state.arr_ModelBackupYourWallet }
+          click_UseOtherMethod={ () => alert( 'working' ) }
+          click_Confirm={ () => {
+            this.setState( {
+              arr_ModelBackupYourWallet: [
+                {
+                  modalVisible: false
+                }
+              ],
+              arr_ModelFindYourTrustedContacts: [
+                {
+                  modalVisible: true
+                }
+              ]
+            } )
+          } }
+          closeModal={ () => {
+            this.setState( {
+              arr_ModelBackupYourWallet: [
+                {
+                  modalVisible: false
+                }
+              ]
+            } )
+          } }
+        />
+        <ModelFindYourTrustedContacts
+          data={ this.state.arr_ModelFindYourTrustedContacts }
+          click_Confirm={ () => {
+            this.setState( {
+              arr_ModelFindYourTrustedContacts: [
+                {
+                  modalVisible: false
+                }
+              ]
+            } )
+            this.props.navigation.push( "BackUpYourWalletNavigator" )
+          } }
+          closeModal={ () => {
+            this.setState( {
+              arr_ModelFindYourTrustedContacts: [
+                {
+                  modalVisible: false
+                }
+              ]
+            } )
+          } }
+        />
       </Container>
     );
   }

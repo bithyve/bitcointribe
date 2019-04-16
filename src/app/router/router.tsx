@@ -6,7 +6,7 @@ import {
   createBottomTabNavigator
 } from "react-navigation";
 import { StyleSheet, Platform } from "react-native";
-import { Icon } from "@up-shared/components";
+import { SvgIcon } from "@up-shared/components";
 
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
@@ -62,6 +62,10 @@ import WalletSetupScreens from "../../screens/DrawerScreen/WalletSetupScreens/Wa
 import WalletNameScreen from "../../screens/DrawerScreen/WalletSetupScreens/WalletNameScreen/WalletNameScreen";
 import FirstSecretQuestionScreen from "../../screens/DrawerScreen/WalletSetupScreens/FirstSecretQuestionScreen/FirstSecretQuestionScreen";
 import SecondSecretQuestion from "../../screens/DrawerScreen/WalletSetupScreens/SecondSecretQuestion/SecondSecretQuestion";
+
+
+//TODO: Backup your Walleet Screen
+import AllContactListScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/AllContactListScreen/AllContactListScreen";
 
 //TODO: StackNavigator
 
@@ -181,6 +185,18 @@ const WalletSetupStackNavigatorRouter = createStackNavigator(
   }
 );
 
+const BackUpYourWalletStackNavigatorRouter = createStackNavigator(
+  {
+    AllContactListScreen: {
+      screen: AllContactListScreen,
+      navigationOptions: { header: null }
+    },
+  },
+  {
+    initialRouteName: "AllContactListScreen"
+  }
+);
+
 
 //TODO: TabNavigator
 //TODO: TabNavigator:TabNavigator
@@ -192,7 +208,7 @@ const TabNavigator = createBottomTabNavigator(
         tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
         drawerLockMode: "locked-open",
         tabBarIcon: ( { tintColor } ) => (
-          <Icon name="wallet" color={ tintColor } size={ 22 } />
+          <SvgIcon name="wallet" color={ tintColor } size={ 22 } />
         )
       }
     },
@@ -201,7 +217,7 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: "Transaction", //localization("TabBarItem.Analytics"),
         tabBarIcon: ( { tintColor } ) => (
-          <Icon name="icon_transactions" color={ tintColor } size={ 22 } />
+          <SvgIcon name="icon_transactions" color={ tintColor } size={ 22 } />
         )
       }
     },
@@ -210,7 +226,7 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: "QR", //localization("TabBarItem.Accounts"),
         tabBarIcon: ( { tintColor } ) => (
-          <Icon name="qr-codes" color={ tintColor } size={ 22 } />
+          <SvgIcon name="qr-codes" color={ tintColor } size={ 22 } />
         )
       }
     },
@@ -220,7 +236,7 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: "Settings", //localization("TabBarItem.More"),
         tabBarIcon: ( { tintColor } ) => (
-          <Icon name="more-icon" color={ tintColor } size={ 22 } />
+          <SvgIcon name="more-icon" color={ tintColor } size={ 22 } />
         )
       }
     }
@@ -300,7 +316,11 @@ export const createRootNavigator = (
       WalletSetUpScreen: {
         screen: WalletSetupStackNavigatorRouter,
         navigationOptions: { header: null }
-      }
+      },
+      BackUpYourWalletNavigator: {
+        screen: BackUpYourWalletStackNavigatorRouter,
+        navigationOptions: { header: null }
+      },
       //Drwaer Navigation
       // SecurityScreen: {
       //   screen: SecurityScreen,
@@ -376,7 +396,7 @@ export const createRootNavigator = (
     },
     {
       //initialRouteName: signedIn ? "OnBoardingNavigator" : PasscodeConfirmScreen
-      initialRouteName: signedIn ? "OnBoardingNavigator" : screenName //"TabbarBottom" //
+      initialRouteName: signedIn ? "OnBoardingNavigator" : screenName // "TabbarBottom" //
       // initialRouteName: signedIn ? "OnBoardingNavigator" : "OnBoardingNavigator"
       // initialRouteName: signedIn ? "TabbarBottom" : "TabbarBottom"
     }

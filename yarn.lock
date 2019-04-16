@@ -7633,6 +7633,11 @@ react-native-connectivity-tracker@^1.0.0:
   dependencies:
     underscore "*"
 
+react-native-contacts@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-contacts/-/react-native-contacts-4.0.0.tgz#5fa41527ca37cb3382890d3d867765c1ea4fb7e7"
+  integrity sha512-SkO4AiuiDkVKmL9+VotwLbiesp0EzcWstVWTM4K+eU7Bh+y/aAWkqCB0FyCm5kSNi6xHcZJr62ATh9S7blaZQg==
+
 react-native-country-picker-modal@^0.6.2:
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/react-native-country-picker-modal/-/react-native-country-picker-modal-0.6.2.tgz#ba97118be4373be0c11cd51e445e6bd448e2f1ca"

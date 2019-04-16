@@ -167,6 +167,7 @@ configurations.all {
   }
 
 dependencies {
+    compile project(':react-native-contacts')
     compile project(':react-native-webview')
     compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
 transitive = true;

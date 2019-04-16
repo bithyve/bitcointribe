@@ -1,3 +1,3 @@
-import Icon from "./icon/IconsComponent";
+import SvgIcon from "./icon/IconsComponent";
 
-export { Icon };
+export { SvgIcon };
