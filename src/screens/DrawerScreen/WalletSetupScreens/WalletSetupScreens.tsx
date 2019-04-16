@@ -15,7 +15,7 @@ import {
     Tab, Tabs, TabHeading,
     Segment
 } from "native-base";
-import { Icon } from "@up-shared/components";
+import { SvgIcon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
@@ -47,7 +47,7 @@ export default class WalletSetupScreens extends React.Component<any, any> {
                                 transparent
                                 onPress={ () => this.props.navigation.pop() }
                             >
-                                <Icon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
+                                <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
                                 <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Set up your wallet</Text>
                             </Button>
                         </View>

@@ -553,8 +553,7 @@ const insertSSSShareAndShareId = (
               passcode
             ),
             utils.encrypt( share[ i ].toString(), passcode ),
-            utils.encrypt( shareId[ i ].toString(), passcode ),
-            utils.encrypt( fulldate.toString(), passcode )
+            utils.encrypt( shareId[ i ].toString(), passcode )
           ]
         );
       }

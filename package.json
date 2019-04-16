@@ -6,7 +6,7 @@
   "license": "ISC",
   "scripts": {
     "compile": "tsc",
-    "prepare": "rn-nodeify --install --hack",
+    "prepare": "cp -r -f ./src/app/lib/IssueFiles/Buffer/index.js ./node_modules/bip32/index.js && cp -r -f ./src/app/lib/IssueFiles/Model/index.js ./node_modules/source-map-support/source-map-support.js && cp -r -f ./src/app/lib/IssueFiles/slideMenuAndroid/MainActivity.java ./android/app/src/main/java/com/bithyve/hexa/MainActivity.java && cp -r -f ./src/app/lib/IssueFiles/qrcodeimagereader/ScannerMask.js  ./node_modules/react-native-barcode-scanners/src/ScannerMask.js && rn-nodeify --install --hack  &&  react-native link",
     "issuemodel": "cp -r -f .src/app/lib/IssueFiles/Model/index.js ./node_modules/source-map-support/source-map-support.js",
     "issueBuffer": "cp -r -f ./src/app/lib/IssueFiles/Buffer/index.js ./node_modules/bip32/index.js",
     "issueSlideMenuAndroid": "cp -r -f ./src/app/lib/IssueFiles/slideMenuAndroid/MainActivity.java ./android/app/src/main/java/com/bithyve/hexa/MainActivity.java",
@@ -82,6 +82,7 @@
     "react-native-config": "^0.11.7",
     "react-native-confirmation-code-input": "^1.0.4",
     "react-native-connectivity-tracker": "^1.0.0",
+    "react-native-contacts": "^4.0.0",
     "react-native-country-picker-modal": "^0.6.2",
     "react-native-crypto": "^2.1.2",
     "react-native-custom-datepicker-ios": "^0.0.5",

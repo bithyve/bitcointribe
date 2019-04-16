@@ -15,8 +15,6 @@ import {
     Picker,
     Icon
 } from "native-base";
-import { Icon as CustIcon } from "@up-shared/components";
-import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 
@@ -84,10 +82,7 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         }, 100 );
     }
     //TODO: func click_Confirm
-    async click_Confirm() {
-        this.setState( {
-            flag_Loading: true
-        } )
+    click_Confirm = async () => {
         const dateTime = Date.now();
         const fulldate = Math.floor( dateTime / 1000 );
         let data = this.state.data;
@@ -114,38 +109,34 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                 encryptedShares,
                 shareIds
             );
-            if ( resultSSSShareIdInserted ) {
-                const resultCreatAccount = await dbOpration.insertCreateAccount(
-                    localDB.tableName.tblAccount,
-                    fulldate,
-                    "",
-                    "BTC",
-                    walletName,
-                    "Wallet",
-                    ""
-                );
-                if ( resultCreatAccount ) {
-                    this.setState( {
-                        flag_Loading: false
-                    } )
-                    this.props.prevScreen();
-                }
-            }
+            console.log( { resultSSSShareIdInserted } );
+
+            await dbOpration.insertCreateAccount(
+                localDB.tableName.tblAccount,
+                fulldate,
+                "",
+                "BTC",
+                walletName,
+                "Wallet",
+                ""
+            );
+            this.setState( {
+                flag_Loading: false
+            } )
+            this.props.prevScreen();
         }
-        //console.log( { shareIds});
-        // const { share, otp } = sss.createTransferShare( encryptedShares[ 0 ], walletName )
-        // console.log( { otpEncryptedShare: share, otp } )
-        // const { messageId, success } = await sss.uploadShare( share );
-        // console.log( { otpEncryptedShare: share, messageId, success } )
-        // // Trusted party
-        // const otpEncryptedShare = await sss.downloadShare( messageId )
-        // console.log( { downloadedOTPEncShare: otpEncryptedShare } )
-        // const decryptedStorageShare = await sss.decryptOTPEncShare( otpEncryptedShare, messageId, otp );
-        // console.log( { decryptedStorageShare } )
-
-
-
     }
+    //console.log( { shareIds});
+    // const { share, otp } = sss.createTransferShare( encryptedShares[ 0 ], walletName )
+    // console.log( { otpEncryptedShare: share, otp } )
+    // const { messageId, success } = await sss.uploadShare( share );
+    // console.log( { otpEncryptedShare: share, messageId, success } )
+    // // Trusted party
+    // const otpEncryptedShare = await sss.downloadShare( messageId )
+    // console.log( { downloadedOTPEncShare: otpEncryptedShare } )
+    // const decryptedStorageShare = await sss.decryptOTPEncShare( otpEncryptedShare, messageId, otp );
+    // console.log( { decryptedStorageShare } )
+
 
     render() {
         const itemList = this.state.arr_QuestionList.map( ( item: any, index: number ) => (
@@ -222,7 +213,12 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                     </View>
                     <View style={ styles.viewProcedBtn }>
                         <Text note style={ { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } } numberOfLines={ 1 }>Make sure you don’t select questions, answers to </Text>
-                        <FullLinearGradientButton title="Confirm & Proceed" disabled={ this.state.flag_ConfirmDisableBtn } style={ [ this.state.flag_ConfirmDisableBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } click_Done={ () => this.click_Confirm() } />
+                        <FullLinearGradientButton title="Confirm & Proceed" disabled={ this.state.flag_ConfirmDisableBtn } style={ [ this.state.flag_ConfirmDisableBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } click_Done={ () => {
+                            this.setState( {
+                                flag_Loading: true
+                            } )
+                            this.click_Confirm()
+                        } } />
                     </View>
                 </KeyboardAwareScrollView>
                 <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 60 } />
