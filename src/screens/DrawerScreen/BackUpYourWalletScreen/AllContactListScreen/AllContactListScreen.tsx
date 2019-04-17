@@ -26,17 +26,10 @@ import { Avatar, SearchBar } from 'react-native-elements';
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import WalletSetUpScrolling from "HexaWallet/src/app/custcompontes/OnBoarding/WalletSetUpScrolling/WalletSetUpScrolling";
-
-
-import WalletNameScreen from "./WalletNameScreen/WalletNameScreen";
-import FirstSecretQuestionScreen from "./FirstSecretQuestionScreen/FirstSecretQuestionScreen";
-import SecondSecretQuestion from "./SecondSecretQuestion/SecondSecretQuestion";
 
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-
 
 export default class AllContactListScreen extends React.Component<any, any> {
 
@@ -88,10 +81,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
                 }
             }
         } )
-
         this.setState( { data: this.state.data } )
-
-
         if ( seletedLength >= 2 ) {
             this.setState( {
                 flag_NextBtnDisable: false
@@ -107,8 +97,8 @@ export default class AllContactListScreen extends React.Component<any, any> {
     searchFilterFunction = ( text: string ) => {
         if ( text.length > 0 ) {
             const newData = this.state.data.filter( item => {
-                const itemData = `${ item.givenName.toUpperCase() }   
-    ${ item.familyName.toUpperCase() }`;
+                const itemData = `${ item.givenName != null && item.givenName.toUpperCase() }   
+    ${ item.familyName != null && item.familyName.toUpperCase() }`;
                 const textData = text.toUpperCase();
                 return itemData.indexOf( textData ) > -1;
             } );
@@ -120,6 +110,13 @@ export default class AllContactListScreen extends React.Component<any, any> {
             } )
         }
     };
+
+    //TODO: func click_Next
+    click_Next() {
+        this.props.navigation.push( "SecretSharingScreen", {
+            data: this.state.SelectedFakeContactList
+        } );
+    }
 
 
     render() {
@@ -137,63 +134,68 @@ export default class AllContactListScreen extends React.Component<any, any> {
                                 <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Contacts</Text>
                             </Button>
                         </View>
-                        <View style={ { flex: 0.2 } }>
-                            <View style={ { marginLeft: 10, marginRight: 10, backgroundColor: "#EDEDED", borderRadius: 10 } }>
-                                <Item style={ { borderColor: 'transparent', marginLeft: 10 } }>
-                                    <Icon name="ios-search" color="#B7B7B7" />
-                                    <Input placeholder="Enter a name to begin search" placeholderTextColor="#B7B7B7"
-                                        onChangeText={ text => this.searchFilterFunction( text ) }
-                                        autoCorrect={ false } />
-                                </Item>
+                        <KeyboardAwareScrollView
+                            enableOnAndroid
+                            extraScrollHeight={ 40 }
+                        >
+                            <View style={ { flex: 0.2 } }>
+                                <View style={ { marginLeft: 10, marginRight: 10, backgroundColor: "#EDEDED", borderRadius: 10 } }>
+                                    <Item style={ { borderColor: 'transparent', marginLeft: 10 } }>
+                                        <Icon name="ios-search" color="#B7B7B7" />
+                                        <Input placeholder="Enter a name to begin search" placeholderTextColor="#B7B7B7"
+                                            onChangeText={ text => this.searchFilterFunction( text ) }
+                                            autoCorrect={ false } />
+                                    </Item>
+                                </View>
+                                <Text note style={ { marginLeft: 10, marginRight: 10, marginBottom: 20 } }>Select three of your trusted contacts, make sure you can always reach this people to recover your wallet</Text>
                             </View>
-                            <Text note style={ { marginLeft: 10, marginRight: 10 } }>Select three of your trusted contacts, make sure you can always reach this people to recover your wallet</Text>
-                        </View>
-                        <View style={ { flex: 1 } }>
-                            <FlatList
-                                data={
-                                    this.state.data
-                                }
-                                showsVerticalScrollIndicator={ false }
-                                renderItem={ ( { item } ) => (
-                                    <TouchableOpacity style={ {
-                                    } } onPress={ () => {
-                                        this.press( item )
-                                    } }>
-                                        <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
-                                            <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                                { renderIf( item.thumbnailPath != "" )(
-                                                    <Avatar medium rounded source={ { uri: item.thumbnailPath } } />
-                                                ) }
-                                                { renderIf( item.thumbnailPath == "" )(
-                                                    <Avatar medium rounded title={ item.givenName.charAt( 0 ) + item.familyName.charAt( 0 ) } />
-                                                ) }
-                                                <Text style={ { alignSelf: "center", marginLeft: 10 } }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                            <View style={ { flex: 1 } }>
+                                <FlatList
+                                    data={
+                                        this.state.data
+                                    }
+                                    showsVerticalScrollIndicator={ false }
+                                    renderItem={ ( { item } ) => (
+                                        <TouchableOpacity style={ {
+                                        } } onPress={ () => {
+                                            this.press( item )
+                                        } }>
+                                            <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
+                                                <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
+                                                    { renderIf( item.thumbnailPath != "" )(
+                                                        <Avatar medium rounded source={ { uri: item.thumbnailPath } } />
+                                                    ) }
+                                                    { renderIf( item.thumbnailPath == "" )(
+                                                        <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
+                                                    ) }
+                                                    <Text style={ { alignSelf: "center", marginLeft: 10 } }>{ item.givenName }{ " " }{ item.familyName }</Text>
 
-                                                <View style={ {
-                                                    flex: 1,
-                                                    alignItems: 'flex-end',
-                                                    justifyContent: 'center'
-                                                } }>
-                                                    { item.check
-                                                        ? (
-                                                            <IconFontAwe name="checkbox-marked" size={ 30 } color={ primaryColor } />
-                                                        )
-                                                        : (
-                                                            <IconFontAwe name="checkbox-blank-outline" size={ 30 } color={ darkGrey } />
-                                                        ) }
+                                                    <View style={ {
+                                                        flex: 1,
+                                                        alignItems: 'flex-end',
+                                                        justifyContent: 'center'
+                                                    } }>
+                                                        { item.check
+                                                            ? (
+                                                                <IconFontAwe name="checkbox-marked" size={ 30 } color={ primaryColor } />
+                                                            )
+                                                            : (
+                                                                <IconFontAwe name="checkbox-blank-outline" size={ 30 } color={ darkGrey } />
+                                                            ) }
+                                                    </View>
                                                 </View>
-                                            </View>
 
-                                        </View>
-                                    </TouchableOpacity>
-                                ) }
-                                keyExtractor={ item => item.recordID }
-                                extraData={ this.state }
-                            />
-                        </View>
+                                            </View>
+                                        </TouchableOpacity>
+                                    ) }
+                                    keyExtractor={ item => item.recordID }
+                                    extraData={ this.state }
+                                />
+                            </View>
+                        </KeyboardAwareScrollView>
                         { renderIf( this.state.flag_NextBtnDisable == false )(
-                            <View style={ { flex: 0.14 } }>
-                                <FullLinearGradientButton title="Next" disabled={ this.state.flag_NextBtnDisable } style={ [ this.state.flag_NextBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10, marginLeft: 30, marginRight: 30 } ] } click_Done={ () => this.click_FirstQuestion() } />
+                            <View style={ styles.btnNext }>
+                                <FullLinearGradientButton title="Next" disabled={ this.state.flag_NextBtnDisable } style={ [ this.state.flag_NextBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10, marginLeft: 30, marginRight: 30 } ] } click_Done={ () => this.click_Next() } />
                             </View>
                         ) }
                     </ImageBackground>
@@ -234,5 +236,11 @@ const styles = StyleSheet.create( {
     viewProcedBtn: {
         flex: 2,
         justifyContent: "flex-end"
+    },
+    btnNext: {
+        position: "absolute",
+        bottom: 10,
+        width: "100%"
+
     }
 } );
