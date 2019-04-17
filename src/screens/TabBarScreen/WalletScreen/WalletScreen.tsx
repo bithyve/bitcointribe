@@ -13,7 +13,8 @@ import {
   FlatList,
   ScrollView,
   Animated,
-  LayoutAnimation
+  LayoutAnimation,
+  AsyncStorage
 } from "react-native";
 import {
   Container,
@@ -32,6 +33,7 @@ import { RkCard } from "react-native-ui-kitten";
 import DropdownAlert from "react-native-dropdownalert";
 import { SvgIcon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
+import Permissions from 'react-native-permissions'
 
 //Custome Compontes
 import ViewShieldIcons from "HexaWallet/src/app/custcompontes/View/ViewShieldIcons/ViewShieldIcons";
@@ -163,17 +165,28 @@ export default class WalletScreen extends React.Component {
     console.log( { resSSSDetails } );
 
     if ( resSSSDetails.temp.length == 0 ) {
+      // this.setState( {
+      //   shiledIconPer: 1,
+      //   arr_CustShiledIcon: [
+      //     {
+      //       "title": "Looks like your app needs a quick check to maintain good health",
+      //       "image": "shield_1",
+      //       "imageHeight": this.animatedShieldIconSize,
+      //       "imageWidth": this.animatedShieldIconSize
+      //     }
+      //   ]
+      // } );
       this.setState( {
-        shiledIconPer: 1,
+        shiledIconPer: 3,
         arr_CustShiledIcon: [
           {
-            "title": "Looks like your app needs a quick check to maintain good health",
-            "image": "shield_1",
+            "title": "Your wallet is not secure, some Information about backup comes here. Click on the icon to backup",
+            "image": "shield_2",
             "imageHeight": this.animatedShieldIconSize,
             "imageWidth": this.animatedShieldIconSize
           }
         ]
-      } )
+      } );
     } else {
       this.setState( {
         shiledIconPer: 3,
@@ -185,7 +198,7 @@ export default class WalletScreen extends React.Component {
             "imageWidth": this.animatedShieldIconSize
           }
         ]
-      } )
+      } );
     }
     this.setState( {
       arr_wallets: resultWallet.temp,
@@ -374,7 +387,8 @@ export default class WalletScreen extends React.Component {
         </Button>
         <ModelBackupYourWallet data={ this.state.arr_ModelBackupYourWallet }
           click_UseOtherMethod={ () => alert( 'working' ) }
-          click_Confirm={ () => {
+          click_Confirm={ async () => {
+            AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
             this.setState( {
               arr_ModelBackupYourWallet: [
                 {
@@ -386,7 +400,14 @@ export default class WalletScreen extends React.Component {
                   modalVisible: true
                 }
               ]
-            } )
+            } );
+            try {
+              Permissions.request( 'contacts' ).then( response => {
+                console.log( { response } );
+              } );
+            } catch ( err ) {
+              console.warn( err );
+            }
           } }
           closeModal={ () => {
             this.setState( {
@@ -401,6 +422,7 @@ export default class WalletScreen extends React.Component {
         <ModelFindYourTrustedContacts
           data={ this.state.arr_ModelFindYourTrustedContacts }
           click_Confirm={ () => {
+            AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
             this.setState( {
               arr_ModelFindYourTrustedContacts: [
                 {
