@@ -66,7 +66,9 @@ import SecondSecretQuestion from "../../screens/DrawerScreen/WalletSetupScreens/
 
 //TODO: Backup your Walleet Screen
 import AllContactListScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/AllContactListScreen/AllContactListScreen";
-
+import SecretSharingScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/SecretSharingScreen/SecretSharingScreen";
+import TrustedContactScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactScreen/TrustedContactScreen";
+import ShareSecretViaQRScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/ShareSecretViaQRScreen/ShareSecretViaQRScreen";
 //TODO: StackNavigator
 
 //TODO: StackNavigator:ONBoarding
@@ -191,6 +193,18 @@ const BackUpYourWalletStackNavigatorRouter = createStackNavigator(
       screen: AllContactListScreen,
       navigationOptions: { header: null }
     },
+    SecretSharingScreen: {
+      screen: SecretSharingScreen,
+      navigationOptions: { header: null }
+    },
+    TrustedContactScreen: {
+      screen: TrustedContactScreen,
+      navigationOptions: { header: null }
+    },
+    ShareSecretViaQRScreen: {
+      screen: ShareSecretViaQRScreen,
+      navigationOptions: { header: null }
+    }
   },
   {
     initialRouteName: "AllContactListScreen"
@@ -396,7 +410,7 @@ export const createRootNavigator = (
     },
     {
       //initialRouteName: signedIn ? "OnBoardingNavigator" : PasscodeConfirmScreen
-      initialRouteName: signedIn ? "OnBoardingNavigator" : screenName // "TabbarBottom" //
+      initialRouteName: signedIn ? "OnBoardingNavigator" : screenName //"TabbarBottom" //
       // initialRouteName: signedIn ? "OnBoardingNavigator" : "OnBoardingNavigator"
       // initialRouteName: signedIn ? "TabbarBottom" : "TabbarBottom"
     }
