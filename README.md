@@ -36,9 +36,10 @@ Prerequisites:
 After installing node and yarn, the following commands should get you started with Hexa Wallet on your local computer
 
 ```
-git clone https://github.com/thecryptobee/Hexa-Wallet.git
+git clone https://github.com/thecryptobee/BitHyve-Wallet.git
 cd Hexa-Wallet
 sudo yarn install
+
 sudo react-native link` [known issue #2](https://github.com/thecryptobee/Hexa-Wallet/issues/2
 sudo npm install -g rn-nodeify
 rn-nodeify --install --hack
@@ -47,7 +48,13 @@ rn-nodeify --install --hack
 npm run android-dev
 
 ```
+=======
 
+//To Run Android
+npm run android-dev
+
+
+```
 ## Contributing
 
 Please feel free to open a pull requests and issues with bugfixes and suggestions.
@@ -55,3 +62,4 @@ Please feel free to open a pull requests and issues with bugfixes and suggestion
 ## License
 
 [MIT](LICENSE)
+

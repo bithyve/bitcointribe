@@ -36,9 +36,13 @@ yarn-error.log
 /.env.dev
 /.env
 /env.dev
+/.env.local
+/.env.prod
 
 #Documents
 /src/assets/Documents
+
+
 
 # BUCK
 buck-out/
