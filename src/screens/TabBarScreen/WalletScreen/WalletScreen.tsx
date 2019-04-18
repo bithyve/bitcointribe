@@ -165,28 +165,28 @@ export default class WalletScreen extends React.Component {
     console.log( { resSSSDetails } );
 
     if ( resSSSDetails.temp.length == 0 ) {
-      // this.setState( {
-      //   shiledIconPer: 1,
-      //   arr_CustShiledIcon: [
-      //     {
-      //       "title": "Looks like your app needs a quick check to maintain good health",
-      //       "image": "shield_1",
-      //       "imageHeight": this.animatedShieldIconSize,
-      //       "imageWidth": this.animatedShieldIconSize
-      //     }
-      //   ]
-      // } );
       this.setState( {
-        shiledIconPer: 3,
+        shiledIconPer: 1,
         arr_CustShiledIcon: [
           {
-            "title": "Your wallet is not secure, some Information about backup comes here. Click on the icon to backup",
-            "image": "shield_2",
+            "title": "Looks like your app needs a quick check to maintain good health",
+            "image": "shield_1",
             "imageHeight": this.animatedShieldIconSize,
             "imageWidth": this.animatedShieldIconSize
           }
         ]
       } );
+      // this.setState( {
+      //   shiledIconPer: 3,
+      //   arr_CustShiledIcon: [
+      //     {
+      //       "title": "Your wallet is not secure, some Information about backup comes here. Click on the icon to backup",
+      //       "image": "shield_2",
+      //       "imageHeight": this.animatedShieldIconSize,
+      //       "imageWidth": this.animatedShieldIconSize
+      //     }
+      //   ]
+      // } );
     } else {
       this.setState( {
         shiledIconPer: 3,

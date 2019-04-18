@@ -61,6 +61,8 @@ const readTablesData = ( tableName: any ) => {
     } );
   } );
 };
+
+
 const readAccountTablesData = ( tableName: string ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve: any, reject: any ) => {
@@ -347,8 +349,8 @@ const insertAccountTypeData = ( tblName, txtDate ) => {
   } );
 };
 
-//TODO:  insert tblWallet
-
+//TODO: ========================================>  Wallet Details  <========================================
+//insert   
 const insertWallet = (
   tblName: string,
   fulldate: string,
@@ -380,6 +382,44 @@ const insertWallet = (
       );
       resolve( true );
     } );
+  } );
+};
+//update
+const updateWalletAnswerDetials = (
+  tblName: string,
+  answerDetails: any
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        console.log( { answerDetails } );
+
+        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+          var len = results.rows.length;
+          if ( len > 0 ) {
+            for ( let i = 0; i < len; i++ ) {
+              let dbdecryptId = utils.decrypt(
+                results.rows.item( i ).id,
+                passcode
+              );
+              txn.executeSql(
+                "update " +
+                tblName +
+                " set setUpWalletAnswerDetails = :setUpWalletAnswerDetails where id = :id",
+                [
+                  utils.encrypt( answerDetails.toString(), passcode ),
+                  dbdecryptId
+                ]
+              );
+              resolve( true );
+            }
+          }
+        } );
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
   } );
 };
 
@@ -461,7 +501,7 @@ const insertLastBeforeCreateAccount = (
 
 
 
-//TODO: insdrt Transaction
+//TODO: insert Transaction
 const insertTblTransation = (
   tblName: string,
   transactionDetails: any,
@@ -531,8 +571,49 @@ const insertTblTransation = (
 };
 
 
+//TODO: ========================================>  SSS Details  <========================================
 
-//TODO: insert SSS Details
+//read
+const readSSSTableData = ( tableName: any, recordID: string ) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    var temp = [];
+    db.transaction( tx => {
+      tx.executeSql( "SELECT * FROM " + tableName, [], ( tx, results ) => {
+        var len = results.rows.length;
+        console.log( { len } );
+
+        if ( len > 0 ) {
+          for ( let i = 0; i < len; i++ ) {
+            // console.log( { results } );
+            // console.log( results.rows.item( i ).recordId );
+            let dbdecryptrecordID = utils.decrypt(
+              results.rows.item( i ).recordId,
+              passcode
+            );
+            // console.log( { dbdecryptrecordID } );
+            if ( dbdecryptrecordID == recordID ) {
+              let data = results.rows.item( i );
+              data.id = data.id;
+              data.share = utils.decrypt( data.share, passcode );
+              data.shareId = utils.decrypt( data.shareId, passcode );
+              data.keeperInfo = utils.decrypt( data.keeperInfo, passcode );
+              temp.push( data );
+              break;
+            }
+          }
+          resolve( { temp } );
+        } else {
+          resolve( { temp } );
+        }
+      } );
+    } );
+  } );
+};
+
+
+
+//insert
 const insertSSSShareAndShareId = (
   tblName: string,
   fulldate: string,
@@ -562,6 +643,42 @@ const insertSSSShareAndShareId = (
   } );
 };
 
+//update
+const updateSSSContactListDetails = (
+  tblName: string,
+  contactDetails: any
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        // console.log( contactDetails[ 0 ].recordID );
+        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+          var len = results.rows.length;
+          if ( len > 0 ) {
+            for ( let i = 0; i < len; i++ ) {
+              let dbdecryptShareId = results.rows.item( i ).shareId;
+              //console.log( { dbdecryptShareId } );
+              txn.executeSql(
+                "update " +
+                tblName +
+                " set keeperInfo = :keeperInfo,recordId =:recordId where shareId = :shareId",
+                [
+                  utils.encrypt( JSON.stringify( contactDetails[ i ] ).toString(), passcode ),
+                  utils.encrypt( ( contactDetails[ i ].recordID ).toString(), passcode ),
+                  dbdecryptShareId
+                ]
+              );
+            }
+            resolve( true );
+          }
+        } );
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
 
 
 module.exports = {
@@ -570,10 +687,16 @@ module.exports = {
   readTableAcccountType,
   readRecentTransactionAddressWise,
   insertAccountTypeData,
+  //Wallet Details
   insertWallet,
+  updateWalletAnswerDetials,
+
   insertCreateAccount,
   insertLastBeforeCreateAccount,
   insertTblTransation,
   updateTableData,
-  insertSSSShareAndShareId
+  //SSS Details
+  readSSSTableData,
+  insertSSSShareAndShareId,
+  updateSSSContactListDetails
 };
