@@ -405,6 +405,11 @@ export default class WalletScreen extends React.Component {
               Permissions.request( 'contacts' ).then( response => {
                 console.log( { response } );
               } );
+              Permissions.request( 'readSms' ).then( response => {
+                console.log( { response } );
+              } );
+
+
             } catch ( err ) {
               console.warn( err );
             }

@@ -652,24 +652,34 @@ const updateSSSContactListDetails = (
   return new Promise( ( resolve, reject ) => {
     try {
       db.transaction( function ( txn ) {
-        // console.log( contactDetails[ 0 ].recordID );
+        console.log( { contactDetails } );
+
         txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
           var len = results.rows.length;
           if ( len > 0 ) {
             for ( let i = 0; i < len; i++ ) {
               let dbdecryptShareId = results.rows.item( i ).shareId;
               //console.log( { dbdecryptShareId } );
+
+              let jsonConstactDetial = JSON.stringify( contactDetails[ i ] ).toString();
+              let jsonRecordId = ( contactDetails[ i ].recordID ).toString();
+
+              console.log( { jsonConstactDetial, jsonRecordId } );
+
+
               txn.executeSql(
                 "update " +
                 tblName +
                 " set keeperInfo = :keeperInfo,recordId =:recordId where shareId = :shareId",
                 [
-                  utils.encrypt( JSON.stringify( contactDetails[ i ] ).toString(), passcode ),
-                  utils.encrypt( ( contactDetails[ i ].recordID ).toString(), passcode ),
+                  utils.encrypt( jsonConstactDetial, passcode ),
+                  utils.encrypt( jsonRecordId, passcode ),
                   dbdecryptShareId
                 ]
               );
             }
+            console.log( "done" );
+
             resolve( true );
           }
         } );
