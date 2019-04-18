@@ -88,7 +88,9 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         let data = this.state.data;
         let walletDetails = utils.getWalletDetails();
         let walletName = data.walletName;
+        let firstQuestion = data.question;
         let firstAnswer = data.answer;
+        let secoundQuestion = this.state.selected;
         let secoundAnser = this.state.secoundAnswer;
         const sss = new S3Service(
             walletDetails[ 0 ].mnemonic
@@ -109,8 +111,7 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                 encryptedShares,
                 shareIds
             );
-            console.log( { resultSSSShareIdInserted } );
-
+            // console.log( { resultSSSShareIdInserted } );
             await dbOpration.insertCreateAccount(
                 localDB.tableName.tblAccount,
                 fulldate,
@@ -120,12 +121,24 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                 "Wallet",
                 ""
             );
+            let jsonAnswerDetails = {};
+            jsonAnswerDetails.walletName = walletName;
+            jsonAnswerDetails.firstQuestion = firstQuestion;
+            jsonAnswerDetails.firstAnswer = firstAnswer;
+            jsonAnswerDetails.secoundQuestion = secoundQuestion;
+            jsonAnswerDetails.secoundAnser = secoundAnser;
+            await dbOpration.updateWalletAnswerDetials(
+                localDB.tableName.tblWallet,
+                jsonAnswerDetails,
+            );
             this.setState( {
                 flag_Loading: false
             } )
             this.props.prevScreen();
         }
     }
+
+
     //console.log( { shareIds});
     // const { share, otp } = sss.createTransferShare( encryptedShares[ 0 ], walletName )
     // console.log( { otpEncryptedShare: share, otp } )
@@ -221,7 +234,7 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                         } } />
                     </View>
                 </KeyboardAwareScrollView>
-                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 60 } />
+                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
             </View>
         );
     }

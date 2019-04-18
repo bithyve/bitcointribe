@@ -19,7 +19,7 @@ export default class CreateTables extends Component {
       txn.executeSql(
         "CREATE TABLE IF NOT EXISTS " +
         localDB.tableName.tblWallet +
-        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,mnemonic TEXT,privateKey TEXT,address TEXT,publicKey TEXT,walletType TEXT,lastUpdated TEXT)",
+        "(id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,mnemonic TEXT,privateKey TEXT,address TEXT,publicKey TEXT,walletType TEXT,setUpWalletAnswerDetails TEXT,lastUpdated TEXT)",
         []
       );
       txn.executeSql(
@@ -43,7 +43,7 @@ export default class CreateTables extends Component {
       txn.executeSql(
         "CREATE TABLE IF NOT EXISTS " +
         localDB.tableName.tblSSSDetails +
-        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,share TEXT,shareId TEXT,keeperInfo TEXT,transferMethod TEXT,sharedDate TEXT,acceptedDate TEXT,lastSuccessfulCheck TEXT)",
+        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,share TEXT,shareId TEXT,keeperInfo TEXT,recordId TEXT,transferMethod TEXT,sharedDate TEXT,acceptedDate TEXT,lastSuccessfulCheck TEXT)",
         []
       );
       console.log( "create database." );

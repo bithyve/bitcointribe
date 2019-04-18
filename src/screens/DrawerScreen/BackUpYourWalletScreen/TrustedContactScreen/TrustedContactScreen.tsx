@@ -31,6 +31,11 @@ import ModelTrustedContactEmailAndPhoneShare from "HexaWallet/src/app/custcompon
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var utils = require( "HexaWallet/src/app/constants/Utils" );
+
+//TODO: Bitcoin Files
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 export default class TrustedContactScreen extends React.Component<any, any> {
 
@@ -45,7 +50,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
 
     componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
-        console.log( { data } );
+        // console.log( { data } );
         let temp = [];
         let arr_Emails = data.emailAddresses;
         let arr_PhoneNumbers = data.phoneNumbers;
@@ -65,6 +70,24 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             data: data,
             arr_ConstactDetailsList: temp
         } )
+    }
+
+    componentDidMount = async () => {
+        let data = this.props.navigation.getParam( "data" );
+        //  console.log( { data } );
+        let resSSSDetails = await dbOpration.readSSSTableData(
+            localDB.tableName.tblSSSDetails,
+            data.recordID
+        );
+        console.log( { resSSSDetails } );
+        let walletDetails = utils.getWalletDetails();
+        const sss = new S3Service(
+            walletDetails[ 0 ].mnemonic
+        );
+        const { share, otp } = sss.createTransferShare( resSSSDetails.temp[ 0 ].share, data.givenName )
+        console.log( { otpEncryptedShare: share, otp } )
+        const { messageId, success } = await sss.uploadShare( share );
+        console.log( { otpEncryptedShare: share, messageId, success } )
     }
 
     render() {

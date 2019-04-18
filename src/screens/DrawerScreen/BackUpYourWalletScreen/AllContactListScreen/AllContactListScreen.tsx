@@ -24,12 +24,14 @@ import Contacts from 'react-native-contacts';
 import { Avatar, SearchBar } from 'react-native-elements';
 
 //TODO: Custome Pages
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
 export default class AllContactListScreen extends React.Component<any, any> {
 
@@ -39,7 +41,8 @@ export default class AllContactListScreen extends React.Component<any, any> {
             data: [],
             arr_ContactList: [],
             SelectedFakeContactList: [],
-            flag_NextBtnDisable: true
+            flag_NextBtnDisable: true,
+            flag_Loading: false
         } )
     }
 
@@ -58,31 +61,39 @@ export default class AllContactListScreen extends React.Component<any, any> {
         } )
     }
 
-
     press = ( hey ) => {
-        let seletedLength = this.state.SelectedFakeContactList.length;
-        console.log( { seletedLength } );
-
-        this.state.data.map( ( item ) => {
+        this.state.data.map( ( item, index ) => {
             if ( item.recordID === hey.recordID ) {
+                //if ( this.state.SelectedFakeContactList.length <= 2 ) {
                 item.check = !item.check
                 if ( item.check === true ) {
-
                     this.state.SelectedFakeContactList.push( item );
-                    console.log( 'selected:' + item.givenName );
+                    //  console.log( 'selected:' + item.givenName );
 
                 } else if ( item.check === false ) {
                     const i = this.state.SelectedFakeContactList.indexOf( item )
                     if ( 1 != -1 ) {
                         this.state.SelectedFakeContactList.splice( i, 1 )
-                        console.log( 'unselect:' + item.givenName )
+                        //  console.log( 'unselect:' + item.givenName )
                         return this.state.SelectedFakeContactList
                     }
                 }
+                // } else {
+                //     item.check = false;
+                //     const i = this.state.SelectedFakeContactList.indexOf( index )
+                //     console.log( { i } );
+                //     if ( 1 != -1 ) {
+                //         this.state.SelectedFakeContactList.splice( i, 1 )
+                //         console.log( 'unselect:' + item.givenName )
+                //         //return this.state.SelectedFakeContactList
+                //     }
+                // }
             }
         } )
+        let seletedLength = this.state.SelectedFakeContactList.length;
+        // console.log( { seletedLength } );
         this.setState( { data: this.state.data } )
-        if ( seletedLength >= 2 ) {
+        if ( seletedLength == 3 ) {
             this.setState( {
                 flag_NextBtnDisable: false
             } )
@@ -112,10 +123,18 @@ export default class AllContactListScreen extends React.Component<any, any> {
     };
 
     //TODO: func click_Next
-    click_Next() {
-        this.props.navigation.push( "SecretSharingScreen", {
-            data: this.state.SelectedFakeContactList
-        } );
+    click_Next = async () => {
+        let selectedContactList = this.state.SelectedFakeContactList;
+        // console.log( { selectedContactList } );
+        const resUpdateSSSContactDetails = await dbOpration.updateSSSContactListDetails(
+            localDB.tableName.tblSSSDetails,
+            selectedContactList,
+        );
+        if ( resUpdateSSSContactDetails ) {
+            this.props.navigation.push( "SecretSharingScreen", {
+                data: this.state.SelectedFakeContactList
+            } );
+        }
     }
 
 
@@ -200,6 +219,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
                         ) }
                     </ImageBackground>
                 </SafeAreaView>
+                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message="Loading" />
             </Container >
         );
     }
