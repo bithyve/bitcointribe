@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert } from "react-native";
 import {
     Container,
     Header,
@@ -22,6 +22,9 @@ import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Contacts from 'react-native-contacts';
 import { Avatar } from 'react-native-elements';
+import SendSMS from 'react-native-sms';
+//import Mailer from 'react-native-mail';
+var Mailer = require( 'NativeModules' ).RNMail;
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -44,7 +47,9 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         this.state = ( {
             data: [],
             arr_TrustedContactEmailAndPhoneShare: [],
-            arr_ConstactDetailsList: []
+            arr_ConstactDetailsList: [],
+            qrCodeString: "",
+            messageId: ""
         } )
     }
 
@@ -84,11 +89,73 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         const sss = new S3Service(
             walletDetails[ 0 ].mnemonic
         );
+
+
         const { share, otp } = sss.createTransferShare( resSSSDetails.temp[ 0 ].share, data.givenName )
         console.log( { otpEncryptedShare: share, otp } )
+
+        const encryptedShare = sss.createQRShare( resSSSDetails.temp[ 0 ].share, data.givenName )
+
         const { messageId, success } = await sss.uploadShare( share );
         console.log( { otpEncryptedShare: share, messageId, success } )
+
+        this.setState( {
+            qrCodeString: encryptedShare,
+            messageId
+        } )
     }
+
+    //TODO: click on model confirm button 
+    click_SentURLSmsOrEmail( item: any ) {
+        console.log( { item } );
+        var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+        if ( reg.test( item.value ) == false ) {
+            SendSMS.send( {
+                body: 'https://bithyve.com/sssdetails/' + this.state.messageId,
+                recipients: [ item.value ],
+                successTypes: [ 'sent', 'queued' ]
+            }, ( completed, cancelled, error ) => {
+                if ( completed ) {
+                    console.log( 'SMS Sent Completed' );
+                    this.setState( {
+                        arr_TrustedContactEmailAndPhoneShare: [ {
+                            modalVisible: false,
+                            contactDetails: ""
+                        } ]
+                    } )
+                    setTimeout( () => {
+                        Alert.alert( 'SMS Sent Completed' );
+                    }, 1000 );
+
+                } else if ( cancelled ) {
+                    console.log( 'SMS Sent Cancelled' );
+                } else if ( error ) {
+                    console.log( 'Some error occured' );
+                }
+            } );
+        } else {
+            Mailer.mail( {
+                subject: 'Hexa Wallet SSS Recovery ID',
+                recipients: [ item.value ],
+                body: 'https://bithyve.com/sssdetails/' + this.state.messageId,
+                isHTML: true,
+            }, ( error, event ) => {
+                if ( event == "sent" ) {
+                    this.setState( {
+                        arr_TrustedContactEmailAndPhoneShare: [ {
+                            modalVisible: false,
+                            contactDetails: ""
+                        } ]
+                    } )
+                    setTimeout( () => {
+                        Alert.alert( 'Email Sent Completed' );
+                    }, 1000 );
+
+                }
+            } );
+        }
+    }
+
 
     render() {
         let data = this.state.data;
@@ -161,7 +228,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                             <Button
                                 onPress={ () => {
                                     this.props.navigation.push( "ShareSecretViaQRScreen", {
-                                        data: "Lorem ipsum dolor sit amet, consectetur"
+                                        data: this.state.qrCodeString
                                     } );
                                 } }
                                 style={ {
@@ -187,6 +254,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         </View>
                         <ModelTrustedContactEmailAndPhoneShare
                             data={ this.state.arr_TrustedContactEmailAndPhoneShare }
+                            click_Confirm={ ( val: any ) => this.click_SentURLSmsOrEmail( val ) }
                             closeModal={ () => {
                                 this.setState( {
                                     arr_TrustedContactEmailAndPhoneShare: [ {

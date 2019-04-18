@@ -17,7 +17,18 @@ export default class ModelTrustedContactEmailAndPhoneShare extends Component {
     constructor ( props: any ) {
         super( props )
         this.state = ( {
-            selected_category: null,
+            selected_category: "",
+            flag_ConfirmBtnDisable: true
+        } )
+    }
+
+
+    //TODO: func list on click itme
+
+    click_Item( item: any ) {
+        this.setState( {
+            selected_category: item,
+            flag_ConfirmBtnDisable: false
         } )
     }
 
@@ -77,10 +88,7 @@ export default class ModelTrustedContactEmailAndPhoneShare extends Component {
                                 showsVerticalScrollIndicator={ false }
                                 renderItem={ ( { item } ) => (
                                     <TouchableOpacity onPress={ () => {
-                                        console.log( item );
-                                        this.setState( {
-                                            selected_category: item.value
-                                        } )
+                                        this.click_Item( item )
                                     } }
                                         style={ setTimeout( () => {
                                             this.state.selected_category == item.value ?
@@ -112,10 +120,10 @@ export default class ModelTrustedContactEmailAndPhoneShare extends Component {
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <FullLinearGradientButton
-                                click_Done={ () => this.props.click_Confirm() }
+                                click_Done={ () => this.props.click_Confirm( this.state.selected_category ) }
                                 title="Confirm & Proceed"
-                                disabled={ false }
-                                style={ [ { borderRadius: 10 } ] } />
+                                disabled={ this.state.flag_ConfirmBtnDisable }
+                                style={ [ this.state.flag_ConfirmBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } />
                         </View>
                     </View>
                 </View>
