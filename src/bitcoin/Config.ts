@@ -11,16 +11,22 @@ class Config {
   public DERIVATION_BRANCH: string = config.BIT_DERIVATION_BRANCH;
   public TOKEN: string = config.BIT_BLOCKCYPHER_API_URLS_TOKEN;
   public SSS_OTP_LENGTH: string = config.BIT_SSS_OTP_LENGTH;
-  public SSS_TOTAL: number = parseInt(config.BIT_SSS_TOTAL, 10);
-  public SSS_THRESHOLD: number = parseInt(config.BIT_SSS_THRESHOLD, 10);
+  public SSS_TOTAL: number = parseInt( config.BIT_SSS_TOTAL, 10 );
+  public SSS_THRESHOLD: number = parseInt( config.BIT_SSS_THRESHOLD, 10 );
   public BH_SERVER = {
     DEV: config.BIT_API_URLS_BH_SERVER_DEV,
     PROD: config.BIT_API_URLS_BH_SERVER_PROD,
   };
 
   public ESPLORA_API_ENDPOINTS = {
-    TESTNET_MULTIBALANCE: config.BIT_ESPLORA_TESTNET_MULTIBALANCE,
-    MAINNET_MULTIBALANCE: config.BIT_ESPLORA_MAINNET_MULTIBALANCE,
+    TESTNET: {
+      MULTIBALANCE: config.BIT_ESPLORA_TESTNET_MULTIBALANCE,
+      MULTIUTXO: config.BIT_ESPLORA_TESTNET_MULTIUTXO,
+    },
+    MAINNET: {
+      MULTIBALANCE: config.BIT_ESPLORA_MAINNET_MULTIBALANCE,
+      MULTIUTXO: config.BIT_ESPLORA_MAINNET_MULTIUTXO,
+    },
   };
 
   public SERVER: string = this.BH_SERVER.PROD;
@@ -58,27 +64,27 @@ class Config {
     },
   };
 
-  constructor(env: string) {
+  constructor ( env: string ) {
     this.ENVIRONMENT = env;
     this.setNetwork();
-    this.BITCOIN_NODE = new Client({
+    this.BITCOIN_NODE = new Client( {
       network:
         this.NETWORK === bitcoinJS.networks.bitcoin ? "mainnet" : "testnet",
       username: config.BIT_RPC_USERNAME,
       password: config.BIT_RPC_PASSWORD,
       host: config.BIT_HOST_IP,
-    });
+    } );
   }
 
   public setNetwork = (): void => {
-    if (this.ENVIRONMENT === "PROD") {
+    if ( this.ENVIRONMENT === "PROD" ) {
       this.NETWORK = bitcoinJS.networks.bitcoin;
-    } else if (this.ENVIRONMENT === "DEV") {
+    } else if ( this.ENVIRONMENT === "DEV" ) {
       this.NETWORK = bitcoinJS.networks.testnet;
     } else {
-      throw new Error("Please specify an apt environment(PROD||DEV)");
+      throw new Error( "Please specify an apt environment(PROD||DEV)" );
     }
   }
 }
 
-export default new Config(config.BIT_ENVIRONMENT);
+export default new Config( config.BIT_ENVIRONMENT );

@@ -8,11 +8,13 @@ import {
   Dimensions,
   Image,
   Keyboard,
-  StatusBar
+  StatusBar,
+  Linking
 } from "react-native";
 import { StackActions, NavigationActions } from "react-navigation";
 import CodeInput from "react-native-confirmation-code-input";
 import * as Keychain from "react-native-keychain";
+import DeepLinking from "react-native-deep-linking";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
@@ -62,6 +64,8 @@ export default class PasscodeScreen extends Component {
     this.retrieveData();
   }
 
+
+
   retrieveData = async () => {
     try {
       const resultWallet = await dbOpration.readTablesData(
@@ -103,10 +107,9 @@ export default class PasscodeScreen extends Component {
     }
   }
 
-  onSuccess = ( code: string ) => {
-    let commonData = Singleton.getInstance();
-    let pageName = commonData.getRootViewController();
 
+  onSuccess = ( code: string ) => {
+    let pageName = utils.getRootViewController();
     if ( pageName == "TabbarBottom" ) {
       const resetAction = StackActions.reset( {
         index: 0, // <-- currect active route from actions array
@@ -122,6 +125,8 @@ export default class PasscodeScreen extends Component {
       this.setState( { flag_dialogShow: true } );
     }
   };
+
+
 
   //TODO: func urlDecription
   async urlDecription( code: any ) {

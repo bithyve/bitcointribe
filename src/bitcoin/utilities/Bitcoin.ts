@@ -125,12 +125,25 @@ export default class Bitcoin {
     };
   }
 
-  public multiGetBalanceByAddress = async (addresses) => {
+  public blockcypherBalFallback = async (addresses) => {
+    let bal = 0;
+    let unconfirmedBal = 0;
+    for (const addr of addresses) {
+      const { balanceData } = await this.getBalance(addr);
+      bal += balanceData.balance;
+      unconfirmedBal += balanceData.unconfirmed_balance;
+    }
+
+    return { bal, unconfirmedBal };
+  }
+
+  public getBalanceByAddresses = async (addresses) => {
     let res: AxiosResponse;
-    if (this.network === bitcoinJS.networks.testnet) {
-      try {
+    try {
+      if (this.network === bitcoinJS.networks.testnet) {
+        // throw new Error("fabricated error");
         res = await axios.post(
-          config.ESPLORA_API_ENDPOINTS.TESTNET_MULTIBALANCE,
+          config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIBALANCE,
           {
             addresses,
           },
@@ -143,31 +156,39 @@ export default class Bitcoin {
             unconfirmedBalance: res.data.UnconfirmedBalance,
           },
         };
-      } catch (err) {
-        console.log(`An error occured while fetching balance: ${err}`);
+      } else {
+        res = await axios.post(
+          config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIBALANCE,
+          {
+            addresses,
+          },
+        );
         return {
           status: res.status,
-          errorMessage: err.message,
+          data: {
+            balance: res.data.Balance,
+            unconfirmedBalance: res.data.UnconfirmedBalance,
+          },
         };
       }
-    } else {
+    } catch (err) {
+      console.log(
+        `An error occured while fetching balance via Esplora: ${err}`,
+      );
+      console.log("Using Blockcypher fallback");
       try {
-        res = await axios.post(
-          config.ESPLORA_API_ENDPOINTS.MAINNET_MULTIBALANCE,
-          {
-            addresses,
-          },
+        const { bal, unconfirmedBal } = await this.blockcypherBalFallback(
+          addresses,
         );
-
         return {
-          status: res.status,
+          status: 200,
           data: {
-            balance: res.data.Balance,
-            unconfirmedBalance: res.data.UnconfirmedBalance,
+            balance: bal,
+            unconfirmedBalance: unconfirmedBal,
           },
         };
       } catch (err) {
-        console.log(`An error occured while fetching balance: ${err}`);
+        console.log("Blockcypher fallback failed aswell!");
         return {
           status: res.status,
           errorMessage: err.message,
@@ -415,6 +436,70 @@ export default class Bitcoin {
     return unspentOutputs;
   }
 
+  public blockcypherUTXOFallback = async (addresses: string[]) => {
+    const UTXOs = [];
+    // tslint:disable-next-line:forin
+    for (const address of addresses) {
+      console.log(`Fetching utxos corresponding to ${address}`);
+      const utxos = await this.fetchUnspentOutputs(address);
+      UTXOs.push(...utxos);
+    }
+    return UTXOs;
+  }
+
+  public multiFetchUnspentOutputs = async (
+    addresses: string[],
+  ): Promise<any> => {
+    try {
+      let data;
+      if (this.network === bitcoinJS.networks.testnet) {
+        const res: AxiosResponse = await axios.post(
+          config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIUTXO,
+          { addresses },
+        );
+        data = res.data;
+      } else {
+        const res: AxiosResponse = await axios.post(
+          config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIUTXO,
+          { addresses },
+        );
+        data = res.data;
+      }
+
+      const unspentOutputs = [];
+      for (const addressSpecificUTXOs of data) {
+        for (const utxo of addressSpecificUTXOs) {
+          const { txid, vout, value, Address } = utxo;
+          unspentOutputs.push({
+            txId: txid,
+            vout,
+            value,
+            address: Address,
+          });
+        }
+      }
+      console.log(unspentOutputs.length);
+      return unspentOutputs;
+    } catch (err) {
+      console.log(`An error occured while connecting to Esplora: ${err}`);
+      console.log("Switching to Blockcypher UTXO fallback");
+
+      try {
+        const UTXOs = await this.blockcypherUTXOFallback(addresses);
+        console.log(UTXOs.length);
+        return UTXOs;
+      } catch (err) {
+        console.log(
+          `Blockcypher UTXO fallback failed with the following error: ${err}`,
+        );
+        return {
+          status: 500,
+          errorMessage: err.message,
+        };
+      }
+    }
+  }
+
   public fetchTransactionDetails = async (txHash: string): Promise<any> => {
     if (this.network === bitcoinJS.networks.testnet) {
       const { data } = await axios.get(
@@ -462,7 +547,7 @@ export default class Bitcoin {
     txnPriority?: string,
   ): Promise<{ inputs: object[]; txb: TransactionBuilder; fee: number }> => {
     console.log({ senderAddress });
-    const inputUTXOs = await this.fetchUnspentOutputs(senderAddress);
+    const inputUTXOs = await this.multiFetchUnspentOutputs([senderAddress]);
     console.log("Fetched the inputs");
     const outputUTXOs = [{ address: recipientAddress, value: amount }];
 

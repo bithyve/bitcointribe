@@ -21,7 +21,7 @@ import { SvgIcon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Contacts from 'react-native-contacts';
-import { Avatar, SearchBar } from 'react-native-elements';
+import { Avatar } from 'react-native-elements';
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
