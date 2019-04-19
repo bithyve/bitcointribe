@@ -124,11 +124,36 @@ export default class SecureHDWallet extends Bitcoin {
       }
 
       console.log(this.consumedAddresses);
-      const res = await this.multiGetBalanceByAddress(this.consumedAddresses);
+      const res = await this.getBalanceByAddresses(this.consumedAddresses);
       return res;
     } catch (err) {
       console.warn(err);
     }
+  }
+
+  public fetchTransactions = async () => {
+    if (this.consumedAddresses.length === 0) {
+      // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
+      await this.fetchBalance();
+    }
+
+    const transactions = {
+      status: 200, // mocking for now
+      totalTransactions: 0,
+      confirmedTransactions: 0,
+      unconfirmedTransactions: 0,
+      transactionDetails: [],
+    };
+    for (const address of this.consumedAddresses) {
+      console.log(`Fetching transactions corresponding to ${address}`);
+      const txns = await this.fetchTransactionsByAddress(address);
+      transactions.totalTransactions += txns.totalTransactions;
+      transactions.confirmedTransactions += txns.confirmedTransactions;
+      transactions.unconfirmedTransactions += txns.unconfirmedTransactions;
+      transactions.transactionDetails.push(...txns.transactionDetails);
+    }
+
+    return transactions;
   }
 
   public fetchUtxo = async () => {
@@ -136,13 +161,8 @@ export default class SecureHDWallet extends Bitcoin {
       // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
       await this.fetchBalance();
     }
-    const UTXOs = [];
-    for (const address of this.consumedAddresses) {
-      console.log(`Fetching utxos corresponding to ${address}`);
-      const utxos = await this.fetchUnspentOutputs(address);
-      UTXOs.push(...utxos);
-    }
 
+    const UTXOs = await this.multiFetchUnspentOutputs(this.consumedAddresses);
     return UTXOs;
   }
 

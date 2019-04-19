@@ -145,6 +145,40 @@ const setSetupWallet = ( value: any ) => {
   return true;
 }
 
+//TODO: Singleton  Set and Get RootViewController
+const getRootViewController = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getRootViewController();
+}
+const setRootViewController = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setRootViewController( value );
+  return true;
+}
+
+//TODO: Singleton Set and Get DeepLinkingUrl
+const getDeepLinkingUrl = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getDeepLinkingUrl();
+}
+const setDeepLinkingUrl = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setDeepLinkingUrl( value );
+  return true;
+}
+
+//TODO: Singleton Set and Get DeepLinkingType
+const getDeepLinkingType = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getDeepLinkingType();
+}
+const setDeepLinkingType = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setDeepLinkingType( value );
+  return true;
+}
+
+
 module.exports = {
   getUnixTimeDate,
   getUnixToDateFormat,
@@ -157,9 +191,16 @@ module.exports = {
   date_diff_indays,
   getDeviceModel,
   getStatusBarHeight,
+  //Singleton       
   getMnemonic,
   getWalletDetails,
   setWalletDetails,
   getSetupWallet,
-  setSetupWallet
+  setSetupWallet,
+  getRootViewController,
+  setRootViewController,
+  getDeepLinkingUrl,
+  setDeepLinkingUrl,
+  getDeepLinkingType,
+  setDeepLinkingType
 };

@@ -660,13 +660,9 @@ const updateSSSContactListDetails = (
             for ( let i = 0; i < len; i++ ) {
               let dbdecryptShareId = results.rows.item( i ).shareId;
               //console.log( { dbdecryptShareId } );
-
               let jsonConstactDetial = JSON.stringify( contactDetails[ i ] ).toString();
               let jsonRecordId = ( contactDetails[ i ].recordID ).toString();
-
               console.log( { jsonConstactDetial, jsonRecordId } );
-
-
               txn.executeSql(
                 "update " +
                 tblName +

@@ -4,6 +4,7 @@ export default class Singleton {
   public passcode: string = "";
   public rootViewController: string = "TabbarBottom";
   public deepLinkingUrl: string = "";
+  public deepLinkingType: string = "";
 
 
 
@@ -44,6 +45,15 @@ export default class Singleton {
   }
   setDeepLinkingUrl( url: string ) {
     this.deepLinkingUrl = url;
+  }
+
+
+  //TODO: deepLinkingType
+  getDeepLinkingType() {
+    return this.deepLinkingType;
+  }
+  setDeepLinkingType( type: string ) {
+    this.deepLinkingType = type;
   }
 
   //Wallet Details
