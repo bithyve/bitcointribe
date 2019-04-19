@@ -51,6 +51,14 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
             data: item
         } );
     }
+
+
+    goBack() {
+        const { navigation } = this.props;
+        navigation.goBack();
+        navigation.state.params.onSelect( { selected: true } );
+    }
+
     render() {
         return (
             <Container>
@@ -60,7 +68,7 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
                         <View style={ { marginLeft: 10, marginTop: 15 } }>
                             <Button
                                 transparent
-                                onPress={ () => this.props.navigation.pop() }
+                                onPress={ () => this.goBack() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
                                 <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Share Secret via QR</Text>

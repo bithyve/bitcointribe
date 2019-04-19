@@ -9,9 +9,12 @@ import { createRootNavigator } from "HexaWallet/src/app/router/router";
 import LaunchScreen from "HexaWallet/src/screens/LaunchScreen/LaunchScreen";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 
+
+//TODO: Custome Object
+var utils = require( "HexaWallet/src/app/constants/Utils" );
 export default class HexaWalletWalletWallet extends React.Component
 {
-  constructor ( props: any )
+  constructor ( props )    
   {
     super( props );
     this.state = {
@@ -21,55 +24,30 @@ export default class HexaWalletWalletWallet extends React.Component
     };
     StatusBar.setBarStyle( 'light-content', true );
   }
-
   async componentDidMount ()
   {
     try
     {
       AppState.addEventListener( "change", this._handleAppStateChange );
       AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
-
       //TODO: Deep Linking
-      let commonData = Singleton.getInstance();
       DeepLinking.addScheme( "https://" );
       Linking.addEventListener( "url", this.handleUrl );
       DeepLinking.addRoute(
-        "/prime-sign-230407.appspot.com/jointAccountCreate",
-        response =>
-        {
-          console.log( {
-            response
-          } );
-        }
-      );
-      DeepLinking.addRoute(
-        "/prime-sign-230407.appspot.com/ja/:script",
-        response =>
-        {
-          let res = response;
-          console.log( {
-            res
-          } );
-          Alert.alert( JSON.stringify( response ) );
-        }
-      );
-      DeepLinking.addRoute(
-        "/prime-sign-230407.appspot.com/ja/:pageName/:script",
+        "/prime-sign-230407.appspot.com/sss/:pageName/:script",
         response =>
         {
           console.log( {
             response
           } );
           var pageName;
-          if ( response.pageName == "mck" )
+          if ( response.pageName == "TB" )
           {
-            pageName = "MergeConfirmJointAccountScreen";
-          } else if ( response.pageName == "ca" )
-          {
-            pageName = "CreateJointAccountScreen";
+            pageName = "TabbarBottom";
           }
-          commonData.setRootViewController( pageName );
-          commonData.setDeepLinkingUrl( response.script );
+          utils.setRootViewController( pageName );
+          utils.setDeepLinkingUrl( response.script );
+          utils.setDeepLinkingType( "SSSDetails" );
         }
       );
 
@@ -187,7 +165,6 @@ export default class HexaWalletWalletWallet extends React.Component
     );
     console.log( "first = " + this.state.status, this.state.isStartPage );
     const AppContainer = createAppContainer( Layout );
-
     return this.state.status ? (
       <LaunchScreen
         onComplited={ ( status: boolean, pageName: string ) =>

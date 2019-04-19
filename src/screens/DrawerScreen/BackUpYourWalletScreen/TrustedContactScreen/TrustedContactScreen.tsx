@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, AsyncStorage } from "react-native";
 import {
     Container,
     Header,
@@ -25,6 +25,7 @@ import { Avatar } from 'react-native-elements';
 import SendSMS from 'react-native-sms';
 //import Mailer from 'react-native-mail';
 var Mailer = require( 'NativeModules' ).RNMail;
+import Share from "react-native-share";
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -49,7 +50,9 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             arr_TrustedContactEmailAndPhoneShare: [],
             arr_ConstactDetailsList: [],
             qrCodeString: "",
-            messageId: ""
+            messageId: "",
+            otpCode: "",
+            flag_OtpCodeShowStatus: false
         } )
     }
 
@@ -101,7 +104,8 @@ export default class TrustedContactScreen extends React.Component<any, any> {
 
         this.setState( {
             qrCodeString: encryptedShare,
-            messageId
+            messageId,
+            otpCode: otp
         } )
     }
 
@@ -111,7 +115,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
         if ( reg.test( item.value ) == false ) {
             SendSMS.send( {
-                body: 'https://bithyve.com/sssdetails/' + this.state.messageId,
+                body: 'https://prime-sign-230407.appspot.com/sss/TB/' + this.state.messageId,
                 recipients: [ item.value ],
                 successTypes: [ 'sent', 'queued' ]
             }, ( completed, cancelled, error ) => {
@@ -125,6 +129,10 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                     } )
                     setTimeout( () => {
                         Alert.alert( 'SMS Sent Completed' );
+                        this.setState( {
+                            flag_OtpCodeShowStatus: true
+                        } )
+                        AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
                     }, 1000 );
 
                 } else if ( cancelled ) {
@@ -137,7 +145,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             Mailer.mail( {
                 subject: 'Hexa Wallet SSS Recovery ID',
                 recipients: [ item.value ],
-                body: 'https://bithyve.com/sssdetails/' + this.state.messageId,
+                body: 'https://prime-sign-230407.appspot.com/sss/TB/' + this.state.messageId,
                 isHTML: true,
             }, ( error, event ) => {
                 if ( event == "sent" ) {
@@ -149,12 +157,22 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                     } )
                     setTimeout( () => {
                         Alert.alert( 'Email Sent Completed' );
+                        this.setState( {
+                            flag_OtpCodeShowStatus: true
+                        } )
+                        AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
                     }, 1000 );
 
                 }
             } );
         }
     }
+
+    onSelect = data => {
+        this.setState( {
+            flag_OtpCodeShowStatus: true
+        } )
+    };
 
 
     render() {
@@ -223,38 +241,68 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                 extraData={ this.state }
                             />
                         </View>
-                        <View style={ Platform.OS == "ios" ? { flex: 0.6 } : { flex: 0.8 } }>
-                            <Text note style={ { textAlign: "center" } }>Select how you want to share secret with the selected trusted contact</Text>
-                            <Button
-                                onPress={ () => {
-                                    this.props.navigation.push( "ShareSecretViaQRScreen", {
-                                        data: this.state.qrCodeString
-                                    } );
-                                } }
-                                style={ {
-                                    backgroundColor: "#838383", borderRadius: 10, margin: 5,
-                                    height: 50,
-                                } }
-                                full>
-                                <Text>Share secret via QR code</Text>
-                            </Button>
-                            <FullLinearGradientButton
-                                click_Done={ () => {
-                                    this.setState( {
-                                        arr_TrustedContactEmailAndPhoneShare: [ {
-                                            modalVisible: true,
-                                            contactDetails: data,
-                                            arr_ConstactDetailsList: this.state.arr_ConstactDetailsList
-                                        } ]
-                                    } )
-                                } }
-                                title="Share secret email/phone"
-                                disabled={ false }
-                                style={ [ { borderRadius: 10 } ] } />
-                        </View>
+                        { renderIf( this.state.flag_OtpCodeShowStatus == true )(
+                            <View style={ [ Platform.OS == "ios" ? { flex: 0.6 } : { flex: 0.8 }, { marginLeft: 5, marginRight: 5 } ] }>
+                                <Text note style={ { textAlign: "center" } }>Some information about the OTP and how it works comes in this space</Text>
+                                <View style={ { flex: 0.8, backgroundColor: "#ffffff", borderRadius: 5, flexDirection: "row", alignItems: "center", justifyContent: "center", margin: 10 } }>
+                                    <Text note style={ { flex: 2, marginLeft: 10 } }>OTP</Text>
+                                    <Text style={ { flex: 8, letterSpacing: 30, alignSelf: "center", textAlign: "center" } }>{ this.state.otpCode }</Text>
+                                </View>
+                                <FullLinearGradientButton
+                                    click_Done={ () => {
+                                        let shareOptions = {
+                                            title: "OTP",
+                                            message: "sss opt:" + this.state.otpCode,
+                                            url: "\nhttps://bithyve.com/",
+                                            subject: "sss opt " //  for email
+                                        };
+                                        Share.open( shareOptions )
+                                            .then( res => {
+                                                console.log( res );
+                                            } )
+                                    } }
+                                    title="Share OTP with Trusted Contact"
+                                    disabled={ false }
+                                    style={ [ { borderRadius: 10 } ] } />
+                            </View>
+                        ) }
+                        { renderIf( this.state.flag_OtpCodeShowStatus != true )(
+                            <View style={ Platform.OS == "ios" ? { flex: 0.6 } : { flex: 0.8 } }>
+                                <Text note style={ { textAlign: "center" } }>Select how you want to share secret with the selected trusted contact</Text>
+                                <Button
+                                    onPress={ () => {
+                                        this.props.navigation.push( "ShareSecretViaQRScreen",
+                                            { onSelect: this.onSelect, data: this.state.qrCodeString }
+                                        );
+                                    } }
+                                    style={ {
+                                        backgroundColor: "#838383", borderRadius: 10, margin: 5,
+                                        height: 50,
+                                    } }
+                                    full>
+                                    <Text>Share secret via QR code</Text>
+                                </Button>
+                                <FullLinearGradientButton
+                                    click_Done={ () => {
+                                        this.setState( {
+                                            arr_TrustedContactEmailAndPhoneShare: [ {
+                                                modalVisible: true,
+                                                contactDetails: data,
+                                                arr_ConstactDetailsList: this.state.arr_ConstactDetailsList
+                                            } ]
+                                        } )
+                                    } }
+                                    title="Share secret email/phone"
+                                    disabled={ false }
+                                    style={ [ { borderRadius: 10 } ] } />
+                            </View>
+                        ) }
                         <ModelTrustedContactEmailAndPhoneShare
                             data={ this.state.arr_TrustedContactEmailAndPhoneShare }
-                            click_Confirm={ ( val: any ) => this.click_SentURLSmsOrEmail( val ) }
+                            click_Confirm={ ( val: any ) => {
+                                AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
+                                this.click_SentURLSmsOrEmail( val )
+                            } }
                             closeModal={ () => {
                                 this.setState( {
                                     arr_TrustedContactEmailAndPhoneShare: [ {

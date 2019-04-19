@@ -40,7 +40,7 @@ import ViewShieldIcons from "HexaWallet/src/app/custcompontes/View/ViewShieldIco
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
 import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model/ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
-
+import ModelAcceptSecret from "../../../app/custcompontes/Model/ModelAcceptSecret/ModelAcceptSecret";
 
 
 //TODO: Custome object
@@ -78,6 +78,7 @@ import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 
+
 export default class WalletScreen extends React.Component {
   constructor ( props: any ) {
     super( props );
@@ -96,10 +97,16 @@ export default class WalletScreen extends React.Component {
 
       //Model 
       arr_ModelBackupYourWallet: [],
-      arr_ModelFindYourTrustedContacts: []
+      arr_ModelFindYourTrustedContacts: [],
+      arr_ModelAcceptSecret: [],
+      //DeepLinking Param
+      deepLinkingUrl: ""
     };
     isNetwork = utils.getNetwork();
   }
+
+
+
   //TODO: Page Life Cycle
   componentWillMount() {
     this.willFocusSubscription = this.props.navigation.addListener(
@@ -145,10 +152,32 @@ export default class WalletScreen extends React.Component {
       outputRange: [ 50, 70 ],
       extrapolate: "clamp"
     } );
+
+
+    let urlScript = utils.getDeepLinkingUrl();
+    let urlType = utils.getDeepLinkingType();
+    if ( urlType != "" ) {
+      this.setState( {
+        deepLinkingUrl: urlScript,
+        arr_ModelAcceptSecret: [
+          {
+            modalVisible: true
+          }
+        ]
+      } )
+    }
   }
+
+
+
+
+
   componentWillUnmount() {
     this.willFocusSubscription.remove();
   }
+
+
+
   //TODO: func connnection_FetchData
   async connnection_FetchData() {
     const resultWallet = await dbOpration.readTablesData(
@@ -161,9 +190,7 @@ export default class WalletScreen extends React.Component {
     const resSSSDetails = await dbOpration.readTablesData(
       localDB.tableName.tblSSSDetails
     );
-
-    console.log( { resSSSDetails } );
-
+    //console.log( { resSSSDetails } );
     if ( resSSSDetails.temp.length == 0 ) {
       this.setState( {
         shiledIconPer: 1,
@@ -205,9 +232,6 @@ export default class WalletScreen extends React.Component {
       arr_accounts: resAccount.temp
     } );
   }
-
-
-
 
   render() {
     return (
@@ -445,6 +469,39 @@ export default class WalletScreen extends React.Component {
                 }
               ]
             } )
+          } }
+        />
+        <ModelAcceptSecret
+          data={ this.state.arr_ModelAcceptSecret }
+          closeModal={ () => {
+            this.setState( {
+              arr_ModelAcceptSecret: [
+                {
+                  modalVisible: false
+                }
+              ]
+            } )
+          } }
+          click_RejectSecret={ () => {
+            utils.setDeepLinkingType( "" );
+            utils.setDeepLinkingUrl( "" );
+            this.setState( {
+              arr_ModelAcceptSecret: [
+                {
+                  modalVisible: false
+                }
+              ]
+            } )
+          } }
+          click_AcceptSecret={ () => {
+            this.setState( {
+              arr_ModelAcceptSecret: [
+                {
+                  modalVisible: false
+                }
+              ]
+            } )
+            this.props.navigation.push( "TrustedContactAcceptNavigator", { data: this.state.deepLinkingUrl } )
           } }
         />
       </Container>

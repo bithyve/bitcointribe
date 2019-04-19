@@ -69,6 +69,9 @@ import AllContactListScreen from "../../screens/DrawerScreen/BackUpYourWalletScr
 import SecretSharingScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/SecretSharingScreen/SecretSharingScreen";
 import TrustedContactScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactScreen/TrustedContactScreen";
 import ShareSecretViaQRScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/ShareSecretViaQRScreen/ShareSecretViaQRScreen";
+import TrustedContactAcceptOtpScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactAcceptOtpScreen/TrustedContactAcceptOtpScreen";
+
+
 //TODO: StackNavigator
 
 //TODO: StackNavigator:ONBoarding
@@ -211,6 +214,20 @@ const BackUpYourWalletStackNavigatorRouter = createStackNavigator(
   }
 );
 
+const TrustedContactAcceptStackNavigatorRouter = createStackNavigator(
+  {
+    TrustedContactAcceptOtpScreen: {
+      screen: TrustedContactAcceptOtpScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "TrustedContactAcceptOtpScreen"
+  }
+);
+
+
+
 
 //TODO: TabNavigator
 //TODO: TabNavigator:TabNavigator
@@ -335,6 +352,10 @@ export const createRootNavigator = (
         screen: BackUpYourWalletStackNavigatorRouter,
         navigationOptions: { header: null }
       },
+      TrustedContactAcceptNavigator: {
+        screen: TrustedContactAcceptStackNavigatorRouter,
+        navigationOptions: { header: null }
+      }
       //Drwaer Navigation
       // SecurityScreen: {
       //   screen: SecurityScreen,

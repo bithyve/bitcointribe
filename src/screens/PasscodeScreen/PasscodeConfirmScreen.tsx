@@ -265,7 +265,7 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
             />
           </View>
         </KeyboardAwareScrollView>
-        <Loader loading={ this.state.isLoading } color={ colors.appColor } size={ 60 } />
+        <Loader loading={ this.state.isLoading } color={ colors.appColor } size={ 30 } />
       </View>
     );
   }

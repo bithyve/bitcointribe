@@ -300,7 +300,7 @@ export default class HDSegwitWallet extends Bitcoin {
       }
 
       console.log(this.usedAddresses);
-      const res = await this.multiGetBalanceByAddress(this.usedAddresses);
+      const res = await this.getBalanceByAddresses(this.usedAddresses);
       return res;
     } catch (err) {
       console.warn(err);
@@ -319,13 +319,7 @@ export default class HDSegwitWallet extends Bitcoin {
     // addresses +=
     //   "|" + this.getInternalAddressByIndex(this.nextFreeChangeAddressIndex);
 
-    const UTXOs = [];
-    // tslint:disable-next-line:forin
-    for (const address of this.usedAddresses) {
-      console.log(`Fetching utxos corresponding to ${address}`);
-      const utxos = await this.fetchUnspentOutputs(address);
-      UTXOs.push(...utxos);
-    }
+    const UTXOs = await this.multiFetchUnspentOutputs(this.usedAddresses);
 
     return UTXOs;
 
