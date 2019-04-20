@@ -161,7 +161,9 @@ export default class WalletScreen extends React.Component {
         deepLinkingUrl: urlScript,
         arr_ModelAcceptSecret: [
           {
-            modalVisible: true
+            modalVisible: true,
+            name: urlScript.n,
+            mobileNo: urlScript.m
           }
         ]
       } )
@@ -477,7 +479,9 @@ export default class WalletScreen extends React.Component {
             this.setState( {
               arr_ModelAcceptSecret: [
                 {
-                  modalVisible: false
+                  modalVisible: false,
+                  name: "",
+                  mobileNo: ""
                 }
               ]
             } )
@@ -488,7 +492,9 @@ export default class WalletScreen extends React.Component {
             this.setState( {
               arr_ModelAcceptSecret: [
                 {
-                  modalVisible: false
+                  modalVisible: false,
+                  name: "",
+                  mobileNo: ""
                 }
               ]
             } )
@@ -497,7 +503,9 @@ export default class WalletScreen extends React.Component {
             this.setState( {
               arr_ModelAcceptSecret: [
                 {
-                  modalVisible: false
+                  modalVisible: false,
+                  name: "",
+                  mobileNo: ""
                 }
               ]
             } )

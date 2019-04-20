@@ -28,6 +28,7 @@ var Mailer = require( 'NativeModules' ).RNMail;
 import Share from "react-native-share";
 
 //TODO: Custome Pages
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import ModelTrustedContactEmailAndPhoneShare from "HexaWallet/src/app/custcompontes/Model/ModelTrustedContactEmailAndPhoneShare/ModelTrustedContactEmailAndPhoneShare";
@@ -52,7 +53,8 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             qrCodeString: "",
             messageId: "",
             otpCode: "",
-            flag_OtpCodeShowStatus: false
+            flag_OtpCodeShowStatus: false,
+            flag_Loading: true
         } )
     }
 
@@ -101,21 +103,36 @@ export default class TrustedContactScreen extends React.Component<any, any> {
 
         const { messageId, success } = await sss.uploadShare( share );
         console.log( { otpEncryptedShare: share, messageId, success } )
+        if ( messageId != "" || messageId != null ) {
+            this.setState( {
+                qrCodeString: encryptedShare,
+                messageId,
+                otpCode: otp,
+                flag_Loading: false
+            } )
+        }
+    }
 
-        this.setState( {
-            qrCodeString: encryptedShare,
-            messageId,
-            otpCode: otp
-        } )
+    componentWillUnmount() {
+        AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
     }
 
     //TODO: click on model confirm button 
     click_SentURLSmsOrEmail( item: any ) {
-        console.log( { item } );
+        AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
         var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+        let data = this.props.navigation.getParam( "data" );
+        let script = {};
+        script.n = this.state.data.givenName + " " + this.state.data.familyName;
+        script.m = data.phoneNumbers[ 0 ].number;
+        script.mi = this.state.messageId;
+        var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
+        encpScript = encpScript.split( "/" ).join( "_+_" );
+        console.log( { encpScript } );
+
         if ( reg.test( item.value ) == false ) {
             SendSMS.send( {
-                body: 'https://prime-sign-230407.appspot.com/sss/TB/' + this.state.messageId,
+                body: 'https://prime-sign-230407.appspot.com/sss/TB/' + encpScript,
                 recipients: [ item.value ],
                 successTypes: [ 'sent', 'queued' ]
             }, ( completed, cancelled, error ) => {
@@ -132,7 +149,6 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         this.setState( {
                             flag_OtpCodeShowStatus: true
                         } )
-                        AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
                     }, 1000 );
 
                 } else if ( cancelled ) {
@@ -142,29 +158,52 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                 }
             } );
         } else {
-            Mailer.mail( {
-                subject: 'Hexa Wallet SSS Recovery ID',
-                recipients: [ item.value ],
-                body: 'https://prime-sign-230407.appspot.com/sss/TB/' + this.state.messageId,
-                isHTML: true,
-            }, ( error, event ) => {
-                if ( event == "sent" ) {
+            if ( Platform.OS == "android" ) {
+                Mailer.mail( {
+                    subject: 'Hexa Wallet SSS Recovery ID',
+                    recipients: [ item.value ],
+                    body: 'https://prime-sign-230407.appspot.com/sss/TB/' + encpScript,
+                    isHTML: true,
+                }, ( error, event ) => {
+                    if ( event == "sent" ) {
+                        console.log( { event } );
+                    }
+                } );
+                this.setState( {
+                    arr_TrustedContactEmailAndPhoneShare: [ {
+                        modalVisible: false,
+                        contactDetails: ""
+                    } ]
+                } )
+                setTimeout( () => {
+                    Alert.alert( 'Email Sent Completed' );
                     this.setState( {
-                        arr_TrustedContactEmailAndPhoneShare: [ {
-                            modalVisible: false,
-                            contactDetails: ""
-                        } ]
+                        flag_OtpCodeShowStatus: true
                     } )
-                    setTimeout( () => {
-                        Alert.alert( 'Email Sent Completed' );
+                }, 1000 );
+            } else {
+                Mailer.mail( {
+                    subject: 'Hexa Wallet SSS Recovery ID',
+                    recipients: [ item.value ],
+                    body: 'https://prime-sign-230407.appspot.com/sss/TB/' + encpScript,
+                    isHTML: true,
+                }, ( error, event ) => {
+                    if ( event == "sent" ) {
                         this.setState( {
-                            flag_OtpCodeShowStatus: true
+                            arr_TrustedContactEmailAndPhoneShare: [ {
+                                modalVisible: false,
+                                contactDetails: ""
+                            } ]
                         } )
-                        AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
-                    }, 1000 );
-
-                }
-            } );
+                        setTimeout( () => {
+                            Alert.alert( 'Email Sent Completed' );
+                            this.setState( {
+                                flag_OtpCodeShowStatus: true
+                            } )
+                        }, 1000 );
+                    }
+                } );
+            }
         }
     }
 
@@ -314,6 +353,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         />
                     </ImageBackground>
                 </SafeAreaView>
+                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
             </Container >
         );
     }

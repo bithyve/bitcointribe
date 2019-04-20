@@ -7,6 +7,7 @@ import { Avatar } from 'react-native-elements';
 
 export default class ModelAcceptSecret extends Component {
     render() {
+        let name = this.props.data.length != 0 ? this.props.data[ 0 ].name : "temp"
         return (
             <Modal
                 transparent
@@ -22,15 +23,15 @@ export default class ModelAcceptSecret extends Component {
                 ] }>
                     <View style={ styles.viewModelBody }>
                         <View style={ { flexDirection: "row", flex: 0.5 } }>
-                            <Text style={ { fontWeight: "bold", fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } }>Arpan Jain has selected you as his trusted contact</Text>
+                            <Text style={ { fontWeight: "bold", fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } }>{ name } has selected you as his trusted contact</Text>
                             <Button light iconLeft style={ { width: 40, height: 40, borderRadius: 20 } } onPress={ () => this.props.closeModal() }>
                                 <Icon name='close' style={ { alignSelf: "center" } } />
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
                             <Text note style={ { textAlign: "center", fontSize: 12, marginBottom: 20 } }>Some information about the importance secret keeping</Text>
-                            <Avatar medium rounded title="A" />
-                            <Text>Arpan Jain</Text>
+                            <Avatar medium rounded title={ name.charAt( 0 ) } />
+                            <Text>{ name }</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <Text note style={ { textAlign: "center", fontSize: 12 } }>You will need to open the Hexa application on your device once in two weeks to make sure the secret is still accessible</Text>

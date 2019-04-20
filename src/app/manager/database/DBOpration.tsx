@@ -687,6 +687,37 @@ const updateSSSContactListDetails = (
 };
 
 
+//TODO: ========================================>  SSS Trusted Party Details   <========================================
+//insert
+const insertTrustedPartyDetails = (
+  tblName: string,
+  fulldate: string,
+  messageId: any,
+  otpEncShare: any,
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    db.transaction( function ( txn ) {
+      txn.executeSql(
+        "INSERT INTO " +
+        tblName +
+        "(dateCreated,messageId,otpEncShare) VALUES (:dateCreated,:messageId,:otpEncShare)",
+        [
+          utils.encrypt(
+            fulldate.toString(),
+            passcode
+          ),
+          utils.encrypt( messageId.toString(), passcode ),
+          utils.encrypt( JSON.stringify( otpEncShare ).toString(), passcode )
+        ]
+      );
+      resolve( true );
+    } );
+  } );
+};
+
+
+
 module.exports = {
   readTablesData,
   readAccountTablesData,
@@ -704,5 +735,7 @@ module.exports = {
   //SSS Details
   readSSSTableData,
   insertSSSShareAndShareId,
-  updateSSSContactListDetails
+  updateSSSContactListDetails,
+  //SSS Trusted Party Details 
+  insertTrustedPartyDetails
 };

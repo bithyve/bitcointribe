@@ -173,7 +173,8 @@ var localDB = {
     tblAccountType: Config.DB_TBL_ACCOUNTTYPE,
     tblAccount: Config.DB_TBL_ACCOUNT,
     tblTransaction: Config.DB_TBL_TRANSACTION,
-    tblSSSDetails: Config.DB_TBL_SSSDETAILS
+    tblSSSDetails: Config.DB_TBL_SSSDETAILS,
+    tblTrustedPartyDetails: Config.DB_TBL_SSSTrustedPartyDetails
   }
 };
 
