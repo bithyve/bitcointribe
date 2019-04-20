@@ -46,6 +46,12 @@ export default class CreateTables extends Component {
         " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,share TEXT,shareId TEXT,keeperInfo TEXT,recordId TEXT,transferMethod TEXT,sharedDate TEXT,acceptedDate TEXT,lastSuccessfulCheck TEXT)",
         []
       );
+      txn.executeSql(
+        "CREATE TABLE IF NOT EXISTS " +
+        localDB.tableName.tblTrustedPartyDetails +
+        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,messageId TEXT,otpEncShare TEXT)",
+        []
+      );
       console.log( "create database." );
     } );
   }

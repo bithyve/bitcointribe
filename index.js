@@ -46,7 +46,13 @@ export default class HexaWalletWalletWallet extends React.Component
             pageName = "TabbarBottom";
           }
           utils.setRootViewController( pageName );
-          utils.setDeepLinkingUrl( response.script );
+          var script = response.script;
+          script = script.split( "_+_" ).join( "/" );
+          console.log( { script } );
+          var decpScript = utils.decrypt( script, "122334" )
+          decpScript = JSON.parse( decpScript );
+          console.log( { decpScript } );
+          utils.setDeepLinkingUrl( decpScript );
           utils.setDeepLinkingType( "SSSDetails" );
         }
       );

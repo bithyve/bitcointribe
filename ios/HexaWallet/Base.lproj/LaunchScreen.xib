@@ -14,24 +14,10 @@
         <view contentMode="scaleToFill" id="iN0-l3-epB">
             <rect key="frame" x="0.0" y="0.0" width="480" height="480"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-            <subviews>
-                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="screenbackground" translatesAutoresizingMaskIntoConstraints="NO" id="VDj-dd-0FJ">
-                    <rect key="frame" x="0.0" y="0.0" width="480" height="480"/>
-                </imageView>
-            </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-            <constraints>
-                <constraint firstItem="VDj-dd-0FJ" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="EkR-rk-oKv"/>
-                <constraint firstAttribute="bottom" secondItem="VDj-dd-0FJ" secondAttribute="bottom" id="Gep-FZ-Vc9"/>
-                <constraint firstAttribute="trailing" secondItem="VDj-dd-0FJ" secondAttribute="trailing" id="Q6T-wS-ewW"/>
-                <constraint firstItem="VDj-dd-0FJ" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="m2x-qM-aI2"/>
-            </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="548" y="455"/>
         </view>
     </objects>
-    <resources>
-        <image name="screenbackground" width="750" height="1624"/>
-    </resources>
 </document>
