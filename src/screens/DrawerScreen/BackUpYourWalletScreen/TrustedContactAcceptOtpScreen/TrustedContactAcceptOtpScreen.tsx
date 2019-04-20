@@ -9,7 +9,8 @@ import {
     Keyboard,
     StatusBar,
     Linking,
-    ImageBackground
+    ImageBackground,
+    Alert
 } from "react-native";
 import {
     Container,
@@ -70,47 +71,64 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                     cellBorderWidth: 0
                 }
             ],
+            statusConfirmBtnDisable: true,
             flag_Loading: false
         };
     }
 
-    _onFinishCheckingCode = async ( isValid: boolean, code: string ) => {
+    _onFinishCheckingCode = async ( code: string ) => {
         console.log( { code } );
+        if ( code.length == 6 ) {
+            this.setState( {
+                otp: code,
+                statusConfirmBtnDisable: false
+            } )
+        }
+    }
 
+    onSuccess = async () => {
+        const dateTime = Date.now();
+        const fulldate = Math.floor( dateTime / 1000 );
         this.setState( {
             flag_Loading: true
         } )
-        let enterOtp = code;
-        let messageId = this.props.navigation.getParam( "data" );
+        let enterOtp = this.state.otp;
+        let script = this.props.navigation.getParam( "data" );
+        let messageId = script.mi;
         let walletDetails = utils.getWalletDetails();
         const sss = new S3Service(
             walletDetails[ 0 ].mnemonic
         );
         console.log( { messageId, enterOtp } );
-
         const resDonwShare = await sss.downloadShare( messageId );
         const resDecryptOTPEncShare = await sss.decryptOTPEncShare( resDonwShare, messageId, enterOtp )
-
         console.log( { resDonwShare, resDecryptOTPEncShare } );
-    }
+        if ( resDecryptOTPEncShare != "" || resDecryptOTPEncShare != null ) {
+            const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
+                localDB.tableName.tblTrustedPartyDetails,
+                fulldate,
+                messageId,
+                resDecryptOTPEncShare
+            );
+            if ( resinsertTrustedPartyDetails ) {
+                this.setState( {
+                    flag_Loading: false
+                } )
+                setTimeout( () => {
+                    Alert.alert(
+                        'Success',
+                        'EncShare Created.',
+                        [
+                            { text: 'Cancel', onPress: () => console.log( 'Cancel Pressed!' ) },
+                            { text: 'OK', onPress: () => { this.props.navigation.pop() } },
 
-    onSuccess = ( code: string ) => {
-        let pageName = utils.getRootViewController();
-        if ( pageName == "TabbarBottom" ) {
-            const resetAction = StackActions.reset( {
-                index: 0, // <-- currect active route from actions array
-                key: null,
-                actions: [
-                    NavigationActions.navigate( {
-                        routeName: pageName
-                    } )
-                ]
-            } );
-            this.props.navigation.dispatch( resetAction );
-        } else {
-            this.setState( { flag_dialogShow: true } );
+                        ],
+                        { cancelable: false }
+                    )
+                }, 100 );
+            }
         }
-    };
+    }
 
     render() {
         return (
@@ -144,8 +162,8 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                                 ref="codeInputRef1"
                                 secureTextEntry
                                 keyboardType="default"
+                                autoCapitalize="sentences"
                                 codeLength={ 6 }
-                                compareWithCode={ this.state.otp }
                                 activeColor={ this.state.passcodeStyle[ 0 ].activeColor }
                                 inactiveColor={ this.state.passcodeStyle[ 0 ].inactiveColor }
                                 className="border-box"
@@ -160,8 +178,8 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                                     justifyContent: "center",
                                     height: Platform.OS == "ios" ? 0 : 40,
                                 } }
-                                onFulfill={ ( isValid, code ) =>
-                                    this._onFinishCheckingCode( isValid, code )
+                                onFulfill={ ( code ) =>
+                                    this._onFinishCheckingCode( code )
                                 }
                             />
                             { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
@@ -172,11 +190,11 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                             <Text note style={ { textAlign: "center", marginBottom: 30 } }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
                             <FullLinearGradientButton
                                 style={ [
-                                    this.state.status == true ? { opacity: 1 } : { opacity: 0.4 },
+                                    this.state.statusConfirmBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 },
                                     { borderRadius: 5 } ] }
-                                disabled={ this.state.status == true ? false : true }
+                                disabled={ this.state.statusConfirmBtnDisable }
                                 title="Confirm & Proceed"
-                                click_Done={ () => this.onSuccess( this.state.pincode ) }
+                                click_Done={ () => this.onSuccess() }
                             />
                         </View>
                     </KeyboardAwareScrollView>

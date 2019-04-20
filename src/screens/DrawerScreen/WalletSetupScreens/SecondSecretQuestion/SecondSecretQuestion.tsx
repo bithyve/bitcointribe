@@ -228,9 +228,16 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                         <Text note style={ { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } } numberOfLines={ 1 }>Make sure you don’t select questions, answers to </Text>
                         <FullLinearGradientButton title="Confirm & Proceed" disabled={ this.state.flag_ConfirmDisableBtn } style={ [ this.state.flag_ConfirmDisableBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } click_Done={ () => {
                             this.setState( {
-                                flag_Loading: true
+                                flag_Loading: true,
+                                flag_ConfirmDisableBtn: true
                             } )
-                            this.click_Confirm()
+                            if ( Platform.OS != "ios" ) {
+                                setTimeout( () => {
+                                    this.click_Confirm()
+                                }, 100 );
+                            } else {
+                                this.click_Confirm()
+                            }
                         } } />
                     </View>
                 </KeyboardAwareScrollView>
