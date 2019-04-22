@@ -21,6 +21,9 @@ import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 
 
+//TODO: Custome StyleSheet Files       
+import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
 //TODO: Custome Object
 import {
   colors,
@@ -182,14 +185,14 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
           <View style={ styles.viewAppLogo }>
             <Image style={ styles.imgAppLogo } source={ images.appIcon } />
             <Text
-              style={ [ { color: "#000000", fontWeight: "bold", marginTop: 20 } ] }
+              style={ [ globalStyle.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
             >
               Hello, Crypto wizard
             </Text>
           </View>
           <View style={ styles.viewFirstPasscode }>
             <Text
-              style={ { marginTop: 10, fontWeight: "bold", color: "#8B8B8B" } }
+              style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
               note
             >
               Create Passcode
@@ -252,7 +255,7 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
               }
             />
             { renderIf( this.state.passcodeSecoundStyle[ 0 ].activeColor == "red" )(
-              <Text style={ { color: "red", marginTop: 44 } }>{ this.state.success }</Text>
+              <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>
             ) }
           </View>
           <View style={ styles.viewBtnProceed }>

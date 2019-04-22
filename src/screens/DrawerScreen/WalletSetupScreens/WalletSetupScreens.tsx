@@ -26,6 +26,9 @@ import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGra
 import WalletSetUpScrolling from "HexaWallet/src/app/custcompontes/OnBoarding/WalletSetUpScrolling/WalletSetUpScrolling";
 
 
+//TODO: Custome StyleSheet Files       
+import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
 import WalletNameScreen from "./WalletNameScreen/WalletNameScreen";
 import FirstSecretQuestionScreen from "./FirstSecretQuestionScreen/FirstSecretQuestionScreen";
 import SecondSecretQuestion from "./SecondSecretQuestion/SecondSecretQuestion";
@@ -48,7 +51,7 @@ export default class WalletSetupScreens extends React.Component<any, any> {
                                 onPress={ () => this.props.navigation.pop() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Set up your wallet</Text>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Set up your wallet</Text>
                             </Button>
                         </View>
                         <WalletSetUpScrolling >

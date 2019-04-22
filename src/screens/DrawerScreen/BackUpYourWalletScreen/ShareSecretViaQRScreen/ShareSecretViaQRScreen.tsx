@@ -28,6 +28,9 @@ import QRCode from "react-native-qrcode";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
 
+//TODO: Custome StyleSheet Files       
+import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
@@ -71,7 +74,7 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
                                 onPress={ () => this.goBack() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Share Secret via QR</Text>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Share Secret via QR</Text>
                             </Button>
                         </View>
                         <KeyboardAwareScrollView
@@ -79,7 +82,7 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
                             extraScrollHeight={ 40 }
                         >
                             <View style={ { flex: 0.1, margin: 20 } }>
-                                <Text note style={ { textAlign: "center" } }>Some information about the importance of trust with these contacts</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
                             </View>
 
                             <View style={ { flex: 1, alignItems: "center" } }>
@@ -93,7 +96,7 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
                                 />
                             </View>
                             <View style={ { flex: 0.5, alignItems: "center" } }>
-                                <Text note style={ { textAlign: "center", margin: 10 } }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut faucibus pulvinar elementum integer enim neque volutpat. Leo integer malesuada nunc vel. Purus faucibus ornare suspendisse sed nisi lacus sed. Et ligula ullamcorper malesuada proin libero nunc consequat. A cras semper auctor neque vitae tempus quam pellentesque. In nisl nisi scelerisque eu ultrices vitae auctor eu augue. Sed risus ultricies tristique nulla aliquet enim tortor. Curabitur gravida arcu ac tortor dignissim convallis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Porta lorem mollis aliquam ut porttitor Leo a.</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut faucibus pulvinar elementum integer enim neque volutpat. Leo integer malesuada nunc vel. Purus faucibus ornare suspendisse sed nisi lacus sed. Et ligula ullamcorper malesuada proin libero nunc consequat. A cras semper auctor neque vitae tempus quam pellentesque. In nisl nisi scelerisque eu ultrices vitae auctor eu augue. Sed risus ultricies tristique nulla aliquet enim tortor. Curabitur gravida arcu ac tortor dignissim convallis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Porta lorem mollis aliquam ut porttitor Leo a.</Text>
                             </View>
                         </KeyboardAwareScrollView>
 

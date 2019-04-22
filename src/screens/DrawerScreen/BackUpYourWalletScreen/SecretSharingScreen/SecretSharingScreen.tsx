@@ -25,6 +25,10 @@ import { Avatar, SearchBar } from 'react-native-elements';
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+
+//TODO: Custome StyleSheet Files       
+import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
@@ -63,11 +67,11 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                                 onPress={ () => this.props.navigation.pop() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Secret Sharing</Text>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Secret Sharing</Text>
                             </Button>
                         </View>
                         <View style={ { flex: 0.1, margin: 20 } }>
-                            <Text note style={ { textAlign: "center" } }>Some information on the functionality of this screen and how a user can come back to this</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information on the functionality of this screen and how a user can come back to this</Text>
                         </View>
 
                         <View style={ { flex: 1 } }>
@@ -90,8 +94,8 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                                                     <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
                                                 ) }
                                                 <View style={ { flexDirection: "column", justifyContent: "center" } }>
-                                                    <Text style={ { marginLeft: 10, fontWeight: "bold", fontSize: 16 } }>{ item.givenName }{ " " }{ item.familyName }</Text>
-                                                    <Text style={ { marginLeft: 10, fontSize: 14, color: "#37A0DA" } }>Secret Not Shared</Text>
+                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: "#37A0DA" } ] }>Secret Not Shared</Text>
                                                 </View>
                                                 <View style={ {
                                                     flex: 1,
@@ -109,7 +113,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                             />
                         </View>
                         <View style={ { flex: 0.14, alignItems: "center" } }>
-                            <Text note style={ { textAlign: "center" } }>Some information about the importance of trust with these contacts</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
                         </View>
                     </ImageBackground>
                 </SafeAreaView>
