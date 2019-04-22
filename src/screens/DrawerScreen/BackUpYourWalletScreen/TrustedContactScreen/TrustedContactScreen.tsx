@@ -33,6 +33,10 @@ import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import ModelTrustedContactEmailAndPhoneShare from "HexaWallet/src/app/custcompontes/Model/ModelTrustedContactEmailAndPhoneShare/ModelTrustedContactEmailAndPhoneShare";
 
+
+//TODO: Custome StyleSheet Files       
+import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
@@ -227,11 +231,11 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                 onPress={ () => this.props.navigation.pop() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Trusted Contact</Text>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Trusted Contact</Text>
                             </Button>
                         </View>
                         <View style={ { flex: 0.1, margin: 20 } }>
-                            <Text note style={ { textAlign: "center" } }>Some information about the importance of trust with these contacts</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
                         </View>
                         <View style={ Platform.OS == "ios" ? { flex: 0.4 } : { flex: 0.5 } }>
                             <View style={ { flex: 1, flexDirection: 'row' } }>
@@ -245,13 +249,13 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                 </View>
                                 <View style={ { flex: 4.4 } }>
                                     <Button bordered style={ { marginLeft: 10, height: "70%", borderColor: "#D0D0D0" } }>
-                                        <Text style={ { color: "#838383" } }>Change Contact</Text>
+                                        <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#838383" } ] }>Change Contact</Text>
                                     </Button>
                                 </View>
                             </View>
                             <View style={ { flex: 1, alignItems: "center", marginRight: 20 } }>
-                                <Text style={ { fontWeight: "bold", fontSize: 17 } }>{ data.givenName }{ " " }{ data.familyName }</Text>
-                                <Text style={ { fontSize: 14, color: colors.appColor } }>Secret Not Shared</Text>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 17 } ] }>{ data.givenName }{ " " }{ data.familyName }</Text>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, color: colors.appColor } ] }>Secret Not Shared</Text>
                             </View>
                         </View>
                         <View style={ { flex: 1 } }>
@@ -268,10 +272,10 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                             </View>
                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
                                                 <View style={ { flexDirection: "row", flex: 1, } }>
-                                                    <Text style={ { marginLeft: 10, fontWeight: "bold", fontSize: 16, flex: 1, alignSelf: "flex-start" } }>Secret Created</Text>
-                                                    <Text style={ { alignSelf: "flex-end", flex: 1 } }>19 April ‘19, 11:00am</Text>
+                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16, flex: 1, alignSelf: "flex-start" } ] }>Secret Created</Text>
+                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { alignSelf: "flex-end", flex: 1 } ] }>19 April ‘19, 11:00am</Text>
                                                 </View>
-                                                <Text style={ { marginLeft: 10, fontSize: 14, color: "#37A0DA" } }>Lorem ipsum dolor sit amet, consectetur</Text>
+                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: "#37A0DA" } ] }>Lorem ipsum dolor sit amet, consectetur</Text>
                                             </View>
                                         </View>
                                     </View>
@@ -284,8 +288,8 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                             <View style={ [ Platform.OS == "ios" ? { flex: 0.6 } : { flex: 0.8 }, { marginLeft: 5, marginRight: 5 } ] }>
                                 <Text note style={ { textAlign: "center" } }>Some information about the OTP and how it works comes in this space</Text>
                                 <View style={ { flex: 0.8, backgroundColor: "#ffffff", borderRadius: 5, flexDirection: "row", alignItems: "center", justifyContent: "center", margin: 10 } }>
-                                    <Text note style={ { flex: 2, marginLeft: 10 } }>OTP</Text>
-                                    <Text style={ { flex: 8, letterSpacing: 30, alignSelf: "center", textAlign: "center" } }>{ this.state.otpCode }</Text>
+                                    <Text note style={ [ globalStyle.ffFiraSansMedium, { flex: 2, marginLeft: 10 } ] }>OTP</Text>
+                                    <Text style={ [ globalStyle.ffOpenSansBold, { flex: 8, letterSpacing: 30, alignSelf: "center", textAlign: "center" } ] }>{ this.state.otpCode }</Text>
                                 </View>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
@@ -307,17 +311,17 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         ) }
                         { renderIf( this.state.flag_OtpCodeShowStatus != true )(
                             <View style={ Platform.OS == "ios" ? { flex: 0.6 } : { flex: 0.8 } }>
-                                <Text note style={ { textAlign: "center" } }>Select how you want to share secret with the selected trusted contact</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select how you want to share secret with the selected trusted contact</Text>
                                 <Button
                                     onPress={ () => {
                                         this.props.navigation.push( "ShareSecretViaQRScreen",
                                             { onSelect: this.onSelect, data: this.state.qrCodeString }
                                         );
                                     } }
-                                    style={ {
+                                    style={ [ globalStyle.ffFiraSansSemiBold, {
                                         backgroundColor: "#838383", borderRadius: 10, margin: 5,
                                         height: 50,
-                                    } }
+                                    } ] }
                                     full>
                                     <Text>Share secret via QR code</Text>
                                 </Button>

@@ -36,9 +36,8 @@ const styles = StyleSheet.create( {
   textWhite: {
     color: "#FFFFFF",
     fontSize: 16,
+    fontFamily: "FiraSans-SemiBold",
     alignSelf: "center",
-    fontWeight: "bold",
-    fontFamily: "Avenir"
   },
   btnDone: {
     margin: 5,

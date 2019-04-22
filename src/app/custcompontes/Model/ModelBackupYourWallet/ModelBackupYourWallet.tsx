@@ -2,6 +2,12 @@ import React, { Component } from 'react';
 import { Modal, TouchableHighlight, View, Alert, StyleSheet, Platform } from 'react-native';
 import { Button, Icon, Text } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+
+
+//TODO: Custome StyleSheet Files       
+import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
+
 export default class ModelBackupYourWallet extends Component {
     render() {
         return (
@@ -19,21 +25,21 @@ export default class ModelBackupYourWallet extends Component {
                 ] }>
                     <View style={ styles.viewModelBody }>
                         <View style={ { flexDirection: "row", flex: 0.4 } }>
-                            <Text style={ { fontWeight: "bold", fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10 } }>Backup your Wallet</Text>
+                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10 } ] }>Backup your Wallet</Text>
                             <Button light iconLeft style={ { width: 40, height: 40, borderRadius: 20 } } onPress={ () => this.props.closeModal() }>
                                 <Icon name='close' style={ { alignSelf: "center" } } />
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ { textAlign: "center" } }>Some information comes here, that explains the user why they need to select trusted contacts</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information comes here, that explains the user why they need to select trusted contacts</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <Button
                                 onPress={ () => this.props.click_UseOtherMethod() }
-                                style={ {
+                                style={ [ globalStyle.ffFiraSansSemiBold, {
                                     backgroundColor: "#838383", borderRadius: 10, margin: 5,
                                     height: 50,
-                                } }
+                                } ] }
                                 full>
                                 <Text>Use other methods</Text>
                             </Button>

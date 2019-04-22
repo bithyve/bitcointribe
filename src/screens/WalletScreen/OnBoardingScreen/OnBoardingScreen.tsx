@@ -8,6 +8,10 @@ import CreateTables from "HexaWallet/src/app/manager/database/CreateTables";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import OnBoarding from "HexaWallet/src/app/custcompontes/OnBoarding/OnBoarding";
 
+
+//TODO: Custome StyleSheet Files       
+import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
 //TODO: Custome object
 import { colors, images, msg } from "HexaWallet/src/app/constants/Constants";
 
@@ -74,8 +78,8 @@ export default class OnBoardingScreen extends React.Component<any, any> {
                 resizeMode="contain"
                 source={ data[ 0 ].image }
               />
-              <Text style={ styles.header }>{ data[ 0 ].title }</Text>
-              <Text note style={ styles.text }>
+              <Text style={ [ styles.header, globalStyle.ffFiraSansBold ] }>{ data[ 0 ].title }</Text>
+              <Text note style={ [ styles.text, globalStyle.ffFiraSansMedium ] }>
                 { data[ 0 ].subtitle }
               </Text>
             </View>
@@ -86,8 +90,8 @@ export default class OnBoardingScreen extends React.Component<any, any> {
                 resizeMode="contain"
                 source={ data[ 1 ].image }
               />
-              <Text style={ styles.header }>{ data[ 1 ].title }</Text>
-              <Text note style={ styles.text }>
+              <Text style={ [ styles.header, globalStyle.ffFiraSansBold ] }>{ data[ 1 ].title }</Text>
+              <Text note style={ [ styles.text, globalStyle.ffFiraSansMedium ] }>
                 { data[ 1 ].subtitle }
               </Text>
             </View>
@@ -98,8 +102,8 @@ export default class OnBoardingScreen extends React.Component<any, any> {
                 resizeMode="contain"
                 source={ data[ 2 ].image }
               />
-              <Text style={ styles.header }>{ data[ 2 ].title }</Text>
-              <Text note style={ styles.text }>
+              <Text style={ [ styles.header, globalStyle.ffFiraSansBold ] }>{ data[ 2 ].title }</Text>
+              <Text note style={ [ styles.text, globalStyle.ffFiraSansMedium ] }>
                 { data[ 2 ].subtitle }
               </Text>
             </View>
@@ -124,10 +128,9 @@ const styles = StyleSheet.create( {
   // Header styles
   header: {
     color: "#000000",
-    fontFamily: "Avenir",
     fontSize: 30,
-    fontWeight: "bold",
     marginVertical: 15,
+    margin: 20,
     textAlign: "center"
   },
   // Text below header

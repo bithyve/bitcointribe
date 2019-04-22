@@ -43,6 +43,9 @@ import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model
 import ModelAcceptSecret from "../../../app/custcompontes/Model/ModelAcceptSecret/ModelAcceptSecret";
 
 
+//TODO: Custome StyleSheet Files       
+import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
 //TODO: Custome object
 import {
   colors,
@@ -87,6 +90,7 @@ export default class WalletScreen extends React.Component {
       arr_wallets: [],
       arr_accounts: [],
       arr_SSSDetails: [],
+      flag_cardScrolling: false,
 
       //Shiled Icons
       shiledIconPer: 1,
@@ -189,6 +193,11 @@ export default class WalletScreen extends React.Component {
     const resAccount = await dbOpration.readTablesData(
       localDB.tableName.tblAccount
     );
+    if ( resAccount.temp.length > 4 ) {
+      this.setState( {
+        flag_cardScrolling: true
+      } )
+    }
     const resSSSDetails = await dbOpration.readTablesData(
       localDB.tableName.tblSSSDetails
     );
@@ -236,6 +245,7 @@ export default class WalletScreen extends React.Component {
   }
 
   render() {
+    let flag_cardScrolling = this.state.flag_cardScrolling;
     return (
       <Container>
         <Content scrollEnabled={ false } contentContainerStyle={ styles.container }>
@@ -257,22 +267,21 @@ export default class WalletScreen extends React.Component {
                 } }
               >
                 <Animated.Text
-                  style={ {
+                  style={ [ globalStyle.ffFiraSansMedium, {
                     color: "#fff",
-                    fontWeight: "bold",
                     fontSize: this.animatedAppTextSize,
                     marginTop: 20,
                     marginBottom: 30
-                  } }
+                  } ] }
                 >
                   My Wallets
                 </Animated.Text>
                 <Animated.Text
-                  style={ {
+                  style={ [ globalStyle.ffFiraSansRegular, {
                     color: "#fff",
-                    fontSize: 16,
+                    fontSize: 14,
                     opacity: this.animatedTextOpacity
-                  } }
+                  } ] }
                 >
                   { this.state.arr_CustShiledIcon.length != 0 ? this.state.arr_CustShiledIcon[ 0 ].title : "" }
                 </Animated.Text>
@@ -314,6 +323,7 @@ export default class WalletScreen extends React.Component {
                 contentContainerStyle={ { flex: 0 } }
                 horizontal={ false }
                 pagingEnabled={ false }
+                scrollEnabled={ flag_cardScrolling == true ? true : false }
                 onScroll={ Animated.event( [
                   {
                     nativeEvent: { contentOffset: { y: this.state.scrollY } }
@@ -323,6 +333,7 @@ export default class WalletScreen extends React.Component {
                 <FlatList
                   data={ this.state.arr_accounts }
                   showsVerticalScrollIndicator={ false }
+                  scrollEnabled={ flag_cardScrolling == true ? true : false }
                   renderItem={ ( { item } ) => (
                     <RkCard
                       rkType="shadowed"
@@ -346,16 +357,14 @@ export default class WalletScreen extends React.Component {
                           size={ 40 }
                         />
                         <Text
-                          style={ {
+                          style={ [ globalStyle.ffFiraSansMedium, {
                             flex: 2,
                             fontSize: 16,
-                            fontWeight: "bold",
                             marginLeft: 10
-                          } }
+                          } ] }
                         >
                           { item.accountName }
                         </Text>
-
                         <SvgIcon name="icon_more" color="gray" size={ 15 } />
                       </View>
                       <View
@@ -374,8 +383,8 @@ export default class WalletScreen extends React.Component {
                           <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
                         </View>
                         <View style={ { flex: 4 } }>
-                          <Text note>Anant's Savings</Text>
-                          <Text style={ { fontWeight: "bold", fontSize: 18 } }>
+                          <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
+                          <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
                             60,000
                           </Text>
                         </View>
@@ -394,7 +403,7 @@ export default class WalletScreen extends React.Component {
                               size={ 25 }
                             />
                           </Button>
-                          <Button transparent>
+                          <Button transparent style={ { marginLeft: 10 } }>
                             <SvgIcon name="icon_multisig" color="gray" size={ 20 } />
                           </Button>
                         </View>
