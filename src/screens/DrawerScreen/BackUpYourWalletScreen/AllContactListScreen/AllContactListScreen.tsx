@@ -28,6 +28,9 @@ import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 
+//TODO: Custome StyleSheet Files       
+import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
@@ -103,7 +106,6 @@ export default class AllContactListScreen extends React.Component<any, any> {
             } )
         }
     }
-
     //TODO: Searching Contact List
     searchFilterFunction = ( text: string ) => {
         if ( text.length > 0 ) {
@@ -121,7 +123,6 @@ export default class AllContactListScreen extends React.Component<any, any> {
             } )
         }
     };
-
     //TODO: func click_Next
     click_Next = async () => {
         let selectedContactList = this.state.SelectedFakeContactList;
@@ -137,7 +138,6 @@ export default class AllContactListScreen extends React.Component<any, any> {
         }
     }
 
-
     render() {
         return (
             <Container>
@@ -150,7 +150,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
                                 onPress={ () => this.props.navigation.pop() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Contacts</Text>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Contacts</Text>
                             </Button>
                         </View>
                         <KeyboardAwareScrollView
@@ -161,12 +161,14 @@ export default class AllContactListScreen extends React.Component<any, any> {
                                 <View style={ { marginLeft: 10, marginRight: 10, backgroundColor: "#EDEDED", borderRadius: 10 } }>
                                     <Item style={ { borderColor: 'transparent', marginLeft: 10 } }>
                                         <Icon name="ios-search" color="#B7B7B7" />
-                                        <Input placeholder="Enter a name to begin search" placeholderTextColor="#B7B7B7"
+                                        <Input placeholder="Enter a name to begin search"
+                                            style={ [ globalStyle.ffFiraSansMedium ] }
+                                            placeholderTextColor="#B7B7B7"
                                             onChangeText={ text => this.searchFilterFunction( text ) }
                                             autoCorrect={ false } />
                                     </Item>
                                 </View>
-                                <Text note style={ { marginLeft: 10, marginRight: 10, marginBottom: 20 } }>Select three of your trusted contacts, make sure you can always reach this people to recover your wallet</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20 } ] }>Select three of your trusted contacts, make sure you can always reach this people to recover your wallet</Text>
                             </View>
                             <View style={ { flex: 1 } }>
                                 <FlatList
@@ -187,7 +189,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
                                                     { renderIf( item.thumbnailPath == "" )(
                                                         <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
                                                     ) }
-                                                    <Text style={ { alignSelf: "center", marginLeft: 10 } }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                    <Text style={ [ globalStyle.ffFiraSansRegular, { alignSelf: "center", marginLeft: 10 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
 
                                                     <View style={ {
                                                         flex: 1,

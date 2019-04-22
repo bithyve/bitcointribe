@@ -18,7 +18,15 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 //TODO: Custome Pages
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-//TODO: Custome Object
+
+
+
+//TODO: Custome StyleSheet Files       
+import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
+
+
+//TODO: Custome Object  
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 export default class FirstSecretQuestionScreen extends React.Component<any, any> {
@@ -101,8 +109,8 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                     contentContainerStyle={ { flexGrow: 1, } }
                 >
                     <View style={ styles.viewPagination }>
-                        <Text style={ { fontWeight: "bold", fontFamily: "FiraSans-Medium", fontSize: 22, textAlign: "center" } }>Step 2: Select first secret question</Text>
-                        <Text note style={ { marginTop: 20, textAlign: "center" } }>To Set up you need to select two secret questions</Text>
+                        <Text style={ [ globalStyle.ffFiraSansMedium, { fontWeight: "bold", fontSize: 22, textAlign: "center" } ] }>Step 2: Select first secret question</Text>
+                        <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>To Set up you need to select two secret questions</Text>
                     </View>
                     <View style={ styles.viewInputFiled }>
 
@@ -116,11 +124,12 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                                             </Button>
                                         </Left>
                                         <Body style={ { flex: 3 } }>
-                                            <Title style={ { color: "#000" } }>Select Question</Title>
+                                            <Title style={ [ globalStyle.ffFiraSansMedium, { color: "#000" } ] }>Select Question</Title>
                                         </Body>
                                         <Right />
                                     </Header> }
                                 mode="dropdown"
+                                style={ [ globalStyle.ffFiraSansMedium ] }
                                 iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -10 } } /> }
                                 selectedValue={ this.state.firstQuestion }
                                 onValueChange={ this.onValueChange.bind( this ) }
@@ -136,6 +145,7 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                                 keyboardType="default"
                                 autoCapitalize='sentences'
                                 placeholder='Write your answer here'
+                                style={ [ globalStyle.ffFiraSansMedium ] }
                                 placeholderTextColor="#B7B7B7"
                                 onChangeText={ ( val ) => {
                                     this.setState( {
@@ -153,6 +163,7 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                                 keyboardType="default"
                                 autoCapitalize='none'
                                 placeholder='Confirm answer'
+                                style={ [ globalStyle.ffFiraSansMedium ] }
                                 placeholderTextColor="#B7B7B7"
                                 onChangeText={ ( val ) => {
                                     this.setState( {
@@ -167,7 +178,7 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                         </Item>
                     </View>
                     <View style={ styles.viewProcedBtn }>
-                        <Text note style={ { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } } numberOfLines={ 1 }>Make sure you don’t select questions, answers to </Text>
+                        <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } ] } numberOfLines={ 1 }>Make sure you don’t select questions, answers to </Text>
                         <FullLinearGradientButton title="Confirm & Select Second Question" disabled={ this.state.flag_ConfirmDisableBtn } style={ [ this.state.flag_ConfirmDisableBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } click_Done={ () => this.click_FirstQuestion() } />
                     </View>
                 </KeyboardAwareScrollView>

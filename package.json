@@ -195,7 +195,8 @@
   },
   "rnpm": {
     "assets": [
-      "./src/assets/fonts/*"
+      "./src/assets/fonts/*",
+      "./src/assets/fonts/firaSans"
     ]
   },
   "react-native": {

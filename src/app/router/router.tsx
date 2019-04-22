@@ -280,7 +280,8 @@ const TabNavigator = createBottomTabNavigator(
       showIcon: true,
       activeTintColor: colors.appColor,
       labelStyle: {
-        fontSize: 11
+        fontSize: 11,
+        fontFamily: "FiraSans-Medium"
       },
       style: {
         backgroundColor: "#ffffff"
@@ -431,7 +432,7 @@ export const createRootNavigator = (
     },
     {
       //initialRouteName: signedIn ? "OnBoardingNavigator" : PasscodeConfirmScreen
-      initialRouteName: signedIn ? "OnBoardingNavigator" : screenName //"TabbarBottom" //
+      initialRouteName: signedIn ? "OnBoardingNavigator" : "TabbarBottom" // screenName //
       // initialRouteName: signedIn ? "OnBoardingNavigator" : "OnBoardingNavigator"
       // initialRouteName: signedIn ? "TabbarBottom" : "TabbarBottom"
     }

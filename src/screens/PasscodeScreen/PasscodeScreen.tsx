@@ -22,6 +22,10 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 
+
+//TODO: Custome StyleSheet Files       
+import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
 //TODO: Custome Object
 import {
   colors,
@@ -36,9 +40,6 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
-
-
-
 
 export default class PasscodeScreen extends Component {
   constructor ( props: any ) {
@@ -181,14 +182,14 @@ export default class PasscodeScreen extends Component {
           <View style={ styles.viewAppLogo }>
             <Image style={ styles.imgAppLogo } source={ images.appIcon } />
             <Text
-              style={ [ { color: "#000000", fontWeight: "bold", marginTop: 20 } ] }
+              style={ [ globalStyle.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
             >
               Hello, Crypto wizard
             </Text>
           </View>
           <View style={ styles.viewPasscode }>
             <Text
-              style={ { marginTop: 10, fontWeight: "bold", color: "#8B8B8B" } }
+              style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
             >
               Re - Enter Passcode{ " " }
             </Text>
@@ -218,7 +219,7 @@ export default class PasscodeScreen extends Component {
               }
             />
             { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
-              <Text style={ { color: "red", marginTop: 44 } }>{ this.state.success }</Text>
+              <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>
             ) }
           </View>
           <View style={ styles.viewBtnProceed }>
