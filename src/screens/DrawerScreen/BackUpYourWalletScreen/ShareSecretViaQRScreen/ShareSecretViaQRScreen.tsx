@@ -43,9 +43,10 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
         } )
     }
 
-    
+
     componentWillMount() {
-        let data = this.props.navigation.getParam( "data" );
+        let data = JSON.parse( this.props.navigation.getParam( "data" ) );
+        console.log( { data } );
         this.setState( {
             data: data
         } )
@@ -60,8 +61,8 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
     }
     goBack() {
         const { navigation } = this.props;
-        navigation.goBack();  
-      //  navigation.state.params.onSelect( { selected: true } );
+        navigation.goBack();
+        //  navigation.state.params.onSelect( { selected: true } );
     }
 
 
