@@ -167,6 +167,7 @@ configurations.all {
   }
 
 dependencies {
+    compile project(':react-native-background-fetch')
     compile project(':react-native-mail')
     compile project(':react-native-sms')
     compile project(':react-native-contacts')
