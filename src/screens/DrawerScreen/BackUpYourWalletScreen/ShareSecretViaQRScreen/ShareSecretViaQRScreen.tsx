@@ -42,25 +42,28 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
             data: []
         } )
     }
+
+    
     componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
         this.setState( {
             data: data
         } )
     }
+
+
     //TODO: func click_Item
     click_Item = ( item: any ) => {
         this.props.navigation.push( "TrustedContactScreen", {
             data: item
         } );
     }
-
-
     goBack() {
         const { navigation } = this.props;
-        navigation.goBack();
-        navigation.state.params.onSelect( { selected: true } );
+        navigation.goBack();  
+      //  navigation.state.params.onSelect( { selected: true } );
     }
+
 
     render() {
         return (

@@ -408,7 +408,7 @@ const updateWalletAnswerDetials = (
                 tblName +
                 " set setUpWalletAnswerDetails = :setUpWalletAnswerDetails where id = :id",
                 [
-                  utils.encrypt( answerDetails.toString(), passcode ),
+                  utils.encrypt( JSON.stringify( answerDetails ).toString(), passcode ),
                   dbdecryptId
                 ]
               );
