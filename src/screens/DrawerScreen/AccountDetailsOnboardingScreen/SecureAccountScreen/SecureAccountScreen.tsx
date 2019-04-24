@@ -19,8 +19,8 @@ import Loader from "react-native-modal-loader";
 import { colors, images, localDB } from "bithyve/src/app/constants/Constants";
 var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
 
-//TODO: SecureAccount
-import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
+//TODO: Bitcoin Files
+//import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
 
 //localization
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
@@ -33,39 +33,39 @@ export default class SecureAccountScreen extends React.Component {
     };
   }
 
-  //TODO: func click_CreateSecureAccount
-  async click_CreateSecureAccount() {
-    this.setState({ isLoading: true });
-    const resultWallet = await dbOpration.readTablesData(
-      localDB.tableName.tblWallet
-    );
-    console.log({ resultWallet });
-    var mnemonic = resultWallet.temp[0].mnemonic.replace(/,/g, " ");
-    const secureAccountAssets = await secureAccount.setupSecureAccount(
-      mnemonic
-    );
-    if (secureAccountAssets.statusCode == 200) {
-      this.props.navigation.push("SecureSecretKeyScreen", {
-        data: secureAccountAssets.data,
-        mnemonicKey: mnemonic
-      });
-    } else {
-      this.dropdown.alertWithType(
-        "error",
-        "OH",
-        secureAccountAssets.errorMessage
-      );
-    }
-    this.setState({ isLoading: false });
-  }
-
-  //TODO: func stopLoading
-
-  stopLoading(value) {
-    this.setState({
-      isLoading: value
-    });
-  }
+  // //TODO: func click_CreateSecureAccount
+  // async click_CreateSecureAccount() {
+  //   this.setState({ isLoading: true });
+  //   const resultWallet = await dbOpration.readTablesData(
+  //     localDB.tableName.tblWallet
+  //   );
+  //   console.log({ resultWallet });
+  //   var mnemonic = resultWallet.temp[0].mnemonic.replace(/,/g, " ");
+  //   const secureAccountAssets = await secureAccount.setupSecureAccount(
+  //     mnemonic
+  //   );
+  //   if (secureAccountAssets.statusCode == 200) {
+  //     this.props.navigation.push("SecureSecretKeyScreen", {
+  //       data: secureAccountAssets.data,
+  //       mnemonicKey: mnemonic
+  //     });
+  //   } else {
+  //     this.dropdown.alertWithType(
+  //       "error",
+  //       "OH",
+  //       secureAccountAssets.errorMessage
+  //     );
+  //   }
+  //   this.setState({ isLoading: false });
+  // }
+  //
+  // //TODO: func stopLoading
+  //
+  // stopLoading(value) {
+  //   this.setState({
+  //     isLoading: value
+  //   });
+  // }
 
   render() {
     const { activeSections } = this.state;

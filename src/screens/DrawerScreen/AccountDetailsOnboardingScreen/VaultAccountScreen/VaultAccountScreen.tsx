@@ -32,8 +32,8 @@ var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
 //TODO: Custome Component
 import BackButton from "bithyve/src/app/custcompontes/buttons/BackButton";
 
-//TODO: VaultAccount
-import vaultAccount from "bithyve/src/bitcoin/services/VaultAccount";
+//TODO: Bitcoin Files
+//import vaultAccount from "bithyve/src/bitcoin/services/VaultAccount";
 
 //TODO:flags
 let flag_SelectType: boolean = null;
