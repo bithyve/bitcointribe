@@ -5,6 +5,7 @@ import {
   Dimensions,
   StatusBar,
   TouchableOpacity,
+  TouchableHighlight,
   StyleSheet,
   RefreshControl,
   Platform,
@@ -12,7 +13,8 @@ import {
   FlatList,
   ScrollView,
   Animated,
-  LayoutAnimation
+  LayoutAnimation,
+  AsyncStorage
 } from "react-native";
 import {
   Container,
@@ -28,17 +30,21 @@ import {
   ListItem
 } from "native-base";
 import { RkCard } from "react-native-ui-kitten";
-import Carousel, { Pagination } from "react-native-snap-carousel";
-import Icon from "react-native-vector-icons/FontAwesome";
-import { SkypeIndicator } from "react-native-indicators";
 import DropdownAlert from "react-native-dropdownalert";
-import SvgImage from "react-native-remote-svg";
+import { SvgIcon } from "@up-shared/components";
+import IconFontAwe from "react-native-vector-icons/FontAwesome";
+import Permissions from 'react-native-permissions'
 
 //Custome Compontes
-import SCLAlertAccountTypes from "bithyve/src/app/custcompontes/alert/SCLAlertAccountTypes";
-import ViewRecentTransaction from "bithyve/src/app/custcompontes/view/ViewRecentTransaction";
-import TabBarWalletScreen from "bithyve/src/app/custcompontes/view/tabbar/TabBarWalletScreen/TabBarWalletScreen";
-import ViewWalletScreenCards from "bithyve/src/app/custcompontes/view/ViewWalletScreenCards/ViewWalletScreenCards";
+import ViewShieldIcons from "HexaWallet/src/app/custcompontes/View/ViewShieldIcons/ViewShieldIcons";
+import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
+import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model/ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
+import ModelAcceptSecret from "../../../app/custcompontes/Model/ModelAcceptSecret/ModelAcceptSecret";
+
+
+//TODO: Custome StyleSheet Files       
+import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Custome object
 import {
@@ -46,338 +52,481 @@ import {
   images,
   localDB,
   errorMessage
-} from "bithyve/src/app/constants/Constants";
-var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
-var utils = require("bithyve/src/app/constants/Utils");
-import renderIf from "bithyve/src/app/constants/validation/renderIf";
-import Singleton from "bithyve/src/app/constants/Singleton";
+} from "HexaWallet/src/app/constants/Constants";
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var utils = require( "HexaWallet/src/app/constants/Utils" );
+import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+import Singleton from "HexaWallet/src/app/constants/Singleton";
 
 let isNetwork: boolean;
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
   "window"
 );
-
-function wp(percentage: number) {
-  const value = (percentage * viewportWidth) / 100;
-  return Math.round(value);
+function wp( percentage: number ) {
+  const value = ( percentage * viewportWidth ) / 100;
+  return Math.round( value );
 }
 const slideHeight = viewportHeight * 0.36;
-const slideWidth = wp(75);
-const itemHorizontalMargin = wp(2);
+const slideWidth = wp( 75 );
+const itemHorizontalMargin = wp( 2 );
 const sliderWidth = viewportWidth;
 const itemWidth = slideWidth + itemHorizontalMargin * 2;
 const SLIDER_1_FIRST_ITEM = 0;
 
-//TODO: Wallets
-import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
+//TODO: Bitcoin Files
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+
 
 //localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
+
+
+
 export default class WalletScreen extends React.Component {
-  constructor(props: any) {
-    super(props);
+  constructor ( props: any ) {
+    super( props );
     this.state = {
       isNetwork: true,
-      tranDetails: [],
-      accountTypeList: [],
-      arr_WalletScreenCard: [],
-      accountTypeVisible: false,
-      popupData: [],
-      recentTransactionData: [],
-      walletsData: [],
-      slider1ActiveSlide: SLIDER_1_FIRST_ITEM,
-      isOpen: false,
-      refreshing: false,
-      isLoading: false,
-      isLoading1: false,
-      isNoTranstion: false,
-      cardIndexNo: 0,
-      scrollY: new Animated.Value(0)
+      arr_wallets: [],
+      arr_accounts: [],
+      arr_SSSDetails: [],
+      flag_cardScrolling: false,
+
+      //Shiled Icons
+      shiledIconPer: 1,
+      scrollY: new Animated.Value( 0 ),
+
+      //custome comp
+      arr_CustShiledIcon: [],
+
+      //Model 
+      arr_ModelBackupYourWallet: [],
+      arr_ModelFindYourTrustedContacts: [],
+      arr_ModelAcceptSecret: [],
+      //DeepLinking Param
+      deepLinkingUrl: ""
     };
     isNetwork = utils.getNetwork();
   }
 
+
+
   //TODO: Page Life Cycle
   componentWillMount() {
+    this.willFocusSubscription = this.props.navigation.addListener(
+      "willFocus",
+      () => {
+        isNetwork = utils.getNetwork();
+        this.connnection_FetchData();
+      }
+    );
+    //TODO: Animation View
     this.startHeaderHeight = 200;
     this.endHeaderHeight = 100;
-    this.animatedHeaderHeight = this.state.scrollY.interpolate({
-      inputRange: [0, 100],
-      outputRange: [this.startHeaderHeight, this.endHeaderHeight],
+    this.animatedHeaderHeight = this.state.scrollY.interpolate( {
+      inputRange: [ 0, 100 ],
+      outputRange: [ this.startHeaderHeight, this.endHeaderHeight ],
       extrapolate: "clamp"
-    });
+    } );
 
-    this.animatedScrolling = this.animatedHeaderHeight.interpolate({
-      inputRange: [this.endHeaderHeight, this.startHeaderHeight],
-      outputRange: [15, -40],
+    this.animatedMarginTopScrolling = this.animatedHeaderHeight.interpolate( {
+      inputRange: [ this.endHeaderHeight, this.startHeaderHeight ],
+      outputRange: [ 10, -35 ],
       extrapolate: "clamp"
-    });
+    } );
 
-    this.animatedAppTextSize = this.animatedHeaderHeight.interpolate({
-      inputRange: [this.endHeaderHeight, this.startHeaderHeight],
-      outputRange: [-1, 28],
+    this.animatedAppTextSize = this.animatedHeaderHeight.interpolate( {
+      inputRange: [ this.endHeaderHeight, this.startHeaderHeight ],
+      outputRange: [ 18, 24 ],
       extrapolate: "clamp"
-    });
+    } );
 
-    this.animatedApp1TextSize = this.animatedHeaderHeight.interpolate({
-      inputRange: [this.endHeaderHeight, this.startHeaderHeight],
-      outputRange: [28, -1],
+    this.animatedTextOpacity = this.animatedHeaderHeight.interpolate( {
+      inputRange: [ this.endHeaderHeight, this.startHeaderHeight ],
+      outputRange: [ 0, 1 ],
       extrapolate: "clamp"
-    });
+    } );
+    this.animatedShieldViewFlex = this.animatedHeaderHeight.interpolate( {
+      inputRange: [ this.endHeaderHeight, this.startHeaderHeight ],
+      outputRange: [ 2, 2 ],
+      extrapolate: "clamp"
+    } );
+    this.animatedShieldIconSize = this.animatedHeaderHeight.interpolate( {
+      inputRange: [ this.endHeaderHeight, this.startHeaderHeight ],
+      outputRange: [ 50, 70 ],
+      extrapolate: "clamp"
+    } );
 
-    this.animatedTextOpacity = this.animatedHeaderHeight.interpolate({
-      inputRange: [this.endHeaderHeight, this.startHeaderHeight],
-      outputRange: [0, 1],
-      extrapolate: "clamp"
-    });
 
-    this.animatedShieldViewFlex = this.animatedHeaderHeight.interpolate({
-      inputRange: [this.endHeaderHeight, this.startHeaderHeight],
-      outputRange: [3, 2],
-      extrapolate: "clamp"
-    });
+    let urlScript = utils.getDeepLinkingUrl();
+    let urlType = utils.getDeepLinkingType();
+    if ( urlType != "" ) {
+      this.setState( {
+        deepLinkingUrl: urlScript,
+        arr_ModelAcceptSecret: [
+          {
+            modalVisible: true,
+            name: urlScript.n,
+            mobileNo: urlScript.m
+          }
+        ]
+      } )
+    }
+  }
 
-    this.animatedShieldIconSize = this.animatedHeaderHeight.interpolate({
-      inputRange: [this.endHeaderHeight, this.startHeaderHeight],
-      outputRange: [60, 100],
-      extrapolate: "clamp"
-    });
+
+
+
+
+  componentWillUnmount() {
+    this.willFocusSubscription.remove();
+  }
+
+
+
+  //TODO: func connnection_FetchData
+  async connnection_FetchData() {
+    const resultWallet = await dbOpration.readTablesData(
+      localDB.tableName.tblWallet
+    );
+    await utils.setWalletDetails( resultWallet.temp );
+    const resAccount = await dbOpration.readTablesData(
+      localDB.tableName.tblAccount
+    );
+    if ( resAccount.temp.length > 4 ) {
+      this.setState( {
+        flag_cardScrolling: true
+      } )
+    }
+    const resSSSDetails = await dbOpration.readTablesData(
+      localDB.tableName.tblSSSDetails
+    );
+    //console.log( { resSSSDetails } );
+    if ( resSSSDetails.temp.length == 0 ) {
+      this.setState( {
+        shiledIconPer: 1,
+        arr_CustShiledIcon: [
+          {
+            "title": "Looks like your app needs a quick check to maintain good health",
+            "image": "shield_1",
+            "imageHeight": this.animatedShieldIconSize,
+            "imageWidth": this.animatedShieldIconSize
+          }
+        ]
+      } );
+      // this.setState( {
+      //   shiledIconPer: 3,
+      //   arr_CustShiledIcon: [
+      //     {
+      //       "title": "Your wallet is not secure, some Information about backup comes here. Click on the icon to backup",
+      //       "image": "shield_2",
+      //       "imageHeight": this.animatedShieldIconSize,
+      //       "imageWidth": this.animatedShieldIconSize
+      //     }
+      //   ]
+      // } );
+    } else {
+      this.setState( {
+        shiledIconPer: 3,
+        arr_CustShiledIcon: [
+          {
+            "title": "Your wallet is not secure, some Information about backup comes here. Click on the icon to backup",
+            "image": "shield_2",
+            "imageHeight": this.animatedShieldIconSize,
+            "imageWidth": this.animatedShieldIconSize
+          }
+        ]
+      } );
+    }
+    this.setState( {
+      arr_wallets: resultWallet.temp,
+      arr_accounts: resAccount.temp
+    } );
   }
 
   render() {
+    let flag_cardScrolling = this.state.flag_cardScrolling;
     return (
       <Container>
-        <Content scrollEnabled={false} contentContainerStyle={styles.container}>
-          <StatusBar
-            backgroundColor={colors.appColor}
-            barStyle="dark-content"
-          />
-          <SafeAreaView style={styles.container}>
-            {/* title */}
+        <Content scrollEnabled={ false } contentContainerStyle={ styles.container }>
+          <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
+          <SafeAreaView style={ styles.container }>
+            {/* Top View Animation */ }
             <Animated.View
-              style={{
+              style={ {
                 height: this.animatedHeaderHeight,
                 backgroundColor: colors.appColor,
-                flexDirection: "row"
-              }}
+                flexDirection: "row",
+                zIndex: 0
+              } }
             >
               <Animated.View
-                style={{
-                  marginLeft: 10,
+                style={ {
+                  marginLeft: 20,
                   flex: 4
-                }}
+                } }
               >
                 <Animated.Text
-                  style={{
+                  style={ [ globalStyle.ffFiraSansMedium, {
                     color: "#fff",
-                    fontWeight: "bold",
                     fontSize: this.animatedAppTextSize,
                     marginTop: 20,
-                    marginBottom: 40
-                  }}
+                    marginBottom: 30
+                  } ] }
                 >
                   My Wallets
-                  <Animated.Text
-                    style={{
-                      color: "#fff",
-                      fontWeight: "bold",
-                      fontSize: this.animatedApp1TextSize
-                    }}
-                  >
-                    Wallet
-                  </Animated.Text>
                 </Animated.Text>
                 <Animated.Text
-                  style={{
+                  style={ [ globalStyle.ffFiraSansRegular, {
                     color: "#fff",
-                    fontSize: 16,
+                    fontSize: 14,
                     opacity: this.animatedTextOpacity
-                  }}
+                  } ] }
                 >
-                  Looks like your app needs a quick check to maintain good
-                  health
+                  { this.state.arr_CustShiledIcon.length != 0 ? this.state.arr_CustShiledIcon[ 0 ].title : "" }
                 </Animated.Text>
               </Animated.View>
 
               <Animated.View
-                style={{
+                style={ {
                   flex: this.animatedShieldViewFlex,
+                  marginRight: 10,
                   alignItems: "flex-end",
                   justifyContent: "center"
-                }}
+                } }
               >
-                <Animated.Image
-                  source={images.walletScreen.walletIcon}
-                  style={[
-                    {
-                      height: this.animatedShieldIconSize,
-                      width: this.animatedShieldIconSize
-                    }
-                  ]}
-                />
+                <ViewShieldIcons data={ this.state.arr_CustShiledIcon } click_Image={ () => {
+                  if ( this.state.shiledIconPer == 1 ) {
+                    this.props.navigation.push( "WalletSetUpScreen" )
+                  } else {
+                    this.setState( {
+                      arr_ModelBackupYourWallet: [
+                        {
+                          modalVisible: true,
+                        }
+                      ]
+                    } )
+                  }
+                } } />
               </Animated.View>
             </Animated.View>
-            {/*  cards */}
+            {/*  cards */ }
             <Animated.View
-              style={{ flex: 6, marginTop: this.animatedScrolling }}
+              style={ {
+                flex: 6,
+                marginTop: this.animatedMarginTopScrolling,
+                zIndex: 1
+              } }
             >
               <ScrollView
-                scrollEventThrottle={16}
-                horizontal={false}
-                pagingEnabled={false}
-                onScroll={Animated.event([
+                scrollEventThrottle={ 40 }
+                contentContainerStyle={ { flex: 0 } }
+                horizontal={ false }
+                pagingEnabled={ false }
+                scrollEnabled={ flag_cardScrolling == true ? true : false }
+                onScroll={ Animated.event( [
                   {
                     nativeEvent: { contentOffset: { y: this.state.scrollY } }
                   }
-                ])}
+                ] ) }
               >
                 <FlatList
-                  data={[
-                    {
-                      type: "Daily Wallet",
-                      name: "Anant's Savings",
-                      amount: "60,000"
-                    },
-                    {
-                      type: "Secure Wallet",
-                      name: "Anant's Savings",
-                      amount: "60,000"
-                    },
-                    {
-                      type: "Daily Wallet",
-                      name: "Anant's Savings",
-                      amount: "60,000"
-                    },
-                    {
-                      type: "Secure Wallet",
-                      name: "Anant's Savings",
-                      amount: "60,000"
-                    }
-                  ]}
-                  showsVerticalScrollIndicator={false}
-                  renderItem={({ item }) => (
+                  data={ this.state.arr_accounts }
+                  showsVerticalScrollIndicator={ false }
+                  scrollEnabled={ flag_cardScrolling == true ? true : false }
+                  renderItem={ ( { item } ) => (
                     <RkCard
                       rkType="shadowed"
-                      style={{
+                      style={ {
                         flex: 1,
                         margin: 10,
                         borderRadius: 10
-                      }}
+                      } }
                     >
                       <View
                         rkCardHeader
-                        style={{
+                        style={ {
+                          flex: 1,
                           borderBottomColor: "#F5F5F5",
-                          borderBottomWidth: 1,
-                          marginLeft: 5,
-                          marginRight: 5,
-                          height: 60
-                        }}
+                          borderBottomWidth: 1
+                        } }
                       >
-                        <SvgImage
-                          source={require("bithyve/src/assets/images/svg/WalletScreen/lock.svg")}
-                          style={[
-                            {
-                              flex: 0.6,
-                              width: "100%",
-                              height: 55
-                            }
-                          ]}
+                        <SvgIcon
+                          name="icon_dailywallet"
+                          color="#37A0DA"
+                          size={ 40 }
                         />
                         <Text
-                          style={{ flex: 2, fontSize: 16, fontWeight: "bold" }}
+                          style={ [ globalStyle.ffFiraSansMedium, {
+                            flex: 2,
+                            fontSize: 16,
+                            marginLeft: 10
+                          } ] }
                         >
-                          {item.type}
+                          { item.accountName }
                         </Text>
-                        <Button
-                          transparent
-                          style={{
-                            alignItems: "flex-end",
-                            justifyContent: "flex-end",
-                            alignSelf: "flex-end",
-                            flex: 1
-                          }}
-                        >
-                          <SvgImage
-                            source={require("bithyve/src/assets/images/svg/WalletScreen/menu.svg")}
-                            style={[
-                              {
-                                width: "100%",
-                                height: 55
-                              }
-                            ]}
-                          />
-                        </Button>
+                        <SvgIcon name="icon_more" color="gray" size={ 15 } />
                       </View>
                       <View
                         rkCardContent
-                        style={{
+                        style={ {
                           flex: 1,
                           flexDirection: "row"
-                        }}
+                        } }
                       >
-                        <View style={{ flex: 1 }}>
-                          <SvgImage
-                            source={require("bithyve/src/assets/images/svg/WalletScreen/bitcoin-logo.svg")}
-                            style={[
-                              {
-                                width: "100%",
-                                height: 50
-                              }
-                            ]}
-                          />
+                        <View
+                          style={ {
+                            flex: 1,
+                            justifyContent: "center"
+                          } }
+                        >
+                          <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
                         </View>
-                        <View style={{ flex: 4 }}>
-                          <Text note>Anant's Savings</Text>
-                          <Text style={{ fontWeight: "bold", fontSize: 18 }}>
+                        <View style={ { flex: 4 } }>
+                          <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
+                          <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
                             60,000
                           </Text>
                         </View>
                         <View
-                          style={{
+                          style={ {
                             flex: 1,
                             flexDirection: "row",
                             alignItems: "flex-end",
                             justifyContent: "flex-end"
-                          }}
+                          } }
                         >
-                          <Button
-                            transparent
-                            primary
-                            style={{ alignSelf: "flex-end" }}
-                          >
-                            <Icon name="history" color="gray" size={15} />
+                          <Button transparent>
+                            <SvgIcon
+                              name="icon_timelock"
+                              color="gray"
+                              size={ 25 }
+                            />
                           </Button>
-                          <Button
-                            transparent
-                            primary
-                            style={{ alignSelf: "flex-end", marginLeft: 10 }}
-                          >
-                            <Icon name="users" color="gray" size={15} />
+                          <Button transparent style={ { marginLeft: 10 } }>
+                            <SvgIcon name="icon_multisig" color="gray" size={ 20 } />
                           </Button>
                         </View>
                       </View>
                     </RkCard>
-                  )}
-                  keyExtractor={(item, index) => index}
+                  ) }
+                  keyExtractor={ ( item, index ) => index }
                 />
               </ScrollView>
             </Animated.View>
           </SafeAreaView>
         </Content>
-        <DropdownAlert ref={ref => (this.dropdown = ref)} />
-        <Button transparent style={styles.plusButtonBottom}>
-          <SvgImage
-            source={images.svgImages.walletScreen.plusButtonBottom}
-            style={[styles.svgImage]}
-          />
+        <DropdownAlert ref={ ref => ( this.dropdown = ref ) } />
+        <Button transparent style={ styles.plusButtonBottom }>
+          <IconFontAwe name="plus" size={ 20 } color="#fff" />
         </Button>
+        <ModelBackupYourWallet data={ this.state.arr_ModelBackupYourWallet }
+          click_UseOtherMethod={ () => alert( 'working' ) }
+          click_Confirm={ async () => {
+            AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
+            this.setState( {
+              arr_ModelBackupYourWallet: [
+                {
+                  modalVisible: false
+                }
+              ],
+              arr_ModelFindYourTrustedContacts: [
+                {
+                  modalVisible: true
+                }
+              ]
+            } );
+            try {
+              Permissions.request( 'contacts' ).then( response => {
+                console.log( { response } );
+              } );
+              Permissions.request( 'readSms' ).then( response => {
+                console.log( { response } );
+              } );
+
+
+            } catch ( err ) {
+              console.warn( err );
+            }
+          } }
+          closeModal={ () => {
+            this.setState( {
+              arr_ModelBackupYourWallet: [
+                {
+                  modalVisible: false
+                }
+              ]
+            } )
+          } }
+        />
+        <ModelFindYourTrustedContacts
+          data={ this.state.arr_ModelFindYourTrustedContacts }
+          click_Confirm={ () => {
+            AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
+            this.setState( {
+              arr_ModelFindYourTrustedContacts: [
+                {
+                  modalVisible: false
+                }
+              ]
+            } )
+            this.props.navigation.push( "BackUpYourWalletNavigator" )
+          } }
+          closeModal={ () => {
+            this.setState( {
+              arr_ModelFindYourTrustedContacts: [
+                {
+                  modalVisible: false
+                }
+              ]
+            } )
+          } }
+        />
+        <ModelAcceptSecret
+          data={ this.state.arr_ModelAcceptSecret }
+          closeModal={ () => {
+            this.setState( {
+              arr_ModelAcceptSecret: [
+                {
+                  modalVisible: false,
+                  name: "",
+                  mobileNo: ""
+                }
+              ]
+            } )
+          } }
+          click_RejectSecret={ () => {
+            utils.setDeepLinkingType( "" );
+            utils.setDeepLinkingUrl( "" );
+            this.setState( {
+              arr_ModelAcceptSecret: [
+                {
+                  modalVisible: false,
+                  name: "",
+                  mobileNo: ""
+                }
+              ]
+            } )
+          } }
+          click_AcceptSecret={ () => {
+            this.setState( {
+              arr_ModelAcceptSecret: [
+                {
+                  modalVisible: false,
+                  name: "",
+                  mobileNo: ""
+                }
+              ]
+            } )
+            this.props.navigation.push( "TrustedContactAcceptNavigator", { data: this.state.deepLinkingUrl } )
+          } }
+        />
       </Container>
     );
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1
   },
@@ -386,16 +535,18 @@ const styles = StyleSheet.create({
     width: "100%"
   },
   plusButtonBottom: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     position: "absolute",
     bottom: 10,
     right: 10,
     alignSelf: "center",
+    backgroundColor: colors.appColor,
     justifyContent: "center"
   },
   svgImage: {
     width: "100%",
     height: "100%"
   }
-});
+} );

@@ -73,12 +73,17 @@ apply plugin: 'io.fabric'
  */
 
 project.ext.react = [
-    entryFile: "index.js"
+    entryFile: "index.js"   
 ]
+
+project.ext.vectoricons = [       
+    iconFontNames: [ 'icomoon.ttf' ] // Name of the font files you want to copy
+]   
 
 apply from: "../../node_modules/react-native/react.gradle"
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
+
 /**
  * Set this to true to create two separate APKs instead of one:
  *   - An APK that only works on ARM devices
@@ -88,28 +93,28 @@ apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.grad
  * the correct one based on the CPU architecture of their device.
  */
 def enableSeparateBuildPerCPUArchitecture = false
-
+    
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
 def enableProguardInReleaseBuilds = false
-
+    
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.bithyve.hexa"
+        applicationId "com.hexawallet"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        multiDexEnabled true
         versionCode 1
-        versionName "1.0.0.280319"
+        versionName "1.0"
+         multiDexEnabled true
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
     }
-    packagingOptions {
+     packagingOptions {
         pickFirst '**/libgnustl_shared.so'
     }
     splits {
@@ -119,8 +124,8 @@ android {
             universalApk false  // If true, also generate a universal APK
             include "armeabi-v7a", "x86"
         }
-    }
-    signingConfigs {
+    }  
+     signingConfigs {
 release {
 storeFile file("hexawallet.keystore")
  storePassword "developer"
@@ -130,11 +135,15 @@ keyAlias "hexawallet"
  }
     buildTypes {
         release {
-              aaptOptions.cruncherEnabled=false // here
+               aaptOptions.cruncherEnabled=false // here
+                signingConfig signingConfigs.release
+            //     minifyEnabled true
+            // shrinkResources true
+            // zipAlignEnabled true
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
-    }
+    }  
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -151,16 +160,21 @@ keyAlias "hexawallet"
 }
 
 configurations.all {
+
  resolutionStrategy {
         force 'org.webkit:android-jsc:r236355'
  }
   }
 
 dependencies {
+    compile project(':react-native-mail')
+    compile project(':react-native-sms')
+    compile project(':react-native-contacts')
     compile project(':react-native-webview')
-compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
 transitive = true;
 }
+  implementation 'com.android.support:multidex:1.0.3'
 compile project(':react-native-sqlite-storage')
     compile project(':react-native-view-shot')
     compile project(':react-native-vector-icons')
@@ -172,6 +186,7 @@ compile project(':react-native-sqlite-storage')
     compile project(':react-native-share')
     compile project(':react-native-randombytes')
     compile project(':react-native-os')
+    compile project(':react-native-linear-gradient')
     compile project(':react-native-lewin-qrcode')
     compile project(':react-native-keychain')
     compile project(':react-native-inappbrowser-reborn')

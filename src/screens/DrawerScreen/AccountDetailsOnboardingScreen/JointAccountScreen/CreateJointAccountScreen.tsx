@@ -40,9 +40,11 @@ import {
   msg
 } from "bithyve/src/app/constants/Constants";
 import SCLAlertOk from "bithyve/src/app/custcompontes/alert/SCLAlertOk";
-//TODO: VaultAccount
-import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
+
 const { width } = Dimensions.get("screen");
+
+//TODO: Bitcoin Files
+//import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
 
 //localization
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
@@ -83,42 +85,42 @@ export default class CreateJointAccountScreen extends React.Component {
   //   }
   // }
 
-  //TODO: func selfCreateJointAccount
-  componentWillMount() {
-    let qrCodeData = this.props.navigation.getParam("data");
-    console.log({ qrCodeData });
-    if (qrCodeData != "") {
-      this.selfCreateJointAccount(qrCodeData);
-    }
-  }
+  // //TODO: func selfCreateJointAccount
+  // componentWillMount() {
+  //   let qrCodeData = this.props.navigation.getParam("data");
+  //   console.log({ qrCodeData });
+  //   if (qrCodeData != "") {
+  //     this.selfCreateJointAccount(qrCodeData);
+  //   }
+  // }
 
-  async selfCreateJointAccount(data: any) {
-    const dateTime = Date.now();
-    const fulldate = Math.floor(dateTime / 1000);
-    const resultWallet = await dbOpration.readTablesData(
-      localDB.tableName.tblWallet
-    );
-    let mnemonic = resultWallet.temp[0].mnemonic.replace(/,/g, " ");
-    const details = {
-      jointDetails: data
-    };
-    const resJointAccountCreate = jointAccount.createInitiatedJointAccount(
-      mnemonic,
-      details
-    );
-    const additionalInfo = {
-      scripts: resJointAccountCreate.multiSig.scripts,
-      jointData: JSON.parse(resJointAccountCreate.creationJSON)
-    };
-    if (flag_createJoinAccount) {
-      this.connection_CreateJointAccount(
-        fulldate,
-        resJointAccountCreate.multiSig.address,
-        additionalInfo
-      );
-      flag_createJoinAccount = false;
-    }
-  }
+  // async selfCreateJointAccount(data: any) {
+  //   const dateTime = Date.now();
+  //   const fulldate = Math.floor(dateTime / 1000);
+  //   const resultWallet = await dbOpration.readTablesData(
+  //     localDB.tableName.tblWallet
+  //   );
+  //   let mnemonic = resultWallet.temp[0].mnemonic.replace(/,/g, " ");
+  //   const details = {
+  //     jointDetails: data
+  //   };
+  //   const resJointAccountCreate = jointAccount.createInitiatedJointAccount(
+  //     mnemonic,
+  //     details
+  //   );
+  //   const additionalInfo = {
+  //     scripts: resJointAccountCreate.multiSig.scripts,
+  //     jointData: JSON.parse(resJointAccountCreate.creationJSON)
+  //   };
+  //   if (flag_createJoinAccount) {
+  //     this.connection_CreateJointAccount(
+  //       fulldate,
+  //       resJointAccountCreate.multiSig.address,
+  //       additionalInfo
+  //     );
+  //     flag_createJoinAccount = false;
+  //   }
+  // }
 
   async connection_CreateJointAccount(
     fulldate: string,

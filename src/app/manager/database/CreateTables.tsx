@@ -3,8 +3,8 @@ import SQLite from "react-native-sqlite-storage";
 import { localDB } from "../../../app/constants/Constants";
 
 export default class CreateTables extends Component {
-  constructor(props) {
-    super(props);
+  constructor ( props ) {
+    super( props );
   }
 
   componentDidMount() {
@@ -14,46 +14,58 @@ export default class CreateTables extends Component {
       this.errorCB
     );
 
-    db.transaction(function(txn) {
+    db.transaction( function ( txn ) {
       //TODO: TABLE
       txn.executeSql(
         "CREATE TABLE IF NOT EXISTS " +
-          localDB.tableName.tblWallet +
-          " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,mnemonic TEXT,privateKey TEXT,address TEXT,publicKey TEXT,walletType TEXT,lastUpdated TEXT)",
+        localDB.tableName.tblWallet +
+        "(id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,mnemonic TEXT,privateKey TEXT,address TEXT,publicKey TEXT,walletType TEXT,setUpWalletAnswerDetails TEXT,lastUpdated TEXT)",
         []
       );
       txn.executeSql(
         "CREATE TABLE IF NOT EXISTS " +
-          localDB.tableName.tblAccountType +
-          " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,name TEXT,lastUpdated TEXT)",
+        localDB.tableName.tblAccountType +
+        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,name TEXT,lastUpdated TEXT)",
         []
       );
       txn.executeSql(
         "CREATE TABLE IF NOT EXISTS " +
-          localDB.tableName.tblAccount +
-          " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,address TEXT,balance TEXT,unit TEXT,accountName TEXT,accountType TEXT,additionalInfo TEXT,lastUpdated TEXT,FOREIGN KEY(accountType) REFERENCES tblAccountType(name))",
+        localDB.tableName.tblAccount +
+        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,address TEXT,balance TEXT,unit TEXT,accountName TEXT,accountType TEXT,additionalInfo TEXT,lastUpdated TEXT)",
         []
       );
       txn.executeSql(
         "CREATE TABLE IF NOT EXISTS " +
-          localDB.tableName.tblTransaction +
-          " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,accountAddress TEXT,transactionHash TEXT,balance INTEGER,unit TEXT,fees INTEGER,transactionType TEXT,confirmationType TEXT,lastUpdated TEXT,FOREIGN KEY(accountAddress) REFERENCES tblAccount(address))",
+        localDB.tableName.tblTransaction +
+        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,accountAddress TEXT,transactionHash TEXT,balance INTEGER,unit TEXT,fees INTEGER,transactionType TEXT,confirmationType TEXT,lastUpdated TEXT)",
         []
       );
-      console.log("create database.");
-    });
+      txn.executeSql(
+        "CREATE TABLE IF NOT EXISTS " +
+        localDB.tableName.tblSSSDetails +
+        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,share TEXT,shareId TEXT,keeperInfo TEXT,recordId TEXT,transferMethod TEXT,sharedDate TEXT,acceptedDate TEXT,lastSuccessfulCheck TEXT)",
+        []
+      );
+      txn.executeSql(
+        "CREATE TABLE IF NOT EXISTS " +
+        localDB.tableName.tblTrustedPartyDetails +
+        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,messageId TEXT,otpEncShare TEXT)",
+        []
+      );
+      console.log( "create database." );
+    } );
   }
 
-  errorCB(err) {
-    console.log("SQL Error: " + err);
+  errorCB( err ) {
+    console.log( "SQL Error: " + err );
   }
 
   successCB() {
-    console.log("SQL executed fine");
+    console.log( "SQL executed fine" );
   }
 
   openCB() {
-    console.log("Database OPENED");
+    console.log( "Database OPENED" );
   }
 
   render() {

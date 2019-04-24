@@ -1,6 +1,3 @@
-/**
- * Created by dungtran on 8/20/17.
- */
 import React, { Component } from "react";
 import {
   StyleSheet,
@@ -8,300 +5,298 @@ import {
   View,
   AsyncStorage,
   Animated,
+  Platform,
+  KeyboardAvoidingView,
+  Image,
   StatusBar
 } from "react-native";
 import { StackActions, NavigationActions } from "react-navigation";
 import CodeInput from "react-native-confirmation-code-input";
 import * as Keychain from "react-native-keychain";
-import DropdownAlert from "react-native-dropdownalert";
-import Loader from "react-native-modal-loader";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //TODO: Custome Pages
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+
+
+//TODO: Custome StyleSheet Files       
+import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
+//TODO: Custome Object
 import {
   colors,
   localDB,
-  errorValidMsg
-} from "bithyve/src/app/constants/Constants";
-var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
-var utils = require("bithyve/src/app/constants/Utils");
-import renderIf from "bithyve/src/app/constants/validation/renderIf";
-import Singleton from "bithyve/src/app/constants/Singleton";
+  errorValidMsg,
+  images
+} from "HexaWallet/src/app/constants/Constants";
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var utils = require( "HexaWallet/src/app/constants/Utils" );
+import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+import Singleton from "HexaWallet/src/app/constants/Singleton";
 
-//TODO: RegularAccount
-import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
+//TODO: Bitcoin Files
 
-//localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
 
-export default class PasscodeConfirmScreen extends Component {
-  constructor(props) {
-    super(props);
+//TODO: Local Varible    
+let isNetwork: Boolean;
+
+//TODO: Localization   
+import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
+
+
+export default class PasscodeConfirmScreen extends Component<any, any> {
+  constructor ( props: any ) {
+    super( props );
     this.state = {
-      mnemonicValues: [],
-      status: "choice",
+      mnemonicValues: "",
+      status: false,
       pincode: "",
-      success: localization("PasscodeConfirmScreen.subTitle"),
+      success: "Passcode does not match!",
+      passcodeSecoundStyle: [
+        {
+          activeColor: colors.black,
+          inactiveColor: colors.black,
+          cellBorderWidth: 0
+        }
+      ],
       isLoading: false
     };
     isNetwork = utils.getNetwork();
   }
 
-  //TODO: Page Life Cycle
-  componentWillMount() {
-    this.animatedValue = new Animated.Value(0);
-    this.value = 0;
-    this.animatedValue.addListener(({ value }) => {
-      this.value = value;
-    });
-    this.frontInterpolate = this.animatedValue.interpolate({
-      inputRange: [0, 180],
-      outputRange: ["0deg", "180deg"]
-    });
-    this.backInterpolate = this.animatedValue.interpolate({
-      inputRange: [0, 180],
-      outputRange: ["180deg", "360deg"]
-    });
-    this.frontOpacity = this.animatedValue.interpolate({
-      inputRange: [89, 90],
-      outputRange: [1, 0]
-    });
-    this.backOpacity = this.animatedValue.interpolate({
-      inputRange: [89, 90],
-      outputRange: [0, 1]
-    });
+  // async componentDidMount() {
+  //   // let mnemonic = await utils.getMnemonic();
+  //   // alert( { mnemonic } );
+  //   this.setState( {
+  //     mnemonicValues: utils.getMnemonic()
+  //   } );
+  // }
+
+  onCheckPincode( code: any ) {
+    this.setState( {
+      pincode: code
+    } );
   }
 
-  onCheckPincode(code: any) {
-    this.setState({
-      status: "confirm",
-      pincode: code,
-      success: localization("PasscodeConfirmScreen.subTitleConfirm")
-    });
-    this.flipCard();
-  }
-
-  flipCard() {
-    if (this.value >= 90) {
-      Animated.spring(this.animatedValue, {
-        toValue: 0,
-        friction: 8,
-        tension: 10
-      }).start();
-    } else {
-      Animated.spring(this.animatedValue, {
-        toValue: 180,
-        friction: 8,
-        tension: 10
-      }).start();
-    }
-  }
-
-  _onFinishCheckingCode2(isValid, code) {
-    if (isValid) {
-      this.setState({
-        isLoading: true
-      });
-      this.saveData(code);
-    } else {
-      this.dropdown.alertWithType(
-        "error",
-        localization("PasscodeConfirmScreen.issuetitle"),
-        localization("PasscodeConfirmScreen.issueSubTitle")
-      );
-    }
-  }
-
-  saveData = async (code: string) => {
-    let commonData = Singleton.getInstance();
-    commonData.setPasscode(code);
-    const {
-      mnemonic,
-      address,
-      privateKey,
-      keyPair
-    } = await RegularAccount.createWallet();
-    const publicKey = keyPair.publicKey.toString("hex");
-    this.setState({
-      mnemonicValues: mnemonic.split(" ")
-    });
-    if (this.state.mnemonicValues.length > 0) {
-      //mnemonic key
-      var mnemonicValue = this.state.mnemonicValues;
-      var priKeyValue = privateKey;
-      //User Details Data
-      const dateTime = Date.now();
-      const fulldate = Math.floor(dateTime / 1000);
-      const resultAccountType = await dbOpration.insertAccountTypeData(
-        localDB.tableName.tblAccountType,
-        fulldate
-      );
-      if (resultAccountType) {
-        const resultCreateWallet = await dbOpration.insertWallet(
-          localDB.tableName.tblWallet,
-          fulldate,
-          mnemonicValue,
-          priKeyValue,
-          address,
-          publicKey,
-          "Primary"
-        );
-        if (resultCreateWallet) {
-          const resultCreateAccountSaving = await dbOpration.insertCreateAccount(
-            localDB.tableName.tblAccount,
-            fulldate,
-            address,
-            "BTC",
-            "Savings",
-            "Savings",
-            ""
-          );
-          if (resultCreateAccountSaving) {
-            const resultCreateAccount = await dbOpration.insertCreateAccount(
-              localDB.tableName.tblAccount,
-              fulldate,
-              "",
-              "",
-              "UnKnown",
-              "UnKnown",
-              ""
-            );
-            if (resultCreateAccount) {
-              try {
-                const username = "HexaWallet";
-                const password = code;
-                // Store the credentials
-                await Keychain.setGenericPassword(username, password);
-                AsyncStorage.setItem(
-                  "PasscodeCreateStatus",
-                  JSON.stringify(true)
-                );
-              } catch (error) {
-                // Error saving data
-              }
-              this.setState({
-                success: "Ok"
-                //isLoading: false
-              });
-              const resetAction = StackActions.reset({
-                index: 0, // <-- currect active route from actions array
-                key: null,
-                actions: [
-                  NavigationActions.navigate({ routeName: "TabbarBottom" })
-                ]
-              });
-              this.props.navigation.dispatch(resetAction);
-            }
+  _onFinishCheckingCode2( isValid: boolean, code: any ) {
+    if ( isValid ) {
+      this.setState( {
+        pincode: code,
+        status: true,
+        passcodeSecoundStyle: [
+          {
+            activeColor: colors.black,
+            inactiveColor: colors.black,
+            cellBorderWidth: 0,
           }
+        ]
+      } );
+    } else {
+      this.setState( {
+        passcodeSecoundStyle: [
+          {
+            activeColor: "red",
+            inactiveColor: "red",
+            cellBorderWidth: 1
+          }
+        ]
+      } );
+    }
+  }
+
+  saveData = async () => {
+    try {
+      this.setState( {
+        isLoading: true
+      } )
+      let code = this.state.pincode;
+      let commonData = Singleton.getInstance();
+      commonData.setPasscode( code );
+      let mnemonic = [ "silent", "useless", "panic", "cousin", "page", "black", "abandon", "ticket", "hand", "minor", "stand", "excite" ]; //await utils.getMnemonic(); //this.state.mnemonicValues;
+      console.log( { mnemonic } );
+      const dateTime = Date.now();
+      const fulldate = Math.floor( dateTime / 1000 );
+      const resultCreateWallet = await dbOpration.insertWallet(
+        localDB.tableName.tblWallet,
+        fulldate,
+        mnemonic,
+        "",
+        "",
+        "",
+        "Primary"
+      );
+      if ( resultCreateWallet ) {
+        const resultCreateDailyWallet = await dbOpration.insertCreateAccount(
+          localDB.tableName.tblAccount,
+          fulldate,
+          "",
+          "BTC",
+          "Daily Wallet",
+          "Daily Wallet",
+          ""
+        );
+        console.log( { resultCreateDailyWallet } );
+        if ( resultCreateDailyWallet ) {
+          try {
+            const username = "HexaWallet";
+            const password = code;
+            // Store the credentials
+            await Keychain.setGenericPassword( username, password );
+            AsyncStorage.setItem(
+              "PasscodeCreateStatus",
+              JSON.stringify( true )
+            );
+          } catch ( error ) {
+            // Error saving data
+          }
+          this.setState( {
+            isLoading: false
+          } );
+          const resetAction = StackActions.reset( {
+            index: 0, // <-- currect active route from actions array
+            key: null,
+            actions: [
+              NavigationActions.navigate( { routeName: "TabbarBottom" } )
+            ]
+          } );
+          this.props.navigation.dispatch( resetAction );
+        } else {
+          alert( 'issue' );
         }
+      } else {
+        alert( 'issue 1' );
       }
+    } catch ( e ) {
+      console.log( { e } );
     }
   };
 
   render() {
-    const frontAnimatedStyle = {
-      transform: [{ rotateY: this.frontInterpolate }]
-    };
-    const backAnimatedStyle = {
-      transform: [{ rotateY: this.backInterpolate }]
-    };
     return (
-      <View style={styles.container}>
-        <StatusBar backgroundColor={colors.appColor} barStyle="dark-content" />
-        <Text
-          style={[styles.txtTitle, { color: "#000000", fontWeight: "bold" }]}
+      <View style={ styles.container }>
+        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ true } barStyle="dark-content" />
+        <KeyboardAwareScrollView
+          enableOnAndroid
+          extraScrollHeight={ 40 }
+          contentContainerStyle={ { flexGrow: 1, } }
         >
-          {localization("appConfig.appName")}
-        </Text>
-        <Text style={{ color: "#000", marginTop: 10 }}>
-          {this.state.success}
-        </Text>
-        {renderIf(this.state.status == "choice")(
-          <Animated.View
-            style={[
-              styles.flipCard,
-              frontAnimatedStyle,
-              { opacity: this.frontOpacity }
-            ]}
-          >
+          <View style={ styles.viewAppLogo }>
+            <Image style={ styles.imgAppLogo } source={ images.appIcon } />
+            <Text
+              style={ [ globalStyle.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
+            >
+              Hello, Crypto wizard
+            </Text>
+          </View>
+          <View style={ styles.viewFirstPasscode }>
+            <Text
+              style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
+              note
+            >
+              Create Passcode
+            </Text>
             <CodeInput
-              ref="codeInputRef2"
+              ref="codeInputRef"
               secureTextEntry
               keyboardType="numeric"
-              codeLength={4}
-              activeColor={colors.black}
-              inactiveColor={colors.black}
-              className="border-circle"
-              cellBorderWidth={2}
-              autoFocus={true}
+              codeLength={ 5 }
+              activeColor={ colors.black }
+              inactiveColor={ colors.black }
+              className="border-box"
+              cellBorderWidth={ 0 }
+              autoFocus={ true }
               inputPosition="center"
-              inputPosition="center"
-              space={10}
-              size={50}
-              codeInputStyle={{ borderWidth: 1.5 }}
-              codeInputStyle={{ fontWeight: "800" }}
-              onFulfill={code => this.onCheckPincode(code)}
+              space={ 10 }
+              size={ 55 }
+              containerStyle={ {
+                alignItems: "center",
+                justifyContent: "center",
+                height: Platform.OS == "ios" ? 0 : 40,
+              } }
+              codeInputStyle={ {
+                borderRadius: 5,
+                backgroundColor: "#F1F1F1"
+              } }
+              onFulfill={ code => this.onCheckPincode( code ) }
             />
-          </Animated.View>
-        )}
-        {renderIf(this.state.status == "confirm")(
-          <Animated.View
-            style={[
-              styles.flipCard,
-              styles.flipCardBack,
-              backAnimatedStyle,
-              { opacity: this.backOpacity }
-            ]}
-          >
+          </View>
+          <View style={ styles.viewSecoundPasscode }>
+            <Text
+              style={ { marginTop: 10, fontWeight: "bold", color: "#8B8B8B" } }
+            >
+              Re - Enter Passcode{ " " }
+            </Text>
             <CodeInput
-              ref="codeInputRef2"
+              ref="codeInputRef1"
               secureTextEntry
               keyboardType="numeric"
-              codeLength={4}
-              activeColor={colors.black}
-              inactiveColor={colors.black}
-              className="border-circle"
-              cellBorderWidth={2}
-              compareWithCode={this.state.pincode}
-              autoFocus={true}
+              codeLength={ 5 }
+              activeColor={ this.state.passcodeSecoundStyle[ 0 ].activeColor }
+              inactiveColor={ this.state.passcodeSecoundStyle[ 0 ].inactiveColor }
+              className="border-box"
+              cellBorderWidth={
+                this.state.passcodeSecoundStyle[ 0 ].cellBorderWidth
+              }
+              compareWithCode={ this.state.pincode }
+              autoFocus={ false }
               inputPosition="center"
-              inputPosition="center"
-              space={10}
-              size={50}
-              codeInputStyle={{ borderWidth: 1.5 }}
-              codeInputStyle={{ fontWeight: "800" }}
-              onFulfill={(isValid, code) =>
-                this._onFinishCheckingCode2(isValid, code)
+              space={ 10 }
+              size={ 55 }
+              codeInputStyle={ { borderRadius: 5, backgroundColor: "#F1F1F1" } }
+              containerStyle={ {
+                alignItems: "center",
+                justifyContent: "center",
+                height: Platform.OS == "ios" ? 0 : 40,
+              } }
+              onFulfill={ ( isValid, code ) =>
+                this._onFinishCheckingCode2( isValid, code )
               }
             />
-          </Animated.View>
-        )}
-        <DropdownAlert ref={ref => (this.dropdown = ref)} />
-        <Loader loading={this.state.isLoading} color={colors.appColor} />
+            { renderIf( this.state.passcodeSecoundStyle[ 0 ].activeColor == "red" )(
+              <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>
+            ) }
+          </View>
+          <View style={ styles.viewBtnProceed }>
+            <FullLinearGradientButton
+              style={ [
+                this.state.status == true ? { opacity: 1 } : { opacity: 0.4 }, { borderRadius: 5 } ] }
+              disabled={ this.state.status == true ? false : true }
+              title="PROCEED"
+              click_Done={ () => this.saveData() }
+            />
+          </View>
+        </KeyboardAwareScrollView>
+        <Loader loading={ this.state.isLoading } color={ colors.appColor } size={ 30 } />
       </View>
     );
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
-    flex: 1,
-    alignItems: "center"
-  },
-  cardContainer: {
     flex: 1
   },
-  txtText: {
-    color: colors.appColor,
-    fontFamily: "Lalezar"
+  viewAppLogo: {
+    flex: 0.5,
+    alignItems: "center",
+    marginTop: 50
   },
-  txtTitle: {
-    marginTop: 100,
-    fontSize: 40
+  viewFirstPasscode: {
+    flex: 1.4,
+    alignItems: "center"
   },
-  //code:new style
-  inputWrapper3: {
-    paddingVertical: 50,
-    paddingHorizontal: 20,
-    backgroundColor: "#2F0B3A"
+  viewSecoundPasscode: {
+    flex: 1.4,
+    alignItems: "center"
+  },
+  viewBtnProceed: {
+    flex: 0.2,
+    marginTop: 20
+  },
+  imgAppLogo: {
+    height: 150,
+    width: 150
   }
-});
+} );
