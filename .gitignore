@@ -36,6 +36,10 @@ yarn-error.log
 /.env.dev
 /.env
 /env.dev
+/.env.local
+/.env.prod
+/.env.live
+/.env.staging
 
 #Documents
 /src/assets/Documents
