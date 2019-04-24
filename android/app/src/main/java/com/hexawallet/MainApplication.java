@@ -3,6 +3,7 @@ package com.hexawallet;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
 import com.chirag.RNMail.RNMail;
 import com.tkporter.sendsms.SendSMSPackage;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
@@ -52,6 +53,7 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
          new SQLitePluginPackage(),
           new MainReactPackage(),
+            new RNBackgroundFetchPackage(),
             new RNMail(),
             SendSMSPackage.getInstance(),
             new ReactNativeContacts(),

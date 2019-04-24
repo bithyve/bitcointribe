@@ -133,6 +133,7 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
             jsonAnswerDetails.firstAnswer = firstAnswer;
             jsonAnswerDetails.secoundQuestion = secoundQuestion;
             jsonAnswerDetails.secoundAnser = secoundAnser;
+            console.log( { jsonAnswerDetails } );
             await dbOpration.updateWalletAnswerDetials(
                 localDB.tableName.tblWallet,
                 jsonAnswerDetails,

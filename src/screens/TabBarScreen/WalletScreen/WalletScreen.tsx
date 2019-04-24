@@ -189,6 +189,8 @@ export default class WalletScreen extends React.Component {
     const resultWallet = await dbOpration.readTablesData(
       localDB.tableName.tblWallet
     );
+    console.log( { resultWallet } );
+
     await utils.setWalletDetails( resultWallet.temp );
     const resAccount = await dbOpration.readTablesData(
       localDB.tableName.tblAccount
@@ -398,9 +400,9 @@ export default class WalletScreen extends React.Component {
                         >
                           <Button transparent>
                             <SvgIcon
-                              name="icon_timelock"
+                              name="timelockNew"
                               color="gray"
-                              size={ 25 }
+                              size={ 20 }
                             />
                           </Button>
                           <Button transparent style={ { marginLeft: 10 } }>
