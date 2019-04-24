@@ -5,12 +5,16 @@ import {
   ScrollView, // Handles navigation between screens
   StyleSheet, // CSS-like styles
   View,
-  Text // Container component
+  Text,
+  StatusBar
 } from "react-native";
-import Button from "./Button";
+import { Button } from "native-base";
+import LinearGradient from "react-native-linear-gradient";
 
+//TODO: Custome object
+import { colors } from "HexaWallet/src/app/constants/Constants";
 // Detect screen width and height
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get( "window" );
 
 interface Props {
   click_GetStarted: Function;
@@ -37,17 +41,15 @@ export default class OnBoarding extends Component<Props, any> {
     // Fisrt is screen is active
     index: 0
   };
-
-  state = this.initState(this.props);
-
+  state = this.initState( this.props );
   /**
    * Initialize the state
    */
-  initState(props) {
+  initState( props ) {
     // Get the total number of slides passed as children
     const total = props.children ? props.children.length || 1 : 0,
       // Current index
-      index = total > 1 ? Math.min(props.index, total - 1) : 0,
+      index = total > 1 ? Math.min( props.index, total - 1 ) : 0,
       // Current offset
       offset = width * index;
 
@@ -91,7 +93,7 @@ export default class OnBoarding extends Component<Props, any> {
       e.nativeEvent.contentOffset
         ? e.nativeEvent.contentOffset.x
         : // When scrolled with .scrollTo() on Android there is no contentOffset
-          e.nativeEvent.position * this.state.width
+        e.nativeEvent.position * this.state.width
     );
   };
 
@@ -101,8 +103,8 @@ export default class OnBoarding extends Component<Props, any> {
    */
   onScrollEndDrag = e => {
     const {
-        contentOffset: { x: newOffset }
-      } = e.nativeEvent,
+      contentOffset: { x: newOffset }
+    } = e.nativeEvent,
       { children } = this.props,
       { index } = this.state,
       { offset } = this.internals;
@@ -112,7 +114,7 @@ export default class OnBoarding extends Component<Props, any> {
     // or left on the first one
     if (
       offset === newOffset &&
-      (index === 0 || index === children.length - 1)
+      ( index === 0 || index === children.length - 1 )
     ) {
       this.internals.isScrolling = false;
     }
@@ -129,19 +131,19 @@ export default class OnBoarding extends Component<Props, any> {
     let index = state.index;
 
     // Do nothing if offset didn't change
-    if (!diff) {
+    if ( !diff ) {
       return;
     }
 
     // Make sure index is always an integer
-    index = parseInt(index + Math.round(diff / step), 10);
+    index = parseInt( index + Math.round( diff / step ), 10 );
 
     // Update internal offset
     this.internals.offset = offset;
     // Update index in the state
-    this.setState({
+    this.setState( {
       index
-    });
+    } );
   };
 
   /**
@@ -149,7 +151,7 @@ export default class OnBoarding extends Component<Props, any> {
    */
   swipe = () => {
     // Ignore if already scrolling or if there is less than 2 slides
-    if (this.internals.isScrolling || this.state.total < 2) {
+    if ( this.internals.isScrolling || this.state.total < 2 ) {
       return;
     }
 
@@ -159,20 +161,20 @@ export default class OnBoarding extends Component<Props, any> {
       y = 0;
 
     // Call scrollTo on scrollView component to perform the swipe
-    this.scrollView && this.scrollView.scrollTo({ x, y, animated: true });
+    this.scrollView && this.scrollView.scrollTo( { x, y, animated: true } );
 
     // Update internal scroll state
     this.internals.isScrolling = true;
 
     // Trigger onScrollEnd manually on android
-    if (Platform.OS === "android") {
-      setImmediate(() => {
-        this.onScrollEnd({
+    if ( Platform.OS === "android" ) {
+      setImmediate( () => {
+        this.onScrollEnd( {
           nativeEvent: {
             position: diff
           }
-        });
-      });
+        } );
+      } );
     }
   };
 
@@ -183,21 +185,21 @@ export default class OnBoarding extends Component<Props, any> {
   renderScrollView = pages => {
     return (
       <ScrollView
-        ref={component => {
+        ref={ component => {
           this.scrollView = component;
-        }}
-        {...this.props}
-        contentContainerStyle={[styles.wrapper, this.props.style]}
-        onScrollBeginDrag={this.onScrollBegin}
-        onMomentumScrollEnd={this.onScrollEnd}
-        onScrollEndDrag={this.onScrollEndDrag}
+        } }
+        { ...this.props }
+        contentContainerStyle={ [ styles.wrapper, this.props.style ] }
+        onScrollBeginDrag={ this.onScrollBegin }
+        onMomentumScrollEnd={ this.onScrollEnd }
+        onScrollEndDrag={ this.onScrollEndDrag }
       >
-        {pages.map((page, i) => (
+        { pages.map( ( page, i ) => (
           // Render each slide inside a View
-          <View style={[styles.fullScreen, styles.slide]} key={i}>
-            {page}
+          <View style={ [ styles.fullScreen, styles.slide ] } key={ i }>
+            { page }
           </View>
-        ))}
+        ) ) }
       </ScrollView>
     );
   };
@@ -206,28 +208,28 @@ export default class OnBoarding extends Component<Props, any> {
    * Render pagination indicators
    */
   renderPagination = () => {
-    if (this.state.total <= 1) {
+    if ( this.state.total <= 1 ) {
       return null;
     }
 
-    const ActiveDot = <View style={[styles.dot, styles.activeDot]} />,
-      Dot = <View style={styles.dot} />;
+    const ActiveDot = <View style={ [ styles.dot, styles.activeDot ] } />,
+      Dot = <View style={ styles.dot } />;
 
     let dots = [];
 
-    for (let key = 0; key < this.state.total; key++) {
+    for ( let key = 0; key < this.state.total; key++ ) {
       dots.push(
         key === this.state.index
           ? // Active dot
-            React.cloneElement(ActiveDot, { key })
+          React.cloneElement( ActiveDot, { key } )
           : // Other dots
-            React.cloneElement(Dot, { key })
+          React.cloneElement( Dot, { key } )
       );
     }
 
     return (
-      <View pointerEvents="none" style={[styles.pagination, styles.fullScreen]}>
-        {dots}
+      <View pointerEvents="none" style={ [ styles.pagination ] }>
+        { dots }
       </View>
     );
   };
@@ -238,21 +240,61 @@ export default class OnBoarding extends Component<Props, any> {
   renderButton = () => {
     const lastScreen = this.state.index === this.state.total - 1;
     return (
-      <View
-        pointerEvents="box-none"
-        style={[styles.buttonWrapper, styles.fullScreen]}
-      >
-        {lastScreen ? (
-          // Show this button on the last screen
-          // TODO: Add a handler that would send a user to your app after onboarding is complete
-          <Button
-            text="Get Started"
-            onPress={() => this.props.click_GetStarted()}
-          />
+      <View pointerEvents="box-none">
+        <StatusBar backgroundColor={ colors.white } barStyle="dark-content" />
+        { lastScreen ? (
+          <View style={ { margin: 10 } }>
+            <LinearGradient
+              colors={ [ "#37A0DA", "#0071BC" ] }
+              start={ { x: 0, y: 0 } }
+              end={ { x: 1, y: 0 } }
+              style={ styles.btnGetStarted }
+            >
+              <Button
+                transparent
+                full
+                onPress={ () => this.props.click_GetStarted() }
+              >
+                <Text style={ styles.textWhite }>Get Started</Text>
+              </Button>
+            </LinearGradient>
+          </View>
         ) : (
-          // Or this one otherwise
-          <Button text="Continue" onPress={() => this.swipe()} />
-        )}
+            <View style={ { flexDirection: "row" } }>
+              <View style={ { flex: 1, backgroundColor: "white" } }>
+                <Button
+                  transparent
+                  onPress={ () => this.props.click_GetStarted() }
+                  style={ { alignSelf: "flex-start", marginLeft: 20 } }
+                >
+                  <Text style={ [ styles.btnSkipNext, { color: "gray" } ] }>
+                    Skip
+                </Text>
+                </Button>
+              </View>
+              <View style={ { alignItems: "center", justifyContent: "center" } }>
+                { this.renderPagination() }
+              </View>
+              <View
+                style={ {
+                  flex: 1,
+                  alignItems: "flex-end",
+                  justifyContent: "flex-end",
+                  backgroundColor: "white"
+                } }
+              >
+                <Button
+                  transparent
+                  onPress={ () => this.swipe() }
+                  style={ { alignSelf: "flex-end", marginRight: 20 } }
+                >
+                  <Text style={ [ styles.btnSkipNext, { color: colors.appColor } ] }>
+                    Next
+                </Text>
+                </Button>
+              </View>
+            </View>
+          ) }
       </View>
     );
   };
@@ -260,27 +302,26 @@ export default class OnBoarding extends Component<Props, any> {
   /**
    * Render the component
    */
-  render = ({ children } = this.props) => {
+  render = ( { children } = this.props ) => {
     return (
-      <View style={[styles.container, styles.fullScreen]}>
-        {/* Render screens */}
-        {this.renderScrollView(children)}
-        {/* Render pagination */}
-        {this.renderPagination()}
-        {/* Render Continue or Done button */}
-        {this.renderButton()}
+      <View style={ [ styles.container, styles.fullScreen ] }>
+        {/* Render screens */ }
+        { this.renderScrollView( children ) }
+        { this.renderButton() }
       </View>
     );
   };
 }
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   // Set width and height to the screen size
   fullScreen: {
+    flex: 1,
     width: width,
     height: height
   },
   // Main container
   container: {
+    flex: 1,
     backgroundColor: "transparent",
     position: "relative"
   },
@@ -290,11 +331,6 @@ const styles = StyleSheet.create({
   },
   // Pagination indicators
   pagination: {
-    position: "absolute",
-    bottom: 110,
-    left: 0,
-    right: 0,
-    flex: 1,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "flex-end",
@@ -316,18 +352,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#000000"
   },
   // Button wrapper
-  buttonWrapper: {
-    backgroundColor: "transparent",
-    flexDirection: "column",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    flex: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 40,
-    justifyContent: "flex-end",
-    alignItems: "center"
-  },
   //TODO:Button
   button: {
     borderRadius: 50, // Rounded border
@@ -338,9 +362,25 @@ const styles = StyleSheet.create({
     height: 40
   },
   // Button text
-  text: {
+  textWhite: {
     color: "#FFFFFF",
+    fontSize: 18,
+    alignSelf: "center",
     fontWeight: "bold",
     fontFamily: "Avenir"
+  },
+  //new styles
+  btnSkipNext: {
+    fontWeight: "bold",
+    fontSize: 14
+  },
+  btnGetStarted: {
+    borderRadius: 5,
+    height: 50
+  },
+  linearGradient: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderRadius: 5
   }
-});
+} );

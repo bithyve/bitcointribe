@@ -1,34 +1,32 @@
-import regularAccount from "../../services/RegularAccount";
+import RegularAccount from "../../services/accounts/RegularAccount";
 
 describe("Regular Account", async () => {
+  let importedRegularAccount: RegularAccount;
   beforeAll(() => {
-    jest.setTimeout(50000);
+    jest.setTimeout(100000);
   });
 
-  test("generates an HD Wallet", async () => {
-    const { mnemonic, address, keyPair } = await regularAccount.createWallet();
-    expect(mnemonic).toBeDefined();
-    expect(address).toBeDefined();
-    expect(keyPair).toBeDefined();
+  test("generates an HD Segwit Wallet", async () => {
+    const regularAccount = new RegularAccount();
+    const mnemonic = regularAccount.hdWallet.getMnemonic();
+    console.log({ mnemonic });
+    expect(mnemonic).toBeTruthy();
   });
 
-  test("imports an HD Wallet", async () => {
+  test("imports an HD Segwit Wallet", async () => {
     const dummyMnemonic =
-      "spray danger ostrich volume soldier scare shed excess jeans scheme hammer exist";
-
-    const { mnemonic, address, keyPair } = await regularAccount.importWallet(
-      dummyMnemonic
-    );
-
+      "unique issue slogan party van unfair assault warfare then rubber satisfy snack";
+    importedRegularAccount = new RegularAccount(dummyMnemonic);
+    const mnemonic = await importedRegularAccount.hdWallet.getMnemonic();
     expect(mnemonic).toEqual(dummyMnemonic);
-    expect(address).toBeDefined();
-    expect(keyPair).toBeDefined();
   });
 
-  test("reflects the balance of a given address", async () => {
-    const address = "2N9XSYkDMCu4q3gCuPFZUtaDceiK2sWziik";
-    const { balanceData } = await regularAccount.getBalance(address);
-    expect(balanceData.final_balance).toBeTruthy();
+  test("reflects the balance of the wallet", async () => {
+    const { data } = await importedRegularAccount.getBalance();
+    const { balance, unconfirmedBalance } = data;
+    console.log({ balance, unconfirmedBalance });
+    expect(balance).toBeDefined();
+    expect(unconfirmedBalance).toBeDefined();
   });
 
   test("provides transaction details against a supplied transaction hash", async () => {
@@ -38,44 +36,38 @@ describe("Regular Account", async () => {
       block_hash,
       block_height,
       hash,
-      confirmations
-    } = await regularAccount.getTransactionDetails(txHash);
+      confirmations,
+    } = await importedRegularAccount.getTransactionDetails(txHash);
     expect(block_hash).toBeDefined();
     expect(block_height).toBeDefined();
     expect(confirmations).toBeGreaterThan(6);
     expect(hash).toEqual(txHash);
   });
 
-  test("fetches transctions corresponding to a given address", async () => {
-    const dummyAddress = "2N4qBb5f1KyfbpHxtLM86QgbZ7qcxsFf9AL";
+  test("fetches transctions againts the HD wallet", async () => {
     const {
       totalTransactions,
       confirmedTransactions,
       transactionDetails,
-      address
-    } = await regularAccount.getTransactions(dummyAddress);
-    expect(totalTransactions).toBeDefined();
-    expect(confirmedTransactions).toBeDefined();
-    expect(transactionDetails).toBeDefined();
-    expect(address).toEqual(dummyAddress);
+    } = await importedRegularAccount.getTransactions();
+    console.log({ totalTransactions, confirmedTransactions });
+    expect(totalTransactions).toBeGreaterThanOrEqual(confirmedTransactions);
+    expect(confirmedTransactions).toBeGreaterThanOrEqual(0);
+    expect(transactionDetails).toBeTruthy();
   });
 
   test("transacts from one btc address to another", async () => {
     const transfer = {
-      senderAdderess: "2NAwqcZHo2DW9c8Qs9Jxaat3jHW3aqsBpFs",
-      recipientAddress: "2N4qBb5f1KyfbpHxtLM86QgbZ7qcxsFf9AL",
+      recipientAddress: "2NAwqcZHo2DW9c8Qs9Jxaat3jHW3aqsBpFs",
       amount: 3500,
-      privateKey: "cR5PcKVDDXHotM8zexjr5wLkxWf7zkL2pAsPc9yaCbPgwjGrK3pc"
     };
 
-    const res = await regularAccount.transfer(
-      transfer.senderAdderess,
+    const res = await importedRegularAccount.transfer(
       transfer.recipientAddress,
       transfer.amount,
-      transfer.privateKey
     );
-    //console.log(res);
-    // expect(statusCode).toBe(200);
-    expect(res.data.txid).toBeDefined();
+    console.log({ res });
+    expect(res.status).toBe(200);
+    expect(res.data.txid).toBeTruthy();
   });
 });

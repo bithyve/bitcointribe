@@ -39,6 +39,13 @@ After installing node and yarn, the following commands should get you started wi
 git clone https://github.com/thecryptobee/BitHyve-Wallet.git
 cd Hexa-Wallet
 sudo yarn install
+rn-nodeify --install --hack
+
+//To Run Android
+npm run android-dev
+
+```
+=======
 
 //To Run Android
 npm run android-dev
