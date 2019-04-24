@@ -26,6 +26,7 @@ import SendSMS from 'react-native-sms';
 //import Mailer from 'react-native-mail';
 var Mailer = require( 'NativeModules' ).RNMail;
 import Share from "react-native-share";
+import BackgroundFetch from "react-native-background-fetch";
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
@@ -47,7 +48,6 @@ var utils = require( "HexaWallet/src/app/constants/Utils" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 export default class TrustedContactScreen extends React.Component<any, any> {
-
     constructor ( props: any ) {
         super( props )
         this.state = ( {
@@ -58,11 +58,12 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             messageId: "",
             otpCode: "",
             flag_OtpCodeShowStatus: false,
-            flag_Loading: true
+            flag_Loading: false
         } )
     }
 
     componentWillMount() {
+        this.load_data();
         let data = this.props.navigation.getParam( "data" );
         // console.log( { data } );
         let temp = [];
@@ -86,33 +87,28 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         } )
     }
 
-    componentDidMount = async () => {
+    load_data = async () => {
         let data = this.props.navigation.getParam( "data" );
-        //  console.log( { data } );
         let resSSSDetails = await dbOpration.readSSSTableData(
             localDB.tableName.tblSSSDetails,
             data.recordID
         );
         console.log( { resSSSDetails } );
         let walletDetails = utils.getWalletDetails();
+        console.log( { walletDetails } );
         const sss = new S3Service(
             walletDetails[ 0 ].mnemonic
         );
-
-
         const { share, otp } = sss.createTransferShare( resSSSDetails.temp[ 0 ].share, data.givenName )
         console.log( { otpEncryptedShare: share, otp } )
-
         const encryptedShare = sss.createQRShare( resSSSDetails.temp[ 0 ].share, data.givenName )
-
         const { messageId, success } = await sss.uploadShare( share );
         console.log( { otpEncryptedShare: share, messageId, success } )
         if ( messageId != "" || messageId != null ) {
             this.setState( {
                 qrCodeString: encryptedShare,
                 messageId,
-                otpCode: otp,
-                flag_Loading: false
+                otpCode: otp
             } )
         }
     }
@@ -211,13 +207,6 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         }
     }
 
-    onSelect = data => {
-        this.setState( {
-            flag_OtpCodeShowStatus: true
-        } )
-    };
-
-
     render() {
         let data = this.state.data;
         return (
@@ -315,7 +304,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                 <Button
                                     onPress={ () => {
                                         this.props.navigation.push( "ShareSecretViaQRScreen",
-                                            { onSelect: this.onSelect, data: this.state.qrCodeString }
+                                            { data: this.state.qrCodeString }
                                         );
                                     } }
                                     style={ [ globalStyle.ffFiraSansSemiBold, {
