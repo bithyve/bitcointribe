@@ -15,18 +15,25 @@ import {
     Icon,
     List,
     ListItem,
-    Thumbnail
+    Thumbnail,
+    Card,
+    CardItem
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Contacts from 'react-native-contacts';
 import { Avatar } from 'react-native-elements';
+import GridView from 'react-native-super-grid';
+
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+
+
+
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -45,7 +52,8 @@ export default class AllContactListScreen extends React.Component<any, any> {
             arr_ContactList: [],
             SelectedFakeContactList: [],
             flag_NextBtnDisable: true,
-            flag_Loading: false
+            flag_Loading: false,
+            flag_MaxItemSeletedof3: true
         } )
     }
 
@@ -72,7 +80,6 @@ export default class AllContactListScreen extends React.Component<any, any> {
                 if ( item.check === true ) {
                     this.state.SelectedFakeContactList.push( item );
                     //  console.log( 'selected:' + item.givenName );
-
                 } else if ( item.check === false ) {
                     const i = this.state.SelectedFakeContactList.indexOf( item )
                     if ( 1 != -1 ) {
@@ -81,16 +88,6 @@ export default class AllContactListScreen extends React.Component<any, any> {
                         return this.state.SelectedFakeContactList
                     }
                 }
-                // } else {
-                //     item.check = false;
-                //     const i = this.state.SelectedFakeContactList.indexOf( index )
-                //     console.log( { i } );
-                //     if ( 1 != -1 ) {
-                //         this.state.SelectedFakeContactList.splice( i, 1 )
-                //         console.log( 'unselect:' + item.givenName )
-                //         //return this.state.SelectedFakeContactList
-                //     }
-                // }
             }
         } )
         let seletedLength = this.state.SelectedFakeContactList.length;
@@ -135,6 +132,42 @@ export default class AllContactListScreen extends React.Component<any, any> {
             this.props.navigation.push( "SecretSharingScreen", {
                 data: this.state.SelectedFakeContactList
             } );
+        }  
+    }
+
+    //TODO: Remove gird on click item
+    click_RemoveGridItem( item: any ) {
+        // console.log( { item } );
+        let arr_SelectedItem = this.state.SelectedFakeContactList;
+        let arr_FullArrayList = this.state.data;
+        for ( var i = 0; i < arr_SelectedItem.length; i++ ) {
+            if ( arr_SelectedItem[ i ].recordID === item.recordID ) {
+                arr_SelectedItem.splice( i, 1 );
+                // console.log( arr_FullArrayList[ i ] );
+                break;
+            }
+        }
+        for ( var i = 0; i < arr_FullArrayList.length; i++ ) {
+            if ( arr_FullArrayList[ i ].recordID === item.recordID ) {
+                let data = arr_FullArrayList[ i ];
+                data.check = false;
+                arr_FullArrayList[ i ] = data;
+                break;
+            }
+        }
+        this.setState( {
+            SelectedFakeContactList: arr_SelectedItem,
+            data: arr_FullArrayList
+        } )
+        let seletedLength = this.state.SelectedFakeContactList.length;
+        if ( seletedLength == 3 ) {
+            this.setState( {
+                flag_NextBtnDisable: false
+            } )
+        } else {
+            this.setState( {
+                flag_NextBtnDisable: true
+            } )
         }
     }
 
@@ -171,6 +204,29 @@ export default class AllContactListScreen extends React.Component<any, any> {
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20 } ] }>Select three of your trusted contacts, make sure you can always reach this people to recover your wallet</Text>
                             </View>
                             <View style={ { flex: 1 } }>
+                                <GridView
+                                    style={ styles.gridSelectedList }
+                                    items={ this.state.SelectedFakeContactList }
+                                    renderItem={ ( item, index ) => (
+                                        <View style={ { alignItems: "center", justifyContent: "center", } }>
+                                            <View style={ { flexDirection: "row" } }>
+                                                { renderIf( item.thumbnailPath != "" )(
+                                                    <Avatar medium rounded source={ { uri: item.thumbnailPath } } />
+                                                ) }
+                                                { renderIf( item.thumbnailPath == "" )(
+                                                    <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
+                                                ) }
+                                                <View style={ { alignItems: "flex-end", justifyContent: "flex-end", marginLeft: -14 } }>
+                                                    <TouchableOpacity onPress={ () => this.click_RemoveGridItem( item ) }>
+                                                        <SvgIcon name="close-circle" color="gray" size={ 20 } style={ { borderColor: "#F8F8F8", borderWidth: 2, borderRadius: 12 } } />
+                                                    </TouchableOpacity>
+                                                </View>
+                                            </View>
+                                            <Text>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                        </View>
+                                    ) }
+                                    itemsPerRow={ 4 }
+                                />
                                 <FlatList
                                     data={
                                         this.state.data
@@ -264,5 +320,9 @@ const styles = StyleSheet.create( {
         bottom: 10,
         width: "100%"
 
+    },
+    //Grid View Selected
+    gridSelectedList: {
+        flex: 1
     }
 } );
