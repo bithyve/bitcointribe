@@ -55,7 +55,7 @@ export default class HexaWalletWalletWallet extends React.Component
           decpScript = JSON.parse( decpScript );
           console.log( { decpScript } );
           utils.setDeepLinkingUrl( decpScript );
-          utils.setDeepLinkingType( "SSSDetails" );
+          utils.setDeepLinkingType( "SSS Recovery Sms/Email" );
         }
       );
 

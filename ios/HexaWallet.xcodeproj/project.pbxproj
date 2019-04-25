@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		001FD8F5BCF344BE99EA8AA9 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F79788E7D60A489CA04491E9 /* MaterialIcons.ttf */; };
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
@@ -49,7 +50,6 @@
 		5D087D2DC59F4B31A9156356 /* libLRDRCTSimpleToast.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FD310308004AE7AF908854 /* libLRDRCTSimpleToast.a */; };
 		64124680D74747159D3E0015 /* OpenSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 35C5495272FF4DE3848C3E71 /* OpenSans-Italic.ttf */; };
 		6DFC72604B8F4443B69B6008 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 217C85E1C99846F6A3F816E0 /* OpenSans-Bold.ttf */; };
-		744871B409DF40878612E4B1 /* TSBackgroundFetch.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33F7945A602049C191321762 /* TSBackgroundFetch.framework */; };
 		7D81AE9904FB45A59C8EC5C4 /* libRNKeychain.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C90D3C23D4B8444CB83322E5 /* libRNKeychain.a */; };
 		83156ABA9CEF4AC0BA325594 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D3F2C344CA734A728140F0EB /* OpenSans-Regular.ttf */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
@@ -64,8 +64,6 @@
 		8BC2E3E8225F265500442E2F /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BC2E3E6225F265500442E2F /* Fabric.framework */; };
 		8BE2C276226992C6009F5786 /* HexaWallet.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 8BE2C25322699285009F5786 /* HexaWallet.entitlements */; };
 		8E61BB40BB824EB6B636B8AD /* libQRCode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D36784344EE54C93963D531B /* libQRCode.a */; };
-		90FF65FDF74147E6A0BC0028 /* libRNBackgroundFetch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 144FFA864F964FE6BBEABB96 /* libRNBackgroundFetch.a */; };
-		910F6EBE35C4499BB9C7A87D /* RNBackgroundFetch+AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5525E9681C49C783377C5F /* RNBackgroundFetch+AppDelegate.m */; };
 		94EB2CDCF5444CFEB54B8108 /* FiraSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6312467B46FF4C75AE036FC2 /* FiraSans-SemiBold.ttf */; };
 		954AA393C8F44F209B65DDC3 /* Roboto_medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 71898628EDD94D338CA3CF62 /* Roboto_medium.ttf */; };
 		A7667A4133D048B4AFAD5695 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A9E853E665D0400894C0E659 /* MaterialCommunityIcons.ttf */; };
@@ -377,13 +375,6 @@
 			remoteGlobalIDString = 46FEDE8A1AFF192F00D3261C;
 			remoteInfo = RNMailTests;
 		};
-		8B1E76F6227061EB004BFAA4 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 1891D8C0AFF84A7F9C2ACA56 /* RNBackgroundFetch.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 835318541D52293F005738CD;
-			remoteInfo = RNBackgroundFetch;
-		};
 		8B380ECA2265DFE100C1061E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 690C74A340DA467B938BF1F9 /* RCTContacts.xcodeproj */;
@@ -690,7 +681,6 @@
 		14830C34842E4B828E74CB95 /* RNGestureHandler.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNGestureHandler.xcodeproj; path = "../node_modules/react-native-gesture-handler/ios/RNGestureHandler.xcodeproj"; sourceTree = "<group>"; };
 		175C64779F784FDE910B4636 /* Roboto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto.ttf; path = "../node_modules/native-base/Fonts/Roboto.ttf"; sourceTree = "<group>"; };
 		185C32C47BC9403C8CA8AB88 /* libRNGestureHandler-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNGestureHandler-tvOS.a"; sourceTree = "<group>"; };
-		1891D8C0AFF84A7F9C2ACA56 /* RNBackgroundFetch.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNBackgroundFetch.xcodeproj; path = "../node_modules/react-native-background-fetch/ios/RNBackgroundFetch.xcodeproj"; sourceTree = "<group>"; };
 		1A434BB9DC3A410096F46441 /* SplashScreen.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = SplashScreen.xcodeproj; path = "../node_modules/react-native-splash-screen/ios/SplashScreen.xcodeproj"; sourceTree = "<group>"; };
 		1E33C81F6E414F269A8CA315 /* libRNGestureHandler.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNGestureHandler.a; sourceTree = "<group>"; };
 		1E986C0389DD4A348E6999AF /* QrCode.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = QrCode.xcodeproj; path = "../node_modules/react-native-lewin-qrcode/ios/QrCode.xcodeproj"; sourceTree = "<group>"; };
@@ -778,7 +768,6 @@
 		D83A5D27028C46708EC243A9 /* RNMail.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNMail.xcodeproj; path = "../node_modules/react-native-mail/RNMail.xcodeproj"; sourceTree = "<group>"; };
 		D85F397489BD4D63966D4959 /* libSQLite.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libSQLite.a; sourceTree = "<group>"; };
 		DB3362A7BD3E4B9893520A70 /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
-		DB5525E9681C49C783377C5F /* RNBackgroundFetch+AppDelegate.m */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; name = "RNBackgroundFetch+AppDelegate.m"; path = "../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/RNBackgroundFetch+AppDelegate.m"; sourceTree = "<group>"; };
 		DD75884E76064477B2CB5B06 /* OpenSans-SemiboldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-SemiboldItalic.ttf"; path = "../src/assets/fonts/openSans/OpenSans-SemiboldItalic.ttf"; sourceTree = "<group>"; };
 		DE85129E78204D3BAC455F3E /* libBVLinearGradient.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libBVLinearGradient.a; sourceTree = "<group>"; };
 		DFBBB02C29744B75B24F5A16 /* libSplashScreen.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libSplashScreen.a; sourceTree = "<group>"; };
@@ -852,8 +841,6 @@
 				4E78C46403A04141BBE4384B /* libReactNativePermissions.a in Frameworks */,
 				4D4EB3E447B54F618C0B0288 /* libSendSMS.a in Frameworks */,
 				F8C33CE111514405A5D0E45A /* libRNMail.a in Frameworks */,
-				90FF65FDF74147E6A0BC0028 /* libRNBackgroundFetch.a in Frameworks */,
-				744871B409DF40878612E4B1 /* TSBackgroundFetch.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -952,7 +939,6 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
-				DB5525E9681C49C783377C5F /* RNBackgroundFetch+AppDelegate.m */,
 			);
 			name = HexaWallet;
 			sourceTree = "<group>";
@@ -1093,7 +1079,6 @@
 				E20E8E01A6044057BB7D5F28 /* ReactNativePermissions.xcodeproj */,
 				20899DDDC07A4FC78F5272BE /* SendSMS.xcodeproj */,
 				D83A5D27028C46708EC243A9 /* RNMail.xcodeproj */,
-				1891D8C0AFF84A7F9C2ACA56 /* RNBackgroundFetch.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1145,14 +1130,6 @@
 			children = (
 				8B00EBCE2268A28100BAD109 /* libRNMail.a */,
 				8B00EBD02268A28100BAD109 /* RNMailTests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		8B1E76F3227061EB004BFAA4 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				8B1E76F7227061EB004BFAA4 /* libRNBackgroundFetch.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1590,10 +1567,6 @@
 					ProjectRef = E20E8E01A6044057BB7D5F28 /* ReactNativePermissions.xcodeproj */;
 				},
 				{
-					ProductGroup = 8B1E76F3227061EB004BFAA4 /* Products */;
-					ProjectRef = 1891D8C0AFF84A7F9C2ACA56 /* RNBackgroundFetch.xcodeproj */;
-				},
-				{
 					ProductGroup = 8BC2E315225F1D9F00442E2F /* Products */;
 					ProjectRef = A9F93F96206C4AFB8089A249 /* RNCamera.xcodeproj */;
 				},
@@ -1968,13 +1941,6 @@
 			remoteRef = 8B00EBCF2268A28100BAD109 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		8B1E76F7227061EB004BFAA4 /* libRNBackgroundFetch.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRNBackgroundFetch.a;
-			remoteRef = 8B1E76F6227061EB004BFAA4 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		8B380ECB2265DFE100C1061E /* libRCTContacts.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -2335,7 +2301,6 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
-				910F6EBE35C4499BB9C7A87D /* RNBackgroundFetch+AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2367,9 +2332,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = Y5TCB759QL;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -2467,9 +2430,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = Y5TCB759QL;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
@@ -2601,7 +2562,6 @@
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-sms/SendSMS",
 					"$(SRCROOT)/../node_modules/react-native-mail/RNMail",
-					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
 				);
 				INFOPLIST_FILE = HexaWallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -2660,7 +2620,6 @@
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-sms/SendSMS",
 					"$(SRCROOT)/../node_modules/react-native-mail/RNMail",
-					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
 				);
 				INFOPLIST_FILE = HexaWallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;

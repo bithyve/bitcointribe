@@ -105,10 +105,10 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         const { messageId, success } = await sss.uploadShare( share );
         console.log( { otpEncryptedShare: share, messageId, success } )
         let qrCodeData = {};
+        qrCodeData.type = "SSS Recovery";
         qrCodeData.share = resSSSDetails.temp[ 0 ].share;
         qrCodeData.name = this.state.data.givenName + " " + this.state.data.familyName;
         qrCodeData.phoneNo = data.phoneNumbers[ 0 ].number;
-        console.log( { qrCodeData } )
         if ( messageId != "" || messageId != null ) {
             this.setState( {
                 qrCodeString: JSON.stringify( qrCodeData ).toString(),
@@ -134,7 +134,6 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );
         console.log( { encpScript } );
-
         if ( reg.test( item.value ) == false ) {
             SendSMS.send( {
                 body: 'https://prime-sign-230407.appspot.com/sss/TB/' + encpScript,
@@ -308,15 +307,40 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select how you want to share secret with the selected trusted contact</Text>
                                 <Button
                                     onPress={ () => {
-                                        this.props.navigation.push( "ShareSecretViaQRScreen",
-                                            { data: this.state.qrCodeString }
-                                        );
+                                        var qrCodeData = this.state.qrCodeString;
+                                        console.log( { qrCodeData } );
+                                        if ( qrCodeData != "" ) {
+                                            this.props.navigation.push( "ShareSecretViaQRScreen",
+                                                { data: qrCodeData }
+                                            );
+                                        } else {
+                                            this.setState( {
+                                                flag_Loading: true
+                                            } )
+                                            setTimeout( () => {
+                                                qrCodeData = this.state.qrCodeString;
+                                                if ( qrCodeData != "" ) {
+                                                    this.setState( {
+                                                        flag_Loading: false
+                                                    } );
+                                                    this.props.navigation.push( "ShareSecretViaQRScreen",
+                                                        { data: qrCodeData }
+                                                    );
+                                                } else {
+                                                    this.setState( {
+                                                        flag_Loading: true
+                                                    } )
+                                                }
+                                            }, 6000 );
+                                        }
                                     } }
                                     style={ [ globalStyle.ffFiraSansSemiBold, {
                                         backgroundColor: "#838383", borderRadius: 10, margin: 5,
                                         height: 50,
                                     } ] }
-                                    full>
+                                    full
+
+                                >
                                     <Text>Share secret via QR code</Text>
                                 </Button>
                                 <FullLinearGradientButton
@@ -338,7 +362,27 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                             data={ this.state.arr_TrustedContactEmailAndPhoneShare }
                             click_Confirm={ ( val: any ) => {
                                 AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
-                                this.click_SentURLSmsOrEmail( val )
+                                var messageId = this.state.messageId;
+                                if ( messageId != "" ) {
+                                    this.click_SentURLSmsOrEmail( val )
+                                } else {
+                                    this.setState( {
+                                        flag_Loading: true
+                                    } )
+                                    setTimeout( () => {
+                                        messageId = this.state.messageId;
+                                        if ( messageId != "" ) {
+                                            this.setState( {
+                                                flag_Loading: false
+                                            } );
+                                            this.click_SentURLSmsOrEmail( val )
+                                        } else {
+                                            this.setState( {
+                                                flag_Loading: true
+                                            } )
+                                        }
+                                    }, 6000 );
+                                }
                             } }
                             closeModal={ () => {
                                 this.setState( {

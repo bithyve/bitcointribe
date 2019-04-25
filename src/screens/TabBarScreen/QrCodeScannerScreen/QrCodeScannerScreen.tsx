@@ -80,9 +80,18 @@ export default class QrCodeScannerScreen extends React.Component {
 
     onBarCodeRead( res: any ) {
         try {
+            var result = JSON.parse( res.data );
+            result = JSON.parse( result );
             AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
-            console.log( res.data );
-
+            if ( result.type == "SSS Recovery" ) {
+                utils.setDeepLinkingType( "SSS Recovery QrCode" );
+                let deepLinkPara = {};
+                deepLinkPara.n = result.name;
+                deepLinkPara.m = result.phoneNo;
+                deepLinkPara.encpShare = result.share;
+                utils.setDeepLinkingUrl( deepLinkPara );
+                this.props.navigation.navigate( 'WalletScreen' );
+            }
         } catch ( error ) {
             console.log( error );
         }

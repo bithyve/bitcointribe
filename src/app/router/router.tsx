@@ -241,7 +241,7 @@ const TrustedContactAcceptStackNavigatorRouter = createStackNavigator(
 //TODO: TabNavigator:TabNavigator
 const TabNavigator = createBottomTabNavigator(
   {
-    Payment: {
+    WalletScreen: {
       screen: WalletScreen, //PaymentScreen,
       navigationOptions: {
         tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
@@ -281,7 +281,7 @@ const TabNavigator = createBottomTabNavigator(
     }
   },
   {
-    initialRouteName: "Payment",
+    initialRouteName: "WalletScreen",
     tabBarOptions: {
       showLabel: true,
       //swipeEnabled: true,
