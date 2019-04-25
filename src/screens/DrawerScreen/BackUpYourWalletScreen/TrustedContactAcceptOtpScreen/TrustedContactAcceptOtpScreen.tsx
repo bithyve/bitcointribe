@@ -100,15 +100,20 @@ export default class TrustedContactAcceptOtpScreen extends Component {
             walletDetails[ 0 ].mnemonic
         );
         console.log( { messageId, enterOtp } );
+        let userDetails = {};
+        userDetails.name = script.n;
+        userDetails.mobileNo = script.m;
         const resDonwShare = await sss.downloadShare( messageId );
         const resDecryptOTPEncShare = await sss.decryptOTPEncShare( resDonwShare, messageId, enterOtp )
-        console.log( { resDonwShare, resDecryptOTPEncShare } );
+        let resShareId = await sss.getShareId( resDecryptOTPEncShare.encryptedShare )
+        console.log( { resDecryptOTPEncShare, resShareId } );
         if ( resDecryptOTPEncShare != "" || resDecryptOTPEncShare != null ) {
             const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
                 localDB.tableName.tblTrustedPartyDetails,
                 fulldate,
-                messageId,
-                resDecryptOTPEncShare
+                userDetails,
+                resDecryptOTPEncShare,
+                resShareId
             );
             if ( resinsertTrustedPartyDetails ) {
                 this.setState( {
@@ -117,10 +122,15 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                 setTimeout( () => {
                     Alert.alert(
                         'Success',
-                        'EncShare Created.',
+                        'Decrypted share created.',
                         [
-                            { text: 'Cancel', onPress: () => console.log( 'Cancel Pressed!' ) },
-                            { text: 'OK', onPress: () => { this.props.navigation.pop() } },
+                            {
+                                text: 'OK', onPress: () => {
+                                    utils.setDeepLinkingType( "" );
+                                    utils.setDeepLinkingUrl( "" );
+                                    this.props.navigation.pop()
+                                }
+                            },
 
                         ],
                         { cancelable: false }

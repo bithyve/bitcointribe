@@ -43,15 +43,13 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
         } )
     }
 
-
     componentWillMount() {
-        let data = JSON.parse( this.props.navigation.getParam( "data" ) );
-        console.log( { data } );
+        let data = JSON.stringify( this.props.navigation.getParam( "data" ) );
+        //console.log( { data } );
         this.setState( {
-            data: data
+            data: data.toString()
         } )
     }
-
 
     //TODO: func click_Item
     click_Item = ( item: any ) => {
@@ -64,7 +62,6 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
         navigation.goBack();
         //  navigation.state.params.onSelect( { selected: true } );
     }
-
 
     render() {
         return (
