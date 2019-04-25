@@ -14,7 +14,8 @@ import {
   ScrollView,
   Animated,
   LayoutAnimation,
-  AsyncStorage
+  AsyncStorage,
+  Alert
 } from "react-native";
 import {
   Container,
@@ -42,6 +43,9 @@ import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelB
 import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model/ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
 import ModelAcceptSecret from "../../../app/custcompontes/Model/ModelAcceptSecret/ModelAcceptSecret";
 
+
+//TODO: Custome Pages
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -91,6 +95,7 @@ export default class WalletScreen extends React.Component {
       arr_accounts: [],
       arr_SSSDetails: [],
       flag_cardScrolling: false,
+      flag_Loading: false,
 
       //Shiled Icons
       shiledIconPer: 1,
@@ -104,7 +109,8 @@ export default class WalletScreen extends React.Component {
       arr_ModelFindYourTrustedContacts: [],
       arr_ModelAcceptSecret: [],
       //DeepLinking Param
-      deepLinkingUrl: ""
+      deepLinkingUrl: "",
+      deepLinkingUrlType: ""
     };
     isNetwork = utils.getNetwork();
   }
@@ -118,6 +124,7 @@ export default class WalletScreen extends React.Component {
       () => {
         isNetwork = utils.getNetwork();
         this.connnection_FetchData();
+        this.getDeepLinkingData();
       }
     );
     //TODO: Animation View
@@ -156,22 +163,6 @@ export default class WalletScreen extends React.Component {
       outputRange: [ 50, 70 ],
       extrapolate: "clamp"
     } );
-
-
-    let urlScript = utils.getDeepLinkingUrl();
-    let urlType = utils.getDeepLinkingType();
-    if ( urlType != "" ) {
-      this.setState( {
-        deepLinkingUrl: urlScript,
-        arr_ModelAcceptSecret: [
-          {
-            modalVisible: true,
-            name: urlScript.n,
-            mobileNo: urlScript.m
-          }
-        ]
-      } )
-    }
   }
 
 
@@ -244,6 +235,82 @@ export default class WalletScreen extends React.Component {
       arr_wallets: resultWallet.temp,
       arr_accounts: resAccount.temp
     } );
+  }
+
+  //TODO: func get Deeplinking data 
+  getDeepLinkingData() {
+    let urlScript = utils.getDeepLinkingUrl();
+    let urlType = utils.getDeepLinkingType();
+    if ( urlType != "" ) {
+      this.setState( {
+        deepLinkingUrl: urlScript,
+        deepLinkingUrlType: urlType,
+        arr_ModelAcceptSecret: [
+          {
+            modalVisible: true,
+            name: urlScript.n,
+            mobileNo: urlScript.m,
+            encpShare: urlScript.encpShare
+          }
+        ]
+      } )
+    }
+  }
+
+  //TODO: Qrcode Scan SSS Details Download Desc Sahre
+  downloadDescShare = async () => {
+    this.setState( {
+      flag_Loading: true
+    } );
+    const dateTime = Date.now();
+    const fulldate = Math.floor( dateTime / 1000 );
+    let urlScript = utils.getDeepLinkingUrl();
+    let userDetail = {};
+    userDetail.name = urlScript.n;
+    userDetail.mobileNo = urlScript.m;
+    let walletDetails = utils.getWalletDetails();
+    const sss = new S3Service(
+      walletDetails[ 0 ].mnemonic
+    );
+    let resShareId = await sss.getShareId( urlScript.encpShare )
+    const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
+      localDB.tableName.tblTrustedPartyDetails,
+      fulldate,
+      userDetail,
+      urlScript.encpShare,
+      resShareId
+    );
+    if ( resinsertTrustedPartyDetails ) {
+      this.setState( {
+        flag_Loading: false,
+        arr_ModelAcceptSecret: [
+          {
+            modalVisible: false,
+            name: "",
+            mobileNo: "",
+            encpShare: ""
+
+          }
+        ]
+      } )
+      setTimeout( () => {
+        Alert.alert(
+          'Success',
+          'Decrypted share created.',
+          [
+            {
+              text: 'OK', onPress: () => {
+                utils.setDeepLinkingType( "" );
+                utils.setDeepLinkingUrl( "" );
+                this.connnection_FetchData();
+              }
+            },
+
+          ],
+          { cancelable: false }
+        )
+      }, 100 );
+    }
   }
 
   render() {
@@ -487,12 +554,15 @@ export default class WalletScreen extends React.Component {
         <ModelAcceptSecret
           data={ this.state.arr_ModelAcceptSecret }
           closeModal={ () => {
+            utils.setDeepLinkingType( "" );
+            utils.setDeepLinkingUrl( "" );
             this.setState( {
               arr_ModelAcceptSecret: [
                 {
                   modalVisible: false,
                   name: "",
-                  mobileNo: ""
+                  mobileNo: "",
+                  encpShare: ""
                 }
               ]
             } )
@@ -505,24 +575,32 @@ export default class WalletScreen extends React.Component {
                 {
                   modalVisible: false,
                   name: "",
-                  mobileNo: ""
+                  mobileNo: "",
+                  encpShare: ""
                 }
               ]
             } )
           } }
           click_AcceptSecret={ () => {
+            utils.setDeepLinkingType( "" );
             this.setState( {
               arr_ModelAcceptSecret: [
                 {
                   modalVisible: false,
                   name: "",
-                  mobileNo: ""
+                  mobileNo: "",
+                  encpShare: ""
                 }
               ]
             } )
-            this.props.navigation.push( "TrustedContactAcceptNavigator", { data: this.state.deepLinkingUrl } )
+            if ( this.state.deepLinkingUrlType == "SSS Recovery Sms/Email" ) {
+              this.props.navigation.push( "TrustedContactAcceptNavigator", { data: this.state.deepLinkingUrl } )
+            } else {
+              this.downloadDescShare();
+            }
           } }
         />
+        <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
       </Container>
     );
   }

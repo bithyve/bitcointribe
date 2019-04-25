@@ -692,8 +692,9 @@ const updateSSSContactListDetails = (
 const insertTrustedPartyDetails = (
   tblName: string,
   fulldate: string,
-  messageId: any,
-  otpEncShare: any,
+  userDetails: any,
+  decrShare: any,
+  shareId: any,
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
@@ -701,14 +702,15 @@ const insertTrustedPartyDetails = (
       txn.executeSql(
         "INSERT INTO " +
         tblName +
-        "(dateCreated,messageId,otpEncShare) VALUES (:dateCreated,:messageId,:otpEncShare)",
+        "(dateCreated,userDetails,decrShare,shareId) VALUES (:dateCreated,:userDetails,:decrShare,:shareId)",
         [
           utils.encrypt(
             fulldate.toString(),
             passcode
           ),
-          utils.encrypt( messageId.toString(), passcode ),
-          utils.encrypt( JSON.stringify( otpEncShare ).toString(), passcode )
+          utils.encrypt( JSON.stringify( userDetails ).toString(), passcode ),
+          utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
+          utils.encrypt( shareId.toString(), passcode )
         ]
       );
       resolve( true );
