@@ -30,7 +30,9 @@ import {
     List,
     ListItem
 } from "native-base";
-import BarcodeScanner from "react-native-barcode-scanners";
+//import BarcodeScanner from "react-native-barcode-scanners";
+import { QRScannerView } from 'ac-qrcode';
+
 
 
 //TODO: Custome StyleSheet Files       
@@ -57,12 +59,15 @@ export default class QrCodeScannerScreen extends React.Component {
     constructor ( props: any ) {
         super( props );
         this.state = {
-
         };
     }
 
     componentWillMount() {
-        AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
+        try {
+            AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
+        } catch ( err ) {
+            console.warn( err );
+        }
     }
 
     //TODO: Page life Cycle
@@ -101,23 +106,68 @@ export default class QrCodeScannerScreen extends React.Component {
         console.log( "read data from gallery" );
         console.log( { res } );
     }
+
+
+    _renderTitleBar() {
+        return (
+            <Text></Text>
+        );
+    }
+
+    _renderMenu() {
+        return (
+            <Text></Text>
+        )
+    }
+
+    barcodeReceived( e: any ) {
+        try {
+            var result = JSON.parse( e.data );
+            result = JSON.parse( result );
+            AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
+            if ( result.type == "SSS Recovery" ) {
+                utils.setDeepLinkingType( "SSS Recovery QrCode" );
+                let deepLinkPara = {};
+                deepLinkPara.n = result.name;
+                deepLinkPara.m = result.phoneNo;
+                deepLinkPara.encpShare = result.share;
+                utils.setDeepLinkingUrl( deepLinkPara );
+                this.props.navigation.navigate( 'WalletScreen' );
+            }
+        } catch ( error ) {
+            console.log( error );
+        }
+    }
+
+
     render() {
         return (
             <Container>
+                <StatusBar hidden />
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <BarcodeScanner
-                            Title={ "QRCode Scanner" }
+                        {/* <BarcodeScanner
+                            Title={ "QRCode Scanner" }   
                             styles={ styles.barcodeScanner }
                             cameraProps={ { captureAudio: false } }
                             onBarCodeReadByGalleryStart={ data =>
                                 this.onBarCodeReadByGalleryStart.call( this, data )
-                            }
+                            }  
                             onReadBarCodeByGalleryFailure={ () =>
                                 this.onReadBarCodeByGalleryFailure.call( this )
                             }
                             onBarCodeRead={ data => this.onBarCodeRead.call( this, data ) }
+                        />    */}
+                        < QRScannerView
+                            hintText=""
+                            rectHeight={ Dimensions.get( 'screen' ).height / 2.0 }
+                            rectWidth={ Dimensions.get( 'screen' ).width - 20 }
+                            scanBarColor={ colors.appColor }
+                            cornerColor={ colors.appColor }
+                            onScanResultReceived={ this.barcodeReceived.bind( this ) }
+                            renderTopBarView={ () => this._renderTitleBar() }
+                            renderBottomMenuView={ () => this._renderMenu() }
                         />
                     </ImageBackground>
                 </SafeAreaView>
