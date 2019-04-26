@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Dimensions } from "react-native";
 import {
     Container,
     Header,
@@ -132,7 +132,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
             this.props.navigation.push( "SecretSharingScreen", {
                 data: this.state.SelectedFakeContactList
             } );
-        }  
+        }
     }
 
     //TODO: Remove gird on click item
@@ -225,7 +225,8 @@ export default class AllContactListScreen extends React.Component<any, any> {
                                             <Text>{ item.givenName }{ " " }{ item.familyName }</Text>
                                         </View>
                                     ) }
-                                    itemsPerRow={ 4 }
+                                    itemDimension={ Dimensions.get( 'screen' ).width / 4.0 }
+                                    itemsPerRow={ 3 }
                                 />
                                 <FlatList
                                     data={

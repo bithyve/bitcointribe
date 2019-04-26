@@ -163,6 +163,17 @@ export default class WalletScreen extends React.Component {
       outputRange: [ 50, 70 ],
       extrapolate: "clamp"
     } );
+
+    //Permission buz qrcode tab click to android issue generate qr code on camera not showing
+    try {
+      AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
+      Permissions.request( 'camera' ).then( response => {
+        AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
+        console.log( { response } );
+      } );
+    } catch ( err ) {
+      console.warn( err );
+    }
   }
 
 

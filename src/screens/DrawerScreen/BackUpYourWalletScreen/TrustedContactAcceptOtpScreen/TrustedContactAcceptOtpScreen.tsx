@@ -52,8 +52,6 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
-
-
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
