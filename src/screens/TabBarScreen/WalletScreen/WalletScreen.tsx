@@ -291,19 +291,21 @@ export default class WalletScreen extends React.Component {
       urlScript.encpShare,
       resShareId
     );
-    if ( resinsertTrustedPartyDetails ) {
-      this.setState( {
-        flag_Loading: false,
-        arr_ModelAcceptSecret: [
-          {
-            modalVisible: false,
-            name: "",
-            mobileNo: "",
-            encpShare: ""
 
-          }
-        ]
-      } )
+    //console.log( { resinsertTrustedPartyDetails } );
+    this.setState( {
+      flag_Loading: false,
+      arr_ModelAcceptSecret: [
+        {
+          modalVisible: false,
+          name: "",
+          mobileNo: "",
+          encpShare: ""
+
+        }
+      ]
+    } )
+    if ( resinsertTrustedPartyDetails == true ) {
       setTimeout( () => {
         Alert.alert(
           'Success',
@@ -317,6 +319,23 @@ export default class WalletScreen extends React.Component {
               }
             },
 
+          ],
+          { cancelable: false }
+        )
+      }, 100 );
+    } else {
+      setTimeout( () => {
+        Alert.alert(
+          'OH',
+          resinsertTrustedPartyDetails,
+          [
+            {
+              text: 'OK', onPress: () => {
+                utils.setDeepLinkingType( "" );
+                utils.setDeepLinkingUrl( "" );
+                this.connnection_FetchData();
+              }
+            },
           ],
           { cancelable: false }
         )
