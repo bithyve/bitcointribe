@@ -934,6 +934,13 @@ abstract-leveldown@~0.12.1:
   dependencies:
     xtend "~3.0.0"
 
+ac-qrcode@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/ac-qrcode/-/ac-qrcode-1.0.1.tgz#46978c21e809fe5f603eeb6f14a2b7511c8dcd90"
+  integrity sha1-RpeMIegJ/l9gPutvFKK3URyNzZA=
+  dependencies:
+    react-native-camera "^0.7.0"
+
 accepts@~1.3.3, accepts@~1.3.5:
   version "1.3.5"
   resolved "https://registry.yarnpkg.com/accepts/-/accepts-1.3.5.tgz#eb777df6011723a3b14e8a72c0805c8e86746bd2"
@@ -7580,6 +7587,11 @@ react-native-calendars@^1.21.0:
     prop-types "^15.5.10"
     xdate "^0.8.0"
 
+react-native-camera@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/react-native-camera/-/react-native-camera-0.7.0.tgz#a033a80b73fb1d56c2459a829f65a6f8f1a7328c"
+  integrity sha1-oDOoC3P7HVbCRZqCn2Wm+PGnMow=
+
 react-native-camera@^1.1.2, react-native-camera@^1.6.3:
   version "1.13.1"
   resolved "https://registry.yarnpkg.com/react-native-camera/-/react-native-camera-1.13.1.tgz#19277ccae0a49dbf1b96049da5b95c847ea7aff2"
@@ -7999,6 +8011,14 @@ react-native-popup-menu@^0.14.2:
   version "0.14.2"
   resolved "https://registry.yarnpkg.com/react-native-popup-menu/-/react-native-popup-menu-0.14.2.tgz#c71e6d662ce143cdfd3a640fe22f2c54f2f54eda"
   integrity sha512-hVy9z4JLj+6/ll2UXwR2O+exzx57b0gdLbUZUY2A1hXrTGOgxDpsQ+sQBHTLeUXoSQDtZxGcunmpIc1ZjdhMHg==
+
+react-native-qrcode-scanner@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/react-native-qrcode-scanner/-/react-native-qrcode-scanner-1.1.2.tgz#5b6dfb4efd267a810bedb1f09b7c9ccb6d321e20"
+  integrity sha512-ID/s6za6N1m+V5dgzGZYr+rf9txuTYEnqqkowR8hujm9ddPRJEkXXGkoR6Y18WnpDGS7eDEt2BNPLXFkLLYhvQ==
+  dependencies:
+    prop-types "^15.5.10"
+    react-native-permissions "^1.1.1"
 
 react-native-qrcode@^0.2.7:
   version "0.2.7"

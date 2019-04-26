@@ -7,7 +7,6 @@ buildscript {
         compileSdkVersion = 28
         targetSdkVersion = 26
         supportLibVersion = "27.1.1"
-       
     }  
     repositories {
         google()
@@ -50,8 +49,8 @@ subprojects {
         resolutionStrategy.eachDependency { details ->
             if (details.requested.group == 'com.android.support'
                     && !details.requested.name.contains('multidex') ) {
-                details.useVersion "27.1.0"  
+                details.useVersion "26.1.0"     
             }
-        }
+        }   
     }
 }

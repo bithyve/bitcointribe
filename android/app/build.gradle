@@ -167,7 +167,7 @@ configurations.all {
   }
 
 dependencies {
-
+   
     compile project(':react-native-mail')
     compile project(':react-native-sms')
     compile project(':react-native-contacts')
@@ -209,3 +209,4 @@ task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
 }
+
