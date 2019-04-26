@@ -113,7 +113,7 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                 resDecryptOTPEncShare,
                 resShareId
             );
-            if ( resinsertTrustedPartyDetails ) {
+            if ( resinsertTrustedPartyDetails == true ) {
                 this.setState( {
                     flag_Loading: false
                 } )
@@ -130,6 +130,26 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                                 }
                             },
 
+                        ],
+                        { cancelable: false }
+                    )
+                }, 100 );
+            } else {
+                this.setState( {
+                    flag_Loading: false
+                } )
+                setTimeout( () => {
+                    Alert.alert(
+                        'OH',
+                        resinsertTrustedPartyDetails,
+                        [
+                            {
+                                text: 'OK', onPress: () => {
+                                    utils.setDeepLinkingType( "" );
+                                    utils.setDeepLinkingUrl( "" );
+                                    this.props.navigation.pop()
+                                }
+                            },
                         ],
                         { cancelable: false }
                     )
