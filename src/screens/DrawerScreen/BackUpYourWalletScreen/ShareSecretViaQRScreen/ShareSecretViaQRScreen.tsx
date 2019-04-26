@@ -85,7 +85,6 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
                             <View style={ { flex: 0.1, margin: 20 } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
                             </View>
-
                             <View style={ { flex: 1, alignItems: "center" } }>
                                 <QRCode
                                     ref="qrcodeView"
