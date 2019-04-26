@@ -43,14 +43,13 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
         } )
     }
 
-    
     componentWillMount() {
-        let data = this.props.navigation.getParam( "data" );
+        let data = JSON.stringify( this.props.navigation.getParam( "data" ) );
+        //console.log( { data } );
         this.setState( {
-            data: data
+            data: data.toString()
         } )
     }
-
 
     //TODO: func click_Item
     click_Item = ( item: any ) => {
@@ -60,10 +59,9 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
     }
     goBack() {
         const { navigation } = this.props;
-        navigation.goBack();  
-      //  navigation.state.params.onSelect( { selected: true } );
+        navigation.goBack();
+        //  navigation.state.params.onSelect( { selected: true } );
     }
-
 
     render() {
         return (
@@ -87,7 +85,6 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
                             <View style={ { flex: 0.1, margin: 20 } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
                             </View>
-
                             <View style={ { flex: 1, alignItems: "center" } }>
                                 <QRCode
                                     ref="qrcodeView"
