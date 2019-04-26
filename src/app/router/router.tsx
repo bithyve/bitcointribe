@@ -54,8 +54,14 @@ import PasscodeConfirmScreen from "HexaWallet/src/screens/PasscodeScreen/Passcod
 // //Right DrawerScreen
 // import NotificationScreen from "bithyve/src/screens/DrawerScreen/NotificationScreen/NotificationScreen";
 
+//Tabbar screen
+import QrCodeScannerScreen from "HexaWallet/src/screens/TabBarScreen/QrCodeScannerScreen/QrCodeScannerScreen";
+
+
 //TODO: New Screen Hexa Wallet
 import WalletScreen from "HexaWallet/src/screens/TabBarScreen/WalletScreen/WalletScreen";
+
+
 
 //TODO: Wallet SetUp Screen
 import WalletSetupScreens from "../../screens/DrawerScreen/WalletSetupScreens/WalletSetupScreens";
@@ -70,6 +76,8 @@ import SecretSharingScreen from "../../screens/DrawerScreen/BackUpYourWalletScre
 import TrustedContactScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactScreen/TrustedContactScreen";
 import ShareSecretViaQRScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/ShareSecretViaQRScreen/ShareSecretViaQRScreen";
 import TrustedContactAcceptOtpScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactAcceptOtpScreen/TrustedContactAcceptOtpScreen";
+
+
 
 
 //TODO: StackNavigator
@@ -233,7 +241,7 @@ const TrustedContactAcceptStackNavigatorRouter = createStackNavigator(
 //TODO: TabNavigator:TabNavigator
 const TabNavigator = createBottomTabNavigator(
   {
-    Payment: {
+    WalletScreen: {
       screen: WalletScreen, //PaymentScreen,
       navigationOptions: {
         tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
@@ -252,8 +260,8 @@ const TabNavigator = createBottomTabNavigator(
         )
       }
     },
-    Accounts: {
-      screen: WalletScreen,
+    QrCodeScannerScreen: {
+      screen: QrCodeScannerScreen,
       navigationOptions: {
         tabBarLabel: "QR", //localization("TabBarItem.Accounts"),
         tabBarIcon: ( { tintColor } ) => (
@@ -273,7 +281,7 @@ const TabNavigator = createBottomTabNavigator(
     }
   },
   {
-    initialRouteName: "Payment",
+    initialRouteName: "WalletScreen",
     tabBarOptions: {
       showLabel: true,
       //swipeEnabled: true,

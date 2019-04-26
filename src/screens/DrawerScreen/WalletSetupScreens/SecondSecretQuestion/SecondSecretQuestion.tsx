@@ -62,7 +62,6 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                 selected: resWalletData.arr_QuestionList[ 0 ].item
             } )
         }
-
     }
 
     onValueChange( value: string ) {
