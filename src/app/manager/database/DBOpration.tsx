@@ -692,26 +692,60 @@ const updateSSSContactListDetails = (
 const insertTrustedPartyDetails = (
   tblName: string,
   fulldate: string,
-  messageId: any,
-  otpEncShare: any,
+  userDetails: any,
+  decrShare: any,
+  shareId: any,
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
     db.transaction( function ( txn ) {
-      txn.executeSql(
-        "INSERT INTO " +
-        tblName +
-        "(dateCreated,messageId,otpEncShare) VALUES (:dateCreated,:messageId,:otpEncShare)",
-        [
-          utils.encrypt(
-            fulldate.toString(),
-            passcode
-          ),
-          utils.encrypt( messageId.toString(), passcode ),
-          utils.encrypt( JSON.stringify( otpEncShare ).toString(), passcode )
-        ]
-      );
-      resolve( true );
+      txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+        var len = results.rows.length;
+        if ( len > 0 ) {
+          for ( let i = 0; i < len; i++ ) {
+            let dbdecryptShareId = utils.decrypt(
+              results.rows.item( i ).shareId,
+              passcode
+            );
+            // console.log( { dbdecryptrecordID } );
+            if ( dbdecryptShareId == shareId ) {
+              resolve( "Already same share stored." );
+            } else {
+              txn.executeSql(
+                "INSERT INTO " +
+                tblName +
+                "(dateCreated,userDetails,decrShare,shareId) VALUES (:dateCreated,:userDetails,:decrShare,:shareId)",
+                [
+                  utils.encrypt(
+                    fulldate.toString(),
+                    passcode
+                  ),
+                  utils.encrypt( JSON.stringify( userDetails ).toString(), passcode ),
+                  utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
+                  utils.encrypt( shareId.toString(), passcode )
+                ]
+              );
+              resolve( true );
+            }
+          }
+        } else {
+          txn.executeSql(
+            "INSERT INTO " +
+            tblName +
+            "(dateCreated,userDetails,decrShare,shareId) VALUES (:dateCreated,:userDetails,:decrShare,:shareId)",
+            [
+              utils.encrypt(
+                fulldate.toString(),
+                passcode
+              ),
+              utils.encrypt( JSON.stringify( userDetails ).toString(), passcode ),
+              utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
+              utils.encrypt( shareId.toString(), passcode )
+            ]
+          );
+          resolve( true );
+        }
+      } );
     } );
   } );
 };
