@@ -53,8 +53,7 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 import {
   colors,
   images,
-  localDB,
-  errorMessage
+  localDB
 } from "HexaWallet/src/app/constants/Constants";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );

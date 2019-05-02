@@ -14,6 +14,8 @@ export default class S3Service {
     return encryptedShares;
   }
 
+  public getWalletId = () => this.sss.getWalletId();
+
   public getShareId = (encryptedShare: string) =>
     this.sss.getShareId(encryptedShare)
 

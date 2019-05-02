@@ -6,6 +6,9 @@ export default class Singleton {
   public deepLinkingUrl: string = "";
   public deepLinkingType: string = "";
 
+  //Class Object 
+  public S3Service: any;
+
 
 
   //Wallet Details
