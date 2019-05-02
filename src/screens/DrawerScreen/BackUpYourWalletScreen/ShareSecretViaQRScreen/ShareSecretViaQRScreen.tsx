@@ -22,7 +22,8 @@ import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Contacts from 'react-native-contacts';
 import { Avatar, SearchBar } from 'react-native-elements';
-import QRCode from "react-native-qrcode";
+// import QRCode from "react-native-qrcode";
+import QRCode from 'react-native-qrcode-svg';
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -45,7 +46,7 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
 
     componentWillMount() {
         let data = JSON.stringify( this.props.navigation.getParam( "data" ) );
-        //console.log( { data } );
+        console.log( { data } );
         this.setState( {
             data: data.toString()
         } )
@@ -60,7 +61,6 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
     goBack() {
         const { navigation } = this.props;
         navigation.goBack();
-        //  navigation.state.params.onSelect( { selected: true } );
     }
 
     render() {
@@ -86,14 +86,20 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center" } }>
-                                <QRCode
+                                {/* <QRCode
                                     ref="qrcodeView"
                                     value={ this.state.data }
                                     size={ Dimensions.get( "screen" ).width - 70 }
                                     bgColor="black"
                                     fgColor="white"
                                     style={ { width: "100%", height: "100%" } }
-                                />
+                                /> */}
+                                <QRCode
+          value={this.state.data}
+          getRef={c => (this.svg = c)}   
+          size={Dimensions.get('screen').width - 50}
+        />  
+       
                             </View>
                             <View style={ { flex: 0.5, alignItems: "center" } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut faucibus pulvinar elementum integer enim neque volutpat. Leo integer malesuada nunc vel. Purus faucibus ornare suspendisse sed nisi lacus sed. Et ligula ullamcorper malesuada proin libero nunc consequat. A cras semper auctor neque vitae tempus quam pellentesque. In nisl nisi scelerisque eu ultrices vitae auctor eu augue. Sed risus ultricies tristique nulla aliquet enim tortor. Curabitur gravida arcu ac tortor dignissim convallis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Porta lorem mollis aliquam ut porttitor Leo a.</Text>

@@ -262,15 +262,18 @@ export default class WalletScreen extends React.Component {
     } );
     const dateTime = Date.now();
     const fulldate = Math.floor( dateTime / 1000 );
-    let urlScript = utils.getDeepLinkingUrl();
+    let urlScript = utils.getDeepLinkingUrl();   
     let userDetail = {};
-    userDetail.name = urlScript.n;
+    userDetail.name = urlScript.n;  
     userDetail.mobileNo = urlScript.m;
     let walletDetails = utils.getWalletDetails();
     const sss = new S3Service(
       walletDetails[ 0 ].mnemonic
     );
     let resShareId = await sss.getShareId( urlScript.encpShare )
+    console.log( { resShareId } );  
+
+    const { data, updated } = await sss.updateHealth( urlScript.meta.walletId, urlScript.encpShare );
     const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
       localDB.tableName.tblTrustedPartySSSDetails,
       fulldate,
