@@ -48,8 +48,8 @@ export default class CreateTables extends Component {
       );
       txn.executeSql(
         "CREATE TABLE IF NOT EXISTS " +
-        localDB.tableName.tblTrustedPartyDetails +
-        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,userDetails TEXT,decrShare TEXT,shareId TEXT)",
+        localDB.tableName.tblTrustedPartySSSDetails +
+        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,userDetails TEXT,decrShare TEXT,shareId TEXT,nonPMDDData TEXT)",
         []
       );
       console.log( "create database." );

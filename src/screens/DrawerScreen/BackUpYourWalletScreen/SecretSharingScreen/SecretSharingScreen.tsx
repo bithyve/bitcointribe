@@ -32,8 +32,16 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-export default class SecretSharingScreen extends React.Component<any, any> {
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
+
+
+//TODO: Bitcoin Files
+import SSS from "HexaWallet/src/bitcoin/utilities/sss/SSS";
+
+
+
+export default class SecretSharingScreen extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props )
         this.state = ( {
@@ -41,9 +49,22 @@ export default class SecretSharingScreen extends React.Component<any, any> {
         } )
     }
 
-
-    componentWillMount() {
+    componentWillMount = async () => {
         let data = this.props.navigation.getParam( "data" );
+        let resSSSDetails = await dbOpration.readTablesData(
+            localDB.tableName.tblSSSDetails
+        );
+        let arr_EncpShare = [];
+        for ( let i = 0; i < resSSSDetails.temp.length; i++ ) {
+            let data = resSSSDetails.temp[ i ];
+            arr_EncpShare.push( data.share )
+        }
+
+        const sss = new SSS();
+        const resCheckHealth = await sss.checkHealth( arr_EncpShare );
+        console.log( { resCheckHealth } );
+
+        console.log( { data } );
         this.setState( {
             data: data
         } )

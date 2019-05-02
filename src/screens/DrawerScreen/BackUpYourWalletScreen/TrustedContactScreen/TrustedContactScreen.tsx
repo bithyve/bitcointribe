@@ -93,7 +93,10 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             localDB.tableName.tblSSSDetails,
             data.recordID
         );
+
         console.log( { resSSSDetails } );
+
+
         let walletDetails = utils.getWalletDetails();
         console.log( { walletDetails } );
         const sss = new S3Service(

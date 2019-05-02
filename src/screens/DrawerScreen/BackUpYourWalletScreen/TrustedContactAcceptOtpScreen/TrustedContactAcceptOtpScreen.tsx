@@ -107,11 +107,12 @@ export default class TrustedContactAcceptOtpScreen extends Component {
         console.log( { resDecryptOTPEncShare, resShareId } );
         if ( resDecryptOTPEncShare != "" || resDecryptOTPEncShare != null ) {
             const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
-                localDB.tableName.tblTrustedPartyDetails,
+                localDB.tableName.tblTrustedPartySSSDetails,
                 fulldate,
                 userDetails,
                 resDecryptOTPEncShare,
-                resShareId
+                resShareId,
+                "temp"
             );
             if ( resinsertTrustedPartyDetails == true ) {
                 this.setState( {
