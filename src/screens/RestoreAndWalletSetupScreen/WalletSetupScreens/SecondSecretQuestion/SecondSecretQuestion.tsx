@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, Dimensions, Platform, SafeAreaView } from "react-native";
+import { StyleSheet, ImageBackground, View, Dimensions, Platform, SafeAreaView, Alert } from "react-native";
 import {
     Container,
     Header,
@@ -92,6 +92,8 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         const fulldate = Math.floor( dateTime / 1000 );
         let data = this.state.data;
         let walletDetails = utils.getWalletDetails();
+        console.log( { walletDetails } );
+
         let walletName = data.walletName;
         let firstQuestion = data.question;
         let firstAnswer = data.answer;
@@ -102,46 +104,59 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         );
         const answers = [ firstAnswer, secoundAnser ];
         const encryptedShares = sss.generateShares( answers );
-        //console.log( { encryptedShares } );
-        const shareIds = []
-        const transShare = [];
-        for ( const share of encryptedShares ) {
-            shareIds.push( sss.getShareId( share ) )
-            transShare.push( sss.createTransferShare( share, walletName ) )
-        }
-        if ( shareIds != null ) {
-            const resultSSSShareIdInserted = await dbOpration.insertSSSShareAndShareId(
-                localDB.tableName.tblSSSDetails,
-                fulldate,
-                encryptedShares,
-                shareIds
-            );
-            // console.log( { resultSSSShareIdInserted } );
-            await dbOpration.insertCreateAccount(
-                localDB.tableName.tblAccount,
-                fulldate,
-                "",
-                "BTC",
-                walletName,
-                "Wallet",
-                ""
-            );
-            let jsonAnswerDetails = {};
-            jsonAnswerDetails.walletName = walletName;
-            jsonAnswerDetails.firstQuestion = firstQuestion;
-            jsonAnswerDetails.firstAnswer = firstAnswer;
-            jsonAnswerDetails.secoundQuestion = secoundQuestion;
-            jsonAnswerDetails.secoundAnser = secoundAnser;
-            console.log( { jsonAnswerDetails } );
-            await dbOpration.updateWalletAnswerDetials(
-                localDB.tableName.tblWallet,
-                jsonAnswerDetails,
-            );
+        console.log( { encryptedShares } );
+
+        //save to share to database
+        const resInitializeHealthcheck = await sss.initializeHealthcheck( encryptedShares );
+        console.log( { resInitializeHealthcheck } );
+        if ( resInitializeHealthcheck.success ) {
+            //console.log( { encryptedShares } );
+            const shareIds = [];
+            const transShare = [];
+            for ( const share of encryptedShares ) {
+                shareIds.push( sss.getShareId( share ) )
+                transShare.push( sss.createTransferShare( share, walletName ) )
+            }
+            if ( shareIds != null ) {
+                const resultSSSShareIdInserted = await dbOpration.insertSSSShareAndShareId(
+                    localDB.tableName.tblSSSDetails,
+                    fulldate,
+                    encryptedShares,
+                    shareIds
+                );
+                console.log( { resultSSSShareIdInserted } );
+                await dbOpration.insertCreateAccount(
+                    localDB.tableName.tblAccount,
+                    fulldate,
+                    "",
+                    "BTC",
+                    walletName,
+                    "Wallet",
+                    ""
+                );
+                let jsonAnswerDetails = {};
+                jsonAnswerDetails.walletName = walletName;
+                jsonAnswerDetails.firstQuestion = firstQuestion;
+                jsonAnswerDetails.firstAnswer = firstAnswer;
+                jsonAnswerDetails.secoundQuestion = secoundQuestion;
+                jsonAnswerDetails.secoundAnser = secoundAnser;
+                console.log( { jsonAnswerDetails } );
+                await dbOpration.updateWalletAnswerDetials(
+                    localDB.tableName.tblWallet,
+                    jsonAnswerDetails,
+                );
+                this.setState( {
+                    flag_Loading: false
+                } )
+                this.props.prevScreen();
+            }
+        } else {
             this.setState( {
                 flag_Loading: false
-            } )
-            this.props.prevScreen();
+            } );
+            Alert.alert( "InitializeHealthcheck not working." )
         }
+
     }
 
 

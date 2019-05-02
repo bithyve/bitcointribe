@@ -2,7 +2,6 @@ import Client from "bitcoin-core";
 import bitcoinJS, { Network } from "bitcoinjs-lib";
 import config from "react-native-config";
 
-
 class Config {
   public ENVIRONMENT: string;
   public NETWORK: Network;
@@ -13,6 +12,7 @@ class Config {
   public SSS_OTP_LENGTH: string = config.BIT_SSS_OTP_LENGTH;
   public SSS_TOTAL: number = parseInt( config.BIT_SSS_TOTAL, 10 );
   public SSS_THRESHOLD: number = parseInt( config.BIT_SSS_THRESHOLD, 10 );
+  public MSG_ID_LENGTH: number = parseInt( config.BIT_MSG_ID_LENGTH, 10 );
   public BH_SERVER = {
     DEV: config.BIT_API_URLS_BH_SERVER_DEV,
     PROD: config.BIT_API_URLS_BH_SERVER_PROD,

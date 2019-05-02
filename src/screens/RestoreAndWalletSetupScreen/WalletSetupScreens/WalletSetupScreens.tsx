@@ -16,8 +16,7 @@ import {
     Segment
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
-import IconFontAwe from "react-native-vector-icons/FontAwesome";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { StackActions, NavigationActions } from "react-navigation";
 
 
 //TODO: Custome Pages
@@ -39,6 +38,18 @@ import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants"
 
 
 export default class WalletSetupScreens extends React.Component<any, any> {
+
+    //TODO:click_GotoPermisionScrenn
+    click_GotoPermisionScrenn() {
+        const resetAction = StackActions.reset( {
+            index: 0, // <-- currect active route from actions array
+            key: null,
+            actions: [
+                NavigationActions.navigate( { routeName: "PermissionNavigator" } )
+            ]
+        } );
+        this.props.navigation.dispatch( resetAction );
+    }
     render() {
         return (
             <Container>
@@ -60,7 +71,7 @@ export default class WalletSetupScreens extends React.Component<any, any> {
                             {/* Second screen */ }
                             <FirstSecretQuestionScreen />
                             {/* Third screen */ }
-                            <SecondSecretQuestion prevScreen={ () => this.props.navigation.pop() } />
+                            <SecondSecretQuestion prevScreen={ () => this.click_GotoPermisionScrenn() } />
                         </WalletSetUpScrolling>
                     </ImageBackground>
                 </SafeAreaView>

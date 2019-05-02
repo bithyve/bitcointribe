@@ -32,7 +32,7 @@ export default class OnBoardingScreen extends React.Component<any, any> {
     } );
   }
 
-  //TODO: func click_Done
+  //TODO: func click_Done  
   click_Done() {
     console.log( "click" );
     const resetAction = StackActions.reset( {

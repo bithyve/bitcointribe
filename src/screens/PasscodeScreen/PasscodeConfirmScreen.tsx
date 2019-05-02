@@ -8,7 +8,8 @@ import {
   Platform,
   KeyboardAvoidingView,
   Image,
-  StatusBar
+  StatusBar,
+  Alert
 } from "react-native";
 import { StackActions, NavigationActions } from "react-navigation";
 import CodeInput from "react-native-confirmation-code-input";
@@ -46,6 +47,9 @@ let isNetwork: Boolean;
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 
+//TODO: Bitcon Files
+import Bitcoin from "HexaWallet/src/bitcoin/utilities/Bitcoin";
+import bip39 from 'react-native-bip39'
 export default class PasscodeConfirmScreen extends Component<any, any> {
   constructor ( props: any ) {
     super( props );
@@ -108,14 +112,18 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
 
   saveData = async () => {
     try {
-      this.setState( {
-        isLoading: true
-      } )
+      // this.setState( {
+      //   isLoading: true
+      // } )    
       let code = this.state.pincode;
       let commonData = Singleton.getInstance();
       commonData.setPasscode( code );
-      let mnemonic = [ "silent", "useless", "panic", "cousin", "page", "black", "abandon", "ticket", "hand", "minor", "stand", "excite" ]; //await utils.getMnemonic(); //this.state.mnemonicValues;
+      // const bitcoin = new Bitcoin();   
+      // const mnemonic = await bitcoin.createHDWallet();
+      // Alert.alert( mnemonic );      
+      const mnemonic = await bip39.generateMnemonic( 256 );
       console.log( { mnemonic } );
+      //let mnemonic = [ "silent", "useless", "panic", "cousin", "page", "black", "abandon", "ticket", "hand", "minor", "stand", "excite" ]; //await utils.getMnemonic(); //this.state.mnemonicValues;
       const dateTime = Date.now();
       const fulldate = Math.floor( dateTime / 1000 );
       const resultCreateWallet = await dbOpration.insertWallet(
@@ -158,7 +166,7 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
             index: 0, // <-- currect active route from actions array
             key: null,
             actions: [
-              NavigationActions.navigate( { routeName: "TabbarBottom" } )
+              NavigationActions.navigate( { routeName: "RestoreAndWalletSetupNavigator" } )
             ]
           } );
           this.props.navigation.dispatch( resetAction );
