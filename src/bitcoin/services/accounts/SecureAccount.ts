@@ -10,7 +10,9 @@ export default class SecureAccount {
   }
 
   public getRecoveryMnemonic = async () =>
-    this.secureHDWallet.getRecoveryMnemonic()
+    this.secureHDWallet.getSecondaryMnemonic()
+
+  public getAccountId = () => this.secureHDWallet.getAccountId();
 
   public getAddress = async () =>
     await this.secureHDWallet.getReceivingAddress()
@@ -20,8 +22,15 @@ export default class SecureAccount {
   public setupSecureAccount = async () =>
     await this.secureHDWallet.setupSecureAccount()
 
-  public validateSecureAccountSetup = async (token: number, secret: string) =>
-    await this.secureHDWallet.validateSecureAccountSetup(token, secret)
+  public importSecureAccount = (bhXpub: string, secondaryXpub: string) =>
+    this.secureHDWallet.prepareSecureAccount(bhXpub, secondaryXpub)
+
+  public validateSecureAccountSetup = async (
+    token: number,
+    secret: string,
+    xIndex: number,
+  ) =>
+    await this.secureHDWallet.validateSecureAccountSetup(token, secret, xIndex)
 
   public partiallySignedSecureTransaction = async ({
     recipientAddress,

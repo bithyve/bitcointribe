@@ -9,24 +9,25 @@ import Bitcoin from "./Bitcoin";
 
 export default class SecureHDWallet extends Bitcoin {
   public primaryMnemonic: string;
-  public recoveryMnemonic: string;
+  public secondaryMnemonic: string;
   public walletID: string;
-  public xpubs;
+  public xpubs: {
+    primary: string;
+    secondary: string;
+    bh: string;
+  };
   public path: string;
   public network;
   public consumedAddresses: string[];
   public nextFreeChildIndex: number;
   public primaryXpriv: string;
-  public bhXpub: string;
   public multiSigCache;
   public signingEssentialsCache;
 
   constructor(primaryMnemonic: string) {
     super();
     this.primaryMnemonic = primaryMnemonic;
-    this.recoveryMnemonic = bip39.generateMnemonic();
     this.network = config.NETWORK;
-    this.xpubs = {};
     this.consumedAddresses = [];
     this.nextFreeChildIndex = 0;
     this.multiSigCache = {};
@@ -44,7 +45,7 @@ export default class SecureHDWallet extends Bitcoin {
     return xKey.publicKey.toString("hex");
   }
 
-  public getRecoveryMnemonic = () => this.recoveryMnemonic;
+  public getSecondaryMnemonic = () => this.secondaryMnemonic;
 
   public getRecoverableXKey = (
     mnemonic: string,
@@ -63,6 +64,15 @@ export default class SecureHDWallet extends Bitcoin {
       const xpriv = root.derivePath("m/" + path).toBase58();
       return xpriv;
     }
+  }
+
+  public getAccountId = () => {
+    const mutliSig = this.createSecureMultiSig(0);
+    const { address } = mutliSig; // getting the first receiving address
+    return crypto
+      .createHash("sha256")
+      .update(address)
+      .digest("hex");
   }
 
   public fetchBalance = async () => {
@@ -225,26 +235,38 @@ export default class SecureHDWallet extends Bitcoin {
     return freeAddress;
   }
 
-  public generateSecureAccAssets = async () => {
-    const primaryXpub = this.getRecoverableXKey(
-      this.primaryMnemonic,
-      this.path,
-    );
-    const recoveryXpub = this.getRecoverableXKey(
-      this.recoveryMnemonic,
-      this.path,
-    );
+  public derivePath = (bhXpub: string) => {
+    const bhxpub = bip32.fromBase58(bhXpub, this.network);
+    let path;
+    if (bhxpub.index === 0) {
+      path = config.DERIVATION_BRANCH;
+    } else {
+      path = config.WALLET_XPUB_PATH + config.DERIVATION_BRANCH;
+    }
+    return path;
+  }
+
+  public prepareSecureAccount = async (bhXpub, secondaryXpub?) => {
+    const path = this.derivePath(bhXpub);
+    const primaryXpub = this.getRecoverableXKey(this.primaryMnemonic, path);
+
+    if (!secondaryXpub) {
+      this.secondaryMnemonic = bip39.generateMnemonic(256);
+      secondaryXpub = this.getRecoverableXKey(this.secondaryMnemonic, path);
+    }
 
     this.primaryXpriv = this.getRecoverableXKey(
       this.primaryMnemonic,
-      this.path,
+      path,
       true,
     );
 
     this.xpubs = {
       primary: primaryXpub,
-      recovery: recoveryXpub,
+      secondary: secondaryXpub,
+      bh: bhXpub,
     };
+
     const hash = crypto.createHash("sha512");
     const seed = bip39.mnemonicToSeed(this.primaryMnemonic);
     hash.update(seed);
@@ -257,15 +279,15 @@ export default class SecureHDWallet extends Bitcoin {
     } // cache hit
 
     console.log(`creating multiSig against index: ${childIndex}`);
+
     const childPrimaryPub = this.getPub(
       this.deriveChildXKey(this.xpubs.primary, childIndex),
     );
     const childRecoveryPub = this.getPub(
-      this.deriveChildXKey(this.xpubs.recovery, childIndex),
+      this.deriveChildXKey(this.xpubs.secondary, childIndex),
     );
-    // console.log({ bhXpub: this.bhXpub });
     const childBHPub = this.getPub(
-      this.deriveChildXKey(this.bhXpub, childIndex),
+      this.deriveChildXKey(this.xpubs.bh, childIndex),
     );
 
     // public keys should be aligned in the following way: [bhPub, primaryPub, recoveryPub]
@@ -294,14 +316,8 @@ export default class SecureHDWallet extends Bitcoin {
         errorMessage: err.response.data,
       };
     }
-    this.bhXpub = res.data.bhXpub;
-    const bhxpub = bip32.fromBase58(this.bhXpub, this.network);
-    if (bhxpub.index === 0) {
-      this.path = config.DERIVATION_BRANCH;
-    } else {
-      this.path = config.WALLET_XPUB_PATH + config.DERIVATION_BRANCH;
-    }
-    await this.generateSecureAccAssets();
+
+    await this.prepareSecureAccount(res.data.bhXpub);
 
     return {
       status: res.status,
@@ -309,11 +325,16 @@ export default class SecureHDWallet extends Bitcoin {
     };
   }
 
-  public validateSecureAccountSetup = async (token: number, secret: string) => {
+  public validateSecureAccountSetup = async (
+    token: number,
+    secret: string,
+    xIndex: number,
+  ) => {
     try {
       const res = await axios.post(config.SERVER + "/validate2FASetup", {
         token,
         secret,
+        xIndex,
         walletID: this.walletID,
       });
       return { status: res.status, data: res.data };
@@ -412,8 +433,8 @@ const smokeRunner = async () => {
   };
   const secureWallet = new SecureHDWallet(dummyMnemonic);
   await secureWallet.setupSecureAccount();
-  secureWallet.xpubs.recovery = dummyRecoveryXpub;
-  secureWallet.bhXpub = dummyBHXpub;
+  secureWallet.xpubs.secondary = dummyRecoveryXpub;
+  secureWallet.xpubs.bh = dummyBHXpub;
 
   //   const balance = await secureWallet.fetchBalance(); // updates the consumed address list
   //   console.log(balance);

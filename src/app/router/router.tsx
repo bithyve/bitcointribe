@@ -10,21 +10,24 @@ import { SvgIcon } from "@up-shared/components";
 
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
-//OnBoarding
-import OnBoardingScreen from "HexaWallet/src/screens/WalletScreen/OnBoardingScreen/OnBoardingScreen";
+
+//TODO: RestoreAndWalletSetupScreen  
+import OnBoardingScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/OnBoardingScreen/OnBoardingScreen";
+import PasscodeScreen from "HexaWallet/src/screens/PasscodeScreen/PasscodeScreen";
+import PasscodeConfirmScreen from "HexaWallet/src/screens/PasscodeScreen/PasscodeConfirmScreen";
+import RestoreAndReoverWalletScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/RestoreAndReoverWalletScreen/RestoreAndReoverWalletScreen";
+import WalletSetupScreens from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/WalletSetupScreens/WalletSetupScreens";
+import PermissionScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/PermissionScreen/PermissionScreen";
 
 // import BackupPhraseScreen from "bithyve/src/screens/WalletScreen/BackupPhraseScreen/BackupPhraseScreen";
 // import VerifyBackupPhraseScreen from "bithyve/src/screens/WalletScreen/VerifyBackupPhraseScreen/VerifyBackupPhraseScreen";
-// //Passcode
-import PasscodeScreen from "HexaWallet/src/screens/PasscodeScreen/PasscodeScreen";
-import PasscodeConfirmScreen from "HexaWallet/src/screens/PasscodeScreen/PasscodeConfirmScreen";
-//
+
 // //Tabbar Bottom
 // import PaymentScreen from "bithyve/src/screens/TabBarScreen/PaymentScreen/PaymentScreen";
 // import AnalyticsScreen from "bithyve/src/screens/TabBarScreen/AnalyticsScreen/AnalyticsScreen";
 // import AccountsScreen from "bithyve/src/screens/TabBarScreen/AccountsScreen/AccountsScreen";
 // import CardsScreen from "bithyve/src/screens/TabBarScreen/CardsScreen/CardsScreen";
-// import MoreScreen from "bithyve/src/screens/TabBarScreen/MoreScreen/MoreScreen";
+import SettingScreen from "HexaWallet/src/screens/TabBarScreen/SettingScreen/SettingScreen";
 //
 // //Left DrawerScreen
 // import SecurityScreen from "bithyve/src/screens/DrawerScreen/SecurityScreen/SecurityScreen";
@@ -61,15 +64,6 @@ import QrCodeScannerScreen from "HexaWallet/src/screens/TabBarScreen/QrCodeScann
 //TODO: New Screen Hexa Wallet
 import WalletScreen from "HexaWallet/src/screens/TabBarScreen/WalletScreen/WalletScreen";
 
-
-
-//TODO: Wallet SetUp Screen
-import WalletSetupScreens from "../../screens/DrawerScreen/WalletSetupScreens/WalletSetupScreens";
-import WalletNameScreen from "../../screens/DrawerScreen/WalletSetupScreens/WalletNameScreen/WalletNameScreen";
-import FirstSecretQuestionScreen from "../../screens/DrawerScreen/WalletSetupScreens/FirstSecretQuestionScreen/FirstSecretQuestionScreen";
-import SecondSecretQuestion from "../../screens/DrawerScreen/WalletSetupScreens/SecondSecretQuestion/SecondSecretQuestion";
-
-
 //TODO: Backup your Walleet Screen
 import AllContactListScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/AllContactListScreen/AllContactListScreen";
 import SecretSharingScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/SecretSharingScreen/SecretSharingScreen";
@@ -80,10 +74,12 @@ import TrustedContactAcceptOtpScreen from "../../screens/DrawerScreen/BackUpYour
 
 
 
+
+
 //TODO: StackNavigator
 
 //TODO: StackNavigator:ONBoarding
-const OnBoardingRouter = createStackNavigator(
+const OnBoardingStackNavigator = createStackNavigator(
   {
     OnBoarding: {
       screen: OnBoardingScreen,
@@ -95,8 +91,25 @@ const OnBoardingRouter = createStackNavigator(
   }
 );
 
-//TODO: StackNavigator: JointAccountStackRouter
+const RestoreAndWalletSetupStackNavigator = createStackNavigator(
+  {
+    RestoreAndReoverWalletScreen: {
+      screen: RestoreAndReoverWalletScreen,
+      navigationOptions: { header: null }
+    },
+    WalletSetupScreens: {
+      screen: WalletSetupScreens,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "RestoreAndReoverWalletScreen"
+  }
+);
 
+
+
+//TODO: StackNavigator: JointAccountStackRouter
 // const JointAccountStackRouter = createStackNavigator(
 //   {
 //     CreateJointAccountScreen: {
@@ -177,26 +190,7 @@ const OnBoardingRouter = createStackNavigator(
 // );
 
 
-//TODO: StackNavigator:WalletSetupStackNavigatorRouter
-const WalletSetupStackNavigatorRouter = createStackNavigator(
-  {
-    WalletSetupScreens: {
-      screen: WalletSetupScreens,
-      navigationOptions: { header: null }
-    },
-    FirstSecretQuestionScreen: {
-      screen: FirstSecretQuestionScreen,
-      navigationOptions: { header: null }
-    },
-    SecondSecretQuestion: {
-      screen: SecondSecretQuestion,
-      navigationOptions: { header: null }
-    }
-  },
-  {
-    initialRouteName: "WalletSetupScreens"
-  }
-);
+//TODO: FirstTimeWalletSetupStackNavigatorRouter
 
 const BackUpYourWalletStackNavigatorRouter = createStackNavigator(
   {
@@ -234,9 +228,6 @@ const TrustedContactAcceptStackNavigatorRouter = createStackNavigator(
   }
 );
 
-
-
-
 //TODO: TabNavigator
 //TODO: TabNavigator:TabNavigator
 const TabNavigator = createBottomTabNavigator(
@@ -270,8 +261,8 @@ const TabNavigator = createBottomTabNavigator(
       }
     },
 
-    More: {
-      screen: WalletScreen,
+    Settings: {
+      screen: SettingScreen,
       navigationOptions: {
         tabBarLabel: "Settings", //localization("TabBarItem.More"),
         tabBarIcon: ( { tintColor } ) => (
@@ -342,19 +333,23 @@ export const createRootNavigator = (
         navigationOptions: { header: null }
       },
       OnBoardingNavigator: {
-        screen: OnBoardingRouter,
+        screen: OnBoardingStackNavigator,
         navigationOptions: { header: null }
       },
       PasscodeConfirmScreen: {
         screen: PasscodeConfirmScreen,
         navigationOptions: { header: null }
       },
-      TabbarBottom: {
-        screen: TabNavigator,
+      RestoreAndWalletSetupNavigator: {
+        screen: RestoreAndWalletSetupStackNavigator,
         navigationOptions: { header: null }
       },
-      WalletSetUpScreen: {
-        screen: WalletSetupStackNavigatorRouter,
+      PermissionNavigator: {
+        screen: PermissionScreen,
+        navigationOptions: { header: null }
+      },
+      TabbarBottom: {
+        screen: TabNavigator,
         navigationOptions: { header: null }
       },
       BackUpYourWalletNavigator: {
@@ -441,6 +436,7 @@ export const createRootNavigator = (
     {
       //initialRouteName: signedIn ? "OnBoardingNavigator" : PasscodeConfirmScreen
       initialRouteName: signedIn ? "OnBoardingNavigator" : screenName //"TabbarBottom" // 
+      // initialRouteName: signedIn ? "OnBoardingNavigator" : "PermissionNavigator" //"TabbarBottom" // 
       // initialRouteName: signedIn ? "OnBoardingNavigator" : "OnBoardingNavigator"
       // initialRouteName: signedIn ? "TabbarBottom" : "TabbarBottom"
     }

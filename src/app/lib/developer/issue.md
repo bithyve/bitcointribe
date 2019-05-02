@@ -178,3 +178,9 @@ compileSdkVersion = 28
 ```
 
 ```
+
+
+#  _react.PropsTypes.oneofTypes
+
+=>check this lib
+
