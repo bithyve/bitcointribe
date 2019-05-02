@@ -265,7 +265,6 @@ export default class SSS {
     encryptedShares.forEach( ( encShare ) =>
       shareIDs.push( this.getShareId( encShare ) ),
     );
-
     try {
       const res = await axios.post( config.SERVER + "/checkHealth", {
         walletID: this.getWalletId(),

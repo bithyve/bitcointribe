@@ -29,7 +29,6 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 import {
   colors,
   localDB,
-  errorValidMsg,
   images
 } from "HexaWallet/src/app/constants/Constants";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
