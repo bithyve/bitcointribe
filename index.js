@@ -11,7 +11,6 @@ import Singleton from "HexaWallet/src/app/constants/Singleton";
 
 
 
-
 //TODO: Custome Object
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 export default class HexaWalletWalletWallet extends React.Component

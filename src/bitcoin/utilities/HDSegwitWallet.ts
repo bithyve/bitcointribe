@@ -2,6 +2,7 @@ import bip32 from "bip32";
 import bip39 from "bip39";
 import bitcoinJS, { TransactionBuilder } from "bitcoinjs-lib";
 import coinselect from "coinselect";
+import crypto from "crypto";
 import Bitcoin from "./Bitcoin";
 
 export default class HDSegwitWallet extends Bitcoin {
@@ -16,7 +17,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
   constructor(mnemonic?: string) {
     super();
-    this.mnemonic = mnemonic ? mnemonic : bip39.generateMnemonic();
+    this.mnemonic = mnemonic ? mnemonic : bip39.generateMnemonic(256);
     this.usedAddresses = [];
     this.nextFreeAddressIndex = 0;
     this.nextFreeChangeAddressIndex = 0;
@@ -27,6 +28,22 @@ export default class HDSegwitWallet extends Bitcoin {
 
   public getMnemonic = () => {
     return this.mnemonic;
+  }
+
+  public getWalletId = () =>
+    crypto
+      .createHash("sha512")
+      .update(bip39.mnemonicToSeed(this.mnemonic))
+      .digest("hex")
+
+  public getAccountId = () => {
+    const node = bip32.fromBase58(this.getXpub(), this.network);
+    const keyPair = node.derive(0).derive(0);
+    const address = this.getAddress(keyPair); // getting the first receiving address
+    return crypto
+      .createHash("sha256")
+      .update(address)
+      .digest("hex");
   }
 
   public getXpub = () => {
@@ -148,6 +165,9 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     if (!freeAddress) {
+      console.log(
+        "Failed to find a free address in the external address cycle, using the next address without checking",
+      );
       // giving up as we could find a free address in the above cycle
       freeAddress = this.getExternalAddressByIndex(
         this.nextFreeAddressIndex + itr,
@@ -184,6 +204,9 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     if (!freeAddress) {
+      console.log(
+        "Failed to find a free address in the change address cycle, using the next address without checking",
+      );
       // giving up as we could find a free address in the above cycle
       freeAddress = this.getInternalAddressByIndex(
         this.nextFreeChangeAddressIndex + itr,
@@ -288,7 +311,6 @@ export default class HDSegwitWallet extends Bitcoin {
       this.nextFreeAddressIndex = await binarySearchIterationForExternalAddress(
         100,
       );
-      console.log(this.nextFreeAddressIndex);
       this.usedAddresses = [];
 
       // generating all involved addresses:

@@ -34,7 +34,6 @@ import { RkCard } from "react-native-ui-kitten";
 import DropdownAlert from "react-native-dropdownalert";
 import { SvgIcon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
-import Permissions from 'react-native-permissions'
 
 //Custome Compontes
 import ViewShieldIcons from "HexaWallet/src/app/custcompontes/View/ViewShieldIcons/ViewShieldIcons";
@@ -163,17 +162,6 @@ export default class WalletScreen extends React.Component {
       outputRange: [ 50, 70 ],
       extrapolate: "clamp"
     } );
-
-    //Permission buz qrcode tab click to android issue generate qr code on camera not showing
-    try {
-      AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
-      Permissions.request( 'camera' ).then( response => {
-        AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
-        console.log( { response } );
-      } );
-    } catch ( err ) {
-      console.warn( err );
-    }
   }
 
 
@@ -205,7 +193,7 @@ export default class WalletScreen extends React.Component {
     const resSSSDetails = await dbOpration.readTablesData(
       localDB.tableName.tblSSSDetails
     );
-    //console.log( { resSSSDetails } );
+    console.log( { resSSSDetails } );
     if ( resSSSDetails.temp.length == 0 ) {
       this.setState( {
         shiledIconPer: 1,
@@ -285,11 +273,12 @@ export default class WalletScreen extends React.Component {
     );
     let resShareId = await sss.getShareId( urlScript.encpShare )
     const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
-      localDB.tableName.tblTrustedPartyDetails,
+      localDB.tableName.tblTrustedPartySSSDetails,
       fulldate,
       userDetail,
       urlScript.encpShare,
-      resShareId
+      resShareId,
+      "temp"
     );
 
     //console.log( { resinsertTrustedPartyDetails } );
@@ -535,18 +524,6 @@ export default class WalletScreen extends React.Component {
                 }
               ]
             } );
-            try {
-              Permissions.request( 'contacts' ).then( response => {
-                console.log( { response } );
-              } );
-              Permissions.request( 'readSms' ).then( response => {
-                console.log( { response } );
-              } );
-
-
-            } catch ( err ) {
-              console.warn( err );
-            }
           } }
           closeModal={ () => {
             this.setState( {

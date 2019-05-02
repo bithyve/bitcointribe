@@ -18,6 +18,10 @@ export default class RegularAccount {
 
   public getMnemonic = () => this.hdWallet.getMnemonic();
 
+  public getWalletId = () => this.hdWallet.getWalletId();
+
+  public getAccountId = () => this.hdWallet.getAccountId();
+
   public getAddress = async () => await this.hdWallet.getReceivingAddress();
 
   public getBalance = async () => await this.hdWallet.fetchBalance();
