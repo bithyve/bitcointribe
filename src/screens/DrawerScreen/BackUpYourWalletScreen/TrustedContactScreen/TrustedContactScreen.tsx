@@ -108,9 +108,8 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         const { messageId, success } = await sss.uploadShare( share );
         console.log( { otpEncryptedShare: share, messageId, success } )
         let qrCodeData = {};
-        qrCodeData.type = "SSS Recovery";
-        qrCodeData.share = resSSSDetails.temp[ 0 ].share;
-        qrCodeData.name = this.state.data.givenName + " " + this.state.data.familyName;
+         qrCodeData.type = "SSS Recovery";  
+        qrCodeData.share = resSSSDetails.temp[ 0 ].share;  
         qrCodeData.phoneNo = data.phoneNumbers[ 0 ].number;
         if ( messageId != "" || messageId != null ) {
             this.setState( {

@@ -124,6 +124,7 @@
     "react-native-popup-menu": "^0.14.2",
     "react-native-qrcode": "^0.2.7",
     "react-native-qrcode-scanner": "^1.1.2",
+    "react-native-qrcode-svg": "^5.1.2",
     "react-native-randombytes": "^3.5.1",
     "react-native-remote-svg": "^2.0.0",
     "react-native-rsa": "^0.0.3",
