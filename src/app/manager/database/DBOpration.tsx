@@ -49,6 +49,12 @@ const readTablesData = ( tableName: any ) => {
               data.lastUpdated = utils.decrypt( data.lastUpdated, passcode );
               temp.push( data );
             }
+            else if ( tableName == "tblSSSDetails" ) {
+              data.id = data.id;
+              data.share = utils.decrypt( data.share, passcode );
+              data.shareId = utils.decrypt( data.shareId, passcode );
+              temp.push( data );
+            }
             else {
               temp.push( data );
             }
@@ -662,7 +668,7 @@ const updateSSSContactListDetails = (
               //console.log( { dbdecryptShareId } );
               let jsonConstactDetial = JSON.stringify( contactDetails[ i ] ).toString();
               let jsonRecordId = ( contactDetails[ i ].recordID ).toString();
-              console.log( { jsonConstactDetial, jsonRecordId } );
+              //  console.log( { jsonConstactDetial, jsonRecordId } );
               txn.executeSql(
                 "update " +
                 tblName +
@@ -695,6 +701,7 @@ const insertTrustedPartyDetails = (
   userDetails: any,
   decrShare: any,
   shareId: any,
+  nonPMDDData: any
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
@@ -714,7 +721,7 @@ const insertTrustedPartyDetails = (
               txn.executeSql(
                 "INSERT INTO " +
                 tblName +
-                "(dateCreated,userDetails,decrShare,shareId) VALUES (:dateCreated,:userDetails,:decrShare,:shareId)",
+                "(dateCreated,userDetails,decrShare,shareId,nonPMDDData) VALUES (:dateCreated,:userDetails,:decrShare,:shareId,:nonPMDDData)",
                 [
                   utils.encrypt(
                     fulldate.toString(),
@@ -722,7 +729,8 @@ const insertTrustedPartyDetails = (
                   ),
                   utils.encrypt( JSON.stringify( userDetails ).toString(), passcode ),
                   utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
-                  utils.encrypt( shareId.toString(), passcode )
+                  utils.encrypt( shareId.toString(), passcode ),
+                  utils.encrypt( nonPMDDData.toString(), passcode )
                 ]
               );
               resolve( true );
