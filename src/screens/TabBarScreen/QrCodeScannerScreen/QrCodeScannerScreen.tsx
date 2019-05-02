@@ -78,34 +78,7 @@ export default class QrCodeScannerScreen extends React.Component {
         }
     }
 
-    onReadBarCodeByGalleryFailure() {
-        Alert.alert( "Note", "Not found barcode!" );
-    }
-
-    onBarCodeRead( res: any ) {
-        try {
-            var result = JSON.parse( res.data );
-            result = JSON.parse( result );
-            AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
-            if ( result.type == "SSS Recovery" ) {
-                utils.setDeepLinkingType( "SSS Recovery QrCode" );
-                let deepLinkPara = {};
-                deepLinkPara.n = result.name;
-                deepLinkPara.m = result.phoneNo;
-                deepLinkPara.encpShare = result.share;
-                utils.setDeepLinkingUrl( deepLinkPara );
-                this.props.navigation.navigate( 'WalletScreen' );
-            }
-        } catch ( error ) {
-            console.log( error );
-        }
-    }
-
-    onBarCodeReadByGalleryStart( res: any ) {
-        console.log( "read data from gallery" );
-        console.log( { res } );
-    }
-
+   
 
     _renderTitleBar() {
         return (
@@ -127,7 +100,7 @@ export default class QrCodeScannerScreen extends React.Component {
             if ( result.type == "SSS Recovery" ) {
                 utils.setDeepLinkingType( "SSS Recovery QrCode" );
                 let deepLinkPara = {};
-                deepLinkPara.n = result.name;
+                deepLinkPara.n = "appasaheb lakade"  
                 deepLinkPara.m = result.phoneNo;
                 deepLinkPara.encpShare = result.share;
                 utils.setDeepLinkingUrl( deepLinkPara );
@@ -135,7 +108,7 @@ export default class QrCodeScannerScreen extends React.Component {
             }
         } catch ( error ) {
             console.log( error );
-        }
+        }  
     }
 
 
@@ -146,18 +119,6 @@ export default class QrCodeScannerScreen extends React.Component {
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        {/* <BarcodeScanner
-                            Title={ "QRCode Scanner" }   
-                            styles={ styles.barcodeScanner }
-                            cameraProps={ { captureAudio: false } }
-                            onBarCodeReadByGalleryStart={ data =>
-                                this.onBarCodeReadByGalleryStart.call( this, data )
-                            }  
-                            onReadBarCodeByGalleryFailure={ () =>
-                                this.onReadBarCodeByGalleryFailure.call( this )
-                            }
-                            onBarCodeRead={ data => this.onBarCodeRead.call( this, data ) }
-                        />    */}
                         < QRScannerView
                             hintText=""
                             rectHeight={ Dimensions.get( 'screen' ).height / 2.0 }
