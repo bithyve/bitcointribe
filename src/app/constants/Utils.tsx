@@ -179,6 +179,8 @@ const setDeepLinkingType = ( value: any ) => {
 }
 
 
+
+
 module.exports = {
   getUnixTimeDate,
   getUnixToDateFormat,
@@ -202,5 +204,5 @@ module.exports = {
   getDeepLinkingUrl,
   setDeepLinkingUrl,
   getDeepLinkingType,
-  setDeepLinkingType
+  setDeepLinkingType,
 };

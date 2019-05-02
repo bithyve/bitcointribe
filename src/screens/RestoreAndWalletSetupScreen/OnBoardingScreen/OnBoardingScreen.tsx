@@ -12,8 +12,8 @@ import OnBoarding from "HexaWallet/src/app/custcompontes/OnBoarding/OnBoarding";
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
-//TODO: Custome object
-import { colors, images, msg } from "HexaWallet/src/app/constants/Constants";
+//TODO: Custome object  
+import { colors, images } from "HexaWallet/src/app/constants/Constants";
 
 //localization 
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";

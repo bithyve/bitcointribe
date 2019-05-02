@@ -41,8 +41,7 @@ import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGra
 import {
     colors,
     images,
-    localDB,
-    errorMessage
+    localDB
 } from "HexaWallet/src/app/constants/Constants";
 import utils from "HexaWallet/src/app/constants/Utils";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
@@ -103,7 +102,12 @@ export default class TrustedContactAcceptOtpScreen extends Component {
         userDetails.mobileNo = script.m;
         const resDonwShare = await sss.downloadShare( messageId );
         const resDecryptOTPEncShare = await sss.decryptOTPEncShare( resDonwShare, messageId, enterOtp )
+        console.log( { resDecryptOTPEncShare } );
         let resShareId = await sss.getShareId( resDecryptOTPEncShare.encryptedShare )
+        const resgetWalletId = await sss.getWalletId();
+        const resupdateHealth = await sss.updateHealth( resgetWalletId, resDecryptOTPEncShare.encryptedShare )
+        console.log( { resupdateHealth } );
+
         console.log( { resDecryptOTPEncShare, resShareId } );
         if ( resDecryptOTPEncShare != "" || resDecryptOTPEncShare != null ) {
             const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(

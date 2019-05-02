@@ -36,6 +36,7 @@ var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
+
 export default class SecondSecretQuestion extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props );
@@ -105,8 +106,6 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         const answers = [ firstAnswer, secoundAnser ];
         const encryptedShares = sss.generateShares( answers );
         console.log( { encryptedShares } );
-
-        //save to share to database
         const resInitializeHealthcheck = await sss.initializeHealthcheck( encryptedShares );
         console.log( { resInitializeHealthcheck } );
         if ( resInitializeHealthcheck.success ) {

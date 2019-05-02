@@ -31,14 +31,15 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+var utils = require( "HexaWallet/src/app/constants/Utils" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
 
 
 //TODO: Bitcoin Files
-import SSS from "HexaWallet/src/bitcoin/utilities/sss/SSS";
-
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus";
 
 
 export default class SecretSharingScreen extends React.Component<any, any> {
@@ -51,6 +52,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
 
     componentWillMount = async () => {
         let data = this.props.navigation.getParam( "data" );
+        console.log( { data } );
         let resSSSDetails = await dbOpration.readTablesData(
             localDB.tableName.tblSSSDetails
         );
@@ -60,11 +62,22 @@ export default class SecretSharingScreen extends React.Component<any, any> {
             arr_EncpShare.push( data.share )
         }
 
-        const sss = new SSS();
+        console.log( { arr_EncpShare } );
+
+        let walletDetails = utils.getWalletDetails();
+        const sss = new S3Service(
+            walletDetails[ 0 ].mnemonic
+        );
         const resCheckHealth = await sss.checkHealth( arr_EncpShare );
         console.log( { resCheckHealth } );
+        const healthStatus = new HealthStatus();
+        const resHealthStatus = await healthStatus.shareHealthStatus( resCheckHealth.lastUpdateds );
+        console.log( { resHealthStatus } );
 
-        console.log( { data } );
+
+
+
+
         this.setState( {
             data: data
         } )
