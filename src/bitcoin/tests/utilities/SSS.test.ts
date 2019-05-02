@@ -5,9 +5,11 @@ import config from "../../Config";
 import SSS from "../../utilities/sss/SSS";
 
 describe("Shamir's Secret Sharing", async () => {
-  let mnemonic: string;
+  let userMnemonic: string;
+  let trustedMnemonic: string;
   let answers;
-  let sss: SSS;
+  let userSSS: SSS;
+  let trustedSSS: SSS;
   let tag: string;
   let encryptedShares;
   let sharedAssets;
@@ -19,15 +21,17 @@ describe("Shamir's Secret Sharing", async () => {
 
   beforeAll(() => {
     jest.setTimeout(50000);
-    mnemonic = bip39.generateMnemonic(256);
+    userMnemonic = bip39.generateMnemonic(256);
+    trustedMnemonic = bip39.generateMnemonic(256);
     answers = ["answer1", "answer2"];
-    sss = new SSS(mnemonic);
+    userSSS = new SSS(userMnemonic);
+    trustedSSS = new SSS(trustedMnemonic);
     tag = "TheCryptoBee";
     sharedAssets = [];
     recoveredShares = [];
     walletId = crypto
       .createHash("sha512")
-      .update(bip39.mnemonicToSeed(mnemonic))
+      .update(bip39.mnemonicToSeed(userMnemonic))
       .digest("hex");
 
     dummyNonPMDD = {
@@ -45,36 +49,36 @@ describe("Shamir's Secret Sharing", async () => {
   });
 
   test("generates encrypted shares corresponding to supplied mnemonic", () => {
-    const shares = sss.generateShares();
-    encryptedShares = sss.encryptShares(shares, answers);
+    const shares = userSSS.generateShares();
+    encryptedShares = userSSS.encryptShares(shares, answers);
     expect(encryptedShares.length).toEqual(config.SSS_TOTAL);
     expect(encryptedShares[0]).toBeTruthy();
   });
 
   test("initializes Healthcheck", async () => {
-    const { success } = await sss.initializeHealthcheck(encryptedShares);
+    const { success } = await userSSS.initializeHealthcheck(encryptedShares);
     expect(success).toBe(true);
   });
 
   test("encrypts and uploads the non-PMDD data to the server", async () => {
-    encryptedNonPMDD = await sss.encryptNonPMDD(dummyNonPMDD);
-    const { updated } = await sss.updateNonPMDD(encryptedNonPMDD);
+    encryptedNonPMDD = await userSSS.encryptNonPMDD(dummyNonPMDD);
+    const { updated } = await userSSS.updateNonPMDD(encryptedNonPMDD);
     expect(updated).toBe(true);
   });
 
   test("downloads the non-PMDD and decrypts it (user specific)", async () => {
-    const { nonPMDD } = await sss.fetchNonPMDD(walletId);
-    const decryptedNonPMDD = await sss.decryptNonPMDD(nonPMDD);
+    const { nonPMDD } = await userSSS.fetchNonPMDD(walletId);
+    const decryptedNonPMDD = await userSSS.decryptNonPMDD(nonPMDD);
     expect(decryptedNonPMDD).toEqual(dummyNonPMDD);
   });
 
   test("generates messageID against supplied shares and encrypts the shares with OTPs", () => {
     for (const encryptedShare of encryptedShares) {
-      const metaShare = sss.addMeta(encryptedShare, tag);
-      const { share, otp } = sss.encryptViaOTP(metaShare);
+      const metaShare = userSSS.addMeta(encryptedShare, tag);
+      const { share, otp } = userSSS.encryptViaOTP(metaShare);
       sharedAssets.push({
         otpEncryptedShare: share,
-        messageId: sss.generateMessageID(),
+        messageId: userSSS.generateMessageID(),
         otp,
       });
     }
@@ -86,17 +90,25 @@ describe("Shamir's Secret Sharing", async () => {
   test("uploads the otp encrypted share to the server (stored against the supplied messageId)", async () => {
     for (const sharedAsset of sharedAssets) {
       const { otpEncryptedShare, messageId } = sharedAsset;
-      const { success } = await sss.uploadShare(otpEncryptedShare, messageId);
+      const { success } = await userSSS.uploadShare(
+        otpEncryptedShare,
+        messageId,
+      );
       expect(success).toBe(true);
     }
   });
 
-  test("downloads the shares corresponding to the supplied messageIds and then decrypts them using OTPs", async () => {
+  test("downloads the shares corresponding to the supplied messageIds and then decrypts them using OTPs (trusted party specific)", async () => {
     for (const sharedAsset of sharedAssets) {
       const { messageId, otp } = sharedAsset;
-      const { otpEncryptedShare } = await sss.downloadShare(messageId);
-      const decryptedMetaShare = sss.decryptViaOTP(otpEncryptedShare, otp);
+      const { otpEncryptedShare } = await trustedSSS.downloadShare(messageId);
 
+      const decryptedMetaShare = trustedSSS.decryptViaOTP(
+        otpEncryptedShare,
+        otp,
+      );
+      const isValid = trustedSSS.validateDecryption(decryptedMetaShare);
+      expect(isValid).toBe(true);
       const res = await axios.post(config.SERVER + "/affirmDecryption", {
         messageId,
       });
@@ -112,7 +124,7 @@ describe("Shamir's Secret Sharing", async () => {
   });
 
   test("updates the health of a given share and gets updated nonPMDD (trusted party specific)", async () => {
-    const { updated, data } = await sss.updateHealth(
+    const { updated, data } = await trustedSSS.updateHealth(
       userWalletId,
       recoveredShares[1],
     );
@@ -121,16 +133,16 @@ describe("Shamir's Secret Sharing", async () => {
   });
 
   test("checks the health of a given share (user specific)", async () => {
-    const { health } = await sss.checkHealth(recoveredShares[1]);
-    expect(health).toBe("GREEN");
+    const { lastUpdateds } = await userSSS.checkHealth(recoveredShares);
+    expect(lastUpdateds).toBeDefined();
   });
 
   test("recovers the mnemonic from an encrypted set of shares (above threshold)", () => {
-    const decryptedShares = sss.decryptShares(recoveredShares, answers);
-    const recoveredMnemonic = sss.recoverFromShares([
+    const decryptedShares = userSSS.decryptShares(recoveredShares, answers);
+    const recoveredMnemonic = userSSS.recoverFromShares([
       decryptedShares[0],
       decryptedShares[2],
     ]);
-    expect(recoveredMnemonic).toEqual(mnemonic);
+    expect(recoveredMnemonic).toEqual(userMnemonic);
   });
 });

@@ -2,12 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import bip39 from "bip39";
 import crypto from "crypto";
 import secrets from "secrets.js-grempe";
-import uuidv4 from "uuid/v4";
 import config from "../../Config";
-
-
-
-
 
 export default class SSS {
   private mnemonic: string;
@@ -37,16 +32,21 @@ export default class SSS {
 
   public getShares = () => this.encryptedShares;
 
-  public generateOTP = ( otpLength: number ) => {
-    let OTP: string = "";
-    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    for ( let itr = 0; itr < otpLength; itr++ ) {
-      OTP += possible.charAt( Math.floor( Math.random() * possible.length ) );
+  public generateRandomString = ( length ) => {
+    let randomString: string = "";
+    const possibleChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    for ( let itr = 0; itr < length; itr++ ) {
+      randomString += possibleChars.charAt(
+        Math.floor( Math.random() * possibleChars.length ),
+      );
     }
-    return OTP;
+    return randomString;
   }
+  public generateOTP = ( otpLength: number ) =>
+    this.generateRandomString( otpLength )
 
-  public generateMessageID = () => uuidv4();
+  public generateMessageID = () =>
+    this.generateRandomString( config.MSG_ID_LENGTH )
 
   public generateShares = () => {
     // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
@@ -150,10 +150,7 @@ export default class SSS {
   }
 
   public decryptViaOTP = ( otpEncryptedShare: string, otp: string ) => {
-    console.log( "OTP", otp )
-    console.log( 'Decrypting via OTP' )
     const key = this.generateKey( otp );
-    console.log( "Generated key" )
     // const key = crypto.scryptSync(
     //   intermediateKey,
     //   this.cipherSpec.salt,
@@ -164,14 +161,11 @@ export default class SSS {
       key,
       this.cipherSpec.iv,
     );
-    console.log( "Setup deciper done" )
+
     try {
-      console.log( "Starting decryption" )
       let decrypted = decipher.update( otpEncryptedShare, "hex", "utf8" );
       decrypted += decipher.final( "utf8" );
-      console.log( { decrypted } )
       const decryptedMetaShare = JSON.parse( decrypted );
-      console.log( { decryptedMetaShare } )
       if ( decryptedMetaShare.meta.validator !== "HEXA" ) {
         throw new Error(
           "Either the share is corrupt or the decryption OTP is wrong.",
@@ -187,11 +181,10 @@ export default class SSS {
   }
 
   public validateDecryption = ( decryptedShare, existingShares: any[] = [] ) => {
-    if ( decryptedShare.meta.walletID === this.getWalletId( this.mnemonic ) ) {
+    if ( decryptedShare.meta.walletId === this.getWalletId() ) {
       throw new Error( "You're not allowed to be your own trusted party" );
     }
-    console.log( "Here" );
-    console.log( existingShares.length )
+
     if ( existingShares.length ) {
       for ( const share of existingShares ) {
         if ( share.meta.walletID === decryptedShare.meta.walletID ) {
@@ -220,7 +213,7 @@ export default class SSS {
 
     try {
       const res = await axios.post( config.SERVER + "/healthCheckInit", {
-        walletID: this.getWalletId( this.mnemonic ),
+        walletID: this.getWalletId(),
         shareIDs,
       } );
       return {
@@ -267,17 +260,22 @@ export default class SSS {
     }
   }
 
-  public checkHealth = async ( encryptedShare: string ) => {
+  public checkHealth = async ( encryptedShares: string[] ) => {
+    const shareIDs: string[] = [];
+    encryptedShares.forEach( ( encShare ) =>
+      shareIDs.push( this.getShareId( encShare ) ),
+    );
+
     try {
       const res = await axios.post( config.SERVER + "/checkHealth", {
-        walletID: this.getWalletId( this.mnemonic ),
-        shareID: this.getShareId( encryptedShare ),
+        walletID: this.getWalletId(),
+        shareIDs,
       } );
-      const { health } = res.data;
+      const { lastUpdateds } = res.data;
 
       return {
         status: res.status,
-        health,
+        lastUpdateds,
       };
     } catch ( err ) {
       return {
@@ -337,7 +335,7 @@ export default class SSS {
   public updateNonPMDD = async ( encryptedNonPMDD: string ) => {
     try {
       const res = await axios.post( config.SERVER + "/updateNonPMDD", {
-        walletID: this.getWalletId( this.mnemonic ),
+        walletID: this.getWalletId(),
         nonPMDD: encryptedNonPMDD,
       } );
       const { updated } = res.data;
@@ -380,7 +378,7 @@ export default class SSS {
   }
 
   public addMeta = ( encryptedShare: string, tag: string ) => {
-    const walletId = this.getWalletId( this.mnemonic );
+    const walletId = this.getWalletId();
     const timeStamp = new Date().toLocaleString( undefined, {
       day: "numeric",
       month: "numeric",
@@ -446,10 +444,10 @@ export default class SSS {
     return decryptedShares;
   }
 
-  public getWalletId = ( mnemonic: string ) =>
+  public getWalletId = () =>
     crypto
       .createHash( "sha512" )
-      .update( bip39.mnemonicToSeed( mnemonic ) )
+      .update( bip39.mnemonicToSeed( this.mnemonic ) )
       .digest( "hex" )
 
   private validShare = ( checksumedShare ) => {
@@ -476,13 +474,10 @@ export default class SSS {
   private generateKey = ( psuedoKey: string ) => {
     const hashRounds = 5048;
     let key = psuedoKey;
-    console.log( key )
     for ( let itr = 0; itr < hashRounds; itr++ ) {
       const hash = crypto.createHash( "sha512" );
       key = hash.update( key ).digest( "hex" );
     }
-    console.log( "hashing done" )
-    console.log( key.length )
     return key.slice( key.length - this.cipherSpec.keyLength );
   }
 }

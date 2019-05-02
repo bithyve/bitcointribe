@@ -7577,6 +7577,15 @@ react-native-barcode-scanners@^1.0.4:
     react-native-image-picker "^0.26.7"
     react-native-lewin-qrcode "^1.0.1"
 
+react-native-bip39@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-bip39/-/react-native-bip39-2.3.0.tgz#30c58d93a22b41f4937727fd456ab6b03f452671"
+  integrity sha1-MMWNk6IrQfSTdyf9RWq2sD9FJnE=
+  dependencies:
+    react-native-crypto "^2.0.1"
+    react-native-randombytes "^2.2.0"
+    unorm "^1.3.3"
+
 react-native-calendars@^1.21.0:
   version "1.32.0"
   resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.32.0.tgz#3dc3d4c624f32f750731aa859efea80b2d3cb18b"
@@ -8028,6 +8037,14 @@ react-native-qrcode@^0.2.7:
     create-react-class "^15.6.0"
     prop-types "^15.5.10"
     qr.js "0.0.0"
+
+react-native-randombytes@^2.2.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-randombytes/-/react-native-randombytes-2.3.0.tgz#3ed6f8a4a803c453d787961047f6b2650d7c7335"
+  integrity sha1-Ptb4pKgDxFPXh5YQR/ayZQ18czU=
+  dependencies:
+    buffer "^4.9.1"
+    sjcl "^1.0.3"
 
 react-native-randombytes@^3.5.1:
   version "3.5.2"
