@@ -78,7 +78,7 @@ export default class QrCodeScannerScreen extends React.Component {
         }
     }
 
-   
+
 
     _renderTitleBar() {
         return (
@@ -96,19 +96,20 @@ export default class QrCodeScannerScreen extends React.Component {
         try {
             var result = JSON.parse( e.data );
             result = JSON.parse( result );
+            //console.log( { result } );
             AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
             if ( result.type == "SSS Recovery" ) {
                 utils.setDeepLinkingType( "SSS Recovery QrCode" );
                 let deepLinkPara = {};
-                deepLinkPara.n = "appasaheb lakade"  
+                deepLinkPara.n = "appasaheb lakade"
                 deepLinkPara.m = result.phoneNo;
-                deepLinkPara.encpShare = result.share;
+                deepLinkPara.data = result.data;
                 utils.setDeepLinkingUrl( deepLinkPara );
                 this.props.navigation.navigate( 'WalletScreen' );
             }
         } catch ( error ) {
             console.log( error );
-        }  
+        }
     }
 
 

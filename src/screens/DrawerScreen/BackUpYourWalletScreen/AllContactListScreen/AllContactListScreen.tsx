@@ -42,6 +42,7 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 export default class AllContactListScreen extends React.Component<any, any> {
 
@@ -57,20 +58,19 @@ export default class AllContactListScreen extends React.Component<any, any> {
         } )
     }
 
-
-    componentWillMount() {
+    componentWillMount = () => {
         Contacts.getAll( ( err, contacts ) => {
             if ( err ) {
                 throw err;
             }
-            console.log( { contacts } );
-
+            //console.log( { contacts } );
             this.setState( {
                 data: contacts,
                 arr_ContactList: contacts
             } )
         } )
     }
+
 
     press = ( hey ) => {
         this.state.data.map( ( item, index ) => {
@@ -120,17 +120,18 @@ export default class AllContactListScreen extends React.Component<any, any> {
             } )
         }
     };
+
     //TODO: func click_Next
     click_Next = async () => {
         let selectedContactList = this.state.SelectedFakeContactList;
-        // console.log( { selectedContactList } );
+        console.log( { selectedContactList } );
         const resUpdateSSSContactDetails = await dbOpration.updateSSSContactListDetails(
             localDB.tableName.tblSSSDetails,
             selectedContactList,
         );
         if ( resUpdateSSSContactDetails ) {
             this.props.navigation.push( "SecretSharingScreen", {
-                data: this.state.SelectedFakeContactList
+                data: selectedContactList
             } );
         }
     }

@@ -65,7 +65,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
     componentWillMount() {
         this.load_data();
         let data = this.props.navigation.getParam( "data" );
-        // console.log( { data } );
+        console.log( { data } );
         let temp = [];
         let arr_Emails = data.emailAddresses;
         let arr_PhoneNumbers = data.phoneNumbers;
@@ -93,24 +93,28 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             localDB.tableName.tblSSSDetails,
             data.recordID
         );
-
-        console.log( { resSSSDetails } );
-
-
+        //console.log( { resSSSDetails } );
         let walletDetails = utils.getWalletDetails();
-        console.log( { walletDetails } );
+        //console.log( { walletDetails } );
+        const walletNameDetails = JSON.parse( walletDetails.setUpWalletAnswerDetails );
+        // console.log( { walletNameDetails } );
         const sss = new S3Service(
-            walletDetails[ 0 ].mnemonic
+            walletDetails.mnemonic
         );
         const { share, otp } = sss.createTransferShare( resSSSDetails.temp[ 0 ].share, data.givenName )
-        console.log( { otpEncryptedShare: share, otp } )
+        // console.log( { otpEncryptedShare: share, otp } )
         const encryptedShare = sss.createQRShare( resSSSDetails.temp[ 0 ].share, data.givenName )
         const { messageId, success } = await sss.uploadShare( share );
-        console.log( { otpEncryptedShare: share, messageId, success } )
+        //console.log( { otpEncryptedShare: share, messageId, success } )
+        const resQRShare = await sss.createQRShare( resSSSDetails.temp[ 0 ].share, walletNameDetails.walletName );
+        const jsonResQRShare = JSON.parse( resQRShare );
+        // console.log( { resQRShare } );
+        console.log( { jsonResQRShare } );
         let qrCodeData = {};
-         qrCodeData.type = "SSS Recovery";  
-        qrCodeData.share = resSSSDetails.temp[ 0 ].share;  
+        qrCodeData.type = "SSS Recovery";
+        qrCodeData.data = jsonResQRShare;
         qrCodeData.phoneNo = data.phoneNumbers[ 0 ].number;
+        console.log( { qrCodeData } );
         if ( messageId != "" || messageId != null ) {
             this.setState( {
                 qrCodeString: JSON.stringify( qrCodeData ).toString(),
@@ -151,6 +155,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         } ]
                     } )
                     setTimeout( () => {
+                        this.connection_UpdateSSSDetails( "SMS" );
                         Alert.alert( 'SMS Sent Completed' );
                         this.setState( {
                             flag_OtpCodeShowStatus: true
@@ -164,6 +169,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                 }
             } );
         } else {
+            this.connection_UpdateSSSDetails( "EMAIL" );
             if ( Platform.OS == "android" ) {
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Recovery ID',
@@ -211,6 +217,30 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                 } );
             }
         }
+    }
+
+    //TODO: func backQrCodeScreen
+    backQrCodeScreen() {
+        this.connection_UpdateSSSDetails( "QR" );
+    }
+
+    //TODO: func SSS Details table update data 
+    connection_UpdateSSSDetails = async ( type: string ) => {
+        const dateTime = Date.now();
+        const fulldate = Math.floor( dateTime / 1000 );
+        let data = this.props.navigation.getParam( "data" );
+        console.log( localDB.tableName.tblSSSDetails,
+            type,
+            fulldate,
+            data.recordID);
+        
+        let resupdateSSSTransferMehtodDetails = await dbOpration.updateSSSTransferMehtodDetails(
+            localDB.tableName.tblSSSDetails,
+            type,
+            fulldate,
+            data.recordID
+        )
+        console.log( { resupdateSSSTransferMehtodDetails } );
     }
 
     render() {
@@ -313,7 +343,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                         console.log( { qrCodeData } );
                                         if ( qrCodeData != "" ) {
                                             this.props.navigation.push( "ShareSecretViaQRScreen",
-                                                { data: qrCodeData }
+                                                { data: qrCodeData, onSelect: this.backQrCodeScreen() }
                                             );
                                         } else {
                                             this.setState( {
@@ -326,7 +356,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                                         flag_Loading: false
                                                     } );
                                                     this.props.navigation.push( "ShareSecretViaQRScreen",
-                                                        { data: qrCodeData }
+                                                        { data: qrCodeData, onSelect: this.backQrCodeScreen() }
                                                     );
                                                 } else {
                                                     this.setState( {

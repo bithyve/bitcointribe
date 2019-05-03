@@ -228,12 +228,40 @@ const TrustedContactAcceptStackNavigatorRouter = createStackNavigator(
   }
 );
 
+
+// TabNavigator StackNavigator  
+
+const WalletScreenStackNavigatorRouter = createStackNavigator(
+  {
+    WalletScreen: {
+      screen: WalletScreen,
+      navigationOptions: { header: null }
+    },
+    SecretSharingScreen: {
+      screen: SecretSharingScreen,
+      navigationOptions: { header: null }
+    },
+    TrustedContactScreen: {
+      screen: TrustedContactScreen,
+      navigationOptions: { header: null }
+    },
+    ShareSecretViaQRScreen: {
+      screen: ShareSecretViaQRScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "WalletScreen"
+  }
+);
+
+
 //TODO: TabNavigator
 //TODO: TabNavigator:TabNavigator
 const TabNavigator = createBottomTabNavigator(
   {
     WalletScreen: {
-      screen: WalletScreen, //PaymentScreen,
+      screen: WalletScreenStackNavigatorRouter, //PaymentScreen,
       navigationOptions: {
         tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
         drawerLockMode: "locked-open",

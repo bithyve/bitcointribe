@@ -77,7 +77,7 @@ const SLIDER_1_FIRST_ITEM = 0;
 
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
-
+import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus";
 
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
@@ -94,14 +94,11 @@ export default class WalletScreen extends React.Component {
       arr_SSSDetails: [],
       flag_cardScrolling: false,
       flag_Loading: false,
-
       //Shiled Icons
       shiledIconPer: 1,
       scrollY: new Animated.Value( 0 ),
-
       //custome comp
       arr_CustShiledIcon: [],
-
       //Model 
       arr_ModelBackupYourWallet: [],
       arr_ModelFindYourTrustedContacts: [],
@@ -112,8 +109,6 @@ export default class WalletScreen extends React.Component {
     };
     isNetwork = utils.getNetwork();
   }
-
-
 
   //TODO: Page Life Cycle
   componentWillMount() {
@@ -163,24 +158,19 @@ export default class WalletScreen extends React.Component {
     } );
   }
 
-
-
-
-
   componentWillUnmount() {
     this.willFocusSubscription.remove();
   }
 
 
-
   //TODO: func connnection_FetchData
   async connnection_FetchData() {
-    const resultWallet = await dbOpration.readTablesData(
+    var resultWallet = await dbOpration.readTablesData(
       localDB.tableName.tblWallet
     );
-    console.log( { resultWallet } );
-
-    await utils.setWalletDetails( resultWallet.temp );
+    resultWallet = resultWallet.temp[ 0 ];
+    //console.log( { resultWallet } );
+    await utils.setWalletDetails( resultWallet );
     const resAccount = await dbOpration.readTablesData(
       localDB.tableName.tblAccount
     );
@@ -189,11 +179,15 @@ export default class WalletScreen extends React.Component {
         flag_cardScrolling: true
       } )
     }
-    const resSSSDetails = await dbOpration.readTablesData(
+    var resSSSDetails = await dbOpration.readTablesData(
       localDB.tableName.tblSSSDetails
     );
+    resSSSDetails = resSSSDetails.temp;
     console.log( { resSSSDetails } );
-    if ( resSSSDetails.temp.length == 0 ) {
+    await utils.setSSSDetails( resSSSDetails );
+    //TODO: appHealthStatus funciton   
+    this.connection_AppHealthStatus( resultWallet.lastUpdated, 0, resSSSDetails, resultWallet );
+    if ( resSSSDetails.length == 0 ) {
       this.setState( {
         shiledIconPer: 1,
         arr_CustShiledIcon: [
@@ -230,9 +224,34 @@ export default class WalletScreen extends React.Component {
       } );
     }
     this.setState( {
-      arr_wallets: resultWallet.temp,
+      arr_wallets: resultWallet,
       arr_accounts: resAccount.temp
     } );
+  }
+
+
+  //TODO: func connection_AppHealthStatus
+  connection_AppHealthStatus = async ( qatime: number, satime: number, shares: any, resultWallet: any ) => {
+    let arr_EncpShare = [];
+    for ( let i = 0; i < shares.length; i++ ) {
+      let data = shares[ i ];
+      arr_EncpShare.push( data.share )
+    }
+    const sss = new S3Service(
+      resultWallet.mnemonic
+    );
+    const resCheckHealth = await sss.checkHealth( arr_EncpShare );
+    //console.log( { resCheckHealth } );
+    let healthStatus = new HealthStatus();
+    // console.log( qatime, satime, resCheckHealth.lastUpdateds );
+    const res = await healthStatus.appHealthStatus( qatime, satime, resCheckHealth.lastUpdateds );
+    // console.log( { res } );
+    let resupdateWalletDetials = await dbOpration.updateWalletDetials(
+      localDB.tableName.tblWallet,
+      res
+    )
+    console.log( { resupdateWalletDetials } );
+    console.log( { res } );
   }
 
   //TODO: func get Deeplinking data 
@@ -262,75 +281,85 @@ export default class WalletScreen extends React.Component {
     } );
     const dateTime = Date.now();
     const fulldate = Math.floor( dateTime / 1000 );
-    let urlScript = utils.getDeepLinkingUrl();   
+    let urlScript = utils.getDeepLinkingUrl();
+    // console.log( { urlScript } );
+    let urlScriptData = urlScript.data;
+    console.log( { urlScriptData } );
     let userDetail = {};
-    userDetail.name = urlScript.n;  
+    userDetail.name = urlScript.n;
     userDetail.mobileNo = urlScript.m;
+    userDetail.walletId = urlScriptData.meta.walletId;
+    // console.log( { userDetail } );
     let walletDetails = utils.getWalletDetails();
     const sss = new S3Service(
-      walletDetails[ 0 ].mnemonic
+      walletDetails.mnemonic
     );
-    let resShareId = await sss.getShareId( urlScript.encpShare )
-    console.log( { resShareId } );  
+    let resShareId = await sss.getShareId( urlScriptData.encryptedShare )
+    //console.log( { resShareId } );
+    const { data, updated } = await sss.updateHealth( urlScriptData.meta.walletId, urlScriptData.encryptedShare );
+    if ( updated ) {
+      const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
+        localDB.tableName.tblTrustedPartySSSDetails,
+        fulldate,
+        userDetail,
+        urlScriptData.encryptedShare,
+        resShareId,
+        urlScriptData,
+        typeof data !== "undefined" ? data : ""
+      );
+      //console.log( { resinsertTrustedPartyDetails } );
+      this.setState( {
+        flag_Loading: false,
+        arr_ModelAcceptSecret: [
+          {
+            modalVisible: false,
+            name: "",
+            mobileNo: "",
+            encpShare: ""
+          }
+        ]
+      } )
+      if ( resinsertTrustedPartyDetails == true ) {
+        setTimeout( () => {
+          Alert.alert(
+            'Success',
+            'Decrypted share created.',
+            [
+              {
+                text: 'OK', onPress: () => {
+                  utils.setDeepLinkingType( "" );
+                  utils.setDeepLinkingUrl( "" );
+                  this.connnection_FetchData();
+                }
+              },
 
-    const { data, updated } = await sss.updateHealth( urlScript.meta.walletId, urlScript.encpShare );
-    const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
-      localDB.tableName.tblTrustedPartySSSDetails,
-      fulldate,
-      userDetail,
-      urlScript.encpShare,
-      resShareId,
-      "temp"
-    );
-
-    //console.log( { resinsertTrustedPartyDetails } );
-    this.setState( {
-      flag_Loading: false,
-      arr_ModelAcceptSecret: [
-        {
-          modalVisible: false,
-          name: "",
-          mobileNo: "",
-          encpShare: ""
-
-        }
-      ]
-    } )
-    if ( resinsertTrustedPartyDetails == true ) {
-      setTimeout( () => {
-        Alert.alert(
-          'Success',
-          'Decrypted share created.',
-          [
-            {
-              text: 'OK', onPress: () => {
-                utils.setDeepLinkingType( "" );
-                utils.setDeepLinkingUrl( "" );
-                this.connnection_FetchData();
-              }
-            },
-
-          ],
-          { cancelable: false }
-        )
-      }, 100 );
+            ],
+            { cancelable: false }
+          )
+        }, 100 );
+      } else {
+        setTimeout( () => {
+          Alert.alert(
+            'OH',
+            resinsertTrustedPartyDetails,
+            [
+              {
+                text: 'OK', onPress: () => {
+                  utils.setDeepLinkingType( "" );
+                  utils.setDeepLinkingUrl( "" );
+                  this.connnection_FetchData();
+                }
+              },
+            ],
+            { cancelable: false }
+          )
+        }, 100 );
+      }
     } else {
-      setTimeout( () => {
-        Alert.alert(
-          'OH',
-          resinsertTrustedPartyDetails,
-          [
-            {
-              text: 'OK', onPress: () => {
-                utils.setDeepLinkingType( "" );
-                utils.setDeepLinkingUrl( "" );
-                this.connnection_FetchData();
-              }
-            },
-          ],
-          { cancelable: false }
-        )
-      }, 100 );
+      this.setState( {
+        flag_Loading: false
+      } )
+      Alert.alert( "updateHealth func not working." )
     }
   }
 
@@ -548,7 +577,18 @@ export default class WalletScreen extends React.Component {
                 }
               ]
             } )
-            this.props.navigation.push( "BackUpYourWalletNavigator" )
+            let resSSSDetails = utils.getSSSDetails();
+            let temp = [];
+            if ( resSSSDetails[ 0 ].keeperInfo != "" ) {
+              for ( let i = 0; i < resSSSDetails.length; i++ ) {
+                temp.push( JSON.parse( resSSSDetails[ i ].keeperInfo ) )
+              }
+              this.props.navigation.push( "SecretSharingScreen", {
+                data: temp
+              } );
+            } else {
+              this.props.navigation.push( "BackUpYourWalletNavigator" )
+            }
           } }
           closeModal={ () => {
             this.setState( {

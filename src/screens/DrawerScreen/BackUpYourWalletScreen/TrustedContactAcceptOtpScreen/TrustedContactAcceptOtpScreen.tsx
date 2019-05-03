@@ -94,15 +94,15 @@ export default class TrustedContactAcceptOtpScreen extends Component {
         let messageId = script.mi;
         let walletDetails = utils.getWalletDetails();
         const sss = new S3Service(
-            walletDetails[ 0 ].mnemonic
+            walletDetails.mnemonic
         );
-        console.log( { messageId, enterOtp } );
+        //  console.log( { messageId, enterOtp } );
         let userDetails = {};
         userDetails.name = script.n;
         userDetails.mobileNo = script.m;
         const resDonwShare = await sss.downloadShare( messageId );
         const resDecryptOTPEncShare = await sss.decryptOTPEncShare( resDonwShare, messageId, enterOtp )
-        console.log( { resDecryptOTPEncShare } );
+        //console.log( { resDecryptOTPEncShare } );
         let resShareId = await sss.getShareId( resDecryptOTPEncShare.encryptedShare )
         const { data, updated } = await sss.updateHealth( resDecryptOTPEncShare.meta.walletId, resDecryptOTPEncShare.encryptedShare );
         if ( updated ) {
@@ -111,9 +111,10 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                     localDB.tableName.tblTrustedPartySSSDetails,
                     fulldate,
                     userDetails,
-                    resDecryptOTPEncShare,
+                    resDecryptOTPEncShare.encryptedShare,
                     resShareId,
-                    data
+                    resDecryptOTPEncShare,
+                    typeof data !== "undefined" ? data : ""
                 );
                 if ( resinsertTrustedPartyDetails == true ) {
                     this.setState( {
