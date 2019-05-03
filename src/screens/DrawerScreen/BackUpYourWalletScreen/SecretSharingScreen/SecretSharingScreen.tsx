@@ -53,34 +53,9 @@ export default class SecretSharingScreen extends React.Component<any, any> {
     componentWillMount = async () => {
         let data = this.props.navigation.getParam( "data" );
         console.log( { data } );
-        let resSSSDetails = await dbOpration.readTablesData(
-            localDB.tableName.tblSSSDetails
-        );
-        let arr_EncpShare = [];
-        for ( let i = 0; i < resSSSDetails.temp.length; i++ ) {
-            let data = resSSSDetails.temp[ i ];
-            arr_EncpShare.push( data.share )
-        }
-
-        console.log( { arr_EncpShare } );
-
-        let walletDetails = utils.getWalletDetails();
-        const sss = new S3Service(
-            walletDetails[ 0 ].mnemonic
-        );
-        const resCheckHealth = await sss.checkHealth( arr_EncpShare );
-        console.log( { resCheckHealth } );
-        const healthStatus = new HealthStatus();
-        const resHealthStatus = await healthStatus.shareHealthStatus( resCheckHealth.lastUpdateds );
-        console.log( { resHealthStatus } );
-
-
-
-
-
         this.setState( {
             data: data
-        } )
+        } );
     }
 
     //TODO: func click_Item

@@ -36,6 +36,7 @@ const readTablesData = ( tableName: any ) => {
               data.lastUpdated = utils.decrypt( data.lastUpdated, passcode );
               data.publicKey = utils.decrypt( data.publicKey, passcode );
               data.walletType = utils.decrypt( data.walletType, passcode );
+              data.setUpWalletAnswerDetails = utils.decrypt( data.setUpWalletAnswerDetails, passcode );
               temp.push( data );
             } else if ( tableName == "tblAccount" ) {
               data.id = data.id;
@@ -53,6 +54,7 @@ const readTablesData = ( tableName: any ) => {
               data.id = data.id;
               data.share = utils.decrypt( data.share, passcode );
               data.shareId = utils.decrypt( data.shareId, passcode );
+              data.keeperInfo = utils.decrypt( data.keeperInfo, passcode );
               temp.push( data );
             }
             else {
@@ -67,6 +69,22 @@ const readTablesData = ( tableName: any ) => {
     } );
   } );
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 const readAccountTablesData = ( tableName: string ) => {
@@ -364,18 +382,16 @@ const insertWallet = (
   priKeyValue: any,
   address: string,
   publicKey: string,
-  walletType: string
+  walletType: string,
+  setUpWalletAnswerDetails: any
 ) => {
   let passcode = getPasscode();
-
-  console.log( { tblName, fulldate, mnemonicValue } );
-
   return new Promise( ( resolve, reject ) => {
     db.transaction( function ( txn ) {
       txn.executeSql(
         "INSERT INTO " +
         tblName +
-        " (dateCreated,mnemonic,privateKey,address,publicKey,walletType,lastUpdated) VALUES (:dateCreated,:mnemonic,:privateKey,:address,:publicKey,:walletType,:lastUpdated)",
+        " (dateCreated,mnemonic,privateKey,address,publicKey,walletType,setUpWalletAnswerDetails,lastUpdated) VALUES (:dateCreated,:mnemonic,:privateKey,:address,:publicKey,:walletType,:setUpWalletAnswerDetails,:lastUpdated)",
         [
           utils.encrypt( fulldate.toString(), passcode ),
           utils.encrypt( mnemonicValue.toString(), passcode ),
@@ -383,6 +399,7 @@ const insertWallet = (
           utils.encrypt( address.toString(), passcode ),
           utils.encrypt( publicKey.toString(), passcode ),
           utils.encrypt( walletType.toString(), passcode ),
+          utils.encrypt( JSON.stringify( setUpWalletAnswerDetails ).toString(), passcode ),
           utils.encrypt( fulldate.toString(), passcode )
         ]
       );
@@ -391,37 +408,23 @@ const insertWallet = (
   } );
 };
 //update
-const updateWalletAnswerDetials = (
+const updateWalletDetials = (
   tblName: string,
-  answerDetails: any
+  appHealthStatus: any
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
     try {
       db.transaction( function ( txn ) {
-        console.log( { answerDetails } );
-
-        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
-          var len = results.rows.length;
-          if ( len > 0 ) {
-            for ( let i = 0; i < len; i++ ) {
-              let dbdecryptId = utils.decrypt(
-                results.rows.item( i ).id,
-                passcode
-              );
-              txn.executeSql(
-                "update " +
-                tblName +
-                " set setUpWalletAnswerDetails = :setUpWalletAnswerDetails where id = :id",
-                [
-                  utils.encrypt( JSON.stringify( answerDetails ).toString(), passcode ),
-                  dbdecryptId
-                ]
-              );
-              resolve( true );
-            }
-          }
-        } );
+        txn.executeSql(
+          "update " +
+          tblName +
+          " set appHealthStatus = :appHealthStatus where id = 1",
+          [
+            utils.encrypt( JSON.stringify( appHealthStatus ).toString(), passcode )
+          ]
+        );
+        resolve( true );
       } );
     } catch ( error ) {
       console.log( error );
@@ -578,7 +581,6 @@ const insertTblTransation = (
 
 
 //TODO: ========================================>  SSS Details  <========================================
-
 //read
 const readSSSTableData = ( tableName: any, recordID: string ) => {
   let passcode = getPasscode();
@@ -692,6 +694,51 @@ const updateSSSContactListDetails = (
   } );
 };
 
+//update trnasfer method and shared date
+const updateSSSTransferMehtodDetails = (
+  tblName: string,
+  type: string,
+  date: string,
+  recoardId: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+          var len = results.rows.length;
+          if ( len > 0 ) {
+            for ( let i = 0; i < len; i++ ) {
+              console.log( results.rows.item( i ).recordId );
+              let dbdecryptrecordID = utils.decrypt(
+                results.rows.item( i ).recordId,
+                passcode
+              );
+              let recordId = results.rows.item( i ).recordId;
+              if ( dbdecryptrecordID == recoardId ) {
+                txn.executeSql(
+                  "update " +
+                  tblName +
+                  " set transferMethod = :transferMethod,sharedDate =:sharedDate where recordId = :recordId",
+                  [
+                    utils.encrypt( type, passcode ),
+                    utils.encrypt( date, passcode ),
+                    recordId
+                  ]
+                );
+                resolve( true );
+                break;
+              }
+            }
+          }
+        } );
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
 
 //TODO: ========================================>  SSS Trusted Party Details   <========================================
 //insert
@@ -701,6 +748,7 @@ const insertTrustedPartyDetails = (
   userDetails: any,
   decrShare: any,
   shareId: any,
+  allJson: any,
   nonPMDDData: any
 ) => {
   let passcode = getPasscode();
@@ -721,7 +769,7 @@ const insertTrustedPartyDetails = (
               txn.executeSql(
                 "INSERT INTO " +
                 tblName +
-                "(dateCreated,userDetails,decrShare,shareId,nonPMDDData) VALUES (:dateCreated,:userDetails,:decrShare,:shareId,:nonPMDDData)",
+                "(dateCreated,userDetails,decrShare,shareId,allJson,nonPMDDData) VALUES (:dateCreated,:userDetails,:decrShare,:shareId,:allJson,:nonPMDDData)",
                 [
                   utils.encrypt(
                     fulldate.toString(),
@@ -730,7 +778,8 @@ const insertTrustedPartyDetails = (
                   utils.encrypt( JSON.stringify( userDetails ).toString(), passcode ),
                   utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
                   utils.encrypt( shareId.toString(), passcode ),
-                  utils.encrypt( nonPMDDData.toString(), passcode )
+                  utils.encrypt( JSON.stringify( allJson ).toString(), passcode ),
+                  utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode )
                 ]
               );
               resolve( true );
@@ -740,7 +789,7 @@ const insertTrustedPartyDetails = (
           txn.executeSql(
             "INSERT INTO " +
             tblName +
-            "(dateCreated,userDetails,decrShare,shareId) VALUES (:dateCreated,:userDetails,:decrShare,:shareId)",
+            "(dateCreated,userDetails,decrShare,shareId,allJson,nonPMDDData) VALUES (:dateCreated,:userDetails,:decrShare,:shareId,:allJson,:nonPMDDData)",
             [
               utils.encrypt(
                 fulldate.toString(),
@@ -748,7 +797,9 @@ const insertTrustedPartyDetails = (
               ),
               utils.encrypt( JSON.stringify( userDetails ).toString(), passcode ),
               utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
-              utils.encrypt( shareId.toString(), passcode )
+              utils.encrypt( shareId.toString(), passcode ),
+              utils.encrypt( JSON.stringify( allJson ).toString(), passcode ),
+              utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode )
             ]
           );
           resolve( true );
@@ -768,7 +819,7 @@ module.exports = {
   insertAccountTypeData,
   //Wallet Details
   insertWallet,
-  updateWalletAnswerDetials,
+  updateWalletDetials,
 
   insertCreateAccount,
   insertLastBeforeCreateAccount,
@@ -778,6 +829,7 @@ module.exports = {
   readSSSTableData,
   insertSSSShareAndShareId,
   updateSSSContactListDetails,
+  updateSSSTransferMehtodDetails,
   //SSS Trusted Party Details 
   insertTrustedPartyDetails
 };

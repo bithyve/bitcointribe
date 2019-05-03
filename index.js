@@ -13,7 +13,7 @@ import Singleton from "HexaWallet/src/app/constants/Singleton";
 
 //TODO: Custome Object
 var utils = require( "HexaWallet/src/app/constants/Utils" );
-export default class HexaWalletWalletWallet extends React.Component
+export default class HexaWallet extends React.Component
 {
   constructor ( props )    
   {
@@ -52,8 +52,8 @@ export default class HexaWalletWalletWallet extends React.Component
           console.log( { script } );
           var decpScript = utils.decrypt( script, "122334" )
           decpScript = JSON.parse( decpScript );
-          console.log( { decpScript } );   
-          utils.setDeepLinkingUrl( decpScript );  
+          console.log( { decpScript } );
+          utils.setDeepLinkingUrl( decpScript );
           utils.setDeepLinkingType( "SSS Recovery Sms/Email" );
         }
       );
@@ -185,4 +185,4 @@ export default class HexaWalletWalletWallet extends React.Component
 }
 
 console.disableYellowBox = true;
-AppRegistry.registerComponent( appName, () => HexaWalletWalletWallet );
+AppRegistry.registerComponent( appName, () => HexaWallet );

@@ -178,6 +178,17 @@ const setDeepLinkingType = ( value: any ) => {
   return true;
 }
 
+//TODO: Singleton SSS Details Get and Set Values
+const getSSSDetails = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getSSSDetails();
+}
+const setSSSDetails = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setSSSDetails( value );
+  return true;
+}
+
 
 
 
@@ -205,4 +216,6 @@ module.exports = {
   setDeepLinkingUrl,
   getDeepLinkingType,
   setDeepLinkingType,
+  getSSSDetails,
+  setSSSDetails
 };
