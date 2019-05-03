@@ -6,16 +6,20 @@ export default class Singleton {
   public deepLinkingUrl: string = "";
   public deepLinkingType: string = "";
 
-  //Class Object 
-  public S3Service: any;
+
 
 
 
   //Wallet Details
-  public walletDetails: any;
+  public walletJsonDetails: any;
 
   //Setup your wallet screen
   public setupWallet = {};
+
+  //SSS Details
+  public sssJsonDetails: any;
+
+
 
 
   /**
@@ -61,17 +65,27 @@ export default class Singleton {
 
   //Wallet Details
   getWalletDetails() {
-    return this.walletDetails;
+    return this.walletJsonDetails;
   }
 
   setWalletDetails( url: string ) {
-    this.walletDetails = url;
+    this.walletJsonDetails = url;
   }
 
+  //Setup your wallet
   getSetupWallet() {
     return this.setupWallet;
   }
   setSetupWallet( url: string ) {
     this.setupWallet = url;
   }
+
+  //sss details   
+  getSSSDetails() {
+    return this.sssJsonDetails;
+  }
+  setSSSDetails( value: any ) {
+    this.sssJsonDetails = value;
+  }
+
 }

@@ -4,32 +4,32 @@ export default class HealthStatus {
   public goodCount = 0;
   public badCount = 0;
   public T: number = parseInt( config.HEALTH_CHECK_TIME, 10 );
+
   public appHealthStatus = (
-    QAtime,
-    SAtime,
+    QAtime: number,
+    SAtime: number,
     share: [
-      { shareid: string; shareTimestamp: number },
-      { shareid: string; shareTimestamp: number },
-      { shareid: string; shareTimestamp: number }
+      { shareId: string; updatedAt: number },
+      { shareId: string; updatedAt: number },
+      { shareId: string; updatedAt: number }
     ],
   ) => {
-    let appStatus = "Red!";
+    let appStatus = "1";
     const ss = this.shareHealthStatus( share );
     const sharesStatus = ss.SharesStage;
     const QAStatus = this.QAHealthStatus( QAtime );
     const SAStatus = this.secureAccountHealthStatus( SAtime );
     if ( this.uglyCount >= 2 ) {
-      appStatus = "Red!";
+      appStatus = "1";
     } else if ( this.uglyCount === 1 ) {
-      appStatus = "Red";
+      appStatus = "2";
     } else if ( this.badCount > 1 ) {
-      appStatus = "Amber";
+      appStatus = "3";
     } else if ( this.badCount === 1 ) {
-      appStatus = "Green";
+      appStatus = "4";
     } else if ( this.goodCount === 3 ) {
-      appStatus = "Green Check";
+      appStatus = "5";
     }
-    // console.log(ss.shareInfo);
     return {
       shareInfo: ss.shareInfo,
       sharesStatus,
@@ -38,6 +38,8 @@ export default class HealthStatus {
       appStatus,
     };
   }
+
+
   private QAHealthStatus = ( time: number ) => {
     let QAStage = "ugly";
     const delta = Math.abs( Date.now() - time );
@@ -75,13 +77,11 @@ export default class HealthStatus {
 
   private shareHealthStatus = (
     share: [
-      { shareid: string; shareTimestamp: number },
-      { shareid: string; shareTimestamp: number },
-      { shareid: string; shareTimestamp: number }
+      { shareId: string; updatedAt: number },
+      { shareId: string; updatedAt: number },
+      { shareId: string; updatedAt: number }
     ],
   ) => {
-    console.log( { share } );
-
     let SharesStage = "ugly";
     const sStage: string[] = new Array( 3 );
     const shareInfo = [];
@@ -90,13 +90,13 @@ export default class HealthStatus {
     let shareGoodCount = 0;
     for ( let i = 0; i < 3; i++ ) {
       const obj = share[ i ];
-      shareInfo.push( { shareid: obj.shareid, shareStage: "ugly" } );
+      shareInfo.push( { shareid: obj.shareId, shareStage: "ugly" } );
     }
     const delta: number[] = new Array( 3 );
     const numberOfDays: number[] = new Array( 3 );
     for ( let i = 0; i < delta.length; i++ ) {
       const obj = share[ i ];
-      delta[ i ] = Math.abs( Date.now() - obj.shareTimestamp );
+      delta[ i ] = Math.abs( Date.now() - obj.updatedAt );
     }
     for ( let i = 0; i < numberOfDays.length; i++ ) {
       numberOfDays[ i ] = Math.floor( delta[ i ] / ( 60 * 60 * 24 * 1000 ) );

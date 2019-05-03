@@ -35,8 +35,6 @@ import SecondSecretQuestion from "./SecondSecretQuestion/SecondSecretQuestion";
 //TODO: Custome Object
 import { colors, images } from "HexaWallet/src/app/constants/Constants";
 
-
-
 export default class WalletSetupScreens extends React.Component<any, any> {
 
     //TODO:click_GotoPermisionScrenn
