@@ -57,6 +57,7 @@ import {
 } from "HexaWallet/src/app/constants/Constants";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
+var commSSS = require( "HexaWallet/src/app/manager/CommonFunction/CommSSS/CommSSS" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 
@@ -185,8 +186,8 @@ export default class WalletScreen extends React.Component {
     resSSSDetails = resSSSDetails.temp;
     console.log( { resSSSDetails } );
     await utils.setSSSDetails( resSSSDetails );
-    //TODO: appHealthStatus funciton   
-    this.connection_AppHealthStatus( resultWallet.lastUpdated, 0, resSSSDetails, resultWallet );
+    //TODO: appHealthStatus funciton      
+    await commSSS.connection_AppHealthStatus( resultWallet.lastUpdated, 0, resSSSDetails, resultWallet );
     if ( resSSSDetails.length == 0 ) {
       this.setState( {
         shiledIconPer: 1,
@@ -199,17 +200,6 @@ export default class WalletScreen extends React.Component {
           }
         ]
       } );
-      // this.setState( {
-      //   shiledIconPer: 3,
-      //   arr_CustShiledIcon: [
-      //     {
-      //       "title": "Your wallet is not secure, some Information about backup comes here. Click on the icon to backup",
-      //       "image": "shield_2",
-      //       "imageHeight": this.animatedShieldIconSize,
-      //       "imageWidth": this.animatedShieldIconSize
-      //     }
-      //   ]
-      // } );
     } else {
       this.setState( {
         shiledIconPer: 3,
@@ -230,29 +220,7 @@ export default class WalletScreen extends React.Component {
   }
 
 
-  //TODO: func connection_AppHealthStatus
-  connection_AppHealthStatus = async ( qatime: number, satime: number, shares: any, resultWallet: any ) => {
-    let arr_EncpShare = [];
-    for ( let i = 0; i < shares.length; i++ ) {
-      let data = shares[ i ];
-      arr_EncpShare.push( data.share )
-    }
-    const sss = new S3Service(
-      resultWallet.mnemonic
-    );
-    const resCheckHealth = await sss.checkHealth( arr_EncpShare );
-    //console.log( { resCheckHealth } );
-    let healthStatus = new HealthStatus();
-    // console.log( qatime, satime, resCheckHealth.lastUpdateds );
-    const res = await healthStatus.appHealthStatus( qatime, satime, resCheckHealth.lastUpdateds );
-    // console.log( { res } );
-    let resupdateWalletDetials = await dbOpration.updateWalletDetials(
-      localDB.tableName.tblWallet,
-      res
-    )
-    console.log( { resupdateWalletDetials } );
-    console.log( { res } );
-  }
+
 
   //TODO: func get Deeplinking data 
   getDeepLinkingData() {
@@ -578,14 +546,8 @@ export default class WalletScreen extends React.Component {
               ]
             } )
             let resSSSDetails = utils.getSSSDetails();
-            let temp = [];
             if ( resSSSDetails[ 0 ].keeperInfo != "" ) {
-              for ( let i = 0; i < resSSSDetails.length; i++ ) {
-                temp.push( JSON.parse( resSSSDetails[ i ].keeperInfo ) )
-              }
-              this.props.navigation.push( "SecretSharingScreen", {
-                data: temp
-              } );
+              this.props.navigation.push( "SecretSharingScreen" );
             } else {
               this.props.navigation.push( "BackUpYourWalletNavigator" )
             }

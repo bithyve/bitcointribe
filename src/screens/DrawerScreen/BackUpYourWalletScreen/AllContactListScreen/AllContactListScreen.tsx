@@ -130,9 +130,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
             selectedContactList,
         );
         if ( resUpdateSSSContactDetails ) {
-            this.props.navigation.push( "SecretSharingScreen", {
-                data: selectedContactList
-            } );
+            this.props.navigation.push( "SecretSharingScreen" );
         }
     }
 
