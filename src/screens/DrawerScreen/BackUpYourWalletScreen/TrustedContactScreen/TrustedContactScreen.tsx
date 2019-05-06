@@ -23,6 +23,9 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Contacts from 'react-native-contacts';
 import { Avatar } from 'react-native-elements';
 import SendSMS from 'react-native-sms';
+import TimerCountdown from "react-native-timer-countdown";
+
+
 //import Mailer from 'react-native-mail';
 var Mailer = require( 'NativeModules' ).RNMail;
 import Share from "react-native-share";
@@ -44,6 +47,7 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
+
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
@@ -54,6 +58,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             data: [],
             arr_TrustedContactEmailAndPhoneShare: [],
             arr_ConstactDetailsList: [],
+            arr_History: [],
             qrCodeString: "",
             messageId: "",
             otpCode: "",
@@ -83,7 +88,8 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         }
         this.setState( {
             data: data,
-            arr_ConstactDetailsList: temp
+            arr_ConstactDetailsList: temp,
+            arr_History: data.history
         } )
     }
 
@@ -220,27 +226,39 @@ export default class TrustedContactScreen extends React.Component<any, any> {
     }
 
     //TODO: func backQrCodeScreen
-    backQrCodeScreen() {
+    onSelect = ( data: any ) => {
         this.connection_UpdateSSSDetails( "QR" );
-    }
+    };
+
 
     //TODO: func SSS Details table update data 
     connection_UpdateSSSDetails = async ( type: string ) => {
         const dateTime = Date.now();
         const fulldate = Math.floor( dateTime / 1000 );
+        let history = this.state.arr_History;
+        let temp = history;
+        let jsondata = {};
+        jsondata.title = "Secret Share using " + type.toLowerCase();;
+        jsondata.date = utils.getUnixToDateFormat( fulldate );
+        temp.push( jsondata );
         let data = this.props.navigation.getParam( "data" );
-        console.log( localDB.tableName.tblSSSDetails,
-            type,
-            fulldate,
-            data.recordID);
-        
         let resupdateSSSTransferMehtodDetails = await dbOpration.updateSSSTransferMehtodDetails(
             localDB.tableName.tblSSSDetails,
             type,
             fulldate,
+            temp,
             data.recordID
         )
+        this.setState( {
+            arr_History: temp
+        } )
         console.log( { resupdateSSSTransferMehtodDetails } );
+    }
+
+    goBack() {
+        const { navigation } = this.props;
+        navigation.pop();
+        // navigation.state.params.onSelect( { selected: true } );
     }
 
     render() {
@@ -253,7 +271,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         <View style={ { marginLeft: 10, marginTop: 15 } }>
                             <Button
                                 transparent
-                                onPress={ () => this.props.navigation.pop() }
+                                onPress={ () => this.goBack() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Trusted Contact</Text>
@@ -280,13 +298,13 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                             </View>
                             <View style={ { flex: 1, alignItems: "center", marginRight: 20 } }>
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 17 } ] }>{ data.givenName }{ " " }{ data.familyName }</Text>
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, color: colors.appColor } ] }>Secret Not Shared</Text>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, color: data.statusMsgColor } ] }>{ data.statusMsg }</Text>
                             </View>
                         </View>
                         <View style={ { flex: 1 } }>
                             <FlatList
                                 data={
-                                    [ 1 ]
+                                    this.state.arr_History
                                 }
                                 showsVerticalScrollIndicator={ false }
                                 renderItem={ ( { item } ) => (
@@ -297,10 +315,9 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                             </View>
                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
                                                 <View style={ { flexDirection: "row", flex: 1, } }>
-                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16, flex: 1, alignSelf: "flex-start" } ] }>Secret Created</Text>
-                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { alignSelf: "flex-end", flex: 1 } ] }>19 April ‘19, 11:00am</Text>
+                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16, flex: 1, alignSelf: "center", } ] }>{ item.title }</Text>
+                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { alignSelf: "center", flex: 1 } ] }>{ item.date }</Text>
                                                 </View>
-                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: "#37A0DA" } ] }>Lorem ipsum dolor sit amet, consectetur</Text>
                                             </View>
                                         </View>
                                     </View>
@@ -343,7 +360,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                         console.log( { qrCodeData } );
                                         if ( qrCodeData != "" ) {
                                             this.props.navigation.push( "ShareSecretViaQRScreen",
-                                                { data: qrCodeData, onSelect: this.backQrCodeScreen() }
+                                                { data: qrCodeData, onSelect: this.onSelect }
                                             );
                                         } else {
                                             this.setState( {
@@ -356,7 +373,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                                         flag_Loading: false
                                                     } );
                                                     this.props.navigation.push( "ShareSecretViaQRScreen",
-                                                        { data: qrCodeData, onSelect: this.backQrCodeScreen() }
+                                                        { data: qrCodeData, onSelect: this.onSelect }
                                                     );
                                                 } else {
                                                     this.setState( {

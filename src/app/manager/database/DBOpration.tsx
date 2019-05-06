@@ -55,6 +55,12 @@ const readTablesData = ( tableName: any ) => {
               data.share = utils.decrypt( data.share, passcode );
               data.shareId = utils.decrypt( data.shareId, passcode );
               data.keeperInfo = utils.decrypt( data.keeperInfo, passcode );
+              data.sharedDate = utils.decrypt( data.sharedDate, passcode );
+              data.history = utils.decrypt( data.history, passcode );
+              data.transferMethod = utils.decrypt( data.transferMethod, passcode );
+              data.acceptedDate = utils.decrypt( data.acceptedDate, passcode );
+              data.lastSuccessfulCheck = utils.decrypt( data.lastSuccessfulCheck, passcode );
+              data.shareStage = utils.decrypt( data.shareStage, passcode );
               temp.push( data );
             }
             else {
@@ -69,21 +75,6 @@ const readTablesData = ( tableName: any ) => {
     } );
   } );
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -619,8 +610,6 @@ const readSSSTableData = ( tableName: any, recordID: string ) => {
   } );
 };
 
-
-
 //insert
 const insertSSSShareAndShareId = (
   tblName: string,
@@ -630,19 +619,25 @@ const insertSSSShareAndShareId = (
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
+    let temp = [];
+    let data = {};
+    data.title = "Secret Created.";
+    data.date = utils.getUnixToDateFormat( fulldate );
+    temp.push( data );
     db.transaction( function ( txn ) {
       for ( let i = 0; i < share.length; i++ ) {
         txn.executeSql(
           "INSERT INTO " +
           tblName +
-          "(dateCreated,share,shareId) VALUES (:dateCreated,:share,:shareId)",
+          "(dateCreated,share,shareId,history) VALUES (:dateCreated,:share,:shareId,:history)",
           [
             utils.encrypt(
               fulldate.toString(),
               passcode
             ),
             utils.encrypt( share[ i ].toString(), passcode ),
-            utils.encrypt( shareId[ i ].toString(), passcode )
+            utils.encrypt( shareId[ i ].toString(), passcode ),
+            utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
           ]
         );
       }
@@ -699,6 +694,7 @@ const updateSSSTransferMehtodDetails = (
   tblName: string,
   type: string,
   date: string,
+  history: any,
   recoardId: string
 ) => {
   let passcode = getPasscode();
@@ -709,20 +705,22 @@ const updateSSSTransferMehtodDetails = (
           var len = results.rows.length;
           if ( len > 0 ) {
             for ( let i = 0; i < len; i++ ) {
-              console.log( results.rows.item( i ).recordId );
+              //  console.log( results.rows.item( i ).recordId );
               let dbdecryptrecordID = utils.decrypt(
                 results.rows.item( i ).recordId,
                 passcode
               );
+              //console.log( { dbdecryptrecordID, recoardId } );
               let recordId = results.rows.item( i ).recordId;
               if ( dbdecryptrecordID == recoardId ) {
                 txn.executeSql(
                   "update " +
                   tblName +
-                  " set transferMethod = :transferMethod,sharedDate =:sharedDate where recordId = :recordId",
+                  " set transferMethod = :transferMethod,sharedDate =:sharedDate,history =:history where recordId = :recordId",
                   [
-                    utils.encrypt( type, passcode ),
-                    utils.encrypt( date, passcode ),
+                    utils.encrypt( type.toString(), passcode ),
+                    utils.encrypt( date.toString(), passcode ),
+                    utils.encrypt( JSON.stringify( history ).toString(), passcode ),
                     recordId
                   ]
                 );
@@ -738,6 +736,60 @@ const updateSSSTransferMehtodDetails = (
     }
   } );
 };
+
+
+//update shareId shareStage
+const updateSSSShareStage = (
+  tblName: string,
+  shareInfo: any,
+  fulldate: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        // console.log( { shareInfo } );
+        for ( let i = 0; i < shareInfo.length; i++ ) {
+          txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+            var len = results.rows.length;
+            if ( len > 0 ) {
+              for ( let j = 0; j < len; j++ ) {
+                //  console.log( results.rows.item( i ).recordId );
+                let decryptShareId = utils.decrypt(
+                  results.rows.item( j ).shareId,
+                  passcode
+                );
+                let shareId = results.rows.item( j ).shareId;
+                if ( decryptShareId == shareInfo[ i ].shareid ) {
+                  txn.executeSql(
+                    "update " +
+                    tblName +
+                    " set shareStage = :shareStage,lastSuccessfulCheck =:lastSuccessfulCheck where shareid = :shareid",
+                    [
+                      utils.encrypt( shareInfo[ i ].shareStage.toString(), passcode ),
+                      utils.encrypt( fulldate.toString(), passcode ),
+                      shareId
+                    ]
+                  );
+                  resolve( true );
+                  break;
+                }
+              }
+            }
+          } );
+        }
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
+
+
+
+
+
 
 
 //TODO: ========================================>  SSS Trusted Party Details   <========================================
@@ -830,6 +882,7 @@ module.exports = {
   insertSSSShareAndShareId,
   updateSSSContactListDetails,
   updateSSSTransferMehtodDetails,
+  updateSSSShareStage,
   //SSS Trusted Party Details 
   insertTrustedPartyDetails
 };

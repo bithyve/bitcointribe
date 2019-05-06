@@ -148,6 +148,7 @@
     "react-native-swiper": "^1.5.13",
     "react-native-tag-select": "^2.0.0",
     "react-native-tcp": "^3.2.1",
+    "react-native-timer-countdown": "^4.1.0",
     "react-native-udp": "^2.3.1",
     "react-native-ui-kitten": "3.1.2",
     "react-native-ultimate-listview": "^3.3.0",
