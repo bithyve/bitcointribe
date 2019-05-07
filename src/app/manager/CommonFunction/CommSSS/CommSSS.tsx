@@ -1,3 +1,4 @@
+import Contacts from 'react-native-contacts';
 import {
     colors,
     images,
@@ -41,6 +42,25 @@ const connection_AppHealthStatus = async ( qatime: number, satime: number, share
     // console.log( { res } );
 }
 
+
+
+
+
+const getContactNameSMS = async ( mobileNo: string ) => {
+
+}
+
+
+
+const getContactNameEmail = async ( email: string ) => {
+
+}
+
+
+
+
 module.exports = {
-    connection_AppHealthStatus
+    connection_AppHealthStatus,
+    getContactNameSMS,
+    getContactNameEmail
 };

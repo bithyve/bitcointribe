@@ -18,6 +18,7 @@ export default class Singleton {
 
   //SSS Details
   public sssJsonDetails: any;
+  public sssDetailsRecordIDWise: any;
 
 
 
@@ -87,5 +88,13 @@ export default class Singleton {
   setSSSDetails( value: any ) {
     this.sssJsonDetails = value;
   }
+  getSSSDetailsRecordIDWise() {
+    return this.sssDetailsRecordIDWise;
+  }
+  setSSSDetailsRecordIDWise( value: any ) {
+    this.sssDetailsRecordIDWise = value;
+  }
+
+
 
 }
