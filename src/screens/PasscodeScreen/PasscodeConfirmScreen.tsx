@@ -29,7 +29,6 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 import {
   colors,
   localDB,
-  errorValidMsg,
   images
 } from "HexaWallet/src/app/constants/Constants";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
@@ -49,7 +48,7 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 //TODO: Bitcon Files
 import Bitcoin from "HexaWallet/src/bitcoin/utilities/Bitcoin";
-import bip39 from 'react-native-bip39'
+
 export default class PasscodeConfirmScreen extends Component<any, any> {
   constructor ( props: any ) {
     super( props );
@@ -112,70 +111,25 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
 
   saveData = async () => {
     try {
-      // this.setState( {
-      //   isLoading: true
-      // } )    
       let code = this.state.pincode;
       let commonData = Singleton.getInstance();
       commonData.setPasscode( code );
-      // const bitcoin = new Bitcoin();   
-      // const mnemonic = await bitcoin.createHDWallet();
-      // Alert.alert( mnemonic );      
-      const mnemonic = await bip39.generateMnemonic( 256 );
-      console.log( { mnemonic } );
-      //let mnemonic = [ "silent", "useless", "panic", "cousin", "page", "black", "abandon", "ticket", "hand", "minor", "stand", "excite" ]; //await utils.getMnemonic(); //this.state.mnemonicValues;
-      const dateTime = Date.now();
-      const fulldate = Math.floor( dateTime / 1000 );
-      const resultCreateWallet = await dbOpration.insertWallet(
-        localDB.tableName.tblWallet,
-        fulldate,
-        mnemonic,
-        "",
-        "",
-        "",
-        "Primary"
+      const username = "HexaWallet";
+      const password = code;
+      // Store the credentials
+      await Keychain.setGenericPassword( username, password );
+      AsyncStorage.setItem(
+        "PasscodeCreateStatus",
+        JSON.stringify( true )
       );
-      if ( resultCreateWallet ) {
-        const resultCreateDailyWallet = await dbOpration.insertCreateAccount(
-          localDB.tableName.tblAccount,
-          fulldate,
-          "",
-          "BTC",
-          "Daily Wallet",
-          "Daily Wallet",
-          ""
-        );
-        console.log( { resultCreateDailyWallet } );
-        if ( resultCreateDailyWallet ) {
-          try {
-            const username = "HexaWallet";
-            const password = code;
-            // Store the credentials
-            await Keychain.setGenericPassword( username, password );
-            AsyncStorage.setItem(
-              "PasscodeCreateStatus",
-              JSON.stringify( true )
-            );
-          } catch ( error ) {
-            // Error saving data
-          }
-          this.setState( {
-            isLoading: false
-          } );
-          const resetAction = StackActions.reset( {
-            index: 0, // <-- currect active route from actions array
-            key: null,
-            actions: [
-              NavigationActions.navigate( { routeName: "RestoreAndWalletSetupNavigator" } )
-            ]
-          } );
-          this.props.navigation.dispatch( resetAction );
-        } else {
-          alert( 'issue' );
-        }
-      } else {
-        alert( 'issue 1' );
-      }
+      const resetAction = StackActions.reset( {
+        index: 0, // <-- currect active route from actions array
+        key: null,
+        actions: [
+          NavigationActions.navigate( { routeName: "RestoreAndWalletSetupNavigator" } )
+        ]
+      } );
+      this.props.navigation.dispatch( resetAction );
     } catch ( e ) {
       console.log( { e } );
     }

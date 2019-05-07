@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert } from "react-native";
 import {
     Container,
     Header,
@@ -22,6 +22,7 @@ import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Contacts from 'react-native-contacts';
 import { Avatar, SearchBar } from 'react-native-elements';
+import TimerCountdown from "react-native-timer-countdown";
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -31,44 +32,103 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+var utils = require( "HexaWallet/src/app/constants/Utils" );
+var commSSS = require( "HexaWallet/src/app/manager/CommonFunction/CommSSS/CommSSS" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
 
 
 //TODO: Bitcoin Files
-import SSS from "HexaWallet/src/bitcoin/utilities/sss/SSS";
-
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus";
 
 
 export default class SecretSharingScreen extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props )
         this.state = ( {
-            data: []
+            data: [],
         } )
     }
 
     componentWillMount = async () => {
-        let data = this.props.navigation.getParam( "data" );
-        let resSSSDetails = await dbOpration.readTablesData(
-            localDB.tableName.tblSSSDetails
+        this.willFocusSubscription = this.props.navigation.addListener(
+            "willFocus",
+            () => {
+                this.connection_Load();
+            }
         );
-        let arr_EncpShare = [];
-        for ( let i = 0; i < resSSSDetails.temp.length; i++ ) {
-            let data = resSSSDetails.temp[ i ];
-            arr_EncpShare.push( data.share )
+    }
+
+
+    componentWillUnmount() {
+        this.willFocusSubscription.remove();
+    }
+
+    connection_Load = async () => {
+        const resultWallet = await utils.getWalletDetails();
+        const resSSSDetails = await utils.getSSSDetails();
+        let updateShareIdStatus = await commSSS.connection_AppHealthStatus( resultWallet.lastUpdated, 0, resSSSDetails, resultWallet );
+        if ( updateShareIdStatus ) {
+            var data = await dbOpration.readTablesData(
+                localDB.tableName.tblSSSDetails
+            );
+            data = data.temp;
+            console.log( { data } );
+            const dateTime = Date.now();
+            const fulldate = Math.floor( dateTime / 1000 );
+            let temp = [];
+            for ( let i = 0; i < data.length; i++ ) {
+                let jsondata = JSON.parse( data[ i ].keeperInfo );
+                jsondata.history = JSON.parse( data[ i ].history );
+                let sharedDate = parseInt( data[ i ].sharedDate );
+                var startDate = new Date( utils.getUnixToDateFormat( fulldate ) );
+                var endDate = new Date( utils.getUnixToDateFormat( sharedDate ) );
+                var diff = Math.abs( startDate.getTime() - endDate.getTime() );
+                const minutes = Math.floor( ( diff / 1000 ) / 60 );
+                const seconds = Math.floor( diff / 1000 % 60 );
+                const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
+                jsondata.totalSec = 600 - totalSec;
+                if ( totalSec < 600 && data[ i ].shareStage == "ugly" ) {
+                    jsondata.statusMsg = "Shared";
+                    jsondata.statusMsgColor = "#C07710";
+                    jsondata.flag_timer = true;
+                } else if ( totalSec >= 600 && data[ i ].shareStage == "ugly" ) {
+                    jsondata.statusMsg = "Shared OTP expired.";
+                    jsondata.statusMsgColor = "#C07710";
+                    jsondata.flag_timer = false;
+                } else if ( data[ i ].shareStage == "good" ) {
+                    jsondata.statusMsg = "Share accessible";
+                    jsondata.statusMsgColor = "#008000";
+                    jsondata.flag_timer = false;
+                } else if ( data[ i ].shareStage == "bad" ) {
+                    jsondata.statusMsg = "Share accessible";
+                    jsondata.statusMsgColor = "#C07710";
+                    jsondata.flag_timer = false;
+                } else if ( data[ i ].shareStage == "ugly" && data[ i ].sharedDate != "" ) {
+                    jsondata.statusMsg = "Share not accessible";
+                    jsondata.statusMsgColor = "#ff0000";
+                    jsondata.flag_timer = false;
+                }
+                else {
+                    jsondata.statusMsg = "Not shared";
+                    jsondata.statusMsgColor = "#ff0000";
+                    jsondata.flag_timer = false;
+                }
+                temp.push( jsondata )
+            }
+            console.log( { data, temp } );
+            this.setState( {
+                data: temp
+            } );
+        } else {
+            Alert.alert( "ShareId status not changed." )
         }
 
-        const sss = new SSS();
-        const resCheckHealth = await sss.checkHealth( arr_EncpShare );
-        console.log( { resCheckHealth } );
-
-        console.log( { data } );
-        this.setState( {
-            data: data
-        } )
     }
+
+
 
     //TODO: func click_Item
     click_Item = ( item: any ) => {
@@ -116,7 +176,28 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                                                 ) }
                                                 <View style={ { flexDirection: "column", justifyContent: "center" } }>
                                                     <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
-                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: "#37A0DA" } ] }>Secret Not Shared</Text>
+                                                    <View style={ { flexDirection: "row" } }>
+                                                        <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                        { renderIf( item.flag_timer )(
+                                                            <TimerCountdown
+                                                                initialMilliseconds={ item.totalSec * 1000 }
+                                                                onExpire={ () => this.connection_Load() }
+                                                                formatMilliseconds={ ( milliseconds ) => {
+                                                                    const remainingSec = Math.round( milliseconds / 1000 );
+                                                                    const seconds = parseInt( ( remainingSec % 60 ).toString(), 10 );
+                                                                    const minutes = parseInt( ( ( remainingSec / 60 ) % 60 ).toString(), 10 );
+                                                                    const hours = parseInt( ( remainingSec / 3600 ).toString(), 10 );
+                                                                    const s = seconds < 10 ? '0' + seconds : seconds;
+                                                                    const m = minutes < 10 ? '0' + minutes : minutes;
+                                                                    let h = hours < 10 ? '0' + hours : hours;
+                                                                    h = h === '00' ? '' : h + ':';
+                                                                    return h + m + ':' + s;
+                                                                } }
+                                                                allowFontScaling={ true }
+                                                                style={ { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } }
+                                                            />
+                                                        ) }
+                                                    </View>
                                                 </View>
                                                 <View style={ {
                                                     flex: 1,
