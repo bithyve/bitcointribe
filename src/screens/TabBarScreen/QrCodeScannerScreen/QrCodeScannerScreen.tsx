@@ -101,7 +101,7 @@ export default class QrCodeScannerScreen extends React.Component {
             if ( result.type == "SSS Recovery" ) {
                 utils.setDeepLinkingType( "SSS Recovery QrCode" );
                 let deepLinkPara = {};
-                deepLinkPara.n = "appasaheb lakade"
+                deepLinkPara.n = result.phoneNo;
                 deepLinkPara.m = result.phoneNo;
                 deepLinkPara.data = result.data;
                 utils.setDeepLinkingUrl( deepLinkPara );

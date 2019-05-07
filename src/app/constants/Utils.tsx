@@ -188,6 +188,17 @@ const setSSSDetails = ( value: any ) => {
   commonData.setSSSDetails( value );
   return true;
 }
+//TODO: Singleton SSS Details RecordIDWise Get and Set Values
+const getSSSDetailsRecordIDWise = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getSSSDetailsRecordIDWise();
+}
+const setSSSDetailsRecordIDWise = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setSSSDetailsRecordIDWise( value );
+  return true;
+}
+
 
 
 
@@ -216,6 +227,10 @@ module.exports = {
   setDeepLinkingUrl,
   getDeepLinkingType,
   setDeepLinkingType,
+  //Singleton SSS Details
+
   getSSSDetails,
-  setSSSDetails
+  setSSSDetails,
+  getSSSDetailsRecordIDWise,
+  setSSSDetailsRecordIDWise
 };

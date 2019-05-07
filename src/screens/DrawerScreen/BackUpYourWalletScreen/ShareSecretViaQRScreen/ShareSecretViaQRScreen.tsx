@@ -35,26 +35,41 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+var utils = require( "HexaWallet/src/app/constants/Utils" );
+
+//TODO: Bitcoin Files
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 export default class ShareSecretViaQRScreen extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props )
         this.state = ( {
-            data: []
+            data: [],
+            flag_Loading: false,
+            msg_Loading: "Loading"
         } )
     }
 
-    componentWillMount() {
-        let data = JSON.stringify( this.props.navigation.getParam( "data" ) );
-        var parseData = JSON.parse( data );
-        parseData = JSON.parse( parseData );
-        console.log( { parseData } );
-
+    componentWillMount = async () => {
+        let walletDetails = utils.getWalletDetails();
+        let resSSSDetails = utils.getSSSDetailsRecordIDWise();
+        //console.log( { resSSSDetails, walletDetails } );
+        const walletNameDetails = JSON.parse( walletDetails.setUpWalletAnswerDetails );
+        const sss = new S3Service(
+            walletDetails.mnemonic
+        );
+        const resQRShare = await sss.createQRShare( resSSSDetails.share, walletNameDetails.walletName );
+        const jsonResQRShare = JSON.parse( resQRShare );
+        // console.log( { resQRShare } );
+        // console.log( { jsonResQRShare } );
+        let qrCodeData = {};
+        qrCodeData.type = "SSS Recovery";
+        qrCodeData.data = jsonResQRShare;
+        console.log( { qrCodeData } );
         this.setState( {
-            data: data.toString()
+            data: JSON.stringify( qrCodeData ).toString()
         } )
     }
-
     //TODO: func click_Item
     click_Item = ( item: any ) => {
         this.props.navigation.push( "TrustedContactScreen", {

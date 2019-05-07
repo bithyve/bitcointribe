@@ -45,7 +45,6 @@ var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 export default class AllContactListScreen extends React.Component<any, any> {
-
     constructor ( props: any ) {
         super( props )
         this.state = ( {
@@ -57,7 +56,6 @@ export default class AllContactListScreen extends React.Component<any, any> {
             flag_MaxItemSeletedof3: true
         } )
     }
-
     componentWillMount = () => {
         Contacts.getAll( ( err, contacts ) => {
             if ( err ) {
@@ -70,8 +68,6 @@ export default class AllContactListScreen extends React.Component<any, any> {
             } )
         } )
     }
-
-
     press = ( hey ) => {
         this.state.data.map( ( item, index ) => {
             if ( item.recordID === hey.recordID ) {
