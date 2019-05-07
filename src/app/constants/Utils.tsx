@@ -178,6 +178,30 @@ const setDeepLinkingType = ( value: any ) => {
   return true;
 }
 
+//TODO: Singleton SSS Details Get and Set Values
+const getSSSDetails = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getSSSDetails();
+}
+const setSSSDetails = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setSSSDetails( value );
+  return true;
+}
+//TODO: Singleton SSS Details RecordIDWise Get and Set Values
+const getSSSDetailsRecordIDWise = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getSSSDetailsRecordIDWise();
+}
+const setSSSDetailsRecordIDWise = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setSSSDetailsRecordIDWise( value );
+  return true;
+}
+
+
+
+
 
 module.exports = {
   getUnixTimeDate,
@@ -202,5 +226,11 @@ module.exports = {
   getDeepLinkingUrl,
   setDeepLinkingUrl,
   getDeepLinkingType,
-  setDeepLinkingType
+  setDeepLinkingType,
+  //Singleton SSS Details
+
+  getSSSDetails,
+  setSSSDetails,
+  getSSSDetailsRecordIDWise,
+  setSSSDetailsRecordIDWise
 };

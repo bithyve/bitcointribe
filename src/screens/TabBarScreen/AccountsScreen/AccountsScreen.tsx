@@ -34,11 +34,10 @@ import ViewRecentTransaction from "bithyve/src/app/custcompontes/view/ViewRecent
 import {
   colors,
   images,
-  localDB,
-  errorMessage
+  localDB
 } from "bithyve/src/app/constants/Constants";
-var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
-var utils = require("bithyve/src/app/constants/Utils");
+var dbOpration = require( "bithyve/src/app/manager/database/DBOpration" );
+var utils = require( "bithyve/src/app/constants/Utils" );
 import renderIf from "bithyve/src/app/constants/validation/renderIf";
 import Singleton from "bithyve/src/app/constants/Singleton";
 
@@ -47,13 +46,13 @@ const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
   "window"
 );
 
-function wp(percentage: number) {
-  const value = (percentage * viewportWidth) / 100;
-  return Math.round(value);
+function wp( percentage: number ) {
+  const value = ( percentage * viewportWidth ) / 100;
+  return Math.round( value );
 }
 const slideHeight = viewportHeight * 0.36;
-const slideWidth = wp(75);
-const itemHorizontalMargin = wp(2);
+const slideWidth = wp( 75 );
+const itemHorizontalMargin = wp( 2 );
 const sliderWidth = viewportWidth;
 const itemWidth = slideWidth + itemHorizontalMargin * 2;
 const SLIDER_1_FIRST_ITEM = 0;
@@ -65,8 +64,8 @@ const SLIDER_1_FIRST_ITEM = 0;
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
 
 export default class AccountsScreen extends React.Component<any, any> {
-  constructor(props: any) {
-    super(props);
+  constructor ( props: any ) {
+    super( props );
     this.state = {
       isNetwork: true,
       tranDetails: [],
@@ -435,112 +434,112 @@ export default class AccountsScreen extends React.Component<any, any> {
 
   //TODO: func click_openPopupAccountType
   click_openPopupAccountType() {
-    if (isNetwork) {
-      this.setState({ accountTypeVisible: !this.state.accountTypeVisible });
+    if ( isNetwork ) {
+      this.setState( { accountTypeVisible: !this.state.accountTypeVisible } );
     } else {
-      this.dropdown.alertWithType("info", "OH", errorMessage.offline);
+      this.dropdown.alertWithType( "info", "OH", errorMessage.offline );
     }
   }
 
   //TODO: func refresh
   refresh() {
-    this.setState({ refreshing: true });
-    return new Promise(resolve => {
-      setTimeout(() => {
-        this.setState({ refreshing: false });
+    this.setState( { refreshing: true } );
+    return new Promise( resolve => {
+      setTimeout( () => {
+        this.setState( { refreshing: false } );
         this.connnection_FetchData();
         resolve();
-      }, 1000);
-    });
+      }, 1000 );
+    } );
   }
 
   //TODO: func openRecentTrans
-  openRecentTrans(item: any) {
-    this.props.navigation.navigate("RecentTransactionsScreen", {
+  openRecentTrans( item: any ) {
+    this.props.navigation.navigate( "RecentTransactionsScreen", {
       transationDetails: item
-    });
+    } );
   }
 
   //TODO: func cardBgColor
-  cardBgColor(type: string) {
-    if (type == "Saving") {
+  cardBgColor( type: string ) {
+    if ( type == "Saving" ) {
       return "style.cardSlideBgImageSaving";
     } else {
       return "style.cardSlideBgImageSecure";
     }
   }
-  _renderItem({ item, index }) {
+  _renderItem( { item, index } ) {
     return (
-      <View key={"card" + index}>
-        {renderIf(item.accountType == "UnKnown")(
-          <TouchableOpacity onPress={this.click_openPopupAccountType}>
-            <RkCard style={styles.rkCardUnnown}>
-              <Icon name="plus-circle" size={40} color={"#ffffff"} />
+      <View key={ "card" + index }>
+        { renderIf( item.accountType == "UnKnown" )(
+          <TouchableOpacity onPress={ this.click_openPopupAccountType }>
+            <RkCard style={ styles.rkCardUnnown }>
+              <Icon name="plus-circle" size={ 40 } color={ "#ffffff" } />
               <Text
-                style={{ marginTop: 10, fontWeight: "bold", fontSize: 20 }}
+                style={ { marginTop: 10, fontWeight: "bold", fontSize: 20 } }
                 note
               >
-                {localization("AccountsScreen.createaWallet")}
+                { localization( "AccountsScreen.createaWallet" ) }
               </Text>
             </RkCard>
           </TouchableOpacity>
-        )}
-        {renderIf(item.accountType != "UnKnown")(
+        ) }
+        { renderIf( item.accountType != "UnKnown" )(
           <TouchableOpacity
-            onPress={() =>
-              this.props.navigation.push("AccountsDetailsScreen", {
+            onPress={ () =>
+              this.props.navigation.push( "AccountsDetailsScreen", {
                 data: item,
                 walletsData: this.state.walletsData,
                 indexNo: index
-              })
+              } )
             }
           >
-            <RkCard style={styles.rkCard}>
+            <RkCard style={ styles.rkCard }>
               <ImageBackground
-                source={images.accounts[item.accountType]}
-                style={styles[item.accountType]}
-                borderRadius={10}
-                imageStyle={{
+                source={ images.accounts[ item.accountType ] }
+                style={ styles[ item.accountType ] }
+                borderRadius={ 10 }
+                imageStyle={ {
                   resizeMode: "cover" // works only here!
-                }}
+                } }
               >
-                <View rkCardContent style={styles.cardHeader}>
-                  <Text style={[styles.cardText, styles.cardTitle]}>
-                    {item.accountName}
+                <View rkCardContent style={ styles.cardHeader }>
+                  <Text style={ [ styles.cardText, styles.cardTitle ] }>
+                    { item.accountName }
                   </Text>
-                  {renderIf(item.accountType == "Joint")(
-                    <Text style={[styles.cardText]}>Joint Account</Text>
-                  )}
+                  { renderIf( item.accountType == "Joint" )(
+                    <Text style={ [ styles.cardText ] }>Joint Account</Text>
+                  ) }
 
                   <Text
-                    style={[
+                    style={ [
                       styles.cardText,
                       styles.cardAmount,
                       { marginTop: 10 }
-                    ]}
+                    ] }
                   >
-                    {item.balance} {item.unit}
+                    { item.balance } { item.unit }
                   </Text>
                 </View>
-                <View style={styles.cardFotter}>
-                  <TouchableOpacity onPress={() => alert("working")}>
-                    <Icon name="ellipsis-v" size={30} color={colors.white} />
+                <View style={ styles.cardFotter }>
+                  <TouchableOpacity onPress={ () => alert( "working" ) }>
+                    <Icon name="ellipsis-v" size={ 30 } color={ colors.white } />
                   </TouchableOpacity>
                 </View>
               </ImageBackground>
             </RkCard>
           </TouchableOpacity>
-        )}
+        ) }
       </View>
     );
   }
 
   //TODO: func createNewAccount
-  createNewAccount(type: string) {
-    this.setState({ accountTypeVisible: !this.state.accountTypeVisible });
-    this.props.navigation.push("AccountDetailsOnboardingRouter", {
+  createNewAccount( type: string ) {
+    this.setState( { accountTypeVisible: !this.state.accountTypeVisible } );
+    this.props.navigation.push( "AccountDetailsOnboardingRouter", {
       type: type
-    });
+    } );
   }
 
   render() {
@@ -548,113 +547,113 @@ export default class AccountsScreen extends React.Component<any, any> {
     return (
       <Container>
         <Content
-          contentContainerStyle={styles.container}
+          contentContainerStyle={ styles.container }
           refreshControl={
             <RefreshControl
-              refreshing={this.state.refreshing}
-              onRefresh={this.refresh.bind(this)}
+              refreshing={ this.state.refreshing }
+              onRefresh={ this.refresh.bind( this ) }
             />
           }
         >
           <StatusBar
-            backgroundColor={colors.appColor}
+            backgroundColor={ colors.appColor }
             barStyle="dark-content"
-            translucent={true}
+            translucent={ true }
           />
           <ImageBackground
-            source={images.appBackgound}
-            style={styles.backgroundImage}
-            imageStyle={{
+            source={ images.appBackgound }
+            style={ styles.backgroundImage }
+            imageStyle={ {
               resizeMode: "cover" // works only here!
-            }}
+            } }
           >
             <Header transparent>
               <Left>
                 <Button
                   transparent
-                  onPress={() => this.props.navigation.toggleDrawer()}
+                  onPress={ () => this.props.navigation.toggleDrawer() }
                 >
-                  <Icon name="bars" size={25} color="#ffffff" />
+                  <Icon name="bars" size={ 25 } color="#ffffff" />
                 </Button>
               </Left>
-              <Body style={{ flex: 0, alignItems: "center" }}>
+              <Body style={ { flex: 0, alignItems: "center" } }>
                 <Title
-                  adjustsFontSizeToFit={true}
-                  numberOfLines={1}
-                  style={styles.titleUserName}
+                  adjustsFontSizeToFit={ true }
+                  numberOfLines={ 1 }
+                  style={ styles.titleUserName }
                 >
-                  {localization("appConfig.appName")}
+                  { localization( "appConfig.appName" ) }
                 </Title>
               </Body>
               <Right>
                 <Button
                   transparent
-                  onPress={() =>
-                    this.props.navigation.push("NotificationScreen")
+                  onPress={ () =>
+                    this.props.navigation.push( "NotificationScreen" )
                   }
                 >
-                  <Icon name="bell" size={15} color="#ffffff" />
+                  <Icon name="bell" size={ 15 } color="#ffffff" />
                 </Button>
-                <Button transparent onPress={this.click_openPopupAccountType}>
-                  <Icon name="plus" size={25} color="#ffffff" />
+                <Button transparent onPress={ this.click_openPopupAccountType }>
+                  <Icon name="plus" size={ 25 } color="#ffffff" />
                 </Button>
               </Right>
             </Header>
 
-            <View style={styles.sliderView}>
+            <View style={ styles.sliderView }>
               <Carousel
-                ref={c => {
+                ref={ c => {
                   this._carousel = c;
-                }}
-                data={this.state.accountTypeList}
-                renderItem={this._renderItem.bind(this)}
-                sliderWidth={sliderWidth}
-                itemWidth={itemWidth}
-                onSnapToItem={index => this.getSwapCardDetails(index)}
+                } }
+                data={ this.state.accountTypeList }
+                renderItem={ this._renderItem.bind( this ) }
+                sliderWidth={ sliderWidth }
+                itemWidth={ itemWidth }
+                onSnapToItem={ index => this.getSwapCardDetails( index ) }
               />
-              {renderIf(!this.state.isLoading)(
+              { renderIf( !this.state.isLoading )(
                 <Pagination
-                  dotsLength={this.state.accountTypeList.length}
-                  activeDotIndex={slider1ActiveSlide}
-                  containerStyle={styles.paginationContainer}
-                  dotColor={"rgba(255, 255, 255, 0.92)"}
-                  dotStyle={styles.paginationDot}
-                  inactiveDotColor={colors.black}
-                  inactiveDotOpacity={0.4}
-                  inactiveDotScale={0.6}
-                  carouselRef={this._slider1Ref}
-                  tappableDots={!!this._slider1Ref}
+                  dotsLength={ this.state.accountTypeList.length }
+                  activeDotIndex={ slider1ActiveSlide }
+                  containerStyle={ styles.paginationContainer }
+                  dotColor={ "rgba(255, 255, 255, 0.92)" }
+                  dotStyle={ styles.paginationDot }
+                  inactiveDotColor={ colors.black }
+                  inactiveDotOpacity={ 0.4 }
+                  inactiveDotScale={ 0.6 }
+                  carouselRef={ this._slider1Ref }
+                  tappableDots={ !!this._slider1Ref }
                 />
-              )}
+              ) }
 
-              {renderIf(this.state.isLoading)(
-                <View style={styles.loading}>
-                  <SkypeIndicator color={colors.white} />
+              { renderIf( this.state.isLoading )(
+                <View style={ styles.loading }>
+                  <SkypeIndicator color={ colors.white } />
                 </View>
-              )}
+              ) }
             </View>
-            <View style={styles.viewMainRecentTran}>
+            <View style={ styles.viewMainRecentTran }>
               <ViewRecentTransaction
-                data={this.state.recentTransactionData}
-                openRecentTrans={(val: any) => this.openRecentTrans(val)}
+                data={ this.state.recentTransactionData }
+                openRecentTrans={ ( val: any ) => this.openRecentTrans( val ) }
               />
             </View>
           </ImageBackground>
         </Content>
         <SCLAlertAccountTypes
-          status={this.state.accountTypeVisible}
-          onRequestClose={() => this.setState({ accountTypeVisible: false })}
-          data={this.state.popupData}
-          onPress={(val: string) => this.createNewAccount(val)}
+          status={ this.state.accountTypeVisible }
+          onRequestClose={ () => this.setState( { accountTypeVisible: false } ) }
+          data={ this.state.popupData }
+          onPress={ ( val: string ) => this.createNewAccount( val ) }
         />
 
-        <DropdownAlert ref={ref => (this.dropdown = ref)} />
+        <DropdownAlert ref={ ref => ( this.dropdown = ref ) } />
       </Container>
     );
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1
   },
@@ -876,4 +875,4 @@ const styles = StyleSheet.create({
     marginRight: 5,
     height: 50
   }
-});
+} );

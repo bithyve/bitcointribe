@@ -23,6 +23,9 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Contacts from 'react-native-contacts';
 import { Avatar } from 'react-native-elements';
 import SendSMS from 'react-native-sms';
+import TimerCountdown from "react-native-timer-countdown";
+
+
 //import Mailer from 'react-native-mail';
 var Mailer = require( 'NativeModules' ).RNMail;
 import Share from "react-native-share";
@@ -44,6 +47,7 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
+
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
@@ -54,18 +58,19 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             data: [],
             arr_TrustedContactEmailAndPhoneShare: [],
             arr_ConstactDetailsList: [],
-            qrCodeString: "",
+            arr_History: [],
+            arr_resSSSDetails: [],
             messageId: "",
             otpCode: "",
             flag_OtpCodeShowStatus: false,
-            flag_Loading: false
+            flag_Loading: false,
+            msg_Loading: "Loading"
         } )
     }
 
-    componentWillMount() {
-        this.load_data();
+    componentWillMount = async () => {
         let data = this.props.navigation.getParam( "data" );
-        // console.log( { data } );
+        console.log( { data } );
         let temp = [];
         let arr_Emails = data.emailAddresses;
         let arr_PhoneNumbers = data.phoneNumbers;
@@ -81,42 +86,47 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             dataJson.value = arr_Emails[ i ].email;
             temp.push( dataJson );
         }
+        var resSSSDetails = await dbOpration.readSSSTableData(
+            localDB.tableName.tblSSSDetails,
+            data.recordID
+        );
+        resSSSDetails = resSSSDetails.temp[ 0 ];
+        await utils.setSSSDetailsRecordIDWise( resSSSDetails )
         this.setState( {
             data: data,
-            arr_ConstactDetailsList: temp
+            arr_ConstactDetailsList: temp,
+            arr_History: data.history,
+            arr_resSSSDetails: resSSSDetails
         } )
     }
 
     load_data = async () => {
+        this.setState( {
+            flag_Loading: true,
+            msg_Loading: "Message id genreating"
+
+        } )
         let data = this.props.navigation.getParam( "data" );
-        let resSSSDetails = await dbOpration.readSSSTableData(
-            localDB.tableName.tblSSSDetails,
-            data.recordID
-        );
-
-        console.log( { resSSSDetails } );
-
-
+        //console.log( { resSSSDetails } );
         let walletDetails = utils.getWalletDetails();
-        console.log( { walletDetails } );
+        //console.log( { walletDetails } );
         const sss = new S3Service(
-            walletDetails[ 0 ].mnemonic
+            walletDetails.mnemonic
         );
-        const { share, otp } = sss.createTransferShare( resSSSDetails.temp[ 0 ].share, data.givenName )
-        console.log( { otpEncryptedShare: share, otp } )
-        const encryptedShare = sss.createQRShare( resSSSDetails.temp[ 0 ].share, data.givenName )
+        let resSSSDetails = this.state.arr_resSSSDetails;
+        const { share, otp } = sss.createTransferShare( resSSSDetails.share, data.givenName )
+        // console.log( { otpEncryptedShare: share, otp } )
         const { messageId, success } = await sss.uploadShare( share );
-        console.log( { otpEncryptedShare: share, messageId, success } )
-        let qrCodeData = {};
-        qrCodeData.type = "SSS Recovery";
-        qrCodeData.share = resSSSDetails.temp[ 0 ].share;
-        qrCodeData.name = this.state.data.givenName + " " + this.state.data.familyName;
-        qrCodeData.phoneNo = data.phoneNumbers[ 0 ].number;
         if ( messageId != "" || messageId != null ) {
             this.setState( {
-                qrCodeString: JSON.stringify( qrCodeData ).toString(),
                 messageId,
-                otpCode: otp
+                otpCode: otp,
+                flag_Loading: false,
+                arr_TrustedContactEmailAndPhoneShare: [ {
+                    modalVisible: true,
+                    contactDetails: data,
+                    arr_ConstactDetailsList: this.state.arr_ConstactDetailsList
+                } ]
             } )
         }
     }
@@ -131,7 +141,6 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
         let data = this.props.navigation.getParam( "data" );
         let script = {};
-        script.n = this.state.data.givenName + " " + this.state.data.familyName;
         script.m = data.phoneNumbers[ 0 ].number;
         script.mi = this.state.messageId;
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
@@ -152,6 +161,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         } ]
                     } )
                     setTimeout( () => {
+                        this.connection_UpdateSSSDetails( "SMS" );
                         Alert.alert( 'SMS Sent Completed' );
                         this.setState( {
                             flag_OtpCodeShowStatus: true
@@ -165,6 +175,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                 }
             } );
         } else {
+            this.connection_UpdateSSSDetails( "EMAIL" );
             if ( Platform.OS == "android" ) {
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Recovery ID',
@@ -214,6 +225,46 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         }
     }
 
+    //TODO: func backQrCodeScreen
+    onSelect = ( data: any ) => {
+        this.connection_UpdateSSSDetails( "QR" );
+    };
+
+
+    //TODO: func SSS Details table update data 
+    connection_UpdateSSSDetails = async ( type: string ) => {
+        const dateTime = Date.now();
+        const fulldate = Math.floor( dateTime / 1000 );
+        let history = this.state.arr_History;
+        let state_data = this.state.data;
+        state_data.statusMsgColor = "#C07710";
+        state_data.statusMsg = "Shared";
+        let temp = history;
+        let jsondata = {};
+        jsondata.title = "Secret Share using " + type.toLowerCase();;
+        jsondata.date = utils.getUnixToDateFormat( fulldate );
+        temp.push( jsondata );
+        let data = this.props.navigation.getParam( "data" );
+        let resupdateSSSTransferMehtodDetails = await dbOpration.updateSSSTransferMehtodDetails(
+            localDB.tableName.tblSSSDetails,
+            type,
+            fulldate,
+            temp,
+            data.recordID
+        )
+        this.setState( {
+            arr_History: temp,
+            data: state_data
+        } )
+        console.log( { resupdateSSSTransferMehtodDetails } );
+    }
+
+    goBack() {
+        const { navigation } = this.props;
+        navigation.pop();
+        // navigation.state.params.onSelect( { selected: true } );
+    }
+
     render() {
         let data = this.state.data;
         return (
@@ -224,7 +275,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         <View style={ { marginLeft: 10, marginTop: 15 } }>
                             <Button
                                 transparent
-                                onPress={ () => this.props.navigation.pop() }
+                                onPress={ () => this.goBack() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Trusted Contact</Text>
@@ -251,13 +302,13 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                             </View>
                             <View style={ { flex: 1, alignItems: "center", marginRight: 20 } }>
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 17 } ] }>{ data.givenName }{ " " }{ data.familyName }</Text>
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, color: colors.appColor } ] }>Secret Not Shared</Text>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, color: data.statusMsgColor } ] }>{ data.statusMsg }</Text>
                             </View>
                         </View>
                         <View style={ { flex: 1 } }>
                             <FlatList
                                 data={
-                                    [ 1 ]
+                                    this.state.arr_History
                                 }
                                 showsVerticalScrollIndicator={ false }
                                 renderItem={ ( { item } ) => (
@@ -268,10 +319,9 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                             </View>
                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
                                                 <View style={ { flexDirection: "row", flex: 1, } }>
-                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16, flex: 1, alignSelf: "flex-start" } ] }>Secret Created</Text>
-                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { alignSelf: "flex-end", flex: 1 } ] }>19 April ‘19, 11:00am</Text>
+                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16, flex: 1, alignSelf: "center", } ] }>{ item.title }</Text>
+                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { alignSelf: "center", flex: 1 } ] }>{ item.date }</Text>
                                                 </View>
-                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: "#37A0DA" } ] }>Lorem ipsum dolor sit amet, consectetur</Text>
                                             </View>
                                         </View>
                                     </View>
@@ -310,51 +360,20 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select how you want to share secret with the selected trusted contact</Text>
                                 <Button
                                     onPress={ () => {
-                                        var qrCodeData = this.state.qrCodeString;
-                                        console.log( { qrCodeData } );
-                                        if ( qrCodeData != "" ) {
-                                            this.props.navigation.push( "ShareSecretViaQRScreen",
-                                                { data: qrCodeData }
-                                            );
-                                        } else {
-                                            this.setState( {
-                                                flag_Loading: true
-                                            } )
-                                            setTimeout( () => {
-                                                qrCodeData = this.state.qrCodeString;
-                                                if ( qrCodeData != "" ) {
-                                                    this.setState( {
-                                                        flag_Loading: false
-                                                    } );
-                                                    this.props.navigation.push( "ShareSecretViaQRScreen",
-                                                        { data: qrCodeData }
-                                                    );
-                                                } else {
-                                                    this.setState( {
-                                                        flag_Loading: true
-                                                    } )
-                                                }
-                                            }, 6000 );
-                                        }
+                                        this.props.navigation.push( "ShareSecretViaQRScreen", { onSelect: this.onSelect } );
                                     } }
                                     style={ [ globalStyle.ffFiraSansSemiBold, {
                                         backgroundColor: "#838383", borderRadius: 10, margin: 5,
                                         height: 50,
                                     } ] }
                                     full
-
                                 >
                                     <Text>Share secret via QR code</Text>
                                 </Button>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
-                                        this.setState( {
-                                            arr_TrustedContactEmailAndPhoneShare: [ {
-                                                modalVisible: true,
-                                                contactDetails: data,
-                                                arr_ConstactDetailsList: this.state.arr_ConstactDetailsList
-                                            } ]
-                                        } )
+                                        this.load_data();
+
                                     } }
                                     title="Share secret email/phone"
                                     disabled={ false }
@@ -398,11 +417,14 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         />
                     </ImageBackground>
                 </SafeAreaView>
-                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
+                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
             </Container >
         );
     }
 }
+
+
+
 
 const primaryColor = colors.appColor;
 const styles = StyleSheet.create( {

@@ -33,9 +33,7 @@ import FirstSecretQuestionScreen from "./FirstSecretQuestionScreen/FirstSecretQu
 import SecondSecretQuestion from "./SecondSecretQuestion/SecondSecretQuestion";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
-
-
+import { colors, images } from "HexaWallet/src/app/constants/Constants";
 
 export default class WalletSetupScreens extends React.Component<any, any> {
 

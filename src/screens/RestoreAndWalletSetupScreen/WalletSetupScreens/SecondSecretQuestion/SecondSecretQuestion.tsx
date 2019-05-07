@@ -35,6 +35,7 @@ var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import bip39 from 'react-native-bip39'
 
 export default class SecondSecretQuestion extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -91,22 +92,17 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         const dateTime = Date.now();
         const fulldate = Math.floor( dateTime / 1000 );
         let data = this.state.data;
-        let walletDetails = utils.getWalletDetails();
-        console.log( { walletDetails } );
-
+        const mnemonic = await bip39.generateMnemonic( 256 );
+        console.log( { mnemonic } );
         let walletName = data.walletName;
         let firstQuestion = data.question;
         let firstAnswer = data.answer;
         let secoundQuestion = this.state.selected;
         let secoundAnser = this.state.secoundAnswer;
-        const sss = new S3Service(
-            walletDetails[ 0 ].mnemonic
-        );
+        const sss = new S3Service( mnemonic );
         const answers = [ firstAnswer, secoundAnser ];
         const encryptedShares = sss.generateShares( answers );
         console.log( { encryptedShares } );
-
-        //save to share to database
         const resInitializeHealthcheck = await sss.initializeHealthcheck( encryptedShares );
         console.log( { resInitializeHealthcheck } );
         if ( resInitializeHealthcheck.success ) {
@@ -118,13 +114,39 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                 transShare.push( sss.createTransferShare( share, walletName ) )
             }
             if ( shareIds != null ) {
-                const resultSSSShareIdInserted = await dbOpration.insertSSSShareAndShareId(
+                await dbOpration.insertSSSShareAndShareId(
                     localDB.tableName.tblSSSDetails,
                     fulldate,
                     encryptedShares,
                     shareIds
                 );
-                console.log( { resultSSSShareIdInserted } );
+                // console.log( { resultSSSShareIdInserted } );
+                let jsonAnswerDetails = {};
+                jsonAnswerDetails.walletName = walletName;
+                jsonAnswerDetails.firstQuestion = firstQuestion;
+                jsonAnswerDetails.firstAnswer = firstAnswer;
+                jsonAnswerDetails.secoundQuestion = secoundQuestion;
+                jsonAnswerDetails.secoundAnser = secoundAnser;
+                // console.log( { jsonAnswerDetails } );
+                await dbOpration.insertWallet(
+                    localDB.tableName.tblWallet,
+                    fulldate,
+                    mnemonic,
+                    "",
+                    "",
+                    "",
+                    "Primary",
+                    jsonAnswerDetails
+                );
+                await dbOpration.insertCreateAccount(
+                    localDB.tableName.tblAccount,
+                    fulldate,
+                    "",
+                    "BTC",
+                    "Daily Wallet",
+                    "Daily Wallet",
+                    ""
+                );
                 await dbOpration.insertCreateAccount(
                     localDB.tableName.tblAccount,
                     fulldate,
@@ -133,17 +155,6 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                     walletName,
                     "Wallet",
                     ""
-                );
-                let jsonAnswerDetails = {};
-                jsonAnswerDetails.walletName = walletName;
-                jsonAnswerDetails.firstQuestion = firstQuestion;
-                jsonAnswerDetails.firstAnswer = firstAnswer;
-                jsonAnswerDetails.secoundQuestion = secoundQuestion;
-                jsonAnswerDetails.secoundAnser = secoundAnser;
-                console.log( { jsonAnswerDetails } );
-                await dbOpration.updateWalletAnswerDetials(
-                    localDB.tableName.tblWallet,
-                    jsonAnswerDetails,
                 );
                 this.setState( {
                     flag_Loading: false

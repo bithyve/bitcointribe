@@ -41,8 +41,7 @@ import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGra
 import {
     colors,
     images,
-    localDB,
-    errorMessage
+    localDB
 } from "HexaWallet/src/app/constants/Constants";
 import utils from "HexaWallet/src/app/constants/Utils";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
@@ -95,67 +94,73 @@ export default class TrustedContactAcceptOtpScreen extends Component {
         let messageId = script.mi;
         let walletDetails = utils.getWalletDetails();
         const sss = new S3Service(
-            walletDetails[ 0 ].mnemonic
+            walletDetails.mnemonic
         );
-        console.log( { messageId, enterOtp } );
+        //  console.log( { messageId, enterOtp } );
         let userDetails = {};
         userDetails.name = script.n;
         userDetails.mobileNo = script.m;
         const resDonwShare = await sss.downloadShare( messageId );
         const resDecryptOTPEncShare = await sss.decryptOTPEncShare( resDonwShare, messageId, enterOtp )
+        //console.log( { resDecryptOTPEncShare } );
         let resShareId = await sss.getShareId( resDecryptOTPEncShare.encryptedShare )
-        console.log( { resDecryptOTPEncShare, resShareId } );
-        if ( resDecryptOTPEncShare != "" || resDecryptOTPEncShare != null ) {
-            const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
-                localDB.tableName.tblTrustedPartySSSDetails,
-                fulldate,
-                userDetails,
-                resDecryptOTPEncShare,
-                resShareId,
-                "temp"
-            );
-            if ( resinsertTrustedPartyDetails == true ) {
-                this.setState( {
-                    flag_Loading: false
-                } )
-                setTimeout( () => {
-                    Alert.alert(
-                        'Success',
-                        'Decrypted share created.',
-                        [
-                            {
-                                text: 'OK', onPress: () => {
-                                    utils.setDeepLinkingType( "" );
-                                    utils.setDeepLinkingUrl( "" );
-                                    this.props.navigation.pop()
-                                }
-                            },
+        const { data, updated } = await sss.updateHealth( resDecryptOTPEncShare.meta.walletId, resDecryptOTPEncShare.encryptedShare );
+        if ( updated ) {
+            if ( resDecryptOTPEncShare != "" || resDecryptOTPEncShare != null ) {
+                const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
+                    localDB.tableName.tblTrustedPartySSSDetails,
+                    fulldate,
+                    userDetails,
+                    resDecryptOTPEncShare.encryptedShare,
+                    resShareId,
+                    resDecryptOTPEncShare,
+                    typeof data !== "undefined" ? data : ""
+                );
+                if ( resinsertTrustedPartyDetails == true ) {
+                    this.setState( {
+                        flag_Loading: false
+                    } )
+                    setTimeout( () => {
+                        Alert.alert(
+                            'Success',
+                            'Decrypted share created.',
+                            [
+                                {
+                                    text: 'OK', onPress: () => {
+                                        utils.setDeepLinkingType( "" );
+                                        utils.setDeepLinkingUrl( "" );
+                                        this.props.navigation.pop()
+                                    }
+                                },
 
-                        ],
-                        { cancelable: false }
-                    )
-                }, 100 );
-            } else {
-                this.setState( {
-                    flag_Loading: false
-                } )
-                setTimeout( () => {
-                    Alert.alert(
-                        'OH',
-                        resinsertTrustedPartyDetails,
-                        [
-                            {
-                                text: 'OK', onPress: () => {
-                                    utils.setDeepLinkingType( "" );
-                                    utils.setDeepLinkingUrl( "" );
-                                    this.props.navigation.pop()
-                                }
-                            },
-                        ],
-                        { cancelable: false }
-                    )
-                }, 100 );
+                            ],
+                            { cancelable: false }
+                        )
+                    }, 100 );
+                } else {
+                    this.setState( {
+                        flag_Loading: false
+                    } )
+                    setTimeout( () => {
+                        Alert.alert(
+                            'OH',
+                            resinsertTrustedPartyDetails,
+                            [
+                                {
+                                    text: 'OK', onPress: () => {
+                                        utils.setDeepLinkingType( "" );
+                                        utils.setDeepLinkingUrl( "" );
+                                        this.props.navigation.pop()
+                                    }
+                                },
+                            ],
+                            { cancelable: false }
+                        )
+                    }, 100 );
+                }
             }
+        } else {
+            Alert.alert( "updateHealth fun not working." )
         }
     }
 

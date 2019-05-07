@@ -230,11 +230,18 @@ export default class SSS {
 
   public updateHealth = async ( walletID: string, encryptedShare: string ) => {
     try {
+      console.log( { walletID, encryptedShare } );
+
       const res = await axios.post( config.SERVER + "/updateHealth", {
         walletID,
         shareID: this.getShareId( encryptedShare ),
       } );
+      console.log( { res } );
+
       const { updated, nonPMDD } = res.data;
+
+
+
 
       if ( updated ) {
         if ( nonPMDD ) {
@@ -265,7 +272,6 @@ export default class SSS {
     encryptedShares.forEach( ( encShare ) =>
       shareIDs.push( this.getShareId( encShare ) ),
     );
-
     try {
       const res = await axios.post( config.SERVER + "/checkHealth", {
         walletID: this.getWalletId(),

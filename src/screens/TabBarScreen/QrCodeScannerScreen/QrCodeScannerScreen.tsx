@@ -42,8 +42,7 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 import {
     colors,
     images,
-    localDB,
-    errorMessage
+    localDB
 } from "HexaWallet/src/app/constants/Constants";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
@@ -79,33 +78,6 @@ export default class QrCodeScannerScreen extends React.Component {
         }
     }
 
-    onReadBarCodeByGalleryFailure() {
-        Alert.alert( "Note", "Not found barcode!" );
-    }
-
-    onBarCodeRead( res: any ) {
-        try {
-            var result = JSON.parse( res.data );
-            result = JSON.parse( result );
-            AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
-            if ( result.type == "SSS Recovery" ) {
-                utils.setDeepLinkingType( "SSS Recovery QrCode" );
-                let deepLinkPara = {};
-                deepLinkPara.n = result.name;
-                deepLinkPara.m = result.phoneNo;
-                deepLinkPara.encpShare = result.share;
-                utils.setDeepLinkingUrl( deepLinkPara );
-                this.props.navigation.navigate( 'WalletScreen' );
-            }
-        } catch ( error ) {
-            console.log( error );
-        }
-    }
-
-    onBarCodeReadByGalleryStart( res: any ) {
-        console.log( "read data from gallery" );
-        console.log( { res } );
-    }
 
 
     _renderTitleBar() {
@@ -124,13 +96,14 @@ export default class QrCodeScannerScreen extends React.Component {
         try {
             var result = JSON.parse( e.data );
             result = JSON.parse( result );
+            //console.log( { result } );
             AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
             if ( result.type == "SSS Recovery" ) {
                 utils.setDeepLinkingType( "SSS Recovery QrCode" );
                 let deepLinkPara = {};
-                deepLinkPara.n = result.name;
+                deepLinkPara.n = result.phoneNo;
                 deepLinkPara.m = result.phoneNo;
-                deepLinkPara.encpShare = result.share;
+                deepLinkPara.data = result.data;
                 utils.setDeepLinkingUrl( deepLinkPara );
                 this.props.navigation.navigate( 'WalletScreen' );
             }
@@ -147,18 +120,6 @@ export default class QrCodeScannerScreen extends React.Component {
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        {/* <BarcodeScanner
-                            Title={ "QRCode Scanner" }   
-                            styles={ styles.barcodeScanner }
-                            cameraProps={ { captureAudio: false } }
-                            onBarCodeReadByGalleryStart={ data =>
-                                this.onBarCodeReadByGalleryStart.call( this, data )
-                            }  
-                            onReadBarCodeByGalleryFailure={ () =>
-                                this.onReadBarCodeByGalleryFailure.call( this )
-                            }
-                            onBarCodeRead={ data => this.onBarCodeRead.call( this, data ) }
-                        />    */}
                         < QRScannerView
                             hintText=""
                             rectHeight={ Dimensions.get( 'screen' ).height / 2.0 }

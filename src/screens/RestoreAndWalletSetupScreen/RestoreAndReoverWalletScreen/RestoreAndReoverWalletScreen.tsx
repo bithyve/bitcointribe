@@ -37,8 +37,7 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 import {
     colors,
     images,
-    localDB,
-    errorMessage
+    localDB
 } from "HexaWallet/src/app/constants/Constants";
 import utils from "HexaWallet/src/app/constants/Utils";
 import Singleton from "HexaWallet/src/app/constants/Singleton";

@@ -13,7 +13,7 @@ import Singleton from "HexaWallet/src/app/constants/Singleton";
 
 //TODO: Custome Object
 var utils = require( "HexaWallet/src/app/constants/Utils" );
-export default class HexaWalletWalletWallet extends React.Component
+export default class HexaWallet extends React.Component
 {
   constructor ( props )    
   {
@@ -185,4 +185,4 @@ export default class HexaWalletWalletWallet extends React.Component
 }
 
 console.disableYellowBox = true;
-AppRegistry.registerComponent( appName, () => HexaWalletWalletWallet );
+AppRegistry.registerComponent( appName, () => HexaWallet );

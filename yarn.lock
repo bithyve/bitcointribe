@@ -7434,7 +7434,7 @@ qr.js@0.0.0:
   resolved "https://registry.yarnpkg.com/qr.js/-/qr.js-0.0.0.tgz#cace86386f59a0db8050fa90d9b6b0e88a1e364f"
   integrity sha1-ys6GOG9ZoNuAUPqQ2baw6IoeNk8=
 
-qrcode@^1.3.2:
+qrcode@^1.2.0, qrcode@^1.3.2:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/qrcode/-/qrcode-1.3.3.tgz#5ef50c0c890cffa1897f452070f0f094936993de"
   integrity sha512-SH7V13AcJusH3GT8bMNOGz4w0L+LjcpNOU/NiOgtBhT/5DoWeZE6D5ntMJnJ84AMkoaM4kjJJoHoh9g++8lWFg==
@@ -8029,6 +8029,14 @@ react-native-qrcode-scanner@^1.1.2:
     prop-types "^15.5.10"
     react-native-permissions "^1.1.1"
 
+react-native-qrcode-svg@^5.1.2:
+  version "5.1.2"
+  resolved "https://registry.yarnpkg.com/react-native-qrcode-svg/-/react-native-qrcode-svg-5.1.2.tgz#1368a1142b7d4916c3d8b1903fd2046185340fd0"
+  integrity sha512-nQ0x2DHQMC2XI5QDxYMGaUhqZ4UT/o/V1Wr0oet5uZwkfnc8OoPt08dae/tO7VcCG7x3plmmafm7Tsh3g67bHA==
+  dependencies:
+    prop-types "^15.5.10"
+    qrcode "^1.2.0"
+
 react-native-qrcode@^0.2.7:
   version "0.2.7"
   resolved "https://registry.yarnpkg.com/react-native-qrcode/-/react-native-qrcode-0.2.7.tgz#d103166fb1a5b53643e8bf7b88c0672e689ac4f8"
@@ -8242,6 +8250,11 @@ react-native-tcp@^3.2.1:
     ip-regex "^1.0.3"
     process "^0.11.9"
     util "^0.10.3"
+
+react-native-timer-countdown@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-timer-countdown/-/react-native-timer-countdown-4.1.0.tgz#d507902ceda2b7f39a13f27454fd56ad15047f63"
+  integrity sha512-UHRRSzsRI7xKukADGOJ2+vXOzHmLsFsX31RunA/OW0yLTs2L7fZRP5BFFQd13XbUu2x8xQdXM10UF6ZoOP5JEw==
 
 react-native-typescript-transformer@^1.2.11:
   version "1.2.12"
