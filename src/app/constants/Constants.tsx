@@ -1,87 +1,16 @@
 import Config from "react-native-config";
 
-//Error Messages
-var errorMessage = {
-  cancel: Config.MES_ERROR_CANCEL,
-  ok: Config.MES_ERROR_OK,
-  thanks: Config.MES_ERROR_THANKS,
-  logout_Title: Config.MES_ERROR_LOGOUT,
-  logout_message: Config.MES_ERROR_LOGOUT_MESSAGE,
-  aLERT_Title: Config.MES_ERROR_ALERT_TITLE,
-  aPI_FAILED: Config.MES_ERROR_API_FAILED,
-  internet_ErrorTitle: Config.MES_ERROR_INTERNET_ERROR_TITLE,
-  fAILED_INTERNET: Config.MES_ERROR_FAILED_INTERNET,
-  offline: Config.MES_ERROR_OFFLINE,
-  initiatorSamePublicKUse: Config.MES_INITIATORSAME_PUBLIC_KUSE,
-  invalidToken: Config.MES_INVALID_TOKEN,
-  transactionFailed: Config.MES_TRAN_FAILED,
-  addressNotFound: Config.MES_ADDRESS_NOTFOUND
-};
-
-//Messages
-var msg = {
-  secretKeyMsg: Config.MES_SECRET_KEY,
-  onBoarding: {
-    title1: Config.MES_ONBOARDING_TITLE1,
-    subTitle1: Config.MES_ONBOARDING_SUBTITLE1,
-    title2: Config.MES_ONBOARDING_TITLE2,
-    subTitle2: Config.MES_ONBOARDING_SUBTITLE2,
-    title3: Config.MES_ONBOARDING_TITLE3,
-    subTitle3: Config.MES_ONBOARDING_SUBTITLE3
-  },
-  createJoinAccount: Config.MES_CREATEJOINACCOUNT,
-  jointAccountImport: Config.MES_JOINTACCOUNTIMPORT,
-  successSecureAccount: Config.MES_SUCCESS_SECURE_ACCOUNT,
-  createVaultAccount: Config.MES_CREATEVAULTACCOUNT,
-  accountDetails: {
-    secure: {
-      title1: Config.MES_ACCOUNTDETAILS_SECURE_TITLE1,
-      subTitle1: Config.MES_ACCOUNTDETAILS_SECURE_SUBTITLE1,
-      title2: Config.MES_ACCOUNTDETAILS_SECURE_TITLE2,
-      subTitle2: Config.MES_ACCOUNTDETAILS_SECURE_SUBTITLE2,
-      title3: Config.MES_ACCOUNTDETAILS_SECURE_TITLE3,
-      subTitle3: Config.MES_ACCOUNTDETAILS_SECURE_SUBTITLE3
-    },
-    joint: {
-      title1: Config.MES_ACCOUNTDETAILS_JOINT_TITLE1,
-      subTitle1: Config.MES_ACCOUNTDETAILS_JOINT_SUBTITLE1,
-      title2: Config.MES_ACCOUNTDETAILS_JOINT_TITLE2,
-      subTitle2: Config.MES_ACCOUNTDETAILS_JOINT_SUBTITLE2,
-      title3: Config.MES_ACCOUNTDETAILS_JOINT_TITLE3,
-      subTitle3: Config.MES_ACCOUNTDETAILS_JOINT_SUBTITLE3
-    },
-    vault: {
-      title1: Config.MES_ACCOUNTDETAILS_VAULT_TITLE1,
-      subTitle1: Config.MES_ACCOUNTDETAILS_VAULT_SUBTITLE1,
-      title2: Config.MES_ACCOUNTDETAILS_VAULT_TITLE2,
-      subTitle2: Config.MES_ACCOUNTDETAILS_VAULT_SUBTITLE2
-    }
-  },
-  transactionSccuess: Config.MES_TRAS_SUCCESS,
-  amountTranSuccess: Config.MES_AMOUNT_TRNS_SUCCESS
-};
-
-//Validation Messages
-var errorValidMsg = {
-  enterCode: Config.MES_ENTER_CODE,
-  confirmPincode: Config.MES_VALID_CONFIRMPINCODE,
-  correctPassword: Config.MES_VALID_CORRECTPASSWORD,
-  correctCode: Config.MES_VALID_CORRECTCODE,
-  enterToken: Config.MES_VALID_ENTERTOKEN,
-  logoutConfirm: Config.MES_VALID_LOGOUTCONFIRM
-};
-
-//Colors
+//Colors  
 var colors = {
-  appColor: Config.COLOR_APP,
+  appColor: "#2595D6",
   tabbarActiveColor: "#2D71B6",
-  black: Config.COLOR_BLACK,
-  white: "#ffffff",
-  Saving: Config.COLOR_SAVING,
-  Secure: Config.COLOR_SECURE,
-  Vault: Config.COLOR_VAULT,
-  Joint: Config.COLOR_VAULT,
-  placeholder: Config.COLOR_PLACEHOLDER
+  black: "#000000",
+  white: "#FFFFFF",
+  Saving: "#E6A620",
+  Secure: "#30A2F3",
+  Vault: "#679F37",
+  Joint: "#660000",
+  placeholder: "#5F5F5F"
 };
 
 const assetsImages = "../../assets/images/";
@@ -183,9 +112,6 @@ var notification = {
 };
 
 export {
-  errorMessage,
-  errorValidMsg,
-  msg,
   localDB,
   colors,
   images,

@@ -13,13 +13,12 @@ export default class CreateTables extends Component {
       this.openCB,
       this.errorCB
     );
-
     db.transaction( function ( txn ) {
       //TODO: TABLE
       txn.executeSql(
         "CREATE TABLE IF NOT EXISTS " +
         localDB.tableName.tblWallet +
-        "(id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,mnemonic TEXT,privateKey TEXT,address TEXT,publicKey TEXT,walletType TEXT,setUpWalletAnswerDetails TEXT,lastUpdated TEXT)",
+        "(id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT ,mnemonic TEXT,privateKey TEXT,address TEXT,publicKey TEXT,walletType TEXT,setUpWalletAnswerDetails TEXT,appHealthStatus TEXT NOT NULL DEFAULT '',lastUpdated TEXT)",
         []
       );
       txn.executeSql(
@@ -43,13 +42,13 @@ export default class CreateTables extends Component {
       txn.executeSql(
         "CREATE TABLE IF NOT EXISTS " +
         localDB.tableName.tblSSSDetails +
-        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,share TEXT,shareId TEXT,keeperInfo TEXT,recordId TEXT,transferMethod TEXT,sharedDate TEXT,acceptedDate TEXT,lastSuccessfulCheck TEXT)",
+        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,share TEXT,shareId TEXT,keeperInfo TEXT NOT NULL DEFAULT '',recordId TEXT NOT NULL DEFAULT '',transferMethod TEXT NOT NULL DEFAULT '',sharedDate TEXT NOT NULL DEFAULT '',history TEXT NOT NULL DEFAULT '',acceptedDate TEXT NOT NULL DEFAULT '',lastSuccessfulCheck TEXT NOT NULL DEFAULT '',shareStage TEXT NOT NULL DEFAULT '')",
         []
       );
       txn.executeSql(
         "CREATE TABLE IF NOT EXISTS " +
         localDB.tableName.tblTrustedPartySSSDetails +
-        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,userDetails TEXT,decrShare TEXT,shareId TEXT,nonPMDDData TEXT)",
+        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,userDetails TEXT,decrShare TEXT,shareId TEXT,allJson TEXT,nonPMDDData TEXT)",
         []
       );
       console.log( "create database." );

@@ -8,6 +8,7 @@ class Config {
   public BITCOIN_NODE: Client;
   public WALLET_XPUB_PATH: string = config.BIT_WALLET_XPUB_PATH;
   public DERIVATION_BRANCH: string = config.BIT_DERIVATION_BRANCH;
+  public HEALTH_CHECK_TIME: string = config.BIT_HEALTH_CHECK_TIME;
   public TOKEN: string = config.BIT_BLOCKCYPHER_API_URLS_TOKEN;
   public SSS_OTP_LENGTH: string = config.BIT_SSS_OTP_LENGTH;
   public SSS_TOTAL: number = parseInt( config.BIT_SSS_TOTAL, 10 );
