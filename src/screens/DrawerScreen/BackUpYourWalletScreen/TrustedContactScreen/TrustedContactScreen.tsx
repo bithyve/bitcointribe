@@ -59,16 +59,16 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             arr_TrustedContactEmailAndPhoneShare: [],
             arr_ConstactDetailsList: [],
             arr_History: [],
-            qrCodeString: "",
+            arr_resSSSDetails: [],
             messageId: "",
             otpCode: "",
             flag_OtpCodeShowStatus: false,
-            flag_Loading: false
+            flag_Loading: false,
+            msg_Loading: "Loading"
         } )
     }
 
-    componentWillMount() {
-        this.load_data();
+    componentWillMount = async () => {
         let data = this.props.navigation.getParam( "data" );
         console.log( { data } );
         let temp = [];
@@ -86,46 +86,47 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             dataJson.value = arr_Emails[ i ].email;
             temp.push( dataJson );
         }
+        var resSSSDetails = await dbOpration.readSSSTableData(
+            localDB.tableName.tblSSSDetails,
+            data.recordID
+        );
+        resSSSDetails = resSSSDetails.temp[ 0 ];
+        await utils.setSSSDetailsRecordIDWise( resSSSDetails )
         this.setState( {
             data: data,
             arr_ConstactDetailsList: temp,
-            arr_History: data.history
+            arr_History: data.history,
+            arr_resSSSDetails: resSSSDetails
         } )
     }
 
     load_data = async () => {
+        this.setState( {
+            flag_Loading: true,
+            msg_Loading: "Message id genreating"
+
+        } )
         let data = this.props.navigation.getParam( "data" );
-        let resSSSDetails = await dbOpration.readSSSTableData(
-            localDB.tableName.tblSSSDetails,
-            data.recordID
-        );
         //console.log( { resSSSDetails } );
         let walletDetails = utils.getWalletDetails();
         //console.log( { walletDetails } );
-        const walletNameDetails = JSON.parse( walletDetails.setUpWalletAnswerDetails );
-        // console.log( { walletNameDetails } );
         const sss = new S3Service(
             walletDetails.mnemonic
         );
-        const { share, otp } = sss.createTransferShare( resSSSDetails.temp[ 0 ].share, data.givenName )
+        let resSSSDetails = this.state.arr_resSSSDetails;
+        const { share, otp } = sss.createTransferShare( resSSSDetails.share, data.givenName )
         // console.log( { otpEncryptedShare: share, otp } )
-        const encryptedShare = sss.createQRShare( resSSSDetails.temp[ 0 ].share, data.givenName )
         const { messageId, success } = await sss.uploadShare( share );
-        //console.log( { otpEncryptedShare: share, messageId, success } )
-        const resQRShare = await sss.createQRShare( resSSSDetails.temp[ 0 ].share, walletNameDetails.walletName );
-        const jsonResQRShare = JSON.parse( resQRShare );
-        // console.log( { resQRShare } );
-        console.log( { jsonResQRShare } );
-        let qrCodeData = {};
-        qrCodeData.type = "SSS Recovery";
-        qrCodeData.data = jsonResQRShare;
-        qrCodeData.phoneNo = data.phoneNumbers[ 0 ].number;
-        console.log( { qrCodeData } );
         if ( messageId != "" || messageId != null ) {
             this.setState( {
-                qrCodeString: JSON.stringify( qrCodeData ).toString(),
                 messageId,
-                otpCode: otp
+                otpCode: otp,
+                flag_Loading: false,
+                arr_TrustedContactEmailAndPhoneShare: [ {
+                    modalVisible: true,
+                    contactDetails: data,
+                    arr_ConstactDetailsList: this.state.arr_ConstactDetailsList
+                } ]
             } )
         }
     }
@@ -140,7 +141,6 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
         let data = this.props.navigation.getParam( "data" );
         let script = {};
-        script.n = this.state.data.givenName + " " + this.state.data.familyName;
         script.m = data.phoneNumbers[ 0 ].number;
         script.mi = this.state.messageId;
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
@@ -236,6 +236,9 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         const dateTime = Date.now();
         const fulldate = Math.floor( dateTime / 1000 );
         let history = this.state.arr_History;
+        let state_data = this.state.data;
+        state_data.statusMsgColor = "#C07710";
+        state_data.statusMsg = "Shared";
         let temp = history;
         let jsondata = {};
         jsondata.title = "Secret Share using " + type.toLowerCase();;
@@ -250,7 +253,8 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             data.recordID
         )
         this.setState( {
-            arr_History: temp
+            arr_History: temp,
+            data: state_data
         } )
         console.log( { resupdateSSSTransferMehtodDetails } );
     }
@@ -356,51 +360,20 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select how you want to share secret with the selected trusted contact</Text>
                                 <Button
                                     onPress={ () => {
-                                        var qrCodeData = this.state.qrCodeString;
-                                        console.log( { qrCodeData } );
-                                        if ( qrCodeData != "" ) {
-                                            this.props.navigation.push( "ShareSecretViaQRScreen",
-                                                { data: qrCodeData, onSelect: this.onSelect }
-                                            );
-                                        } else {
-                                            this.setState( {
-                                                flag_Loading: true
-                                            } )
-                                            setTimeout( () => {
-                                                qrCodeData = this.state.qrCodeString;
-                                                if ( qrCodeData != "" ) {
-                                                    this.setState( {
-                                                        flag_Loading: false
-                                                    } );
-                                                    this.props.navigation.push( "ShareSecretViaQRScreen",
-                                                        { data: qrCodeData, onSelect: this.onSelect }
-                                                    );
-                                                } else {
-                                                    this.setState( {
-                                                        flag_Loading: true
-                                                    } )
-                                                }
-                                            }, 6000 );
-                                        }
+                                        this.props.navigation.push( "ShareSecretViaQRScreen", { onSelect: this.onSelect } );
                                     } }
                                     style={ [ globalStyle.ffFiraSansSemiBold, {
                                         backgroundColor: "#838383", borderRadius: 10, margin: 5,
                                         height: 50,
                                     } ] }
                                     full
-
                                 >
                                     <Text>Share secret via QR code</Text>
                                 </Button>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
-                                        this.setState( {
-                                            arr_TrustedContactEmailAndPhoneShare: [ {
-                                                modalVisible: true,
-                                                contactDetails: data,
-                                                arr_ConstactDetailsList: this.state.arr_ConstactDetailsList
-                                            } ]
-                                        } )
+                                        this.load_data();
+
                                     } }
                                     title="Share secret email/phone"
                                     disabled={ false }
@@ -444,11 +417,14 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         />
                     </ImageBackground>
                 </SafeAreaView>
-                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
+                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
             </Container >
         );
     }
 }
+
+
+
 
 const primaryColor = colors.appColor;
 const styles = StyleSheet.create( {

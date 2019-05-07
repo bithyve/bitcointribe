@@ -226,6 +226,7 @@ export default class WalletScreen extends React.Component {
   getDeepLinkingData() {
     let urlScript = utils.getDeepLinkingUrl();
     let urlType = utils.getDeepLinkingType();
+    console.log( { urlScript } );
     if ( urlType != "" ) {
       this.setState( {
         deepLinkingUrl: urlScript,
@@ -233,7 +234,7 @@ export default class WalletScreen extends React.Component {
         arr_ModelAcceptSecret: [
           {
             modalVisible: true,
-            name: urlScript.n,
+            name: urlScript.m,
             mobileNo: urlScript.m,
             encpShare: urlScript.encpShare
           }
