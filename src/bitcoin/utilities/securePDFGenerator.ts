@@ -33,7 +33,7 @@ export default class SecurePDFGen {
     const path = this.getXpubDerivationPath(bhXpub);
     const secondaryXpub = this.getRecoverableXKey(secondaryMnemonic, path);
 
-    const assets = [{ secondaryXpub }, { bhXpub }, { twoFAsecret }];
+    const assets = [{ secondaryXpub }, { twoFAsecret }];
     for (const asset of assets) {
       if (Object.keys(asset)[0] === "twoFAsecret") {
         this.qrGenerator(asset, false);
@@ -117,22 +117,38 @@ export default class SecurePDFGen {
     const doc = new PDFDocument({ userPassword: password });
     doc.pipe(require("fs").createWriteStream("assets/secure.pdf"));
 
-    doc.image(`assets/${Object.keys(assets[0])[0]}.png`, 175, 70, {
+    doc
+      .font("Helvetica-Bold")
+      .fontSize(20)
+      .text("Secondary Xpub (Encrypted):\n", 50, 70);
+
+    doc.image(`assets/${Object.keys(assets[0])[0]}.png`, 175, 110, {
       fit: [250, 300],
     });
-    doc.fontSize(15).text("Secondary Xpub (Encrypted)", 200, 320);
-    doc.image(`assets/${Object.keys(assets[1])[0]}.png`, 175, 345, {
-      fit: [250, 300],
-    });
-    doc.fontSize(15).text("BitHyve Xpub (Encrypted)", 210, 595);
+    //  doc.fontSize(13).text("Secondary Xpub (Encrypted)", 200, 320);
+    // doc.image(`assets/${Object.keys(assets[1])[0]}.png`, 175, 345, {
+    //   fit: [250, 300],
+    // });
+    // doc.fontSize(15).text("BitHyve Xpub (Encrypted)", 210, 595);
 
     doc
+      .font("Courier")
       .fontSize(15)
       .text(
-        "Scan the above QR Codes using your HEXA wallet in order to restore your Secure Account.",
+        "Scan the above QR Code using your HEXA wallet in order to restore your Secure Account.",
         115,
-        645,
+        370,
       );
+
+    doc
+      .font("Helvetica-Bold")
+      .fontSize(20)
+      .text("2FA Secret:\n", 50, 440);
+    doc.image(`assets/${Object.keys(assets[1])[0]}.png`, 200, 460);
+    doc
+      .font("Courier")
+      .fontSize(17)
+      .text(`${twoFAsecret}`, 150, 675);
 
     doc.addPage();
 
@@ -160,15 +176,6 @@ export default class SecurePDFGen {
       .font("Courier")
       .fontSize(17)
       .text(`${bhXpub}\n\n\n`);
-    doc
-      .font("Helvetica-Bold")
-      .fontSize(20)
-      .text("2FA Secret:\n");
-    doc.image(`assets/${Object.keys(assets[2])[0]}.png`, 175);
-    doc
-      .font("Courier")
-      .fontSize(17)
-      .text(`${twoFAsecret}\n\n`, 125);
 
     doc.end();
   }

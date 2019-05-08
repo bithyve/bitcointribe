@@ -98,8 +98,8 @@ export default class TrustedContactAcceptOtpScreen extends Component {
         );
         //  console.log( { messageId, enterOtp } );
         let userDetails = {};
-        userDetails.name = script.n;
-        userDetails.mobileNo = script.m;
+        userDetails.name = "Hexa Wallet";
+        userDetails.mobileNo = "1234";
         const resDonwShare = await sss.downloadShare( messageId );
         const resDecryptOTPEncShare = await sss.decryptOTPEncShare( resDonwShare, messageId, enterOtp )
         //console.log( { resDecryptOTPEncShare } );

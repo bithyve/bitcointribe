@@ -1,4 +1,4 @@
-import RegularAccount from "../../services/accounts/RegularAccount";
+import RegularAccount from "../../../services/accounts/RegularAccount";
 
 describe("Regular Account", async () => {
   let importedRegularAccount: RegularAccount;

@@ -737,7 +737,6 @@ const updateSSSTransferMehtodDetails = (
   } );
 };
 
-
 //update shareId shareStage
 const updateSSSShareStage = (
   tblName: string,
@@ -748,19 +747,18 @@ const updateSSSShareStage = (
   return new Promise( ( resolve, reject ) => {
     try {
       db.transaction( function ( txn ) {
-        // console.log( { shareInfo } );
+        //console.log( { tblName, shareInfo, fulldate } );
         for ( let i = 0; i < shareInfo.length; i++ ) {
           txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
             var len = results.rows.length;
             if ( len > 0 ) {
               for ( let j = 0; j < len; j++ ) {
-                //  console.log( results.rows.item( i ).recordId );
                 let decryptShareId = utils.decrypt(
                   results.rows.item( j ).shareId,
                   passcode
                 );
                 let shareId = results.rows.item( j ).shareId;
-                if ( decryptShareId == shareInfo[ i ].shareid ) {
+                if ( decryptShareId == shareInfo[ i ].shareId ) {
                   txn.executeSql(
                     "update " +
                     tblName +
@@ -784,13 +782,6 @@ const updateSSSShareStage = (
     }
   } );
 };
-
-
-
-
-
-
-
 
 //TODO: ========================================>  SSS Trusted Party Details   <========================================
 //insert

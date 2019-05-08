@@ -1,4 +1,4 @@
-import JointAccount from "../../services/accounts/JointAccount";
+import JointAccount from "../../../services/accounts/JointAccount";
 
 describe("Joint Account", () => {
   let jointAccount: JointAccount;
