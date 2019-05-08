@@ -1,6 +1,6 @@
 import bip65 from "bip65";
 import { ECPair } from "bitcoinjs-lib";
-import VaultAccount from "../../services/accounts/VaultAccount";
+import VaultAccount from "../../../services/accounts/VaultAccount";
 
 describe("Vault Account", async () => {
   let vaultAccount: VaultAccount;
