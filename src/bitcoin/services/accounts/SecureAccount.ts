@@ -22,8 +22,13 @@ export default class SecureAccount {
   public setupSecureAccount = async () =>
     await this.secureHDWallet.setupSecureAccount()
 
-  public importSecureAccount = (bhXpub: string, secondaryXpub: string) =>
-    this.secureHDWallet.prepareSecureAccount(bhXpub, secondaryXpub)
+  public checkHealth = async (pos: string) =>
+    this.secureHDWallet.checkHealth(pos)
+
+  public importSecureAccount = async (token: number, secondaryXpub: string) => {
+    const { bhXpub } = await this.secureHDWallet.importBHXpub(token);
+    return this.secureHDWallet.prepareSecureAccount(bhXpub, secondaryXpub);
+  }
 
   public validateSecureAccountSetup = async (
     token: number,

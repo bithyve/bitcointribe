@@ -172,10 +172,13 @@ export default class WalletScreen extends React.Component {
     resultWallet = resultWallet.temp[ 0 ];
     //console.log( { resultWallet } );
     await utils.setWalletDetails( resultWallet );
-    const resAccount = await dbOpration.readTablesData(
+    var resAccount = await dbOpration.readTablesData(
       localDB.tableName.tblAccount
     );
-    if ( resAccount.temp.length > 4 ) {
+    resAccount = resAccount.temp;
+    console.log( { resAccount } );
+
+    if ( resAccount.length > 4 ) {
       this.setState( {
         flag_cardScrolling: true
       } )
@@ -186,8 +189,11 @@ export default class WalletScreen extends React.Component {
     resSSSDetails = resSSSDetails.temp;
     console.log( { resSSSDetails } );
     await utils.setSSSDetails( resSSSDetails );
+    this.setState( {
+      arr_wallets: resultWallet,
+      arr_accounts: resAccount
+    } );
     //TODO: appHealthStatus funciton      
-    await commSSS.connection_AppHealthStatus( resultWallet.lastUpdated, 0, resSSSDetails, resultWallet );
     if ( resSSSDetails.length == 0 ) {
       this.setState( {
         shiledIconPer: 1,
@@ -213,10 +219,7 @@ export default class WalletScreen extends React.Component {
         ]
       } );
     }
-    this.setState( {
-      arr_wallets: resultWallet,
-      arr_accounts: resAccount.temp
-    } );
+    await commSSS.connection_AppHealthStatus( resultWallet.lastUpdated, 0, resSSSDetails, resultWallet );
   }
 
 
@@ -234,8 +237,8 @@ export default class WalletScreen extends React.Component {
         arr_ModelAcceptSecret: [
           {
             modalVisible: true,
-            name: urlScript.m,
-            mobileNo: urlScript.m,
+            name: "Hexa Wallet",
+            mobileNo: "1234",
             encpShare: urlScript.encpShare
           }
         ]
@@ -255,8 +258,8 @@ export default class WalletScreen extends React.Component {
     let urlScriptData = urlScript.data;
     console.log( { urlScriptData } );
     let userDetail = {};
-    userDetail.name = urlScript.n;
-    userDetail.mobileNo = urlScript.m;
+    userDetail.name = "Hexa Wallet";
+    userDetail.mobileNo = "1234";
     userDetail.walletId = urlScriptData.meta.walletId;
     // console.log( { userDetail } );
     let walletDetails = utils.getWalletDetails();

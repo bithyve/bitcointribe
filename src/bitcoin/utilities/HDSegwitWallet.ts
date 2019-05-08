@@ -153,9 +153,9 @@ export default class HDSegwitWallet extends Bitcoin {
 
       this.externalAddressesCache[this.nextFreeAddressIndex + itr] = address; // updating cache just for any case
 
-      const { totalTransactions } = await this.fetchTransactionsByAddress(
+      const { totalTransactions } = await this.fetchTransactionsByAddresses([
         address,
-      );
+      ]);
       if (totalTransactions === 0) {
         // free address found
         freeAddress = address;
@@ -192,9 +192,9 @@ export default class HDSegwitWallet extends Bitcoin {
         this.nextFreeChangeAddressIndex + itr
       ] = address; // updating cache just for any case
 
-      const { totalTransactions } = await this.fetchTransactionsByAddress(
+      const { totalTransactions } = await this.fetchTransactionsByAddresses([
         address,
-      );
+      ]);
       if (totalTransactions === 0) {
         // free address found
         freeAddress = address;
@@ -229,9 +229,9 @@ export default class HDSegwitWallet extends Bitcoin {
         if (depth >= 20) {
           return maxUsedIndex + 1;
         } // fail
-        const txs = await this.fetchTransactionsByAddress(
+        const txs = await this.fetchTransactionsByAddresses([
           this.getInternalAddressByIndex(index),
-        );
+        ]);
         console.log(txs);
         if (txs.totalTransactions === 0) {
           console.log({ index });
@@ -242,9 +242,9 @@ export default class HDSegwitWallet extends Bitcoin {
           index = Math.floor((index - maxUsedIndex) / 2 + maxUsedIndex);
         } else {
           maxUsedIndex = Math.max(maxUsedIndex, index); // set
-          const txs2 = await this.fetchTransactionsByAddress(
+          const txs2 = await this.fetchTransactionsByAddresses([
             this.getInternalAddressByIndex(index + 1),
-          );
+          ]);
           if (txs2.totalTransactions === 0) {
             return index + 1;
           } // thats our next free address
@@ -275,9 +275,9 @@ export default class HDSegwitWallet extends Bitcoin {
         if (depth >= 20) {
           return maxUsedIndex + 1;
         } // fail
-        const txs = await this.fetchTransactionsByAddress(
+        const txs = await this.fetchTransactionsByAddresses([
           this.getExternalAddressByIndex(index),
-        );
+        ]);
 
         console.log(txs);
         if (txs.totalTransactions === 0) {
@@ -289,9 +289,9 @@ export default class HDSegwitWallet extends Bitcoin {
           index = Math.floor((index - maxUsedIndex) / 2 + maxUsedIndex);
         } else {
           maxUsedIndex = Math.max(maxUsedIndex, index); // set
-          const txs2 = await this.fetchTransactionsByAddress(
+          const txs2 = await this.fetchTransactionsByAddresses([
             this.getExternalAddressByIndex(index + 1),
-          );
+          ]);
           if (txs2.totalTransactions === 0) {
             return index + 1;
           } // thats our next free address
@@ -325,7 +325,7 @@ export default class HDSegwitWallet extends Bitcoin {
       const res = await this.getBalanceByAddresses(this.usedAddresses);
       return res;
     } catch (err) {
-      console.warn(err);
+      console.log(`An error occured while fetching wallet balance: ${err}`);
     }
   }
 
@@ -381,23 +381,8 @@ export default class HDSegwitWallet extends Bitcoin {
       // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
       await this.fetchBalance();
     }
-    const transactions = {
-      status: 200, // mocking for now
-      totalTransactions: 0,
-      confirmedTransactions: 0,
-      unconfirmedTransactions: 0,
-      transactionDetails: [],
-    };
-    for (const address of this.usedAddresses) {
-      console.log(`Fetching transactions corresponding to ${address}`);
-      const txns = await this.fetchTransactionsByAddress(address);
-      transactions.totalTransactions += txns.totalTransactions;
-      transactions.confirmedTransactions += txns.confirmedTransactions;
-      transactions.unconfirmedTransactions += txns.unconfirmedTransactions;
-      transactions.transactionDetails.push(...txns.transactionDetails);
-    }
 
-    return transactions;
+    return await this.fetchTransactionsByAddresses(this.usedAddresses);
   }
 
   public createHDTransaction = async (
