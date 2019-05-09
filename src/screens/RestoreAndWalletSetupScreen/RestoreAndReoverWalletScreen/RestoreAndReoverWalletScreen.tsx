@@ -54,7 +54,7 @@ export default class RestoreAndReoverWalletScreen extends Component {
         };
     }
 
-    componentDidMount = async () => {
+    async componentDidMount() {
         const resultWallet = await dbOpration.readTablesData(
             localDB.tableName.tblWallet
         );
@@ -65,10 +65,13 @@ export default class RestoreAndReoverWalletScreen extends Component {
     click_Card( item: any ) {
         if ( item == "Set up as a New Wallet" ) {
             this.props.navigation.push( "WalletSetupScreens" );
+        } else if ( "Restore Wallet Using mnemonic" ) {
+            this.props.navigation.push( "RestoreWalletUsingMnemonicNavigator" )
         } else {
             Alert.alert( "Working." );
         }
     }
+
     render() {
         return (
             <View style={ styles.container }>
@@ -82,8 +85,41 @@ export default class RestoreAndReoverWalletScreen extends Component {
                             enableOnAndroid={ true }
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
+                            <View style={ styles.viewSetupWallet }>
+                                <Text style={ [ globalStyle.ffFiraSansBold, { color: "#ffffff", marginTop: 50, fontSize: 26, textAlign: "center" } ] }>Setup Wallet</Text>
+                                <TouchableOpacity
+                                    onPress={ () => this.click_Card( "Set up as a New Wallet" ) }
+                                >
+                                    <RkCard
+                                        rkType="shadowed"
+                                        style={ {
+                                            flex: 0.1,
+                                            borderRadius: 8,
+                                            marginTop: 40
+                                        } }
+                                    >
+                                        <View
+                                            rkCardHeader
+                                            style={ {
+                                                flex: 1,
+                                            } }
+                                        >
+                                            <Text
+                                                style={ [ globalStyle.ffFiraSansMedium ] }
+                                            >
+                                                Set up as a New Wallet
+                                            </Text>
+                                            <SvgIcon
+                                                name="icon_forword"
+                                                color="#BABABA"
+                                                size={ 20 }
+                                            />
+                                        </View>
+                                    </RkCard>
+                                </TouchableOpacity>
+                            </View>
                             <View style={ styles.viewAppLogo }>
-                                <Image style={ styles.imgAppLogo } source={ images.appIcon } />
+                                <Image style={ styles.imgAppLogo } source={ images.RestoreRecoverScreen.restore } />
                                 <Text
                                     style={ [ globalStyle.ffFiraSansBold, { color: "#ffffff", marginTop: 20, fontSize: 26 } ] }
                                 >
@@ -92,7 +128,7 @@ export default class RestoreAndReoverWalletScreen extends Component {
                             </View>
                             <View style={ { flex: 1, margin: 10 } }>
                                 <FlatList
-                                    data={ [ "Restore Wallet Using Trusted Contacts.", "Restore Wallet Using mnemonic", "Set up as a New Wallet" ] }
+                                    data={ [ "Restore Wallet Using Trusted Contacts", "Restore Wallet Using mnemonic" ] }
                                     showsVerticalScrollIndicator={ false }
                                     renderItem={ ( { item } ) => (
                                         <TouchableOpacity
@@ -129,9 +165,9 @@ export default class RestoreAndReoverWalletScreen extends Component {
                                     keyExtractor={ ( item, index ) => index }
                                 />
                             </View>
-                            <View style={ { flex: 3, alignItems: "center" } }>
-                                <Text style={ [ styles.txtWhiteColor, globalStyle.ffFiraSansBold, { fontSize: 20 } ] }>What Does Retore Do?</Text>
-                                <Text style={ [ styles.txtWhiteColor, globalStyle.ffFiraSansRegular, { textAlign: "center", margin: 10 } ] }>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod temporundefined</Text>
+                            <View style={ { flex: 3, alignItems: "center", margin: 20 } }>
+                                <Text style={ [ styles.txtWhiteColor, globalStyle.ffFiraSansBold, { fontSize: 20 } ] }>What Does Restoring Do?</Text>
+                                <Text style={ [ styles.txtWhiteColor, globalStyle.ffFiraSansRegular, { textAlign: "center", margin: 10 } ] }>Restore & recover funds in your Hexa or other Bitcoin Wallets</Text>
                             </View>
                         </KeyboardAwareScrollView>
                     </ImageBackground>
@@ -146,14 +182,18 @@ let styles = StyleSheet.create( {
         flex: 1,
         backgroundColor: "#1F8BCD"
     },
+    viewSetupWallet: {
+        flex: 4,
+        margin: 10
+    },
     viewAppLogo: {
         marginTop: 20,
         flex: 1,
         alignItems: "center",
     },
     imgAppLogo: {
-        height: 100,
-        width: 100
+        height: 70,
+        width: 70
     },
     txtWhiteColor: {
         color: "#ffffff"
