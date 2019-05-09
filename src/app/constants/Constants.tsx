@@ -88,8 +88,8 @@ var images = {
     validationKey: require( assetsImages + "secureAccount/validationKey.png" )
   },
   walletScreen: {
-    "shield_1": require( assetsImages + "WalletScreen/shield_1.png" ),
-    "shield_2": require( assetsImages + "WalletScreen/shield_2.png" ),
+    "sheild_1": require( assetsImages + "WalletScreen/sheild_1.png" ),
+    "sheild_2": require( assetsImages + "WalletScreen/sheild_2.png" ),
   }
 };
 
@@ -111,9 +111,15 @@ var notification = {
   notifi_UserDetialsChange: "notifi_UserDetialsChange"
 };
 
+var asyncStorageKeys = {
+  rootViewController: "rootViewController",
+  flag_PasscodeCreate: "flag_PasscodeCreate"
+}
+
 export {
   localDB,
   colors,
   images,
-  notification
+  notification,
+  asyncStorageKeys
 };
