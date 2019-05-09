@@ -60,6 +60,7 @@ export default class WalletUsingPassphraseScrren extends Component {
             arr_ModelWalletName: [
                 {
                     modalVisible: true,
+                    flag_DisableBtnNext: true
                 }
             ]
         } )
