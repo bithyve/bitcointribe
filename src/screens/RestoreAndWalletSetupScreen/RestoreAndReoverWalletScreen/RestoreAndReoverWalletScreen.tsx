@@ -58,7 +58,7 @@ export default class RestoreAndReoverWalletScreen extends Component {
         const resultWallet = await dbOpration.readTablesData(
             localDB.tableName.tblWallet
         );
-        await utils.setWalletDetails( resultWallet.temp );
+        await utils.setWalletDetails( resultWallet.temp[ 0 ] );
     }
 
     //TODO: func click on list card item

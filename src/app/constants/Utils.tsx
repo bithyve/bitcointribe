@@ -199,9 +199,16 @@ const setSSSDetailsRecordIDWise = ( value: any ) => {
   return true;
 }
 
-
-
-
+//TODO: App Health Status
+const getAppHealthStatus = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getAppHealthStatus();
+}
+const setAppHealthStatus = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setAppHealthStatus( value );
+  return true;
+}
 
 module.exports = {
   getUnixTimeDate,
@@ -228,9 +235,11 @@ module.exports = {
   getDeepLinkingType,
   setDeepLinkingType,
   //Singleton SSS Details
-
   getSSSDetails,
   setSSSDetails,
   getSSSDetailsRecordIDWise,
-  setSSSDetailsRecordIDWise
+  setSSSDetailsRecordIDWise,
+  //Singleton App Health Status
+  getAppHealthStatus,
+  setAppHealthStatus
 };

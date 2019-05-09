@@ -17,12 +17,10 @@ import {
 } from "native-base";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -33,9 +31,11 @@ import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants"
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
+
+
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
-import bip39 from 'react-native-bip39'
+
 
 export default class SecondSecretQuestion extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -92,14 +92,14 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         const dateTime = Date.now();
         const fulldate = Math.floor( dateTime / 1000 );
         let data = this.state.data;
-        const mnemonic = await bip39.generateMnemonic( 256 );
-        console.log( { mnemonic } );
+        const resWallet = await utils.getWalletDetails();
+        console.log( { resWallet } );
         let walletName = data.walletName;
         let firstQuestion = data.question;
         let firstAnswer = data.answer;
         let secoundQuestion = this.state.selected;
         let secoundAnser = this.state.secoundAnswer;
-        const sss = new S3Service( mnemonic );
+        const sss = new S3Service( resWallet.mnemonic );
         const answers = [ firstAnswer, secoundAnser ];
         const encryptedShares = sss.generateShares( answers );
         console.log( { encryptedShares } );
@@ -128,24 +128,9 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                 jsonAnswerDetails.secoundQuestion = secoundQuestion;
                 jsonAnswerDetails.secoundAnser = secoundAnser;
                 // console.log( { jsonAnswerDetails } );
-                await dbOpration.insertWallet(
+                await dbOpration.updateWalletDetials(
                     localDB.tableName.tblWallet,
-                    fulldate,
-                    mnemonic,
-                    "",
-                    "",
-                    "",
-                    "Primary",
                     jsonAnswerDetails
-                );
-                await dbOpration.insertCreateAccount(
-                    localDB.tableName.tblAccount,
-                    fulldate,
-                    "",
-                    "BTC",
-                    "Daily Wallet",
-                    "Daily Wallet",
-                    ""
                 );
                 await dbOpration.insertCreateAccount(
                     localDB.tableName.tblAccount,
