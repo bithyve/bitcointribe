@@ -16,6 +16,8 @@ import OnBoardingScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen
 import PasscodeScreen from "HexaWallet/src/screens/PasscodeScreen/PasscodeScreen";
 import PasscodeConfirmScreen from "HexaWallet/src/screens/PasscodeScreen/PasscodeConfirmScreen";
 import RestoreAndReoverWalletScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/RestoreAndReoverWalletScreen/RestoreAndReoverWalletScreen";
+
+import WalletUsingPassphraseScrren from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingMnemonicScreen/WalletUsingPassphraseScrren/WalletUsingPassphraseScrren";
 import WalletSetupScreens from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/WalletSetupScreens/WalletSetupScreens";
 import PermissionScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/PermissionScreen/PermissionScreen";
 
@@ -76,6 +78,7 @@ import TrustedContactAcceptOtpScreen from "../../screens/DrawerScreen/BackUpYour
 
 
 
+
 //TODO: StackNavigator
 
 //TODO: StackNavigator:ONBoarding
@@ -88,6 +91,18 @@ const OnBoardingStackNavigator = createStackNavigator(
   },
   {
     initialRouteName: "OnBoarding"
+  }
+);
+
+const RestoreWalletUsingMnemonicStackNavigator = createStackNavigator(
+  {
+    WalletUsingPassphraseScrren: {
+      screen: WalletUsingPassphraseScrren,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "WalletUsingPassphraseScrren"
   }
 );
 
@@ -370,6 +385,10 @@ export const createRootNavigator = (
       },
       RestoreAndWalletSetupNavigator: {
         screen: RestoreAndWalletSetupStackNavigator,
+        navigationOptions: { header: null }
+      },
+      RestoreWalletUsingMnemonicNavigator: {
+        screen: RestoreWalletUsingMnemonicStackNavigator,
         navigationOptions: { header: null }
       },
       PermissionNavigator: {

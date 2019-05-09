@@ -92,19 +92,19 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                 var endDate = new Date( sharedDate * 1000 );
                 //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
                 var diff = Math.abs( startDate.getTime() - endDate.getTime() );
-                //console.warn( 'diff' + diff.toString() );
+                //console.warn( 'diff' + diff.toString() );  
                 const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
                 const seconds: any = Math.floor( diff / 1000 % 60 );
                 //console.log( { minutes, seconds } );
                 //console.warn( minutes.toString() )
                 const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
-                //console.log( { totalSec } );
-                jsondata.totalSec = 600 - totalSec;
-                if ( totalSec < 600 && data[ i ].shareStage == "Ugly" ) {
+                //console.log( { totalSec } );  
+                jsondata.totalSec = 540 - totalSec;
+                if ( totalSec < 540 && data[ i ].shareStage == "Ugly" ) {
                     jsondata.statusMsg = "Shared";
                     jsondata.statusMsgColor = "#C07710";
                     jsondata.flag_timer = true;
-                } else if ( totalSec >= 600 && data[ i ].shareStage == "Ugly" ) {
+                } else if ( totalSec >= 540 && data[ i ].shareStage == "Ugly" ) {
                     jsondata.statusMsg = "Shared OTP expired.";
                     jsondata.statusMsgColor = "#C07710";
                     jsondata.flag_timer = false;
