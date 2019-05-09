@@ -193,14 +193,17 @@ export default class WalletScreen extends React.Component {
       arr_wallets: resultWallet,
       arr_accounts: resAccount
     } );
-    //TODO: appHealthStatus funciton      
-    if ( resSSSDetails.length == 0 ) {
+    //TODO: appHealthStatus funciton   
+    await commSSS.connection_AppHealthStatus( resultWallet.lastUpdated, 0, resSSSDetails, resultWallet );
+    let resAppHealthStatus = await utils.getAppHealthStatus();
+    console.log( { resAppHealthStatus } );
+    if ( resAppHealthStatus.overallStatus == "Red!" ) {
       this.setState( {
         shiledIconPer: 1,
         arr_CustShiledIcon: [
           {
             "title": "Looks like your app needs a quick check to maintain good health",
-            "image": "shield_1",
+            "image": "sheild_1",
             "imageHeight": this.animatedShieldIconSize,
             "imageWidth": this.animatedShieldIconSize
           }
@@ -212,14 +215,14 @@ export default class WalletScreen extends React.Component {
         arr_CustShiledIcon: [
           {
             "title": "Your wallet is not secure, some Information about backup comes here. Click on the icon to backup",
-            "image": "shield_2",
+            "image": "sheild_2",
             "imageHeight": this.animatedShieldIconSize,
             "imageWidth": this.animatedShieldIconSize
           }
         ]
       } );
     }
-    await commSSS.connection_AppHealthStatus( resultWallet.lastUpdated, 0, resSSSDetails, resultWallet );
+
   }
 
 
@@ -387,7 +390,7 @@ export default class WalletScreen extends React.Component {
                 } }
               >
                 <ViewShieldIcons data={ this.state.arr_CustShiledIcon } click_Image={ () => {
-                  if ( this.state.shiledIconPer == 1 ) {
+                  if ( this.state.shiledIconPer == 0 ) {
                     this.props.navigation.push( "WalletSetUpScreen" )
                   } else {
                     this.setState( {

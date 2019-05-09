@@ -5,6 +5,7 @@ import {
     localDB
 } from "HexaWallet/src/app/constants/Constants";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var utils = require( "HexaWallet/src/app/constants/Utils" );
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
@@ -25,7 +26,8 @@ const connection_AppHealthStatus = async ( qatime: number, satime: number, share
     //console.log( { resCheckHealth } );
     //console.log( qatime, satime, resCheckHealth.lastUpdateds );
     const res = await sss.appHealthStatus( qatime, satime, resCheckHealth.lastUpdateds );
-    //console.log( { res } );
+    await utils.setAppHealthStatus( res )
+    // console.log( { res } );
     let resupdateWalletDetials = await dbOpration.updateWalletDetials(
         localDB.tableName.tblWallet,
         res
