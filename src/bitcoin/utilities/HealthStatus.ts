@@ -10,7 +10,7 @@ export default class HealthStatus {
     ugly: number;
   };
 
-  constructor () {
+  constructor() {
     this.counter = {
       good: 0,
       bad: 0,
@@ -21,71 +21,69 @@ export default class HealthStatus {
   public appHealthStatus = (
     qaTimestamp: number,
     secureTimestamp: number,
-    shares?: [
+    shares: [
       { shareId: string; updatedAt: number },
       { shareId: string; updatedAt: number },
       { shareId: string; updatedAt: number }
     ],
-    mnemonicTimestamp?: number,
-  ) => {
-    let overallStatus = HEXA_HEALTH.STAGE1;
-    const qaStatus = this.qaHealthStatus( qaTimestamp );
-    const secureAcStatus = this.secureAccountHealthStatus( secureTimestamp );
+    mnemonicTimestamp: number,
+    backupType: string,
+  ): {
+    backupType: string;
+    sharesInfo: Array<{ shareId: number; shareStage: string }>;
+    sharesStatus: string;
+    mnemonicStatus: string;
+    qaStatus: string;
+    secureAcStatus: string;
+    overallStatus: string;
+  } => {
+    let overallStatus: string = HEXA_HEALTH.STAGE1;
+    const qaRes = this.qaHealthStatus(qaTimestamp);
+    const qaStatus = qaRes.qaStage;
+    const saRes = this.secureAccountHealthStatus(secureTimestamp);
+    const secureAcStatus = saRes.secureAcStage;
 
-    let mnemonicStatus: string = ENTITY_HEALTH.STAGE1;
+    let mnemonicStatus = ENTITY_HEALTH.STAGE1;
     let sharesData: any;
-    let sharesInfo: any = ENTITY_HEALTH.STAGE1;
+    let sharesInfo: any;
     let sharesStatus: string = ENTITY_HEALTH.STAGE1;
 
-    if ( shares && mnemonicTimestamp ) {
-      throw new Error(
-        "Both shares and mnemonic timestamps can not be provided simultaneously",
-      );
-    } else if ( shares ) {
-      sharesData = this.shareHealthStatus( shares );
+    if (backupType === "mnemonic") {
+      const mnemonicRes = this.mnemonicHealthStatus(mnemonicTimestamp);
+      mnemonicStatus = mnemonicRes.mnemonicStage;
+    } else {
+      sharesData = this.shareHealthStatus(shares);
       sharesInfo = sharesData.sharesInfo;
       sharesStatus = sharesData.sharesStage;
-    } else if ( mnemonicTimestamp ) {
-      mnemonicStatus = this.mnemonicHealthStatus( mnemonicTimestamp );
-    } else {
-      throw new Error( "Neither shares nor mnemonic timestamps is provided" );
     }
-
-    if ( this.counter.ugly >= 2 ) {
+    if (this.counter.ugly >= 2) {
       overallStatus = HEXA_HEALTH.STAGE1;
-    } else if ( this.counter.ugly === 1 ) {
+    } else if (this.counter.ugly === 1) {
       overallStatus = HEXA_HEALTH.STAGE2;
-    } else if ( this.counter.bad > 1 ) {
+    } else if (this.counter.bad > 1) {
       overallStatus = HEXA_HEALTH.STAGE3;
-    } else if ( this.counter.bad === 1 ) {
+    } else if (this.counter.bad === 1) {
       overallStatus = HEXA_HEALTH.STAGE4;
-    } else if ( this.counter.good === 3 ) {
+    } else if (this.counter.good === 3) {
       overallStatus = HEXA_HEALTH.STAGE5;
     }
 
-    if ( shares ) {
-      return {
-        sharesInfo,
-        sharesStatus,
-        qaStatus,
-        secureAcStatus,
-        overallStatus,
-      };
-    } else {
-      return {
-        mnemonicStatus,
-        qaStatus,
-        secureAcStatus,
-        overallStatus,
-      };
-    }
+    return {
+      backupType,
+      sharesInfo,
+      sharesStatus,
+      mnemonicStatus,
+      qaStatus,
+      secureAcStatus,
+      overallStatus,
+    };
   }
 
-  private mnemonicHealthStatus = ( time: number ) => {
+  private mnemonicHealthStatus = (time: number): { mnemonicStage: string } => {
     let mnemonicStage = ENTITY_HEALTH.STAGE1;
-    const delta = Math.abs( Date.now() - time );
-    const numberOfDays = Math.round( delta / ( 60 * 60 * 24 * 1000 ) );
-    if ( numberOfDays > 2 * TIME_SLOTS.MNEMONIC_SLOT ) {
+    const delta = Math.abs(Date.now() - time);
+    const numberOfDays = Math.round(delta / (60 * 60 * 24 * 1000));
+    if (numberOfDays > 2 * TIME_SLOTS.MNEMONIC_SLOT) {
       mnemonicStage = ENTITY_HEALTH.STAGE1;
       this.counter.ugly++;
     } else if (
@@ -94,19 +92,19 @@ export default class HealthStatus {
     ) {
       mnemonicStage = ENTITY_HEALTH.STAGE2;
       this.counter.bad++;
-    } else if ( numberOfDays <= TIME_SLOTS.MNEMONIC_SLOT ) {
+    } else if (numberOfDays <= TIME_SLOTS.MNEMONIC_SLOT) {
       mnemonicStage = ENTITY_HEALTH.STAGE3;
       this.counter.good++;
     }
-    return mnemonicStage;
+    return { mnemonicStage };
   }
 
-  private qaHealthStatus = ( time: number ) => {
-    let qaStage = ENTITY_HEALTH.STAGE1;
-    const delta = Math.abs( Date.now() - time );
-    const numberOfDays = Math.round( delta / ( 60 * 60 * 24 * 1000 ) );
+  private qaHealthStatus = (time: number): { qaStage: string } => {
+    let qaStage: string = ENTITY_HEALTH.STAGE1;
+    const delta = Math.abs(Date.now() - time);
+    const numberOfDays = Math.round(delta / (60 * 60 * 24 * 1000));
 
-    if ( numberOfDays > TIME_SLOTS.SHARE_SLOT2 ) {
+    if (numberOfDays > TIME_SLOTS.SHARE_SLOT2) {
       qaStage = ENTITY_HEALTH.STAGE1;
       this.counter.ugly++;
     } else if (
@@ -115,18 +113,20 @@ export default class HealthStatus {
     ) {
       qaStage = ENTITY_HEALTH.STAGE2;
       this.counter.bad++;
-    } else if ( numberOfDays <= TIME_SLOTS.SHARE_SLOT1 ) {
+    } else if (numberOfDays <= TIME_SLOTS.SHARE_SLOT1) {
       qaStage = ENTITY_HEALTH.STAGE3;
       this.counter.good++;
     }
-    return qaStage;
+    return { qaStage };
   }
 
-  private secureAccountHealthStatus = ( time: number ) => {
+  private secureAccountHealthStatus = (
+    time: number,
+  ): { secureAcStage: string } => {
     let secureAcStage = ENTITY_HEALTH.STAGE1;
-    const delta = Math.abs( Date.now() - time );
-    const numberOfDays = Math.floor( delta / ( 60 * 60 * 24 * 1000 ) );
-    if ( numberOfDays > TIME_SLOTS.SHARE_SLOT2 ) {
+    const delta = Math.abs(Date.now() - time);
+    const numberOfDays = Math.floor(delta / (60 * 60 * 24 * 1000));
+    if (numberOfDays > TIME_SLOTS.SHARE_SLOT2) {
       secureAcStage = ENTITY_HEALTH.STAGE1;
       this.counter.ugly++;
     } else if (
@@ -135,13 +135,12 @@ export default class HealthStatus {
     ) {
       secureAcStage = ENTITY_HEALTH.STAGE2;
       this.counter.bad++;
-    } else if ( numberOfDays <= TIME_SLOTS.SHARE_SLOT2 ) {
+    } else if (numberOfDays <= TIME_SLOTS.SHARE_SLOT2) {
       secureAcStage = ENTITY_HEALTH.STAGE3;
       this.counter.good++;
     }
-    return secureAcStage;
+    return { secureAcStage };
   }
-
 
   private shareHealthStatus = (
     shares: [
@@ -149,61 +148,64 @@ export default class HealthStatus {
       { shareId: string; updatedAt: number },
       { shareId: string; updatedAt: number }
     ],
-  ) => {
+  ): {
+    sharesStage: string;
+    sharesInfo: Array<{ shareId: number; shareStage: string }>;
+  } => {
     let sharesStage = ENTITY_HEALTH.STAGE1;
     const sharesInfo = [];
     let shareUglyCount = 0;
     let shareBadCount = 0;
     let shareGoodCount = 0;
-    for ( let itr = 0; itr < shares.length; itr++ ) {
-      const obj = shares[ itr ];
-      sharesInfo.push( {
+    for (let itr = 0; itr < shares.length; itr++) {
+      const obj = shares[itr];
+      sharesInfo.push({
         shareId: obj.shareId,
         shareStage: ENTITY_HEALTH.STAGE1,
-      } );
+      });
     }
-    const delta: number[] = new Array( 3 );
-    const numberOfDays: number[] = new Array( 3 );
-    for ( let i = 0; i < delta.length; i++ ) {
-      const obj = shares[ i ];
-      delta[ i ] = Math.abs( Date.now() - obj.updatedAt );
+    const delta: number[] = new Array(3);
+    const numberOfDays: number[] = new Array(3);
+    for (let i = 0; i < delta.length; i++) {
+      const obj = shares[i];
+      delta[i] = Math.abs(Date.now() - obj.updatedAt);
     }
-    for ( let i = 0; i < numberOfDays.length; i++ ) {
-      numberOfDays[ i ] = Math.floor( delta[ i ] / ( 60 * 60 * 24 * 1000 ) );
-      const obj = sharesInfo[ i ];
-      if ( numberOfDays[ i ] > TIME_SLOTS.SHARE_SLOT2 ) {
+    for (let i = 0; i < numberOfDays.length; i++) {
+      numberOfDays[i] = Math.floor(delta[i] / (60 * 60 * 24 * 1000));
+      const obj = sharesInfo[i];
+      if (numberOfDays[i] > TIME_SLOTS.SHARE_SLOT2) {
         obj.shareStage = ENTITY_HEALTH.STAGE1;
         shareUglyCount++;
       } else if (
-        numberOfDays[ i ] > TIME_SLOTS.SHARE_SLOT1 &&
-        numberOfDays[ i ] <= TIME_SLOTS.SHARE_SLOT2
+        numberOfDays[i] > TIME_SLOTS.SHARE_SLOT1 &&
+        numberOfDays[i] <= TIME_SLOTS.SHARE_SLOT2
       ) {
         obj.shareStage = ENTITY_HEALTH.STAGE2;
         shareBadCount++;
-      } else if ( numberOfDays[ i ] <= TIME_SLOTS.SHARE_SLOT1 ) {
+      } else if (numberOfDays[i] <= TIME_SLOTS.SHARE_SLOT1) {
         obj.shareStage = ENTITY_HEALTH.STAGE3;
         shareGoodCount++;
       }
     }
-    if ( shareUglyCount >= 2 ) {
+    if (shareUglyCount >= 2) {
       sharesStage = ENTITY_HEALTH.STAGE1;
       this.counter.ugly++;
-    } else if ( shareGoodCount > 2 ) {
+    } else if (shareGoodCount > 2) {
       sharesStage = ENTITY_HEALTH.STAGE3;
       this.counter.good++;
     } else if (
       shareGoodCount === 2 &&
-      ( shareBadCount === 1 || shareUglyCount === 1 )
+      (shareBadCount === 1 || shareUglyCount === 1)
     ) {
       sharesStage = ENTITY_HEALTH.STAGE2;
       this.counter.bad++;
     } else if (
       shareBadCount === 2 &&
-      ( shareGoodCount === 1 || shareUglyCount === 1 )
+      (shareGoodCount === 1 || shareUglyCount === 1)
     ) {
       sharesStage = ENTITY_HEALTH.STAGE1;
       this.counter.ugly++;
-    } else if ( shareBadCount >= 2 ) {
+    } else if (shareBadCount >= 2) {
       sharesStage = ENTITY_HEALTH.STAGE2;
       this.counter.ugly++;
     }
@@ -213,27 +215,33 @@ export default class HealthStatus {
 
 /////////// SMOKE TEST ///////////////
 
-// const healthStatus = new HealthStatus();
-// console.log(
-//   "Share based:",
-//   healthStatus.appHealthStatus(1555725600000, 1555725600000, [
-//     {
-//       shareID:
-//         "856e8ade9c4ec1edca1ec84f8674af25d52e4270842c365eb48e73ed35702f86",
-//       updatedAt: 1555725600000,
-//     },
-//     {
-//       shareID:
-//         "856e8ade9c4ec1edca1ec84f8674af25d52e4270842c365eb48e73ed35702f86",
-//       updatedAt: 1555725600000,
-//     },
-//     {
-//       shareID:
-//         "856e8ade9c4ec1edca1ec84f8674af25d52e4270842c365eb48e73ed35702f86",
-//       updatedAt: 1555725600000,
-//     },
-//   ]),
-// );
+const healthStatus = new HealthStatus();
+console.log(
+  "Share based:",
+  healthStatus.appHealthStatus(
+    1555725600000,
+    1555725600000,
+    [
+      {
+        shareId:
+          "856e8ade9c4ec1edca1ec84f8674af25d52e4270842c365eb48e73ed35702f86",
+        updatedAt: 1555725600000,
+      },
+      {
+        shareId:
+          "856e8ade9c4ec1edca1ec84f8674af25d52e4270842c365eb48e73ed35702f86",
+        updatedAt: 1555725600000,
+      },
+      {
+        shareId:
+          "856e8ade9c4ec1edca1ec84f8674af25d52e4270842c365eb48e73ed35702f86",
+        updatedAt: 1555725600000,
+      },
+    ],
+    1555725600000,
+    "mnemonic",
+  ),
+);
 
 // console.log(
 //   "Mnemonic based:",
