@@ -34,6 +34,9 @@ var images = {
   RestoreRecoverScreen: {
     restore: require( assetsImages + "RestoreAndRecoverScreen/restore.png" ),
   },
+  WalletRestoreUsingPassphrase: {
+    walletrestored: require( assetsImages + "walletRestoreUsingPassphrase/illustration_walletrestored.png" ),
+  },
   WalletSetupScreen: {
     WalletScreen: {
       backgoundImage: require( assetsImages + "SetUpWallet/background.png" )

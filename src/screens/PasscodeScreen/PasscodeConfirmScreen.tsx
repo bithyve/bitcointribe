@@ -16,6 +16,7 @@ import CodeInput from "react-native-confirmation-code-input";
 import * as Keychain from "react-native-keychain";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import bip39 from 'react-native-bip39'
+import originalBIP39 from "bip39"
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
@@ -47,7 +48,7 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 
 //TODO: Bitcon Files
-import Bitcoin from "HexaWallet/src/bitcoin/utilities/Bitcoin";
+import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 
 export default class PasscodeConfirmScreen extends Component<any, any> {
   constructor ( props: any ) {
@@ -118,8 +119,13 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
       commonData.setPasscode( code );
       const username = "HexaWallet";
       const password = code;
+
+      // const regularAccount = new RegularAccount();
+      // const resGetMnemonic = regularAccount.getSomething();
+      // Alert.alert( resGetMnemonic );    
+
       const mnemonic = await bip39.generateMnemonic( 256 );
-      // console.log( { mnemonic } );
+      // console.log( { mnemonic});
       await dbOpration.insertWallet(
         localDB.tableName.tblWallet,
         fulldate,

@@ -423,6 +423,32 @@ const updateWalletDetials = (
   } );
 };
 
+const updateWalletMnemonic = (
+  tblName: string,
+  mnemonic: string,
+  fulldate: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        txn.executeSql(
+          "update " +
+          tblName +
+          " set mnemonic = :mnemonic,lastUpdated = :lastUpdated where id = 1",
+          [
+            utils.encrypt( mnemonic.toString(), passcode ),
+            utils.encrypt( fulldate.toString(), passcode )
+          ]
+        );
+        resolve( true );
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
 //TODO: insert tblAccount Only First Time
 const insertCreateAccount = (
   tblName: string,
@@ -863,6 +889,7 @@ module.exports = {
   //Wallet Details
   insertWallet,
   updateWalletDetials,
+  updateWalletMnemonic,
 
   insertCreateAccount,
   insertLastBeforeCreateAccount,

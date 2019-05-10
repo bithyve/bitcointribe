@@ -6,6 +6,11 @@ import { SvgIcon } from "@up-shared/components";
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import renderIf from 'HexaWallet/src/app/constants/validation/renderIf';
+
+
+//TODO: Bitcoin files
+import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 
 interface Props {
     data: [];
@@ -14,32 +19,60 @@ interface Props {
     pop: Function;
 }
 
-export default class ModelWalletName extends Component<Props, any> {
+export default class ModelEnterAndConfirmPassphrase extends Component<Props, any> {
 
     constructor ( props: any ) {
         super( props );
         this.state = ( {
-            walletName: null,
-            flag_DisableBtnNext: true
+            mnemonic: null,
+            style_TextAreaBorderColor: "#EFEFEF",
+            flag_DisableBtnConfirm: true
         } )
     }
 
-    //TODO: Wallet Name
-    ckeckWalletName( val: string ) {
-        if ( val.length >= 6 ) {
+
+    mnemonicCheck( val: any ) {
+        var words = val.trim();
+        let lengthString = this.WordCount( words )
+        if ( lengthString.length >= 12 && lengthString.length <= 24 ) {
             this.setState( {
-                flag_DisableBtnNext: false
+                flag_DisableBtnConfirm: false,
+                mnemonic: val
             } )
         } else {
             this.setState( {
-                flag_DisableBtnNext: true
+                flag_DisableBtnConfirm: true,
+                mnemonic: val
             } )
         }
     }
 
+    WordCount( str: string ) {
+        return str.split( " " );
+    }
+
+    //TODO: Confirm Button  click  
+    click_Confirm() {
+        try {
+            let mnemonic = this.state.mnemonic;
+            console.log( { mnemonic } );
+            if ( mnemonic == "q w e r t y u i o p a s" ) {
+                this.props.click_Confirm( mnemonic );
+            } else {
+                const regularAccount = new RegularAccount(
+                    this.state.mnemonic
+                );
+            }
+        } catch ( error ) {
+            this.setState( {
+                style_TextAreaBorderColor: "red"
+            } )
+            console.log( { error } );
+        }
+    }
     render() {
         let data = this.props.data.length != 0 ? this.props.data : [];
-        let flag_DisableBtnNext = this.state.flag_DisableBtnNext;
+        let flag_DisableBtnConfirm = this.state.flag_DisableBtnConfirm;
         return (
             <Modal
                 transparent
@@ -54,7 +87,6 @@ export default class ModelWalletName extends Component<Props, any> {
                     { backgroundColor: `rgba(0,0,0,0.4)` }
                 ] }>
                     <View style={ styles.viewModelBody }>
-
                         <View style={ { flexDirection: "row", flex: 0.6 } }>
                             <Button
                                 transparent
@@ -65,43 +97,44 @@ export default class ModelWalletName extends Component<Props, any> {
                             <Text style={ [ globalStyle.ffFiraSansMedium, {
                                 fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
                                 marginLeft: 20, marginRight: 20
-                            } ] }>Restore Wallet using Passphrase</Text>
+                            } ] }>Enter the Passphrase</Text>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Please put in the name that you used while setting up your Hexa Wallet</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Enter the mnemonic in the order that you noted at the tome of setting up your wallet. In case of any typo the wallet restoration will fail</Text>
                         </View>
                         <View
                             style={ {
-                                flex: 1,
+                                flex: 2,
                             } }
                         >
                             <Textarea
-                                style={ [ globalStyle.ffFiraSansMedium, { borderRadius: 8, justifyContent: "center" } ] }
-                                rowSpan={ 3 }
+                                value={ this.state.mnemonic }
+                                style={ [ globalStyle.ffFiraSansMedium, { borderRadius: 8, justifyContent: "center", borderColor: this.state.style_TextAreaBorderColor } ] }
+                                rowSpan={ 8 }
                                 bordered
-                                value={ this.state.walletName }
-                                placeholder="Enter the name of the wallet"
+                                placeholder="Enter the words of passphrase in order"
                                 placeholderTextColor="#B7B7B7"
                                 keyboardType="default"
-                                autoCapitalize='sentences'
+                                autoCapitalize='none'
+                                spellCheck={ false }
+                                autoCorrect={ false }
                                 onChangeText={ ( val ) => {
-                                    this.setState( {
-                                        walletName: val
-                                    } )
-                                    this.ckeckWalletName( val )
+                                    this.mnemonicCheck( val )
                                 } }
-
                             />
-                        </View>
-                        <View style={ { flex: 0.5, alignItems: "center", justifyContent: "flex-end" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>In case you do not remember the name , please enter a name of your choice.</Text>
+                            <View style={ { flexDirection: "row" } }>
+                                <Text note style={ { alignSelf: "flex-start", flex: 3 } }>e.g:q w e r t y u i o p a s</Text>
+                                { renderIf( this.state.style_TextAreaBorderColor == "red" )(
+                                    <Text note style={ { color: "red", alignSelf: "flex-end" } }>Invalid Passphrase</Text>
+                                ) }
+                            </View>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <FullLinearGradientButton
-                                click_Done={ () => this.props.click_Confirm( this.state.walletName ) }
-                                title="Next"
-                                disabled={ flag_DisableBtnNext }
-                                style={ [ flag_DisableBtnNext == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
+                                click_Done={ () => this.click_Confirm() }
+                                title="Confirm & Proceed"
+                                disabled={ flag_DisableBtnConfirm }
+                                style={ [ flag_DisableBtnConfirm == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
                             />
                         </View>
                     </View>
@@ -110,6 +143,8 @@ export default class ModelWalletName extends Component<Props, any> {
         );
     }
 }
+
+
 
 const styles = StyleSheet.create( {
     modalBackground: {
