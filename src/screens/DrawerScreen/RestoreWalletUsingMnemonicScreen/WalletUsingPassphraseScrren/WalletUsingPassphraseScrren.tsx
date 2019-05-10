@@ -28,6 +28,8 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import ModelWalletName from "HexaWallet/src/app/custcompontes/Model/ModelWalletUsingPassphrase/ModelWalletName";
+import ModelEnterAndConfirmPassphrase from "HexaWallet/src/app/custcompontes/Model/ModelWalletUsingPassphrase/ModelEnterAndConfirmPassphrase";
+import ModelWalletSuccessfullyRestored from "HexaWallet/src/app/custcompontes/Model/ModelWalletUsingPassphrase/ModelWalletSuccessfullyRestored";
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -36,7 +38,8 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 import {
     colors,
     images,
-    localDB
+    localDB,
+    asyncStorageKeys
 } from "HexaWallet/src/app/constants/Constants";
 import utils from "HexaWallet/src/app/constants/Utils";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
@@ -47,11 +50,18 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 
+
+//TODO: Bitcoin Files
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+
 export default class WalletUsingPassphraseScrren extends Component {
     constructor ( props: any ) {
         super( props );
         this.state = {
-            arr_ModelWalletName: []
+            arr_ModelWalletName: [],
+            arr_ConfirmPassphrase: [],
+            arr_ModelRestoreSucess: [],
+            wallerName: ""
         };
     }
 
@@ -59,11 +69,54 @@ export default class WalletUsingPassphraseScrren extends Component {
         this.setState( {
             arr_ModelWalletName: [
                 {
-                    modalVisible: true,
-                    flag_DisableBtnNext: true
+                    modalVisible: true
                 }
             ]
         } )
+    }
+
+    //TODO: func click_getWalletDetails
+    getWalletDetails = async ( mnemonic: string ) => {
+        const dateTime = Date.now();
+        const fulldate = Math.floor( dateTime / 1000 );
+        let walletName = this.state.wallerName;
+
+
+        // const sss = new S3Service( walletName );
+        // const res = await sss.appHealthStatus( 0, 0, null, fulldate );
+        // console.log( { res } );
+        // await utils.setAppHealthStatus( res )
+
+        await dbOpration.updateWalletMnemonic(
+            localDB.tableName.tblWallet,
+            mnemonic,
+            fulldate
+        );
+        await dbOpration.insertCreateAccount(
+            localDB.tableName.tblAccount,
+            fulldate,
+            "",
+            "BTC",
+            walletName,
+            "Wallet",
+            ""
+        );
+    }
+
+    //TODO: Sucess Model
+    click_Skip() {
+        const resetAction = StackActions.reset( {
+            index: 0, // <-- currect active route from actions array
+            key: null,
+            actions: [
+                NavigationActions.navigate( { routeName: "TabbarBottom" } )
+            ]
+        } );
+        AsyncStorage.setItem(
+            asyncStorageKeys.rootViewController,
+            "TabbarBottom"
+        );
+        this.props.navigation.dispatch( resetAction );
     }
 
     render() {
@@ -71,14 +124,6 @@ export default class WalletUsingPassphraseScrren extends Component {
             <View style={ styles.container }>
                 <SafeAreaView style={ styles.container }>
                     <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                    <View style={ { marginLeft: 10, marginTop: 15 } }>
-                        <Button
-                            transparent
-                            onPress={ () => this.props.navigation.pop() }
-                        >
-                            <SvgIcon name="icon_back" size={ 30 } color="#ffffff" />
-                        </Button>
-                    </View>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <KeyboardAwareScrollView
                             enableAutomaticScroll
@@ -87,8 +132,75 @@ export default class WalletUsingPassphraseScrren extends Component {
                             enableOnAndroid={ true }
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
-                            <ModelWalletName data={ this.state.arr_ModelWalletName } click_Confirm={ () => console.log( 'hi' )
-                            } />
+                            <ModelWalletName data={ this.state.arr_ModelWalletName } click_Confirm={ ( val ) => {
+                                console.log( { val } );
+                                this.setState( {
+                                    wallerName: val,
+                                    arr_ModelWalletName: [
+                                        {
+                                            modalVisible: false
+                                        }
+                                    ],
+                                    arr_ConfirmPassphrase: [
+                                        {
+                                            modalVisible: true
+                                        }
+                                    ]
+                                } )
+                            }
+                            }
+                                pop={ () => {
+                                    this.setState( {
+                                        arr_ModelWalletName: [
+                                            {
+                                                modalVisible: false
+                                            }
+                                        ]
+                                    } );
+                                    this.props.navigation.pop()
+                                } }
+                            />
+                            <ModelEnterAndConfirmPassphrase data={ this.state.arr_ConfirmPassphrase } click_Confirm={ ( val: string ) => {
+                                this.getWalletDetails( val );
+                                this.setState( {
+                                    arr_ConfirmPassphrase: [
+                                        {
+                                            modalVisible: false
+                                        }
+                                    ],
+                                    arr_ModelRestoreSucess: [
+                                        {
+                                            modalVisible: true
+                                        }
+                                    ]
+                                } )
+                            }
+                            }
+                                pop={ () => {
+                                    this.setState( {
+                                        arr_ConfirmPassphrase: [
+                                            {
+                                                modalVisible: false
+                                            }
+                                        ],
+                                        arr_ModelWalletName: [
+                                            {
+                                                modalVisible: true
+                                            }
+                                        ],
+
+                                    } );
+
+                                } }
+
+                            />
+                            <ModelWalletSuccessfullyRestored data={ this.state.arr_ModelRestoreSucess } click_Skip={ () => {
+                                this.click_Skip()
+                            }
+                            }
+                                click_RestoreSecureAccount={ () => Alert.alert( 'Working' ) }
+                            />
+
                         </KeyboardAwareScrollView>
                     </ImageBackground>
                 </SafeAreaView>

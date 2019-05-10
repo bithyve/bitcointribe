@@ -58,6 +58,8 @@ export default class RestoreAndReoverWalletScreen extends Component {
         const resultWallet = await dbOpration.readTablesData(
             localDB.tableName.tblWallet
         );
+        console.log( { resultWallet } );
+
         await utils.setWalletDetails( resultWallet.temp[ 0 ] );
     }
 
