@@ -8,7 +8,7 @@ var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
-
+import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus"
 
 //TODO: func connection_AppHealthStatus (WalletScreen,TrustedContactScreen)
 const connection_AppHealthStatus = async ( qatime: number, satime: number, shares: any, resultWallet: any ) => {
@@ -25,7 +25,8 @@ const connection_AppHealthStatus = async ( qatime: number, satime: number, share
     const resCheckHealth = await sss.checkHealth( arr_EncpShare );
     //console.log( { resCheckHealth } );
     //console.log( qatime, satime, resCheckHealth.lastUpdateds );
-    const res = await sss.appHealthStatus( qatime, satime, resCheckHealth.lastUpdateds );
+    const healthStatus = new HealthStatus();
+    const res = await healthStatus.appHealthStatus( qatime, satime, resCheckHealth.lastUpdateds, 0, "share" );
     await utils.setAppHealthStatus( res )
     // console.log( { res } );
     let resupdateWalletDetials = await dbOpration.updateWalletDetials(

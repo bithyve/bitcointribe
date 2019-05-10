@@ -183,3 +183,4 @@ export default class HexaWallet extends React.Component
 
 console.disableYellowBox = true;
 AppRegistry.registerComponent( appName, () => HexaWallet );
+

@@ -53,6 +53,7 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus"
 
 export default class WalletUsingPassphraseScrren extends Component {
     constructor ( props: any ) {
@@ -80,17 +81,18 @@ export default class WalletUsingPassphraseScrren extends Component {
         const dateTime = Date.now();
         const fulldate = Math.floor( dateTime / 1000 );
         let walletName = this.state.wallerName;
-
-
-        // const sss = new S3Service( walletName );
-        // const res = await sss.appHealthStatus( 0, 0, null, fulldate );
-        // console.log( { res } );
-        // await utils.setAppHealthStatus( res )
-
+        const healthStatus = new HealthStatus();
+        const res = await healthStatus.appHealthStatus( 0, 0, null, fulldate, "mnemonic" );
+        console.log( { res } );
+        await utils.setAppHealthStatus( res );
         await dbOpration.updateWalletMnemonic(
             localDB.tableName.tblWallet,
             mnemonic,
             fulldate
+        );
+        await dbOpration.updateWalletDetials(
+            localDB.tableName.tblWallet,
+            res
         );
         await dbOpration.insertCreateAccount(
             localDB.tableName.tblAccount,

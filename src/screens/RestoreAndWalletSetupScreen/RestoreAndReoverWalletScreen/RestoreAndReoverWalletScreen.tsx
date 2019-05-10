@@ -67,7 +67,7 @@ export default class RestoreAndReoverWalletScreen extends Component {
     click_Card( item: any ) {
         if ( item == "Set up as a New Wallet" ) {
             this.props.navigation.push( "WalletSetupScreens" );
-        } else if ( "Restore Wallet Using mnemonic" ) {
+        } else if ( item == "Restore Wallet Using mnemonic" ) {
             this.props.navigation.push( "RestoreWalletUsingMnemonicNavigator" )
         } else {
             Alert.alert( "Working." );

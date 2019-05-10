@@ -36,6 +36,7 @@ const readTablesData = ( tableName: any ) => {
               data.lastUpdated = utils.decrypt( data.lastUpdated, passcode );
               data.publicKey = utils.decrypt( data.publicKey, passcode );
               data.walletType = utils.decrypt( data.walletType, passcode );
+              data.appHealthStatus = utils.decrypt( data.appHealthStatus, passcode );
               data.setUpWalletAnswerDetails = utils.decrypt( data.setUpWalletAnswerDetails, passcode );
               temp.push( data );
             } else if ( tableName == "tblAccount" ) {
