@@ -37,6 +37,7 @@ var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 
+
 export default class SecondSecretQuestion extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props );
