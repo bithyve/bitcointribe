@@ -170,7 +170,7 @@ export default class WalletScreen extends React.Component {
       localDB.tableName.tblWallet
     );
     resultWallet = resultWallet.temp[ 0 ];
-    //console.log( { resultWallet } );
+    console.log( { resultWallet } );
     await utils.setWalletDetails( resultWallet );
     var resAccount = await dbOpration.readTablesData(
       localDB.tableName.tblAccount
@@ -197,7 +197,7 @@ export default class WalletScreen extends React.Component {
     await commSSS.connection_AppHealthStatus( resultWallet.lastUpdated, 0, resSSSDetails, resultWallet );
     let resAppHealthStatus = await utils.getAppHealthStatus();
     console.log( { resAppHealthStatus } );
-    if ( resAppHealthStatus.overallStatus == "Red!" ) {
+    if ( resAppHealthStatus.overallStatus == "1" ) {
       this.setState( {
         shiledIconPer: 1,
         arr_CustShiledIcon: [
