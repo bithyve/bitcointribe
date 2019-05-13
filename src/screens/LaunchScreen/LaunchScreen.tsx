@@ -33,7 +33,7 @@ export default class LaunchScreen extends Component<Props, any> {
     } )
   }
 
-  componentDidMount = async () => {
+  async componentDidMount() {
     let commonData = Singleton.getInstance();
     let value = await AsyncStorage.getItem( asyncStorageKeys.flag_PasscodeCreate );
     let rootViewController = await AsyncStorage.getItem( asyncStorageKeys.rootViewController );

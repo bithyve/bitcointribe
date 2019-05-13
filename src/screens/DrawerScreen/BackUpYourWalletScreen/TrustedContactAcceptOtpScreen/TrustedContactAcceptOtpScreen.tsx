@@ -75,7 +75,7 @@ export default class TrustedContactAcceptOtpScreen extends Component {
     }
 
 
-    componentDidMount = async () => {
+    async componentDidMount() {
         let script = this.props.navigation.getParam( "data" );
         let messageId = script.mi;
         console.log( { messageId } );
