@@ -3,9 +3,18 @@ import { Modal, TouchableHighlight, View, Alert, StyleSheet } from 'react-native
 import { Button, Icon, Text, Textarea, Form } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import { SvgIcon } from "@up-shared/components";
+import bip39 from 'react-native-bip39';
+
+
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
+
+//TODO: Custome Object
+import {
+    colors
+} from "HexaWallet/src/app/constants/Constants";
 import renderIf from 'HexaWallet/src/app/constants/validation/renderIf';
 
 
@@ -17,6 +26,7 @@ interface Props {
     closeModal: Function;
     click_Confirm: Function;
     pop: Function;
+    loadingFlag: Function;
 }
 
 export default class ModelEnterAndConfirmPassphrase extends Component<Props, any> {
@@ -26,7 +36,8 @@ export default class ModelEnterAndConfirmPassphrase extends Component<Props, any
         this.state = ( {
             mnemonic: null,
             style_TextAreaBorderColor: "#EFEFEF",
-            flag_DisableBtnConfirm: true
+            flag_DisableBtnConfirm: true,
+            flag_Loading: false
         } )
     }
 
@@ -52,17 +63,25 @@ export default class ModelEnterAndConfirmPassphrase extends Component<Props, any
     }
 
     //TODO: Confirm Button  click  
-    click_Confirm() {
+    click_Confirm = async () => {
         try {
+            this.props.loadingFlag( true );
+            this.setState( {
+                flag_DisableBtnConfirm: true
+            } );
             let mnemonic = this.state.mnemonic;
-            console.log( { mnemonic } );
-            if ( mnemonic == "q w e r t y u i o p a s" ) {
-                this.props.click_Confirm( mnemonic );
+            const regularAccount = new RegularAccount(
+                this.state.mnemonic
+            );
+            const getBal = await regularAccount.getBalance();
+            if ( getBal.status == 200 ) {
+                let bal = getBal.data.balance;
+                this.props.click_Confirm( mnemonic, bal );
+                this.props.loadingFlag( false );
             } else {
-                const regularAccount = new RegularAccount(
-                    this.state.mnemonic
-                );
+                Alert.alert( "GetBalance and mnemonic wrong." );
             }
+            console.log( { getBal } );
         } catch ( error ) {
             this.setState( {
                 style_TextAreaBorderColor: "red"
@@ -70,6 +89,7 @@ export default class ModelEnterAndConfirmPassphrase extends Component<Props, any
             console.log( { error } );
         }
     }
+
     render() {
         let data = this.props.data.length != 0 ? this.props.data : [];
         let flag_DisableBtnConfirm = this.state.flag_DisableBtnConfirm;

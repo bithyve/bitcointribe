@@ -181,6 +181,16 @@ compileSdkVersion = 28
 
 
 #  _react.PropsTypes.oneofTypes
-
+  
 =>check this lib
+
+
+# Cannot read property 'oneOfType' of undefined
+
+ => check ac-qrcode lib props-type  
+
+# windows.location.host
+
+=> check this lib bunyan  
+inside bunyan.js  
 

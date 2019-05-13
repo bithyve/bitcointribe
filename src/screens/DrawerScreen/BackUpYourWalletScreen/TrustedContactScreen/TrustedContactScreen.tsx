@@ -68,7 +68,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         } )
     }
 
-    componentWillMount = async () => {
+    async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
         console.log( { data } );
         let temp = [];

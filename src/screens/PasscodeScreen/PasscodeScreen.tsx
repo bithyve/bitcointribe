@@ -66,6 +66,14 @@ export default class PasscodeScreen extends Component {
     this.retrieveData();
   }
 
+  async componentDidMount() {
+    const resultWallet = await dbOpration.readTablesData(
+      localDB.tableName.tblWallet
+    );
+    console.log( { resultWallet } );
+    await utils.setWalletDetails( resultWallet.temp[ 0 ] );
+  }
+
   retrieveData = async () => {
     try {
       const resultWallet = await dbOpration.readTablesData(

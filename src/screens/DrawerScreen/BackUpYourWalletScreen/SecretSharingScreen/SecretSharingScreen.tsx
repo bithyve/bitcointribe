@@ -34,7 +34,7 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
-var commSSS = require( "HexaWallet/src/app/manager/CommonFunction/CommSSS/CommSSS" );
+var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
@@ -53,14 +53,18 @@ export default class SecretSharingScreen extends React.Component<any, any> {
         } )
     }
 
-    componentWillMount = async () => {
+    async componentWillMount() {
         this.willFocusSubscription = this.props.navigation.addListener(
             "willFocus",
             () => {
-                this.connection_Load();
+                setInterval( () => {
+                    this.connection_Load()
+                }, 10000 )
             }
         );
     }
+
+
 
 
     componentWillUnmount() {
@@ -70,7 +74,13 @@ export default class SecretSharingScreen extends React.Component<any, any> {
     connection_Load = async () => {
         const resultWallet = await utils.getWalletDetails();
         const resSSSDetails = await utils.getSSSDetails();
-        let updateShareIdStatus = await commSSS.connection_AppHealthStatus( resultWallet.lastUpdated, 0, resSSSDetails, resultWallet );
+        console.log( { resSSSDetails } );
+
+        let encrShares = [];
+        for ( let i = 0; i < resSSSDetails.length; i++ ) {
+            encrShares.push( resSSSDetails[ i ].share )
+        }
+        let updateShareIdStatus = await comAppHealth.connection_AppHealthStatus( parseInt( resultWallet.lastUpdated ), 0, encrShares, resultWallet.mnemonic );
         console.log( { updateShareIdStatus } );
         if ( updateShareIdStatus ) {
             var data = await dbOpration.readTablesData(

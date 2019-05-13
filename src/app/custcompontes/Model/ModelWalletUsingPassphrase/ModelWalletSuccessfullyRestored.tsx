@@ -76,8 +76,8 @@ export default class ModelWalletSuccessfullyRestored extends Component<Props, an
                             <View style={ { flexDirection: "row", justifyContent: "center", alignItems: "center", margin: 10 } }>
                                 <SvgIcon name="icon_dollar" color="#D0D0D0" size={ 20 } />
                                 <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
-                                    60,000
-                          </Text>
+                                    { data.length != 0 ? data[ 0 ].bal : 0 }
+                                </Text>
                             </View>
                             <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Restore your secure account now You can opt to do it later</Text>
                         </View>
