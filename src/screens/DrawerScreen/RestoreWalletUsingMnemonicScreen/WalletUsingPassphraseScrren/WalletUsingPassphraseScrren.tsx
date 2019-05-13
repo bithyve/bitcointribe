@@ -26,6 +26,7 @@ import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //TODO: Custome Pages
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import ModelWalletName from "HexaWallet/src/app/custcompontes/Model/ModelWalletUsingPassphrase/ModelWalletName";
 import ModelEnterAndConfirmPassphrase from "HexaWallet/src/app/custcompontes/Model/ModelWalletUsingPassphrase/ModelEnterAndConfirmPassphrase";
@@ -45,6 +46,7 @@ import utils from "HexaWallet/src/app/constants/Utils";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
@@ -62,7 +64,8 @@ export default class WalletUsingPassphraseScrren extends Component {
             arr_ModelWalletName: [],
             arr_ConfirmPassphrase: [],
             arr_ModelRestoreSucess: [],
-            wallerName: ""
+            wallerName: "",
+            flag_Loading: false
         };
     }
 
@@ -77,32 +80,35 @@ export default class WalletUsingPassphraseScrren extends Component {
     }
 
     //TODO: func click_getWalletDetails
-    getWalletDetails = async ( mnemonic: string ) => {
+    getWalletDetails = async ( mnemonic: string, bal: any ) => {
         const dateTime = Date.now();
         const fulldate = Math.floor( dateTime / 1000 );
         let walletName = this.state.wallerName;
-        const healthStatus = new HealthStatus();
-        const res = await healthStatus.appHealthStatus( 0, 0, null, fulldate, "mnemonic" );
-        console.log( { res } );
-        await utils.setAppHealthStatus( res );
-        await dbOpration.updateWalletMnemonic(
+        await dbOpration.insertWallet(
             localDB.tableName.tblWallet,
-            mnemonic,
-            fulldate
-        );
-        await dbOpration.updateWalletDetials(
-            localDB.tableName.tblWallet,
-            res
-        );
-        await dbOpration.insertCreateAccount(
-            localDB.tableName.tblAccount,
             fulldate,
+            mnemonic,
             "",
-            "BTC",
+            "",
+            "",
             walletName,
-            "Wallet",
             ""
         );
+        const res = await comAppHealth.check_AppHealthStausUsingMnemonic( 0, 0, null, fulldate, "mnemonic" );
+        if ( res ) {
+            await dbOpration.insertCreateAccount(
+                localDB.tableName.tblAccount,
+                fulldate,
+                "",
+                bal,
+                "BTC",
+                "Daily Wallet",
+                "Daily Wallet",
+                ""
+            );
+        } else {
+            Alert.alert( "App health staus not updated." )
+        }
     }
 
     //TODO: Sucess Model
@@ -162,8 +168,11 @@ export default class WalletUsingPassphraseScrren extends Component {
                                     this.props.navigation.pop()
                                 } }
                             />
-                            <ModelEnterAndConfirmPassphrase data={ this.state.arr_ConfirmPassphrase } click_Confirm={ ( val: string ) => {
-                                this.getWalletDetails( val );
+                            <ModelEnterAndConfirmPassphrase data={ this.state.arr_ConfirmPassphrase } loadingFlag={ ( flag: boolean ) => {
+                                this.setState( { flag_Loading: flag } )
+                                console.log( { flag } );
+                            } } click_Confirm={ ( val: string, bal: any ) => {
+                                this.getWalletDetails( val, bal );
                                 this.setState( {
                                     arr_ConfirmPassphrase: [
                                         {
@@ -172,7 +181,8 @@ export default class WalletUsingPassphraseScrren extends Component {
                                     ],
                                     arr_ModelRestoreSucess: [
                                         {
-                                            modalVisible: true
+                                            modalVisible: true,
+                                            bal: bal
                                         }
                                     ]
                                 } )
@@ -202,7 +212,7 @@ export default class WalletUsingPassphraseScrren extends Component {
                             }
                                 click_RestoreSecureAccount={ () => Alert.alert( 'Working' ) }
                             />
-
+                            <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
                         </KeyboardAwareScrollView>
                     </ImageBackground>
                 </SafeAreaView>

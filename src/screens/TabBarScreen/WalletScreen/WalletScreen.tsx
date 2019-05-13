@@ -57,7 +57,6 @@ import {
 } from "HexaWallet/src/app/constants/Constants";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
-var commSSS = require( "HexaWallet/src/app/manager/CommonFunction/CommSSS/CommSSS" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 
@@ -90,11 +89,11 @@ export default class WalletScreen extends React.Component {
     super( props );
     this.state = {
       isNetwork: true,
-      arr_wallets: [],
       arr_accounts: [],
       arr_SSSDetails: [],
       flag_cardScrolling: false,
       flag_Loading: false,
+      walletDetails: [],
       //Shiled Icons
       shiledIconPer: 1,
       scrollY: new Animated.Value( 0 ),
@@ -190,12 +189,11 @@ export default class WalletScreen extends React.Component {
     console.log( { resSSSDetails } );
     await utils.setSSSDetails( resSSSDetails );
     this.setState( {
-      arr_wallets: resultWallet,
-      arr_accounts: resAccount
+      walletDetails: resultWallet,
+      arr_accounts: resAccount,
     } );
     //TODO: appHealthStatus funciton   
-    await commSSS.connection_AppHealthStatus( resultWallet.lastUpdated, 0, resSSSDetails, resultWallet );
-    let resAppHealthStatus = await utils.getAppHealthStatus();
+    let resAppHealthStatus = JSON.parse( resultWallet.appHealthStatus );
     console.log( { resAppHealthStatus } );
     if ( resAppHealthStatus.overallStatus == "1" ) {
       this.setState( {
@@ -340,6 +338,7 @@ export default class WalletScreen extends React.Component {
 
   render() {
     let flag_cardScrolling = this.state.flag_cardScrolling;
+    let walletDetails = this.state.walletDetails;
     return (
       <Container>
         <Content scrollEnabled={ false } contentContainerStyle={ styles.container }>
@@ -368,7 +367,7 @@ export default class WalletScreen extends React.Component {
                     marginBottom: 30
                   } ] }
                 >
-                  My Wallets
+                  { walletDetails.walletType != null ? walletDetails.walletType : "Hexa Wallet" }
                 </Animated.Text>
                 <Animated.Text
                   style={ [ globalStyle.ffFiraSansRegular, {
@@ -390,18 +389,24 @@ export default class WalletScreen extends React.Component {
                 } }
               >
                 <ViewShieldIcons data={ this.state.arr_CustShiledIcon } click_Image={ () => {
-                  if ( this.state.shiledIconPer == 0 ) {
-                    this.props.navigation.push( "WalletSetUpScreen" )
+                  let resSSSDetails = utils.getSSSDetails();
+                  if ( resSSSDetails.length > 0 ) {
+                    if ( this.state.shiledIconPer == 0 ) {
+                      this.props.navigation.push( "WalletSetUpScreen" )
+                    } else {
+                      this.setState( {
+                        arr_ModelBackupYourWallet: [
+                          {
+                            modalVisible: true,
+                          }
+                        ]
+                      } )
+                    }
                   } else {
-                    this.setState( {
-                      arr_ModelBackupYourWallet: [
-                        {
-                          modalVisible: true,
-                        }
-                      ]
-                    } )
+                    Alert.alert( "Working." );
                   }
-                } } />
+                }
+                } />
               </Animated.View>
             </Animated.View>
             {/*  cards */ }
@@ -479,7 +484,7 @@ export default class WalletScreen extends React.Component {
                         <View style={ { flex: 4 } }>
                           <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
                           <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
-                            60,000
+                            { item.balance }
                           </Text>
                         </View>
                         <View
@@ -558,6 +563,7 @@ export default class WalletScreen extends React.Component {
             } else {
               this.props.navigation.push( "BackUpYourWalletNavigator" )
             }
+
           } }
           closeModal={ () => {
             this.setState( {

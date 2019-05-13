@@ -400,9 +400,33 @@ const insertWallet = (
   } );
 };
 //update
-const updateWalletDetials = (
+const updateWalletAnswerDetails = (
   tblName: string,
-  appHealthStatus: any
+  AnswerDetails: any
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        txn.executeSql(
+          "update " +
+          tblName +
+          " set setUpWalletAnswerDetails = :setUpWalletAnswerDetails where id = 1",
+          [
+            utils.encrypt( JSON.stringify( AnswerDetails ).toString(), passcode )
+          ]
+        );
+        resolve( true );
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
+const updateWalletAppHealthStatus = (
+  tblName: string,
+  AppHealthStatus: any
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
@@ -413,7 +437,7 @@ const updateWalletDetials = (
           tblName +
           " set appHealthStatus = :appHealthStatus where id = 1",
           [
-            utils.encrypt( JSON.stringify( appHealthStatus ).toString(), passcode )
+            utils.encrypt( JSON.stringify( AppHealthStatus ).toString(), passcode )
           ]
         );
         resolve( true );
@@ -423,6 +447,8 @@ const updateWalletDetials = (
     }
   } );
 };
+
+
 
 const updateWalletMnemonic = (
   tblName: string,
@@ -455,6 +481,7 @@ const insertCreateAccount = (
   tblName: string,
   date: string,
   address: string,
+  bal: string,
   unit: string,
   accountName: string,
   accountType: string,
@@ -471,7 +498,7 @@ const insertCreateAccount = (
         [
           fullDate,
           utils.encrypt( address.toString(), passcode ),
-          utils.encrypt( "0.0", passcode ),
+          utils.encrypt( bal.toString(), passcode ),
           utils.encrypt( unit.toString(), passcode ),
           utils.encrypt( accountName.toString(), passcode ),
           utils.encrypt( accountType.toString(), passcode ),
@@ -889,8 +916,9 @@ module.exports = {
   insertAccountTypeData,
   //Wallet Details
   insertWallet,
-  updateWalletDetials,
+  updateWalletAnswerDetails,
   updateWalletMnemonic,
+  updateWalletAppHealthStatus,
 
   insertCreateAccount,
   insertLastBeforeCreateAccount,

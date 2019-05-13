@@ -6,7 +6,7 @@
   "license": "ISC",
   "scripts": {
     "compile": "tsc",
-    "prepare": "cp -r -f ./src/app/lib/IssueFiles/Buffer/index.js ./node_modules/bip32/index.js && cp -r -f ./src/app/lib/IssueFiles/Model/index.js ./node_modules/source-map-support/source-map-support.js && cp -r -f ./src/app/lib/IssueFiles/slideMenuAndroid/MainActivity.java ./android/app/src/main/java/com/bithyve/hexa/MainActivity.java && cp -r -f ./src/app/lib/IssueFiles/qrcodeimagereader/ScannerMask.js  ./node_modules/react-native-barcode-scanners/src/ScannerMask.js && rn-nodeify --install --hack  &&  react-native link",
+    "prepare": "rn-nodeify --install --hack  &&  react-native link",
     "issuemodel": "cp -r -f .src/app/lib/IssueFiles/Model/index.js ./node_modules/source-map-support/source-map-support.js",
     "issueBuffer": "cp -r -f ./src/app/lib/IssueFiles/Buffer/index.js ./node_modules/bip32/index.js",
     "issueSlideMenuAndroid": "cp -r -f ./src/app/lib/IssueFiles/slideMenuAndroid/MainActivity.java ./android/app/src/main/java/com/bithyve/hexa/MainActivity.java",
