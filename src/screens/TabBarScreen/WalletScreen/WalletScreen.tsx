@@ -238,7 +238,7 @@ export default class WalletScreen extends React.Component {
         arr_ModelAcceptSecret: [
           {
             modalVisible: true,
-            name: "Hexa Wallet",
+            name: urlScript.wn,
             mobileNo: "1234",
             encpShare: urlScript.encpShare
           }
@@ -249,17 +249,18 @@ export default class WalletScreen extends React.Component {
 
   //TODO: Qrcode Scan SSS Details Download Desc Sahre
   downloadDescShare = async () => {
+
     this.setState( {
       flag_Loading: true
     } );
     const dateTime = Date.now();
     const fulldate = Math.floor( dateTime / 1000 );
     let urlScript = utils.getDeepLinkingUrl();
-    // console.log( { urlScript } );
+    console.log( { urlScript } );
     let urlScriptData = urlScript.data;
     console.log( { urlScriptData } );
     let userDetail = {};
-    userDetail.name = "Hexa Wallet";
+    userDetail.name = urlScript.wn;
     userDetail.mobileNo = "1234";
     userDetail.walletId = urlScriptData.meta.walletId;
     // console.log( { userDetail } );
@@ -271,7 +272,7 @@ export default class WalletScreen extends React.Component {
     //console.log( { resShareId } );
     const { data, updated } = await sss.updateHealth( urlScriptData.meta.walletId, urlScriptData.encryptedShare );
     if ( updated ) {
-      const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
+      const resTrustedParty = await dbOpration.insertTrustedPartyDetails(
         localDB.tableName.tblTrustedPartySSSDetails,
         fulldate,
         userDetail,
@@ -280,7 +281,7 @@ export default class WalletScreen extends React.Component {
         urlScriptData,
         typeof data !== "undefined" ? data : ""
       );
-      //console.log( { resinsertTrustedPartyDetails } );
+      console.log( { resTrustedParty } );
       this.setState( {
         flag_Loading: false,
         arr_ModelAcceptSecret: [
@@ -292,7 +293,7 @@ export default class WalletScreen extends React.Component {
           }
         ]
       } )
-      if ( resinsertTrustedPartyDetails == true ) {
+      if ( resTrustedParty == true ) {
         setTimeout( () => {
           Alert.alert(
             'Success',
@@ -314,7 +315,7 @@ export default class WalletScreen extends React.Component {
         setTimeout( () => {
           Alert.alert(
             'OH',
-            resinsertTrustedPartyDetails,
+            resTrustedParty,
             [
               {
                 text: 'OK', onPress: () => {
