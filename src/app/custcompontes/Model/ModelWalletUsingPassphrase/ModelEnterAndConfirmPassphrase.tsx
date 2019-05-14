@@ -84,8 +84,9 @@ export default class ModelEnterAndConfirmPassphrase extends Component<Props, any
             console.log( { getBal } );
         } catch ( error ) {
             this.setState( {
-                style_TextAreaBorderColor: "red"
-            } )
+                style_TextAreaBorderColor: "red",
+                flag_DisableBtnConfirm: false
+            } );
             console.log( { error } );
         }
     }

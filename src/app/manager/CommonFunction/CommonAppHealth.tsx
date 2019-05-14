@@ -21,10 +21,11 @@ const connection_AppHealthStatus = async ( qatime: number, satime: number, encrS
         mnemonic
     );
     const resCheckHealth = await sss.checkHealth( encrShares );
-    // console.log( { resCheckHealth } );
+    console.log( { resCheckHealth } );
     //console.log( qatime, satime, resCheckHealth.lastUpdateds );
     const healthStatus = new HealthStatus();
     const res = await healthStatus.appHealthStatus( qatime, satime, resCheckHealth.lastUpdateds, 0, "share" );
+    console.log( { res } );
     await utils.setAppHealthStatus( res )
     // console.log( { res } );
     let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
