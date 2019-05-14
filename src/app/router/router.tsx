@@ -30,6 +30,7 @@ import PermissionScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen
 // import AccountsScreen from "bithyve/src/screens/TabBarScreen/AccountsScreen/AccountsScreen";
 // import CardsScreen from "bithyve/src/screens/TabBarScreen/CardsScreen/CardsScreen";
 import SettingScreen from "HexaWallet/src/screens/TabBarScreen/SettingScreen/SettingScreen";
+import ContactSharedSecretList from "HexaWallet/src/screens/TabBarScreen/SettingScreen/ContactsSharedSecredYouScreen/ContactSharedSecretList";
 //
 // //Left DrawerScreen
 // import SecurityScreen from "bithyve/src/screens/DrawerScreen/SecurityScreen/SecurityScreen";
@@ -79,6 +80,7 @@ import TrustedContactAcceptOtpScreen from "../../screens/DrawerScreen/BackUpYour
 
 
 
+
 //TODO: StackNavigator
 
 //TODO: StackNavigator:ONBoarding
@@ -121,6 +123,22 @@ const RestoreAndWalletSetupStackNavigator = createStackNavigator(
     initialRouteName: "RestoreAndReoverWalletScreen"
   }
 );
+
+const SettingsStackNavigator = createStackNavigator(
+  {
+    ContactSharedSecretList: {
+      screen: ContactSharedSecretList,
+      navigationOptions: {
+        header: null,
+        tabBarVisible: false
+      }
+    }
+  },
+  {
+    initialRouteName: "ContactSharedSecretList"
+  }
+);
+
 
 
 
@@ -310,7 +328,7 @@ const TabNavigator = createBottomTabNavigator(
         tabBarLabel: "Settings", //localization("TabBarItem.More"),
         tabBarIcon: ( { tintColor } ) => (
           <SvgIcon name="more-icon" color={ tintColor } size={ 22 } />
-        )
+        ),
       }
     }
   },
@@ -406,7 +424,12 @@ export const createRootNavigator = (
       TrustedContactAcceptNavigator: {
         screen: TrustedContactAcceptStackNavigatorRouter,
         navigationOptions: { header: null }
+      },
+      SettingsContactSharedSecretListNavigator: {
+        screen: SettingsStackNavigator,
+        navigationOptions: { header: null }
       }
+
       //Drwaer Navigation
       // SecurityScreen: {
       //   screen: SecurityScreen,

@@ -77,11 +77,17 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
   //   } );
   // }
 
+
+
+
+
+
   onCheckPincode( code: any ) {
     this.setState( {
       pincode: code
     } );
   }
+
 
   _onFinishCheckingCode2( isValid: boolean, code: any ) {
     if ( isValid ) {

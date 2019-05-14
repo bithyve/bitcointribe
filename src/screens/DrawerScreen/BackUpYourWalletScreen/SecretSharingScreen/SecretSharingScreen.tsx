@@ -57,9 +57,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
         this.willFocusSubscription = this.props.navigation.addListener(
             "willFocus",
             () => {
-                setInterval( () => {
-                    this.connection_Load()
-                }, 10000 )
+                this.connection_Load()
             }
         );
     }
@@ -142,6 +140,9 @@ export default class SecretSharingScreen extends React.Component<any, any> {
             this.setState( {
                 data: temp
             } );
+            setInterval( () => {
+                this.connection_Load()
+            }, 10000 );
         } else {
             Alert.alert( "ShareId status not changed." )
         }

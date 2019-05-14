@@ -64,6 +64,16 @@ const readTablesData = ( tableName: any ) => {
               data.shareStage = utils.decrypt( data.shareStage, passcode );
               temp.push( data );
             }
+            else if ( tableName == "tblTrustedPartySSSDetails" ) {
+              data.id = data.id;
+              data.dateCreated = utils.decrypt( data.dateCreated, passcode );
+              data.userDetails = utils.decrypt( data.userDetails, passcode );
+              data.decrShare = utils.decrypt( data.decrShare, passcode );
+              data.shareId = utils.decrypt( data.shareId, passcode );
+              data.allJson = utils.decrypt( data.allJson, passcode );
+              data.nonPMDDData = utils.decrypt( data.nonPMDDData, passcode );
+              temp.push( data );
+            }
             else {
               temp.push( data );
             }

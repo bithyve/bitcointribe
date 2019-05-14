@@ -18,6 +18,7 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import bip39 from 'react-native-bip39';
 
+
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -55,6 +56,9 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         window.EventBus.on( "swipeScreen", this.loadQuestionList );
         this.loadQuestionList = this.loadQuestionList.bind( this );
     }
+
+
+
 
     loadQuestionList = async () => {
         let resWalletData = await utils.getSetupWallet();
