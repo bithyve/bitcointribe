@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { Modal, TouchableHighlight, View, Alert, StyleSheet } from 'react-native';
 import { Button, Icon, Text, Textarea, Form } from "native-base";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+
 import { SvgIcon } from "@up-shared/components";
 import bip39 from 'react-native-bip39';
 
 
+//TODO: Custome Compontes
+import FullLinearGradientLoadingButton from 'HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientLoadingButton';
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -16,10 +18,11 @@ import {
     colors
 } from "HexaWallet/src/app/constants/Constants";
 import renderIf from 'HexaWallet/src/app/constants/validation/renderIf';
-
+var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 //TODO: Bitcoin files
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+
 
 interface Props {
     data: [];
@@ -37,6 +40,7 @@ export default class ModelEnterAndConfirmPassphrase extends Component<Props, any
             mnemonic: null,
             style_TextAreaBorderColor: "#EFEFEF",
             flag_DisableBtnConfirm: true,
+            flag_ConfirmBtnAnimating: false,
             flag_Loading: false
         } )
     }
@@ -67,7 +71,8 @@ export default class ModelEnterAndConfirmPassphrase extends Component<Props, any
         try {
             this.props.loadingFlag( true );
             this.setState( {
-                flag_DisableBtnConfirm: true
+                flag_DisableBtnConfirm: true,
+                flag_ConfirmBtnAnimating: true
             } );
             let mnemonic = this.state.mnemonic;
             const regularAccount = new RegularAccount(
@@ -78,6 +83,10 @@ export default class ModelEnterAndConfirmPassphrase extends Component<Props, any
                 let bal = getBal.data.balance;
                 this.props.click_Confirm( mnemonic, bal );
                 this.props.loadingFlag( false );
+                this.setState( {
+                    flag_DisableBtnConfirm: true,
+                    flag_ConfirmBtnAnimating: false
+                } )
             } else {
                 Alert.alert( "GetBalance and mnemonic wrong." );
             }
@@ -85,7 +94,8 @@ export default class ModelEnterAndConfirmPassphrase extends Component<Props, any
         } catch ( error ) {
             this.setState( {
                 style_TextAreaBorderColor: "red",
-                flag_DisableBtnConfirm: false
+                flag_DisableBtnConfirm: false,
+                flag_ConfirmBtnAnimating: false
             } );
             console.log( { error } );
         }
@@ -94,6 +104,8 @@ export default class ModelEnterAndConfirmPassphrase extends Component<Props, any
     render() {
         let data = this.props.data.length != 0 ? this.props.data : [];
         let flag_DisableBtnConfirm = this.state.flag_DisableBtnConfirm;
+        let flag_ConfirmBtnAnimating = this.state.flag_ConfirmBtnAnimating;
+
         return (
             <Modal
                 transparent
@@ -151,10 +163,11 @@ export default class ModelEnterAndConfirmPassphrase extends Component<Props, any
                             </View>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
-                            <FullLinearGradientButton
+                            <FullLinearGradientLoadingButton
                                 click_Done={ () => this.click_Confirm() }
-                                title="Confirm & Proceed"
+                                title="  Confirm & Proceed"
                                 disabled={ flag_DisableBtnConfirm }
+                                animating={ flag_ConfirmBtnAnimating }
                                 style={ [ flag_DisableBtnConfirm == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
                             />
                         </View>
@@ -174,7 +187,7 @@ const styles = StyleSheet.create( {
 
     },
     viewModelBody: {
-        flex: 0.6,
+        flex: utils.getIphoneSize() == "iphone X" ? 0.6 : 0.8,
         margin: 20,
         padding: 10,
         borderRadius: 10,

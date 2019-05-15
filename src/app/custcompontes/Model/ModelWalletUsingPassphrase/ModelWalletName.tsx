@@ -7,6 +7,9 @@ import { SvgIcon } from "@up-shared/components";
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
+//TODO: Custome Object
+var utils = require( "HexaWallet/src/app/constants/Utils" );
+
 interface Props {
     data: [];
     closeModal: Function;
@@ -118,7 +121,7 @@ const styles = StyleSheet.create( {
 
     },
     viewModelBody: {
-        flex: 0.6,
+        flex: utils.getIphoneSize() == "iphone X" ? 0.6 : 0.8,
         margin: 20,
         padding: 10,
         borderRadius: 10,
