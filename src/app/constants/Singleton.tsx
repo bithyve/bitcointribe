@@ -26,6 +26,7 @@ export default class Singleton {
 
 
 
+
   /**
    * @returns {Singleton}
    */
@@ -99,13 +100,13 @@ export default class Singleton {
   }
 
   //App Health Status
+
   getAppHealthStatus() {
     return this.appHealthStatus;
   }
   setAppHealthStatus( value: any ) {
     this.appHealthStatus = value;
   }
-
 
 
 }

@@ -710,6 +710,35 @@ const insertSSSShareAndShareId = (
   } );
 };
 
+const insertRestoreUsingTrustedContactKeepInfo = (
+  tblName: string,
+  fulldate: string,
+  keepInfo: any
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    db.transaction( function ( txn ) {
+      for ( let i = 0; i < keepInfo.length; i++ ) {
+        let data = keepInfo[ i ];
+        txn.executeSql(
+          "INSERT INTO " +
+          tblName +
+          "(dateCreated,keeperInfo,recordId) VALUES (:dateCreated,:keeperInfo,:recordId)",
+          [
+            utils.encrypt(
+              fulldate.toString(),
+              passcode
+            ),
+            utils.encrypt( JSON.stringify( data ).toString(), passcode ),
+            utils.encrypt( data.recordID.toString(), passcode ),
+          ]
+        );
+      }
+      resolve( true );
+    } );
+  } );
+};
+
 //update
 const updateSSSContactListDetails = (
   tblName: string,
@@ -934,9 +963,11 @@ module.exports = {
   insertLastBeforeCreateAccount,
   insertTblTransation,
   updateTableData,
+
   //SSS Details
   readSSSTableData,
   insertSSSShareAndShareId,
+  insertRestoreUsingTrustedContactKeepInfo,
   updateSSSContactListDetails,
   updateSSSTransferMehtodDetails,
   updateSSSShareStage,
