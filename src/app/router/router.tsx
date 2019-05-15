@@ -17,7 +17,11 @@ import PasscodeScreen from "HexaWallet/src/screens/PasscodeScreen/PasscodeScreen
 import PasscodeConfirmScreen from "HexaWallet/src/screens/PasscodeScreen/PasscodeConfirmScreen";
 import RestoreAndReoverWalletScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/RestoreAndReoverWalletScreen/RestoreAndReoverWalletScreen";
 
-import WalletUsingPassphraseScrren from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingMnemonicScreen/WalletUsingPassphraseScrren/WalletUsingPassphraseScrren";
+import RestoreWalletUsingMnemonicScrren from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingMnemonicScreen/RestoreWalletUsingMnemonicScrren";
+
+import RestoreWalletUsingTrustedContactScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreWalletUsingTrustedContactScreen";
+
+
 import WalletSetupScreens from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/WalletSetupScreens/WalletSetupScreens";
 import PermissionScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/PermissionScreen/PermissionScreen";
 
@@ -81,6 +85,7 @@ import TrustedContactAcceptOtpScreen from "../../screens/DrawerScreen/BackUpYour
 
 
 
+
 //TODO: StackNavigator
 
 //TODO: StackNavigator:ONBoarding
@@ -98,15 +103,30 @@ const OnBoardingStackNavigator = createStackNavigator(
 
 const RestoreWalletUsingMnemonicStackNavigator = createStackNavigator(
   {
-    WalletUsingPassphraseScrren: {
-      screen: WalletUsingPassphraseScrren,
+    RestoreWalletUsingMnemonicScrren: {
+      screen: RestoreWalletUsingMnemonicScrren,
       navigationOptions: { header: null }
     }
   },
   {
-    initialRouteName: "WalletUsingPassphraseScrren"
+    initialRouteName: "RestoreWalletUsingMnemonicScrren"
   }
 );
+
+const RestoreWalletUsingTrustedContactStackNavigator = createStackNavigator(
+  {
+    RestoreWalletUsingTrustedContactScreen: {
+      screen: RestoreWalletUsingTrustedContactScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "RestoreWalletUsingTrustedContactScreen"
+  }
+);
+
+
+
 
 const RestoreAndWalletSetupStackNavigator = createStackNavigator(
   {
@@ -249,27 +269,8 @@ const BackUpYourWalletStackNavigatorRouter = createStackNavigator(
   }
 );
 
-const TrustedContactAcceptStackNavigatorRouter = createStackNavigator(
+const BackUpYourWalletSecoundTimeStackNavigatorRouter = createStackNavigator(
   {
-    TrustedContactAcceptOtpScreen: {
-      screen: TrustedContactAcceptOtpScreen,
-      navigationOptions: { header: null }
-    }
-  },
-  {
-    initialRouteName: "TrustedContactAcceptOtpScreen"
-  }
-);
-
-
-// TabNavigator StackNavigator  
-
-const WalletScreenStackNavigatorRouter = createStackNavigator(
-  {
-    WalletScreen: {
-      screen: WalletScreen,
-      navigationOptions: { header: null }
-    },
     SecretSharingScreen: {
       screen: SecretSharingScreen,
       navigationOptions: { header: null }
@@ -284,7 +285,19 @@ const WalletScreenStackNavigatorRouter = createStackNavigator(
     }
   },
   {
-    initialRouteName: "WalletScreen"
+    initialRouteName: "SecretSharingScreen"
+  }
+);
+
+const TrustedContactAcceptStackNavigatorRouter = createStackNavigator(
+  {
+    TrustedContactAcceptOtpScreen: {
+      screen: TrustedContactAcceptOtpScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "TrustedContactAcceptOtpScreen"
   }
 );
 
@@ -294,7 +307,7 @@ const WalletScreenStackNavigatorRouter = createStackNavigator(
 const TabNavigator = createBottomTabNavigator(
   {
     WalletScreen: {
-      screen: WalletScreenStackNavigatorRouter, //PaymentScreen,
+      screen: WalletScreen, //PaymentScreen,
       navigationOptions: {
         tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
         drawerLockMode: "locked-open",
@@ -409,6 +422,10 @@ export const createRootNavigator = (
         screen: RestoreWalletUsingMnemonicStackNavigator,
         navigationOptions: { header: null }
       },
+      RestoreWalletUsingTrustedContactNavigator: {
+        screen: RestoreWalletUsingTrustedContactStackNavigator,
+        navigationOptions: { header: null }
+      },
       PermissionNavigator: {
         screen: PermissionScreen,
         navigationOptions: { header: null }
@@ -419,6 +436,10 @@ export const createRootNavigator = (
       },
       BackUpYourWalletNavigator: {
         screen: BackUpYourWalletStackNavigatorRouter,
+        navigationOptions: { header: null }
+      },
+      BackUpYourWalletSecoundTimeNavigator: {
+        screen: BackUpYourWalletSecoundTimeStackNavigatorRouter,
         navigationOptions: { header: null }
       },
       TrustedContactAcceptNavigator: {

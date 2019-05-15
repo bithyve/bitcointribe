@@ -32,7 +32,7 @@ interface Props {
     loadingFlag: Function;
 }
 
-export default class ModelEnterAndConfirmPassphrase extends Component<Props, any> {
+export default class ModelEnterAndConfirmMnemonic extends Component<Props, any> {
 
     constructor ( props: any ) {
         super( props );

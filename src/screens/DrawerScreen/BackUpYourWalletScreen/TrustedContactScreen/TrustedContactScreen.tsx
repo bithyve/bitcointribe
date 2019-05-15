@@ -23,7 +23,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Contacts from 'react-native-contacts';
 import { Avatar } from 'react-native-elements';
 import SendSMS from 'react-native-sms';
-import TimerCountdown from "react-native-timer-countdown";
+import Permissions from 'react-native-permissions'
 
 
 //import Mailer from 'react-native-mail';
@@ -98,6 +98,14 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             arr_History: data.history,
             arr_resSSSDetails: resSSSDetails
         } )
+    }
+
+    componentDidMount() {
+        if ( Platform.OS == "android" ) {
+            Permissions.request( 'readSms' ).then( ( response: any ) => {
+                console.log( response );
+            } );
+        }
     }
 
     load_data = async () => {
