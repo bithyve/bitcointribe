@@ -19,17 +19,14 @@ import { RkCard } from "react-native-ui-kitten";
 import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text, Button } from 'native-base';
 import { StackActions, NavigationActions } from "react-navigation";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
-import Permissions from 'react-native-permissions'
 import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-
-
-
-//TODO: Custome Compontes
+//TODO: Custome Compontes  
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import ModelWalletName from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelWalletName";
-import ModelContactPermission from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelContactPermission";
+import ModelSelectedContactsList from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelSelectedContactsList";
+import ModelSelectedPersonRequestSent from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelSelectedPersonRequestSent";
+
 
 
 //TODO: Custome StyleSheet Files       
@@ -52,22 +49,36 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 
 
-
-
-export default class RestoreWalletUsingTrustedContactScreen extends Component {
+export default class RestoreSelectedContactsListScreen extends Component {
     constructor ( props: any ) {
         super( props );
         this.state = {
-            arr_ModelWalletName: [],
-            arr_ModelContactPermission: [],
-            walletName: "",
+            arr_ModelSelectedContact: [],
+            arr_ModelSelectedPersonRequestSent: []
         };
     }
     componentDidMount() {
         this.setState( {
-            arr_ModelWalletName: [
+            arr_ModelSelectedContact: [
                 {
                     modalVisible: true
+                }
+            ]
+        } )
+    }
+
+    //TODO: model  in request click
+    click_Request = async ( item: any ) => {
+        console.log( { item } );
+        this.setState( {
+            arr_ModelSelectedPersonRequestSent: [
+                {
+                    modalVisible: true,
+                    item: {
+                        name: item.givenName + " " + item.familyName,
+                        thumbnailPath: item.thumbnailPath,
+                        url: "http://bithyve.com"
+                    }
                 }
             ]
         } )
@@ -86,29 +97,20 @@ export default class RestoreWalletUsingTrustedContactScreen extends Component {
                             enableOnAndroid={ true }
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
-                            <ModelWalletName data={ this.state.arr_ModelWalletName } click_Confirm={ ( val ) => {
-                                console.log( { val } );
+                            <ModelSelectedContactsList data={ this.state.arr_ModelSelectedContact } click_Next={ () => {
                                 this.setState( {
-                                    walletName: val,
-                                    arr_ModelWalletName: [
+                                    arr_ModelSelectedContact: [
                                         {
                                             modalVisible: false
                                         }
-                                    ],
-                                    arr_ModelContactPermission: [
-                                        {
-                                            modalVisible: true
-                                        }
                                     ]
                                 } );
-                                Permissions.request( 'contacts' ).then( ( response: any ) => {
-                                    console.log( response );
-                                } );
                             }
                             }
+                                click_Request={ ( item: any ) => this.click_Request( item ) }
                                 pop={ () => {
                                     this.setState( {
-                                        arr_ModelWalletName: [
+                                        arr_ModelSelectedContact: [
                                             {
                                                 modalVisible: false
                                             }
@@ -117,34 +119,7 @@ export default class RestoreWalletUsingTrustedContactScreen extends Component {
                                     this.props.navigation.pop()
                                 } }
                             />
-                            <ModelContactPermission data={ this.state.arr_ModelContactPermission } click_Confirm={ () => {
-                                this.setState( {
-                                    arr_ModelContactPermission: [
-                                        {
-                                            modalVisible: false
-                                        }
-                                    ],
-                                } );
-                                this.props.navigation.push( "RestoreAllContactListScreen" );
-                            }
-                            }
-                                pop={ () => {
-                                    this.setState( {
-                                        arr_ModelContactPermission: [
-                                            {
-                                                modalVisible: false
-                                            }
-                                        ],
-                                        arr_ModelWalletName: [
-                                            {
-                                                modalVisible: true
-                                            }
-                                        ],
-
-                                    } );
-
-                                } }
-                            />
+                            <ModelSelectedPersonRequestSent data={ this.state.arr_ModelSelectedPersonRequestSent } />
                         </KeyboardAwareScrollView>
                     </ImageBackground>
                 </SafeAreaView>

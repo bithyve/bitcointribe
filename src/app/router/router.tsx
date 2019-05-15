@@ -1,5 +1,6 @@
 import React from "react";
 import { colors, images } from "../constants/Constants";
+import utils from "HexaWallet/src/app/constants/Utils";
 import {
   createStackNavigator,
   createDrawerNavigator,
@@ -7,6 +8,8 @@ import {
 } from "react-navigation";
 import { StyleSheet, Platform } from "react-native";
 import { SvgIcon } from "@up-shared/components";
+
+
 
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
@@ -20,6 +23,8 @@ import RestoreAndReoverWalletScreen from "HexaWallet/src/screens/RestoreAndWalle
 import RestoreWalletUsingMnemonicScrren from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingMnemonicScreen/RestoreWalletUsingMnemonicScrren";
 
 import RestoreWalletUsingTrustedContactScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreWalletUsingTrustedContactScreen";
+import RestoreAllContactListScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreAllContactListScreen";
+import RestoreSelectedContactsListScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreSelectedContactsListScreen";
 
 
 import WalletSetupScreens from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/WalletSetupScreens/WalletSetupScreens";
@@ -86,6 +91,7 @@ import TrustedContactAcceptOtpScreen from "../../screens/DrawerScreen/BackUpYour
 
 
 
+
 //TODO: StackNavigator
 
 //TODO: StackNavigator:ONBoarding
@@ -114,16 +120,50 @@ const RestoreWalletUsingMnemonicStackNavigator = createStackNavigator(
 );
 
 const RestoreWalletUsingTrustedContactStackNavigator = createStackNavigator(
+
   {
     RestoreWalletUsingTrustedContactScreen: {
       screen: RestoreWalletUsingTrustedContactScreen,
       navigationOptions: { header: null }
+    },
+    RestoreAllContactListScreen: {
+      screen: RestoreAllContactListScreen,
+      navigationOptions: { header: null }
+    },
+    RestoreSelectedContactsListScreen: {
+      screen: RestoreSelectedContactsListScreen,
+      navigationOptions: { header: null }
     }
   },
   {
+
     initialRouteName: "RestoreWalletUsingTrustedContactScreen"
   }
+
 );
+const RestoreWalletUsingTrustedContactStackNavigator1 = createStackNavigator(
+
+  {
+    RestoreWalletUsingTrustedContactScreen: {
+      screen: RestoreWalletUsingTrustedContactScreen,
+      navigationOptions: { header: null }
+    },
+    RestoreAllContactListScreen: {
+      screen: RestoreAllContactListScreen,
+      navigationOptions: { header: null }
+    },
+    RestoreSelectedContactsListScreen: {
+      screen: RestoreSelectedContactsListScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+
+    initialRouteName: "RestoreSelectedContactsListScreen"
+  }
+
+);
+
 
 
 
@@ -424,6 +464,10 @@ export const createRootNavigator = (
       },
       RestoreWalletUsingTrustedContactNavigator: {
         screen: RestoreWalletUsingTrustedContactStackNavigator,
+        navigationOptions: { header: null }
+      },
+      RestoreWalletUsingTrustedContactNavigator1: {
+        screen: RestoreWalletUsingTrustedContactStackNavigator1,
         navigationOptions: { header: null }
       },
       PermissionNavigator: {

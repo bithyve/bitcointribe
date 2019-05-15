@@ -51,10 +51,27 @@ export default class RestoreAndReoverWalletScreen extends Component {
     constructor ( props: any ) {
         super( props );
         this.state = {
+            arr_SecoundMenu: []
         };
     }
 
-
+    async componentWillMount() {
+        var resSSSDetails = await dbOpration.readTablesData(
+            localDB.tableName.tblSSSDetails
+        );
+        resSSSDetails = resSSSDetails.temp;
+        console.log( { resSSSDetails } );
+        await utils.setSSSDetails( resSSSDetails );
+        let temp = [];
+        if ( resSSSDetails.length > 0 ) {
+            temp = [ "Continue Restoring Wallet Using Trusted Contacts", "Restore Wallet Using mnemonic" ];
+        } else {
+            temp = [ "Restore Wallet Using Trusted Contacts", "Restore Wallet Using mnemonic" ];
+        }
+        this.setState( {
+            arr_SecoundMenu: temp
+        } )
+    }
 
     //TODO: func click on list card item
     click_Card( item: any ) {
@@ -62,8 +79,11 @@ export default class RestoreAndReoverWalletScreen extends Component {
             this.props.navigation.push( "WalletSetupScreens" );
         } else if ( item == "Restore Wallet Using mnemonic" ) {
             this.props.navigation.push( "RestoreWalletUsingMnemonicNavigator" )
-        } else {
+        } else if ( item == "Restore Wallet Using Trusted Contacts" ) {
             this.props.navigation.push( "RestoreWalletUsingTrustedContactNavigator" );
+        }
+        else {
+            this.props.navigation.push( "RestoreWalletUsingTrustedContactNavigator1" );
         }
     }
 
@@ -100,7 +120,7 @@ export default class RestoreAndReoverWalletScreen extends Component {
                                             } }
                                         >
                                             <Text
-                                                style={ [ globalStyle.ffFiraSansMedium ] }
+                                                style={ [ globalStyle.ffFiraSansMedium, { flex: 6 } ] }
                                             >
                                                 Set up as a New Wallet
                                             </Text>
@@ -108,6 +128,7 @@ export default class RestoreAndReoverWalletScreen extends Component {
                                                 name="icon_forword"
                                                 color="#BABABA"
                                                 size={ 20 }
+                                                style={ { flex: 0.2, alignSelf: "center" } }
                                             />
                                         </View>
                                     </RkCard>
@@ -123,7 +144,7 @@ export default class RestoreAndReoverWalletScreen extends Component {
                             </View>
                             <View style={ { flex: 1, margin: 10 } }>
                                 <FlatList
-                                    data={ [ "Restore Wallet Using Trusted Contacts", "Restore Wallet Using mnemonic" ] }
+                                    data={ this.state.arr_SecoundMenu }
                                     showsVerticalScrollIndicator={ false }
                                     renderItem={ ( { item } ) => (
                                         <TouchableOpacity
@@ -144,7 +165,7 @@ export default class RestoreAndReoverWalletScreen extends Component {
                                                     } }
                                                 >
                                                     <Text
-                                                        style={ [ globalStyle.ffFiraSansMedium ] }
+                                                        style={ [ globalStyle.ffFiraSansMedium, { flex: 6 } ] }
                                                     >
                                                         { item }
                                                     </Text>
@@ -152,6 +173,7 @@ export default class RestoreAndReoverWalletScreen extends Component {
                                                         name="icon_forword"
                                                         color="#BABABA"
                                                         size={ 20 }
+                                                        style={ { flex: 0.2, alignSelf: "center" } }
                                                     />
                                                 </View>
                                             </RkCard>

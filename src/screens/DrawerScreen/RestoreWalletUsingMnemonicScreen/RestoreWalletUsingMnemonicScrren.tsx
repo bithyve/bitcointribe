@@ -94,7 +94,7 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
             walletName,
             ""
         );
-        const res = await comAppHealth.check_AppHealthStausUsingMnemonic( 0, 0, null, fulldate, "mnemonic" );
+        const res = await comAppHealth.check_AppHealthStausUsingMnemonic( 0, 0, null, dateTime, "mnemonic" );
         if ( res ) {
             await dbOpration.insertCreateAccount(
                 localDB.tableName.tblAccount,
