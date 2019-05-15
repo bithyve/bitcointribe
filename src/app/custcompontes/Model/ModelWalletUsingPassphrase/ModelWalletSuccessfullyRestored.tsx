@@ -11,6 +11,7 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 import {
     images
 } from "HexaWallet/src/app/constants/Constants";
+var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 interface Props {
     data: [];
@@ -119,7 +120,7 @@ const styles = StyleSheet.create( {
         margin: 20
     },
     viewModelBody: {
-        flex: 0.7,
+        flex: utils.getIphoneSize() == "iphone X" ? 0.7 : 0.9,
         margin: 20,
         padding: 10,
         borderRadius: 10,
