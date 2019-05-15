@@ -28,9 +28,9 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import ModelWalletName from "HexaWallet/src/app/custcompontes/Model/ModelWalletUsingPassphrase/ModelWalletName";
-import ModelEnterAndConfirmPassphrase from "HexaWallet/src/app/custcompontes/Model/ModelWalletUsingPassphrase/ModelEnterAndConfirmPassphrase";
-import ModelWalletSuccessfullyRestored from "HexaWallet/src/app/custcompontes/Model/ModelWalletUsingPassphrase/ModelWalletSuccessfullyRestored";
+import ModelWalletName from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingMnemonic/ModelWalletName";
+import ModelEnterAndConfirmMnemonic from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingMnemonic/ModelEnterAndConfirmMnemonic";
+import ModelWalletSuccessfullyRestored from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingMnemonic/ModelWalletSuccessfullyRestored";
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -57,7 +57,7 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus"
 
-export default class WalletUsingPassphraseScrren extends Component {
+export default class RestoreWalletUsingMnemonicScrren extends Component {
     constructor ( props: any ) {
         super( props );
         this.state = {
@@ -110,6 +110,8 @@ export default class WalletUsingPassphraseScrren extends Component {
             Alert.alert( "App health staus not updated." )
         }
     }
+
+
 
     //TODO: Sucess Model
     click_Skip() {
@@ -168,7 +170,7 @@ export default class WalletUsingPassphraseScrren extends Component {
                                     this.props.navigation.pop()
                                 } }
                             />
-                            <ModelEnterAndConfirmPassphrase data={ this.state.arr_ConfirmPassphrase } loadingFlag={ ( flag: boolean ) => {
+                            <ModelEnterAndConfirmMnemonic data={ this.state.arr_ConfirmPassphrase } loadingFlag={ ( flag: boolean ) => {
                                 this.setState( { flag_Loading: flag } )
                                 console.log( { flag } );
                             } } click_Confirm={ ( val: string, bal: any ) => {
