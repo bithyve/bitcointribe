@@ -116,6 +116,24 @@ const getStatusBarHeight = () => {
 }
 
 
+const getIphoneSize = () => {
+  let model = DeviceInfo.getModel();
+  console.log( { model } );
+  var iphoneSeries = "IPhone X";
+  if (
+    model == "iPhone XS" ||
+    model == "iPhone XS Max" ||
+    model == "iPhone XR" ||
+    model == "iPhone X"
+  ) {
+    iphoneSeries = "iphone X";
+  }
+  else {
+    iphoneSeries = "!iphone X"
+  }
+  return iphoneSeries;
+}
+
 
 const getMnemonic = () => {
   let mnemonic = bip39.generateMnemonic();
@@ -222,6 +240,7 @@ module.exports = {
   date_diff_indays,
   getDeviceModel,
   getStatusBarHeight,
+  getIphoneSize,
   //Singleton       
   getMnemonic,
   getWalletDetails,
