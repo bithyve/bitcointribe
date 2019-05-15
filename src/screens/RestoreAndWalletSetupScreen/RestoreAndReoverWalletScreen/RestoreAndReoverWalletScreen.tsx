@@ -63,7 +63,7 @@ export default class RestoreAndReoverWalletScreen extends Component {
         } else if ( item == "Restore Wallet Using mnemonic" ) {
             this.props.navigation.push( "RestoreWalletUsingMnemonicNavigator" )
         } else {
-            Alert.alert( "Working." );
+            this.props.navigation.push( "RestoreWalletUsingTrustedContactNavigator" );
         }
     }
 

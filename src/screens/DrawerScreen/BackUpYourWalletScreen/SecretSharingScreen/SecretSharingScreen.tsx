@@ -164,12 +164,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                             <Button
                                 transparent
                                 onPress={ () => {
-                                    let resSSSDetails = utils.getSSSDetails();
-                                    if ( resSSSDetails[ 0 ].keeperInfo != "" ) {
-                                        this.props.navigation.pop();
-                                    } else {
-                                        this.props.navigation.navigate( "TabbarBottom" );
-                                    }
+                                    this.props.navigation.navigate( "TabbarBottom" );
                                 } }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
