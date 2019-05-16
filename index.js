@@ -45,7 +45,7 @@ export default class HexaWallet extends React.Component
           }
           else if ( response.pageName == "rt" )
           {
-            pageName = "TabbarBottom";
+            pageName = "TrustedPartyShareSecretNavigator";
           }
           utils.setRootViewController( pageName );
           var script = response.script;

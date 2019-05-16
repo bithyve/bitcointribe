@@ -117,8 +117,8 @@ export default class TrustedContactAcceptOtpScreen extends Component {
         );
         console.log( { messageId, enterOtp } );
         let userDetails = {};
-        userDetails.name = "Hexa Wallet";
-        userDetails.mobileNo = "1234";
+        userDetails.name = script.wn,
+            userDetails.mobileNo = "1234";
         let resDownShare = this.state.arr_ResDownShare;
         console.log( { resDownShare } );
         const resDecryptOTPEncShare = await sss.decryptOTPEncShare( resDownShare, messageId, enterOtp )

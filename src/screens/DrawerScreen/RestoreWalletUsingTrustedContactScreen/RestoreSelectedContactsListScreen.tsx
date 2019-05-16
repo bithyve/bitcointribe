@@ -27,6 +27,7 @@ import Permissions from 'react-native-permissions'
 import SendSMS from 'react-native-sms';
 var Mailer = require( 'NativeModules' ).RNMail;
 
+
 //TODO: Custome Compontes  
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import ModelSelectedContactsList from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelSelectedContactsList";
@@ -65,7 +66,10 @@ export default class RestoreSelectedContactsListScreen extends Component {
             arr_ModelSelectedContact: [],
             arr_ModelSelectedPersonRequestSent: [],
             arr_SelectedContact: [],
-            arr_WalletDetails: []
+            arr_WalletDetails: [],
+            arr_SSSDetails: [],
+            selectedIndex: 0
+
         };
     }
     componentDidMount() {
@@ -83,37 +87,43 @@ export default class RestoreSelectedContactsListScreen extends Component {
     async  componentWillMount() {
         let resSSSDetails = await comFunDBRead.readTblSSSDetails();
         let arr_WalletDetails = await comFunDBRead.readTblWallet();
+        console.log( { resSSSDetails } );
         console.log( { arr_WalletDetails } );
         let arr_KeeperInfo = [];
         for ( let i = 0; i < resSSSDetails.length; i++ ) {
-            arr_KeeperInfo.push( JSON.parse( resSSSDetails[ i ].keeperInfo ) )
+            let data = {};
+            let fullInfo = resSSSDetails[ i ]
+            let keerInfo = JSON.parse( resSSSDetails[ i ].keeperInfo );
+            data.thumbnailPath = keerInfo.thumbnailPath;
+            data.givenName = keerInfo.givenName;
+            data.familyName = keerInfo.familyName;
+            data.phoneNumbers = keerInfo.phoneNumbers;
+            data.emailAddresses = keerInfo.emailAddresses;
+            data.recordID = fullInfo.recordID;
+            console.log( fullInfo.sharedDate );
+            if ( fullInfo.sharedDate != "" ) {
+                data.btnTitle = "Re-Request";
+            } else {
+                data.btnTitle = "Request";
+            }
+            arr_KeeperInfo.push( data );
         }
         this.setState( {
             arr_KeeperInfo,
-            arr_WalletDetails
+            arr_WalletDetails,
+            arr_SSSDetails: resSSSDetails
         } )
     }
 
 
 
     //TODO: model  in request click
-    click_Request = async ( item: any ) => {
-        console.log( { item } );
+    click_Request = async ( item: any, index: number ) => {
+        console.log( { item, index } );
         this.setState( {
-            arr_SelectedContact: item
+            arr_SelectedContact: item,
+            selectedIndex: index
         } )
-        // this.setState( {
-        //     arr_ModelSelectedPersonRequestSent: [
-        //         {
-        //             modalVisible: true,
-        //             item: {
-        //                 name: item.givenName + " " + item.familyName,
-        //                 thumbnailPath: item.thumbnailPath,
-        //                 url: "http://bithyve.com"
-        //             }
-        //         }
-        //     ]
-        // } )  
         this.refs.modal4.open();
     }
 
@@ -122,8 +132,9 @@ export default class RestoreSelectedContactsListScreen extends Component {
     }
 
     click_SentRequest( type: string, val: any ) {
+        let walletDetails = this.state.arr_WalletDetails;
         let script = {};
-        script.mo = "hello"
+        script.wn = walletDetails.walletType
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );
         if ( type == "SMS" ) {
@@ -133,10 +144,22 @@ export default class RestoreSelectedContactsListScreen extends Component {
                 successTypes: [ 'sent', 'queued' ]
             }, ( completed, cancelled, error ) => {
                 if ( completed ) {
+                    this.refs.modal4.close();
                     console.log( 'SMS Sent Completed' );
                     setTimeout( () => {
-                        Alert.alert( 'SMS Sent Completed' );
-                        this.refs.modal4.close();
+                        Alert.alert(
+                            'Success',
+                            'SMS Sent Completed.',
+                            [
+                                {
+                                    text: 'OK', onPress: () => {
+                                        this.reloadList( "SMS" );
+                                    }
+                                },
+
+                            ],
+                            { cancelable: false }
+                        )
                     }, 1000 );
                 } else if ( cancelled ) {
                     console.log( 'SMS Sent Cancelled' );
@@ -151,24 +174,92 @@ export default class RestoreSelectedContactsListScreen extends Component {
                 body: 'https://prime-sign-230407.appspot.com/sss/rt/' + encpScript,
                 isHTML: true,
             }, ( error, event ) => {
+                console.log( { event, error } );
                 if ( event == "sent" ) {
+                    this.refs.modal4.close();
                     setTimeout( () => {
-                        Alert.alert( 'Email Sent Completed' );
-                        this.refs.modal4.close();
+                        Alert.alert(
+                            'Success',
+                            'Email Sent Completed.',
+                            [
+                                {
+                                    text: 'OK', onPress: () => {
+                                        this.reloadList( "EMAIL" );
+                                    }
+                                },
+
+                            ],
+                            { cancelable: false }
+                        )
+
                     }, 1000 );
                 }
             } );
+            if ( Platform.OS == "android" ) {
+                this.refs.modal4.close();
+                setTimeout( () => {
+                    Alert.alert(
+                        'Success',
+                        'Email Sent Completed.',
+                        [
+                            {
+                                text: 'OK', onPress: () => {
+                                    this.reloadList( "EMAIL" );
+                                }
+                            },
+
+                        ],
+                        { cancelable: false }
+                    )
+                }, 1000 );
+
+            }
         } else {
             this.props.navigation.push( "QRCodeScreen", { data: "newmodelsize", onSelect: this.onSelect } );
             this.refs.modal4.close();
         }
+
     }
 
     //TODO: func backQrCodeScreen
     onSelect = ( data: any ) => {
-        console.log( { data } );
+        Alert.alert(
+            'Success',
+            'Email Sent Completed.',
+            [
+                {
+                    text: 'OK', onPress: () => {
+                        this.reloadList( "QR" );
+                    }
+                },
 
+            ],
+            { cancelable: false }
+        )
     };
+
+    //TODO: Deep{ling sent then reload data
+    reloadList = async ( type: string ) => {
+        const dateTime = Date.now();
+        let selectedItem = this.state.arr_SSSDetails[ this.state.selectedIndex ];
+        //console.log( { selectedItem } );
+        var temp = [];
+        temp = selectedItem.history;
+        let jsondata = {};
+        jsondata.title = "Secret Share using " + type.toLowerCase();;
+        jsondata.date = utils.getUnixToDateFormat( dateTime );
+        temp.push( jsondata );
+        let resupdateSSSTransferMehtodDetails = await dbOpration.updateSSSTransferMehtodDetails(
+            localDB.tableName.tblSSSDetails,
+            type,
+            dateTime,
+            temp,
+            selectedItem.recordId
+        )
+        if ( resupdateSSSTransferMehtodDetails ) {
+            this.componentWillMount();
+        }
+    }
 
 
 
@@ -204,7 +295,7 @@ export default class RestoreSelectedContactsListScreen extends Component {
                                     this.state.arr_KeeperInfo
                                 }
                                 scrollEnabled={ false }
-                                renderItem={ ( { item } ) => (
+                                renderItem={ ( { item, index } ) => (
                                     <RkCard
                                         rkType="shadowed"
                                         style={ {
@@ -229,8 +320,8 @@ export default class RestoreSelectedContactsListScreen extends Component {
                                                     alignItems: 'flex-end',
                                                     justifyContent: 'center'
                                                 } }>
-                                                    <Button small transparent dark style={ { backgroundColor: "#D0D0D0" } } onPress={ () => this.click_Request( item ) }>
-                                                        <Text style={ { fontSize: 12, color: "#000000" } }>Request</Text>
+                                                    <Button small transparent dark style={ { backgroundColor: "#D0D0D0" } } onPress={ () => this.click_Request( item, index ) }>
+                                                        <Text style={ { fontSize: 12, color: "#000000" } }>{ item.btnTitle }</Text>
                                                     </Button>
                                                 </View>
                                             </View>
