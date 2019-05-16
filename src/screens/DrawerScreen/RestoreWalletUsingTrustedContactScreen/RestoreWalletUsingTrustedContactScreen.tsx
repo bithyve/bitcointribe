@@ -125,7 +125,7 @@ export default class RestoreWalletUsingTrustedContactScreen extends Component {
                                         }
                                     ],
                                 } );
-                                this.props.navigation.push( "RestoreAllContactListScreen" );
+                                this.props.navigation.push( "RestoreAllContactListScreen", { walletName: this.state.walletName } );
                             }
                             }
                                 pop={ () => {

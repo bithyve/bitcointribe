@@ -35,19 +35,7 @@ export default class ModelSelectedContactsList extends Component<Props, any> {
         } )
     }
 
-    async  componentWillMount() {
-        var resSSSDetails = await dbOpration.readTablesData(
-            localDB.tableName.tblSSSDetails
-        );
-        resSSSDetails = resSSSDetails.temp;
-        let arr_KeeperInfo = [];
-        for ( let i = 0; i < resSSSDetails.length; i++ ) {
-            arr_KeeperInfo.push( JSON.parse( resSSSDetails[ i ].keeperInfo ) )
-        }
-        this.setState( {
-            arr_KeeperInfo
-        } )
-    }
+
 
     render() {
         let data = this.props.data.length != 0 ? this.props.data : [];
