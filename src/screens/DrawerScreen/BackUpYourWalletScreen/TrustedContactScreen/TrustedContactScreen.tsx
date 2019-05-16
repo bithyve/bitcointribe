@@ -248,6 +248,9 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         state_data.statusMsg = "Shared";
         let temp = history;
         let jsondata = {};
+        if ( type != "QR" ) {
+            jsondata.otp = this.state.otpCode
+        }
         jsondata.title = "Secret Share using " + type.toLowerCase();;
         jsondata.date = utils.getUnixToDateFormat( fulldate );
         temp.push( jsondata );
