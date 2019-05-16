@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Dimensions } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Dimensions, Alert } from "react-native";
 import {
     Container,
     Header,
@@ -41,6 +41,7 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
         super( props )
         this.state = ( {
             data: [],
+            walletName: "",
             arr_ContactList: [],
             SelectedFakeContactList: [],
             flag_NextBtnDisable: true,
@@ -54,13 +55,15 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
             if ( err ) {
                 throw err;
             }
-            //console.log( { contacts } );
+            let walletName = this.props.navigation.getParam( "walletName" );
             this.setState( {
                 data: contacts,
-                arr_ContactList: contacts
+                arr_ContactList: contacts,
+                walletName
             } )
         } )
     }
+
     press = ( hey ) => {
         this.state.data.map( ( item, index ) => {
             if ( item.recordID === hey.recordID ) {
@@ -117,6 +120,7 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
         } )
         const dateTime = Date.now();
         const fulldate = Math.floor( dateTime / 1000 );
+        let walletName = this.state.walletName;
         let selectedContactList = this.state.SelectedFakeContactList;
         console.log( { selectedContactList } );
         let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactKeepInfo(
@@ -125,7 +129,19 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
             selectedContactList
         );
         if ( resInsertContactList ) {
+            await dbOpration.insertWallet(
+                localDB.tableName.tblWallet,
+                fulldate,
+                "",
+                "",
+                "",
+                "",
+                walletName,
+                ""
+            );
             this.props.navigation.push( "RestoreSelectedContactsListScreen" )
+        } else {
+            Alert.alert( "Data not insert in sss details table." )
         }
     }
 

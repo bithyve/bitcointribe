@@ -155,7 +155,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         console.log( { encpScript } );
         if ( reg.test( item.value ) == false ) {
             SendSMS.send( {
-                body: 'https://prime-sign-230407.appspot.com/sss/TB/' + encpScript,
+                body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
                 recipients: [ item.value ],
                 successTypes: [ 'sent', 'queued' ]
             }, ( completed, cancelled, error ) => {
@@ -187,7 +187,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Recovery ID',
                     recipients: [ item.value ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/TB/' + encpScript,
+                    body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
                     isHTML: true,
                 }, ( error, event ) => {
                     if ( event == "sent" ) {
@@ -208,9 +208,9 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                 }, 1000 );
             } else {
                 Mailer.mail( {
-                    subject: 'Hexa Wallet SSS Recovery ID',
+                    subject: 'Hexa Wallet SSS Backup',
                     recipients: [ item.value ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/TB/' + encpScript,
+                    body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
                     isHTML: true,
                 }, ( error, event ) => {
                     if ( event == "sent" ) {
