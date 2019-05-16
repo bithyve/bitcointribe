@@ -54,6 +54,9 @@ var utils = require( "HexaWallet/src/app/constants/Utils" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
 let isNetwork: boolean;
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
   "window"
@@ -165,29 +168,14 @@ export default class WalletScreen extends React.Component {
 
   //TODO: func connnection_FetchData
   async connnection_FetchData() {
-    var resultWallet = await dbOpration.readTablesData(
-      localDB.tableName.tblWallet
-    );
-    resultWallet = resultWallet.temp[ 0 ];
-    console.log( { resultWallet } );
-    await utils.setWalletDetails( resultWallet );
-    var resAccount = await dbOpration.readTablesData(
-      localDB.tableName.tblAccount
-    );
-    resAccount = resAccount.temp;
-    console.log( { resAccount } );
-
+    var resultWallet = await comFunDBRead.readTblWallet();
+    var resAccount = await comFunDBRead.readTblAccount();
     if ( resAccount.length > 4 ) {
       this.setState( {
         flag_cardScrolling: true
       } )
     }
-    var resSSSDetails = await dbOpration.readTablesData(
-      localDB.tableName.tblSSSDetails
-    );
-    resSSSDetails = resSSSDetails.temp;
-    console.log( { resSSSDetails } );
-    await utils.setSSSDetails( resSSSDetails );
+    var resSSSDetails = await comFunDBRead.readTblSSSDetails();
     this.setState( {
       walletDetails: resultWallet,
       arr_accounts: resAccount,

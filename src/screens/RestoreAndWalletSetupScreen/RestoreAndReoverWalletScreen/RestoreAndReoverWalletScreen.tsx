@@ -47,7 +47,11 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
-export default class RestoreAndReoverWalletScreen extends Component {
+interface Props {
+
+}
+
+export default class RestoreAndReoverWalletScreen extends Component<Props, any> {
     constructor ( props: any ) {
         super( props );
         this.state = {
@@ -55,7 +59,21 @@ export default class RestoreAndReoverWalletScreen extends Component {
         };
     }
 
+
     async componentWillMount() {
+        this.willFocusSubscription = this.props.navigation.addListener(
+            "willFocus",
+            () => {
+                this.loadData();
+            }
+        );
+    }
+
+    componentWillUnmount() {
+        this.willFocusSubscription.remove();
+    }
+
+    loadData = async () => {
         var resSSSDetails = await dbOpration.readTablesData(
             localDB.tableName.tblSSSDetails
         );
