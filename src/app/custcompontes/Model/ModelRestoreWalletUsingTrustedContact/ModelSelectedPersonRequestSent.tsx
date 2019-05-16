@@ -31,10 +31,11 @@ export default class ModelSelectedPersonRequestSent extends Component<Props, any
                 <View style={ [
                     styles.modalBackground,
                     { backgroundColor: `rgba(0,0,0,0.4)` }
-                ] }>
+                ] }
+                >
                     <View style={ styles.viewModelBody }>
                         <View style={ { flexDirection: "row", flex: 0.5 } }>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>{ name } has selected you as his trusted contact</Text>
+                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>{ item.name } has selected you as his trusted contact</Text>
                             <Button light iconLeft style={ { width: 40, height: 40, borderRadius: 20 } } onPress={ () => this.props.closeModal() }>
                                 <Icon name='close' style={ { alignSelf: "center" } } />
                             </Button>
