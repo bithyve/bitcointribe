@@ -195,7 +195,7 @@ const RestoreAndWalletSetupStackNavigator = createStackNavigator(
   }
 );
 
-const SettingsStackNavigator = createStackNavigator(
+const TrustedPartyShareSecretStackNavigator = createStackNavigator(
   {
     ContactSharedSecretList: {
       screen: ContactSharedSecretList,
@@ -497,8 +497,9 @@ export const createRootNavigator = (
         screen: TrustedContactAcceptStackNavigatorRouter,
         navigationOptions: { header: null }
       },
-      SettingsContactSharedSecretListNavigator: {
-        screen: SettingsStackNavigator,
+      //also use deepling url navigaton
+      TrustedPartyShareSecretNavigator: {
+        screen: TrustedPartyShareSecretStackNavigator,
         navigationOptions: { header: null }
       }
 
