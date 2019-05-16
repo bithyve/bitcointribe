@@ -77,15 +77,20 @@ import QrCodeScannerScreen from "HexaWallet/src/screens/TabBarScreen/QrCodeScann
 import WalletScreen from "HexaWallet/src/screens/TabBarScreen/WalletScreen/WalletScreen";
 
 //TODO: Backup your Walleet Screen
-import AllContactListScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/AllContactListScreen/AllContactListScreen";
-import SecretSharingScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/SecretSharingScreen/SecretSharingScreen";
-import TrustedContactScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactScreen/TrustedContactScreen";
-import ShareSecretViaQRScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/ShareSecretViaQRScreen/ShareSecretViaQRScreen";
-import TrustedContactAcceptOtpScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactAcceptOtpScreen/TrustedContactAcceptOtpScreen";
+import AllContactListScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/AllContactListScreen/AllContactListScreen";
+import SecretSharingScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/SecretSharingScreen/SecretSharingScreen";
+import TrustedContactScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactScreen/TrustedContactScreen";
+import ShareSecretViaQRScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/ShareSecretViaQRScreen/ShareSecretViaQRScreen";
+import TrustedContactAcceptOtpScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactAcceptOtpScreen/TrustedContactAcceptOtpScreen";
 
 
 
 
+
+
+
+//TODO: Common Screen  
+import QRCodeScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/QRCodeScreen";
 
 
 
@@ -119,8 +124,8 @@ const RestoreWalletUsingMnemonicStackNavigator = createStackNavigator(
   }
 );
 
-const RestoreWalletUsingTrustedContactStackNavigator = createStackNavigator(
 
+const RestoreWalletUsingTrustedContactStackNavigator = createStackNavigator(
   {
     RestoreWalletUsingTrustedContactScreen: {
       screen: RestoreWalletUsingTrustedContactScreen,
@@ -133,14 +138,20 @@ const RestoreWalletUsingTrustedContactStackNavigator = createStackNavigator(
     RestoreSelectedContactsListScreen: {
       screen: RestoreSelectedContactsListScreen,
       navigationOptions: { header: null }
+    },
+    QRCodeScreen: {
+      screen: QRCodeScreen,
+      navigationOptions: { header: null }
     }
   },
   {
 
     initialRouteName: "RestoreWalletUsingTrustedContactScreen"
   }
-
 );
+
+
+
 const RestoreWalletUsingTrustedContactStackNavigator1 = createStackNavigator(
 
   {
@@ -155,16 +166,16 @@ const RestoreWalletUsingTrustedContactStackNavigator1 = createStackNavigator(
     RestoreSelectedContactsListScreen: {
       screen: RestoreSelectedContactsListScreen,
       navigationOptions: { header: null }
+    },
+    QRCodeScreen: {
+      screen: QRCodeScreen,
+      navigationOptions: { header: null }
     }
   },
   {
-
     initialRouteName: "RestoreSelectedContactsListScreen"
   }
-
 );
-
-
 
 
 
@@ -198,9 +209,6 @@ const SettingsStackNavigator = createStackNavigator(
     initialRouteName: "ContactSharedSecretList"
   }
 );
-
-
-
 
 //TODO: StackNavigator: JointAccountStackRouter
 // const JointAccountStackRouter = createStackNavigator(
@@ -284,7 +292,6 @@ const SettingsStackNavigator = createStackNavigator(
 
 
 //TODO: FirstTimeWalletSetupStackNavigatorRouter
-
 const BackUpYourWalletStackNavigatorRouter = createStackNavigator(
   {
     AllContactListScreen: {

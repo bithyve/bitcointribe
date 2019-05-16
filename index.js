@@ -39,7 +39,11 @@ export default class HexaWallet extends React.Component
             response
           } );
           var pageName;
-          if ( response.pageName == "TB" )
+          if ( response.pageName == "bk" )
+          {
+            pageName = "TabbarBottom";
+          }
+          else if ( response.pageName == "rt" )
           {
             pageName = "TabbarBottom";
           }
