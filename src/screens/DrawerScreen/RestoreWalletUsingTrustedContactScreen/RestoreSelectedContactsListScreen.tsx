@@ -21,11 +21,12 @@ import { StackActions, NavigationActions } from "react-navigation";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import Modal from 'react-native-modalbox';
 
 //TODO: Custome Compontes  
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import ModelSelectedContactsList from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelSelectedContactsList";
-import ModelSelectedPersonRequestSent from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelSelectedPersonRequestSent";
+
 
 
 
@@ -70,18 +71,19 @@ export default class RestoreSelectedContactsListScreen extends Component {
     //TODO: model  in request click
     click_Request = async ( item: any ) => {
         console.log( { item } );
-        this.setState( {
-            arr_ModelSelectedPersonRequestSent: [
-                {
-                    modalVisible: true,
-                    item: {
-                        name: item.givenName + " " + item.familyName,
-                        thumbnailPath: item.thumbnailPath,
-                        url: "http://bithyve.com"
-                    }
-                }
-            ]
-        } )
+        // this.setState( {
+        //     arr_ModelSelectedPersonRequestSent: [
+        //         {
+        //             modalVisible: true,
+        //             item: {
+        //                 name: item.givenName + " " + item.familyName,
+        //                 thumbnailPath: item.thumbnailPath,
+        //                 url: "http://bithyve.com"
+        //             }
+        //         }
+        //     ]
+        // } )  
+        this.refs.modal4.open();
     }
 
     render() {
@@ -89,7 +91,7 @@ export default class RestoreSelectedContactsListScreen extends Component {
             <View style={ styles.container }>
                 <SafeAreaView style={ styles.container }>
                     <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ [ styles.container, { zIndex: 0, position: "absolute" } ] }>
                         <KeyboardAwareScrollView
                             enableAutomaticScroll
                             automaticallyAdjustContentInsets={ true }
@@ -119,10 +121,13 @@ export default class RestoreSelectedContactsListScreen extends Component {
                                     this.props.navigation.pop()
                                 } }
                             />
-                            <ModelSelectedPersonRequestSent data={ this.state.arr_ModelSelectedPersonRequestSent } />
                         </KeyboardAwareScrollView>
                     </ImageBackground>
+                    <Modal style={ [ styles.modal, styles.modal4 ] } position={ "bottom" } ref={ "modal4" }>
+                        <Text>Modal on bottom with backdrop</Text>
+                    </Modal>
                 </SafeAreaView>
+
             </View >
         );
     }
@@ -149,6 +154,15 @@ let styles = StyleSheet.create( {
     },
     txtWhiteColor: {
         color: "#ffffff"
-    }
+    },
+    modal: {
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    modal4: {
+        height: 300,
+        zIndex: 1000,
+        position: 'absolute',
+    },
 
 } );

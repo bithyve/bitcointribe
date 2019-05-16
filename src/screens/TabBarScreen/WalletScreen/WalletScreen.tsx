@@ -237,7 +237,6 @@ export default class WalletScreen extends React.Component {
 
   //TODO: Qrcode Scan SSS Details Download Desc Sahre
   downloadDescShare = async () => {
-
     this.setState( {
       flag_Loading: true
     } );
