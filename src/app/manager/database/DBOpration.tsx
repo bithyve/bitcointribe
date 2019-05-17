@@ -74,6 +74,7 @@ const readTablesData = ( tableName: any ) => {
               data.shareId = utils.decrypt( data.shareId, passcode );
               data.metaData = utils.decrypt( data.metaData, passcode );
               data.nonPMDDData = utils.decrypt( data.nonPMDDData, passcode );
+              data.history = utils.decrypt( data.history, passcode );
               temp.push( data );
             }
             else {
@@ -392,6 +393,10 @@ const insertWallet = (
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
     db.transaction( function ( txn ) {
+      txn.executeSql(
+        "DELETE FROM " +
+        tblName
+      );
       txn.executeSql(
         "INSERT INTO " +
         tblName +
