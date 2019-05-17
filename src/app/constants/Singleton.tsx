@@ -20,6 +20,9 @@ export default class Singleton {
   public sssJsonDetails: any;
   public sssDetailsRecordIDWise: any;
 
+  //App Health Status  
+  public appHealthStatus: any;
+
 
 
 
@@ -93,6 +96,14 @@ export default class Singleton {
   }
   setSSSDetailsRecordIDWise( value: any ) {
     this.sssDetailsRecordIDWise = value;
+  }
+
+  //App Health Status
+  getAppHealthStatus() {
+    return this.appHealthStatus;
+  }
+  setAppHealthStatus( value: any ) {
+    this.appHealthStatus = value;
   }
 
 

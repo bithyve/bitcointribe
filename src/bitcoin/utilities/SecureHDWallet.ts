@@ -27,6 +27,7 @@ export default class SecureHDWallet extends Bitcoin {
   constructor(primaryMnemonic: string) {
     super();
     this.primaryMnemonic = primaryMnemonic;
+    this.walletID = this.getWalletId();
     this.network = config.NETWORK;
     this.consumedAddresses = [];
     this.nextFreeChildIndex = 0;
@@ -40,9 +41,31 @@ export default class SecureHDWallet extends Bitcoin {
     return childXKey.toBase58();
   }
 
+  public importBHXpub = async (token: number) => {
+    const res = await axios.post(config.SERVER + "/importBHXpub", {
+      token,
+      walletID: this.getWalletId(),
+    });
+    const { bhXpub, err } = res.data;
+    if (err) {
+      throw new Error(err);
+    }
+
+    return {
+      bhXpub,
+    };
+  }
+
   public getPub = (extendedKey: string) => {
     const xKey = bip32.fromBase58(extendedKey, this.network);
     return xKey.publicKey.toString("hex");
+  }
+
+  public getWalletId = () => {
+    const hash = crypto.createHash("sha512");
+    const seed = bip39.mnemonicToSeed(this.primaryMnemonic);
+    hash.update(seed);
+    return hash.digest("hex");
   }
 
   public getSecondaryMnemonic = () => this.secondaryMnemonic;
@@ -75,6 +98,15 @@ export default class SecureHDWallet extends Bitcoin {
       .digest("hex");
   }
 
+  public checkHealth = async (pos: string) => {
+    const res = await axios.post(config.SERVER + "/checkSecureHealth", {
+      pos,
+      walletID: this.getWalletId(),
+    });
+
+    return res.data;
+  }
+
   public fetchBalance = async () => {
     try {
       const binarySearchIterationForConsumedAddresses = async (
@@ -89,7 +121,7 @@ export default class SecureHDWallet extends Bitcoin {
         } // fail
 
         const multiSig = this.createSecureMultiSig(index);
-        const txs = await this.fetchTransactionsByAddress(multiSig.address);
+        const txs = await this.fetchTransactionsByAddresses([multiSig.address]);
 
         console.log(txs);
         if (txs.totalTransactions === 0) {
@@ -102,9 +134,9 @@ export default class SecureHDWallet extends Bitcoin {
         } else {
           maxUsedIndex = Math.max(maxUsedIndex, index); // set
           const nextMultiSig = this.createSecureMultiSig(index + 1);
-          const txs2 = await this.fetchTransactionsByAddress(
+          const txs2 = await this.fetchTransactionsByAddresses([
             nextMultiSig.address,
-          );
+          ]);
           if (txs2.totalTransactions === 0) {
             return index + 1;
           } // thats our next free address
@@ -147,23 +179,7 @@ export default class SecureHDWallet extends Bitcoin {
       await this.fetchBalance();
     }
 
-    const transactions = {
-      status: 200, // mocking for now
-      totalTransactions: 0,
-      confirmedTransactions: 0,
-      unconfirmedTransactions: 0,
-      transactionDetails: [],
-    };
-    for (const address of this.consumedAddresses) {
-      console.log(`Fetching transactions corresponding to ${address}`);
-      const txns = await this.fetchTransactionsByAddress(address);
-      transactions.totalTransactions += txns.totalTransactions;
-      transactions.confirmedTransactions += txns.confirmedTransactions;
-      transactions.unconfirmedTransactions += txns.unconfirmedTransactions;
-      transactions.transactionDetails.push(...txns.transactionDetails);
-    }
-
-    return transactions;
+    return await this.fetchTransactionsByAddresses(this.consumedAddresses);
   }
 
   public fetchUtxo = async () => {
@@ -211,9 +227,9 @@ export default class SecureHDWallet extends Bitcoin {
         this.nextFreeChildIndex + itr,
       );
 
-      const { totalTransactions } = await this.fetchTransactionsByAddress(
+      const { totalTransactions } = await this.fetchTransactionsByAddresses([
         address,
-      );
+      ]);
       if (totalTransactions === 0) {
         // free address found
         freeAddress = address;
@@ -266,11 +282,6 @@ export default class SecureHDWallet extends Bitcoin {
       secondary: secondaryXpub,
       bh: bhXpub,
     };
-
-    const hash = crypto.createHash("sha512");
-    const seed = bip39.mnemonicToSeed(this.primaryMnemonic);
-    hash.update(seed);
-    this.walletID = hash.digest("hex");
   }
 
   public createSecureMultiSig = (childIndex) => {
@@ -418,55 +429,3 @@ export default class SecureHDWallet extends Bitcoin {
     return { signedTxb: txb, childIndexArray };
   }
 }
-
-const smokeRunner = async () => {
-  const dummyMnemonic =
-    "unique issue slogan party van unfair assault warfare then rubber satisfy snack";
-  const dummyBHXpub =
-    "tpubDFe4ZoKYAQhR7JQq8s1AKqDeoGWE2Aovf2b4pqEE5Mt2HyqYMkq8AzHYU8zosVeSEf7EJtNGuTkDVqVrT8YjizbuvRttJMS6uRKabEA358d";
-  const dummySecret = "JVSE63CKNZHHKUKHKRAVSVRSIIVUK6DX";
-  const dummyRecoveryXpub =
-    "tpubDDGFLSXWA8K2z1fmg37ivgFmQC5xBMcEycBD5pmYuzpM1GyeoeTeykZxFFcQpVVGvv6scShvtCfRkf59tzJzwoL44VMRR78RywTU46TvCrJ";
-  const transfer = {
-    recipientAddress: "2NAwqcZHo2DW9c8Qs9Jxaat3jHW3aqsBpFs",
-    amount: 9004007,
-  };
-  const secureWallet = new SecureHDWallet(dummyMnemonic);
-  await secureWallet.setupSecureAccount();
-  secureWallet.xpubs.secondary = dummyRecoveryXpub;
-  secureWallet.xpubs.bh = dummyBHXpub;
-
-  //   const balance = await secureWallet.fetchBalance(); // updates the consumed address list
-  //   console.log(balance);
-  //   const address = await secureWallet.getReceivingAddress();
-  //   console.log({ address });
-  //   return;
-
-  const { inputs, txb } = await secureWallet.createSecureHDTransaction(
-    transfer.recipientAddress,
-    transfer.amount,
-  );
-
-  const { signedTxb, childIndexArray } = await secureWallet.signHDTransaction(
-    inputs,
-    txb,
-  );
-  const txHex = signedTxb.buildIncomplete().toHex();
-  console.log({ txHex });
-
-  console.log({ childIndexArray });
-  console.log("Sending transaction to BH_Server for signing");
-  const res = await axios.post(config.SERVER + "/secureHDTransaction", {
-    walletID: this.walletID,
-    txHex,
-    childIndexArray,
-  });
-
-  console.log("Transaction Signed by BH Server");
-  console.log({ txHex: res.data.txHex });
-
-  console.log("------ Broadcasting Transaction --------");
-  // const txHash = await this.bitcoin.broadcastLocally(data.txHex); // TODO: If API falls; globally expose the tesnet RPC (via ngRox maybe)
-  const bRes = await secureWallet.broadcastTransaction(res.data.txHex);
-  console.log(bRes);
-};

@@ -30,7 +30,8 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 import {
   colors,
   images,
-  localDB
+  localDB,
+  asyncStorageKeys
 } from "HexaWallet/src/app/constants/Constants";
 import utils from "HexaWallet/src/app/constants/Utils";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
@@ -41,6 +42,7 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 export default class PasscodeScreen extends Component {
+
   constructor ( props: any ) {
     super( props );
     this.state = {
@@ -64,15 +66,13 @@ export default class PasscodeScreen extends Component {
     this.retrieveData();
   }
 
-
-
   retrieveData = async () => {
     try {
       const resultWallet = await dbOpration.readTablesData(
         localDB.tableName.tblWallet
       );
       await utils.setWalletDetails( resultWallet.temp );
-      AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
+      // AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
       const credentials = await Keychain.getGenericPassword();
       this.setState( {
         pincode: credentials.password
@@ -80,7 +80,7 @@ export default class PasscodeScreen extends Component {
     } catch ( error ) {
       console.log( error );
     }
-  };
+  }
 
   _onFinishCheckingCode( isValid: boolean, code: string ) {
     if ( isValid ) {
@@ -108,22 +108,20 @@ export default class PasscodeScreen extends Component {
   }
 
 
-  onSuccess = ( code: string ) => {
+  onSuccess = async ( code: string ) => {
+    const rootViewController = await AsyncStorage.getItem( asyncStorageKeys.rootViewController );
+    console.log( { rootViewController } );
     let pageName = utils.getRootViewController();
-    if ( pageName == "TabbarBottom" ) {
-      const resetAction = StackActions.reset( {
-        index: 0, // <-- currect active route from actions array
-        key: null,
-        actions: [
-          NavigationActions.navigate( {
-            routeName: pageName
-          } )
-        ]
-      } );
-      this.props.navigation.dispatch( resetAction );
-    } else {
-      this.setState( { flag_dialogShow: true } );
-    }
+    const resetAction = StackActions.reset( {
+      index: 0, // <-- currect active route from actions array
+      key: null,
+      actions: [
+        NavigationActions.navigate( {
+          routeName: rootViewController
+        } )
+      ]
+    } );
+    this.props.navigation.dispatch( resetAction );
   };
 
 

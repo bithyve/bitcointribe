@@ -7,9 +7,6 @@ import "HexaWallet/shim";
 import { name as appName } from "HexaWallet/app.json";
 import { createRootNavigator } from "HexaWallet/src/app/router/router";
 import LaunchScreen from "HexaWallet/src/screens/LaunchScreen/LaunchScreen";
-import Singleton from "HexaWallet/src/app/constants/Singleton";
-
-
 
 //TODO: Custome Object
 var utils = require( "HexaWallet/src/app/constants/Utils" );
@@ -29,7 +26,7 @@ export default class HexaWallet extends React.Component
   {
     try
     {
-      AppState.addEventListener( "change", this._handleAppStateChange );
+      //AppState.addEventListener( "change", this._handleAppStateChange );
       AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
       //TODO: Deep Linking
       DeepLinking.addScheme( "https://" );
@@ -102,7 +99,7 @@ export default class HexaWallet extends React.Component
     try
     {
       Linking.removeEventListener( "url", this.handleUrl );
-      AppState.removeEventListener( "change", this._handleAppStateChange );
+      // AppState.removeEventListener( "change", this._handleAppStateChange );
     } catch ( e )
     {
       console.log( {
@@ -111,42 +108,42 @@ export default class HexaWallet extends React.Component
     }
   }
 
-  _handleAppStateChange = async nextAppState =>
-  {
-    try
-    {
-      var status = JSON.parse(
-        await AsyncStorage.getItem( "PasscodeCreateStatus" )
-      );
-      let flag_BackgoundApp = JSON.parse(
-        await AsyncStorage.getItem( "flag_BackgoundApp" )
-      );
-      if ( status && flag_BackgoundApp )
-      {
-        this.setState( {
-          appState: AppState.currentState
-        } );
-        if ( this.state.appState.match( /inactive|background/ ) )
-        {
-          console.log( {
-            status
-          } );
-          this.setState( {
-            status: true
-          } );
-          console.log(
-            "forgound = " + this.state.status,
-            this.state.isStartPage
-          );
-        }
-      }
-    } catch ( e )
-    {
-      console.log( {
-        e
-      } );
-    }
-  };
+  // _handleAppStateChange = async nextAppState =>
+  // {
+  //   try
+  //   {
+  //     var status = JSON.parse(
+  //       await AsyncStorage.getItem( "PasscodeCreateStatus" )
+  //     );
+  //     let flag_BackgoundApp = JSON.parse(
+  //       await AsyncStorage.getItem( "flag_BackgoundApp" )
+  //     );
+  //     if ( status && flag_BackgoundApp )
+  //     {
+  //       this.setState( {
+  //         appState: AppState.currentState
+  //       } );
+  //       if ( this.state.appState.match( /inactive|background/ ) )
+  //       {
+  //         console.log( {
+  //           status
+  //         } );
+  //         this.setState( {
+  //           status: true
+  //         } );
+  //         console.log(
+  //           "forgound = " + this.state.status,
+  //           this.state.isStartPage
+  //         );
+  //       }
+  //     }
+  //   } catch ( e )
+  //   {
+  //     console.log( {
+  //       e
+  //     } );
+  //   }
+  // };
 
   onComplited ( status, pageName )
   {

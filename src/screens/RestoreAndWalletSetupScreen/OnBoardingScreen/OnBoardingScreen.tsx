@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, SafeAreaView, Image, StatusBar } from "react-native";
+import { StyleSheet, View, SafeAreaView, Image, StatusBar, AsyncStorage } from "react-native";
 import { Text } from "native-base";
 import { StackActions, NavigationActions } from "react-navigation";
 import CreateTables from "HexaWallet/src/app/manager/database/CreateTables";
@@ -13,7 +13,7 @@ import OnBoarding from "HexaWallet/src/app/custcompontes/OnBoarding/OnBoarding";
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Custome object  
-import { colors, images } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
 
 //localization 
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
@@ -34,7 +34,10 @@ export default class OnBoardingScreen extends React.Component<any, any> {
 
   //TODO: func click_Done  
   click_Done() {
-    console.log( "click" );
+    AsyncStorage.setItem(
+      asyncStorageKeys.rootViewController,
+      "PasscodeConfirmScreen"
+    );
     const resetAction = StackActions.reset( {
       index: 0, // <-- currect active route from actions array
       key: null,
