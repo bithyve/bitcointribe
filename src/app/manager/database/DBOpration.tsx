@@ -718,19 +718,25 @@ const insertRestoreUsingTrustedContactKeepInfo = (
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
+    let temp = [];
+    let jsonData = {};
+    jsonData.title = "Secret Created.";
+    jsonData.date = utils.getUnixToDateFormat( fulldate );
+    temp.push( jsonData );
     db.transaction( function ( txn ) {
       for ( let i = 0; i < keepInfo.length; i++ ) {
         let data = keepInfo[ i ];
         txn.executeSql(
           "INSERT INTO " +
           tblName +
-          "(dateCreated,keeperInfo,recordId) VALUES (:dateCreated,:keeperInfo,:recordId)",
+          "(dateCreated,keeperInfo,history,recordId) VALUES (:dateCreated,:keeperInfo,:history,:recordId)",
           [
             utils.encrypt(
               fulldate.toString(),
               passcode
             ),
             utils.encrypt( JSON.stringify( data ).toString(), passcode ),
+            utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
             utils.encrypt( data.recordID.toString(), passcode ),
           ]
         );

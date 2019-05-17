@@ -32,8 +32,20 @@ const readTblSSSDetails = async () => {
     return resSSSDetails;
 }
 
+
+const readTblTrustedPartySSSDetails = async () => {
+    var resSharedSecretList = await dbOpration.readTablesData(
+        localDB.tableName.tblTrustedPartySSSDetails
+    );
+    resSharedSecretList = resSharedSecretList.temp;
+    return resSharedSecretList;
+}
+
+
+
 module.exports = {
     readTblWallet,
     readTblAccount,
-    readTblSSSDetails
+    readTblSSSDetails,
+    readTblTrustedPartySSSDetails
 };
