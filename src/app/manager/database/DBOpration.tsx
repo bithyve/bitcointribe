@@ -62,6 +62,7 @@ const readTablesData = ( tableName: any ) => {
               data.acceptedDate = utils.decrypt( data.acceptedDate, passcode );
               data.lastSuccessfulCheck = utils.decrypt( data.lastSuccessfulCheck, passcode );
               data.shareStage = utils.decrypt( data.shareStage, passcode );
+              data.recordId = utils.decrypt( data.recordId, passcode );
               temp.push( data );
             }
             else if ( tableName == "tblTrustedPartySSSDetails" ) {
@@ -710,6 +711,35 @@ const insertSSSShareAndShareId = (
   } );
 };
 
+const insertRestoreUsingTrustedContactKeepInfo = (
+  tblName: string,
+  fulldate: string,
+  keepInfo: any
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    db.transaction( function ( txn ) {
+      for ( let i = 0; i < keepInfo.length; i++ ) {
+        let data = keepInfo[ i ];
+        txn.executeSql(
+          "INSERT INTO " +
+          tblName +
+          "(dateCreated,keeperInfo,recordId) VALUES (:dateCreated,:keeperInfo,:recordId)",
+          [
+            utils.encrypt(
+              fulldate.toString(),
+              passcode
+            ),
+            utils.encrypt( JSON.stringify( data ).toString(), passcode ),
+            utils.encrypt( data.recordID.toString(), passcode ),
+          ]
+        );
+      }
+      resolve( true );
+    } );
+  } );
+};
+
 //update
 const updateSSSContactListDetails = (
   tblName: string,
@@ -763,6 +793,8 @@ const updateSSSTransferMehtodDetails = (
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
+    console.log( { tblName, type, date, history, recoardId } );
+
     try {
       db.transaction( function ( txn ) {
         txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
@@ -774,7 +806,7 @@ const updateSSSTransferMehtodDetails = (
                 results.rows.item( i ).recordId,
                 passcode
               );
-              //console.log( { dbdecryptrecordID, recoardId } );
+              console.log( { dbdecryptrecordID, recoardId } );
               let recordId = results.rows.item( i ).recordId;
               if ( dbdecryptrecordID == recoardId ) {
                 txn.executeSql(
@@ -934,9 +966,11 @@ module.exports = {
   insertLastBeforeCreateAccount,
   insertTblTransation,
   updateTableData,
+
   //SSS Details
   readSSSTableData,
   insertSSSShareAndShareId,
+  insertRestoreUsingTrustedContactKeepInfo,
   updateSSSContactListDetails,
   updateSSSTransferMehtodDetails,
   updateSSSShareStage,

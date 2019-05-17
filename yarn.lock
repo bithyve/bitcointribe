@@ -8041,6 +8041,14 @@ react-native-modal-picker@^0.0.16:
   resolved "https://registry.yarnpkg.com/react-native-modal-picker/-/react-native-modal-picker-0.0.16.tgz#c9324d880a3bb8f36b772f378164977e2f431cbc"
   integrity sha1-yTJNiAo7uPNrdy83gWSXfi9DHLw=
 
+react-native-modalbox@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/react-native-modalbox/-/react-native-modalbox-1.7.1.tgz#cdb623ecd1cbe8699a450217c25b2d6666dc63e6"
+  integrity sha512-Jqn12MKQaT5OSb1uMAEeDQF02xHS+WWdgKl55ecoIknrDy+FIoC3fXHMEoRZH6agADDg9eVBqx8w+P7+EwXTbQ==
+  dependencies:
+    create-react-class "^15.6.0"
+    prop-types "^15.5.10"
+
 react-native-motion@^1.0.1:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/react-native-motion/-/react-native-motion-1.0.4.tgz#a0ac807a1065fd1de25fb6e332692ecf1c12ccac"

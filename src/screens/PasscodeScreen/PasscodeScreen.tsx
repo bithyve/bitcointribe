@@ -38,6 +38,9 @@ import Singleton from "HexaWallet/src/app/constants/Singleton";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
@@ -118,18 +121,33 @@ export default class PasscodeScreen extends Component {
 
   onSuccess = async ( code: string ) => {
     const rootViewController = await AsyncStorage.getItem( asyncStorageKeys.rootViewController );
-    console.log( { rootViewController } );
+    // console.log( { rootViewController } );
     let pageName = utils.getRootViewController();
-    const resetAction = StackActions.reset( {
-      index: 0, // <-- currect active route from actions array
-      key: null,
-      actions: [
-        NavigationActions.navigate( {
-          routeName: rootViewController
-        } )
-      ]
-    } );
-    this.props.navigation.dispatch( resetAction );
+    let walletDetails = await comFunDBRead.readTblWallet();
+    if ( pageName != "TrustedPartyShareSecretNavigator" ) {
+      const resetAction = StackActions.reset( {
+        index: 0, // <-- currect active route from actions array
+        key: null,
+        actions: [
+          NavigationActions.navigate( {
+            routeName: rootViewController
+          } )
+        ]
+      } );
+      this.props.navigation.dispatch( resetAction );
+    } else {
+      const resetAction = StackActions.reset( {
+        index: 0, // <-- currect active route from actions array
+        key: null,
+        actions: [
+          NavigationActions.navigate( {
+            routeName: pageName
+          } )
+        ]
+      } );
+      this.props.navigation.dispatch( resetAction );
+    }
+
   };
 
 

@@ -139,7 +139,7 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                     walletName,
                     ""
                 );
-                await comAppHealth.connection_AppHealthStatus( fulldate, 0, encryptedShares, mnemonic )
+                await comAppHealth.connection_AppHealthStatus( dateTime, 0, encryptedShares, mnemonic )
                 // console.log( { resultSSSShareIdInserted } );
                 let jsonAnswerDetails = {};
                 jsonAnswerDetails.walletName = walletName;
