@@ -1,7 +1,7 @@
 /** @format */
 import React from "react";
 import { createAppContainer } from "react-navigation";
-import { AsyncStorage, AppState, AppRegistry, Linking, StatusBar } from "react-native";
+import { AsyncStorage, AppState, AppRegistry, Linking, StatusBar, Alert } from "react-native";
 import DeepLinking from "react-native-deep-linking";
 import "HexaWallet/shim";
 import { name as appName } from "HexaWallet/app.json";
@@ -49,6 +49,9 @@ export default class HexaWallet extends React.Component
           {
             pageName = "TrustedPartyShareSecretNavigator";
             type = "SSS Restore SMS/EMAIL";
+          } else
+          {
+            Alert.alert( "Working" );
           }
           utils.setRootViewController( pageName );
           var script = response.script;
