@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, Platform, SafeAreaView, FlatList, TouchableOpacity, Dimensions } from "react-native";
+import { StyleSheet, ImageBackground, View, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert } from "react-native";
 import {
     Container,
     Item,
@@ -14,6 +14,10 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Contacts from 'react-native-contacts';
 import { Avatar } from 'react-native-elements';
 import GridView from 'react-native-super-grid';
+import Modal from 'react-native-modalbox';
+import Permissions from 'react-native-permissions'
+import SendSMS from 'react-native-sms';
+var Mailer = require( 'NativeModules' ).RNMail;
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
@@ -29,6 +33,9 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
 export default class ContactSharedSecretList extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props )
@@ -36,6 +43,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             data: [],
             arr_OrignalDetails: [],
             SelectedFakeContactList: [],
+            arr_SelectedContact: [],
             flag_NextBtnDisable: true,
             flag_NextBtnDisable1: false,
             flag_Loading: false,
@@ -44,19 +52,19 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
     }
 
     async componentWillMount() {
-        var resSharedSecretList = await dbOpration.readTablesData(
-            localDB.tableName.tblTrustedPartySSSDetails
-        );
-        resSharedSecretList = resSharedSecretList.temp;
-        // console.log( { resSharedSecretList } );
+        var resSharedSecretList = await comFunDBRead.readTblTrustedPartySSSDetails();
+        console.log( { resSharedSecretList } );
         let temp = [];
         for ( let i = 0; i < resSharedSecretList.length; i++ ) {
             let data = {};
-            let allJson = JSON.parse( resSharedSecretList[ i ].allJson );
-            let userDetails = JSON.parse( resSharedSecretList[ i ].userDetails )
-            data.name = allJson.meta.tag;
-            data.walletName = userDetails.name;
-            data.m = "+91 9876543210"
+            let keeperInfo = JSON.parse( resSharedSecretList[ i ].keeperInfo );
+            console.log( { keeperInfo } );
+
+            let urlScript = JSON.parse( resSharedSecretList[ i ].urlScript )
+            data.walletName = urlScript.walletName;
+            data.keeperInfo = keeperInfo;
+            data.name = keeperInfo.givenName + " " + keeperInfo.familyName;
+            data.mobileNo = keeperInfo.phoneNumbers[ 0 ].number;
             temp.push( data );
         }
         // console.log( { temp } );
@@ -64,12 +72,49 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             data: temp,
             arr_OrignalDetails: temp
         } )
+
+        //TODO: DeepLinking open person contact detail
+        let urlScript = utils.getDeepLinkingUrl();
+        let urlType = utils.getDeepLinkingType();
+        if ( urlType == "SSS Restore SMS/EMAIL" ) {
+            let walletName = urlScript.wn;
+            let jsonTemp = {}
+            for ( let i = 0; i < temp.length; i++ ) {
+                if ( temp[ i ].walletName == walletName ) {
+                    let data = temp[ i ];
+                    console.log( { data } );
+                    jsonTemp.thumbnailPath = data.keeperInfo.thumbnailPath;
+                    jsonTemp.givenName = data.keeperInfo.givenName;
+                    jsonTemp.familyName = data.keeperInfo.familyName;
+                    jsonTemp.phoneNumbers = data.keeperInfo.phoneNumbers[ 0 ].number;
+                    jsonTemp.emailAddresses = data.keeperInfo.emailAddresses[ 0 ].email;
+                    jsonTemp.qrCodeString = "Wallet";
+                    break;
+                } else {
+                    Alert.alert( "This Wallet Name recoard not found!" )
+                }
+            }
+            this.setState( {
+                arr_SelectedContact: jsonTemp
+            } )
+            this.refs.modal4.open();
+        }
     }
+
+    componentDidMount() {
+        if ( Platform.OS == "android" ) {
+            Permissions.request( 'readSms' ).then( ( response: any ) => {
+                console.log( response );
+            } );
+        }
+    }
+
 
     press = ( hey: any ) => {
         console.log( { hey } );
 
     }
+
     //TODO: Searching Contact List
     searchFilterFunction = ( text: string ) => {
         if ( text.length > 0 ) {
@@ -89,10 +134,140 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
     };
 
 
+    //TODO: Deeplinking 
+    click_SentRequest( type: string, val: any ) {
+        let script = {};
+        script.wn = "Wallet";
+        var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
+        encpScript = encpScript.split( "/" ).join( "_+_" );
+        this.refs.modal4.close();
+        if ( type == "SMS" ) {
+            SendSMS.send( {
+                body: 'https://prime-sign-230407.appspot.com/sss/rta/' + encpScript,
+                recipients: [ val ],
+                successTypes: [ 'sent', 'queued' ]
+            }, ( completed, cancelled, error ) => {
+                if ( completed ) {
+                    console.log( 'SMS Sent Completed' );
+                    setTimeout( () => {
+                        Alert.alert(
+                            'Success',
+                            'SMS Sent Completed.',
+                            [
+                                {
+                                    text: 'OK', onPress: () => {
+                                        this.reloadList( "SMS" );
+                                    }
+                                },
+
+                            ],
+                            { cancelable: false }
+                        )
+                    }, 1000 );
+                } else if ( cancelled ) {
+                    console.log( 'SMS Sent Cancelled' );
+                } else if ( error ) {
+                    console.log( 'Some error occured' );
+                }
+            } );
+        } else if ( type == "EMAIL" ) {
+            Mailer.mail( {
+                subject: 'Hexa Wallet SSS Restore',
+                recipients: [ val ],
+                body: 'https://prime-sign-230407.appspot.com/sss/rta/' + encpScript,
+                isHTML: true,
+            }, ( error, event ) => {
+                console.log( { event, error } );
+                if ( event == "sent" ) {
+                    setTimeout( () => {
+                        Alert.alert(
+                            'Success',
+                            'Email Sent Completed.',
+                            [
+                                {
+                                    text: 'OK', onPress: () => {
+                                        this.reloadList( "EMAIL" );
+                                    }
+                                },
+
+                            ],
+                            { cancelable: false }
+                        )
+
+                    }, 1000 );
+                }
+            } );
+            if ( Platform.OS == "android" ) {
+                setTimeout( () => {
+                    Alert.alert(
+                        'Success',
+                        'Email Sent Completed.',
+                        [
+                            {
+                                text: 'OK', onPress: () => {
+                                    this.reloadList( "EMAIL" );
+                                }
+                            },
+
+                        ],
+                        { cancelable: false }
+                    )
+                }, 1000 );
+
+            }
+        } else {
+            this.props.navigation.push( "QRCodeScreen", { data: "newmodelsize", onSelect: this.onSelect } );
+            this.refs.modal4.close();
+        }
+
+    }
+
+    //TODO: func backQrCodeScreen
+    onSelect = ( data: any ) => {
+        Alert.alert(
+            'Success',
+            'Email Sent Completed.',
+            [
+                {
+                    text: 'OK', onPress: () => {
+                        this.reloadList( "QR" );
+                    }
+                },
+
+            ],
+            { cancelable: false }
+        )
+    };
+
+    //TODO: Deep{ling sent then reload data
+    reloadList = async ( type: string ) => {
+        const dateTime = Date.now();
+        let selectedItem = this.state.arr_SSSDetails[ this.state.selectedIndex ];
+        //console.log( { selectedItem } );
+        var temp = [];
+        temp = JSON.parse( selectedItem.history );
+        //console.log( { temp } );
+        let jsondata = {};
+        jsondata.title = "Secret Share using " + type.toLowerCase();;
+        jsondata.date = utils.getUnixToDateFormat( dateTime );
+        temp.push( jsondata );
+
+        // let resupdateSSSTransferMehtodDetails = await dbOpration.updateSSSTransferMehtodDetails(
+        //     localDB.tableName.tblTrustedPartySSSDetails,
+        //     type,
+        //     dateTime,
+        //     temp,
+        //     selectedItem.recordId
+        // )
+        // if ( resupdateSSSTransferMehtodDetails ) {
+        //     this.componentWillMount();
+        // }
+    }
 
 
     render() {
         let data = this.state.data;
+        let selectedContact = this.state.arr_SelectedContact;
         let secretList;
         const list = <FlatList
             data={
@@ -107,11 +282,16 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                     <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
                             <View style={ { alignItems: "center", justifyContent: "center" } }>
-                                <Avatar style={ { alignSelf: "center" } } medium rounded title={ item.name.charAt( 0 ) } />
+                                { renderIf( item.keeperInfo.thumbnailPath != "" )(
+                                    <Avatar medium rounded source={ { uri: item.keeperInfo.thumbnailPath } } />
+                                ) }
+                                { renderIf( item.keeperInfo.thumbnailPath == "" )(
+                                    <Avatar medium rounded title={ item.keeperInfo.givenName != null && item.keeperInfo.givenName.charAt( 0 ) } />
+                                ) }
                             </View>
                             <View style={ { flexDirection: "column" } }>
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10 } ] }>{ item.name }</Text>
-                                <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.m }</Text>
+                                <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.mobileNo }</Text>
                                 <Text note style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.walletName }</Text>
                             </View>
                         </View>
@@ -138,7 +318,16 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                         <View style={ { marginLeft: 10, marginTop: 15 } }>
                             <Button
                                 transparent
-                                onPress={ () => this.props.navigation.pop() }
+                                onPress={ () => {
+                                    let urlScript = utils.getDeepLinkingUrl();
+                                    if ( urlScript != "" ) {
+                                        utils.setDeepLinkingType( "" );
+                                        utils.setDeepLinkingUrl( "" );
+                                        this.props.navigation.navigate( 'WalletScreen' );
+                                    } else {
+                                        this.props.navigation.pop()
+                                    }
+                                } }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 20 : 17, marginLeft: 0 } ] }>Contacts that have shared secrets</Text>
@@ -165,6 +354,57 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                                 { secretList }
                             </View>
                         </KeyboardAwareScrollView>
+                        <Modal style={ [ styles.modal, styles.modal4 ] } position={ "bottom" } ref={ "modal4" }>
+                            <View>
+                                <View style={ { flexDirection: 'column', alignItems: "center", marginTop: 10, marginBottom: 15, borderBottomColor: "#EFEFEF", borderBottomWidth: 1 } }>
+                                    { renderIf( selectedContact.thumbnailPath != "" )(
+                                        <Avatar medium rounded source={ { uri: selectedContact.thumbnailPath } } />
+                                    ) }
+                                    { renderIf( selectedContact.thumbnailPath == "" )(
+                                        <Avatar medium rounded title={ selectedContact.givenName != null && selectedContact.givenName.charAt( 0 ) } />
+                                    ) }
+                                    <Text style={ { marginBottom: 10 } }>{ selectedContact.givenName + " " + selectedContact.familyName }</Text>
+                                </View>
+
+                                <View style={ { alignItems: "center", } }>
+                                    <View style={ { flexDirection: "row", marginBottom: 10 } }>
+                                        <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_SentRequest( "SMS", selectedContact.phoneNumbers ) }>
+                                            <View style={ { alignItems: "center", marginLeft: "20%", flexDirection: "column" } }>
+                                                <SvgIcon
+                                                    name="chat"
+                                                    color="#37A0DA"
+                                                    size={ 35 }
+                                                />
+                                                <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via SMS</Text>
+                                            </View>
+
+                                        </Button>
+                                        <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_SentRequest( "EMAIL", selectedContact.emailAddresses ) }>
+                                            <View style={ { alignItems: "center", marginLeft: "20%", flexDirection: "column" } }>
+                                                <SvgIcon
+                                                    name="mail-2"
+                                                    color="#37A0DA"
+                                                    size={ 30 }
+                                                />
+                                                <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via Email</Text>
+                                            </View>
+                                        </Button>
+                                        <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_SentRequest( "QR", selectedContact.qrCodeString ) }>
+                                            <View style={ { alignItems: "center", marginLeft: "20%", flexDirection: "column" } }>
+                                                <SvgIcon
+                                                    name="qr-code-3"
+                                                    color="#37A0DA"
+                                                    size={ 30 }
+
+                                                />
+                                                <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1", textAlign: "center" } }>Via QR</Text>
+                                            </View>
+                                        </Button>
+                                    </View>
+                                </View>
+
+                            </View>
+                        </Modal>
                     </ImageBackground>
                 </SafeAreaView>
                 <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message="Loading" />
@@ -214,5 +454,12 @@ const styles = StyleSheet.create( {
     //Grid View Selected
     gridSelectedList: {
         flex: 1
+    },
+    modal: {
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10
+    },
+    modal4: {
+        height: 180
     }
 } );

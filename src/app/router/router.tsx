@@ -81,7 +81,9 @@ import AllContactListScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYour
 import SecretSharingScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/SecretSharingScreen/SecretSharingScreen";
 import TrustedContactScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactScreen/TrustedContactScreen";
 import ShareSecretViaQRScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/ShareSecretViaQRScreen/ShareSecretViaQRScreen";
-import TrustedContactAcceptOtpScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactAcceptOtpScreen/TrustedContactAcceptOtpScreen";
+
+import SelectContactListAssociatePerson from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/BackUpTrustedPartySecretStoreScreen/SelectContactListAssociatePerson";
+import TrustedContactAcceptOtpScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/BackUpTrustedPartySecretStoreScreen/TrustedContactAcceptOtpScreen";
 
 
 
@@ -91,6 +93,7 @@ import TrustedContactAcceptOtpScreen from "HexaWallet/src/screens/DrawerScreen/B
 
 //TODO: Common Screen  
 import QRCodeScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/QRCodeScreen";
+
 
 
 
@@ -336,15 +339,19 @@ const BackUpYourWalletSecoundTimeStackNavigatorRouter = createStackNavigator(
   }
 );
 
-const TrustedContactAcceptStackNavigatorRouter = createStackNavigator(
+const BackupTrustedPartrySecretStoreStackNavigator = createStackNavigator(
   {
+    SelectContactListAssociatePerson: {
+      screen: SelectContactListAssociatePerson,
+      navigationOptions: { header: null }
+    },
     TrustedContactAcceptOtpScreen: {
       screen: TrustedContactAcceptOtpScreen,
       navigationOptions: { header: null }
     }
   },
   {
-    initialRouteName: "TrustedContactAcceptOtpScreen"
+    initialRouteName: "SelectContactListAssociatePerson"
   }
 );
 
@@ -493,8 +500,8 @@ export const createRootNavigator = (
         screen: BackUpYourWalletSecoundTimeStackNavigatorRouter,
         navigationOptions: { header: null }
       },
-      TrustedContactAcceptNavigator: {
-        screen: TrustedContactAcceptStackNavigatorRouter,
+      BackupTrustedPartrySecretNavigator: {
+        screen: BackupTrustedPartrySecretStoreStackNavigator,
         navigationOptions: { header: null }
       },
       //also use deepling url navigaton

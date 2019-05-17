@@ -32,10 +32,13 @@ import Permissions from 'react-native-permissions'
 //Custome Compontes
 import ViewShieldIcons from "HexaWallet/src/app/custcompontes/View/ViewShieldIcons/ViewShieldIcons";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+
+//TODO: Custome Models
 import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
 import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model/ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
-import ModelAcceptSecret from "../../../app/custcompontes/Model/ModelAcceptSecret/ModelAcceptSecret";
 
+import ModelBackupShareAssociateContact from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelBackupShareAssociateContact";
+import ModelBackupAssociateOpenContactList from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelBackupAssociateOpenContactList";
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
@@ -72,9 +75,7 @@ const sliderWidth = viewportWidth;
 const itemWidth = slideWidth + itemHorizontalMargin * 2;
 const SLIDER_1_FIRST_ITEM = 0;
 
-//TODO: Bitcoin Files
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
-import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus";
+
 
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
@@ -99,7 +100,9 @@ export default class WalletScreen extends React.Component {
       //Model 
       arr_ModelBackupYourWallet: [],
       arr_ModelFindYourTrustedContacts: [],
-      arr_ModelAcceptSecret: [],
+      arr_ModelBackupShareAssociateContact: [],
+      arr_ModelBackupAssociateOpenContactList: [],
+      arr_ModelAcceptOrRejectSecret: [],
       //DeepLinking Param
       deepLinkingUrl: "",
       deepLinkingUrlType: ""
@@ -223,106 +226,26 @@ export default class WalletScreen extends React.Component {
       this.setState( {
         deepLinkingUrl: urlScript,
         deepLinkingUrlType: urlType,
-        arr_ModelAcceptSecret: [
+        arr_ModelBackupShareAssociateContact: [
           {
             modalVisible: true,
-            name: urlScript.wn,
-            mobileNo: "1234",
-            encpShare: urlScript.encpShare
+            walletName: urlScript.wn
           }
         ]
       } )
     }
+
+    // arr_ModelAcceptOrRejectSecret: [
+    //   {
+    //     modalVisible: true,
+    //     name: urlScript.wn,
+    //     mobileNo: "1234",
+    //     encpShare: urlScript.encpShare
+    //   }
+    // ]
   }
 
-  //TODO: Qrcode Scan SSS Details Download Desc Sahre
-  downloadDescShare = async () => {
-    this.setState( {
-      flag_Loading: true
-    } );
-    const dateTime = Date.now();
-    const fulldate = Math.floor( dateTime / 1000 );
-    let urlScript = utils.getDeepLinkingUrl();
-    console.log( { urlScript } );
-    let urlScriptData = urlScript.data;
-    console.log( { urlScriptData } );
-    let userDetail = {};
-    userDetail.name = urlScript.wn;
-    userDetail.mobileNo = "1234";
-    userDetail.walletId = urlScriptData.meta.walletId;
-    // console.log( { userDetail } );
-    let walletDetails = utils.getWalletDetails();
-    const sss = new S3Service(
-      walletDetails.mnemonic
-    );
-    let resShareId = await sss.getShareId( urlScriptData.encryptedShare )
-    //console.log( { resShareId } );
-    const { data, updated } = await sss.updateHealth( urlScriptData.meta.walletId, urlScriptData.encryptedShare );
-    if ( updated ) {
-      const resTrustedParty = await dbOpration.insertTrustedPartyDetails(
-        localDB.tableName.tblTrustedPartySSSDetails,
-        fulldate,
-        userDetail,
-        urlScriptData.encryptedShare,
-        resShareId,
-        urlScriptData,
-        typeof data !== "undefined" ? data : ""
-      );
-      console.log( { resTrustedParty } );
-      this.setState( {
-        flag_Loading: false,
-        arr_ModelAcceptSecret: [
-          {
-            modalVisible: false,
-            name: "",
-            mobileNo: "",
-            encpShare: ""
-          }
-        ]
-      } )
-      if ( resTrustedParty == true ) {
-        setTimeout( () => {
-          Alert.alert(
-            'Success',
-            'Decrypted share created.',
-            [
-              {
-                text: 'OK', onPress: () => {
-                  utils.setDeepLinkingType( "" );
-                  utils.setDeepLinkingUrl( "" );
-                  this.connnection_FetchData();
-                }
-              },
 
-            ],
-            { cancelable: false }
-          )
-        }, 100 );
-      } else {
-        setTimeout( () => {
-          Alert.alert(
-            'OH',
-            resTrustedParty,
-            [
-              {
-                text: 'OK', onPress: () => {
-                  utils.setDeepLinkingType( "" );
-                  utils.setDeepLinkingUrl( "" );
-                  this.connnection_FetchData();
-                }
-              },
-            ],
-            { cancelable: false }
-          )
-        }, 100 );
-      }
-    } else {
-      this.setState( {
-        flag_Loading: false
-      } )
-      Alert.alert( "updateHealth func not working." )
-    }
-  }
 
   render() {
     let flag_cardScrolling = this.state.flag_cardScrolling;
@@ -565,53 +488,64 @@ export default class WalletScreen extends React.Component {
             } )
           } }
         />
-        <ModelAcceptSecret
-          data={ this.state.arr_ModelAcceptSecret }
+
+        <ModelBackupShareAssociateContact data={ this.state.arr_ModelBackupShareAssociateContact }
+          click_AssociateContact={ ( walletName: string ) => {
+            Permissions.request( 'contacts' ).then( ( response: any ) => {
+              console.log( response );
+            } );
+            this.setState( {
+              arr_ModelBackupShareAssociateContact: [
+                {
+                  modalVisible: false,
+                  walletName: "",
+                }
+              ],
+              arr_ModelBackupAssociateOpenContactList: [
+                {
+                  modalVisible: true,
+                  walletName: walletName,
+                }
+              ]
+            } )
+          } }
           closeModal={ () => {
             utils.setDeepLinkingType( "" );
             utils.setDeepLinkingUrl( "" );
             this.setState( {
-              arr_ModelAcceptSecret: [
+              arr_ModelBackupShareAssociateContact: [
                 {
                   modalVisible: false,
-                  name: "",
-                  mobileNo: "",
-                  encpShare: ""
+                  walletName: "",
                 }
               ]
             } )
           } }
-          click_RejectSecret={ () => {
+        />
+
+        <ModelBackupAssociateOpenContactList data={ this.state.arr_ModelBackupAssociateOpenContactList }
+          click_OpenContact={ () => {
+            this.setState( {
+              arr_ModelBackupAssociateOpenContactList: [
+                {
+                  modalVisible: false,
+                  walletName: "",
+                }
+              ]
+            } );
+            this.props.navigation.push( "BackupTrustedPartrySecretNavigator" )
+          } }
+          closeModal={ () => {
             utils.setDeepLinkingType( "" );
             utils.setDeepLinkingUrl( "" );
             this.setState( {
-              arr_ModelAcceptSecret: [
+              arr_ModelBackupAssociateOpenContactList: [
                 {
                   modalVisible: false,
-                  name: "",
-                  mobileNo: "",
-                  encpShare: ""
+                  walletName: "",
                 }
               ]
             } )
-          } }
-          click_AcceptSecret={ () => {
-            utils.setDeepLinkingType( "" );
-            this.setState( {
-              arr_ModelAcceptSecret: [
-                {
-                  modalVisible: false,
-                  name: "",
-                  mobileNo: "",
-                  encpShare: ""
-                }
-              ]
-            } )
-            if ( this.state.deepLinkingUrlType == "SSS Recovery Sms/Email" ) {
-              this.props.navigation.push( "TrustedContactAcceptNavigator", { data: this.state.deepLinkingUrl } )
-            } else {
-              this.downloadDescShare();
-            }
           } }
         />
         <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />

@@ -8,13 +8,24 @@ import { Avatar } from 'react-native-elements';
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
-export default class ModelAcceptSecret extends Component {
+
+
+//TODO: Custome Object
+var utils = require( "HexaWallet/src/app/constants/Utils" );
+
+interface Props {
+    data: [];
+    closeModal: Function;
+    click_AssociateContact: Function;
+}
+
+export default class ModelBackupShareAssociateContact extends Component<Props, any> {
     render() {
-        let name = this.props.data.length != 0 ? this.props.data[ 0 ].name : "temp"
+        let walletName = this.props.data.length != 0 ? this.props.data[ 0 ].walletName : "Hexa Wallet"
         return (
             <Modal
                 transparent
-                animationType={ 'none' }
+                animationType={ 'fade' }
                 visible={ this.props.data.length != 0 ? this.props.data[ 0 ].modalVisible : false }
                 onRequestClose={ () =>
                     this.props.closeModal()
@@ -26,30 +37,21 @@ export default class ModelAcceptSecret extends Component {
                 ] }>
                     <View style={ styles.viewModelBody }>
                         <View style={ { flexDirection: "row", flex: 0.5 } }>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>{ name } has selected you as his trusted contact</Text>
+                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Secret Accepted</Text>
                             <Button light iconLeft style={ { width: 40, height: 40, borderRadius: 20 } } onPress={ () => this.props.closeModal() }>
                                 <Icon name='close' style={ { alignSelf: "center" } } />
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
                             <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Some information about the importance secret keeping</Text>
-                            <Avatar medium rounded title={ name.charAt( 0 ) } />
-                            <Text style={ globalStyle.ffFiraSansMedium }>{ name }</Text>
+                            <Avatar medium rounded title={ walletName.charAt( 0 ) } />
+                            <Text style={ globalStyle.ffFiraSansMedium }>{ walletName }</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>You will need to open the Hexa application on your device once in two weeks to make sure the secret is still accessible</Text>
-                            <Button
-                                onPress={ () => this.props.click_RejectSecret() }
-                                style={ [ globalStyle.ffFiraSansSemiBold, {
-                                    backgroundColor: "#838383", borderRadius: 10, margin: 5,
-                                    height: 50,
-                                } ] }
-                                full>
-                                <Text>Reject Secret</Text>
-                            </Button>
                             <FullLinearGradientButton
-                                click_Done={ () => this.props.click_AcceptSecret() }
-                                title="Accept Secret"
+                                click_Done={ () => this.props.click_AssociateContact( walletName ) }
+                                title="Associate Contact"
                                 disabled={ false }
                                 style={ [ { borderRadius: 10 } ] } />
                         </View>
@@ -66,7 +68,7 @@ const styles = StyleSheet.create( {
         justifyContent: 'center'
     },
     viewModelBody: {
-        flex: 0.7,
+        flex: utils.getIphoneSize() == "iphone X" ? 0.7 : 0.6,
         margin: 20,
         padding: 10,
         borderRadius: 10,
