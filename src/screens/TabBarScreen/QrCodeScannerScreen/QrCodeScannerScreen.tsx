@@ -102,9 +102,8 @@ export default class QrCodeScannerScreen extends React.Component {
                 utils.setDeepLinkingType( "SSS Recovery QR" );
                 let deepLinkPara = {};
                 deepLinkPara.wn = result.wn;
-                deepLinkPara.m = "1234";
                 deepLinkPara.data = result.data;
-                console.log( { deepLinkPara } );
+                //console.log( { deepLinkPara } );
                 utils.setDeepLinkingUrl( deepLinkPara );
                 this.props.navigation.navigate( 'WalletScreen' );
             }
