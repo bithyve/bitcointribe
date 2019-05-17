@@ -39,6 +39,8 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
 
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
@@ -50,6 +52,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
         super( props )
         this.state = ( {
             data: [],
+            arr_Histroy: []
         } )
     }
 
@@ -71,13 +74,24 @@ export default class SecretSharingScreen extends React.Component<any, any> {
 
     connection_Load = async () => {
         const resultWallet = await utils.getWalletDetails();
-        const resSSSDetails = await utils.getSSSDetails();
+        const resSSSDetails = await comFunDBRead.readTblSSSDetails();
         console.log( { resSSSDetails } );
-
         let encrShares = [];
+        let history = [];
         for ( let i = 0; i < resSSSDetails.length; i++ ) {
             encrShares.push( resSSSDetails[ i ].share )
+            history.push( JSON.parse( resSSSDetails[ i ].history ) )
         }
+        //for history get opt
+        let tempOpt = [];
+        for ( let i = 0; i < history.length; i++ ) {
+            let eachHistory = history[ i ];
+            let eachHistoryLength = eachHistory.length;
+            let otp = eachHistory[ eachHistoryLength - 1 ].otp;
+            tempOpt.push( otp )
+        }
+
+
         let updateShareIdStatus = await comAppHealth.connection_AppHealthStatus( parseInt( resultWallet.lastUpdated ), 0, encrShares, resultWallet.mnemonic );
         console.log( { updateShareIdStatus } );
         if ( updateShareIdStatus ) {
@@ -112,6 +126,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                     jsondata.statusMsg = "Shared";
                     jsondata.statusMsgColor = "#C07710";
                     jsondata.flag_timer = true;
+                    jsondata.opt = tempOpt[ i ];
                 } else if ( totalSec >= 540 && data[ i ].shareStage == "Ugly" ) {
                     jsondata.statusMsg = "Shared OTP expired.";
                     jsondata.statusMsgColor = "#C07710";
@@ -140,9 +155,9 @@ export default class SecretSharingScreen extends React.Component<any, any> {
             this.setState( {
                 data: temp
             } );
-            setInterval( () => {
-                this.connection_Load()
-            }, 10000 );
+            // setInterval( () => {
+            //     this.connection_Load()
+            // }, 10000 );
         } else {
             Alert.alert( "ShareId status not changed." )
         }
@@ -164,12 +179,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                             <Button
                                 transparent
                                 onPress={ () => {
-                                    let resSSSDetails = utils.getSSSDetails();
-                                    if ( resSSSDetails[ 0 ].keeperInfo != "" ) {
-                                        this.props.navigation.pop();
-                                    } else {
-                                        this.props.navigation.navigate( "TabbarBottom" );
-                                    }
+                                    this.props.navigation.navigate( "TabbarBottom" );
                                 } }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
@@ -223,6 +233,9 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                                                             />
                                                         ) }
                                                     </View>
+                                                    { renderIf( typeof item.opt !== "undefined" )(
+                                                        <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>OTP { " " }{ item.opt }</Text>
+                                                    ) }
                                                 </View>
                                                 <View style={ {
                                                     flex: 1,

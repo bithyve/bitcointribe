@@ -48,7 +48,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             localDB.tableName.tblTrustedPartySSSDetails
         );
         resSharedSecretList = resSharedSecretList.temp;
-        console.log( { resSharedSecretList } );
+        // console.log( { resSharedSecretList } );
         let temp = [];
         for ( let i = 0; i < resSharedSecretList.length; i++ ) {
             let data = {};
@@ -59,8 +59,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             data.m = "+91 9876543210"
             temp.push( data );
         }
-        console.log( { temp } );
-
+        // console.log( { temp } );
         this.setState( {
             data: temp,
             arr_OrignalDetails: temp
@@ -93,6 +92,44 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
 
 
     render() {
+        let data = this.state.data;
+        let secretList;
+        const list = <FlatList
+            data={
+                data
+            }
+            showsVerticalScrollIndicator={ false }
+            renderItem={ ( { item } ) => (
+                <TouchableOpacity style={ {
+                } } onPress={ () => {
+                    this.press( item )
+                } }>
+                    <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
+                        <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
+                            <View style={ { alignItems: "center", justifyContent: "center" } }>
+                                <Avatar style={ { alignSelf: "center" } } medium rounded title={ item.name.charAt( 0 ) } />
+                            </View>
+                            <View style={ { flexDirection: "column" } }>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10 } ] }>{ item.name }</Text>
+                                <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.m }</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.walletName }</Text>
+                            </View>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+            ) }
+            keyExtractor={ item => item.recordID }
+            extraData={ this.state }
+        />
+        let errorMsg = <View style={ { flex: 1, alignItems: "center", justifyContent: "center" } } >
+            <IconFontAwe name="emoticon-sad-outline" size={ 40 } color="gray" />
+            <Text > No Secret Share recoard found! </Text>
+        </View>
+        if ( data.length > 0 ) {
+            secretList = list
+        } else {
+            secretList = errorMsg
+        }
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
@@ -104,7 +141,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                                 onPress={ () => this.props.navigation.pop() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 22 : 17, marginLeft: 0 } ] }>Contacts that have shared secrets</Text>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 20 : 17, marginLeft: 0 } ] }>Contacts that have shared secrets</Text>
                             </Button>
                         </View>
                         <KeyboardAwareScrollView
@@ -122,36 +159,10 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                                             autoCorrect={ false } />
                                     </Item>
                                 </View>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20 } ] }>Send trusted friends wallets details.</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20, textAlign: "center" } ] }>Send trusted friends wallets details.</Text>
                             </View>
                             <View style={ { flex: 1 } }>
-                                <FlatList
-                                    data={
-                                        this.state.data
-                                    }
-                                    showsVerticalScrollIndicator={ false }
-                                    renderItem={ ( { item } ) => (
-                                        <TouchableOpacity style={ {
-                                        } } onPress={ () => {
-                                            this.press( item )
-                                        } }>
-                                            <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
-                                                <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                                    <View style={ { alignItems: "center", justifyContent: "center" } }>
-                                                        <Avatar style={ { alignSelf: "center" } } medium rounded title={ item.name.charAt( 0 ) } />
-                                                    </View>
-                                                    <View style={ { flexDirection: "column" } }>
-                                                        <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10 } ] }>{ item.name }</Text>
-                                                        <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.m }</Text>
-                                                        <Text note style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.walletName }</Text>
-                                                    </View>
-                                                </View>
-                                            </View>
-                                        </TouchableOpacity>
-                                    ) }
-                                    keyExtractor={ item => item.recordID }
-                                    extraData={ this.state }
-                                />
+                                { secretList }
                             </View>
                         </KeyboardAwareScrollView>
                     </ImageBackground>

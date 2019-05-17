@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Image } from 'react-native';
+import { Modal, TouchableHighlight, View, Alert, StyleSheet } from 'react-native';
 import { Button, Icon, Text, Textarea, Form } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import { SvgIcon } from "@up-shared/components";
@@ -8,20 +8,16 @@ import { SvgIcon } from "@up-shared/components";
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Custome Object
-import {
-    images
-} from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 interface Props {
     data: [];
     closeModal: Function;
     click_Confirm: Function;
-    click_RestoreSecureAccount: Function;
-    click_Skip: Function;
+    pop: Function;
 }
 
-export default class ModelWalletSuccessfullyRestored extends Component<Props, any> {
+export default class ModelWalletName extends Component<Props, any> {
 
     constructor ( props: any ) {
         super( props );
@@ -61,43 +57,54 @@ export default class ModelWalletSuccessfullyRestored extends Component<Props, an
                     { backgroundColor: `rgba(0,0,0,0.4)` }
                 ] }>
                     <View style={ styles.viewModelBody }>
+
                         <View style={ { flexDirection: "row", flex: 0.6 } }>
+                            <Button
+                                transparent
+                                onPress={ () => this.props.pop() }
+                            >
+                                <SvgIcon name="icon_back" size={ 25 } color="gray" />
+                            </Button>
                             <Text style={ [ globalStyle.ffFiraSansMedium, {
                                 fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
                                 marginLeft: 20, marginRight: 20
-                            } ] }>Wallet Successfully Restored</Text>
+                            } ] }>Restore Wallet using Trusted Contacts</Text>
                         </View>
-                        <View style={ { flex: 2, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Image style={ styles.imgAppLogo } source={ images.WalletRestoreUsingPassphrase.walletrestored } />
-
+                        <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Please put in the name that you used while setting up your Hexa Wallet</Text>
                         </View>
-                        <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-end" } }>
-                            <Text note style={ styles.txtNotes }>Your Wallet has been recovered successfully</Text>
-                            <Text note>Arpan’s Daily Wallet</Text>
-                            <View style={ { flexDirection: "row", justifyContent: "center", alignItems: "center", margin: 10 } }>
-                                <SvgIcon name="icon_dollar" color="#D0D0D0" size={ 20 } />
-                                <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
-                                    { data.length != 0 ? data[ 0 ].bal : 0 }
-                                </Text>
-                            </View>
-                            <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Restore your secure account now You can opt to do it later</Text>
+                        <View
+                            style={ {
+                                flex: 1,
+                            } }
+                        >
+                            <Textarea
+                                style={ [ globalStyle.ffFiraSansMedium, { borderRadius: 8, justifyContent: "center" } ] }
+                                rowSpan={ 3 }
+                                bordered
+                                value={ this.state.walletName }
+                                placeholder="Enter the name of the wallet"
+                                placeholderTextColor="#B7B7B7"
+                                keyboardType="default"
+                                autoCapitalize='sentences'
+                                onChangeText={ ( val ) => {
+                                    this.setState( {
+                                        walletName: val
+                                    } )
+                                    this.ckeckWalletName( val )
+                                } }
+                            />
+                        </View>
+                        <View style={ { flex: 0.5, alignItems: "center", justifyContent: "flex-end" } }>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>In case you do not remember the name , please enter a name of your choice.</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <FullLinearGradientButton
-                                click_Done={ () => this.props.click_RestoreSecureAccount() }
-                                title="Restore Secure Account"
-                                disabled={ false }
-                                style={ [ { opacity: 1 }, { borderRadius: 10 } ] }
+                                click_Done={ () => this.props.click_Confirm( this.state.walletName ) }
+                                title="Next"
+                                disabled={ flag_DisableBtnNext }
+                                style={ [ flag_DisableBtnNext == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
                             />
-                            <Button
-                                onPress={ () => this.props.click_Skip() }
-                                style={ [ globalStyle.ffFiraSansSemiBold, {
-                                    backgroundColor: "#838383", borderRadius: 10, margin: 5,
-                                    height: 50,
-                                } ] }
-                                full>
-                                <Text>Skip</Text>
-                            </Button>
                         </View>
                     </View>
                 </View>
@@ -112,15 +119,8 @@ const styles = StyleSheet.create( {
         justifyContent: 'center',
 
     },
-    imgAppLogo: {
-        width: 150,
-        height: 170
-    },
-    txtNotes: {
-        margin: 20
-    },
     viewModelBody: {
-        flex: utils.getIphoneSize() == "iphone X" ? 0.7 : 0.9,
+        flex: utils.getIphoneSize() == "iphone X" ? 0.6 : 0.8,
         margin: 20,
         padding: 10,
         borderRadius: 10,

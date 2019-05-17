@@ -1,7 +1,4 @@
-import Contacts from 'react-native-contacts';
 import {
-    colors,
-    images,
     localDB
 } from "HexaWallet/src/app/constants/Constants";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );

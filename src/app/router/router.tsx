@@ -1,5 +1,6 @@
 import React from "react";
 import { colors, images } from "../constants/Constants";
+import utils from "HexaWallet/src/app/constants/Utils";
 import {
   createStackNavigator,
   createDrawerNavigator,
@@ -7,6 +8,8 @@ import {
 } from "react-navigation";
 import { StyleSheet, Platform } from "react-native";
 import { SvgIcon } from "@up-shared/components";
+
+
 
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
@@ -17,7 +20,13 @@ import PasscodeScreen from "HexaWallet/src/screens/PasscodeScreen/PasscodeScreen
 import PasscodeConfirmScreen from "HexaWallet/src/screens/PasscodeScreen/PasscodeConfirmScreen";
 import RestoreAndReoverWalletScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/RestoreAndReoverWalletScreen/RestoreAndReoverWalletScreen";
 
-import WalletUsingPassphraseScrren from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingMnemonicScreen/WalletUsingPassphraseScrren/WalletUsingPassphraseScrren";
+import RestoreWalletUsingMnemonicScrren from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingMnemonicScreen/RestoreWalletUsingMnemonicScrren";
+
+import RestoreWalletUsingTrustedContactScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreWalletUsingTrustedContactScreen";
+import RestoreAllContactListScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreAllContactListScreen";
+import RestoreSelectedContactsListScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreSelectedContactsListScreen";
+
+
 import WalletSetupScreens from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/WalletSetupScreens/WalletSetupScreens";
 import PermissionScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/PermissionScreen/PermissionScreen";
 
@@ -68,13 +77,20 @@ import QrCodeScannerScreen from "HexaWallet/src/screens/TabBarScreen/QrCodeScann
 import WalletScreen from "HexaWallet/src/screens/TabBarScreen/WalletScreen/WalletScreen";
 
 //TODO: Backup your Walleet Screen
-import AllContactListScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/AllContactListScreen/AllContactListScreen";
-import SecretSharingScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/SecretSharingScreen/SecretSharingScreen";
-import TrustedContactScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactScreen/TrustedContactScreen";
-import ShareSecretViaQRScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/ShareSecretViaQRScreen/ShareSecretViaQRScreen";
-import TrustedContactAcceptOtpScreen from "../../screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactAcceptOtpScreen/TrustedContactAcceptOtpScreen";
+import AllContactListScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/AllContactListScreen/AllContactListScreen";
+import SecretSharingScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/SecretSharingScreen/SecretSharingScreen";
+import TrustedContactScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactScreen/TrustedContactScreen";
+import ShareSecretViaQRScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/ShareSecretViaQRScreen/ShareSecretViaQRScreen";
+import TrustedContactAcceptOtpScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactAcceptOtpScreen/TrustedContactAcceptOtpScreen";
 
 
+
+
+
+
+
+//TODO: Common Screen  
+import QRCodeScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/QRCodeScreen";
 
 
 
@@ -98,15 +114,70 @@ const OnBoardingStackNavigator = createStackNavigator(
 
 const RestoreWalletUsingMnemonicStackNavigator = createStackNavigator(
   {
-    WalletUsingPassphraseScrren: {
-      screen: WalletUsingPassphraseScrren,
+    RestoreWalletUsingMnemonicScrren: {
+      screen: RestoreWalletUsingMnemonicScrren,
       navigationOptions: { header: null }
     }
   },
   {
-    initialRouteName: "WalletUsingPassphraseScrren"
+    initialRouteName: "RestoreWalletUsingMnemonicScrren"
   }
 );
+
+
+const RestoreWalletUsingTrustedContactStackNavigator = createStackNavigator(
+  {
+    RestoreWalletUsingTrustedContactScreen: {
+      screen: RestoreWalletUsingTrustedContactScreen,
+      navigationOptions: { header: null }
+    },
+    RestoreAllContactListScreen: {
+      screen: RestoreAllContactListScreen,
+      navigationOptions: { header: null }
+    },
+    RestoreSelectedContactsListScreen: {
+      screen: RestoreSelectedContactsListScreen,
+      navigationOptions: { header: null }
+    },
+    QRCodeScreen: {
+      screen: QRCodeScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+
+    initialRouteName: "RestoreWalletUsingTrustedContactScreen"
+  }
+);
+
+
+
+const RestoreWalletUsingTrustedContactStackNavigator1 = createStackNavigator(
+
+  {
+    RestoreWalletUsingTrustedContactScreen: {
+      screen: RestoreWalletUsingTrustedContactScreen,
+      navigationOptions: { header: null }
+    },
+    RestoreAllContactListScreen: {
+      screen: RestoreAllContactListScreen,
+      navigationOptions: { header: null }
+    },
+    RestoreSelectedContactsListScreen: {
+      screen: RestoreSelectedContactsListScreen,
+      navigationOptions: { header: null }
+    },
+    QRCodeScreen: {
+      screen: QRCodeScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "RestoreSelectedContactsListScreen"
+  }
+);
+
+
 
 const RestoreAndWalletSetupStackNavigator = createStackNavigator(
   {
@@ -124,7 +195,7 @@ const RestoreAndWalletSetupStackNavigator = createStackNavigator(
   }
 );
 
-const SettingsStackNavigator = createStackNavigator(
+const TrustedPartyShareSecretStackNavigator = createStackNavigator(
   {
     ContactSharedSecretList: {
       screen: ContactSharedSecretList,
@@ -138,9 +209,6 @@ const SettingsStackNavigator = createStackNavigator(
     initialRouteName: "ContactSharedSecretList"
   }
 );
-
-
-
 
 //TODO: StackNavigator: JointAccountStackRouter
 // const JointAccountStackRouter = createStackNavigator(
@@ -224,7 +292,6 @@ const SettingsStackNavigator = createStackNavigator(
 
 
 //TODO: FirstTimeWalletSetupStackNavigatorRouter
-
 const BackUpYourWalletStackNavigatorRouter = createStackNavigator(
   {
     AllContactListScreen: {
@@ -249,27 +316,8 @@ const BackUpYourWalletStackNavigatorRouter = createStackNavigator(
   }
 );
 
-const TrustedContactAcceptStackNavigatorRouter = createStackNavigator(
+const BackUpYourWalletSecoundTimeStackNavigatorRouter = createStackNavigator(
   {
-    TrustedContactAcceptOtpScreen: {
-      screen: TrustedContactAcceptOtpScreen,
-      navigationOptions: { header: null }
-    }
-  },
-  {
-    initialRouteName: "TrustedContactAcceptOtpScreen"
-  }
-);
-
-
-// TabNavigator StackNavigator  
-
-const WalletScreenStackNavigatorRouter = createStackNavigator(
-  {
-    WalletScreen: {
-      screen: WalletScreen,
-      navigationOptions: { header: null }
-    },
     SecretSharingScreen: {
       screen: SecretSharingScreen,
       navigationOptions: { header: null }
@@ -284,7 +332,19 @@ const WalletScreenStackNavigatorRouter = createStackNavigator(
     }
   },
   {
-    initialRouteName: "WalletScreen"
+    initialRouteName: "SecretSharingScreen"
+  }
+);
+
+const TrustedContactAcceptStackNavigatorRouter = createStackNavigator(
+  {
+    TrustedContactAcceptOtpScreen: {
+      screen: TrustedContactAcceptOtpScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "TrustedContactAcceptOtpScreen"
   }
 );
 
@@ -294,7 +354,7 @@ const WalletScreenStackNavigatorRouter = createStackNavigator(
 const TabNavigator = createBottomTabNavigator(
   {
     WalletScreen: {
-      screen: WalletScreenStackNavigatorRouter, //PaymentScreen,
+      screen: WalletScreen, //PaymentScreen,
       navigationOptions: {
         tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
         drawerLockMode: "locked-open",
@@ -409,6 +469,14 @@ export const createRootNavigator = (
         screen: RestoreWalletUsingMnemonicStackNavigator,
         navigationOptions: { header: null }
       },
+      RestoreWalletUsingTrustedContactNavigator: {
+        screen: RestoreWalletUsingTrustedContactStackNavigator,
+        navigationOptions: { header: null }
+      },
+      RestoreWalletUsingTrustedContactNavigator1: {
+        screen: RestoreWalletUsingTrustedContactStackNavigator1,
+        navigationOptions: { header: null }
+      },
       PermissionNavigator: {
         screen: PermissionScreen,
         navigationOptions: { header: null }
@@ -421,12 +489,17 @@ export const createRootNavigator = (
         screen: BackUpYourWalletStackNavigatorRouter,
         navigationOptions: { header: null }
       },
+      BackUpYourWalletSecoundTimeNavigator: {
+        screen: BackUpYourWalletSecoundTimeStackNavigatorRouter,
+        navigationOptions: { header: null }
+      },
       TrustedContactAcceptNavigator: {
         screen: TrustedContactAcceptStackNavigatorRouter,
         navigationOptions: { header: null }
       },
-      SettingsContactSharedSecretListNavigator: {
-        screen: SettingsStackNavigator,
+      //also use deepling url navigaton
+      TrustedPartyShareSecretNavigator: {
+        screen: TrustedPartyShareSecretStackNavigator,
         navigationOptions: { header: null }
       }
 

@@ -23,7 +23,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Contacts from 'react-native-contacts';
 import { Avatar } from 'react-native-elements';
 import SendSMS from 'react-native-sms';
-import TimerCountdown from "react-native-timer-countdown";
+import Permissions from 'react-native-permissions'
 
 
 //import Mailer from 'react-native-mail';
@@ -100,6 +100,14 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         } )
     }
 
+    componentDidMount() {
+        if ( Platform.OS == "android" ) {
+            Permissions.request( 'readSms' ).then( ( response: any ) => {
+                console.log( response );
+            } );
+        }
+    }
+
     load_data = async () => {
         this.setState( {
             flag_Loading: true,
@@ -147,7 +155,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         console.log( { encpScript } );
         if ( reg.test( item.value ) == false ) {
             SendSMS.send( {
-                body: 'https://prime-sign-230407.appspot.com/sss/TB/' + encpScript,
+                body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
                 recipients: [ item.value ],
                 successTypes: [ 'sent', 'queued' ]
             }, ( completed, cancelled, error ) => {
@@ -179,7 +187,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Recovery ID',
                     recipients: [ item.value ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/TB/' + encpScript,
+                    body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
                     isHTML: true,
                 }, ( error, event ) => {
                     if ( event == "sent" ) {
@@ -200,9 +208,9 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                 }, 1000 );
             } else {
                 Mailer.mail( {
-                    subject: 'Hexa Wallet SSS Recovery ID',
+                    subject: 'Hexa Wallet SSS Backup',
                     recipients: [ item.value ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/TB/' + encpScript,
+                    body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
                     isHTML: true,
                 }, ( error, event ) => {
                     if ( event == "sent" ) {
@@ -240,6 +248,9 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         state_data.statusMsg = "Shared";
         let temp = history;
         let jsondata = {};
+        if ( type != "QR" ) {
+            jsondata.otp = this.state.otpCode
+        }
         jsondata.title = "Secret Share using " + type.toLowerCase();;
         jsondata.date = utils.getUnixToDateFormat( fulldate );
         temp.push( jsondata );
