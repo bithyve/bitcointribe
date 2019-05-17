@@ -134,14 +134,12 @@ export default class TrustedContactScreen extends React.Component<any, any> {
     componentWillUnmount() {
         AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
     }
-
     //TODO: click on model confirm button 
     click_SentURLSmsOrEmail( item: any ) {
         AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
         var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
         let data = this.props.navigation.getParam( "data" );
         let script = {};
-        script.m = data.phoneNumbers[ 0 ].number;
         script.mi = this.state.messageId;
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );

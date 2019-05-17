@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, AsyncStorage } from "react-native";
 import {
     Container,
     Header,
@@ -11,9 +11,8 @@ import {
     Left,
     Right,
     Body,
-    Text,
-    Tab, Tabs, TabHeading,
-    Segment
+    Text
+
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
 import { StackActions, NavigationActions } from "react-navigation";
@@ -32,8 +31,8 @@ import WalletNameScreen from "./WalletNameScreen/WalletNameScreen";
 import FirstSecretQuestionScreen from "./FirstSecretQuestionScreen/FirstSecretQuestionScreen";
 import SecondSecretQuestion from "./SecondSecretQuestion/SecondSecretQuestion";
 
-//TODO: Custome Object
-import { colors, images } from "HexaWallet/src/app/constants/Constants";
+//TODO: Custome Object  
+import { colors, images, asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
 
 export default class WalletSetupScreens extends React.Component<any, any> {
 
@@ -43,9 +42,13 @@ export default class WalletSetupScreens extends React.Component<any, any> {
             index: 0, // <-- currect active route from actions array
             key: null,
             actions: [
-                NavigationActions.navigate( { routeName: "PermissionNavigator" } )
+                NavigationActions.navigate( { routeName: "TabbarBottom" } )
             ]
         } );
+        AsyncStorage.setItem(
+            asyncStorageKeys.rootViewController,
+            "TabbarBottom"
+        );
         this.props.navigation.dispatch( resetAction );
     }
     render() {

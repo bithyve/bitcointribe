@@ -12,7 +12,7 @@ import {
   Easing
 } from "react-native";
 
-import { colors, images } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 
 //localization
@@ -23,6 +23,7 @@ interface Props {
   onComplited: Function;
 }
 
+
 export default class LaunchScreen extends Component<Props, any> {
   constructor ( props: any ) {
     super( props );
@@ -30,19 +31,24 @@ export default class LaunchScreen extends Component<Props, any> {
       centerLogo: null,
       centerLogoOpticy: new Animated.Value( 0 )
     } )
-
   }
 
-  async componentDidMount() {
+  componentDidMount = async () => {
     let commonData = Singleton.getInstance();
-    let value = await AsyncStorage.getItem( "PasscodeCreateStatus" );
+    let value = await AsyncStorage.getItem( asyncStorageKeys.flag_PasscodeCreate );
+    let rootViewController = await AsyncStorage.getItem( asyncStorageKeys.rootViewController );
+    console.log( { value, rootViewController } );
     let status = JSON.parse( value );
     const credentials = await Keychain.getGenericPassword();
     commonData.setPasscode( credentials.password );
     setTimeout( () => {
-      if ( status ) {
+      if ( rootViewController == "PasscodeConfirmScreen" ) {
+        this.props.onComplited( false, rootViewController );
+      }
+      else if ( status ) {
         this.props.onComplited( false, "PasscodeScreen" );
-      } else {
+      }
+      else {
         this.props.onComplited( false, "OnBoardingNavigator" );
       }
     }, 3000 );
@@ -60,6 +66,7 @@ export default class LaunchScreen extends Component<Props, any> {
       this.setState( { centerLogo: images.LaunchScreen.hexaLogo } )
     }, 2000 );
   }
+
 
   render() {
     const animatedOpcity = { opacity: this.state.centerLogoOpticy }
@@ -82,6 +89,7 @@ export default class LaunchScreen extends Component<Props, any> {
     );
   }
 }
+
 
 const styles = StyleSheet.create( {
   container: {

@@ -8,7 +8,6 @@ class Config {
   public BITCOIN_NODE: Client;
   public WALLET_XPUB_PATH: string = config.BIT_WALLET_XPUB_PATH;
   public DERIVATION_BRANCH: string = config.BIT_DERIVATION_BRANCH;
-  public HEALTH_CHECK_TIME: string = config.BIT_HEALTH_CHECK_TIME;
   public TOKEN: string = config.BIT_BLOCKCYPHER_API_URLS_TOKEN;
   public SSS_OTP_LENGTH: string = config.BIT_SSS_OTP_LENGTH;
   public SSS_TOTAL: number = parseInt( config.BIT_SSS_TOTAL, 10 );
@@ -19,14 +18,38 @@ class Config {
     PROD: config.BIT_API_URLS_BH_SERVER_PROD,
   };
 
+  public HEALTH_STATUS = {
+    HEXA_HEALTH: {
+      STAGE1: config.BIT_HEXA_HEALTH_STAGE1,
+      STAGE2: config.BIT_HEXA_HEALTH_STAGE2,
+      STAGE3: config.BIT_HEXA_HEALTH_STAGE3,
+      STAGE4: config.BIT_HEXA_HEALTH_STAGE4,
+      STAGE5: config.BIT_HEXA_HEALTH_STAGE5,
+    },
+
+    ENTITY_HEALTH: {
+      STAGE1: config.BIT_ENTITY_HEALTH_STAGE1,
+      STAGE2: config.BIT_ENTITY_HEALTH_STAGE2,
+      STAGE3: config.BIT_ENTITY_HEALTH_STAGE3,
+    },
+
+    TIME_SLOTS: {
+      SHARE_SLOT1: parseInt( config.BIT_SHARE_HEALTH_TIME_SLOT1, 10 ),
+      SHARE_SLOT2: parseInt( config.BIT_SHARE_HEALTH_TIME_SLOT2, 10 ),
+      MNEMONIC_SLOT: parseInt( config.BIT_MNEMONIC_HEALTH_TIME_SLOT, 10 ),
+    },
+  };
+
   public ESPLORA_API_ENDPOINTS = {
     TESTNET: {
       MULTIBALANCE: config.BIT_ESPLORA_TESTNET_MULTIBALANCE,
       MULTIUTXO: config.BIT_ESPLORA_TESTNET_MULTIUTXO,
+      MULTITXN: config.BIT_ESPLORA_TESTNET_MULTITXN,
     },
     MAINNET: {
       MULTIBALANCE: config.BIT_ESPLORA_MAINNET_MULTIBALANCE,
       MULTIUTXO: config.BIT_ESPLORA_MAINNET_MULTIUTXO,
+      MULTITXN: config.BIT_ESPLORA_MAINNET_MULTITXN,
     },
   };
 

@@ -15,6 +15,7 @@ import { StackActions, NavigationActions } from "react-navigation";
 import CodeInput from "react-native-confirmation-code-input";
 import * as Keychain from "react-native-keychain";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import bip39 from 'react-native-bip39'
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
@@ -29,16 +30,15 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 import {
   colors,
   localDB,
-  images
+  images,
+  asyncStorageKeys
 } from "HexaWallet/src/app/constants/Constants";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 
-//TODO: Bitcoin Files
-
-
+//TODO: Bitcoin Files   
 //TODO: Local Varible    
 let isNetwork: Boolean;
 
@@ -111,15 +111,38 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
 
   saveData = async () => {
     try {
+      const dateTime = Date.now();
+      const fulldate = Math.floor( dateTime / 1000 );
       let code = this.state.pincode;
       let commonData = Singleton.getInstance();
       commonData.setPasscode( code );
       const username = "HexaWallet";
       const password = code;
+      const mnemonic = await bip39.generateMnemonic( 256 );
+      // console.log( { mnemonic } );
+      await dbOpration.insertWallet(
+        localDB.tableName.tblWallet,
+        fulldate,
+        mnemonic,
+        "",
+        "",
+        "",
+        "Primary",
+        ""
+      );
+      await dbOpration.insertCreateAccount(
+        localDB.tableName.tblAccount,
+        fulldate,
+        "",
+        "BTC",
+        "Daily Wallet",
+        "Daily Wallet",
+        ""
+      );
       // Store the credentials
       await Keychain.setGenericPassword( username, password );
       AsyncStorage.setItem(
-        "PasscodeCreateStatus",
+        asyncStorageKeys.flag_PasscodeCreate,
         JSON.stringify( true )
       );
       const resetAction = StackActions.reset( {
@@ -129,6 +152,10 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
           NavigationActions.navigate( { routeName: "RestoreAndWalletSetupNavigator" } )
         ]
       } );
+      AsyncStorage.setItem(
+        asyncStorageKeys.rootViewController,
+        "RestoreAndWalletSetupNavigator"
+      );
       this.props.navigation.dispatch( resetAction );
     } catch ( e ) {
       console.log( { e } );
