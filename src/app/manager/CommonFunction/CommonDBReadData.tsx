@@ -8,6 +8,8 @@ const readTblWallet = async () => {
     var resultWallet = await dbOpration.readTablesData(
         localDB.tableName.tblWallet
     );
+    console.log( { resultWallet } );
+
     resultWallet = resultWallet.temp[ 0 ];
     //console.log( { resultWallet } );
     await utils.setWalletDetails( resultWallet );
@@ -32,8 +34,20 @@ const readTblSSSDetails = async () => {
     return resSSSDetails;
 }
 
+
+const readTblTrustedPartySSSDetails = async () => {
+    var resSharedSecretList = await dbOpration.readTablesData(
+        localDB.tableName.tblTrustedPartySSSDetails
+    );
+    resSharedSecretList = resSharedSecretList.temp;
+    return resSharedSecretList;
+}
+
+
+
 module.exports = {
     readTblWallet,
     readTblAccount,
-    readTblSSSDetails
+    readTblSSSDetails,
+    readTblTrustedPartySSSDetails
 };

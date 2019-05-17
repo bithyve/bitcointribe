@@ -137,14 +137,14 @@ export default class RestoreSelectedContactsListScreen extends Component {
         script.wn = walletDetails.walletType
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );
+        this.refs.modal4.close();
         if ( type == "SMS" ) {
             SendSMS.send( {
-                body: 'https://prime-sign-230407.appspot.com/sss/rt/' + encpScript,
+                body: 'https://prime-sign-230407.appspot.com/sss/rtb/' + encpScript,
                 recipients: [ val[ 0 ].number ],
                 successTypes: [ 'sent', 'queued' ]
             }, ( completed, cancelled, error ) => {
                 if ( completed ) {
-                    this.refs.modal4.close();
                     console.log( 'SMS Sent Completed' );
                     setTimeout( () => {
                         Alert.alert(
@@ -171,12 +171,11 @@ export default class RestoreSelectedContactsListScreen extends Component {
             Mailer.mail( {
                 subject: 'Hexa Wallet SSS Restore',
                 recipients: [ val[ 0 ].email ],
-                body: 'https://prime-sign-230407.appspot.com/sss/rt/' + encpScript,
+                body: 'https://prime-sign-230407.appspot.com/sss/rtb/' + encpScript,
                 isHTML: true,
             }, ( error, event ) => {
                 console.log( { event, error } );
                 if ( event == "sent" ) {
-                    this.refs.modal4.close();
                     setTimeout( () => {
                         Alert.alert(
                             'Success',
@@ -196,7 +195,6 @@ export default class RestoreSelectedContactsListScreen extends Component {
                 }
             } );
             if ( Platform.OS == "android" ) {
-                this.refs.modal4.close();
                 setTimeout( () => {
                     Alert.alert(
                         'Success',
@@ -244,7 +242,8 @@ export default class RestoreSelectedContactsListScreen extends Component {
         let selectedItem = this.state.arr_SSSDetails[ this.state.selectedIndex ];
         //console.log( { selectedItem } );
         var temp = [];
-        temp = selectedItem.history;
+        temp = JSON.parse( selectedItem.history );
+        //console.log( { temp } );
         let jsondata = {};
         jsondata.title = "Secret Share using " + type.toLowerCase();;
         jsondata.date = utils.getUnixToDateFormat( dateTime );

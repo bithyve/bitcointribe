@@ -70,16 +70,17 @@ export default class TrustedContactAcceptOtpScreen extends Component {
             ],
             statusConfirmBtnDisable: true,
             flag_Loading: false,
+            keeperInfo: [],
             arr_ResDownShare: []
         };
     }
 
 
     async componentDidMount() {
-        let script = this.props.navigation.getParam( "data" );
+        let keeperInfo = this.props.navigation.getParam( "data" );
+        let script = utils.getDeepLinkingUrl();
         let messageId = script.mi;
         console.log( { messageId } );
-
         let walletDetails = utils.getWalletDetails();
         const sss = new S3Service(
             walletDetails.mnemonic
@@ -87,7 +88,8 @@ export default class TrustedContactAcceptOtpScreen extends Component {
         const resDownShare = await sss.downloadShare( messageId );
         console.log( { resDownShare } );
         this.setState( {
-            arr_ResDownShare: resDownShare
+            arr_ResDownShare: resDownShare,
+            keeperInfo
         } )
     }
 
@@ -104,40 +106,43 @@ export default class TrustedContactAcceptOtpScreen extends Component {
 
     onSuccess = async () => {
         const dateTime = Date.now();
-        const fulldate = Math.floor( dateTime / 1000 );
         this.setState( {
             flag_Loading: true
         } )
+        let keeperInfo = this.state.keeperInfo;
         let enterOtp = this.state.otp;
-        let script = this.props.navigation.getParam( "data" );
+        let script = utils.getDeepLinkingUrl();
         let messageId = script.mi;
         let walletDetails = utils.getWalletDetails();
         const sss = new S3Service(
             walletDetails.mnemonic
         );
-        console.log( { messageId, enterOtp } );
-        let userDetails = {};
-        userDetails.name = script.wn,
-            userDetails.mobileNo = "1234";
+        //console.log( { messageId, enterOtp } );
+        let urlScript = {};
+        urlScript.walletName = script.wn;
         let resDownShare = this.state.arr_ResDownShare;
-        console.log( { resDownShare } );
+        //console.log( { resDownShare } );
         const resDecryptOTPEncShare = await sss.decryptOTPEncShare( resDownShare, messageId, enterOtp )
-        console.log( { resDecryptOTPEncShare } );
+        //console.log( { resDecryptOTPEncShare } );
         let resShareId = await sss.getShareId( resDecryptOTPEncShare.decryptedShare.encryptedShare )
-        console.log( { resShareId } );
+        //console.log( { resShareId } );
 
         const { data, updated } = await sss.updateHealth( resDecryptOTPEncShare.decryptedShare.meta.walletId, resDecryptOTPEncShare.decryptedShare.encryptedShare );
+        // console.log( { data, updated } );
+
         if ( updated ) {
             if ( resDecryptOTPEncShare != "" || resDecryptOTPEncShare != null ) {
                 const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
                     localDB.tableName.tblTrustedPartySSSDetails,
-                    fulldate,
-                    userDetails,
+                    dateTime,
+                    keeperInfo,
+                    urlScript,
                     resDecryptOTPEncShare.decryptedShare.encryptedShare,
                     resShareId,
                     resDecryptOTPEncShare.decryptedShare,
                     typeof data !== "undefined" ? data : ""
                 );
+                //console.log( { resinsertTrustedPartyDetails } );
                 if ( resinsertTrustedPartyDetails == true ) {
                     this.setState( {
                         flag_Loading: false
@@ -151,7 +156,7 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                                     text: 'OK', onPress: () => {
                                         utils.setDeepLinkingType( "" );
                                         utils.setDeepLinkingUrl( "" );
-                                        this.props.navigation.pop()
+                                        this.props.navigation.navigate( 'WalletScreen' );
                                     }
                                 },
 
@@ -172,7 +177,7 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                                     text: 'OK', onPress: () => {
                                         utils.setDeepLinkingType( "" );
                                         utils.setDeepLinkingUrl( "" );
-                                        this.props.navigation.pop()
+                                        this.props.navigation.navigate( 'WalletScreen' );
                                     }
                                 },
                             ],

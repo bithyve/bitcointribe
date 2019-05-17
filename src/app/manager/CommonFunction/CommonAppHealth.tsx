@@ -24,18 +24,18 @@ const connection_AppHealthStatus = async ( qatime: number, satime: number, encrS
     const res = await healthStatus.appHealthStatus( qatime, satime, resCheckHealth.lastUpdateds, 0, "share" );
     console.log( { res } );
     await utils.setAppHealthStatus( res )
-    // console.log( { res } );
+    console.log( { res } );
     let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
         localDB.tableName.tblWallet,
         res
     );
-    //console.log( { resupdateWalletDetials } );
+    console.log( { resupdateWalletDetials } );
     let resupdateSSSShareStage = await dbOpration.updateSSSShareStage(
         localDB.tableName.tblSSSDetails,
         res.sharesInfo,
         fulldate
     );
-    // console.log( { resupdateSSSShareStage } );
+    console.log( { resupdateSSSShareStage } );
     return resupdateSSSShareStage;
     // console.log( { resupdateSSSShareStage } );
     // console.log( { resupdateWalletDetials } );
