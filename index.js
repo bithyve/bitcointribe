@@ -1,7 +1,7 @@
 /** @format */
 import React from "react";
 import { createAppContainer } from "react-navigation";
-import { AsyncStorage, AppState, AppRegistry, Linking, StatusBar } from "react-native";
+import { AsyncStorage, AppState, AppRegistry, Linking, StatusBar, Alert } from "react-native";
 import DeepLinking from "react-native-deep-linking";
 import "HexaWallet/shim";
 import { name as appName } from "HexaWallet/app.json";
@@ -39,13 +39,19 @@ export default class HexaWallet extends React.Component
             response
           } );
           var pageName;
+          var type;
           if ( response.pageName == "bk" )
           {
             pageName = "TabbarBottom";
+            type = "SSS Recovery SMS/EMAIL";
           }
-          else if ( response.pageName == "rt" )
+          else if ( response.pageName == "rtb" )  
           {
             pageName = "TrustedPartyShareSecretNavigator";
+            type = "SSS Restore SMS/EMAIL";
+          } else
+          {
+            Alert.alert( "Working" );
           }
           utils.setRootViewController( pageName );
           var script = response.script;
@@ -55,7 +61,7 @@ export default class HexaWallet extends React.Component
           decpScript = JSON.parse( decpScript );
           console.log( { decpScript } );
           utils.setDeepLinkingUrl( decpScript );
-          utils.setDeepLinkingType( "SSS Recovery Sms/Email" );
+          utils.setDeepLinkingType( type );
         }
       );
 

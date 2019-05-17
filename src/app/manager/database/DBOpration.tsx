@@ -68,11 +68,13 @@ const readTablesData = ( tableName: any ) => {
             else if ( tableName == "tblTrustedPartySSSDetails" ) {
               data.id = data.id;
               data.dateCreated = utils.decrypt( data.dateCreated, passcode );
-              data.userDetails = utils.decrypt( data.userDetails, passcode );
+              data.keeperInfo = utils.decrypt( data.keeperInfo, passcode );
+              data.urlScript = utils.decrypt( data.urlScript, passcode );
               data.decrShare = utils.decrypt( data.decrShare, passcode );
               data.shareId = utils.decrypt( data.shareId, passcode );
-              data.allJson = utils.decrypt( data.allJson, passcode );
+              data.metaData = utils.decrypt( data.metaData, passcode );
               data.nonPMDDData = utils.decrypt( data.nonPMDDData, passcode );
+              data.history = utils.decrypt( data.history, passcode );
               temp.push( data );
             }
             else {
@@ -391,6 +393,10 @@ const insertWallet = (
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
     db.transaction( function ( txn ) {
+      txn.executeSql(
+        "DELETE FROM " +
+        tblName
+      );
       txn.executeSql(
         "INSERT INTO " +
         tblName +
@@ -718,19 +724,25 @@ const insertRestoreUsingTrustedContactKeepInfo = (
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
+    let temp = [];
+    let jsonData = {};
+    jsonData.title = "Secret Created.";
+    jsonData.date = utils.getUnixToDateFormat( fulldate );
+    temp.push( jsonData );
     db.transaction( function ( txn ) {
       for ( let i = 0; i < keepInfo.length; i++ ) {
         let data = keepInfo[ i ];
         txn.executeSql(
           "INSERT INTO " +
           tblName +
-          "(dateCreated,keeperInfo,recordId) VALUES (:dateCreated,:keeperInfo,:recordId)",
+          "(dateCreated,keeperInfo,history,recordId) VALUES (:dateCreated,:keeperInfo,:history,:recordId)",
           [
             utils.encrypt(
               fulldate.toString(),
               passcode
             ),
             utils.encrypt( JSON.stringify( data ).toString(), passcode ),
+            utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
             utils.encrypt( data.recordID.toString(), passcode ),
           ]
         );
@@ -884,10 +896,11 @@ const updateSSSShareStage = (
 const insertTrustedPartyDetails = (
   tblName: string,
   fulldate: string,
-  userDetails: any,
+  keeperInfo: any,
+  urlScript: any,
   decrShare: any,
   shareId: any,
-  allJson: any,
+  metaData: any,
   nonPMDDData: any
 ) => {
   let passcode = getPasscode();
@@ -908,16 +921,17 @@ const insertTrustedPartyDetails = (
               txn.executeSql(
                 "INSERT INTO " +
                 tblName +
-                "(dateCreated,userDetails,decrShare,shareId,allJson,nonPMDDData) VALUES (:dateCreated,:userDetails,:decrShare,:shareId,:allJson,:nonPMDDData)",
+                "(dateCreated,keeperInfo,urlScript,decrShare,shareId,metaData,nonPMDDData) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:shareId,:metaData,:nonPMDDData)",
                 [
                   utils.encrypt(
                     fulldate.toString(),
                     passcode
                   ),
-                  utils.encrypt( JSON.stringify( userDetails ).toString(), passcode ),
+                  utils.encrypt( JSON.stringify( keeperInfo ).toString(), passcode ),
+                  utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
                   utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
                   utils.encrypt( shareId.toString(), passcode ),
-                  utils.encrypt( JSON.stringify( allJson ).toString(), passcode ),
+                  utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
                   utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode )
                 ]
               );
@@ -928,16 +942,17 @@ const insertTrustedPartyDetails = (
           txn.executeSql(
             "INSERT INTO " +
             tblName +
-            "(dateCreated,userDetails,decrShare,shareId,allJson,nonPMDDData) VALUES (:dateCreated,:userDetails,:decrShare,:shareId,:allJson,:nonPMDDData)",
+            "(dateCreated,keeperInfo,urlScript,decrShare,shareId,metaData,nonPMDDData) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:shareId,:metaData,:nonPMDDData)",
             [
               utils.encrypt(
                 fulldate.toString(),
                 passcode
               ),
-              utils.encrypt( JSON.stringify( userDetails ).toString(), passcode ),
+              utils.encrypt( JSON.stringify( keeperInfo ).toString(), passcode ),
+              utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
               utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
               utils.encrypt( shareId.toString(), passcode ),
-              utils.encrypt( JSON.stringify( allJson ).toString(), passcode ),
+              utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
               utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode )
             ]
           );
