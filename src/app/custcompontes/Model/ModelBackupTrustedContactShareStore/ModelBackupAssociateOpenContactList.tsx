@@ -16,10 +16,10 @@ var utils = require( "HexaWallet/src/app/constants/Utils" );
 interface Props {
     data: [];
     closeModal: Function;
-    click_AssociateContact: Function;
+    click_OpenContact: Function;
 }
 
-export default class ModelBackupShareAssociateContact extends Component<Props, any> {
+export default class ModelBackupAssociateOpenContactList extends Component<Props, any> {
     render() {
         let walletName = this.props.data.length != 0 ? this.props.data[ 0 ].walletName : "Hexa Wallet"
         return (
@@ -37,7 +37,7 @@ export default class ModelBackupShareAssociateContact extends Component<Props, a
                 ] }>
                     <View style={ styles.viewModelBody }>
                         <View style={ { flexDirection: "row", flex: 0.5 } }>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Secret Accepted</Text>
+                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Associate { walletName } with your contacts</Text>
                             <Button light iconLeft style={ { width: 40, height: 40, borderRadius: 20 } } onPress={ () => this.props.closeModal() }>
                                 <Icon name='close' style={ { alignSelf: "center" } } />
                             </Button>
@@ -50,8 +50,8 @@ export default class ModelBackupShareAssociateContact extends Component<Props, a
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>You will need to open the Hexa application on your device once in two weeks to make sure the secret is still accessible</Text>
                             <FullLinearGradientButton
-                                click_Done={ () => this.props.click_AssociateContact( walletName ) }
-                                title="Associate Contact"
+                                click_Done={ () => this.props.click_OpenContact() }
+                                title="Open Contacts"
                                 disabled={ false }
                                 style={ [ { borderRadius: 10 } ] } />
                         </View>
