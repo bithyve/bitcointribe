@@ -39,13 +39,16 @@ export default class HexaWallet extends React.Component
             response
           } );
           var pageName;
+          var type;
           if ( response.pageName == "bk" )
           {
             pageName = "TabbarBottom";
+            type = "SSS Recovery SMS/EMAIL";
           }
-          else if ( response.pageName == "rt" )
+          else if ( response.pageName == "rtb" )  
           {
             pageName = "TrustedPartyShareSecretNavigator";
+            type = "SSS Restore SMS/EMAIL";
           }
           utils.setRootViewController( pageName );
           var script = response.script;
@@ -55,7 +58,7 @@ export default class HexaWallet extends React.Component
           decpScript = JSON.parse( decpScript );
           console.log( { decpScript } );
           utils.setDeepLinkingUrl( decpScript );
-          utils.setDeepLinkingType( "SSS Recovery Sms/Email" );
+          utils.setDeepLinkingType( type );
         }
       );
 
