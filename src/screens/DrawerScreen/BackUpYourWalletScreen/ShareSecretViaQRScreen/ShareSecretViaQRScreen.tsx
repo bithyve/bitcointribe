@@ -50,7 +50,7 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
         } )
     }
 
-    componentWillMount = async () => {
+    async componentWillMount() {
         let walletDetails = utils.getWalletDetails();
         let resSSSDetails = utils.getSSSDetailsRecordIDWise();
         //console.log( { resSSSDetails, walletDetails } );
@@ -64,6 +64,7 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
         // console.log( { jsonResQRShare } );
         let qrCodeData = {};
         qrCodeData.type = "SSS Recovery";
+        qrCodeData.wn = walletDetails.walletType;
         qrCodeData.data = jsonResQRShare;
         console.log( { qrCodeData } );
         this.setState( {

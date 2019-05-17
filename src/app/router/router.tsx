@@ -16,6 +16,8 @@ import OnBoardingScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen
 import PasscodeScreen from "HexaWallet/src/screens/PasscodeScreen/PasscodeScreen";
 import PasscodeConfirmScreen from "HexaWallet/src/screens/PasscodeScreen/PasscodeConfirmScreen";
 import RestoreAndReoverWalletScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/RestoreAndReoverWalletScreen/RestoreAndReoverWalletScreen";
+
+import WalletUsingPassphraseScrren from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingMnemonicScreen/WalletUsingPassphraseScrren/WalletUsingPassphraseScrren";
 import WalletSetupScreens from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/WalletSetupScreens/WalletSetupScreens";
 import PermissionScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/PermissionScreen/PermissionScreen";
 
@@ -28,6 +30,7 @@ import PermissionScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen
 // import AccountsScreen from "bithyve/src/screens/TabBarScreen/AccountsScreen/AccountsScreen";
 // import CardsScreen from "bithyve/src/screens/TabBarScreen/CardsScreen/CardsScreen";
 import SettingScreen from "HexaWallet/src/screens/TabBarScreen/SettingScreen/SettingScreen";
+import ContactSharedSecretList from "HexaWallet/src/screens/TabBarScreen/SettingScreen/ContactsSharedSecredYouScreen/ContactSharedSecretList";
 //
 // //Left DrawerScreen
 // import SecurityScreen from "bithyve/src/screens/DrawerScreen/SecurityScreen/SecurityScreen";
@@ -76,6 +79,8 @@ import TrustedContactAcceptOtpScreen from "../../screens/DrawerScreen/BackUpYour
 
 
 
+
+
 //TODO: StackNavigator
 
 //TODO: StackNavigator:ONBoarding
@@ -88,6 +93,18 @@ const OnBoardingStackNavigator = createStackNavigator(
   },
   {
     initialRouteName: "OnBoarding"
+  }
+);
+
+const RestoreWalletUsingMnemonicStackNavigator = createStackNavigator(
+  {
+    WalletUsingPassphraseScrren: {
+      screen: WalletUsingPassphraseScrren,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "WalletUsingPassphraseScrren"
   }
 );
 
@@ -106,6 +123,22 @@ const RestoreAndWalletSetupStackNavigator = createStackNavigator(
     initialRouteName: "RestoreAndReoverWalletScreen"
   }
 );
+
+const SettingsStackNavigator = createStackNavigator(
+  {
+    ContactSharedSecretList: {
+      screen: ContactSharedSecretList,
+      navigationOptions: {
+        header: null,
+        tabBarVisible: false
+      }
+    }
+  },
+  {
+    initialRouteName: "ContactSharedSecretList"
+  }
+);
+
 
 
 
@@ -295,7 +328,7 @@ const TabNavigator = createBottomTabNavigator(
         tabBarLabel: "Settings", //localization("TabBarItem.More"),
         tabBarIcon: ( { tintColor } ) => (
           <SvgIcon name="more-icon" color={ tintColor } size={ 22 } />
-        )
+        ),
       }
     }
   },
@@ -372,6 +405,10 @@ export const createRootNavigator = (
         screen: RestoreAndWalletSetupStackNavigator,
         navigationOptions: { header: null }
       },
+      RestoreWalletUsingMnemonicNavigator: {
+        screen: RestoreWalletUsingMnemonicStackNavigator,
+        navigationOptions: { header: null }
+      },
       PermissionNavigator: {
         screen: PermissionScreen,
         navigationOptions: { header: null }
@@ -387,7 +424,12 @@ export const createRootNavigator = (
       TrustedContactAcceptNavigator: {
         screen: TrustedContactAcceptStackNavigatorRouter,
         navigationOptions: { header: null }
+      },
+      SettingsContactSharedSecretListNavigator: {
+        screen: SettingsStackNavigator,
+        navigationOptions: { header: null }
       }
+
       //Drwaer Navigation
       // SecurityScreen: {
       //   screen: SecurityScreen,

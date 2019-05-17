@@ -68,7 +68,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         } )
     }
 
-    componentWillMount = async () => {
+    async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
         console.log( { data } );
         let temp = [];
@@ -138,8 +138,9 @@ export default class TrustedContactScreen extends React.Component<any, any> {
     click_SentURLSmsOrEmail( item: any ) {
         AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
         var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-        let data = this.props.navigation.getParam( "data" );
+        let walletDetails = utils.getWalletDetails();
         let script = {};
+        script.wn = walletDetails.walletType;
         script.mi = this.state.messageId;
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );

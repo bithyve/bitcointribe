@@ -69,9 +69,28 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                 }
             ],
             statusConfirmBtnDisable: true,
-            flag_Loading: false
+            flag_Loading: false,
+            arr_ResDownShare: []
         };
     }
+
+
+    async componentDidMount() {
+        let script = this.props.navigation.getParam( "data" );
+        let messageId = script.mi;
+        console.log( { messageId } );
+
+        let walletDetails = utils.getWalletDetails();
+        const sss = new S3Service(
+            walletDetails.mnemonic
+        );
+        const resDownShare = await sss.downloadShare( messageId );
+        console.log( { resDownShare } );
+        this.setState( {
+            arr_ResDownShare: resDownShare
+        } )
+    }
+
 
     _onFinishCheckingCode = async ( code: string ) => {
         console.log( { code } );
@@ -96,24 +115,27 @@ export default class TrustedContactAcceptOtpScreen extends Component {
         const sss = new S3Service(
             walletDetails.mnemonic
         );
-        //  console.log( { messageId, enterOtp } );
+        console.log( { messageId, enterOtp } );
         let userDetails = {};
         userDetails.name = "Hexa Wallet";
         userDetails.mobileNo = "1234";
-        const resDonwShare = await sss.downloadShare( messageId );
-        const resDecryptOTPEncShare = await sss.decryptOTPEncShare( resDonwShare, messageId, enterOtp )
-        //console.log( { resDecryptOTPEncShare } );
-        let resShareId = await sss.getShareId( resDecryptOTPEncShare.encryptedShare )
-        const { data, updated } = await sss.updateHealth( resDecryptOTPEncShare.meta.walletId, resDecryptOTPEncShare.encryptedShare );
+        let resDownShare = this.state.arr_ResDownShare;
+        console.log( { resDownShare } );
+        const resDecryptOTPEncShare = await sss.decryptOTPEncShare( resDownShare, messageId, enterOtp )
+        console.log( { resDecryptOTPEncShare } );
+        let resShareId = await sss.getShareId( resDecryptOTPEncShare.decryptedShare.encryptedShare )
+        console.log( { resShareId } );
+
+        const { data, updated } = await sss.updateHealth( resDecryptOTPEncShare.decryptedShare.meta.walletId, resDecryptOTPEncShare.decryptedShare.encryptedShare );
         if ( updated ) {
             if ( resDecryptOTPEncShare != "" || resDecryptOTPEncShare != null ) {
                 const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
                     localDB.tableName.tblTrustedPartySSSDetails,
                     fulldate,
                     userDetails,
-                    resDecryptOTPEncShare.encryptedShare,
+                    resDecryptOTPEncShare.decryptedShare.encryptedShare,
                     resShareId,
-                    resDecryptOTPEncShare,
+                    resDecryptOTPEncShare.decryptedShare,
                     typeof data !== "undefined" ? data : ""
                 );
                 if ( resinsertTrustedPartyDetails == true ) {

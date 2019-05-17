@@ -15,7 +15,8 @@ import { StackActions, NavigationActions } from "react-navigation";
 import CodeInput from "react-native-confirmation-code-input";
 import * as Keychain from "react-native-keychain";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import bip39 from 'react-native-bip39'
+
+
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
@@ -46,8 +47,7 @@ let isNetwork: Boolean;
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 
-//TODO: Bitcon Files
-import Bitcoin from "HexaWallet/src/bitcoin/utilities/Bitcoin";
+
 
 export default class PasscodeConfirmScreen extends Component<any, any> {
   constructor ( props: any ) {
@@ -77,11 +77,17 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
   //   } );
   // }
 
+
+
+
+
+
   onCheckPincode( code: any ) {
     this.setState( {
       pincode: code
     } );
   }
+
 
   _onFinishCheckingCode2( isValid: boolean, code: any ) {
     if ( isValid ) {
@@ -118,27 +124,7 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
       commonData.setPasscode( code );
       const username = "HexaWallet";
       const password = code;
-      const mnemonic = await bip39.generateMnemonic( 256 );
-      // console.log( { mnemonic } );
-      await dbOpration.insertWallet(
-        localDB.tableName.tblWallet,
-        fulldate,
-        mnemonic,
-        "",
-        "",
-        "",
-        "Primary",
-        ""
-      );
-      await dbOpration.insertCreateAccount(
-        localDB.tableName.tblAccount,
-        fulldate,
-        "",
-        "BTC",
-        "Daily Wallet",
-        "Daily Wallet",
-        ""
-      );
+
       // Store the credentials
       await Keychain.setGenericPassword( username, password );
       AsyncStorage.setItem(

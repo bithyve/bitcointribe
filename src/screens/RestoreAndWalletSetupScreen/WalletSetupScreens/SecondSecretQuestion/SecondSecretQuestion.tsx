@@ -16,6 +16,8 @@ import {
     Icon
 } from "native-base";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import bip39 from 'react-native-bip39';
+
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
@@ -30,11 +32,13 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 
 
 
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 
 
 export default class SecondSecretQuestion extends React.Component<any, any> {
@@ -52,6 +56,9 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         window.EventBus.on( "swipeScreen", this.loadQuestionList );
         this.loadQuestionList = this.loadQuestionList.bind( this );
     }
+
+
+
 
     loadQuestionList = async () => {
         let resWalletData = await utils.getSetupWallet();
@@ -92,14 +99,16 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         const dateTime = Date.now();
         const fulldate = Math.floor( dateTime / 1000 );
         let data = this.state.data;
-        const resWallet = await utils.getWalletDetails();
-        console.log( { resWallet } );
+        // const regularAccount = new RegularAccount();
+        // const resGetMnemonic = regularAccount.getMnemonic();
+        // const mnemonic = resGetMnemonic; //await bip39.generateMnemonic( 256 );
+        const mnemonic = await bip39.generateMnemonic( 256 );
         let walletName = data.walletName;
         let firstQuestion = data.question;
         let firstAnswer = data.answer;
         let secoundQuestion = this.state.selected;
         let secoundAnser = this.state.secoundAnswer;
-        const sss = new S3Service( resWallet.mnemonic );
+        const sss = new S3Service( mnemonic );
         const answers = [ firstAnswer, secoundAnser ];
         const encryptedShares = sss.generateShares( answers );
         console.log( { encryptedShares } );
@@ -120,6 +129,17 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                     encryptedShares,
                     shareIds
                 );
+                await dbOpration.insertWallet(
+                    localDB.tableName.tblWallet,
+                    fulldate,
+                    mnemonic,
+                    "",
+                    "",
+                    "",
+                    walletName,
+                    ""
+                );
+                await comAppHealth.connection_AppHealthStatus( fulldate, 0, encryptedShares, mnemonic )
                 // console.log( { resultSSSShareIdInserted } );
                 let jsonAnswerDetails = {};
                 jsonAnswerDetails.walletName = walletName;
@@ -128,17 +148,19 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                 jsonAnswerDetails.secoundQuestion = secoundQuestion;
                 jsonAnswerDetails.secoundAnser = secoundAnser;
                 // console.log( { jsonAnswerDetails } );
-                await dbOpration.updateWalletDetials(
+                await dbOpration.updateWalletAnswerDetails(
                     localDB.tableName.tblWallet,
                     jsonAnswerDetails
                 );
+                // console.log( { mnemonic});
                 await dbOpration.insertCreateAccount(
                     localDB.tableName.tblAccount,
                     fulldate,
                     "",
+                    "0.0",
                     "BTC",
-                    walletName,
-                    "Wallet",
+                    "Daily Wallet",
+                    "Daily Wallet",
                     ""
                 );
                 this.setState( {

@@ -57,7 +57,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
             flag_MaxItemSeletedof3: true
         } )
     }
-    componentWillMount = () => {
+    componentWillMount() {
         Contacts.getAll( ( err, contacts ) => {
             if ( err ) {
                 throw err;
