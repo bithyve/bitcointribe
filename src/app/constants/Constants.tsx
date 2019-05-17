@@ -31,6 +31,12 @@ var images = {
     onB2: require( assetsImages + "onBoardingScreen/illustration_security.png" ),
     onB3: require( assetsImages + "onBoardingScreen/illustration_share.png" )
   },
+  RestoreRecoverScreen: {
+    restore: require( assetsImages + "RestoreAndRecoverScreen/restore.png" ),
+  },
+  WalletRestoreUsingPassphrase: {
+    walletrestored: require( assetsImages + "walletRestoreUsingPassphrase/illustration_walletrestored.png" ),
+  },
   WalletSetupScreen: {
     WalletScreen: {
       backgoundImage: require( assetsImages + "SetUpWallet/background.png" )
