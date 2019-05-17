@@ -57,7 +57,6 @@ import {
 } from "HexaWallet/src/app/constants/Constants";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
-var commSSS = require( "HexaWallet/src/app/manager/CommonFunction/CommSSS/CommSSS" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 
@@ -90,11 +89,11 @@ export default class WalletScreen extends React.Component {
     super( props );
     this.state = {
       isNetwork: true,
-      arr_wallets: [],
       arr_accounts: [],
       arr_SSSDetails: [],
       flag_cardScrolling: false,
       flag_Loading: false,
+      walletDetails: [],
       //Shiled Icons
       shiledIconPer: 1,
       scrollY: new Animated.Value( 0 ),
@@ -170,7 +169,7 @@ export default class WalletScreen extends React.Component {
       localDB.tableName.tblWallet
     );
     resultWallet = resultWallet.temp[ 0 ];
-    //console.log( { resultWallet } );
+    console.log( { resultWallet } );
     await utils.setWalletDetails( resultWallet );
     var resAccount = await dbOpration.readTablesData(
       localDB.tableName.tblAccount
@@ -190,14 +189,13 @@ export default class WalletScreen extends React.Component {
     console.log( { resSSSDetails } );
     await utils.setSSSDetails( resSSSDetails );
     this.setState( {
-      arr_wallets: resultWallet,
-      arr_accounts: resAccount
+      walletDetails: resultWallet,
+      arr_accounts: resAccount,
     } );
     //TODO: appHealthStatus funciton   
-    await commSSS.connection_AppHealthStatus( resultWallet.lastUpdated, 0, resSSSDetails, resultWallet );
-    let resAppHealthStatus = await utils.getAppHealthStatus();
+    let resAppHealthStatus = JSON.parse( resultWallet.appHealthStatus );
     console.log( { resAppHealthStatus } );
-    if ( resAppHealthStatus.overallStatus == "Red!" ) {
+    if ( resAppHealthStatus.overallStatus == "1" ) {
       this.setState( {
         shiledIconPer: 1,
         arr_CustShiledIcon: [
@@ -240,7 +238,7 @@ export default class WalletScreen extends React.Component {
         arr_ModelAcceptSecret: [
           {
             modalVisible: true,
-            name: "Hexa Wallet",
+            name: urlScript.wn,
             mobileNo: "1234",
             encpShare: urlScript.encpShare
           }
@@ -251,17 +249,18 @@ export default class WalletScreen extends React.Component {
 
   //TODO: Qrcode Scan SSS Details Download Desc Sahre
   downloadDescShare = async () => {
+
     this.setState( {
       flag_Loading: true
     } );
     const dateTime = Date.now();
     const fulldate = Math.floor( dateTime / 1000 );
     let urlScript = utils.getDeepLinkingUrl();
-    // console.log( { urlScript } );
+    console.log( { urlScript } );
     let urlScriptData = urlScript.data;
     console.log( { urlScriptData } );
     let userDetail = {};
-    userDetail.name = "Hexa Wallet";
+    userDetail.name = urlScript.wn;
     userDetail.mobileNo = "1234";
     userDetail.walletId = urlScriptData.meta.walletId;
     // console.log( { userDetail } );
@@ -273,7 +272,7 @@ export default class WalletScreen extends React.Component {
     //console.log( { resShareId } );
     const { data, updated } = await sss.updateHealth( urlScriptData.meta.walletId, urlScriptData.encryptedShare );
     if ( updated ) {
-      const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
+      const resTrustedParty = await dbOpration.insertTrustedPartyDetails(
         localDB.tableName.tblTrustedPartySSSDetails,
         fulldate,
         userDetail,
@@ -282,7 +281,7 @@ export default class WalletScreen extends React.Component {
         urlScriptData,
         typeof data !== "undefined" ? data : ""
       );
-      //console.log( { resinsertTrustedPartyDetails } );
+      console.log( { resTrustedParty } );
       this.setState( {
         flag_Loading: false,
         arr_ModelAcceptSecret: [
@@ -294,7 +293,7 @@ export default class WalletScreen extends React.Component {
           }
         ]
       } )
-      if ( resinsertTrustedPartyDetails == true ) {
+      if ( resTrustedParty == true ) {
         setTimeout( () => {
           Alert.alert(
             'Success',
@@ -316,7 +315,7 @@ export default class WalletScreen extends React.Component {
         setTimeout( () => {
           Alert.alert(
             'OH',
-            resinsertTrustedPartyDetails,
+            resTrustedParty,
             [
               {
                 text: 'OK', onPress: () => {
@@ -340,6 +339,7 @@ export default class WalletScreen extends React.Component {
 
   render() {
     let flag_cardScrolling = this.state.flag_cardScrolling;
+    let walletDetails = this.state.walletDetails;
     return (
       <Container>
         <Content scrollEnabled={ false } contentContainerStyle={ styles.container }>
@@ -368,7 +368,7 @@ export default class WalletScreen extends React.Component {
                     marginBottom: 30
                   } ] }
                 >
-                  My Wallets
+                  { walletDetails.walletType != null ? walletDetails.walletType : "Hexa Wallet" }
                 </Animated.Text>
                 <Animated.Text
                   style={ [ globalStyle.ffFiraSansRegular, {
@@ -390,18 +390,24 @@ export default class WalletScreen extends React.Component {
                 } }
               >
                 <ViewShieldIcons data={ this.state.arr_CustShiledIcon } click_Image={ () => {
-                  if ( this.state.shiledIconPer == 0 ) {
-                    this.props.navigation.push( "WalletSetUpScreen" )
+                  let resSSSDetails = utils.getSSSDetails();
+                  if ( resSSSDetails.length > 0 ) {
+                    if ( this.state.shiledIconPer == 0 ) {
+                      this.props.navigation.push( "WalletSetUpScreen" )
+                    } else {
+                      this.setState( {
+                        arr_ModelBackupYourWallet: [
+                          {
+                            modalVisible: true,
+                          }
+                        ]
+                      } )
+                    }
                   } else {
-                    this.setState( {
-                      arr_ModelBackupYourWallet: [
-                        {
-                          modalVisible: true,
-                        }
-                      ]
-                    } )
+                    Alert.alert( "Working." );
                   }
-                } } />
+                }
+                } />
               </Animated.View>
             </Animated.View>
             {/*  cards */ }
@@ -479,7 +485,7 @@ export default class WalletScreen extends React.Component {
                         <View style={ { flex: 4 } }>
                           <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
                           <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
-                            60,000
+                            { item.balance }
                           </Text>
                         </View>
                         <View
@@ -558,6 +564,7 @@ export default class WalletScreen extends React.Component {
             } else {
               this.props.navigation.push( "BackUpYourWalletNavigator" )
             }
+
           } }
           closeModal={ () => {
             this.setState( {

@@ -36,6 +36,7 @@ const readTablesData = ( tableName: any ) => {
               data.lastUpdated = utils.decrypt( data.lastUpdated, passcode );
               data.publicKey = utils.decrypt( data.publicKey, passcode );
               data.walletType = utils.decrypt( data.walletType, passcode );
+              data.appHealthStatus = utils.decrypt( data.appHealthStatus, passcode );
               data.setUpWalletAnswerDetails = utils.decrypt( data.setUpWalletAnswerDetails, passcode );
               temp.push( data );
             } else if ( tableName == "tblAccount" ) {
@@ -61,6 +62,16 @@ const readTablesData = ( tableName: any ) => {
               data.acceptedDate = utils.decrypt( data.acceptedDate, passcode );
               data.lastSuccessfulCheck = utils.decrypt( data.lastSuccessfulCheck, passcode );
               data.shareStage = utils.decrypt( data.shareStage, passcode );
+              temp.push( data );
+            }
+            else if ( tableName == "tblTrustedPartySSSDetails" ) {
+              data.id = data.id;
+              data.dateCreated = utils.decrypt( data.dateCreated, passcode );
+              data.userDetails = utils.decrypt( data.userDetails, passcode );
+              data.decrShare = utils.decrypt( data.decrShare, passcode );
+              data.shareId = utils.decrypt( data.shareId, passcode );
+              data.allJson = utils.decrypt( data.allJson, passcode );
+              data.nonPMDDData = utils.decrypt( data.nonPMDDData, passcode );
               temp.push( data );
             }
             else {
@@ -399,9 +410,33 @@ const insertWallet = (
   } );
 };
 //update
-const updateWalletDetials = (
+const updateWalletAnswerDetails = (
   tblName: string,
-  appHealthStatus: any
+  AnswerDetails: any
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        txn.executeSql(
+          "update " +
+          tblName +
+          " set setUpWalletAnswerDetails = :setUpWalletAnswerDetails where id = 1",
+          [
+            utils.encrypt( JSON.stringify( AnswerDetails ).toString(), passcode )
+          ]
+        );
+        resolve( true );
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
+const updateWalletAppHealthStatus = (
+  tblName: string,
+  AppHealthStatus: any
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
@@ -412,7 +447,35 @@ const updateWalletDetials = (
           tblName +
           " set appHealthStatus = :appHealthStatus where id = 1",
           [
-            utils.encrypt( JSON.stringify( appHealthStatus ).toString(), passcode )
+            utils.encrypt( JSON.stringify( AppHealthStatus ).toString(), passcode )
+          ]
+        );
+        resolve( true );
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
+
+
+const updateWalletMnemonic = (
+  tblName: string,
+  mnemonic: string,
+  fulldate: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        txn.executeSql(
+          "update " +
+          tblName +
+          " set mnemonic = :mnemonic,lastUpdated = :lastUpdated where id = 1",
+          [
+            utils.encrypt( mnemonic.toString(), passcode ),
+            utils.encrypt( fulldate.toString(), passcode )
           ]
         );
         resolve( true );
@@ -428,6 +491,7 @@ const insertCreateAccount = (
   tblName: string,
   date: string,
   address: string,
+  bal: string,
   unit: string,
   accountName: string,
   accountType: string,
@@ -444,7 +508,7 @@ const insertCreateAccount = (
         [
           fullDate,
           utils.encrypt( address.toString(), passcode ),
-          utils.encrypt( "0.0", passcode ),
+          utils.encrypt( bal.toString(), passcode ),
           utils.encrypt( unit.toString(), passcode ),
           utils.encrypt( accountName.toString(), passcode ),
           utils.encrypt( accountType.toString(), passcode ),
@@ -862,7 +926,9 @@ module.exports = {
   insertAccountTypeData,
   //Wallet Details
   insertWallet,
-  updateWalletDetials,
+  updateWalletAnswerDetails,
+  updateWalletMnemonic,
+  updateWalletAppHealthStatus,
 
   insertCreateAccount,
   insertLastBeforeCreateAccount,
