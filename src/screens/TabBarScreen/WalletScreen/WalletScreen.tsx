@@ -1,19 +1,12 @@
 import React from "react";
 import {
   View,
-  ImageBackground,
   Dimensions,
-  StatusBar,
-  TouchableOpacity,
-  TouchableHighlight,
   StyleSheet,
-  RefreshControl,
-  Platform,
   SafeAreaView,
   FlatList,
   ScrollView,
   Animated,
-  LayoutAnimation,
   AsyncStorage,
   Alert
 } from "react-native";
@@ -34,6 +27,7 @@ import { RkCard } from "react-native-ui-kitten";
 import DropdownAlert from "react-native-dropdownalert";
 import { SvgIcon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
+import Permissions from 'react-native-permissions'
 
 //Custome Compontes
 import ViewShieldIcons from "HexaWallet/src/app/custcompontes/View/ViewShieldIcons/ViewShieldIcons";
@@ -59,6 +53,9 @@ var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
+
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
 let isNetwork: boolean;
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
@@ -158,6 +155,12 @@ export default class WalletScreen extends React.Component {
     } );
   }
 
+  componentDidMount() {
+    Permissions.request( 'camera' ).then( ( response: any ) => {
+      console.log( response );
+    } );
+  }
+
   componentWillUnmount() {
     this.willFocusSubscription.remove();
   }
@@ -165,29 +168,14 @@ export default class WalletScreen extends React.Component {
 
   //TODO: func connnection_FetchData
   async connnection_FetchData() {
-    var resultWallet = await dbOpration.readTablesData(
-      localDB.tableName.tblWallet
-    );
-    resultWallet = resultWallet.temp[ 0 ];
-    console.log( { resultWallet } );
-    await utils.setWalletDetails( resultWallet );
-    var resAccount = await dbOpration.readTablesData(
-      localDB.tableName.tblAccount
-    );
-    resAccount = resAccount.temp;
-    console.log( { resAccount } );
-
+    var resultWallet = await comFunDBRead.readTblWallet();
+    var resAccount = await comFunDBRead.readTblAccount();
     if ( resAccount.length > 4 ) {
       this.setState( {
         flag_cardScrolling: true
       } )
     }
-    var resSSSDetails = await dbOpration.readTablesData(
-      localDB.tableName.tblSSSDetails
-    );
-    resSSSDetails = resSSSDetails.temp;
-    console.log( { resSSSDetails } );
-    await utils.setSSSDetails( resSSSDetails );
+    var resSSSDetails = await comFunDBRead.readTblSSSDetails();
     this.setState( {
       walletDetails: resultWallet,
       arr_accounts: resAccount,
@@ -249,7 +237,6 @@ export default class WalletScreen extends React.Component {
 
   //TODO: Qrcode Scan SSS Details Download Desc Sahre
   downloadDescShare = async () => {
-
     this.setState( {
       flag_Loading: true
     } );
@@ -523,7 +510,9 @@ export default class WalletScreen extends React.Component {
         <ModelBackupYourWallet data={ this.state.arr_ModelBackupYourWallet }
           click_UseOtherMethod={ () => alert( 'working' ) }
           click_Confirm={ async () => {
-            AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
+            await Permissions.request( 'contacts' ).then( ( response: any ) => {
+              console.log( response );
+            } );
             this.setState( {
               arr_ModelBackupYourWallet: [
                 {
@@ -560,7 +549,7 @@ export default class WalletScreen extends React.Component {
             } )
             let resSSSDetails = utils.getSSSDetails();
             if ( resSSSDetails[ 0 ].keeperInfo != "" ) {
-              this.props.navigation.push( "SecretSharingScreen" );
+              this.props.navigation.push( "BackUpYourWalletSecoundTimeNavigator" );
             } else {
               this.props.navigation.push( "BackUpYourWalletNavigator" )
             }

@@ -81,7 +81,7 @@ export default class SettingScreen extends React.Component<any, any> {
   click_MenuItem( item: any ) {
     let title = item.title;
     if ( title == "Contacts that have shared secret with you" ) {
-      this.props.navigation.push( "SettingsContactSharedSecretListNavigator" );
+      this.props.navigation.push( "TrustedPartyShareSecretNavigator" );
     } else {
       Alert.alert( "Working." );
     }
