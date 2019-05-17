@@ -1,7 +1,7 @@
 import bip39 from "bip39";
 import crypto from "crypto";
 import authenticator from "otplib/authenticator";
-import SecureAccount from "../../services/accounts/SecureAccount";
+import SecureAccount from "../../../services/accounts/SecureAccount";
 
 describe("Secure Account", () => {
   let secureAccount: SecureAccount;
@@ -51,17 +51,29 @@ describe("Secure Account", () => {
     }
   });
 
+  test("checks the health of the secureAccount", async () => {
+    const dummyMnemonic =
+      "horn middle issue story near liar captain version where speed bubble goose obvious member ski first rebuild palace spy royal segment river defy travel";
+    const dummyTwoFASecret = "OZRDQOBUGBYEYMTIJQ3WINLBGM2XA5CG";
+    const dummyPOS = dummyTwoFASecret.slice(dummyTwoFASecret.length - 4);
+    const secureHDAccount = new SecureAccount(dummyMnemonic);
+    const { isValid } = await secureHDAccount.checkHealth(dummyPOS);
+    console.log({ isValid });
+    expect(isValid).toBe(true);
+  });
+
   test("imports secure account", async () => {
     const dummyMnemonic =
-      "unique issue slogan party van unfair assault warfare then rubber satisfy snack";
+      "horn middle issue story near liar captain version where speed bubble goose obvious member ski first rebuild palace spy royal segment river defy travel";
     const dummySecondaryXpub =
       "tpubDDGFLSXWA8K2z1fmg37ivgFmQC5xBMcEycBD5pmYuzpM1GyeoeTeykZxFFcQpVVGvv6scShvtCfRkf59tzJzwoL44VMRR78RywTU46TvCrJ";
-    const dummyBHXpub =
-      "tpubDFe4ZoKYAQhR7JQq8s1AKqDeoGWE2Aovf2b4pqEE5Mt2HyqYMkq8AzHYU8zosVeSEf7EJtNGuTkDVqVrT8YjizbuvRttJMS6uRKabEA358d";
+    const dummyTwoFASecret = "OZRDQOBUGBYEYMTIJQ3WINLBGM2XA5CG";
 
     const secureHDAccount = new SecureAccount(dummyMnemonic);
-    secureHDAccount.importSecureAccount(dummyBHXpub, dummySecondaryXpub);
+    const dummyToken = authenticator.generate(dummyTwoFASecret);
+    await secureHDAccount.importSecureAccount(dummyToken, dummySecondaryXpub);
     const address = await secureHDAccount.getAddress();
+    console.log({ address });
     expect(address).toBeTruthy();
   });
 
@@ -71,15 +83,16 @@ describe("Secure Account", () => {
     const dummySecret = "GZFXQUJSKI4GMNSLMN3VIK3SKBSU64KV";
     const dummySecondaryXpub =
       "tpubDDGFLSXWA8K2z1fmg37ivgFmQC5xBMcEycBD5pmYuzpM1GyeoeTeykZxFFcQpVVGvv6scShvtCfRkf59tzJzwoL44VMRR78RywTU46TvCrJ";
-    const dummyBHXpub =
-      "tpubDHmUoBnFtKNcX4tD21HJXCKS1HPZTAZpYVuCvQtuPHzghwpWUwGQuLDURiWt77BsQnnhhRqXwDwJL3SiRQxudegC73FSLHRHXoCu2tAKoHG";
+    // const dummyBHXpub =
+    //   "tpubDHmUoBnFtKNcX4tD21HJXCKS1HPZTAZpYVuCvQtuPHzghwpWUwGQuLDURiWt77BsQnnhhRqXwDwJL3SiRQxudegC73FSLHRHXoCu2tAKoHG";
+    const dummyToken = authenticator.generate(dummySecret);
 
     const transfer = {
       recipientAddress: "2NAwqcZHo2DW9c8Qs9Jxaat3jHW3aqsBpFs",
       amount: 3500,
     };
     const secureHDAccount = new SecureAccount(dummyMnemonic);
-    await secureHDAccount.importSecureAccount(dummyBHXpub, dummySecondaryXpub);
+    await secureHDAccount.importSecureAccount(dummyToken, dummySecondaryXpub);
     // secureHDAccount.secureHDWallet.xpubs.secondary = dummySecondaryXpub;
     // secureHDAccount.secureHDWallet.xpubs.bh = dummyBHXpub;
 

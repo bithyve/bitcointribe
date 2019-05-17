@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, YellowBox } from "react-native";
 import {
     Container,
     Header,
@@ -23,6 +23,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Contacts from 'react-native-contacts';
 import { Avatar, SearchBar } from 'react-native-elements';
 import TimerCountdown from "react-native-timer-countdown";
+import moment from "moment";
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -70,6 +71,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
         const resultWallet = await utils.getWalletDetails();
         const resSSSDetails = await utils.getSSSDetails();
         let updateShareIdStatus = await commSSS.connection_AppHealthStatus( resultWallet.lastUpdated, 0, resSSSDetails, resultWallet );
+        console.log( { updateShareIdStatus } );
         if ( updateShareIdStatus ) {
             var data = await dbOpration.readTablesData(
                 localDB.tableName.tblSSSDetails
@@ -83,30 +85,38 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                 let jsondata = JSON.parse( data[ i ].keeperInfo );
                 jsondata.history = JSON.parse( data[ i ].history );
                 let sharedDate = parseInt( data[ i ].sharedDate );
-                var startDate = new Date( utils.getUnixToDateFormat( fulldate ) );
-                var endDate = new Date( utils.getUnixToDateFormat( sharedDate ) );
+                // console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
+                // var startDate = new Date( utils.getUnixToDateFormat( fulldate ) );
+                // var endDate = new Date( utils.getUnixToDateFormat( sharedDate ) );
+                var startDate = new Date( fulldate * 1000 );
+                var endDate = new Date( sharedDate * 1000 );
+                //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
                 var diff = Math.abs( startDate.getTime() - endDate.getTime() );
-                const minutes = Math.floor( ( diff / 1000 ) / 60 );
-                const seconds = Math.floor( diff / 1000 % 60 );
+                //console.warn( 'diff' + diff.toString() );
+                const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
+                const seconds: any = Math.floor( diff / 1000 % 60 );
+                //console.log( { minutes, seconds } );
+                //console.warn( minutes.toString() )
                 const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
+                //console.log( { totalSec } );
                 jsondata.totalSec = 600 - totalSec;
-                if ( totalSec < 600 && data[ i ].shareStage == "ugly" ) {
+                if ( totalSec < 600 && data[ i ].shareStage == "Ugly" ) {
                     jsondata.statusMsg = "Shared";
                     jsondata.statusMsgColor = "#C07710";
                     jsondata.flag_timer = true;
-                } else if ( totalSec >= 600 && data[ i ].shareStage == "ugly" ) {
+                } else if ( totalSec >= 600 && data[ i ].shareStage == "Ugly" ) {
                     jsondata.statusMsg = "Shared OTP expired.";
                     jsondata.statusMsgColor = "#C07710";
                     jsondata.flag_timer = false;
-                } else if ( data[ i ].shareStage == "good" ) {
+                } else if ( data[ i ].shareStage == "Good" ) {
                     jsondata.statusMsg = "Share accessible";
                     jsondata.statusMsgColor = "#008000";
                     jsondata.flag_timer = false;
-                } else if ( data[ i ].shareStage == "bad" ) {
+                } else if ( data[ i ].shareStage == "Bad" ) {
                     jsondata.statusMsg = "Share accessible";
                     jsondata.statusMsgColor = "#C07710";
                     jsondata.flag_timer = false;
-                } else if ( data[ i ].shareStage == "ugly" && data[ i ].sharedDate != "" ) {
+                } else if ( data[ i ].shareStage == "Ugly" && data[ i ].sharedDate != "" ) {
                     jsondata.statusMsg = "Share not accessible";
                     jsondata.statusMsgColor = "#ff0000";
                     jsondata.flag_timer = false;
@@ -125,10 +135,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
         } else {
             Alert.alert( "ShareId status not changed." )
         }
-
     }
-
-
 
     //TODO: func click_Item
     click_Item = ( item: any ) => {
@@ -145,7 +152,14 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                         <View style={ { marginLeft: 10, marginTop: 15 } }>
                             <Button
                                 transparent
-                                onPress={ () => this.props.navigation.pop() }
+                                onPress={ () => {
+                                    let resSSSDetails = utils.getSSSDetails();
+                                    if ( resSSSDetails[ 0 ].keeperInfo != "" ) {
+                                        this.props.navigation.pop();
+                                    } else {
+                                        this.props.navigation.navigate( "TabbarBottom" );
+                                    }
+                                } }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Secret Sharing</Text>

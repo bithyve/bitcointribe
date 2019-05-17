@@ -52,6 +52,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
             arr_ContactList: [],
             SelectedFakeContactList: [],
             flag_NextBtnDisable: true,
+            flag_NextBtnDisable1: false,
             flag_Loading: false,
             flag_MaxItemSeletedof3: true
         } )
@@ -119,13 +120,16 @@ export default class AllContactListScreen extends React.Component<any, any> {
 
     //TODO: func click_Next
     click_Next = async () => {
+        this.setState( {
+            flag_NextBtnDisable1: true
+        } )
         let selectedContactList = this.state.SelectedFakeContactList;
         console.log( { selectedContactList } );
         const resUpdateSSSContactDetails = await dbOpration.updateSSSContactListDetails(
             localDB.tableName.tblSSSDetails,
             selectedContactList,
         );
-        if ( resUpdateSSSContactDetails ) {
+        if ( resUpdateSSSContactDetails == true ) {
             this.props.navigation.push( "SecretSharingScreen" );
         }
     }
@@ -268,7 +272,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
                         </KeyboardAwareScrollView>
                         { renderIf( this.state.flag_NextBtnDisable == false )(
                             <View style={ styles.btnNext }>
-                                <FullLinearGradientButton title="Next" disabled={ this.state.flag_NextBtnDisable } style={ [ this.state.flag_NextBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10, marginLeft: 30, marginRight: 30 } ] } click_Done={ () => this.click_Next() } />
+                                <FullLinearGradientButton title="Next" disabled={ this.state.flag_NextBtnDisable || this.state.flag_NextBtnDisable1 } style={ [ this.state.flag_NextBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10, marginLeft: 30, marginRight: 30 } ] } click_Done={ () => this.click_Next() } />
                             </View>
                         ) }
                     </ImageBackground>
