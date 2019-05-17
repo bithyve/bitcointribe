@@ -53,15 +53,18 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
 
     async componentWillMount() {
         var resSharedSecretList = await comFunDBRead.readTblTrustedPartySSSDetails();
-        // console.log( { resSharedSecretList } );
+        console.log( { resSharedSecretList } );
         let temp = [];
         for ( let i = 0; i < resSharedSecretList.length; i++ ) {
             let data = {};
-            let allJson = JSON.parse( resSharedSecretList[ i ].allJson );
-            let userDetails = JSON.parse( resSharedSecretList[ i ].userDetails )
-            data.name = allJson.meta.tag;
-            data.walletName = userDetails.name;
-            data.m = "+91 9876543210"
+            let keeperInfo = JSON.parse( resSharedSecretList[ i ].keeperInfo );
+            console.log( { keeperInfo } );
+
+            let urlScript = JSON.parse( resSharedSecretList[ i ].urlScript )
+            data.walletName = urlScript.walletName;
+            data.keeperInfo = keeperInfo;
+            data.name = keeperInfo.givenName + " " + keeperInfo.familyName;
+            data.mobileNo = keeperInfo.phoneNumbers[ 0 ].number;
             temp.push( data );
         }
         // console.log( { temp } );
@@ -74,16 +77,25 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         let urlScript = utils.getDeepLinkingUrl();
         let urlType = utils.getDeepLinkingType();
         if ( urlType == "SSS Restore SMS/EMAIL" ) {
-            let data = {};
-            data.thumbnailPath = "";
-            data.givenName = "A";
-            data.familyName = "B";
-            data.phoneNumbers = "+91 987654321";
-            data.emailAddresses = "user@gmail.com";
-            data.qrCodeString = "Wallet";
-            let arr_SelectedContact = data;
+            let walletName = urlScript.wn;
+            let jsonTemp = {}
+            for ( let i = 0; i < temp.length; i++ ) {
+                if ( temp[ i ].walletName == walletName ) {
+                    let data = temp[ i ];
+                    console.log( { data } );
+                    jsonTemp.thumbnailPath = data.keeperInfo.thumbnailPath;
+                    jsonTemp.givenName = data.keeperInfo.givenName;
+                    jsonTemp.familyName = data.keeperInfo.familyName;
+                    jsonTemp.phoneNumbers = data.keeperInfo.phoneNumbers[ 0 ].number;
+                    jsonTemp.emailAddresses = data.keeperInfo.emailAddresses[ 0 ].email;
+                    jsonTemp.qrCodeString = "Wallet";
+                    break;
+                } else {
+                    Alert.alert( "This Wallet Name recoard not found!" )
+                }
+            }
             this.setState( {
-                arr_SelectedContact
+                arr_SelectedContact: jsonTemp
             } )
             this.refs.modal4.open();
         }
@@ -132,7 +144,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         if ( type == "SMS" ) {
             SendSMS.send( {
                 body: 'https://prime-sign-230407.appspot.com/sss/rta/' + encpScript,
-                recipients: [ val[ 0 ].number ],
+                recipients: [ val ],
                 successTypes: [ 'sent', 'queued' ]
             }, ( completed, cancelled, error ) => {
                 if ( completed ) {
@@ -161,7 +173,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         } else if ( type == "EMAIL" ) {
             Mailer.mail( {
                 subject: 'Hexa Wallet SSS Restore',
-                recipients: [ val[ 0 ].email ],
+                recipients: [ val ],
                 body: 'https://prime-sign-230407.appspot.com/sss/rta/' + encpScript,
                 isHTML: true,
             }, ( error, event ) => {
@@ -270,11 +282,16 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                     <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
                             <View style={ { alignItems: "center", justifyContent: "center" } }>
-                                <Avatar style={ { alignSelf: "center" } } medium rounded title={ item.name.charAt( 0 ) } />
+                                { renderIf( item.keeperInfo.thumbnailPath != "" )(
+                                    <Avatar medium rounded source={ { uri: item.keeperInfo.thumbnailPath } } />
+                                ) }
+                                { renderIf( item.keeperInfo.thumbnailPath == "" )(
+                                    <Avatar medium rounded title={ item.keeperInfo.givenName != null && item.keeperInfo.givenName.charAt( 0 ) } />
+                                ) }
                             </View>
                             <View style={ { flexDirection: "column" } }>
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10 } ] }>{ item.name }</Text>
-                                <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.m }</Text>
+                                <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.mobileNo }</Text>
                                 <Text note style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.walletName }</Text>
                             </View>
                         </View>
@@ -301,7 +318,16 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                         <View style={ { marginLeft: 10, marginTop: 15 } }>
                             <Button
                                 transparent
-                                onPress={ () => this.props.navigation.pop() }
+                                onPress={ () => {
+                                    let urlScript = utils.getDeepLinkingUrl();
+                                    if ( urlScript != "" ) {
+                                        utils.setDeepLinkingType( "" );
+                                        utils.setDeepLinkingUrl( "" );
+                                        this.props.navigation.navigate( 'WalletScreen' );
+                                    } else {
+                                        this.props.navigation.pop()
+                                    }
+                                } }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 20 : 17, marginLeft: 0 } ] }>Contacts that have shared secrets</Text>

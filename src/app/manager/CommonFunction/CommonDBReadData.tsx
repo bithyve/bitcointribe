@@ -8,6 +8,8 @@ const readTblWallet = async () => {
     var resultWallet = await dbOpration.readTablesData(
         localDB.tableName.tblWallet
     );
+    console.log( { resultWallet } );
+
     resultWallet = resultWallet.temp[ 0 ];
     //console.log( { resultWallet } );
     await utils.setWalletDetails( resultWallet );
