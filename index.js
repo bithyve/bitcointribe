@@ -49,6 +49,10 @@ export default class HexaWallet extends React.Component
           {
             pageName = "TrustedPartyShareSecretNavigator";
             type = "SSS Restore SMS/EMAIL";
+          } else if ( response.pageName == "rta" )
+          {
+            pageName = "OTPScreenNavigator";
+            type = "SSS Restore SMS/EMAIL";
           } else
           {
             Alert.alert( "Working" );
