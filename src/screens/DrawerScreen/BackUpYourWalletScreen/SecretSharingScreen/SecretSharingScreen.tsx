@@ -23,7 +23,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Contacts from 'react-native-contacts';
 import { Avatar, SearchBar } from 'react-native-elements';
 import TimerCountdown from "react-native-timer-countdown";
-import moment from "moment";
+
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -108,8 +108,6 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                 jsondata.history = JSON.parse( data[ i ].history );
                 let sharedDate = parseInt( data[ i ].sharedDate );
                 // console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
-                // var startDate = new Date( utils.getUnixToDateFormat( fulldate ) );
-                // var endDate = new Date( utils.getUnixToDateFormat( sharedDate ) );
                 var startDate = new Date( fulldate * 1000 );
                 var endDate = new Date( sharedDate * 1000 );
                 //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )

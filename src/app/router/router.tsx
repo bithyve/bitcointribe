@@ -93,6 +93,8 @@ import TrustedContactAcceptOtpScreen from "HexaWallet/src/screens/DrawerScreen/B
 
 //TODO: Common Screen  
 import QRCodeScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/QRCodeScreen";
+import OTPScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/OTPScreen";
+
 
 
 
@@ -512,8 +514,12 @@ export const createRootNavigator = (
       TrustedPartyShareSecretNavigator: {
         screen: TrustedPartyShareSecretStackNavigator,
         navigationOptions: { header: null }
+      },
+      //TODO: Common Screens
+      OTPScreenNavigator: {
+        screen: OTPScreen,
+        navigationOptions: { header: null }
       }
-
       //Drwaer Navigation
       // SecurityScreen: {
       //   screen: SecurityScreen,

@@ -185,7 +185,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             this.connection_UpdateSSSDetails( "EMAIL" );
             if ( Platform.OS == "android" ) {
                 Mailer.mail( {
-                    subject: 'Hexa Wallet SSS Recovery ID',
+                    subject: 'Hexa Wallet SSS Recovery',
                     recipients: [ item.value ],
                     body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
                     isHTML: true,
