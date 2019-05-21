@@ -206,6 +206,10 @@ const TrustedPartyShareSecretStackNavigator = createStackNavigator(
         header: null,
         tabBarVisible: false
       }
+    },
+    QRCodeScreen: {
+      screen: QRCodeScreen,
+      navigationOptions: { header: null }
     }
   },
   {
