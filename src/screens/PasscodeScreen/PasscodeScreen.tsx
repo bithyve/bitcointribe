@@ -124,7 +124,7 @@ export default class PasscodeScreen extends Component {
     // console.log( { rootViewController } );
     let pageName = utils.getRootViewController();
     let walletDetails = await comFunDBRead.readTblWallet();
-    if ( pageName != "TrustedPartyShareSecretNavigator" ) {
+    if ( pageName != "TrustedPartyShareSecretNavigator" && pageName != "OTPScreenNavigator" ) {
       const resetAction = StackActions.reset( {
         index: 0, // <-- currect active route from actions array
         key: null,

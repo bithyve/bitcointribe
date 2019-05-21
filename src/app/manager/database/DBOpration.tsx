@@ -75,6 +75,7 @@ const readTablesData = ( tableName: any ) => {
               data.metaData = utils.decrypt( data.metaData, passcode );
               data.nonPMDDData = utils.decrypt( data.nonPMDDData, passcode );
               data.history = utils.decrypt( data.history, passcode );
+              data.sharedDate = utils.decrypt( data.sharedDate, passcode );
               temp.push( data );
             }
             else {
@@ -806,7 +807,6 @@ const updateSSSTransferMehtodDetails = (
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
     console.log( { tblName, type, date, history, recoardId } );
-
     try {
       db.transaction( function ( txn ) {
         txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
@@ -964,6 +964,56 @@ const insertTrustedPartyDetails = (
 };
 
 
+const updateHistroyAndSharedDate = (
+  tblName: string,
+  history: any,
+  sharedDate: string,
+  id: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        //  console.log( { tblName, history, sharedDate, id } );
+        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+          var len = results.rows.length;
+          if ( len > 0 ) {
+            for ( let j = 0; j < len; j++ ) {
+              let tableId = results.rows.item( j ).id;
+              if ( tableId == id ) {
+                txn.executeSql(
+                  "update " +
+                  tblName +
+                  " set history = :history,sharedDate =:sharedDate where id = :id",
+                  [
+                    utils.encrypt( JSON.stringify( history ).toString(), passcode ),
+                    utils.encrypt( sharedDate.toString(), passcode ),
+                    id
+                  ]
+                );
+                resolve( true );
+                break;
+              }
+            }
+          }
+        } );
+
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
+
+
+
+
+
+
+
+
+
 
 module.exports = {
   readTablesData,
@@ -989,6 +1039,8 @@ module.exports = {
   updateSSSContactListDetails,
   updateSSSTransferMehtodDetails,
   updateSSSShareStage,
+
   //SSS Trusted Party Details 
-  insertTrustedPartyDetails
+  insertTrustedPartyDetails,
+  updateHistroyAndSharedDate
 };

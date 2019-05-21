@@ -54,7 +54,7 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
-export default class TrustedContactAcceptOtpScreen extends Component {
+export default class OTPScreen extends Component {
     constructor ( props: any ) {
         super( props );
         this.state = {
@@ -77,17 +77,18 @@ export default class TrustedContactAcceptOtpScreen extends Component {
 
 
     async componentDidMount() {
-        let keeperInfo = this.props.navigation.getParam( "data" );
         let script = utils.getDeepLinkingUrl();
         let messageId = script.mi;
         console.log( { messageId } );
-        const resDownShare = await S3Service.downloadShare( messageId );
-        console.log( { resDownShare } );
+        let walletDetails = utils.getWalletDetails();
+        const resDownloadShare = await S3Service.downloadShare( messageId );
+        // console.log( resDownloadShare );
         this.setState( {
-            arr_ResDownShare: resDownShare,
-            keeperInfo
+            arr_ResDownShare: resDownloadShare,
         } )
     }
+
+
 
 
     _onFinishCheckingCode = async ( code: string ) => {
@@ -105,86 +106,94 @@ export default class TrustedContactAcceptOtpScreen extends Component {
         this.setState( {
             flag_Loading: true
         } )
-        let keeperInfo = this.state.keeperInfo;
         let enterOtp = this.state.otp;
         let script = utils.getDeepLinkingUrl();
         let messageId = script.mi;
-        let walletDetails = utils.getWalletDetails();
-        const sss = new S3Service(
-            walletDetails.mnemonic
-        );
-        //console.log( { messageId, enterOtp } );
-        let urlScript = {};
-        urlScript.walletName = script.wn;
         let resDownShare = this.state.arr_ResDownShare;
         //console.log( { resDownShare } );
         const resDecryptOTPEncShare = await S3Service.decryptOTPEncShare( resDownShare, messageId, enterOtp )
-        //console.log( { resDecryptOTPEncShare } );
-        let resShareId = await sss.getShareId( resDecryptOTPEncShare.decryptedShare.encryptedShare )
-        //console.log( { resShareId } );
+        if ( resDecryptOTPEncShare.status == 200 ) {
+            setTimeout( () => {
+                Alert.alert(
+                    'Success',
+                    'Decrypted share created.',
+                    [
+                        {
+                            text: 'OK', onPress: () => {
+                                utils.setDeepLinkingType( "" );
+                                utils.setDeepLinkingUrl( "" );
+                                // this.props.navigation.navigate( 'WalletScreen' );
+                            }
+                        },
 
-        const { data, updated } = await sss.updateHealth( resDecryptOTPEncShare.decryptedShare.meta.walletId, resDecryptOTPEncShare.decryptedShare.encryptedShare );
-        // console.log( { data, updated } );
-
-        if ( updated ) {
-            if ( resDecryptOTPEncShare != "" || resDecryptOTPEncShare != null ) {
-                const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
-                    localDB.tableName.tblTrustedPartySSSDetails,
-                    dateTime,
-                    keeperInfo,
-                    urlScript,
-                    resDecryptOTPEncShare.decryptedShare.encryptedShare,
-                    resShareId,
-                    resDecryptOTPEncShare.decryptedShare,
-                    typeof data !== "undefined" ? data : ""
-                );
-                //console.log( { resinsertTrustedPartyDetails } );
-                if ( resinsertTrustedPartyDetails == true ) {
-                    this.setState( {
-                        flag_Loading: false
-                    } )
-                    setTimeout( () => {
-                        Alert.alert(
-                            'Success',
-                            'Decrypted share created.',
-                            [
-                                {
-                                    text: 'OK', onPress: () => {
-                                        utils.setDeepLinkingType( "" );
-                                        utils.setDeepLinkingUrl( "" );
-                                        this.props.navigation.navigate( 'WalletScreen' );
-                                    }
-                                },
-
-                            ],
-                            { cancelable: false }
-                        )
-                    }, 100 );
-                } else {
-                    this.setState( {
-                        flag_Loading: false
-                    } )
-                    setTimeout( () => {
-                        Alert.alert(
-                            'OH',
-                            resinsertTrustedPartyDetails,
-                            [
-                                {
-                                    text: 'OK', onPress: () => {
-                                        utils.setDeepLinkingType( "" );
-                                        utils.setDeepLinkingUrl( "" );
-                                        this.props.navigation.navigate( 'WalletScreen' );
-                                    }
-                                },
-                            ],
-                            { cancelable: false }
-                        )
-                    }, 100 );
-                }
-            }
-        } else {
-            Alert.alert( "updateHealth fun not working." )
+                    ],
+                    { cancelable: false }
+                )
+            }, 100 );
         }
+
+
+
+
+        // if ( updated ) {
+        //     if ( resDecryptOTPEncShare != "" || resDecryptOTPEncShare != null ) {
+        //         const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
+        //             localDB.tableName.tblTrustedPartySSSDetails,
+        //             dateTime,
+        //             keeperInfo,
+        //             urlScript,
+        //             resDecryptOTPEncShare.decryptedShare.encryptedShare,
+        //             resShareId,
+        //             resDecryptOTPEncShare.decryptedShare,
+        //             typeof data !== "undefined" ? data : ""
+        //         );
+        //         //console.log( { resinsertTrustedPartyDetails } );
+        //         if ( resinsertTrustedPartyDetails == true ) {
+        //             this.setState( {
+        //                 flag_Loading: false
+        //             } )
+        //             setTimeout( () => {
+        //                 Alert.alert(
+        //                     'Success',
+        //                     'Decrypted share created.',
+        //                     [
+        //                         {
+        //                             text: 'OK', onPress: () => {
+        //                                 utils.setDeepLinkingType( "" );
+        //                                 utils.setDeepLinkingUrl( "" );
+        //                                 this.props.navigation.navigate( 'WalletScreen' );
+        //                             }
+        //                         },
+
+        //                     ],
+        //                     { cancelable: false }
+        //                 )
+        //             }, 100 );
+        //         } else {
+        //             this.setState( {
+        //                 flag_Loading: false
+        //             } )
+        //             setTimeout( () => {
+        //                 Alert.alert(
+        //                     'OH',
+        //                     resinsertTrustedPartyDetails,
+        //                     [
+        //                         {
+        //                             text: 'OK', onPress: () => {
+        //                                 utils.setDeepLinkingType( "" );
+        //                                 utils.setDeepLinkingUrl( "" );
+        //                                 this.props.navigation.navigate( 'WalletScreen' );
+        //                             }
+        //                         },
+        //                     ],
+        //                     { cancelable: false }
+        //                 )
+        //             }, 100 );
+        //         }
+        //     }
+        // } else {
+        //     Alert.alert( "updateHealth fun not working." )
+        // }
     }
 
     render() {
@@ -204,7 +213,6 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                                 transparent
                                 onPress={ () => this.props.navigation.pop() }
                             >
-                                <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
                                 <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Accept Secret via OTP</Text>
                             </Button>
                             <Text note style={ { textAlign: "center", marginTop: 10, marginRight: 10 } }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
