@@ -81,6 +81,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             let jsonTemp = {}
             for ( let i = 0; i < temp.length; i++ ) {
                 if ( temp[ i ].walletName == walletName ) {
+                    this.refs.modal4.open();
                     let data = temp[ i ];
                     console.log( { data } );
                     jsonTemp.thumbnailPath = data.keeperInfo.thumbnailPath;
@@ -97,7 +98,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             this.setState( {
                 arr_SelectedContact: jsonTemp
             } )
-            this.refs.modal4.open();
+
         }
     }
 
@@ -110,9 +111,19 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
     }
 
 
-    press = ( hey: any ) => {
-        console.log( { hey } );
-
+    press = ( item: any ) => {
+        console.log( { item } );
+        let jsonTemp = {}
+        jsonTemp.thumbnailPath = item.keeperInfo.thumbnailPath;
+        jsonTemp.givenName = item.keeperInfo.givenName;
+        jsonTemp.familyName = item.keeperInfo.familyName;
+        jsonTemp.phoneNumbers = item.keeperInfo.phoneNumbers[ 0 ].number;
+        jsonTemp.emailAddresses = item.keeperInfo.emailAddresses[ 0 ].email;
+        jsonTemp.qrCodeString = "Wallet";
+        this.setState( {
+            arr_SelectedContact: jsonTemp
+        } )
+        this.refs.modal4.open();
     }
 
     //TODO: Searching Contact List
@@ -224,19 +235,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
 
     //TODO: func backQrCodeScreen
     onSelect = ( data: any ) => {
-        Alert.alert(
-            'Success',
-            'Email Sent Completed.',
-            [
-                {
-                    text: 'OK', onPress: () => {
-                        this.reloadList( "QR" );
-                    }
-                },
-
-            ],
-            { cancelable: false }
-        )
+        console.log( { data } );
     };
 
     //TODO: Deep{ling sent then reload data
