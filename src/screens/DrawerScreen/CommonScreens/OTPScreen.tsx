@@ -37,6 +37,9 @@ import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 
+//TODO: Custome Model
+import ModelRestoreAssociateContactList from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelRestoreAssociateContactList";
+
 //TODO: Custome Object   
 import {
     colors,
@@ -53,6 +56,10 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
 
 export default class OTPScreen extends Component {
     constructor ( props: any ) {
@@ -71,25 +78,47 @@ export default class OTPScreen extends Component {
             statusConfirmBtnDisable: true,
             flag_Loading: false,
             keeperInfo: [],
-            arr_ResDownShare: []
+            arr_ResDownShare: [],
+            arr_ModelRestoreAssociateContactList: [],
+            recordId: ""
         };
     }
 
 
-    async componentDidMount() {
+    async componentWillMount() {
         let script = utils.getDeepLinkingUrl();
         let messageId = script.mi;
         console.log( { messageId } );
         let walletDetails = utils.getWalletDetails();
         const resDownloadShare = await S3Service.downloadShare( messageId );
-        // console.log( resDownloadShare );
+        let resSSSDetails = await comFunDBRead.readTblSSSDetails();
+        let arr_KeeperInfo = [];
+        for ( let i = 0; i < resSSSDetails.length; i++ ) {
+            let data = {};
+            let fullInfo = resSSSDetails[ i ]
+            if ( fullInfo.acceptedDate == "" ) {
+                let keerInfo = JSON.parse( resSSSDetails[ i ].keeperInfo );
+                data.thumbnailPath = keerInfo.thumbnailPath;
+                data.givenName = keerInfo.givenName;
+                data.familyName = keerInfo.familyName;
+                data.phoneNumbers = keerInfo.phoneNumbers;
+                data.emailAddresses = keerInfo.emailAddresses;
+                data.recordId = fullInfo.recordId;
+                arr_KeeperInfo.push( data );
+            }
+        }
+        console.log( { arr_KeeperInfo } );
         this.setState( {
-            arr_ResDownShare: resDownloadShare,
+            arr_ModelRestoreAssociateContactList: [
+                {
+                    modalVisible: true,
+                    item: arr_KeeperInfo
+                }
+            ],
+            arr_ResDownShare: resDownloadShare
         } )
+
     }
-
-
-
 
     _onFinishCheckingCode = async ( code: string ) => {
         console.log( { code } );
@@ -109,91 +138,47 @@ export default class OTPScreen extends Component {
         let enterOtp = this.state.otp;
         let script = utils.getDeepLinkingUrl();
         let messageId = script.mi;
+        let recordId = this.state.recordId;
+        console.log( { messageId, recordId } );
+
         let resDownShare = this.state.arr_ResDownShare;
         //console.log( { resDownShare } );
-        const resDecryptOTPEncShare = await S3Service.decryptOTPEncShare( resDownShare, messageId, enterOtp )
+        const resDecryptOTPEncShare = await S3Service.decryptOTPEncShare( resDownShare, messageId, enterOtp );
+        console.log( { resDecryptOTPEncShare } );
         if ( resDecryptOTPEncShare.status == 200 ) {
-            setTimeout( () => {
-                Alert.alert(
-                    'Success',
-                    'Decrypted share created.',
-                    [
-                        {
-                            text: 'OK', onPress: () => {
-                                utils.setDeepLinkingType( "" );
-                                utils.setDeepLinkingUrl( "" );
-                                // this.props.navigation.navigate( 'WalletScreen' );
-                            }
-                        },
 
-                    ],
-                    { cancelable: false }
-                )
-            }, 100 );
+            const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSSSRetoreDecryptedShare(
+                localDB.tableName.tblSSSDetails,
+                resDecryptOTPEncShare.decryptedShare,
+                dateTime,
+                recordId
+            );
+            if ( resUpdateSSSRetoreDecryptedShare ) {
+                this.setState( {
+                    flag_Loading: false
+                } )
+                setTimeout( () => {
+                    Alert.alert(
+                        'Success',
+                        'Decrypted share created.',
+                        [
+                            {
+                                text: 'OK', onPress: () => {
+                                    utils.setDeepLinkingType( "" );
+                                    utils.setDeepLinkingUrl( "" );
+                                    this.props.navigation.navigate( 'RestoreWalletUsingTrustedContactNavigator1' );
+                                }
+                            },
+
+                        ],
+                        { cancelable: false }
+                    )
+                }, 100 );
+            } else {
+                Alert.alert( "Local db database not update.(mobile no not correct.)" )
+            }
         }
 
-
-
-
-        // if ( updated ) {
-        //     if ( resDecryptOTPEncShare != "" || resDecryptOTPEncShare != null ) {
-        //         const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
-        //             localDB.tableName.tblTrustedPartySSSDetails,
-        //             dateTime,
-        //             keeperInfo,
-        //             urlScript,
-        //             resDecryptOTPEncShare.decryptedShare.encryptedShare,
-        //             resShareId,
-        //             resDecryptOTPEncShare.decryptedShare,
-        //             typeof data !== "undefined" ? data : ""
-        //         );
-        //         //console.log( { resinsertTrustedPartyDetails } );
-        //         if ( resinsertTrustedPartyDetails == true ) {
-        //             this.setState( {
-        //                 flag_Loading: false
-        //             } )
-        //             setTimeout( () => {
-        //                 Alert.alert(
-        //                     'Success',
-        //                     'Decrypted share created.',
-        //                     [
-        //                         {
-        //                             text: 'OK', onPress: () => {
-        //                                 utils.setDeepLinkingType( "" );
-        //                                 utils.setDeepLinkingUrl( "" );
-        //                                 this.props.navigation.navigate( 'WalletScreen' );
-        //                             }
-        //                         },
-
-        //                     ],
-        //                     { cancelable: false }
-        //                 )
-        //             }, 100 );
-        //         } else {
-        //             this.setState( {
-        //                 flag_Loading: false
-        //             } )
-        //             setTimeout( () => {
-        //                 Alert.alert(
-        //                     'OH',
-        //                     resinsertTrustedPartyDetails,
-        //                     [
-        //                         {
-        //                             text: 'OK', onPress: () => {
-        //                                 utils.setDeepLinkingType( "" );
-        //                                 utils.setDeepLinkingUrl( "" );
-        //                                 this.props.navigation.navigate( 'WalletScreen' );
-        //                             }
-        //                         },
-        //                     ],
-        //                     { cancelable: false }
-        //                 )
-        //             }, 100 );
-        //         }
-        //     }
-        // } else {
-        //     Alert.alert( "updateHealth fun not working." )
-        // }
     }
 
     render() {
@@ -264,6 +249,18 @@ export default class OTPScreen extends Component {
                         </View>
                     </KeyboardAwareScrollView>
                 </ImageBackground>
+                <ModelRestoreAssociateContactList data={ this.state.arr_ModelRestoreAssociateContactList } click_Confirm={ ( recordId: string ) => {
+                    this.setState( {
+                        recordId,
+                        arr_ModelRestoreAssociateContactList: [
+                            {
+                                modalVisible: false,
+                                item: ""
+                            }
+                        ],
+                    } )
+                }
+                } />
                 <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
             </View>
         );

@@ -52,6 +52,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             otp: "",
             qrCodeString: "",
             walletName: "",
+            mobileNo: "",
             flag_NextBtnDisable: true,
             flag_NextBtnDisable1: false,
             flag_Loading: false,
@@ -74,7 +75,6 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             }
         }
         console.log( { history } );
-
         //for history get opt
         let tempOpt = [];
         for ( let i = 0; i < history.length; i++ ) {
@@ -118,11 +118,10 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             data: temp,
             arr_OrignalDetails: temp
         } );
-
         //TODO: DeepLinking open person contact detail
         let urlScript = utils.getDeepLinkingUrl();
         let urlType = utils.getDeepLinkingType();
-        let qrCodeString, walletName;
+        let qrCodeString, walletNa, mobileNo;
         if ( urlType == "SSS Restore SMS/EMAIL" ) {
             let walletName = urlScript.wn;
             let jsonTemp = {}
@@ -142,9 +141,11 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                     jsonTemp.history = data.history;
                     jsonTemp.sharedDate = data.sharedDate;
                     jsonTemp.metaData = data.metaData;
+                    jsonTemp.mobileNo = data.mobileNo;
                     jsonTemp.id = data.id;
                     qrCodeString = data.metaData;
-                    walletName = data.walletName;
+                    walletNa = data.walletName;
+                    mobileNo = data.mobileNo;
                     break;
                 } else {
                     Alert.alert( "This Wallet Name recoard not found!" )
@@ -152,7 +153,9 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             }
             this.setState( {
                 arr_SelectedContact: jsonTemp,
-                qrCodeString
+                qrCodeString,
+                walletName: walletNa,
+                mobileNo
             } )
 
         }
@@ -181,12 +184,14 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         jsonTemp.history = item.history;
         jsonTemp.sharedDate = item.sharedDate;
         jsonTemp.metaData = item.metaData;
+        jsonTemp.mobileNo = item.mobileNo;
         jsonTemp.id = item.id;
         jsonTemp.qrCodeString = "Wallet";
         this.setState( {
             arr_SelectedContact: jsonTemp,
             qrCodeString: item.metaData,
-            walletName: item.walletName
+            walletName: item.walletName,
+            mobileNo: item.mobileNo
         } )
         this.refs.modal4.open();
     }
@@ -239,6 +244,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
     click_SentRequest( type: string, val: any ) {
         let script = {};
         script.mi = this.state.messageId;
+        // script.mo = this.state.mobileNo;
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );
         this.refs.modal4.close();
@@ -315,7 +321,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                 }, 1000 );
             }
         } else if ( type == "QR" && this.state.messageId != "" ) {
-            this.props.navigation.push( "QRCodeScreen", { data: this.state.qrCodeString, walletName: this.state.walletName, onSelect: this.onSelect } );
+            this.props.navigation.push( "QRCodeScreen", { data: this.state.qrCodeString, walletName: this.state.walletName, mobileNo: this.state.mobileNo, onSelect: this.onSelect } );
             this.refs.modal4.close();
         }
     }

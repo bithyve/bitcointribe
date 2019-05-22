@@ -68,17 +68,20 @@ export default class RestoreSelectedContactsListScreen extends Component {
             arr_SelectedContact: [],
             arr_WalletDetails: [],
             arr_SSSDetails: [],
-            selectedIndex: 0
+            selectedIndex: 0,
+            flag_DisableBtnNext: true
 
         };
     }
     componentDidMount() {
         this.setState( {
             arr_KeeperInfo: [],
-            flag_DisableBtnNext: true
         } )
         if ( Platform.OS == "android" ) {
             Permissions.request( 'readSms' ).then( ( response: any ) => {
+                console.log( response );
+            } );
+            Permissions.request( 'camera' ).then( ( response: any ) => {
                 console.log( response );
             } );
         }
@@ -90,6 +93,7 @@ export default class RestoreSelectedContactsListScreen extends Component {
         console.log( { resSSSDetails } );
         console.log( { arr_WalletDetails } );
         let arr_KeeperInfo = [];
+        let count_AcceptedSecret = 0;
         for ( let i = 0; i < resSSSDetails.length; i++ ) {
             let data = {};
             let fullInfo = resSSSDetails[ i ]
@@ -99,14 +103,30 @@ export default class RestoreSelectedContactsListScreen extends Component {
             data.familyName = keerInfo.familyName;
             data.phoneNumbers = keerInfo.phoneNumbers;
             data.emailAddresses = keerInfo.emailAddresses;
-            data.recordID = fullInfo.recordID;
+            data.recordId = fullInfo.recordId;
             console.log( fullInfo.sharedDate );
-            if ( fullInfo.sharedDate != "" ) {
+            if ( fullInfo.sharedDate == "" && fullInfo.acceptedDate == "" ) {
+                data.btnTitle = "Request";
+                data.flag_BtnTitle = true;
+            } else if ( fullInfo.sharedDate != "" && fullInfo.acceptedDate == "" ) {
                 data.btnTitle = "Re-Request";
+                data.flag_BtnTitle = true;
+            } else if ( fullInfo.sharedDate != "" && fullInfo.acceptedDate != "" ) {
+                data.successMsg = "Secret Receieved";
+                data.flag_BtnTitle = false;
             } else {
                 data.btnTitle = "Request";
+                data.flag_BtnTitle = true;
+            }
+            if ( fullInfo.acceptedDate != "" ) {
+                count_AcceptedSecret = count_AcceptedSecret + 1;
             }
             arr_KeeperInfo.push( data );
+        }
+        if ( count_AcceptedSecret > 1 ) {
+            this.setState( {
+                flag_DisableBtnNext: false
+            } )
         }
         this.setState( {
             arr_KeeperInfo,
@@ -213,7 +233,7 @@ export default class RestoreSelectedContactsListScreen extends Component {
 
             }
         } else {
-            this.props.navigation.push( "QRCodeScreen", { data: "newmodelsize", onSelect: this.onSelect } );
+            this.props.navigation.push( "QRCodeScanScreen", { onSelect: this.onSelect } );
             this.refs.modal4.close();
         }
 
@@ -221,19 +241,8 @@ export default class RestoreSelectedContactsListScreen extends Component {
 
     //TODO: func backQrCodeScreen
     onSelect = ( data: any ) => {
-        Alert.alert(
-            'Success',
-            'Email Sent Completed.',
-            [
-                {
-                    text: 'OK', onPress: () => {
-                        this.reloadList( "QR" );
-                    }
-                },
-
-            ],
-            { cancelable: false }
-        )
+        console.log( { data } );
+        this.reloadList( "QR" );
     };
 
     //TODO: Deep{ling sent then reload data
@@ -273,7 +282,7 @@ export default class RestoreSelectedContactsListScreen extends Component {
                         <View style={ { marginLeft: 10, marginTop: 15 } }>
                             <Button
                                 transparent
-                                onPress={ () => this.props.navigation.pop() }
+                                onPress={ () => this.props.navigation.navigate( "RestoreAndWalletSetupNavigator" ) }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 22 : 17, marginLeft: 0 } ] }>Selected Contacts</Text>
@@ -313,22 +322,27 @@ export default class RestoreSelectedContactsListScreen extends Component {
                                                 ) }
                                                 <View style={ { flexDirection: "column", justifyContent: "center", flex: 2.8 } }>
                                                     <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                    { renderIf( item.flag_BtnTitle != true )(
+                                                        <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 12, color: "#50B48A" } ] }>{ item.successMsg }</Text>
+                                                    ) }
                                                 </View>
-                                                <View style={ {
-                                                    flex: 1,
-                                                    alignItems: 'flex-end',
-                                                    justifyContent: 'center'
-                                                } }>
-                                                    <Button small transparent dark style={ { backgroundColor: "#D0D0D0" } } onPress={ () => this.click_Request( item, index ) }>
-                                                        <Text style={ { fontSize: 12, color: "#000000" } }>{ item.btnTitle }</Text>
-                                                    </Button>
-                                                </View>
+                                                { renderIf( item.flag_BtnTitle == true )(
+                                                    <View style={ {
+                                                        flex: 1,
+                                                        alignItems: 'flex-end',
+                                                        justifyContent: 'center'
+                                                    } }>
+                                                        <Button small transparent dark style={ { backgroundColor: "#D0D0D0" } } onPress={ () => this.click_Request( item, index ) }>
+                                                            <Text style={ { fontSize: 12, color: "#000000" } }>{ item.btnTitle }</Text>
+                                                        </Button>
+                                                    </View>
+                                                ) }
                                             </View>
                                         </View>
                                     </RkCard>
 
                                 ) }
-                                keyExtractor={ item => item.recordID }
+                                keyExtractor={ item => item.recordId }
                                 extraData={ this.state }
                             />
                         </View>

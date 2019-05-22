@@ -53,6 +53,7 @@ const readTablesData = ( tableName: any ) => {
             }
             else if ( tableName == "tblSSSDetails" ) {
               data.id = data.id;
+              data.dateCreated = utils.decrypt( data.dateCreated, passcode );
               data.share = utils.decrypt( data.share, passcode );
               data.shareId = utils.decrypt( data.shareId, passcode );
               data.keeperInfo = utils.decrypt( data.keeperInfo, passcode );
@@ -63,6 +64,8 @@ const readTablesData = ( tableName: any ) => {
               data.lastSuccessfulCheck = utils.decrypt( data.lastSuccessfulCheck, passcode );
               data.shareStage = utils.decrypt( data.shareStage, passcode );
               data.recordId = utils.decrypt( data.recordId, passcode );
+              data.decryptedShare = utils.decrypt( data.decryptedShare, passcode );
+              data.mobileNo = utils.decrypt( data.mobileNo, passcode );
               temp.push( data );
             }
             else if ( tableName == "tblTrustedPartySSSDetails" ) {
@@ -733,10 +736,12 @@ const insertRestoreUsingTrustedContactKeepInfo = (
     db.transaction( function ( txn ) {
       for ( let i = 0; i < keepInfo.length; i++ ) {
         let data = keepInfo[ i ];
+        let phoneNo = data.phoneNumbers[ 0 ].number
+        // console.log( { data, phoneNo } );
         txn.executeSql(
           "INSERT INTO " +
           tblName +
-          "(dateCreated,keeperInfo,history,recordId) VALUES (:dateCreated,:keeperInfo,:history,:recordId)",
+          "(dateCreated,keeperInfo,history,recordId,mobileNo) VALUES (:dateCreated,:keeperInfo,:history,:recordId,:mobileNo)",
           [
             utils.encrypt(
               fulldate.toString(),
@@ -745,6 +750,7 @@ const insertRestoreUsingTrustedContactKeepInfo = (
             utils.encrypt( JSON.stringify( data ).toString(), passcode ),
             utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
             utils.encrypt( data.recordID.toString(), passcode ),
+            utils.encrypt( phoneNo.toString(), passcode ),
           ]
         );
       }
@@ -772,14 +778,17 @@ const updateSSSContactListDetails = (
               //console.log( { dbdecryptShareId } );
               let jsonConstactDetial = JSON.stringify( contactDetails[ i ] ).toString();
               let jsonRecordId = ( contactDetails[ i ].recordID ).toString();
-              //  console.log( { jsonConstactDetial, jsonRecordId } );
+              let phoneNo = ( contactDetails[ i ].phoneNumbers[ 0 ].number ).toString();
+              //console.log( { jsonConstactDetial, jsonRecordId } );
+              console.log( { jsonRecordId, phoneNo } );
               txn.executeSql(
                 "update " +
                 tblName +
-                " set keeperInfo = :keeperInfo,recordId =:recordId where shareId = :shareId",
+                " set keeperInfo = :keeperInfo,recordId =:recordId,mobileNo =:mobileNo where shareId = :shareId",
                 [
                   utils.encrypt( jsonConstactDetial, passcode ),
                   utils.encrypt( jsonRecordId, passcode ),
+                  utils.encrypt( phoneNo, passcode ),
                   dbdecryptShareId
                 ]
               );
@@ -891,6 +900,54 @@ const updateSSSShareStage = (
   } );
 };
 
+
+//update shareId shareStage
+const updateSSSRetoreDecryptedShare = (
+  tblName: string,
+  decryptedShare: any,
+  fulldate: string,
+  recordID: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        //console.log( { tblName, shareInfo, fulldate } );
+        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+          var len = results.rows.length;
+          if ( len > 0 ) {
+            for ( let j = 0; j < len; j++ ) {
+              let decryptRecordId = utils.decrypt(
+                results.rows.item( j ).recordId,
+                passcode
+              );
+              let encpRecordId = results.rows.item( j ).recordId;
+              if ( decryptRecordId == recordID ) {
+                txn.executeSql(
+                  "update " +
+                  tblName +
+                  " set decryptedShare = :decryptedShare,acceptedDate =:acceptedDate,lastSuccessfulCheck =:lastSuccessfulCheck where recordId = :recordId",
+                  [
+                    utils.encrypt( JSON.stringify( decryptedShare ).toString(), passcode ),
+                    utils.encrypt( fulldate.toString(), passcode ),
+                    utils.encrypt( fulldate.toString(), passcode ),
+                    encpRecordId
+                  ]
+                );
+                resolve( true );
+                break;
+              }
+            }
+          }
+        } );
+      } );
+    }
+    catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
 //TODO: ========================================>  SSS Trusted Party Details   <========================================
 //insert
 const insertTrustedPartyDetails = (
@@ -905,6 +962,11 @@ const insertTrustedPartyDetails = (
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
+    let temp = [];
+    let jsonData = {};
+    jsonData.title = "Secret Stored.";
+    jsonData.date = utils.getUnixToDateFormat( fulldate );
+    temp.push( jsonData );
     db.transaction( function ( txn ) {
       txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
         var len = results.rows.length;
@@ -921,7 +983,7 @@ const insertTrustedPartyDetails = (
               txn.executeSql(
                 "INSERT INTO " +
                 tblName +
-                "(dateCreated,keeperInfo,urlScript,decrShare,shareId,metaData,nonPMDDData) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:shareId,:metaData,:nonPMDDData)",
+                "(dateCreated,keeperInfo,urlScript,decrShare,shareId,metaData,nonPMDDData,history) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:shareId,:metaData,:nonPMDDData,:history)",
                 [
                   utils.encrypt(
                     fulldate.toString(),
@@ -932,7 +994,8 @@ const insertTrustedPartyDetails = (
                   utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
                   utils.encrypt( shareId.toString(), passcode ),
                   utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
-                  utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode )
+                  utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
+                  utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
                 ]
               );
               resolve( true );
@@ -942,7 +1005,7 @@ const insertTrustedPartyDetails = (
           txn.executeSql(
             "INSERT INTO " +
             tblName +
-            "(dateCreated,keeperInfo,urlScript,decrShare,shareId,metaData,nonPMDDData) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:shareId,:metaData,:nonPMDDData)",
+            "(dateCreated,keeperInfo,urlScript,decrShare,shareId,metaData,nonPMDDData,history) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:shareId,:metaData,:nonPMDDData,:history)",
             [
               utils.encrypt(
                 fulldate.toString(),
@@ -953,7 +1016,8 @@ const insertTrustedPartyDetails = (
               utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
               utils.encrypt( shareId.toString(), passcode ),
               utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
-              utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode )
+              utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
+              utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
             ]
           );
           resolve( true );
@@ -1039,6 +1103,7 @@ module.exports = {
   updateSSSContactListDetails,
   updateSSSTransferMehtodDetails,
   updateSSSShareStage,
+  updateSSSRetoreDecryptedShare,
 
   //SSS Trusted Party Details 
   insertTrustedPartyDetails,
