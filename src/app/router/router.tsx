@@ -27,6 +27,7 @@ import RestoreAllContactListScreen from "HexaWallet/src/screens/DrawerScreen/Res
 import RestoreSelectedContactsListScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreSelectedContactsListScreen";
 
 
+
 import WalletSetupScreens from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/WalletSetupScreens/WalletSetupScreens";
 import PermissionScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/PermissionScreen/PermissionScreen";
 
@@ -94,6 +95,8 @@ import TrustedContactAcceptOtpScreen from "HexaWallet/src/screens/DrawerScreen/B
 //TODO: Common Screen  
 import QRCodeScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/QRCodeScreen";
 import OTPScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/OTPScreen";
+import QRCodeScanScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/QRCodeScanScreen";
+
 
 
 
@@ -147,6 +150,10 @@ const RestoreWalletUsingTrustedContactStackNavigator = createStackNavigator(
     QRCodeScreen: {
       screen: QRCodeScreen,
       navigationOptions: { header: null }
+    },
+    QRCodeScanScreen: {
+      screen: QRCodeScanScreen,
+      navigationOptions: { header: null }
     }
   },
   {
@@ -174,6 +181,10 @@ const RestoreWalletUsingTrustedContactStackNavigator1 = createStackNavigator(
     },
     QRCodeScreen: {
       screen: QRCodeScreen,
+      navigationOptions: { header: null }
+    },
+    QRCodeScanScreen: {
+      screen: QRCodeScanScreen,
       navigationOptions: { header: null }
     }
   },
