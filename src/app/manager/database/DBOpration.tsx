@@ -912,30 +912,46 @@ const updateSSSRetoreDecryptedShare = (
   return new Promise( ( resolve, reject ) => {
     try {
       db.transaction( function ( txn ) {
-        //console.log( { tblName, shareInfo, fulldate } );
+        console.log( { tblName, decryptedShare } );
         txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
           var len = results.rows.length;
           if ( len > 0 ) {
             for ( let j = 0; j < len; j++ ) {
+              let dataNew = results.rows.item( j );
+              console.log( { dataNew } );
               let decryptRecordId = utils.decrypt(
                 results.rows.item( j ).recordId,
                 passcode
               );
-              let encpRecordId = results.rows.item( j ).recordId;
-              if ( decryptRecordId == recordID ) {
-                txn.executeSql(
-                  "update " +
-                  tblName +
-                  " set decryptedShare = :decryptedShare,acceptedDate =:acceptedDate,lastSuccessfulCheck =:lastSuccessfulCheck where recordId = :recordId",
-                  [
-                    utils.encrypt( JSON.stringify( decryptedShare ).toString(), passcode ),
-                    utils.encrypt( fulldate.toString(), passcode ),
-                    utils.encrypt( fulldate.toString(), passcode ),
-                    encpRecordId
-                  ]
-                );
-                resolve( true );
+              let dbDecryptedShare = results.rows.item( j ).decryptedShare;
+              var decrptedShare = "";
+              if ( dbDecryptedShare != "" ) {
+                decrptedShare = JSON.parse( utils.decrypt(
+                  dbDecryptedShare,
+                  passcode
+                ) );
+              }
+              if ( Object.keys( decryptedShare ).length == Object.keys( decrptedShare ).length ) {
+                console.log( "same data" );
+                resolve( "Already same decryptedShare stored.Please use other contact person." );
                 break;
+              } else {
+                let encpRecordId = results.rows.item( j ).recordId;
+                if ( decryptRecordId == recordID ) {
+                  txn.executeSql(
+                    "update " +
+                    tblName +
+                    " set decryptedShare = :decryptedShare,acceptedDate =:acceptedDate,lastSuccessfulCheck =:lastSuccessfulCheck where recordId = :recordId",
+                    [
+                      utils.encrypt( JSON.stringify( decryptedShare ).toString(), passcode ),
+                      utils.encrypt( fulldate.toString(), passcode ),
+                      utils.encrypt( fulldate.toString(), passcode ),
+                      encpRecordId
+                    ]
+                  );
+                  resolve( true );
+                  break;
+                }
               }
             }
           }

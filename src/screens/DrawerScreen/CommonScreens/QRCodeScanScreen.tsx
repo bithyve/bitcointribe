@@ -116,7 +116,7 @@ export default class QRCodeScanScreen extends React.Component {
         try {
             var result = e.data;
             result = JSON.parse( result );
-            console.log( { result } );
+            // console.log( { result } );
             if ( result.type == "SSS Restore" ) {
                 utils.setDeepLinkingType( "SSS Restore QR" );
                 let item = this.state.item;
@@ -155,14 +155,15 @@ export default class QRCodeScanScreen extends React.Component {
         let decryptedShare = this.state.decryptedShare;
         const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSSSRetoreDecryptedShare(
             localDB.tableName.tblSSSDetails,
-            decryptedShare,
+            JSON.parse( decryptedShare ),
             dateTime,
             recordId
         );
-        if ( resUpdateSSSRetoreDecryptedShare ) {
+        if ( resUpdateSSSRetoreDecryptedShare == true ) {
             this.click_GoBack();
+        } else {
+            Alert.alert( resUpdateSSSRetoreDecryptedShare );
         }
-
     }
 
     render() {
