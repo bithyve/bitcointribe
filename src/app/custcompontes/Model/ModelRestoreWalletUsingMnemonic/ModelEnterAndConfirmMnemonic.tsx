@@ -79,6 +79,8 @@ export default class ModelEnterAndConfirmMnemonic extends Component<Props, any> 
                 this.state.mnemonic
             );
             const getBal = await regularAccount.getBalance();
+            console.log( { getBal } );
+
             if ( getBal.status == 200 ) {
                 let bal = getBal.data.balance;
                 this.props.click_Confirm( mnemonic, bal );

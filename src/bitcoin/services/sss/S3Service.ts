@@ -43,7 +43,7 @@ export default class S3Service {
     await this.sss.decryptNonPMDD( encryptedNonPMDD );
 
   public static recoverFromShares = (
-    encryptedShares: string,
+    encryptedShares: string[],
     answers: string[]
   ) => {
     const decryptedShares = SSS.decryptShares( encryptedShares, answers );

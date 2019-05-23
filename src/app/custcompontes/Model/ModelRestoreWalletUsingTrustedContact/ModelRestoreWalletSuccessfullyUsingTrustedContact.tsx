@@ -21,7 +21,7 @@ interface Props {
     click_Skip: Function;
 }
 
-export default class ModelWalletSuccessfullyRestored extends Component<Props, any> {
+export default class ModelRestoreWalletSuccessfullyUsingTrustedContact extends Component<Props, any> {
 
     constructor ( props: any ) {
         super( props );
@@ -46,7 +46,6 @@ export default class ModelWalletSuccessfullyRestored extends Component<Props, an
 
     render() {
         let data = this.props.data.length != 0 ? this.props.data : [];
-        let flag_DisableBtnNext = this.state.flag_DisableBtnNext;
         return (
             <Modal
                 transparent
@@ -71,7 +70,7 @@ export default class ModelWalletSuccessfullyRestored extends Component<Props, an
                             <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingMnemonic.walletrestored } />
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-end" } }>
-                            <Text note style={ styles.txtNotes }>Your Wallet has been recovered successfully</Text>
+                            <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Congratulations! You can now use your Daily Account</Text>
                             <Text note>{ data.length != 0 ? data[ 0 ].walletName : "Hexa Wallet" }</Text>
                             <View style={ { flexDirection: "row", justifyContent: "center", alignItems: "center", margin: 10 } }>
                                 <SvgIcon name="icon_bitcoin" color="#D0D0D0" size={ 20 } />
@@ -95,7 +94,7 @@ export default class ModelWalletSuccessfullyRestored extends Component<Props, an
                                     height: 50,
                                 } ] }
                                 full>
-                                <Text>Skip</Text>
+                                <Text style={ { color: "#ffffff" } }>Skip</Text>
                             </Button>
                         </View>
                     </View>

@@ -25,6 +25,7 @@ import RestoreWalletUsingMnemonicScrren from "HexaWallet/src/screens/DrawerScree
 import RestoreWalletUsingTrustedContactScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreWalletUsingTrustedContactScreen";
 import RestoreAllContactListScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreAllContactListScreen";
 import RestoreSelectedContactsListScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreSelectedContactsListScreen";
+import RestoreWalletUsingTrustedContactQueAndAnwScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreWalletUsingTrustedContactQueAndAnwScreen";
 
 
 
@@ -105,6 +106,7 @@ import QRCodeScanScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/
 
 
 
+
 //TODO: StackNavigator
 
 //TODO: StackNavigator:ONBoarding
@@ -154,10 +156,13 @@ const RestoreWalletUsingTrustedContactStackNavigator = createStackNavigator(
     QRCodeScanScreen: {
       screen: QRCodeScanScreen,
       navigationOptions: { header: null }
+    },
+    RestoreWalletUsingTrustedContactQueAndAnwScreen: {
+      screen: RestoreWalletUsingTrustedContactQueAndAnwScreen,
+      navigationOptions: { header: null }
     }
   },
   {
-
     initialRouteName: "RestoreWalletUsingTrustedContactScreen"
   }
 );
@@ -165,7 +170,6 @@ const RestoreWalletUsingTrustedContactStackNavigator = createStackNavigator(
 
 
 const RestoreWalletUsingTrustedContactStackNavigator1 = createStackNavigator(
-
   {
     RestoreWalletUsingTrustedContactScreen: {
       screen: RestoreWalletUsingTrustedContactScreen,
@@ -185,6 +189,10 @@ const RestoreWalletUsingTrustedContactStackNavigator1 = createStackNavigator(
     },
     QRCodeScanScreen: {
       screen: QRCodeScanScreen,
+      navigationOptions: { header: null }
+    },
+    RestoreWalletUsingTrustedContactQueAndAnwScreen: {
+      screen: RestoreWalletUsingTrustedContactQueAndAnwScreen,
       navigationOptions: { header: null }
     }
   },
