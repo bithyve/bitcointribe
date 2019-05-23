@@ -21,16 +21,15 @@ import { StackActions, NavigationActions } from "react-navigation";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import Permissions from 'react-native-permissions'
 import { SvgIcon } from "@up-shared/components";
-
-
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-//TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+//TODO: Custome Compontes
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import ModelWalletName from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingMnemonic/ModelWalletName";
-import ModelEnterAndConfirmMnemonic from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingMnemonic/ModelEnterAndConfirmMnemonic";
-import ModelWalletSuccessfullyRestored from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingMnemonic/ModelWalletSuccessfullyRestored";
+
+//TODO: Custome Models  
+import ModelRestoreWalletFirstQuestion from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelRestoreWalletFirstQuestion";
+import ModelRestoreWalletSecoundQuestion from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelRestoreWalletSecoundQuestion";
+import ModelRestoreWalletSuccessfullyUsingTrustedContact from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelRestoreWalletSuccessfullyUsingTrustedContact";
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -46,32 +45,41 @@ import utils from "HexaWallet/src/app/constants/Utils";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
+
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
 
 
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
-import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus"
 
-export default class RestoreWalletUsingMnemonicScrren extends Component {
+export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Component {
+
     constructor ( props: any ) {
         super( props );
         this.state = {
-            arr_ModelWalletName: [],
-            arr_ConfirmPassphrase: [],
-            arr_ModelRestoreSucess: [],
-            wallerName: "",
-            flag_Loading: false
+            arr_WalletDetail: [],
+            arr_SSSDetails: [],
+            arr_ModelRestoreWalletFirstQuestion: [],
+            arr_ModelRestoreWalletSecoundQuestion: [],
+            arr_QuestionAndAnwserDetails: [],
+            arr_ModelRestoreWalletSuccessfullyUsingTrustedContact: []
         };
     }
 
-    componentDidMount() {
+
+    async componentDidMount() {
+        let arr_WalletDetail = await comFunDBRead.readTblWallet();
+        let arr_SSSDetails = await comFunDBRead.readTblSSSDetails();
+        console.log( { arr_WalletDetail } );
         this.setState( {
-            arr_ModelWalletName: [
+            arr_WalletDetail,
+            arr_SSSDetails,
+            arr_ModelRestoreWalletFirstQuestion: [
                 {
                     modalVisible: true
                 }
@@ -79,41 +87,55 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
         } )
     }
 
-    //TODO: func click_getWalletDetails
-    getWalletDetails = async ( mnemonic: string, bal: any ) => {
-        const dateTime = Date.now();
-        const fulldate = Math.floor( dateTime / 1000 );
-        let walletName = this.state.wallerName;
-        await dbOpration.insertWallet(
-            localDB.tableName.tblWallet,
-            fulldate,
-            mnemonic,
-            "",
-            "",
-            "",
-            walletName,
-            ""
-        );
-        const res = await comAppHealth.check_AppHealthStausUsingMnemonic( 0, 0, null, dateTime, "mnemonic" );
-        if ( res ) {
-            await dbOpration.insertCreateAccount(
-                localDB.tableName.tblAccount,
-                fulldate,
-                "",
-                bal,
-                "BTC",
-                "Daily Wallet",
-                "Daily Wallet",
-                ""
-            );
-        } else {
-            Alert.alert( "App health staus not updated." )
+    //TODO: Secound question click Next 
+    click_SecoundNext = async ( secoundQuestion: string, secoundAnswer: string, arr_QuestionList: any ) => {
+        let walletDetail = this.state.arr_WalletDetail;
+        let sssDetails = this.state.arr_SSSDetails;
+
+        var temp = [];
+        temp = this.state.arr_QuestionAndAnwserDetails;
+        let data = {};
+        data.secoundQuestion = secoundQuestion;
+        data.secoundAnswer = secoundAnswer;
+        temp.push( data );
+        let decryptedShare = [];
+        let answers = [ temp[ 0 ].firstAnswer, temp[ 1 ].secoundAnswer ];
+        for ( let i = 0; i < sssDetails.length; i++ ) {
+            let data = sssDetails[ i ];
+            if ( data.decryptedShare != "" ) {
+                decryptedShare.push( JSON.parse( data.decryptedShare ) )
+            }
         }
+        console.log( { sssDetails, temp } );
+        console.log( { decryptedShare, answers } );
+        const resRecoverFromShares = await S3Service.recoverFromShares( decryptedShare, answers );
+        console.log( { resRecoverFromShares } );
+
+
+        // this.setState( {
+        //     arr_QuestionAndAnwserDetails: temp,
+        //     arr_ModelRestoreWalletSecoundQuestion: [
+        //         {
+        //             modalVisible: false,
+        //             arr_QuestionList
+        //         }
+        //     ],
+        //     arr_ModelRestoreWalletSuccessfullyUsingTrustedContact: [
+        //         {
+        //             modalVisible: true,
+        //             walletName: walletDetail.walletType,
+        //             bal: "0.00",
+        //         }
+        //     ]
+        // } )
+
     }
 
 
 
-    //TODO: Sucess Model
+
+
+    //TODO: Success Wallet Setup then skip button on click
     click_Skip() {
         const resetAction = StackActions.reset( {
             index: 0, // <-- currect active route from actions array
@@ -129,6 +151,7 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
         this.props.navigation.dispatch( resetAction );
     }
 
+
     render() {
         return (
             <View style={ styles.container }>
@@ -142,18 +165,25 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
                             enableOnAndroid={ true }
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
-                            <ModelWalletName data={ this.state.arr_ModelWalletName } click_Confirm={ ( val ) => {
-                                console.log( { val } );
+                            <ModelRestoreWalletFirstQuestion data={ this.state.arr_ModelRestoreWalletFirstQuestion } click_Next={ ( firstQuestion: string, firstAnswer: string, arr_QuestionList: any ) => {
+                                console.log( { arr_QuestionList } );
+
+                                let temp = [];
+                                let data = {};
+                                data.firstQuestion = firstQuestion;
+                                data.firstAnswer = firstAnswer;
+                                temp.push( data );
                                 this.setState( {
-                                    wallerName: val,
-                                    arr_ModelWalletName: [
+                                    arr_QuestionAndAnwserDetails: temp,
+                                    arr_ModelRestoreWalletFirstQuestion: [
                                         {
                                             modalVisible: false
                                         }
                                     ],
-                                    arr_ConfirmPassphrase: [
+                                    arr_ModelRestoreWalletSecoundQuestion: [
                                         {
-                                            modalVisible: true
+                                            modalVisible: true,
+                                            arr_QuestionList
                                         }
                                     ]
                                 } )
@@ -161,7 +191,7 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
                             }
                                 pop={ () => {
                                     this.setState( {
-                                        arr_ModelWalletName: [
+                                        arr_ModelRestoreWalletFirstQuestion: [
                                             {
                                                 modalVisible: false
                                             }
@@ -170,52 +200,33 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
                                     this.props.navigation.pop()
                                 } }
                             />
-                            <ModelEnterAndConfirmMnemonic data={ this.state.arr_ConfirmPassphrase } loadingFlag={ ( flag: boolean ) => {
-                                this.setState( { flag_Loading: flag } )
-                                console.log( { flag } );
-                            } } click_Confirm={ ( val: string, bal: any ) => {
-                                this.getWalletDetails( val, bal );
-                                this.setState( {
-                                    arr_ConfirmPassphrase: [
-                                        {
-                                            modalVisible: false
-                                        }
-                                    ],
-                                    arr_ModelRestoreSucess: [
-                                        {
-                                            modalVisible: true,
-                                            walletName: this.state.wallerName,
-                                            bal: bal.toString()
-                                        }
-                                    ]
-                                } )
-                            }
-                            }
+                            <ModelRestoreWalletSecoundQuestion data={ this.state.arr_ModelRestoreWalletSecoundQuestion }
+                                click_Next={ ( secoundQuestion: string, secoundAnswer: string, arr_QuestionList: any ) => {
+                                    this.click_SecoundNext( secoundQuestion, secoundAnswer, arr_QuestionList );
+                                }
+                                }
                                 pop={ () => {
                                     this.setState( {
-                                        arr_ConfirmPassphrase: [
+                                        arr_ModelRestoreWalletSecoundQuestion: [
                                             {
                                                 modalVisible: false
                                             }
                                         ],
-                                        arr_ModelWalletName: [
+                                        arr_ModelRestoreWalletFirstQuestion: [
                                             {
                                                 modalVisible: true
                                             }
-                                        ],
-
+                                        ]
                                     } );
-
                                 } }
-
                             />
-                            <ModelWalletSuccessfullyRestored data={ this.state.arr_ModelRestoreSucess } click_Skip={ () => {
-                                this.click_Skip()
-                            }
-                            }
+                            <ModelRestoreWalletSuccessfullyUsingTrustedContact data={ this.state.arr_ModelRestoreWalletSuccessfullyUsingTrustedContact }
+                                click_Skip={ () => {
+                                    this.click_Skip()
+                                }
+                                }
                                 click_RestoreSecureAccount={ () => Alert.alert( 'Working' ) }
                             />
-                            <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
                         </KeyboardAwareScrollView>
                     </ImageBackground>
                 </SafeAreaView>
@@ -223,6 +234,7 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
         );
     }
 }
+
 
 let styles = StyleSheet.create( {
     container: {

@@ -153,7 +153,7 @@ export default class OTPScreen extends Component {
                 dateTime,
                 recordId
             );
-            if ( resUpdateSSSRetoreDecryptedShare ) {
+            if ( resUpdateSSSRetoreDecryptedShare == true ) {
                 this.setState( {
                     flag_Loading: false
                 } )
@@ -175,8 +175,12 @@ export default class OTPScreen extends Component {
                     )
                 }, 100 );
             } else {
-                Alert.alert( "Local db database not update.(mobile no not correct.)" )
+                this.setState( {
+                    flag_Loading: false
+                } )
+                Alert.alert( resUpdateSSSRetoreDecryptedShare );
             }
+
         }
 
     }

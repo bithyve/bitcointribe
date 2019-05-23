@@ -148,7 +148,7 @@ export default class RestoreSelectedContactsListScreen extends Component {
     }
 
     click_Next() {
-        console.log( 'next' );
+        this.props.navigation.push( "RestoreWalletUsingTrustedContactQueAndAnwScreen" );
     }
 
     click_SentRequest( type: string, val: any ) {
