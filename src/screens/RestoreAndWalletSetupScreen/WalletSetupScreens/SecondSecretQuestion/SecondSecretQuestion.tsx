@@ -141,16 +141,18 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                 );
                 await comAppHealth.connection_AppHealthStatus( dateTime, 0, encryptedShares, mnemonic )
                 // console.log( { resultSSSShareIdInserted } );
-                let jsonAnswerDetails = {};
-                jsonAnswerDetails.walletName = walletName;
-                jsonAnswerDetails.firstQuestion = firstQuestion;
-                jsonAnswerDetails.firstAnswer = firstAnswer;
-                jsonAnswerDetails.secoundQuestion = secoundQuestion;
-                jsonAnswerDetails.secoundAnser = secoundAnser;
-                // console.log( { jsonAnswerDetails } );
+                var temp = [];
+                let data = {};
+                data.firstQuestion = firstQuestion;
+                data.firstAnswer = firstAnswer;
+                temp.push( data );
+                let data1 = {};
+                data1.secoundQuestion = secoundQuestion;
+                data1.secoundAnswer = secoundAnser;
+                temp.push( data1 );
                 await dbOpration.updateWalletAnswerDetails(
                     localDB.tableName.tblWallet,
-                    jsonAnswerDetails
+                    temp
                 );
                 // console.log( { mnemonic});
                 await dbOpration.insertCreateAccount(

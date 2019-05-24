@@ -77,7 +77,10 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
 
     render() {
         let flag_DisableBtnNext = this.state.flag_DisableBtnNext;
-        const itemList = this.state.arr_QuestionList.map( ( item: any, index: number ) => (
+        let firstQuestion = this.state.firstQuestion;
+        let dataQuestionList = this.props.data.length != 0 ? this.props.data[ 0 ].arr_FirstQuestionList : "temp";
+        let arr_QuestionList = this.state.arr_QuestionList != null ? this.state.arr_QuestionList : dataQuestionList;
+        const itemList = arr_QuestionList.map( ( item: any, index: number ) => (
             <Picker.Item label={ item.item } value={ item.item } />
         ) );
         return (
@@ -123,7 +126,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                                     mode="dropdown"
                                     style={ [ globalStyle.ffFiraSansMedium ] }
                                     iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -40 } } /> }
-                                    selectedValue={ this.state.firstQuestion }
+                                    selectedValue={ firstQuestion }
                                     onValueChange={ this.onValueChange.bind( this ) }
                                 >
                                     { itemList }

@@ -102,13 +102,13 @@ def enableProguardInReleaseBuilds = false
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-
+  
     defaultConfig {
         applicationId "com.hexawallet"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1    
-        versionName "1.0.0.230519"  
+        versionCode 1       
+        versionName "1.0.1.240519"    
          multiDexEnabled true  
         ndk {
             abiFilters "armeabi-v7a", "x86"
