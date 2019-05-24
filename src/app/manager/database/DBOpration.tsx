@@ -65,7 +65,6 @@ const readTablesData = ( tableName: any ) => {
               data.shareStage = utils.decrypt( data.shareStage, passcode );
               data.recordId = utils.decrypt( data.recordId, passcode );
               data.decryptedShare = utils.decrypt( data.decryptedShare, passcode );
-              data.mobileNo = utils.decrypt( data.mobileNo, passcode );
               temp.push( data );
             }
             else if ( tableName == "tblTrustedPartySSSDetails" ) {
@@ -497,6 +496,40 @@ const updateWalletMnemonic = (
   } );
 };
 
+
+const updateWalletMnemonicAndAnwserDetails = (
+  tblName: string,
+  mnemonic: string,
+  QueAnwserDetails: any,
+  fulldate: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        txn.executeSql(
+          "update " +
+          tblName +
+          " set mnemonic = :mnemonic,setUpWalletAnswerDetails = :setUpWalletAnswerDetails, lastUpdated = :lastUpdated where id = 1",
+          [
+            utils.encrypt( mnemonic.toString(), passcode ),
+            utils.encrypt( JSON.stringify( QueAnwserDetails ).toString(), passcode ),
+            utils.encrypt( fulldate.toString(), passcode )
+          ]
+        );
+        resolve( true );
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
+
+
+
+//TODO: ========================================>  Accounts  Details  <========================================
+
 //TODO: insert tblAccount Only First Time
 const insertCreateAccount = (
   tblName: string,
@@ -736,12 +769,11 @@ const insertRestoreUsingTrustedContactKeepInfo = (
     db.transaction( function ( txn ) {
       for ( let i = 0; i < keepInfo.length; i++ ) {
         let data = keepInfo[ i ];
-        let phoneNo = data.phoneNumbers[ 0 ].number
-        // console.log( { data, phoneNo } );
+        // console.log( { data } );
         txn.executeSql(
           "INSERT INTO " +
           tblName +
-          "(dateCreated,keeperInfo,history,recordId,mobileNo) VALUES (:dateCreated,:keeperInfo,:history,:recordId,:mobileNo)",
+          "(dateCreated,keeperInfo,history,recordId) VALUES (:dateCreated,:keeperInfo,:history,:recordId)",
           [
             utils.encrypt(
               fulldate.toString(),
@@ -750,7 +782,6 @@ const insertRestoreUsingTrustedContactKeepInfo = (
             utils.encrypt( JSON.stringify( data ).toString(), passcode ),
             utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
             utils.encrypt( data.recordID.toString(), passcode ),
-            utils.encrypt( phoneNo.toString(), passcode ),
           ]
         );
       }
@@ -778,17 +809,15 @@ const updateSSSContactListDetails = (
               //console.log( { dbdecryptShareId } );
               let jsonConstactDetial = JSON.stringify( contactDetails[ i ] ).toString();
               let jsonRecordId = ( contactDetails[ i ].recordID ).toString();
-              let phoneNo = ( contactDetails[ i ].phoneNumbers[ 0 ].number ).toString();
               //console.log( { jsonConstactDetial, jsonRecordId } );
-              console.log( { jsonRecordId, phoneNo } );
+              // console.log( { jsonRecordId } );  
               txn.executeSql(
                 "update " +
                 tblName +
-                " set keeperInfo = :keeperInfo,recordId =:recordId,mobileNo =:mobileNo where shareId = :shareId",
+                " set keeperInfo = :keeperInfo,recordId =:recordId where shareId = :shareId",
                 [
                   utils.encrypt( jsonConstactDetial, passcode ),
                   utils.encrypt( jsonRecordId, passcode ),
-                  utils.encrypt( phoneNo, passcode ),
                   dbdecryptShareId
                 ]
               );
@@ -901,6 +930,52 @@ const updateSSSShareStage = (
 };
 
 
+const updateSSSShareStageWhereRecordId = (
+  tblName: string,
+  shareInfo: any,
+  arr_RecordId: any,
+  fulldate: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        //console.log( { tblName, shareInfo, fulldate } );
+        for ( let i = 0; i < shareInfo.length; i++ ) {
+          txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+            var len = results.rows.length;
+            if ( len > 0 ) {
+              for ( let j = 0; j < len; j++ ) {
+                let decryptRecordId = utils.decrypt(
+                  results.rows.item( j ).recordId,
+                  passcode
+                );
+                let encpRecordId = results.rows.item( j ).recordId;
+                if ( decryptRecordId == arr_RecordId[ i ] ) {
+                  txn.executeSql(
+                    "update " +
+                    tblName +
+                    " set shareStage = :shareStage,lastSuccessfulCheck =:lastSuccessfulCheck where recordId = :recordId",
+                    [
+                      utils.encrypt( shareInfo[ i ].shareStage.toString(), passcode ),
+                      utils.encrypt( fulldate.toString(), passcode ),
+                      encpRecordId
+                    ]
+                  );
+                  resolve( true );
+                  break;
+                }
+              }
+            }
+          } );
+        }
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
 //update shareId shareStage
 const updateSSSRetoreDecryptedShare = (
   tblName: string,
@@ -931,7 +1006,8 @@ const updateSSSRetoreDecryptedShare = (
                   passcode
                 ) );
               }
-              if ( Object.keys( decryptedShare ).length == Object.keys( decrptedShare ).length ) {
+              console.log( { decryptedShare, decrptedShare } );
+              if ( Object.keys( decryptedShare ) == Object.keys( decrptedShare ) ) {
                 console.log( "same data" );
                 resolve( "Already same decryptedShare stored.Please use other contact person." );
                 break;
@@ -1086,27 +1162,21 @@ const updateHistroyAndSharedDate = (
 };
 
 
-
-
-
-
-
-
-
-
-
 module.exports = {
   readTablesData,
   readAccountTablesData,
   readTableAcccountType,
   readRecentTransactionAddressWise,
   insertAccountTypeData,
+
   //Wallet Details
   insertWallet,
   updateWalletAnswerDetails,
   updateWalletMnemonic,
   updateWalletAppHealthStatus,
+  updateWalletMnemonicAndAnwserDetails,
 
+  //Account Details
   insertCreateAccount,
   insertLastBeforeCreateAccount,
   insertTblTransation,
@@ -1119,6 +1189,7 @@ module.exports = {
   updateSSSContactListDetails,
   updateSSSTransferMehtodDetails,
   updateSSSShareStage,
+  updateSSSShareStageWhereRecordId,
   updateSSSRetoreDecryptedShare,
 
   //SSS Trusted Party Details 

@@ -9,7 +9,7 @@ import config from "../../Config";
 export default class SSS {
   private mnemonic: string;
   private encryptedShares;
-  private static threshold: number;
+  private static threshold: number = config.SSS_THRESHOLD;
   private static cipherSpec = {
     algorithm: "aes-192-cbc",
     salt: "bithyeSalt", // NOTE: The salt should be as unique as possible. It is recommended that a salt is random and at least 16 bytes long
@@ -50,7 +50,6 @@ export default class SSS {
 
   public generateShares = () => {
     // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
-    SSS.threshold = config.SSS_THRESHOLD;
     const shares = secrets.share(
       this.stringToHex( this.mnemonic ),
       config.SSS_TOTAL,
