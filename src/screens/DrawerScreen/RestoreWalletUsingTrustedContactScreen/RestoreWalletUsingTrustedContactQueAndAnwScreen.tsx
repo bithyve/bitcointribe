@@ -23,6 +23,9 @@ import Permissions from 'react-native-permissions'
 import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
+//TODO: Custome Pages
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+
 //TODO: Custome Compontes
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
@@ -51,11 +54,12 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
-
+var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 
 
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 
 export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Component {
 
@@ -64,10 +68,24 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
         this.state = {
             arr_WalletDetail: [],
             arr_SSSDetails: [],
+            arr_QuestionList: [],
+            arr_FirstQuestionList: [ {
+                "item": "Name of your first pet?"
+            }, {
+                "item": "Name of your favourite teacher?"
+            }, {
+                "item": "Name of your favourite food?"
+            }, {
+                "item": "Name of your first company?"
+            }, {
+                "item": "Name of your first employee?"
+            }
+            ],
             arr_ModelRestoreWalletFirstQuestion: [],
             arr_ModelRestoreWalletSecoundQuestion: [],
             arr_QuestionAndAnwserDetails: [],
-            arr_ModelRestoreWalletSuccessfullyUsingTrustedContact: []
+            arr_ModelRestoreWalletSuccessfullyUsingTrustedContact: [],
+            flag_Loading: false
         };
     }
 
@@ -89,9 +107,13 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
 
     //TODO: Secound question click Next 
     click_SecoundNext = async ( secoundQuestion: string, secoundAnswer: string, arr_QuestionList: any ) => {
+        this.setState( {
+            flag_Loading: true
+        } );
+        const dateTime = Date.now();
         let walletDetail = this.state.arr_WalletDetail;
         let sssDetails = this.state.arr_SSSDetails;
-
+        console.log( { walletDetail } );
         var temp = [];
         temp = this.state.arr_QuestionAndAnwserDetails;
         let data = {};
@@ -99,41 +121,69 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
         data.secoundAnswer = secoundAnswer;
         temp.push( data );
         let decryptedShare = [];
+        let arr_RecordId = [];
         let answers = [ temp[ 0 ].firstAnswer, temp[ 1 ].secoundAnswer ];
         for ( let i = 0; i < sssDetails.length; i++ ) {
             let data = sssDetails[ i ];
             if ( data.decryptedShare != "" ) {
-                decryptedShare.push( JSON.parse( data.decryptedShare ) )
+                let decryptedShareJson = JSON.parse( data.decryptedShare );
+                decryptedShare.push( decryptedShareJson.encryptedShare );
             }
+            arr_RecordId.push( data.recordId );
         }
         console.log( { sssDetails, temp } );
         console.log( { decryptedShare, answers } );
-        const resRecoverFromShares = await S3Service.recoverFromShares( decryptedShare, answers );
-        console.log( { resRecoverFromShares } );
-
-
-        // this.setState( {
-        //     arr_QuestionAndAnwserDetails: temp,
-        //     arr_ModelRestoreWalletSecoundQuestion: [
-        //         {
-        //             modalVisible: false,
-        //             arr_QuestionList
-        //         }
-        //     ],
-        //     arr_ModelRestoreWalletSuccessfullyUsingTrustedContact: [
-        //         {
-        //             modalVisible: true,
-        //             walletName: walletDetail.walletType,
-        //             bal: "0.00",
-        //         }
-        //     ]
-        // } )
-
+        const mnemonic = await S3Service.recoverFromShares( decryptedShare, answers );
+        console.log( mnemonic )
+        const regularAccount = new RegularAccount(
+            mnemonic
+        );
+        await dbOpration.updateWalletMnemonicAndAnwserDetails(
+            localDB.tableName.tblWallet,
+            mnemonic,
+            temp,
+            dateTime
+        );
+        const res = await comAppHealth.connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact( dateTime, 0, decryptedShare, mnemonic, arr_RecordId );
+        // console.log( { res } );
+        const getBal = await regularAccount.getBalance();
+        //console.log( { getBal } );
+        if ( getBal.status == 200 && res ) {
+            this.setState( {
+                flag_Loading: false
+            } )
+            await dbOpration.insertCreateAccount(
+                localDB.tableName.tblAccount,
+                dateTime,
+                "",
+                getBal.data.balance,
+                "BTC",
+                "Daily Wallet",
+                "Daily Wallet",
+                ""
+            );
+            setTimeout( () => {
+                this.setState( {
+                    arr_QuestionAndAnwserDetails: temp,
+                    arr_ModelRestoreWalletSecoundQuestion: [
+                        {
+                            modalVisible: false,
+                            arr_QuestionList
+                        }
+                    ],
+                    arr_ModelRestoreWalletSuccessfullyUsingTrustedContact: [
+                        {
+                            modalVisible: true,
+                            walletName: walletDetail.walletType,
+                            bal: getBal.data.balance
+                        }
+                    ]
+                } )
+            }, 1000 );
+        } else {
+            Alert.alert( "App health not updated." )
+        }
     }
-
-
-
-
 
     //TODO: Success Wallet Setup then skip button on click
     click_Skip() {
@@ -201,20 +251,28 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
                                 } }
                             />
                             <ModelRestoreWalletSecoundQuestion data={ this.state.arr_ModelRestoreWalletSecoundQuestion }
+                                flag_Loading={ this.state.flag_Loading }
                                 click_Next={ ( secoundQuestion: string, secoundAnswer: string, arr_QuestionList: any ) => {
+                                    this.setState( {
+                                        arr_QuestionList
+                                    } )
                                     this.click_SecoundNext( secoundQuestion, secoundAnswer, arr_QuestionList );
                                 }
                                 }
                                 pop={ () => {
+                                    let arr_FirstQuestionList = this.state.arr_FirstQuestionList;
+                                    let arr_QuestionList = this.state.arr_QuestionList;
                                     this.setState( {
                                         arr_ModelRestoreWalletSecoundQuestion: [
                                             {
-                                                modalVisible: false
+                                                modalVisible: false,
+                                                arr_QuestionList
                                             }
                                         ],
                                         arr_ModelRestoreWalletFirstQuestion: [
                                             {
-                                                modalVisible: true
+                                                modalVisible: true,
+                                                arr_FirstQuestionList
                                             }
                                         ]
                                     } );
@@ -230,6 +288,7 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
                         </KeyboardAwareScrollView>
                     </ImageBackground>
                 </SafeAreaView>
+                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
             </View >
         );
     }

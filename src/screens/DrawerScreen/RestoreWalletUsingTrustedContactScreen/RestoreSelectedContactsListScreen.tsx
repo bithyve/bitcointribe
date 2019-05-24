@@ -135,11 +135,10 @@ export default class RestoreSelectedContactsListScreen extends Component {
         } )
     }
 
-
-
     //TODO: model  in request click
     click_Request = async ( item: any, index: number ) => {
         console.log( { item, index } );
+
         this.setState( {
             arr_SelectedContact: item,
             selectedIndex: index
@@ -152,6 +151,8 @@ export default class RestoreSelectedContactsListScreen extends Component {
     }
 
     click_SentRequest( type: string, val: any ) {
+        console.log( { val } );
+
         let walletDetails = this.state.arr_WalletDetails;
         let script = {};
         script.wn = walletDetails.walletType
@@ -161,7 +162,7 @@ export default class RestoreSelectedContactsListScreen extends Component {
         if ( type == "SMS" ) {
             SendSMS.send( {
                 body: 'https://prime-sign-230407.appspot.com/sss/rtb/' + encpScript,
-                recipients: [ val[ 0 ].number ],
+                recipients: [ val.length != 0 ? val[ 0 ].number : "" ],
                 successTypes: [ 'sent', 'queued' ]
             }, ( completed, cancelled, error ) => {
                 if ( completed ) {
@@ -190,7 +191,7 @@ export default class RestoreSelectedContactsListScreen extends Component {
         } else if ( type == "EMAIL" ) {
             Mailer.mail( {
                 subject: 'Hexa Wallet SSS Restore',
-                recipients: [ val[ 0 ].email ],
+                recipients: [ val.length != 0 ? val[ 0 ].email : "" ],
                 body: 'https://prime-sign-230407.appspot.com/sss/rtb/' + encpScript,
                 isHTML: true,
             }, ( error, event ) => {
@@ -368,7 +369,12 @@ export default class RestoreSelectedContactsListScreen extends Component {
 
                                 <View style={ { alignItems: "center", } }>
                                     <View style={ { flexDirection: "row", marginBottom: 10 } }>
-                                        <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_SentRequest( "SMS", selectedContact.phoneNumbers ) }>
+                                        <Button transparent
+                                            style={ [ { alignItems: "center", flex: 1 } ] }
+                                            onPress={ () => this.click_SentRequest( "SMS", selectedContact.phoneNumbers ) }
+
+
+                                        >
                                             <View style={ { alignItems: "center", marginLeft: "20%", flexDirection: "column" } }>
                                                 <SvgIcon
                                                     name="chat"

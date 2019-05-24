@@ -26,11 +26,21 @@ interface Props {
     pop: Function;
     click_Request: Function
 }
+
+//TODO: Custome Pages
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+
+//TODO: Custome Object
+import {
+    colors
+} from "HexaWallet/src/app/constants/Constants";
+
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 
 export default class ModelRestoreWalletSecoundQuestion extends Component<Props, any> {
+
     constructor ( props: any ) {
         super( props )
         this.state = ( {
@@ -47,6 +57,7 @@ export default class ModelRestoreWalletSecoundQuestion extends Component<Props, 
             secoundQuestion: value
         } );
     }
+
     //TODO: func check_CorrectAnswer
     check_CorrectAnswer() {
         setTimeout( () => {
@@ -61,8 +72,9 @@ export default class ModelRestoreWalletSecoundQuestion extends Component<Props, 
                 } )
             }
         }, 100 );
-
     }
+
+
 
     render() {
         let flag_DisableBtnNext = this.state.flag_DisableBtnNext;
@@ -161,6 +173,7 @@ export default class ModelRestoreWalletSecoundQuestion extends Component<Props, 
                                 style={ [ flag_DisableBtnNext == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
                             />
                         </View>
+                        <Loader loading={ this.props.flag_Loading } color={ colors.appColor } size={ 30 } />
                     </View>
                 </View>
             </Modal>

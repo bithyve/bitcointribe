@@ -44,7 +44,8 @@ export default class ModelBackupShareAssociateContact extends Component<Props, a
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
                             <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Some information about the importance secret keeping</Text>
-                            <Avatar medium rounded title={ walletName.charAt( 0 ) } />
+                            {/* <Avatar medium rounded title={ walletName.length != 0 ? walletName.charAt( 0 ) : "Hexa Wallet" } /> */ }
+                            <Avatar medium rounded title={ "Working" } />
                             <Text style={ globalStyle.ffFiraSansMedium }>{ walletName }</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
