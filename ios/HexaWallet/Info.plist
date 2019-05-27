@@ -25,9 +25,11 @@
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>bithyvewallet</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>stage</string>
+				<string>bithyvewallet</string>
 			</array>
 		</dict>
 	</array>
@@ -47,6 +49,8 @@
 			</dict>
 		</array>
 	</dict>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>whatsapp</string>

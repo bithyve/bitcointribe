@@ -53,12 +53,11 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
     async componentWillMount() {
         let walletDetails = utils.getWalletDetails();
         let resSSSDetails = utils.getSSSDetailsRecordIDWise();
-        //console.log( { resSSSDetails, walletDetails } );
-        const walletNameDetails = JSON.parse( walletDetails.setUpWalletAnswerDetails );
+        console.log( { resSSSDetails, walletDetails } );
         const sss = new S3Service(
             walletDetails.mnemonic
         );
-        const resQRShare = await sss.createQRShare( resSSSDetails.share, walletNameDetails.walletName );
+        const resQRShare = await sss.createQRShare( resSSSDetails.share, walletDetails.walletType );
         const jsonResQRShare = JSON.parse( resQRShare );
         // console.log( { resQRShare } );
         // console.log( { jsonResQRShare } );

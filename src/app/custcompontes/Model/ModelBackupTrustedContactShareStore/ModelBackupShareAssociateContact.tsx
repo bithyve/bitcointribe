@@ -17,6 +17,7 @@ interface Props {
     data: [];
     closeModal: Function;
     click_AssociateContact: Function;
+    click_Skip: Function;
 }
 
 export default class ModelBackupShareAssociateContact extends Component<Props, any> {
@@ -44,8 +45,7 @@ export default class ModelBackupShareAssociateContact extends Component<Props, a
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
                             <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Some information about the importance secret keeping</Text>
-                            {/* <Avatar medium rounded title={ walletName.length != 0 ? walletName.charAt( 0 ) : "Hexa Wallet" } /> */ }
-                            <Avatar medium rounded title={ "Working" } />
+                            <Avatar medium rounded title={ walletName.length != 0 ? walletName.charAt( 0 ) : "" } />
                             <Text style={ globalStyle.ffFiraSansMedium }>{ walletName }</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
@@ -55,6 +55,15 @@ export default class ModelBackupShareAssociateContact extends Component<Props, a
                                 title="Associate Contact"
                                 disabled={ false }
                                 style={ [ { borderRadius: 10 } ] } />
+                            <Button
+                                onPress={ () => this.props.click_Skip() }
+                                style={ [ globalStyle.ffFiraSansSemiBold, {
+                                    backgroundColor: "#838383", borderRadius: 10, margin: 5,
+                                    height: 50,
+                                } ] }
+                                full>
+                                <Text>Skip</Text>
+                            </Button>
                         </View>
                     </View>
                 </View>

@@ -61,7 +61,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
 
     async componentWillMount( flagModelOpen: boolean ) {
         var resSharedSecretList = await comFunDBRead.readTblTrustedPartySSSDetails();
-        // console.log( { resSharedSecretList } );
+        console.log( { resSharedSecretList } );
         const dateTime = Date.now();
         const fulldate = Math.floor( dateTime / 1000 );
         let history = [];
@@ -84,11 +84,26 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             tempOpt.push( otp )
         }
         console.log( { tempOpt } );
+
         let temp = [];
         for ( let i = 0; i < resSharedSecretList.length; i++ ) {
             let data = {};
-            let keeperInfo = JSON.parse( resSharedSecretList[ i ].keeperInfo );
+            var keeperInfo = {};
+            let decrShare = JSON.parse( resSharedSecretList[ i ].decrShare );
+            console.log( { decrShare } );
+            if ( resSharedSecretList[ i ].keeperInfo != "" ) {
+                keeperInfo = JSON.parse( resSharedSecretList[ i ].keeperInfo );
+            } else {
+                keeperInfo.givenName = decrShare.meta.tag;
+                keeperInfo.familyName = "";
+                keeperInfo.phoneNumbers = [];
+                keeperInfo.thumbnailPath = "";
+                keeperInfo.emailAddresses = [];
+
+            }
+            // console.log( { keeperInfo } );
             let urlScript = JSON.parse( resSharedSecretList[ i ].urlScript )
+            console.log( { urlScript } );
             let sharedDate = parseInt( resSharedSecretList[ i ].sharedDate );
             //  console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
             //console.log( 'sharedDate date =' + sharedDate.toString() + " and full date =" + fulldate.toString() );
@@ -253,7 +268,6 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                 const textData = text.toUpperCase();
                 return itemData.indexOf( textData ) > -1;
             } );
-
             this.setState( { data: newData } );
         } else {
             this.setState( {
@@ -412,7 +426,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                             </View>
                             <View style={ { flexDirection: "column" } }>
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10 } ] }>{ item.name }</Text>
-                                <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.mobileNo != "" ? item.mobileNo : "Not Number Found!" }</Text>
+                                <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.mobileNo != "" ? item.mobileNo : "Not Number!" }</Text>
                                 <Text note style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.walletName }</Text>
                                 { renderIf( typeof item.opt !== "undefined" )(
                                     <TimerCountdown
