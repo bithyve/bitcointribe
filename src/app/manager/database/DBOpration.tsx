@@ -78,6 +78,7 @@ const readTablesData = ( tableName: any ) => {
               data.nonPMDDData = utils.decrypt( data.nonPMDDData, passcode );
               data.history = utils.decrypt( data.history, passcode );
               data.sharedDate = utils.decrypt( data.sharedDate, passcode );
+              data.type = utils.decrypt( data.type, passcode );
               temp.push( data );
             }
             else {
@@ -1075,7 +1076,7 @@ const insertTrustedPartyDetails = (
               txn.executeSql(
                 "INSERT INTO " +
                 tblName +
-                "(dateCreated,keeperInfo,urlScript,decrShare,shareId,metaData,nonPMDDData,history) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:shareId,:metaData,:nonPMDDData,:history)",
+                "(dateCreated,keeperInfo,urlScript,decrShare,shareId,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:shareId,:metaData,:nonPMDDData,:history,:type)",
                 [
                   utils.encrypt(
                     fulldate.toString(),
@@ -1088,6 +1089,7 @@ const insertTrustedPartyDetails = (
                   utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
                   utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
                   utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
+                  utils.encrypt( "With Associate Contact", passcode )
                 ]
               );
               resolve( true );
@@ -1097,7 +1099,7 @@ const insertTrustedPartyDetails = (
           txn.executeSql(
             "INSERT INTO " +
             tblName +
-            "(dateCreated,keeperInfo,urlScript,decrShare,shareId,metaData,nonPMDDData,history) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:shareId,:metaData,:nonPMDDData,:history)",
+            "(dateCreated,keeperInfo,urlScript,decrShare,shareId,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:shareId,:metaData,:nonPMDDData,:history,:type)",
             [
               utils.encrypt(
                 fulldate.toString(),
@@ -1110,6 +1112,7 @@ const insertTrustedPartyDetails = (
               utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
               utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
               utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
+              utils.encrypt( "With Associate Contact", passcode )
             ]
           );
           resolve( true );
@@ -1118,6 +1121,90 @@ const insertTrustedPartyDetails = (
     } );
   } );
 };
+
+
+
+const insertTrustedPartyDetailWithoutAssociate = (
+  tblName: string,
+  fulldate: string,
+  urlScript: any,
+  decrShare: any,
+  shareId: any,
+  metaData: any,
+  nonPMDDData: any,
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    let temp = [];
+    let jsonData = {};
+    jsonData.title = "Secret Stored.";
+    jsonData.date = utils.getUnixToDateFormat( fulldate );
+    temp.push( jsonData );
+    db.transaction( function ( txn ) {
+      txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+        var len = results.rows.length;
+        if ( len > 0 ) {
+          for ( let i = 0; i < len; i++ ) {
+            let dbdecryptShareId = utils.decrypt(
+              results.rows.item( i ).shareId,
+              passcode
+            );
+            // console.log( { dbdecryptrecordID } );
+            if ( dbdecryptShareId == shareId ) {
+              resolve( "Already same share stored." );
+            } else {
+              txn.executeSql(
+                "INSERT INTO " +
+                tblName +
+                "(dateCreated,urlScript,decrShare,shareId,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:shareId,:metaData,:nonPMDDData,:history,:type)",
+                [
+                  utils.encrypt(
+                    fulldate.toString(),
+                    passcode
+                  ),
+                  utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
+                  utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
+                  utils.encrypt( shareId.toString(), passcode ),
+                  utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
+                  utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
+                  utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
+                  utils.encrypt( "Without Associate Contact", passcode )
+                ]
+              );
+              resolve( true );
+            }
+          }
+        } else {
+          txn.executeSql(
+            "INSERT INTO " +
+            tblName +
+            "(dateCreated,urlScript,decrShare,shareId,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:shareId,:metaData,:nonPMDDData,:history,:type)",
+            [
+              utils.encrypt(
+                fulldate.toString(),
+                passcode
+              ),
+              utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
+              utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
+              utils.encrypt( shareId.toString(), passcode ),
+              utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
+              utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
+              utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
+              utils.encrypt( "Without Associate Contact", passcode )
+            ]
+          );
+          resolve( true );
+        }
+      } );
+    } );
+  } );
+};
+
+
+
+
+
+
 
 
 const updateHistroyAndSharedDate = (
@@ -1194,5 +1281,6 @@ module.exports = {
 
   //SSS Trusted Party Details 
   insertTrustedPartyDetails,
+  insertTrustedPartyDetailWithoutAssociate,
   updateHistroyAndSharedDate
 };

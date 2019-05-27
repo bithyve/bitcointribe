@@ -80,7 +80,8 @@ const SLIDER_1_FIRST_ITEM = 0;
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
-
+//TODO: Bitcoin files
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 export default class WalletScreen extends React.Component {
   constructor ( props: any ) {
@@ -234,15 +235,86 @@ export default class WalletScreen extends React.Component {
         ]
       } )
     }
+  }
 
-    // arr_ModelAcceptOrRejectSecret: [
-    //   {
-    //     modalVisible: true,
-    //     name: urlScript.wn,
-    //     mobileNo: "1234",
-    //     encpShare: urlScript.encpShare
-    //   }
-    // ]
+  //TODO: click_SkipAssociateContact
+
+  click_SkipAssociateContact = async () => {
+    let deepLinkingUrlType = utils.getDeepLinkingType();
+    if ( deepLinkingUrlType == "SSS Recovery QR" ) {
+      this.setState( {
+        flag_Loading: true
+      } );
+      const dateTime = Date.now();
+      let urlScriptDetails = utils.getDeepLinkingUrl();
+      //console.log( { urlScriptDetails } );  
+      let urlScriptData = urlScriptDetails.data;
+      console.log( { urlScriptData } );
+      let urlScript = {};
+      urlScript.walletName = urlScriptDetails.wn;
+      let walletDetails = utils.getWalletDetails();
+      const sss = new S3Service(
+        walletDetails.mnemonic
+      );
+      let resShareId = await sss.getShareId( urlScriptData.encryptedShare )
+      console.log( { resShareId } );
+      const { data, updated } = await sss.updateHealth( urlScriptData.meta.walletId, urlScriptData.encryptedShare );
+      if ( updated ) {
+        const resTrustedParty = await dbOpration.insertTrustedPartyDetailWithoutAssociate(
+          localDB.tableName.tblTrustedPartySSSDetails,
+          dateTime,
+          urlScript,
+          urlScriptData,
+          resShareId,
+          urlScriptData,
+          typeof data !== "undefined" ? data : ""
+        );
+        this.setState( {
+          flag_Loading: false,
+        } )
+        if ( resTrustedParty == true ) {
+          setTimeout( () => {
+            Alert.alert(
+              'Success',
+              'Decrypted share created.',
+              [
+                {
+                  text: 'OK', onPress: () => {
+                    utils.setDeepLinkingType( "" );
+                    utils.setDeepLinkingUrl( "" );
+                  }
+                },
+
+              ],
+              { cancelable: false }
+            )
+          }, 100 );
+        } else {
+          setTimeout( () => {
+            Alert.alert(
+              'OH',
+              resTrustedParty,
+              [
+                {
+                  text: 'OK', onPress: () => {
+                    utils.setDeepLinkingType( "" );
+                    utils.setDeepLinkingUrl( "" );
+                  }
+                },
+              ],
+              { cancelable: false }
+            )
+          }, 100 );
+        }
+      } else {
+        this.setState( {
+          flag_Loading: false
+        } )
+        Alert.alert( "updateHealth func not working." )
+      }
+    } else {
+      this.props.navigation.push( "OTPBackupShareStoreNavigator" );
+    }
   }
 
 
@@ -508,6 +580,17 @@ export default class WalletScreen extends React.Component {
                 }
               ]
             } )
+          } }
+          click_Skip={ () => {
+            this.setState( {
+              arr_ModelBackupShareAssociateContact: [
+                {
+                  modalVisible: false,
+                  walletName: "",
+                }
+              ]
+            } );
+            this.click_SkipAssociateContact();
           } }
           closeModal={ () => {
             utils.setDeepLinkingType( "" );

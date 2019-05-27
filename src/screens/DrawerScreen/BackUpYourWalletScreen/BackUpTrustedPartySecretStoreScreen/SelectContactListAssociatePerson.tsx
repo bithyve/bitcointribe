@@ -105,13 +105,12 @@ export default class SelectContactListAssociatePerson extends React.Component<an
         let keeperInfo = this.state.arr_SelectedItem;
         let urlScript = {};
         urlScript.walletName = urlScriptDetails.wn;
-        // console.log( { userDetail } );
         let walletDetails = utils.getWalletDetails();
         const sss = new S3Service(
             walletDetails.mnemonic
         );
         let resShareId = await sss.getShareId( urlScriptData.encryptedShare )
-        //console.log( { resShareId } );
+        console.log( { resShareId } );
         const { data, updated } = await sss.updateHealth( urlScriptData.meta.walletId, urlScriptData.encryptedShare );
         if ( updated ) {
             const resTrustedParty = await dbOpration.insertTrustedPartyDetails(

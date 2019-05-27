@@ -152,6 +152,8 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
             this.setState( {
                 flag_Loading: false
             } )
+            utils.setDeepLinkingType( "" );
+            utils.setDeepLinkingUrl( "" );
             await dbOpration.insertCreateAccount(
                 localDB.tableName.tblAccount,
                 dateTime,
@@ -187,6 +189,7 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
 
     //TODO: Success Wallet Setup then skip button on click
     click_Skip() {
+
         const resetAction = StackActions.reset( {
             index: 0, // <-- currect active route from actions array
             key: null,
