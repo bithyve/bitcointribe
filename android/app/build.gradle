@@ -1,7 +1,7 @@
 apply plugin: "com.android.application"
 
-import com.android.build.OutputFile
-apply plugin: 'io.fabric'
+import com.android.build.OutputFile  
+apply plugin: 'io.fabric'  
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
  * and bundleReleaseJsAndAssets).
@@ -71,7 +71,7 @@ apply plugin: 'io.fabric'
  *   extraPackagerArgs: []
  * ]
  */
-
+  
 project.ext.react = [
     entryFile: "index.js"   
 ]
@@ -83,7 +83,7 @@ project.ext.vectoricons = [
 apply from: "../../node_modules/react-native/react.gradle"
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
-
+    
 /**
  * Set this to true to create two separate APKs instead of one:
  *   - An APK that only works on ARM devices
@@ -164,17 +164,16 @@ configurations.all {
  resolutionStrategy {
         force 'org.webkit:android-jsc:r236355'
  }
-  }
+  } 
 
-dependencies {
-   
+dependencies {    
     compile project(':react-native-mail')
     compile project(':react-native-sms')
     compile project(':react-native-contacts')
     compile project(':react-native-webview')
     compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
 transitive = true;
-}  
+}      
   implementation 'com.android.support:multidex:1.0.3'
 compile project(':react-native-sqlite-storage')
     compile project(':react-native-view-shot')  

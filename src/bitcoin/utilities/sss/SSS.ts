@@ -407,6 +407,9 @@ export default class SSS {
       }
     };
 
+    console.log( '====================================' );
+    console.log( { share } );
+    console.log( '====================================' );
     return JSON.stringify( share );
   };
 

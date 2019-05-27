@@ -82,7 +82,7 @@ export default class ModelEnterAndConfirmMnemonic extends Component<Props, any> 
             console.log( { getBal } );
 
             if ( getBal.status == 200 ) {
-                let bal = getBal.data.balance;
+                let bal = getBal.data.balance / 1e8;
                 this.props.click_Confirm( mnemonic, bal );
                 this.props.loadingFlag( false );
                 this.setState( {
