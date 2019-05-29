@@ -36,7 +36,7 @@ import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/
 //TODO: Custome Models
 import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
 import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model/ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
-
+import ModelAcceptOrRejectSecret from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelAcceptOrRejectSecret";
 import ModelBackupShareAssociateContact from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelBackupShareAssociateContact";
 import ModelBackupAssociateOpenContactList from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelBackupAssociateOpenContactList";
 
@@ -159,11 +159,7 @@ export default class WalletScreen extends React.Component {
     } );
   }
 
-  componentDidMount() {
-    Permissions.request( 'camera' ).then( ( response: any ) => {
-      console.log( response );
-    } );
-  }
+
 
   componentWillUnmount() {
     this.willFocusSubscription.remove();
@@ -227,7 +223,7 @@ export default class WalletScreen extends React.Component {
       this.setState( {
         deepLinkingUrl: urlScript,
         deepLinkingUrlType: urlType,
-        arr_ModelBackupShareAssociateContact: [
+        arr_ModelAcceptOrRejectSecret: [
           {
             modalVisible: true,
             walletName: urlScript.wn
@@ -502,6 +498,40 @@ export default class WalletScreen extends React.Component {
         <Button transparent style={ styles.plusButtonBottom }>
           <IconFontAwe name="plus" size={ 20 } color="#fff" />
         </Button>
+
+        <ModelAcceptOrRejectSecret
+          data={ this.state.arr_ModelAcceptOrRejectSecret }
+          closeModal={ () => {
+            utils.setDeepLinkingType( "" );
+            utils.setDeepLinkingUrl( "" );
+            this.setState( {
+              arr_ModelAcceptOrRejectSecret: [
+                {
+                  modalVisible: false,
+                  walletName: ""
+                }
+              ]
+            } )
+          } }
+          click_AcceptSecret={ ( wn: string ) => {
+            this.setState( {
+              arr_ModelAcceptOrRejectSecret: [
+                {
+                  modalVisible: false,
+                  walletName: ""
+                }
+              ],
+              arr_ModelBackupShareAssociateContact: [
+                {
+                  modalVisible: true,
+                  walletName: wn
+                }
+              ]
+            } );
+          } }
+        />
+
+
         <ModelBackupYourWallet data={ this.state.arr_ModelBackupYourWallet }
           click_UseOtherMethod={ () => alert( 'working' ) }
           click_Confirm={ async () => {

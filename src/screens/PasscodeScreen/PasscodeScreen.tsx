@@ -240,6 +240,7 @@ export default class PasscodeScreen extends Component {
               onFulfill={ ( isValid, code ) =>
                 this._onFinishCheckingCode( isValid, code )
               }
+              type='withoutcharacters'
             />
             { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
               <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>

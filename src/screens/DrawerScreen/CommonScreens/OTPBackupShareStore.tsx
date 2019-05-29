@@ -216,6 +216,7 @@ export default class OTPBackupShareStore extends Component {
                                 onFulfill={ ( code ) =>
                                     this._onFinishCheckingCode( code )
                                 }
+                                type='characters'
                             />
                             { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
                                 <Text style={ { color: "red", marginTop: 44 } }>{ this.state.success }</Text>
