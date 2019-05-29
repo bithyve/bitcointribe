@@ -329,7 +329,7 @@ export default class RestoreSelectedContactsListScreen extends Component {
                                                 </View>
                                                 { renderIf( item.flag_BtnTitle == true )(
                                                     <View style={ {
-                                                        flex: 1,
+                                                        flex: 1.5,
                                                         alignItems: 'flex-end',
                                                         justifyContent: 'center'
                                                     } }>
@@ -341,7 +341,6 @@ export default class RestoreSelectedContactsListScreen extends Component {
                                             </View>
                                         </View>
                                     </RkCard>
-
                                 ) }
                                 keyExtractor={ item => item.recordId }
                                 extraData={ this.state }
