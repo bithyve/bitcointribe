@@ -21,7 +21,9 @@ import {
   Body,
   Text,
   List,
-  ListItem
+  ListItem,
+  Icon,
+  Fab
 } from "native-base";
 import { RkCard } from "react-native-ui-kitten";
 import DropdownAlert from "react-native-dropdownalert";
@@ -106,7 +108,8 @@ export default class WalletScreen extends React.Component {
       arr_ModelAcceptOrRejectSecret: [],
       //DeepLinking Param
       deepLinkingUrl: "",
-      deepLinkingUrlType: ""
+      deepLinkingUrlType: "",
+      flag_FabActive: 'true'
     };
     isNetwork = utils.getNetwork();
   }
@@ -496,7 +499,24 @@ export default class WalletScreen extends React.Component {
         </Content>
         <DropdownAlert ref={ ref => ( this.dropdown = ref ) } />
         <Button transparent style={ styles.plusButtonBottom }>
-          <IconFontAwe name="plus" size={ 20 } color="#fff" />
+          <Fab
+            active={ this.state.flag_FabActive }
+            direction="up"
+            containerStyle={ {} }
+            style={ { backgroundColor: colors.appColor } }
+            position="bottomRight"
+            onPress={ () => this.setState( { flag_FabActive: !this.state.flag_FabActive } ) }>
+            <Icon name="add" />
+            <Button style={ { backgroundColor: '#34A34F' } }>
+              <Icon name="logo-whatsapp" />
+            </Button>
+            <Button style={ { backgroundColor: '#3B5998' } }>
+              <Icon name="logo-facebook" />
+            </Button>
+            <Button disabled style={ { backgroundColor: '#DD5144' } }>
+              <Icon name="mail" />
+            </Button>
+          </Fab>
         </Button>
 
         <ModelAcceptOrRejectSecret
@@ -676,18 +696,12 @@ const styles = StyleSheet.create( {
     width: "100%"
   },
   plusButtonBottom: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
     position: "absolute",
-    bottom: 10,
-    right: 10,
-    alignSelf: "center",
-    backgroundColor: colors.appColor,
-    justifyContent: "center"
+    bottom: 5,
+    right: 5,
   },
   svgImage: {
     width: "100%",
     height: "100%"
   }
-} );
+} );  
