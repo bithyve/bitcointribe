@@ -9,19 +9,23 @@ import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus"
 
 
 
+
 //TODO: func connection_AppHealthStatus (WalletScreen,TrustedContactScreen)
 const connection_AppHealthStatus = async ( qatime: number, satime: number, encrShares: any, mnemonic: any ) => {
-    //  console.log( { qatime, satime, encrShares, mnemonic } );
+    console.log( { qatime, satime, encrShares, mnemonic } );
     const dateTime = Date.now();
-    const fulldate = Math.floor( dateTime / 1000 );
+    // const fulldate = Math.floor( dateTime / 1000 );
     const sss = new S3Service(
         mnemonic
     );
     var resCheckHealth = await sss.checkHealth( encrShares );
     resCheckHealth = resCheckHealth.lastUpdateds;
+    console.log( "Initializing HealthStatuss" )
     const healthStatus = new HealthStatus();
+    console.log( { qatime, satime, resCheckHealth } );
+
     const res = await healthStatus.appHealthStatus( qatime, satime, resCheckHealth, 0, "share" );
-    // console.log( { res } );
+    console.log( { res } );
     await utils.setAppHealthStatus( res )
     //console.log( { res } );
     let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
@@ -32,7 +36,7 @@ const connection_AppHealthStatus = async ( qatime: number, satime: number, encrS
     let resupdateSSSShareStage = await dbOpration.updateSSSShareStage(
         localDB.tableName.tblSSSDetails,
         res.sharesInfo,
-        fulldate
+        dateTime
     );
     //console.log( { resupdateSSSShareStage } );
     return resupdateSSSShareStage;
@@ -45,7 +49,6 @@ const connection_AppHealthStatus = async ( qatime: number, satime: number, encrS
 const connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact = async ( qatime: number, satime: number, encrShares: any, mnemonic: any, arr_RecordId: any ) => {
     //  console.log( { qatime, satime, encrShares, mnemonic } );
     const dateTime = Date.now();
-    const fulldate = Math.floor( dateTime / 1000 );
     const sss = new S3Service(
         mnemonic
     );
@@ -72,7 +75,7 @@ const connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact = async ( 
         localDB.tableName.tblSSSDetails,
         res.sharesInfo,
         arr_RecordId,
-        fulldate
+        dateTime
     );
     // console.log( { resupdateSSSShareStage } );
     return resupdateSSSShareStage;
@@ -80,9 +83,6 @@ const connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact = async ( 
     // console.log( { resupdateWalletDetials } );
     // console.log( { res } );
 }
-
-
-
 
 const check_AppHealthStausUsingMnemonic = async ( qatime: number, satime: number, shares: any, mnemonicTime: any ) => {
     const healthStatus = new HealthStatus();

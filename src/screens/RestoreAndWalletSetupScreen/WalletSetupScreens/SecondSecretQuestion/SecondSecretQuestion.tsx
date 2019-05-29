@@ -97,7 +97,6 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
     //TODO: func click_Confirm
     click_Confirm = async () => {
         const dateTime = Date.now();
-        const fulldate = Math.floor( dateTime / 1000 );
         let data = this.state.data;
         // const regularAccount = new RegularAccount();
         // const resGetMnemonic = regularAccount.getMnemonic();
@@ -113,6 +112,11 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         const encryptedShares = sss.generateShares( answers );
         console.log( { encryptedShares } );
         const resInitializeHealthcheck = await sss.initializeHealthcheck( encryptedShares );
+        const regularAccount = new RegularAccount(
+            mnemonic
+        );
+        const getAddress = await regularAccount.getAddress();
+        //console.log( { getAddress } );
         console.log( { resInitializeHealthcheck } );
         if ( resInitializeHealthcheck.success ) {
             //console.log( { encryptedShares } );
@@ -125,13 +129,13 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
             if ( shareIds != null ) {
                 await dbOpration.insertSSSShareAndShareId(
                     localDB.tableName.tblSSSDetails,
-                    fulldate,
+                    dateTime,
                     encryptedShares,
                     shareIds
                 );
                 await dbOpration.insertWallet(
                     localDB.tableName.tblWallet,
-                    fulldate,
+                    dateTime,
                     mnemonic,
                     "",
                     "",
@@ -157,8 +161,8 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                 // console.log( { mnemonic});
                 await dbOpration.insertCreateAccount(
                     localDB.tableName.tblAccount,
-                    fulldate,
-                    "",
+                    dateTime,
+                    getAddress,
                     "0.0",
                     "BTC",
                     "Daily Wallet",

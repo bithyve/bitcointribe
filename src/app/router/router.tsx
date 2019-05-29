@@ -87,7 +87,8 @@ import ShareSecretViaQRScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYo
 import SelectContactListAssociatePerson from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/BackUpTrustedPartySecretStoreScreen/SelectContactListAssociatePerson";
 import TrustedContactAcceptOtpScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/BackUpTrustedPartySecretStoreScreen/TrustedContactAcceptOtpScreen";
 
-
+//TODO: Settings 
+import MnemonicShowScreen from "HexaWallet/src/screens/TabBarScreen/SettingScreen/MnemonicShowScreen/MnemonicShowScreen";
 
 
 
@@ -98,6 +99,7 @@ import QRCodeScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/QRCo
 import OTPScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/OTPScreen";
 import QRCodeScanScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/QRCodeScanScreen";
 import OTPBackupShareStore from "HexaWallet/src/screens/DrawerScreen/CommonScreens/OTPBackupShareStore";
+
 
 
 
@@ -382,6 +384,20 @@ const BackupTrustedPartrySecretStoreStackNavigator = createStackNavigator(
 );
 
 
+//TODO: SettingsScreen 
+
+const SettingsStackNavigator = createStackNavigator(
+  {
+    MnemonicShowScreen: {
+      screen: MnemonicShowScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "MnemonicShowScreen"
+  } );
+
+
 //TODO: TabNavigator
 //TODO: TabNavigator:TabNavigator
 const TabNavigator = createBottomTabNavigator(
@@ -542,6 +558,11 @@ export const createRootNavigator = (
       },
       OTPBackupShareStoreNavigator: {
         screen: OTPBackupShareStore,
+        navigationOptions: { header: null }
+      },
+      //TODO: Settings   
+      SettingsNavigator: {
+        screen: SettingsStackNavigator,
         navigationOptions: { header: null }
       }
       //Drwaer Navigation

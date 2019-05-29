@@ -16,6 +16,8 @@ export default class HealthStatus {
       bad: 0,
       ugly: 0,
     };
+    console.log( "Constructor Executed" );
+    console.log( this.counter )
   }
 
   public appHealthStatus = (
@@ -25,20 +27,7 @@ export default class HealthStatus {
       { shareId: string; updatedAt: number },
       { shareId: string; updatedAt: number },
       { shareId: string; updatedAt: number }
-    ] = [
-        {
-          shareId: "0",
-          updatedAt: 0,
-        },
-        {
-          shareId: "0",
-          updatedAt: 0,
-        },
-        {
-          shareId: "0",
-          updatedAt: 0,
-        },
-      ],
+    ],
     mnemonicTimestamp: number,
     backupType: string,
   ): {
@@ -50,6 +39,10 @@ export default class HealthStatus {
     secureAcStatus: string;
     overallStatus: string;
   } => {
+    console.log( { qaTimestamp, secureTimestamp, shares, mnemonicTimestamp, backupType } );
+    console.log( { counter: this.counter } )
+
+
     let overallStatus: string = HEXA_HEALTH.STAGE1;
     const qaRes = this.qaHealthStatus( qaTimestamp );
     const qaStatus = qaRes.qaStage;
@@ -69,9 +62,14 @@ export default class HealthStatus {
       sharesInfo = sharesData.sharesInfo;
       sharesStatus = sharesData.sharesStage;
     }
+
+    console.log( { counter: this.counter } );
+
     if ( this.counter.ugly >= 2 ) {
       overallStatus = HEXA_HEALTH.STAGE1;
+      console.log( "1" );
     } else if ( this.counter.ugly === 1 ) {
+      console.log( "2.." );
       overallStatus = HEXA_HEALTH.STAGE2;
     } else if ( this.counter.bad > 1 ) {
       overallStatus = HEXA_HEALTH.STAGE3;
@@ -80,6 +78,9 @@ export default class HealthStatus {
     } else if ( this.counter.good === 3 ) {
       overallStatus = HEXA_HEALTH.STAGE5;
     }
+
+    console.log( { overallStatus, } );
+
 
     return {
       backupType,
@@ -140,6 +141,7 @@ export default class HealthStatus {
     const delta = Math.abs( Date.now() - time );
     const numberOfDays = Math.floor( delta / ( 60 * 60 * 24 * 1000 ) );
     if ( numberOfDays > TIME_SLOTS.SHARE_SLOT2 ) {
+      console.log( { numberOfDays } );
       secureAcStage = ENTITY_HEALTH.STAGE1;
       this.counter.ugly++;
     } else if (

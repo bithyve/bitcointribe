@@ -47,6 +47,11 @@ export default class SettingScreen extends React.Component<any, any> {
         icon: "shield"
       },
       {
+        title: "Change Backup Method",
+        subTitle: "Currently your wallet is backed via Trusted Contact",
+        icon: "shield"
+      },
+      {
         title: "Contacts that have shared secret with you",
         subTitle: "Lorem ipsum dolor sit amet,",
         icon: "contact-book"
@@ -82,7 +87,10 @@ export default class SettingScreen extends React.Component<any, any> {
     let title = item.title;
     if ( title == "Contacts that have shared secret with you" ) {
       this.props.navigation.push( "TrustedPartyShareSecretNavigator" );
-    } else {
+    } else if ( title == "Settings" ) {
+      this.props.navigation.push( "SettingsNavigator" );
+    }
+    else {
       Alert.alert( "Working." );
     }
   }
@@ -90,6 +98,7 @@ export default class SettingScreen extends React.Component<any, any> {
 
 
   render() {
+
     return (
       <Container>
         <SafeAreaView style={ styles.container }>
@@ -143,7 +152,7 @@ export default class SettingScreen extends React.Component<any, any> {
                             >
                               { item.title }
                             </Text>
-                            <Text note style={ { fontSize: 11 } }>{ item.subTitle }</Text>
+                            <Text note numberOfLines={ 1 } style={ { fontSize: 11 } }>{ item.subTitle }</Text>
                           </View>
                           <View style={ { flex: 0.2, justifyContent: "center", alignItems: "flex-end" } }>
                             <SvgIcon

@@ -1,5 +1,5 @@
 apply plugin: "com.android.application"
-
+  
 import com.android.build.OutputFile  
 apply plugin: 'io.fabric'  
 /**
@@ -108,12 +108,12 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1       
-        versionName "1.0.1.240519"    
-         multiDexEnabled true  
+        versionName "1.0.2.280519"      
+         multiDexEnabled true    
         ndk {
             abiFilters "armeabi-v7a", "x86"
-        }
-    }
+        }  
+      }    
      packagingOptions {
         pickFirst '**/libgnustl_shared.so'
     }
