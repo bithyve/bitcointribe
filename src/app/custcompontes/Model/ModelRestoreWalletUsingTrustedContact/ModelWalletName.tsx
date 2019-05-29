@@ -93,6 +93,9 @@ export default class ModelWalletName extends Component<Props, any> {
                                     } )
                                     this.ckeckWalletName( val )
                                 } }
+                                multiline={ false }
+                                returnKeyType="done"
+                                blurOnSubmit={ true }
                             />
                         </View>
                         <View style={ { flex: 0.5, alignItems: "center", justifyContent: "flex-end" } }>

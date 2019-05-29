@@ -82,11 +82,11 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
     //TODO: func click_getWalletDetails
     getWalletDetails = async ( mnemonic: string, bal: any ) => {
         const dateTime = Date.now();
-        const fulldate = Math.floor( dateTime / 1000 );
+        // const fulldate = Math.floor( dateTime / 1000 );
         let walletName = this.state.wallerName;
         await dbOpration.insertWallet(
             localDB.tableName.tblWallet,
-            fulldate,
+            dateTime,
             mnemonic,
             "",
             "",
@@ -98,7 +98,7 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
         if ( res ) {
             await dbOpration.insertCreateAccount(
                 localDB.tableName.tblAccount,
-                fulldate,
+                dateTime,
                 "",
                 bal,
                 "BTC",

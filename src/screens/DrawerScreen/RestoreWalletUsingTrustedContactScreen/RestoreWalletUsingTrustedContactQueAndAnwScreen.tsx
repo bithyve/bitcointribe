@@ -158,7 +158,7 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
                 localDB.tableName.tblAccount,
                 dateTime,
                 "",
-                getBal.data.balance,
+                getBal.data.balance / 1e8,
                 "BTC",
                 "Daily Wallet",
                 "Daily Wallet",
@@ -177,7 +177,7 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
                         {
                             modalVisible: true,
                             walletName: walletDetail.walletType,
-                            bal: getBal.data.balance
+                            bal: getBal.data.balance / 1e8
                         }
                     ]
                 } )
