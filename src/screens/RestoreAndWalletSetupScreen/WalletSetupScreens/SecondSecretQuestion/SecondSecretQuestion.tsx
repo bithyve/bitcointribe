@@ -127,13 +127,13 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                 transShare.push( sss.createTransferShare( share, walletName ) )
             }
             if ( shareIds != null ) {
-                await dbOpration.insertSSSShareAndShareId(
+                let resInsertSSSShare = await dbOpration.insertSSSShareAndShareId(
                     localDB.tableName.tblSSSDetails,
                     dateTime,
                     encryptedShares,
                     shareIds
                 );
-                await dbOpration.insertWallet(
+                let resInsertWallet = await dbOpration.insertWallet(
                     localDB.tableName.tblWallet,
                     dateTime,
                     mnemonic,
@@ -143,7 +143,7 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                     walletName,
                     ""
                 );
-                await comAppHealth.connection_AppHealthStatus( dateTime, 0, encryptedShares, mnemonic )
+                let resAppHealthStatus = await comAppHealth.connection_AppHealthStatus( dateTime, 0, encryptedShares, mnemonic )
                 // console.log( { resultSSSShareIdInserted } );
                 var temp = [];
                 let data = {};
@@ -154,12 +154,12 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                 data1.secoundQuestion = secoundQuestion;
                 data1.secoundAnswer = secoundAnser;
                 temp.push( data1 );
-                await dbOpration.updateWalletAnswerDetails(
+                let resUpdateWalletAns = await dbOpration.updateWalletAnswerDetails(
                     localDB.tableName.tblWallet,
                     temp
                 );
                 // console.log( { mnemonic});
-                await dbOpration.insertCreateAccount(
+                let resInsertCreateAcc = await dbOpration.insertCreateAccount(
                     localDB.tableName.tblAccount,
                     dateTime,
                     getAddress,
@@ -169,10 +169,14 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                     "Daily Wallet",
                     ""
                 );
-                this.setState( {
-                    flag_Loading: false
-                } )
-                this.props.prevScreen();
+                if ( resInsertSSSShare && resInsertWallet && resAppHealthStatus && resInsertCreateAcc ) {
+                    this.setState( {
+                        flag_Loading: false
+                    } )
+                    this.props.prevScreen();
+                } else {
+                    Alert.alert( "Local db update issue!" )
+                }
             }
         } else {
             this.setState( {

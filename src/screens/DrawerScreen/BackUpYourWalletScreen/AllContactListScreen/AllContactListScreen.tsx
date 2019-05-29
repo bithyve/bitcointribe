@@ -105,6 +105,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
             } )
         }
     }
+
     //TODO: Searching Contact List
     searchFilterFunction = ( text: string ) => {
         if ( text.length > 0 ) {
@@ -114,7 +115,6 @@ export default class AllContactListScreen extends React.Component<any, any> {
                 const textData = text.toUpperCase();
                 return itemData.indexOf( textData ) > -1;
             } );
-
             this.setState( { data: newData } );
         } else {
             this.setState( {

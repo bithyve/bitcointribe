@@ -80,7 +80,7 @@ export default class OTPScreen extends Component {
             keeperInfo: [],
             arr_ResDownShare: [],
             arr_ModelRestoreAssociateContactList: [],
-            recordId: ""
+            recordId: "",
         };
     }
 
@@ -117,8 +117,8 @@ export default class OTPScreen extends Component {
             ],
             arr_ResDownShare: resDownloadShare
         } )
-
     }
+
 
     _onFinishCheckingCode = async ( code: string ) => {
         console.log( { code } );
@@ -222,7 +222,7 @@ export default class OTPScreen extends Component {
                                 inactiveColor={ this.state.passcodeStyle[ 0 ].inactiveColor }
                                 className="border-box"
                                 cellBorderWidth={ this.state.passcodeStyle[ 0 ].cellBorderWidth }
-                                autoFocus={ true }
+                                autoFocus={ false }
                                 inputPosition="center"
                                 space={ 5 }
                                 size={ 50 }
@@ -235,6 +235,8 @@ export default class OTPScreen extends Component {
                                 onFulfill={ ( code ) =>
                                     this._onFinishCheckingCode( code )
                                 }
+                                type='characters'
+
                             />
                             { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
                                 <Text style={ { color: "red", marginTop: 44 } }>{ this.state.success }</Text>

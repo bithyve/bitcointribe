@@ -216,10 +216,8 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                                 Enter OTP
                         </Text>
                             <CodeInput
-                                ref="codeInputRef1"
                                 secureTextEntry
-                                keyboardType="default"
-                                autoCapitalize="sentences"
+                                keyboardType="name-phone-pad"
                                 codeLength={ 6 }
                                 activeColor={ this.state.passcodeStyle[ 0 ].activeColor }
                                 inactiveColor={ this.state.passcodeStyle[ 0 ].inactiveColor }
@@ -238,6 +236,7 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                                 onFulfill={ ( code ) =>
                                     this._onFinishCheckingCode( code )
                                 }
+                                type='characters'
                             />
                             { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
                                 <Text style={ { color: "red", marginTop: 44 } }>{ this.state.success }</Text>
