@@ -1,0 +1,161 @@
+import React from "react";
+import { StyleSheet, ImageBackground, View, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, Clipboard } from "react-native";
+import {
+    Container,
+    Item,
+    Input,
+    Button,
+    Text,
+    Icon,
+    Textarea
+} from "native-base";
+import { SvgIcon } from "@up-shared/components";
+import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import Toast from 'react-native-simple-toast';
+
+//TODO: Custome Pages
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+
+//TODO: Custome StyleSheet Files       
+import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
+//TODO: Custome Object
+import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var utils = require( "HexaWallet/src/app/constants/Utils" );
+
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
+//TODO: Bitcoin Files
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+
+export default class MnemonicShowScreen extends React.Component<any, any> {
+    constructor ( props: any ) {
+        super( props )
+        this.state = ( {
+            walletDetails: [],
+            arr_AccountDetails: []
+        } )
+    }
+
+    async componentWillMount() {
+        let walletDetails = await comFunDBRead.readTblWallet();
+        let resAccountDetails = await comFunDBRead.readTblAccount();
+        console.log( { walletDetails, resAccountDetails } );
+        this.setState( {
+            walletDetails,
+            arr_AccountDetails: resAccountDetails[ 0 ]
+        } );
+    }
+
+    render() {
+        let walletDetails = this.state.walletDetails;
+        let accountDetails = this.state.arr_AccountDetails;
+        return (
+            <Container>
+                <SafeAreaView style={ styles.container }>
+                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
+                        <View style={ { marginLeft: 10, marginTop: 15 } }>
+                            <Button
+                                transparent
+                                onPress={ () =>
+                                    this.props.navigation.pop() }
+                            >
+                                <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 20 : 17, marginLeft: 0 } ] }>Mnemonic</Text>
+                            </Button>
+                        </View>
+                        <KeyboardAwareScrollView
+                            enableOnAndroid
+                            extraScrollHeight={ 40 }
+                            contentContainerStyle={ { flexGrow: 1, } }
+                        >
+                            <View style={ { flex: 1, margin: 10 } }>
+                                <Text style={ { textAlign: "center" } }>{ walletDetails.mnemonic } </Text>
+                                <FullLinearGradientButton
+                                    click_Done={ () => {
+                                        Clipboard.setString( walletDetails.mnemonic );
+                                        Toast.show( 'Mnemonic coped!' );
+                                    } }
+                                    title="Copy Mnemonic"
+                                    disabled={ false }
+                                    style={ [ { opacity: 1, borderRadius: 10, marginTop: 20 } ] }
+                                />
+                            </View>
+                            <View style={ { flex: 1 } }>
+                                <Text style={ { textAlign: "center" } }>{ accountDetails.address } </Text>
+                                <FullLinearGradientButton
+                                    click_Done={ () => {
+                                        Clipboard.setString( accountDetails.address );
+                                        Toast.show( 'Mnemonic Address!' );
+                                    } }
+                                    title="Copy Address"
+                                    disabled={ false }
+                                    style={ [ { opacity: 1, borderRadius: 10, marginTop: 20 } ] }
+                                />
+                            </View>
+                        </KeyboardAwareScrollView>
+                    </ImageBackground>
+                </SafeAreaView>
+                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message="Loading" />
+            </Container >
+        );
+    }
+}
+
+const primaryColor = colors.appColor;
+const darkGrey = "#bdc3c7";
+const styles = StyleSheet.create( {
+    container: {
+        flex: 1,
+        backgroundColor: "#F8F8F8",
+    },
+    viewPagination: {
+        flex: 2,
+        alignItems: "center",
+        justifyContent: "center",
+        marginLeft: 30,
+        marginRight: 30
+    },
+    viewInputFiled: {
+        flex: 3,
+        alignItems: "center",
+        margin: 10
+    },
+    itemInputWalletName: {
+        borderWidth: 0,
+        borderRadius: 10,
+        shadowOffset: { width: 2, height: 2 },
+        shadowColor: 'gray',
+        shadowOpacity: 0.3,
+        backgroundColor: '#FFFFFF'
+
+    },
+    viewProcedBtn: {
+        flex: 2,
+        justifyContent: "flex-end"
+    },
+    btnNext: {
+        position: "absolute",
+        bottom: 10,
+        width: "100%"
+
+    },
+    //Grid View Selected
+    gridSelectedList: {
+        flex: 1
+    },
+    modal: {
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10
+    },
+    modal4: {
+        height: 180
+    }
+} );

@@ -63,7 +63,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         var resSharedSecretList = await comFunDBRead.readTblTrustedPartySSSDetails();
         console.log( { resSharedSecretList } );
         const dateTime = Date.now();
-        const fulldate = Math.floor( dateTime / 1000 );
+        //const fulldate = Math.floor( dateTime / 1000 );
         let history = [];
         for ( let i = 0; i < resSharedSecretList.length; i++ ) {
             if ( resSharedSecretList[ i ].history != "" ) {
@@ -107,7 +107,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             let sharedDate = parseInt( resSharedSecretList[ i ].sharedDate );
             //  console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
             //console.log( 'sharedDate date =' + sharedDate.toString() + " and full date =" + fulldate.toString() );
-            var startDate = new Date( fulldate * 1000 );
+            var startDate = new Date( dateTime * 1000 );
             var endDate = new Date( sharedDate * 1000 );
             var diff = Math.abs( startDate.getTime() - endDate.getTime() );
             const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
@@ -369,9 +369,8 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
 
     //TODO: Deep{ling sent then reload data
     reloadList = async ( type: string ) => {
-
         const dateTime = Date.now();
-        const fulldate = Math.floor( dateTime / 1000 );
+        // const fulldate = Math.floor( dateTime / 1000 );
         let selectedItem = this.state.arr_SelectedContact;
         // console.log( { selectedItem } );
         var temp = [];
@@ -390,7 +389,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         let resUpdateHistroyAndSharedDate = await dbOpration.updateHistroyAndSharedDate(
             localDB.tableName.tblTrustedPartySSSDetails,
             temp,
-            fulldate,
+            dateTime,
             selectedItem.id
         );
         if ( resUpdateHistroyAndSharedDate ) {

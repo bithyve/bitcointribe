@@ -117,8 +117,6 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
 
   saveData = async () => {
     try {
-      const dateTime = Date.now();
-      const fulldate = Math.floor( dateTime / 1000 );
       let code = this.state.pincode;
       let commonData = Singleton.getInstance();
       commonData.setPasscode( code );

@@ -1,5 +1,6 @@
 import Config from "react-native-config";
 
+
 //Colors  
 var colors = {
   appColor: "#2595D6",
@@ -12,6 +13,7 @@ var colors = {
   Joint: "#660000",
   placeholder: "#5F5F5F"
 };
+
 
 const assetsImages = "../../assets/images/";
 var images = {
@@ -101,6 +103,7 @@ var images = {
     "sheild_2": require( assetsImages + "WalletScreen/sheild_2.png" ),
   }
 };
+
 
 //Local Database
 var localDB = {

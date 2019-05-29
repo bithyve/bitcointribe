@@ -42,6 +42,7 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
         this.state = ( {
             data: [],
             walletName: "",
+            filterValue: "",
             arr_ContactList: [],
             SelectedFakeContactList: [],
             flag_NextBtnDisable: true,
@@ -87,14 +88,19 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
         this.setState( { data: this.state.data } )
         if ( seletedLength == 3 ) {
             this.setState( {
-                flag_NextBtnDisable: false
+                flag_NextBtnDisable: false,
+                filterValue: "",
+                data: this.state.arr_ContactList
             } )
         } else {
             this.setState( {
-                flag_NextBtnDisable: true
+                flag_NextBtnDisable: true,
+                filterValue: "",
+                data: this.state.arr_ContactList
             } )
         }
     }
+
     //TODO: Searching Contact List
     searchFilterFunction = ( text: string ) => {
         if ( text.length > 0 ) {
@@ -117,21 +123,21 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
     click_Next = async () => {
         this.setState( {
             flag_NextBtnDisable1: true
-        } )
+        } );
         const dateTime = Date.now();
-        const fulldate = Math.floor( dateTime / 1000 );
+        // const fulldate = Math.floor( dateTime / 1000 );
         let walletName = this.state.walletName;
         let selectedContactList = this.state.SelectedFakeContactList;
         console.log( { selectedContactList } );
         let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactKeepInfo(
             localDB.tableName.tblSSSDetails,
-            fulldate,
+            dateTime,
             selectedContactList
         );
         if ( resInsertContactList ) {
             await dbOpration.insertWallet(
                 localDB.tableName.tblWallet,
-                fulldate,
+                dateTime,
                 "",
                 "",
                 "",
@@ -205,9 +211,15 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
                                     <Item style={ { borderColor: 'transparent', marginLeft: 10 } }>
                                         <Icon name="ios-search" color="#B7B7B7" />
                                         <Input placeholder="Enter a name to begin search"
+                                            value={ this.state.filterValue }
                                             style={ [ globalStyle.ffFiraSansMedium ] }
                                             placeholderTextColor="#B7B7B7"
-                                            onChangeText={ text => this.searchFilterFunction( text ) }
+                                            onChangeText={ text => {
+                                                this.setState( {
+                                                    filterValue: text
+                                                } );
+                                                this.searchFilterFunction( text )
+                                            } }
                                             autoCorrect={ false } />
                                     </Item>
                                 </View>
@@ -232,7 +244,7 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
                                                     </TouchableOpacity>
                                                 </View>
                                             </View>
-                                            <Text>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                            <Text numberOfLines={ 1 }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                         </View>
                                     ) }
                                     itemDimension={ Dimensions.get( 'screen' ).width / 4.0 }
