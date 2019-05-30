@@ -91,7 +91,9 @@ import TrustedContactAcceptOtpScreen from "HexaWallet/src/screens/DrawerScreen/B
 import MnemonicShowScreen from "HexaWallet/src/screens/TabBarScreen/SettingScreen/MnemonicShowScreen/MnemonicShowScreen";
 
 
-
+//TODO: Backup Wallet Mnemonic Screen      
+import BackupWalletMnemonicScreen from "HexaWallet/src/screens/DrawerScreen/BackupWalletMnemonicScreen/BackupWalletMnemonicScreen";
+import BackupWalletMnemonicConfirmMnemonicScreen from "HexaWallet/src/screens/DrawerScreen/BackupWalletMnemonicScreen/BackupWalletMnemonicConfirmMnemonicScreen";
 
 
 //TODO: Common Screen  
@@ -99,6 +101,8 @@ import QRCodeScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/QRCo
 import OTPScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/OTPScreen";
 import QRCodeScanScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/QRCodeScanScreen";
 import OTPBackupShareStore from "HexaWallet/src/screens/DrawerScreen/CommonScreens/OTPBackupShareStore";
+
+
 
 
 
@@ -385,11 +389,18 @@ const BackupTrustedPartrySecretStoreStackNavigator = createStackNavigator(
 
 
 //TODO: SettingsScreen 
-
 const SettingsStackNavigator = createStackNavigator(
   {
     MnemonicShowScreen: {
       screen: MnemonicShowScreen,
+      navigationOptions: { header: null }
+    },
+    BackupWalletMnemonicScreen: {
+      screen: BackupWalletMnemonicScreen,
+      navigationOptions: { header: null }
+    },
+    BackupWalletMnemonicConfirmMnemonicScreen: {
+      screen: BackupWalletMnemonicConfirmMnemonicScreen,
       navigationOptions: { header: null }
     }
   },
