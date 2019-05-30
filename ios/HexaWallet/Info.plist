@@ -118,6 +118,7 @@
 		<string>OpenSans-Semibold.ttf</string>
 		<string>OpenSans-SemiboldItalic.ttf</string>
 		<string>FiraSans-SemiBold.ttf</string>
+		<string>OpenSans-ExtraBold.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
