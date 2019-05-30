@@ -7,12 +7,16 @@ import {
     Button,
     Text,
     Icon,
-    Textarea
+    Textarea,
+    Left,
+    Right,
+    List, ListItem,
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Toast from 'react-native-simple-toast';
+import { RkCard } from "react-native-ui-kitten";
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
@@ -39,7 +43,11 @@ export default class MnemonicShowScreen extends React.Component<any, any> {
         super( props )
         this.state = ( {
             walletDetails: [],
-            arr_AccountDetails: []
+            arr_AccountDetails: [],
+            arr_ListItem: [ {
+                title: "Backup Wallet Mnemonic"
+            }
+            ]
         } )
     }
 
@@ -51,6 +59,15 @@ export default class MnemonicShowScreen extends React.Component<any, any> {
             walletDetails,
             arr_AccountDetails: resAccountDetails[ 0 ]
         } );
+    }
+
+    //TODO: list on click
+    click_MenuItem( item: any ) {
+        console.log( { item } );
+        let title = item.title;
+        if ( title == "Backup Wallet Mnemonic" ) {
+            this.props.navigation.push( "BackupWalletMnemonicScreen" );
+        }
     }
 
     render() {
@@ -76,6 +93,53 @@ export default class MnemonicShowScreen extends React.Component<any, any> {
                             extraScrollHeight={ 40 }
                             contentContainerStyle={ { flexGrow: 1, } }
                         >
+                            <View style={ { flex: 0.2, borderRadius: 10, margin: 8 } }>
+                                <FlatList
+                                    data={ this.state.arr_ListItem }
+                                    showsVerticalScrollIndicator={ false }
+                                    scrollEnabled={ false }
+                                    renderItem={ ( { item } ) => (
+                                        <TouchableOpacity
+                                            onPress={ () => this.click_MenuItem( item ) }
+                                        >
+                                            <RkCard
+                                                rkType="shadowed"
+                                                style={ {
+                                                    flex: 1,
+                                                    borderRadius: 8,
+                                                    marginLeft: 8,
+                                                    marginRight: 8,
+                                                    marginBottom: 4,
+                                                } }
+                                            >
+                                                <View
+                                                    rkCardHeader
+                                                    style={ {
+                                                        flex: 1,
+                                                    } }
+                                                >
+                                                    <View style={ { flex: 1, flexDirection: "column" } }>
+                                                        <Text
+                                                            style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14 } ] }
+                                                        >
+                                                            { item.title }
+                                                        </Text>
+
+                                                    </View>
+                                                    <View style={ { flex: 0.2, justifyContent: "center", alignItems: "flex-end" } }>
+                                                        <SvgIcon
+                                                            name="icon_forword"
+                                                            color="#BABABA"
+                                                            size={ 20 }
+                                                        />
+                                                    </View>
+                                                </View>
+                                            </RkCard>
+                                        </TouchableOpacity>
+                                    ) }
+                                    keyExtractor={ ( item, index ) => index }
+                                />
+                            </View>
                             <View style={ { flex: 1, margin: 10 } }>
                                 <Text style={ { textAlign: "center" } }>{ walletDetails.mnemonic } </Text>
                                 <FullLinearGradientButton

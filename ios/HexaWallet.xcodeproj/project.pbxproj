@@ -91,6 +91,7 @@
 		F59CFC5F3F954F5790CCBBED /* libSafariViewManager.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 913BD2D037394413B8478041 /* libSafariViewManager.a */; };
 		F8C33CE111514405A5D0E45A /* libRNMail.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C16621D886464C44AAC0D4A6 /* libRNMail.a */; };
 		FA7A5D0089794E2190B5E3F4 /* Roboto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 175C64779F784FDE910B4636 /* Roboto.ttf */; };
+		C9A6353C8F444E9FBDD3EB07 /* OpenSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 79A5C5C8CCE3425DBF6DD45E /* OpenSans-ExtraBold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -780,6 +781,7 @@
 		F20E9B1F5BCC4F9C9ACD43FA /* libRNCWebView.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNCWebView.a; sourceTree = "<group>"; };
 		F79788E7D60A489CA04491E9 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		FE1000554C4B4546B076292C /* libRNI18n.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNI18n.a; sourceTree = "<group>"; };
+		79A5C5C8CCE3425DBF6DD45E /* OpenSans-ExtraBold.ttf */ = {isa = PBXFileReference; name = "OpenSans-ExtraBold.ttf"; path = "../src/assets/fonts/openSans/OpenSans-ExtraBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1012,6 +1014,7 @@
 				C264874973234B7180EAFC84 /* OpenSans-Semibold.ttf */,
 				DD75884E76064477B2CB5B06 /* OpenSans-SemiboldItalic.ttf */,
 				6312467B46FF4C75AE036FC2 /* FiraSans-SemiBold.ttf */,
+				79A5C5C8CCE3425DBF6DD45E /* OpenSans-ExtraBold.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -2263,6 +2266,7 @@
 				25E2338DA13E4F2DB4DD8DA0 /* OpenSans-Semibold.ttf in Resources */,
 				2DCB368F51E34D40ACED8788 /* OpenSans-SemiboldItalic.ttf in Resources */,
 				94EB2CDCF5444CFEB54B8108 /* FiraSans-SemiBold.ttf in Resources */,
+				C9A6353C8F444E9FBDD3EB07 /* OpenSans-ExtraBold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
