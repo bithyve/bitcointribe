@@ -39,6 +39,7 @@ var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonApp
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
 
 export default class SecondSecretQuestion extends React.Component<any, any> {
@@ -115,6 +116,18 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         const regularAccount = new RegularAccount(
             mnemonic
         );
+        const secureAccount = new SecureAccount( mnemonic );
+        const resSetupSecureAccount = await secureAccount.setupSecureAccount();
+        console.log( resSetupSecureAccount.data.setupData );
+        const secondaryMnemonic = await secureAccount.getRecoveryMnemonic();
+        let arr_SecureDetails = [];
+        let secureDetails = {};
+        secureDetails.setupData = resSetupSecureAccount.data.setupData;
+        secureDetails.secondaryMnemonic = secondaryMnemonic;
+        secureDetails.backupDate = dateTime;
+        secureDetails.title = "Backup Now";
+        secureDetails.addInfo = "";
+        arr_SecureDetails.push( secureDetails );
         const getAddress = await regularAccount.getAddress();
         //console.log( { getAddress } );
         console.log( { resInitializeHealthcheck } );
@@ -158,7 +171,7 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                     localDB.tableName.tblWallet,
                     temp
                 );
-                // console.log( { mnemonic});
+                //  console.log( { resUpdateWalletAns } );
                 let resInsertCreateAcc = await dbOpration.insertCreateAccount(
                     localDB.tableName.tblAccount,
                     dateTime,
@@ -166,13 +179,23 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                     "0.0",
                     "BTC",
                     "Daily Wallet",
-                    "Daily Wallet",
+                    "Regular Account",
                     ""
                 );
-                if ( resInsertSSSShare && resInsertWallet && resAppHealthStatus && resInsertCreateAcc ) {
+                let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+                    localDB.tableName.tblAccount,
+                    dateTime,
+                    "",
+                    "0.0",
+                    "BTC",
+                    "Secure Account",
+                    "Secure Account",
+                    arr_SecureDetails
+                );
+                if ( resInsertSSSShare && resInsertWallet && resAppHealthStatus && resUpdateWalletAns && resInsertSecureCreateAcc && resInsertCreateAcc ) {
                     this.setState( {
                         flag_Loading: false
-                    } )
+                    } );
                     this.props.prevScreen();
                 } else {
                     Alert.alert( "Local db update issue!" )
