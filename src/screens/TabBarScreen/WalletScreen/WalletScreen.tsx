@@ -100,16 +100,16 @@ export default class WalletScreen extends React.Component {
       scrollY: new Animated.Value( 0 ),
       //custome comp
       arr_CustShiledIcon: [],
-      //Model 
+      //Model    
       arr_ModelBackupYourWallet: [],
       arr_ModelFindYourTrustedContacts: [],
       arr_ModelBackupShareAssociateContact: [],
       arr_ModelBackupAssociateOpenContactList: [],
       arr_ModelAcceptOrRejectSecret: [],
-      //DeepLinking Param
+      //DeepLinking Param   
       deepLinkingUrl: "",
       deepLinkingUrlType: "",
-      flag_FabActive: 'true'
+      flag_FabActive: false
     };
     isNetwork = utils.getNetwork();
   }
@@ -173,15 +173,37 @@ export default class WalletScreen extends React.Component {
   async connnection_FetchData() {
     var resultWallet = await comFunDBRead.readTblWallet();
     var resAccount = await comFunDBRead.readTblAccount();
-    if ( resAccount.length > 4 ) {
+    let temp = [];
+    for ( let i = 0; i < resAccount.length; i++ ) {
+      let dataAccount = resAccount[ i ];
+      let additionalInfo = JSON.parse( dataAccount.additionalInfo );
+      console.log( { additionalInfo } );
+      let setupData = additionalInfo != "" ? additionalInfo[ 0 ] : "";
+      console.log( { setupData } );
+      let data = {};
+      data.id = dataAccount.id;
+      data.accountName = dataAccount.accountName;
+      data.accountType = dataAccount.accountType;
+      data.address = dataAccount.address;
+      data.balance = dataAccount.balance;
+      data.dateCreated = dataAccount.dateCreated;
+      data.lastUpdated = dataAccount.lastUpdated;
+      data.unit = dataAccount.unit;
+      data.setupData = setupData;
+      if ( setupData != null || setupData != "" ) {
+        data.secureBtnTitle = setupData.title;
+      }
+      temp.push( data )
+    }
+    //console.log( { resAccount,temp} );
+    if ( temp.length > 4 ) {
       this.setState( {
         flag_cardScrolling: true
       } )
     }
-    var resSSSDetails = await comFunDBRead.readTblSSSDetails();
     this.setState( {
       walletDetails: resultWallet,
-      arr_accounts: resAccount,
+      arr_accounts: temp,
     } );
     //TODO: appHealthStatus funciton   
     let resAppHealthStatus = JSON.parse( resultWallet.appHealthStatus );
@@ -213,9 +235,6 @@ export default class WalletScreen extends React.Component {
     }
 
   }
-
-
-
 
   //TODO: func get Deeplinking data 
   getDeepLinkingData() {
@@ -318,6 +337,141 @@ export default class WalletScreen extends React.Component {
 
 
 
+  _renderItem( { item, index } ) {
+    return (
+      <View key={ "card" + index }>
+        { renderIf( item.accountType != "Secure Account" )(
+          <RkCard
+            rkType="shadowed"
+            style={ {
+              flex: 1,
+              margin: 10,
+              height: 145,
+              borderRadius: 10
+            } }
+          >
+            <View
+              rkCardHeader
+              style={ {
+                flex: 1,
+                borderBottomColor: "#F5F5F5",
+                borderBottomWidth: 1
+              } }
+            >
+              <SvgIcon
+                name="icon_dailywallet"
+                color="#37A0DA"
+                size={ 40 }
+              />
+              <Text
+                style={ [ globalStyle.ffFiraSansMedium, {
+                  flex: 2,
+                  fontSize: 16,
+                  marginLeft: 10
+                } ] }
+              >
+                { item.accountName }
+              </Text>
+              <SvgIcon name="icon_more" color="gray" size={ 15 } />
+            </View>
+            <View
+              rkCardContent
+              style={ {
+                flex: 1,
+                flexDirection: "row"
+              } }
+            >
+              <View
+                style={ {
+                  flex: 1,
+                  justifyContent: "center"
+                } }
+              >
+                <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
+              </View>
+              <View style={ { flex: 4 } }>
+                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
+                <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
+                  { item.balance }
+                </Text>
+              </View>
+              <View
+                style={ {
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "flex-end",
+                  justifyContent: "flex-end"
+                } }
+              >
+                <Button transparent>
+                  <SvgIcon
+                    name="timelockNew"
+                    color="gray"
+                    size={ 20 }
+                  />
+                </Button>
+                <Button transparent style={ { marginLeft: 10 } }>
+                  <SvgIcon name="icon_multisig" color="gray" size={ 20 } />
+                </Button>
+              </View>
+
+            </View>
+          </RkCard>
+        ) }
+        { renderIf( item.accountType == "Secure Account" )(
+          <RkCard
+            rkType="shadowed"
+            style={ {
+              flex: 1,
+              margin: 10,
+              height: 145,
+              borderRadius: 10
+            } }
+          >
+
+            <View
+              rkCardContent
+              style={ {
+                flex: 1,
+                flexDirection: "row",
+                justifyContent: "center"
+              } }
+            >
+              <View
+                style={ {
+                  flex: 1,
+                  justifyContent: "center"
+                } }
+              >
+                <SvgIcon
+                  name="icon_dailywallet"
+                  color="#37A0DA"
+                  size={ 40 }
+                />
+              </View>
+              <View style={ { flex: 3, alignItems: "flex-start", justifyContent: "center" } }>
+                <Text
+                  style={ [ globalStyle.ffFiraSansMedium, {
+                    fontSize: 16,
+                  } ] }
+                >
+                  { item.accountName }
+                </Text>
+                <Text note>Secure Account is not backed up</Text>
+              </View>
+              <View style={ { flex: 2, alignItems: "flex-end", justifyContent: "center" } }>
+                <Button light style={ { borderRadius: 8, borderColor: "gray", borderWidth: 0.4, alignSelf: "flex-end" } }>
+                  <Text style={ { color: "#838383" } } >{ item.secureBtnTitle }</Text>
+                </Button>
+              </View>
+            </View>
+          </RkCard>
+        ) }
+      </View>
+    );
+  }
+
+
   render() {
     let flag_cardScrolling = this.state.flag_cardScrolling;
     let walletDetails = this.state.walletDetails;
@@ -415,82 +569,7 @@ export default class WalletScreen extends React.Component {
                   data={ this.state.arr_accounts }
                   showsVerticalScrollIndicator={ false }
                   scrollEnabled={ flag_cardScrolling == true ? true : false }
-                  renderItem={ ( { item } ) => (
-                    <RkCard
-                      rkType="shadowed"
-                      style={ {
-                        flex: 1,
-                        margin: 10,
-                        borderRadius: 10
-                      } }
-                    >
-                      <View
-                        rkCardHeader
-                        style={ {
-                          flex: 1,
-                          borderBottomColor: "#F5F5F5",
-                          borderBottomWidth: 1
-                        } }
-                      >
-                        <SvgIcon
-                          name="icon_dailywallet"
-                          color="#37A0DA"
-                          size={ 40 }
-                        />
-                        <Text
-                          style={ [ globalStyle.ffFiraSansMedium, {
-                            flex: 2,
-                            fontSize: 16,
-                            marginLeft: 10
-                          } ] }
-                        >
-                          { item.accountName }
-                        </Text>
-                        <SvgIcon name="icon_more" color="gray" size={ 15 } />
-                      </View>
-                      <View
-                        rkCardContent
-                        style={ {
-                          flex: 1,
-                          flexDirection: "row"
-                        } }
-                      >
-                        <View
-                          style={ {
-                            flex: 1,
-                            justifyContent: "center"
-                          } }
-                        >
-                          <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
-                        </View>
-                        <View style={ { flex: 4 } }>
-                          <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
-                          <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
-                            { item.balance }
-                          </Text>
-                        </View>
-                        <View
-                          style={ {
-                            flex: 1,
-                            flexDirection: "row",
-                            alignItems: "flex-end",
-                            justifyContent: "flex-end"
-                          } }
-                        >
-                          <Button transparent>
-                            <SvgIcon
-                              name="timelockNew"
-                              color="gray"
-                              size={ 20 }
-                            />
-                          </Button>
-                          <Button transparent style={ { marginLeft: 10 } }>
-                            <SvgIcon name="icon_multisig" color="gray" size={ 20 } />
-                          </Button>
-                        </View>
-                      </View>
-                    </RkCard>
-                  ) }
+                  renderItem={ this._renderItem.bind( this ) }
                   keyExtractor={ ( item, index ) => index }
                 />
               </ScrollView>
