@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Modal, TouchableHighlight, View, Alert, StyleSheet } from 'react-native';
 import { Button, Icon, Text, Textarea, Form } from "native-base";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
 
 import { SvgIcon } from "@up-shared/components";
 import bip39 from 'react-native-bip39';
@@ -117,64 +119,72 @@ export default class ModelEnterAndConfirmMnemonic extends Component<Props, any> 
                     this.props.closeModal()
                 }
             >
-                <View style={ [
-                    styles.modalBackground,
-                    { backgroundColor: `rgba(0,0,0,0.4)` }
-                ] }>
-                    <View style={ styles.viewModelBody }>
-                        <View style={ { flexDirection: "row", flex: 0.6 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.props.pop() }
-                            >
-                                <SvgIcon name="icon_back" size={ 25 } color="gray" />
-                            </Button>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, {
-                                fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
-                                marginLeft: 20, marginRight: 20
-                            } ] }>Enter the Passphrase</Text>
-                        </View>
-                        <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Enter the mnemonic in the order that you noted at the tome of setting up your wallet. In case of any typo the wallet restoration will fail</Text>
-                        </View>
-                        <View
-                            style={ {
-                                flex: 2,
-                            } }
-                        >
-                            <Textarea
-                                value={ this.state.mnemonic }
-                                style={ [ globalStyle.ffFiraSansMedium, { borderRadius: 8, justifyContent: "center", borderColor: this.state.style_TextAreaBorderColor } ] }
-                                rowSpan={ 8 }
-                                bordered
-                                placeholder="Enter the words of passphrase in order"
-                                placeholderTextColor="#B7B7B7"
-                                keyboardType="default"
-                                autoCapitalize='none'
-                                spellCheck={ false }
-                                autoCorrect={ false }
-                                onChangeText={ ( val ) => {
-                                    this.mnemonicCheck( val )
+                <KeyboardAwareScrollView
+                    enableAutomaticScroll
+                    automaticallyAdjustContentInsets={ true }
+                    keyboardOpeningTime={ 0 }
+                    enableOnAndroid={ true }
+                    contentContainerStyle={ { flexGrow: utils.getIphoneSize() == "iphone X" ? 0.6 : 0.8 } }
+                >
+                    <View style={ [
+                        styles.modalBackground,
+                        { backgroundColor: `rgba(0,0,0,0.4)` }
+                    ] }>
+                        <View style={ styles.viewModelBody }>
+                            <View style={ { flexDirection: "row", flex: 0.6 } }>
+                                <Button
+                                    transparent
+                                    onPress={ () => this.props.pop() }
+                                >
+                                    <SvgIcon name="icon_back" size={ 25 } color="gray" />
+                                </Button>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, {
+                                    fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
+                                    marginLeft: 20, marginRight: 20
+                                } ] }>Enter the Passphrase</Text>
+                            </View>
+                            <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Enter the mnemonic in the order that you noted at the tome of setting up your wallet. In case of any typo the wallet restoration will fail</Text>
+                            </View>
+                            <View
+                                style={ {
+                                    flex: 2,
                                 } }
-                            />
-                            <View style={ { flexDirection: "row" } }>
-                                <Text note style={ { alignSelf: "flex-start", flex: 3 } }>e.g:q w e r t y u i o p a s</Text>
-                                { renderIf( this.state.style_TextAreaBorderColor == "red" )(
-                                    <Text note style={ { color: "red", alignSelf: "flex-end" } }>Invalid Passphrase</Text>
-                                ) }
+                            >
+                                <Textarea
+                                    value={ this.state.mnemonic }
+                                    style={ [ globalStyle.ffFiraSansMedium, { borderRadius: 8, justifyContent: "center", borderColor: this.state.style_TextAreaBorderColor } ] }
+                                    rowSpan={ 8 }
+                                    bordered
+                                    placeholder="Enter the words of passphrase in order"
+                                    placeholderTextColor="#B7B7B7"
+                                    keyboardType="default"
+                                    autoCapitalize='none'
+                                    spellCheck={ false }
+                                    autoCorrect={ false }
+                                    onChangeText={ ( val ) => {
+                                        this.mnemonicCheck( val )
+                                    } }
+                                />
+                                <View style={ { flexDirection: "row" } }>
+                                    <Text note style={ { alignSelf: "flex-start", flex: 3 } }>e.g:q w e r t y u i o p a s</Text>
+                                    { renderIf( this.state.style_TextAreaBorderColor == "red" )(
+                                        <Text note style={ { color: "red", alignSelf: "flex-end" } }>Invalid Passphrase</Text>
+                                    ) }
+                                </View>
+                            </View>
+                            <View style={ { flex: 1, justifyContent: "flex-end" } }>
+                                <FullLinearGradientLoadingButton
+                                    click_Done={ () => this.click_Confirm() }
+                                    title="  Confirm & Proceed"
+                                    disabled={ flag_DisableBtnConfirm }
+                                    animating={ flag_ConfirmBtnAnimating }
+                                    style={ [ flag_DisableBtnConfirm == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
+                                />
                             </View>
                         </View>
-                        <View style={ { flex: 1, justifyContent: "flex-end" } }>
-                            <FullLinearGradientLoadingButton
-                                click_Done={ () => this.click_Confirm() }
-                                title="  Confirm & Proceed"
-                                disabled={ flag_DisableBtnConfirm }
-                                animating={ flag_ConfirmBtnAnimating }
-                                style={ [ flag_DisableBtnConfirm == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
-                            />
-                        </View>
                     </View>
-                </View>
+                </KeyboardAwareScrollView>
             </Modal>
         );
     }

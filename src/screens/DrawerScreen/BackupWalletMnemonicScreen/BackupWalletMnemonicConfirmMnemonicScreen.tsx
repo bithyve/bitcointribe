@@ -68,16 +68,18 @@ export default class BackupWalletMnemonicConfirmMnemonicScreen extends Component
         var resultWallet = await comFunDBRead.readTblWallet();
         let mnemonic = resultWallet.mnemonic;
         let arr_Mnemonic = mnemonic.split( ' ' );
-        let arr_randomNo = this.getRandomNumber( 0, arr_Mnemonic.length );
-        // console.log( { arr_Mnemonic, arr_randomNo } );
+        let arr_randomNo = this.getRandomNumber( 1, arr_Mnemonic.length );
+        console.log( { arr_Mnemonic, arr_randomNo } );
+        console.log( arr_randomNo[ 0 ] - 1 );
+
         this.setState( {
             arr_randomNo,
             arr_Mnemonic,
             arr_ModelConfirmMnemonic1of3: [
                 {
                     modalVisible: true,
-                    number: converter.toWords( arr_randomNo[ 0 ] ),
-                    word: arr_Mnemonic[ arr_randomNo[ 0 ] ]
+                    number: converter.toOrdinal( arr_randomNo[ 0 ] ),
+                    word: arr_Mnemonic[ arr_randomNo[ 0 ] - 1 ]
                 }
             ]
         } )
@@ -117,15 +119,15 @@ export default class BackupWalletMnemonicConfirmMnemonicScreen extends Component
                                     arr_ModelConfirmMnemonic1of3: [
                                         {
                                             modalVisible: false,
-                                            number: converter.toWords( arr_randomNo[ 0 ] ),
-                                            word: arr_Mnemonic[ arr_randomNo[ 0 ] ]
+                                            number: converter.toOrdinal( arr_randomNo[ 0 ] ),
+                                            word: arr_Mnemonic[ arr_randomNo[ 0 ] - 1 ]
                                         }
                                     ],
                                     arr_ModelConfirmMnemonic2of3: [
                                         {
                                             modalVisible: true,
-                                            number: converter.toWords( arr_randomNo[ 1 ] ),
-                                            word: arr_Mnemonic[ arr_randomNo[ 1 ] ]
+                                            number: converter.toOrdinal( arr_randomNo[ 1 ] ),
+                                            word: arr_Mnemonic[ arr_randomNo[ 1 ] - 1 ]
                                         }
                                     ]
                                 } );
@@ -135,8 +137,8 @@ export default class BackupWalletMnemonicConfirmMnemonicScreen extends Component
                                         arr_ModelConfirmMnemonic1of3: [
                                             {
                                                 modalVisible: false,
-                                                number: converter.toWords( arr_randomNo[ 0 ] ),
-                                                word: arr_Mnemonic[ arr_randomNo[ 0 ] ]
+                                                number: converter.toOrdinal( arr_randomNo[ 0 ] ),
+                                                word: arr_Mnemonic[ arr_randomNo[ 0 ] - 1 ]
                                             }
                                         ]
                                     } );
@@ -148,15 +150,15 @@ export default class BackupWalletMnemonicConfirmMnemonicScreen extends Component
                                     arr_ModelConfirmMnemonic2of3: [
                                         {
                                             modalVisible: false,
-                                            number: converter.toWords( arr_randomNo[ 1 ] ),
-                                            word: arr_Mnemonic[ arr_randomNo[ 1 ] ]
+                                            number: converter.toOrdinal( arr_randomNo[ 1 ] ),
+                                            word: arr_Mnemonic[ arr_randomNo[ 1 ] - 1 ]
                                         }
                                     ],
                                     arr_ModelConfirmMnemonic3of3: [
                                         {
                                             modalVisible: true,
-                                            number: converter.toWords( arr_randomNo[ 2 ] ),
-                                            word: arr_Mnemonic[ arr_randomNo[ 2 ] ]
+                                            number: converter.toOrdinal( arr_randomNo[ 2 ] ),
+                                            word: arr_Mnemonic[ arr_randomNo[ 2 ] - 1 ]
                                         }
                                     ]
                                 } );
@@ -166,8 +168,8 @@ export default class BackupWalletMnemonicConfirmMnemonicScreen extends Component
                                         arr_ModelConfirmMnemonic2of3: [
                                             {
                                                 modalVisible: false,
-                                                number: converter.toWords( arr_randomNo[ 1 ] ),
-                                                word: arr_Mnemonic[ arr_randomNo[ 1 ] ]
+                                                number: converter.toOrdinal( arr_randomNo[ 1 ] ),
+                                                word: arr_Mnemonic[ arr_randomNo[ 1 ] - 1 ]
                                             }
                                         ]
                                     } );
@@ -178,8 +180,8 @@ export default class BackupWalletMnemonicConfirmMnemonicScreen extends Component
                                     arr_ModelConfirmMnemonic3of3: [
                                         {
                                             modalVisible: false,
-                                            number: converter.toWords( arr_randomNo[ 2 ] ),
-                                            word: arr_Mnemonic[ arr_randomNo[ 2 ] ]
+                                            number: converter.toOrdinal( arr_randomNo[ 2 ] ),
+                                            word: arr_Mnemonic[ arr_randomNo[ 2 ] - 1 ]
                                         }
                                     ],
                                     arr_ModelWalletSuccessfullyBackedUp: [
@@ -194,8 +196,8 @@ export default class BackupWalletMnemonicConfirmMnemonicScreen extends Component
                                         arr_ModelConfirmMnemonic3of3: [
                                             {
                                                 modalVisible: false,
-                                                number: converter.toWords( arr_randomNo[ 2 ] ),
-                                                word: arr_Mnemonic[ arr_randomNo[ 2 ] ]
+                                                number: converter.toOrdinal( arr_randomNo[ 2 ] ),
+                                                word: arr_Mnemonic[ arr_randomNo[ 2 ] - 1 ]
                                             }
                                         ]
                                     } );
