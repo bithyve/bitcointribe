@@ -18,6 +18,8 @@ import {
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import { Avatar } from 'react-native-elements';
 import { SvgIcon } from "@up-shared/components";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
 
 interface Props {
     data: [];
@@ -96,86 +98,94 @@ export default class ModelRestoreWalletSecoundQuestion extends Component<Props, 
                     this.props.closeModal()
                 }
             >
-                <View style={ [
-                    styles.modalBackground,
-                    { backgroundColor: `rgba(0,0,0,0.4)` }
-                ] }
+                <KeyboardAwareScrollView
+                    enableAutomaticScroll
+                    automaticallyAdjustContentInsets={ true }
+                    keyboardOpeningTime={ 0 }
+                    enableOnAndroid={ true }
+                    contentContainerStyle={ { flexGrow: 0.7 } }
                 >
-                    <View style={ styles.viewModelBody }>
-                        <View style={ { flexDirection: "row", flex: 0.5 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.props.pop() }
-                            >
-                                <SvgIcon name="icon_back" size={ 25 } color="gray" />
-                            </Button>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Restore wallet using Trusted Contacts</Text>
-                        </View>
-                        <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ { textAlign: "center" } }>Enter the secound question and answer you chose at the time of setting up the wallet</Text>
-                            <View style={ styles.itemQuestionPicker }>
-                                <Picker
-                                    renderHeader={ backAction =>
-                                        <Header style={ { backgroundColor: "#ffffff" } }>
-                                            <Left>
-                                                <Button transparent onPress={ backAction }>
-                                                    <Icon name="arrow-back" style={ { color: "#000" } } />
-                                                </Button>
-                                            </Left>
-                                            <Body style={ { flex: 3 } }>
-                                                <Title style={ [ globalStyle.ffFiraSansMedium, { color: "#000" } ] }>Select Question</Title>
-                                            </Body>
-                                            <Right />
-                                        </Header> }
-                                    mode="dropdown"
-                                    style={ [ globalStyle.ffFiraSansMedium ] }
-                                    iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -40 } } /> }
-                                    selectedValue={ secoundQuestion }
-                                    onValueChange={ this.onValueChange.bind( this ) }
+                    <View style={ [
+                        styles.modalBackground,
+                        { backgroundColor: `rgba(0,0,0,0.4)` }
+                    ] }
+                    >
+                        <View style={ styles.viewModelBody }>
+                            <View style={ { flexDirection: "row", flex: 0.5 } }>
+                                <Button
+                                    transparent
+                                    onPress={ () => this.props.pop() }
                                 >
-                                    { itemList }
-                                </Picker>
+                                    <SvgIcon name="icon_back" size={ 25 } color="gray" />
+                                </Button>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Restore wallet using Trusted Contacts</Text>
                             </View>
-                            <Item rounded style={ styles.itemInputWalletName }>
-                                <Input
-                                    secureTextEntry
-                                    keyboardType="default"
-                                    autoCapitalize='sentences'
-                                    placeholder='Write your answer here'
-                                    style={ [ globalStyle.ffFiraSansMedium ] }
-                                    placeholderTextColor="#B7B7B7"
-                                    onChangeText={ ( val ) => {
-                                        this.setState( {
-                                            secoundAnswer: val
-                                        } )
+                            <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
+                                <Text note style={ { textAlign: "center" } }>Enter the secound question and answer you chose at the time of setting up the wallet</Text>
+                                <View style={ styles.itemQuestionPicker }>
+                                    <Picker
+                                        renderHeader={ backAction =>
+                                            <Header style={ { backgroundColor: "#ffffff" } }>
+                                                <Left>
+                                                    <Button transparent onPress={ backAction }>
+                                                        <Icon name="arrow-back" style={ { color: "#000" } } />
+                                                    </Button>
+                                                </Left>
+                                                <Body style={ { flex: 3 } }>
+                                                    <Title style={ [ globalStyle.ffFiraSansMedium, { color: "#000" } ] }>Select Question</Title>
+                                                </Body>
+                                                <Right />
+                                            </Header> }
+                                        mode="dropdown"
+                                        style={ [ globalStyle.ffFiraSansMedium ] }
+                                        iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -40 } } /> }
+                                        selectedValue={ secoundQuestion }
+                                        onValueChange={ this.onValueChange.bind( this ) }
+                                    >
+                                        { itemList }
+                                    </Picker>
+                                </View>
+                                <Item rounded style={ styles.itemInputWalletName }>
+                                    <Input
+                                        secureTextEntry
+                                        keyboardType="default"
+                                        autoCapitalize='sentences'
+                                        placeholder='Write your answer here'
+                                        style={ [ globalStyle.ffFiraSansMedium ] }
+                                        placeholderTextColor="#B7B7B7"
+                                        onChangeText={ ( val ) => {
+                                            this.setState( {
+                                                secoundAnswer: val
+                                            } )
+                                        } }
+                                        onKeyPress={ () =>
+                                            this.check_CorrectAnswer()
+                                        }
+                                    />
+                                </Item>
+                            </View>
+                            <View style={ { flex: 1, justifyContent: "flex-end" } }>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>In case the answer does not match with the original answer, restoration process will fail</Text>
+                                <FullLinearGradientButton
+                                    click_Done={ () => {
+                                        let secQuestion = this.state.secoundQuestion;
+                                        let secoundQuestionValue;
+                                        if ( secQuestion == "" ) {
+                                            secoundQuestionValue = secoundQuestion
+                                        } else {
+                                            secoundQuestionValue = secQuestion;
+                                        }
+                                        this.props.click_Next( secoundQuestionValue, this.state.secoundAnswer, arr_QuestionList )
                                     } }
-                                    onKeyPress={ () =>
-                                        this.check_CorrectAnswer()
-                                    }
+                                    title="Next"
+                                    disabled={ flag_DisableBtnNext }
+                                    style={ [ flag_DisableBtnNext == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
                                 />
-                            </Item>
+                            </View>
+                            <Loader loading={ this.props.flag_Loading } color={ colors.appColor } size={ 30 } />
                         </View>
-                        <View style={ { flex: 1, justifyContent: "flex-end" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>In case the answer does not match with the original answer, restoration process will fail</Text>
-                            <FullLinearGradientButton
-                                click_Done={ () => {
-                                    let secQuestion = this.state.secoundQuestion;
-                                    let secoundQuestionValue;
-                                    if ( secQuestion == "" ) {
-                                        secoundQuestionValue = secoundQuestion
-                                    } else {
-                                        secoundQuestionValue = secQuestion;
-                                    }
-                                    this.props.click_Next( secoundQuestionValue, this.state.secoundAnswer, arr_QuestionList )
-                                } }
-                                title="Next"
-                                disabled={ flag_DisableBtnNext }
-                                style={ [ flag_DisableBtnNext == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
-                            />
-                        </View>
-                        <Loader loading={ this.props.flag_Loading } color={ colors.appColor } size={ 30 } />
                     </View>
-                </View>
+                </KeyboardAwareScrollView>
             </Modal>
         );
     }
