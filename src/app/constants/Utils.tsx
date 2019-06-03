@@ -81,6 +81,19 @@ const date_diff_indays = ( date1: any, date2: any ) => {
   }
 };
 
+const getRandomBetweenNumber = ( min: number, max: number ) => {
+  let arr_Number = [];
+  for ( let i = 0; i < 3; i++ ) {
+    let value = min + Math.floor( Math.random() * ( max - min ) )
+    if ( arr_Number.indexOf( value ) !== -1 ) {
+      arr_Number.push( min + Math.floor( Math.random() * ( max - min ) ) );
+    } else {
+      arr_Number.push( value )
+    }
+  }
+  return arr_Number;
+}
+
 const getDeviceModel = () => {
   let model = DeviceInfo.getModel();
   let modelName;
@@ -240,6 +253,7 @@ module.exports = {
   decrypt,
   sortFunction,
   date_diff_indays,
+  getRandomBetweenNumber,
   getDeviceModel,
   getStatusBarHeight,
   getIphoneSize,

@@ -107,8 +107,8 @@ android {
         applicationId "com.hexawallet"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1       
-        versionName "1.0.2.300519"          
+        versionCode 1            
+        versionName "1.0.0.310519"              
          multiDexEnabled true    
         ndk {
             abiFilters "armeabi-v7a", "x86"

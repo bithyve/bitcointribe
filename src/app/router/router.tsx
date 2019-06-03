@@ -106,6 +106,14 @@ import OTPBackupShareStore from "HexaWallet/src/screens/DrawerScreen/CommonScree
 
 
 
+//TODO: Backup Secure Account  
+import BackupSecureAccountScreen from "HexaWallet/src/screens/DrawerScreen/BackupSecureAccountScreen/BackupSecureAccountScreen";
+
+
+
+//TODO: Restore Secure Account
+import RestoreSecureAccountScreen from "HexaWallet/src/screens/DrawerScreen/RestoreSecureAccountScreen/RestoreSecureAccountScreen";
+
 
 
 
@@ -408,6 +416,33 @@ const SettingsStackNavigator = createStackNavigator(
     initialRouteName: "MnemonicShowScreen"
   } );
 
+//TODO: Backup Secure Account Stack Navigator
+
+const BackupSecureAccountWithPdfStackNavigator = createStackNavigator(
+  {
+    BackupSecureAccountScreen: {
+      screen: BackupSecureAccountScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "BackupSecureAccountScreen"
+  } );
+
+//TODO: Restore Secure Account Stack Navigator
+const ResotreSecureAccountStackNavigator = createStackNavigator(
+  {
+    RestoreSecureAccountScreen: {
+      screen: RestoreSecureAccountScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "RestoreSecureAccountScreen"
+  }
+)
+
+
 
 //TODO: TabNavigator
 //TODO: TabNavigator:TabNavigator
@@ -574,6 +609,16 @@ export const createRootNavigator = (
       //TODO: Settings   
       SettingsNavigator: {
         screen: SettingsStackNavigator,
+        navigationOptions: { header: null }
+      },
+      //TODO: Backup Secure Account
+      BackupSecureAccountWithPdfNavigator: {
+        screen: BackupSecureAccountWithPdfStackNavigator,
+        navigationOptions: { header: null }
+      },
+      //TODO: Restore Secure Account 
+      ResotreSecureAccountNavigator: {
+        screen: ResotreSecureAccountStackNavigator,
         navigationOptions: { header: null }
       }
       //Drwaer Navigation
