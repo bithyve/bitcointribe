@@ -286,7 +286,16 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
                                     this.click_Skip()
                                 }
                                 }
-                                click_RestoreSecureAccount={ () => Alert.alert( 'Working' ) }
+                                click_RestoreSecureAccount={ () => {
+                                    this.setState( {
+                                        arr_ModelRestoreWalletSuccessfullyUsingTrustedContact: [
+                                            {
+                                                modalVisible: false
+                                            }
+                                        ]
+                                    } )
+                                    this.props.navigation.push( "ResotreSecureAccountNavigator" );
+                                } }
                             />
                         </KeyboardAwareScrollView>
                     </ImageBackground>

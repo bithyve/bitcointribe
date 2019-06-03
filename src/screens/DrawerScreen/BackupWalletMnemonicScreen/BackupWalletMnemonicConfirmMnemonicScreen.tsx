@@ -68,7 +68,7 @@ export default class BackupWalletMnemonicConfirmMnemonicScreen extends Component
         var resultWallet = await comFunDBRead.readTblWallet();
         let mnemonic = resultWallet.mnemonic;
         let arr_Mnemonic = mnemonic.split( ' ' );
-        let arr_randomNo = this.getRandomNumber( 1, arr_Mnemonic.length );
+        let arr_randomNo = utils.getRandomBetweenNumber( 1, arr_Mnemonic.length );
         console.log( { arr_Mnemonic, arr_randomNo } );
         console.log( arr_randomNo[ 0 ] - 1 );
 
@@ -83,19 +83,6 @@ export default class BackupWalletMnemonicConfirmMnemonicScreen extends Component
                 }
             ]
         } )
-    }
-
-    getRandomNumber( min: number, max: number ) {
-        let arr_Number = [];
-        for ( let i = 0; i < 3; i++ ) {
-            let value = min + Math.floor( Math.random() * ( max - min ) )
-            if ( arr_Number.indexOf( value ) !== -1 ) {
-                arr_Number.push( min + Math.floor( Math.random() * ( max - min ) ) );
-            } else {
-                arr_Number.push( value )
-            }
-        }
-        return arr_Number;
     }
 
     render() {

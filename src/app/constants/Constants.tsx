@@ -101,6 +101,13 @@ var images = {
   walletScreen: {
     "sheild_1": require( assetsImages + "WalletScreen/sheild_1.png" ),
     "sheild_2": require( assetsImages + "WalletScreen/sheild_2.png" ),
+  },
+  backupSecureAccount: {
+    "steps": require( assetsImages + "backupSecureAccount/backupsecureAccount.png" ),
+    "failedBackup": require( assetsImages + "icon/illustration_unsucessful.png" ),
+  },
+  retoreSeecureAccount: {
+    "steps": require( assetsImages + "icon/RestoreSecureAccount.png" ),
   }
 };
 

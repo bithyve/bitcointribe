@@ -173,6 +173,7 @@ export default class WalletScreen extends React.Component {
   async connnection_FetchData() {
     var resultWallet = await comFunDBRead.readTblWallet();
     var resAccount = await comFunDBRead.readTblAccount();
+    await comFunDBRead.readTblSSSDetails();
     let temp = [];
     for ( let i = 0; i < resAccount.length; i++ ) {
       let dataAccount = resAccount[ i ];
@@ -196,7 +197,7 @@ export default class WalletScreen extends React.Component {
       temp.push( data )
     }
     //console.log( { resAccount,temp} );
-    if ( temp.length > 4 ) {
+    if ( resAccount.length > 4 ) {
       this.setState( {
         flag_cardScrolling: true
       } )
@@ -428,7 +429,6 @@ export default class WalletScreen extends React.Component {
               borderRadius: 10
             } }
           >
-
             <View
               rkCardContent
               style={ {
@@ -460,7 +460,7 @@ export default class WalletScreen extends React.Component {
                 <Text note>Secure Account is not backed up</Text>
               </View>
               <View style={ { flex: 2, alignItems: "flex-end", justifyContent: "center" } }>
-                <Button light style={ { borderRadius: 8, borderColor: "gray", borderWidth: 0.4, alignSelf: "flex-end" } }>
+                <Button light style={ { borderRadius: 8, borderColor: "gray", borderWidth: 0.4, alignSelf: "flex-end" } } onPress={ () => this.props.navigation.push( "BackupSecureAccountWithPdfNavigator" ) }>
                   <Text style={ { color: "#838383" } } >{ item.secureBtnTitle }</Text>
                 </Button>
               </View>
@@ -526,6 +526,7 @@ export default class WalletScreen extends React.Component {
               >
                 <ViewShieldIcons data={ this.state.arr_CustShiledIcon } click_Image={ () => {
                   let resSSSDetails = utils.getSSSDetails();
+                  console.log( { resSSSDetails } );
                   if ( resSSSDetails.length > 0 ) {
                     if ( this.state.shiledIconPer == 0 ) {
                       this.props.navigation.push( "WalletSetUpScreen" )
