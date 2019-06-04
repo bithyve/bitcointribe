@@ -8078,6 +8078,13 @@ react-native-os@^1.2.2:
   resolved "https://registry.yarnpkg.com/react-native-os/-/react-native-os-1.2.2.tgz#402cee00ac00a0588200a66b90e1d2b5a593fec0"
   integrity sha512-LfA6bip2P1kKgexvNL26TaIKYrJIdc/xlRZ7WAgi+19s+qq/+l9mk897EDNXgmue/8tRJk55GjlGd709AJY9XA==
 
+react-native-pdf-lib@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/react-native-pdf-lib/-/react-native-pdf-lib-0.2.1.tgz#03adeea07e548e5a3757623c35837f7623070640"
+  integrity sha512-CJg97rbVKuQAZs/U2GZ+P8VczikK0C9U2SoA30u+bxVtcnbBxh84JcMus3V5dZcfSrA+SIRWCDd0tQ8P2CeEjg==
+  dependencies:
+    babel-preset-flow "^6.23.0"
+
 react-native-permissions@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-1.1.1.tgz#4876004681ff8556454613d85249b01baff9b35b"
