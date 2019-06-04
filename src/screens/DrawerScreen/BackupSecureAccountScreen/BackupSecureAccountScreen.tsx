@@ -24,6 +24,7 @@ import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 var converter = require( 'number-to-words' );
 
+
 //TODO: Custome Compontes
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import ModelBackupSecureAccount from "HexaWallet/src/app/custcompontes/Model/ModelBackupSecureAccount/ModelBackupSecureAccount";
@@ -52,20 +53,36 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 
 
+
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
+
+//TODO: Bitcoin Files
+import SecurePDFGen from "HexaWallet/src/bitcoin/utilities/securePDFGenerator";
 
 export default class BackupSecureAccountScreen extends Component {
     constructor ( props: any ) {
         super( props );
         this.state = {
+
             arr_ModelBackupSecureAccount: [],
             arr_ModelAuto6DigitCode: [],
             arr_ModelSecureAccountSucessBackup: [],
             arr_ModelSecureAccountFailedBackup: []
         };
     }
+
     async componentDidMount() {
+        var resultWallet = await comFunDBRead.readTblWallet();
+        let setUpWalletAnswerDetails = resultWallet.setUpWalletAnswerDetails;
+        console.log( { resultWallet, setUpWalletAnswerDetails } );
+        //TODO: Generate pdf  
+        // const securePDFGen = new SecurePDFGen(
+        //     resultWallet.mnemonic
+        // );
+
+
         this.setState( {
             arr_ModelBackupSecureAccount: [
                 {

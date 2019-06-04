@@ -55,7 +55,7 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
-
+   
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
@@ -69,10 +69,11 @@ export default class RestoreSelectedContactsListScreen extends Component {
             arr_WalletDetails: [],
             arr_SSSDetails: [],
             selectedIndex: 0,
-            flag_DisableBtnNext: true
-
+              flag_DisableBtnNext: true
+            //flag_DisableBtnNext: false
         };
-    }
+    }   
+    
     componentDidMount() {
         this.setState( {
             arr_KeeperInfo: [],
@@ -147,7 +148,8 @@ export default class RestoreSelectedContactsListScreen extends Component {
     }
 
     click_Next() {
-        this.props.navigation.push( "RestoreWalletUsingTrustedContactQueAndAnwScreen" );
+         this.props.navigation.push( "RestoreWalletUsingTrustedContactQueAndAnwScreen" );
+        //this.props.navigation.push( "ResotreSecureAccountNavigator" );
     }
 
     click_SentRequest( type: string, val: any ) {

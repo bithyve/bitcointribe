@@ -28,6 +28,8 @@ var converter = require( 'number-to-words' );
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import ModelRestoreSecureAccount from "HexaWallet/src/app/custcompontes/Model/ModelRestoreSecureAccount/ModelRestoreSecureAccount";
 import ModelQRCodeScanRestoreSecureAccount from "HexaWallet/src/app/custcompontes/Model/ModelRestoreSecureAccount/ModelQRCodeScanRestoreSecureAccount";
+import ModelRestoreGAVerificationCode from "HexaWallet/src/app/custcompontes/Model/ModelRestoreSecureAccount/ModelRestoreGAVerificationCode";
+
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -51,6 +53,7 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 
 
+
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
@@ -59,7 +62,8 @@ export default class RestoreSecureAccountScreen extends Component {
         super( props );
         this.state = {
             arr_ModelRestoreSecureAccount: [],
-            arr_ModelQRCodeScanRestoreSecureAccount: []
+            arr_ModelQRCodeScanRestoreSecureAccount: [],
+            arr_ModelRestoreGAVerificationCode: []
         };
     }
     async componentDidMount() {
@@ -110,7 +114,37 @@ export default class RestoreSecureAccountScreen extends Component {
                                     this.props.navigation.pop()
                                 } }
                             />
-                            <ModelQRCodeScanRestoreSecureAccount data={ this.state.arr_ModelQRCodeScanRestoreSecureAccount } />
+                            <ModelQRCodeScanRestoreSecureAccount data={ this.state.arr_ModelQRCodeScanRestoreSecureAccount }
+                                click_Next={ () => {
+                                    this.setState( {
+                                        arr_ModelQRCodeScanRestoreSecureAccount: [
+                                            {
+                                                modalVisible: false
+                                            }
+                                        ],
+                                        arr_ModelRestoreGAVerificationCode: [ {
+                                            modalVisible: true
+                                        } ]
+                                    } );
+                                } }
+                                closeModal={ () => {
+                                    this.setState( {
+                                        arr_ModelQRCodeScanRestoreSecureAccount: [
+                                            {
+                                                modalVisible: false
+                                            }
+                                        ],
+                                        arr_ModelRestoreSecureAccount: [
+                                            {
+                                                modalVisible: true
+                                            }
+                                        ]
+                                    } );
+                                } }
+                            />
+                            <ModelRestoreGAVerificationCode data={ this.state.arr_ModelRestoreGAVerificationCode }
+
+                            />
                         </KeyboardAwareScrollView>
                     </ImageBackground>
                 </SafeAreaView>
