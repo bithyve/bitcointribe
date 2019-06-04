@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		001FD8F5BCF344BE99EA8AA9 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F79788E7D60A489CA04491E9 /* MaterialIcons.ttf */; };
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
@@ -40,6 +41,7 @@
 		40EFBA531F4C43778F2E6C55 /* FiraSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D108028045F0442D866766E5 /* FiraSans-Medium.ttf */; };
 		4666556A749C46178331FA35 /* libRNGestureHandler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E33C81F6E414F269A8CA315 /* libRNGestureHandler.a */; };
 		4D4EB3E447B54F618C0B0288 /* libSendSMS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 51313D7C5F31433EA4DBE132 /* libSendSMS.a */; };
+		4D689860C2BD4B33A1AD2EE8 /* libRNPDFLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CA7053F84CF4CD799D066AA /* libRNPDFLib.a */; };
 		4E78C46403A04141BBE4384B /* libReactNativePermissions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E2F82CA2B15461A8AD1B880 /* libReactNativePermissions.a */; };
 		5119E2C0735142A8B5FE9931 /* OpenSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1071A441D479425A8A2D28C0 /* OpenSans-BoldItalic.ttf */; };
 		5438D1C47B7A4702BC6C6EEE /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 61AD7036CCE24CAA88B8E2DA /* libRNVectorIcons.a */; };
@@ -65,6 +67,7 @@
 		8E61BB40BB824EB6B636B8AD /* libQRCode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D36784344EE54C93963D531B /* libQRCode.a */; };
 		94EB2CDCF5444CFEB54B8108 /* FiraSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6312467B46FF4C75AE036FC2 /* FiraSans-SemiBold.ttf */; };
 		954AA393C8F44F209B65DDC3 /* Roboto_medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 71898628EDD94D338CA3CF62 /* Roboto_medium.ttf */; };
+		9EE4E67F72A54FBC8924A63E /* Times New Roman.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B7160825CCAA41AB80D87B4C /* Times New Roman.ttf */; };
 		A7667A4133D048B4AFAD5695 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A9E853E665D0400894C0E659 /* MaterialCommunityIcons.ttf */; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
 		B1FB3ECF4A09444380DB4B9D /* libRNSpinkit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C7E5050866048CFB1F6FA82 /* libRNSpinkit.a */; };
@@ -375,6 +378,13 @@
 			remoteGlobalIDString = 46FEDE8A1AFF192F00D3261C;
 			remoteInfo = RNMailTests;
 		};
+		8B214D6022A672AA004EFBF0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 60B23392C44B46DE84AC768F /* RNPDFLib.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNPdfLib;
+		};
 		8B380ECA2265DFE100C1061E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 690C74A340DA467B938BF1F9 /* RCTContacts.xcodeproj */;
@@ -682,6 +692,7 @@
 		175C64779F784FDE910B4636 /* Roboto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto.ttf; path = "../node_modules/native-base/Fonts/Roboto.ttf"; sourceTree = "<group>"; };
 		185C32C47BC9403C8CA8AB88 /* libRNGestureHandler-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNGestureHandler-tvOS.a"; sourceTree = "<group>"; };
 		1A434BB9DC3A410096F46441 /* SplashScreen.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = SplashScreen.xcodeproj; path = "../node_modules/react-native-splash-screen/ios/SplashScreen.xcodeproj"; sourceTree = "<group>"; };
+		1CA7053F84CF4CD799D066AA /* libRNPDFLib.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNPDFLib.a; sourceTree = "<group>"; };
 		1E33C81F6E414F269A8CA315 /* libRNGestureHandler.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNGestureHandler.a; sourceTree = "<group>"; };
 		1E986C0389DD4A348E6999AF /* QrCode.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = QrCode.xcodeproj; path = "../node_modules/react-native-lewin-qrcode/ios/QrCode.xcodeproj"; sourceTree = "<group>"; };
 		20899DDDC07A4FC78F5272BE /* SendSMS.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = SendSMS.xcodeproj; path = "../node_modules/react-native-sms/SendSMS.xcodeproj"; sourceTree = "<group>"; };
@@ -714,6 +725,7 @@
 		5A7F10B97BE74CFCBCF6767D /* libReactNativeConfig-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libReactNativeConfig-tvOS.a"; sourceTree = "<group>"; };
 		5CDFA23CE4F64D36886DA66E /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/native-base/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
+		60B23392C44B46DE84AC768F /* RNPDFLib.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNPDFLib.xcodeproj; path = "../node_modules/react-native-pdf-lib/ios/RNPDFLib.xcodeproj"; sourceTree = "<group>"; };
 		60FD310308004AE7AF908854 /* libLRDRCTSimpleToast.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libLRDRCTSimpleToast.a; sourceTree = "<group>"; };
 		61AD7036CCE24CAA88B8E2DA /* libRNVectorIcons.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVectorIcons.a; sourceTree = "<group>"; };
 		6312467B46FF4C75AE036FC2 /* FiraSans-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-SemiBold.ttf"; path = "../src/assets/fonts/firaSans/FiraSans-SemiBold.ttf"; sourceTree = "<group>"; };
@@ -754,6 +766,7 @@
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
 		B07973F31EAC468886ED2F27 /* RNInAppBrowser.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNInAppBrowser.xcodeproj; path = "../node_modules/react-native-inappbrowser-reborn/ios/RNInAppBrowser.xcodeproj"; sourceTree = "<group>"; };
 		B2DC60DE022A444591F0D3AF /* RNRandomBytes.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNRandomBytes.xcodeproj; path = "../node_modules/react-native-randombytes/RNRandomBytes.xcodeproj"; sourceTree = "<group>"; };
+		B7160825CCAA41AB80D87B4C /* Times New Roman.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Times New Roman.ttf"; path = "../node_modules/react-native-pdf-lib/assets/Times New Roman.ttf"; sourceTree = "<group>"; };
 		BD08C2CBB7104F22A1EB03F4 /* FiraSans-BookItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-BookItalic.ttf"; path = "../src/assets/fonts/firaSans/FiraSans-BookItalic.ttf"; sourceTree = "<group>"; };
 		C16621D886464C44AAC0D4A6 /* libRNMail.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNMail.a; sourceTree = "<group>"; };
 		C264874973234B7180EAFC84 /* OpenSans-Semibold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Semibold.ttf"; path = "../src/assets/fonts/openSans/OpenSans-Semibold.ttf"; sourceTree = "<group>"; };
@@ -842,6 +855,7 @@
 				4E78C46403A04141BBE4384B /* libReactNativePermissions.a in Frameworks */,
 				4D4EB3E447B54F618C0B0288 /* libSendSMS.a in Frameworks */,
 				F8C33CE111514405A5D0E45A /* libRNMail.a in Frameworks */,
+				4D689860C2BD4B33A1AD2EE8 /* libRNPDFLib.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1015,6 +1029,7 @@
 				DD75884E76064477B2CB5B06 /* OpenSans-SemiboldItalic.ttf */,
 				6312467B46FF4C75AE036FC2 /* FiraSans-SemiBold.ttf */,
 				79A5C5C8CCE3425DBF6DD45E /* OpenSans-ExtraBold.ttf */,
+				B7160825CCAA41AB80D87B4C /* Times New Roman.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1081,6 +1096,7 @@
 				E20E8E01A6044057BB7D5F28 /* ReactNativePermissions.xcodeproj */,
 				20899DDDC07A4FC78F5272BE /* SendSMS.xcodeproj */,
 				D83A5D27028C46708EC243A9 /* RNMail.xcodeproj */,
+				60B23392C44B46DE84AC768F /* RNPDFLib.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1136,6 +1152,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		8B214D5D22A672A9004EFBF0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8B214D6122A672AA004EFBF0 /* libRNPDFLib.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		8B380EC72265DFE000C1061E /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -1185,6 +1209,7 @@
 				C16621D886464C44AAC0D4A6 /* libRNMail.a */,
 				0627B204DCA940DBBC4E03AA /* RNMailTests.xctest */,
 				144FFA864F964FE6BBEABB96 /* libRNBackgroundFetch.a */,
+				1CA7053F84CF4CD799D066AA /* libRNPDFLib.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -1613,6 +1638,10 @@
 					ProjectRef = 320901539A644AD7AAB76BCB /* RNOS.xcodeproj */;
 				},
 				{
+					ProductGroup = 8B214D5D22A672A9004EFBF0 /* Products */;
+					ProjectRef = 60B23392C44B46DE84AC768F /* RNPDFLib.xcodeproj */;
+				},
+				{
 					ProductGroup = 8BC2E313225F1D9F00442E2F /* Products */;
 					ProjectRef = B2DC60DE022A444591F0D3AF /* RNRandomBytes.xcodeproj */;
 				},
@@ -1943,6 +1972,13 @@
 			remoteRef = 8B00EBCF2268A28100BAD109 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		8B214D6122A672AA004EFBF0 /* libRNPDFLib.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNPDFLib.a;
+			remoteRef = 8B214D6022A672AA004EFBF0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		8B380ECB2265DFE100C1061E /* libRCTContacts.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -2267,6 +2303,7 @@
 				2DCB368F51E34D40ACED8788 /* OpenSans-SemiboldItalic.ttf in Resources */,
 				94EB2CDCF5444CFEB54B8108 /* FiraSans-SemiBold.ttf in Resources */,
 				C9A6353C8F444E9FBDD3EB07 /* OpenSans-ExtraBold.ttf in Resources */,
+				9EE4E67F72A54FBC8924A63E /* Times New Roman.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2372,12 +2409,14 @@
 					"$(SRCROOT)/../node_modules/react-native-sms/SendSMS",
 					"$(SRCROOT)/../node_modules/react-native-mail/RNMail",
 					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
+					"$(SRCROOT)/../node_modules/react-native-pdf-lib/ios/**",
 				);
 				INFOPLIST_FILE = HexaWalletTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -2466,12 +2505,14 @@
 					"$(SRCROOT)/../node_modules/react-native-sms/SendSMS",
 					"$(SRCROOT)/../node_modules/react-native-mail/RNMail",
 					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
+					"$(SRCROOT)/../node_modules/react-native-pdf-lib/ios/**",
 				);
 				INFOPLIST_FILE = HexaWalletTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -2565,6 +2606,7 @@
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-sms/SendSMS",
 					"$(SRCROOT)/../node_modules/react-native-mail/RNMail",
+					"$(SRCROOT)/../node_modules/react-native-pdf-lib/ios/**",
 				);
 				INFOPLIST_FILE = HexaWallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -2623,6 +2665,7 @@
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-sms/SendSMS",
 					"$(SRCROOT)/../node_modules/react-native-mail/RNMail",
+					"$(SRCROOT)/../node_modules/react-native-pdf-lib/ios/**",
 				);
 				INFOPLIST_FILE = HexaWallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
