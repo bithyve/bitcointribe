@@ -2,7 +2,7 @@ import bip32 from "bip32";
 import bip39 from "bip39";
 import crypto from "crypto";
 // import PDFDocument from "pdfkit";
-i//mport qr from "qr-image";
+//import qr from "qr-image";
 import config from "../Config";
 
 export default class SecurePDFGen {
@@ -22,12 +22,12 @@ export default class SecurePDFGen {
       iv: Buffer.alloc( 16, 0 ),
     };
     this.mnemonic = mnemonic;
-  }  
+  }
 
-  public getSecondaryXpub = async (secondaryMnemonic, bhXpub) => {
+  public getSecondaryXpub = async ( secondaryMnemonic, bhXpub ) => {
     const path = this.getXpubDerivationPath( bhXpub );
     const secondaryXpub = this.getRecoverableXKey( secondaryMnemonic, path );
-    return this.encryptor(JSON.stringify(secondaryXpub), this.mnemonic);
+    return this.encryptor( JSON.stringify( secondaryXpub ), this.mnemonic );
   }
 
   // public generate = async (
@@ -47,15 +47,15 @@ export default class SecurePDFGen {
   //       this.qrGenerator( asset );
   //     }
   //   }
-    // setTimeout( () => {
-    //   this.pdfGenerator(
-    //     password,
-    //     secondaryMnemonic,
-    //     bhXpub,
-    //     twoFAsecret,
-    //     assets,
-    //   );
-    // }, 1000 );
+  // setTimeout( () => {
+  //   this.pdfGenerator(
+  //     password,
+  //     secondaryMnemonic,
+  //     bhXpub,
+  //     twoFAsecret,
+  //     assets,
+  //   );
+  // }, 1000 );
   //}
 
   private getXpubDerivationPath = ( bhXpub ) => {
