@@ -71,7 +71,6 @@ apply plugin: 'io.fabric'
  *   extraPackagerArgs: []
  * ]
  */
-  
 project.ext.react = [
     entryFile: "index.js"   
 ]
@@ -79,7 +78,7 @@ project.ext.react = [
 project.ext.vectoricons = [       
     iconFontNames: [ 'icomoon.ttf' ] // Name of the font files you want to copy
 ]   
-
+   
 apply from: "../../node_modules/react-native/react.gradle"
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
@@ -99,10 +98,10 @@ def enableSeparateBuildPerCPUArchitecture = false
  */
 def enableProguardInReleaseBuilds = false
     
-android {
+android {  
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-  
+      
     defaultConfig {
         applicationId "com.hexawallet"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -131,7 +130,7 @@ storeFile file("hexawallet.keystore")
  storePassword "developer"
 keyAlias "hexawallet"
  keyPassword "developer"
- }
+ }  
  }
     buildTypes {
         release {
@@ -160,10 +159,9 @@ keyAlias "hexawallet"
 }
 
 configurations.all {
-
  resolutionStrategy {
         force 'org.webkit:android-jsc:r236355'
- }
+ }  
   } 
 
 dependencies {    
@@ -201,11 +199,11 @@ compile project(':react-native-sqlite-storage')
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules
 }
-
+  
 // Run this once to be able to run the application with BUCK
 // puts all compile dependencies into folder libs for BUCK to use
 task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
-}
+}   
 

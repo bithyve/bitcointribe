@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Image, Platform } from 'react-native';
+import { Modal, TouchableHighlight, View, Alert, StyleSheet, Image, Platform, CameraRoll } from 'react-native';
 import { Button, Icon, Text } from "native-base";
 var Mailer = require( 'NativeModules' ).RNMail;
 import Share from "react-native-share";
 import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
+var RNFS = require( 'react-native-fs' );
+import RNFetchBlob from 'react-native-fetch-blob'
+
 
 
 //TODO: Custome Compontes  
@@ -21,6 +24,10 @@ import {
 } from "HexaWallet/src/app/constants/Constants";
 
 
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
+
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 interface Props {
@@ -30,30 +37,246 @@ interface Props {
     click_Next: Function;
 }
 
-export default class ModelBackupSecureAccount extends Component<Props, any> {
+//TODO: Bitcoin Files
+import SecurePDFGen from 'HexaWallet/src/bitcoin/utilities/securePDFGenerator';
 
+export default class ModelBackupSecureAccount extends Component<Props, any> {
+    pdfObj = null;
     constructor ( props: any ) {
         super( props )
         this.state = ( {
+            pdfDetails: [],
             pdfFilePath: "",
-            flag_NextBtnDisable: true
+            flag_NextBtnDisable: true,
+            flag_XPubQR: false
         } )
     }
 
+    header( text: any ) {
+        return { text: text, margins: [ 0, 0, 0, 8 ] };
+    }
 
-    async  componentDidMount() {
+
+    async componentDidMount() {
+        var resultWallet = await comFunDBRead.readTblWallet();
+        var resAccount = await comFunDBRead.readTblAccount();
+        let data = this.props.data.length != 0 ? this.props.data[ 0 ].secureAccountDetails : [];
+        let setupData = data.setupData;
+        //console.log( { new: setupData } );
+        const securePDFGen = new SecurePDFGen(
+            resultWallet.mnemonic
+        );
+        //console.log( setupData.secondaryMnemonic, setupData.setupData.bhXpub );
+        let resGetSecondaryXpub = await securePDFGen.getSecondaryXpub( setupData.secondaryMnemonic, setupData.setupData.bhXpub );
+        // console.log( { resGetSecondaryXpub } );
+        let temp = [];
+        temp.push( { secondaryXpub: resGetSecondaryXpub, secret: setupData.setupData.secret, secondaryMnemonic: setupData.secondaryMnemonic, bhXpub: setupData.setupData.bhXpub } )
+        this.setState( {
+            pdfDetails: temp
+        } )
+        this.generateSecondaryXpub( temp );
+    }
+
+    generateSecondaryXpub = async ( data: any ) => {
+        let secondaryXpub = data[ 0 ].secondaryXpub;
+        //console.log( { secondaryXpub } );
+        const docsDir = await PDFLib.getDocumentsDirectory();
+        //console.log( { docsDir } );
+        var path = `${ docsDir }/secondaryXpub.png`;
+        await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + secondaryXpub, {
+        } )
+            .then( ( res: any ) => {
+                let base64Str = res.base64()
+                RNFS.writeFile( path, base64Str, "base64" )
+                    .then( ( success: any ) => {
+                        this.generate2FASecret( data );
+                    } )
+                    .catch( ( err: any ) => {
+                        console.log( { err } );
+
+                    } )
+            } )
+            .catch( ( errorMessage: string ) => {
+                Alert.alert( errorMessage )
+
+            } )
+    }
+    generate2FASecret = async ( data: any ) => {
+        let secret2FA = data[ 0 ].secret;
+        const docsDir = await PDFLib.getDocumentsDirectory();
+        // console.log( { docsDir } );
+        var path = `${ docsDir }/secret2FA.png`;
+        await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + secret2FA, {
+        } )
+            .then( ( res: any ) => {
+                let base64Str = res.base64()
+                RNFS.writeFile( path, base64Str, "base64" )
+                    .then( ( success: any ) => {
+                        this.genreatePdf( data );
+                    } )
+                    .catch( ( err: any ) => {
+                        console.log( { err } );
+
+                    } )
+            } )
+            .catch( ( errorMessage: string ) => {
+                Alert.alert( errorMessage )
+
+            } )
+    }
+
+    chunkArray( arr: any, n: any ) {
+        var chunkLength = Math.max( arr.length / n, 1 );
+        var chunks = [];
+        for ( var i = 0; i < n; i++ ) {
+            if ( chunkLength * ( i + 1 ) <= arr.length ) chunks.push( arr.slice( chunkLength * i, chunkLength * ( i + 1 ) ) );
+        }
+        return chunks;
+    }
+    split2s( str: string, delim: any ) {
+        var p = str.indexOf( delim );
+        if ( p !== -1 ) {
+            return [ str.substring( 0, p ), str.substring( p ) ];
+        } else {
+            return [ str ];
+        }
+    }
+
+
+    genreatePdf = async ( data: any ) => {
+        let secret2FA = data[ 0 ].secret;
+        let secondaryMnemonic = data[ 0 ].secondaryMnemonic;
+        let arrSecondaryMnemonic = secondaryMnemonic.split( ' ' );
+        var firstArrSecondaryMnemonic, secoundArrSecondaryMnemonic, threeSecondaryMnemonic;
+        let arrSepArray = this.chunkArray( arrSecondaryMnemonic, 3 );
+        firstArrSecondaryMnemonic = arrSepArray[ 0 ].toString();
+        firstArrSecondaryMnemonic = firstArrSecondaryMnemonic.split( ',' ).join( ' ' );
+        secoundArrSecondaryMnemonic = arrSepArray[ 1 ].toString();
+        secoundArrSecondaryMnemonic = secoundArrSecondaryMnemonic.split( ',' ).join( ' ' );
+        threeSecondaryMnemonic = arrSepArray[ 2 ].toString();
+        threeSecondaryMnemonic = threeSecondaryMnemonic.split( ',' ).join( ' ' );
+        //bhXpub
+        let bhXpub = data[ 0 ].bhXpub;
+        console.log( { bhXpub } );
+        var firstArrbhXpub, secoundArrbhXpub, threebhXpub;
+        let arrSepArraybhXpub = bhXpub.match( /.{1,40}/g );
+        console.log( arrSepArraybhXpub );
+        firstArrbhXpub = arrSepArraybhXpub[ 0 ].toString();
+        firstArrbhXpub = firstArrbhXpub.split( ',' ).join( ' ' );
+        secoundArrbhXpub = arrSepArraybhXpub[ 1 ].toString();
+        secoundArrbhXpub = secoundArrbhXpub.split( ',' ).join( ' ' );
+        threebhXpub = arrSepArraybhXpub[ 2 ].toString();
+        threebhXpub = threebhXpub.split( ',' ).join( ' ' );
+
+        console.log( { secondaryMnemonic, bhXpub } );
+        const docsDir = await PDFLib.getDocumentsDirectory();
+        const pdfPath = `${ docsDir }/sercurepdf.pdf`;
+        const imgSecondaryXpub = `${ docsDir }/secondaryXpub.png`;
+        const img2FASecret = `${ docsDir }/secret2FA.png`;
         const page1 = PDFPage
             .create()
             .drawText( 'Secondary Xpub (Encrypted):', {
                 x: 5,
-                y: 5
+                y: 480,
+                fontSize: 18
             } )
-        // Create a new PDF in your app's private Documents directory
-        const docsDir = await PDFLib.getDocumentsDirectory();
-        const pdfPath = `${ docsDir }/sercurepdf.pdf`;
+            .drawImage(
+                imgSecondaryXpub,
+                'png',
+                {
+                    x: 50,
+                    y: 310,
+                    width: 150,
+                    height: 150,
+                    source: 'assets'
+                }
+            )
+            .drawText( 'Scan the above QR Code using your HEXA', {
+                x: 25,
+                y: 295,
+                fontSize: 10
+            } )
+            .drawText( 'wallet in order to restore your Secure Account.', {
+                x: 25,
+                y: 283,
+                fontSize: 10
+            } )
+            .drawText( '2FA Secret:', {
+                x: 5,
+                y: 250,
+                fontSize: 18
+            } )
+            .drawImage(
+                img2FASecret,
+                'png',
+                {
+                    x: 50,
+                    y: 80,
+                    width: 150,
+                    height: 150,
+                    source: 'assets'
+                }
+            )
+            .drawText( secret2FA, {
+                x: 25,
+                y: 60,
+                fontSize: 10
+            } )
+        const page2 = PDFPage
+            .create()
+            .drawText( 'Following assets can be used to recover your funds using', {
+                x: 5,
+                y: 480,
+                fontSize: 10
+            } )
+            .drawText( 'the open - sourced ga - recovery tool.', {
+                x: 5,
+                y: 470,
+                fontSize: 10
+            } )
+            .drawText( 'Secondary Mnemonic:', {
+                x: 5,
+                y: 440,
+                fontSize: 18
+            } )
+            .drawText( firstArrSecondaryMnemonic, {
+                x: 5,
+                y: 420,
+                fontSize: 10
+            } )
+            .drawText( secoundArrSecondaryMnemonic, {
+                x: 5,
+                y: 408,
+                fontSize: 10
+            } )
+            .drawText( threeSecondaryMnemonic, {
+                x: 5,
+                y: 396,
+                fontSize: 10
+            } )
+            .drawText( 'BitHyve Xpub:', {
+                x: 5,
+                y: 350,
+                fontSize: 18
+            } )
+            .drawText( firstArrbhXpub, {
+                x: 5,
+                y: 330,
+                fontSize: 10
+            } )
+            .drawText( secoundArrbhXpub, {
+                x: 5,
+                y: 318,
+                fontSize: 10
+            } )
+            .drawText( threebhXpub, {
+                x: 5,
+                y: 306,
+                fontSize: 10
+            } )
         PDFDocument
             .create( pdfPath )
-            .addPages( page1 )
+            .addPages( page1, page2 )
             .write() // Returns a promise that resolves with the PDF's path
             .then( path => {
                 console.log( 'PDF created at: ' + path );
@@ -72,11 +295,9 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
                 flag_NextBtnDisable: !flag_NextBtnDisable
             } )
             Mailer.mail( {
-                subject: 'need help',
-                recipients: [ '' ],
-                ccRecipients: [ '' ],
-                bccRecipients: [ '' ],
-                body: '<b>A Bold Body</b>',
+                subject: 'Store secure account pdf.',
+                recipients: [ 'appasahebl@bithyve.com' ],
+                body: '<b>Secure Account PDF.Store any secure location.</b>',
                 isHTML: true,
                 attachment: {
                     path: pdfFilePath,  // The absolute path of the file from which to read data.
@@ -108,12 +329,13 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
     }
 
     render() {
+        let data = this.props.data.length != 0 ? this.props.data : [];
         let flag_NextBtnDisable = this.state.flag_NextBtnDisable;
         return (
             <Modal
                 transparent
                 animationType={ 'fade' }
-                visible={ this.props.data.length != 0 ? this.props.data[ 0 ].modalVisible : false }
+                visible={ data.length != 0 ? data[ 0 ].modalVisible : false }
                 onRequestClose={ () =>
                     this.props.closeModal()
                 }

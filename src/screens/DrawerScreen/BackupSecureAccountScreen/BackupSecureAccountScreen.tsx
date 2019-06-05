@@ -54,8 +54,7 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 
 
-//TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
 
 
 //TODO: Bitcoin Files
@@ -65,7 +64,7 @@ export default class BackupSecureAccountScreen extends Component {
     constructor ( props: any ) {
         super( props );
         this.state = {
-
+            arr_SecureAccountDetails: [],
             arr_ModelBackupSecureAccount: [],
             arr_ModelAuto6DigitCode: [],
             arr_ModelSecureAccountSucessBackup: [],
@@ -74,23 +73,19 @@ export default class BackupSecureAccountScreen extends Component {
     }
 
     async componentDidMount() {
-        var resultWallet = await comFunDBRead.readTblWallet();
-        let setUpWalletAnswerDetails = resultWallet.setUpWalletAnswerDetails;
-        console.log( { resultWallet, setUpWalletAnswerDetails } );
-        //TODO: Generate pdf  
-        // const securePDFGen = new SecurePDFGen(
-        //     resultWallet.mnemonic
-        // );
-
-
+        let data = this.props.navigation.getParam( "data" );
+        console.log( { data } );
         this.setState( {
+            arr_SecureAccountDetails: data,
             arr_ModelBackupSecureAccount: [
                 {
                     modalVisible: true,
+                    secureAccountDetails: data
                 }
             ]
         } )
     }
+
 
     render() {
         return (
