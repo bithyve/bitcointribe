@@ -4,6 +4,12 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.hopding.pdflib.PDFLibPackage;
+import com.RNFetchBlob.RNFetchBlobPackage;
+import com.hopding.pdflib.PDFLibPackage;
+import com.hopding.pdflib.PDFLibPackage;
+import com.hopding.pdflib.PDFLibPackage;
+import com.hopding.pdflib.PDFLibPackage;
+import com.hopding.pdflib.PDFLibPackage;
 import com.chirag.RNMail.RNMail;
 import com.tkporter.sendsms.SendSMSPackage;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
@@ -51,6 +57,12 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(new SQLitePluginPackage(), new MainReactPackage(),
+            new PDFLibPackage(),
+            new RNFetchBlobPackage(),
+            new PDFLibPackage(),
+            new PDFLibPackage(),
+            new PDFLibPackage(),
+            new PDFLibPackage(),
             new PDFLibPackage(),
             new RNMail(),   
           SendSMSPackage.getInstance(), new ReactNativeContacts(), new RNCWebViewPackage(), new RNViewShotPackage(),

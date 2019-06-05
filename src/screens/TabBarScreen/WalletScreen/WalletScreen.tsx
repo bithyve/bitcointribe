@@ -460,7 +460,7 @@ export default class WalletScreen extends React.Component {
                 <Text note>Secure Account is not backed up</Text>
               </View>
               <View style={ { flex: 2, alignItems: "flex-end", justifyContent: "center" } }>
-                <Button light style={ { borderRadius: 8, borderColor: "gray", borderWidth: 0.4, alignSelf: "flex-end" } } onPress={ () => this.props.navigation.push( "BackupSecureAccountWithPdfNavigator" ) }>
+                <Button light style={ { borderRadius: 8, borderColor: "gray", borderWidth: 0.4, alignSelf: "flex-end" } } onPress={ () => this.props.navigation.push( "BackupSecureAccountWithPdfNavigator", { data: item } ) }>
                   <Text style={ { color: "#838383" } } >{ item.secureBtnTitle }</Text>
                 </Button>
               </View>
