@@ -8,7 +8,8 @@ import {
   ScrollView,
   Animated,
   AsyncStorage,
-  Alert
+  Alert,
+  Image
 } from "react-native";
 import {
   Container,
@@ -173,6 +174,7 @@ export default class WalletScreen extends React.Component {
   async connnection_FetchData() {
     var resultWallet = await comFunDBRead.readTblWallet();
     var resAccount = await comFunDBRead.readTblAccount();
+    console.log( { resAccount } );
     await comFunDBRead.readTblSSSDetails();
     let temp = [];
     for ( let i = 0; i < resAccount.length; i++ ) {
@@ -545,7 +547,11 @@ export default class WalletScreen extends React.Component {
                 } />
               </Animated.View>
             </Animated.View>
+
+
             {/*  cards */ }
+
+
             <Animated.View
               style={ {
                 flex: 6,

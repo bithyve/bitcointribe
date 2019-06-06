@@ -14,6 +14,7 @@ import {
     SafeAreaView,
     FlatList,
     TouchableOpacity,
+    PermissionsAndroid
 } from "react-native";
 import { RkCard } from "react-native-ui-kitten";
 import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text, Button } from 'native-base';
@@ -74,7 +75,24 @@ export default class BackupSecureAccountScreen extends Component {
 
     async componentDidMount() {
         let data = this.props.navigation.getParam( "data" );
-        console.log( { data } );
+        // console.log( { data } );
+        if ( Platform.OS == "android" ) {
+            //         [PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE, PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE],
+            try {
+                await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                    {
+                        title: 'Storage Permission',
+                        message:
+                            'Write storage permission need.',
+                        buttonNegative: 'Cancel',
+                        buttonPositive: 'OK',
+                    },
+                );
+            } catch ( err ) {
+                console.warn( err );
+            }
+        }
         this.setState( {
             arr_SecureAccountDetails: data,
             arr_ModelBackupSecureAccount: [
@@ -84,6 +102,7 @@ export default class BackupSecureAccountScreen extends Component {
                 }
             ]
         } )
+
     }
 
 
