@@ -48,6 +48,24 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
         }
     }
 
+
+    //TODO: Check code
+    click_Next() {
+        let code = this.state.code;
+        if ( code == "123456" ) {
+            this.props.click_Next();
+        } else {
+            Alert.alert(
+                "Oops",
+                "Please enter correct code.",
+                [
+                    { text: 'Ok', onPress: () => console.log( 'OK' ) },
+                ],
+                { cancelable: true }
+            )
+        }
+    }
+
     render() {
         let data = this.props.data.length != 0 ? this.props.data : [];
         let flag_DisableBtnNext = this.state.flag_DisableBtnNext;
@@ -97,14 +115,14 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
                             >
                                 <TextInput
                                     style={ [ globalStyle.ffFiraSansMedium, { borderRadius: 8, justifyContent: "center", borderColor: "gray", borderWidth: 0.4, height: 60, textAlign: "center" } ] }
-                                    value={ this.state.enterWrod }
+                                    value={ this.state.code }
                                     placeholder="Enter 6 digit code"
                                     placeholderTextColor="#B7B7B7"
                                     keyboardType="default"
                                     autoCapitalize='none'
                                     onChangeText={ ( val ) => {
                                         this.setState( {
-                                            enterWrod: val
+                                            code: val
                                         } )
                                         this.ckeckWalletName( val )
                                     } }
@@ -116,7 +134,7 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
                             <View style={ { flex: 1, justifyContent: "flex-end" } }>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
-                                        this.props.click_Next()
+                                        this.click_Next()
                                     }
                                     }
                                     title="Next"
