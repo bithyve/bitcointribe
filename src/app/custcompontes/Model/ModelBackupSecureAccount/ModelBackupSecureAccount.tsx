@@ -61,7 +61,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
         var resAccount = await comFunDBRead.readTblAccount();
         let data = this.props.data.length != 0 ? this.props.data[ 0 ].secureAccountDetails : [];
         let setupData = data.setupData;
-        //console.log( { new: setupData } );
+        console.log( { setupData } );
         const securePDFGen = new SecurePDFGen(
             resultWallet.mnemonic
         );
@@ -77,10 +77,23 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
     }
 
     generateSecondaryXpub = async ( data: any ) => {
+
+        RNFS.readDir( RNFS.ExternalStorageDirectoryPath ).then( files => {
+            console.log( { files } );
+        } )
+            .catch( err => {
+                console.log( err.message, err.code );
+            } );
         let secondaryXpub = data[ 0 ].secondaryXpub;
         //console.log( { secondaryXpub } );
-        const docsDir = await PDFLib.getDocumentsDirectory();
-        //console.log( { docsDir } );
+        var docsDir;
+        if ( Platform.OS == "android" ) {
+            docsDir = await RNFS.ExternalStorageDirectoryPath //RNFS.DocumentDirectoryPath;
+        } else {
+            docsDir = await PDFLib.getDocumentsDirectory();
+        }
+        docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
+        console.log( { docsDir } );
         var path = `${ docsDir }/secondaryXpub.png`;
         await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + secondaryXpub, {
         } )
@@ -102,7 +115,13 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
     }
     generate2FASecret = async ( data: any ) => {
         let secret2FA = data[ 0 ].secret;
-        const docsDir = await PDFLib.getDocumentsDirectory();
+        var docsDir;
+        if ( Platform.OS == "android" ) {
+            docsDir = await RNFS.ExternalStorageDirectoryPath //RNFS.DocumentDirectoryPath;
+        } else {
+            docsDir = await PDFLib.getDocumentsDirectory();
+        }
+        docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
         // console.log( { docsDir } );
         var path = `${ docsDir }/secret2FA.png`;
         await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + secret2FA, {
@@ -168,10 +187,20 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
         threebhXpub = threebhXpub.split( ',' ).join( ' ' );
 
         console.log( { secondaryMnemonic, bhXpub } );
-        const docsDir = await PDFLib.getDocumentsDirectory();
+        var docsDir;
+        if ( Platform.OS == "android" ) {
+            docsDir = await RNFS.ExternalStorageDirectoryPath;
+        } else {
+            docsDir = await PDFLib.getDocumentsDirectory();
+        }
         const pdfPath = `${ docsDir }/sercurepdf.pdf`;
+        console.log( { pdfPath } );
+        docsDir = Platform.OS === 'android' ? `/${ docsDir }` : docsDir;
+        console.log( { docsDir } );
         const imgSecondaryXpub = `${ docsDir }/secondaryXpub.png`;
         const img2FASecret = `${ docsDir }/secret2FA.png`;
+        console.log( { imgSecondaryXpub, img2FASecret } );
+
         const page1 = PDFPage
             .create()
             .drawText( 'Secondary Xpub (Encrypted):', {
