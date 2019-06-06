@@ -132,16 +132,16 @@ export default class BackupSecureAccountScreen extends Component {
                                             modalVisible: false
                                         }
                                     ],
-                                    // arr_ModelSecureAccountSucessBackup: [
-                                    //     {
-                                    //         modalVisible: true
-                                    //     }
-                                    // ],
-                                    arr_ModelSecureAccountFailedBackup: [
+                                    arr_ModelSecureAccountSucessBackup: [
                                         {
                                             modalVisible: true
                                         }
-                                    ]
+                                    ],
+                                    // arr_ModelSecureAccountFailedBackup: [
+                                    //     {
+                                    //         modalVisible: true
+                                    //     }
+                                    // ]
                                 } )
                             } pop={ () => {
                                 this.setState( {
