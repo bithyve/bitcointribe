@@ -461,7 +461,7 @@ export default class WalletScreen extends React.Component {
               </View>
               <View style={ { flex: 2, alignItems: "flex-end", justifyContent: "center" } }>
                 <Button light style={ { borderRadius: 8, borderColor: "gray", borderWidth: 0.4, alignSelf: "flex-end" } } onPress={ () => this.props.navigation.push( "BackupSecureAccountWithPdfNavigator", { data: item } ) }>
-                  <Text style={ { color: "#838383" } } >{ item.secureBtnTitle }</Text>
+                  <Text style={ { color: "#838383", fontSize: 14 } } >{ item.secureBtnTitle }</Text>
                 </Button>
               </View>
             </View>
@@ -470,7 +470,6 @@ export default class WalletScreen extends React.Component {
       </View>
     );
   }
-
 
   render() {
     let flag_cardScrolling = this.state.flag_cardScrolling;

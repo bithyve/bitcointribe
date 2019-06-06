@@ -1,16 +1,6 @@
-rootProject.name = 'HexaWallet'
-include ':react-native-pdf-lib'
-project(':react-native-pdf-lib').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-pdf-lib/android')
-include ':react-native-fetch-blob'
+rootProject.name = 'HexaWallet'  
+include ':react-native-fetch-blob'    
 project(':react-native-fetch-blob').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-fetch-blob/android')
-include ':react-native-pdf-lib'
-project(':react-native-pdf-lib').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-pdf-lib/android')
-include ':react-native-pdf-lib'
-project(':react-native-pdf-lib').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-pdf-lib/android')
-include ':react-native-pdf-lib'
-project(':react-native-pdf-lib').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-pdf-lib/android')
-include ':react-native-pdf-lib'
-project(':react-native-pdf-lib').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-pdf-lib/android')
 include ':react-native-pdf-lib'  
 project(':react-native-pdf-lib').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-pdf-lib/android')
 include ':react-native-mail'

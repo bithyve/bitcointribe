@@ -8,12 +8,13 @@ var RNFS = require( 'react-native-fs' );
 import RNFetchBlob from 'react-native-fetch-blob'
 
 
+//TODO: Custome Pages
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 
 //TODO: Custome Compontes  
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import FullLinearGradientIconButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientIconButton";
 import { SvgIcon } from "@up-shared/components";
-
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -23,11 +24,8 @@ import {
     images
 } from "HexaWallet/src/app/constants/Constants";
 
-
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
-
-
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 interface Props {
@@ -48,6 +46,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
             pdfDetails: [],
             pdfFilePath: "",
             flag_NextBtnDisable: true,
+            flag_Loading: true,
             flag_XPubQR: false
         } )
     }
@@ -281,6 +280,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
             .then( path => {
                 console.log( 'PDF created at: ' + path );
                 this.setState( {
+                    flag_Loading: false,
                     pdfFilePath: path
                 } )
             } );
@@ -294,43 +294,48 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
             this.setState( {
                 flag_NextBtnDisable: !flag_NextBtnDisable
             } )
-            Mailer.mail( {
-                subject: 'Store secure account pdf.',
-                recipients: [ 'appasahebl@bithyve.com' ],
-                body: '<b>Secure Account PDF.Store any secure location.</b>',
-                isHTML: true,
-                attachment: {
-                    path: pdfFilePath,  // The absolute path of the file from which to read data.
-                    type: 'pdf',      // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-                    name: 'sercurepdf',   // Optional: Custom filename for attachment
-                }
-            }, ( error, event ) => {
+        }
+        Mailer.mail( {
+            subject: 'Store secure account pdf.',
+            recipients: [ 'appasahebl@bithyve.com' ],
+            body: '<b>Secure Account PDF.Store any secure location.</b>',
+            isHTML: true,
+            attachment: {
+                path: pdfFilePath,  // The absolute path of the file from which to read data.
+                type: 'pdf',      // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+                name: 'sercurepdf',   // Optional: Custom filename for attachment
+            }
+        }, ( error, event ) => {
+            if ( event == "sent" ) {
+                Alert.alert(
+                    "Success",
+                    "Email sent success.",
+                    [
+                        { text: 'Ok', onPress: () => console.log( 'OK' ) },
+                    ],
+                    { cancelable: true }
+                )
+            } else {
                 Alert.alert(
                     error,
                     event,
                     [
                         { text: 'Ok', onPress: () => console.log( 'OK: Email Error Response' ) },
-                        { text: 'Cancel', onPress: () => console.log( 'CANCEL: Email Error Response' ) }
                     ],
                     { cancelable: true }
                 )
-            } );
-        }
+            }
 
+        } );
 
-        // const shareOptions = {
-        //     title: 'Backup Secure Account',
-        //     message: 'This pdf store on google driver to other secure location.',
-        //     url: 'http://www.kciti.edu/wp-content/uploads/2017/07/cprogramming_tutorial.pdf',
-        //     type: 'application/pdf',
-        //     social: Share.Social.EMAIL
-        // };
-        // Share.shareSingle( shareOptions );
     }
+
+
 
     render() {
         let data = this.props.data.length != 0 ? this.props.data : [];
         let flag_NextBtnDisable = this.state.flag_NextBtnDisable;
+        let flag_Loading = this.state.flag_Loading;
         return (
             <Modal
                 transparent
@@ -358,7 +363,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
                             } ] }>Backup Secure Wallet</Text>
 
                         </View>
-                        <View style={ { flex: Platform.OS == "ios" ? 1.8 : 1, alignItems: "center", justifyContent: "flex-start" } }>
+                        <View style={ { flex: utils.getIphoneSize() == "iphone X" ? 1.4 : 1.2, alignItems: "center", justifyContent: "flex-start" } }>
                             <Text note style={ { textAlign: "center", margin: 20 } }>To backup your secure account you will have to follow these steps.</Text>
                             <Image
                                 style={ { flex: 1, width: "100%", height: "100%" } }
@@ -382,6 +387,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
                                 style={ [ flag_NextBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } />
                         </View>
                     </View>
+                    <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
                 </View>
             </Modal>
         );
@@ -394,7 +400,7 @@ const styles = StyleSheet.create( {
         justifyContent: 'center'
     },
     viewModelBody: {
-        flex: utils.getIphoneSize() == "iphone X" ? 0.9 : 1,
+        flex: utils.getIphoneSize() == "iphone X" ? 0.9 : 0.9,
         margin: 20,
         padding: 10,
         borderRadius: 10,
