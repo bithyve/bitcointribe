@@ -75,9 +75,8 @@ export default class BackupSecureAccountScreen extends Component {
 
     async componentDidMount() {
         let data = this.props.navigation.getParam( "data" );
-        // console.log( { data } );
+        console.log( { data } );
         if ( Platform.OS == "android" ) {
-            //         [PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE, PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE],
             try {
                 await PermissionsAndroid.request(
                     PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
