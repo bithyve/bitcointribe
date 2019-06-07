@@ -181,7 +181,7 @@ dependencies {
     compile project(':react-native-webview')
     compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
     transitive = true;
-    }           
+    }               
     implementation 'com.android.support:multidex:1.0.3'
     compile project(':react-native-sqlite-storage')
     compile project(':react-native-view-shot')  

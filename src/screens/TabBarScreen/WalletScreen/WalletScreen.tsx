@@ -550,8 +550,6 @@ export default class WalletScreen extends React.Component {
 
 
             {/*  cards */ }
-
-
             <Animated.View
               style={ {
                 flex: 6,
@@ -580,6 +578,7 @@ export default class WalletScreen extends React.Component {
                 />
               </ScrollView>
             </Animated.View>
+
           </SafeAreaView>
         </Content>
         <DropdownAlert ref={ ref => ( this.dropdown = ref ) } />
@@ -635,8 +634,6 @@ export default class WalletScreen extends React.Component {
             } );
           } }
         />
-
-
         <ModelBackupYourWallet data={ this.state.arr_ModelBackupYourWallet }
           click_UseOtherMethod={ () => alert( 'working' ) }
           click_Confirm={ async () => {
@@ -683,7 +680,6 @@ export default class WalletScreen extends React.Component {
             } else {
               this.props.navigation.push( "BackUpYourWalletNavigator" )
             }
-
           } }
           closeModal={ () => {
             this.setState( {
@@ -695,7 +691,6 @@ export default class WalletScreen extends React.Component {
             } )
           } }
         />
-
         <ModelBackupShareAssociateContact data={ this.state.arr_ModelBackupShareAssociateContact }
           click_AssociateContact={ ( walletName: string ) => {
             Permissions.request( 'contacts' ).then( ( response: any ) => {
