@@ -55,11 +55,16 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
         return { text: text, margins: [ 0, 0, 0, 8 ] };
     }
 
+    componentWillReceiveProps( nextProps: any ) {
+        let data = nextProps.data;
+        if ( data[ 0 ].modalVisible == true ) {
+            this.readPropsValue( data[ 0 ].secureAccountDetails )
+        }
+    }
 
-    async componentDidMount() {
+    readPropsValue = async ( data: any ) => {
         var resultWallet = await comFunDBRead.readTblWallet();
         var resAccount = await comFunDBRead.readTblAccount();
-        let data = this.props.data.length != 0 ? this.props.data[ 0 ].secureAccountDetails : [];
         let setupData = data.setupData;
         console.log( { setupData } );
         const securePDFGen = new SecurePDFGen(
@@ -76,16 +81,10 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
         this.generateSecondaryXpub( temp );
     }
 
-    generateSecondaryXpub = async ( data: any ) => {
 
-        RNFS.readDir( RNFS.ExternalStorageDirectoryPath ).then( files => {
-            console.log( { files } );
-        } )
-            .catch( err => {
-                console.log( err.message, err.code );
-            } );
+    generateSecondaryXpub = async ( data: any ) => {
         let secondaryXpub = data[ 0 ].secondaryXpub;
-        //console.log( { secondaryXpub } );
+        console.log( { secondaryXpub } );
         var docsDir;
         if ( Platform.OS == "android" ) {
             docsDir = await RNFS.ExternalStorageDirectoryPath //RNFS.DocumentDirectoryPath;
@@ -197,8 +196,8 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
         console.log( { pdfPath } );
         docsDir = Platform.OS === 'android' ? `/${ docsDir }` : docsDir;
         console.log( { docsDir } );
-        const imgSecondaryXpub = `${ docsDir }/secondaryXpub.png`;
-        const img2FASecret = `${ docsDir }/secret2FA.png`;
+        const imgSecondaryXpub = `${ docsDir }/secondaryXpub.png`; //"secondaryXpub.png"; //
+        const img2FASecret = `${ docsDir }/secret2FA.png`; //"secondaryXpub.png"; //
         console.log( { imgSecondaryXpub, img2FASecret } );
 
         const page1 = PDFPage
@@ -216,7 +215,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
                     y: 310,
                     width: 150,
                     height: 150,
-                    source: 'assets'
+                    //source: 'assets'
                 }
             )
             .drawText( 'Scan the above QR Code using your HEXA', {
@@ -242,7 +241,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
                     y: 80,
                     width: 150,
                     height: 150,
-                    source: 'assets'
+                    // source: 'assets'
                 }
             )
             .drawText( secret2FA, {
@@ -407,8 +406,8 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
                                 iconName="share"
                                 iconColor={ "#ffffff" }
                                 iconSize={ 20 }
-                                disabled={ false }
-                                style={ [ { borderRadius: 10 } ] } />
+                                disabled={ flag_Loading }
+                                style={ [ flag_Loading == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } />
                             <FullLinearGradientButton
                                 click_Done={ () => this.props.click_Next() }
                                 title="Next"
@@ -416,12 +415,13 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
                                 style={ [ flag_NextBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } />
                         </View>
                     </View>
-                    <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
                 </View>
             </Modal>
         );
     }
 }
+
+
 
 const styles = StyleSheet.create( {
     modalBackground: {
