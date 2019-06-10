@@ -43,11 +43,11 @@ export default class ModelQRCodeScanRestoreSecureAccount extends Component<Props
 
     componentDidMount() {
         Permissions.request( 'camera' ).then( ( response: any ) => {
-            if ( response == "authorized" ) {
-                this.render();
-            }
+            console.log( { response } );
         } );
     }
+
+
 
     _renderTitleBar() {
         return (
@@ -64,7 +64,8 @@ export default class ModelQRCodeScanRestoreSecureAccount extends Component<Props
     barcodeReceived( e: any ) {
         try {
             var result = e.data;
-            result = JSON.parse( result );
+            console.log( { result } );
+            //Alert.alert( result )
             this.props.click_Next();
         } catch ( error ) {
             console.log( error );
@@ -105,8 +106,8 @@ export default class ModelQRCodeScanRestoreSecureAccount extends Component<Props
                         } ] }>Restore { "\n" } Secure Account</Text>
                         <Text style={ { color: "#ffffff", textAlign: "center", fontSize: 14 } }>Step 1</Text>
                     </View>
-                    <View style={ { flex: 2, alignItems: "center", justifyContent: "center" } }>
-                        < QRScannerView
+                    <View style={ { flex: 2 } }>
+                        <QRScannerView
                             hintText=""
                             rectHeight={ Dimensions.get( 'screen' ).height / 2.0 }
                             rectWidth={ Dimensions.get( 'screen' ).width - 20 }
@@ -116,8 +117,6 @@ export default class ModelQRCodeScanRestoreSecureAccount extends Component<Props
                             renderTopBarView={ () => this._renderTitleBar() }
                             renderBottomMenuView={ () => this._renderMenu() }
                         />
-                        <Button onPress={ () => this.props.click_Next() }><Text>next</Text></Button>
-
                     </View>
                     <View style={ { flex: 1, alignItems: "center", justifyContent: "center" } }>
                         <Text style={ { color: "#ffffff", textAlign: "center", fontSize: 18 } }>Scan Secondary xPub</Text>
