@@ -118,7 +118,7 @@ export default class BackupSecureAccountScreen extends Component {
                             enableOnAndroid={ true }
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
-                            <ModelBackupSecureAccount data={ this.state.arr_ModelBackupSecureAccount } click_Next={ () => {
+                            <ModelBackupSecureAccount data={ this.state.arr_ModelBackupSecureAccount } click_Next={ ( data: any ) => {
                                 this.setState( {
                                     arr_ModelBackupSecureAccount: [
                                         {
@@ -127,7 +127,8 @@ export default class BackupSecureAccountScreen extends Component {
                                     ],
                                     arr_ModelAuto6DigitCode: [
                                         {
-                                            modalVisible: true
+                                            modalVisible: true,
+                                            data: data
                                         }
                                     ]
                                 } );
@@ -147,7 +148,8 @@ export default class BackupSecureAccountScreen extends Component {
                                 this.setState( {
                                     arr_ModelAuto6DigitCode: [
                                         {
-                                            modalVisible: false
+                                            modalVisible: false,
+                                            data: []
                                         }
                                     ],
                                     arr_ModelSecureAccountSucessBackup: [
@@ -155,11 +157,6 @@ export default class BackupSecureAccountScreen extends Component {
                                             modalVisible: true
                                         }
                                     ],
-                                    // arr_ModelSecureAccountFailedBackup: [
-                                    //     {
-                                    //         modalVisible: true
-                                    //     }
-                                    // ]
                                 } )
                             } pop={ () => {
                                 this.setState( {
@@ -168,13 +165,8 @@ export default class BackupSecureAccountScreen extends Component {
                                             modalVisible: false
                                         }
                                     ],
-                                    arr_ModelBackupSecureAccount: [
-                                        {
-                                            modalVisible: true
-                                        }
-                                    ]
                                 } );
-
+                                this.props.navigation.pop()
                             } } />
                             <ModelSecureAccountSucessBackup data={ this.state.arr_ModelSecureAccountSucessBackup }
                                 click_Done={ () => {

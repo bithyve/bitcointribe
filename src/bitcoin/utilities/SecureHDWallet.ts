@@ -226,6 +226,7 @@ export default class SecureHDWallet extends Bitcoin {
       const { address } = this.createSecureMultiSig(
         this.nextFreeChildIndex + itr,
       );
+      console.log( "From create multiSig: ", address );
 
       const { totalTransactions } = await this.fetchTransactionsByAddresses( [
         address,
@@ -265,6 +266,7 @@ export default class SecureHDWallet extends Bitcoin {
   public prepareSecureAccount = async ( bhXpub, secondaryXpub?) => {
     const path = this.derivePath( bhXpub );
     const primaryXpub = this.getRecoverableXKey( this.primaryMnemonic, path );
+    console.log( { path } );
 
     if ( !secondaryXpub ) {
       this.secondaryMnemonic = await bip39.generateMnemonic( 256 );
@@ -281,6 +283,12 @@ export default class SecureHDWallet extends Bitcoin {
       secondary: secondaryXpub,
       bh: bhXpub,
     };
+
+    console.log( { xpubs: this.xpubs } );
+
+    return {
+      prepared: true
+    }
   }
 
   public createSecureMultiSig = ( childIndex ) => {
@@ -289,6 +297,7 @@ export default class SecureHDWallet extends Bitcoin {
     } // cache hit
 
     console.log( `creating multiSig against index: ${ childIndex }` );
+    console.log( this.xpubs );
 
     const childPrimaryPub = this.getPub(
       this.deriveChildXKey( this.xpubs.primary, childIndex ),
@@ -328,9 +337,10 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     await this.prepareSecureAccount( res.data.bhXpub );
+
     return {
       status: res.status,
-      data: { setupData: res.data },
+      data: { setupData: res.data, secondaryXpub: this.xpubs.secondary },
     };
   }
 
@@ -340,6 +350,8 @@ export default class SecureHDWallet extends Bitcoin {
     xIndex: number,
   ) => {
     try {
+      console.log( token, secret, xIndex, this.walletID );
+
       const res = await axios.post( config.SERVER + "/validate2FASetup", {
         token,
         secret,

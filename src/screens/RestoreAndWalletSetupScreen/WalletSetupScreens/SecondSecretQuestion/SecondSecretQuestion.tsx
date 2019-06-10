@@ -123,6 +123,7 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         let arr_SecureDetails = [];
         let secureDetails = {};
         secureDetails.setupData = resSetupSecureAccount.data.setupData;
+        secureDetails.secondaryXpub = resSetupSecureAccount.data.secondaryXpub;
         secureDetails.secondaryMnemonic = secondaryMnemonic;
         secureDetails.backupDate = dateTime;
         secureDetails.title = "Backup Now";

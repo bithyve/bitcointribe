@@ -84,6 +84,23 @@ const connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact = async ( 
     // console.log( { res } );
 }
 
+//Secure Account Backup
+
+const connection_AppHealthStatusSecureAccountBackup = async ( qatime: number, satime: number, encrShares: any, mnemonic: any ) => {
+    //  console.log( { qatime, satime, encrShares, mnemonic } );
+    const healthStatus = new HealthStatus();
+    const res = await healthStatus.appHealthStatus( qatime, satime, encrShares, 0, "share" );
+    // console.log( { res } );
+    await utils.setAppHealthStatus( res )
+    let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
+        localDB.tableName.tblWallet,
+        res
+    );
+    return resupdateWalletDetials;
+}
+
+
+
 const check_AppHealthStausUsingMnemonic = async ( qatime: number, satime: number, shares: any, mnemonicTime: any ) => {
     const healthStatus = new HealthStatus();
     const res = await healthStatus.appHealthStatus( qatime, satime, shares, mnemonicTime, "mnemonic" );
@@ -99,5 +116,6 @@ const check_AppHealthStausUsingMnemonic = async ( qatime: number, satime: number
 module.exports = {
     connection_AppHealthStatus,
     connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact,
+    connection_AppHealthStatusSecureAccountBackup,
     check_AppHealthStausUsingMnemonic
 };

@@ -13,9 +13,10 @@ import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 
 //TODO: Custome Compontes  
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import FullLinearGradientIconButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientIconButton";
-import { SvgIcon } from "@up-shared/components";
+import FullLinearGradientIconWithLoadingButton from 'HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientIconWithLoadingButton';
 
+
+import { SvgIcon } from "@up-shared/components";
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 //TODO: Custome Object
@@ -24,9 +25,11 @@ import {
     images
 } from "HexaWallet/src/app/constants/Constants";
 
+
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
+
 
 interface Props {
     data: [];
@@ -35,14 +38,17 @@ interface Props {
     click_Next: Function;
 }
 
+
 //TODO: Bitcoin Files
 import SecurePDFGen from 'HexaWallet/src/bitcoin/utilities/securePDFGenerator';
+
 
 export default class ModelBackupSecureAccount extends Component<Props, any> {
     pdfObj = null;
     constructor ( props: any ) {
         super( props )
         this.state = ( {
+            data: [],
             pdfDetails: [],
             pdfFilePath: "",
             flag_NextBtnDisable: true,
@@ -51,36 +57,41 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
         } )
     }
 
+
     header( text: any ) {
         return { text: text, margins: [ 0, 0, 0, 8 ] };
     }
 
     componentWillReceiveProps( nextProps: any ) {
         let data = nextProps.data;
+        console.log( { data } );
         if ( data[ 0 ].modalVisible == true ) {
             this.readPropsValue( data[ 0 ].secureAccountDetails )
+            this.setState( {
+                data: data[ 0 ].secureAccountDetails
+            } )
         }
     }
 
+
     readPropsValue = async ( data: any ) => {
-        var resultWallet = await comFunDBRead.readTblWallet();
-        var resAccount = await comFunDBRead.readTblAccount();
+        let resultWallet = await utils.getMnemonic();
+        console.log( { resultWallet } );
         let setupData = data.setupData;
         console.log( { setupData } );
         const securePDFGen = new SecurePDFGen(
-            resultWallet.mnemonic
+            resultWallet
         );
         //console.log( setupData.secondaryMnemonic, setupData.setupData.bhXpub );
         let resGetSecondaryXpub = await securePDFGen.getSecondaryXpub( setupData.secondaryMnemonic, setupData.setupData.bhXpub );
         // console.log( { resGetSecondaryXpub } );
         let temp = [];
-        temp.push( { secondaryXpub: resGetSecondaryXpub, secret: setupData.setupData.secret, secondaryMnemonic: setupData.secondaryMnemonic, bhXpub: setupData.setupData.bhXpub } )
+        temp.push( { secondaryXpub: resGetSecondaryXpub, qrData: setupData.setupData.qrData, secret: setupData.setupData.secret, secondaryMnemonic: setupData.secondaryMnemonic, bhXpub: setupData.setupData.bhXpub } )
         this.setState( {
             pdfDetails: temp
         } )
         this.generateSecondaryXpub( temp );
     }
-
 
     generateSecondaryXpub = async ( data: any ) => {
         let secondaryXpub = data[ 0 ].secondaryXpub;
@@ -114,6 +125,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
     }
     generate2FASecret = async ( data: any ) => {
         let secret2FA = data[ 0 ].secret;
+        let qrData = data[ 0 ].qrData;
         var docsDir;
         if ( Platform.OS == "android" ) {
             docsDir = await RNFS.ExternalStorageDirectoryPath //RNFS.DocumentDirectoryPath;
@@ -123,7 +135,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
         docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
         // console.log( { docsDir } );
         var path = `${ docsDir }/secret2FA.png`;
-        await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + secret2FA, {
+        await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + qrData, {
         } )
             .then( ( res: any ) => {
                 let base64Str = res.base64()
@@ -318,11 +330,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
     click_DonloadFile() {
         let flag_NextBtnDisable = this.state.flag_NextBtnDisable;
         let pdfFilePath = this.state.pdfFilePath;
-        if ( flag_NextBtnDisable ) {
-            this.setState( {
-                flag_NextBtnDisable: !flag_NextBtnDisable
-            } )
-        }
+
         Mailer.mail( {
             subject: 'Store secure account pdf.',
             recipients: [ 'appasahebl@bithyve.com' ],
@@ -335,6 +343,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
             }
         }, ( error, event ) => {
             if ( event == "sent" ) {
+
                 Alert.alert(
                     "Success",
                     "Email sent success.",
@@ -355,10 +364,12 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
             }
 
         } );
-
+        if ( flag_NextBtnDisable ) {
+            this.setState( {
+                flag_NextBtnDisable: !flag_NextBtnDisable
+            } )
+        }
     }
-
-
 
     render() {
         let data = this.props.data.length != 0 ? this.props.data : [];
@@ -400,16 +411,17 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
                             />
                         </View>
                         <View style={ { flex: 0.4, justifyContent: "flex-end" } }>
-                            <FullLinearGradientIconButton
+                            <FullLinearGradientIconWithLoadingButton
                                 click_Done={ () => this.click_DonloadFile() }
                                 title="Share PDF"
                                 iconName="share"
                                 iconColor={ "#ffffff" }
                                 iconSize={ 20 }
                                 disabled={ flag_Loading }
-                                style={ [ flag_Loading == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } />
+                                animating={ flag_Loading }
+                                style={ [ { borderRadius: 10 } ] } />
                             <FullLinearGradientButton
-                                click_Done={ () => this.props.click_Next() }
+                                click_Done={ () => this.props.click_Next( this.state.data ) }
                                 title="Next"
                                 disabled={ flag_NextBtnDisable }
                                 style={ [ flag_NextBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } />
