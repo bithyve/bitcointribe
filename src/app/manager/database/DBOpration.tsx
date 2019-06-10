@@ -610,6 +610,52 @@ const insertLastBeforeCreateAccount = (
 
 
 
+//update   
+const updateSecureAccountAddressAndBal = (
+  tblName: string,
+  address: string,
+  bal: string,
+  id: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+          var len = results.rows.length;
+          if ( len > 0 ) {
+            for ( let i = 0; i < len; i++ ) {
+              let dbId = results.rows.item( i ).id;
+              if ( dbId == id ) {
+                txn.executeSql(
+                  "update " +
+                  tblName +
+                  " set address = :address,balance =:balance where id = :id",
+                  [
+                    utils.encrypt( address.toString(), passcode ),
+                    utils.encrypt( bal.toString(), passcode ),
+                    dbId
+                  ]
+                );
+                resolve( true );
+              }
+            }
+          }
+        } );
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
+
+
+
+
+//TODO: ========================================>  Transaction  Details  <========================================
+
+
 //TODO: insert Transaction
 const insertTblTransation = (
   tblName: string,
@@ -1266,6 +1312,9 @@ module.exports = {
   //Account Details
   insertCreateAccount,
   insertLastBeforeCreateAccount,
+  updateSecureAccountAddressAndBal,
+
+  //Transation Details
   insertTblTransation,
   updateTableData,
 
@@ -1279,8 +1328,9 @@ module.exports = {
   updateSSSShareStageWhereRecordId,
   updateSSSRetoreDecryptedShare,
 
+
   //SSS Trusted Party Details 
   insertTrustedPartyDetails,
   insertTrustedPartyDetailWithoutAssociate,
   updateHistroyAndSharedDate
-};
+};    

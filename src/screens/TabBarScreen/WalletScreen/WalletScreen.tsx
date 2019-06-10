@@ -421,7 +421,7 @@ export default class WalletScreen extends React.Component {
             </View>
           </RkCard>
         ) }
-        { renderIf( item.accountType == "Secure Account" )(
+        { renderIf( item.accountType == "Secure Account" && item.address == "" )(
           <RkCard
             rkType="shadowed"
             style={ {
@@ -466,6 +466,84 @@ export default class WalletScreen extends React.Component {
                   <Text style={ { color: "#838383", fontSize: 14 } } >{ item.secureBtnTitle }</Text>
                 </Button>
               </View>
+            </View>
+          </RkCard>
+        ) }
+        { renderIf( item.accountType == "Secure Account" && item.address != "" )(
+          <RkCard
+            rkType="shadowed"
+            style={ {
+              flex: 1,
+              margin: 10,
+              height: 145,
+              borderRadius: 10
+            } }
+          >
+            <View
+              rkCardHeader
+              style={ {
+                flex: 1,
+                borderBottomColor: "#F5F5F5",
+                borderBottomWidth: 1
+              } }
+            >
+              <SvgIcon
+                name="icon_dailywallet"
+                color="#37A0DA"
+                size={ 40 }
+              />
+              <Text
+                style={ [ globalStyle.ffFiraSansMedium, {
+                  flex: 2,
+                  fontSize: 16,
+                  marginLeft: 10
+                } ] }
+              >
+                { item.accountName }
+              </Text>
+              <SvgIcon name="icon_more" color="gray" size={ 15 } />
+            </View>
+            <View
+              rkCardContent
+              style={ {
+                flex: 1,
+                flexDirection: "row"
+              } }
+            >
+              <View
+                style={ {
+                  flex: 1,
+                  justifyContent: "center"
+                } }
+              >
+                <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
+              </View>
+              <View style={ { flex: 4 } }>
+                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
+                <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
+                  { item.balance }
+                </Text>
+              </View>
+              <View
+                style={ {
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "flex-end",
+                  justifyContent: "flex-end"
+                } }
+              >
+                <Button transparent>
+                  <SvgIcon
+                    name="timelockNew"
+                    color="gray"
+                    size={ 20 }
+                  />
+                </Button>
+                <Button transparent style={ { marginLeft: 10 } }>
+                  <SvgIcon name="icon_multisig" color="gray" size={ 20 } />
+                </Button>
+              </View>
+
             </View>
           </RkCard>
         ) }
