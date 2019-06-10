@@ -66,14 +66,24 @@ export default class RestoreSecureAccountScreen extends Component {
             arr_ModelRestoreGAVerificationCode: []
         };
     }
-    async componentDidMount() {
-        this.setState( {
-            arr_ModelRestoreSecureAccount: [
-                {
-                    modalVisible: true,
-                }
-            ]
-        } )
+
+    componentWillMount() {
+        this.willFocusSubscription = this.props.navigation.addListener(
+            "willFocus",
+            () => {
+                this.setState( {
+                    arr_ModelRestoreSecureAccount: [
+                        {
+                            modalVisible: true,
+                        }
+                    ]
+                } );
+            }
+        );
+    }
+
+    componentWillUnmount() {
+        this.willFocusSubscription.remove();
     }
 
     render() {
@@ -101,7 +111,9 @@ export default class RestoreSecureAccountScreen extends Component {
                                             modalVisible: true
                                         }
                                     ]
+
                                 } );
+                                // this.props.navigation.push( "QRCodeScanRestoreSecureAccount" );
                             } }
                                 pop={ () => {
                                     this.setState( {
@@ -143,7 +155,6 @@ export default class RestoreSecureAccountScreen extends Component {
                                 } }
                             />
                             <ModelRestoreGAVerificationCode data={ this.state.arr_ModelRestoreGAVerificationCode }
-
                             />
                         </KeyboardAwareScrollView>
                     </ImageBackground>

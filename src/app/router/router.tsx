@@ -113,6 +113,7 @@ import BackupSecureAccountScreen from "HexaWallet/src/screens/DrawerScreen/Backu
 
 //TODO: Restore Secure Account
 import RestoreSecureAccountScreen from "HexaWallet/src/screens/DrawerScreen/RestoreSecureAccountScreen/RestoreSecureAccountScreen";
+import QRCodeScanRestoreSecureAccount from "HexaWallet/src/screens/DrawerScreen/RestoreSecureAccountScreen/QRCodeScanRestoreSecureAccount";
 
 
 
@@ -434,6 +435,10 @@ const ResotreSecureAccountStackNavigator = createStackNavigator(
   {
     RestoreSecureAccountScreen: {
       screen: RestoreSecureAccountScreen,
+      navigationOptions: { header: null }
+    },
+    QRCodeScanRestoreSecureAccount: {
+      screen: QRCodeScanRestoreSecureAccount,
       navigationOptions: { header: null }
     }
   },
