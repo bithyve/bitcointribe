@@ -75,16 +75,19 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
 
 
     readPropsValue = async ( data: any ) => {
-        let resultWallet = await utils.getMnemonic();
+
+        let resultWallet = await utils.getWalletDetails();
         console.log( { resultWallet } );
         let setupData = data.setupData;
-        console.log( { setupData } );
+        //console.log( { setupData } );
+        // Alert.alert( resultWallet.mnemonic )
         const securePDFGen = new SecurePDFGen(
-            resultWallet
+            resultWallet.mnemonic
         );
         //console.log( setupData.secondaryMnemonic, setupData.setupData.bhXpub );
         let resGetSecondaryXpub = await securePDFGen.getSecondaryXpub( setupData.secondaryMnemonic, setupData.setupData.bhXpub );
-        // console.log( { resGetSecondaryXpub } );
+        // Alert.alert( resGetSecondaryXpub );
+        console.log( { resGetSecondaryXpub } );
         let temp = [];
         temp.push( { secondaryXpub: resGetSecondaryXpub, qrData: setupData.setupData.qrData, secret: setupData.setupData.secret, secondaryMnemonic: setupData.secondaryMnemonic, bhXpub: setupData.setupData.bhXpub } )
         this.setState( {

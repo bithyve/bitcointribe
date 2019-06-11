@@ -23,6 +23,7 @@ export default class SecureHDWallet extends Bitcoin {
   public primaryXpriv: string;
   public multiSigCache;
   public signingEssentialsCache;
+  public cipherSpec;
 
   constructor ( primaryMnemonic: string ) {
     super();
@@ -33,6 +34,12 @@ export default class SecureHDWallet extends Bitcoin {
     this.nextFreeChildIndex = 0;
     this.multiSigCache = {};
     this.signingEssentialsCache = {};
+    this.cipherSpec = {
+      algorithm: "aes-192-cbc",
+      salt: "bithyeSalt", // NOTE: The salt should be as unique as possible. It is recommended that a salt is random and at least 16 bytes long
+      keyLength: 24,
+      iv: Buffer.alloc( 16, 0 ),
+    };
   }
 
   public deriveChildXKey = ( extendedKey: string, childIndex: number ) => {
@@ -261,6 +268,32 @@ export default class SecureHDWallet extends Bitcoin {
       path = config.WALLET_XPUB_PATH + config.DERIVATION_BRANCH;
     }
     return path;
+  }
+
+  public generateKey = ( psuedoKey: string ): string => {
+    const hashRounds = 5048;
+    let key = psuedoKey;
+    for ( let itr = 0; itr < hashRounds; itr++ ) {
+      const hash = crypto.createHash( "sha512" );
+      key = hash.update( key ).digest( "hex" );
+    }
+    return key.slice( key.length - this.cipherSpec.keyLength );
+  }
+
+  public decryptSecondaryXpub = ( encryptedSecXpub: string ) => {
+    console.log( { primaryMnemonic: this.primaryMnemonic } );
+
+    const key = this.generateKey(
+      bip39.mnemonicToSeed( this.primaryMnemonic ).toString( "hex" ),
+    );
+    const decipher = crypto.createDecipheriv(
+      this.cipherSpec.algorithm,
+      key,
+      this.cipherSpec.iv,
+    );
+    let decrypted = decipher.update( encryptedSecXpub, "hex", "utf8" );
+    decrypted += decipher.final( "utf8" );
+    return { secondaryXpub: decrypted };
   }
 
   public prepareSecureAccount = async ( bhXpub, secondaryXpub?) => {
