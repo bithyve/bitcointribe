@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Modal, TouchableHighlight, View, Alert, StyleSheet, Image, Platform } from 'react-native';
 import { Button, Icon, Text } from "native-base";
+import CodeInput from "react-native-confirmation-code-input";
+
 
 var Mailer = require( 'NativeModules' ).RNMail;
 import Share from "react-native-share";
@@ -12,13 +14,18 @@ import FullLinearGradientIconButton from "HexaWallet/src/app/custcompontes/Linea
 import { SvgIcon } from "@up-shared/components";
 
 
+//TODO: Custome Pages
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 //TODO: Custome Object
 import {
     colors,
-    images
+    images,
+    localDB
 } from "HexaWallet/src/app/constants/Constants";
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 interface Props {
@@ -28,17 +35,97 @@ interface Props {
     click_Next: Function;
 }
 
+
+//Bitcoin Files
+import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
+
+
 export default class ModelRestoreGAVerificationCode extends Component<Props, any> {
 
     constructor ( props: any ) {
         super( props )
         this.state = ( {
-            flag_NextBtnDisable: true
+            otp: "",
+            xPub: "",
+            passcodeStyle: [
+                {
+                    activeColor: colors.black,
+                    inactiveColor: colors.black,
+                    cellBorderWidth: 0
+                }
+            ],
+            flag_NextBtnDisable: true,
+            flag_Loading: false
         } )
     }
 
+
+    componentWillReceiveProps( nextProps: any ) {
+        let data = nextProps.data;
+        console.log( { data } );
+        if ( data.length != 0 ) {
+            if ( data[ 0 ].modalVisible == true ) {
+                this.setState( {
+                    xPub: data[ 0 ].xPub
+                } )
+            }
+        }
+
+    }
+
+    //TODO: Otp enter after
+    _onFinishCheckingCode( code: any ) {
+        console.log( { code } );
+        if ( code.length == 6 ) {
+            this.setState( {
+                otp: code,
+                flag_NextBtnDisable: false
+            } )
+        }
+    }
+
+    //TODO: Click on next button
+    click_Next = async () => {
+        this.setState( {
+            flag_Loading: true
+        } );
+        const dateTime = Date.now();
+        let code = this.state.otp;
+        let xPub = this.state.xPub;
+        let resultWallet = await utils.getWalletDetails();
+        const secureAccount = new SecureAccount( resultWallet.mnemonic );
+        let resImportSecureAccount = await secureAccount.importSecureAccount( code, xPub );
+        if ( resImportSecureAccount.imported == true ) {
+            const address = await secureAccount.getAddress();
+            console.log( { address } );
+            const balance = await secureAccount.getBalance();
+            console.log( { balance } );
+            let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+                localDB.tableName.tblAccount,
+                dateTime,
+                address,
+                balance.data.balance / 1e8,
+                "BTC",
+                "Secure Account",
+                "Secure Account",
+                ""
+            );
+            if ( resInsertSecureCreateAcc ) {
+                this.setState( {
+                    flag_Loading: false
+                } );
+                setTimeout( () => {
+                    this.props.click_Next();
+                }, 100 );
+
+            }
+        }
+    }
+
+
     render() {
         let flag_NextBtnDisable = this.state.flag_NextBtnDisable;
+        let flag_Loading = this.state.flag_Loading;
         return (
             <Modal
                 transparent
@@ -62,27 +149,47 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
                             </Button>
                             <Text style={ [ globalStyle.ffFiraSansMedium, {
                                 fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
-                                marginLeft: 20, marginRight: 20
+                                marginLeft: 10, marginRight: 10
                             } ] }>Enter the GA verification code</Text>
-
                         </View>
-                        <View style={ { flex: Platform.OS == "ios" ? 1.8 : 1, alignItems: "center", justifyContent: "flex-start" } }>
+                        <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
                             <Text style={ { textAlign: "center", margin: 20 } }>Step 2</Text>
-                            <Text note style={ { textAlign: "center", margin: 20 } }>Enter the next in sequence verification code generated on Google Authentication for your Hexa Wallet.</Text>
-                            <Image
-                                style={ { flex: 1, width: "100%", height: "100%" } }
-                                resizeMode="contain"
-                                source={ images.retoreSeecureAccount.steps }
+                            <Text note style={ { textAlign: "center", margin: 20 } }>Enter the next in sequence verification code generated on Google Authentication for your Hexa Wallet</Text>
+                            <CodeInput
+                                ref="codeInputRef1"
+                                secureTextEntry
+                                keyboardType="default"
+                                autoCapitalize="sentences"
+                                codeLength={ 6 }
+                                activeColor={ this.state.passcodeStyle[ 0 ].activeColor }
+                                inactiveColor={ this.state.passcodeStyle[ 0 ].inactiveColor }
+                                className="border-box"
+                                cellBorderWidth={ this.state.passcodeStyle[ 0 ].cellBorderWidth }
+                                autoFocus={ false }
+                                inputPosition="center"
+                                space={ 5 }
+                                size={ 47 }
+                                codeInputStyle={ { borderRadius: 5, backgroundColor: "#F1F1F1" } }
+                                containerStyle={ {
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    height: Platform.OS == "ios" ? 0 : 40,
+                                } }
+                                onFulfill={ ( code: any ) =>
+                                    this._onFinishCheckingCode( code )
+                                }
+                                type='withoutcharacters'
                             />
                         </View>
-                        <View style={ { flex: 0.4, justifyContent: "flex-end" } }>
-                            <Text note style={ { textAlign: "center", margin: 20 } }>In case you do not have the code, refer to the PDF downloaded while backing up secure account.</Text>
+                        <View style={ { flex: 0.7, justifyContent: "flex-end" } }>
+                            <Text note style={ { textAlign: "center", margin: 20 } }>In case you do not have the code, refer to the PDF downloaded while backing up secure account</Text>
                             <FullLinearGradientButton
-                                click_Done={ () => this.props.click_Next() }
+                                click_Done={ () => this.click_Next() }
                                 title="Next"
-                                disabled={ false }
-                                style={ [ { opacity: 1 }, { borderRadius: 10 } ] } />
+                                disabled={ flag_NextBtnDisable }
+                                style={ [ flag_NextBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } />
                         </View>
+                        <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
                     </View>
                 </View>
             </Modal>

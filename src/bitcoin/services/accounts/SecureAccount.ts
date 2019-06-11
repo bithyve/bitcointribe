@@ -29,9 +29,17 @@ export default class SecureAccount {
   public checkHealth = async ( pos: string ) =>
     this.secureHDWallet.checkHealth( pos )
 
+  public decryptSecondaryXpub = ( encryptedSecXpub: string ) =>
+    this.secureHDWallet.decryptSecondaryXpub( encryptedSecXpub )
+
   public importSecureAccount = async ( token: number, secondaryXpub: string ) => {
     const { bhXpub } = await this.secureHDWallet.importBHXpub( token );
-    return this.secureHDWallet.prepareSecureAccount( bhXpub, secondaryXpub );
+    const { prepared } = await this.secureHDWallet.prepareSecureAccount( bhXpub, secondaryXpub );
+    if ( prepared ) {
+      return { imported: true }
+    } else {
+      return { imported: false }
+    }
   }
 
   public validateSecureAccountSetup = async (
@@ -105,14 +113,11 @@ export default class SecureAccount {
         txHex,
         childIndexArray,
       } );
-
       console.log(
         "---- Transaction Signed by BH Server (2nd sig for 2/3 MultiSig)----",
       );
-
       console.log( { txHex: res.data.txHex } );
       console.log( "------ Broadcasting Transaction --------" );
-
       const bRes = await this.secureHDWallet.broadcastTransaction(
         res.data.txHex,
       );
@@ -125,4 +130,4 @@ export default class SecureAccount {
       };
     }
   }
-}
+}  

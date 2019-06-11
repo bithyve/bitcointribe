@@ -1,5 +1,5 @@
 import bip32 from "bip32";
-import bip39 from "bip39";
+import bip39 from "react-native-bip39";
 import crypto from "crypto";
 // import PDFDocument from "pdfkit";
 //import qr from "qr-image";
@@ -27,8 +27,13 @@ export default class SecurePDFGen {
   public getSecondaryXpub = async ( secondaryMnemonic, bhXpub ) => {
     const path = this.getXpubDerivationPath( bhXpub );
     const secondaryXpub = this.getRecoverableXKey( secondaryMnemonic, path );
-    return this.encryptor( JSON.stringify( secondaryXpub ), this.mnemonic );
+    console.log( { secondaryXpub } );
+
+    return this.encryptor( secondaryXpub );
   }
+
+
+
 
   // public generate = async (
   //   password,
@@ -89,20 +94,33 @@ export default class SecurePDFGen {
     return key.slice( key.length - this.cipherSpec.keyLength );
   }
 
-  private encryptor = ( data, encKey ) => {
-    const key = this.generateKey( encKey );
+  private encryptor = ( data ) => {
+    console.log( { primaryMnemonic: this.mnemonic } );
+    const seed = bip39.mnemonicToSeed( this.mnemonic ).toString( "hex" );
+    console.log( { seed } );
+
+    const key = this.generateKey(
+      seed,
+    );
+    console.log( { key } );
+
+    // const key = this.generateKey(encKey);
     const cipher = crypto.createCipheriv(
       this.cipherSpec.algorithm,
       key,
       this.cipherSpec.iv,
     );
+    console.log( { cipher } );
+
     let encrypted = cipher.update( data, "utf8", "hex" );
     encrypted += cipher.final( "hex" );
     return encrypted;
   }
 
-  private decryptor = ( encData, decKey ) => {
-    const key = this.generateKey( decKey );
+  private decryptor = ( encData ): string => {
+    const key = this.generateKey(
+      bip39.mnemonicToSeed( this.mnemonic ).toString( "hex" ),
+    );
     const decipher = crypto.createDecipheriv(
       this.cipherSpec.algorithm,
       key,

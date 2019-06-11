@@ -14,9 +14,9 @@ import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGra
 import FullLinearGradientIconButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientIconButton";
 import { SvgIcon } from "@up-shared/components";
 
-
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
 //TODO: Custome Object
 import {
     colors,
@@ -24,6 +24,11 @@ import {
 } from "HexaWallet/src/app/constants/Constants";
 
 var utils = require( "HexaWallet/src/app/constants/Utils" );
+
+
+//Bitcoin Files
+import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
+
 interface Props {
     data: [];
     pop: Function;
@@ -61,18 +66,21 @@ export default class ModelQRCodeScanRestoreSecureAccount extends Component<Props
         )
     }
 
-    barcodeReceived( e: any ) {
+    barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
+            let resultWallet = await utils.getWalletDetails();
+            const secureAccount = new SecureAccount( resultWallet.mnemonic );
             console.log( { result } );
-            //Alert.alert( result )
-            this.props.click_Next();
+            if ( result != "" ) {
+                let resDecryptSecondaryXpub = await secureAccount.decryptSecondaryXpub( result );
+                console.log( { resDecryptSecondaryXpub } );
+                this.props.click_Next( resDecryptSecondaryXpub.secondaryXpub );
+            }
         } catch ( error ) {
             console.log( error );
         }
     }
-
-
 
     render() {
         let data = this.props.data.length != 0 ? this.props.data : [];

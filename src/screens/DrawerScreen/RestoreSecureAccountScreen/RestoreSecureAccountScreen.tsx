@@ -29,7 +29,7 @@ import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/
 import ModelRestoreSecureAccount from "HexaWallet/src/app/custcompontes/Model/ModelRestoreSecureAccount/ModelRestoreSecureAccount";
 import ModelQRCodeScanRestoreSecureAccount from "HexaWallet/src/app/custcompontes/Model/ModelRestoreSecureAccount/ModelQRCodeScanRestoreSecureAccount";
 import ModelRestoreGAVerificationCode from "HexaWallet/src/app/custcompontes/Model/ModelRestoreSecureAccount/ModelRestoreGAVerificationCode";
-
+import ModelSecureAccountSucessRestore from "HexaWallet/src/app/custcompontes/Model/ModelRestoreSecureAccount/ModelSecureAccountSucessRestore";
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -54,6 +54,7 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 
 
+
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
@@ -63,7 +64,8 @@ export default class RestoreSecureAccountScreen extends Component {
         this.state = {
             arr_ModelRestoreSecureAccount: [],
             arr_ModelQRCodeScanRestoreSecureAccount: [],
-            arr_ModelRestoreGAVerificationCode: []
+            arr_ModelRestoreGAVerificationCode: [],
+            arr_ModelSecureAccountSucessRestore: []
         };
     }
 
@@ -127,7 +129,7 @@ export default class RestoreSecureAccountScreen extends Component {
                                 } }
                             />
                             <ModelQRCodeScanRestoreSecureAccount data={ this.state.arr_ModelQRCodeScanRestoreSecureAccount }
-                                click_Next={ () => {
+                                click_Next={ ( xPub: string ) => {
                                     this.setState( {
                                         arr_ModelQRCodeScanRestoreSecureAccount: [
                                             {
@@ -135,7 +137,8 @@ export default class RestoreSecureAccountScreen extends Component {
                                             }
                                         ],
                                         arr_ModelRestoreGAVerificationCode: [ {
-                                            modalVisible: true
+                                            modalVisible: true,
+                                            xPub
                                         } ]
                                     } );
                                 } }
@@ -155,7 +158,60 @@ export default class RestoreSecureAccountScreen extends Component {
                                 } }
                             />
                             <ModelRestoreGAVerificationCode data={ this.state.arr_ModelRestoreGAVerificationCode }
+                                click_Next={ () => {
+                                    this.setState( {
+                                        arr_ModelRestoreGAVerificationCode: [ {
+                                            modalVisible: false,
+                                            xPub: ""
+                                        } ],
+                                        arr_ModelSecureAccountSucessRestore: [
+                                            {
+                                                modalVisible: true
+                                            }
+                                        ]
+                                    } );
+                                } }
+                                pop={ () => {
+                                    this.setState( {
+                                        arr_ModelRestoreGAVerificationCode: [
+                                            {
+                                                modalVisible: false,
+                                                xPub: ""
+                                            }
+                                        ],
+                                        arr_ModelQRCodeScanRestoreSecureAccount: [
+                                            {
+                                                modalVisible: true
+                                            }
+                                        ]
+                                    } );
+                                } }
                             />
+
+                            <ModelSecureAccountSucessRestore data={ this.state.arr_ModelSecureAccountSucessRestore }
+                                click_Done={ () => {
+                                    this.setState( {
+                                        arr_ModelSecureAccountSucessRestore: [
+                                            {
+                                                modalVisible: false,
+                                            }
+                                        ]
+                                    } )
+                                    const resetAction = StackActions.reset( {
+                                        index: 0, // <-- currect active route from actions array
+                                        key: null,
+                                        actions: [
+                                            NavigationActions.navigate( { routeName: "TabbarBottom" } )
+                                        ]
+                                    } );
+                                    AsyncStorage.setItem(
+                                        asyncStorageKeys.rootViewController,
+                                        "TabbarBottom"
+                                    );
+                                    this.props.navigation.dispatch( resetAction );
+                                } }
+                            />
+
                         </KeyboardAwareScrollView>
                     </ImageBackground>
                 </SafeAreaView>

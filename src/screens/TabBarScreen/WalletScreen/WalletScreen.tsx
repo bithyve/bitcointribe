@@ -9,7 +9,8 @@ import {
   Animated,
   AsyncStorage,
   Alert,
-  Image
+  Image,
+  RefreshControl
 } from "react-native";
 import {
   Container,
@@ -85,6 +86,7 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 //TODO: Bitcoin files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 
 export default class WalletScreen extends React.Component {
   constructor ( props: any ) {
@@ -96,6 +98,7 @@ export default class WalletScreen extends React.Component {
       flag_cardScrolling: false,
       flag_Loading: false,
       walletDetails: [],
+      refreshing: false,
       //Shiled Icons
       shiledIconPer: 1,
       scrollY: new Animated.Value( 0 ),
@@ -340,6 +343,35 @@ export default class WalletScreen extends React.Component {
 
 
 
+  //TODO: func refresh
+  refresh = async () => {
+    this.setState( {
+      flag_Loading: true
+    } )
+    var resAccount = await comFunDBRead.readTblAccount();
+    console.log( { resAccount } );
+    let resultWallet = await utils.getWalletDetails();
+    const regularAccount = new RegularAccount(
+      resultWallet.mnemonic
+    );
+    const getBal = await regularAccount.getBalance();
+    console.log( { getBal } );
+    const resUpdateRegularAccountBal = await dbOpration.updateRegularAccountBal(
+      localDB.tableName.tblAccount,
+      resAccount[ 0 ].address,
+      getBal.data.balance / 1e8,
+      resAccount[ 0 ].id
+    );
+    if ( resUpdateRegularAccountBal ) {
+      this.setState( {
+        flag_Loading: false
+      } )
+      this.connnection_FetchData();
+    }
+  }
+
+
+
   _renderItem( { item, index } ) {
     return (
       <View key={ "card" + index }>
@@ -554,9 +586,19 @@ export default class WalletScreen extends React.Component {
   render() {
     let flag_cardScrolling = this.state.flag_cardScrolling;
     let walletDetails = this.state.walletDetails;
+    let flag_Loading = this.state.flag_Loading;
     return (
       <Container>
-        <Content scrollEnabled={ false } contentContainerStyle={ styles.container }>
+        <Content
+          scrollEnabled={ true }
+          contentContainerStyle={ styles.container }
+          refreshControl={
+            <RefreshControl
+              refreshing={ this.state.refreshing }
+              onRefresh={ this.refresh.bind( this ) }
+            />
+          }
+        >
           <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
           <SafeAreaView style={ styles.container }>
             {/* Top View Animation */ }
@@ -839,7 +881,7 @@ export default class WalletScreen extends React.Component {
             } )
           } }
         />
-        <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
+        <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
       </Container>
     );
   }
