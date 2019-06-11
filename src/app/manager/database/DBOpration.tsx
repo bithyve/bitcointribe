@@ -649,6 +649,48 @@ const updateSecureAccountAddressAndBal = (
   } );
 };
 
+const updateRegularAccountBal = (
+  tblName: string,
+  address: string,
+  bal: string,
+  id: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+          var len = results.rows.length;
+          if ( len > 0 ) {
+            for ( let i = 0; i < len; i++ ) {
+              let dbdecryptAddress = utils.decrypt(
+                results.rows.item( i ).address,
+                passcode
+              );
+              let dbId = results.rows.item( i ).id;
+              let dbAddress = results.rows.item( i ).address;
+              if ( dbId == id && dbdecryptAddress == address ) {
+                txn.executeSql(
+                  "update " +
+                  tblName +
+                  " set balance =:balance where id = :id and address = :address",
+                  [
+                    utils.encrypt( bal.toString(), passcode ),
+                    dbId,
+                    dbAddress
+                  ]
+                );
+                resolve( true );
+              }
+            }
+          }
+        } );
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
 
 
 
@@ -1313,6 +1355,7 @@ module.exports = {
   insertCreateAccount,
   insertLastBeforeCreateAccount,
   updateSecureAccountAddressAndBal,
+  updateRegularAccountBal,
 
   //Transation Details
   insertTblTransation,

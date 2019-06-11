@@ -42,9 +42,8 @@
       </activity>
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
         <meta-data
-                           android:name="io.fabric.ApiKey"
-                           android:value="2d0b58f102661fcabd3be54e6516854e2b0983f6"
-                       />
+            android:name="io.fabric.ApiKey"
+            android:value="2d0b58f102661fcabd3be54e6516854e2b0983f6" />
     </application>  
 
 </manifest>
