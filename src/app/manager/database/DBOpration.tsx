@@ -618,6 +618,7 @@ const updateSecureAccountAddressAndBal = (
   id: string
 ) => {
   let passcode = getPasscode();
+  let date = Date.now();
   return new Promise( ( resolve, reject ) => {
     try {
       db.transaction( function ( txn ) {
@@ -630,10 +631,11 @@ const updateSecureAccountAddressAndBal = (
                 txn.executeSql(
                   "update " +
                   tblName +
-                  " set address = :address,balance =:balance where id = :id",
+                  " set address = :address,balance =:balance,lastUpdated =:lastUpdated where id = :id",
                   [
                     utils.encrypt( address.toString(), passcode ),
                     utils.encrypt( bal.toString(), passcode ),
+                    utils.encrypt( date.toString(), passcode ),
                     dbId
                   ]
                 );

@@ -118,7 +118,7 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         );
         const secureAccount = new SecureAccount( mnemonic );
         const resSetupSecureAccount = await secureAccount.setupSecureAccount();
-        console.log( resSetupSecureAccount.data.setupData );
+        // console.log( resSetupSecureAccount.data.setupData );
         const secondaryMnemonic = await secureAccount.getRecoveryMnemonic();
         let arr_SecureDetails = [];
         let secureDetails = {};
@@ -126,7 +126,7 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         secureDetails.secondaryXpub = resSetupSecureAccount.data.secondaryXpub;
         secureDetails.secondaryMnemonic = secondaryMnemonic;
         secureDetails.backupDate = dateTime;
-        secureDetails.title = "Backup Now";
+        secureDetails.title = "Setup";
         secureDetails.addInfo = "";
         arr_SecureDetails.push( secureDetails );
         const getAddress = await regularAccount.getAddress();
