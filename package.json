@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "author": "Bithyve",
-  "license": "ISC",
+  "license": "MIT",
   "scripts": {
     "compile": "tsc",
     "prepare": "rn-nodeify --install --hack  &&  react-native link",
