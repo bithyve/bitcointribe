@@ -8,7 +8,7 @@ then install all again npm xcode(cmd line) then run...
 ```
 
 ## 28/12/2018 Iusse (Buffer)
-
+   
 ```
 1.Buffer can't not find
 /node_modules/bip32<br>

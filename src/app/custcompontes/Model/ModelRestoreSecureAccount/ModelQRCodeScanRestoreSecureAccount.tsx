@@ -25,6 +25,8 @@ import {
 
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
+//TODO: Common Function
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
 //Bitcoin Files
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
@@ -37,13 +39,19 @@ interface Props {
 }
 
 export default class ModelQRCodeScanRestoreSecureAccount extends Component<Props, any> {
-
     constructor ( props: any ) {
         super( props )
         this.state = ( {
+            mnemonic: "",
             flag_NextBtnDisable: true
         } )
+    }
 
+    componentWillReceiveProps = async ( nextProps: any ) => {
+        let resultWallet = await utils.getWalletDetails();
+        this.setState( {
+            mnemonic: resultWallet.mnemonic
+        } );
     }
 
     componentDidMount() {
@@ -51,8 +59,6 @@ export default class ModelQRCodeScanRestoreSecureAccount extends Component<Props
             console.log( { response } );
         } );
     }
-
-
 
     _renderTitleBar() {
         return (
@@ -69,12 +75,13 @@ export default class ModelQRCodeScanRestoreSecureAccount extends Component<Props
     barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
-            let resultWallet = await utils.getWalletDetails();
-            const secureAccount = new SecureAccount( resultWallet.mnemonic );
-            console.log( { result } );
+            let mnemonic = this.state.mnemonic;
+            // console.log( { mnemonic } );
+            const secureAccount = new SecureAccount( mnemonic );
+            //console.log( { result } );
             if ( result != "" ) {
                 let resDecryptSecondaryXpub = await secureAccount.decryptSecondaryXpub( result );
-                console.log( { resDecryptSecondaryXpub } );
+                //console.log( { resDecryptSecondaryXpub } );
                 this.props.click_Next( resDecryptSecondaryXpub.secondaryXpub );
             }
         } catch ( error ) {
