@@ -60,6 +60,7 @@ var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonApp
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
 export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Component {
 
@@ -147,6 +148,8 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
         const res = await comAppHealth.connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact( dateTime, 0, decryptedShare, mnemonic, arr_RecordId );
         // console.log( { res } );
         const getBal = await regularAccount.getBalance();
+        const secureAccount = new SecureAccount( mnemonic );
+        const resSetupSecureAccount = await secureAccount.setupSecureAccount();
         //console.log( { getBal } );
         if ( getBal.status == 200 && res ) {
             this.setState( {
@@ -164,24 +167,50 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
                 "Daily Wallet",
                 ""
             );
-            setTimeout( () => {
-                this.setState( {
-                    arr_QuestionAndAnwserDetails: temp,
-                    arr_ModelRestoreWalletSecoundQuestion: [
-                        {
-                            modalVisible: false,
-                            arr_QuestionList
-                        }
-                    ],
-                    arr_ModelRestoreWalletSuccessfullyUsingTrustedContact: [
-                        {
-                            modalVisible: true,
-                            walletName: walletDetail.walletType,
-                            bal: getBal.data.balance / 1e8
-                        }
-                    ]
-                } )
-            }, 1000 );
+            const secondaryMnemonic = await secureAccount.getRecoveryMnemonic();
+            let arr_SecureDetails = [];
+            let secureDetails = {};
+            secureDetails.setupData = resSetupSecureAccount.data.setupData;
+            secureDetails.secondaryXpub = resSetupSecureAccount.data.secondaryXpub;
+            secureDetails.secondaryMnemonic = secondaryMnemonic;
+            secureDetails.backupDate = dateTime;
+            secureDetails.title = "Active Now";
+            secureDetails.addInfo = "";
+            arr_SecureDetails.push( secureDetails );
+            let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+                localDB.tableName.tblAccount,
+                dateTime,
+                "",
+                "0.0",
+                "BTC",
+                "Secure Account",
+                "Secure Account",
+                arr_SecureDetails
+            );
+            if ( resInsertSecureCreateAcc ) {
+                setTimeout( () => {
+                    this.setState( {
+                        arr_QuestionAndAnwserDetails: temp,
+                        arr_ModelRestoreWalletSecoundQuestion: [
+                            {
+                                modalVisible: false,
+                                arr_QuestionList
+                            }
+                        ],
+                        arr_ModelRestoreWalletSuccessfullyUsingTrustedContact: [
+                            {
+                                modalVisible: true,
+                                walletName: walletDetail.walletType,
+                                bal: getBal.data.balance / 1e8
+                            }
+                        ]
+                    } )
+                    AsyncStorage.setItem(
+                        asyncStorageKeys.rootViewController,
+                        "TabbarBottom"
+                    );
+                }, 1000 );
+            }
         } else {
             Alert.alert( "App health not updated." )
         }
@@ -189,7 +218,6 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
 
     //TODO: Success Wallet Setup then skip button on click
     click_Skip() {
-
         const resetAction = StackActions.reset( {
             index: 0, // <-- currect active route from actions array
             key: null,
@@ -197,10 +225,6 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
                 NavigationActions.navigate( { routeName: "TabbarBottom" } )
             ]
         } );
-        AsyncStorage.setItem(
-            asyncStorageKeys.rootViewController,
-            "TabbarBottom"
-        );
         this.props.navigation.dispatch( resetAction );
     }
 

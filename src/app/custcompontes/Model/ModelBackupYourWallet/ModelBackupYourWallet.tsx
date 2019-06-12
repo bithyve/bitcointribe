@@ -62,7 +62,7 @@ const styles = StyleSheet.create( {
         justifyContent: 'center'
     },
     viewModelBody: {
-        flex: 0.6,
+        flex: Platform.OS == "ios" ? 0.6 : 0.8,
         margin: 20,
         padding: 10,
         borderRadius: 10,

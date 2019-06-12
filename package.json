@@ -34,7 +34,7 @@
     "@types/bip39": "^2.4.1",
     "@types/bitcoinjs-lib": "^4.0.0",
     "@types/node": "^10.12.18",
-    "ac-qrcode": "^1.0.1",
+    "ac-qrcode": "1.0.1",
     "assert": "^1.4.1",
     "asyncstorage-down": "^4.1.2",
     "axios": "^0.18.0",

@@ -5,7 +5,8 @@ var Mailer = require( 'NativeModules' ).RNMail;
 import Share from "react-native-share";
 import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 var RNFS = require( 'react-native-fs' );
-import RNFetchBlob from 'react-native-fetch-blob'
+import RNFetchBlob from 'react-native-fetch-blob';
+import axios from "axios";
 
 
 //TODO: Custome Pages
@@ -329,6 +330,26 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
                     pdfFilePath: path
                 } )
             } );
+
+        console.log( { pdfPath } );
+
+        var formData = new FormData();
+        formData.append( 'File', pdfPath );
+        formData.append( 'PdfOwnerPasswordNew', '1111' );
+
+        // const config = {  
+        //     headers: {
+        //         "content-type": "multipart/form-data"
+        //     }
+        // };
+        // axios
+        //     .post( "https://v2.convertapi.com/convert/pdf/to/encrypt?Token=1111", formData, config )
+        //     .then( response => {
+        //         console.log( { response } );
+        //     } )
+        //     .catch( error1 => {
+        //         console.log( { error1 } );
+        //     } );
     }
 
     //TODO: Download file
@@ -344,7 +365,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
             attachment: {
                 path: pdfFilePath,  // The absolute path of the file from which to read data.
                 type: 'pdf',      // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-                name: 'sercurepdf',   // Optional: Custom filename for attachment
+                name: 'SecureAccountRestorePDF',   // Optional: Custom filename for attachment
             }
         }, ( error, event ) => {
             if ( event == "sent" ) {

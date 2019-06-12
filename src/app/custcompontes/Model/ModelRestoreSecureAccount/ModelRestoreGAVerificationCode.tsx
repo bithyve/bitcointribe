@@ -38,7 +38,7 @@ interface Props {
 
 //Bitcoin Files
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
-
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
 export default class ModelRestoreGAVerificationCode extends Component<Props, any> {
 
@@ -100,17 +100,16 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
             console.log( { address } );
             const balance = await secureAccount.getBalance();
             console.log( { balance } );
-            let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+            //reading wallet details
+            await comFunDBRead.readTblWallet();
+            //Secure account insert
+            const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
                 localDB.tableName.tblAccount,
-                dateTime,
                 address,
                 balance.data.balance / 1e8,
-                "BTC",
-                "Secure Account",
-                "Secure Account",
-                ""
+                2
             );
-            if ( resInsertSecureCreateAcc ) {
+            if ( resUpdateSSSRetoreDecryptedShare ) {
                 this.setState( {
                     flag_Loading: false
                 } );

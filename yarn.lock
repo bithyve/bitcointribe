@@ -934,7 +934,7 @@ abstract-leveldown@~0.12.1:
   dependencies:
     xtend "~3.0.0"
 
-ac-qrcode@^1.0.1:
+ac-qrcode@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/ac-qrcode/-/ac-qrcode-1.0.1.tgz#46978c21e809fe5f603eeb6f14a2b7511c8dcd90"
   integrity sha1-RpeMIegJ/l9gPutvFKK3URyNzZA=
