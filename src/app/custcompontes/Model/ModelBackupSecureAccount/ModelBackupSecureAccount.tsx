@@ -62,20 +62,22 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
         return { text: text, margins: [ 0, 0, 0, 8 ] };
     }
 
-    componentWillReceiveProps( nextProps: any ) {
-        let data = nextProps.data;
-        console.log( { data } );
-        if ( data[ 0 ].modalVisible == true ) {
-            this.readPropsValue( data[ 0 ].secureAccountDetails )
-            this.setState( {
-                data: data[ 0 ].secureAccountDetails
-            } )
-        }
+    componentWillReceiveProps = async ( nextProps: any ) => {
+        //this point use backgound task
+        setTimeout( () => {
+            let data = nextProps.data;
+            console.log( { data } );
+            if ( data[ 0 ].modalVisible == true ) {
+                this.readPropsValue( data[ 0 ].secureAccountDetails )
+                this.setState( {
+                    data: data[ 0 ].secureAccountDetails
+                } )
+            }
+        }, 100 );
     }
 
 
     readPropsValue = async ( data: any ) => {
-
         let resultWallet = await utils.getWalletDetails();
         console.log( { resultWallet } );
         let setupData = data.setupData;
@@ -138,7 +140,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
         docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
         // console.log( { docsDir } );
         var path = `${ docsDir }/secret2FA.png`;
-        await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + qrData, {
+        await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + qrData, {
         } )
             .then( ( res: any ) => {
                 let base64Str = res.base64()
@@ -207,7 +209,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
         } else {
             docsDir = await PDFLib.getDocumentsDirectory();
         }
-        const pdfPath = `${ docsDir }/sercurepdf.pdf`;
+        const pdfPath = `${ docsDir }/SecureAccountRestore.pdf`;
         console.log( { pdfPath } );
         docsDir = Platform.OS === 'android' ? `/${ docsDir }` : docsDir;
         console.log( { docsDir } );
@@ -226,42 +228,42 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
                 imgSecondaryXpub,
                 'png',
                 {
-                    x: 50,
-                    y: 310,
-                    width: 150,
-                    height: 150,
+                    x: 25,
+                    y: 270,
+                    width: 200,
+                    height: 200,
                     //source: 'assets'
                 }
             )
             .drawText( 'Scan the above QR Code using your HEXA', {
-                x: 25,
-                y: 295,
+                x: 30,
+                y: 260,
                 fontSize: 10
             } )
             .drawText( 'wallet in order to restore your Secure Account.', {
-                x: 25,
-                y: 283,
+                x: 30,
+                y: 248,
                 fontSize: 10
             } )
             .drawText( '2FA Secret:', {
                 x: 5,
-                y: 250,
+                y: 220,
                 fontSize: 18
             } )
             .drawImage(
                 img2FASecret,
                 'png',
                 {
-                    x: 50,
-                    y: 80,
-                    width: 150,
-                    height: 150,
+                    x: 25,
+                    y: 12,
+                    width: 200,
+                    height: 200,
                     // source: 'assets'
                 }
             )
             .drawText( secret2FA, {
                 x: 25,
-                y: 60,
+                y: 2,
                 fontSize: 10
             } )
         const page2 = PDFPage
