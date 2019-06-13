@@ -116,6 +116,8 @@ import RestoreSecureAccountScreen from "HexaWallet/src/screens/DrawerScreen/Rest
 
 
 
+//TODO: Health of the App
+import HealthOfTheAppScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/HealthOfTheAppScreen";
 
 
 
@@ -413,6 +415,19 @@ const SettingsStackNavigator = createStackNavigator(
     initialRouteName: "MnemonicShowScreen"
   } );
 
+//TODO: HealthOfTheScreen Stack Navigator
+const HealthOfTheAppStackNavigator = createStackNavigator(
+  {
+    HealthOfTheAppScreen: {
+      screen: HealthOfTheAppScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "HealthOfTheAppScreen"
+  } );
+
+
 //TODO: Backup Secure Account Stack Navigator
 
 const BackupSecureAccountWithPdfStackNavigator = createStackNavigator(
@@ -606,6 +621,11 @@ export const createRootNavigator = (
       //TODO: Settings   
       SettingsNavigator: {
         screen: SettingsStackNavigator,
+        navigationOptions: { header: null }
+      },
+      //TODO: HealthOfTheApp
+      HealthOfTheAppNavigator: {
+        screen: HealthOfTheAppStackNavigator,
         navigationOptions: { header: null }
       },
       //TODO: Backup Secure Account
