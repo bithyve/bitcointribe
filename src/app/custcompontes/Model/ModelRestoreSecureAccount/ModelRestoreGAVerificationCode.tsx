@@ -47,6 +47,8 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
         this.state = ( {
             otp: "",
             xPub: "",
+            prevScreenName: "",
+            prevData: [],
             passcodeStyle: [
                 {
                     activeColor: colors.black,
@@ -62,15 +64,16 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
 
     componentWillReceiveProps( nextProps: any ) {
         let data = nextProps.data;
-        console.log( { data } );
+        //console.log( { data } );
         if ( data.length != 0 ) {
             if ( data[ 0 ].modalVisible == true ) {
                 this.setState( {
-                    xPub: data[ 0 ].xPub
+                    xPub: data[ 0 ].xPub,
+                    prevScreenName: data[ 0 ].prevScreenName,
+                    prevData: data[ 0 ].prevData,
                 } )
             }
         }
-
     }
 
     //TODO: Otp enter after
@@ -92,6 +95,8 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
         const dateTime = Date.now();
         let code = this.state.otp;
         let xPub = this.state.xPub;
+        let prevScreenName = this.state.prevScreenName;
+        let prevData = this.state.prevData;
         let resultWallet = await utils.getWalletDetails();
         const secureAccount = new SecureAccount( resultWallet.mnemonic );
         let resImportSecureAccount = await secureAccount.importSecureAccount( code, xPub );
@@ -103,12 +108,24 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
             //reading wallet details
             await comFunDBRead.readTblWallet();
             //Secure account insert
-            const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
-                localDB.tableName.tblAccount,
-                address,
-                balance.data.balance / 1e8,
-                2
-            );
+            let resUpdateSSSRetoreDecryptedShare;
+            if ( prevScreenName != "WalletScreen" ) {
+                resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
+                    localDB.tableName.tblAccount,
+                    address,
+                    balance.data.balance / 1e8,
+                    2
+                );
+            } else {
+                // console.log( { prevData } );
+                resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
+                    localDB.tableName.tblAccount,
+                    address,
+                    balance.data.balance / 1e8,
+                    prevData.id
+                );
+
+            }
             if ( resUpdateSSSRetoreDecryptedShare ) {
                 this.setState( {
                     flag_Loading: false

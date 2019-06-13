@@ -318,7 +318,7 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
                                             }
                                         ]
                                     } )
-                                    this.props.navigation.push( "ResotreSecureAccountNavigator" );
+                                    this.props.navigation.push( "ResotreSecureAccountNavigator", { prevScreen: "RestoreWallet" } );
                                 } }
                             />
                         </KeyboardAwareScrollView>

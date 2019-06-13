@@ -244,7 +244,7 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
                                             }
                                         ]
                                     } )
-                                    this.props.navigation.push( "ResotreSecureAccountNavigator" )
+                                    this.props.navigation.push( "ResotreSecureAccountNavigator", { prevScreen: "RestoreWallet" } )
                                 } }
                             />
                             <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />

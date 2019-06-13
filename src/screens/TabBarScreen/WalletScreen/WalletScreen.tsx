@@ -79,8 +79,6 @@ const sliderWidth = viewportWidth;
 const itemWidth = slideWidth + itemHorizontalMargin * 2;
 const SLIDER_1_FIRST_ITEM = 0;
 
-
-
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
@@ -166,12 +164,9 @@ export default class WalletScreen extends React.Component {
     } );
   }
 
-
-
   componentWillUnmount() {
     this.willFocusSubscription.remove();
   }
-
 
   //TODO: func connnection_FetchData
   async connnection_FetchData() {
@@ -494,7 +489,13 @@ export default class WalletScreen extends React.Component {
                 <Text note>Secure Account is not backed up</Text>
               </View>
               <View style={ { flex: 2, alignItems: "flex-end", justifyContent: "center" } }>
-                <Button light style={ { borderRadius: 8, borderColor: "gray", borderWidth: 0.4, alignSelf: "flex-end" } } onPress={ () => this.props.navigation.push( "BackupSecureAccountWithPdfNavigator", { data: item } ) }>
+                <Button light style={ { borderRadius: 8, borderColor: "gray", borderWidth: 0.4, alignSelf: "flex-end" } } onPress={ () => {
+                  if ( item.secureBtnTitle == "Setup" ) {
+                    this.props.navigation.push( "BackupSecureAccountWithPdfNavigator", { data: item } )
+                  } else {
+                    this.props.navigation.push( "ResotreSecureAccountNavigator", { prevScreen: "WalletScreen", data: item } );
+                  }
+                } }>
                   <Text style={ { color: "#838383", fontSize: 14 } } >{ item.secureBtnTitle }</Text>
                 </Button>
               </View>
