@@ -378,6 +378,24 @@ const BackUpYourWalletSecoundTimeStackNavigatorRouter = createStackNavigator(
   }
 );
 
+const TrustedContactStackNavigator = createStackNavigator(
+  {
+    TrustedContactScreen: {
+      screen: TrustedContactScreen,
+      navigationOptions: { header: null }
+    },
+    ShareSecretViaQRScreen: {
+      screen: ShareSecretViaQRScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "TrustedContactScreen"
+  }
+);
+
+
+
 const BackupTrustedPartrySecretStoreStackNavigator = createStackNavigator(
   {
     SelectContactListAssociatePerson: {
@@ -626,6 +644,10 @@ export const createRootNavigator = (
       //TODO: HealthOfTheApp
       HealthOfTheAppNavigator: {
         screen: HealthOfTheAppStackNavigator,
+        navigationOptions: { header: null }
+      },
+      TrustedContactNavigator: {
+        screen: TrustedContactStackNavigator,
         navigationOptions: { header: null }
       },
       //TODO: Backup Secure Account
