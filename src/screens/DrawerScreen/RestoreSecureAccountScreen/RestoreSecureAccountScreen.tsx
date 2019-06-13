@@ -62,6 +62,8 @@ export default class RestoreSecureAccountScreen extends Component {
     constructor ( props: any ) {
         super( props );
         this.state = {
+            prevScreenName: "",
+            prevData: [],
             arr_ModelRestoreSecureAccount: [],
             arr_ModelQRCodeScanRestoreSecureAccount: [],
             arr_ModelRestoreGAVerificationCode: [],
@@ -70,10 +72,15 @@ export default class RestoreSecureAccountScreen extends Component {
     }
 
     componentWillMount() {
+        let data = this.props.navigation.getParam( "data" );
+        let screenName = this.props.navigation.getParam( "prevScreen" );
+        console.log( { data, screenName } );
         this.willFocusSubscription = this.props.navigation.addListener(
             "willFocus",
             () => {
                 this.setState( {
+                    prevScreenName: screenName,
+                    prevData: data,
                     arr_ModelRestoreSecureAccount: [
                         {
                             modalVisible: true,
@@ -130,6 +137,8 @@ export default class RestoreSecureAccountScreen extends Component {
                             />
                             <ModelQRCodeScanRestoreSecureAccount data={ this.state.arr_ModelQRCodeScanRestoreSecureAccount }
                                 click_Next={ ( xPub: string ) => {
+                                    let prevScreenName = this.state.prevScreenName;
+                                    let prevData = this.state.prevData;
                                     this.setState( {
                                         arr_ModelQRCodeScanRestoreSecureAccount: [
                                             {
@@ -138,7 +147,9 @@ export default class RestoreSecureAccountScreen extends Component {
                                         ],
                                         arr_ModelRestoreGAVerificationCode: [ {
                                             modalVisible: true,
-                                            xPub
+                                            xPub,
+                                            prevScreenName,
+                                            prevData
                                         } ]
                                     } );
                                 } }
@@ -162,7 +173,9 @@ export default class RestoreSecureAccountScreen extends Component {
                                     this.setState( {
                                         arr_ModelRestoreGAVerificationCode: [ {
                                             modalVisible: false,
-                                            xPub: ""
+                                            xPub: "",
+                                            prevScreenName: "",
+                                            prevData: []
                                         } ],
                                         arr_ModelSecureAccountSucessRestore: [
                                             {
@@ -190,6 +203,8 @@ export default class RestoreSecureAccountScreen extends Component {
 
                             <ModelSecureAccountSucessRestore data={ this.state.arr_ModelSecureAccountSucessRestore }
                                 click_Done={ () => {
+                                    let prevScreenName = this.state.prevScreenName;
+                                    console.log( { prevScreenName } );
                                     this.setState( {
                                         arr_ModelSecureAccountSucessRestore: [
                                             {
@@ -197,18 +212,23 @@ export default class RestoreSecureAccountScreen extends Component {
                                             }
                                         ]
                                     } )
-                                    const resetAction = StackActions.reset( {
-                                        index: 0, // <-- currect active route from actions array
-                                        key: null,
-                                        actions: [
-                                            NavigationActions.navigate( { routeName: "TabbarBottom" } )
-                                        ]
-                                    } );
-                                    AsyncStorage.setItem(
-                                        asyncStorageKeys.rootViewController,
-                                        "TabbarBottom"
-                                    );
-                                    this.props.navigation.dispatch( resetAction );
+
+                                    if ( prevScreenName != "WalletScreen" ) {
+                                        const resetAction = StackActions.reset( {
+                                            index: 0, // <-- currect active route from actions array
+                                            key: null,
+                                            actions: [
+                                                NavigationActions.navigate( { routeName: "TabbarBottom" } )
+                                            ]
+                                        } );
+                                        AsyncStorage.setItem(
+                                            asyncStorageKeys.rootViewController,
+                                            "TabbarBottom"
+                                        );
+                                        this.props.navigation.dispatch( resetAction );
+                                    } else {
+                                        this.props.navigation.navigate( "TabbarBottom" )
+                                    }
                                 } }
                             />
 

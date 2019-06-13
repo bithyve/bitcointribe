@@ -48,7 +48,8 @@ export default class ModelQRCodeScanRestoreSecureAccount extends Component<Props
     }
 
     componentWillReceiveProps = async ( nextProps: any ) => {
-        let resultWallet = await utils.getWalletDetails();
+        let resultWallet = await comFunDBRead.readTblWallet();
+        console.log( { mnumanic: resultWallet } );
         this.setState( {
             mnemonic: resultWallet.mnemonic
         } );
