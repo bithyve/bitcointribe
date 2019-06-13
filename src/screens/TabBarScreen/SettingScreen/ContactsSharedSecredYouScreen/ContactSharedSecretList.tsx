@@ -107,8 +107,8 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             let sharedDate = parseInt( resSharedSecretList[ i ].sharedDate );
             //  console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
             //console.log( 'sharedDate date =' + sharedDate.toString() + " and full date =" + fulldate.toString() );
-            var startDate = new Date( dateTime * 1000 );
-            var endDate = new Date( sharedDate * 1000 );
+            var startDate = new Date( dateTime );
+            var endDate = new Date( sharedDate );
             var diff = Math.abs( startDate.getTime() - endDate.getTime() );
             const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
             const seconds: any = Math.floor( diff / 1000 % 60 );

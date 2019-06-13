@@ -31,15 +31,14 @@ import { RkCard } from "react-native-ui-kitten";
 import DropdownAlert from "react-native-dropdownalert";
 import { SvgIcon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
-import Permissions from 'react-native-permissions'
+import Permissions from 'react-native-permissions';
 
 //Custome Compontes
 import ViewShieldIcons from "HexaWallet/src/app/custcompontes/View/ViewShieldIcons/ViewShieldIcons";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
 //TODO: Custome Models
-import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
-import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model/ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
+
 import ModelAcceptOrRejectSecret from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelAcceptOrRejectSecret";
 import ModelBackupShareAssociateContact from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelBackupShareAssociateContact";
 import ModelBackupAssociateOpenContactList from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelBackupAssociateOpenContactList";
@@ -103,8 +102,6 @@ export default class WalletScreen extends React.Component {
       //custome comp
       arr_CustShiledIcon: [],
       //Model    
-      arr_ModelBackupYourWallet: [],
-      arr_ModelFindYourTrustedContacts: [],
       arr_ModelBackupShareAssociateContact: [],
       arr_ModelBackupAssociateOpenContactList: [],
       arr_ModelAcceptOrRejectSecret: [],
@@ -647,23 +644,24 @@ export default class WalletScreen extends React.Component {
                 } }
               >
                 <ViewShieldIcons data={ this.state.arr_CustShiledIcon } click_Image={ () => {
-                  let resSSSDetails = utils.getSSSDetails();
-                  console.log( { resSSSDetails } );
-                  if ( resSSSDetails.length > 0 ) {
-                    if ( this.state.shiledIconPer == 0 ) {
-                      this.props.navigation.push( "WalletSetUpScreen" )
-                    } else {
-                      this.setState( {
-                        arr_ModelBackupYourWallet: [
-                          {
-                            modalVisible: true,
-                          }
-                        ]
-                      } )
-                    }
-                  } else {
-                    Alert.alert( "Working." );
-                  }
+                  // let resSSSDetails = utils.getSSSDetails();
+                  // console.log( { resSSSDetails } );
+                  // if ( resSSSDetails.length > 0 ) {
+                  //   if ( this.state.shiledIconPer == 0 ) {
+                  //     this.props.navigation.push( "WalletSetUpScreen" )
+                  //   } else {  
+                  //     this.setState( {
+                  //       arr_ModelBackupYourWallet: [
+                  //         {
+                  //           modalVisible: true,
+                  //         }
+                  //       ]
+                  //     } )
+                  //   }
+                  // } else {
+                  //   Alert.alert( "Working." );
+                  // }  
+                  this.props.navigation.push( "HealthOfTheAppNavigator" );
                 }
                 } />
               </Animated.View>
@@ -755,63 +753,7 @@ export default class WalletScreen extends React.Component {
             } );
           } }
         />
-        <ModelBackupYourWallet data={ this.state.arr_ModelBackupYourWallet }
-          click_UseOtherMethod={ () => alert( 'working' ) }
-          click_Confirm={ async () => {
-            await Permissions.request( 'contacts' ).then( ( response: any ) => {
-              console.log( response );
-            } );
-            this.setState( {
-              arr_ModelBackupYourWallet: [
-                {
-                  modalVisible: false
-                }
-              ],
-              arr_ModelFindYourTrustedContacts: [
-                {
-                  modalVisible: true
-                }
-              ]
-            } );
-          } }
-          closeModal={ () => {
-            this.setState( {
-              arr_ModelBackupYourWallet: [
-                {
-                  modalVisible: false
-                }
-              ]
-            } )
-          } }
-        />
-        <ModelFindYourTrustedContacts
-          data={ this.state.arr_ModelFindYourTrustedContacts }
-          click_Confirm={ () => {
-            AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
-            this.setState( {
-              arr_ModelFindYourTrustedContacts: [
-                {
-                  modalVisible: false
-                }
-              ]
-            } )
-            let resSSSDetails = utils.getSSSDetails();
-            if ( resSSSDetails[ 0 ].keeperInfo != "" ) {
-              this.props.navigation.push( "BackUpYourWalletSecoundTimeNavigator" );
-            } else {
-              this.props.navigation.push( "BackUpYourWalletNavigator" )
-            }
-          } }
-          closeModal={ () => {
-            this.setState( {
-              arr_ModelFindYourTrustedContacts: [
-                {
-                  modalVisible: false
-                }
-              ]
-            } )
-          } }
-        />
+
         <ModelBackupShareAssociateContact data={ this.state.arr_ModelBackupShareAssociateContact }
           click_AssociateContact={ ( walletName: string ) => {
             Permissions.request( 'contacts' ).then( ( response: any ) => {

@@ -175,7 +175,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                             <Button
                                 transparent
                                 onPress={ () => {
-                                    this.props.navigation.navigate( "TabbarBottom" );
+                                    this.props.navigation.navigate( "HealthOfTheAppNavigator" );
                                 } }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
