@@ -111,6 +111,9 @@ var images = {
   },
   backupSecretQuestion: {
     "icon": require( assetsImages + "backupSecretQuestions/icon_shieldred.png" ),
+  },
+  backupSecureTwoFactorAuto: {
+    "icon": require( assetsImages + "backupSecureTwoFactorAuto/icon_shieldyellow.png" ),
   }
 };
 

@@ -58,13 +58,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             ],
             arr_SecretQuestion: [],
             arr_QuestionAndAnswerDetails: [],
-            arr_2FactorAuto: [
-                {
-                    title: "Health of the App",
-                    subTitle: "Lorem ipsum dolor sit amet",
-                    icon: "shield"
-                }
-            ],
+            arr_2FactorAuto: [],
+            arr_SecureAccountDetials: [],
             arr_ModelBackupYourWallet: [],
             arr_ModelFindYourTrustedContacts: [],
             flag_isTrustedContacts: true,
@@ -75,8 +70,6 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             flag_Loading: true
         } )
     }
-
-
 
     async componentWillMount() {
         this.willFocusSubscription = this.props.navigation.addListener(
@@ -200,6 +193,15 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 icon: "shield"
             }
         ];
+        //Secure Two Factor Auto
+        let arr_2FactorAuto = [
+            {
+                title: "2 Factor Aunthentication",
+                subTitle: "Not backed up",
+                color: "#ff0000",
+                icon: "shield"
+            }
+        ];
         let setUpWalletAnswerDetails = JSON.parse( walletDetails.setUpWalletAnswerDetails );
         console.log( { setUpWalletAnswerDetails } );
         this.setState( {
@@ -207,6 +209,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             flag_isMnemonic,
             arr_TrustedContacts: temp,
             arr_SecretQuestion,
+            arr_2FactorAuto,
             arr_QuestionAndAnswerDetails: setUpWalletAnswerDetails[ 0 ],
             flag_Loading: false
         } )
@@ -233,6 +236,12 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 }
             ]
         } )
+    }
+
+
+    //TODO: Setup Two Factor 
+    click_TwoFactorSetup() {
+        this.props.navigation.push( "BackupSecureTwoFactorAutoScreen", { data: this.state.arr_QuestionAndAnswerDetails } );
     }
 
     render() {
@@ -508,7 +517,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                         scrollEnabled={ false }
                                         renderItem={ ( { item } ) => (
                                             <TouchableOpacity
-                                                onPress={ () => this.click_MenuItem( item ) }
+                                                onPress={ () => this.click_TwoFactorSetup() }
                                             >
                                                 <RkCard
                                                     rkType="shadowed"
@@ -539,7 +548,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                             >
                                                                 { item.title }
                                                             </Text>
-                                                            <Text note numberOfLines={ 1 } style={ { fontSize: 11 } }>{ item.subTitle }</Text>
+                                                            <Text note numberOfLines={ 1 } style={ { fontSize: 11, color: item.color } }>{ item.subTitle }</Text>
                                                         </View>
                                                         <View style={ { flex: 0.2, justifyContent: "center", alignItems: "flex-end" } }>
                                                             <SvgIcon
