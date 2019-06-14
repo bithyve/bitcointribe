@@ -56,13 +56,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                     icon: "shield"
                 }
             ],
-            arr_SecretQuestion: [
-                {
-                    title: "Health of the App",
-                    subTitle: "Lorem ipsum dolor sit amet",
-                    icon: "shield"
-                }
-            ],
+            arr_SecretQuestion: [],
+            arr_QuestionAndAnswerDetails: [],
             arr_2FactorAuto: [
                 {
                     title: "Health of the App",
@@ -102,7 +97,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         let walletDetails = await utils.getWalletDetails();
         let backupType = JSON.parse( walletDetails.appHealthStatus );
         let sssDetails = await utils.getSSSDetails();
-        // console.log( { walletDetails, sssDetails } );
+        console.log( { walletDetails, sssDetails } );
         let flag_isSetupTrustedContact, flag_isMnemonic;
         let encrShares = [];
         let history = [];
@@ -153,7 +148,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                     //console.warn( minutes.toString() )
                     const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
                     let mesData = data[ i ];
-                    console.log( { totalSec, mesData } );
+                    //  console.log( { totalSec, mesData } );
                     jsondata.totalSec = 540 - totalSec;
                     if ( totalSec < 540 && data[ i ].shareStage == "Ugly" ) {
                         jsondata.statusMsg = "Shared";
@@ -196,11 +191,23 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             flag_isMnemonic = false;
         }
 
-
+        //Secret Questions  
+        let arr_SecretQuestion = [
+            {
+                title: "First Secret Question",
+                subTitle: "Not backed up",
+                color: "#ff0000",
+                icon: "shield"
+            }
+        ];
+        let setUpWalletAnswerDetails = JSON.parse( walletDetails.setUpWalletAnswerDetails );
+        console.log( { setUpWalletAnswerDetails } );
         this.setState( {
             flag_isSetupTrustedContact,
             flag_isMnemonic,
             arr_TrustedContacts: temp,
+            arr_SecretQuestion,
+            arr_QuestionAndAnswerDetails: setUpWalletAnswerDetails[ 0 ],
             flag_Loading: false
         } )
     }
@@ -213,8 +220,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
     }
 
     //TODO: func click_FirstMenuItem
-    click_MenuItem( item: any ) {
-        console.log( { item } );
+    click_SecretQuestion( item: any ) {
+        this.props.navigation.push( "BackupSecretQuestionsScreen", { data: this.state.arr_QuestionAndAnswerDetails } );
     }
 
     //TODO: click_SetupTrustedContacts
@@ -441,7 +448,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                         scrollEnabled={ false }
                                         renderItem={ ( { item } ) => (
                                             <TouchableOpacity
-                                                onPress={ () => this.click_MenuItem( item ) }
+                                                onPress={ () => this.click_SecretQuestion( item ) }
                                             >
                                                 <RkCard
                                                     rkType="shadowed"
@@ -472,7 +479,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                             >
                                                                 { item.title }
                                                             </Text>
-                                                            <Text note numberOfLines={ 1 } style={ { fontSize: 11 } }>{ item.subTitle }</Text>
+                                                            <Text note numberOfLines={ 1 } style={ { fontSize: 11, color: item.color } }>{ item.subTitle }</Text>
                                                         </View>
                                                         <View style={ { flex: 0.2, justifyContent: "center", alignItems: "flex-end" } }>
                                                             <SvgIcon

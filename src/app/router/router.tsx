@@ -118,6 +118,7 @@ import RestoreSecureAccountScreen from "HexaWallet/src/screens/DrawerScreen/Rest
 
 //TODO: Health of the App
 import HealthOfTheAppScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/HealthOfTheAppScreen";
+import BackupSecretQuestionsScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/BackupSecretQuestionsScreen/BackupSecretQuestionsScreen";
 
 
 
@@ -438,6 +439,10 @@ const HealthOfTheAppStackNavigator = createStackNavigator(
   {
     HealthOfTheAppScreen: {
       screen: HealthOfTheAppScreen,
+      navigationOptions: { header: null }
+    },
+    BackupSecretQuestionsScreen: {
+      screen: BackupSecretQuestionsScreen,
       navigationOptions: { header: null }
     }
   },
