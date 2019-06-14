@@ -12,7 +12,7 @@ import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus"
 
 //TODO: func connection_AppHealthStatus (WalletScreen,TrustedContactScreen)
 const connection_AppHealthStatus = async ( qatime: number, satime: number, encrShares: any, mnemonic: any ) => {
-    console.log( { qatime, satime, encrShares, mnemonic } );
+    //console.log( { qatime, satime, encrShares, mnemonic } );
     const dateTime = Date.now();
     // const fulldate = Math.floor( dateTime / 1000 );
     const sss = new S3Service(
@@ -20,12 +20,12 @@ const connection_AppHealthStatus = async ( qatime: number, satime: number, encrS
     );
     var resCheckHealth = await sss.checkHealth( encrShares );
     resCheckHealth = resCheckHealth.lastUpdateds;
-    console.log( "Initializing HealthStatuss" )
+    //console.log( "Initializing HealthStatuss" )
     const healthStatus = new HealthStatus();
-    console.log( { qatime, satime, resCheckHealth } );
+    //console.log( { qatime, satime, resCheckHealth } );
 
     const res = await healthStatus.appHealthStatus( qatime, satime, resCheckHealth, 0, "share" );
-    console.log( { res } );
+    //console.log( { res } );
     await utils.setAppHealthStatus( res )
     //console.log( { res } );
     let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
@@ -105,7 +105,7 @@ const check_AppHealthStausUsingMnemonic = async ( qatime: number, satime: number
     const healthStatus = new HealthStatus();
     const res = await healthStatus.appHealthStatus( qatime, satime, shares, mnemonicTime, "mnemonic" );
     await utils.setAppHealthStatus( res )
-    console.log( { res } );
+    //console.log( { res } );
     let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
         localDB.tableName.tblWallet,
         res
