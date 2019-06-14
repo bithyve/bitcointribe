@@ -108,6 +108,9 @@ var images = {
   },
   retoreSeecureAccount: {
     "steps": require( assetsImages + "icon/RestoreSecureAccount.png" ),
+  },
+  backupSecretQuestion: {
+    "icon": require( assetsImages + "backupSecretQuestions/icon_shieldred.png" ),
   }
 };
 
