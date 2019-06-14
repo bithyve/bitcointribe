@@ -39,6 +39,7 @@ var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonApp
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
 
 export default class SecondSecretQuestion extends React.Component<any, any> {
@@ -97,7 +98,6 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
     //TODO: func click_Confirm
     click_Confirm = async () => {
         const dateTime = Date.now();
-        const fulldate = Math.floor( dateTime / 1000 );
         let data = this.state.data;
         // const regularAccount = new RegularAccount();
         // const resGetMnemonic = regularAccount.getMnemonic();
@@ -113,6 +113,24 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         const encryptedShares = sss.generateShares( answers );
         console.log( { encryptedShares } );
         const resInitializeHealthcheck = await sss.initializeHealthcheck( encryptedShares );
+        const regularAccount = new RegularAccount(
+            mnemonic
+        );
+        const secureAccount = new SecureAccount( mnemonic );
+        const resSetupSecureAccount = await secureAccount.setupSecureAccount();
+        // console.log( resSetupSecureAccount.data.setupData );
+        const secondaryMnemonic = await secureAccount.getRecoveryMnemonic();
+        let arr_SecureDetails = [];
+        let secureDetails = {};
+        secureDetails.setupData = resSetupSecureAccount.data.setupData;
+        secureDetails.secondaryXpub = resSetupSecureAccount.data.secondaryXpub;
+        secureDetails.secondaryMnemonic = secondaryMnemonic;
+        secureDetails.backupDate = dateTime;
+        secureDetails.title = "Setup";
+        secureDetails.addInfo = "";
+        arr_SecureDetails.push( secureDetails );
+        const getAddress = await regularAccount.getAddress();
+        //console.log( { getAddress } );
         console.log( { resInitializeHealthcheck } );
         if ( resInitializeHealthcheck.success ) {
             //console.log( { encryptedShares } );
@@ -123,15 +141,15 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                 transShare.push( sss.createTransferShare( share, walletName ) )
             }
             if ( shareIds != null ) {
-                await dbOpration.insertSSSShareAndShareId(
+                let resInsertSSSShare = await dbOpration.insertSSSShareAndShareId(
                     localDB.tableName.tblSSSDetails,
-                    fulldate,
+                    dateTime,
                     encryptedShares,
                     shareIds
                 );
-                await dbOpration.insertWallet(
+                let resInsertWallet = await dbOpration.insertWallet(
                     localDB.tableName.tblWallet,
-                    fulldate,
+                    dateTime,
                     mnemonic,
                     "",
                     "",
@@ -139,34 +157,50 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                     walletName,
                     ""
                 );
-                await comAppHealth.connection_AppHealthStatus( dateTime, 0, encryptedShares, mnemonic )
+                let resAppHealthStatus = await comAppHealth.connection_AppHealthStatus( dateTime, 0, encryptedShares, mnemonic )
                 // console.log( { resultSSSShareIdInserted } );
-                let jsonAnswerDetails = {};
-                jsonAnswerDetails.walletName = walletName;
-                jsonAnswerDetails.firstQuestion = firstQuestion;
-                jsonAnswerDetails.firstAnswer = firstAnswer;
-                jsonAnswerDetails.secoundQuestion = secoundQuestion;
-                jsonAnswerDetails.secoundAnser = secoundAnser;
-                // console.log( { jsonAnswerDetails } );
-                await dbOpration.updateWalletAnswerDetails(
+                var temp = [];
+                let data = {};
+                data.firstQuestion = firstQuestion;
+                data.firstAnswer = firstAnswer;
+                temp.push( data );
+                let data1 = {};
+                data1.secoundQuestion = secoundQuestion;
+                data1.secoundAnswer = secoundAnser;
+                temp.push( data1 );
+                let resUpdateWalletAns = await dbOpration.updateWalletAnswerDetails(
                     localDB.tableName.tblWallet,
-                    jsonAnswerDetails
+                    temp
                 );
-                // console.log( { mnemonic});
-                await dbOpration.insertCreateAccount(
+                //  console.log( { resUpdateWalletAns } );
+                let resInsertCreateAcc = await dbOpration.insertCreateAccount(
                     localDB.tableName.tblAccount,
-                    fulldate,
-                    "",
+                    dateTime,
+                    getAddress,
                     "0.0",
                     "BTC",
                     "Daily Wallet",
-                    "Daily Wallet",
+                    "Regular Account",
                     ""
                 );
-                this.setState( {
-                    flag_Loading: false
-                } )
-                this.props.prevScreen();
+                let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+                    localDB.tableName.tblAccount,
+                    dateTime,
+                    "",
+                    "0.0",
+                    "BTC",
+                    "Secure Account",
+                    "Secure Account",
+                    arr_SecureDetails
+                );
+                if ( resInsertSSSShare && resInsertWallet && resAppHealthStatus && resUpdateWalletAns && resInsertSecureCreateAcc && resInsertCreateAcc ) {
+                    this.setState( {
+                        flag_Loading: false
+                    } );
+                    this.props.prevScreen();
+                } else {
+                    Alert.alert( "Local db update issue!" )
+                }
             }
         } else {
             this.setState( {
