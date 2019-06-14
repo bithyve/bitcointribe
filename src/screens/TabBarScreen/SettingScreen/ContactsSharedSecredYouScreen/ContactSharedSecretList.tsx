@@ -18,6 +18,7 @@ import Modal from 'react-native-modalbox';
 import Permissions from 'react-native-permissions'
 import SendSMS from 'react-native-sms';
 var Mailer = require( 'NativeModules' ).RNMail;
+import TimerCountdown from "react-native-timer-countdown";
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
@@ -36,6 +37,9 @@ var utils = require( "HexaWallet/src/app/constants/Utils" );
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
+//TODO: Bitcoin Files
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+
 export default class ContactSharedSecretList extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props )
@@ -44,6 +48,10 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             arr_OrignalDetails: [],
             SelectedFakeContactList: [],
             arr_SelectedContact: [],
+            messageId: "",
+            otp: "",
+            qrCodeString: "",
+            walletName: "",
             flag_NextBtnDisable: true,
             flag_NextBtnDisable1: false,
             flag_Loading: false,
@@ -51,53 +59,133 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         } )
     }
 
-    async componentWillMount() {
+    async componentWillMount( flagModelOpen: boolean ) {
         var resSharedSecretList = await comFunDBRead.readTblTrustedPartySSSDetails();
         console.log( { resSharedSecretList } );
+        const dateTime = Date.now();
+        //const fulldate = Math.floor( dateTime / 1000 );
+        let history = [];
+        for ( let i = 0; i < resSharedSecretList.length; i++ ) {
+            if ( resSharedSecretList[ i ].history != "" ) {
+                history.push( JSON.parse( resSharedSecretList[ i ].history ) )
+            }
+            else {
+                history.push( [] )
+            }
+        }
+        console.log( { history } );
+        //for history get opt
+        let tempOpt = [];
+        for ( let i = 0; i < history.length; i++ ) {
+            let eachHistory = history[ i ];
+            let eachHistoryLength = eachHistory.length;
+            console.log( { eachHistoryLength } );
+            let otp = eachHistory[ eachHistoryLength - 1 ].otp;
+            tempOpt.push( otp )
+        }
+        console.log( { tempOpt } );
+
         let temp = [];
         for ( let i = 0; i < resSharedSecretList.length; i++ ) {
             let data = {};
-            let keeperInfo = JSON.parse( resSharedSecretList[ i ].keeperInfo );
-            console.log( { keeperInfo } );
+            var keeperInfo = {};
+            let decrShare = JSON.parse( resSharedSecretList[ i ].decrShare );
+            console.log( { decrShare } );
+            if ( resSharedSecretList[ i ].keeperInfo != "" ) {
+                keeperInfo = JSON.parse( resSharedSecretList[ i ].keeperInfo );
+            } else {
+                keeperInfo.givenName = decrShare.meta.tag;
+                keeperInfo.familyName = "";
+                keeperInfo.phoneNumbers = [];
+                keeperInfo.thumbnailPath = "";
+                keeperInfo.emailAddresses = [];
 
+            }
+            // console.log( { keeperInfo } );
             let urlScript = JSON.parse( resSharedSecretList[ i ].urlScript )
+            console.log( { urlScript } );
+            let sharedDate = parseInt( resSharedSecretList[ i ].sharedDate );
+            //  console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
+            //console.log( 'sharedDate date =' + sharedDate.toString() + " and full date =" + fulldate.toString() );
+            var startDate = new Date( dateTime );
+            var endDate = new Date( sharedDate );
+            var diff = Math.abs( startDate.getTime() - endDate.getTime() );
+            const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
+            const seconds: any = Math.floor( diff / 1000 % 60 );
+            const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
+            if ( totalSec < 540 ) {
+                data.totalSec = 540 - totalSec;
+                data.opt = tempOpt[ i ];
+            }
             data.walletName = urlScript.walletName;
             data.keeperInfo = keeperInfo;
-            data.name = keeperInfo.givenName + " " + keeperInfo.familyName;
-            data.mobileNo = keeperInfo.phoneNumbers[ 0 ].number;
+            data.name = keeperInfo.givenName != "" ? keeperInfo.givenName : "" + " " + keeperInfo.familyName != "" ? keeperInfo.familyName : "";
+            let number;
+            if ( keeperInfo.phoneNumbers.length != 0 ) {
+                number = keeperInfo.phoneNumbers[ 0 ].number;
+            } else {
+                number = "";
+            }
+            data.mobileNo = number;
+            data.history = resSharedSecretList[ i ].history;
+            data.sharedDate = resSharedSecretList[ i ].sharedDate;
+            data.metaData = resSharedSecretList[ i ].metaData;
+            data.id = resSharedSecretList[ i ].id;
+
             temp.push( data );
         }
         // console.log( { temp } );
         this.setState( {
             data: temp,
             arr_OrignalDetails: temp
-        } )
-
+        } );
         //TODO: DeepLinking open person contact detail
         let urlScript = utils.getDeepLinkingUrl();
         let urlType = utils.getDeepLinkingType();
+        let qrCodeString, walletNa;
         if ( urlType == "SSS Restore SMS/EMAIL" ) {
             let walletName = urlScript.wn;
             let jsonTemp = {}
             for ( let i = 0; i < temp.length; i++ ) {
                 if ( temp[ i ].walletName == walletName ) {
                     let data = temp[ i ];
-                    console.log( { data } );
+                    // console.log( { data } );
+                    if ( flagModelOpen != false ) {
+                        this.getMessageId( JSON.parse( data.metaData ) );
+                        this.refs.modal4.open();
+                    }
                     jsonTemp.thumbnailPath = data.keeperInfo.thumbnailPath;
                     jsonTemp.givenName = data.keeperInfo.givenName;
                     jsonTemp.familyName = data.keeperInfo.familyName;
-                    jsonTemp.phoneNumbers = data.keeperInfo.phoneNumbers[ 0 ].number;
-                    jsonTemp.emailAddresses = data.keeperInfo.emailAddresses[ 0 ].email;
-                    jsonTemp.qrCodeString = "Wallet";
+                    let mobileNo, emial;
+                    if ( data.keeperInfo.phoneNumbers.length != 0 ) {
+                        mobileNo = data.keeperInfo.phoneNumbers[ 0 ].number;
+                    }
+                    else if ( item.keeperInfo.emailAddresses.length != 0 ) {
+                        emial = item.keeperInfo.emailAddresses[ 0 ].email;
+                    } else {
+                        mobileNo = "";
+                        emial = "";
+                    }
+                    jsonTemp.phoneNumbers = mobileNo;
+                    jsonTemp.emailAddresses = emial;
+                    jsonTemp.history = data.history;
+                    jsonTemp.sharedDate = data.sharedDate;
+                    jsonTemp.metaData = data.metaData;
+                    jsonTemp.id = data.id;
+                    qrCodeString = data.metaData;
+                    walletNa = data.walletName;
                     break;
                 } else {
                     Alert.alert( "This Wallet Name recoard not found!" )
                 }
             }
             this.setState( {
-                arr_SelectedContact: jsonTemp
+                arr_SelectedContact: jsonTemp,
+                qrCodeString,
+                walletName: walletNa,
             } )
-            this.refs.modal4.open();
+
         }
     }
 
@@ -110,9 +198,65 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
     }
 
 
-    press = ( hey: any ) => {
-        console.log( { hey } );
 
+
+    press = ( item: any ) => {
+        // console.log( { item } );
+        let jsonTemp = {}
+        this.getMessageId( JSON.parse( item.metaData ) );
+        jsonTemp.thumbnailPath = item.keeperInfo.thumbnailPath;
+        jsonTemp.givenName = item.keeperInfo.givenName;
+        jsonTemp.familyName = item.keeperInfo.familyName;
+        let mobileNo, emial;
+        if ( item.keeperInfo.phoneNumbers.length != 0 ) {
+            mobileNo = item.keeperInfo.phoneNumbers[ 0 ].number;
+        }
+        else if ( item.keeperInfo.emailAddresses.length != 0 ) {
+            emial = item.keeperInfo.emailAddresses[ 0 ].email;
+        } else {
+            mobileNo = "";
+            emial = "";
+        }
+        jsonTemp.phoneNumbers = mobileNo;
+        jsonTemp.emailAddresses = emial;
+        jsonTemp.history = item.history;
+        jsonTemp.sharedDate = item.sharedDate;
+        jsonTemp.metaData = item.metaData;
+
+        jsonTemp.id = item.id;
+        jsonTemp.qrCodeString = "Wallet";
+        this.setState( {
+            arr_SelectedContact: jsonTemp,
+            qrCodeString: item.metaData,
+            walletName: item.walletName,
+        } )
+        this.refs.modal4.open();
+    }
+
+
+    //TODO: Generate Message Id
+    getMessageId = async ( metaData: any ) => {
+        this.setState( {
+            flag_Loading: true
+        } );
+        //    console.log( { metaData } );
+        let walletDetails = utils.getWalletDetails();
+        //      console.log( { walletDetails } );
+        const sss = new S3Service(
+            walletDetails.mnemonic
+        );
+        //        console.log( { sss } );
+        const { share, otp } = sss.createTransferShare( metaData );
+        //  console.log( { share, otp } );
+        const { messageId, success } = await sss.uploadShare( share );
+
+        if ( messageId != "" || messageId != null ) {
+            this.setState( {
+                messageId,
+                otp,
+                flag_Loading: false
+            } );
+        }
     }
 
     //TODO: Searching Contact List
@@ -124,7 +268,6 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                 const textData = text.toUpperCase();
                 return itemData.indexOf( textData ) > -1;
             } );
-
             this.setState( { data: newData } );
         } else {
             this.setState( {
@@ -133,18 +276,17 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         }
     };
 
-
     //TODO: Deeplinking 
     click_SentRequest( type: string, val: any ) {
         let script = {};
-        script.wn = "Wallet";
+        script.mi = this.state.messageId;
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );
         this.refs.modal4.close();
-        if ( type == "SMS" ) {
+        if ( type == "SMS" && this.state.messageId != "" ) {
             SendSMS.send( {
                 body: 'https://prime-sign-230407.appspot.com/sss/rta/' + encpScript,
-                recipients: [ val ],
+                recipients: [ val != "" ? val : "" ],
                 successTypes: [ 'sent', 'queued' ]
             }, ( completed, cancelled, error ) => {
                 if ( completed ) {
@@ -170,14 +312,13 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                     console.log( 'Some error occured' );
                 }
             } );
-        } else if ( type == "EMAIL" ) {
+        } else if ( type == "EMAIL" && this.state.messageId != "" ) {
             Mailer.mail( {
                 subject: 'Hexa Wallet SSS Restore',
-                recipients: [ val ],
+                recipients: [ val != "" ? val : "" ],
                 body: 'https://prime-sign-230407.appspot.com/sss/rta/' + encpScript,
                 isHTML: true,
             }, ( error, event ) => {
-                console.log( { event, error } );
                 if ( event == "sent" ) {
                     setTimeout( () => {
                         Alert.alert(
@@ -213,55 +354,48 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                         { cancelable: false }
                     )
                 }, 1000 );
-
             }
-        } else {
-            this.props.navigation.push( "QRCodeScreen", { data: "newmodelsize", onSelect: this.onSelect } );
+        } else if ( type == "QR" && this.state.messageId != "" ) {
+            this.props.navigation.push( "QRCodeScreen", { data: this.state.qrCodeString, walletName: this.state.walletName, onSelect: this.onSelect } );
             this.refs.modal4.close();
         }
-
     }
 
     //TODO: func backQrCodeScreen
     onSelect = ( data: any ) => {
-        Alert.alert(
-            'Success',
-            'Email Sent Completed.',
-            [
-                {
-                    text: 'OK', onPress: () => {
-                        this.reloadList( "QR" );
-                    }
-                },
-
-            ],
-            { cancelable: false }
-        )
+        this.reloadList( "QR" );
     };
+
 
     //TODO: Deep{ling sent then reload data
     reloadList = async ( type: string ) => {
         const dateTime = Date.now();
-        let selectedItem = this.state.arr_SSSDetails[ this.state.selectedIndex ];
-        //console.log( { selectedItem } );
+        // const fulldate = Math.floor( dateTime / 1000 );
+        let selectedItem = this.state.arr_SelectedContact;
+        // console.log( { selectedItem } );
         var temp = [];
-        temp = JSON.parse( selectedItem.history );
-        //console.log( { temp } );
+        if ( selectedItem.history != "" ) {
+            temp = JSON.parse( selectedItem.history );
+        }
+        //  console.log( { temp } );
         let jsondata = {};
+        if ( type != "QR" ) {
+            jsondata.otp = this.state.otp
+        }
         jsondata.title = "Secret Share using " + type.toLowerCase();;
         jsondata.date = utils.getUnixToDateFormat( dateTime );
         temp.push( jsondata );
+        // console.log( { temp } );
+        let resUpdateHistroyAndSharedDate = await dbOpration.updateHistroyAndSharedDate(
+            localDB.tableName.tblTrustedPartySSSDetails,
+            temp,
+            dateTime,
+            selectedItem.id
+        );
+        if ( resUpdateHistroyAndSharedDate ) {
+            this.componentWillMount( false );
 
-        // let resupdateSSSTransferMehtodDetails = await dbOpration.updateSSSTransferMehtodDetails(
-        //     localDB.tableName.tblTrustedPartySSSDetails,
-        //     type,
-        //     dateTime,
-        //     temp,
-        //     selectedItem.recordId
-        // )
-        // if ( resupdateSSSTransferMehtodDetails ) {
-        //     this.componentWillMount();
-        // }
+        }
     }
 
 
@@ -291,8 +425,30 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                             </View>
                             <View style={ { flexDirection: "column" } }>
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10 } ] }>{ item.name }</Text>
-                                <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.mobileNo }</Text>
+                                <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.mobileNo != "" ? item.mobileNo : "Not Number!" }</Text>
                                 <Text note style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.walletName }</Text>
+                                { renderIf( typeof item.opt !== "undefined" )(
+                                    <TimerCountdown
+                                        initialMilliseconds={ item.totalSec * 1000 }
+                                        onExpire={ () => this.componentWillMount( false ) }
+                                        formatMilliseconds={ ( milliseconds ) => {
+                                            const remainingSec = Math.round( milliseconds / 1000 );
+                                            const seconds = parseInt( ( remainingSec % 60 ).toString(), 10 );
+                                            const minutes = parseInt( ( ( remainingSec / 60 ) % 60 ).toString(), 10 );
+                                            const hours = parseInt( ( remainingSec / 3600 ).toString(), 10 );
+                                            const s = seconds < 10 ? '0' + seconds : seconds;
+                                            const m = minutes < 10 ? '0' + minutes : minutes;
+                                            let h = hours < 10 ? '0' + hours : hours;
+                                            h = h === '00' ? '' : h + ':';
+                                            return h + m + ':' + s;
+                                        } }
+                                        allowFontScaling={ true }
+                                        style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: "gray" } ] }
+                                    />
+                                ) }
+                                { renderIf( typeof item.opt !== "undefined" )(
+                                    <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: "gray" } ] }>OTP { " " }{ item.opt }</Text>
+                                ) }
                             </View>
                         </View>
                     </View>

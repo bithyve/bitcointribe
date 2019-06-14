@@ -124,7 +124,7 @@ export default class PasscodeScreen extends Component {
     // console.log( { rootViewController } );
     let pageName = utils.getRootViewController();
     let walletDetails = await comFunDBRead.readTblWallet();
-    if ( pageName != "TrustedPartyShareSecretNavigator" ) {
+    if ( pageName != "TrustedPartyShareSecretNavigator" && pageName != "OTPScreenNavigator" ) {
       const resetAction = StackActions.reset( {
         index: 0, // <-- currect active route from actions array
         key: null,
@@ -240,6 +240,7 @@ export default class PasscodeScreen extends Component {
               onFulfill={ ( isValid, code ) =>
                 this._onFinishCheckingCode( isValid, code )
               }
+              type='withoutcharacters'
             />
             { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
               <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>

@@ -52,8 +52,16 @@ export default class QRCodeScreen extends React.Component<any, any> {
 
     async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
+        let walletName = this.props.navigation.getParam( "walletName" );
+        let mobileNo = this.props.navigation.getParam( "mobileNo" );
+        let qrCodeData = {};
+        qrCodeData.type = "SSS Restore";
+        qrCodeData.wn = walletName;
+        // qrCodeData.mo = mobileNo;
+        qrCodeData.data = data.toString();
+        console.log( { qrCodeData } );
         this.setState( {
-            data: JSON.stringify( data ).toString()
+            data: JSON.stringify( qrCodeData ).toString()
         } )
     }
 

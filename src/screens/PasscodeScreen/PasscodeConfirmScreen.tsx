@@ -117,8 +117,6 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
 
   saveData = async () => {
     try {
-      const dateTime = Date.now();
-      const fulldate = Math.floor( dateTime / 1000 );
       let code = this.state.pincode;
       let commonData = Singleton.getInstance();
       commonData.setPasscode( code );
@@ -195,6 +193,7 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
                 backgroundColor: "#F1F1F1"
               } }
               onFulfill={ code => this.onCheckPincode( code ) }
+              type='withoutcharacters'
             />
           </View>
           <View style={ styles.viewSecoundPasscode }>
@@ -228,6 +227,7 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
               onFulfill={ ( isValid, code ) =>
                 this._onFinishCheckingCode2( isValid, code )
               }
+              type='withoutcharacters'
             />
             { renderIf( this.state.passcodeSecoundStyle[ 0 ].activeColor == "red" )(
               <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>

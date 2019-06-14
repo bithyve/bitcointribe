@@ -1,5 +1,8 @@
-rootProject.name = 'HexaWallet'
-    
+rootProject.name = 'HexaWallet'  
+include ':react-native-fetch-blob'    
+project(':react-native-fetch-blob').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-fetch-blob/android')
+include ':react-native-pdf-lib'  
+project(':react-native-pdf-lib').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-pdf-lib/android')
 include ':react-native-mail'
 project(':react-native-mail').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-mail/android')
 include ':react-native-sms'
@@ -52,5 +55,5 @@ include ':react-native-camera'
 project(':react-native-camera').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-camera/android')
 include ':react-native-sqlite-storage'
 project(':react-native-sqlite-storage').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sqlite-storage/src/android')
-include ':app'      
+include ':app'         
   

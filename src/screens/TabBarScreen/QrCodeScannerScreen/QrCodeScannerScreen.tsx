@@ -32,7 +32,7 @@ import {
 } from "native-base";
 //import BarcodeScanner from "react-native-barcode-scanners";
 import { QRScannerView } from 'ac-qrcode';
-
+import Permissions from 'react-native-permissions'
 
 
 //TODO: Custome StyleSheet Files       
@@ -61,24 +61,13 @@ export default class QrCodeScannerScreen extends React.Component {
         };
     }
 
-    componentWillMount() {
-        try {
-            AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
-        } catch ( err ) {
-            console.warn( err );
-        }
+    componentDidMount() {
+        Permissions.request( 'camera' ).then( ( response: any ) => {
+            if ( response == "authorized" ) {
+                this.render();
+            }
+        } );
     }
-
-    //TODO: Page life Cycle
-    async componentWillUnmount() {
-        try {
-            AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
-        } catch ( error ) {
-            console.log( error );
-        }
-    }
-
-
 
     _renderTitleBar() {
         return (

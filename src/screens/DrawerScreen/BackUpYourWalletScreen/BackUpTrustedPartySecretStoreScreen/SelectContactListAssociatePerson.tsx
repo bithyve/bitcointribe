@@ -78,18 +78,36 @@ export default class SelectContactListAssociatePerson extends React.Component<an
     }
 
     press = ( item: any ) => {
-        let name = item.givenName + " " + item.familyName;
-        let urlScript = utils.getDeepLinkingUrl();
+        // console.log( { item } );  
+        let givenName = item.givenName != "" ? item.givenName : "";
+        let familyName = item.familyName != "" ? item.familyName : ""
+        let name = givenName + " " + familyName;
+        //console.log( { name } );
         this.setState( {
             arr_SelectedItem: item,
-            arr_ModelAcceptOrRejectSecret: [
+        } );
+        let urlType = utils.getDeepLinkingType();
+        Alert.alert(
+            'Are you sure?',
+            name + ' this contact associate  ?',
+            [
                 {
-                    modalVisible: true,
-                    name,
-                    walletName: urlScript.wn,
-                }
-            ]
-        } )
+                    text: 'Cancel',
+                    onPress: () => console.log( 'Cancel Pressed' ),
+                    style: 'cancel',
+                },
+                {
+                    text: 'Confirm', onPress: () => {
+                        if ( urlType == "SSS Recovery SMS/EMAIL" ) {
+                            this.props.navigation.push( "TrustedContactAcceptOtpScreen", { data: this.state.arr_SelectedItem } )
+                        } else {
+                            this.downloadDescShare();
+                        }
+                    }
+                },
+            ],
+            { cancelable: false },
+        );
     }
 
     //TODO: Qrcode Scan SSS Details Download Desc Sahre
@@ -105,13 +123,12 @@ export default class SelectContactListAssociatePerson extends React.Component<an
         let keeperInfo = this.state.arr_SelectedItem;
         let urlScript = {};
         urlScript.walletName = urlScriptDetails.wn;
-        // console.log( { userDetail } );
         let walletDetails = utils.getWalletDetails();
         const sss = new S3Service(
             walletDetails.mnemonic
         );
         let resShareId = await sss.getShareId( urlScriptData.encryptedShare )
-        //console.log( { resShareId } );
+        console.log( { resShareId } );
         const { data, updated } = await sss.updateHealth( urlScriptData.meta.walletId, urlScriptData.encryptedShare );
         if ( updated ) {
             const resTrustedParty = await dbOpration.insertTrustedPartyDetails(
@@ -263,38 +280,7 @@ export default class SelectContactListAssociatePerson extends React.Component<an
                                 />
                             </View>
                         </KeyboardAwareScrollView>
-                        <ModelAcceptOrRejectSecret
-                            data={ this.state.arr_ModelAcceptOrRejectSecret }
-                            closeModal={ () => {
-                                this.setState( {
-                                    arr_ModelAcceptOrRejectSecret: [
-                                        {
-                                            modalVisible: false,
-                                            name: "",
-                                            walletName: ""
-                                        }
-                                    ]
-                                } )
-                            } }
-                            click_AcceptSecret={ () => {
-                                let urlType = utils.getDeepLinkingType();
-                                this.setState( {
-                                    arr_ModelAcceptOrRejectSecret: [
-                                        {
-                                            modalVisible: false,
-                                            name: "",
-                                            mobileNo: "",
-                                            encpShare: ""
-                                        }
-                                    ]
-                                } );
-                                if ( urlType == "SSS Recovery SMS/EMAIL" ) {
-                                    this.props.navigation.push( "TrustedContactAcceptOtpScreen", { data: this.state.arr_SelectedItem } )
-                                } else {
-                                    this.downloadDescShare();
-                                }
-                            } }
-                        />
+
                     </ImageBackground>
                 </SafeAreaView>
                 <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message="Loading" />

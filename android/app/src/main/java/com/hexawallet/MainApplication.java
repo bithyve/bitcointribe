@@ -3,6 +3,8 @@ package com.hexawallet;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.hopding.pdflib.PDFLibPackage;
+import com.RNFetchBlob.RNFetchBlobPackage;
 import com.chirag.RNMail.RNMail;
 import com.tkporter.sendsms.SendSMSPackage;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
@@ -49,13 +51,14 @@ public class MainApplication extends Application implements ReactApplication {
 
     @Override
     protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(new SQLitePluginPackage(), new MainReactPackage(), new RNMail(),
-          SendSMSPackage.getInstance(), new ReactNativeContacts(), new RNCWebViewPackage(), new RNViewShotPackage(),
-          new VectorIconsPackage(), new UdpSocketsModule(), new TcpSocketsModule(), new SvgPackage(),
-          new SplashScreenReactPackage(), new RNSpinkitPackage(), new RNSharePackage(), new RandomBytesPackage(),
-          new RNOSModule(), new LinearGradientPackage(), new QRScanReaderPackage(), new KeychainPackage(),
-          new RNInAppBrowserPackage(), new ImagePickerPackage(), new RNI18nPackage(), new RNGestureHandlerPackage(),
-          new RNFSPackage(), new RNDeviceInfo(), new ReactNativeConfigPackage(), new RNCameraPackage());
+      return Arrays.<ReactPackage>asList(new SQLitePluginPackage(), new MainReactPackage(), new PDFLibPackage(),
+          new RNFetchBlobPackage(), new RNMail(), SendSMSPackage.getInstance(), new ReactNativeContacts(),
+          new RNCWebViewPackage(), new RNViewShotPackage(), new VectorIconsPackage(), new UdpSocketsModule(),
+          new TcpSocketsModule(), new SvgPackage(), new SplashScreenReactPackage(), new RNSpinkitPackage(),
+          new RNSharePackage(), new RandomBytesPackage(), new RNOSModule(), new LinearGradientPackage(),
+          new QRScanReaderPackage(), new KeychainPackage(), new RNInAppBrowserPackage(), new ImagePickerPackage(),
+          new RNI18nPackage(), new RNGestureHandlerPackage(), new RNFSPackage(), new RNDeviceInfo(),
+          new ReactNativeConfigPackage(), new RNCameraPackage());
     }
 
     @Override
@@ -74,5 +77,5 @@ public class MainApplication extends Application implements ReactApplication {
     super.onCreate();
     Fabric.with(this, new Crashlytics());
     SoLoader.init(this, /* native exopackage */ false);
-  }  
+  }
 }

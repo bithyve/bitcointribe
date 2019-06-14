@@ -50,6 +50,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
         this.state = ( {
             data: [],
             arr_ContactList: [],
+            filterValue: "",
             SelectedFakeContactList: [],
             flag_NextBtnDisable: true,
             flag_NextBtnDisable1: false,
@@ -92,14 +93,19 @@ export default class AllContactListScreen extends React.Component<any, any> {
         this.setState( { data: this.state.data } )
         if ( seletedLength == 3 ) {
             this.setState( {
-                flag_NextBtnDisable: false
+                flag_NextBtnDisable: false,
+                filterValue: "",
+                data: this.state.arr_ContactList
             } )
         } else {
             this.setState( {
-                flag_NextBtnDisable: true
+                flag_NextBtnDisable: true,
+                filterValue: "",
+                data: this.state.arr_ContactList
             } )
         }
     }
+
     //TODO: Searching Contact List
     searchFilterFunction = ( text: string ) => {
         if ( text.length > 0 ) {
@@ -109,7 +115,6 @@ export default class AllContactListScreen extends React.Component<any, any> {
                 const textData = text.toUpperCase();
                 return itemData.indexOf( textData ) > -1;
             } );
-
             this.setState( { data: newData } );
         } else {
             this.setState( {
@@ -194,10 +199,18 @@ export default class AllContactListScreen extends React.Component<any, any> {
                                     <Item style={ { borderColor: 'transparent', marginLeft: 10 } }>
                                         <Icon name="ios-search" color="#B7B7B7" />
                                         <Input placeholder="Enter a name to begin search"
+                                            value={ this.state.filterValue }
                                             style={ [ globalStyle.ffFiraSansMedium ] }
                                             placeholderTextColor="#B7B7B7"
-                                            onChangeText={ text => this.searchFilterFunction( text ) }
-                                            autoCorrect={ false } />
+                                            onChangeText={ text => {
+                                                this.setState( {
+                                                    filterValue: text
+                                                } );
+                                                this.searchFilterFunction( text )
+                                            } }
+                                            autoCorrect={ false }
+                                            returnKeyType="done"
+                                        />
                                     </Item>
                                 </View>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20 } ] }>Select three of your trusted contacts, make sure you can always reach this people to recover your wallet</Text>
@@ -221,7 +234,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
                                                     </TouchableOpacity>
                                                 </View>
                                             </View>
-                                            <Text>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                            <Text numberOfLines={ 1 }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                         </View>
                                     ) }
                                     itemDimension={ Dimensions.get( 'screen' ).width / 4.0 }

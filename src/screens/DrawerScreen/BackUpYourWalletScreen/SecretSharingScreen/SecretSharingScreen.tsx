@@ -23,7 +23,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Contacts from 'react-native-contacts';
 import { Avatar, SearchBar } from 'react-native-elements';
 import TimerCountdown from "react-native-timer-countdown";
-import moment from "moment";
+
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -65,9 +65,6 @@ export default class SecretSharingScreen extends React.Component<any, any> {
         );
     }
 
-
-
-
     componentWillUnmount() {
         this.willFocusSubscription.remove();
     }
@@ -90,8 +87,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
             let otp = eachHistory[ eachHistoryLength - 1 ].otp;
             tempOpt.push( otp )
         }
-
-
+        console.log( parseInt( resultWallet.lastUpdated ) );
         let updateShareIdStatus = await comAppHealth.connection_AppHealthStatus( parseInt( resultWallet.lastUpdated ), 0, encrShares, resultWallet.mnemonic );
         console.log( { updateShareIdStatus } );
         if ( updateShareIdStatus ) {
@@ -101,16 +97,14 @@ export default class SecretSharingScreen extends React.Component<any, any> {
             data = data.temp;
             console.log( { data } );
             const dateTime = Date.now();
-            const fulldate = Math.floor( dateTime / 1000 );
+            //const fulldate = Math.floor( dateTime / 1000 );
             let temp = [];
             for ( let i = 0; i < data.length; i++ ) {
                 let jsondata = JSON.parse( data[ i ].keeperInfo );
                 jsondata.history = JSON.parse( data[ i ].history );
                 let sharedDate = parseInt( data[ i ].sharedDate );
                 // console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
-                // var startDate = new Date( utils.getUnixToDateFormat( fulldate ) );
-                // var endDate = new Date( utils.getUnixToDateFormat( sharedDate ) );
-                var startDate = new Date( fulldate * 1000 );
+                var startDate = new Date( dateTime * 1000 );
                 var endDate = new Date( sharedDate * 1000 );
                 //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
                 var diff = Math.abs( startDate.getTime() - endDate.getTime() );
@@ -151,7 +145,9 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                 }
                 temp.push( jsondata )
             }
+
             console.log( { data, temp } );
+
             this.setState( {
                 data: temp
             } );
@@ -179,7 +175,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                             <Button
                                 transparent
                                 onPress={ () => {
-                                    this.props.navigation.navigate( "TabbarBottom" );
+                                    this.props.navigation.navigate( "HealthOfTheAppNavigator" );
                                 } }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
@@ -213,7 +209,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                                                     <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                     <View style={ { flexDirection: "row" } }>
                                                         <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
-                                                        { renderIf( item.flag_timer )(
+                                                        { renderIf( typeof item.opt !== "undefined" )(
                                                             <TimerCountdown
                                                                 initialMilliseconds={ item.totalSec * 1000 }
                                                                 onExpire={ () => this.connection_Load() }
