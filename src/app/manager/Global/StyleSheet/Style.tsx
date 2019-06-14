@@ -28,5 +28,8 @@ export default StyleSheet.create( {
     ffOpenSansRegular: {
         fontFamily: "OpenSans-Regular"
     },
+    ffOpenSansExtraBold: {
+        fontFamily: "OpenSans-ExtraBold"
+    }
 
 } );

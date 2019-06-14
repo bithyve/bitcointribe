@@ -142,6 +142,8 @@ export default class TrustedContactScreen extends React.Component<any, any> {
     componentWillUnmount() {
         AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
     }
+
+
     //TODO: click on model confirm button 
     click_SentURLSmsOrEmail( item: any ) {
         AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
@@ -185,7 +187,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             this.connection_UpdateSSSDetails( "EMAIL" );
             if ( Platform.OS == "android" ) {
                 Mailer.mail( {
-                    subject: 'Hexa Wallet SSS Recovery ID',
+                    subject: 'Hexa Wallet SSS Recovery',
                     recipients: [ item.value ],
                     body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
                     isHTML: true,
@@ -232,16 +234,17 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         }
     }
 
+
+
     //TODO: func backQrCodeScreen
     onSelect = ( data: any ) => {
         this.connection_UpdateSSSDetails( "QR" );
     };
 
-
     //TODO: func SSS Details table update data 
     connection_UpdateSSSDetails = async ( type: string ) => {
         const dateTime = Date.now();
-        const fulldate = Math.floor( dateTime / 1000 );
+        //const fulldate = Math.floor( dateTime / 1000 );
         let history = this.state.arr_History;
         let state_data = this.state.data;
         state_data.statusMsgColor = "#C07710";
@@ -252,13 +255,13 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             jsondata.otp = this.state.otpCode
         }
         jsondata.title = "Secret Share using " + type.toLowerCase();;
-        jsondata.date = utils.getUnixToDateFormat( fulldate );
+        jsondata.date = utils.getUnixToDateFormat( dateTime );
         temp.push( jsondata );
         let data = this.props.navigation.getParam( "data" );
         let resupdateSSSTransferMehtodDetails = await dbOpration.updateSSSTransferMehtodDetails(
             localDB.tableName.tblSSSDetails,
             type,
-            fulldate,
+            dateTime,
             temp,
             data.recordID
         )

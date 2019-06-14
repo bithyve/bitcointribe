@@ -81,11 +81,7 @@ export default class TrustedContactAcceptOtpScreen extends Component {
         let script = utils.getDeepLinkingUrl();
         let messageId = script.mi;
         console.log( { messageId } );
-        let walletDetails = utils.getWalletDetails();
-        const sss = new S3Service(
-            walletDetails.mnemonic
-        );
-        const resDownShare = await sss.downloadShare( messageId );
+        const resDownShare = await S3Service.downloadShare( messageId );
         console.log( { resDownShare } );
         this.setState( {
             arr_ResDownShare: resDownShare,
@@ -122,7 +118,7 @@ export default class TrustedContactAcceptOtpScreen extends Component {
         urlScript.walletName = script.wn;
         let resDownShare = this.state.arr_ResDownShare;
         //console.log( { resDownShare } );
-        const resDecryptOTPEncShare = await sss.decryptOTPEncShare( resDownShare, messageId, enterOtp )
+        const resDecryptOTPEncShare = await S3Service.decryptOTPEncShare( resDownShare, messageId, enterOtp )
         //console.log( { resDecryptOTPEncShare } );
         let resShareId = await sss.getShareId( resDecryptOTPEncShare.decryptedShare.encryptedShare )
         //console.log( { resShareId } );
@@ -220,10 +216,8 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                                 Enter OTP
                         </Text>
                             <CodeInput
-                                ref="codeInputRef1"
                                 secureTextEntry
-                                keyboardType="default"
-                                autoCapitalize="sentences"
+                                keyboardType="name-phone-pad"
                                 codeLength={ 6 }
                                 activeColor={ this.state.passcodeStyle[ 0 ].activeColor }
                                 inactiveColor={ this.state.passcodeStyle[ 0 ].inactiveColor }
@@ -242,6 +236,7 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                                 onFulfill={ ( code ) =>
                                     this._onFinishCheckingCode( code )
                                 }
+                                type='characters'
                             />
                             { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
                                 <Text style={ { color: "red", marginTop: 44 } }>{ this.state.success }</Text>

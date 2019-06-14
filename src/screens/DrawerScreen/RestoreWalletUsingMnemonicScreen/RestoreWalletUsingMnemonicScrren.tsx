@@ -56,6 +56,7 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus"
+import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
 export default class RestoreWalletUsingMnemonicScrren extends Component {
     constructor ( props: any ) {
@@ -82,11 +83,11 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
     //TODO: func click_getWalletDetails
     getWalletDetails = async ( mnemonic: string, bal: any ) => {
         const dateTime = Date.now();
-        const fulldate = Math.floor( dateTime / 1000 );
+        // const fulldate = Math.floor( dateTime / 1000 );
         let walletName = this.state.wallerName;
         await dbOpration.insertWallet(
             localDB.tableName.tblWallet,
-            fulldate,
+            dateTime,
             mnemonic,
             "",
             "",
@@ -94,11 +95,15 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
             walletName,
             ""
         );
+
+        const secureAccount = new SecureAccount( mnemonic );
+        const resSetupSecureAccount = await secureAccount.setupSecureAccount();
+
         const res = await comAppHealth.check_AppHealthStausUsingMnemonic( 0, 0, null, dateTime, "mnemonic" );
         if ( res ) {
             await dbOpration.insertCreateAccount(
                 localDB.tableName.tblAccount,
-                fulldate,
+                dateTime,
                 "",
                 bal,
                 "BTC",
@@ -106,12 +111,34 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
                 "Daily Wallet",
                 ""
             );
+            const secondaryMnemonic = await secureAccount.getRecoveryMnemonic();
+            let arr_SecureDetails = [];
+            let secureDetails = {};
+            secureDetails.setupData = resSetupSecureAccount.data.setupData;
+            secureDetails.secondaryXpub = resSetupSecureAccount.data.secondaryXpub;
+            secureDetails.secondaryMnemonic = secondaryMnemonic;
+            secureDetails.backupDate = dateTime;
+            secureDetails.title = "Active Now";
+            secureDetails.addInfo = "";
+            arr_SecureDetails.push( secureDetails );
+            await dbOpration.insertCreateAccount(
+                localDB.tableName.tblAccount,
+                dateTime,
+                "",
+                "0.0",
+                "BTC",
+                "Secure Account",
+                "Secure Account",
+                arr_SecureDetails
+            );
+            AsyncStorage.setItem(
+                asyncStorageKeys.rootViewController,
+                "TabbarBottom"
+            );
         } else {
             Alert.alert( "App health staus not updated." )
         }
     }
-
-
 
     //TODO: Sucess Model
     click_Skip() {
@@ -122,10 +149,6 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
                 NavigationActions.navigate( { routeName: "TabbarBottom" } )
             ]
         } );
-        AsyncStorage.setItem(
-            asyncStorageKeys.rootViewController,
-            "TabbarBottom"
-        );
         this.props.navigation.dispatch( resetAction );
     }
 
@@ -184,7 +207,8 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
                                     arr_ModelRestoreSucess: [
                                         {
                                             modalVisible: true,
-                                            bal: bal
+                                            walletName: this.state.wallerName,
+                                            bal: bal.toString()
                                         }
                                     ]
                                 } )
@@ -212,7 +236,16 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
                                 this.click_Skip()
                             }
                             }
-                                click_RestoreSecureAccount={ () => Alert.alert( 'Working' ) }
+                                click_RestoreSecureAccount={ () => {
+                                    this.setState( {
+                                        arr_ModelRestoreSucess: [
+                                            {
+                                                modalVisible: false
+                                            }
+                                        ]
+                                    } )
+                                    this.props.navigation.push( "ResotreSecureAccountNavigator", { prevScreen: "RestoreWallet" } )
+                                } }
                             />
                             <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
                         </KeyboardAwareScrollView>

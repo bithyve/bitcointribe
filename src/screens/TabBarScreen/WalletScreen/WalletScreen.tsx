@@ -8,7 +8,9 @@ import {
   ScrollView,
   Animated,
   AsyncStorage,
-  Alert
+  Alert,
+  Image,
+  RefreshControl
 } from "react-native";
 import {
   Container,
@@ -21,22 +23,23 @@ import {
   Body,
   Text,
   List,
-  ListItem
+  ListItem,
+  Icon,
+  Fab
 } from "native-base";
 import { RkCard } from "react-native-ui-kitten";
 import DropdownAlert from "react-native-dropdownalert";
 import { SvgIcon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
-import Permissions from 'react-native-permissions'
+import Permissions from 'react-native-permissions';
 
 //Custome Compontes
 import ViewShieldIcons from "HexaWallet/src/app/custcompontes/View/ViewShieldIcons/ViewShieldIcons";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
 //TODO: Custome Models
-import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
-import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model/ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
 
+import ModelAcceptOrRejectSecret from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelAcceptOrRejectSecret";
 import ModelBackupShareAssociateContact from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelBackupShareAssociateContact";
 import ModelBackupAssociateOpenContactList from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelBackupAssociateOpenContactList";
 
@@ -75,12 +78,12 @@ const sliderWidth = viewportWidth;
 const itemWidth = slideWidth + itemHorizontalMargin * 2;
 const SLIDER_1_FIRST_ITEM = 0;
 
-
-
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
-
+//TODO: Bitcoin files
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 
 export default class WalletScreen extends React.Component {
   constructor ( props: any ) {
@@ -92,20 +95,20 @@ export default class WalletScreen extends React.Component {
       flag_cardScrolling: false,
       flag_Loading: false,
       walletDetails: [],
+      refreshing: false,
       //Shiled Icons
       shiledIconPer: 1,
       scrollY: new Animated.Value( 0 ),
       //custome comp
       arr_CustShiledIcon: [],
-      //Model 
-      arr_ModelBackupYourWallet: [],
-      arr_ModelFindYourTrustedContacts: [],
+      //Model    
       arr_ModelBackupShareAssociateContact: [],
       arr_ModelBackupAssociateOpenContactList: [],
       arr_ModelAcceptOrRejectSecret: [],
-      //DeepLinking Param
+      //DeepLinking Param   
       deepLinkingUrl: "",
-      deepLinkingUrlType: ""
+      deepLinkingUrlType: "",
+      flag_FabActive: false
     };
     isNetwork = utils.getNetwork();
   }
@@ -158,30 +161,47 @@ export default class WalletScreen extends React.Component {
     } );
   }
 
-  componentDidMount() {
-    Permissions.request( 'camera' ).then( ( response: any ) => {
-      console.log( response );
-    } );
-  }
-
   componentWillUnmount() {
     this.willFocusSubscription.remove();
   }
-
 
   //TODO: func connnection_FetchData
   async connnection_FetchData() {
     var resultWallet = await comFunDBRead.readTblWallet();
     var resAccount = await comFunDBRead.readTblAccount();
+    console.log( { resAccount } );
+    await comFunDBRead.readTblSSSDetails();
+    let temp = [];
+    for ( let i = 0; i < resAccount.length; i++ ) {
+      let dataAccount = resAccount[ i ];
+      let additionalInfo = JSON.parse( dataAccount.additionalInfo );
+      console.log( { additionalInfo } );
+      let setupData = additionalInfo != "" ? additionalInfo[ 0 ] : "";
+      console.log( { setupData } );
+      let data = {};
+      data.id = dataAccount.id;
+      data.accountName = dataAccount.accountName;
+      data.accountType = dataAccount.accountType;
+      data.address = dataAccount.address;
+      data.balance = dataAccount.balance;
+      data.dateCreated = dataAccount.dateCreated;
+      data.lastUpdated = dataAccount.lastUpdated;
+      data.unit = dataAccount.unit;
+      data.setupData = setupData;
+      if ( setupData != null || setupData != "" ) {
+        data.secureBtnTitle = setupData.title;
+      }
+      temp.push( data )
+    }
+    //console.log( { resAccount,temp} );
     if ( resAccount.length > 4 ) {
       this.setState( {
         flag_cardScrolling: true
       } )
     }
-    var resSSSDetails = await comFunDBRead.readTblSSSDetails();
     this.setState( {
       walletDetails: resultWallet,
-      arr_accounts: resAccount,
+      arr_accounts: temp,
     } );
     //TODO: appHealthStatus funciton   
     let resAppHealthStatus = JSON.parse( resultWallet.appHealthStatus );
@@ -214,9 +234,6 @@ export default class WalletScreen extends React.Component {
 
   }
 
-
-
-
   //TODO: func get Deeplinking data 
   getDeepLinkingData() {
     let urlScript = utils.getDeepLinkingUrl();
@@ -226,7 +243,7 @@ export default class WalletScreen extends React.Component {
       this.setState( {
         deepLinkingUrl: urlScript,
         deepLinkingUrlType: urlType,
-        arr_ModelBackupShareAssociateContact: [
+        arr_ModelAcceptOrRejectSecret: [
           {
             modalVisible: true,
             walletName: urlScript.wn
@@ -234,25 +251,352 @@ export default class WalletScreen extends React.Component {
         ]
       } )
     }
+  }
 
-    // arr_ModelAcceptOrRejectSecret: [
-    //   {
-    //     modalVisible: true,
-    //     name: urlScript.wn,
-    //     mobileNo: "1234",
-    //     encpShare: urlScript.encpShare
-    //   }
-    // ]
+  //TODO: click_SkipAssociateContact
+
+  click_SkipAssociateContact = async () => {
+    let deepLinkingUrlType = utils.getDeepLinkingType();
+    if ( deepLinkingUrlType == "SSS Recovery QR" ) {
+      this.setState( {
+        flag_Loading: true
+      } );
+      const dateTime = Date.now();
+      let urlScriptDetails = utils.getDeepLinkingUrl();
+      //console.log( { urlScriptDetails } );  
+      let urlScriptData = urlScriptDetails.data;
+      console.log( { urlScriptData } );
+      let urlScript = {};
+      urlScript.walletName = urlScriptDetails.wn;
+      let walletDetails = utils.getWalletDetails();
+      const sss = new S3Service(
+        walletDetails.mnemonic
+      );
+      let resShareId = await sss.getShareId( urlScriptData.encryptedShare )
+      console.log( { resShareId } );
+      const { data, updated } = await sss.updateHealth( urlScriptData.meta.walletId, urlScriptData.encryptedShare );
+      if ( updated ) {
+        const resTrustedParty = await dbOpration.insertTrustedPartyDetailWithoutAssociate(
+          localDB.tableName.tblTrustedPartySSSDetails,
+          dateTime,
+          urlScript,
+          urlScriptData,
+          resShareId,
+          urlScriptData,
+          typeof data !== "undefined" ? data : ""
+        );
+        this.setState( {
+          flag_Loading: false,
+        } )
+        if ( resTrustedParty == true ) {
+          setTimeout( () => {
+            Alert.alert(
+              'Success',
+              'Decrypted share created.',
+              [
+                {
+                  text: 'OK', onPress: () => {
+                    utils.setDeepLinkingType( "" );
+                    utils.setDeepLinkingUrl( "" );
+                  }
+                },
+
+              ],
+              { cancelable: false }
+            )
+          }, 100 );
+        } else {
+          setTimeout( () => {
+            Alert.alert(
+              'OH',
+              resTrustedParty,
+              [
+                {
+                  text: 'OK', onPress: () => {
+                    utils.setDeepLinkingType( "" );
+                    utils.setDeepLinkingUrl( "" );
+                  }
+                },
+              ],
+              { cancelable: false }
+            )
+          }, 100 );
+        }
+      } else {
+        this.setState( {
+          flag_Loading: false
+        } )
+        Alert.alert( "updateHealth func not working." )
+      }
+    } else {
+      this.props.navigation.push( "OTPBackupShareStoreNavigator" );
+    }
   }
 
 
 
+  //TODO: func refresh
+  refresh = async () => {
+    this.setState( {
+      flag_Loading: true
+    } )
+    var resAccount = await comFunDBRead.readTblAccount();
+    console.log( { resAccount } );
+    let resultWallet = await utils.getWalletDetails();
+    const regularAccount = new RegularAccount(
+      resultWallet.mnemonic
+    );
+    const getBal = await regularAccount.getBalance();
+    console.log( { getBal } );
+    const resUpdateRegularAccountBal = await dbOpration.updateRegularAccountBal(
+      localDB.tableName.tblAccount,
+      resAccount[ 0 ].address,
+      getBal.data.balance / 1e8,
+      resAccount[ 0 ].id
+    );
+    if ( resUpdateRegularAccountBal ) {
+      this.setState( {
+        flag_Loading: false
+      } )
+      this.connnection_FetchData();
+    }
+  }
+
+
+
+  _renderItem( { item, index } ) {
+    return (
+      <View key={ "card" + index }>
+        { renderIf( item.accountType != "Secure Account" )(
+          <RkCard
+            rkType="shadowed"
+            style={ {
+              flex: 1,
+              margin: 10,
+              height: 145,
+              borderRadius: 10
+            } }
+          >
+            <View
+              rkCardHeader
+              style={ {
+                flex: 1,
+                borderBottomColor: "#F5F5F5",
+                borderBottomWidth: 1
+              } }
+            >
+              <SvgIcon
+                name="icon_dailywallet"
+                color="#37A0DA"
+                size={ 40 }
+              />
+              <Text
+                style={ [ globalStyle.ffFiraSansMedium, {
+                  flex: 2,
+                  fontSize: 16,
+                  marginLeft: 10
+                } ] }
+              >
+                { item.accountName }
+              </Text>
+              <SvgIcon name="icon_more" color="gray" size={ 15 } />
+            </View>
+            <View
+              rkCardContent
+              style={ {
+                flex: 1,
+                flexDirection: "row"
+              } }
+            >
+              <View
+                style={ {
+                  flex: 1,
+                  justifyContent: "center"
+                } }
+              >
+                <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
+              </View>
+              <View style={ { flex: 4 } }>
+                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
+                <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
+                  { item.balance }
+                </Text>
+              </View>
+              <View
+                style={ {
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "flex-end",
+                  justifyContent: "flex-end"
+                } }
+              >
+                <Button transparent>
+                  <SvgIcon
+                    name="timelockNew"
+                    color="gray"
+                    size={ 20 }
+                  />
+                </Button>
+                <Button transparent style={ { marginLeft: 10 } }>
+                  <SvgIcon name="icon_multisig" color="gray" size={ 20 } />
+                </Button>
+              </View>
+
+            </View>
+          </RkCard>
+        ) }
+        { renderIf( item.accountType == "Secure Account" && item.address == "" )(
+          <RkCard
+            rkType="shadowed"
+            style={ {
+              flex: 1,
+              margin: 10,
+              height: 145,
+              borderRadius: 10
+            } }
+          >
+            <View
+              rkCardContent
+              style={ {
+                flex: 1,
+                flexDirection: "row",
+                justifyContent: "center"
+              } }
+            >
+              <View
+                style={ {
+                  flex: 1,
+                  justifyContent: "center"
+                } }
+              >
+                <SvgIcon
+                  name="icon_dailywallet"
+                  color="#37A0DA"
+                  size={ 40 }
+                />
+              </View>
+              <View style={ { flex: 3, alignItems: "flex-start", justifyContent: "center" } }>
+                <Text
+                  style={ [ globalStyle.ffFiraSansMedium, {
+                    fontSize: 16,
+                  } ] }
+                >
+                  { item.accountName }
+                </Text>
+                <Text note>Secure Account is not backed up</Text>
+              </View>
+              <View style={ { flex: 2, alignItems: "flex-end", justifyContent: "center" } }>
+                <Button light style={ { borderRadius: 8, borderColor: "gray", borderWidth: 0.4, alignSelf: "flex-end" } } onPress={ () => {
+                  if ( item.secureBtnTitle == "Setup" ) {
+                    this.props.navigation.push( "BackupSecureAccountWithPdfNavigator", { data: item } )
+                  } else {
+                    this.props.navigation.push( "ResotreSecureAccountNavigator", { prevScreen: "WalletScreen", data: item } );
+                  }
+                } }>
+                  <Text style={ { color: "#838383", fontSize: 14 } } >{ item.secureBtnTitle }</Text>
+                </Button>
+              </View>
+            </View>
+          </RkCard>
+        ) }
+        { renderIf( item.accountType == "Secure Account" && item.address != "" )(
+          <RkCard
+            rkType="shadowed"
+            style={ {
+              flex: 1,
+              margin: 10,
+              height: 145,
+              borderRadius: 10
+            } }
+          >
+            <View
+              rkCardHeader
+              style={ {
+                flex: 1,
+                borderBottomColor: "#F5F5F5",
+                borderBottomWidth: 1
+              } }
+            >
+              <SvgIcon
+                name="icon_dailywallet"
+                color="#37A0DA"
+                size={ 40 }
+              />
+              <Text
+                style={ [ globalStyle.ffFiraSansMedium, {
+                  flex: 2,
+                  fontSize: 16,
+                  marginLeft: 10
+                } ] }
+              >
+                { item.accountName }
+              </Text>
+              <SvgIcon name="icon_more" color="gray" size={ 15 } />
+            </View>
+            <View
+              rkCardContent
+              style={ {
+                flex: 1,
+                flexDirection: "row"
+              } }
+            >
+              <View
+                style={ {
+                  flex: 1,
+                  justifyContent: "center"
+                } }
+              >
+                <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
+              </View>
+              <View style={ { flex: 4 } }>
+                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
+                <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
+                  { item.balance }
+                </Text>
+              </View>
+              <View
+                style={ {
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "flex-end",
+                  justifyContent: "flex-end"
+                } }
+              >
+                <Button transparent>
+                  <SvgIcon
+                    name="timelockNew"
+                    color="gray"
+                    size={ 20 }
+                  />
+                </Button>
+                <Button transparent style={ { marginLeft: 10 } }>
+                  <SvgIcon name="icon_multisig" color="gray" size={ 20 } />
+                </Button>
+              </View>
+
+            </View>
+          </RkCard>
+        ) }
+      </View>
+    );
+  }
+
   render() {
     let flag_cardScrolling = this.state.flag_cardScrolling;
     let walletDetails = this.state.walletDetails;
+    let flag_Loading = this.state.flag_Loading;
     return (
       <Container>
-        <Content scrollEnabled={ false } contentContainerStyle={ styles.container }>
+        <Content
+          scrollEnabled={ true }
+          contentContainerStyle={ styles.container }
+          refreshControl={
+            <RefreshControl
+              refreshing={ this.state.refreshing }
+              onRefresh={ this.refresh.bind( this ) }
+            />
+          }
+        >
           <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
           <SafeAreaView style={ styles.container }>
             {/* Top View Animation */ }
@@ -300,26 +644,30 @@ export default class WalletScreen extends React.Component {
                 } }
               >
                 <ViewShieldIcons data={ this.state.arr_CustShiledIcon } click_Image={ () => {
-                  let resSSSDetails = utils.getSSSDetails();
-                  if ( resSSSDetails.length > 0 ) {
-                    if ( this.state.shiledIconPer == 0 ) {
-                      this.props.navigation.push( "WalletSetUpScreen" )
-                    } else {
-                      this.setState( {
-                        arr_ModelBackupYourWallet: [
-                          {
-                            modalVisible: true,
-                          }
-                        ]
-                      } )
-                    }
-                  } else {
-                    Alert.alert( "Working." );
-                  }
+                  // let resSSSDetails = utils.getSSSDetails();
+                  // console.log( { resSSSDetails } );
+                  // if ( resSSSDetails.length > 0 ) {
+                  //   if ( this.state.shiledIconPer == 0 ) {
+                  //     this.props.navigation.push( "WalletSetUpScreen" )
+                  //   } else {  
+                  //     this.setState( {
+                  //       arr_ModelBackupYourWallet: [
+                  //         {
+                  //           modalVisible: true,
+                  //         }
+                  //       ]
+                  //     } )
+                  //   }
+                  // } else {
+                  //   Alert.alert( "Working." );
+                  // }  
+                  this.props.navigation.push( "HealthOfTheAppNavigator" );
                 }
                 } />
               </Animated.View>
             </Animated.View>
+
+
             {/*  cards */ }
             <Animated.View
               style={ {
@@ -344,148 +692,65 @@ export default class WalletScreen extends React.Component {
                   data={ this.state.arr_accounts }
                   showsVerticalScrollIndicator={ false }
                   scrollEnabled={ flag_cardScrolling == true ? true : false }
-                  renderItem={ ( { item } ) => (
-                    <RkCard
-                      rkType="shadowed"
-                      style={ {
-                        flex: 1,
-                        margin: 10,
-                        borderRadius: 10
-                      } }
-                    >
-                      <View
-                        rkCardHeader
-                        style={ {
-                          flex: 1,
-                          borderBottomColor: "#F5F5F5",
-                          borderBottomWidth: 1
-                        } }
-                      >
-                        <SvgIcon
-                          name="icon_dailywallet"
-                          color="#37A0DA"
-                          size={ 40 }
-                        />
-                        <Text
-                          style={ [ globalStyle.ffFiraSansMedium, {
-                            flex: 2,
-                            fontSize: 16,
-                            marginLeft: 10
-                          } ] }
-                        >
-                          { item.accountName }
-                        </Text>
-                        <SvgIcon name="icon_more" color="gray" size={ 15 } />
-                      </View>
-                      <View
-                        rkCardContent
-                        style={ {
-                          flex: 1,
-                          flexDirection: "row"
-                        } }
-                      >
-                        <View
-                          style={ {
-                            flex: 1,
-                            justifyContent: "center"
-                          } }
-                        >
-                          <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
-                        </View>
-                        <View style={ { flex: 4 } }>
-                          <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
-                          <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
-                            { item.balance }
-                          </Text>
-                        </View>
-                        <View
-                          style={ {
-                            flex: 1,
-                            flexDirection: "row",
-                            alignItems: "flex-end",
-                            justifyContent: "flex-end"
-                          } }
-                        >
-                          <Button transparent>
-                            <SvgIcon
-                              name="timelockNew"
-                              color="gray"
-                              size={ 20 }
-                            />
-                          </Button>
-                          <Button transparent style={ { marginLeft: 10 } }>
-                            <SvgIcon name="icon_multisig" color="gray" size={ 20 } />
-                          </Button>
-                        </View>
-                      </View>
-                    </RkCard>
-                  ) }
+                  renderItem={ this._renderItem.bind( this ) }
                   keyExtractor={ ( item, index ) => index }
                 />
               </ScrollView>
             </Animated.View>
+
           </SafeAreaView>
         </Content>
         <DropdownAlert ref={ ref => ( this.dropdown = ref ) } />
         <Button transparent style={ styles.plusButtonBottom }>
-          <IconFontAwe name="plus" size={ 20 } color="#fff" />
+          <Fab
+            active={ this.state.flag_FabActive }
+            direction="up"
+            containerStyle={ {} }
+            style={ { backgroundColor: colors.appColor } }
+            position="bottomRight"
+            onPress={ () => this.setState( { flag_FabActive: !this.state.flag_FabActive } ) }>
+            <Icon name="add" />
+            <Button style={ { backgroundColor: '#34A34F' } }>
+              <Icon name="logo-whatsapp" />
+            </Button>
+            <Button style={ { backgroundColor: '#3B5998' } }>
+              <Icon name="logo-facebook" />
+            </Button>
+            <Button disabled style={ { backgroundColor: '#DD5144' } }>
+              <Icon name="mail" />
+            </Button>
+          </Fab>
         </Button>
-        <ModelBackupYourWallet data={ this.state.arr_ModelBackupYourWallet }
-          click_UseOtherMethod={ () => alert( 'working' ) }
-          click_Confirm={ async () => {
-            await Permissions.request( 'contacts' ).then( ( response: any ) => {
-              console.log( response );
-            } );
+
+        <ModelAcceptOrRejectSecret
+          data={ this.state.arr_ModelAcceptOrRejectSecret }
+          closeModal={ () => {
+            utils.setDeepLinkingType( "" );
+            utils.setDeepLinkingUrl( "" );
             this.setState( {
-              arr_ModelBackupYourWallet: [
+              arr_ModelAcceptOrRejectSecret: [
                 {
-                  modalVisible: false
+                  modalVisible: false,
+                  walletName: ""
+                }
+              ]
+            } )
+          } }
+          click_AcceptSecret={ ( wn: string ) => {
+            this.setState( {
+              arr_ModelAcceptOrRejectSecret: [
+                {
+                  modalVisible: false,
+                  walletName: ""
                 }
               ],
-              arr_ModelFindYourTrustedContacts: [
+              arr_ModelBackupShareAssociateContact: [
                 {
-                  modalVisible: true
+                  modalVisible: true,
+                  walletName: wn
                 }
               ]
             } );
-          } }
-          closeModal={ () => {
-            this.setState( {
-              arr_ModelBackupYourWallet: [
-                {
-                  modalVisible: false
-                }
-              ]
-            } )
-          } }
-        />
-        <ModelFindYourTrustedContacts
-          data={ this.state.arr_ModelFindYourTrustedContacts }
-          click_Confirm={ () => {
-            AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
-            this.setState( {
-              arr_ModelFindYourTrustedContacts: [
-                {
-                  modalVisible: false
-                }
-              ]
-            } )
-            let resSSSDetails = utils.getSSSDetails();
-            if ( resSSSDetails[ 0 ].keeperInfo != "" ) {
-              this.props.navigation.push( "BackUpYourWalletSecoundTimeNavigator" );
-            } else {
-              this.props.navigation.push( "BackUpYourWalletNavigator" )
-            }
-
-          } }
-          closeModal={ () => {
-            this.setState( {
-              arr_ModelFindYourTrustedContacts: [
-                {
-                  modalVisible: false
-                }
-              ]
-            } )
           } }
         />
 
@@ -508,6 +773,17 @@ export default class WalletScreen extends React.Component {
                 }
               ]
             } )
+          } }
+          click_Skip={ () => {
+            this.setState( {
+              arr_ModelBackupShareAssociateContact: [
+                {
+                  modalVisible: false,
+                  walletName: "",
+                }
+              ]
+            } );
+            this.click_SkipAssociateContact();
           } }
           closeModal={ () => {
             utils.setDeepLinkingType( "" );
@@ -548,7 +824,7 @@ export default class WalletScreen extends React.Component {
             } )
           } }
         />
-        <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
+        <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
       </Container>
     );
   }
@@ -563,18 +839,12 @@ const styles = StyleSheet.create( {
     width: "100%"
   },
   plusButtonBottom: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
     position: "absolute",
-    bottom: 10,
-    right: 10,
-    alignSelf: "center",
-    backgroundColor: colors.appColor,
-    justifyContent: "center"
+    bottom: 5,
+    right: 5,
   },
   svgImage: {
     width: "100%",
     height: "100%"
   }
-} );
+} );  

@@ -72,9 +72,9 @@ export default class ModelWalletSuccessfullyRestored extends Component<Props, an
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-end" } }>
                             <Text note style={ styles.txtNotes }>Your Wallet has been recovered successfully</Text>
-                            <Text note>Arpan’s Daily Wallet</Text>
+                            <Text note>{ data.length != 0 ? data[ 0 ].walletName : "Hexa Wallet" }</Text>
                             <View style={ { flexDirection: "row", justifyContent: "center", alignItems: "center", margin: 10 } }>
-                                <SvgIcon name="icon_dollar" color="#D0D0D0" size={ 20 } />
+                                <SvgIcon name="icon_bitcoin" color="#D0D0D0" size={ 20 } />
                                 <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
                                     { data.length != 0 ? data[ 0 ].bal : 0 }
                                 </Text>

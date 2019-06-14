@@ -178,6 +178,8 @@ export default class OnBoarding extends Component<Props, any> {
     }
   };
 
+
+
   /**
    * Render ScrollView component
    * @param {array} slides to swipe through

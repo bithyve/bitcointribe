@@ -1,5 +1,6 @@
 import Config from "react-native-config";
 
+
 //Colors  
 var colors = {
   appColor: "#2595D6",
@@ -12,6 +13,7 @@ var colors = {
   Joint: "#660000",
   placeholder: "#5F5F5F"
 };
+
 
 const assetsImages = "../../assets/images/";
 var images = {
@@ -99,8 +101,22 @@ var images = {
   walletScreen: {
     "sheild_1": require( assetsImages + "WalletScreen/sheild_1.png" ),
     "sheild_2": require( assetsImages + "WalletScreen/sheild_2.png" ),
+  },
+  backupSecureAccount: {
+    "steps": require( assetsImages + "backupSecureAccount/backupsecureAccount.png" ),
+    "failedBackup": require( assetsImages + "icon/illustration_unsucessful.png" ),
+  },
+  retoreSeecureAccount: {
+    "steps": require( assetsImages + "icon/RestoreSecureAccount.png" ),
+  },
+  backupSecretQuestion: {
+    "icon": require( assetsImages + "backupSecretQuestions/icon_shieldred.png" ),
+  },
+  backupSecureTwoFactorAuto: {
+    "icon": require( assetsImages + "backupSecureTwoFactorAuto/icon_shieldyellow.png" ),
   }
 };
+
 
 //Local Database
 var localDB = {

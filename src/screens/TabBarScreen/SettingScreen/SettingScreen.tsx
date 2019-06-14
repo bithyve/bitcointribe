@@ -33,7 +33,7 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
-
+var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 
 export default class SettingScreen extends React.Component<any, any> {
@@ -41,9 +41,30 @@ export default class SettingScreen extends React.Component<any, any> {
   constructor ( props: any ) {
     super( props )
     this.state = ( {
+      arr_FirstListItem: []
+    } );
+  }
+
+
+  async componentWillMount() {
+    let walletDetails = await utils.getWalletDetails();
+    let backupType = JSON.parse( walletDetails.appHealthStatus );
+    let subTitle;
+    console.log( { backupType } );
+    if ( backupType.backupType != "share" ) {
+      subTitle = "Currently your wallet is backed via Mnemonic";
+    } else {
+      subTitle = "Currently your wallet is backed via Trusted Contacts";
+    }
+    this.setState( {
       arr_FirstListItem: [ {
         title: "Health of the App",
         subTitle: "Lorem ipsum dolor sit amet",
+        icon: "shield"
+      },
+      {
+        title: "Change Backup Method",
+        subTitle: subTitle,
         icon: "shield"
       },
       {
@@ -76,20 +97,23 @@ export default class SettingScreen extends React.Component<any, any> {
 
 
 
-
   //TODO: func click_FirstMenuItem
   click_MenuItem( item: any ) {
     let title = item.title;
-    if ( title == "Contacts that have shared secret with you" ) {
+    if ( title == "Health of the App" ) {
+      this.props.navigation.push( "HealthOfTheAppNavigator" );
+    }
+    else if ( title == "Contacts that have shared secret with you" ) {
       this.props.navigation.push( "TrustedPartyShareSecretNavigator" );
-    } else {
+    } else if ( title == "Settings" ) {
+      this.props.navigation.push( "SettingsNavigator" );
+    }
+    else {
       Alert.alert( "Working." );
     }
   }
-
-
-
   render() {
+    let arr_FirstListItem = this.state.arr_FirstListItem;
     return (
       <Container>
         <SafeAreaView style={ styles.container }>
@@ -107,7 +131,7 @@ export default class SettingScreen extends React.Component<any, any> {
               </View>
               <View style={ { flex: 0.7 } }>
                 <FlatList
-                  data={ this.state.arr_FirstListItem }
+                  data={ arr_FirstListItem }
                   showsVerticalScrollIndicator={ false }
                   scrollEnabled={ false }
                   renderItem={ ( { item } ) => (
@@ -143,7 +167,7 @@ export default class SettingScreen extends React.Component<any, any> {
                             >
                               { item.title }
                             </Text>
-                            <Text note style={ { fontSize: 11 } }>{ item.subTitle }</Text>
+                            <Text note numberOfLines={ 1 } style={ { fontSize: 11 } }>{ item.subTitle }</Text>
                           </View>
                           <View style={ { flex: 0.2, justifyContent: "center", alignItems: "flex-end" } }>
                             <SvgIcon

@@ -1,61 +1,49 @@
 # Hexa Wallet
 
-## What is Hexa Wallet?
+Hexa Wallet is a user friendly mobile bitcoin wallet that enables p2p commerce.
 
-Hexa Wallet is a user friendly mobile bitcoin wallet that enables p2p commerce. There are various types of accounts that are supported in the Hexa Wallet:
+![Hexa Wallet](hexa.png)
 
-1.  Savings Account
+There are various types of accounts that are supported in the Hexa Wallet:
 
-- A savings account is a standard bitcoin wallet
+1. Savings Account: A savings account is a standard bitcoin wallet optimal for daily use
+2. Secure Account: A secure account is a bitcoin wallet secured by 2FA optimal for storing larger amounts of bitcoin
+3. Vault Account (post R1): A vault account is a bitcoin wallet that is time locked to prevent spending before the due date.
+4. Joint Account (post R1): A joint account is a 2of2 multisig bitcoin wallet.
 
-2.  Secure Account
+Hexa requires a pin to unlock and access funds and Accounts are protected by a seed restoration feature which can be used to import wallets from other devices or from an older version of Hexa.
 
-- A secure account is a bitcoin wallet secured by 2FA.
-
-3.  Vault Account
-
-- A vault account is a bitcoin wallet that is time locked to prevent spending before the due date.
-
-4.  Joint Account
-
-- A joint account is a 2of2 multisig bitcoin wallet.
-
-All accounts are protected by a pin which is required to unlock the Hexa Wallet. Accounts also have a seed restoration feature which can be used to import wallets from other devices or from an older version of the Hexa Wallet wallet.
-
-## Design Considerations
+### Design Considerations
 
 The various design considerations that Hexa chose to undertake are over at [the wiki](https://github.com/thecryptobee/Hexa-Wallet/wiki/Design-Considerations)
 
-## Build / Local Setup
+### Developing locally
 
-Prerequisites:
+#### Prerequisites:
+- [Node](https://nodejs.org/en/)
+- [yarn](https://www.npmjs.com/package/yarn)
+- [React-Native](https://www.npmjs.com/package/react-native)] + [rn-nodeify](https://www.npmjs.com/package/rn-nodeify)
+- [Xcode](https://developer.apple.com/xcode/)
+- iOS Simulator on Xcode
 
-- Node with npm
-- yarn
-
-After installing node and yarn, the following commands should get you started with Hexa Wallet on your local computer
-
+#### Installing hexa
 ```
-git clone https://github.com/thecryptobee/BitHyve-Wallet.git
+git clone https://github.com/thecryptobee/Hexa-Wallet.git
 cd Hexa-Wallet
 sudo yarn install
-rn-nodeify --install --hack
-
-//To Run Android
-npm run android-dev
-
+chmod +x pkgchanges/setup.sh
+./pkgchanges/setup.sh
 ```
-=======
 
-//To Run Android
-npm run android-dev
+Make sure you have a `.env.dev` similar to `.env.example` in your project's root directory before running hexa. If this file is absent, you will be faced with a red screen on the iOS Simulator.
 
+#### Running hexa
 ```
-## Contributing
+npm run ios
+```
 
+### Contributing
 Please feel free to open a pull requests and issues with bugfixes and suggestions.
 
-## License
-
-[MIT](LICENSE)
-
+### License
+[LICENSE](LICENSE)
