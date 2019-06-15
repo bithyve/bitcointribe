@@ -16,14 +16,14 @@ export default class VaultAccount {
       bitcoinJS.opcodes.OP_CHECKLOCKTIMEVERIFY,
       bitcoinJS.opcodes.OP_DROP,
       publicKey,
-      bitcoinJS.opcodes.OP_CHECKSIG,
+      bitcoinJS.opcodes.OP_CHECKSIG
     ]);
-  }
+  };
 
   public createTLC = async (
     mnemonic: string,
     time: number,
-    blockHeight: number,
+    blockHeight: number
   ): Promise<{
     address: string;
     lockTime: number;
@@ -52,25 +52,25 @@ export default class VaultAccount {
     const p2sh = bitcoinJS.payments.p2sh({
       redeem: bitcoinJS.payments.p2wsh({
         redeem: { output: redeemScript, network: this.bitcoin.network },
-        network: this.bitcoin.network,
+        network: this.bitcoin.network
       }),
-      network: this.bitcoin.network,
+      network: this.bitcoin.network
     });
 
     return {
       address: p2sh.address,
       lockTime,
       privateKey: keyPair.toWIF(),
-      redeemScript: redeemScript.toString("hex"),
+      redeemScript: redeemScript.toString("hex")
     };
-  }
+  };
 
   public transfer = async (
     senderAddress: string,
     recipientAddress: string,
     amount: number,
     lockTime: number,
-    privateKey: string,
+    privateKey: string
   ) => {
     if (this.bitcoin.isValidAddress(recipientAddress)) {
       const { balanceData } = await this.bitcoin.getBalance(senderAddress);
@@ -86,7 +86,7 @@ export default class VaultAccount {
             mediantime} second(s) remaining for the UTXO to be spendable (approximately)`;
           return {
             status: 400,
-            errorMessage,
+            errorMessage
           };
         }
       } else {
@@ -97,7 +97,7 @@ export default class VaultAccount {
             height} block(s) remaining for the UTXO to be spendable`;
           return {
             status: 400,
-            errorMessage,
+            errorMessage
           };
         }
       }
@@ -106,12 +106,12 @@ export default class VaultAccount {
         senderAddress,
         recipientAddress,
         amount,
-        0xfffffffe,
+        0xfffffffe
       );
       console.log("---- Transaction Created ----");
       if (parseInt(balanceData.final_balance, 10) + fee <= amount) {
         throw new Error(
-          "Insufficient balance to compensate for transfer amount and the txn fee",
+          "Insufficient balance to compensate for transfer amount and the txn fee"
         );
       }
 
@@ -126,16 +126,16 @@ export default class VaultAccount {
       const signatureHash = tx.hashForSignature(0, redeemScript, hashType);
 
       const unlockingScript = bitcoinJS.script.compile([
-        bitcoinJS.script.signature.encode(keyPair.sign(signatureHash), hashType),
+        bitcoinJS.script.signature.encode(keyPair.sign(signatureHash), hashType)
       ]);
 
       const redeemScriptSig = bitcoinJS.payments.p2sh({
         redeem: {
           input: unlockingScript,
           output: redeemScript,
-          network: this.bitcoin.network,
+          network: this.bitcoin.network
         },
-        network: this.bitcoin.network,
+        network: this.bitcoin.network
       }).input;
       tx.setInputScript(0, redeemScriptSig);
       console.log("---- Transaction Signed ----");
@@ -148,14 +148,14 @@ export default class VaultAccount {
     } else {
       return {
         status: 400,
-        errorMessage: "Supplied recipient address is wrong.",
+        errorMessage: "Supplied recipient address is wrong."
       };
     }
-  }
+  };
 
   public recoverVault = async (redeemScriptHex: string) => {
     const decodedScript = await this.bitcoin.client.decodeScript(
-      redeemScriptHex,
+      redeemScriptHex
     );
     const { asm } = decodedScript;
     const splits = asm.split(" ");
@@ -166,18 +166,18 @@ export default class VaultAccount {
       const address = bitcoinJS.payments.p2sh({
         redeem: bitcoinJS.payments.p2wsh({
           redeem: { output: redeemScript, network: this.bitcoin.network },
-          network: this.bitcoin.network,
+          network: this.bitcoin.network
         }),
-        network: this.bitcoin.network,
+        network: this.bitcoin.network
       }).address;
 
       return {
         address,
         lockTime,
-        publicKey: pubKey.toString("hex"),
+        publicKey: pubKey.toString("hex")
       };
     } else {
       throw new Error("Vault recovery failed");
     }
-  }
+  };
 }

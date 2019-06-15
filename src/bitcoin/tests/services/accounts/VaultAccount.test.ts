@@ -28,7 +28,7 @@ describe("Vault Account", async () => {
     const { lockTime, address, redeemScript } = await vaultAccount.createTLC(
       mnemonic,
       time,
-      null,
+      null
     );
     vaultLockTime = lockTime;
     vaultAddress = address;
@@ -42,7 +42,7 @@ describe("Vault Account", async () => {
     const { lockTime, address, privateKey } = await vaultAccount.createTLC(
       mnemonic,
       null,
-      numberOfBlocks,
+      numberOfBlocks
     );
     expect(address).toBeDefined();
     expect(lockTime).toBeLessThan(500000000); // locktime variable should be less than 500m
@@ -64,14 +64,14 @@ describe("Vault Account", async () => {
       recipientAddress: "2N4qBb5f1KyfbpHxtLM86QgbZ7qcxsFf9AL",
       amount: 4500,
       privateKey,
-      lockTime,
+      lockTime
     };
     const res = await vaultAccount.transfer(
       transfer.senderAddress,
       transfer.recipientAddress,
       transfer.amount,
       transfer.lockTime,
-      transfer.privateKey,
+      transfer.privateKey
     );
 
     if (res.status !== 200) {
@@ -98,14 +98,14 @@ describe("Vault Account", async () => {
       recipientAddress: "2N4qBb5f1KyfbpHxtLM86QgbZ7qcxsFf9AL",
       amount: 4500,
       privateKey,
-      lockTime,
+      lockTime
     };
     const res = await vaultAccount.transfer(
       transfer.senderAddress,
       transfer.recipientAddress,
       transfer.amount,
       transfer.lockTime,
-      transfer.privateKey,
+      transfer.privateKey
     );
     if (res.status !== 200) {
       throw new Error("transaction from vault account failed");
@@ -116,7 +116,7 @@ describe("Vault Account", async () => {
 
   test("recovers the vault from a recovery script(redeem)", async () => {
     const { address, lockTime } = await vaultAccount.recoverVault(
-      recoveryScript,
+      recoveryScript
     );
     expect(address).toEqual(vaultAddress);
     expect(lockTime).toEqual(vaultLockTime);

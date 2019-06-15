@@ -36,7 +36,7 @@ describe("Regular Account", async () => {
       block_hash,
       block_height,
       hash,
-      confirmations,
+      confirmations
     } = await importedRegularAccount.getTransactionDetails(txHash);
     expect(block_hash).toBeDefined();
     expect(block_height).toBeDefined();
@@ -48,7 +48,7 @@ describe("Regular Account", async () => {
     const {
       totalTransactions,
       confirmedTransactions,
-      transactionDetails,
+      transactionDetails
     } = await importedRegularAccount.getTransactions();
     console.log({ totalTransactions, confirmedTransactions });
     expect(totalTransactions).toBeGreaterThanOrEqual(confirmedTransactions);
@@ -59,12 +59,12 @@ describe("Regular Account", async () => {
   test("transacts from one btc address to another", async () => {
     const transfer = {
       recipientAddress: "2NAwqcZHo2DW9c8Qs9Jxaat3jHW3aqsBpFs",
-      amount: 3500,
+      amount: 3500
     };
 
     const res = await importedRegularAccount.transfer(
       transfer.recipientAddress,
-      transfer.amount,
+      transfer.amount
     );
     console.log({ res });
     expect(res.status).toBe(200);

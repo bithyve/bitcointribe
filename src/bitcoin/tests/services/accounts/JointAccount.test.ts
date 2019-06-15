@@ -30,7 +30,7 @@ describe("Joint Account", () => {
   test("inititates the creation of joint account (cretor's end)", async () => {
     const details = {
       creator: "Matt",
-      walletName: "ST. Funding",
+      walletName: "ST. Funding"
     };
 
     initDetails = jointAccount.initiateJointAccount(creatorMnemonic, details);
@@ -46,12 +46,12 @@ describe("Joint Account", () => {
   test("merges an initiated joint account (merger's end)", async () => {
     const details = {
       jointDetails: initDetails,
-      merger: "Ken",
+      merger: "Ken"
     };
 
     const { multiSig, mergeJSON } = jointAccount.mergeJointAccount(
       mergerMnemonic,
-      details,
+      details
     );
     mergeDetails = mergeJSON;
     const { scripts, address } = multiSig;
@@ -77,11 +77,11 @@ describe("Joint Account", () => {
 
   test("completes an initiated joint account (creator's end)", () => {
     const details = {
-      jointDetails: ackDetails,
+      jointDetails: ackDetails
     };
     const { multiSig, creationJSON } = jointAccount.createInitiatedJointAccount(
       creatorMnemonic,
-      details,
+      details
     );
     creationDetails = creationJSON;
 
@@ -102,7 +102,7 @@ describe("Joint Account", () => {
       recipientAddress: "2N4qBb5f1KyfbpHxtLM86QgbZ7qcxsFf9AL",
       amount: 4500,
       privateKey: creatorPriv,
-      scripts: jointMultiSig.scripts,
+      scripts: jointMultiSig.scripts
     });
 
     if (res.status === 200) {

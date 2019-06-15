@@ -1,8 +1,8 @@
 import bip32 from "bip32";
-import bip39 from "react-native-bip39";
 import crypto from "crypto";
+import bip39 from "react-native-bip39";
 // import PDFDocument from "pdfkit";
-//import qr from "qr-image";
+// import qr from "qr-image";
 import config from "../Config";
 
 export default class SecurePDFGen {
@@ -14,26 +14,23 @@ export default class SecurePDFGen {
     keyLength: number;
   };
 
-  constructor ( mnemonic: string ) {
+  constructor(mnemonic: string) {
     this.cipherSpec = {
       algorithm: "aes-192-cbc",
       salt: "bithyeSalt",
       keyLength: 24,
-      iv: Buffer.alloc( 16, 0 ),
+      iv: Buffer.alloc(16, 0)
     };
     this.mnemonic = mnemonic;
   }
 
-  public getSecondaryXpub = async ( secondaryMnemonic, bhXpub ) => {
-    const path = this.getXpubDerivationPath( bhXpub );
-    const secondaryXpub = this.getRecoverableXKey( secondaryMnemonic, path );
-    console.log( { secondaryXpub } );
+  public getSecondaryXpub = async (secondaryMnemonic, bhXpub) => {
+    const path = this.getXpubDerivationPath(bhXpub);
+    const secondaryXpub = this.getRecoverableXKey(secondaryMnemonic, path);
+    console.log({ secondaryXpub });
 
-    return this.encryptor( secondaryXpub );
-  }
-
-
-
+    return this.encryptor(secondaryXpub);
+  };
 
   // public generate = async (
   //   password,
@@ -61,82 +58,80 @@ export default class SecurePDFGen {
   //     assets,
   //   );
   // }, 1000 );
-  //}
+  // }
 
-  private getXpubDerivationPath = ( bhXpub ) => {
-    const bhxpub = bip32.fromBase58( bhXpub, config.NETWORK );
+  private getXpubDerivationPath = bhXpub => {
+    const bhxpub = bip32.fromBase58(bhXpub, config.NETWORK);
     let path;
-    if ( bhxpub.index === 0 ) {
+    if (bhxpub.index === 0) {
       path = config.DERIVATION_BRANCH;
     } else {
       path = config.WALLET_XPUB_PATH + config.DERIVATION_BRANCH;
     }
     return path;
-  }
+  };
 
-  private getRecoverableXKey = ( mnemonic: string, path: string ) => {
-    const seed = bip39.mnemonicToSeed( mnemonic );
-    const root = bip32.fromSeed( seed, config.NETWORK );
+  private getRecoverableXKey = (mnemonic: string, path: string) => {
+    const seed = bip39.mnemonicToSeed(mnemonic);
+    const root = bip32.fromSeed(seed, config.NETWORK);
     const xpub = root
-      .derivePath( "m/" + path )
+      .derivePath("m/" + path)
       .neutered()
       .toBase58();
     return xpub;
-  }
+  };
 
-  private generateKey = ( psuedoKey: string ) => {
+  private generateKey = (psuedoKey: string) => {
     const hashRounds = 5048;
     let key = psuedoKey;
-    for ( let itr = 0; itr < hashRounds; itr++ ) {
-      const hash = crypto.createHash( "sha512" );
-      key = hash.update( key ).digest( "hex" );
+    for (let itr = 0; itr < hashRounds; itr++) {
+      const hash = crypto.createHash("sha512");
+      key = hash.update(key).digest("hex");
     }
-    return key.slice( key.length - this.cipherSpec.keyLength );
-  }
+    return key.slice(key.length - this.cipherSpec.keyLength);
+  };
 
-  private encryptor = ( data ) => {
-    console.log( { primaryMnemonic: this.mnemonic } );
-    const seed = bip39.mnemonicToSeed( this.mnemonic ).toString( "hex" );
-    console.log( { seed } );
+  private encryptor = data => {
+    console.log({ primaryMnemonic: this.mnemonic });
+    const seed = bip39.mnemonicToSeed(this.mnemonic).toString("hex");
+    console.log({ seed });
 
-    const key = this.generateKey(
-      seed,
-    );
-    console.log( { key } );
+    const key = this.generateKey(seed);
+    console.log({ key });
 
     // const key = this.generateKey(encKey);
     const cipher = crypto.createCipheriv(
       this.cipherSpec.algorithm,
       key,
-      this.cipherSpec.iv,
+      this.cipherSpec.iv
     );
-    console.log( { cipher } );
+    console.log({ cipher });
 
-    let encrypted = cipher.update( data, "utf8", "hex" );
-    encrypted += cipher.final( "hex" );
+    let encrypted = cipher.update(data, "utf8", "hex");
+    encrypted += cipher.final("hex");
     return encrypted;
-  }
+  };
 
-  private decryptor = ( encData ): string => {
+  private decryptor = (encData): string => {
     const key = this.generateKey(
-      bip39.mnemonicToSeed( this.mnemonic ).toString( "hex" ),
+      bip39.mnemonicToSeed(this.mnemonic).toString("hex")
     );
     const decipher = crypto.createDecipheriv(
       this.cipherSpec.algorithm,
       key,
-      this.cipherSpec.iv,
+      this.cipherSpec.iv
     );
-    let decrypted = decipher.update( encData, "hex", "utf8" );
-    decrypted += decipher.final( "utf8" );
+    let decrypted = decipher.update(encData, "hex", "utf8");
+    decrypted += decipher.final("utf8");
     return decrypted;
-  }
+  };
 
   // private pdfGenerator = (
   //   password: string,
   //   secondaryMnemonic: string,
   //   bhXpub: string,
   //   twoFAsecret: string,
-  //   assets,  
+  //   assets,
   // ) => {
   //   const doc = new PDFDocument( { userPassword: password } );
   //   doc.pipe( require( "fs" ).createWriteStream( "assets/secure.pdf" ) );
@@ -202,7 +197,7 @@ export default class SecurePDFGen {
   //     .text( `${ bhXpub }\n\n\n` );
 
   //   doc.end();
-  // } 
+  // }
 
   // private qrGenerator = ( asset, encrypt = true ) => {
   //   let data = JSON.stringify( asset );

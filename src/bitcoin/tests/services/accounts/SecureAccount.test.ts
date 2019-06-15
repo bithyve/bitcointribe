@@ -31,7 +31,7 @@ describe("Secure Account", () => {
 
       validationData = {
         secret: setupData.secret,
-        xIndex: setupData.xIndex,
+        xIndex: setupData.xIndex
       };
     }
   });
@@ -41,7 +41,7 @@ describe("Secure Account", () => {
     const res = await secureAccount.validateSecureAccountSetup(
       token,
       validationData.secret,
-      validationData.xIndex,
+      validationData.xIndex
     );
     if (res.status !== 200) {
       throw new Error("secure account setup validation failed");
@@ -89,7 +89,7 @@ describe("Secure Account", () => {
 
     const transfer = {
       recipientAddress: "2NAwqcZHo2DW9c8Qs9Jxaat3jHW3aqsBpFs",
-      amount: 3500,
+      amount: 3500
     };
     const secureHDAccount = new SecureAccount(dummyMnemonic);
     await secureHDAccount.importSecureAccount(dummyToken, dummySecondaryXpub);
@@ -102,17 +102,17 @@ describe("Secure Account", () => {
     // console.log(data);
     const {
       txHex,
-      childIndexArray,
+      childIndexArray
     } = await secureHDAccount.partiallySignedSecureTransaction({
       recipientAddress: transfer.recipientAddress,
-      amount: transfer.amount,
+      amount: transfer.amount
     });
 
     const token = authenticator.generate(dummySecret);
     const res = await secureHDAccount.serverSigningAndBroadcasting(
       token,
       txHex,
-      childIndexArray,
+      childIndexArray
     );
 
     if (res.status !== 200) {

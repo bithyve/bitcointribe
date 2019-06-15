@@ -41,8 +41,8 @@ describe("Shamir's Secret Sharing", async () => {
           "6beca89eb6a14f63b813b6c6fa20368505d5a7d65a870c16b54007201804f7a9ccf36175d9df4432fa78724f6d8dc78b883b98e60d8d9c88c303debd2b554f3a",
         tag: "TheCryptoBee",
         timeStamp: "3/27/2019, 6:17 PM",
-        info: "TheCryptoBee's sss share",
-      },
+        info: "TheCryptoBee's sss share"
+      }
     };
   });
 
@@ -73,7 +73,7 @@ describe("Shamir's Secret Sharing", async () => {
       const { share, otp } = userSSS.createTransferShare(encryptedShare, tag);
       sharedAssets.push({
         otpEncryptedShare: share,
-        otp,
+        otp
       });
     }
 
@@ -85,7 +85,7 @@ describe("Shamir's Secret Sharing", async () => {
     for (let itr = 0; itr < sharedAssets.length; itr++) {
       const { otpEncryptedShare } = sharedAssets[itr];
       const { success, messageId } = await userSSS.uploadShare(
-        otpEncryptedShare,
+        otpEncryptedShare
       );
       sharedAssets[itr].messageId = messageId;
       expect(success).toBe(true);
@@ -99,7 +99,7 @@ describe("Shamir's Secret Sharing", async () => {
       const { decryptedShare } = await trustedSSS.decryptOTPEncShare(
         otpEncryptedShare,
         messageId,
-        otp,
+        otp
       );
 
       userWalletId = decryptedShare.meta.walletId;
@@ -114,7 +114,7 @@ describe("Shamir's Secret Sharing", async () => {
   test("updates the health of a given share and gets updated nonPMDD (trusted party specific)", async () => {
     const { updated, data } = await trustedSSS.updateHealth(
       userWalletId,
-      recoveredShares[1],
+      recoveredShares[1]
     );
     expect(updated).toBe(true);
     expect(data).toBeTruthy();
@@ -129,7 +129,7 @@ describe("Shamir's Secret Sharing", async () => {
   test("recovers the mnemonic from an encrypted set of shares (above threshold)", () => {
     const recoveredMnemonic = userSSS.recoverFromShares(
       [recoveredShares[0], recoveredShares[2]],
-      answers,
+      answers
     );
     expect(recoveredMnemonic).toEqual(userMnemonic);
   });
