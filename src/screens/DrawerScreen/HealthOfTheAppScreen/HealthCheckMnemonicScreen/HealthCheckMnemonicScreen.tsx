@@ -26,8 +26,9 @@ var converter = require( 'number-to-words' );
 
 //TODO: Custome Compontes
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import ModelSecureTwoFactorSecretThreeCode from "HexaWallet/src/app/custcompontes/Model/ModelSecureTwoFactorAuto/ModelSecureTwoFactorSecretThreeCode";
-import ModelSecureTwoFactorSuccessBackedUp from "HexaWallet/src/app/custcompontes/Model/ModelSecureTwoFactorAuto/ModelSecureTwoFactorSuccessBackedUp";
+import ModelHealthCheckMnemonicFirstWord from "HexaWallet/src/app/custcompontes/Model/ModelHealthCheckMnemonic/ModelHealthCheckMnemonicFirstWord";
+import ModelHealthCheckMnemonicSecoundWord from "HexaWallet/src/app/custcompontes/Model/ModelHealthCheckMnemonic/ModelHealthCheckMnemonicSecoundWord";
+import ModelHealthCheckMnemonicThirdWord from "HexaWallet/src/app/custcompontes/Model/ModelHealthCheckMnemonic/ModelHealthCheckMnemonicThirdWord";
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -49,15 +50,18 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 
 
+
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
-export default class BackupSecureTwoFactorAutoScreen extends Component {
+export default class HealthCheckMnemonicScreen extends Component {
     constructor ( props: any ) {
         super( props );
         this.state = {
-            arr_ModelSecureTwoFactorSecretThreeCode: [],
-            arr_ModelSecureTwoFactorSuccessBackedUp: []
+            data: [],
+            arr_ModelHealthCheckMnemonicFirstWord: [],
+            arr_ModelHealthCheckMnemonicSecoundWord: [],
+            arr_ModelHealthCheckMnemonicThirdWord: []
         };
     }
 
@@ -65,16 +69,18 @@ export default class BackupSecureTwoFactorAutoScreen extends Component {
         let data = this.props.navigation.getParam( "data" );
         setTimeout( () => {
             this.setState( {
-                arr_ModelSecureTwoFactorSecretThreeCode: [ {
+                data,
+                arr_ModelHealthCheckMnemonicFirstWord: [ {
                     modalVisible: true,
-                    data
+                    number: data[ 0 ][ 0 ],
+                    word: data[ 1 ][ 0 ]
                 } ]
             } )
         }, 100 );
     }
 
     render() {
-        let { arr_ModelSecureTwoFactorSuccessBackedUp } = this.state;
+        let { arr_ModelHealthCheckMnemonicFirstWord, arr_ModelHealthCheckMnemonicSecoundWord, arr_ModelHealthCheckMnemonicThirdWord, data } = this.state;
         return (
             <View style={ styles.container }>
                 <SafeAreaView style={ styles.container }>
@@ -87,35 +93,61 @@ export default class BackupSecureTwoFactorAutoScreen extends Component {
                             enableOnAndroid={ true }
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
-                            <ModelSecureTwoFactorSecretThreeCode data={ this.state.arr_ModelSecureTwoFactorSecretThreeCode } click_Next={ () => {
-                                this.setState( {
-                                    arr_ModelSecureTwoFactorSecretThreeCode: [
-                                        {
+                            <ModelHealthCheckMnemonicFirstWord data={ arr_ModelHealthCheckMnemonicFirstWord }
+                                click_Next={ () => {
+                                    this.setState( {
+                                        arr_ModelHealthCheckMnemonicFirstWord: [ {
                                             modalVisible: false,
-                                            data: []
-                                        }
-                                    ],
-                                    arr_ModelSecureTwoFactorSuccessBackedUp: [ {
-                                        modalVisible: true,
-                                    } ]
-                                } );
-                            } }
+                                        } ],
+                                        arr_ModelHealthCheckMnemonicSecoundWord: [ {
+                                            modalVisible: true,
+                                            number: data[ 0 ][ 1 ],
+                                            word: data[ 1 ][ 1 ]
+                                        } ]
+                                    } )
+                                } }
                                 pop={ () => {
                                     this.setState( {
-                                        arr_ModelSecureTwoFactorSecretThreeCode: [
-                                            {
-                                                modalVisible: false,
-                                                data: []
-                                            }
-                                        ]
-                                    } );
+                                        arr_ModelHealthCheckMnemonicFirstWord: [ {
+                                            modalVisible: false,
+                                        } ]
+                                    } )
                                     this.props.navigation.pop()
                                 } }
                             />
-                            <ModelSecureTwoFactorSuccessBackedUp data={ arr_ModelSecureTwoFactorSuccessBackedUp }
-                                click_GoToWallet={ () => {
+                            <ModelHealthCheckMnemonicSecoundWord data={ arr_ModelHealthCheckMnemonicSecoundWord }
+                                click_Next={ () => {
                                     this.setState( {
-                                        arr_ModelSecureTwoFactorSuccessBackedUp: [ {
+                                        arr_ModelHealthCheckMnemonicSecoundWord: [ {
+                                            modalVisible: false,
+                                        } ],
+                                        arr_ModelHealthCheckMnemonicThirdWord: [ {
+                                            modalVisible: true,
+                                            number: data[ 0 ][ 2 ],
+                                            word: data[ 1 ][ 2 ]
+                                        } ]
+                                    } )
+                                } }
+                                pop={ () => {
+                                    this.setState( {
+                                        arr_ModelHealthCheckMnemonicSecoundWord: [ {
+                                            modalVisible: false,
+                                        } ]
+                                    } )
+                                    this.props.navigation.pop()
+                                } }
+                            />
+                            <ModelHealthCheckMnemonicThirdWord data={ arr_ModelHealthCheckMnemonicThirdWord }
+                                click_Next={ () => {
+                                    this.setState( {
+                                        arr_ModelHealthCheckMnemonicThirdWord: [ {
+                                            modalVisible: false,
+                                        } ]
+                                    } )
+                                } }
+                                pop={ () => {
+                                    this.setState( {
+                                        arr_ModelHealthCheckMnemonicThirdWord: [ {
                                             modalVisible: false,
                                         } ]
                                     } )
