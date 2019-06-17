@@ -120,6 +120,7 @@ import RestoreSecureAccountScreen from "HexaWallet/src/screens/DrawerScreen/Rest
 import HealthOfTheAppScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/HealthOfTheAppScreen";
 import BackupSecretQuestionsScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/BackupSecretQuestionsScreen/BackupSecretQuestionsScreen";
 import BackupSecureTwoFactorAutoScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/BackupSecureTwoFactorAutoScreen/BackupSecureTwoFactorAutoScreen";
+import HealthCheckMnemonicScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/HealthCheckMnemonicScreen/HealthCheckMnemonicScreen";
 
 
 
@@ -448,6 +449,10 @@ const HealthOfTheAppStackNavigator = createStackNavigator(
     },
     BackupSecureTwoFactorAutoScreen: {
       screen: BackupSecureTwoFactorAutoScreen,
+      navigationOptions: { header: null }
+    },
+    HealthCheckMnemonicScreen: {
+      screen: HealthCheckMnemonicScreen,
       navigationOptions: { header: null }
     }
   },

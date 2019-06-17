@@ -21,6 +21,8 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Permissions from 'react-native-permissions';
 import { Avatar } from 'react-native-elements';
 import TimerCountdown from "react-native-timer-countdown";
+var converter = require( 'number-to-words' );
+
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -44,18 +46,17 @@ var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonApp
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
 
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
+
 export default class HealthOfTheAppScreen extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props )
         this.state = ( {
             arr_TrustedContacts: [],
-            arr_Mnemonic: [
-                {
-                    title: "Change Backup Method",
-                    subTitle: "Currently your wallet is backed via Trusted Contact",
-                    icon: "shield"
-                }
-            ],
+            arr_Mnemonic: [],
+            arr_MnemonicDetails: [],
             arr_SecretQuestion: [],
             arr_QuestionAndAnswerDetails: [],
             arr_2FactorAuto: [],
@@ -75,9 +76,9 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         this.willFocusSubscription = this.props.navigation.addListener(
             "willFocus",
             () => {
-                this.setState( {
-                    flag_Loading: true
-                } )
+                // this.setState( {
+                //     flag_Loading: true
+                // } )  
                 this.loaddata();
             }
         );
@@ -88,94 +89,97 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
     loaddata = async () => {
         let walletDetails = await utils.getWalletDetails();
+        var resAccountDetails = await comFunDBRead.readTblAccount();
         let backupType = JSON.parse( walletDetails.appHealthStatus );
         let sssDetails = await utils.getSSSDetails();
-        console.log( { walletDetails, sssDetails } );
+        // console.log( { walletDetails, sssDetails } );
         let flag_isSetupTrustedContact, flag_isMnemonic;
         let encrShares = [];
         let history = [];
         let tempOpt = [];
         let temp = [];
         //Trusted Contacts
-        if ( sssDetails[ 0 ].keeperInfo == "" ) {
-            flag_isSetupTrustedContact = true;
-        } else {
-            flag_isSetupTrustedContact = false;
-
-            //Trusted Contacts list
-            for ( let i = 0; i < sssDetails.length; i++ ) {
-                encrShares.push( sssDetails[ i ].share )
-                history.push( JSON.parse( sssDetails[ i ].history ) )
-            }
-            //for history get opt
-            for ( let i = 0; i < history.length; i++ ) {
-                let eachHistory = history[ i ];
-                let eachHistoryLength = eachHistory.length;
-                let otp = eachHistory[ eachHistoryLength - 1 ].otp;
-                tempOpt.push( otp )
-            }
-            //console.log( parseInt( walletDetails.lastUpdated ) );
-            let updateShareIdStatus = await comAppHealth.connection_AppHealthStatus( parseInt( walletDetails.lastUpdated ), 0, encrShares, walletDetails.mnemonic );
-            // console.log( { updateShareIdStatus } );
-            if ( updateShareIdStatus ) {
-                var data = await dbOpration.readTablesData(
-                    localDB.tableName.tblSSSDetails
-                );
-                data = data.temp;
-                //console.log( { data } );
-                const dateTime = Date.now();
-                //const fulldate = Math.floor( dateTime / 1000 );
-                for ( let i = 0; i < data.length; i++ ) {
-                    let jsondata = JSON.parse( data[ i ].keeperInfo );
-                    jsondata.history = JSON.parse( data[ i ].history );
-                    let sharedDate = parseInt( data[ i ].sharedDate );
-                    // console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
-                    var startDate = new Date( dateTime );
-                    var endDate = new Date( sharedDate );
-                    //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
-                    var diff = Math.abs( startDate.getTime() - endDate.getTime() );
-                    //console.warn( 'diff' + diff.toString() );  
-                    const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
-                    const seconds: any = Math.floor( diff / 1000 % 60 );
-                    //console.log( { minutes, seconds } );
-                    //console.warn( minutes.toString() )
-                    const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
-                    let mesData = data[ i ];
-                    //  console.log( { totalSec, mesData } );
-                    jsondata.totalSec = 540 - totalSec;
-                    if ( totalSec < 540 && data[ i ].shareStage == "Ugly" ) {
-                        jsondata.statusMsg = "Shared";
-                        jsondata.statusMsgColor = "#C07710";
-                        jsondata.flag_timer = true;
-                        jsondata.opt = tempOpt[ i ];
-                    } else if ( totalSec >= 540 && data[ i ].shareStage == "Ugly" ) {
-                        jsondata.statusMsg = "Shared OTP expired.";
-                        jsondata.statusMsgColor = "#C07710";
-                        jsondata.flag_timer = false;
-                    } else if ( data[ i ].shareStage == "Good" ) {
-                        jsondata.statusMsg = "Share accessible";
-                        jsondata.statusMsgColor = "#008000";
-                        jsondata.flag_timer = false;
-                    } else if ( data[ i ].shareStage == "Bad" ) {
-                        jsondata.statusMsg = "Share accessible";
-                        jsondata.statusMsgColor = "#C07710";
-                        jsondata.flag_timer = false;
-                    } else if ( data[ i ].shareStage == "Ugly" && data[ i ].sharedDate != "" ) {
-                        jsondata.statusMsg = "Share not accessible";
-                        jsondata.statusMsgColor = "#ff0000";
-                        jsondata.flag_timer = false;
-                    }
-                    else {
-                        jsondata.statusMsg = "Not shared";
-                        jsondata.statusMsgColor = "#ff0000";
-                        jsondata.flag_timer = false;
-                    }
-                    temp.push( jsondata )
-                }
+        if ( sssDetails.length > 0 ) {
+            if ( sssDetails[ 0 ].keeperInfo == "" ) {
+                flag_isSetupTrustedContact = true;
             } else {
-                Alert.alert( "ShareId status not changed." )
+                flag_isSetupTrustedContact = false;
+                //Trusted Contacts list
+                for ( let i = 0; i < sssDetails.length; i++ ) {
+                    encrShares.push( sssDetails[ i ].share )
+                    history.push( JSON.parse( sssDetails[ i ].history ) )
+                }
+                //for history get opt
+                for ( let i = 0; i < history.length; i++ ) {
+                    let eachHistory = history[ i ];
+                    let eachHistoryLength = eachHistory.length;
+                    let otp = eachHistory[ eachHistoryLength - 1 ].otp;
+                    tempOpt.push( otp )
+                }
+                //console.log( parseInt( walletDetails.lastUpdated ) );
+                let updateShareIdStatus = await comAppHealth.connection_AppHealthStatus( parseInt( walletDetails.lastUpdated ), 0, encrShares, walletDetails.mnemonic );
+                // console.log( { updateShareIdStatus } );
+                if ( updateShareIdStatus ) {
+                    var data = await dbOpration.readTablesData(
+                        localDB.tableName.tblSSSDetails
+                    );
+                    data = data.temp;
+                    //console.log( { data } );
+                    const dateTime = Date.now();
+                    //const fulldate = Math.floor( dateTime / 1000 );
+                    for ( let i = 0; i < data.length; i++ ) {
+                        let jsondata = JSON.parse( data[ i ].keeperInfo );
+                        jsondata.history = JSON.parse( data[ i ].history );
+                        let sharedDate = parseInt( data[ i ].sharedDate );
+                        // console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
+                        var startDate = new Date( dateTime );
+                        var endDate = new Date( sharedDate );
+                        //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
+                        var diff = Math.abs( startDate.getTime() - endDate.getTime() );
+                        //console.warn( 'diff' + diff.toString() );  
+                        const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
+                        const seconds: any = Math.floor( diff / 1000 % 60 );
+                        //console.log( { minutes, seconds } );
+                        //console.warn( minutes.toString() )
+                        const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
+                        let mesData = data[ i ];
+                        //  console.log( { totalSec, mesData } );
+                        jsondata.totalSec = 540 - totalSec;
+                        if ( totalSec < 540 && data[ i ].shareStage == "Ugly" ) {
+                            jsondata.statusMsg = "Shared";
+                            jsondata.statusMsgColor = "#C07710";
+                            jsondata.flag_timer = true;
+                            jsondata.opt = tempOpt[ i ];
+                        } else if ( totalSec >= 540 && data[ i ].shareStage == "Ugly" ) {
+                            jsondata.statusMsg = "Shared OTP expired.";
+                            jsondata.statusMsgColor = "#C07710";
+                            jsondata.flag_timer = false;
+                        } else if ( data[ i ].shareStage == "Good" ) {
+                            jsondata.statusMsg = "Share accessible";
+                            jsondata.statusMsgColor = "#008000";
+                            jsondata.flag_timer = false;
+                        } else if ( data[ i ].shareStage == "Bad" ) {
+                            jsondata.statusMsg = "Share accessible";
+                            jsondata.statusMsgColor = "#C07710";
+                            jsondata.flag_timer = false;
+                        } else if ( data[ i ].shareStage == "Ugly" && data[ i ].sharedDate != "" ) {
+                            jsondata.statusMsg = "Share not accessible";
+                            jsondata.statusMsgColor = "#ff0000";
+                            jsondata.flag_timer = false;
+                        }
+                        else {
+                            jsondata.statusMsg = "Not shared";
+                            jsondata.statusMsgColor = "#ff0000";
+                            jsondata.flag_timer = false;
+                        }
+                        temp.push( jsondata )
+                    }
+                } else {
+                    Alert.alert( "ShareId status not changed." )
+                }
             }
-
+        } else {
+            flag_isMnemonic = true;
         }
         //Mnemonic
         if ( backupType.backupType != "share" ) {
@@ -183,6 +187,24 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         } else {
             flag_isMnemonic = false;
         }
+        let arr_Mnemonic = [
+            {
+                title: "Mnemonic",
+                subTitle: "Not backed up",
+                color: "#ff0000",
+                icon: "shield"
+            }
+        ];
+        let dbMnemonic = walletDetails.mnemonic;
+        let arr_CheckMnemonic = dbMnemonic.split( ' ' );
+        let arr_randomNo = utils.getRandomBetweenNumber( 1, arr_CheckMnemonic.length );
+        console.log( { arr_CheckMnemonic, arr_randomNo } );
+        let arr_MnemonicNumbers = [ converter.toOrdinal( arr_randomNo[ 0 ] ), converter.toOrdinal( arr_randomNo[ 1 ] ), converter.toOrdinal( arr_randomNo[ 2 ] ) ]
+        let arr_MnemoicWords = [ arr_CheckMnemonic[ arr_randomNo[ 0 ] - 1 ], arr_CheckMnemonic[ arr_randomNo[ 1 ] - 1 ], arr_CheckMnemonic[ arr_randomNo[ 2 ] - 1 ] ]
+        var arr_MnemonicDetails = [];
+        arr_MnemonicDetails = [ arr_MnemonicNumbers, arr_MnemoicWords ];
+        console.log( { arr_MnemonicDetails } );
+
 
         //Secret Questions  
         let arr_SecretQuestion = [
@@ -202,14 +224,25 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 icon: "shield"
             }
         ];
+        //Two Factor Autoentication
+        let secureAdditionalInfo = JSON.parse( resAccountDetails[ 1 ].additionalInfo );
+        let arr_SecureAccountDetials = [ {
+            secret: secureAdditionalInfo[ 0 ].setupData.secret
+        } ];
+        // console.log( { arr_SecureAccountDetials } );
         let setUpWalletAnswerDetails = JSON.parse( walletDetails.setUpWalletAnswerDetails );
-        console.log( { setUpWalletAnswerDetails } );
+        // console.log( { setUpWalletAnswerDetails } );
+
+
         this.setState( {
             flag_isSetupTrustedContact,
+            arr_Mnemonic,
+            arr_MnemonicDetails,
             flag_isMnemonic,
             arr_TrustedContacts: temp,
             arr_SecretQuestion,
             arr_2FactorAuto,
+            arr_SecureAccountDetials,
             arr_QuestionAndAnswerDetails: setUpWalletAnswerDetails[ 0 ],
             flag_Loading: false
         } )
@@ -241,7 +274,13 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
     //TODO: Setup Two Factor 
     click_TwoFactorSetup() {
-        this.props.navigation.push( "BackupSecureTwoFactorAutoScreen", { data: this.state.arr_QuestionAndAnswerDetails } );
+        this.props.navigation.push( "BackupSecureTwoFactorAutoScreen", { data: this.state.arr_SecureAccountDetials } );
+    }
+
+
+    //Mnemonic click
+    click_MnemoicItem() {
+        this.props.navigation.push( "HealthCheckMnemonicScreen", { data: this.state.arr_MnemonicDetails } );
     }
 
     render() {
@@ -268,123 +307,125 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                             enableOnAndroid={ true }
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
-                            <View style={ styles.viewTrustedContacts }>
-                                <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
-                                    <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Trusted Contacts</Text>
-                                </View>
-                                { renderIf( flag_isSetupTrustedContact != true )(
-                                    <View style={ { flex: 1 } }>
-                                        <FlatList
-                                            data={
-                                                arr_TrustedContacts
-                                            }
-                                            showsVerticalScrollIndicator={ false }
-                                            renderItem={ ( { item } ) => (
-                                                <TouchableOpacity style={ {
-                                                } } onPress={ () => {
-                                                    this.click_Item( item )
-                                                } }>
-                                                    <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
-                                                        <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                                            { renderIf( item.thumbnailPath != "" )(
-                                                                <Avatar medium rounded source={ { uri: item.thumbnailPath } } />
-                                                            ) }
-                                                            { renderIf( item.thumbnailPath == "" )(
-                                                                <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
-                                                            ) }
-                                                            <View style={ { flexDirection: "column", justifyContent: "center" } }>
-                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
-                                                                <View style={ { flexDirection: "row" } }>
-                                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                            { renderIf( flag_isMnemonic != true )(
+                                <View style={ styles.viewTrustedContacts }>
+                                    <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
+                                        <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Trusted Contacts</Text>
+                                    </View>
+                                    { renderIf( flag_isSetupTrustedContact != true )(
+                                        <View style={ { flex: 1 } }>
+                                            <FlatList
+                                                data={
+                                                    arr_TrustedContacts
+                                                }
+                                                showsVerticalScrollIndicator={ false }
+                                                renderItem={ ( { item } ) => (
+                                                    <TouchableOpacity style={ {
+                                                    } } onPress={ () => {
+                                                        this.click_Item( item )
+                                                    } }>
+                                                        <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
+                                                            <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
+                                                                { renderIf( item.thumbnailPath != "" )(
+                                                                    <Avatar medium rounded source={ { uri: item.thumbnailPath } } />
+                                                                ) }
+                                                                { renderIf( item.thumbnailPath == "" )(
+                                                                    <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
+                                                                ) }
+                                                                <View style={ { flexDirection: "column", justifyContent: "center" } }>
+                                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                                    <View style={ { flexDirection: "row" } }>
+                                                                        <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                                        { renderIf( typeof item.opt !== "undefined" )(
+                                                                            <TimerCountdown
+                                                                                initialMilliseconds={ item.totalSec * 1000 }
+                                                                                onExpire={ () => this.connection_Load() }
+                                                                                formatMilliseconds={ ( milliseconds ) => {
+                                                                                    const remainingSec = Math.round( milliseconds / 1000 );
+                                                                                    const seconds = parseInt( ( remainingSec % 60 ).toString(), 10 );
+                                                                                    const minutes = parseInt( ( ( remainingSec / 60 ) % 60 ).toString(), 10 );
+                                                                                    const hours = parseInt( ( remainingSec / 3600 ).toString(), 10 );
+                                                                                    const s = seconds < 10 ? '0' + seconds : seconds;
+                                                                                    const m = minutes < 10 ? '0' + minutes : minutes;
+                                                                                    let h = hours < 10 ? '0' + hours : hours;
+                                                                                    h = h === '00' ? '' : h + ':';
+                                                                                    return h + m + ':' + s;
+                                                                                } }
+                                                                                allowFontScaling={ true }
+                                                                                style={ { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } }
+                                                                            />
+                                                                        ) }
+                                                                    </View>
                                                                     { renderIf( typeof item.opt !== "undefined" )(
-                                                                        <TimerCountdown
-                                                                            initialMilliseconds={ item.totalSec * 1000 }
-                                                                            onExpire={ () => this.connection_Load() }
-                                                                            formatMilliseconds={ ( milliseconds ) => {
-                                                                                const remainingSec = Math.round( milliseconds / 1000 );
-                                                                                const seconds = parseInt( ( remainingSec % 60 ).toString(), 10 );
-                                                                                const minutes = parseInt( ( ( remainingSec / 60 ) % 60 ).toString(), 10 );
-                                                                                const hours = parseInt( ( remainingSec / 3600 ).toString(), 10 );
-                                                                                const s = seconds < 10 ? '0' + seconds : seconds;
-                                                                                const m = minutes < 10 ? '0' + minutes : minutes;
-                                                                                let h = hours < 10 ? '0' + hours : hours;
-                                                                                h = h === '00' ? '' : h + ':';
-                                                                                return h + m + ':' + s;
-                                                                            } }
-                                                                            allowFontScaling={ true }
-                                                                            style={ { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } }
-                                                                        />
+                                                                        <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>OTP { " " }{ item.opt }</Text>
                                                                     ) }
                                                                 </View>
-                                                                { renderIf( typeof item.opt !== "undefined" )(
-                                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>OTP { " " }{ item.opt }</Text>
-                                                                ) }
-                                                            </View>
-                                                            <View style={ {
-                                                                flex: 1,
-                                                                alignItems: 'flex-end',
-                                                                justifyContent: 'center'
-                                                            } }>
-                                                                <SvgIcon name="icon_share" size={ 25 } color={ primaryColor } />
+                                                                <View style={ {
+                                                                    flex: 1,
+                                                                    alignItems: 'flex-end',
+                                                                    justifyContent: 'center'
+                                                                } }>
+                                                                    <SvgIcon name="icon_share" size={ 25 } color={ primaryColor } />
+                                                                </View>
                                                             </View>
                                                         </View>
-                                                    </View>
-                                                </TouchableOpacity>
-                                            ) }
-                                            keyExtractor={ item => item.recordID }
-                                            extraData={ this.state }
-                                        />
-                                    </View>
-                                ) }
-                                { renderIf( flag_isSetupTrustedContact == true )(
-                                    <TouchableOpacity
-                                        onPress={ () => this.click_SetupTrustedContacts() }
-                                    >
-                                        <View style={ { flex: 0.00 } }>
-                                            <RkCard
-                                                rkType="shadowed"
-                                                style={ {
-                                                    flex: 1,
-                                                    borderRadius: 8,
-                                                    marginLeft: 8,
-                                                    marginRight: 8,
-                                                    marginBottom: 4,
-                                                } }
-                                            >
-                                                <View
-                                                    rkCardHeader
+                                                    </TouchableOpacity>
+                                                ) }
+                                                keyExtractor={ item => item.recordID }
+                                                extraData={ this.state }
+                                            />
+                                        </View>
+                                    ) }
+                                    { renderIf( flag_isSetupTrustedContact == true )(
+                                        <TouchableOpacity
+                                            onPress={ () => this.click_SetupTrustedContacts() }
+                                        >
+                                            <View style={ { flex: 0.00 } }>
+                                                <RkCard
+                                                    rkType="shadowed"
                                                     style={ {
                                                         flex: 1,
+                                                        borderRadius: 8,
+                                                        marginLeft: 8,
+                                                        marginRight: 8,
+                                                        marginBottom: 4,
                                                     } }
                                                 >
-                                                    <View style={ { flex: 0.2, justifyContent: "center", alignItems: "flex-start" } }>
-                                                        <IconFontAwe
-                                                            name="address-book"
-                                                            color="#BABABA"
-                                                            size={ 30 }
-                                                        />
-                                                    </View>
-                                                    <View style={ { flex: 1, flexDirection: "column" } }>
-                                                        <Text
-                                                            style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] }
-                                                        >
-                                                            Setup Trusted Contacts
+                                                    <View
+                                                        rkCardHeader
+                                                        style={ {
+                                                            flex: 1,
+                                                        } }
+                                                    >
+                                                        <View style={ { flex: 0.2, justifyContent: "center", alignItems: "flex-start" } }>
+                                                            <IconFontAwe
+                                                                name="address-book"
+                                                                color="#BABABA"
+                                                                size={ 30 }
+                                                            />
+                                                        </View>
+                                                        <View style={ { flex: 1, flexDirection: "column" } }>
+                                                            <Text
+                                                                style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] }
+                                                            >
+                                                                Setup Trusted Contacts
                                                 </Text>
-                                                        <Text note numberOfLines={ 1 } style={ { fontSize: 11 } }>Please first setup trusted contacts.</Text>
+                                                            <Text note numberOfLines={ 1 } style={ { fontSize: 11 } }>Please first setup trusted contacts.</Text>
+                                                        </View>
+                                                        <View style={ { flex: 0.2, justifyContent: "center", alignItems: "flex-end" } }>
+                                                            <SvgIcon
+                                                                name="icon_forword"
+                                                                color="#BABABA"
+                                                                size={ 20 }
+                                                            />
+                                                        </View>
                                                     </View>
-                                                    <View style={ { flex: 0.2, justifyContent: "center", alignItems: "flex-end" } }>
-                                                        <SvgIcon
-                                                            name="icon_forword"
-                                                            color="#BABABA"
-                                                            size={ 20 }
-                                                        />
-                                                    </View>
-                                                </View>
-                                            </RkCard>
-                                        </View>
-                                    </TouchableOpacity>
-                                ) }
-                            </View>
+                                                </RkCard>
+                                            </View>
+                                        </TouchableOpacity>
+                                    ) }
+                                </View>
+                            ) }
                             { renderIf( flag_isMnemonic == true )(
                                 <View style={ styles.viewMnemonic }>
                                     <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
@@ -397,7 +438,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                             scrollEnabled={ false }
                                             renderItem={ ( { item } ) => (
                                                 <TouchableOpacity
-                                                    onPress={ () => this.click_MenuItem( item ) }
+                                                    onPress={ () => this.click_MnemoicItem() }
                                                 >
                                                     <RkCard
                                                         rkType="shadowed"
@@ -428,7 +469,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                                 >
                                                                     { item.title }
                                                                 </Text>
-                                                                <Text note numberOfLines={ 1 } style={ { fontSize: 11 } }>{ item.subTitle }</Text>
+                                                                <Text note numberOfLines={ 1 } style={ { fontSize: 11, color: item.color } }>{ item.subTitle }</Text>
                                                             </View>
                                                             <View style={ { flex: 0.2, justifyContent: "center", alignItems: "flex-end" } }>
                                                                 <SvgIcon
