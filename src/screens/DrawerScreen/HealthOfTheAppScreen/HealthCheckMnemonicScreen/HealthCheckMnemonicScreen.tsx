@@ -29,6 +29,8 @@ import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/
 import ModelHealthCheckMnemonicFirstWord from "HexaWallet/src/app/custcompontes/Model/ModelHealthCheckMnemonic/ModelHealthCheckMnemonicFirstWord";
 import ModelHealthCheckMnemonicSecoundWord from "HexaWallet/src/app/custcompontes/Model/ModelHealthCheckMnemonic/ModelHealthCheckMnemonicSecoundWord";
 import ModelHealthCheckMnemonicThirdWord from "HexaWallet/src/app/custcompontes/Model/ModelHealthCheckMnemonic/ModelHealthCheckMnemonicThirdWord";
+import ModelHeackCheckMnemonicSucessBackedUp from "HexaWallet/src/app/custcompontes/Model/ModelHealthCheckMnemonic/ModelHeackCheckMnemonicSucessBackedUp";
+
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -51,6 +53,7 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 
 
+
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
@@ -61,7 +64,8 @@ export default class HealthCheckMnemonicScreen extends Component {
             data: [],
             arr_ModelHealthCheckMnemonicFirstWord: [],
             arr_ModelHealthCheckMnemonicSecoundWord: [],
-            arr_ModelHealthCheckMnemonicThirdWord: []
+            arr_ModelHealthCheckMnemonicThirdWord: [],
+            arr_ModelHeackCheckMnemonicSucessBackedUp: []
         };
     }
 
@@ -80,7 +84,7 @@ export default class HealthCheckMnemonicScreen extends Component {
     }
 
     render() {
-        let { arr_ModelHealthCheckMnemonicFirstWord, arr_ModelHealthCheckMnemonicSecoundWord, arr_ModelHealthCheckMnemonicThirdWord, data } = this.state;
+        let { arr_ModelHealthCheckMnemonicFirstWord, arr_ModelHealthCheckMnemonicSecoundWord, arr_ModelHealthCheckMnemonicThirdWord, arr_ModelHeackCheckMnemonicSucessBackedUp, data } = this.state;
         return (
             <View style={ styles.container }>
                 <SafeAreaView style={ styles.container }>
@@ -142,6 +146,9 @@ export default class HealthCheckMnemonicScreen extends Component {
                                     this.setState( {
                                         arr_ModelHealthCheckMnemonicThirdWord: [ {
                                             modalVisible: false,
+                                        } ],
+                                        arr_ModelHeackCheckMnemonicSucessBackedUp: [ {
+                                            modalVisible: true,
                                         } ]
                                     } )
                                 } }
@@ -152,6 +159,18 @@ export default class HealthCheckMnemonicScreen extends Component {
                                         } ]
                                     } )
                                     this.props.navigation.pop()
+                                } }
+                            />
+                            <ModelHeackCheckMnemonicSucessBackedUp data={ arr_ModelHeackCheckMnemonicSucessBackedUp }
+                                click_GoToWallet={ () => {
+                                    this.setState( {
+                                        arr_ModelHeackCheckMnemonicSucessBackedUp: [
+                                            {
+                                                modalVisible: false
+                                            }
+                                        ]
+                                    } )
+                                    this.props.navigation.pop();
                                 } }
                             />
                         </KeyboardAwareScrollView>
