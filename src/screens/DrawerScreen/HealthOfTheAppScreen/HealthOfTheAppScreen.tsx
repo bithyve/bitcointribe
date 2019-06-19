@@ -63,12 +63,16 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             arr_SecureAccountDetials: [],
             arr_ModelBackupYourWallet: [],
             arr_ModelFindYourTrustedContacts: [],
+
             flag_isTrustedContacts: true,
             flag_isSetupTrustedContact: false,
             flag_isMnemonic: false,
             flag_isSecretQuestions: true,
             flag_isTwoFactor: true,
-            flag_Loading: true
+            flag_Loading: true,
+            //TouchableOpacity Disable
+            flag_DisableSecureTwoFactor: true,
+            flag_DisableSecretQuestion: true
         } )
     }
 
@@ -207,33 +211,50 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
 
         //Secret Questions  
+        let flag_DisableSecretQuestion, subTitleQA;
+        let setUpWalletAnswerDetails = JSON.parse( walletDetails.setUpWalletAnswerDetails );
+        if ( setUpWalletAnswerDetails != "" ) {
+            flag_DisableSecretQuestion = false;
+            subTitleQA = "Not backed up";
+        } else {
+            flag_DisableSecretQuestion = true;
+            subTitleQA = "Please first setup your Secret Questions.";
+        }
         let arr_SecretQuestion = [
             {
                 title: "First Secret Question",
-                subTitle: "Not backed up",
+                subTitle: subTitleQA,
                 color: "#ff0000",
                 icon: "shield"
             }
         ];
+
         //Secure Two Factor Auto
+        let flag_DisableSecureTwoFactor, subTitleTwoFactor;
+        //Two Factor Autoentication
+        let secureAccountDetails = resAccountDetails[ 1 ];
+        if ( secureAccountDetails.address != "" ) {
+            flag_DisableSecureTwoFactor = false
+            subTitleTwoFactor = "Not backed up";
+        } else {
+            flag_DisableSecureTwoFactor = true;
+            subTitleTwoFactor = "Please first active Secure Account.";
+        }
+
         let arr_2FactorAuto = [
             {
                 title: "2 Factor Aunthentication",
-                subTitle: "Not backed up",
+                subTitle: subTitleTwoFactor,
                 color: "#ff0000",
                 icon: "shield"
             }
         ];
-        //Two Factor Autoentication
         let secureAdditionalInfo = JSON.parse( resAccountDetails[ 1 ].additionalInfo );
         let arr_SecureAccountDetials = [ {
             secret: secureAdditionalInfo[ 0 ].setupData.secret
         } ];
+
         // console.log( { arr_SecureAccountDetials } );
-        let setUpWalletAnswerDetails = JSON.parse( walletDetails.setUpWalletAnswerDetails );
-        // console.log( { setUpWalletAnswerDetails } );
-
-
         this.setState( {
             flag_isSetupTrustedContact,
             arr_Mnemonic,
@@ -244,6 +265,9 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             arr_2FactorAuto,
             arr_SecureAccountDetials,
             arr_QuestionAndAnswerDetails: setUpWalletAnswerDetails[ 0 ],
+            //TouchableOpacity  
+            flag_DisableSecureTwoFactor,
+            flag_DisableSecretQuestion,
             flag_Loading: false
         } )
     }
@@ -285,6 +309,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
     render() {
         let { flag_isTrustedContacts, flag_isSetupTrustedContact, flag_isMnemonic, flag_isSecretQuestions, flag_isTwoFactor, flag_Loading } = this.state;
+        //TouchableOpacity
+        let { flag_DisableSecureTwoFactor, flag_DisableSecretQuestion } = this.state;
         let { arr_TrustedContacts } = this.state;
         return (
             <Container>
@@ -499,6 +525,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                         renderItem={ ( { item } ) => (
                                             <TouchableOpacity
                                                 onPress={ () => this.click_SecretQuestion( item ) }
+                                                disabled={ flag_DisableSecretQuestion }
                                             >
                                                 <RkCard
                                                     rkType="shadowed"
@@ -559,6 +586,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                         renderItem={ ( { item } ) => (
                                             <TouchableOpacity
                                                 onPress={ () => this.click_TwoFactorSetup() }
+                                                disabled={ flag_DisableSecureTwoFactor }
                                             >
                                                 <RkCard
                                                     rkType="shadowed"
