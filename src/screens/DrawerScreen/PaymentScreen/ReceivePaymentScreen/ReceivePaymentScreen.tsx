@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Dimensions } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Dimensions, Clipboard, Alert } from "react-native";
 import {
     Container,
     Header,
@@ -21,6 +21,10 @@ import { RkCard } from "react-native-ui-kitten";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import QRCode from 'react-native-qrcode-svg';
+//import QRCode from 'react-native-qrcode';
+import Toast from 'react-native-simple-toast';
+import Share from 'react-native-share';
+import RNFetchBlob from 'react-native-fetch-blob';
 
 
 //TODO: Custome Pages
@@ -61,6 +65,7 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
             accountAddress: "",
             amount: "",
             qrcodeAddresWithAmount: "hexa",
+            flag_Loading: false
         } )
     }
 
@@ -77,7 +82,7 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
             arr_AccountList,
             accountName: arr_AccountList[ 0 ].accountName,
             accountAddress: arr_AccountList[ 0 ].address,
-            qrcodeAddresWithAmount: paymentQRCode.toString(),
+            qrcodeAddresWithAmount: paymentQRCode.paymentURI.toString(),
         } )
     }
 
@@ -97,19 +102,63 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
             accountName: value,
             amount: "",
             accountAddress: arr_AccountList[ index ].address,
-            qrcodeAddresWithAmount: paymentQRCode.toString(),
+            qrcodeAddresWithAmount: paymentQRCode.paymentURI.toString(),
         } );
     }
 
-    //input value change then get new code code string 
+    //get only address qrcode string
     getQrCode = async ( address: any, option?: any ) => {
-        console.log( { address, option } );
-
         let walletDetails = await utils.getWalletDetails();
         const regularAccount = new RegularAccount(
             walletDetails.mnemonic
         );
         return await regularAccount.getPaymentURI( address, option );
+    }
+
+    //amount change then get qrcode string
+    getQrCodeWithAmount = async () => {
+        let address = this.state.accountAddress;
+        let amount = this.state.amount;
+        console.log( { amount, address } );
+        let options = {
+            amount
+        }
+        let walletDetails = await utils.getWalletDetails();
+        const regularAccount = new RegularAccount(
+            walletDetails.mnemonic
+        );
+        var getQRCodeString;
+        if ( amount != "" ) {
+            getQRCodeString = await regularAccount.getPaymentURI( address, options );
+        } else {
+            getQRCodeString = await regularAccount.getPaymentURI( address );
+        }
+
+        console.log( { getQRCodeString } );
+        this.setState( {
+            qrcodeAddresWithAmount: getQRCodeString.paymentURI.toString(),
+        } )
+    }
+    //share qrcode image
+    click_ShareQRCode = async () => {
+        var base64Str;
+        let address = this.state.qrcodeAddresWithAmount;
+        let accountName = this.state.accountName;
+        await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + address, {
+        } )
+            .then( ( res: any ) => {
+                base64Str = "data:image/png;base64," + res.base64()
+            } )
+            .catch( ( errorMessage: string ) => {
+                Alert.alert( errorMessage )
+            } )
+        //console.log( { base64Str } );
+        const shareOptions = {
+            title: 'Hexa App',
+            message: "This is " + accountName + " qrcode",
+            url: base64Str
+        };
+        Share.open( shareOptions );
     }
 
     render() {
@@ -118,7 +167,7 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
         //values
         let { accountName, qrcodeAddresWithAmount, amount } = this.state;
         //flag
-
+        let { flag_Loading } = this.state;
         const itemList = arr_AccountList.map( ( item: any, index: number ) => (
             <Picker.Item label={ item.accountName } value={ item.accountName } />
         ) );
@@ -180,7 +229,15 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
                                             keyboardType="numeric"
                                             placeholder="Amount"
                                             placeholderTextColor="#D0D0D0"
-                                            onChange={ ( val ) => this.getQrCode( val ) }
+                                            returnKeyType="done"
+                                            onChangeText={ ( val ) => {
+                                                this.setState( {
+                                                    amount: val
+                                                } )
+                                                setTimeout( () => {
+                                                    this.getQrCodeWithAmount()
+                                                }, 100 );
+                                            } }
                                             style={ [ globalStyle.ffOpenSansBold, { flex: 1, fontSize: 18 } ] }
                                         />
                                     </View>
@@ -192,31 +249,37 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
                                     size={ Dimensions.get( 'screen' ).width - 120 }
                                 />
                                 <View style={ { flexDirection: "row", margin: 10 } }>
-                                    <Text style={ { color: "#1378B7" } }>dsajflkdsjlkfj  </Text>
-                                    <IconFontAwe
-                                        name="copy"
-                                        size={ 20 }
-                                        color="#2F2F2F"
-                                    />
+                                    <Text numberOfLines={ 1 } style={ { flex: 0.9, color: "#1378B7", textAlign: "center", marginLeft: 10, } }>{ qrcodeAddresWithAmount + "  " } </Text>
+                                    <TouchableOpacity onPress={ () => {
+                                        Clipboard.setString( qrcodeAddresWithAmount );
+                                        Toast.show( 'address copied' );
+                                    } }>
+                                        <IconFontAwe
+                                            name="copy"
+                                            size={ 20 }
+                                            color="#2F2F2F"
+                                        />
+                                    </TouchableOpacity>
                                 </View>
                             </View>
                             <View style={ { flex: 1 } }>
                                 <Text note style={ { textAlign: "center", margin: 5 } }>Share this address to receive founds</Text>
                                 <FullLinearGradientButton
                                     style={ [ { opacity: 1 }, { borderRadius: 10 } ] }
-                                    disabled={ this.state.status == true ? false : true }
-                                    title="Call to Action Comes Here"
-                                    click_Done={ () => console.log( 'working' ) }
+                                    disabled={ false }
+                                    title="Share QRCode"
+                                    click_Done={ () => this.click_ShareQRCode() }
                                 />
                             </View>
                         </KeyboardAwareScrollView>
                     </ImageBackground>
                 </SafeAreaView>
+                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
             </Container >
         );
     }
 }
-const primaryColor = colors.appColor;
+
 const styles = StyleSheet.create( {
     container: {
         flex: 1

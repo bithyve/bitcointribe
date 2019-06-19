@@ -45,6 +45,17 @@ export default class RegularAccount {
     },
   ) => this.hdWallet.generatePaymentURI( address, options )
 
+  public addressDiff = (
+    scannedStr: string,
+  ) =>
+    this.hdWallet.addressDiff( scannedStr )
+
+  public decodePaymentURI = (
+    paymentURI: string,
+  ) => this.hdWallet.decodePaymentURI( paymentURI )
+
+
+
 
   public transfer = async ( recipientAddress: string, amount: number ) => {
     if ( this.hdWallet.isValidAddress( recipientAddress ) ) {

@@ -51,6 +51,17 @@ export default class SecureAccount {
     },
   ) => this.secureHDWallet.generatePaymentURI( address, options )
 
+  public addressDiff = (
+    scannedStr: string,
+  ) =>
+    this.secureHDWallet.addressDiff( scannedStr )
+
+  public decodePaymentURI = (
+    paymentURI: string,
+  ) => this.secureHDWallet.decodePaymentURI( paymentURI )
+
+
+
   public validateSecureAccountSetup = async (
     token: number,
     secret: string,
