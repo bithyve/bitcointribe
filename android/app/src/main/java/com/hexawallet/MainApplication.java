@@ -3,6 +3,8 @@ package com.hexawallet;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import fr.snapp.imagebase64.RNImgToBase64Package;
+import fr.snapp.imagebase64.RNImgToBase64Package;
 import com.hopding.pdflib.PDFLibPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.chirag.RNMail.RNMail;
@@ -51,7 +53,9 @@ public class MainApplication extends Application implements ReactApplication {
 
     @Override
     protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(new SQLitePluginPackage(), new MainReactPackage(), new PDFLibPackage(),
+      return Arrays.<ReactPackage>asList(new SQLitePluginPackage(), new MainReactPackage(),
+            new RNImgToBase64Package(),
+            new RNImgToBase64Package(), new PDFLibPackage(),
           new RNFetchBlobPackage(), new RNMail(), SendSMSPackage.getInstance(), new ReactNativeContacts(),
           new RNCWebViewPackage(), new RNViewShotPackage(), new VectorIconsPackage(), new UdpSocketsModule(),
           new TcpSocketsModule(), new SvgPackage(), new SplashScreenReactPackage(), new RNSpinkitPackage(),

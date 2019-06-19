@@ -54,6 +54,9 @@ import Singleton from "HexaWallet/src/app/constants/Singleton";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
 
+//TODO: Bitcoin Files
+import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+
 export default class QrCodeScannerScreen extends React.Component {
     constructor ( props: any ) {
         super( props );
@@ -87,20 +90,32 @@ export default class QrCodeScannerScreen extends React.Component {
         )
     }
 
-    barcodeReceived( e: any ) {
+
+    barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
-            result = JSON.parse( result );
-            console.log( { result } );
-            AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
-            if ( result.type == "SSS Recovery" ) {
-                utils.setDeepLinkingType( "SSS Recovery QR" );
-                let deepLinkPara = {};
-                deepLinkPara.wn = result.wn;
-                deepLinkPara.data = result.data;
-                //console.log( { deepLinkPara } );
-                utils.setDeepLinkingUrl( deepLinkPara );
-                this.props.navigation.navigate( 'WalletScreen' );
+            let walletDetails = await utils.getWalletDetails();
+            const regularAccount = new RegularAccount(
+                walletDetails.mnemonic
+            );
+            let resAddressDiff = await regularAccount.addressDiff( result );
+            if ( resAddressDiff.type == "paymentURI" ) {
+                let resDecPaymentURI = await regularAccount.decodePaymentURI( result );
+                console.log( { resDecPaymentURI } );
+            } else if ( resAddressDiff.type == "address" ) {
+
+            } else {
+                result = JSON.parse( result );
+                AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
+                if ( result.type == "SSS Recovery" ) {
+                    utils.setDeepLinkingType( "SSS Recovery QR" );
+                    let deepLinkPara = {};
+                    deepLinkPara.wn = result.wn;
+                    deepLinkPara.data = result.data;
+                    //console.log( { deepLinkPara } );
+                    utils.setDeepLinkingUrl( deepLinkPara );
+                    this.props.navigation.navigate( 'WalletScreen' );
+                }
             }
         } catch ( error ) {
             console.log( error );
