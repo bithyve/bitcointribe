@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import bip32 from "bip32";
 import bip39 from "bip39";
 import bip65 from "bip65";
+import bip21 from "bip21";
 import bitcoinJS, {
   ECPair,
   Network,
@@ -77,6 +78,17 @@ export default class Bitcoin {
 
     const mnemonic = bip39.generateMnemonic( 256 );
     return this.generateHDWallet( mnemonic, passphrase );
+  }
+
+  public generatePaymentURI = (
+    address: string,
+    options?: { amount: number; label?: string; message?: string },
+  ): { paymentURI: string } => {
+    if ( options ) {
+      return { paymentURI: bip21.encode( address, options ) };
+    } else {
+      return { paymentURI: bip21.encode( address ) };
+    }
   }
 
   public getP2SH = ( keyPair: ECPair ) =>

@@ -124,6 +124,10 @@ import HealthCheckMnemonicScreen from "HexaWallet/src/screens/DrawerScreen/Healt
 
 
 
+
+//TODO: Payment Screen 
+import ReceivePaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/ReceivePaymentScreen/ReceivePaymentScreen";
+
 //TODO: StackNavigator
 
 //TODO: StackNavigator:ONBoarding
@@ -488,6 +492,21 @@ const ResotreSecureAccountStackNavigator = createStackNavigator(
 )
 
 
+//TODO: Payment Navigation
+//Receive Payment Stack Navigator
+const ReceivePaymentStackNavigator = createStackNavigator(
+  {
+    ReceivePaymentScreen: {
+      screen: ReceivePaymentScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "ReceivePaymentScreen"
+  }
+)
+
+
 
 //TODO: TabNavigator
 //TODO: TabNavigator:TabNavigator
@@ -674,7 +693,13 @@ export const createRootNavigator = (
       ResotreSecureAccountNavigator: {
         screen: ResotreSecureAccountStackNavigator,
         navigationOptions: { header: null }
-      }
+      },
+      //TODO: Payment Navigation
+      //ReceivePayment
+      ReceivePaymentNavigator: {
+        screen: ReceivePaymentStackNavigator,
+        navigationOptions: { header: null }
+      },
       //Drwaer Navigation
       // SecurityScreen: {
       //   screen: SecurityScreen,

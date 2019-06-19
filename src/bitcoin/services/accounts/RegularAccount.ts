@@ -36,6 +36,16 @@ export default class RegularAccount {
     return keyPair.publicKey;
   }
 
+  public getPaymentURI = (
+    address: string,
+    options?: {
+      amount: number;
+      label?: string;
+      message?: string;
+    },
+  ) => this.hdWallet.generatePaymentURI( address, options )
+
+
   public transfer = async ( recipientAddress: string, amount: number ) => {
     if ( this.hdWallet.isValidAddress( recipientAddress ) ) {
       // use decorators as they come out of experimental phase
