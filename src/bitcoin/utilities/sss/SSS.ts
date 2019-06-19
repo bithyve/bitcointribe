@@ -4,8 +4,6 @@ import crypto from "crypto";
 import secrets from "secrets.js-grempe";
 import config from "../../Config";
 
-
-
 export default class SSS {
   private mnemonic: string;
   private encryptedShares;
@@ -33,15 +31,11 @@ export default class SSS {
   public getShares = () => this.encryptedShares;
 
   public generateRandomString = length => {
-    let randomString: string = "";
-    const possibleChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    for ( let itr = 0; itr < length; itr++ ) {
-      randomString += possibleChars.charAt(
-        Math.floor( Math.random() * possibleChars.length )
-      );
-    }
-    return randomString;
+    lengthBytes = length / 2;
+    randomString = crypto.randomBytes(lengthBytes);
+    return randomString.toString('hex').toUpperCase();
   };
+
   public generateOTP = ( otpLength: number ) =>
     this.generateRandomString( otpLength );
 
@@ -70,7 +64,7 @@ export default class SSS {
         const shares = [];
         for ( const share of decryptedShares ) {
           if ( SSS.validShare( share ) ) {
-            shares.push( share.slice( 0, share.length - 4 ) );
+            shares.push( share.slice( 0, share.length - 8 ) );
           } else {
             throw new Error( `Invalid checksum, share: ${ share } is corrupt` );
           }
@@ -463,8 +457,8 @@ export default class SSS {
       .digest( "hex" );
 
   private static validShare = checksumedShare => {
-    const extractedChecksum = checksumedShare.slice( checksumedShare.length - 4 );
-    const recoveredShare = checksumedShare.slice( 0, checksumedShare.length - 4 );
+    const extractedChecksum = checksumedShare.slice( checksumedShare.length - 8 );
+    const recoveredShare = checksumedShare.slice( 0, checksumedShare.length - 8 );
     const calculatedChecksum = SSS.calculateChecksum( recoveredShare );
     if ( calculatedChecksum !== extractedChecksum ) {
       return false;
@@ -480,7 +474,7 @@ export default class SSS {
       temp = hash.digest( "hex" );
     }
 
-    return temp.slice( 0, 4 );
+    return temp.slice( 0, 8 );
   };
 
   private static generateKey = ( psuedoKey: string ) => {
