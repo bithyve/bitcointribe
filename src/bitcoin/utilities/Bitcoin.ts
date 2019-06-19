@@ -85,10 +85,24 @@ export default class Bitcoin {
     options?: { amount: number; label?: string; message?: string },
   ): { paymentURI: string } => {
     if ( options ) {
+      // options.amount = options.amount / 1e8; // converting from sats to btc
       return { paymentURI: bip21.encode( address, options ) };
     } else {
       return { paymentURI: bip21.encode( address ) };
     }
+  }
+
+  public decodePaymentURI = (
+    paymentURI: string,
+  ): {
+    address: string;
+    options: {
+      amount?: number;
+      label?: string;
+      message?: string;
+    };
+  } => {
+    return bip21.decode( paymentURI );
   }
 
   public getP2SH = ( keyPair: ECPair ) =>
@@ -624,6 +638,27 @@ export default class Bitcoin {
       return true;
     } catch ( e ) {
       return false;
+    }
+  }
+
+  public isPaymentURI = ( paymentURI: string ): boolean => {
+    if ( paymentURI.slice( 0, 8 ) === "bitcoin:" ) {
+      return true;
+    }
+    return false;
+  }
+
+  public addressDiff = (
+    scannedStr: string,
+  ): {
+    type: string;
+  } => {
+    if ( this.isPaymentURI( scannedStr ) ) {
+      return { type: "paymentURI" };
+    } else if ( this.isValidAddress( scannedStr ) ) {
+      return { type: "address" };
+    } else {
+      throw new Error( "Invalid QR: Neither an address nor paymentURI" );
     }
   }
 
