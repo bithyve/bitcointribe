@@ -194,3 +194,6 @@ compileSdkVersion = 28
 => check this lib bunyan  
 inside bunyan.js  
 
+# com.android.builder.dexing.DexArchiveMergerException: Error while merging dex archives: 
+
+

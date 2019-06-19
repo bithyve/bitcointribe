@@ -10,7 +10,8 @@ import {
   AsyncStorage,
   Alert,
   Image,
-  RefreshControl
+  RefreshControl,
+  ImageBackground
 } from "react-native";
 import {
   Container,
@@ -32,6 +33,7 @@ import DropdownAlert from "react-native-dropdownalert";
 import { SvgIcon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import Permissions from 'react-native-permissions';
+
 
 //Custome Compontes
 import ViewShieldIcons from "HexaWallet/src/app/custcompontes/View/ViewShieldIcons/ViewShieldIcons";
@@ -108,16 +110,21 @@ export default class WalletScreen extends React.Component {
       //DeepLinking Param   
       deepLinkingUrl: "",
       deepLinkingUrlType: "",
-      flag_FabActive: false
+      flag_FabActive: false,
+
+      //Circler Progress
+      progressFill: 15
     };
     isNetwork = utils.getNetwork();
   }
 
   //TODO: Page Life Cycle
   componentWillMount() {
+    let { progressFill } = this.state;
     this.willFocusSubscription = this.props.navigation.addListener(
       "willFocus",
       () => {
+
         isNetwork = utils.getNetwork();
         this.connnection_FetchData();
         this.getDeepLinkingData();
@@ -213,8 +220,9 @@ export default class WalletScreen extends React.Component {
           {
             "title": "Looks like your app needs a quick check to maintain good health",
             "image": "sheild_1",
-            "imageHeight": this.animatedShieldIconSize,
-            "imageWidth": this.animatedShieldIconSize
+            "imageHeight": 80, //this.animatedShieldIconSize,
+            "imageWidth": 80, //this.animatedShieldIconSize,
+            progressFill: 15
           }
         ]
       } );
@@ -225,8 +233,9 @@ export default class WalletScreen extends React.Component {
           {
             "title": "Your wallet is not secure, some Information about backup comes here. Click on the icon to backup",
             "image": "sheild_2",
-            "imageHeight": this.animatedShieldIconSize,
-            "imageWidth": this.animatedShieldIconSize
+            "imageHeight": 80, //this.animatedShieldIconSize,
+            "imageWidth": 80, //this.animatedShieldIconSize,
+            progressFill: 30
           }
         ]
       } );
@@ -377,6 +386,7 @@ export default class WalletScreen extends React.Component {
               borderRadius: 10
             } }
           >
+
             <View
               rkCardHeader
               style={ {
@@ -385,6 +395,7 @@ export default class WalletScreen extends React.Component {
                 borderBottomWidth: 1
               } }
             >
+
               <SvgIcon
                 name="icon_dailywallet"
                 color="#37A0DA"
@@ -443,6 +454,7 @@ export default class WalletScreen extends React.Component {
               </View>
 
             </View>
+
           </RkCard>
         ) }
         { renderIf( item.accountType == "Secure Account" && item.address == "" )(
@@ -600,6 +612,9 @@ export default class WalletScreen extends React.Component {
           <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
           <SafeAreaView style={ styles.container }>
             {/* Top View Animation */ }
+
+
+
             <Animated.View
               style={ {
                 height: this.animatedHeaderHeight,
@@ -644,27 +659,12 @@ export default class WalletScreen extends React.Component {
                 } }
               >
                 <ViewShieldIcons data={ this.state.arr_CustShiledIcon } click_Image={ () => {
-                  // let resSSSDetails = utils.getSSSDetails();
-                  // console.log( { resSSSDetails } );
-                  // if ( resSSSDetails.length > 0 ) {
-                  //   if ( this.state.shiledIconPer == 0 ) {
-                  //     this.props.navigation.push( "WalletSetUpScreen" )
-                  //   } else {  
-                  //     this.setState( {
-                  //       arr_ModelBackupYourWallet: [
-                  //         {
-                  //           modalVisible: true,
-                  //         }
-                  //       ]
-                  //     } )
-                  //   }
-                  // } else {
-                  //   Alert.alert( "Working." );
-                  // }  
                   this.props.navigation.push( "HealthOfTheAppNavigator" );
                 }
                 } />
               </Animated.View>
+
+
             </Animated.View>
 
 

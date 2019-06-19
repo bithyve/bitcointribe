@@ -77,7 +77,13 @@ export default class QrCodeScannerScreen extends React.Component {
 
     _renderMenu() {
         return (
-            <Text></Text>
+            <Button
+                full
+                style={ { margin: 15, borderRadius: 10, backgroundColor: "#ffffff" } }
+                onPress={ () => this.props.navigation.push( "ReceivePaymentNavigator" ) }
+            >
+                <Text style={ { color: "#000000" } }>Request Payment</Text>
+            </Button>
         )
     }
 
@@ -119,6 +125,7 @@ export default class QrCodeScannerScreen extends React.Component {
                             renderTopBarView={ () => this._renderTitleBar() }
                             renderBottomMenuView={ () => this._renderMenu() }
                         />
+
                     </ImageBackground>
                 </SafeAreaView>
             </Container >
