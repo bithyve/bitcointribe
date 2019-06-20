@@ -127,9 +127,13 @@ import HealthCheckMnemonicScreen from "HexaWallet/src/screens/DrawerScreen/Healt
 
 //TODO: Payment Screen 
 import ReceivePaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/ReceivePaymentScreen/ReceivePaymentScreen";
+import SendPaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/SendPaymentScreen/SendPaymentScreen";
+import ConfirmAndSendPaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/SendPaymentScreen/ConfirmAndSendPaymentScreen";
+
+
+
 
 //TODO: StackNavigator
-
 //TODO: StackNavigator:ONBoarding
 const OnBoardingStackNavigator = createStackNavigator(
   {
@@ -506,6 +510,23 @@ const ReceivePaymentStackNavigator = createStackNavigator(
   }
 )
 
+//Send Payment Stack Navigator
+const SendPaymentStackNavigator = createStackNavigator(
+  {
+    SendPaymentScreen: {
+      screen: SendPaymentScreen,
+      navigationOptions: { header: null }
+    },
+    ConfirmAndSendPaymentScreen: {
+      screen: ConfirmAndSendPaymentScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "SendPaymentScreen"
+  }
+)
+
 
 
 //TODO: TabNavigator
@@ -695,11 +716,16 @@ export const createRootNavigator = (
         navigationOptions: { header: null }
       },
       //TODO: Payment Navigation
-      //ReceivePayment
+      //ReceivePayment  
       ReceivePaymentNavigator: {
         screen: ReceivePaymentStackNavigator,
         navigationOptions: { header: null }
       },
+      //SentPayment    
+      SendPaymentNavigator: {
+        screen: SendPaymentStackNavigator,
+        navigationOptions: { header: null }
+      }
       //Drwaer Navigation
       // SecurityScreen: {
       //   screen: SecurityScreen,

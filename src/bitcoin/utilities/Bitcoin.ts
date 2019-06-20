@@ -166,6 +166,7 @@ export default class Bitcoin {
   public getBalanceByAddresses = async ( addresses ) => {
     let res: AxiosResponse;
     try {
+      throw new Error( "Temp Disable" )
       if ( this.network === bitcoinJS.networks.testnet ) {
         // throw new Error("fabricated error");
         res = await axios.post(
@@ -198,9 +199,9 @@ export default class Bitcoin {
         };
       }
     } catch ( err ) {
-      console.log(
-        `An error occured while fetching balance via Esplora: ${ err }`,
-      );
+      // console.log(
+      //   `An error occured while fetching balance via Esplora: ${ err }`,
+      // );
       console.log( "Using Blockcypher fallback" );
       try {
         const { bal, unconfirmedBal } = await this.blockcypherBalFallback(
