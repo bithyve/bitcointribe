@@ -56,12 +56,23 @@ import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/
 
 //TODO: Bitcoin Files
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
-
+var flag_SendPaymentScreen = true;
 export default class QrCodeScannerScreen extends React.Component {
     constructor ( props: any ) {
         super( props );
         this.state = {
         };
+    }
+    componentWillMount() {
+        this.willFocusSubscription = this.props.navigation.addListener(
+            "willFocus",
+            () => {
+                flag_SendPaymentScreen = true;
+            }
+        );
+    }
+    componentWillUnmount() {
+        this.willFocusSubscription.remove();
     }
 
     componentDidMount() {
@@ -99,11 +110,12 @@ export default class QrCodeScannerScreen extends React.Component {
                 walletDetails.mnemonic
             );
             let resAddressDiff = await regularAccount.addressDiff( result );
-            if ( resAddressDiff.type == "paymentURI" ) {
+            if ( resAddressDiff.type == "paymentURI" || resAddressDiff.type == "address" ) {
                 let resDecPaymentURI = await regularAccount.decodePaymentURI( result );
-                console.log( { resDecPaymentURI } );
-            } else if ( resAddressDiff.type == "address" ) {
-
+                if ( flag_SendPaymentScreen == true ) {
+                    this.props.navigation.push( "SendPaymentNavigator", { data: resDecPaymentURI } );
+                    flag_SendPaymentScreen = false;
+                }
             } else {
                 result = JSON.parse( result );
                 AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
