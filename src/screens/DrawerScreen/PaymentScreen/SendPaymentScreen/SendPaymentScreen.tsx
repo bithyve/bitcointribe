@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Dimensions, Clipboard, Image } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Dimensions, Clipboard, Image, Alert } from "react-native";
 import {
     Container,
     Header,
@@ -54,6 +54,7 @@ var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBR
 
 //TODO: Bitcoin Files
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
 
 export default class SendPaymentScreen extends React.Component<any, any> {
@@ -65,11 +66,13 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             address: "",
             amount: "0.0",
             memo: "",
+            selectedAccountBal: 0.0,
             memoMsg: "Add Memo",
             tranPrio: 1,
             //flag
             flag_Memo: false,
-            flag_DisableSentBtn: false
+            flag_DisableSentBtn: true,
+            flag_Loading: false
         } )
     }
 
@@ -86,13 +89,14 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         let arr_AccountList = await comFunDBRead.readTblAccount();
         console.log( { arr_AccountList } );
 
-        var temp = [], arr_SelectAccountDetails = [];
+        var temp = [], arr_SelectAccountDetails = [], balDailyAccount, flag_DisableSentBtn;
         for ( let i = 0; i < arr_AccountList.length; i++ ) {
             let item = arr_AccountList[ i ];
             let data = {};
             if ( i == 0 ) {
                 data.checked = true;
                 arr_SelectAccountDetails = item;
+                balDailyAccount = item.balance;
             } else {
                 data.checked = false;
             }
@@ -101,22 +105,44 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             data.address = item.address;
             temp.push( data );
         }
+        //Sent button Enable and Disable
+        if ( amount != "" && amount < balDailyAccount ) {
+            flag_DisableSentBtn = false;
+        } else if ( amount != "" && amount > balDailyAccount ) {
+            flag_DisableSentBtn = true;
+        }
+
 
         console.log( { temp } );
-
-
-
         this.setState( {
             address,
             amount,
             arr_AccountList: temp,
-            arr_SelectAccountDetails
+            arr_SelectAccountDetails,
+            selectedAccountBal: balDailyAccount,
+            flag_DisableSentBtn
         } )
     }
 
 
     setAmount() {
-        let { amount } = this.state;
+        let { amount, selectedAccountBal } = this.state;
+        let enterAmount = parseFloat( amount );
+
+        console.log( { enterAmount } );
+
+        var flag_DisableSentBtn;
+        if ( enterAmount != 0 && enterAmount < selectedAccountBal ) {
+            flag_DisableSentBtn = false;
+        } else if ( enterAmount >= selectedAccountBal ) {
+            flag_DisableSentBtn = true;
+        } else if ( amount == "" || enterAmount == 0 ) {
+            flag_DisableSentBtn = true;
+        }
+
+        this.setState( {
+            flag_DisableSentBtn
+        } )
 
     }
 
@@ -146,13 +172,70 @@ export default class SendPaymentScreen extends React.Component<any, any> {
 
 
     //TODO: Send they amount 
-    click_SendAmount() {
-        let data = {}
-        data.amount = this.state.amount;
-        data.memo = this.state.memo;
-        data.priority = this.state.tranPrio;
-        data.selectedAccount = this.state.arr_SelectAccountDetails;
-        this.props.navigation.push( "ConfirmAndSendPaymentScreen", { data: [ data ] } );
+    click_SendAmount = async () => {
+        this.setState( {
+            flag_Loading: true
+        } )
+        let { arr_SelectAccountDetails, address, amount, tranPrio } = this.state;
+        let amountFloat = parseFloat( amount );
+        let priority = this.getPriority( tranPrio );
+        console.log( { arr_SelectAccountDetails } );
+        let walletDetails = await utils.getWalletDetails();
+        let regularAccount = new RegularAccount( walletDetails.mnemonic );
+        var resTransferST;
+        let data = {};
+        if ( arr_SelectAccountDetails.accountType == "Regular Account" ) {
+            //console.log( { address, amountFloat, priority } );
+            resTransferST = await regularAccount.transferST1( address, amountFloat, priority );
+            console.log( { resTransferST } );
+        } else {
+        }
+        if ( resTransferST.status == 200 ) {
+            this.setState( {
+                flag_Loading: false
+            } )
+            data.mnemonic = walletDetails.mnemonic;
+            data.amount = this.state.amount;
+            data.respAddress = address;
+            data.bal = arr_SelectAccountDetails.balance;
+            data.accountName = arr_SelectAccountDetails.accountName;
+            data.memo = this.state.memo;
+            data.priority = priority;
+            data.tranFee = resTransferST.data.fee.toString();
+            data.selectedAccount = arr_SelectAccountDetails;
+            data.resTransferST = resTransferST;
+            this.props.navigation.push( "ConfirmAndSendPaymentScreen", { data: [ data ] } );
+        } else {
+            Alert.alert(
+                'Oops',
+                resTransferST.err + "\n Total Fee = " + resTransferST.data.fee,
+                [
+                    {
+                        text: 'Ok', onPress: () => {
+
+                        }
+                    },
+                ],
+                { cancelable: false },
+            );
+            this.setState( {
+                flag_DisableSentBtn: true,
+                flag_Loading: false
+            } )
+        }
+
+
+    }
+
+    //buz bitcoin need small letter 
+    getPriority( no: any ) {
+        if ( no == 0 ) {
+            return "High"
+        } else if ( no == 1 ) {
+            return "Medium"
+        } else {
+            return "Low"
+        }
     }
 
     _renderItem( { item, index } ) {
@@ -203,7 +286,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         //values
         let { amount, tranPrio, memoMsg, memo } = this.state;
         //flag
-        let { flag_Memo, flag_DisableSentBtn } = this.state;
+        let { flag_Memo, flag_DisableSentBtn, flag_Loading } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
@@ -335,7 +418,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
                         </KeyboardAwareScrollView>
                     </ImageBackground>
                 </SafeAreaView>
-                {/* <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } /> */ }
+                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
             </Container >
         );
     }

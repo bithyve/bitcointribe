@@ -348,22 +348,26 @@ export default class WalletScreen extends React.Component {
   refresh = async () => {
     this.setState( {
       flag_Loading: true
-    } )
+    } );
     var resAccount = await comFunDBRead.readTblAccount();
     console.log( { resAccount } );
     let resultWallet = await utils.getWalletDetails();
-    const regularAccount = new RegularAccount(
-      resultWallet.mnemonic
-    );
+    let regularAccount = await utils.getRegularAccountObject();
+    // const regularAccount = new RegularAccount(
+    //   resultWallet.mnemonic
+    // );    
+    console.log( { regularAccount } );
+    let resgetMnemonic = await regularAccount.getMnemonic();
+    console.log( { resgetMnemonic } );
     const getBal = await regularAccount.getBalance();
     console.log( { getBal } );
-    const resUpdateRegularAccountBal = await dbOpration.updateRegularAccountBal(
+    const resUpdateAccountBal = await dbOpration.updateAccountBal(
       localDB.tableName.tblAccount,
       resAccount[ 0 ].address,
       getBal.data.balance / 1e8,
       resAccount[ 0 ].id
     );
-    if ( resUpdateRegularAccountBal ) {
+    if ( resUpdateAccountBal ) {
       this.setState( {
         flag_Loading: false
       } )

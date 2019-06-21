@@ -69,36 +69,65 @@ export default class SecureAccount {
   ) =>
     await this.secureHDWallet.validateSecureAccountSetup( token, secret, xIndex )
 
-  public partiallySignedSecureTransaction = async ( {
-    recipientAddress,
-    amount,
-  }: {
-    recipientAddress: string;
-    amount: number;
-  } ) => {
-    if ( this.secureHDWallet.isValidAddress( recipientAddress ) ) {
-      const { data } = await this.secureHDWallet.fetchBalance();
-      const { balance, unconfirmedBalance } = data;
-      console.log( { balance, unconfirmedBalance } );
 
-      console.log( "---- Creating Transaction ----" );
-      const {
-        inputs,
-        txb,
-        fee,
-      } = await this.secureHDWallet.createSecureHDTransaction(
-        recipientAddress,
-        amount,
-      );
+  public transferST1 = async (
+    recipientAddress: string,
+    amount: number,
+    priority?: string,
+  ) => {
+    try {
+      if ( this.secureHDWallet.isValidAddress( recipientAddress ) ) {
+        amount = amount * 1e8; // converting into sats
+        const {
+          data
+        } = await this.secureHDWallet.fetchBalance();
 
-      console.log( "---- Transaction Created ----" );
-
-      if ( balance + unconfirmedBalance + fee < amount ) {
-        throw new Error(
-          "Insufficient balance to compensate for transfer amount and the txn fee",
+        console.log( "---- Creating Transaction ----" );
+        const {
+          inputs,
+          txb,
+          fee,
+        } = await this.secureHDWallet.createSecureHDTransaction(
+          recipientAddress,
+          amount,
+          priority.toLowerCase(),
         );
-      }
 
+        if ( data.balance + data.unconfirmedBalance < amount + fee ) {
+          return {
+            status: 400,
+            err:
+              "Insufficient balance to compensate for transfer amount and the txn fee",
+            data: { fee: fee / 1e8 },
+          };
+        }
+        if ( inputs && txb ) {
+          console.log( "---- Transaction Created ----" );
+          return {
+            status: 200,
+            data: { inputs, txb, fee: fee / 1e8 },
+          };
+        } else {
+          throw new Error( "Unable to create transaction" );
+        }
+      } else {
+        throw new Error( "Recipient address is wrong" );
+      }
+    } catch ( err ) {
+      return { status: 400, err: err.message };
+    }
+  }
+
+  public transferST2 = async (
+    inputs: Array<{
+      txId: string;
+      vout: number;
+      value: number;
+      address: string;
+    }>,
+    txb,
+  ) => {
+    try {
       const {
         signedTxb,
         childIndexArray,
@@ -109,45 +138,38 @@ export default class SecureAccount {
       console.log(
         "---- Transaction signed by the user (1st sig for 2/3 MultiSig)----",
       );
-      console.log( { txHex } );
-      return { txHex, childIndexArray };
-    } else {
+
       return {
-        status: 400,
-        errorMessage: "Supplied recipient address is wrong.",
+        status: 200,
+        data: { txHex, childIndexArray },
       };
+    } catch ( err ) {
+      return { status: 400, err: err.message };
     }
   }
 
-  public serverSigningAndBroadcasting = async (
-    token,
-    txHex,
-    childIndexArray,
-  ) => {
-    let res: AxiosResponse;
-    try {
-      console.log( this.secureHDWallet.walletID );
-      res = await axios.post( config.SERVER + "/secureHDTransaction", {
-        walletID: this.secureHDWallet.walletID,
-        token,
-        txHex,
-        childIndexArray,
-      } );
-      console.log(
-        "---- Transaction Signed by BH Server (2nd sig for 2/3 MultiSig)----",
-      );
-      console.log( { txHex: res.data.txHex } );
-      console.log( "------ Broadcasting Transaction --------" );
-      const bRes = await this.secureHDWallet.broadcastTransaction(
-        res.data.txHex,
-      );
-      return bRes;
-    } catch ( err ) {
-      console.log( "An error occured:", err );
-      return {
-        status: err.response.status,
-        errorMessage: err.response.data,
+  public transferST3 = async (
+    token: number,
+    txHex: string,
+    childIndexArray: Array<{
+      childIndex: number;
+      inputIdentifier: {
+        txId: string;
+        vout: number;
       };
+    }>,
+  ) => {
+    try {
+      return {
+        status: 200,
+        data: await this.secureHDWallet.serverSigningAndBroadcast(
+          token,
+          txHex,
+          childIndexArray,
+        ),
+      };
+    } catch ( err ) {
+      return { status: 400, err: err.message };
     }
   }
 }  
