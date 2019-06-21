@@ -651,7 +651,7 @@ const updateSecureAccountAddressAndBal = (
   } );
 };
 
-const updateRegularAccountBal = (
+const updateAccountBal = (
   tblName: string,
   address: string,
   bal: string,
@@ -1357,7 +1357,7 @@ module.exports = {
   insertCreateAccount,
   insertLastBeforeCreateAccount,
   updateSecureAccountAddressAndBal,
-  updateRegularAccountBal,
+  updateAccountBal,
 
   //Transation Details
   insertTblTransation,

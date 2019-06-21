@@ -105,8 +105,12 @@ export default class HDSegwitWallet extends Bitcoin {
       return this.addressToWIFCache[ address ];
     } // cache hit
 
+
+
     // fast approach, first lets iterate over all addressess we have in cache
     for ( const index of Object.keys( this.internalAddresssesCache ) ) {
+      console.log( { index } );
+
       if ( this.getInternalAddressByIndex( parseInt( index, 10 ) ) === address ) {
         return ( this.addressToWIFCache[ address ] = this.getInternalWIFByIndex(
           parseInt( index, 10 ),
@@ -123,14 +127,14 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     // cache miss: lets iterate over all addresses we have up to first unused address index
-    for ( let itr = 0; itr <= this.nextFreeChangeAddressIndex + 3; itr++ ) {
+    for ( let itr = 0; itr <= this.nextFreeChangeAddressIndex + 5; itr++ ) {
       const possibleAddress = this.getInternalAddressByIndex( itr );
       if ( possibleAddress === address ) {
         return this.getInternalWIFByIndex( itr );
       }
     }
 
-    for ( let itr = 0; itr <= this.nextFreeAddressIndex + 3; itr++ ) {
+    for ( let itr = 0; itr <= this.nextFreeAddressIndex + 5; itr++ ) {
       const possibleAddress = this.getExternalAddressByIndex( itr );
       if ( possibleAddress === address ) {
         return this.getExternalWIFByIndex( itr );
@@ -388,9 +392,9 @@ export default class HDSegwitWallet extends Bitcoin {
   public createHDTransaction = async (
     recipientAddress: string,
     amount: number,
-    nSequence?: number,
     txnPriority?: string,
-  ): Promise<{ inputs: object[]; txb: TransactionBuilder; fee: number }> => {
+    nSequence?: number,
+  ) => {
     const inputUTXOs = await this.fetchUtxo();
     console.log( "Input UTXOs:", inputUTXOs );
     const outputUTXOs = [ { address: recipientAddress, value: amount } ];
@@ -406,6 +410,15 @@ export default class HDSegwitWallet extends Bitcoin {
     console.log( "\tFee", fee );
     console.log( "\tInputs:", inputs );
     console.log( "\tOutputs:", outputs );
+
+
+
+    if ( !inputs ) {
+      // insufficient input utxos to compensate for output utxos + fee
+      console.log( "Ran" );
+
+      return { fee };
+    }
 
     const txb: TransactionBuilder = new bitcoinJS.TransactionBuilder(
       this.network,

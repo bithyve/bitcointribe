@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, Dimensions, Platform, SafeAreaView, Alert } from "react-native";
+import { StyleSheet, ImageBackground, View, Dimensions, Platform, SafeAreaView, Alert, AsyncStorage } from "react-native";
 import {
     Container,
     Header,
@@ -29,7 +29,7 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, localDB, asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
@@ -117,6 +117,14 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
             mnemonic
         );
         const secureAccount = new SecureAccount( mnemonic );
+        let object = { regularAccount, secureAccount }
+        await AsyncStorage.setItem(
+            asyncStorageKeys.bitcoinClassObject,
+            JSON.stringify( object )
+        );
+        //Singleton class object set
+        await utils.setRegularAccountObject( regularAccount );
+        await utils.setSecureAccountObject( secureAccount );
         const resSetupSecureAccount = await secureAccount.setupSecureAccount();
         // console.log( resSetupSecureAccount.data.setupData );
         const secondaryMnemonic = await secureAccount.getRecoveryMnemonic();

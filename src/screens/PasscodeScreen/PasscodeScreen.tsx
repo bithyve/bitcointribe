@@ -121,7 +121,10 @@ export default class PasscodeScreen extends Component {
 
   onSuccess = async ( code: string ) => {
     const rootViewController = await AsyncStorage.getItem( asyncStorageKeys.rootViewController );
-    // console.log( { rootViewController } );
+    var bitcoinClassObject = await AsyncStorage.getItem( asyncStorageKeys.bitcoinClassObject );
+    bitcoinClassObject = JSON.parse( bitcoinClassObject );
+    await utils.setRegularAccountObject( bitcoinClassObject.regularAccount );
+    await utils.setSecureAccountObject( bitcoinClassObject.secureAccount );
     let pageName = utils.getRootViewController();
     let walletDetails = await comFunDBRead.readTblWallet();
     if ( pageName != "TrustedPartyShareSecretNavigator" && pageName != "OTPScreenNavigator" ) {

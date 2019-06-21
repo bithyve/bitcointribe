@@ -204,7 +204,7 @@ export default class SecureHDWallet extends Bitcoin {
       return this.signingEssentialsCache[ address ];
     } // cache hit
 
-    for ( let itr = 0; itr <= this.nextFreeChildIndex + 3; itr++ ) {
+    for ( let itr = 0; itr <= this.nextFreeChildIndex + 5; itr++ ) {
       const multiSig = this.createSecureMultiSig( itr );
 
       if ( multiSig.address === address ) {
@@ -471,4 +471,45 @@ export default class SecureHDWallet extends Bitcoin {
 
     return { signedTxb: txb, childIndexArray };
   }
+
+  public serverSigningAndBroadcast = async (
+    token: number,
+    txHex: string,
+    childIndexArray: Array<{
+      childIndex: number;
+      inputIdentifier: {
+        txId: string;
+        vout: number;
+      };
+    }>,
+  ): Promise<{
+    txid: string;
+  }> => {
+    try {
+      let res;
+      try {
+        res = await axios.post( "secureHDTransaction", {
+          walletID: this.walletID,
+          token,
+          txHex,
+          childIndexArray,
+        } );
+      } catch ( err ) {
+        throw new Error( err.response.data.err );
+      }
+
+      console.log(
+        "---- Transaction Signed by BH Server (2nd sig for 2/3 MultiSig)----",
+      );
+
+      console.log( { txHex: res.data.txHex } );
+      console.log( "------ Broadcasting Transaction --------" );
+
+      const { txid } = await this.broadcastTransaction( res.data.txHex );
+      return { txid };
+    } catch ( err ) {
+      throw new Error( `Unable to transfer: ${ err.message }` );
+    }
+  }
+
 }
