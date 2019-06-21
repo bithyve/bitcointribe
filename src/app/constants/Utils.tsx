@@ -240,7 +240,29 @@ const setAppHealthStatus = ( value: any ) => {
   return true;
 }
 
+//TODO: Singleton Bitcoin Class
 
+
+const getRegularAccountObject = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getRegularAccountObject();
+}
+
+const setRegularAccountObject = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setRegularAccountObject( value );
+  return true;
+}
+
+const getSecureAccountObject = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getSecureAccountObject();
+}
+const setSecureAccountObject = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setSecureAccountObject( value );
+  return true;
+}
 
 
 module.exports = {
@@ -257,7 +279,8 @@ module.exports = {
   getDeviceModel,
   getStatusBarHeight,
   getIphoneSize,
-  //Singleton       
+
+  //Singleton          
   getMnemonic,
   getWalletDetails,
   setWalletDetails,
@@ -280,5 +303,9 @@ module.exports = {
   getAppHealthStatus,
   setAppHealthStatus,
 
-
-};
+  //Singleton Bitcoin Class
+  getRegularAccountObject,
+  setRegularAccountObject,
+  getSecureAccountObject,
+  setSecureAccountObject
+};   

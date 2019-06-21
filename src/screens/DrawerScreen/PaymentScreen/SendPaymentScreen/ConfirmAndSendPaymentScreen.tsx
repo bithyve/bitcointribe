@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Dimensions, Clipboard, Image } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Dimensions, Clipboard, Alert } from "react-native";
 import {
     Container,
     Header,
@@ -55,28 +55,103 @@ var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBR
 
 //TODO: Bitcoin Files
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
 
 export default class ConfirmAndSendPaymentScreen extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props )
         this.state = ( {
-            flag_DisableSentBtn: false
+            data: [],
+            flag_DisableSentBtn: false,
+            flag_Loading: false
         } )
     }
 
     async componentWillMount() {
-        let data = this.props.navigation.getParam( "data" );
+        var data = this.props.navigation.getParam( "data" );
+        data = data[ 0 ]
         console.log( { data } );
         let walletDetails = await utils.getWalletDetails();
         let arr_AccountList = await comFunDBRead.readTblAccount();
 
+        this.setState( {
+            data: data
+        } )
+    }
+
+    //TODO: Sent amount
+    click_SentAmount = async () => {
+        //this.setState( { flag_Loading:true})
+        let { data } = this.state;
+        let regularAccount = new RegularAccount( data.mnemonic );
+        let inputs = data.resTransferST.data.inputs;
+        let txb = data.resTransferST.data.txb
+        console.log( { inputs, txb } );
+        var resTransferST;
+        if ( data.selectedAccount.accountType == "Regular Account" ) {
+            resTransferST = await regularAccount.transferST2( data.resTransferST.data.inputs, data.resTransferST.data.txb );
+        }
+        if ( resTransferST.status == 200 ) {
+            //Get Balance 
+            let bal, getTransactions;
+            if ( data.selectedAccount.accountType == "Regular Account" ) {
+                bal = await regularAccount.getBalance();
+                console.log( { bal } );
+            } else {
+            }
+            if ( bal.status == 200 ) {
+                const resUpdateAccountBal = await dbOpration.updateAccountBal(
+                    localDB.tableName.tblAccount,
+                    data.selectedAccount.address,
+                    bal.data.balance / 1e8,
+                    data.selectedAccount.id
+                );
+                if ( resUpdateAccountBal ) {
+                    getTransactions = await regularAccount.getTransactions();
+                    console.log( { getTransactions } );
+                }
+                console.log( { resUpdateAccountBal } );
+            } else {
+                Alert.alert(
+                    'Oops',
+                    bal.err,
+                    [
+                        {
+                            text: 'Ok', onPress: () => {
+
+                            }
+                        },
+                    ],
+                    { cancelable: false },
+                );
+            }
+        } else {
+            Alert.alert(
+                'Oops',
+                resTransferST.err,
+                [
+                    {
+                        text: 'Ok', onPress: () => {
+
+                        }
+                    },
+                ],
+                { cancelable: false },
+            );
+        }
+
+
+
+        console.log( { resTransferST } );
     }
 
 
     render() {
+        //array 
+        let { data } = this.state;
         //flag  
-        let { flag_DisableSentBtn } = this.state;
+        let { flag_DisableSentBtn, flag_Loading } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
@@ -100,7 +175,7 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
                         >
                             <View style={ { flex: 1, marginTop: 20, alignItems: "center" } }>
                                 <Text note>FUNDS BEING TRANSFERRED TO</Text>
-                                <Text style={ [ { margin: 10, fontWeight: "bold" } ] }>9843729548372</Text>
+                                <Text style={ [ { margin: 10, fontWeight: "bold", textAlign: "center" } ] }>{ data.respAddress }</Text>
                                 <Text note style={ { textAlign: "center", margin: 10 } }>Kindly confirm the address Founds once transferred can not be recovered.</Text>
                             </View>
                             <View style={ { flex: 1 } }>
@@ -113,7 +188,7 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
                                             style={ { flex: 0.25 } }
                                         />
                                         <View style={ { flexDirection: "column" } }>
-                                            <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 16 } ] }>account</Text>
+                                            <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 16 } ] }>{ data.accountName }</Text>
                                             <View style={ { flexDirection: "row", alignItems: "center" } }>
                                                 <Text note style={ [ { fontSize: 12 } ] }>Available balance</Text>
                                                 <SvgIcon
@@ -121,41 +196,101 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
                                                     color="#D0D0D0"
                                                     size={ 15 }
                                                 />
-                                                <Text note style={ { fontSize: 12, marginLeft: -0.01 } }>bal</Text>
+                                                <Text note style={ { fontSize: 12, marginLeft: -0.01 } }>{ data.bal }</Text>
                                             </View>
                                         </View>
                                     </View>
                                 </View>
                                 <View style={ { flex: 1 } }>
-                                    <Card style={ { flex: 1, marginLeft: 10, marginRight: 10, marginTop: 10, alignItems: "center" } }>
-                                        <CardItem>
-                                            <Body>
-                                                <Text>
-                                                //Your text here
-                                                </Text>
-                                            </Body>
-                                        </CardItem>
-                                    </Card>
-                                </View>
+                                    <RkCard
+                                        rkType="shadowed"
+                                        style={ {
+                                            flex: 1,
+                                            margin: 10,
+                                            padding: 10,
+                                            borderRadius: 10
+                                        } }
+                                    >
+                                        <View
+                                            rkCardBody
+                                        >
+                                            <View style={ { flex: 1, alignItems: "center", flexDirection: "row" } }>
+                                                <SvgIcon
+                                                    name="icon_bitcoin"
+                                                    color="#D0D0D0"
+                                                    size={ 40 }
+                                                    style={ { flex: 0.3, marginLeft: 20 } }
+                                                />
+                                                <View>
+                                                    <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 30 } ] }> { data.amount }</Text>
 
+                                                    <View style={ { flexDirection: "row", alignItems: "center" } }>
+                                                        <Text note style={ [ { fontSize: 12 } ] }>Transaction Fee</Text>
+                                                        <SvgIcon
+                                                            name="icon_bitcoin"
+                                                            color="#D0D0D0"
+                                                            size={ 15 }
+                                                        />
+                                                        <Text note style={ { fontSize: 12, marginLeft: -0.01 } }>{ data.tranFee }</Text>
+
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </RkCard>
+                                    { renderIf( data.memo != "" )(
+                                        <RkCard
+                                            rkType="shadowed"
+                                            style={ {
+                                                flex: 1,
+                                                margin: 10,
+                                                padding: 10,
+                                                borderRadius: 10
+                                            } }
+                                        >
+                                            <View
+                                                rkCardBody
+                                            >
+                                                <View style={ { flex: 1 } }>
+                                                    <Text style={ [ globalStyle.ffFiraSansRegular, { fontSize: 14, margin: 14 } ] }>{ data.memo }</Text>
+                                                </View>
+                                            </View>
+                                        </RkCard>
+                                    ) }
+                                </View>
                                 <View style={ { flex: 1 } }>
-
+                                    <Text style={ { margin: 15 } }>Transaction Priority</Text>
+                                    <RkCard
+                                        rkType="shadowed"
+                                        style={ {
+                                            flex: 1,
+                                            margin: 10,
+                                            padding: 10,
+                                            borderRadius: 10
+                                        } }
+                                    >
+                                        <View
+                                            rkCardBody
+                                        >
+                                            <View style={ { flex: 1, padding: 10 } }>
+                                                <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 14 } ] }>{ data.priority } Priority</Text>
+                                            </View>
+                                        </View>
+                                    </RkCard>
                                 </View>
-
                             </View>
                             <View style={ { flex: 1 } }>
-
                                 <FullLinearGradientButton
                                     style={ [ flag_DisableSentBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
                                     disabled={ flag_DisableSentBtn }
                                     title="Send"
-                                    click_Done={ () => this.click_ShareQRCode() }
+                                    click_Done={ () => this.click_SentAmount() }
                                 />
                             </View>
                         </KeyboardAwareScrollView>
                     </ImageBackground>
                 </SafeAreaView>
-                {/* <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } /> */ }
+                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
             </Container >
         );
     }

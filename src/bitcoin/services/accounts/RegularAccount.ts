@@ -54,6 +54,66 @@ export default class RegularAccount {
     paymentURI: string,
   ) => this.hdWallet.decodePaymentURI( paymentURI )
 
+  public transferST1 = async (
+    recipientAddress: string,
+    amount: number,
+    priority?: string,
+  ) => {
+
+    if ( this.hdWallet.isValidAddress( recipientAddress ) ) {
+      amount = amount * 1e8 //converting into sats
+      console.log( { transferAmount: amount } );
+
+      const {
+        data
+      } = await this.hdWallet.fetchBalance();
+      console.log( data );
+
+      const { inputs, txb, fee } = await this.hdWallet.createHDTransaction(
+        recipientAddress,
+        amount,
+        priority.toLowerCase(),
+      );
+      console.log( "---- Transaction Created ----" );
+      console.log( data.balance + fee, amount );
+
+
+      if ( data.balance + data.unconfirmedBalance < amount + fee ) {
+        return {
+          status: 400,
+          err:
+            "Insufficient balance to compensate for transfer amount and the txn fee",
+          data: { fee: fee / 1e8 },
+        };
+      }
+
+      if ( inputs && txb ) {
+        return { status: 200, data: { inputs, txb, fee: fee / 1e8 } }
+
+      } else {
+        throw new Error( "Unable to create txn" )
+      }
+    } else {
+      throw new Error( "Recipient address is wrong" );
+    }
+  }
+
+  public transferST2 = async (
+    inputs,
+    txb,
+  ) => {
+    try {
+      const signedTxb = this.hdWallet.signHDTransaction( inputs, txb );
+      console.log( "---- Transaction Signed ----" );
+
+      const txHex = signedTxb.build().toHex();
+      const { data } = await this.hdWallet.broadcastTransaction( txHex );
+      console.log( "---- Transaction Broadcasted ----" );
+      return { status: 200, data: { txid: data.txid } }
+    } catch ( err ) {
+      return { status: 400, err: `Transfer failed: ${ err.message }` }
+    }
+  }
 
 
 
@@ -70,7 +130,7 @@ export default class RegularAccount {
       );
       console.log( "---- Transaction Created ----" );
 
-      if ( balance + unconfirmedBalance + fee < amount ) {
+      if ( balance + unconfirmedBalance < amount + fee ) {
         throw new Error(
           "Insufficient balance to compensate for transfer amount and the txn fee",
         );

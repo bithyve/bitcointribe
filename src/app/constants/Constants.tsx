@@ -138,7 +138,8 @@ var notification = {
 
 var asyncStorageKeys = {
   rootViewController: "rootViewController",
-  flag_PasscodeCreate: "flag_PasscodeCreate"
+  flag_PasscodeCreate: "flag_PasscodeCreate",
+  bitcoinClassObject: "bitcoinClassObject"
 }
 
 export {
