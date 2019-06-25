@@ -106,9 +106,10 @@ export default class QrCodeScannerScreen extends React.Component {
         try {
             var result = e.data;
             let walletDetails = await utils.getWalletDetails();
-            const regularAccount = new RegularAccount(
-                walletDetails.mnemonic
-            );
+            let regularAccount = await utils.getRegularAccountObject();
+            // const regularAccount = new RegularAccount(
+            //     walletDetails.mnemonic
+            // );
             let resAddressDiff = await regularAccount.addressDiff( result );
             if ( resAddressDiff.type == "paymentURI" || resAddressDiff.type == "address" ) {
                 let resDecPaymentURI = await regularAccount.decodePaymentURI( result );

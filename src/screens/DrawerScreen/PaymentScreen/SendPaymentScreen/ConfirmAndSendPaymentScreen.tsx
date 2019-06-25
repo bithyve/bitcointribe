@@ -84,7 +84,8 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
     click_SentAmount = async () => {
         //this.setState( { flag_Loading:true})
         let { data } = this.state;
-        let regularAccount = new RegularAccount( data.mnemonic );
+        let regularAccount = await utils.getRegularAccountObject();
+        // let regularAccount = new RegularAccount( data.mnemonic );
         let inputs = data.resTransferST.data.inputs;
         let txb = data.resTransferST.data.txb
         console.log( { inputs, txb } );
@@ -110,6 +111,12 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
                 if ( resUpdateAccountBal ) {
                     getTransactions = await regularAccount.getTransactions();
                     console.log( { getTransactions } );
+                    //update db bal
+                    const resUpdateAccountBal = await dbOpration.updateAccountBalAddressWise(
+                        localDB.tableName.tblAccount,
+                        resAccount[ 0 ].address,
+                        bal.data.balance / 1e8
+                    );
                 }
                 console.log( { resUpdateAccountBal } );
             } else {

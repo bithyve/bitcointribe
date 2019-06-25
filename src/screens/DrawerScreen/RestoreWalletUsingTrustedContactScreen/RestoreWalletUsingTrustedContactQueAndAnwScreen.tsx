@@ -136,9 +136,10 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
         console.log( { decryptedShare, answers } );
         const mnemonic = await S3Service.recoverFromShares( decryptedShare, answers );
         console.log( mnemonic )
-        const regularAccount = new RegularAccount(
-            mnemonic
-        );
+        let regularAccount = await utils.getRegularAccountObject();
+        // const regularAccount = new RegularAccount(
+        //     mnemonic
+        // );
         await dbOpration.updateWalletMnemonicAndAnwserDetails(
             localDB.tableName.tblWallet,
             mnemonic,

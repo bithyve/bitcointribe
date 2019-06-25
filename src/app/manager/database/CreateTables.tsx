@@ -51,6 +51,12 @@ export default class CreateTables extends Component {
         " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,keeperInfo TEXT NOT NULL DEFAULT '',urlScript TEXT NOT NULL DEFAULT '',decrShare TEXT NOT NULL DEFAULT '',shareId TEXT NOT NULL DEFAULT '',metaData TEXT NOT NULL DEFAULT '',nonPMDDData TEXT NOT NULL DEFAULT '',history TEXT NOT NULL DEFAULT '',sharedDate TEXT NOT NULL DEFAULT '',type TEXT NOT NULL DEFAULT '')",
         []
       );
+      txn.executeSql(
+        "CREATE TABLE IF NOT EXISTS " +
+        localDB.tableName.tblBitcoinClassObject +
+        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,className BLOB,type TEXT)",
+        []
+      );
       console.log( "create database." );
     } );
   }
