@@ -17,6 +17,7 @@ import {
 } from "native-base";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import bip39 from 'react-native-bip39';
+// var RNFS = require( 'react-native-fs' );
 
 
 //TODO: Custome Pages
@@ -113,18 +114,39 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         const encryptedShares = sss.generateShares( answers );
         console.log( { encryptedShares } );
         const resInitializeHealthcheck = await sss.initializeHealthcheck( encryptedShares );
+        //let regularAccount = await utils.getRegularAccountObject();
         const regularAccount = new RegularAccount(
             mnemonic
         );
         const secureAccount = new SecureAccount( mnemonic );
-        let object = { regularAccount, secureAccount }
-        await AsyncStorage.setItem(
-            asyncStorageKeys.bitcoinClassObject,
-            JSON.stringify( object )
-        );
-        //Singleton class object set
         await utils.setRegularAccountObject( regularAccount );
         await utils.setSecureAccountObject( secureAccount );
+
+
+        // let replacer = ( key: any, value: any ) => {
+        //     // if we get a function give us the code for that function  
+        //     if ( typeof value === 'function' ) {
+        //         return value.toString();
+        //     }
+        //     return value;
+        // }
+        // var regularJson = JSON.stringify( regularAccount, replacer, 2 );
+        // var secureJson = JSON.stringify( secureAccount, replacer, 2 );
+        // AsyncStorage.setItem(
+        //     asyncStorageKeys.regularClassObject,
+        //     regularJson
+        // );
+        // AsyncStorage.setItem(
+        //     asyncStorageKeys.secureClassObject,
+        //     secureJson
+        // );
+        // console.log( { regularAccount, secureAccount } );
+        // console.log( { regularJson, secureJson } );
+        // //Singleton class object set            
+        // await utils.setRegularAccountObject( regularJson );
+        // await utils.setSecureAccountObject( secureJson );  
+
+
         const resSetupSecureAccount = await secureAccount.setupSecureAccount();
         // console.log( resSetupSecureAccount.data.setupData );
         const secondaryMnemonic = await secureAccount.getRecoveryMnemonic();
@@ -218,6 +240,8 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         }
 
     }
+
+
 
 
     //console.log( { shareIds});

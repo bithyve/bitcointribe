@@ -77,9 +77,10 @@ export default class ModelEnterAndConfirmMnemonic extends Component<Props, any> 
                 flag_ConfirmBtnAnimating: true
             } );
             let mnemonic = this.state.mnemonic;
-            const regularAccount = new RegularAccount(
-                this.state.mnemonic
-            );
+            let regularAccount = await utils.getRegularAccountObject();
+            // const regularAccount = new RegularAccount(
+            //     this.state.mnemonic
+            // );
             const getBal = await regularAccount.getBalance();
             console.log( { getBal } );
 

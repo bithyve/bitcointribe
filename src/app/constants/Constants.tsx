@@ -128,7 +128,8 @@ var localDB = {
     tblAccount: Config.DB_TBL_ACCOUNT,
     tblTransaction: Config.DB_TBL_TRANSACTION,
     tblSSSDetails: Config.DB_TBL_SSSDETAILS,
-    tblTrustedPartySSSDetails: Config.DB_TBL_TBLTRUSTEDPARTYSSSDETAILS
+    tblTrustedPartySSSDetails: Config.DB_TBL_TBLTRUSTEDPARTYSSSDETAILS,
+    tblBitcoinClassObject: Config.DB_TBL_BITCOINCLASSOBJECT
   }
 };
 
@@ -139,7 +140,8 @@ var notification = {
 var asyncStorageKeys = {
   rootViewController: "rootViewController",
   flag_PasscodeCreate: "flag_PasscodeCreate",
-  bitcoinClassObject: "bitcoinClassObject"
+  regularClassObject: "regularClassObject",
+  secureClassObject: "secureClassObject"
 }
 
 export {

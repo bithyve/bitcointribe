@@ -181,7 +181,8 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         let priority = this.getPriority( tranPrio );
         console.log( { arr_SelectAccountDetails } );
         let walletDetails = await utils.getWalletDetails();
-        let regularAccount = new RegularAccount( walletDetails.mnemonic );
+        let regularAccount = await utils.getRegularAccountObject();
+        // let regularAccount = new RegularAccount( walletDetails.mnemonic );
         var resTransferST;
         let data = {};
         if ( arr_SelectAccountDetails.accountType == "Regular Account" ) {
