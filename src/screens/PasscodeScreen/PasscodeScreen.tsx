@@ -44,6 +44,10 @@ var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBR
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
+//TODO: Bitcoin Files
+import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
+
 export default class PasscodeScreen extends Component {
 
   constructor ( props: any ) {
@@ -121,10 +125,35 @@ export default class PasscodeScreen extends Component {
 
   onSuccess = async ( code: string ) => {
     const rootViewController = await AsyncStorage.getItem( asyncStorageKeys.rootViewController );
-    var bitcoinClassObject = await AsyncStorage.getItem( asyncStorageKeys.bitcoinClassObject );
-    bitcoinClassObject = JSON.parse( bitcoinClassObject );
-    await utils.setRegularAccountObject( bitcoinClassObject.regularAccount );
-    await utils.setSecureAccountObject( bitcoinClassObject.secureAccount );
+    let walletDet = await utils.getWalletDetails();
+    if ( walletDet != undefined ) {
+      const regularAccount = new RegularAccount(
+        walletDet.mnemonic
+      );
+      const secureAccount = new SecureAccount( walletDet.mnemonic );
+      await utils.setRegularAccountObject( regularAccount );
+      await utils.setSecureAccountObject( secureAccount );
+    }
+
+    // de_serialize.js   
+    // let reviver = ( key: any, value: any ) => {
+    //   if ( typeof value === 'string'
+    //     && value.indexOf( 'function ' ) === 0 ) {
+    //     let functionTemplate = `(${ value })`;
+    //     return eval( functionTemplate );
+    //   }
+    //   return value;
+    // }
+    // var regularClassObject = await AsyncStorage.getItem( asyncStorageKeys.regularClassObject );
+    // regularClassObject = JSON.parse( regularClassObject, reviver );
+    // var secureClassObject = await AsyncStorage.getItem( asyncStorageKeys.secureClassObject );
+    // secureClassObject = JSON.parse( secureClassObject, reviver );
+    // console.log( { regularClassObject, secureClassObject } );
+    // await utils.setRegularAccountObject( regularClassObject );
+    // await utils.setSecureAccountObject( secureClassObject );
+
+
+    //   await utils.setSecureAccountObject( secureAccount );
     let pageName = utils.getRootViewController();
     let walletDetails = await comFunDBRead.readTblWallet();
     if ( pageName != "TrustedPartyShareSecretNavigator" && pageName != "OTPScreenNavigator" ) {

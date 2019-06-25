@@ -109,9 +109,11 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
     //get only address qrcode string
     getQrCode = async ( address: any, option?: any ) => {
         let walletDetails = await utils.getWalletDetails();
-        const regularAccount = new RegularAccount(
-            walletDetails.mnemonic
-        );
+        let regularAccount = await utils.getRegularAccountObject();
+        console.log( regularAccount );
+        // const regularAccount = new RegularAccount(
+        //     walletDetails.mnemonic
+        // );
         return await regularAccount.getPaymentURI( address, option );
     }
 
@@ -124,9 +126,10 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
             amount
         }
         let walletDetails = await utils.getWalletDetails();
-        const regularAccount = new RegularAccount(
-            walletDetails.mnemonic
-        );
+        let regularAccount = await utils.getRegularAccountObject();
+        // const regularAccount = new RegularAccount(
+        //     walletDetails.mnemonic
+        // );
         var getQRCodeString;
         if ( amount != "" ) {
             getQRCodeString = await regularAccount.getPaymentURI( address, options );

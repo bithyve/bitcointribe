@@ -651,6 +651,46 @@ const updateSecureAccountAddressAndBal = (
   } );
 };
 
+const updateAccountBalAddressWise = (
+  tblName: string,
+  address: string,
+  bal: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+          var len = results.rows.length;
+          if ( len > 0 ) {
+            for ( let i = 0; i < len; i++ ) {
+              let dbdecryptAddress = utils.decrypt(
+                results.rows.item( i ).address,
+                passcode
+              );
+              let dbAddress = results.rows.item( i ).address;
+              if ( dbdecryptAddress == address ) {
+                txn.executeSql(
+                  "update " +
+                  tblName +
+                  " set balance =:balance where address = :address",
+                  [
+                    utils.encrypt( bal.toString(), passcode ),
+                    dbAddress
+                  ]
+                );
+                resolve( true );
+              }
+            }
+          }
+        } );
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
 const updateAccountBal = (
   tblName: string,
   address: string,
@@ -693,6 +733,10 @@ const updateAccountBal = (
     }
   } );
 };
+
+
+
+
 
 
 
@@ -1339,6 +1383,57 @@ const updateHistroyAndSharedDate = (
 };
 
 
+//TODO: ========================================>  Bitcoin Class Object  <========================================
+
+
+const inertBitcoinClassObject = (
+  tblName: string,
+  classObject: any,
+  type: any
+) => {
+  classObject = JSON.stringify( classObject );
+  classObject = JSON.stringify( classObject );
+  console.log( { classObject } );
+  return new Promise( ( resolve, reject ) => {
+    db.transaction( function ( txn: any ) {
+      txn.executeSql(
+        "INSERT INTO " +
+        tblName +
+        "(className,type) VALUES (:className,:type)",
+        [
+          classObject.toString(),
+          type
+        ]
+      );
+      resolve( true );
+    } );
+  } );
+};
+
+const readClassObject = ( tableName: any ) => {
+  return new Promise( ( resolve, reject ) => {
+    db.transaction( tx => {
+      tx.executeSql( "SELECT * FROM " + tableName, [], ( tx, results ) => {
+        var len = results.rows.length;
+        console.log( { len } );
+
+        let temp = [];
+        if ( len > 0 ) {
+          for ( let i = 0; i < len; i++ ) {
+            let data = results.rows.item( i );
+            console.log( { data } );
+            temp.push( data );
+          }
+          resolve( { temp } );
+        }
+
+
+
+      } );
+    } );
+  } );
+};
+
 module.exports = {
   readTablesData,
   readAccountTablesData,
@@ -1358,6 +1453,7 @@ module.exports = {
   insertLastBeforeCreateAccount,
   updateSecureAccountAddressAndBal,
   updateAccountBal,
+  updateAccountBalAddressWise,
 
   //Transation Details
   insertTblTransation,
@@ -1377,5 +1473,9 @@ module.exports = {
   //SSS Trusted Party Details 
   insertTrustedPartyDetails,
   insertTrustedPartyDetailWithoutAssociate,
-  updateHistroyAndSharedDate
+  updateHistroyAndSharedDate,
+
+  //Bitcoin Class Object Store
+  inertBitcoinClassObject,
+  readClassObject
 };    
