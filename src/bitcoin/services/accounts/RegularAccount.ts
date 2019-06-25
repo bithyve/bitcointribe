@@ -2,12 +2,56 @@ import bip39 from "bip39";
 import HDSegwitWallet from "../../utilities/HDSegwitWallet";
 
 export default class RegularAccount {
-  public hdWallet: HDSegwitWallet;
+  public static fromJSON = ( json: string ) => {
+    const { hdWallet } = JSON.parse( json );
+    const {
+      mnemonic,
+      usedAddresses,
+      nextFreeAddressIndex,
+      nextFreeChangeAddressIndex,
+      internalAddresssesCache,
+      externalAddressesCache,
+      addressToWIFCache,
+    }: {
+      mnemonic: string;
+      passphrase: string;
+      purpose: number;
+      usedAddresses: string[];
+      nextFreeAddressIndex: number;
+      nextFreeChangeAddressIndex: number;
+      internalAddresssesCache: {};
+      externalAddressesCache: {};
+      addressToWIFCache: {};
+    } = hdWallet;
 
-  constructor ( mnemonic?: string ) {
+    return new RegularAccount( mnemonic, {
+      usedAddresses,
+      nextFreeAddressIndex,
+      nextFreeChangeAddressIndex,
+      internalAddresssesCache,
+      externalAddressesCache,
+      addressToWIFCache,
+    } );
+  }
+  private hdWallet: HDSegwitWallet;
+
+  constructor (
+    mnemonic?: string,
+    stateVars?: {
+      usedAddresses: string[];
+      nextFreeAddressIndex: number;
+      nextFreeChangeAddressIndex: number;
+      internalAddresssesCache: {};
+      externalAddressesCache: {};
+      addressToWIFCache: {};
+    },
+  ) {
     if ( mnemonic ) {
       if ( bip39.validateMnemonic( mnemonic ) ) {
-        this.hdWallet = new HDSegwitWallet( mnemonic );
+        this.hdWallet = new HDSegwitWallet(
+          mnemonic,
+          stateVars,
+        );
       } else {
         throw new Error( "Invalid Mnemonic" );
       }

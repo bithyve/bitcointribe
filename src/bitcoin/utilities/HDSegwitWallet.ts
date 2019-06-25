@@ -15,15 +15,21 @@ export default class HDSegwitWallet extends Bitcoin {
   public externalAddressesCache;
   public addressToWIFCache;
 
-  constructor ( mnemonic?: string ) {
+  constructor ( mnemonic?: string, stateVars?: any ) {
     super();
     this.mnemonic = mnemonic ? mnemonic : bip39.generateMnemonic( 256 );
-    this.usedAddresses = [];
-    this.nextFreeAddressIndex = 0;
-    this.nextFreeChangeAddressIndex = 0;
-    this.internalAddresssesCache = {}; // index => address
-    this.externalAddressesCache = {}; // index => address
-    this.addressToWIFCache = {};
+    this.usedAddresses = stateVars ? stateVars.usedAddresses : [];
+    this.nextFreeAddressIndex = stateVars ? stateVars.nextFreeAddressIndex : 0;
+    this.nextFreeChangeAddressIndex = stateVars
+      ? stateVars.nextFreeChangeAddressIndex
+      : 0;
+    this.internalAddresssesCache = stateVars
+      ? stateVars.internalAddresssesCache
+      : {}; // index => address
+    this.externalAddressesCache = stateVars
+      ? stateVars.externalAddressesCache
+      : {}; // index => address
+    this.addressToWIFCache = stateVars ? stateVars.addressToWIFCache : {};
   }
 
   public getMnemonic = () => {

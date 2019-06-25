@@ -128,8 +128,7 @@ var localDB = {
     tblAccount: Config.DB_TBL_ACCOUNT,
     tblTransaction: Config.DB_TBL_TRANSACTION,
     tblSSSDetails: Config.DB_TBL_SSSDETAILS,
-    tblTrustedPartySSSDetails: Config.DB_TBL_TBLTRUSTEDPARTYSSSDETAILS,
-    tblBitcoinClassObject: Config.DB_TBL_BITCOINCLASSOBJECT
+    tblTrustedPartySSSDetails: Config.DB_TBL_TBLTRUSTEDPARTYSSSDETAILS
   }
 };
 

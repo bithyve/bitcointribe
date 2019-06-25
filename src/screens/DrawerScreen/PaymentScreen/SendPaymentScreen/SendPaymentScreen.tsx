@@ -128,9 +128,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
     setAmount() {
         let { amount, selectedAccountBal } = this.state;
         let enterAmount = parseFloat( amount );
-
         console.log( { enterAmount } );
-
         var flag_DisableSentBtn;
         if ( enterAmount != 0 && enterAmount < selectedAccountBal ) {
             flag_DisableSentBtn = false;
@@ -139,11 +137,9 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         } else if ( amount == "" || enterAmount == 0 ) {
             flag_DisableSentBtn = true;
         }
-
         this.setState( {
             flag_DisableSentBtn
         } )
-
     }
 
     //Change account details on account list
