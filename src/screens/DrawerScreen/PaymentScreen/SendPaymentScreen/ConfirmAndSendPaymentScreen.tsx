@@ -38,6 +38,9 @@ import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
 import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model/ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
 
+//TODO: Custome Alert   
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -56,6 +59,7 @@ var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBR
 //TODO: Bitcoin Files
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
+
 
 
 export default class ConfirmAndSendPaymentScreen extends React.Component<any, any> {
@@ -80,6 +84,10 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
         } )
     }
 
+    click_Ok = () => {
+        this.props.navigation.navigate( "TabbarBottom" );
+    }
+
     //TODO: Sent amount
     click_SentAmount = async () => {
         //this.setState( { flag_Loading:true})
@@ -95,44 +103,9 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
         }
         if ( resTransferST.status == 200 ) {
             //Get Balance 
-            let bal, getTransactions;
-            if ( data.selectedAccount.accountType == "Regular Account" ) {
-                bal = await regularAccount.getBalance();
-                console.log( { bal } );
-            } else {
-            }
-            if ( bal.status == 200 ) {
-                const resUpdateAccountBal = await dbOpration.updateAccountBal(
-                    localDB.tableName.tblAccount,
-                    data.selectedAccount.address,
-                    bal.data.balance / 1e8,
-                    data.selectedAccount.id
-                );
-                if ( resUpdateAccountBal ) {
-                    getTransactions = await regularAccount.getTransactions();
-                    console.log( { getTransactions } );
-                    //update db bal
-                    const resUpdateAccountBal = await dbOpration.updateAccountBalAddressWise(
-                        localDB.tableName.tblAccount,
-                        resAccount[ 0 ].address,
-                        bal.data.balance / 1e8
-                    );
-                }
-                console.log( { resUpdateAccountBal } );
-            } else {
-                Alert.alert(
-                    'Oops',
-                    bal.err,
-                    [
-                        {
-                            text: 'Ok', onPress: () => {
+            let alert = new AlertSimple();
+            alert.simpleOk( "Success", "Your payment sent successfully.", this.click_Ok );
 
-                            }
-                        },
-                    ],
-                    { cancelable: false },
-                );
-            }
         } else {
             Alert.alert(
                 'Oops',

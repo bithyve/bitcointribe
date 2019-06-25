@@ -1,16 +1,64 @@
-import axios, { AxiosResponse } from "axios";
-import config from "../../Config";
 import SecureHDWallet from "../../utilities/SecureHDWallet";
 
 export default class SecureAccount {
-  public secureHDWallet: SecureHDWallet;
+  public static fromJSON = ( json: string ) => {
+    const { secureHDWallet } = JSON.parse( json );
+    const {
+      primaryMnemonic,
+      secondaryMnemonic,
+      consumedAddresses,
+      nextFreeChildIndex,
+      multiSigCache,
+      signingEssentialsCache,
+      primaryXpriv,
+      xpubs,
+    }: {
+      primaryMnemonic: string;
+      secondaryMnemonic: string;
+      consumedAddresses: string[];
+      nextFreeChildIndex: number;
+      multiSigCache: {};
+      signingEssentialsCache: {};
+      primaryXpriv: string;
+      xpubs: {
+        primary: string;
+        secondary: string;
+        bh: string;
+      };
+    } = secureHDWallet;
 
-  constructor ( primaryMnemonic: string ) {
-    this.secureHDWallet = new SecureHDWallet( primaryMnemonic );
+    return new SecureAccount( primaryMnemonic, {
+      secondaryMnemonic,
+      consumedAddresses,
+      nextFreeChildIndex,
+      multiSigCache,
+      signingEssentialsCache,
+      primaryXpriv,
+      xpubs,
+    } );
   }
+  private secureHDWallet: SecureHDWallet;
 
-  public prepareSecureAccount = async ( bhXpub, secondaryXpub ) =>
-    this.secureHDWallet.prepareSecureAccount( bhXpub, secondaryXpub );
+  constructor (
+    primaryMnemonic: string,
+    stateVars?: {
+      secondaryMnemonic: string;
+      consumedAddresses: string[];
+      nextFreeChildIndex: number;
+      multiSigCache: {};
+      signingEssentialsCache: {};
+      primaryXpriv: string;
+      xpubs: {
+        primary: string;
+        secondary: string;
+        bh: string;
+      };
+    },
+  ) {
+    console.log( "Running secure constructor" );
+
+    this.secureHDWallet = new SecureHDWallet( primaryMnemonic, stateVars );
+  }
 
 
   public getRecoveryMnemonic = async () =>

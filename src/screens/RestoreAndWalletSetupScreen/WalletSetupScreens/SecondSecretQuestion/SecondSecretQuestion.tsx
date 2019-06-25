@@ -119,9 +119,18 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
             mnemonic
         );
         const secureAccount = new SecureAccount( mnemonic );
+        var regularJson = JSON.stringify( regularAccount );
+        var secureJson = JSON.stringify( secureAccount );
+        AsyncStorage.setItem(
+            asyncStorageKeys.regularClassObject,
+            regularJson
+        );
+        AsyncStorage.setItem(
+            asyncStorageKeys.secureClassObject,
+            secureJson
+        );
         await utils.setRegularAccountObject( regularAccount );
         await utils.setSecureAccountObject( secureAccount );
-
 
         // let replacer = ( key: any, value: any ) => {
         //     // if we get a function give us the code for that function  
@@ -147,7 +156,12 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         // await utils.setSecureAccountObject( secureJson );  
 
 
+        console.log( "Setting up secure" );
+
+
         const resSetupSecureAccount = await secureAccount.setupSecureAccount();
+        console.log( "setted up secure" );
+
         // console.log( resSetupSecureAccount.data.setupData );
         const secondaryMnemonic = await secureAccount.getRecoveryMnemonic();
         let arr_SecureDetails = [];

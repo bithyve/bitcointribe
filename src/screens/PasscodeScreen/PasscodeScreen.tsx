@@ -122,18 +122,32 @@ export default class PasscodeScreen extends Component {
     }
   }
 
-
   onSuccess = async ( code: string ) => {
     const rootViewController = await AsyncStorage.getItem( asyncStorageKeys.rootViewController );
-    let walletDet = await utils.getWalletDetails();
-    if ( walletDet != undefined ) {
-      const regularAccount = new RegularAccount(
-        walletDet.mnemonic
-      );
-      const secureAccount = new SecureAccount( walletDet.mnemonic );
-      await utils.setRegularAccountObject( regularAccount );
-      await utils.setSecureAccountObject( secureAccount );
-    }
+    let regularClassObject = await AsyncStorage.getItem( asyncStorageKeys.regularClassObject );
+    let secureClassObject = await AsyncStorage.getItem( asyncStorageKeys.secureClassObject );
+    const regularAccount = RegularAccount.fromJSON( regularClassObject );
+    // console.log( { regularAccount } );
+    await utils.setRegularAccountObject( regularAccount );
+
+    //secure account
+    // let walletDet = await utils.getWalletDetails();
+    // const secureAccount = new SecureAccount( walletDet.mnemonic );
+    // await utils.setSecureAccountObject( secureAccount );
+
+    //let walletDet = await utils.getWalletDetails();
+    const secureAccount = SecureAccount( secureClassObject );
+    await utils.setSecureAccountObject( secureAccount );
+
+
+    // if ( walletDet != undefined ) {  
+    //   const regularAccount = new RegularAccount(
+    //     walletDet.mnemonic
+    //   );
+    //   const secureAccount = new SecureAccount( walletDet.mnemonic );
+    //   await utils.setRegularAccountObject( regularAccount );
+    //   await utils.setSecureAccountObject( secureAccount );
+    // }
 
     // de_serialize.js   
     // let reviver = ( key: any, value: any ) => {

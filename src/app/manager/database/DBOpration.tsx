@@ -1334,13 +1334,6 @@ const insertTrustedPartyDetailWithoutAssociate = (
   } );
 };
 
-
-
-
-
-
-
-
 const updateHistroyAndSharedDate = (
   tblName: string,
   history: any,
@@ -1383,57 +1376,6 @@ const updateHistroyAndSharedDate = (
 };
 
 
-//TODO: ========================================>  Bitcoin Class Object  <========================================
-
-
-const inertBitcoinClassObject = (
-  tblName: string,
-  classObject: any,
-  type: any
-) => {
-  classObject = JSON.stringify( classObject );
-  classObject = JSON.stringify( classObject );
-  console.log( { classObject } );
-  return new Promise( ( resolve, reject ) => {
-    db.transaction( function ( txn: any ) {
-      txn.executeSql(
-        "INSERT INTO " +
-        tblName +
-        "(className,type) VALUES (:className,:type)",
-        [
-          classObject.toString(),
-          type
-        ]
-      );
-      resolve( true );
-    } );
-  } );
-};
-
-const readClassObject = ( tableName: any ) => {
-  return new Promise( ( resolve, reject ) => {
-    db.transaction( tx => {
-      tx.executeSql( "SELECT * FROM " + tableName, [], ( tx, results ) => {
-        var len = results.rows.length;
-        console.log( { len } );
-
-        let temp = [];
-        if ( len > 0 ) {
-          for ( let i = 0; i < len; i++ ) {
-            let data = results.rows.item( i );
-            console.log( { data } );
-            temp.push( data );
-          }
-          resolve( { temp } );
-        }
-
-
-
-      } );
-    } );
-  } );
-};
-
 module.exports = {
   readTablesData,
   readAccountTablesData,
@@ -1474,8 +1416,4 @@ module.exports = {
   insertTrustedPartyDetails,
   insertTrustedPartyDetailWithoutAssociate,
   updateHistroyAndSharedDate,
-
-  //Bitcoin Class Object Store
-  inertBitcoinClassObject,
-  readClassObject
 };    
