@@ -128,6 +128,9 @@ export default class WalletScreen extends React.Component {
         isNetwork = utils.getNetwork();
         this.connnection_FetchData();
         this.getDeepLinkingData();
+
+        //calling refresh
+        this.refresh();
       }
     );
     //TODO: Animation View
@@ -351,29 +354,83 @@ export default class WalletScreen extends React.Component {
     } );
     var resAccount = await comFunDBRead.readTblAccount();
     console.log( { resAccount } );
-    let resultWallet = await utils.getWalletDetails();
+
     let regularAccount = await utils.getRegularAccountObject();
+    let secureAccount = await utils.getSecureAccountObject();
+    console.log( { regularAccount, secureAccount } );
+
+    //let resultWallet = await utils.getWalletDetails();
     // const regularAccount = new RegularAccount(
     //   resultWallet.mnemonic
-    // );    
+    // );         
+
+    //Get Regular Account Bal
     console.log( { regularAccount } );
-    let resgetMnemonic = await regularAccount.getMnemonic();
-    console.log( { resgetMnemonic } );
-    const getBal = await regularAccount.getBalance();
-    console.log( { getBal } );
-    const resUpdateAccountBal = await dbOpration.updateAccountBal(
+    const getBalR = await regularAccount.getBalance();
+    console.log( { getBalR } );
+    const resUpdateAccountBalR = await dbOpration.updateAccountBalAddressWise(
       localDB.tableName.tblAccount,
       resAccount[ 0 ].address,
-      getBal.data.balance / 1e8,
-      resAccount[ 0 ].id
+      getBalR.data.balance / 1e8
     );
-    if ( resUpdateAccountBal ) {
+
+    //Get Secure Account Bal
+    const getBalS = await secureAccount.getBalance();
+    console.log( { getBalS } );
+    const resUpdateAccountBalS = await dbOpration.updateAccountBalAddressWise(
+      localDB.tableName.tblAccount,
+      resAccount[ 1 ].address,
+      getBalS.data.balance / 1e8
+    );
+
+    if ( resUpdateAccountBalR && resUpdateAccountBalS ) {  // 
       this.setState( {
         flag_Loading: false
       } )
       this.connnection_FetchData();
     }
   }
+
+  // getTransactionAndBal() {
+  //   let bal, getTransactions;
+  //   if ( data.selectedAccount.accountType == "Regular Account" ) {
+  //     bal = await regularAccount.getBalance();
+  //     console.log( { bal } );
+  //   } else {
+  //   }
+  //   if ( bal.status == 200 ) {
+  //     const resUpdateAccountBal = await dbOpration.updateAccountBal(
+  //       localDB.tableName.tblAccount,
+  //       data.selectedAccount.address,
+  //       bal.data.balance / 1e8,
+  //       data.selectedAccount.id
+  //     );
+  //     if ( resUpdateAccountBal ) {
+  //       getTransactions = await regularAccount.getTransactions();
+  //       console.log( { getTransactions } );
+  //       //update db bal
+  //       const resUpdateAccountBal = await dbOpration.updateAccountBalAddressWise(
+  //         localDB.tableName.tblAccount,
+  //         resAccount[ 0 ].address,
+  //         bal.data.balance / 1e8
+  //       );
+  //     }
+  //     console.log( { resUpdateAccountBal } );
+  //   } else {
+  //     Alert.alert(
+  //       'Oops',
+  //       bal.err,
+  //       [
+  //         {
+  //           text: 'Ok', onPress: () => {
+
+  //           }
+  //         },
+  //       ],
+  //       { cancelable: false },
+  //     );
+  //   }
+  // }    
 
 
 

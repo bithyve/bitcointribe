@@ -25,21 +25,48 @@ export default class SecureHDWallet extends Bitcoin {
   public signingEssentialsCache;
   public cipherSpec;
 
-  constructor ( primaryMnemonic: string ) {
+  constructor (
+    primaryMnemonic: string,
+    stateVars?: {
+      secondaryMnemonic: string;
+      consumedAddresses: string[];
+      nextFreeChildIndex: number;
+      multiSigCache: {};
+      signingEssentialsCache: {};
+      primaryXpriv: string;
+      xpubs: {
+        primary: string;
+        secondary: string;
+        bh: string;
+      };
+    },
+  ) {
     super();
     this.primaryMnemonic = primaryMnemonic;
-    this.walletID = this.getWalletId();
+    const { walletId } = this.getWalletId();
+    this.walletID = walletId;
     this.network = config.NETWORK;
-    this.consumedAddresses = [];
-    this.nextFreeChildIndex = 0;
-    this.multiSigCache = {};
-    this.signingEssentialsCache = {};
+    this.secondaryMnemonic = stateVars
+      ? stateVars.secondaryMnemonic
+      : bip39.generateMnemonic( 256 );
+    this.consumedAddresses = stateVars ? stateVars.consumedAddresses : [];
+    this.nextFreeChildIndex = stateVars ? stateVars.nextFreeChildIndex : 0;
+    this.multiSigCache = stateVars ? stateVars.multiSigCache : {};
+    this.signingEssentialsCache = stateVars
+      ? stateVars.signingEssentialsCache
+      : {};
     this.cipherSpec = {
       algorithm: "aes-192-cbc",
       salt: "bithyeSalt", // NOTE: The salt should be as unique as possible. It is recommended that a salt is random and at least 16 bytes long
       keyLength: 24,
       iv: Buffer.alloc( 16, 0 ),
     };
+    console.log( "Till here" );
+
+    this.primaryXpriv = stateVars ? stateVars.primaryXpriv : undefined;
+    this.xpubs = stateVars ? stateVars.xpubs : undefined;
+    console.log( "Executed" );
+
   }
 
   public deriveChildXKey = ( extendedKey: string, childIndex: number ) => {
@@ -296,13 +323,14 @@ export default class SecureHDWallet extends Bitcoin {
     return { secondaryXpub: decrypted };
   }
 
-  public prepareSecureAccount = async ( bhXpub, secondaryXpub?) => {
+  public prepareSecureAccount = ( bhXpub, secondaryXpub?) => {
+    console.log( { bhXpub } );
+
     const path = this.derivePath( bhXpub );
     const primaryXpub = this.getRecoverableXKey( this.primaryMnemonic, path );
     console.log( { path } );
 
     if ( !secondaryXpub ) {
-      this.secondaryMnemonic = await bip39.generateMnemonic( 256 );
       secondaryXpub = this.getRecoverableXKey( this.secondaryMnemonic, path );
     }
     this.primaryXpriv = this.getRecoverableXKey(
@@ -369,12 +397,21 @@ export default class SecureHDWallet extends Bitcoin {
       };
     }
 
-    await this.prepareSecureAccount( res.data.bhXpub );
+    console.log( "Preparing secure account" );
 
-    return {
-      status: res.status,
-      data: { setupData: res.data, secondaryXpub: this.xpubs.secondary },
-    };
+    const { prepared } = this.prepareSecureAccount( res.data.bhXpub );
+
+    console.log( { prepared } );
+
+    if ( prepared ) {
+      return {
+        status: res.status,
+        data: { setupData: res.data, secondaryXpub: this.xpubs.secondary },
+      };
+    } else {
+      throw new Error( "Something went wrong" )
+    }
+
   }
 
   public validateSecureAccountSetup = async (

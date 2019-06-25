@@ -110,11 +110,12 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1                 
         versionName "1.0.0.180619"                  
-         
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }      
       } 
+
+       
 
        dexOptions {
       jumboMode = true

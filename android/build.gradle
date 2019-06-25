@@ -45,7 +45,7 @@ task wrapper(type: Wrapper) {
     distributionUrl = distributionUrl.replace("bin", "all")
 }  
 
-
+   
 
 subprojects {
     project.configurations.all {
