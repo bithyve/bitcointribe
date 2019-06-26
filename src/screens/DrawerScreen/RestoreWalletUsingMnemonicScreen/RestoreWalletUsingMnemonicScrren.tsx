@@ -95,8 +95,8 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
             walletName,
             ""
         );
-
-        const secureAccount = new SecureAccount( mnemonic );
+        let secureAccount = await utils.getSecureAccountObject();
+        // const secureAccount = new SecureAccount( mnemonic );
         const resSetupSecureAccount = await secureAccount.setupSecureAccount();
 
         const res = await comAppHealth.check_AppHealthStausUsingMnemonic( 0, 0, null, dateTime, "mnemonic" );

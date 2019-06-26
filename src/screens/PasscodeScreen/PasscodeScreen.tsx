@@ -129,17 +129,14 @@ export default class PasscodeScreen extends Component {
     const regularAccount = RegularAccount.fromJSON( regularClassObject );
     // console.log( { regularAccount } );
     await utils.setRegularAccountObject( regularAccount );
-
-    //secure account
+    //secure account   
     // let walletDet = await utils.getWalletDetails();
     // const secureAccount = new SecureAccount( walletDet.mnemonic );
     // await utils.setSecureAccountObject( secureAccount );
-
     //let walletDet = await utils.getWalletDetails();
-    const secureAccount = SecureAccount( secureClassObject );
+    const secureAccount = SecureAccount.fromJSON( secureClassObject );
+    console.log( { secureAccount } );
     await utils.setSecureAccountObject( secureAccount );
-
-
     // if ( walletDet != undefined ) {  
     //   const regularAccount = new RegularAccount(
     //     walletDet.mnemonic

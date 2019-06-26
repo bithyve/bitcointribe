@@ -43,12 +43,13 @@ export default class SecureHDWallet extends Bitcoin {
   ) {
     super();
     this.primaryMnemonic = primaryMnemonic;
-    const { walletId } = this.getWalletId();
-    this.walletID = walletId;
+    this.walletID = this.getWalletId();
+    console.log( { walletID: this.walletID } );
+
     this.network = config.NETWORK;
     this.secondaryMnemonic = stateVars
       ? stateVars.secondaryMnemonic
-      : bip39.generateMnemonic( 256 );
+      : undefined;
     this.consumedAddresses = stateVars ? stateVars.consumedAddresses : [];
     this.nextFreeChildIndex = stateVars ? stateVars.nextFreeChildIndex : 0;
     this.multiSigCache = stateVars ? stateVars.multiSigCache : {};
@@ -323,14 +324,22 @@ export default class SecureHDWallet extends Bitcoin {
     return { secondaryXpub: decrypted };
   }
 
-  public prepareSecureAccount = ( bhXpub, secondaryXpub?) => {
+  public prepareSecureAccount = async ( bhXpub, secondaryXpub?) => {
     console.log( { bhXpub } );
 
     const path = this.derivePath( bhXpub );
+
+
     const primaryXpub = this.getRecoverableXKey( this.primaryMnemonic, path );
     console.log( { path } );
+    console.log( { primaryXpub } );
+
 
     if ( !secondaryXpub ) {
+
+      this.secondaryMnemonic = await bip39.generateMnemonic( 256 )
+      console.log( { secMne: this.secondaryMnemonic } );
+
       secondaryXpub = this.getRecoverableXKey( this.secondaryMnemonic, path );
     }
     this.primaryXpriv = this.getRecoverableXKey(
@@ -338,6 +347,8 @@ export default class SecureHDWallet extends Bitcoin {
       path,
       true,
     );
+    console.log( { primaryXpriv: this.primaryXpriv } );
+
 
     this.xpubs = {
       primary: primaryXpub,
@@ -399,7 +410,7 @@ export default class SecureHDWallet extends Bitcoin {
 
     console.log( "Preparing secure account" );
 
-    const { prepared } = this.prepareSecureAccount( res.data.bhXpub );
+    const { prepared } = await this.prepareSecureAccount( res.data.bhXpub );
 
     console.log( { prepared } );
 
