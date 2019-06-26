@@ -98,7 +98,8 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
         let prevScreenName = this.state.prevScreenName;
         let prevData = this.state.prevData;
         let resultWallet = await utils.getWalletDetails();
-        const secureAccount = new SecureAccount( resultWallet.mnemonic );
+        let secureAccount = await utils.getSecureAccountObject();
+        // const secureAccount = new SecureAccount( resultWallet.mnemonic );
         let resImportSecureAccount = await secureAccount.importSecureAccount( code, xPub );
         if ( resImportSecureAccount.imported == true ) {
             const address = await secureAccount.getAddress();

@@ -23,7 +23,6 @@ import { Avatar } from 'react-native-elements';
 import TimerCountdown from "react-native-timer-countdown";
 var converter = require( 'number-to-words' );
 
-
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";

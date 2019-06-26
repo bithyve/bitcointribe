@@ -77,38 +77,38 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
         console.log( { data } );
         let setupData = secureAccountDetails.setupData;
         console.log( { secureAccountDetails, setupData } );
-        const secureAccount = new SecureAccount( resultWallet.mnemonic );
+        // const secureAccount = new SecureAccount( resultWallet.mnemonic );
+        let secureAccount = await utils.getSecureAccountObject();
+        console.log( { secureAccount } );
+
         const resValidateSecureAccountSetup = await secureAccount.validateSecureAccountSetup( code, setupData.setupData.secret, setupData.setupData.xIndex );
         console.log( { resValidateSecureAccountSetup } );
         if ( resValidateSecureAccountSetup.data.setupSuccessful ) {
-            const { prepared } = await secureAccount.prepareSecureAccount( setupData.setupData.bhXpub, setupData.secondaryXpub );
-            if ( prepared ) {
-                const address = await secureAccount.getAddress();
-                console.log( { address } );
-                const balance = await secureAccount.getBalance();
-                console.log( { balance } );
-                const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
-                    localDB.tableName.tblAccount,
-                    address,
-                    balance.data.balance / 1e8,
-                    secureAccountDetails.id
-                );
-                let decryptedShare = [
-                    { shareId: "0", updatedAt: 0 },
-                    { shareId: "0", updatedAt: 0 },
-                    { shareId: "0", updatedAt: 0 }
-                ];
-                await comAppHealth.connection_AppHealthStatusSecureAccountBackup( resultWallet.lastUpdated, dateTime, decryptedShare, resultWallet.mnemonic );
-                this.setState( {
-                    flag_Loading: false
-                } )
-                if ( resUpdateSSSRetoreDecryptedShare ) {
-                    setTimeout( () => {
-                        this.props.click_Next();
-                    }, 100 );
-                } else {
-                    Alert.alert( "Secure account db not update!" )
-                }
+            const address = await secureAccount.getAddress();
+            console.log( { address } );
+            const balance = await secureAccount.getBalance();
+            console.log( { balance } );
+            const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
+                localDB.tableName.tblAccount,
+                address,
+                balance.data.balance / 1e8,
+                secureAccountDetails.id
+            );
+            let decryptedShare = [
+                { shareId: "0", updatedAt: 0 },
+                { shareId: "0", updatedAt: 0 },
+                { shareId: "0", updatedAt: 0 }
+            ];
+            await comAppHealth.connection_AppHealthStatusSecureAccountBackup( resultWallet.lastUpdated, dateTime, decryptedShare, resultWallet.mnemonic );
+            this.setState( {
+                flag_Loading: false
+            } )
+            if ( resUpdateSSSRetoreDecryptedShare ) {
+                setTimeout( () => {
+                    this.props.click_Next();
+                }, 100 );
+            } else {
+                Alert.alert( "Secure account db not update!" )
             }
         }
     }

@@ -130,7 +130,7 @@ export default class WalletScreen extends React.Component {
         this.getDeepLinkingData();
 
         //calling refresh
-        this.refresh();
+        //this.refresh();  
       }
     );
     //TODO: Animation View
@@ -375,15 +375,17 @@ export default class WalletScreen extends React.Component {
     );
 
     //Get Secure Account Bal
-    const getBalS = await secureAccount.getBalance();
-    console.log( { getBalS } );
-    const resUpdateAccountBalS = await dbOpration.updateAccountBalAddressWise(
-      localDB.tableName.tblAccount,
-      resAccount[ 1 ].address,
-      getBalS.data.balance / 1e8
-    );
-
-    if ( resUpdateAccountBalR && resUpdateAccountBalS ) {  // 
+    let resUpdateAccountBalS;
+    if ( resAccount[ 1 ].address != "" ) {
+      const getBalS = await secureAccount.getBalance();
+      console.log( { getBalS } );
+      resUpdateAccountBalS = await dbOpration.updateAccountBalAddressWise(
+        localDB.tableName.tblAccount,
+        resAccount[ 1 ].address,
+        getBalS.data.balance / 1e8
+      );
+    }
+    if ( resUpdateAccountBalR ) {  // 
       this.setState( {
         flag_Loading: false
       } )

@@ -574,6 +574,7 @@ const TabNavigator = createBottomTabNavigator(
   },
   {
     initialRouteName: "WalletScreen",
+    order: [ 'WalletScreen', 'Analytics', 'QrCodeScannerScreen', 'Settings' ],
     tabBarOptions: {
       showLabel: true,
       //swipeEnabled: true,
