@@ -17,7 +17,12 @@ const getUnixToDateFormat = unixDate => {
 };
 const getUnixToNormaDateFormat = unixDate => {
   return moment.unix( unixDate ).format( "DD-MM-YYYY" );
+
 };
+
+const getUnixToDateFormat1 = () => {
+  return moment().format( 'hh:mm a , DD MMM YYYY' );
+}
 
 //TODO: Network check
 let isNetwork;
@@ -269,6 +274,7 @@ module.exports = {
   getUnixTimeDate,
   getUnixToDateFormat,
   getUnixToNormaDateFormat,
+  getUnixToDateFormat1,
   getNetwork,
   encrypt,
   encryptAgain,

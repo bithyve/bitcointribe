@@ -3,6 +3,8 @@ import SecureHDWallet from "../../utilities/SecureHDWallet";
 export default class SecureAccount {
   public static fromJSON = ( json: string ) => {
     const { secureHDWallet } = JSON.parse( json );
+    console.log( { secureHDWallet } );
+
     const {
       primaryMnemonic,
       secondaryMnemonic,

@@ -32,6 +32,7 @@ import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import WalletSetUpScrolling from "HexaWallet/src/app/custcompontes/OnBoarding/WalletSetUpScrolling/WalletSetUpScrolling";
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+import FullLinearGradientIconWithLoadingButton from 'HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientIconWithLoadingButton';
 
 //TODO: Custome model  
 import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
@@ -65,7 +66,8 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
             accountAddress: "",
             amount: "",
             qrcodeAddresWithAmount: "hexa",
-            flag_Loading: false
+            flag_Loading: false,
+            flag_LoadingShareBtn: false
         } )
     }
 
@@ -144,6 +146,9 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
     }
     //share qrcode image
     click_ShareQRCode = async () => {
+        this.setState( {
+            flag_LoadingShareBtn: true
+        } )
         var base64Str;
         let address = this.state.qrcodeAddresWithAmount;
         let accountName = this.state.accountName;
@@ -151,6 +156,9 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
         } )
             .then( ( res: any ) => {
                 base64Str = "data:image/png;base64," + res.base64()
+                this.setState( {
+                    flag_LoadingShareBtn: false
+                } )
             } )
             .catch( ( errorMessage: string ) => {
                 Alert.alert( errorMessage )
@@ -170,7 +178,7 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
         //values
         let { accountName, qrcodeAddresWithAmount, amount } = this.state;
         //flag
-        let { flag_Loading } = this.state;
+        let { flag_Loading, flag_LoadingShareBtn } = this.state;
         const itemList = arr_AccountList.map( ( item: any, index: number ) => (
             <Picker.Item label={ item.accountName } value={ item.accountName } />
         ) );
@@ -267,12 +275,15 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
                             </View>
                             <View style={ { flex: 1 } }>
                                 <Text note style={ { textAlign: "center", margin: 5 } }>Share this address to receive founds</Text>
-                                <FullLinearGradientButton
-                                    style={ [ { opacity: 1 }, { borderRadius: 10 } ] }
-                                    disabled={ false }
-                                    title="Share QRCode"
+                                <FullLinearGradientIconWithLoadingButton
                                     click_Done={ () => this.click_ShareQRCode() }
-                                />
+                                    title="Share QRCode"
+                                    iconName="share"
+                                    iconColor={ "#ffffff" }
+                                    iconSize={ 20 }
+                                    disabled={ flag_LoadingShareBtn }
+                                    animating={ flag_LoadingShareBtn }
+                                    style={ [ { borderRadius: 10, margin: 10 } ] } />
                             </View>
                         </KeyboardAwareScrollView>
                     </ImageBackground>

@@ -27,6 +27,7 @@ import Toast from 'react-native-simple-toast';
 import Share from 'react-native-share';
 import RNFetchBlob from 'react-native-fetch-blob';
 import { Slider, CheckBox } from 'react-native-elements';
+import { StackActions, NavigationActions } from "react-navigation";
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -35,8 +36,7 @@ import WalletSetUpScrolling from "HexaWallet/src/app/custcompontes/OnBoarding/Wa
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 
 //TODO: Custome model  
-import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
-import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model/ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
+import ModelConfirmSendSuccess from "HexaWallet/src/app/custcompontes/Model/ModelPaymentScreen/ModelConfirmSendScreen/ModelConfirmSendSuccess";
 
 //TODO: Custome Alert   
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
@@ -62,11 +62,13 @@ import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccoun
 
 
 
+
 export default class ConfirmAndSendPaymentScreen extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props )
         this.state = ( {
             data: [],
+            arrModelConfirmSendSuccess: [],
             flag_DisableSentBtn: false,
             flag_Loading: false
         } )
@@ -83,15 +85,12 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
             data: data
         } )
     }
-
-    click_Ok = () => {
-        this.props.navigation.navigate( "TabbarBottom" );
-    }
-
     //TODO: Sent amount
     click_SentAmount = async () => {
         //this.setState( { flag_Loading:true})
         let { data } = this.state;
+        console.log( { data } );
+        let date = Date.now();
         let regularAccount = await utils.getRegularAccountObject();
         // let regularAccount = new RegularAccount( data.mnemonic );
         let inputs = data.resTransferST.data.inputs;
@@ -101,11 +100,23 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
         if ( data.selectedAccount.accountType == "Regular Account" ) {
             resTransferST = await regularAccount.transferST2( data.resTransferST.data.inputs, data.resTransferST.data.txb );
         }
+        console.log( { resTransferST } );
         if ( resTransferST.status == 200 ) {
             //Get Balance 
-            let alert = new AlertSimple();
-            alert.simpleOk( "Success", "Your payment sent successfully.", this.click_Ok );
-
+            // let alert = new AlertSimple();
+            //alert.simpleOk( "Success", "Your payment sent successfully.", this.click_Ok );
+            this.setState( {
+                arrModelConfirmSendSuccess: [ {
+                    modalVisible: true,
+                    data: [ {
+                        amount: data.amount,
+                        tranFee: data.tranFee,
+                        accountName: data.accountName,
+                        txid: resTransferST.data.txid,
+                        date: utils.getUnixToDateFormat1()
+                    } ]
+                } ]
+            } )
         } else {
             Alert.alert(
                 'Oops',
@@ -120,16 +131,12 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
                 { cancelable: false },
             );
         }
-
-
-
-        console.log( { resTransferST } );
     }
 
 
     render() {
         //array 
-        let { data } = this.state;
+        let { data, arrModelConfirmSendSuccess } = this.state;
         //flag  
         let { flag_DisableSentBtn, flag_Loading } = this.state;
         return (
@@ -155,7 +162,7 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
                         >
                             <View style={ { flex: 1, marginTop: 20, alignItems: "center" } }>
                                 <Text note>FUNDS BEING TRANSFERRED TO</Text>
-                                <Text style={ [ { margin: 10, fontWeight: "bold", textAlign: "center" } ] }>{ data.respAddress }</Text>
+                                <Text style={ [ { margin: 10, fontWeight: "bold", textAlign: "center", fontSize: 14 } ] }>{ data.respAddress }</Text>
                                 <Text note style={ { textAlign: "center", margin: 10 } }>Kindly confirm the address Founds once transferred can not be recovered.</Text>
                             </View>
                             <View style={ { flex: 1 } }>
@@ -269,6 +276,17 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
                             </View>
                         </KeyboardAwareScrollView>
                     </ImageBackground>
+                    <ModelConfirmSendSuccess data={ arrModelConfirmSendSuccess }
+                        click_GoToDailyAccount={ () => {
+                            this.setState( {
+                                arrModelConfirmSendSuccess: [ {
+                                    modalVisible: false,
+                                    data: []
+                                } ]
+                            } )
+                            this.props.navigation.navigate( "TabbarBottom", { id: 1 } )
+                        } }
+                    />
                 </SafeAreaView>
                 <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
             </Container >

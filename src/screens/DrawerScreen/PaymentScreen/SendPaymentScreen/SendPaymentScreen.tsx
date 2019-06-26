@@ -103,7 +103,9 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             data.balance = item.balance;
             data.accountName = item.accountName;
             data.address = item.address;
-            temp.push( data );
+            if ( data.address != "" ) {
+                temp.push( data );
+            }
         }
         //Sent button Enable and Disable
         if ( amount != "" && amount < balDailyAccount ) {
@@ -144,7 +146,9 @@ export default class SendPaymentScreen extends React.Component<any, any> {
 
     //Change account details on account list
     selectAccount( index: any ) {
-        var temp = [], arr_SelectAccountDetails = [];
+        let enterAmount = parseFloat( this.state.amount )
+        console.log( { enterAmount } );
+        var temp = [], arr_SelectAccountDetails = [], selectAccountBal;
         let { arr_AccountList } = this.state;
         for ( let i = 0; i < arr_AccountList.length; i++ ) {
             let item = arr_AccountList[ i ];
@@ -152,17 +156,30 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             if ( i == index ) {
                 data.checked = true;
                 arr_SelectAccountDetails = item;
+                selectAccountBal = parseFloat( item.balance );
             } else {
                 data.checked = false;
             }
             data.balance = item.balance;
+
             data.accountName = item.accountName;
             data.address = item.address;
             temp.push( data );
         }
+        console.log( { selectAccountBal } );
+        var flag_DisableSentBtn;
+        if ( enterAmount != 0 && enterAmount < selectAccountBal ) {
+            flag_DisableSentBtn = false;
+        } else if ( enterAmount >= selectAccountBal ) {
+            flag_DisableSentBtn = true;
+        } else if ( enterAmount == 0 ) {
+            flag_DisableSentBtn = true;
+        }
+
         this.setState( {
             arr_AccountList: temp,
-            arr_SelectAccountDetails
+            arr_SelectAccountDetails,
+            flag_DisableSentBtn
         } )
     }
 
@@ -178,6 +195,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         console.log( { arr_SelectAccountDetails } );
         let walletDetails = await utils.getWalletDetails();
         let regularAccount = await utils.getRegularAccountObject();
+        let secureAccount = await utils.getSecureAccountObject();
         // let regularAccount = new RegularAccount( walletDetails.mnemonic );
         var resTransferST;
         let data = {};
@@ -186,6 +204,9 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             resTransferST = await regularAccount.transferST1( address, amountFloat, priority );
             console.log( { resTransferST } );
         } else {
+            resTransferST = await secureAccount.transferST1( address, amountFloat, priority );
+            console.log( { resTransferST } );
+
         }
         if ( resTransferST.status == 200 ) {
             this.setState( {
@@ -203,21 +224,25 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             data.resTransferST = resTransferST;
             this.props.navigation.push( "ConfirmAndSendPaymentScreen", { data: [ data ] } );
         } else {
-            Alert.alert(
-                'Oops',
-                resTransferST.err + "\n Total Fee = " + resTransferST.data.fee,
-                [
-                    {
-                        text: 'Ok', onPress: () => {
+            this.setState( {
+                flag_Loading: false
+            } )
+            setTimeout( () => {
+                Alert.alert(
+                    'Oops',
+                    resTransferST.err + "\n Total Fee = " + resTransferST.data.fee,
+                    [
+                        {
+                            text: 'Ok', onPress: () => {
 
-                        }
-                    },
-                ],
-                { cancelable: false },
-            );
+                            }
+                        },
+                    ],
+                    { cancelable: false },
+                );
+            }, 100 );
             this.setState( {
                 flag_DisableSentBtn: true,
-                flag_Loading: false
             } )
         }
 
@@ -384,12 +409,14 @@ export default class SendPaymentScreen extends React.Component<any, any> {
                                         animateTransitions={ true }
                                         thumbTintColor={ colors.appColor }
                                         minimumTrackTintColor={ colors.appColor }
-                                        onValueChange={ value => this.setState( { tranPrio: value } ) }
+                                        onValueChange={ value => {
+                                            this.setState( { tranPrio: value } )
+                                        } }
                                     />
                                     <View style={ { flexDirection: "row" } }>
-                                        <Text style={ { flex: 1, textAlign: "left", marginLeft: 20 } }>High</Text>
+                                        <Text style={ { flex: 1, textAlign: "left", marginLeft: 20 } }>Low</Text>
                                         <Text style={ { flex: 1, textAlign: "center" } }>Medium </Text>
-                                        <Text style={ { flex: 1, textAlign: "right", marginRight: 20 } }>Low </Text>
+                                        <Text style={ { flex: 1, textAlign: "right", marginRight: 20 } }>High </Text>
                                     </View>
                                 </View>
 
