@@ -452,7 +452,7 @@ const updateWalletAppHealthStatus = (
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
     try {
-      db.transaction( function ( txn ) {
+      db.transaction( function ( txn: any ) {
         txn.executeSql(
           "update " +
           tblName +
@@ -525,6 +525,8 @@ const updateWalletMnemonicAndAnwserDetails = (
     }
   } );
 };
+
+
 
 
 

@@ -34,9 +34,7 @@ import WalletSetUpScrolling from "HexaWallet/src/app/custcompontes/OnBoarding/Wa
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import FullLinearGradientIconWithLoadingButton from 'HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientIconWithLoadingButton';
 
-//TODO: Custome model  
-import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
-import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model/ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
+
 
 
 //TODO: Custome Alert 
