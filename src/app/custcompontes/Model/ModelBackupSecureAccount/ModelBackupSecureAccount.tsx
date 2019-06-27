@@ -40,6 +40,10 @@ interface Props {
 }
 
 
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
+
 //TODO: Bitcoin Files
 import SecurePDFGen from 'HexaWallet/src/bitcoin/utilities/securePDFGenerator';
 
@@ -81,16 +85,18 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
     readPropsValue = async ( data: any ) => {
         let resultWallet = await utils.getWalletDetails();
         console.log( { resultWallet } );
+        console.log( { data } );
         let setupData = data.setupData;
         //console.log( { setupData } );
         // Alert.alert( resultWallet.mnemonic )
-        const securePDFGen = new SecurePDFGen(
-            resultWallet.mnemonic
-        );
+        let secureAccount = await utils.getSecureAccountObject();
         //console.log( setupData.secondaryMnemonic, setupData.setupData.bhXpub );
-        let resGetSecondaryXpub = await securePDFGen.getSecondaryXpub( setupData.secondaryMnemonic, setupData.setupData.bhXpub );
-        // Alert.alert( resGetSecondaryXpub );
-        console.log( { resGetSecondaryXpub } );
+        var resGetSecondaryXpub = await secureAccount.getSecondaryXpub();
+        if ( resGetSecondaryXpub.status == 200 ) {
+            resGetSecondaryXpub = resGetSecondaryXpub.data;
+        } else {
+            alert.simpleOk( "Oops", resGetSecondaryXpub.err );
+        }
         let temp = [];
         temp.push( { secondaryXpub: resGetSecondaryXpub, qrData: setupData.setupData.qrData, secret: setupData.setupData.secret, secondaryMnemonic: setupData.secondaryMnemonic, bhXpub: setupData.setupData.bhXpub } )
         this.setState( {
@@ -101,7 +107,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
 
     generateSecondaryXpub = async ( data: any ) => {
         let secondaryXpub = data[ 0 ].secondaryXpub;
-        console.log( { secondaryXpub } );
+        //   console.log( { secondaryXpub } );
         var docsDir;
         if ( Platform.OS == "android" ) {
             docsDir = await RNFS.ExternalStorageDirectoryPath //RNFS.DocumentDirectoryPath;
@@ -111,7 +117,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
         docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
         console.log( { docsDir } );
         var path = `${ docsDir }/secondaryXpub.png`;
-        await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + secondaryXpub, {
+        await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + secondaryXpub.secondaryXpub, {
         } )
             .then( ( res: any ) => {
                 let base64Str = res.base64()
@@ -332,24 +338,9 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
             } );
 
         console.log( { pdfPath } );
-
         var formData = new FormData();
         formData.append( 'File', pdfPath );
         formData.append( 'PdfOwnerPasswordNew', '1111' );
-
-        // const config = {  
-        //     headers: {
-        //         "content-type": "multipart/form-data"
-        //     }
-        // };
-        // axios
-        //     .post( "https://v2.convertapi.com/convert/pdf/to/encrypt?Token=1111", formData, config )
-        //     .then( response => {
-        //         console.log( { response } );
-        //     } )
-        //     .catch( error1 => {
-        //         console.log( { error1 } );
-        //     } );
     }
 
     //TODO: Download file

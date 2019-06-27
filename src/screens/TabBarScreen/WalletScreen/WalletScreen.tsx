@@ -40,10 +40,15 @@ import ViewShieldIcons from "HexaWallet/src/app/custcompontes/View/ViewShieldIco
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
 //TODO: Custome Models
-
 import ModelAcceptOrRejectSecret from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelAcceptOrRejectSecret";
 import ModelBackupShareAssociateContact from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelBackupShareAssociateContact";
 import ModelBackupAssociateOpenContactList from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelBackupAssociateOpenContactList";
+
+
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
+
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
@@ -357,7 +362,7 @@ export default class WalletScreen extends React.Component {
 
     let regularAccount = await utils.getRegularAccountObject();
     let secureAccount = await utils.getSecureAccountObject();
-    console.log( { regularAccount, secureAccount } );
+    console.log( { regularAccount } );
 
     //let resultWallet = await utils.getWalletDetails();
     // const regularAccount = new RegularAccount(
@@ -365,8 +370,12 @@ export default class WalletScreen extends React.Component {
     // );         
 
     //Get Regular Account Bal
-    console.log( { regularAccount } );
-    const getBalR = await regularAccount.getBalance();
+    var getBalR = await regularAccount.getBalance();
+    if ( getBalR.status == 200 ) {
+      getBalR = getBalR.data;
+    } else {
+      alert.simpleOk( "Oops", getBalR.err );
+    }
     console.log( { getBalR } );
     const resUpdateAccountBalR = await dbOpration.updateAccountBalAddressWise(
       localDB.tableName.tblAccount,
@@ -377,14 +386,19 @@ export default class WalletScreen extends React.Component {
     //Get Secure Account Bal
     let resUpdateAccountBalS;
     if ( resAccount[ 1 ].address != "" ) {
-      const getBalS = await secureAccount.getBalance();
-      console.log( { getBalS } );
+      var getBalS = await secureAccount.getBalance();
+      if ( getBalS.status == 200 ) {
+        getBalR = getBalS.data;
+      } else {
+        alert.simpleOk( "Oops", getBalS.err );
+      }
       resUpdateAccountBalS = await dbOpration.updateAccountBalAddressWise(
         localDB.tableName.tblAccount,
         resAccount[ 1 ].address,
         getBalS.data.balance / 1e8
       );
     }
+
     if ( resUpdateAccountBalR ) {  // 
       this.setState( {
         flag_Loading: false
