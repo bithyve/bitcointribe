@@ -124,9 +124,9 @@ export default class PasscodeScreen extends Component {
 
   onSuccess = async ( code: string ) => {
     const rootViewController = await AsyncStorage.getItem( asyncStorageKeys.rootViewController );
-
     let regularClassObject = await AsyncStorage.getItem( asyncStorageKeys.regularClassObject );
     let secureClassObject = await AsyncStorage.getItem( asyncStorageKeys.secureClassObject );
+    //regular account   
     const regularAccount = RegularAccount.fromJSON( regularClassObject );
     // console.log( { regularAccount } );
     await utils.setRegularAccountObject( regularAccount );
@@ -134,36 +134,13 @@ export default class PasscodeScreen extends Component {
     const secureAccount = SecureAccount.fromJSON( secureClassObject );
     console.log( { secureAccount } );
     await utils.setSecureAccountObject( secureAccount );
-    // if ( walletDet != undefined ) {  
-    //   const regularAccount = new RegularAccount(
-    //     walletDet.mnemonic
-    //   );
-    //   const secureAccount = new SecureAccount( walletDet.mnemonic );
-    //   await utils.setRegularAccountObject( regularAccount );
-    //   await utils.setSecureAccountObject( secureAccount );
-    // }
 
-    // de_serialize.js   
-    // let reviver = ( key: any, value: any ) => {
-    //   if ( typeof value === 'string'
-    //     && value.indexOf( 'function ' ) === 0 ) {
-    //     let functionTemplate = `(${ value })`;
-    //     return eval( functionTemplate );
-    //   }
-    //   return value;
-    // }
-    // var regularClassObject = await AsyncStorage.getItem( asyncStorageKeys.regularClassObject );
-    // regularClassObject = JSON.parse( regularClassObject, reviver );
-    // var secureClassObject = await AsyncStorage.getItem( asyncStorageKeys.secureClassObject );
-    // secureClassObject = JSON.parse( secureClassObject, reviver );
-    // console.log( { regularClassObject, secureClassObject } );
-    // await utils.setRegularAccountObject( regularClassObject );
-    // await utils.setSecureAccountObject( secureClassObject );
-
+    //Wallet Details Reading
+    await comFunDBRead.readTblWallet();
+    //await comFunDBRead.readTblSSSDetails();
 
     //   await utils.setSecureAccountObject( secureAccount );
     let pageName = utils.getRootViewController();
-    let walletDetails = await comFunDBRead.readTblWallet();
     if ( pageName != "TrustedPartyShareSecretNavigator" && pageName != "OTPScreenNavigator" ) {
       const resetAction = StackActions.reset( {
         index: 0, // <-- currect active route from actions array
@@ -187,11 +164,7 @@ export default class PasscodeScreen extends Component {
       } );
       this.props.navigation.dispatch( resetAction );
     }
-
   };
-
-
-
   //TODO: func urlDecription
   async urlDecription( code: any ) {
     let commonData = Singleton.getInstance();

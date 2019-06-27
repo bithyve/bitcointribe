@@ -107,9 +107,6 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
     click_Confirm = async () => {
         const dateTime = Date.now();
         let data = this.state.data;
-        // const regularAccount = new RegularAccount();
-        // const resGetMnemonic = regularAccount.getMnemonic();
-        // const mnemonic = resGetMnemonic; //await bip39.generateMnemonic( 256 );
         const mnemonic = await bip39.generateMnemonic( 256 );
         let walletName = data.walletName;
         let firstQuestion = data.question;

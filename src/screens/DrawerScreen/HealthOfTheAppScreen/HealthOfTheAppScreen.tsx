@@ -20,6 +20,7 @@ import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Permissions from 'react-native-permissions';
 import { Avatar } from 'react-native-elements';
+import ShimmerPlaceHolder from 'react-native-shimmer-placeholder'
 import TimerCountdown from "react-native-timer-countdown";
 var converter = require( 'number-to-words' );
 
@@ -63,12 +64,13 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             arr_ModelBackupYourWallet: [],
             arr_ModelFindYourTrustedContacts: [],
 
+            //flag
             flag_isTrustedContacts: true,
             flag_isSetupTrustedContact: false,
             flag_isMnemonic: false,
             flag_isSecretQuestions: true,
             flag_isTwoFactor: true,
-            flag_Loading: true,
+            flag_Loading: false,
             //TouchableOpacity Disable
             flag_DisableSecureTwoFactor: true,
             flag_DisableSecretQuestion: true
@@ -79,9 +81,6 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         this.willFocusSubscription = this.props.navigation.addListener(
             "willFocus",
             () => {
-                // this.setState( {
-                //     flag_Loading: true
-                // } )  
                 this.loaddata();
             }
         );
@@ -89,11 +88,11 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
     componentWillUnmount() {
         this.willFocusSubscription.remove();
     }
-
     loaddata = async () => {
         let walletDetails = await utils.getWalletDetails();
         var resAccountDetails = await comFunDBRead.readTblAccount();
         let backupType = JSON.parse( walletDetails.appHealthStatus );
+        console.log( { backupType } );
         let sssDetails = await utils.getSSSDetails();
         // console.log( { walletDetails, sssDetails } );
         let flag_isSetupTrustedContact, flag_isMnemonic;

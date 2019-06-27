@@ -16,13 +16,18 @@ import {
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
 import { StackActions, NavigationActions } from "react-navigation";
+import bip39 from 'react-native-bip39';
 
 
 //TODO: Custome Pages
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import WalletSetUpScrolling from "HexaWallet/src/app/custcompontes/OnBoarding/WalletSetUpScrolling/WalletSetUpScrolling";
 
+//TODO: Custome Alert
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -32,26 +37,134 @@ import FirstSecretQuestionScreen from "./FirstSecretQuestionScreen/FirstSecretQu
 import SecondSecretQuestion from "./SecondSecretQuestion/SecondSecretQuestion";
 
 //TODO: Custome Object  
-import { colors, images, asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, asyncStorageKeys, localDB } from "HexaWallet/src/app/constants/Constants";
+var utils = require( "HexaWallet/src/app/constants/Utils" );
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
+
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
+//TODO: Bitcoin Files
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
 export default class WalletSetupScreens extends React.Component<any, any> {
+    constructor ( props: any ) {
+        super( props )
+        this.state = ( {
+            walletName: "",
+            flag_ProceedBtnDisable: true,
+            flag_Loading: false,
+        } );
+    }
+
+    //TODO: Wallet Name
+    ckeckWalletName( val: string ) {
+        if ( val.length >= 6 ) {
+            this.setState( {
+                flag_ProceedBtnDisable: false
+            } )
+        } else {
+            this.setState( {
+                flag_ProceedBtnDisable: true
+            } )
+        }
+
+    }
+
 
     //TODO:click_GotoPermisionScrenn
-    click_GotoPermisionScrenn() {
-        const resetAction = StackActions.reset( {
-            index: 0, // <-- currect active route from actions array
-            key: null,
-            actions: [
-                NavigationActions.navigate( { routeName: "TabbarBottom" } )
-            ]
+    click_Proceed = async () => {
+        this.setState( {
+            flag_Loading: true
         } );
-        AsyncStorage.setItem(
-            asyncStorageKeys.rootViewController,
-            "TabbarBottom"
+        const dateTime = Date.now();
+        const mnemonic = await bip39.generateMnemonic( 256 );
+        let walletName = this.state.walletName;
+        const regularAccount = new RegularAccount(
+            mnemonic
         );
-        this.props.navigation.dispatch( resetAction );
+        const secureAccount = new SecureAccount( mnemonic );
+        var regularJson = JSON.stringify( regularAccount );
+        AsyncStorage.setItem(
+            asyncStorageKeys.regularClassObject,
+            regularJson
+        );
+        await utils.setRegularAccountObject( regularAccount );
+        //console.log( { secondaryMnemonic } );
+        var secureJson = JSON.stringify( secureAccount );
+        AsyncStorage.setItem(
+            asyncStorageKeys.secureClassObject,
+            secureJson
+        );
+        await utils.setSecureAccountObject( secureAccount );
+        var getAddress = await regularAccount.getAddress();
+        if ( getAddress.status == 200 ) {
+            getAddress = getAddress.data.address
+        } else {
+            alert.simpleOk( "Oops", getAddress.err );
+        }
+        console.log( { getAddress } );
+        let resInsertWallet = await dbOpration.insertWallet(
+            localDB.tableName.tblWallet,
+            dateTime,
+            mnemonic,
+            "",
+            "",
+            "",
+            walletName,
+            ""
+        );
+        await comFunDBRead.readTblWallet();
+        let resInsertCreateAcc = await dbOpration.insertCreateAccount(
+            localDB.tableName.tblAccount,
+            dateTime,
+            getAddress,
+            "0.0",
+            "BTC",
+            "Daily Wallet",
+            "Regular Account",
+            ""
+        );
+        let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+            localDB.tableName.tblAccount,
+            dateTime,
+            "",
+            "0.0",
+            "BTC",
+            "Secure Account",
+            "Secure Account",
+            ""
+        );
+        if ( resInsertWallet && resInsertSecureCreateAcc && resInsertCreateAcc ) {
+            this.setState( {
+                flag_Loading: false
+            } );
+            const resetAction = StackActions.reset( {
+                index: 0, // <-- currect active route from actions array
+                key: null,
+                actions: [
+                    NavigationActions.navigate( { routeName: "TabbarBottom" } )
+                ]
+            } );
+            AsyncStorage.setItem(
+                asyncStorageKeys.rootViewController,
+                "TabbarBottom"
+            );
+            this.props.navigation.dispatch( resetAction );
+
+        } else {
+            alert.simpleOk( "Oops", "Local db update issue!" );
+        }
     }
+
     render() {
+        //array 
+        //values
+        //flag
+        let { flag_ProceedBtnDisable, flag_Loading } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
@@ -66,15 +179,36 @@ export default class WalletSetupScreens extends React.Component<any, any> {
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Set up your wallet</Text>
                             </Button>
                         </View>
-                        <WalletSetUpScrolling >
-                            {/* First screen */ }
-                            <WalletNameScreen />
-                            {/* Second screen */ }
-                            <FirstSecretQuestionScreen />
-                            {/* Third screen */ }
-                            <SecondSecretQuestion prevScreen={ () => this.click_GotoPermisionScrenn() } />
-                        </WalletSetUpScrolling>
+                        <View style={ styles.viewPagination }>
+                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 22, textAlign: "center" } ] }>What do you want to call your Wallet?</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>This name will display on you wallet.</Text>
+                        </View>
+                        <View style={ styles.viewInputFiled }>
+                            <Item rounded style={ styles.itemInputWalletName }>
+                                <Input
+                                    keyboardType="default"
+                                    autoCapitalize='sentences'
+                                    placeholder='Enter a name for your wallet'
+                                    style={ [ globalStyle.ffFiraSansMedium ] }
+                                    placeholderTextColor="#B7B7B7"
+                                    onChangeText={ ( val ) => {
+                                        this.setState( {
+                                            walletName: val
+                                        } )
+                                        this.ckeckWalletName( val )
+                                    } }
+                                />
+                            </Item>
+                        </View>
+                        <View style={ styles.viewProcedBtn }>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } ] } numberOfLines={ 1 }>Lorem ipsum dolor sit amet, consectetur adipiscing </Text>
+                            <FullLinearGradientButton title="Proceed"
+                                disabled={ flag_ProceedBtnDisable }
+                                style={ [ flag_ProceedBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
+                                click_Done={ () => this.click_Proceed() } />
+                        </View>
                     </ImageBackground>
+                    <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
                 </SafeAreaView>
             </Container >
         );
