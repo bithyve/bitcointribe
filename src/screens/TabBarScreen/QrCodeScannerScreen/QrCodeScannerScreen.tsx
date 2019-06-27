@@ -38,6 +38,11 @@ import Permissions from 'react-native-permissions'
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
+
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
+
 //TODO: Custome object
 import {
     colors,
@@ -105,14 +110,20 @@ export default class QrCodeScannerScreen extends React.Component {
     barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
-            let walletDetails = await utils.getWalletDetails();
             let regularAccount = await utils.getRegularAccountObject();
-            // const regularAccount = new RegularAccount(
-            //     walletDetails.mnemonic
-            // );
-            let resAddressDiff = await regularAccount.addressDiff( result );
+            var resAddressDiff = await regularAccount.addressDiff( result );
+            if ( resAddressDiff.status == 200 ) {
+                resAddressDiff = resAddressDiff.data;
+            } else {
+                alert.simpleOk( "Oops", resAddressDiff.err );
+            }
             if ( resAddressDiff.type == "paymentURI" || resAddressDiff.type == "address" ) {
-                let resDecPaymentURI = await regularAccount.decodePaymentURI( result );
+                var resDecPaymentURI = await regularAccount.decodePaymentURI( result );
+                if ( resDecPaymentURI.status == 200 ) {
+                    resDecPaymentURI = resDecPaymentURI.data;
+                } else {
+                    alert.simpleOk( "Oops", resDecPaymentURI.err );
+                }
                 if ( flag_SendPaymentScreen == true ) {
                     this.props.navigation.push( "SendPaymentNavigator", { data: resDecPaymentURI } );
                     flag_SendPaymentScreen = false;

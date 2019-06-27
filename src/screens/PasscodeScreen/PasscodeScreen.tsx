@@ -124,16 +124,13 @@ export default class PasscodeScreen extends Component {
 
   onSuccess = async ( code: string ) => {
     const rootViewController = await AsyncStorage.getItem( asyncStorageKeys.rootViewController );
+
     let regularClassObject = await AsyncStorage.getItem( asyncStorageKeys.regularClassObject );
     let secureClassObject = await AsyncStorage.getItem( asyncStorageKeys.secureClassObject );
     const regularAccount = RegularAccount.fromJSON( regularClassObject );
     // console.log( { regularAccount } );
     await utils.setRegularAccountObject( regularAccount );
-    //secure account   
-    // let walletDet = await utils.getWalletDetails();
-    // const secureAccount = new SecureAccount( walletDet.mnemonic );
-    // await utils.setSecureAccountObject( secureAccount );
-    //let walletDet = await utils.getWalletDetails();
+    //secure account      
     const secureAccount = SecureAccount.fromJSON( secureClassObject );
     console.log( { secureAccount } );
     await utils.setSecureAccountObject( secureAccount );

@@ -39,6 +39,10 @@ import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelB
 import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model/ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
 
 
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
+
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
@@ -73,13 +77,16 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
 
     async componentWillMount() {
         let walletDetails = await utils.getWalletDetails();
+        console.log( { walletDetails } );
         let arr_AccountList = await comFunDBRead.readTblAccount();
+        console.log( { arr_AccountList } );
+
         for ( var i = 0; i < arr_AccountList.length; i++ )
             if ( arr_AccountList[ i ].address === "" ) {
                 arr_AccountList.splice( i, 1 );
             }
-        let paymentQRCode = await this.getQrCode( arr_AccountList[ 0 ].address );
-        //console.log( { paymentQRCode } );
+        var paymentQRCode = await this.getQrCode( arr_AccountList[ 0 ].address );
+        console.log( { arr_AccountList } );
         this.setState( {
             arr_AccountList,
             accountName: arr_AccountList[ 0 ].accountName,
@@ -98,8 +105,7 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
                 index = i;
                 break;
             }
-        let paymentQRCode = await this.getQrCode( arr_AccountList[ index ].address );
-        console.log( { paymentQRCode } );
+        var paymentQRCode = await this.getQrCode( arr_AccountList[ index ].address );
         this.setState( {
             accountName: value,
             amount: "",
@@ -110,13 +116,15 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
 
     //get only address qrcode string
     getQrCode = async ( address: any, option?: any ) => {
-        let walletDetails = await utils.getWalletDetails();
         let regularAccount = await utils.getRegularAccountObject();
         console.log( regularAccount );
-        // const regularAccount = new RegularAccount(
-        //     walletDetails.mnemonic
-        // );
-        return await regularAccount.getPaymentURI( address, option );
+        let resPaymentURI = await regularAccount.getPaymentURI( address, option );
+        if ( resPaymentURI.status == 200 ) {
+            resPaymentURI = resPaymentURI.data
+        } else {
+            alert.simpleOk( "Oops", resPaymentURI.err );
+        }
+        return resPaymentURI;
     }
 
     //amount change then get qrcode string
@@ -127,18 +135,13 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
         let options = {
             amount
         }
-        let walletDetails = await utils.getWalletDetails();
         let regularAccount = await utils.getRegularAccountObject();
-        // const regularAccount = new RegularAccount(
-        //     walletDetails.mnemonic
-        // );
         var getQRCodeString;
         if ( amount != "" ) {
-            getQRCodeString = await regularAccount.getPaymentURI( address, options );
+            getQRCodeString = await this.getQrCode( address, options );
         } else {
-            getQRCodeString = await regularAccount.getPaymentURI( address );
+            getQRCodeString = await this.getQrCode( address );
         }
-
         console.log( { getQRCodeString } );
         this.setState( {
             qrcodeAddresWithAmount: getQRCodeString.paymentURI.toString(),
