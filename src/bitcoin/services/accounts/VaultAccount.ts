@@ -71,7 +71,16 @@ export default class VaultAccount {
     amount: number,
     lockTime: number,
     privateKey: string,
-  ) => {
+  ): Promise<
+    | {
+        txid: string;
+      }
+    | {
+        status: number;
+        errorMessage: string;
+        txid?: undefined;
+      }
+  > => {
     if (this.bitcoin.isValidAddress(recipientAddress)) {
       const { balanceData } = await this.bitcoin.getBalance(senderAddress);
       console.log({ balance: balanceData.final_balance });
