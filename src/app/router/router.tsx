@@ -83,6 +83,7 @@ import AllContactListScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYour
 import SecretSharingScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/SecretSharingScreen/SecretSharingScreen";
 import TrustedContactScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactScreen/TrustedContactScreen";
 import ShareSecretViaQRScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/ShareSecretViaQRScreen/ShareSecretViaQRScreen";
+import SecretQuestionAndAnswerScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/SecretQuestionAndAnswerScreen/SecretQuestionAndAnswerScreen";
 
 import SelectContactListAssociatePerson from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/BackUpTrustedPartySecretStoreScreen/SelectContactListAssociatePerson";
 import TrustedContactAcceptOtpScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/BackUpTrustedPartySecretStoreScreen/TrustedContactAcceptOtpScreen";
@@ -129,6 +130,7 @@ import HealthCheckMnemonicScreen from "HexaWallet/src/screens/DrawerScreen/Healt
 import ReceivePaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/ReceivePaymentScreen/ReceivePaymentScreen";
 import SendPaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/SendPaymentScreen/SendPaymentScreen";
 import ConfirmAndSendPaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/SendPaymentScreen/ConfirmAndSendPaymentScreen";
+
 
 
 
@@ -349,6 +351,10 @@ const BackUpYourWalletStackNavigatorRouter = createStackNavigator(
   {
     AllContactListScreen: {
       screen: AllContactListScreen,
+      navigationOptions: { header: null }
+    },
+    SecretQuestionAndAnswerScreen: {
+      screen: SecretQuestionAndAnswerScreen,
       navigationOptions: { header: null }
     },
     SecretSharingScreen: {

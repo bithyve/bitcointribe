@@ -38,8 +38,11 @@ import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 //TODO: Custome model  
 import ModelConfirmSendSuccess from "HexaWallet/src/app/custcompontes/Model/ModelPaymentScreen/ModelConfirmSendScreen/ModelConfirmSendSuccess";
 
-//TODO: Custome Alert   
+
+
+//TODO: Custome Alert 
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
 
 
 //TODO: Custome StyleSheet Files       
@@ -118,18 +121,7 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
                 } ]
             } )
         } else {
-            Alert.alert(
-                'Oops',
-                resTransferST.err,
-                [
-                    {
-                        text: 'Ok', onPress: () => {
-
-                        }
-                    },
-                ],
-                { cancelable: false },
-            );
+            alert.simpleOk( "Oops", resTransferST.err );
         }
     }
 
