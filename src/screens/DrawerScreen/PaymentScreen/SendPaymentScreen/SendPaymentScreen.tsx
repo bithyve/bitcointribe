@@ -204,12 +204,11 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         } else {
             resTransferST = await secureAccount.transferST1( address, amountFloat, priority );
             console.log( { resTransferST } );
-
         }
         if ( resTransferST.status == 200 ) {
             this.setState( {
                 flag_Loading: false
-            } )
+            } );
             data.mnemonic = walletDetails.mnemonic;
             data.amount = this.state.amount;
             data.respAddress = address;
@@ -243,8 +242,6 @@ export default class SendPaymentScreen extends React.Component<any, any> {
                 flag_DisableSentBtn: true,
             } )
         }
-
-
     }
 
     //buz bitcoin need small letter 

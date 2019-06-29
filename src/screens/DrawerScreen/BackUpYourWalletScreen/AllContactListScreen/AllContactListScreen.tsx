@@ -91,7 +91,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
         let seletedLength = this.state.SelectedFakeContactList.length;
         // console.log( { seletedLength } );
         this.setState( { data: this.state.data } )
-        if ( seletedLength == 3 ) {
+        if ( seletedLength == 2 ) {
             this.setState( {
                 flag_NextBtnDisable: false,
                 filterValue: "",
@@ -130,13 +130,14 @@ export default class AllContactListScreen extends React.Component<any, any> {
         } )
         let selectedContactList = this.state.SelectedFakeContactList;
         console.log( { selectedContactList } );
-        const resUpdateSSSContactDetails = await dbOpration.updateSSSContactListDetails(
-            localDB.tableName.tblSSSDetails,
-            selectedContactList,
-        );
-        if ( resUpdateSSSContactDetails == true ) {
-            this.props.navigation.push( "SecretSharingScreen" );
-        }
+        // const resUpdateSSSContactDetails = await dbOpration.updateSSSContactListDetails(
+        //     localDB.tableName.tblSSSDetails,
+        //     selectedContactList,
+        // );
+        // if ( resUpdateSSSContactDetails == true ) {
+
+        // }     
+        this.props.navigation.push( "SecretQuestionAndAnswerScreen", { data: selectedContactList } );
     }
 
     //TODO: Remove gird on click item
@@ -164,7 +165,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
             data: arr_FullArrayList
         } )
         let seletedLength = this.state.SelectedFakeContactList.length;
-        if ( seletedLength == 3 ) {
+        if ( seletedLength == 2 ) {
             this.setState( {
                 flag_NextBtnDisable: false
             } )

@@ -757,9 +757,18 @@ export default class WalletScreen extends React.Component {
                 } }
               >
                 <ViewShieldIcons data={ arr_CustShiledIcon } click_Image={ () => {
-                  let backupType = JSON.parse( walletDetails.appHealthStatus );
-                  if ( backupType != "" ) {
-                    this.props.navigation.push( "HealthOfTheAppNavigator" );
+                  let appHealthStatus = walletDetails.appHealthStatus;
+                  if ( appHealthStatus != "" ) {
+                    let backupType = JSON.parse( walletDetails.appHealthStatus );
+                    if ( backupType != "" ) {
+                      this.props.navigation.push( "HealthOfTheAppNavigator" );
+                    } else {
+                      this.setState( {
+                        arr_ModelBackupYourWallet: [ {
+                          modalVisible: true
+                        } ]
+                      } )
+                    }
                   } else {
                     this.setState( {
                       arr_ModelBackupYourWallet: [ {
