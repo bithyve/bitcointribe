@@ -189,7 +189,7 @@ export default class WalletScreen extends React.Component {
   async connnection_FetchData() {
     var resultWallet = await utils.getWalletDetails();
     var resAccount = await comFunDBRead.readTblAccount();
-    // console.log( { resAccount } );
+    console.log( { resAccount } );
     let temp = [];
     for ( let i = 0; i < resAccount.length; i++ ) {
       let dataAccount = resAccount[ i ];

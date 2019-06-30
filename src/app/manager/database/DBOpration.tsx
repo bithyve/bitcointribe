@@ -737,6 +737,36 @@ const updateAccountBal = (
 };
 
 
+const updateSecureAccountAddInfo = (
+  tblName: string,
+  date: string,
+  addInfo: any,
+  id: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn: any ) {
+        txn.executeSql(
+          "update " +
+          tblName +
+          " set lastUpdated =:lastUpdated,additionalInfo =:additionalInfo where id = :id",
+          [  
+            utils.encrypt( date.toString(), passcode ),
+            utils.encrypt( JSON.stringify( addInfo ).toString(), passcode ),
+            id
+          ]
+        );
+        resolve( true );
+
+
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
 
 
 
@@ -1398,6 +1428,7 @@ module.exports = {
   updateSecureAccountAddressAndBal,
   updateAccountBal,
   updateAccountBalAddressWise,
+  updateSecureAccountAddInfo,
 
   //Transation Details
   insertTblTransation,

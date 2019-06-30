@@ -116,7 +116,7 @@ describe("Secure Account", () => {
     expect(data.isActive).toBe(true);
   });
 
-  test.only("transacts from a (pre-funded) secure account (multi-stage)", async () => {
+  test("transacts from a (pre-funded) secure account (multi-stage)", async () => {
     const dummyMnemonic =
       "six sort kangaroo special couch fabric dream tuition process sail dutch quarter impact gauge era maple during section width young certain engage collect ahead";
     const dummySecret = "GZFXQUJSKI4GMNSLMN3VIK3SKBSU64KV";

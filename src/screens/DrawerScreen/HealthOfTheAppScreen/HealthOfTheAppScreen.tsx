@@ -13,6 +13,7 @@ import {
     Body,
     Text,
     List, ListItem,
+    Icon
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
 import { RkCard } from "react-native-ui-kitten";
@@ -60,15 +61,37 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         super( props )
         this.state = ( {
             arr_TrustedContacts: [ {
-                thumbnailPath: "",
-                givenName: "Hexa",
+                thumbnailPath: "user",
+                givenName: "Trusted Contact 1",
                 familyName: "",
                 statusMsgColor: "gray",
                 statusMsg: "Status",
                 opt: undefined,
             }, {
-                thumbnailPath: "",
-                givenName: "Hexa",
+                thumbnailPath: "user",
+                givenName: "Trusted Contact 1",
+                familyName: "",
+                statusMsgColor: "gray",
+                statusMsg: "Status",
+                opt: undefined,
+            } ],
+            arr_SelfShare: [ {
+                thumbnailPath: "wallet",
+                givenName: "Wallet",
+                familyName: "",
+                statusMsgColor: "gray",
+                statusMsg: "Status",
+                opt: undefined,
+            }, {
+                thumbnailPath: "email",
+                givenName: "Email",
+                familyName: "",
+                statusMsgColor: "gray",
+                statusMsg: "Status",
+                opt: undefined,
+            }, {
+                thumbnailPath: "mail",
+                givenName: "Cloud Store",
                 familyName: "",
                 statusMsgColor: "gray",
                 statusMsg: "Status",
@@ -86,6 +109,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             //flag
             flag_isTrustedContacts: true,
             flag_TrustedContactClickList: true,
+            flag_SelfShare: true,
+            flag_SelfShareDisable: true,
             flag_isSetupTrustedContact: true,
             flag_isMnemonic: false,
             flag_isSecretQuestions: false,
@@ -334,10 +359,12 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
 
     render() {
-        let { flag_isTrustedContacts, flag_TrustedContactClickList, flag_isSetupTrustedContact, flag_isMnemonic, flag_isSecretQuestions, flag_isTwoFactor, flag_Loading } = this.state;
+        //flag
+        let { flag_isTrustedContacts, flag_TrustedContactClickList, flag_isSetupTrustedContact, flag_isMnemonic, flag_isSecretQuestions, flag_isTwoFactor, flag_Loading, flag_SelfShare, flag_SelfShareDisable } = this.state;
         //TouchableOpacity
         let { flag_DisableSecureTwoFactor, flag_DisableSecretQuestion } = this.state;
-        let { arr_TrustedContacts } = this.state;
+        //array
+        let { arr_TrustedContacts, arr_SelfShare } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
@@ -381,12 +408,13 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                     <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                                                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
                                                             { renderIf( item.thumbnailPath != "" )(
-                                                                <Avatar medium rounded source={ { uri: item.thumbnailPath } } />
+                                                                flag_isSetupTrustedContact == true ? <Avatar medium rounded icon={ { name: item.thumbnailPath, type: 'font-awesome' } } /> : <Avatar medium rounded source={ { uri: item.thumbnailPath } } />
+
                                                             ) }
                                                             { renderIf( item.thumbnailPath == "" )(
                                                                 <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
                                                             ) }
-                                                            <View style={ { flexDirection: "column", justifyContent: "center" } }>
+                                                            <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
                                                                 <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                                 <View style={ { flexDirection: "row" } }>
                                                                     <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
@@ -416,10 +444,15 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                             </View>
                                                             <View style={ {
                                                                 flex: 1,
-                                                                alignItems: 'flex-end',
-                                                                justifyContent: 'center'
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                flexDirection: "row"
                                                             } }>
-                                                                <SvgIcon name="icon_share" size={ 25 } color={ primaryColor } />
+                                                                <View style={ { flexDirection: "column", flex: 1, alignItems: "center" } }>
+                                                                    <Text note style={ { fontSize: 14 } }>Last assessed on</Text>
+                                                                    <Text style={ { fontSize: 14 } }>4/11/2019 12:23</Text>
+                                                                </View>
+                                                                <IconFontAwe name="angle-right" style={ { fontSize: 25, marginRight: 10, flex: 0.1 } } />
                                                             </View>
                                                         </View>
                                                     </View>
@@ -430,24 +463,110 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                         />
                                     </View>
                                     { renderIf( flag_isSetupTrustedContact == true )(
-                                        <FullLinearGradientButton
-                                            click_Done={ async () => {
-                                                this.setState( {
-                                                    arr_ModelFindYourTrustedContacts: [
-                                                        {
-                                                            modalVisible: true
-                                                        }
-                                                    ]
-                                                } );
-                                            }
-                                            }
-                                            title="Setup your SSS"
-                                            disabled={ false }
-                                            style={ [ { opacity: 1 }, { borderRadius: 10 } ] }
-                                        />
+                                        <View style={ { flex: 1 } }>
+                                            <Button
+                                                onPress={ () => {
+                                                    this.setState( {
+                                                        arr_ModelFindYourTrustedContacts: [
+                                                            {
+                                                                modalVisible: true
+                                                            }
+                                                        ]
+                                                    } );
+                                                } }
+                                                style={ [ globalStyle.ffFiraSansSemiBold, {
+                                                    backgroundColor: "#838383", borderRadius: 10, margin: 5,
+                                                    height: 40,
+                                                } ] }
+                                                full>
+                                                <Text style={ { color: "#ffffff" } }>Setup your SSS</Text>
+                                            </Button>
+                                        </View>
                                     ) }
                                 </View>
                             ) }
+
+                            { renderIf( flag_SelfShare == true )(
+                                <View style={ { flex: 3 } }>
+                                    <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
+                                        <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Self Share</Text>
+                                    </View>
+                                    <View style={ { flex: 1 } }>
+                                        <FlatList
+                                            data={
+                                                arr_SelfShare
+                                            }
+                                            showsVerticalScrollIndicator={ false }
+                                            renderItem={ ( { item } ) => (
+                                                <TouchableOpacity style={ {
+                                                } } onPress={ () => {
+                                                    this.click_Item( item )
+                                                } }
+                                                    disabled={ flag_SelfShareDisable }
+                                                >
+                                                    <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
+                                                        <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
+                                                            { renderIf( item.thumbnailPath != "" )(
+                                                                flag_SelfShareDisable == true ? <Avatar medium rounded icon={ { name: item.thumbnailPath, type: 'font-awesome' } } /> : <Avatar medium rounded source={ { uri: item.thumbnailPath } } />
+
+                                                            ) }
+                                                            { renderIf( item.thumbnailPath == "" )(
+                                                                <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
+                                                            ) }
+                                                            <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
+                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                                <View style={ { flexDirection: "row" } }>
+                                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                                    { renderIf( typeof item.opt !== "undefined" )(
+                                                                        <TimerCountdown
+                                                                            initialMilliseconds={ item.totalSec * 1000 }
+                                                                            onExpire={ () => this.connection_Load() }
+                                                                            formatMilliseconds={ ( milliseconds ) => {
+                                                                                const remainingSec = Math.round( milliseconds / 1000 );
+                                                                                const seconds = parseInt( ( remainingSec % 60 ).toString(), 10 );
+                                                                                const minutes = parseInt( ( ( remainingSec / 60 ) % 60 ).toString(), 10 );
+                                                                                const hours = parseInt( ( remainingSec / 3600 ).toString(), 10 );
+                                                                                const s = seconds < 10 ? '0' + seconds : seconds;
+                                                                                const m = minutes < 10 ? '0' + minutes : minutes;
+                                                                                let h = hours < 10 ? '0' + hours : hours;
+                                                                                h = h === '00' ? '' : h + ':';
+                                                                                return h + m + ':' + s;
+                                                                            } }
+                                                                            allowFontScaling={ true }
+                                                                            style={ { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } }
+                                                                        />
+                                                                    ) }
+                                                                </View>
+                                                                { renderIf( typeof item.opt !== "undefined" )(
+                                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>OTP { " " }{ item.opt }</Text>
+                                                                ) }
+                                                            </View>
+                                                            <View style={ {
+                                                                flex: 1,
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                flexDirection: "row"
+                                                            } }>
+                                                                <View style={ { flexDirection: "column", flex: 1, alignItems: "center" } }>
+                                                                    <Text note style={ { fontSize: 14 } }>Last assessed on</Text>
+                                                                    <Text style={ { fontSize: 14 } }>4/11/2019 12:23</Text>
+                                                                </View>
+                                                                <IconFontAwe name="angle-right" style={ { fontSize: 25, marginRight: 10, flex: 0.1 } } />
+                                                            </View>
+                                                        </View>
+                                                    </View>
+                                                </TouchableOpacity>
+                                            ) }
+                                            keyExtractor={ item => item.recordID }
+                                            extraData={ this.state }
+                                        />
+                                    </View>
+
+                                </View>
+                            ) }
+
+
+
 
                             { renderIf( flag_isMnemonic == true )(
                                 <View style={ styles.viewMnemonic }>

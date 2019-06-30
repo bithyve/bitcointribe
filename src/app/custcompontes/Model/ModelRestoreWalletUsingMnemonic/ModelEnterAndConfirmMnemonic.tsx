@@ -78,9 +78,6 @@ export default class ModelEnterAndConfirmMnemonic extends Component<Props, any> 
             } );
             let mnemonic = this.state.mnemonic;
             let regularAccount = await utils.getRegularAccountObject();
-            // const regularAccount = new RegularAccount(
-            //     this.state.mnemonic
-            // );
             const getBal = await regularAccount.getBalance();
             console.log( { getBal } );
 
