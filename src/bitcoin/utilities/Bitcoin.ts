@@ -645,19 +645,28 @@ export default class Bitcoin {
 
   public feeRatesPerByte = async (txnPriority: string = "high") => {
     try {
+      let rates;
+      if (this.network === bitcoinJS.networks.testnet) {
+        const res: AxiosResponse = await axios.get(
+          config.ESPLORA_API_ENDPOINTS.TESTNET.TXN_FEE,
+        );
+        rates = res.data;
+      } else {
+        const res: AxiosResponse = await axios.get(
+          config.ESPLORA_API_ENDPOINTS.MAINNET.TXN_FEE,
+        );
+        rates = res.data;
+      }
       if (txnPriority === "high") {
-        const { feerate } = await this.estimateSmartFee(1);
-        return Math.round((feerate * 1e8) / 1000);
+        return rates["2"];
       } else if (txnPriority === "medium") {
-        const { feerate } = await this.estimateSmartFee(3);
-        return Math.round((feerate * 100000000) / 1000);
+        return rates["4"];
       } else if (txnPriority === "low") {
-        const { feerate } = await this.estimateSmartFee(6);
-        return Math.round((feerate * 100000000) / 1000);
+        return rates["6"];
       }
     } catch (err) {
       console.log(
-        "Fee rates fetching failed @Bitcoin core, using blockcypher fallback",
+        `Fee rates fetching failed @Bitcoin core: ${err}, using blockcypher fallback`,
       );
       try {
         const chainInfo = await this.fetchChainInfo();

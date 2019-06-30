@@ -261,13 +261,3 @@ console.log(
     "share",
   ),
 );
-
-// console.log(
-//   "Mnemonic based:",
-//   healthStatus.appHealthStatus(
-//     1555725600000,
-//     1555725600000,
-//     null,
-//     1555725600000,
-//   ),
-// );

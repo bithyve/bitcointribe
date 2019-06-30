@@ -269,6 +269,16 @@ const setSecureAccountObject = ( value: any ) => {
   return true;
 }
 
+const getS3ServiceObject = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getS3ServiceObject();
+}
+const setS3ServiceObject = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setS3ServiceObject( value );
+  return true;
+}
+
 
 module.exports = {
   getUnixTimeDate,
@@ -313,5 +323,7 @@ module.exports = {
   getRegularAccountObject,
   setRegularAccountObject,
   getSecureAccountObject,
-  setSecureAccountObject
+  setSecureAccountObject,
+  getS3ServiceObject,
+  setS3ServiceObject
 };   

@@ -87,6 +87,7 @@ export default class WalletSetupScreens extends React.Component<any, any> {
             mnemonic
         );
         const secureAccount = new SecureAccount( mnemonic );
+        const sss = new S3Service( mnemonic );
         var regularJson = JSON.stringify( regularAccount );
         AsyncStorage.setItem(
             asyncStorageKeys.regularClassObject,
@@ -100,6 +101,14 @@ export default class WalletSetupScreens extends React.Component<any, any> {
             secureJson
         );
         await utils.setSecureAccountObject( secureAccount );
+
+        var sssJson = JSON.stringify( sss );
+        AsyncStorage.setItem(
+            asyncStorageKeys.s3ServiceClassObject,
+            sssJson
+        );
+        await utils.setS3ServiceObject( sss );
+
         var getAddress = await regularAccount.getAddress();
         if ( getAddress.status == 200 ) {
             getAddress = getAddress.data.address
