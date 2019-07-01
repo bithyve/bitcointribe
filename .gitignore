@@ -45,6 +45,9 @@ env.dev
 #Documents
 /src/assets/Documents
 
+#Bitcoin Files
+*/bitcoin.zip
+
 # BUCK
 buck-out/
 \.buckd/

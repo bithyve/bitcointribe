@@ -452,7 +452,7 @@ const updateWalletAppHealthStatus = (
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
     try {
-      db.transaction( function ( txn ) {
+      db.transaction( function ( txn: any ) {
         txn.executeSql(
           "update " +
           tblName +
@@ -525,6 +525,8 @@ const updateWalletMnemonicAndAnwserDetails = (
     }
   } );
 };
+
+
 
 
 
@@ -651,7 +653,47 @@ const updateSecureAccountAddressAndBal = (
   } );
 };
 
-const updateRegularAccountBal = (
+const updateAccountBalAddressWise = (
+  tblName: string,
+  address: string,
+  bal: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+          var len = results.rows.length;
+          if ( len > 0 ) {
+            for ( let i = 0; i < len; i++ ) {
+              let dbdecryptAddress = utils.decrypt(
+                results.rows.item( i ).address,
+                passcode
+              );
+              let dbAddress = results.rows.item( i ).address;
+              if ( dbdecryptAddress == address ) {
+                txn.executeSql(
+                  "update " +
+                  tblName +
+                  " set balance =:balance where address = :address",
+                  [
+                    utils.encrypt( bal.toString(), passcode ),
+                    dbAddress
+                  ]
+                );
+                resolve( true );
+              }
+            }
+          }
+        } );
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
+const updateAccountBal = (
   tblName: string,
   address: string,
   bal: string,
@@ -693,6 +735,40 @@ const updateRegularAccountBal = (
     }
   } );
 };
+
+
+const updateSecureAccountAddInfo = (
+  tblName: string,
+  date: string,
+  addInfo: any,
+  id: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn: any ) {
+        txn.executeSql(
+          "update " +
+          tblName +
+          " set lastUpdated =:lastUpdated,additionalInfo =:additionalInfo where id = :id",
+          [  
+            utils.encrypt( date.toString(), passcode ),
+            utils.encrypt( JSON.stringify( addInfo ).toString(), passcode ),
+            id
+          ]
+        );
+        resolve( true );
+
+
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
+
+
 
 
 
@@ -1290,13 +1366,6 @@ const insertTrustedPartyDetailWithoutAssociate = (
   } );
 };
 
-
-
-
-
-
-
-
 const updateHistroyAndSharedDate = (
   tblName: string,
   history: any,
@@ -1357,7 +1426,9 @@ module.exports = {
   insertCreateAccount,
   insertLastBeforeCreateAccount,
   updateSecureAccountAddressAndBal,
-  updateRegularAccountBal,
+  updateAccountBal,
+  updateAccountBalAddressWise,
+  updateSecureAccountAddInfo,
 
   //Transation Details
   insertTblTransation,
@@ -1377,5 +1448,5 @@ module.exports = {
   //SSS Trusted Party Details 
   insertTrustedPartyDetails,
   insertTrustedPartyDetailWithoutAssociate,
-  updateHistroyAndSharedDate
+  updateHistroyAndSharedDate,
 };    

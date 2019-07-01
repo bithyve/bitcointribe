@@ -138,7 +138,10 @@ var notification = {
 
 var asyncStorageKeys = {
   rootViewController: "rootViewController",
-  flag_PasscodeCreate: "flag_PasscodeCreate"
+  flag_PasscodeCreate: "flag_PasscodeCreate",
+  regularClassObject: "regularClassObject",
+  secureClassObject: "secureClassObject",
+  s3ServiceClassObject: "s3ServiceClassObject"
 }
 
 export {

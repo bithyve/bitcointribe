@@ -6,7 +6,10 @@ export default class Singleton {
   public deepLinkingUrl: string = "";
   public deepLinkingType: string = "";
 
-
+  //Bitcoin Class
+  public regularAccountObject: any;
+  public secureAccountObject: any;
+  public s3Service: any;
 
 
 
@@ -108,5 +111,29 @@ export default class Singleton {
     this.appHealthStatus = value;
   }
 
+  //Bitcoin class 
+  getRegularAccountObject() {
+    return this.regularAccountObject;
+  }
+  setRegularAccountObject( value: any ) {
+    this.regularAccountObject = value;
+  }
+  getSecureAccountObject() {
+    return this.secureAccountObject;
+  }
+  setSecureAccountObject( value: any ) {
+    this.secureAccountObject = value;
+  }
+  getS3ServiceObject() {
+    return this.s3Service;
+  }
+  setS3ServiceObject( value: any ) {
+    this.s3Service = value;
+  }
 
-}
+
+
+
+
+
+}     

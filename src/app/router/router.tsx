@@ -83,6 +83,7 @@ import AllContactListScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYour
 import SecretSharingScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/SecretSharingScreen/SecretSharingScreen";
 import TrustedContactScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactScreen/TrustedContactScreen";
 import ShareSecretViaQRScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/ShareSecretViaQRScreen/ShareSecretViaQRScreen";
+import SecretQuestionAndAnswerScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/SecretQuestionAndAnswerScreen/SecretQuestionAndAnswerScreen";
 
 import SelectContactListAssociatePerson from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/BackUpTrustedPartySecretStoreScreen/SelectContactListAssociatePerson";
 import TrustedContactAcceptOtpScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/BackUpTrustedPartySecretStoreScreen/TrustedContactAcceptOtpScreen";
@@ -124,8 +125,17 @@ import HealthCheckMnemonicScreen from "HexaWallet/src/screens/DrawerScreen/Healt
 
 
 
-//TODO: StackNavigator
 
+//TODO: Payment Screen 
+import ReceivePaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/ReceivePaymentScreen/ReceivePaymentScreen";
+import SendPaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/SendPaymentScreen/SendPaymentScreen";
+import ConfirmAndSendPaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/SendPaymentScreen/ConfirmAndSendPaymentScreen";
+
+
+
+
+
+//TODO: StackNavigator
 //TODO: StackNavigator:ONBoarding
 const OnBoardingStackNavigator = createStackNavigator(
   {
@@ -343,6 +353,10 @@ const BackUpYourWalletStackNavigatorRouter = createStackNavigator(
       screen: AllContactListScreen,
       navigationOptions: { header: null }
     },
+    SecretQuestionAndAnswerScreen: {
+      screen: SecretQuestionAndAnswerScreen,
+      navigationOptions: { header: null }
+    },
     SecretSharingScreen: {
       screen: SecretSharingScreen,
       navigationOptions: { header: null }
@@ -488,6 +502,38 @@ const ResotreSecureAccountStackNavigator = createStackNavigator(
 )
 
 
+//TODO: Payment Navigation
+//Receive Payment Stack Navigator
+const ReceivePaymentStackNavigator = createStackNavigator(
+  {
+    ReceivePaymentScreen: {
+      screen: ReceivePaymentScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "ReceivePaymentScreen"
+  }
+)
+
+//Send Payment Stack Navigator
+const SendPaymentStackNavigator = createStackNavigator(
+  {
+    SendPaymentScreen: {
+      screen: SendPaymentScreen,
+      navigationOptions: { header: null }
+    },
+    ConfirmAndSendPaymentScreen: {
+      screen: ConfirmAndSendPaymentScreen,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "SendPaymentScreen"
+  }
+)
+
+
 
 //TODO: TabNavigator
 //TODO: TabNavigator:TabNavigator
@@ -534,6 +580,7 @@ const TabNavigator = createBottomTabNavigator(
   },
   {
     initialRouteName: "WalletScreen",
+    order: [ 'WalletScreen', 'Analytics', 'QrCodeScannerScreen', 'Settings' ],
     tabBarOptions: {
       showLabel: true,
       //swipeEnabled: true,
@@ -673,6 +720,17 @@ export const createRootNavigator = (
       //TODO: Restore Secure Account 
       ResotreSecureAccountNavigator: {
         screen: ResotreSecureAccountStackNavigator,
+        navigationOptions: { header: null }
+      },
+      //TODO: Payment Navigation
+      //ReceivePayment  
+      ReceivePaymentNavigator: {
+        screen: ReceivePaymentStackNavigator,
+        navigationOptions: { header: null }
+      },
+      //SentPayment    
+      SendPaymentNavigator: {
+        screen: SendPaymentStackNavigator,
         navigationOptions: { header: null }
       }
       //Drwaer Navigation
