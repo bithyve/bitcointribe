@@ -1,21 +1,34 @@
+import axios, { AxiosInstance } from "axios";
 import Client from "bitcoin-core";
 import bitcoinJS, { Network } from "bitcoinjs-lib";
 import config from "react-native-config";
+
 
 class Config {
   public ENVIRONMENT: string;
   public NETWORK: Network;
   public BITCOIN_NODE: Client;
-  public WALLET_XPUB_PATH: string = config.BIT_WALLET_XPUB_PATH;
-  public DERIVATION_BRANCH: string = config.BIT_DERIVATION_BRANCH;
+  public BH_AXIOS: AxiosInstance;
+  public SECURE_WALLET_XPUB_PATH: string =
+    config.BIT_SECURE_WALLET_XPUB_PATH;
+  public SECURE_DERIVATION_BRANCH: string =
+    config.BIT_SECURE_DERIVATION_BRANCH;
   public TOKEN: string = config.BIT_BLOCKCYPHER_API_URLS_TOKEN;
   public SSS_OTP_LENGTH: string = config.BIT_SSS_OTP_LENGTH;
-  public SSS_TOTAL: number = parseInt( config.BIT_SSS_TOTAL, 10 );
-  public SSS_THRESHOLD: number = parseInt( config.BIT_SSS_THRESHOLD, 10 );
-  public MSG_ID_LENGTH: number = parseInt( config.BIT_MSG_ID_LENGTH, 10 );
   public BH_SERVER = {
     DEV: config.BIT_API_URLS_BH_SERVER_DEV,
     PROD: config.BIT_API_URLS_BH_SERVER_PROD,
+  };
+  public SSS_TOTAL: number = parseInt( config.BIT_SSS_TOTAL, 10 );
+  public SSS_THRESHOLD: number = parseInt( config.BIT_SSS_THRESHOLD, 10 );
+  public MSG_ID_LENGTH: number = parseInt( config.BIT_MSG_ID_LENGTH, 10 );
+  public SCHUNK_SIZE: number = parseInt( config.BIT_SCHUNK_SIZE, 10 );
+  public CHECKSUM_ITR: number = parseInt( config.BIT_CHECKSUM_ITR, 10 );
+  public HEXA_ID: string = config.BIT_HEXA_ID;
+  public DPATH_PURPOSE: number = parseInt( config.BIT_DPATH_PURPOSE, 10 );
+  public STATUS = {
+    SUCCESS: parseInt( config.BIT_SUCCESS_STATUS_CODE, 10 ),
+    ERROR: parseInt( config.BIT_ERROR_STATUS_CODE, 10 ),
   };
 
   public HEALTH_STATUS = {
@@ -45,11 +58,17 @@ class Config {
       MULTIBALANCE: config.BIT_ESPLORA_TESTNET_MULTIBALANCE,
       MULTIUTXO: config.BIT_ESPLORA_TESTNET_MULTIUTXO,
       MULTITXN: config.BIT_ESPLORA_TESTNET_MULTITXN,
+      INSECURE: {
+        TXNDETAILS: config.BIT_ESPLORA_TESTNET_INSECURE_TXNDETAILS,
+      },
     },
     MAINNET: {
       MULTIBALANCE: config.BIT_ESPLORA_MAINNET_MULTIBALANCE,
       MULTIUTXO: config.BIT_ESPLORA_MAINNET_MULTIUTXO,
       MULTITXN: config.BIT_ESPLORA_MAINNET_MULTITXN,
+      INSECURE: {
+        TXNDETAILS: config.BIT_ESPLORA_MAINNET_INSECURE_TXNDETAILS,
+      },
     },
   };
 
@@ -94,19 +113,24 @@ class Config {
     this.BITCOIN_NODE = new Client( {
       network:
         this.NETWORK === bitcoinJS.networks.bitcoin ? "mainnet" : "testnet",
+      timeout: 10000,
       username: config.BIT_RPC_USERNAME,
       password: config.BIT_RPC_PASSWORD,
       host: config.BIT_HOST_IP,
     } );
+    this.BH_AXIOS = axios.create( {
+      baseURL: this.SERVER,
+      headers: { hexa_id: this.HEXA_ID },
+    } );
   }
 
   public setNetwork = (): void => {
-    if ( this.ENVIRONMENT === "PROD" ) {
+    if ( this.ENVIRONMENT === "MAIN" ) {
       this.NETWORK = bitcoinJS.networks.bitcoin;
-    } else if ( this.ENVIRONMENT === "DEV" ) {
+    } else if ( this.ENVIRONMENT === "TEST" ) {
       this.NETWORK = bitcoinJS.networks.testnet;
     } else {
-      throw new Error( "Please specify an apt environment(PROD||DEV)" );
+      throw new Error( "Please specify an apt environment(MAIN||TEST)" );
     }
   }
 }

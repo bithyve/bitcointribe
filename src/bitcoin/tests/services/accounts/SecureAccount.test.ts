@@ -1,6 +1,7 @@
 import bip39 from "bip39";
 import crypto from "crypto";
 import authenticator from "otplib/authenticator";
+import config from "../../../Config";
 import SecureAccount from "../../../services/accounts/SecureAccount";
 
 describe("Secure Account", () => {
@@ -19,21 +20,19 @@ describe("Secure Account", () => {
 
   test("generates the required assets and sets up the secure account", async () => {
     const res = await secureAccount.setupSecureAccount();
-    if (res.status !== 200) {
-      throw new Error("secure account setup failed");
-    } else {
-      const { setupData } = res.data;
+    console.log({ res });
+    expect(res.status).toBe(config.STATUS.SUCCESS);
 
-      expect(setupData.bhXpub).toBeDefined();
-      expect(setupData.secret).toBeDefined();
-      expect(setupData.xIndex).toBeDefined();
-      expect(secureAccount.secureHDWallet.walletID).toBeDefined();
+    const { setupData } = res.data;
 
-      validationData = {
-        secret: setupData.secret,
-        xIndex: setupData.xIndex,
-      };
-    }
+    expect(setupData.bhXpub).toBeTruthy();
+    expect(setupData.secret).toBeTruthy();
+    expect(setupData.xIndex).toBeTruthy();
+
+    validationData = {
+      secret: setupData.secret,
+      xIndex: setupData.xIndex,
+    };
   });
 
   test("validates setup of the secure account", async () => {
@@ -43,23 +42,31 @@ describe("Secure Account", () => {
       validationData.secret,
       validationData.xIndex,
     );
-    if (res.status !== 200) {
-      throw new Error("secure account setup validation failed");
-    } else {
-      const { setupSuccessful } = res.data;
-      expect(setupSuccessful).toBe(true);
-    }
+    expect(res.status).toBe(config.STATUS.SUCCESS);
+    const { setupSuccessful } = res.data;
+    expect(setupSuccessful).toBe(true);
   });
 
   test("checks the health of the secureAccount", async () => {
     const dummyMnemonic =
       "horn middle issue story near liar captain version where speed bubble goose obvious member ski first rebuild palace spy royal segment river defy travel";
     const dummyTwoFASecret = "OZRDQOBUGBYEYMTIJQ3WINLBGM2XA5CG";
-    const dummyPOS = dummyTwoFASecret.slice(dummyTwoFASecret.length - 4);
+    let dummyChunk;
+    const dummyPOS = 1;
+
+    if (dummyPOS === 1) {
+      dummyChunk = dummyTwoFASecret.slice(0, config.SCHUNK_SIZE);
+    } else if (dummyPOS === -1) {
+      dummyChunk = dummyTwoFASecret.slice(
+        dummyTwoFASecret.length - config.SCHUNK_SIZE,
+      );
+    }
+
     const secureHDAccount = new SecureAccount(dummyMnemonic);
-    const { isValid } = await secureHDAccount.checkHealth(dummyPOS);
-    console.log({ isValid });
-    expect(isValid).toBe(true);
+    const res = await secureHDAccount.checkHealth(dummyChunk, dummyPOS);
+    console.log({ res });
+    expect(res.status).toBe(config.STATUS.SUCCESS);
+    expect(res.data.isValid).toBe(true);
   });
 
   test("imports secure account", async () => {
@@ -71,13 +78,45 @@ describe("Secure Account", () => {
 
     const secureHDAccount = new SecureAccount(dummyMnemonic);
     const dummyToken = authenticator.generate(dummyTwoFASecret);
-    await secureHDAccount.importSecureAccount(dummyToken, dummySecondaryXpub);
-    const address = await secureHDAccount.getAddress();
-    console.log({ address });
-    expect(address).toBeTruthy();
+
+    const { status, data } = await secureHDAccount.importSecureAccount(
+      dummyToken,
+      dummySecondaryXpub,
+    );
+    expect(status).toBe(config.STATUS.SUCCESS);
+    expect(data.imported).toBe(true);
+
+    const res = await secureHDAccount.getAddress();
+    expect(res.status).toBe(config.STATUS.SUCCESS);
+    expect(res.data.address).toBeTruthy();
   });
 
-  test("transacts from a (pre-funded) secure account", async () => {
+  test("serialize and deserialize (stringification) secure account obj (state preservation test)", () => {
+    const primaryMnemonic: string =
+      "horn middle issue story near liar captain version where speed bubble goose obvious member ski first rebuild palace spy royal segment river defy travel";
+    const unserializedSecureAccount = new SecureAccount(primaryMnemonic);
+    const initRes = unserializedSecureAccount.getRecoveryMnemonic();
+    console.log({ mnemonic: initRes.data.secondaryMnemonic });
+    const serializedObj = JSON.stringify(unserializedSecureAccount);
+    const deserializedRegAc = SecureAccount.fromJSON(serializedObj);
+    console.log({ deserializedRegAc });
+    const finalRes = deserializedRegAc.getRecoveryMnemonic();
+    console.log({ deserializedMnemonic: finalRes.data.secondaryMnemonic });
+    expect(initRes.data.secondaryMnemonic).toEqual(
+      finalRes.data.secondaryMnemonic,
+    );
+  });
+
+  test("checks whether the secure account has been activated (setup validation: completed)", async () => {
+    const dummyMnemonic =
+      "horn middle issue story near liar captain version where speed bubble goose obvious member ski first rebuild palace spy royal segment river defy travel";
+    const secureHDAccount = new SecureAccount(dummyMnemonic);
+    const { status, data } = await secureHDAccount.isActive();
+    expect(status).toBe(config.STATUS.SUCCESS);
+    expect(data.isActive).toBe(true);
+  });
+
+  test("transacts from a (pre-funded) secure account (multi-stage)", async () => {
     const dummyMnemonic =
       "six sort kangaroo special couch fabric dream tuition process sail dutch quarter impact gauge era maple during section width young certain engage collect ahead";
     const dummySecret = "GZFXQUJSKI4GMNSLMN3VIK3SKBSU64KV";
@@ -88,38 +127,36 @@ describe("Secure Account", () => {
     const dummyToken = authenticator.generate(dummySecret);
 
     const transfer = {
-      recipientAddress: "2NAwqcZHo2DW9c8Qs9Jxaat3jHW3aqsBpFs",
-      amount: 3500,
+      recipientAddress: "2NEcDodh4CyfyB7ZF87zGCxkR4CdpF6oNHm",
+      amount: 3500 / 1e8,
+      priority: "High",
     };
+
     const secureHDAccount = new SecureAccount(dummyMnemonic);
     await secureHDAccount.importSecureAccount(dummyToken, dummySecondaryXpub);
-    // secureHDAccount.secureHDWallet.xpubs.secondary = dummySecondaryXpub;
-    // secureHDAccount.secureHDWallet.xpubs.bh = dummyBHXpub;
+    console.log(JSON.stringify(secureAccount));
+    const transferST1 = await secureHDAccount.transferST1(
+      transfer.recipientAddress,
+      transfer.amount,
+      transfer.priority,
+    );
+    expect(transferST1.status).toBe(config.STATUS.SUCCESS);
+    const { inputs, txb, fee } = transferST1.data;
 
-    // const address = await secureHDAccount.getAddress();
-    // console.log({ address });
-    // const data = await secureHDAccount.getBalance();
-    // console.log(data);
-    const {
-      txHex,
-      childIndexArray,
-    } = await secureHDAccount.partiallySignedSecureTransaction({
-      recipientAddress: transfer.recipientAddress,
-      amount: transfer.amount,
-    });
+    const transferST2 = await secureHDAccount.transferST2(inputs, txb);
+    expect(transferST2.status).toBe(config.STATUS.SUCCESS);
+
+    const { txHex, childIndexArray } = transferST2.data;
 
     const token = authenticator.generate(dummySecret);
-    const res = await secureHDAccount.serverSigningAndBroadcasting(
+    console.log("Executing Transfer");
+    const transferST3 = await secureHDAccount.transferST3(
       token,
       txHex,
       childIndexArray,
     );
-
-    if (res.status !== 200) {
-      throw new Error("transaction from secure account failed");
-    } else {
-      console.log({ txid: res.data.txid });
-      expect(res.data.txid).toBeTruthy();
-    }
+    expect(transferST3.status).toBe(config.STATUS.SUCCESS);
+    console.log({ txid: transferST3.data.txid });
+    expect(transferST3.data.txid).toBeTruthy();
   });
 });

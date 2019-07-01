@@ -1,12 +1,19 @@
 /** @format */
 import React from "react";
 import { createAppContainer } from "react-navigation";
-import { AsyncStorage, AppState, AppRegistry, Linking, StatusBar, Alert } from "react-native";
+import { AsyncStorage, AppState, AppRegistry, Linking, StatusBar, Alert, SafeAreaView, StyleSheet } from "react-native";
 import DeepLinking from "react-native-deep-linking";
 import "HexaWallet/shim";
 import { name as appName } from "HexaWallet/app.json";
 import { createRootNavigator } from "HexaWallet/src/app/router/router";
 import LaunchScreen from "HexaWallet/src/screens/LaunchScreen/LaunchScreen";
+
+
+//TODO: Redux
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
+import allReducers from './src/redux/reducers';
+const store = createStore( allReducers );
 
 //TODO: Custome Object
 var utils = require( "HexaWallet/src/app/constants/Utils" );
@@ -175,6 +182,11 @@ export default class HexaWallet extends React.Component
     }
   }
 
+  addFriend = ( index ) =>
+  {
+    // ...
+  }
+
   render ()
   {
     const Layout = createRootNavigator(
@@ -184,13 +196,32 @@ export default class HexaWallet extends React.Component
     console.log( "first = " + this.state.status, this.state.isStartPage );
     const AppContainer = createAppContainer( Layout );
     return this.state.status ? (
-      <LaunchScreen
-        onComplited={ ( status: boolean, pageName: string ) =>
-          this.onComplited( status, pageName )
-        }
-      />
+      <Provider store={ store }>
+        <SafeAreaView style={ styles.container }>
+          <LaunchScreen
+            screenProps={ {
+              currentFriends: this.state.currentFriends,
+              possibleFriends: this.state.possibleFriends,
+              addFriend: this.addFriend,
+            } }
+            onComplited={ ( status: boolean, pageName: string ) =>
+              this.onComplited( status, pageName )
+            }
+          />
+        </SafeAreaView>
+      </Provider>
     ) : (
-        <AppContainer />
+        <Provider store={ store }>
+          <SafeAreaView style={ styles.container }>
+            <AppContainer
+              screenProps={ {
+                currentFriends: this.state.currentFriends,
+                possibleFriends: this.state.possibleFriends,
+                addFriend: this.addFriend,
+              } }
+            />
+          </SafeAreaView>
+        </Provider>
       );
   }
 }
@@ -198,3 +229,8 @@ export default class HexaWallet extends React.Component
 console.disableYellowBox = true;
 AppRegistry.registerComponent( appName, () => HexaWallet );
 
+let styles = StyleSheet.create( {
+  container: {
+    flex: 1
+  }
+} );

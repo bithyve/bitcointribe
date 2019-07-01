@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, Dimensions, Platform, SafeAreaView, Alert } from "react-native";
+import { StyleSheet, ImageBackground, View, Dimensions, Platform, SafeAreaView, Alert, AsyncStorage } from "react-native";
 import {
     Container,
     Header,
@@ -17,6 +17,7 @@ import {
 } from "native-base";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import bip39 from 'react-native-bip39';
+// var RNFS = require( 'react-native-fs' );
 
 
 //TODO: Custome Pages
@@ -29,17 +30,24 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, localDB, asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 
 
+//TODO: Custome Alert
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
 
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
+
+
+
+
 
 
 export default class SecondSecretQuestion extends React.Component<any, any> {
@@ -99,9 +107,6 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
     click_Confirm = async () => {
         const dateTime = Date.now();
         let data = this.state.data;
-        // const regularAccount = new RegularAccount();
-        // const resGetMnemonic = regularAccount.getMnemonic();
-        // const mnemonic = resGetMnemonic; //await bip39.generateMnemonic( 256 );
         const mnemonic = await bip39.generateMnemonic( 256 );
         let walletName = data.walletName;
         let firstQuestion = data.question;
@@ -110,41 +115,77 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
         let secoundAnser = this.state.secoundAnswer;
         const sss = new S3Service( mnemonic );
         const answers = [ firstAnswer, secoundAnser ];
-        const encryptedShares = sss.generateShares( answers );
-        console.log( { encryptedShares } );
-        const resInitializeHealthcheck = await sss.initializeHealthcheck( encryptedShares );
-        const regularAccount = new RegularAccount(
-            mnemonic
-        );
-        const secureAccount = new SecureAccount( mnemonic );
-        const resSetupSecureAccount = await secureAccount.setupSecureAccount();
-        // console.log( resSetupSecureAccount.data.setupData );
-        const secondaryMnemonic = await secureAccount.getRecoveryMnemonic();
-        let arr_SecureDetails = [];
-        let secureDetails = {};
-        secureDetails.setupData = resSetupSecureAccount.data.setupData;
-        secureDetails.secondaryXpub = resSetupSecureAccount.data.secondaryXpub;
-        secureDetails.secondaryMnemonic = secondaryMnemonic;
-        secureDetails.backupDate = dateTime;
-        secureDetails.title = "Setup";
-        secureDetails.addInfo = "";
-        arr_SecureDetails.push( secureDetails );
-        const getAddress = await regularAccount.getAddress();
-        //console.log( { getAddress } );
-        console.log( { resInitializeHealthcheck } );
-        if ( resInitializeHealthcheck.success ) {
-            //console.log( { encryptedShares } );
-            const shareIds = [];
-            const transShare = [];
-            for ( const share of encryptedShares ) {
-                shareIds.push( sss.getShareId( share ) )
-                transShare.push( sss.createTransferShare( share, walletName ) )
-            }
-            if ( shareIds != null ) {
+
+        const generateShareRes = sss.generateShares( firstAnswer );
+        console.log( { generateShareRes } );
+        if ( generateShareRes.status == 200 ) {
+            const { encryptedShares } = generateShareRes.data;
+            const autoHealthShares = encryptedShares.slice( 0, 3 );
+            const manualHealthShares = encryptedShares.slice( 3 );
+            //console.log( { autoHealthShares, manualHealthShares } );
+            const resInitializeHealthcheck = await sss.initializeHealthcheck( autoHealthShares );
+            //console.log( { resInitializeHealthcheck } );
+            if ( resInitializeHealthcheck.status == 200 ) {
+                const regularAccount = new RegularAccount(
+                    mnemonic
+                );
+                const secureAccount = new SecureAccount( mnemonic );
+                var regularJson = JSON.stringify( regularAccount );
+                AsyncStorage.setItem(
+                    asyncStorageKeys.regularClassObject,
+                    regularJson
+                );
+                await utils.setRegularAccountObject( regularAccount );
+
+                var resSetupSecureAccount = await secureAccount.setupSecureAccount();
+                console.log( { resSetupSecureAccount } );
+
+                if ( resSetupSecureAccount.status == 200 ) {
+                    resSetupSecureAccount = resSetupSecureAccount.data;
+                } else {
+                    alert.simpleOk( "Oops", resSetupSecureAccount.err );
+                }
+                var secondaryMnemonic = await secureAccount.getRecoveryMnemonic();
+                if ( secondaryMnemonic.status == 200 ) {
+                    secondaryMnemonic = secondaryMnemonic.data;
+                } else {
+                    alert.simpleOk( "Oops", secondaryMnemonic.err );
+                }
+                //console.log( { secondaryMnemonic } );
+                var secureJson = JSON.stringify( secureAccount );
+                AsyncStorage.setItem(
+                    asyncStorageKeys.secureClassObject,
+                    secureJson
+                );
+                await utils.setSecureAccountObject( secureAccount );
+
+                let arr_SecureDetails = [];
+                let secureDetails = {};
+                secureDetails.setupData = resSetupSecureAccount.setupData;
+                secureDetails.secondaryMnemonic = secondaryMnemonic.secondaryMnemonic;
+                secureDetails.backupDate = dateTime;
+                secureDetails.title = "Setup";
+                secureDetails.addInfo = "";
+                arr_SecureDetails.push( secureDetails );
+
+                var getAddress = await regularAccount.getAddress();
+                if ( getAddress.status == 200 ) {
+                    getAddress = getAddress.data.address
+                } else {
+                    alert.simpleOk( "Oops", getAddress.err );
+                }
+                console.log( { getAddress } );
+                const shareIds = [];
+                const transShare = [];
+                for ( const share of autoHealthShares ) {
+                    shareIds.push( sss.getShareId( share ) )
+                    transShare.push( sss.createTransferShare( share, walletName ) )
+                }
+                console.log( { shareIds, autoHealthShares } );
                 let resInsertSSSShare = await dbOpration.insertSSSShareAndShareId(
                     localDB.tableName.tblSSSDetails,
                     dateTime,
-                    encryptedShares,
+                    autoHealthShares,
                     shareIds
                 );
                 let resInsertWallet = await dbOpration.insertWallet(
@@ -157,7 +198,7 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                     walletName,
                     ""
                 );
-                let resAppHealthStatus = await comAppHealth.connection_AppHealthStatus( dateTime, 0, encryptedShares, mnemonic )
+                //let resAppHealthStatus = await comAppHealth.connection_AppHealthStatus( dateTime, 0, autoHealthShares, mnemonic )
                 // console.log( { resultSSSShareIdInserted } );
                 var temp = [];
                 let data = {};
@@ -193,7 +234,7 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                     "Secure Account",
                     arr_SecureDetails
                 );
-                if ( resInsertSSSShare && resInsertWallet && resAppHealthStatus && resUpdateWalletAns && resInsertSecureCreateAcc && resInsertCreateAcc ) {
+                if ( resInsertWallet && resUpdateWalletAns && resInsertSecureCreateAcc && resInsertCreateAcc ) {
                     this.setState( {
                         flag_Loading: false
                     } );
@@ -202,14 +243,17 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                     Alert.alert( "Local db update issue!" )
                 }
             }
-        } else {
-            this.setState( {
-                flag_Loading: false
-            } );
-            Alert.alert( "InitializeHealthcheck not working." )
+            else {
+                alert.simpleOk( "Oops", resInitializeHealthcheck.err );
+            }
+        }
+        else {
+            alert.simpleOk( "Oops", generateShareRes.err );
         }
 
     }
+
+
 
 
     //console.log( { shareIds});
