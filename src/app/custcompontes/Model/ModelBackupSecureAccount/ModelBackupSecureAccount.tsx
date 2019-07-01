@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { Modal, TouchableHighlight, View, Alert, StyleSheet, Image, Platform, CameraRoll } from 'react-native';
 import { Button, Icon, Text } from "native-base";
+
 var Mailer = require( 'NativeModules' ).RNMail;
-import Share from "react-native-share";
 import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 var RNFS = require( 'react-native-fs' );
 import RNFetchBlob from 'react-native-fetch-blob';
-import axios from "axios";
+
 
 
 //TODO: Custome Pages

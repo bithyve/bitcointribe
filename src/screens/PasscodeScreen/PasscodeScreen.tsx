@@ -237,7 +237,7 @@ export default class PasscodeScreen extends Component {
                 justifyContent: "center",
                 height: Platform.OS == "ios" ? 0 : 40,
               } }
-              onFulfill={ ( isValid, code ) =>
+              onFulfill={ ( isValid: any, code: any ) =>
                 this._onFinishCheckingCode( isValid, code )
               }
               type='withoutcharacters'
