@@ -174,6 +174,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
         }
         return chunks;
     }
+
     split2s( str: string, delim: any ) {
         var p = str.indexOf( delim );
         if ( p !== -1 ) {
@@ -182,7 +183,6 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
             return [ str ];
         }
     }
-
 
     genreatePdf = async ( data: any ) => {
         let secret2FA = data[ 0 ].secret;
