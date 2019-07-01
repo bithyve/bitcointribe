@@ -43,86 +43,64 @@ import {
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 import utils from "HexaWallet/src/app/constants/Utils";
 
-let wrongEnterAnswerCount = 0;
-
-export default class ModelSecureTwoFactorSecretThreeCode extends Component<Props, any> {
+export default class ModelHealthCheckMnemonicThirdWord extends Component<Props, any> {
     constructor ( props: any ) {
         super( props )
         this.state = ( {
-            secret: "",
-            enterSecret: "",
-            otp: "",
-            message: "First three letter your secure account secret for the PDF",
-            passcodeStyle: [
-                {
-                    activeColor: colors.black,
-                    inactiveColor: colors.black,
-                    cellBorderWidth: 0
-                }
-            ],
-            success: "Secret does not match!",
+            number: "",
+            word: "",
+            enterWord: "",
+            wordBorderColor: "#EFEFEF",
             flag_DisableBtnNext: true
         } );
     }
 
     componentWillReceiveProps( nextProps: any ) {
-        let date = Date.now();
+        console.log( { nextProps } );
         var data = nextProps.data[ 0 ];
-        data = data.data[ 0 ];
+        console.log( { data } );
+
         if ( data != null ) {
-            let secret = data.secret;
-            let secretCount = secret.length;
-            let secretCode, message;
-            console.log( { secret, secretCount } );
-            if ( date % 2 == 0 ) {
-                secretCode = secret.substring( 0, 3 );
-                message = "First three letter your secure account secret for the PDF";
-            } else {
-                secretCode = secret.slice( -3 );
-                message = "Last three letter your secure account secret for the PDF";
-            }
-            console.log( { secretCode } );
             this.setState( {
-                secret: secret,
-                otp: secretCode,
-                message
+                number: data.number,
+                word: data.word,
             } )
         }
     }
 
-    //TODO: Otp enter after
-    _onFinishCheckingCode( isValid: boolean, code: any ) {
-        if ( isValid ) {
-            this.setState( {
-                passcodeStyle: [
-                    {
-                        activeColor: colors.black,
-                        inactiveColor: colors.black,
-                        cellBorderWidth: 0
-                    }
-                ],
-                flag_DisableBtnNext: false
-            } );
-        } else {
-            this.setState( {
-                passcodeStyle: [
-                    {
-                        activeColor: "red",
-                        inactiveColor: "red",
-                        cellBorderWidth: 1
-                    }
-                ],
-                flag_DisableBtnNext: true
-            } );
-        }
+    //TODO: func check_CorrectAnswer
+    check_CorrectWordLength() {
+        setTimeout( () => {
+            let enterWord = this.state.enterWord;
+            if ( enterWord.length >= 3 ) {
+                this.setState( {
+                    flag_DisableBtnNext: false
+                } )
+            }
+            else {
+                this.setState( {
+                    flag_DisableBtnNext: true,
+                    wordBorderColor: "#EFEFEF"
+                } )
+            }
+        }, 100 );
     }
 
     click_Next() {
-        this.props.click_Next();
+        let { enterWord, word } = this.state
+        if ( enterWord == word ) {
+            this.props.click_Next();
+        } else {
+            this.setState( {
+                flag_DisableBtnNext: true,
+                wordBorderColor: "#E64545"
+            } )
+        }
     }
 
+
     render() {
-        let { passcodeStyle, flag_DisableBtnNext, message, otp } = this.state;
+        let { number, enterWord, wordBorderColor, flag_DisableBtnNext } = this.state;
         return (
             <Modal
                 transparent
@@ -157,43 +135,32 @@ export default class ModelSecureTwoFactorSecretThreeCode extends Component<Props
                             <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
                                 <Image source={ images.backupSecureTwoFactorAuto.icon } style={ { width: 80, height: 80, marginTop: -30 } } />
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20 } ] }>Health Check</Text>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, margin: 10 } ] }>Google Authenticator</Text>
-                                <Text note style={ { textAlign: "center" } }>Enter the first three digits of your 2FA secret key from secure PDF</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, margin: 10, marginBottom: 20 } ] }>Mnemonic</Text>
                                 <View style={ styles.viewCodeInput }>
-                                    <CodeInput
-                                        ref="codeInputRef1"
-                                        secureTextEntry
+                                    <Text note style={ { textAlign: "center", margin: 20 } }>Enter the <Text>{ number }</Text>  word from the mnemonic.</Text>
+                                    <Input
                                         keyboardType="default"
-                                        autoCapitalize="sentences"
-                                        codeLength={ 3 }
-                                        activeColor={ passcodeStyle[ 0 ].activeColor }
-                                        inactiveColor={ passcodeStyle[ 0 ].inactiveColor }
-                                        className="border-box"
-                                        cellBorderWidth={ passcodeStyle[ 0 ].cellBorderWidth }
-                                        compareWithCode={ otp }
-                                        autoFocus={ false }
-                                        inputPosition="center"
-                                        space={ 40 }
-                                        size={ 47 }
-                                        codeInputStyle={ { borderRadius: 5, backgroundColor: "#F1F1F1" } }
-                                        containerStyle={ {
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            height: Platform.OS == "ios" ? 0 : 40,
+                                        autoCapitalize='none'
+                                        value={ enterWord }
+                                        placeholder='word'
+                                        style={ [ globalStyle.ffFiraSansMedium, wordBorderColor == "#E64545" ? { borderColor: wordBorderColor, borderWidth: 1.5, borderRadius: 8 } : { borderWidth: 0.6, borderRadius: 8 }, { width: Dimensions.get( 'screen' ).width - 80, height: 40 } ] }
+                                        placeholderTextColor="#B7B7B7"
+                                        onChangeText={ ( val ) => {
+                                            this.setState( {
+                                                enterWord: val
+                                            } )
                                         } }
-                                        onFulfill={ ( isValid: any, code: any ) =>
-                                            this._onFinishCheckingCode( isValid, code )
+                                        onKeyPress={ () =>
+                                            this.check_CorrectWordLength()
                                         }
-                                        type='withoutcharacters'
                                     />
-                                    { renderIf( passcodeStyle[ 0 ].activeColor == "red" )(
-                                        <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 5 } ] }>{ this.state.success }</Text>
+                                    { renderIf( wordBorderColor == "#E64545" )(
+                                        <Text style={ { color: "red", fontSize: 12, alignSelf: "flex-end", margin: 8 } }>Invalid Word!</Text>
                                     ) }
-
                                 </View>
                             </View>
                             <View style={ { flex: 0.1, justifyContent: "flex-end" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>{ message }</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Refer to the 12-24 word mnemonic that you noted down while backing up your wallet.</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_Next()
@@ -225,7 +192,7 @@ const styles = StyleSheet.create( {
         backgroundColor: "#ffffff"
     },
     viewCodeInput: {
-        flex: 1,
+        flex: 0.2,
         alignItems: "center",
         justifyContent: "center",
 
