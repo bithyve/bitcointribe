@@ -38,6 +38,11 @@ import Permissions from 'react-native-permissions'
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
+
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
+
 //TODO: Custome object
 import {
     colors,
@@ -54,11 +59,25 @@ import Singleton from "HexaWallet/src/app/constants/Singleton";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
 
+//TODO: Bitcoin Files
+import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+var flag_SendPaymentScreen = true;
 export default class QrCodeScannerScreen extends React.Component {
     constructor ( props: any ) {
         super( props );
         this.state = {
         };
+    }
+    componentWillMount() {
+        this.willFocusSubscription = this.props.navigation.addListener(
+            "willFocus",
+            () => {
+                flag_SendPaymentScreen = true;
+            }
+        );
+    }
+    componentWillUnmount() {
+        this.willFocusSubscription.remove();
     }
 
     componentDidMount() {
@@ -77,24 +96,50 @@ export default class QrCodeScannerScreen extends React.Component {
 
     _renderMenu() {
         return (
-            <Text></Text>
+            <Button
+                full
+                style={ { margin: 15, borderRadius: 10, backgroundColor: "#ffffff" } }
+                onPress={ () => this.props.navigation.push( "ReceivePaymentNavigator" ) }
+            >
+                <Text style={ { color: "#000000" } }>Request Payment</Text>
+            </Button>
         )
     }
 
-    barcodeReceived( e: any ) {
+
+    barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
-            result = JSON.parse( result );
-            console.log( { result } );
-            AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
-            if ( result.type == "SSS Recovery" ) {
-                utils.setDeepLinkingType( "SSS Recovery QR" );
-                let deepLinkPara = {};
-                deepLinkPara.wn = result.wn;
-                deepLinkPara.data = result.data;
-                //console.log( { deepLinkPara } );
-                utils.setDeepLinkingUrl( deepLinkPara );
-                this.props.navigation.navigate( 'WalletScreen' );
+            let regularAccount = await utils.getRegularAccountObject();
+            var resAddressDiff = await regularAccount.addressDiff( result );
+            if ( resAddressDiff.status == 200 ) {
+                resAddressDiff = resAddressDiff.data;
+            } else {
+                alert.simpleOk( "Oops", resAddressDiff.err );
+            }
+            if ( resAddressDiff.type == "paymentURI" || resAddressDiff.type == "address" ) {
+                var resDecPaymentURI = await regularAccount.decodePaymentURI( result );
+                if ( resDecPaymentURI.status == 200 ) {
+                    resDecPaymentURI = resDecPaymentURI.data;
+                } else {
+                    alert.simpleOk( "Oops", resDecPaymentURI.err );
+                }
+                if ( flag_SendPaymentScreen == true ) {
+                    this.props.navigation.push( "SendPaymentNavigator", { data: resDecPaymentURI } );
+                    flag_SendPaymentScreen = false;
+                }
+            } else {
+                result = JSON.parse( result );
+                AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
+                if ( result.type == "SSS Recovery" ) {
+                    utils.setDeepLinkingType( "SSS Recovery QR" );
+                    let deepLinkPara = {};
+                    deepLinkPara.wn = result.wn;
+                    deepLinkPara.data = result.data;
+                    //console.log( { deepLinkPara } );
+                    utils.setDeepLinkingUrl( deepLinkPara );
+                    this.props.navigation.navigate( 'WalletScreen' );
+                }
             }
         } catch ( error ) {
             console.log( error );
@@ -119,6 +164,7 @@ export default class QrCodeScannerScreen extends React.Component {
                             renderTopBarView={ () => this._renderTitleBar() }
                             renderBottomMenuView={ () => this._renderMenu() }
                         />
+
                     </ImageBackground>
                 </SafeAreaView>
             </Container >

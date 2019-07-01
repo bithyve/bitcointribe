@@ -17,7 +17,12 @@ const getUnixToDateFormat = unixDate => {
 };
 const getUnixToNormaDateFormat = unixDate => {
   return moment.unix( unixDate ).format( "DD-MM-YYYY" );
+
 };
+
+const getUnixToDateFormat1 = () => {
+  return moment().format( 'hh:mm a , DD MMM YYYY' );
+}
 
 //TODO: Network check
 let isNetwork;
@@ -240,13 +245,46 @@ const setAppHealthStatus = ( value: any ) => {
   return true;
 }
 
+//TODO: Singleton Bitcoin Class
 
+
+const getRegularAccountObject = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getRegularAccountObject();
+}
+
+const setRegularAccountObject = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setRegularAccountObject( value );
+  return true;
+}
+
+const getSecureAccountObject = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getSecureAccountObject();
+}
+const setSecureAccountObject = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setSecureAccountObject( value );
+  return true;
+}
+
+const getS3ServiceObject = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getS3ServiceObject();
+}
+const setS3ServiceObject = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setS3ServiceObject( value );
+  return true;
+}
 
 
 module.exports = {
   getUnixTimeDate,
   getUnixToDateFormat,
   getUnixToNormaDateFormat,
+  getUnixToDateFormat1,
   getNetwork,
   encrypt,
   encryptAgain,
@@ -257,7 +295,8 @@ module.exports = {
   getDeviceModel,
   getStatusBarHeight,
   getIphoneSize,
-  //Singleton       
+
+  //Singleton          
   getMnemonic,
   getWalletDetails,
   setWalletDetails,
@@ -280,5 +319,11 @@ module.exports = {
   getAppHealthStatus,
   setAppHealthStatus,
 
-
-};
+  //Singleton Bitcoin Class
+  getRegularAccountObject,
+  setRegularAccountObject,
+  getSecureAccountObject,
+  setSecureAccountObject,
+  getS3ServiceObject,
+  setS3ServiceObject
+};   

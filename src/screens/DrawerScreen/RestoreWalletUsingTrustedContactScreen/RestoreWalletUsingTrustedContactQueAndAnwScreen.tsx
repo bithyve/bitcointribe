@@ -136,9 +136,7 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
         console.log( { decryptedShare, answers } );
         const mnemonic = await S3Service.recoverFromShares( decryptedShare, answers );
         console.log( mnemonic )
-        const regularAccount = new RegularAccount(
-            mnemonic
-        );
+        let regularAccount = await utils.getRegularAccountObject();
         await dbOpration.updateWalletMnemonicAndAnwserDetails(
             localDB.tableName.tblWallet,
             mnemonic,
@@ -148,7 +146,8 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
         const res = await comAppHealth.connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact( dateTime, 0, decryptedShare, mnemonic, arr_RecordId );
         // console.log( { res } );
         const getBal = await regularAccount.getBalance();
-        const secureAccount = new SecureAccount( mnemonic );
+        let secureAccount = await utils.getSecureAccountObject();
+        // const secureAccount = new SecureAccount( mnemonic );
         const resSetupSecureAccount = await secureAccount.setupSecureAccount();
         //console.log( { getBal } );
         if ( getBal.status == 200 && res ) {

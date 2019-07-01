@@ -1,7 +1,7 @@
 apply plugin: "com.android.application"
   
 import com.android.build.OutputFile  
-apply plugin: 'io.fabric'  
+apply plugin: 'io.fabric'    
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
  * and bundleReleaseJsAndAssets).
@@ -109,12 +109,14 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1                 
-        versionName "1.0.1.110619"                
-         multiDexEnabled true      
+        versionName "1.0.0.180619"   
+        //missingDimensionStrategy 'react-native-camera', 'general'                
         ndk {
             abiFilters "armeabi-v7a", "x86"
-        }      
+        }                
       } 
+   
+       
 
        dexOptions {
       jumboMode = true
@@ -172,7 +174,8 @@ configurations.all {
  }  
   } 
 
-dependencies {       
+dependencies {      
+
     compile project(':react-native-fetch-blob')  
     compile project(':react-native-pdf-lib')
     compile project(':react-native-mail')
@@ -181,11 +184,11 @@ dependencies {
     compile project(':react-native-webview')
     compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
     transitive = true;
-    }               
+    }                     
     implementation 'com.android.support:multidex:1.0.3'
     compile project(':react-native-sqlite-storage')
     compile project(':react-native-view-shot')  
-    compile project(':react-native-vector-icons')
+    compile project(':react-native-vector-icons')   
     compile project(':react-native-udp')
     compile project(':react-native-tcp')
     compile project(':react-native-svg')

@@ -9,6 +9,7 @@ describe("Vault Account", async () => {
   let vaultLockTime: number;
   let recoveryScript: string;
   let vaultAddress: string;
+
   beforeAll(async () => {
     jest.setTimeout(50000);
     vaultAccount = new VaultAccount();
@@ -66,7 +67,7 @@ describe("Vault Account", async () => {
       privateKey,
       lockTime,
     };
-    const res = await vaultAccount.transfer(
+    const { txid } = await vaultAccount.transfer(
       transfer.senderAddress,
       transfer.recipientAddress,
       transfer.amount,
@@ -74,11 +75,7 @@ describe("Vault Account", async () => {
       transfer.privateKey,
     );
 
-    if (res.status !== 200) {
-      throw new Error("transaction from vault account failed");
-    } else {
-      expect(res.data.txid).toBeDefined();
-    }
+    expect(txid).toBeTruthy();
   });
 
   test("spends UTXOs from a (pre-funded) vault account once the specified number of blocks are mined", async () => {
@@ -100,18 +97,15 @@ describe("Vault Account", async () => {
       privateKey,
       lockTime,
     };
-    const res = await vaultAccount.transfer(
+    const { txid } = await vaultAccount.transfer(
       transfer.senderAddress,
       transfer.recipientAddress,
       transfer.amount,
       transfer.lockTime,
       transfer.privateKey,
     );
-    if (res.status !== 200) {
-      throw new Error("transaction from vault account failed");
-    } else {
-      expect(res.data.txid).toBeDefined();
-    }
+
+    expect(txid).toBeDefined();
   });
 
   test("recovers the vault from a recovery script(redeem)", async () => {

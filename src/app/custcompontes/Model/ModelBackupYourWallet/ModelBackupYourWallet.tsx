@@ -1,14 +1,23 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Platform } from 'react-native';
+import { Modal, TouchableHighlight, View, Alert, StyleSheet, Platform, Image } from 'react-native';
 import { Button, Icon, Text } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 
+//TODO: Custome Object
+import {
+    images
+} from "HexaWallet/src/app/constants/Constants";
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
+interface Props {
+    click_UseOtherMethod: Function;
+    closeModal: Function;
+    click_Confirm: Function
+}
 
-export default class ModelBackupYourWallet extends Component {
+export default class ModelBackupYourWallet extends Component<Props, any> {
     render() {
         return (
             <Modal
@@ -31,7 +40,8 @@ export default class ModelBackupYourWallet extends Component {
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information comes here, that explains the user why they need to select trusted contacts</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 15 } ] }>Some information comes here, that explains the user why they need to select trusted contacts</Text>
+                            <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingMnemonic.walletrestored } />
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <Button
@@ -61,8 +71,12 @@ const styles = StyleSheet.create( {
         flex: 1,
         justifyContent: 'center'
     },
+    imgAppLogo: {
+        width: 150,
+        height: 170
+    },
     viewModelBody: {
-        flex: Platform.OS == "ios" ? 0.6 : 0.8,
+        flex: Platform.OS == "ios" ? 0.8 : 0.9,
         margin: 20,
         padding: 10,
         borderRadius: 10,

@@ -12,6 +12,7 @@ describe("Joint Account", () => {
   let creatorPriv: string;
   let mergerPriv: string;
   let txHex: string;
+
   beforeAll(async () => {
     jest.setTimeout(50000);
     jointAccount = new JointAccount();
@@ -114,13 +115,7 @@ describe("Joint Account", () => {
   });
 
   test("finalizes an initiated transaction from the joint account (2nd signature provisioning and broadcasting)", async () => {
-    const res = await jointAccount.authorizeJointTxn(txHex, mergerPriv);
-    if (res.status !== 200) {
-      throw new Error("finalization of the joint transaction failed");
-    } else {
-      const { txid } = res.data;
-      console.log({ txid });
-      expect(txid).toBeDefined();
-    }
+    const { txid } = await jointAccount.authorizeJointTxn(txHex, mergerPriv);
+    expect(txid).toBeDefined();
   });
 });

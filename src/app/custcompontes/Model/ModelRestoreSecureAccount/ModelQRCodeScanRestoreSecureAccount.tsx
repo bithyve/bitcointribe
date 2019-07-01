@@ -78,7 +78,8 @@ export default class ModelQRCodeScanRestoreSecureAccount extends Component<Props
             var result = e.data;
             let mnemonic = this.state.mnemonic;
             // console.log( { mnemonic } );
-            const secureAccount = new SecureAccount( mnemonic );
+            let secureAccount = await utils.getSecureAccountObject();
+            // const secureAccount = new SecureAccount( mnemonic );
             //console.log( { result } );
             if ( result != "" ) {
                 let resDecryptSecondaryXpub = await secureAccount.decryptSecondaryXpub( result );
