@@ -189,6 +189,7 @@ export default class WalletScreen extends React.Component {
   async connnection_FetchData() {
     var resultWallet = await utils.getWalletDetails();
     var resAccount = await comFunDBRead.readTblAccount();
+    await comFunDBRead.readTblSSSDetails();
     console.log( { resAccount } );
     let temp = [];
     for ( let i = 0; i < resAccount.length; i++ ) {
@@ -762,6 +763,7 @@ export default class WalletScreen extends React.Component {
                     let backupType = JSON.parse( walletDetails.appHealthStatus );
                     if ( backupType != "" ) {
                       this.props.navigation.push( "HealthOfTheAppNavigator" );
+                      //this.props.navigation.push( "BackUpYourWalletSecoundTimeNavigator" );
                     } else {
                       this.setState( {
                         arr_ModelBackupYourWallet: [ {

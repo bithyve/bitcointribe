@@ -24,6 +24,7 @@ import { Avatar } from 'react-native-elements';
 import ShimmerPlaceHolder from 'react-native-shimmer-placeholder'
 import TimerCountdown from "react-native-timer-countdown";
 var converter = require( 'number-to-words' );
+var Mailer = require( 'NativeModules' ).RNMail;
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -76,21 +77,21 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 opt: undefined,
             } ],
             arr_SelfShare: [ {
-                thumbnailPath: "wallet",
+                thumbnailPath: "bars",
                 givenName: "Wallet",
                 familyName: "",
                 statusMsgColor: "gray",
                 statusMsg: "Status",
                 opt: undefined,
             }, {
-                thumbnailPath: "email",
+                thumbnailPath: "bars",
                 givenName: "Email",
                 familyName: "",
                 statusMsgColor: "gray",
                 statusMsg: "Status",
                 opt: undefined,
             }, {
-                thumbnailPath: "mail",
+                thumbnailPath: "bars",
                 givenName: "Cloud Store",
                 familyName: "",
                 statusMsgColor: "gray",
@@ -108,7 +109,6 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
             //flag
             flag_isTrustedContacts: true,
-            flag_TrustedContactClickList: true,
             flag_SelfShare: true,
             flag_SelfShareDisable: true,
             flag_isSetupTrustedContact: true,
@@ -316,9 +316,275 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
     //     } )
     // }
 
+
+
     loaddata = async () => {
+        let walletDetails = await utils.getWalletDetails();
+        let setUpWalletAnswerDetails = walletDetails.setUpWalletAnswerDetails;
+        var resAccountDetails = await comFunDBRead.readTblAccount();
+        let backupType = JSON.parse( walletDetails.appHealthStatus );
+        console.log( { backupType } );
+        let sssDetails = await utils.getSSSDetails();
+        console.log( { walletDetails, sssDetails } );
+        //flag   
+        let flag_isSetupTrustedContact, flag_isSecretQuestions, flag_isMnemonic;
+        //array  
+        let arr_TrustedContacts = [], arr_SecretQuestion = [];
+        let encrShares = [];
+        let history = [];
+        let tempOpt = [];
+        let temp = [];
+        //Trusted Contacts
+        if ( sssDetails.length > 0 ) {
+            //setup sss
+            if ( sssDetails[ 0 ].keeperInfo == "" ) {
+                flag_isSetupTrustedContact = true;
+            } else {
+                flag_isSetupTrustedContact = false;
+            }
+
+            for ( let i = 0; i <= 1; i++ ) {
+                let keeperInfo = JSON.parse( sssDetails[ i ].keeperInfo );
+                console.log( { keeperInfo } );
+                let data = {};
+                data.encryptedMetaShare = JSON.parse( sssDetails[ i ].encryptedMetaShare );
+                data.emailAddresses = keeperInfo.emailAddresses;
+                data.phoneNumbers = keeperInfo.phoneNumbers;
+                data.history = JSON.parse( sssDetails[ i ].history );
+                data.recordID = keeperInfo.recordID;
+                data.thumbnailPath = keeperInfo.thumbnailPath
+                data.givenName = keeperInfo.givenName;
+                data.familyName = keeperInfo.familyName;
+                const dateTime = Date.now();
+                let sharedDate = parseInt( sssDetails[ i ].sharedDate );
+                // console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
+                var startDate = new Date( dateTime );
+                var endDate = new Date( sharedDate );
+                //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
+                var diff = Math.abs( startDate.getTime() - endDate.getTime() );
+                //console.warn( 'diff' + diff.toString() );  
+                const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
+                const seconds: any = Math.floor( diff / 1000 % 60 );
+                //console.log( { minutes, seconds } );
+                //console.warn( minutes.toString() )
+                const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
+                data.totalSec = 540 - totalSec;
+
+                console.log( { histry: data.history } );
+
+                //for history get opt     
+                for ( let i = 0; i < data.history.length; i++ ) {
+                    let eachHistory = data.history;
+                    console.log( { eachHistory } );
+                    let eachHistoryLength = eachHistory.length;
+                    console.log( { eachHistory } );
+                    console.log( eachHistory[ eachHistoryLength - 1 ] );
+                    // let otp = "otp" in eachHistory[ eachHistoryLength - 1 ] ? eachHistory[ eachHistoryLength - 1 ].otp : undefined
+                    let otp = 'otp' in eachHistory[ eachHistoryLength - 1 ] || undefined
+                    tempOpt.push( otp );
+                }
+                console.log( { share: sssDetails[ i ] } );
+
+                if ( totalSec < 540 && sssDetails[ i ].shareStage == "Ugly" ) {
+                    data.statusMsg = "Shared";
+                    data.statusMsgColor = "#C07710";
+                    data.flag_timer = true;
+                    data.opt = tempOpt[ i ];
+                } else if ( totalSec >= 540 && sssDetails[ i ].shareStage == "Ugly" ) {
+                    data.statusMsg = "Shared OTP expired.";
+                    data.statusMsgColor = "#C07710";
+                    data.flag_timer = false;
+                } else if ( sssDetails[ i ].shareStage == "Good" ) {
+                    data.statusMsg = "Share accessible";
+                    data.statusMsgColor = "#008000";
+                    data.flag_timer = false;
+                } else if ( sssDetails[ i ].shareStage == "Bad" ) {
+                    data.statusMsg = "Share accessible";
+                    data.statusMsgColor = "#C07710";
+                    data.flag_timer = false;
+                } else if ( sssDetails[ i ].shareStage == "Ugly" && sssDetails[ i ].sharedDate != "" ) {
+                    data.statusMsg = "Share not accessible";
+                    data.statusMsgColor = "#ff0000";
+                    data.flag_timer = false;
+                }
+                else {
+                    data.statusMsg = "Not shared";
+                    data.statusMsgColor = "#ff0000";
+                    data.flag_timer = false;
+                }
+                arr_TrustedContacts.push( data );
+            }
+            //secret question
+            console.log( { setUpWalletAnswerDetails } );
+            if ( setUpWalletAnswerDetails == "" ) {
+                flag_isSecretQuestions = false
+            } else {
+                flag_isSecretQuestions = true
+            }
+            let data = {};
+            data.icon = "timelockNew";
+            data.title = "First Secret Question";
+            data.subTitle = "Not Backed up";
+            data.color = "#ff0000";
+            arr_SecretQuestion.push( data )
+            this.setState( {
+                flag_isSetupTrustedContact,
+                arr_TrustedContacts,
+                flag_isSecretQuestions,
+                arr_SecretQuestion
+            } )
+        }
+        // //Trusted Contacts list
+        // for ( let i = 0; i < sssDetails.length; i++ ) {
+        //     encrShares.push( sssDetails[ i ].share )
+        //     history.push( JSON.parse( sssDetails[ i ].history ) )
+        // }
+        // //for history get opt
+        // for ( let i = 0; i < history.length; i++ ) {
+        //     let eachHistory = history[ i ];
+        //     let eachHistoryLength = eachHistory.length;
+        //     let otp = eachHistory[ eachHistoryLength - 1 ].otp;
+        //     tempOpt.push( otp )
+        // }
+        // //console.log( parseInt( walletDetails.lastUpdated ) );
+        // let updateShareIdStatus = await comAppHealth.connection_AppHealthStatus( parseInt( walletDetails.lastUpdated ), 0, encrShares, walletDetails.mnemonic );
+        // // console.log( { updateShareIdStatus } );
+        // if ( updateShareIdStatus ) {
+        //     var data = await dbOpration.readTablesData(
+        //         localDB.tableName.tblSSSDetails
+        //     );
+        //     data = data.temp;
+        //     //console.log( { data } );
+        //     const dateTime = Date.now();
+        //     //const fulldate = Math.floor( dateTime / 1000 );
+        //     for ( let i = 0; i < data.length; i++ ) {
+        //         let jsondata = JSON.parse( data[ i ].keeperInfo );
+        //         jsondata.history = JSON.parse( data[ i ].history );
+        //         let sharedDate = parseInt( data[ i ].sharedDate );
+        //         // console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
+        //         var startDate = new Date( dateTime );
+        //         var endDate = new Date( sharedDate );
+        //         //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
+        //         var diff = Math.abs( startDate.getTime() - endDate.getTime() );
+        //         //console.warn( 'diff' + diff.toString() );  
+        //         const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
+        //         const seconds: any = Math.floor( diff / 1000 % 60 );
+        //         //console.log( { minutes, seconds } );
+        //         //console.warn( minutes.toString() )
+        //         const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
+        //         let mesData = data[ i ];
+        //         //  console.log( { totalSec, mesData } );
+        //         jsondata.totalSec = 540 - totalSec;
+        //         if ( totalSec < 540 && data[ i ].shareStage == "Ugly" ) {
+        //             jsondata.statusMsg = "Shared";
+        //             jsondata.statusMsgColor = "#C07710";
+        //             jsondata.flag_timer = true;
+        //             jsondata.opt = tempOpt[ i ];
+        //         } else if ( totalSec >= 540 && data[ i ].shareStage == "Ugly" ) {
+        //             jsondata.statusMsg = "Shared OTP expired.";
+        //             jsondata.statusMsgColor = "#C07710";
+        //             jsondata.flag_timer = false;
+        //         } else if ( data[ i ].shareStage == "Good" ) {
+        //             jsondata.statusMsg = "Share accessible";
+        //             jsondata.statusMsgColor = "#008000";
+        //             jsondata.flag_timer = false;
+        //         } else if ( data[ i ].shareStage == "Bad" ) {
+        //             jsondata.statusMsg = "Share accessible";
+        //             jsondata.statusMsgColor = "#C07710";
+        //             jsondata.flag_timer = false;
+        //         } else if ( data[ i ].shareStage == "Ugly" && data[ i ].sharedDate != "" ) {
+        //             jsondata.statusMsg = "Share not accessible";
+        //             jsondata.statusMsgColor = "#ff0000";
+        //             jsondata.flag_timer = false;
+        //         }
+        //         else {
+        //             jsondata.statusMsg = "Not shared";
+        //             jsondata.statusMsgColor = "#ff0000";
+        //             jsondata.flag_timer = false;
+        //         }
+        //         temp.push( jsondata )
+        //     }
+        // } else {
+        //     Alert.alert( "ShareId status not changed." )
+        // }
+        //}
+        // } else {
+        //     flag_isMnemonic = true;
+        // }
+        //Mnemonic
+        // if ( backupType.backupType != "share" ) {
+        //     flag_isMnemonic = true;
+        // } else {
+        //     flag_isMnemonic = false;
+        // }
+        // let arr_Mnemonic = [
+        //     {
+        //         title: "Mnemonic",
+        //         subTitle: "Not backed up",
+        //         color: "#ff0000",
+        //         icon: "shield"
+        //     }
+        // ];
+        // let dbMnemonic = walletDetails.mnemonic;
+        // let arr_CheckMnemonic = dbMnemonic.split( ' ' );
+        // let arr_randomNo = utils.getRandomBetweenNumber( 1, arr_CheckMnemonic.length );
+        // console.log( { arr_CheckMnemonic, arr_randomNo } );
+        // let arr_MnemonicNumbers = [ converter.toOrdinal( arr_randomNo[ 0 ] ), converter.toOrdinal( arr_randomNo[ 1 ] ), converter.toOrdinal( arr_randomNo[ 2 ] ) ]
+        // let arr_MnemoicWords = [ arr_CheckMnemonic[ arr_randomNo[ 0 ] - 1 ], arr_CheckMnemonic[ arr_randomNo[ 1 ] - 1 ], arr_CheckMnemonic[ arr_randomNo[ 2 ] - 1 ] ]
+        // var arr_MnemonicDetails = [];
+        // arr_MnemonicDetails = [ arr_MnemonicNumbers, arr_MnemoicWords ];
+        // console.log( { arr_MnemonicDetails } );
+
+
+        // //Secret Questions  
+        // let flag_DisableSecretQuestion, subTitleQA;
+        // let setUpWalletAnswerDetails = JSON.parse( walletDetails.setUpWalletAnswerDetails );
+        // if ( setUpWalletAnswerDetails != "" ) {
+        //     flag_DisableSecretQuestion = false;
+        //     subTitleQA = "Not backed up";
+        // } else {
+        //     flag_DisableSecretQuestion = true;
+        //     subTitleQA = "Please first setup your Secret Questions.";
+        // }
+        // let arr_SecretQuestion = [
+        //     {
+        //         title: "First Secret Question",
+        //         subTitle: subTitleQA,
+        //         color: "#ff0000",
+        //         icon: "shield"
+        //     }
+        // ];
+
+        // //Secure Two Factor Auto
+        // let flag_DisableSecureTwoFactor, subTitleTwoFactor;
+        // //Two Factor Autoentication
+        // let secureAccountDetails = resAccountDetails[ 1 ];
+        // if ( secureAccountDetails.address != "" ) {
+        //     flag_DisableSecureTwoFactor = false
+        //     subTitleTwoFactor = "Not backed up";
+        // } else {
+        //     flag_DisableSecureTwoFactor = true;
+        //     subTitleTwoFactor = "Please first active Secure Account.";
+        // }
+
+        // let arr_2FactorAuto = [
+        //     {
+        //         title: "2 Factor Aunthentication",
+        //         subTitle: subTitleTwoFactor,
+        //         color: "#ff0000",
+        //         icon: "shield"
+        //     }
+        // ];
+        // let secureAdditionalInfo = JSON.parse( resAccountDetails[ 1 ].additionalInfo );
+        // let arr_SecureAccountDetials = [ {
+        //     secret: secureAdditionalInfo[ 0 ].setupData.secret
+        // } ];
+
+        // console.log( { arr_SecureAccountDetials } );
 
     }
+
+
 
     //TODO: func click_Item
     click_Item = ( item: any ) => {
@@ -354,17 +620,67 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
     }
 
 
+    //TODO: Self share
+    click_SelfShare = async ( item: any ) => {
+        let sssDetails = await utils.getSSSDetails();
+        console.log( { sssDetails } );
+        let key = JSON.parse( sssDetails[ 2 ].encryptedMetaShare )
+        var email4shareFilePath = sssDetails[ 3 ].encryptedMetaShare;
+        email4shareFilePath = email4shareFilePath.split( '"' ).join( "" );
+        console.log( { email4shareFilePath } );
+
+        if ( item.givenName == "Wallet" ) {
+            this.props.navigation.push( "SelfShareUsingWalletQRCode", { data: key.key } )
+        } else if ( item.givenName == "Email" ) {
+            Mailer.mail( {
+                subject: 'For 4 Share.',
+                recipients: [ 'appasahebl@bithyve.com' ],
+                body: '<b>For 4 share.Pdf password is your answer.</b>',
+                isHTML: true,
+                attachment: {
+                    path: email4shareFilePath,  // The absolute path of the file from which to read data.
+                    type: 'pdf',      // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+                    name: 'For4Share',   // Optional: Custom filename for attachment
+                }
+            }, ( error, event ) => {
+                if ( event == "sent" ) {
+
+                    Alert.alert(
+                        "Success",
+                        "Email sent success.",
+                        [
+                            { text: 'Ok', onPress: () => console.log( 'OK' ) },
+                        ],
+                        { cancelable: true }
+                    )
+                } else {
+                    Alert.alert(
+                        error,
+                        event,
+                        [
+                            { text: 'Ok', onPress: () => console.log( 'OK: Email Error Response' ) },
+                        ],
+                        { cancelable: true }
+                    )
+                }
+
+            } );
+        } else {
+            alert.simpleOk( "Oops", "Working." );
+        }
+
+    }
 
 
 
 
     render() {
         //flag
-        let { flag_isTrustedContacts, flag_TrustedContactClickList, flag_isSetupTrustedContact, flag_isMnemonic, flag_isSecretQuestions, flag_isTwoFactor, flag_Loading, flag_SelfShare, flag_SelfShareDisable } = this.state;
+        let { flag_isTrustedContacts, flag_isSetupTrustedContact, flag_isMnemonic, flag_isSecretQuestions, flag_isTwoFactor, flag_Loading, flag_SelfShare, flag_SelfShareDisable } = this.state;
         //TouchableOpacity
         let { flag_DisableSecureTwoFactor, flag_DisableSecretQuestion } = this.state;
         //array
-        let { arr_TrustedContacts, arr_SelfShare } = this.state;
+        let { arr_TrustedContacts, arr_SelfShare, arr_SecretQuestion } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
@@ -403,7 +719,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                 } } onPress={ () => {
                                                     this.click_Item( item )
                                                 } }
-                                                    disabled={ flag_TrustedContactClickList }
+                                                    disabled={ flag_isSetupTrustedContact }
                                                 >
                                                     <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                                                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
@@ -500,19 +816,13 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                             renderItem={ ( { item } ) => (
                                                 <TouchableOpacity style={ {
                                                 } } onPress={ () => {
-                                                    this.click_Item( item )
+                                                    this.click_SelfShare( item )
                                                 } }
-                                                    disabled={ flag_SelfShareDisable }
+                                                    disabled={ flag_isSetupTrustedContact }
                                                 >
                                                     <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                                                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                                            { renderIf( item.thumbnailPath != "" )(
-                                                                flag_SelfShareDisable == true ? <Avatar medium rounded icon={ { name: item.thumbnailPath, type: 'font-awesome' } } /> : <Avatar medium rounded source={ { uri: item.thumbnailPath } } />
-
-                                                            ) }
-                                                            { renderIf( item.thumbnailPath == "" )(
-                                                                <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
-                                                            ) }
+                                                            <Avatar medium rounded icon={ { name: item.thumbnailPath, type: 'font-awesome' } } />
                                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
                                                                 <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                                 <View style={ { flexDirection: "row" } }>
@@ -632,19 +942,18 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
 
                             { renderIf( flag_isSecretQuestions == true )(
-                                <View style={ styles.viewSecretQuestion }>
+                                <View style={ { flex: 1 } }>
                                     <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
                                         <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Secret Questions</Text>
                                     </View>
                                     <View style={ { flex: 1 } }>
                                         <FlatList
-                                            data={ this.state.arr_SecretQuestion }
+                                            data={ arr_SecretQuestion }
                                             showsVerticalScrollIndicator={ false }
                                             scrollEnabled={ false }
                                             renderItem={ ( { item } ) => (
                                                 <TouchableOpacity
                                                     onPress={ () => this.click_SecretQuestion( item ) }
-                                                    disabled={ flag_DisableSecretQuestion }
                                                 >
                                                     <RkCard
                                                         rkType="shadowed"

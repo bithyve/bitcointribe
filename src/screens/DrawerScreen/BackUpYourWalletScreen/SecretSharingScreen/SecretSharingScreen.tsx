@@ -75,7 +75,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
         console.log( { resSSSDetails } );
         let encrShares = [];
         let history = [];
-        for ( let i = 0; i < resSSSDetails.length; i++ ) {
+        for ( let i = 0; i <= 1; i++ ) {
             encrShares.push( resSSSDetails[ i ].share )
             history.push( JSON.parse( resSSSDetails[ i ].history ) )
         }
@@ -88,75 +88,72 @@ export default class SecretSharingScreen extends React.Component<any, any> {
             tempOpt.push( otp )
         }
         console.log( parseInt( resultWallet.lastUpdated ) );
-        let updateShareIdStatus = await comAppHealth.connection_AppHealthStatus( parseInt( resultWallet.lastUpdated ), 0, encrShares, resultWallet.mnemonic );
-        console.log( { updateShareIdStatus } );
-        if ( updateShareIdStatus ) {
-            var data = await dbOpration.readTablesData(
-                localDB.tableName.tblSSSDetails
-            );
-            data = data.temp;
-            console.log( { data } );
-            const dateTime = Date.now();
-            //const fulldate = Math.floor( dateTime / 1000 );
-            let temp = [];
-            for ( let i = 0; i < data.length; i++ ) {
-                let jsondata = JSON.parse( data[ i ].keeperInfo );
-                jsondata.history = JSON.parse( data[ i ].history );
-                let sharedDate = parseInt( data[ i ].sharedDate );
-                // console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
-                var startDate = new Date( dateTime * 1000 );
-                var endDate = new Date( sharedDate * 1000 );
-                //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
-                var diff = Math.abs( startDate.getTime() - endDate.getTime() );
-                //console.warn( 'diff' + diff.toString() );  
-                const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
-                const seconds: any = Math.floor( diff / 1000 % 60 );
-                //console.log( { minutes, seconds } );
-                //console.warn( minutes.toString() )
-                const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
-                //console.log( { totalSec } );  
-                jsondata.totalSec = 540 - totalSec;
-                if ( totalSec < 540 && data[ i ].shareStage == "Ugly" ) {
-                    jsondata.statusMsg = "Shared";
-                    jsondata.statusMsgColor = "#C07710";
-                    jsondata.flag_timer = true;
-                    jsondata.opt = tempOpt[ i ];
-                } else if ( totalSec >= 540 && data[ i ].shareStage == "Ugly" ) {
-                    jsondata.statusMsg = "Shared OTP expired.";
-                    jsondata.statusMsgColor = "#C07710";
-                    jsondata.flag_timer = false;
-                } else if ( data[ i ].shareStage == "Good" ) {
-                    jsondata.statusMsg = "Share accessible";
-                    jsondata.statusMsgColor = "#008000";
-                    jsondata.flag_timer = false;
-                } else if ( data[ i ].shareStage == "Bad" ) {
-                    jsondata.statusMsg = "Share accessible";
-                    jsondata.statusMsgColor = "#C07710";
-                    jsondata.flag_timer = false;
-                } else if ( data[ i ].shareStage == "Ugly" && data[ i ].sharedDate != "" ) {
-                    jsondata.statusMsg = "Share not accessible";
-                    jsondata.statusMsgColor = "#ff0000";
-                    jsondata.flag_timer = false;
-                }
-                else {
-                    jsondata.statusMsg = "Not shared";
-                    jsondata.statusMsgColor = "#ff0000";
-                    jsondata.flag_timer = false;
-                }
-                temp.push( jsondata )
+        // let updateShareIdStatus = await comAppHealth.connection_AppHealthStatus( parseInt( resultWallet.lastUpdated ), 0, encrShares, resultWallet.mnemonic );
+        // console.log( { updateShareIdStatus } );
+        // if ( updateShareIdStatus ) {
+        var data = await utils.getSSSDetails();
+        const dateTime = Date.now();
+        //const fulldate = Math.floor( dateTime / 1000 );
+        let temp = [];
+        for ( let i = 0; i <= 1; i++ ) {
+            let jsondata = JSON.parse( data[ i ].keeperInfo );
+            jsondata.history = JSON.parse( data[ i ].history );
+            jsondata.encryptedMetaShare = JSON.parse( data[ i ].encryptedMetaShare );
+            let sharedDate = parseInt( data[ i ].sharedDate );
+            // console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
+            var startDate = new Date( dateTime * 1000 );
+            var endDate = new Date( sharedDate * 1000 );
+            //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
+            var diff = Math.abs( startDate.getTime() - endDate.getTime() );
+            //console.warn( 'diff' + diff.toString() );  
+            const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
+            const seconds: any = Math.floor( diff / 1000 % 60 );
+            //console.log( { minutes, seconds } );
+            //console.warn( minutes.toString() )
+            const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
+            //console.log( { totalSec } );  
+            jsondata.totalSec = 540 - totalSec;
+            if ( totalSec < 540 && data[ i ].shareStage == "Ugly" ) {
+                jsondata.statusMsg = "Shared";
+                jsondata.statusMsgColor = "#C07710";
+                jsondata.flag_timer = true;
+                jsondata.opt = tempOpt[ i ];
+            } else if ( totalSec >= 540 && data[ i ].shareStage == "Ugly" ) {
+                jsondata.statusMsg = "Shared OTP expired.";
+                jsondata.statusMsgColor = "#C07710";
+                jsondata.flag_timer = false;
+            } else if ( data[ i ].shareStage == "Good" ) {
+                jsondata.statusMsg = "Share accessible";
+                jsondata.statusMsgColor = "#008000";
+                jsondata.flag_timer = false;
+            } else if ( data[ i ].shareStage == "Bad" ) {
+                jsondata.statusMsg = "Share accessible";
+                jsondata.statusMsgColor = "#C07710";
+                jsondata.flag_timer = false;
+            } else if ( data[ i ].shareStage == "Ugly" && data[ i ].sharedDate != "" ) {
+                jsondata.statusMsg = "Share not accessible";
+                jsondata.statusMsgColor = "#ff0000";
+                jsondata.flag_timer = false;
             }
-
-            console.log( { data, temp } );
-
-            this.setState( {
-                data: temp
-            } );
-            // setInterval( () => {
-            //     this.connection_Load()
-            // }, 10000 );
-        } else {
-            Alert.alert( "ShareId status not changed." )
+            else {
+                jsondata.statusMsg = "Not shared";
+                jsondata.statusMsgColor = "#ff0000";
+                jsondata.flag_timer = false;
+            }
+            temp.push( jsondata )
         }
+
+        console.log( { data, temp } );
+
+        this.setState( {
+            data: temp
+        } );
+        // setInterval( () => {
+        //     this.connection_Load()
+        // }, 10000 );
+        // } else {
+        //     Alert.alert( "ShareId status not changed." )
+        // }
     }
 
     //TODO: func click_Item

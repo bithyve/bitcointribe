@@ -42,7 +42,7 @@ export default class S3Service {
   }
 
   public static downloadShare = async (
-    messageId: string,
+    key: string,
   ): Promise<
     | {
       status: number;
@@ -60,7 +60,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await SSS.downloadShare( messageId ),
+        data: await SSS.downloadShare( key ),
       };
     } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
@@ -441,7 +441,6 @@ export default class S3Service {
   }
   public createQR = async (
     metashare: IMetaShare,
-    index: number,
   ): Promise<
     | {
       status: number;
@@ -457,7 +456,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.createQR( metashare, index ),
+        data: await this.sss.createQR( metashare ),
       };
     } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
