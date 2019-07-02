@@ -38,6 +38,10 @@ import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGra
 import ModelTrustedContactEmailAndPhoneShare from "HexaWallet/src/app/custcompontes/Model/ModelTrustedContactEmailAndPhoneShare/ModelTrustedContactEmailAndPhoneShare";
 
 
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
+
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
@@ -112,30 +116,34 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         this.setState( {
             flag_Loading: true,
             msg_Loading: "Message id genreating"
-
         } )
         let data = this.props.navigation.getParam( "data" );
+        let encryptedMetaShare = data.encryptedMetaShare;
         //console.log( { resSSSDetails } );
         let walletDetails = utils.getWalletDetails();
-        //console.log( { walletDetails } );
-        const sss = new S3Service(
-            walletDetails.mnemonic
-        );
-        let resSSSDetails = this.state.arr_resSSSDetails;
-        const { share, otp } = sss.createTransferShare( resSSSDetails.share, data.givenName )
-        // console.log( { otpEncryptedShare: share, otp } )
-        const { messageId, success } = await sss.uploadShare( share );
-        if ( messageId != "" || messageId != null ) {
-            this.setState( {
-                messageId,
-                otpCode: otp,
-                flag_Loading: false,
-                arr_TrustedContactEmailAndPhoneShare: [ {
-                    modalVisible: true,
-                    contactDetails: data,
-                    arr_ConstactDetailsList: this.state.arr_ConstactDetailsList
-                } ]
-            } )
+        //console.log( { walletDetails } );   
+        const sss = await utils.getS3ServiceObject();
+        const resEncryptViaOTP = sss.encryptViaOTP( encryptedMetaShare.key );
+        console.log( { resEncryptViaOTP } );
+        if ( resEncryptViaOTP.status == 200 ) {
+            const resUploadShare = await sss.uploadShare( encryptedMetaShare.encryptedMetaShare, encryptedMetaShare.messageId );
+            console.log( { resUploadShare } );
+            if ( resUploadShare.status == 200 || 400 ) {
+                this.setState( {
+                    messageId: encryptedMetaShare.messageId,
+                    otpCode: resEncryptViaOTP.data.otp,
+                    flag_Loading: false,
+                    arr_TrustedContactEmailAndPhoneShare: [ {
+                        modalVisible: true,
+                        contactDetails: data,
+                        arr_ConstactDetailsList: this.state.arr_ConstactDetailsList
+                    } ]
+                } );
+            } else {
+                alert.simpleOk( "Oops", resUploadShare.err );
+            }
+        } else {
+            alert.simpleOk( "Oops", resEncryptViaOTP.err );
         }
     }
 
@@ -244,7 +252,6 @@ export default class TrustedContactScreen extends React.Component<any, any> {
     //TODO: func SSS Details table update data 
     connection_UpdateSSSDetails = async ( type: string ) => {
         const dateTime = Date.now();
-        //const fulldate = Math.floor( dateTime / 1000 );
         let history = this.state.arr_History;
         let state_data = this.state.data;
         state_data.statusMsgColor = "#C07710";
@@ -279,7 +286,8 @@ export default class TrustedContactScreen extends React.Component<any, any> {
     }
 
     render() {
-        let data = this.state.data;
+        //array
+        let { data } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
@@ -373,7 +381,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select how you want to share secret with the selected trusted contact</Text>
                                 <Button
                                     onPress={ () => {
-                                        this.props.navigation.push( "ShareSecretViaQRScreen", { onSelect: this.onSelect } );
+                                        this.props.navigation.push( "ShareSecretViaQRScreen", { data: data, onSelect: this.onSelect } );
                                     } }
                                     style={ [ globalStyle.ffFiraSansSemiBold, {
                                         backgroundColor: "#838383", borderRadius: 10, margin: 5,

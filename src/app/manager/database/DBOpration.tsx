@@ -65,6 +65,7 @@ const readTablesData = ( tableName: any ) => {
               data.shareStage = utils.decrypt( data.shareStage, passcode );
               data.recordId = utils.decrypt( data.recordId, passcode );
               data.decryptedShare = utils.decrypt( data.decryptedShare, passcode );
+              data.encryptedMetaShare = utils.decrypt( data.encryptedMetaShare, passcode );
               temp.push( data );
             }
             else if ( tableName == "tblTrustedPartySSSDetails" ) {
@@ -751,7 +752,7 @@ const updateSecureAccountAddInfo = (
           "update " +
           tblName +
           " set lastUpdated =:lastUpdated,additionalInfo =:additionalInfo where id = :id",
-          [  
+          [
             utils.encrypt( date.toString(), passcode ),
             utils.encrypt( JSON.stringify( addInfo ).toString(), passcode ),
             id
@@ -872,6 +873,7 @@ const readSSSTableData = ( tableName: any, recordID: string ) => {
               data.share = utils.decrypt( data.share, passcode );
               data.shareId = utils.decrypt( data.shareId, passcode );
               data.keeperInfo = utils.decrypt( data.keeperInfo, passcode );
+              data.encryptedMetaShare = utils.decrypt( data.encryptedMetaShare, passcode );
               temp.push( data );
               break;
             }
@@ -886,33 +888,42 @@ const readSSSTableData = ( tableName: any, recordID: string ) => {
 };
 
 //insert
-const insertSSSShareAndShareId = (
+const insertSSSShareDetails = (
   tblName: string,
-  fulldate: string,
-  share: any,
-  shareId: any,
+  temp: any
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
-    let temp = [];
+    temp = temp[ 0 ];
+    console.log( { temp } );
+
+    let histroy = [];
     let data = {};
     data.title = "Secret Created.";
-    data.date = utils.getUnixToDateFormat( fulldate );
-    temp.push( data );
-    db.transaction( function ( txn ) {
-      for ( let i = 0; i < share.length; i++ ) {
+    data.date = utils.getUnixToDateFormat( temp.date );
+    histroy.push( data );
+
+    db.transaction( function ( txn: any ) {
+      for ( let i = 0; i < temp.share.length; i++ ) {
+        //console.log( { len: temp.share.length, i: i } );
+
+        //console.log( { date: temp.date.toString(), share: temp.share[ i ].toString(), keerinfo: JSON.stringify( temp.keeperInfo[ i ].info ).toString(), recoard: temp.recordId[ i ].id.toString(), history: JSON.stringify( histroy ).toString() } );
+
         txn.executeSql(
           "INSERT INTO " +
           tblName +
-          "(dateCreated,share,shareId,history) VALUES (:dateCreated,:share,:shareId,:history)",
+          "(dateCreated,share,shareId,keeperInfo,recordId,history,encryptedMetaShare) VALUES (:dateCreated,:share,:shareId,:keeperInfo,:recordId,:history,:encryptedMetaShare)",
           [
             utils.encrypt(
-              fulldate.toString(),
+              temp.date.toString(),
               passcode
             ),
-            utils.encrypt( share[ i ].toString(), passcode ),
-            utils.encrypt( shareId[ i ].toString(), passcode ),
-            utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
+            utils.encrypt( temp.share[ i ].toString(), passcode ),
+            utils.encrypt( temp.shareId[ i ].data.shareId.toString(), passcode ),
+            utils.encrypt( JSON.stringify( temp.keeperInfo[ i ].info ).toString(), passcode ),
+            utils.encrypt( temp.recordId[ i ].id.toString(), passcode ),
+            utils.encrypt( JSON.stringify( histroy ).toString(), passcode ),
+            utils.encrypt( JSON.stringify( temp.encryptedMetaShare[ i ].metaShare ).toString(), passcode ),
           ]
         );
       }
@@ -1436,7 +1447,7 @@ module.exports = {
 
   //SSS Details
   readSSSTableData,
-  insertSSSShareAndShareId,
+  insertSSSShareDetails,
   insertRestoreUsingTrustedContactKeepInfo,
   updateSSSContactListDetails,
   updateSSSTransferMehtodDetails,

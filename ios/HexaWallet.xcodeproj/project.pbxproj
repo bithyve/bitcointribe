@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		001FD8F5BCF344BE99EA8AA9 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F79788E7D60A489CA04491E9 /* MaterialIcons.ttf */; };
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
@@ -63,6 +64,9 @@
 		8657F0D612D74CF194C189BA /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8746068362AD471589A071D8 /* Zocial.ttf */; };
 		87BE50DA7C1E4AB6AEF71180 /* Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 372BA1DE903948D9A7D28244 /* Foundation.ttf */; };
 		89A871027C4542AB8BF1DA49 /* FontAwesome5_Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4714510228B74465AB49D886 /* FontAwesome5_Regular.ttf */; };
+		8B003A1C22CB488800177530 /* PDFKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B0039CA22CB488800177530 /* PDFKit.framework */; };
+		8B003A1E22CB488F00177530 /* FileProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B003A1D22CB488F00177530 /* FileProvider.framework */; };
+		8B003A2222CB4B8000177530 /* PdfPassword.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B003A2122CB4B8000177530 /* PdfPassword.m */; };
 		8B00EC4A2268A8B700BAD109 /* Messages.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B00EBFA2268A8B700BAD109 /* Messages.framework */; };
 		8B00EC4B2268A8B700BAD109 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B00EC492268A8B700BAD109 /* MessageUI.framework */; };
 		8BA660D522A7B57F0010E934 /* libRCTCameraRoll.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BA6608E22A7B4660010E934 /* libRCTCameraRoll.a */; };
@@ -779,6 +783,10 @@
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		8746068362AD471589A071D8 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/native-base/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		88461CE8B4084922AF584415 /* Roboto-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Bold.ttf"; path = "../src/assets/fonts/Roboto/Roboto-Bold.ttf"; sourceTree = "<group>"; };
+		8B0039CA22CB488800177530 /* PDFKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PDFKit.framework; path = System/Library/Frameworks/PDFKit.framework; sourceTree = SDKROOT; };
+		8B003A1D22CB488F00177530 /* FileProvider.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FileProvider.framework; path = System/Library/Frameworks/FileProvider.framework; sourceTree = SDKROOT; };
+		8B003A2022CB4B6000177530 /* PdfPassword.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PdfPassword.h; sourceTree = "<group>"; };
+		8B003A2122CB4B8000177530 /* PdfPassword.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PdfPassword.m; sourceTree = "<group>"; };
 		8B00EBFA2268A8B700BAD109 /* Messages.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Messages.framework; path = System/Library/Frameworks/Messages.framework; sourceTree = SDKROOT; };
 		8B00EC492268A8B700BAD109 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		8B2B026C22C7703D00A1B809 /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = hi.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -855,6 +863,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B003A1E22CB488F00177530 /* FileProvider.framework in Frameworks */,
+				8B003A1C22CB488800177530 /* PDFKit.framework in Frameworks */,
 				8B00EC4A2268A8B700BAD109 /* Messages.framework in Frameworks */,
 				8B00EC4B2268A8B700BAD109 /* MessageUI.framework in Frameworks */,
 				ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */,
@@ -1001,6 +1011,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				8B003A2022CB4B6000177530 /* PdfPassword.h */,
+				8B003A2122CB4B8000177530 /* PdfPassword.m */,
 			);
 			name = HexaWallet;
 			sourceTree = "<group>";
@@ -1031,6 +1043,8 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8B003A1D22CB488F00177530 /* FileProvider.framework */,
+				8B0039CA22CB488800177530 /* PDFKit.framework */,
 				8B00EBFA2268A8B700BAD109 /* Messages.framework */,
 				8B00EC492268A8B700BAD109 /* MessageUI.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
@@ -2454,6 +2468,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				8B003A2222CB4B8000177530 /* PdfPassword.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
