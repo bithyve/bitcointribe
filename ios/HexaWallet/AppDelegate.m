@@ -11,10 +11,14 @@
 #import <React/RCTRootView.h>
 #import <React/RCTLinkingManager.h>
 
+
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  
+ 
   NSURL *jsCodeLocation;
 
   #ifdef DEBUG
@@ -43,5 +47,10 @@
   return [RCTLinkingManager application:application openURL:url
                       sourceApplication:sourceApplication annotation:annotation];
 }
+
+
+
+
+
 
 @end

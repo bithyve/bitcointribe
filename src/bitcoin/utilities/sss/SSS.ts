@@ -62,10 +62,12 @@ export default class SSS {
   }
 
   public static downloadShare = async (
-    messageId: string,
+    key: string,
   ): Promise<{
     encryptedMetaShare: string;
+    messageId: string;
   }> => {
+    const messageId: string = SSS.getMessageId( key, config.MSG_ID_LENGTH );
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post( "downloadShare", {
@@ -75,7 +77,7 @@ export default class SSS {
       throw new Error( err.response.data.err );
     }
 
-    return { encryptedMetaShare: res.data.share };
+    return { encryptedMetaShare: res.data.share, messageId };
   }
 
   public static validateDecryption = (
@@ -181,6 +183,14 @@ export default class SSS {
     }
   }
 
+  public static getMessageId = ( key: string, length: number ): string => {
+    const messageId = crypto
+      .createHash( "sha256" )
+      .update( key )
+      .digest( "hex" );
+    return messageId.slice( 0, length );
+  }
+
   private static cipherSpec: {
     algorithm: string;
     salt: string;
@@ -258,14 +268,6 @@ export default class SSS {
   public generateMessageID = (): string =>
     this.generateRandomString( config.MSG_ID_LENGTH )
 
-  public getMessageId = ( key: string, length: number ): string => {
-    const messageId = crypto
-      .createHash( "sha256" )
-      .update( key )
-      .digest( "hex" );
-    return messageId.slice( 0, length );
-  }
-
   public generateShares = (): {
     shares: string[];
   } => {
@@ -285,17 +287,16 @@ export default class SSS {
   }
 
   public uploadShare = async (
-    otpEncryptedShare: string,
+    encryptedMetaShare: string,
     messageId: string,
   ): Promise<{
     success: boolean;
-    messageId: string;
   }> => {
     let res: AxiosResponse;
 
     try {
       res = await BH_AXIOS.post( "uploadShare", {
-        share: otpEncryptedShare,
+        share: encryptedMetaShare,
         messageId,
       } );
     } catch ( err ) {
@@ -307,7 +308,7 @@ export default class SSS {
     if ( !success ) {
       throw new Error( "Unable to upload share" );
     }
-    return { success, messageId };
+    return { success };
   }
 
   public encryptViaOTP = (
@@ -342,7 +343,7 @@ export default class SSS {
     metaShare: IMetaShare,
   ): { encryptedMetaShare: string; key: string; messageId: string } => {
     const key: string = this.makeKey( SSS.cipherSpec.keyLength );
-    const messageId: string = this.getMessageId( key, config.MSG_ID_LENGTH );
+    const messageId: string = SSS.getMessageId( key, config.MSG_ID_LENGTH );
     const cipher = crypto.createCipheriv(
       SSS.cipherSpec.algorithm,
       key,
@@ -633,7 +634,6 @@ export default class SSS {
 
   public createQR = async (
     metashare: IMetaShare,
-    index: number,
   ): Promise<{ qrData: string[] }> => {
     const res = JSON.stringify( metashare );
     // this.metashareData = res;
@@ -643,7 +643,7 @@ export default class SSS {
     let start = 0;
     let end = 461;
     for ( let itr = 0; itr < 5; itr++ ) {
-      // console.log(“start”, start, “end”, end);
+      // console.log("start", start, "end", end);
       if ( itr !== 4 ) {
         qrData[ itr ] = res.slice( start, end );
       } else {
@@ -651,17 +651,13 @@ export default class SSS {
       }
       start = end;
       end = end + 461;
-      if ( index === 5 ) {
-        qrData[ itr ] = "c0" + ( itr + 1 ) + qrData[ itr ];
-      } else if ( index === 4 ) {
-        qrData[ itr ] = "e0" + ( itr + 1 ) + qrData[ itr ];
-      }
-      // console.log(“qrData”, itr + 1, “=>“, qrData[itr]);
+      qrData[ itr ] = "00" + ( itr + 1 ) + qrData[ itr ];
+      // console.log("qrData", itr + 1, "=>", qrData[itr]);
       QRCode.toDataURL( qrData[ itr ] )
-        .then( ( url: any ) => {
+        .then( ( url ) => {
           // console.log(url);
         } )
-        .catch( ( err: any ) => {
+        .catch( ( err ) => {
           // console.error(err);
         } );
     }

@@ -40,7 +40,8 @@ var utils = require( "HexaWallet/src/app/constants/Utils" );
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
-export default class ShareSecretViaQRScreen extends React.Component<any, any> {
+export default class SelfShareUsingWalletQRCode extends React.Component<any, any> {
+
     constructor ( props: any ) {
         super( props )
         this.state = ( {
@@ -51,33 +52,16 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
     }
 
     async componentWillMount() {
-        let walletDetails = utils.getWalletDetails();
-        var resSSSDetails = this.props.navigation.getParam( "data" );
-        // resSSSDetails = resSSSDetails.sssDetails;
-        // console.log( { resSSSDetails, walletDetails } );
-        let encryptedMetaShare = resSSSDetails.encryptedMetaShare;
-        // console.log( { encryptedMetaShare } );
-        // console.log( { resQRShare } );
-        // console.log( { jsonResQRShare } );
-        let qrCodeData = {};
-        qrCodeData.type = "SSS Recovery";
-        qrCodeData.wn = walletDetails.walletType;
-        qrCodeData.data = encryptedMetaShare.key;
-        console.log( { qrCodeData } );
+        let data = this.props.navigation.getParam( "data" );
         this.setState( {
-            data: JSON.stringify( qrCodeData ).toString()
+            data: data.toString()
         } )
     }
-    //TODO: func click_Item
-    click_Item = ( item: any ) => {
-        this.props.navigation.push( "TrustedContactScreen", {
-            data: item
-        } );
-    }
+
     goBack() {
         const { navigation } = this.props;
         navigation.goBack();
-        navigation.state.params.onSelect( { selected: true } );
+        // navigation.state.params.onSelect( { selected: true } );
     }
 
     render() {
@@ -92,7 +76,7 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
                                 onPress={ () => this.goBack() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Share Secret via QR</Text>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Share via QR</Text>
                             </Button>
                         </View>
                         <KeyboardAwareScrollView
@@ -103,19 +87,10 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center" } }>
-                                {/* <QRCode
-                                    ref="qrcodeView"
-                                    value={ this.state.data }
-                                    size={ Dimensions.get( "screen" ).width - 70 }
-                                    bgColor="black"
-                                    fgColor="white"
-                                    style={ { width: "100%", height: "100%" } }
-                                /> */}
                                 <QRCode
                                     value={ this.state.data }
                                     size={ Dimensions.get( 'screen' ).width - 50 }
                                 />
-
                             </View>
                             <View style={ { flex: 0.5, alignItems: "center" } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut faucibus pulvinar elementum integer enim neque volutpat. Leo integer malesuada nunc vel. Purus faucibus ornare suspendisse sed nisi lacus sed. Et ligula ullamcorper malesuada proin libero nunc consequat. A cras semper auctor neque vitae tempus quam pellentesque. In nisl nisi scelerisque eu ultrices vitae auctor eu augue. Sed risus ultricies tristique nulla aliquet enim tortor. Curabitur gravida arcu ac tortor dignissim convallis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Porta lorem mollis aliquam ut porttitor Leo a.</Text>

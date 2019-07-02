@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Dimensions, Platform, Image } from 'react-native';
+import { Modal, TouchableHighlight, View, Alert, StyleSheet, Dimensions, Platform, Image, NativeModules } from 'react-native';
 import {
     Container,
     Header,
@@ -24,6 +24,8 @@ import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 var RNFS = require( 'react-native-fs' );
 import RNFetchBlob from 'react-native-fetch-blob';
 
+//Custome Pages
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 
 //TODO: Custome Alert 
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
@@ -43,9 +45,13 @@ interface Props {
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
 //TODO: Custome Object
 import {
     images,
+    colors,
     localDB
 } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
@@ -66,7 +72,8 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             firstAnswer: "",
             secoundAnswer: "",
             answerBorderColor: "#808080",
-            flag_DisableBtnNext: true
+            flag_DisableBtnNext: true,
+            flag_Loading: false
         } );
     }
 
@@ -118,13 +125,17 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
 
     //TODO: Next button on click
     click_Next = async () => {
+        this.setState( {
+            flag_Loading: true
+        } )
         const dateTime = Date.now();
         let walletDetails = await utils.getWalletDetails();
-        console.log( { walletDetails } );
+        //console.log( { walletDetails } );
         let { secoundAnswer, arr_SelectedList } = this.state;
+        //console.log( { arr_SelectedList } );
         let secureAccount = await utils.getSecureAccountObject();
         var resSetupSecureAccount = await secureAccount.setupSecureAccount();
-        console.log( { resSetupSecureAccount } );
+        // console.log( { resSetupSecureAccount } );
         if ( resSetupSecureAccount.status == 200 ) {
             resSetupSecureAccount = resSetupSecureAccount.data;
         } else {
@@ -160,26 +171,26 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
         );
         if ( resInsertSecureCreateAcc ) {
             const sss = await utils.getS3ServiceObject();
-            console.log( { sss } );
+            // console.log( { sss } );
             const generateShareRes = await sss.generateShares( secoundAnswer );
-            console.log( { generateShareRes } );
+            // console.log( { generateShareRes } );
             if ( generateShareRes.status == 200 ) {
                 const { encryptedShares } = generateShareRes.data;
                 const autoHealthShares = encryptedShares.slice( 0, 3 );
                 //console.log( { autoHealthShares, manualHealthShares } );
                 const resInitializeHealthcheck = await sss.initializeHealthcheck( autoHealthShares );
-                console.log( { resInitializeHealthcheck } );
+                //console.log( { resInitializeHealthcheck } );
                 if ( resInitializeHealthcheck.status == 200 || 400 ) {
                     const shareIds = [];
-                    console.log( { autoHealthShares } );
+                    // console.log( { autoHealthShares } );
                     for ( const share of encryptedShares ) {
                         shareIds.push( sss.getShareId( share ) )
                     }
                     //console.log( { bhXpub, secondaryXpub } );
                     const socialStaticNonPMDD = { secondaryXpub, bhXpub: resSetupSecureAccount.setupData.bhXpub }
-                    console.log( { socialStaticNonPMDD } );
+                    //console.log( { socialStaticNonPMDD } );
                     var resEncryptSocialStaticNonPMDD = await sss.encryptStaticNonPMDD( socialStaticNonPMDD );
-                    //console.log( { shareIds, resEncryptStaticNonPMDD } );
+                    console.log( { shareIds, resEncryptSocialStaticNonPMDD } );
                     if ( resEncryptSocialStaticNonPMDD.status == 200 ) {
                         resEncryptSocialStaticNonPMDD = resEncryptSocialStaticNonPMDD.data.encryptedStaticNonPMDD;
                         const buddyStaticNonPMDD = { getSecoundMnemonic, twoFASecret: resSetupSecureAccount.setupData.secret, secondaryXpub, bhXpub: resSetupSecureAccount.setupData.bhXpub };
@@ -188,37 +199,71 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                         if ( resEncryptBuddyStaticNonPMDD.status == 200 ) {
                             resEncryptBuddyStaticNonPMDD = resEncryptBuddyStaticNonPMDD.data.encryptedStaticNonPMDD;
                             let rescreateMetaShare = await sss.createMetaShare( 1, encryptedShares[ 0 ], resEncryptSocialStaticNonPMDD, walletDetails.walletType );
-                            console.log( { encpShare: encryptedShares[ 1 ], rescreateMetaShare } );
+                            // console.log( { encpShare: encryptedShares[ 1 ], rescreateMetaShare } );
+                            let resGenerateEncryptedMetaShare1 = await sss.generateEncryptedMetaShare( rescreateMetaShare.data.metaShare );
                             let rescreateMetaShare1 = await sss.createMetaShare( 2, encryptedShares[ 1 ], resEncryptSocialStaticNonPMDD, walletDetails.walletType );
-                            console.log( { encpShare: encryptedShares[ 2 ], rescreateMetaShare1 } );
+                            //console.log( { encpShare: encryptedShares[ 2 ], rescreateMetaShare1 } );
+                            let resGenerateEncryptedMetaShare2 = await sss.generateEncryptedMetaShare( rescreateMetaShare1.data.metaShare );
                             let rescreateMetaShare2 = await sss.createMetaShare( 3, encryptedShares[ 2 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
-                            console.log( { rescreateMetaShare2 } );
-
-                            //for pdf      
+                            let resGenerateEncryptedMetaShare3 = await sss.generateEncryptedMetaShare( rescreateMetaShare2.data.metaShare );
+                            //console.log( { rescreateMetaShare2 } );
+                            //for pdf                     
                             let rescreateMetaShare3 = await sss.createMetaShare( 4, encryptedShares[ 3 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
                             console.log( { rescreateMetaShare3 } );
                             if ( rescreateMetaShare3.status == 200 ) {
                                 var qrcode4share = await sss.createQR( rescreateMetaShare3.data.metaShare, 4 );
                                 if ( qrcode4share.status == 200 ) {
                                     qrcode4share = qrcode4share.data.qrData
-                                    console.log( { qrcode4share } );
+                                    // console.log( { qrcode4share } );
                                     //creating 4th share pdf
                                     let temp = [];
                                     temp.push( { arrQRCodeData: qrcode4share, secondaryXpub: secondaryXpub, qrData: resSetupSecureAccount.setupData.qrData, secret: resSetupSecureAccount.setupData.secret, secondaryMnemonic: getSecoundMnemonic, bhXpub: resSetupSecureAccount.setupData.bhXpub } )
-                                    let resGenerate4thsharepdf = this.generate4thShare( temp );
-                                    if ( resGenerate4thsharepdf ) {
+                                    let resGenerate4thsharepdf = await this.generate4thShare( temp );
+                                    if ( resGenerate4thsharepdf != "" ) {
                                         let rescreateMetaShare4 = await sss.createMetaShare( 5, encryptedShares[ 4 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
                                         console.log( { rescreateMetaShare4 } );
                                         if ( rescreateMetaShare4.status == 200 ) {
+                                            console.log( "I" );
+
                                             var qrcode5share = await sss.createQR( rescreateMetaShare4.data.metaShare, 5 );
                                             if ( qrcode5share.status == 200 ) {
+                                                console.log( "II" );
                                                 qrcode5share = qrcode5share.data.qrData
                                                 console.log( { qrcode5share } );
                                                 let temp = [];
                                                 temp.push( { arrQRCodeData: qrcode5share, secondaryXpub: secondaryXpub, qrData: resSetupSecureAccount.setupData.qrData, secret: resSetupSecureAccount.setupData.secret, secondaryMnemonic: getSecoundMnemonic, bhXpub: resSetupSecureAccount.setupData.bhXpub } )
-                                                let resGenerate5thsharepdf = this.generate5thShare( temp );
-                                                if ( resGenerate5thsharepdf ) {
+                                                let resGenerate5thsharepdf = await this.generate5thShare( temp );
+                                                console.log( { resGenerate5thsharepdf } );
+                                                if ( resGenerate5thsharepdf != "" ) {
+                                                    console.log( "III" );
+                                                    let keeperInfo = [ { info: arr_SelectedList[ 0 ] }, { info: arr_SelectedList[ 1 ] }, { info: rescreateMetaShare2.data }, { info: qrcode4share[ 0 ] }, { info: qrcode5share[ 0 ] } ];
+                                                    let recoardInfo = [ { id: arr_SelectedList[ 0 ].recordID }, { id: arr_SelectedList[ 1 ].recordID }, { id: "" }, { id: "" }, { id: "" } ];
+                                                    let encryptedMetaShare = [ { metaShare: resGenerateEncryptedMetaShare1.data }, { metaShare: resGenerateEncryptedMetaShare2.data }, { metaShare: resGenerateEncryptedMetaShare3.data }, { metaShare: resGenerate4thsharepdf }, { metaShare: resGenerate5thsharepdf } ]
+                                                    let temp = [ { date: dateTime, share: encryptedShares, shareId: shareIds, keeperInfo: keeperInfo, recordId: recoardInfo, encryptedMetaShare: encryptedMetaShare } ]
+                                                    let resInsertSSSShare = await dbOpration.insertSSSShareDetails(
+                                                        localDB.tableName.tblSSSDetails,
+                                                        temp
+                                                    );
+                                                    if ( resInsertSSSShare ) {
+                                                        let queTemp = [];
+                                                        let questionData = {};
+                                                        questionData.Question = this.state.firstQuestion;
+                                                        questionData.Answer = this.state.secoundAnswer;
+                                                        queTemp.push( questionData );
+                                                        let resUpdateWalletAns = await dbOpration.updateWalletAnswerDetails(
+                                                            localDB.tableName.tblWallet,
+                                                            queTemp
+                                                        );
 
+                                                        if ( resUpdateWalletAns ) {
+                                                            await comFunDBRead.readTblSSSDetails();
+                                                            await comFunDBRead.readTblWallet();
+                                                            this.setState( {
+                                                                flag_Loading: false
+                                                            } );
+                                                            this.props.click_Next();
+                                                        }
+                                                    }
                                                 }
                                             } else {
                                                 alert.simpleOk( "Oops", qrcode4share.err );
@@ -275,10 +320,9 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             // console.log( { resSecoundXpub4Share } );
             let res2FASecret4Share = await this.generateXpubAnd2FAQRCode( qrData, "googleAuto2FASecret4Share.png" );
             // console.log( { res2FASecret4Share } );
-            let create4thPdf = this.genreatePdf4Share( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, resSecoundXpub4Share, res2FASecret4Share, "SecretSharing4Share.pdf", "For 4th Shares" );
-            if ( create4thPdf ) {
-                resolve( true );
-            }
+            let create4thPdf = await this.genreatePdf4Share( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, resSecoundXpub4Share, res2FASecret4Share, "SecretSharing4Share.pdf", "For 4th Shares" );
+            resolve( create4thPdf );
+
         } );
     }
     //for 5th share
@@ -306,23 +350,21 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             // console.log( { resSecoundXpub4Share } );
             let res2FASecret5Share = await this.generateXpubAnd2FAQRCode( qrData, "googleAuto2FASecret5Share.png" );
             // console.log( { res2FASecret4Share } );
-            let create5thPdf = this.genreatePdf4Share( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, resSecoundXpub5Share, res2FASecret5Share, "SecretSharing5Share.pdf", "For 5th Shares" );
-            if ( create5thPdf ) {
-                resolve( true );
-            }
+            let create5thPdf = await this.genreatePdf4Share( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, resSecoundXpub5Share, res2FASecret5Share, "SecretSharing5Share.pdf", "For 5th Shares" );
+            resolve( create5thPdf );
         } );
     }
 
     generateSahreQRCode = async ( share1: string, fileName: string ) => {
         return new Promise( async ( resolve, reject ) => {
-            //note replace { to _ and } to __
+            //note replace { to _ and } to __  
             share1 = share1.split( '"' ).join( "Doublequote" );
             share1 = share1.split( '{' ).join( "Leftbrace" );
             share1 = share1.split( '}' ).join( "Rightbrace" );
             share1 = share1.split( '/' ).join( "_" );
             share1 = share1.split( ',' ).join( "__" );
             share1 = share1.split( ' ' ).join( "space" );
-            console.log( { share1 } );
+            // console.log( { share1 } );
             var docsDir;
             if ( Platform.OS == "android" ) {
                 docsDir = await RNFS.ExternalStorageDirectoryPath //RNFS.DocumentDirectoryPath;
@@ -330,13 +372,13 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 docsDir = await PDFLib.getDocumentsDirectory();
             }
             docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
-            console.log( { docsDir } );
+            // console.log( { docsDir } );
             var path = `${ docsDir }/${ fileName }`;
             await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + share1, {
             } )
                 .then( ( res: any ) => {
                     let base64Str = res.base64()
-                    console.log( { base64Str } );
+                    //console.log( { base64Str } );
                     RNFS.writeFile( path, base64Str, "base64" )
                         .then( ( success: any ) => {
                             resolve( path );
@@ -353,7 +395,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
 
     generateXpubAnd2FAQRCode = async ( share1: string, fileName: string ) => {
         return new Promise( async ( resolve, reject ) => {
-            console.log( { share1 } );
+            //console.log( { share1 } );
             var docsDir;
             if ( Platform.OS == "android" ) {
                 docsDir = await RNFS.ExternalStorageDirectoryPath //RNFS.DocumentDirectoryPath;
@@ -361,13 +403,13 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 docsDir = await PDFLib.getDocumentsDirectory();
             }
             docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
-            console.log( { docsDir } );
+            // console.log( { docsDir } );
             var path = `${ docsDir }/${ fileName }`;
             await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + share1, {
             } )
                 .then( ( res: any ) => {
                     let base64Str = res.base64()
-                    console.log( { base64Str } );
+                    // console.log( { base64Str } );
                     RNFS.writeFile( path, base64Str, "base64" )
                         .then( ( success: any ) => {
                             resolve( path );
@@ -406,7 +448,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             let arrShare3 = this.chunkArray( arrQRCodeData[ 2 ], 11 );
             let arrShare4 = this.chunkArray( arrQRCodeData[ 3 ], 11 );
             let arrShare5 = this.chunkArray( arrQRCodeData[ 4 ], 15 );
-            console.log( { arrShare1 } );
+            //console.log( { arrShare1 } );
 
 
             //Secound Mnemonic
@@ -421,10 +463,10 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             threeSecondaryMnemonic = threeSecondaryMnemonic.split( ',' ).join( ' ' );
 
             //bhXpub
-            console.log( { bhXpub } );
+            // console.log( { bhXpub } );
             var firstArrbhXpub, secoundArrbhXpub, threebhXpub;
             let arrSepArraybhXpub = bhXpub.match( /.{1,40}/g );
-            console.log( arrSepArraybhXpub );
+            // console.log( arrSepArraybhXpub );
             firstArrbhXpub = arrSepArraybhXpub[ 0 ].toString();
             firstArrbhXpub = firstArrbhXpub.split( ',' ).join( ' ' );
             secoundArrbhXpub = arrSepArraybhXpub[ 1 ].toString();
@@ -433,7 +475,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             threebhXpub = threebhXpub.split( ',' ).join( ' ' );
 
 
-            console.log( { secondaryMnemonic, bhXpub } );
+            //console.log( { secondaryMnemonic, bhXpub } );
             var docsDir;
             if ( Platform.OS == "android" ) {
                 docsDir = await RNFS.ExternalStorageDirectoryPath;
@@ -441,9 +483,9 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 docsDir = await PDFLib.getDocumentsDirectory();
             }
             const pdfPath = `${ docsDir }/${ pdfFileName }`;
-            console.log( { pdfPath } );
+            //console.log( { pdfPath } );
             docsDir = Platform.OS === 'android' ? `/${ docsDir }` : docsDir;
-            console.log( { docsDir } );
+            // console.log( { docsDir } );
             const page1 = PDFPage
                 .create()
                 .drawText( forShare, {
@@ -941,7 +983,12 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 .write()
                 .then( ( path: any ) => {
                     console.log( 'PDF created at: ' + path );
-                    resolve( true );
+                    let pdffilePassword = this.state.secoundAnswer;
+                    if ( Platform.OS == "ios" ) {
+                        var PdfPassword = NativeModules.PdfPassword;
+                        PdfPassword.addEvent( "/" + pdfFileName, pdffilePassword );
+                    }
+                    resolve( path );
                 } );
         } );
     }
@@ -953,7 +1000,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
         //values
         let { firstQuestion, firstAnswer, secoundAnswer, answerBorderColor } = this.state;
         //flag
-        let { flag_DisableBtnNext } = this.state;
+        let { flag_DisableBtnNext, flag_Loading } = this.state;
         const itemList = arr_QuestionList.map( ( item: any, index: number ) => (
             <Picker.Item label={ item.item } value={ item.item } style={ { width: 40 } } />
         ) );
@@ -1072,6 +1119,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                                     style={ [ flag_DisableBtnNext == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
                                 />
                             </View>
+                            <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
                         </View>
                     </View>
                 </KeyboardAwareScrollView>
