@@ -99,7 +99,7 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 
-   
+
 android {  
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -108,15 +108,13 @@ android {
         applicationId "com.hexawallet"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1                   
-        versionName "1.0.0.030719"   
+        versionCode 1                 
+        versionName "1.0.0.180619"   
         missingDimensionStrategy 'react-native-camera', 'general'   
         ndk {  
             abiFilters "armeabi-v7a", "x86"
-        }     
-        //multiDexEnabled true   
-         vectorDrawables.useSupportLibrary = true          
-      }     
+        }                
+      }   
    
        
 
