@@ -13,8 +13,8 @@ import {
     Body,
     Text,
     List, ListItem,
-    Icon
 } from "native-base";
+import { Icon } from 'react-native-elements'
 import { SvgIcon } from "@up-shared/components";
 import { RkCard } from "react-native-ui-kitten";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
@@ -25,6 +25,12 @@ import ShimmerPlaceHolder from 'react-native-shimmer-placeholder'
 import TimerCountdown from "react-native-timer-countdown";
 var converter = require( 'number-to-words' );
 var Mailer = require( 'NativeModules' ).RNMail;
+import Modal from 'react-native-modalbox';
+//import SimpleShare from "react-native-simple-share";
+import Share, { ShareSheet } from 'react-native-share';
+import { SocialIcon } from 'react-native-elements'
+
+
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -80,22 +86,22 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 thumbnailPath: "bars",
                 givenName: "Wallet",
                 familyName: "",
-                statusMsgColor: "gray",
-                statusMsg: "Status",
+                statusMsgColor: "#ff0000",
+                statusMsg: "Not shared",
                 opt: undefined,
             }, {
                 thumbnailPath: "bars",
                 givenName: "Email",
                 familyName: "",
-                statusMsgColor: "gray",
-                statusMsg: "Status",
+                statusMsgColor: "#ff0000",
+                statusMsg: "Not shared",
                 opt: undefined,
             }, {
                 thumbnailPath: "bars",
                 givenName: "Cloud Store",
                 familyName: "",
-                statusMsgColor: "gray",
-                statusMsg: "Status",
+                statusMsgColor: "#ff0000",
+                statusMsg: "Not shared",
                 opt: undefined,
             } ],
             arr_Mnemonic: [],
@@ -130,207 +136,30 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             }
         );
     }
+
+
     componentWillUnmount() {
         this.willFocusSubscription.remove();
     }
 
-    // loaddata = async () => {
-    //     let walletDetails = await utils.getWalletDetails();
-    //     var resAccountDetails = await comFunDBRead.readTblAccount();
-    //     let backupType = JSON.parse( walletDetails.appHealthStatus );
-    //     console.log( { backupType } );
-    //     let sssDetails = await utils.getSSSDetails();
-    //     // console.log( { walletDetails, sssDetails } );
-    //     let flag_isSetupTrustedContact, flag_isMnemonic;
-    //     let encrShares = [];
-    //     let history = [];
-    //     let tempOpt = [];
-    //     let temp = [];
-    //     //Trusted Contacts
-    //     if ( sssDetails.length > 0 ) {
-    //         if ( sssDetails[ 0 ].keeperInfo == "" ) {
-    //             flag_isSetupTrustedContact = true;
-    //         } else {
-    //             flag_isSetupTrustedContact = false;
-    //             //Trusted Contacts list
-    //             for ( let i = 0; i < sssDetails.length; i++ ) {
-    //                 encrShares.push( sssDetails[ i ].share )
-    //                 history.push( JSON.parse( sssDetails[ i ].history ) )
-    //             }
-    //             //for history get opt
-    //             for ( let i = 0; i < history.length; i++ ) {
-    //                 let eachHistory = history[ i ];
-    //                 let eachHistoryLength = eachHistory.length;
-    //                 let otp = eachHistory[ eachHistoryLength - 1 ].otp;
-    //                 tempOpt.push( otp )
-    //             }
-    //             //console.log( parseInt( walletDetails.lastUpdated ) );
-    //             let updateShareIdStatus = await comAppHealth.connection_AppHealthStatus( parseInt( walletDetails.lastUpdated ), 0, encrShares, walletDetails.mnemonic );
-    //             // console.log( { updateShareIdStatus } );
-    //             if ( updateShareIdStatus ) {
-    //                 var data = await dbOpration.readTablesData(
-    //                     localDB.tableName.tblSSSDetails
-    //                 );
-    //                 data = data.temp;
-    //                 //console.log( { data } );
-    //                 const dateTime = Date.now();
-    //                 //const fulldate = Math.floor( dateTime / 1000 );
-    //                 for ( let i = 0; i < data.length; i++ ) {
-    //                     let jsondata = JSON.parse( data[ i ].keeperInfo );
-    //                     jsondata.history = JSON.parse( data[ i ].history );
-    //                     let sharedDate = parseInt( data[ i ].sharedDate );
-    //                     // console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
-    //                     var startDate = new Date( dateTime );
-    //                     var endDate = new Date( sharedDate );
-    //                     //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
-    //                     var diff = Math.abs( startDate.getTime() - endDate.getTime() );
-    //                     //console.warn( 'diff' + diff.toString() );  
-    //                     const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
-    //                     const seconds: any = Math.floor( diff / 1000 % 60 );
-    //                     //console.log( { minutes, seconds } );
-    //                     //console.warn( minutes.toString() )
-    //                     const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
-    //                     let mesData = data[ i ];
-    //                     //  console.log( { totalSec, mesData } );
-    //                     jsondata.totalSec = 540 - totalSec;
-    //                     if ( totalSec < 540 && data[ i ].shareStage == "Ugly" ) {
-    //                         jsondata.statusMsg = "Shared";
-    //                         jsondata.statusMsgColor = "#C07710";
-    //                         jsondata.flag_timer = true;
-    //                         jsondata.opt = tempOpt[ i ];
-    //                     } else if ( totalSec >= 540 && data[ i ].shareStage == "Ugly" ) {
-    //                         jsondata.statusMsg = "Shared OTP expired.";
-    //                         jsondata.statusMsgColor = "#C07710";
-    //                         jsondata.flag_timer = false;
-    //                     } else if ( data[ i ].shareStage == "Good" ) {
-    //                         jsondata.statusMsg = "Share accessible";
-    //                         jsondata.statusMsgColor = "#008000";
-    //                         jsondata.flag_timer = false;
-    //                     } else if ( data[ i ].shareStage == "Bad" ) {
-    //                         jsondata.statusMsg = "Share accessible";
-    //                         jsondata.statusMsgColor = "#C07710";
-    //                         jsondata.flag_timer = false;
-    //                     } else if ( data[ i ].shareStage == "Ugly" && data[ i ].sharedDate != "" ) {
-    //                         jsondata.statusMsg = "Share not accessible";
-    //                         jsondata.statusMsgColor = "#ff0000";
-    //                         jsondata.flag_timer = false;
-    //                     }
-    //                     else {
-    //                         jsondata.statusMsg = "Not shared";
-    //                         jsondata.statusMsgColor = "#ff0000";
-    //                         jsondata.flag_timer = false;
-    //                     }
-    //                     temp.push( jsondata )
-    //                 }
-    //             } else {
-    //                 Alert.alert( "ShareId status not changed." )
-    //             }
-    //         }
-    //     } else {
-    //         flag_isMnemonic = true;
-    //     }
-    //     //Mnemonic
-    //     if ( backupType.backupType != "share" ) {
-    //         flag_isMnemonic = true;
-    //     } else {
-    //         flag_isMnemonic = false;
-    //     }
-    //     let arr_Mnemonic = [
-    //         {
-    //             title: "Mnemonic",
-    //             subTitle: "Not backed up",
-    //             color: "#ff0000",
-    //             icon: "shield"
-    //         }
-    //     ];
-    //     let dbMnemonic = walletDetails.mnemonic;
-    //     let arr_CheckMnemonic = dbMnemonic.split( ' ' );
-    //     let arr_randomNo = utils.getRandomBetweenNumber( 1, arr_CheckMnemonic.length );
-    //     console.log( { arr_CheckMnemonic, arr_randomNo } );
-    //     let arr_MnemonicNumbers = [ converter.toOrdinal( arr_randomNo[ 0 ] ), converter.toOrdinal( arr_randomNo[ 1 ] ), converter.toOrdinal( arr_randomNo[ 2 ] ) ]
-    //     let arr_MnemoicWords = [ arr_CheckMnemonic[ arr_randomNo[ 0 ] - 1 ], arr_CheckMnemonic[ arr_randomNo[ 1 ] - 1 ], arr_CheckMnemonic[ arr_randomNo[ 2 ] - 1 ] ]
-    //     var arr_MnemonicDetails = [];
-    //     arr_MnemonicDetails = [ arr_MnemonicNumbers, arr_MnemoicWords ];
-    //     console.log( { arr_MnemonicDetails } );
-
-
-    //     //Secret Questions  
-    //     let flag_DisableSecretQuestion, subTitleQA;
-    //     let setUpWalletAnswerDetails = JSON.parse( walletDetails.setUpWalletAnswerDetails );
-    //     if ( setUpWalletAnswerDetails != "" ) {
-    //         flag_DisableSecretQuestion = false;
-    //         subTitleQA = "Not backed up";
-    //     } else {
-    //         flag_DisableSecretQuestion = true;
-    //         subTitleQA = "Please first setup your Secret Questions.";
-    //     }
-    //     let arr_SecretQuestion = [
-    //         {
-    //             title: "First Secret Question",
-    //             subTitle: subTitleQA,
-    //             color: "#ff0000",
-    //             icon: "shield"
-    //         }
-    //     ];
-
-    //     //Secure Two Factor Auto
-    //     let flag_DisableSecureTwoFactor, subTitleTwoFactor;
-    //     //Two Factor Autoentication
-    //     let secureAccountDetails = resAccountDetails[ 1 ];
-    //     if ( secureAccountDetails.address != "" ) {
-    //         flag_DisableSecureTwoFactor = false
-    //         subTitleTwoFactor = "Not backed up";
-    //     } else {
-    //         flag_DisableSecureTwoFactor = true;
-    //         subTitleTwoFactor = "Please first active Secure Account.";
-    //     }
-
-    //     let arr_2FactorAuto = [
-    //         {
-    //             title: "2 Factor Aunthentication",
-    //             subTitle: subTitleTwoFactor,
-    //             color: "#ff0000",
-    //             icon: "shield"
-    //         }
-    //     ];
-    //     let secureAdditionalInfo = JSON.parse( resAccountDetails[ 1 ].additionalInfo );
-    //     let arr_SecureAccountDetials = [ {
-    //         secret: secureAdditionalInfo[ 0 ].setupData.secret
-    //     } ];
-
-    //     // console.log( { arr_SecureAccountDetials } );
-    //     this.setState( {
-    //         flag_isSetupTrustedContact,
-    //         arr_Mnemonic,
-    //         arr_MnemonicDetails,
-    //         flag_isMnemonic,
-    //         arr_TrustedContacts: temp,
-    //         arr_SecretQuestion,
-    //         arr_2FactorAuto,
-    //         arr_SecureAccountDetials,
-    //         arr_QuestionAndAnswerDetails: setUpWalletAnswerDetails[ 0 ],
-    //         //TouchableOpacity  
-    //         flag_DisableSecureTwoFactor,
-    //         flag_DisableSecretQuestion,
-    //         flag_Loading: false
-    //     } )
-    // }
-
-
-
     loaddata = async () => {
         let walletDetails = await utils.getWalletDetails();
         let setUpWalletAnswerDetails = walletDetails.setUpWalletAnswerDetails;
-        var resAccountDetails = await comFunDBRead.readTblAccount();
         let backupType = JSON.parse( walletDetails.appHealthStatus );
         console.log( { backupType } );
         let sssDetails = await utils.getSSSDetails();
+        let encrShares = [];
+        for ( let i = 0; i <= 2; i++ ) {
+            encrShares.push( sssDetails[ i ].shareId )
+        }
+        let updateShareIdStatus = await comAppHealth.connection_AppHealthAndSSSUpdate( parseInt( walletDetails.lastUpdated ), encrShares );
+        // console.log( { updateShareIdStatus } );   
         console.log( { walletDetails, sssDetails } );
         //flag   
         let flag_isSetupTrustedContact, flag_isSecretQuestions, flag_isMnemonic;
         //array  
         let arr_TrustedContacts = [], arr_SecretQuestion = [];
-        let encrShares = [];
+
         let history = [];
         let tempOpt = [];
         let temp = [];
@@ -357,7 +186,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 data.familyName = keeperInfo.familyName;
                 const dateTime = Date.now();
                 let sharedDate = parseInt( sssDetails[ i ].sharedDate );
-                // console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
+                console.warn( 'sharedDate date =' + sharedDate.toString() );
                 var startDate = new Date( dateTime );
                 var endDate = new Date( sharedDate );
                 //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
@@ -369,50 +198,52 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 //console.warn( minutes.toString() )
                 const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
                 data.totalSec = 540 - totalSec;
-
-                console.log( { histry: data.history } );
-
                 //for history get opt     
-                for ( let i = 0; i < data.history.length; i++ ) {
-                    let eachHistory = data.history;
-                    console.log( { eachHistory } );
+                for ( let i = 0; i < 2; i++ ) {
+                    let eachHistory = JSON.parse( sssDetails[ i ].history );
                     let eachHistoryLength = eachHistory.length;
-                    console.log( { eachHistory } );
-                    console.log( eachHistory[ eachHistoryLength - 1 ] );
-                    // let otp = "otp" in eachHistory[ eachHistoryLength - 1 ] ? eachHistory[ eachHistoryLength - 1 ].otp : undefined
-                    let otp = 'otp' in eachHistory[ eachHistoryLength - 1 ] || undefined
+                    var otp;
+                    if ( eachHistory[ eachHistoryLength - 1 ] != undefined ) {
+                        otp = eachHistory[ eachHistoryLength - 1 ].otp;
+                    } else {
+                        otp = undefined;
+                    }
                     tempOpt.push( otp );
                 }
-                console.log( { share: sssDetails[ i ] } );
-
-                if ( totalSec < 540 && sssDetails[ i ].shareStage == "Ugly" ) {
-                    data.statusMsg = "Shared";
-                    data.statusMsgColor = "#C07710";
-                    data.flag_timer = true;
-                    data.opt = tempOpt[ i ];
-                } else if ( totalSec >= 540 && sssDetails[ i ].shareStage == "Ugly" ) {
-                    data.statusMsg = "Shared OTP expired.";
-                    data.statusMsgColor = "#C07710";
-                    data.flag_timer = false;
-                } else if ( sssDetails[ i ].shareStage == "Good" ) {
-                    data.statusMsg = "Share accessible";
-                    data.statusMsgColor = "#008000";
-                    data.flag_timer = false;
-                } else if ( sssDetails[ i ].shareStage == "Bad" ) {
-                    data.statusMsg = "Share accessible";
-                    data.statusMsgColor = "#C07710";
-                    data.flag_timer = false;
-                } else if ( sssDetails[ i ].shareStage == "Ugly" && sssDetails[ i ].sharedDate != "" ) {
-                    data.statusMsg = "Share not accessible";
-                    data.statusMsgColor = "#ff0000";
-                    data.flag_timer = false;
+                console.log( { tempOpt } );
+                if ( updateShareIdStatus ) {
+                    if ( totalSec < 540 && sssDetails[ i ].shareStage == "Ugly" ) {
+                        data.statusMsg = "Shared";
+                        data.statusMsgColor = "#C07710";
+                        data.flag_timer = true;
+                        data.opt = tempOpt[ i ];
+                    } else if ( totalSec >= 540 && sssDetails[ i ].shareStage == "Ugly" ) {
+                        data.statusMsg = "Shared OTP expired.";
+                        data.statusMsgColor = "#C07710";
+                        data.flag_timer = false;
+                    } else if ( sssDetails[ i ].shareStage == "Good" ) {
+                        data.statusMsg = "Share accessible";
+                        data.statusMsgColor = "#008000";
+                        data.flag_timer = false;
+                    } else if ( sssDetails[ i ].shareStage == "Bad" ) {
+                        data.statusMsg = "Share accessible";
+                        data.statusMsgColor = "#C07710";
+                        data.flag_timer = false;
+                    } else if ( sssDetails[ i ].shareStage == "Ugly" && sssDetails[ i ].sharedDate != "" ) {
+                        data.statusMsg = "Share not accessible";
+                        data.statusMsgColor = "#ff0000";
+                        data.flag_timer = false;
+                    }
+                    else {
+                        data.statusMsg = "Not shared";
+                        data.statusMsgColor = "#ff0000";
+                        data.flag_timer = false;
+                    }
+                    arr_TrustedContacts.push( data );
                 }
                 else {
-                    data.statusMsg = "Not shared";
-                    data.statusMsgColor = "#ff0000";
-                    data.flag_timer = false;
+                    alert.simpleOk( "Oops", "App Health not update in database." );
                 }
-                arr_TrustedContacts.push( data );
             }
             //secret question
             console.log( { setUpWalletAnswerDetails } );
@@ -666,9 +497,47 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
             } );
         } else {
-            alert.simpleOk( "Oops", "Working." );
-        }
+            this.refs.modal4.open();
+            // let shareOptions = {
+            //     title: "React Native",
+            //     message: "Hola mundo",
+            //     url: "http://facebook.github.io/react-native/",
+            //     subject: "Share Link" //  for email
+            // };
 
+            // Share.shareSingle( Object.assign( shareOptions, {
+            //     "social": "twitter"
+            // } ) );
+            // try {
+            //     const result = await SimpleShare.share( {
+            //         message:
+            //             "React Native | A framework for building native apps using React"
+            //     } ); if ( result.action === SimpleShare.sharedAction ) {
+            //         if ( result.activityType ) {
+            //             // shared with activity type of result.activityType
+            //             console.log( "result", result );
+            //         } else {
+            //             // shared
+            //             console.log( "result", result );
+            //         }
+            //     } else if ( result.action === SimpleShare.dismissedAction ) {
+            //         // dismissed
+            //         console.log( "dismissed" );
+            //     }
+            // } catch ( error ) {
+            //     console.log( "error", error.message );
+            // }
+        }
+    }
+
+    click_Share5Sahring( type: string ) {
+        if ( type == "CLOUD" ) {
+
+        } else if ( type == "SLACK" ) {
+
+        } else if ( type == "WHATSAPP" ) {
+
+        }
     }
 
 
@@ -731,7 +600,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                                 <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
                                                             ) }
                                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                                <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                                 <View style={ { flexDirection: "row" } }>
                                                                     <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
                                                                     { renderIf( typeof item.opt !== "undefined" )(
@@ -1098,6 +967,59 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                             } )
                         } }
                     />
+                    <Modal style={ [ styles.modal, styles.modal4 ] } position={ "bottom" } ref={ "modal4" }>
+                        <View style={ { flex: 1 } }>
+                            <View style={ { flexDirection: "row", marginTop: 20 } }>
+                                <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "CLOUD" ) }>
+                                    <View style={ { alignItems: "center", marginLeft: "10%", flexDirection: "column" } }>
+                                        <Icon
+                                            raised
+                                            name='cloud-upload'
+                                            type='font-awesome'
+                                            color='#379FF1'
+                                        />
+                                        <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via Cloud</Text>
+                                    </View>
+                                </Button>
+                                <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "SLACK" ) }>
+                                    <View style={ { alignItems: "center", marginLeft: "10%", flexDirection: "column" } }>
+                                        <Icon
+                                            raised
+                                            name='slack'
+                                            type='font-awesome'
+                                            color='#E2A223'
+                                        />
+                                        <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via Slack</Text>
+                                    </View>
+                                </Button>
+                                <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "WHATSAPP" ) }>
+                                    <View style={ { alignItems: "center", marginLeft: "10%", flexDirection: "column" } }>
+                                        <Icon
+                                            raised
+                                            name='whatsapp'
+                                            type='font-awesome'
+                                            color='#51E46B'
+                                        />
+                                        <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1", textAlign: "center" } }>Via WhatsApp</Text>
+                                    </View>
+                                </Button>
+                            </View>
+
+                            <View style={ { flexDirection: "row", marginTop: 40 } }>
+                                <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "CLOUD" ) }>
+                                    <View style={ { alignItems: "center", marginLeft: "2%", flexDirection: "column" } }>
+                                        <Icon
+                                            raised
+                                            name='wifi'
+                                            type='font-awesome'
+                                            color='#027AFE'
+                                        />
+                                        <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via AirDrop</Text>
+                                    </View>
+                                </Button>
+                            </View>
+                        </View>
+                    </Modal>
                 </SafeAreaView>
                 <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
             </Container >
@@ -1130,5 +1052,13 @@ const styles = StyleSheet.create( {
         shadowOpacity: 0.3,
         backgroundColor: '#FFFFFF'
 
+    },
+    //botom model
+    modal: {
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10
+    },
+    modal4: {
+        height: 180
     }
 } );

@@ -18,7 +18,7 @@ import {
     Thumbnail
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
-import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
+import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Contacts from 'react-native-contacts';
 import { Avatar, SearchBar } from 'react-native-elements';
@@ -30,6 +30,10 @@ import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
 
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
@@ -75,85 +79,84 @@ export default class SecretSharingScreen extends React.Component<any, any> {
         console.log( { resSSSDetails } );
         let encrShares = [];
         let history = [];
+        //for histroy
         for ( let i = 0; i <= 1; i++ ) {
-            encrShares.push( resSSSDetails[ i ].share )
             history.push( JSON.parse( resSSSDetails[ i ].history ) )
         }
+        //for 
+        for ( let i = 0; i <= 2; i++ ) {
+            encrShares.push( resSSSDetails[ i ].shareId )
+        }
+
         //for history get opt
         let tempOpt = [];
-        for ( let i = 0; i < history.length; i++ ) {
+        for ( let i = 0; i < 2; i++ ) {
             let eachHistory = history[ i ];
             let eachHistoryLength = eachHistory.length;
-            let otp = eachHistory[ eachHistoryLength - 1 ].otp;
-            tempOpt.push( otp )
-        }
-        console.log( parseInt( resultWallet.lastUpdated ) );
-        // let updateShareIdStatus = await comAppHealth.connection_AppHealthStatus( parseInt( resultWallet.lastUpdated ), 0, encrShares, resultWallet.mnemonic );
-        // console.log( { updateShareIdStatus } );
-        // if ( updateShareIdStatus ) {
-        var data = await utils.getSSSDetails();
-        const dateTime = Date.now();
-        //const fulldate = Math.floor( dateTime / 1000 );
-        let temp = [];
-        for ( let i = 0; i <= 1; i++ ) {
-            let jsondata = JSON.parse( data[ i ].keeperInfo );
-            jsondata.history = JSON.parse( data[ i ].history );
-            jsondata.encryptedMetaShare = JSON.parse( data[ i ].encryptedMetaShare );
-            let sharedDate = parseInt( data[ i ].sharedDate );
-            // console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
-            var startDate = new Date( dateTime * 1000 );
-            var endDate = new Date( sharedDate * 1000 );
-            //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
-            var diff = Math.abs( startDate.getTime() - endDate.getTime() );
-            //console.warn( 'diff' + diff.toString() );  
-            const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
-            const seconds: any = Math.floor( diff / 1000 % 60 );
-            //console.log( { minutes, seconds } );
-            //console.warn( minutes.toString() )
-            const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
-            //console.log( { totalSec } );  
-            jsondata.totalSec = 540 - totalSec;
-            if ( totalSec < 540 && data[ i ].shareStage == "Ugly" ) {
-                jsondata.statusMsg = "Shared";
-                jsondata.statusMsgColor = "#C07710";
-                jsondata.flag_timer = true;
-                jsondata.opt = tempOpt[ i ];
-            } else if ( totalSec >= 540 && data[ i ].shareStage == "Ugly" ) {
-                jsondata.statusMsg = "Shared OTP expired.";
-                jsondata.statusMsgColor = "#C07710";
-                jsondata.flag_timer = false;
-            } else if ( data[ i ].shareStage == "Good" ) {
-                jsondata.statusMsg = "Share accessible";
-                jsondata.statusMsgColor = "#008000";
-                jsondata.flag_timer = false;
-            } else if ( data[ i ].shareStage == "Bad" ) {
-                jsondata.statusMsg = "Share accessible";
-                jsondata.statusMsgColor = "#C07710";
-                jsondata.flag_timer = false;
-            } else if ( data[ i ].shareStage == "Ugly" && data[ i ].sharedDate != "" ) {
-                jsondata.statusMsg = "Share not accessible";
-                jsondata.statusMsgColor = "#ff0000";
-                jsondata.flag_timer = false;
+            var otp;
+            if ( eachHistory[ eachHistoryLength - 1 ] != undefined ) {
+                otp = eachHistory[ eachHistoryLength - 1 ].otp;
+            } else {
+                otp = undefined;
             }
-            else {
-                jsondata.statusMsg = "Not shared";
-                jsondata.statusMsgColor = "#ff0000";
-                jsondata.flag_timer = false;
-            }
-            temp.push( jsondata )
+            tempOpt.push( otp );
         }
-
-        console.log( { data, temp } );
-
-        this.setState( {
-            data: temp
-        } );
-        // setInterval( () => {
-        //     this.connection_Load()
-        // }, 10000 );
-        // } else {
-        //     Alert.alert( "ShareId status not changed." )
-        // }
+        //console.log( { tempOpt, encrShares } );
+        let updateShareIdStatus = await comAppHealth.connection_AppHealthAndSSSUpdate( parseInt( resultWallet.lastUpdated ), encrShares );
+        console.log( { updateShareIdStatus } );
+        if ( updateShareIdStatus ) {
+            var data = await utils.getSSSDetails();
+            const dateTime = Date.now();
+            let temp = [];
+            for ( let i = 0; i <= 1; i++ ) {
+                console.log( { data: data[ i ] } );
+                let jsondata = JSON.parse( data[ i ].keeperInfo );
+                jsondata.history = JSON.parse( data[ i ].history );
+                jsondata.encryptedMetaShare = JSON.parse( data[ i ].encryptedMetaShare );
+                let sharedDate = parseInt( data[ i ].sharedDate );
+                var startDate = new Date( dateTime );
+                var endDate = new Date( sharedDate );
+                var diff = Math.abs( startDate.getTime() - endDate.getTime() );
+                const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
+                const seconds: any = Math.floor( diff / 1000 % 60 );
+                const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
+                jsondata.totalSec = 540 - totalSec;
+                console.log( { jsondata } );
+                if ( totalSec < 540 && data[ i ].shareStage == "Ugly" ) {
+                    jsondata.statusMsg = "Shared";
+                    jsondata.statusMsgColor = "#C07710";
+                    jsondata.flag_timer = true;
+                    jsondata.opt = tempOpt[ i ];
+                } else if ( totalSec >= 540 && data[ i ].shareStage == "Ugly" ) {
+                    jsondata.statusMsg = "Shared OTP expired.";
+                    jsondata.statusMsgColor = "#C07710";
+                    jsondata.flag_timer = false;
+                } else if ( data[ i ].shareStage == "Good" ) {
+                    jsondata.statusMsg = "Share accessible";
+                    jsondata.statusMsgColor = "#008000";
+                    jsondata.flag_timer = false;
+                } else if ( data[ i ].shareStage == "Bad" ) {
+                    jsondata.statusMsg = "Share accessible";
+                    jsondata.statusMsgColor = "#C07710";
+                    jsondata.flag_timer = false;
+                } else if ( data[ i ].shareStage == "Ugly" && data[ i ].sharedDate != "" ) {
+                    jsondata.statusMsg = "Share not accessible";
+                    jsondata.statusMsgColor = "#ff0000";
+                    jsondata.flag_timer = false;
+                }
+                else {
+                    jsondata.statusMsg = "Not shared";
+                    jsondata.statusMsgColor = "#ff0000";
+                    jsondata.flag_timer = false;
+                }
+                temp.push( jsondata )
+            }
+            this.setState( {
+                data: temp
+            } );
+        } else {
+            alert.simpleOk( "Oops", "App Health not update in database." );
+        }
     }
 
     //TODO: func click_Item
@@ -203,7 +206,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                                                     <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
                                                 ) }
                                                 <View style={ { flexDirection: "column", justifyContent: "center" } }>
-                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                    <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                     <View style={ { flexDirection: "row" } }>
                                                         <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
                                                         { renderIf( typeof item.opt !== "undefined" )(
@@ -235,7 +238,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                                                     alignItems: 'flex-end',
                                                     justifyContent: 'center'
                                                 } }>
-                                                    <SvgIcon name="icon_share" size={ 25 } color={ primaryColor } />
+                                                    <IconFontAwe name="angle-right" style={ { fontSize: 25, marginRight: 10, flex: 0.1 } } />
                                                 </View>
                                             </View>
                                         </View>
