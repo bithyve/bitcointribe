@@ -32,6 +32,10 @@ import { SvgIcon } from "@up-shared/components";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
+
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -81,13 +85,14 @@ export default class OTPBackupShareStore extends Component {
 
 
     async componentWillMount() {
-        let script = utils.getDeepLinkingUrl();
-        let messageId = script.mi;
-        console.log( { messageId } );
-        const resDownloadShare = await S3Service.downloadShare( messageId );
-        this.setState( {
-            arr_ResDownShare: resDownloadShare
-        } )
+        // let script = utils.getDeepLinkingUrl();
+        // let key = script.key;
+        // console.log( { key } );
+        // const resDownloadShare = await S3Service.downloadShare( key );
+        // console.log( { resDownloadShare } );
+        // this.setState( {
+        //     arr_ResDownShare: resDownloadShare
+        // } )
 
     }
 
@@ -101,68 +106,133 @@ export default class OTPBackupShareStore extends Component {
         }
     }
 
+    goBack = () => {
+        utils.setDeepLinkingType( "" );
+        utils.setDeepLinkingUrl( "" );
+        this.props.navigation.navigate( "TabbarBottom" );
+    }
+
     onSuccess = async () => {
         const dateTime = Date.now();
+        console.log( { dateTime } );
+
         this.setState( {
             flag_Loading: true
         } )
+        let flag_Loading = true;
         let enterOtp = this.state.otp;
         let script = utils.getDeepLinkingUrl();
-        let messageId = script.mi;
+        let messageId = script.key;
         console.log( { messageId, enterOtp } );
-        let resDownShare = this.state.arr_ResDownShare;
+        //let resDownShare = this.state.arr_ResDownShare;
         //console.log( { resDownShare } );
         let urlScript = {};
         urlScript.walletName = script.wn;
-        const resDecryptOTPEncShare = await S3Service.decryptOTPEncShare( resDownShare, messageId, enterOtp );
-        let walletDetails = utils.getWalletDetails();
-        const sss = new S3Service(
-            walletDetails.mnemonic
-        );
-        console.log( { resDecryptOTPEncShare } );
-        let resShareId = await sss.getShareId( resDecryptOTPEncShare.decryptedShare.encryptedShare )
-        console.log( { resShareId } );
-        const { data, updated } = await sss.updateHealth( resDecryptOTPEncShare.decryptedShare.meta.walletId, resDecryptOTPEncShare.decryptedShare.encryptedShare );
-        console.log( { resDecryptOTPEncShare } );
-        if ( resDecryptOTPEncShare.status == 200 ) {
-            const resUpdateSSSRetoreDecryptedShare = await dbOpration.insertTrustedPartyDetailWithoutAssociate(
-                localDB.tableName.tblTrustedPartySSSDetails,
-                dateTime,
-                urlScript,
-                resDecryptOTPEncShare.decryptedShare,
-                resShareId,
-                resDecryptOTPEncShare,
-                typeof data !== "undefined" ? data : ""
-            );
-            if ( resUpdateSSSRetoreDecryptedShare == true ) {
-                this.setState( {
-                    flag_Loading: false
-                } );
-                setTimeout( () => {
-                    Alert.alert(
-                        'Success',
-                        'Decrypted share created.',
-                        [
-                            {
-                                text: 'OK', onPress: () => {
-                                    utils.setDeepLinkingType( "" );
-                                    utils.setDeepLinkingUrl( "" );
-                                    this.props.navigation.navigate( 'TabbarBottom' );
-                                }
-                            },
+        urlScript.data = script.key;
+        const sss = await utils.getS3ServiceObject();
+        let resDecryptViaOTP = await S3Service.decryptViaOTP( script.key, enterOtp );
+        console.log( { resDecryptViaOTP } );
+        if ( resDecryptViaOTP.status == 200 ) {
+            const resDownloadShare = await S3Service.downloadShare( resDecryptViaOTP.data.decryptedData );
+            console.log( { resDownloadShare } );
+            if ( resDownloadShare.status == 200 ) {
+                let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownloadShare.data.encryptedMetaShare, resDecryptViaOTP.data.decryptedData );
+                console.log( { resDecryptEncMetaShare } );
+                if ( resDecryptEncMetaShare.status == 200 ) {
+                    const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
+                    console.log( { resUpdateHealth } );
+                    if ( resUpdateHealth.status == 200 ) {
+                        const resTrustedParty = await dbOpration.insertTrustedPartyDetailWithoutAssociate(
+                            localDB.tableName.tblTrustedPartySSSDetails,
+                            dateTime,
+                            urlScript,
+                            resDecryptEncMetaShare.data,
+                            resDecryptEncMetaShare.data.decryptedMetaShare.meta,
+                            resDecryptEncMetaShare.data.decryptedMetaShare.encryptedStaticNonPMDD
+                        );
+                        if ( resTrustedParty ) {
+                            flag_Loading = false;
+                            setTimeout( () => {
+                                alert.simpleOkAction( "Success", "Decrypted share stored.", this.goBack );
+                            }, 100 );
+                        }
+                    } else {
+                        flag_Loading = false;
+                        setTimeout( () => {
+                            alert.simpleOk( "Oops", resUpdateHealth.err );
+                        }, 100 );
+                    }
+                } else {
+                    flag_Loading = false;
+                    setTimeout( () => {
+                        alert.simpleOk( "Oops", resDecryptEncMetaShare.err );
+                    }, 100 );
+                }
 
-                        ],
-                        { cancelable: false }
-                    )
-                }, 100 );
             } else {
-                this.setState( {
-                    flag_Loading: false
-                } )
-                Alert.alert( resUpdateSSSRetoreDecryptedShare );
+                flag_Loading = false;
+                setTimeout( () => {
+                    alert.simpleOk( "Oops", resDownloadShare.err );
+                }, 100 );
             }
-
+        } else {
+            flag_Loading = false;
+            setTimeout( () => {
+                alert.simpleOk( "Oops", resDecryptViaOTP.err );
+            }, 100 );
         }
+        // const resDecryptOTPEncShare = await S3Service.decryptOTPEncShare( resDownShare, messageId, enterOtp );
+        // let walletDetails = utils.getWalletDetails();
+        // const sss = new S3Service(
+        //     walletDetails.mnemonic
+        // );
+        // console.log( { resDecryptOTPEncShare } );
+        // let resShareId = await sss.getShareId( resDecryptOTPEncShare.decryptedShare.encryptedShare )
+        // console.log( { resShareId } );
+        // const { data, updated } = await sss.updateHealth( resDecryptOTPEncShare.decryptedShare.meta.walletId, resDecryptOTPEncShare.decryptedShare.encryptedShare );
+        // console.log( { resDecryptOTPEncShare } );
+        // if ( resDecryptOTPEncShare.status == 200 ) {
+        //     const resUpdateSSSRetoreDecryptedShare = await dbOpration.insertTrustedPartyDetailWithoutAssociate(
+        //         localDB.tableName.tblTrustedPartySSSDetails,
+        //         dateTime,
+        //         urlScript,
+        //         resDecryptOTPEncShare.decryptedShare,
+        //         resShareId,
+        //         resDecryptOTPEncShare,
+        //         typeof data !== "undefined" ? data : ""
+        //     );
+        //     if ( resUpdateSSSRetoreDecryptedShare == true ) {
+        //         this.setState( {
+        //             flag_Loading: false
+        //         } );
+        //         setTimeout( () => {
+        //             Alert.alert(
+        //                 'Success',
+        //                 'Decrypted share created.',
+        //                 [
+        //                     {
+        //                         text: 'OK', onPress: () => {
+        //                             utils.setDeepLinkingType( "" );
+        //                             utils.setDeepLinkingUrl( "" );
+        //                             this.props.navigation.navigate( 'TabbarBottom' );
+        //                         }
+        //                     },
+
+        //                 ],
+        //                 { cancelable: false }
+        //             )
+        //         }, 100 );
+        //     } else {
+        //         this.setState( {
+        //             flag_Loading: false
+        //         } )
+        //         Alert.alert( resUpdateSSSRetoreDecryptedShare );
+        //     }
+
+        // }
+        this.setState( {
+            flag_Loading
+        } )
 
     }
 

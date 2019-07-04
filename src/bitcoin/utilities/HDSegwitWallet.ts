@@ -505,7 +505,7 @@ export default class HDSegwitWallet extends Bitcoin {
       const outputUTXOs = [{ address: recipientAddress, value: amount }];
       console.log("Output UTXOs:", outputUTXOs);
       const txnFee = await this.feeRatesPerByte(txnPriority);
-
+      console.log({ txnFee });
       const { inputs, outputs, fee } = coinselect(
         inputUTXOs,
         outputUTXOs,

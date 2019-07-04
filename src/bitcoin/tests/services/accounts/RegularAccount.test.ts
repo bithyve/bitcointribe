@@ -90,27 +90,11 @@ describe("Regular Account", async () => {
     expect(transactionDetails).toBeTruthy();
   });
 
-  test("transacts from one btc address to another (single-stage transfer)", async () => {
-    const transfer = {
-      recipientAddress: "2NEcDodh4CyfyB7ZF87zGCxkR4CdpF6oNHm",
-      amount: Math.round(3500 / 1e8),
-    };
-
-    const res = await importedRegularAccount.transfer(
-      transfer.recipientAddress,
-      transfer.amount,
-    );
-    console.log({ res });
-    console.log({ txid: res.data.txid });
-    expect(res.status).toBe(config.STATUS.SUCCESS);
-    expect(res.data.txid).toBeTruthy();
-  });
-
   test("transacts from one btc address to another (multi-stage transfer)", async () => {
     const transfer = {
       recipientAddress: "2NEcDodh4CyfyB7ZF87zGCxkR4CdpF6oNHm",
       amount: 3500 / 1e8,
-      priority: "High",
+      priority: "medium",
     };
     const res = await importedRegularAccount.transferST1(
       transfer.recipientAddress,

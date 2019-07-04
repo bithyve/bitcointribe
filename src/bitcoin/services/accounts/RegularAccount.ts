@@ -421,6 +421,7 @@ export default class RegularAccount {
       console.log("---- Transaction Signed ----");
 
       const txHex = signedTxb.build().toHex();
+      console.log({ txHex });
       const { txid } = await this.hdWallet.broadcastTransaction(txHex);
       console.log("---- Transaction Broadcasted ----");
 

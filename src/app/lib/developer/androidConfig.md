@@ -46,8 +46,8 @@ aaptOptions.cruncherEnabled=false // here
 minifyEnabled enableProguardInReleaseBuilds
 proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
 signingConfig signingConfigs.release
-}
-}
+}    
+}  
 }
 ...
 

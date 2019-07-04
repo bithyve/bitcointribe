@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, AsyncStorage } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, AsyncStorage, Clipboard } from "react-native";
 import {
     Container,
     Header,
@@ -18,12 +18,14 @@ import {
     Thumbnail
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
-import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
+import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Contacts from 'react-native-contacts';
 import { Avatar } from 'react-native-elements';
 import SendSMS from 'react-native-sms';
 import Permissions from 'react-native-permissions'
+import Modal from 'react-native-modalbox';
+import Toast from 'react-native-simple-toast';
 
 
 //import Mailer from 'react-native-mail';
@@ -51,6 +53,8 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
@@ -64,7 +68,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             arr_ConstactDetailsList: [],
             arr_History: [],
             arr_resSSSDetails: [],
-            messageId: "",
+            key: "",
             otpCode: "",
             flag_OtpCodeShowStatus: false,
             flag_Loading: false,
@@ -112,74 +116,70 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         }
     }
 
+
     load_data = async () => {
         this.setState( {
             flag_Loading: true,
             msg_Loading: "Message id genreating"
         } )
+        let flag_Loading = true;
         let data = this.props.navigation.getParam( "data" );
         let encryptedMetaShare = data.encryptedMetaShare;
-        //console.log( { resSSSDetails } );
-        let walletDetails = utils.getWalletDetails();
-        //console.log( { walletDetails } );   
         const sss = await utils.getS3ServiceObject();
         const resEncryptViaOTP = sss.encryptViaOTP( encryptedMetaShare.key );
         console.log( { resEncryptViaOTP } );
-        if ( resEncryptViaOTP.status == 200 ) {
+        if ( resEncryptViaOTP.status == 200 || 400 ) {
             const resUploadShare = await sss.uploadShare( encryptedMetaShare.encryptedMetaShare, encryptedMetaShare.messageId );
             console.log( { resUploadShare } );
-            if ( resUploadShare.status == 200 || 400 ) {
+            if ( resUploadShare.status == 200 ) {
                 this.setState( {
                     messageId: encryptedMetaShare.messageId,
+                    key: resEncryptViaOTP.data.otpEncryptedData,
                     otpCode: resEncryptViaOTP.data.otp,
                     flag_Loading: false,
-                    arr_TrustedContactEmailAndPhoneShare: [ {
-                        modalVisible: true,
-                        contactDetails: data,
-                        arr_ConstactDetailsList: this.state.arr_ConstactDetailsList
-                    } ]
                 } );
+                flag_Loading = false;
+                this.refs.modal4.open();
             } else {
-                alert.simpleOk( "Oops", resUploadShare.err );
+                flag_Loading = false;
+                setTimeout( () => {
+                    alert.simpleOk( "Oops", resUploadShare.err );
+                }, 100 );
             }
         } else {
-            alert.simpleOk( "Oops", resEncryptViaOTP.err );
+            flag_Loading = false;
+            setTimeout( () => {
+                alert.simpleOk( "Oops", resEncryptViaOTP.err );
+            }, 100 );
         }
-    }
-
-    componentWillUnmount() {
-        AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
+        this.setState( {
+            flag_Loading
+        } )
     }
 
 
     //TODO: click on model confirm button 
-    click_SentURLSmsOrEmail( item: any ) {
-        AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
+    click_SentURLSmsOrEmail( type: string, value: any ) {
+        // AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
         var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
         let walletDetails = utils.getWalletDetails();
         let script = {};
         script.wn = walletDetails.walletType;
-        script.mi = this.state.messageId;
+        script.key = this.state.key;
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );
         console.log( { encpScript } );
-        if ( reg.test( item.value ) == false ) {
+        if ( type == "SMS" ) {
             SendSMS.send( {
                 body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
-                recipients: [ item.value ],
+                recipients: [ value ],
                 successTypes: [ 'sent', 'queued' ]
             }, ( completed, cancelled, error ) => {
                 if ( completed ) {
                     console.log( 'SMS Sent Completed' );
-                    this.setState( {
-                        arr_TrustedContactEmailAndPhoneShare: [ {
-                            modalVisible: false,
-                            contactDetails: ""
-                        } ]
-                    } )
                     setTimeout( () => {
                         this.connection_UpdateSSSDetails( "SMS" );
-                        Alert.alert( 'SMS Sent Completed' );
+                        alert.simpleOk( "Success", "SMS Sent Successfully." );
                         this.setState( {
                             flag_OtpCodeShowStatus: true
                         } )
@@ -196,7 +196,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             if ( Platform.OS == "android" ) {
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Recovery',
-                    recipients: [ item.value ],
+                    recipients: [ value ],
                     body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
                     isHTML: true,
                 }, ( error, event ) => {
@@ -204,32 +204,20 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         console.log( { event } );
                     }
                 } );
-                this.setState( {
-                    arr_TrustedContactEmailAndPhoneShare: [ {
-                        modalVisible: false,
-                        contactDetails: ""
-                    } ]
-                } )
                 setTimeout( () => {
-                    Alert.alert( 'Email Sent Completed' );
+                    alert.simpleOk( "Success", "Email Sent Successfully." );
                     this.setState( {
                         flag_OtpCodeShowStatus: true
-                    } )
+                    } );
                 }, 1000 );
             } else {
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Backup',
-                    recipients: [ item.value ],
+                    recipients: [ value ],
                     body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
                     isHTML: true,
                 }, ( error, event ) => {
                     if ( event == "sent" ) {
-                        this.setState( {
-                            arr_TrustedContactEmailAndPhoneShare: [ {
-                                modalVisible: false,
-                                contactDetails: ""
-                            } ]
-                        } )
                         setTimeout( () => {
                             Alert.alert( 'Email Sent Completed' );
                             this.setState( {
@@ -265,18 +253,18 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         jsondata.date = utils.getUnixToDateFormat( dateTime );
         temp.push( jsondata );
         let data = this.props.navigation.getParam( "data" );
-        let resupdateSSSTransferMehtodDetails = await dbOpration.updateSSSTransferMehtodDetails(
+        await dbOpration.updateSSSTransferMehtodDetails(
             localDB.tableName.tblSSSDetails,
             type,
             dateTime,
             temp,
             data.recordID
         )
+        await comFunDBRead.readTblSSSDetails();
         this.setState( {
             arr_History: temp,
             data: state_data
         } )
-        console.log( { resupdateSSSTransferMehtodDetails } );
     }
 
     goBack() {
@@ -285,8 +273,21 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         // navigation.state.params.onSelect( { selected: true } );
     }
 
+
+    //TODO: share option click
+    click_SentRequest( type: string, item: any ) {
+        if ( type == "SMS" ) {
+            this.click_SentURLSmsOrEmail( "SMS", item[ 0 ].number );
+        } else if ( type == "EMAIL" ) {
+            this.click_SentURLSmsOrEmail( "EMAIL", item[ 0 ].email );
+        } else {
+            this.props.navigation.push( "ShareSecretViaQRScreen", { data: item, onSelect: this.onSelect } );
+        }
+        this.refs.modal4.close();
+    }
+
     render() {
-        //array
+        //array   
         let { data } = this.state;
         return (
             <Container>
@@ -305,7 +306,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         <View style={ { flex: 0.1, margin: 20 } }>
                             <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
                         </View>
-                        <View style={ Platform.OS == "ios" ? { flex: 0.4 } : { flex: 0.5 } }>
+                        <View style={ Platform.OS == "ios" ? { flex: 0.7 } : { flex: 0.8 } }>
                             <View style={ { flex: 1, flexDirection: 'row' } }>
                                 <View style={ { flex: 5, alignItems: "flex-end" } }>
                                     { renderIf( data.thumbnailPath != "" )(
@@ -326,7 +327,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, color: data.statusMsgColor } ] }>{ data.statusMsg }</Text>
                             </View>
                         </View>
-                        <View style={ { flex: 1 } }>
+                        <View style={ { flex: 2 } }>
                             <FlatList
                                 data={
                                     this.state.arr_History
@@ -357,8 +358,23 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                 <View style={ { flex: 0.8, backgroundColor: "#ffffff", borderRadius: 5, flexDirection: "row", alignItems: "center", justifyContent: "center", margin: 10 } }>
                                     <Text note style={ [ globalStyle.ffFiraSansMedium, { flex: 2, marginLeft: 10 } ] }>OTP</Text>
                                     <Text style={ [ globalStyle.ffOpenSansBold, { flex: 8, letterSpacing: 30, alignSelf: "center", textAlign: "center" } ] }>{ this.state.otpCode }</Text>
+                                    <View style={ { flex: 1, alignItems: "center" } }>
+                                        <TouchableOpacity onPress={ () => {
+                                            Clipboard.setString( this.state.otpCode );
+                                            Toast.show( 'OTP copied.' );
+                                        } }
+                                        >
+                                            <IconFontAwe
+                                                name="copy"
+                                                size={ 20 }
+                                                color="#2F2F2F"
+
+                                            />
+                                        </TouchableOpacity>
+                                    </View>
+
                                 </View>
-                                <FullLinearGradientButton
+                                {/* <FullLinearGradientButton
                                     click_Done={ () => {
                                         let shareOptions = {
                                             title: "OTP",
@@ -373,13 +389,13 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                     } }
                                     title="Share OTP with Trusted Contact"
                                     disabled={ false }
-                                    style={ [ { borderRadius: 10 } ] } />
+                                    style={ [ { borderRadius: 10 } ] } /> */}
                             </View>
                         ) }
                         { renderIf( this.state.flag_OtpCodeShowStatus != true )(
                             <View style={ Platform.OS == "ios" ? { flex: 0.6 } : { flex: 0.8 } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select how you want to share secret with the selected trusted contact</Text>
-                                <Button
+                                {/* <Button
                                     onPress={ () => {
                                         this.props.navigation.push( "ShareSecretViaQRScreen", { data: data, onSelect: this.onSelect } );
                                     } }
@@ -390,13 +406,12 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                     full
                                 >
                                     <Text>Share secret via QR code</Text>
-                                </Button>
+                                </Button> */}
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.load_data();
-
                                     } }
-                                    title="Share secret email/phone"
+                                    title="Share Secret"
                                     disabled={ false }
                                     style={ [ { borderRadius: 10 } ] } />
                             </View>
@@ -405,7 +420,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                             data={ this.state.arr_TrustedContactEmailAndPhoneShare }
                             click_Confirm={ ( val: any ) => {
                                 AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
-                                var messageId = this.state.messageId;
+                                var messageId = this.state.key;
                                 if ( messageId != "" ) {
                                     this.click_SentURLSmsOrEmail( val )
                                 } else {
@@ -413,7 +428,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                         flag_Loading: true
                                     } )
                                     setTimeout( () => {
-                                        messageId = this.state.messageId;
+                                        messageId = this.state.key;
                                         if ( messageId != "" ) {
                                             this.setState( {
                                                 flag_Loading: false
@@ -436,6 +451,56 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                 } )
                             } }
                         />
+                        <Modal style={ [ styles.modal, styles.modal4 ] } position={ "bottom" } ref={ "modal4" }>
+                            <View>
+                                <View style={ { flexDirection: 'column', alignItems: "center", marginTop: 10, marginBottom: 15, borderBottomColor: "#EFEFEF", borderBottomWidth: 1 } }>
+                                    { renderIf( data.thumbnailPath != "" )(
+                                        <Avatar medium rounded source={ { uri: data.thumbnailPath } } />
+                                    ) }
+                                    { renderIf( data.thumbnailPath == "" )(
+                                        <Avatar medium rounded title={ data.givenName != null && data.givenName.charAt( 0 ) } />
+                                    ) }
+                                    <Text style={ { marginBottom: 10 } }>{ data.givenName + " " + data.familyName }</Text>
+                                </View>
+
+                                <View style={ { alignItems: "center", } }>
+                                    <View style={ { flexDirection: "row", marginBottom: 10 } }>
+                                        <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_SentRequest( "SMS", data.phoneNumbers ) }>
+                                            <View style={ { alignItems: "center", marginLeft: "20%", flexDirection: "column" } }>
+                                                <SvgIcon
+                                                    name="chat"
+                                                    color="#37A0DA"
+                                                    size={ 35 }
+                                                />
+                                                <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via SMS</Text>
+                                            </View>
+                                        </Button>
+                                        <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_SentRequest( "EMAIL", data.emailAddresses ) }>
+                                            <View style={ { alignItems: "center", marginLeft: "20%", flexDirection: "column" } }>
+                                                <SvgIcon
+                                                    name="mail-2"
+                                                    color="#37A0DA"
+                                                    size={ 30 }
+                                                />
+                                                <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via Email</Text>
+                                            </View>
+                                        </Button>
+                                        <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_SentRequest( "QR", data ) }>
+                                            <View style={ { alignItems: "center", marginLeft: "20%", flexDirection: "column" } }>
+                                                <SvgIcon
+                                                    name="qr-code-3"
+                                                    color="#37A0DA"
+                                                    size={ 30 }
+
+                                                />
+                                                <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1", textAlign: "center" } }>Via QR</Text>
+                                            </View>
+                                        </Button>
+                                    </View>
+                                </View>
+
+                            </View>
+                        </Modal>
                     </ImageBackground>
                 </SafeAreaView>
                 <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
@@ -452,5 +517,13 @@ const styles = StyleSheet.create( {
     container: {
         flex: 1,
         backgroundColor: "#F8F8F8",
+    },
+    //botom model
+    modal: {
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10
+    },
+    modal4: {
+        height: 180
     }
 } );
