@@ -610,12 +610,12 @@ export default class Bitcoin {
       let data;
       if (this.network === bitcoinJS.networks.testnet) {
         const res: AxiosResponse = await axios.get(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.INSECURE.TXNDETAILS + `/${txID}`,
+          config.ESPLORA_API_ENDPOINTS.TESTNET.TXNDETAILS + `/${txID}`,
         );
         data = res.data;
       } else {
         const res: AxiosResponse = await axios.get(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.INSECURE.TXNDETAILS + `/${txID}`,
+          config.ESPLORA_API_ENDPOINTS.MAINNET.TXNDETAILS + `/${txID}`,
         );
         data = res.data;
       }
@@ -822,10 +822,25 @@ export default class Bitcoin {
     txid: string;
   }> => {
     try {
-      const txid = await this.client.sendRawTransaction(txHex);
-      return {
-        txid,
-      };
+      let res: AxiosResponse;
+      if (this.network === bitcoinJS.networks.testnet) {
+        res = await axios.post(
+          config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
+          txHex,
+          {
+            headers: { "Content-Type": "text/plain" },
+          },
+        );
+      } else {
+        res = await axios.post(
+          config.ESPLORA_API_ENDPOINTS.MAINNET.BROADCAST_TX,
+          txHex,
+          {
+            headers: { "Content-Type": "text/plain" },
+          },
+        );
+      }
+      return { txid: res.data };
     } catch (err) {
       console.log(
         `An error occured while broadcasting through BitHyve Node. Using the fallback mechanism. ${err}`,

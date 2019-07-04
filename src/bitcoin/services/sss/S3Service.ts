@@ -3,8 +3,8 @@ import { IMetaShare, ISocialStaticNonPMDD } from "../../utilities/Interface";
 import SSS from "../../utilities/sss/SSS";
 
 export default class S3Service {
-  public static fromJSON = ( json: string ) => {
-    const { sss } = JSON.parse( json );
+  public static fromJSON = (json: string) => {
+    const { sss } = JSON.parse(json);
     const {
       mnemonic,
       encryptedShares,
@@ -13,7 +13,7 @@ export default class S3Service {
       encryptedShares: string[];
     } = sss;
 
-    return new S3Service( mnemonic, encryptedShares );
+    return new S3Service(mnemonic, encryptedShares);
   }
 
   public static recoverFromShares = (
@@ -21,22 +21,22 @@ export default class S3Service {
     answer: string,
   ):
     | {
-      status: number;
-      data: {
-        mnemonic: string;
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          mnemonic: string;
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    } => {
+        status: number;
+        err: string;
+        data?: undefined;
+      } => {
     try {
-      const { decryptedShares } = SSS.decryptShares( encryptedShares, answer );
-      const { mnemonic } = SSS.recoverFromShares( decryptedShares );
+      const { decryptedShares } = SSS.decryptShares(encryptedShares, answer);
+      const { mnemonic } = SSS.recoverFromShares(decryptedShares);
       return { status: config.STATUS.SUCCESS, data: { mnemonic } };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -45,47 +45,46 @@ export default class S3Service {
     key: string,
   ): Promise<
     | {
-      status: number;
-      data: {
-        encryptedMetaShare: string;
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          encryptedMetaShare: string;
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    }
+        status: number;
+        err: string;
+        data?: undefined;
+      }
   > => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await SSS.downloadShare( key ),
+        data: await SSS.downloadShare(key),
       };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
 
   public static decryptEncMetaShare = async (
     encryptedMetaShare: string,
-    messageId: string,
     key: string,
     walletId?: string,
     existingShares?: IMetaShare[],
   ): Promise<
     | {
-      status: number;
-      data: {
-        decryptedMetaShare: IMetaShare;
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          decryptedMetaShare: IMetaShare;
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    }
+        status: number;
+        err: string;
+        data?: undefined;
+      }
   > => {
     try {
       const { decryptedMetaShare } = SSS.decryptMetaShare(
@@ -94,11 +93,12 @@ export default class S3Service {
       );
 
       if (
-        SSS.validateDecryption( decryptedMetaShare, walletId, existingShares )
+        SSS.validateDecryption(decryptedMetaShare, walletId, existingShares)
       ) {
-        const { deleted } = await SSS.affirmDecryption( messageId );
-        if ( !deleted ) {
-          throw new Error( "Unable to remove the share from the server" );
+        const messageId = SSS.getMessageId(key, config.MSG_ID_LENGTH);
+        const { deleted } = await SSS.affirmDecryption(messageId);
+        if (!deleted) {
+          throw new Error("Unable to remove the share from the server");
         } else {
           return {
             status: config.STATUS.SUCCESS,
@@ -106,7 +106,7 @@ export default class S3Service {
           };
         }
       }
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -116,52 +116,52 @@ export default class S3Service {
     otp: string,
   ):
     | {
-      status: number;
-      data: {
-        decryptedData: any;
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          decryptedData: any;
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    } => {
+        status: number;
+        err: string;
+        data?: undefined;
+      } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: SSS.decryptViaOTP( otpEncryptedData, otp ),
+        data: SSS.decryptViaOTP(otpEncryptedData, otp),
       };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
 
   private sss: SSS;
-  constructor ( mnemonic: string, encryptedShares?: string[] ) {
-    this.sss = new SSS( mnemonic, encryptedShares );
+  constructor(mnemonic: string, encryptedShares?: string[]) {
+    this.sss = new SSS(mnemonic, encryptedShares);
   }
 
   public generateShares = (
     answer: string,
   ):
     | {
-      status: number;
-      data: {
-        encryptedShares: string[];
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          encryptedShares: string[];
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    } => {
+        status: number;
+        err: string;
+        data?: undefined;
+      } => {
     try {
       const { shares } = this.sss.generateShares();
-      const { encryptedShares } = this.sss.encryptShares( shares, answer );
+      const { encryptedShares } = this.sss.encryptShares(shares, answer);
       return { status: config.STATUS.SUCCESS, data: { encryptedShares } };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -170,17 +170,17 @@ export default class S3Service {
     staticNonPMDD: any,
   ):
     | {
-      status: number;
-      data: {
-        encryptedStaticNonPMDD: string;
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          encryptedStaticNonPMDD: string;
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    } => {
+        status: number;
+        err: string;
+        data?: undefined;
+      } => {
     try {
       const { encryptedStaticNonPMDD } = this.sss.encryptStaticNonPMDD(
         staticNonPMDD,
@@ -189,27 +189,27 @@ export default class S3Service {
         status: config.STATUS.SUCCESS,
         data: { encryptedStaticNonPMDD },
       };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
 
   public getWalletId = ():
     | {
-      status: number;
-      data: {
-        walletId: string;
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          walletId: string;
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    } => {
+        status: number;
+        err: string;
+        data?: undefined;
+      } => {
     try {
       return { status: config.STATUS.SUCCESS, data: this.sss.getWalletId() };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -218,23 +218,23 @@ export default class S3Service {
     encryptedShare: string,
   ):
     | {
-      status: number;
-      data: {
-        shareId: string;
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          shareId: string;
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    } => {
+        status: number;
+        err: string;
+        data?: undefined;
+      } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.sss.getShareId( encryptedShare ),
+        data: this.sss.getShareId(encryptedShare),
       };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -243,53 +243,53 @@ export default class S3Service {
     encryptedShares: string[],
   ): Promise<
     | {
-      status: number;
-      data: {
-        success: boolean;
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          success: boolean;
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    }
+        status: number;
+        err: string;
+        data?: undefined;
+      }
   > => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.initializeHealthcheck( encryptedShares ),
+        data: await this.sss.initializeHealthcheck(encryptedShares),
       };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
 
   public checkHealth = async (
-    encryptedShares: string[],
+    shareIDs: string[],
   ): Promise<
     | {
-      status: number;
-      data: {
-        lastUpdateds: Array<{
-          shareId: string;
-          updatedAt: number;
-        }>;
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          lastUpdateds: Array<{
+            shareId: string;
+            updatedAt: number;
+          }>;
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    }
+        status: number;
+        err: string;
+        data?: undefined;
+      }
   > => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.checkHealth( encryptedShares ),
+        data: await this.sss.checkHealth(shareIDs),
       };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -299,84 +299,86 @@ export default class S3Service {
     encryptedShare: string,
   ): Promise<
     | {
-      status: number;
-      data:
-      | {
-        updated: boolean;
-        nonPMDD: string;
+        status: number;
+        data:
+          | {
+              updated: boolean;
+              nonPMDD: string;
+            }
+          | {
+              updated: boolean;
+              nonPMDD?: string;
+            };
+        err?: undefined;
       }
-      | {
-        updated: boolean;
-        nonPMDD?: string;
-      };
-      err?: undefined;
-    }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    }
+        status: number;
+        err: string;
+        data?: undefined;
+      }
   > => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.updateHealth( walletId, encryptedShare ),
+        data: await this.sss.updateHealth(walletId, encryptedShare),
       };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
 
-  public updateNonPMDD = async (
-    nonPMDD: IMetaShare[],
+  public updateDynamicNonPMDD = async (
+    dynamicNonPMDD: IMetaShare[],
   ): Promise<
     | {
-      status: number;
-      data: {
-        updated: boolean;
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          updated: boolean;
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    }
+        status: number;
+        err: string;
+        data?: undefined;
+      }
   > => {
     try {
-      const { encryptedNonPMDD } = await this.sss.encryptNonPMDD( nonPMDD );
+      const { encryptedDynamicNonPMDD } = await this.sss.encryptDynamicNonPMDD(
+        dynamicNonPMDD,
+      );
 
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.updateNonPMDD( encryptedNonPMDD ),
+        data: await this.sss.updateDynamicNonPMDD(encryptedDynamicNonPMDD),
       };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
 
-  public downloadNonPMDD = async (
+  public downloadDynamicNonPMDD = async (
     walletId: string,
   ): Promise<
     | {
-      status: number;
-      data: {
-        nonPMDD: string;
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          nonPMDD: string;
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    }
+        status: number;
+        err: string;
+        data?: undefined;
+      }
   > => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.fetchNonPMDD( walletId ),
+        data: await this.sss.downloadDynamicNonPMDD(walletId),
       };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -385,24 +387,24 @@ export default class S3Service {
     encryptedNonPMDD: string,
   ): Promise<
     | {
-      status: number;
-      data: {
-        decryptedStaticNonPMDD: IMetaShare;
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          decryptedStaticNonPMDD: IMetaShare;
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    }
+        status: number;
+        err: string;
+        data?: undefined;
+      }
   > => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.decryptStaticNonPMDD( encryptedNonPMDD ),
+        data: await this.sss.decryptStaticNonPMDD(encryptedNonPMDD),
       };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -414,17 +416,17 @@ export default class S3Service {
     tag: string,
   ):
     | {
-      status: number;
-      data: {
-        metaShare: IMetaShare;
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          metaShare: IMetaShare;
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    } => {
+        status: number;
+        err: string;
+        data?: undefined;
+      } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
@@ -435,30 +437,31 @@ export default class S3Service {
           tag,
         ),
       };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
   public createQR = async (
     metashare: IMetaShare,
+    index: number,
   ): Promise<
     | {
-      status: number;
-      data: { qrData: string[] };
-      err?: undefined;
-    }
+        status: number;
+        data: { qrData: string[] };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    }
+        status: number;
+        err: string;
+        data?: undefined;
+      }
   > => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.createQR( metashare ),
+        data: await this.sss.createQR(metashare, index),
       };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -470,9 +473,9 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.sss.recoverMetaShareFromQR( qrData ),
+        data: this.sss.recoverMetaShareFromQR(qrData),
       };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -481,25 +484,25 @@ export default class S3Service {
     metaShare: IMetaShare,
   ):
     | {
-      status: number;
-      data: {
-        encryptedMetaShare: string;
-        key: string;
-        messageId: string;
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          encryptedMetaShare: string;
+          key: string;
+          messageId: string;
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    } => {
+        status: number;
+        err: string;
+        data?: undefined;
+      } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.sss.encryptMetaShare( metaShare ),
+        data: this.sss.encryptMetaShare(metaShare),
       };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -508,24 +511,24 @@ export default class S3Service {
     key: string,
   ):
     | {
-      status: number;
-      data: {
-        otpEncryptedData: string;
-        otp: string;
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          otpEncryptedData: string;
+          otp: string;
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    } => {
+        status: number;
+        err: string;
+        data?: undefined;
+      } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.sss.encryptViaOTP( key ),
+        data: this.sss.encryptViaOTP(key),
       };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -535,24 +538,24 @@ export default class S3Service {
     messageId: string,
   ): Promise<
     | {
-      status: number;
-      data: {
-        success: boolean;
-      };
-      err?: undefined;
-    }
+        status: number;
+        data: {
+          success: boolean;
+        };
+        err?: undefined;
+      }
     | {
-      status: number;
-      err: string;
-      data?: undefined;
-    }
+        status: number;
+        err: string;
+        data?: undefined;
+      }
   > => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.uploadShare( encryptedMetaShare, messageId ),
+        data: await this.sss.uploadShare(encryptedMetaShare, messageId),
       };
-    } catch ( err ) {
+    } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }

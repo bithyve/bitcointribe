@@ -107,28 +107,19 @@ export default class QrCodeScannerScreen extends React.Component {
     }
 
 
+    isJson( str: string ) {
+        try {
+            JSON.parse( str );
+        } catch ( e ) {
+            return false;
+        }
+        return true;
+    }
+
     barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
-            let regularAccount = await utils.getRegularAccountObject();
-            var resAddressDiff = await regularAccount.addressDiff( result );
-            if ( resAddressDiff.status == 200 ) {
-                resAddressDiff = resAddressDiff.data;
-            } else {
-                alert.simpleOk( "Oops", resAddressDiff.err );
-            }
-            if ( resAddressDiff.type == "paymentURI" || resAddressDiff.type == "address" ) {
-                var resDecPaymentURI = await regularAccount.decodePaymentURI( result );
-                if ( resDecPaymentURI.status == 200 ) {
-                    resDecPaymentURI = resDecPaymentURI.data;
-                } else {
-                    alert.simpleOk( "Oops", resDecPaymentURI.err );
-                }
-                if ( flag_SendPaymentScreen == true ) {
-                    this.props.navigation.push( "SendPaymentNavigator", { data: resDecPaymentURI } );
-                    flag_SendPaymentScreen = false;
-                }
-            } else {
+            if ( this.isJson( result ) ) {
                 result = JSON.parse( result );
                 AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
                 if ( result.type == "SSS Recovery" ) {
@@ -139,7 +130,28 @@ export default class QrCodeScannerScreen extends React.Component {
                     //console.log( { deepLinkPara } );
                     utils.setDeepLinkingUrl( deepLinkPara );
                     this.props.navigation.navigate( 'WalletScreen' );
+                } else {
+                    let regularAccount = await utils.getRegularAccountObject();
+                    var resAddressDiff = await regularAccount.addressDiff( result );
+                    if ( resAddressDiff.status == 200 ) {
+                        resAddressDiff = resAddressDiff.data;
+                    } else {
+                        alert.simpleOk( "Oops", resAddressDiff.err );
+                    }
+                    if ( resAddressDiff.type == "paymentURI" || resAddressDiff.type == "address" ) {
+                        var resDecPaymentURI = await regularAccount.decodePaymentURI( result );
+                        if ( resDecPaymentURI.status == 200 ) {
+                            resDecPaymentURI = resDecPaymentURI.data;
+                        } else {
+                            alert.simpleOk( "Oops", resDecPaymentURI.err );
+                        }
+                        if ( flag_SendPaymentScreen == true ) {
+                            this.props.navigation.push( "SendPaymentNavigator", { data: resDecPaymentURI } );
+                            flag_SendPaymentScreen = false;
+                        }
+                    }
                 }
+
             }
         } catch ( error ) {
             console.log( error );

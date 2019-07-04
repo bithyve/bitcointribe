@@ -127,6 +127,16 @@ export default class WalletSetupScreens extends React.Component<any, any> {
             ""
         );
         await comFunDBRead.readTblWallet();
+        // let shares = [
+        //     { shareId: "", updatedAt: 0 },
+        //     { shareId: "", updatedAt: 0 },
+        //     { shareId: "", updatedAt: 0 },
+        //     { shareId: "", updatedAt: 0 },
+        //     { shareId: "", updatedAt: 0 }
+        // ];
+        // let resAppHealthStatus = await comAppHealth.connection_AppHealthStatus( 0, shares )
+        // console.log( { resAppHealthStatus } );
+
         let resInsertCreateAcc = await dbOpration.insertCreateAccount(
             localDB.tableName.tblAccount,
             dateTime,

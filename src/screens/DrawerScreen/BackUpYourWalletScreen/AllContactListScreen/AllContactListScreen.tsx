@@ -63,7 +63,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
             if ( err ) {
                 throw err;
             }
-            //console.log( { contacts } );
+            console.log( { contacts } );
             this.setState( {
                 data: contacts,
                 arr_ContactList: contacts

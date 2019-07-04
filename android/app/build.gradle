@@ -109,20 +109,20 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1                   
-        versionName "1.0.0.030719"   
+        versionName "1.0.0.030719"          
         missingDimensionStrategy 'react-native-camera', 'general'   
-        ndk {  
+        ndk {     
             abiFilters "armeabi-v7a", "x86"
-        }     
-        //multiDexEnabled true   
+        }        
+        multiDexEnabled true   
          vectorDrawables.useSupportLibrary = true          
-      }     
-   
-       
+      }       
 
        dexOptions {
       jumboMode = true
-  }
+  }   
+
+ 
 
      packagingOptions {
         pickFirst '**/libgnustl_shared.so'
@@ -174,9 +174,9 @@ configurations.all {
  resolutionStrategy {
         force 'org.webkit:android-jsc:r236355'
  }  
-  } 
+  }    
 
-dependencies {        
+dependencies {           
     compile project(':react-native-fetch-blob')  
     compile project(':react-native-pdf-lib')
     compile project(':react-native-mail')

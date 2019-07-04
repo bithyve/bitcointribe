@@ -46,6 +46,7 @@ interface Props {
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Common Funciton
+var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
 //TODO: Custome Object
@@ -180,7 +181,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 //console.log( { autoHealthShares, manualHealthShares } );
                 const resInitializeHealthcheck = await sss.initializeHealthcheck( autoHealthShares );
                 //console.log( { resInitializeHealthcheck } );
-                if ( resInitializeHealthcheck.status == 200 || 400 ) {
+                if ( resInitializeHealthcheck.status == 200 ) {
                     const shareIds = [];
                     // console.log( { autoHealthShares } );
                     for ( const share of encryptedShares ) {
@@ -236,10 +237,11 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                                                 console.log( { resGenerate5thsharepdf } );
                                                 if ( resGenerate5thsharepdf != "" ) {
                                                     console.log( "III" );
+                                                    let resAppHealthStatus = await comAppHealth.connection_AppHealthStatus( dateTime, shareIds )
                                                     let keeperInfo = [ { info: arr_SelectedList[ 0 ] }, { info: arr_SelectedList[ 1 ] }, { info: rescreateMetaShare2.data }, { info: qrcode4share[ 0 ] }, { info: qrcode5share[ 0 ] } ];
                                                     let recoardInfo = [ { id: arr_SelectedList[ 0 ].recordID }, { id: arr_SelectedList[ 1 ].recordID }, { id: "" }, { id: "" }, { id: "" } ];
                                                     let encryptedMetaShare = [ { metaShare: resGenerateEncryptedMetaShare1.data }, { metaShare: resGenerateEncryptedMetaShare2.data }, { metaShare: resGenerateEncryptedMetaShare3.data }, { metaShare: resGenerate4thsharepdf }, { metaShare: resGenerate5thsharepdf } ]
-                                                    let temp = [ { date: dateTime, share: encryptedShares, shareId: shareIds, keeperInfo: keeperInfo, recordId: recoardInfo, encryptedMetaShare: encryptedMetaShare } ]
+                                                    let temp = [ { date: dateTime, share: encryptedShares, shareId: shareIds, keeperInfo: keeperInfo, recordId: recoardInfo, encryptedMetaShare: encryptedMetaShare, shareStage: resAppHealthStatus } ]
                                                     let resInsertSSSShare = await dbOpration.insertSSSShareDetails(
                                                         localDB.tableName.tblSSSDetails,
                                                         temp

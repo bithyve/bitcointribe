@@ -53,10 +53,17 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
 
     async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
+        let walletDetails = utils.getWalletDetails();
+        let qrCodeData = {};
+        qrCodeData.type = "Self Share";
+        qrCodeData.wn = walletDetails.walletType;
+        qrCodeData.data = data;
+        console.log( { qrCodeData } );
         this.setState( {
-            data: data.toString()
+            data: JSON.stringify( qrCodeData ).toString()
         } )
     }
+
 
     goBack() {
         const { navigation } = this.props;

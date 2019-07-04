@@ -299,73 +299,55 @@ export default class WalletScreen extends React.Component {
       this.setState( {
         flag_Loading: true
       } );
+      let flag_Loading = true;
       const dateTime = Date.now();
       let urlScriptDetails = utils.getDeepLinkingUrl();
       //console.log( { urlScriptDetails } );  
-      let urlScriptData = urlScriptDetails.data;
-      console.log( { urlScriptData } );
       let urlScript = {};
       urlScript.walletName = urlScriptDetails.wn;
+      urlScript.data = urlScriptDetails.data
       let walletDetails = utils.getWalletDetails();
-      const sss = new S3Service(
-        walletDetails.mnemonic
-      );
-      let resShareId = await sss.getShareId( urlScriptData.encryptedShare )
-      console.log( { resShareId } );
-      const { data, updated } = await sss.updateHealth( urlScriptData.meta.walletId, urlScriptData.encryptedShare );
-      if ( updated ) {
-        const resTrustedParty = await dbOpration.insertTrustedPartyDetailWithoutAssociate(
-          localDB.tableName.tblTrustedPartySSSDetails,
-          dateTime,
-          urlScript,
-          urlScriptData,
-          resShareId,
-          urlScriptData,
-          typeof data !== "undefined" ? data : ""
-        );
-        this.setState( {
-          flag_Loading: false,
-        } )
-        if ( resTrustedParty == true ) {
-          setTimeout( () => {
-            Alert.alert(
-              'Success',
-              'Decrypted share created.',
-              [
-                {
-                  text: 'OK', onPress: () => {
-                    utils.setDeepLinkingType( "" );
-                    utils.setDeepLinkingUrl( "" );
-                  }
-                },
-
-              ],
-              { cancelable: false }
-            )
-          }, 100 );
+      const sss = await utils.getS3ServiceObject();
+      let resDownlaodShare = await S3Service.downloadShare( urlScriptDetails.data );
+      console.log( { resDownlaodShare } );
+      if ( resDownlaodShare.status == 200 ) {
+        let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, urlScriptDetails.data );
+        if ( resDecryptEncMetaShare.status == 200 ) {
+          console.log( { resDecryptEncMetaShare } );
+          const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
+          if ( resUpdateHealth.status == 200 ) {
+            const resTrustedParty = await dbOpration.insertTrustedPartyDetailWithoutAssociate(
+              localDB.tableName.tblTrustedPartySSSDetails,
+              dateTime,
+              urlScript,
+              resDecryptEncMetaShare.data,
+              resDecryptEncMetaShare.data.decryptedMetaShare.meta,
+              resDecryptEncMetaShare.data.decryptedMetaShare.encryptedStaticNonPMDD
+            );
+            if ( resTrustedParty ) {
+              flag_Loading = false;
+              utils.setDeepLinkingType( "" );
+              utils.setDeepLinkingUrl( "" );
+              setTimeout( () => {
+                alert.simpleOk( "Success", "Decrypted share stored." );
+              }, 100 );
+            }
+          }
         } else {
+          flag_Loading = false;
           setTimeout( () => {
-            Alert.alert(
-              'OH',
-              resTrustedParty,
-              [
-                {
-                  text: 'OK', onPress: () => {
-                    utils.setDeepLinkingType( "" );
-                    utils.setDeepLinkingUrl( "" );
-                  }
-                },
-              ],
-              { cancelable: false }
-            )
+            alert.simpleOk( "Oops", resDecryptEncMetaShare.err );
           }, 100 );
         }
       } else {
-        this.setState( {
-          flag_Loading: false
-        } )
-        alert.simpleOk( "Oops", "updateHealth func not working." );
+        flag_Loading = false;
+        setTimeout( () => {
+          alert.simpleOk( "Oops", resDownlaodShare.err );
+        }, 100 );
       }
+      this.setState( {
+        flag_Loading
+      } )
     } else {
       this.props.navigation.push( "OTPBackupShareStoreNavigator" );
     }
@@ -762,8 +744,8 @@ export default class WalletScreen extends React.Component {
                   if ( appHealthStatus != "" ) {
                     let backupType = JSON.parse( walletDetails.appHealthStatus );
                     if ( backupType != "" ) {
-                      this.props.navigation.push( "HealthOfTheAppNavigator" );
-                      //this.props.navigation.push( "BackUpYourWalletSecoundTimeNavigator" );
+                      // this.props.navigation.push( "HealthOfTheAppNavigator" );
+                      this.props.navigation.push( "BackUpYourWalletSecoundTimeNavigator" );
                     } else {
                       this.setState( {
                         arr_ModelBackupYourWallet: [ {
@@ -925,7 +907,7 @@ export default class WalletScreen extends React.Component {
                 }
               ]
             } );
-            this.props.navigation.push( "BackupTrustedPartrySecretNavigator" )
+            this.props.navigation.push( "BackupTrustedPartrySecretNavigator" );
           } }
           closeModal={ () => {
             utils.setDeepLinkingType( "" );

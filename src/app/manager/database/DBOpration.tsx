@@ -896,23 +896,20 @@ const insertSSSShareDetails = (
   return new Promise( ( resolve, reject ) => {
     temp = temp[ 0 ];
     console.log( { temp } );
-
     let histroy = [];
     let data = {};
     data.title = "Secret Created.";
     data.date = utils.getUnixToDateFormat( temp.date );
     histroy.push( data );
-
     db.transaction( function ( txn: any ) {
       for ( let i = 0; i < temp.share.length; i++ ) {
         //console.log( { len: temp.share.length, i: i } );
-
         //console.log( { date: temp.date.toString(), share: temp.share[ i ].toString(), keerinfo: JSON.stringify( temp.keeperInfo[ i ].info ).toString(), recoard: temp.recordId[ i ].id.toString(), history: JSON.stringify( histroy ).toString() } );
-
+        console.log( { shareSahre: temp.shareStage[ i ].shareStage } );
         txn.executeSql(
           "INSERT INTO " +
           tblName +
-          "(dateCreated,share,shareId,keeperInfo,recordId,history,encryptedMetaShare) VALUES (:dateCreated,:share,:shareId,:keeperInfo,:recordId,:history,:encryptedMetaShare)",
+          "(dateCreated,share,shareId,keeperInfo,recordId,history,encryptedMetaShare,shareStage,lastSuccessfulCheck) VALUES (:dateCreated,:share,:shareId,:keeperInfo,:recordId,:history,:encryptedMetaShare,:shareStage,:lastSuccessfulCheck)",
           [
             utils.encrypt(
               temp.date.toString(),
@@ -924,6 +921,11 @@ const insertSSSShareDetails = (
             utils.encrypt( temp.recordId[ i ].id.toString(), passcode ),
             utils.encrypt( JSON.stringify( histroy ).toString(), passcode ),
             utils.encrypt( JSON.stringify( temp.encryptedMetaShare[ i ].metaShare ).toString(), passcode ),
+            utils.encrypt( temp.shareStage[ i ].shareStage.toString(), passcode ),
+            utils.encrypt(
+              temp.date.toString(),
+              passcode
+            ),
           ]
         );
       }
@@ -1108,6 +1110,9 @@ const updateSSSShareStage = (
 };
 
 
+
+
+
 const updateSSSShareStageWhereRecordId = (
   tblName: string,
   shareInfo: any,
@@ -1226,7 +1231,6 @@ const insertTrustedPartyDetails = (
   keeperInfo: any,
   urlScript: any,
   decrShare: any,
-  shareId: any,
   metaData: any,
   nonPMDDData: any
 ) => {
@@ -1242,18 +1246,18 @@ const insertTrustedPartyDetails = (
         var len = results.rows.length;
         if ( len > 0 ) {
           for ( let i = 0; i < len; i++ ) {
-            let dbdecryptShareId = utils.decrypt(
-              results.rows.item( i ).shareId,
+            let dbdecryptNonPMDDData = utils.decrypt(
+              results.rows.item( i ).nonPMDDData,
               passcode
             );
             // console.log( { dbdecryptrecordID } );
-            if ( dbdecryptShareId == shareId ) {
-              resolve( "Already same share stored." );
+            if ( dbdecryptNonPMDDData == nonPMDDData ) {
+              resolve( "Already same nonPMDDData stored." );
             } else {
               txn.executeSql(
                 "INSERT INTO " +
                 tblName +
-                "(dateCreated,keeperInfo,urlScript,decrShare,shareId,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:shareId,:metaData,:nonPMDDData,:history,:type)",
+                "(dateCreated,keeperInfo,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)",
                 [
                   utils.encrypt(
                     fulldate.toString(),
@@ -1262,7 +1266,6 @@ const insertTrustedPartyDetails = (
                   utils.encrypt( JSON.stringify( keeperInfo ).toString(), passcode ),
                   utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
                   utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
-                  utils.encrypt( shareId.toString(), passcode ),
                   utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
                   utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
                   utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
@@ -1276,7 +1279,7 @@ const insertTrustedPartyDetails = (
           txn.executeSql(
             "INSERT INTO " +
             tblName +
-            "(dateCreated,keeperInfo,urlScript,decrShare,shareId,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:shareId,:metaData,:nonPMDDData,:history,:type)",
+            "(dateCreated,keeperInfo,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)",
             [
               utils.encrypt(
                 fulldate.toString(),
@@ -1285,7 +1288,6 @@ const insertTrustedPartyDetails = (
               utils.encrypt( JSON.stringify( keeperInfo ).toString(), passcode ),
               utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
               utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
-              utils.encrypt( shareId.toString(), passcode ),
               utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
               utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
               utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
@@ -1306,7 +1308,6 @@ const insertTrustedPartyDetailWithoutAssociate = (
   fulldate: string,
   urlScript: any,
   decrShare: any,
-  shareId: any,
   metaData: any,
   nonPMDDData: any,
 ) => {
@@ -1322,18 +1323,18 @@ const insertTrustedPartyDetailWithoutAssociate = (
         var len = results.rows.length;
         if ( len > 0 ) {
           for ( let i = 0; i < len; i++ ) {
-            let dbdecryptShareId = utils.decrypt(
-              results.rows.item( i ).shareId,
+            let dbdecryptNonPMDDData = utils.decrypt(
+              results.rows.item( i ).nonPMDDData,
               passcode
             );
             // console.log( { dbdecryptrecordID } );
-            if ( dbdecryptShareId == shareId ) {
-              resolve( "Already same share stored." );
+            if ( dbdecryptNonPMDDData == nonPMDDData ) {
+              resolve( "Already same nonPMDDData stored." );
             } else {
               txn.executeSql(
                 "INSERT INTO " +
                 tblName +
-                "(dateCreated,urlScript,decrShare,shareId,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:shareId,:metaData,:nonPMDDData,:history,:type)",
+                "(dateCreated,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)",
                 [
                   utils.encrypt(
                     fulldate.toString(),
@@ -1341,7 +1342,6 @@ const insertTrustedPartyDetailWithoutAssociate = (
                   ),
                   utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
                   utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
-                  utils.encrypt( shareId.toString(), passcode ),
                   utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
                   utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
                   utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
@@ -1355,7 +1355,7 @@ const insertTrustedPartyDetailWithoutAssociate = (
           txn.executeSql(
             "INSERT INTO " +
             tblName +
-            "(dateCreated,urlScript,decrShare,shareId,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:shareId,:metaData,:nonPMDDData,:history,:type)",
+            "(dateCreated,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)",
             [
               utils.encrypt(
                 fulldate.toString(),
@@ -1363,7 +1363,6 @@ const insertTrustedPartyDetailWithoutAssociate = (
               ),
               utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
               utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
-              utils.encrypt( shareId.toString(), passcode ),
               utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
               utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
               utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
