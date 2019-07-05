@@ -14,12 +14,26 @@ buildscript {
             maven { url 'https://maven.fabric.io/public' }
     }  
     dependencies {        
-        classpath 'com.android.tools.build:gradle:3.3.1'  
-        classpath 'io.fabric.tools:gradle:1.+'  
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }  
+        classpath 'com.android.tools.build:gradle:3.2.1'  
+        classpath 'io.fabric.tools:gradle:1.+'       
+    }     
 }
+
+  subprojects {
+        project.configurations.all {
+            resolutionStrategy.eachDependency { details ->
+                if (details.requested.group == 'com.android.support'
+                        && !details.requested.name.contains('multidex') ) {
+                    details.useVersion "27.1.1"
+                }
+
+                if (details.requested.group == 'androidx.core'
+                        && !details.requested.name.contains('androidx') ) {
+                    details.useVersion "1.0.1"
+                }
+            }
+        }
+    }
 
 allprojects {   
     repositories {
@@ -27,7 +41,7 @@ allprojects {
 				maven { url "https://jitpack.io" }
         mavenLocal()
         google()
-        jcenter()
+        jcenter()  
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url "$rootDir/../node_modules/react-native/android"
@@ -37,24 +51,15 @@ allprojects {
         url "$rootDir/../node_modules/jsc-android/dist"
     }
     }
-}
+}  
 
+rootProject.buildDir = '../build'
+   
   
-// task wrapper(type: Wrapper) {
-//     // gradleVersion = '4.4'     
-//     // distributionUrl = distributionUrl.replace("bin", "all")
-// }     
+task wrapper(type: Wrapper) {
+    // gradleVersion = '4.4'     
+    // distributionUrl = distributionUrl.replace("bin", "all")
+}     
    
-   
-
-subprojects {
-    project.configurations.all {
-        resolutionStrategy.eachDependency { details ->
-            if (details.requested.group == 'com.android.support'
-                    && !details.requested.name.contains('multidex') ) {
-                details.useVersion "26.1.0"     
-            }
-        }   
-    }
-}          
+       
    

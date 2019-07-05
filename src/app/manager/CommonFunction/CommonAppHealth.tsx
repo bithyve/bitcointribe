@@ -99,6 +99,59 @@ const connection_AppHealthAndSSSUpdate = async ( qatime: number, sharesId: any )
     return resupdateWalletDetials;
 }
 
+const connection_AppHealthForAllShare = async ( qatime: number, shares: any ) => {
+    console.log( { qatime, shares } );
+    let arr_ShareId = [];
+    let arr_UpdateAt = [];
+    for ( let i = 0; i < shares.length; i++ ) {
+        arr_ShareId.push( shares[ i ].shareId );
+        arr_UpdateAt.push( shares[ i ].updatedAt )
+    }
+    let sortFirstSharedId = arr_ShareId.slice( 0, 3 );
+    let sortShare = shares.slice( 3, 5 );
+    console.log( { sortFirstSharedId, sortShare } );
+    const sss = await utils.getS3ServiceObject();
+    const dateTime = Date.now();
+    var resCheckHealth = await sss.checkHealth( sortFirstSharedId );
+    if ( resCheckHealth.status == 200 ) {
+        resCheckHealth = resCheckHealth.data.lastUpdateds;
+    } else {
+        alert.simpleOk( "Oops", resCheckHealth.err );
+    }
+    resCheckHealth.push.apply( resCheckHealth, sortShare )
+    console.log( { resCheckHealth } );
+    //console.log( "Initializing HealthStatuss" )
+    const healthStatus = new HealthStatus();
+    // console.log( { qatime, resCheckHealth } );
+    const res = await healthStatus.appHealthStatus( qatime, resCheckHealth );
+    console.log( { res } );
+    let temp = [];
+    for ( let i = 0; i < shares.length; i++ ) {
+        let data = {};
+        data.shareId = shares[ i ].shareId;
+        data.shareStage = res.sharesInfo[ i ].shareStage;
+        temp.push( data );
+    }
+    console.log( { temp } );
+    await utils.setAppHealthStatus( res )
+    let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
+        localDB.tableName.tblWallet,
+        res
+    );
+    if ( resupdateWalletDetials ) {
+        let resupdateSSSShareStage = await dbOpration.updateSSSShareStage(
+            localDB.tableName.tblSSSDetails,
+            temp,
+            dateTime
+        );
+        await comFunDBRead.readTblSSSDetails();
+
+    }
+    return resupdateWalletDetials;
+}
+
+
+
 
 const connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact = async ( qatime: number, satime: number, encrShares: any, mnemonic: any, arr_RecordId: any ) => {
     //  console.log( { qatime, satime, encrShares, mnemonic } );
@@ -170,6 +223,7 @@ const check_AppHealthStausUsingMnemonic = async ( qatime: number, satime: number
 module.exports = {
     connection_AppHealthStatus,
     connection_AppHealthAndSSSUpdate,
+    connection_AppHealthForAllShare,
     connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact,
     connection_AppHealthStatusSecureAccountBackup,
     check_AppHealthStausUsingMnemonic

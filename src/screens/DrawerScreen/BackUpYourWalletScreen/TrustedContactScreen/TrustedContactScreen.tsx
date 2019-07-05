@@ -108,6 +108,8 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         } )
     }
 
+
+
     componentDidMount() {
         if ( Platform.OS == "android" ) {
             Permissions.request( 'readSms' ).then( ( response: any ) => {
@@ -121,7 +123,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         this.setState( {
             flag_Loading: true,
             msg_Loading: "Message id genreating"
-        } )
+        } );
         let flag_Loading = true;
         let data = this.props.navigation.getParam( "data" );
         let encryptedMetaShare = data.encryptedMetaShare;
@@ -154,7 +156,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         }
         this.setState( {
             flag_Loading
-        } )
+        } );
     }
 
 
@@ -250,7 +252,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             jsondata.otp = this.state.otpCode
         }
         jsondata.title = "Secret Share using " + type.toLowerCase();;
-        jsondata.date = utils.getUnixToDateFormat( dateTime );
+        jsondata.date = utils.getUnixToDateFormat2();
         temp.push( jsondata );
         let data = this.props.navigation.getParam( "data" );
         await dbOpration.updateSSSTransferMehtodDetails(

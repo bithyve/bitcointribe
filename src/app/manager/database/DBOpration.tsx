@@ -74,7 +74,6 @@ const readTablesData = ( tableName: any ) => {
               data.keeperInfo = utils.decrypt( data.keeperInfo, passcode );
               data.urlScript = utils.decrypt( data.urlScript, passcode );
               data.decrShare = utils.decrypt( data.decrShare, passcode );
-              data.shareId = utils.decrypt( data.shareId, passcode );
               data.metaData = utils.decrypt( data.metaData, passcode );
               data.nonPMDDData = utils.decrypt( data.nonPMDDData, passcode );
               data.history = utils.decrypt( data.history, passcode );
@@ -849,6 +848,7 @@ const insertTblTransation = (
 
 //TODO: ========================================>  SSS Details  <========================================
 //read
+
 const readSSSTableData = ( tableName: any, recordID: string ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
@@ -899,7 +899,7 @@ const insertSSSShareDetails = (
     let histroy = [];
     let data = {};
     data.title = "Secret Created.";
-    data.date = utils.getUnixToDateFormat( temp.date );
+    data.date = utils.getUnixToDateFormat2();;
     histroy.push( data );
     db.transaction( function ( txn: any ) {
       for ( let i = 0; i < temp.share.length; i++ ) {
@@ -944,7 +944,7 @@ const insertRestoreUsingTrustedContactKeepInfo = (
     let temp = [];
     let jsonData = {};
     jsonData.title = "Secret Created.";
-    jsonData.date = utils.getUnixToDateFormat( fulldate );
+    jsonData.date = utils.getUnixToDateFormat2();;
     temp.push( jsonData );
     db.transaction( function ( txn ) {
       for ( let i = 0; i < keepInfo.length; i++ ) {
@@ -1223,6 +1223,51 @@ const updateSSSRetoreDecryptedShare = (
   } );
 };
 
+const updateHistroyAndSharedDate = (
+  tblName: string,
+  history: any,
+  sharedDate: string,
+  id: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        //  console.log( { tblName, history, sharedDate, id } );
+        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+          var len = results.rows.length;
+          if ( len > 0 ) {
+            for ( let j = 0; j < len; j++ ) {
+              let tableId = results.rows.item( j ).id;
+              if ( tableId == id ) {
+                txn.executeSql(
+                  "update " +
+                  tblName +
+                  " set history = :history,sharedDate =:sharedDate where id = :id",
+                  [
+                    utils.encrypt( JSON.stringify( history ).toString(), passcode ),
+                    utils.encrypt( sharedDate.toString(), passcode ),
+                    id
+                  ]
+                );
+                resolve( true );
+                break;
+              }
+            }
+          }
+        } );
+
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
+
+
+
+
 //TODO: ========================================>  SSS Trusted Party Details   <========================================
 //insert
 const insertTrustedPartyDetails = (
@@ -1376,47 +1421,80 @@ const insertTrustedPartyDetailWithoutAssociate = (
   } );
 };
 
-const updateHistroyAndSharedDate = (
+
+
+const insertTrustedPartyDetailSelfShare = (
   tblName: string,
-  history: any,
-  sharedDate: string,
-  id: string
+  fulldate: string,
+  urlScript: any,
+  decrShare: any,
+  metaData: any,
+  nonPMDDData: any,
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
-    try {
-      db.transaction( function ( txn ) {
-        //  console.log( { tblName, history, sharedDate, id } );
-        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
-          var len = results.rows.length;
-          if ( len > 0 ) {
-            for ( let j = 0; j < len; j++ ) {
-              let tableId = results.rows.item( j ).id;
-              if ( tableId == id ) {
-                txn.executeSql(
-                  "update " +
-                  tblName +
-                  " set history = :history,sharedDate =:sharedDate where id = :id",
-                  [
-                    utils.encrypt( JSON.stringify( history ).toString(), passcode ),
-                    utils.encrypt( sharedDate.toString(), passcode ),
-                    id
-                  ]
-                );
-                resolve( true );
-                break;
-              }
+    let temp = [];
+    let jsonData = {};
+    jsonData.title = "Secret Stored.";
+    jsonData.date = utils.getUnixToDateFormat( fulldate );
+    temp.push( jsonData );
+    db.transaction( function ( txn ) {
+      txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+        var len = results.rows.length;
+        if ( len > 0 ) {
+          for ( let i = 0; i < len; i++ ) {
+            let dbdecryptNonPMDDData = utils.decrypt(
+              results.rows.item( i ).nonPMDDData,
+              passcode
+            );
+            // console.log( { dbdecryptrecordID } );
+            if ( dbdecryptNonPMDDData == nonPMDDData ) {
+              resolve( "Already same nonPMDDData stored." );
+            } else {
+              txn.executeSql(
+                "INSERT INTO " +
+                tblName +
+                "(dateCreated,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)",
+                [
+                  utils.encrypt(
+                    fulldate.toString(),
+                    passcode
+                  ),
+                  utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
+                  utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
+                  utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
+                  utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
+                  utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
+                  utils.encrypt( "Self Share", passcode )
+                ]
+              );
+              resolve( true );
             }
           }
-        } );
-
+        } else {
+          txn.executeSql(
+            "INSERT INTO " +
+            tblName +
+            "(dateCreated,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)",
+            [
+              utils.encrypt(
+                fulldate.toString(),
+                passcode
+              ),
+              utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
+              utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
+              utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
+              utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
+              utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
+              utils.encrypt( "Self Share", passcode )
+            ]
+          );
+          resolve( true );
+        }
       } );
-    } catch ( error ) {
-      console.log( error );
-    }
+    } );
   } );
 };
-
 
 module.exports = {
   readTablesData,
@@ -1459,4 +1537,5 @@ module.exports = {
   insertTrustedPartyDetails,
   insertTrustedPartyDetailWithoutAssociate,
   updateHistroyAndSharedDate,
+  insertTrustedPartyDetailSelfShare
 };    

@@ -48,14 +48,21 @@ export default class SettingScreen extends React.Component<any, any> {
 
   async componentWillMount() {
     let walletDetails = await utils.getWalletDetails();
-    let backupType = JSON.parse( walletDetails.appHealthStatus );
+    let backupType;
+    if ( utils.isJson( walletDetails.appHealthStatus ) ) {
+      backupType = JSON.parse( walletDetails.appHealthStatus );
+      backupType = backupType.backupType;
+    } else {
+      backupType = "share";
+    }
     let subTitle;
     console.log( { backupType } );
-    if ( backupType.backupType != "share" ) {
+    if ( backupType != "share" ) {
       subTitle = "Currently your wallet is backed via Mnemonic";
     } else {
       subTitle = "Currently your wallet is backed via Trusted Contacts";
     }
+
     this.setState( {
       arr_FirstListItem: [ {
         title: "Health of the App",
