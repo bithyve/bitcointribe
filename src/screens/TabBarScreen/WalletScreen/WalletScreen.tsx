@@ -44,7 +44,8 @@ import ModelAcceptOrRejectSecret from "HexaWallet/src/app/custcompontes/Model/Mo
 import ModelBackupShareAssociateContact from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelBackupShareAssociateContact";
 import ModelBackupAssociateOpenContactList from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelBackupAssociateOpenContactList";
 import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
-//import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model/ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
+import ModelSelfShareAcceptAndReject from "HexaWallet/src/app/custcompontes/Model/ModelWalletScreen/ModelSelfShareAcceptAndReject";
+
 
 //TODO: Custome Alert 
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
@@ -93,6 +94,7 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 
+
 export default class WalletScreen extends React.Component {
   constructor ( props: any ) {
     super( props );
@@ -112,6 +114,7 @@ export default class WalletScreen extends React.Component {
       arr_ModelBackupAssociateOpenContactList: [],
       arr_ModelAcceptOrRejectSecret: [],
       arr_ModelBackupYourWallet: [],
+      arr_ModelSelfShareAcceptAndReject: [],
       //DeepLinking Param   
       deepLinkingUrl: "",
       deepLinkingUrlType: "",
@@ -277,18 +280,30 @@ export default class WalletScreen extends React.Component {
   getDeepLinkingData() {
     let urlScript = utils.getDeepLinkingUrl();
     let urlType = utils.getDeepLinkingType();
-    //console.log( { urlScript } );
     if ( urlType != "" ) {
-      this.setState( {
-        deepLinkingUrl: urlScript,
-        deepLinkingUrlType: urlType,
-        arr_ModelAcceptOrRejectSecret: [
-          {
-            modalVisible: true,
-            walletName: urlScript.wn
-          }
-        ]
-      } )
+      if ( urlType == "SSS Restore SMS/EMAIL" || urlType == "SSS Recovery QR" ) {
+        this.setState( {
+          deepLinkingUrl: urlScript,
+          deepLinkingUrlType: urlType,
+          arr_ModelAcceptOrRejectSecret: [
+            {
+              modalVisible: true,
+              walletName: urlScript.wn
+            }
+          ]
+        } )
+      } else {
+        this.setState( {
+          deepLinkingUrl: urlScript,
+          deepLinkingUrlType: urlType,
+          arr_ModelSelfShareAcceptAndReject: [
+            {
+              modalVisible: true,
+              walletName: urlScript.wn
+            }
+          ]
+        } )
+      }
     }
   }
 
@@ -352,6 +367,64 @@ export default class WalletScreen extends React.Component {
       this.props.navigation.push( "OTPBackupShareStoreNavigator" );
     }
   }
+
+
+  storeSelfShare = async () => {
+    this.setState( {
+      flag_Loading: true
+    } );
+    let flag_Loading = true;
+    const dateTime = Date.now();
+    let urlScriptDetails = utils.getDeepLinkingUrl();
+    //console.log( { urlScriptDetails } );  
+    let urlScript = {};
+    urlScript.walletName = urlScriptDetails.wn;
+    urlScript.data = urlScriptDetails.data
+    console.log( { urlScript } );
+    const sss = await utils.getS3ServiceObject();
+    let resDownlaodShare = await S3Service.downloadShare( urlScriptDetails.data );
+    console.log( { resDownlaodShare } );
+    if ( resDownlaodShare.status == 200 ) {
+      let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, urlScriptDetails.data );
+      if ( resDecryptEncMetaShare.status == 200 ) {
+        console.log( { resDecryptEncMetaShare } );
+        const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
+        if ( resUpdateHealth.status == 200 ) {
+          const resTrustedParty = await dbOpration.insertTrustedPartyDetailSelfShare(
+            localDB.tableName.tblTrustedPartySSSDetails,
+            dateTime,
+            urlScript,
+            resDecryptEncMetaShare.data,
+            resDecryptEncMetaShare.data.decryptedMetaShare.meta,
+            resDecryptEncMetaShare.data.decryptedMetaShare.encryptedStaticNonPMDD
+          );
+          if ( resTrustedParty ) {
+            flag_Loading = false;
+            utils.setDeepLinkingType( "" );
+            utils.setDeepLinkingUrl( "" );
+            setTimeout( () => {
+              alert.simpleOk( "Success", "Self share stored." );
+            }, 100 );
+          }
+        }
+      } else {
+        flag_Loading = false;
+        setTimeout( () => {
+          alert.simpleOk( "Oops", resDecryptEncMetaShare.err );
+        }, 100 );
+      }
+    } else {
+      flag_Loading = false;
+      setTimeout( () => {
+        alert.simpleOk( "Oops", resDownlaodShare.err );
+      }, 100 );
+    }
+    this.setState( {
+      flag_Loading
+    } )
+  }
+
+
 
 
 
@@ -677,7 +750,7 @@ export default class WalletScreen extends React.Component {
     //array
     let { walletDetails, arr_CustShiledIcon, arr_accounts } = this.state;
     //model array
-    let { arr_ModelAcceptOrRejectSecret, arr_ModelBackupShareAssociateContact, arr_ModelBackupAssociateOpenContactList, arr_ModelBackupYourWallet } = this.state;
+    let { arr_ModelAcceptOrRejectSecret, arr_ModelBackupShareAssociateContact, arr_ModelBackupAssociateOpenContactList, arr_ModelBackupYourWallet, arr_ModelSelfShareAcceptAndReject } = this.state;
     //values
     //flag
     let { flag_cardScrolling, flag_Loading, flag_refreshing } = this.state;
@@ -744,8 +817,8 @@ export default class WalletScreen extends React.Component {
                   if ( appHealthStatus != "" ) {
                     let backupType = JSON.parse( walletDetails.appHealthStatus );
                     if ( backupType != "" ) {
-                      // this.props.navigation.push( "HealthOfTheAppNavigator" );
-                      this.props.navigation.push( "BackUpYourWalletSecoundTimeNavigator" );
+                      this.props.navigation.push( "HealthOfTheAppNavigator" );
+                      //this.props.navigation.push( "BackUpYourWalletSecoundTimeNavigator" );
                     } else {
                       this.setState( {
                         arr_ModelBackupYourWallet: [ {
@@ -850,6 +923,33 @@ export default class WalletScreen extends React.Component {
               ]
             } );
           } }
+        />
+        <ModelSelfShareAcceptAndReject
+          data={ arr_ModelSelfShareAcceptAndReject }
+          closeModal={ () => {
+            utils.setDeepLinkingType( "" );
+            utils.setDeepLinkingUrl( "" );
+            this.setState( {
+              arr_ModelSelfShareAcceptAndReject: [
+                {
+                  modalVisible: false,
+                  walletName: ""
+                }
+              ]
+            } )
+          } }
+          click_AcceptShare={ ( wn: string ) => {
+            this.setState( {
+              arr_ModelSelfShareAcceptAndReject: [
+                {
+                  modalVisible: false,
+                  walletName: ""
+                }
+              ],
+            } );
+            this.storeSelfShare();
+          } }
+
         />
 
         <ModelBackupShareAssociateContact data={ arr_ModelBackupShareAssociateContact }

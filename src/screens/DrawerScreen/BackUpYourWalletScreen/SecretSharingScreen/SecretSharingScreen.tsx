@@ -35,6 +35,9 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
 
+//TODO: Custome Pages
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
@@ -56,7 +59,8 @@ export default class SecretSharingScreen extends React.Component<any, any> {
         super( props )
         this.state = ( {
             data: [],
-            arr_Histroy: []
+            arr_Histroy: [],
+            flag_Loading: false
         } )
     }
 
@@ -64,6 +68,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
         this.willFocusSubscription = this.props.navigation.addListener(
             "willFocus",
             () => {
+
                 this.connection_Load()
             }
         );
@@ -74,6 +79,9 @@ export default class SecretSharingScreen extends React.Component<any, any> {
     }
 
     connection_Load = async () => {
+        this.setState( {
+            flag_Loading: true
+        } );
         const resultWallet = await utils.getWalletDetails();
         const resSSSDetails = await comFunDBRead.readTblSSSDetails();
         console.log( { resSSSDetails } );
@@ -152,7 +160,8 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                 temp.push( jsondata )
             }
             this.setState( {
-                data: temp
+                data: temp,
+                flag_Loading: false
             } );
         } else {
             alert.simpleOk( "Oops", "App Health not update in database." );
@@ -166,6 +175,8 @@ export default class SecretSharingScreen extends React.Component<any, any> {
         } );
     }
     render() {
+        //flag 
+        let { flag_Loading } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
@@ -253,6 +264,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                         </View>
                     </ImageBackground>
                 </SafeAreaView>
+                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
             </Container >
         );
     }

@@ -98,13 +98,14 @@ def enableSeparateBuildPerCPUArchitecture = false
  */
 def enableProguardInReleaseBuilds = false
 
-
+    
    
 android {  
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
       
     defaultConfig {
+         multiDexEnabled true //Add this 
         applicationId "com.hexawallet"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
@@ -114,7 +115,6 @@ android {
         ndk {     
             abiFilters "armeabi-v7a", "x86"
         }        
-        multiDexEnabled true   
          vectorDrawables.useSupportLibrary = true          
       }       
 
@@ -169,12 +169,32 @@ keyAlias "hexawallet"
     }
 }
 
+    
 
 configurations.all {
- resolutionStrategy {
+     resolutionStrategy {
         force 'org.webkit:android-jsc:r236355'
- }  
-  }    
+ } 
+    resolutionStrategy {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'androidx.core') {
+                details.useVersion "1.0.1"
+            }
+            if (details.requested.group == 'androidx.lifecycle') {
+                details.useVersion "2.0.0"
+            }
+            if (details.requested.group == 'androidx.versionedparcelable') {
+                details.useVersion "1.0.0"
+            }
+            if (details.requested.group == 'androidx.fragment') {
+                details.useVersion "1.0.0"
+            }
+            if (details.requested.group == 'androidx.appcompat') {
+                details.useVersion "1.0.1"
+            }
+        }
+    }
+} 
 
 dependencies {           
     compile project(':react-native-fetch-blob')  

@@ -106,20 +106,10 @@ export default class QrCodeScannerScreen extends React.Component {
         )
     }
 
-
-    isJson( str: string ) {
-        try {
-            JSON.parse( str );
-        } catch ( e ) {
-            return false;
-        }
-        return true;
-    }
-
     barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
-            if ( this.isJson( result ) ) {
+            if ( utils.isJson( result ) ) {
                 result = JSON.parse( result );
                 AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
                 if ( result.type == "SSS Recovery" ) {
@@ -130,7 +120,17 @@ export default class QrCodeScannerScreen extends React.Component {
                     //console.log( { deepLinkPara } );
                     utils.setDeepLinkingUrl( deepLinkPara );
                     this.props.navigation.navigate( 'WalletScreen' );
-                } else {
+                } else if ( result.type == "Self Share" ) {
+                    utils.setDeepLinkingType( "Self Share" );
+                    let deepLinkPara = {};
+                    deepLinkPara.wn = result.wn;
+                    deepLinkPara.data = result.data;
+                    utils.setDeepLinkingUrl( deepLinkPara );
+                    this.props.navigation.navigate( 'WalletScreen' );
+                } else if ( result.type == "" ) {
+                    alert.simpleOk( "Oops", "Invalid qrcode.Please scan correct qrcode." );
+                }
+                else {
                     let regularAccount = await utils.getRegularAccountObject();
                     var resAddressDiff = await regularAccount.addressDiff( result );
                     if ( resAddressDiff.status == 200 ) {

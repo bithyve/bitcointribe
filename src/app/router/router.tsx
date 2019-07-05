@@ -123,13 +123,15 @@ import BackupSecretQuestionsScreen from "HexaWallet/src/screens/DrawerScreen/Hea
 import BackupSecureTwoFactorAutoScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/BackupSecureTwoFactorAutoScreen/BackupSecureTwoFactorAutoScreen";
 import HealthCheckMnemonicScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/HealthCheckMnemonicScreen/HealthCheckMnemonicScreen";
 import SelfShareUsingWalletQRCode from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/SelfShareUsingWalletQRCode/SelfShareUsingWalletQRCode";
-
-
+import SelfShareSharingScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/SelfShareSharingScreen/SelfShareSharingScreen";
+import ConfirmSelfShareQRScannerScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/ConfirmSelfShareQRScannerScreen/ConfirmSelfShareQRScannerScreen";
 
 //TODO: Payment Screen 
 import ReceivePaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/ReceivePaymentScreen/ReceivePaymentScreen";
 import SendPaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/SendPaymentScreen/SendPaymentScreen";
 import ConfirmAndSendPaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/SendPaymentScreen/ConfirmAndSendPaymentScreen";
+
+
 
 
 
@@ -472,6 +474,14 @@ const HealthOfTheAppStackNavigator = createStackNavigator(
     },
     SelfShareUsingWalletQRCode: {
       screen: SelfShareUsingWalletQRCode,
+      navigationOptions: { header: null }
+    },
+    SelfShareSharingScreen: {
+      screen: SelfShareSharingScreen,
+      navigationOptions: { header: null }
+    },
+    ConfirmSelfShareQRScannerScreen: {
+      screen: ConfirmSelfShareQRScannerScreen,
       navigationOptions: { header: null }
     }
   },
