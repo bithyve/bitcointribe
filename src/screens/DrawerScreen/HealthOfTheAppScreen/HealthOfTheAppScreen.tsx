@@ -55,11 +55,12 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
+
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
 
 //TODO: Common Funciton
+var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
 
@@ -88,21 +89,18 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 familyName: "",
                 statusMsgColor: "#ff0000",
                 statusMsg: "Not shared",
-                opt: undefined,
             }, {
                 thumbnailPath: "bars",
                 givenName: "Email",
                 familyName: "",
                 statusMsgColor: "#ff0000",
-                statusMsg: "Not shared",
-                opt: undefined,
+                statusMsg: "Not store",
             }, {
                 thumbnailPath: "bars",
                 givenName: "Cloud Store",
                 familyName: "",
                 statusMsgColor: "#ff0000",
-                statusMsg: "Not shared",
-                opt: undefined,
+                statusMsg: "Not store",
             } ],
             arr_Mnemonic: [],
             arr_MnemonicDetails: [],
@@ -143,17 +141,21 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
     }
 
     loaddata = async () => {
+        this.setState( {
+            flag_Loading: true
+        } )
+        let flag_Loading = true;
         let walletDetails = await utils.getWalletDetails();
         let setUpWalletAnswerDetails = walletDetails.setUpWalletAnswerDetails;
         let backupType = JSON.parse( walletDetails.appHealthStatus );
         console.log( { backupType } );
         let sssDetails = await utils.getSSSDetails();
         let encrShares = [];
-        for ( let i = 0; i <= 2; i++ ) {
-            encrShares.push( sssDetails[ i ].shareId )
-        }
-        let updateShareIdStatus = await comAppHealth.connection_AppHealthAndSSSUpdate( parseInt( walletDetails.lastUpdated ), encrShares );
-        // console.log( { updateShareIdStatus } );   
+
+
+
+
+
         console.log( { walletDetails, sssDetails } );
         //flag   
         let flag_isSetupTrustedContact, flag_isSecretQuestions, flag_isMnemonic;
@@ -165,6 +167,12 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         let temp = [];
         //Trusted Contacts
         if ( sssDetails.length > 0 ) {
+            //App Health
+            for ( let i = 0; i <= 2; i++ ) {
+                encrShares.push( sssDetails[ i ].shareId )
+            }
+            let updateShareIdStatus = await comAppHealth.connection_AppHealthAndSSSUpdate( parseInt( walletDetails.lastUpdated ), encrShares );
+
             //setup sss
             if ( sssDetails[ 0 ].keeperInfo == "" ) {
                 flag_isSetupTrustedContact = true;
@@ -245,6 +253,24 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                     alert.simpleOk( "Oops", "App Health not update in database." );
                 }
             }
+
+            //Self Share
+            let arr_SelfShare = [];
+            let selfShareTitle = [ "", "", "Wallet", "Email", "Cloud" ]
+            for ( let i = 0; i < sssDetails.length; i++ ) {
+                if ( i > 1 ) {
+                    let data = {};
+                    data.thumbnailPath = "bars";
+                    data.givenName = selfShareTitle[ i ];
+                    data.familyName = "";
+                    data.statusMsgColor = "#ff0000";
+                    data.statusMsg = "Not shared";
+                    data.sssDetails = sssDetails[ i ];
+                    arr_SelfShare.push( data )
+                }
+            }
+
+
             //secret question
             console.log( { setUpWalletAnswerDetails } );
             if ( setUpWalletAnswerDetails == "" ) {
@@ -258,12 +284,16 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             data.subTitle = "Not Backed up";
             data.color = "#ff0000";
             arr_SecretQuestion.push( data )
+            flag_Loading = false
             this.setState( {
                 flag_isSetupTrustedContact,
                 arr_TrustedContacts,
                 flag_isSecretQuestions,
-                arr_SecretQuestion
+                arr_SecretQuestion,
+                arr_SelfShare,
             } )
+        } else {
+            flag_Loading = false
         }
         // //Trusted Contacts list
         // for ( let i = 0; i < sssDetails.length; i++ ) {
@@ -413,6 +443,9 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
         // console.log( { arr_SecureAccountDetials } );
 
+        this.setState( {
+            flag_Loading
+        } )
     }
 
 
@@ -455,56 +488,24 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
     click_SelfShare = async ( item: any ) => {
         let sssDetails = await utils.getSSSDetails();
         console.log( { sssDetails } );
-        let key = JSON.parse( sssDetails[ 2 ].encryptedMetaShare )
+        let data3Share = sssDetails[ 2 ];
         var email4shareFilePath = sssDetails[ 3 ].encryptedMetaShare;
-        email4shareFilePath = email4shareFilePath.split( '"' ).join( "" );
+
         console.log( { email4shareFilePath } );
-
         if ( item.givenName == "Wallet" ) {
-            this.props.navigation.push( "SelfShareUsingWalletQRCode", { data: key.key } )
+            this.props.navigation.push( "SelfShareUsingWalletQRCode", { data: data3Share } )
         } else if ( item.givenName == "Email" ) {
-            Mailer.mail( {
-                subject: 'For 4 Share.',
-                recipients: [ 'appasahebl@bithyve.com' ],
-                body: '<b>For 4 share.Pdf password is your answer.</b>',
-                isHTML: true,
-                attachment: {
-                    path: email4shareFilePath,  // The absolute path of the file from which to read data.
-                    type: 'pdf',      // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-                    name: 'For4Share',   // Optional: Custom filename for attachment
-                }
-            }, ( error, event ) => {
-                if ( event == "sent" ) {
+            this.props.navigation.push( "SelfShareSharingScreen", { data: item, title: "Email Share" } );
 
-                    Alert.alert(
-                        "Success",
-                        "Email sent success.",
-                        [
-                            { text: 'Ok', onPress: () => console.log( 'OK' ) },
-                        ],
-                        { cancelable: true }
-                    )
-                } else {
-                    Alert.alert(
-                        error,
-                        event,
-                        [
-                            { text: 'Ok', onPress: () => console.log( 'OK: Email Error Response' ) },
-                        ],
-                        { cancelable: true }
-                    )
-                }
-
-            } );
         } else {
-            this.refs.modal4.open();
+            this.props.navigation.push( "SelfShareSharingScreen", { data: item, title: "Cloud Share" } );
+            // this.refs.modal4.open();
             // let shareOptions = {
             //     title: "React Native",
             //     message: "Hola mundo",
             //     url: "http://facebook.github.io/react-native/",
             //     subject: "Share Link" //  for email
             // };
-
             // Share.shareSingle( Object.assign( shareOptions, {
             //     "social": "twitter"
             // } ) );
@@ -696,29 +697,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                                 <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                                 <View style={ { flexDirection: "row" } }>
                                                                     <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
-                                                                    { renderIf( typeof item.opt !== "undefined" )(
-                                                                        <TimerCountdown
-                                                                            initialMilliseconds={ item.totalSec * 1000 }
-                                                                            onExpire={ () => this.connection_Load() }
-                                                                            formatMilliseconds={ ( milliseconds ) => {
-                                                                                const remainingSec = Math.round( milliseconds / 1000 );
-                                                                                const seconds = parseInt( ( remainingSec % 60 ).toString(), 10 );
-                                                                                const minutes = parseInt( ( ( remainingSec / 60 ) % 60 ).toString(), 10 );
-                                                                                const hours = parseInt( ( remainingSec / 3600 ).toString(), 10 );
-                                                                                const s = seconds < 10 ? '0' + seconds : seconds;
-                                                                                const m = minutes < 10 ? '0' + minutes : minutes;
-                                                                                let h = hours < 10 ? '0' + hours : hours;
-                                                                                h = h === '00' ? '' : h + ':';
-                                                                                return h + m + ':' + s;
-                                                                            } }
-                                                                            allowFontScaling={ true }
-                                                                            style={ { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } }
-                                                                        />
-                                                                    ) }
                                                                 </View>
-                                                                { renderIf( typeof item.opt !== "undefined" )(
-                                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>OTP { " " }{ item.opt }</Text>
-                                                                ) }
                                                             </View>
                                                             <View style={ {
                                                                 flex: 1,

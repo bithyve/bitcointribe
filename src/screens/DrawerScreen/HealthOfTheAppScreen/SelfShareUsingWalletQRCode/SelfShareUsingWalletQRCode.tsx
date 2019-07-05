@@ -29,6 +29,13 @@ import QRCode from 'react-native-qrcode-svg';
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
 
+//TODO: Custome Pages
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
+
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
@@ -53,15 +60,23 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
 
     async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
+        let encryptedMetaShare = JSON.parse( data.encryptedMetaShare )
         let walletDetails = utils.getWalletDetails();
-        let qrCodeData = {};
-        qrCodeData.type = "Self Share";
-        qrCodeData.wn = walletDetails.walletType;
-        qrCodeData.data = data;
-        console.log( { qrCodeData } );
-        this.setState( {
-            data: JSON.stringify( qrCodeData ).toString()
-        } )
+        const sss = await utils.getS3ServiceObject();
+        const resUploadShare = await sss.uploadShare( encryptedMetaShare.encryptedMetaShare, encryptedMetaShare.messageId );
+        console.log( { resUploadShare } );
+        if ( resUploadShare.status == 200 ) {
+            let qrCodeData = {};
+            qrCodeData.type = "Self Share";
+            qrCodeData.wn = walletDetails.walletType;
+            qrCodeData.data = encryptedMetaShare.key;
+            //console.log( { qrCodeData } );
+            this.setState( {
+                data: JSON.stringify( qrCodeData ).toString()
+            } )
+        } else {
+            alert.simpleOk( "Oops", resUploadShare.err );
+        }
     }
 
 
@@ -72,6 +87,8 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
     }
 
     render() {
+        //flag 
+        let { flag_Loading } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
@@ -106,6 +123,7 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
 
                     </ImageBackground>
                 </SafeAreaView>
+                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
             </Container >
         );
     }

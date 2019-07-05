@@ -24,6 +24,10 @@ const getUnixToDateFormat1 = () => {
   return moment().format( 'hh:mm a , DD MMM YYYY' );
 }
 
+const getUnixToDateFormat2 = () => {
+  return moment().format( 'DD MMM YYYY , hh:mm a' );
+}
+
 //TODO: Network check
 let isNetwork;
 const onConnectivityChange = ( isConnected, timestamp, connectionInfo ) => {
@@ -157,6 +161,15 @@ const getMnemonic = () => {
   return mnemonic.split( " " );
 }
 
+const isJson = ( str: string ) => {
+  try {
+    JSON.parse( str );
+  } catch ( e ) {
+    return false;
+  }
+  return true;
+}
+
 //Get and Set WalletDetails
 const getWalletDetails = () => {
   let commonData = Singleton.getInstance();
@@ -285,6 +298,7 @@ module.exports = {
   getUnixToDateFormat,
   getUnixToNormaDateFormat,
   getUnixToDateFormat1,
+  getUnixToDateFormat2,
   getNetwork,
   encrypt,
   encryptAgain,
@@ -295,6 +309,7 @@ module.exports = {
   getDeviceModel,
   getStatusBarHeight,
   getIphoneSize,
+  isJson,
 
   //Singleton          
   getMnemonic,
