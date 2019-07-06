@@ -97,6 +97,7 @@ export default class ConfirmSelfShareQRScannerScreen extends React.Component {
     barcodeReceived( e: any ) {
         try {
             var result = e.data;
+            console.log( { result } );
             result = result.split( 'Doublequote' ).join( '"' );
             result = result.split( 'Leftbrace' ).join( "{" );
             result = result.split( 'Rightbrace' ).join( "}" );

@@ -88,19 +88,19 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 givenName: "Wallet",
                 familyName: "",
                 statusMsgColor: "#ff0000",
-                statusMsg: "Not shared",
+                statusMsg: "Not Share",
             }, {
                 thumbnailPath: "bars",
                 givenName: "Email",
                 familyName: "",
                 statusMsgColor: "#ff0000",
-                statusMsg: "Not store",
+                statusMsg: "Not Share",
             }, {
                 thumbnailPath: "bars",
-                givenName: "Cloud Store",
+                givenName: "iCloud Share",
                 familyName: "",
                 statusMsgColor: "#ff0000",
-                statusMsg: "Not store",
+                statusMsg: "Not Share",
             } ],
             arr_Mnemonic: [],
             arr_MnemonicDetails: [],
@@ -145,23 +145,25 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             flag_Loading: true
         } )
         let flag_Loading = true;
+        let dateTime = Date.now();
         let walletDetails = await utils.getWalletDetails();
         let setUpWalletAnswerDetails = walletDetails.setUpWalletAnswerDetails;
-        let backupType = JSON.parse( walletDetails.appHealthStatus );
+        let backupType;
+        if ( utils.isJson( walletDetails.appHealthStatus ) ) {
+            backupType = JSON.parse( walletDetails.appHealthStatus );
+            backupType = backupType.backupType;
+        } else {
+            backupType = "share";
+        }
         console.log( { backupType } );
         let sssDetails = await utils.getSSSDetails();
+        console.log( { sssDetails } );
         let encrShares = [];
-
-
-
-
-
         console.log( { walletDetails, sssDetails } );
         //flag   
         let flag_isSetupTrustedContact, flag_isSecretQuestions, flag_isMnemonic;
         //array  
         let arr_TrustedContacts = [], arr_SecretQuestion = [];
-
         let history = [];
         let tempOpt = [];
         let temp = [];
@@ -171,8 +173,9 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             for ( let i = 0; i <= 2; i++ ) {
                 encrShares.push( sssDetails[ i ].shareId )
             }
-            let updateShareIdStatus = await comAppHealth.connection_AppHealthAndSSSUpdate( parseInt( walletDetails.lastUpdated ), encrShares );
+            console.log( { encrShares } );
 
+            let updateShareIdStatus = await comAppHealth.connection_AppHealthAndSSSUpdate( parseInt( walletDetails.lastUpdated ), encrShares );
             //setup sss
             if ( sssDetails[ 0 ].keeperInfo == "" ) {
                 flag_isSetupTrustedContact = true;
@@ -182,7 +185,6 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
             for ( let i = 0; i <= 1; i++ ) {
                 let keeperInfo = JSON.parse( sssDetails[ i ].keeperInfo );
-                console.log( { keeperInfo } );
                 let data = {};
                 data.encryptedMetaShare = JSON.parse( sssDetails[ i ].encryptedMetaShare );
                 data.emailAddresses = keeperInfo.emailAddresses;
@@ -192,7 +194,6 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 data.thumbnailPath = keeperInfo.thumbnailPath
                 data.givenName = keeperInfo.givenName;
                 data.familyName = keeperInfo.familyName;
-                const dateTime = Date.now();
                 let sharedDate = parseInt( sssDetails[ i ].sharedDate );
                 console.warn( 'sharedDate date =' + sharedDate.toString() );
                 var startDate = new Date( dateTime );
@@ -254,21 +255,28 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 }
             }
 
-            //Self Share
+            //Self Share  
             let arr_SelfShare = [];
-            let selfShareTitle = [ "", "", "Wallet", "Email", "Cloud" ]
+            let arrTitle = [ "", "", "Wallet", "Email", "iCloud" ];
             for ( let i = 0; i < sssDetails.length; i++ ) {
                 if ( i > 1 ) {
+                    console.log( { data: sssDetails[ i ] } );
+                    let sharedDate = sssDetails[ i ].sharedDate;
+                    let shareStage = sssDetails[ i ].shareStage;
+                    let statusMsg = this.getMsgAndColor( sharedDate, shareStage )[ 0 ];
+                    let statusColor = this.getMsgAndColor( sharedDate, shareStage )[ 1 ];
+                    console.log( { statusMsg, statusColor } );
                     let data = {};
                     data.thumbnailPath = "bars";
-                    data.givenName = selfShareTitle[ i ];
+                    data.givenName = arrTitle[ i ];
                     data.familyName = "";
-                    data.statusMsgColor = "#ff0000";
-                    data.statusMsg = "Not shared";
+                    data.statusMsgColor = statusColor;
+                    data.statusMsg = statusMsg;
                     data.sssDetails = sssDetails[ i ];
-                    arr_SelfShare.push( data )
+                    arr_SelfShare.push( data );
                 }
             }
+
 
 
             //secret question
@@ -278,12 +286,28 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             } else {
                 flag_isSecretQuestions = true
             }
+            var setUpWalletAnswer = JSON.parse( walletDetails.setUpWalletAnswerDetails );
+            setUpWalletAnswer = setUpWalletAnswer.slice( -1 ).pop();
+            let secretQueUpdateDate = setUpWalletAnswer.backupDate != undefined ? setUpWalletAnswer.backupDate : 0;
+
+            var startDate = new Date( dateTime );
+            var endDate = new Date( secretQueUpdateDate );
+            var diff = Math.abs( startDate.getTime() - endDate.getTime() );
+            const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
+            const seconds: any = Math.floor( diff / 1000 % 60 );
+            const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
             let data = {};
             data.icon = "timelockNew";
             data.title = "First Secret Question";
-            data.subTitle = "Not Backed up";
-            data.color = "#ff0000";
+            data.subTitle = totalSec <= 8.64e+8 ? "Backed Confirm" : "Not Backed up";
+            data.color = totalSec <= 8.64e+8 ? "#008000" : "#ff0000";
+            data.walletDetails = walletDetails;
             arr_SecretQuestion.push( data )
+
+
+            console.log( { arr_SecretQuestion } );
+
+
             flag_Loading = false
             this.setState( {
                 flag_isSetupTrustedContact,
@@ -448,6 +472,17 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         } )
     }
 
+    getMsgAndColor( sharedDate: string, shareStage: string ) {
+        if ( sharedDate == "" && shareStage != "Good" ) {
+            return [ "Not Share", "#ff0000" ];
+        } else if ( sharedDate != "" && shareStage != "Good" ) {
+            return [ "Shared", "#C07710" ];
+        } else {
+            return [ "Share Confirmed", "#008000" ];
+        }
+    }
+
+
 
 
     //TODO: func click_Item
@@ -459,7 +494,9 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
     //TODO: func click_FirstMenuItem
     click_SecretQuestion( item: any ) {
-        this.props.navigation.push( "BackupSecretQuestionsScreen", { data: this.state.arr_QuestionAndAnswerDetails } );
+        let walletDetails = item.walletDetails;
+        let data = JSON.parse( walletDetails.setUpWalletAnswerDetails );
+        this.props.navigation.push( "BackupSecretQuestionsScreen", { data: data, walletDetails: walletDetails } );
     }
 
     //TODO: click_SetupTrustedContacts
@@ -483,6 +520,42 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         this.props.navigation.push( "HealthCheckMnemonicScreen", { data: this.state.arr_MnemonicDetails } );
     }
 
+    onSelect = async ( returnValue: any ) => {
+        let walletDetails = await utils.getWalletDetails();
+        var sssDetails = await utils.getSSSDetails();
+        let encrShares = [];
+        for ( let i = 0; i <= 2; i++ ) {
+            encrShares.push( sssDetails[ i ].shareId )
+        }
+        console.log( { encrShares } );
+        let updateShareIdStatus = await comAppHealth.connection_AppHealthAndSSSUpdate( parseInt( walletDetails.lastUpdated ), encrShares );
+        if ( updateShareIdStatus ) {
+            sssDetails = await utils.getSSSDetails();
+            let arr_SelfShare = [];
+            let arrTitle = [ "", "", "Wallet", "Email", "iCloud" ];
+            for ( let i = 0; i < sssDetails.length; i++ ) {
+                if ( i > 1 ) {
+                    console.log( { data: sssDetails[ i ] } );
+                    let sharedDate = sssDetails[ i ].sharedDate;
+                    let shareStage = sssDetails[ i ].shareStage;
+                    let statusMsg = this.getMsgAndColor( sharedDate, shareStage )[ 0 ];
+                    let statusColor = this.getMsgAndColor( sharedDate, shareStage )[ 1 ];
+                    console.log( { statusMsg, statusColor } );
+                    let data = {};
+                    data.thumbnailPath = "bars";
+                    data.givenName = arrTitle[ i ];
+                    data.familyName = "";
+                    data.statusMsgColor = statusColor;
+                    data.statusMsg = statusMsg;
+                    data.sssDetails = sssDetails[ i ];
+                    arr_SelfShare.push( data );
+                }
+            }
+            this.setState( {
+                arr_SelfShare
+            } )
+        }
+    }
 
     //TODO: Self share
     click_SelfShare = async ( item: any ) => {
@@ -493,12 +566,12 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
         console.log( { email4shareFilePath } );
         if ( item.givenName == "Wallet" ) {
-            this.props.navigation.push( "SelfShareUsingWalletQRCode", { data: data3Share } )
+            this.props.navigation.push( "SelfShareUsingWalletQRCode", { data: data3Share, onSelect: this.onSelect } )
         } else if ( item.givenName == "Email" ) {
             this.props.navigation.push( "SelfShareSharingScreen", { data: item, title: "Email Share" } );
 
         } else {
-            this.props.navigation.push( "SelfShareSharingScreen", { data: item, title: "Cloud Share" } );
+            this.props.navigation.push( "SelfShareSharingScreen", { data: item, title: "iCloud Share" } );
             // this.refs.modal4.open();
             // let shareOptions = {
             //     title: "React Native",
@@ -532,7 +605,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
     }
 
     click_Share5Sahring( type: string ) {
-        if ( type == "CLOUD" ) {
+        if ( type == "iCLOUD" ) {
 
         } else if ( type == "SLACK" ) {
 
@@ -607,7 +680,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                                     { renderIf( typeof item.opt !== "undefined" )(
                                                                         <TimerCountdown
                                                                             initialMilliseconds={ item.totalSec * 1000 }
-                                                                            onExpire={ () => this.connection_Load() }
+                                                                            onExpire={ () => this.loaddata() }
                                                                             formatMilliseconds={ ( milliseconds ) => {
                                                                                 const remainingSec = Math.round( milliseconds / 1000 );
                                                                                 const seconds = parseInt( ( remainingSec % 60 ).toString(), 10 );
@@ -949,7 +1022,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                     <Modal style={ [ styles.modal, styles.modal4 ] } position={ "bottom" } ref={ "modal4" }>
                         <View style={ { flex: 1 } }>
                             <View style={ { flexDirection: "row", marginTop: 20 } }>
-                                <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "CLOUD" ) }>
+                                <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "iCLOUD" ) }>
                                     <View style={ { alignItems: "center", marginLeft: "10%", flexDirection: "column" } }>
                                         <Icon
                                             raised
@@ -957,7 +1030,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                             type='font-awesome'
                                             color='#379FF1'
                                         />
-                                        <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via Cloud</Text>
+                                        <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via iCloud</Text>
                                     </View>
                                 </Button>
                                 <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "SLACK" ) }>
@@ -985,7 +1058,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                             </View>
 
                             <View style={ { flexDirection: "row", marginTop: 40 } }>
-                                <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "CLOUD" ) }>
+                                <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "iCLOUD" ) }>
                                     <View style={ { alignItems: "center", marginLeft: "2%", flexDirection: "column" } }>
                                         <Icon
                                             raised

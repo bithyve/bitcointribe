@@ -49,7 +49,10 @@ const connection_AppHealthStatus = async ( qatime: number, sharesId: any ) => {
         localDB.tableName.tblWallet,
         res
     );
-    return res.sharesInfo;
+    if ( resupdateWalletDetials ) {
+        return res.sharesInfo;
+    }
+
 }
 
 const connection_AppHealthAndSSSUpdate = async ( qatime: number, sharesId: any ) => {
@@ -93,10 +96,11 @@ const connection_AppHealthAndSSSUpdate = async ( qatime: number, sharesId: any )
             temp,
             dateTime
         );
-        await comFunDBRead.readTblSSSDetails();
-
+        if ( resupdateSSSShareStage ) {
+            await comFunDBRead.readTblSSSDetails();
+            return resupdateWalletDetials;
+        }
     }
-    return resupdateWalletDetials;
 }
 
 const connection_AppHealthForAllShare = async ( qatime: number, shares: any ) => {
@@ -144,10 +148,14 @@ const connection_AppHealthForAllShare = async ( qatime: number, shares: any ) =>
             temp,
             dateTime
         );
-        await comFunDBRead.readTblSSSDetails();
+        if ( resupdateSSSShareStage ) {
+            await comFunDBRead.readTblSSSDetails();
+            return resupdateWalletDetials;
+        }
+
 
     }
-    return resupdateWalletDetials;
+
 }
 
 
@@ -184,11 +192,9 @@ const connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact = async ( 
         arr_RecordId,
         dateTime
     );
-    // console.log( { resupdateSSSShareStage } );
-    return resupdateSSSShareStage;
-    // console.log( { resupdateSSSShareStage } );
-    // console.log( { resupdateWalletDetials } );
-    // console.log( { res } );
+    if ( resupdateSSSShareStage ) {
+        return resupdateSSSShareStage;
+    }
 }
 
 //Secure Account Backup
@@ -203,7 +209,10 @@ const connection_AppHealthStatusSecureAccountBackup = async ( qatime: number, sa
         localDB.tableName.tblWallet,
         res
     );
-    return resupdateWalletDetials;
+    if ( resupdateWalletDetials ) {
+        return resupdateWalletDetials;
+    }
+
 }
 
 
@@ -217,7 +226,9 @@ const check_AppHealthStausUsingMnemonic = async ( qatime: number, satime: number
         localDB.tableName.tblWallet,
         res
     );
-    return resupdateWalletDetials;
+    if ( resupdateWalletDetials ) {
+        return resupdateWalletDetials;
+    }
 }
 
 module.exports = {

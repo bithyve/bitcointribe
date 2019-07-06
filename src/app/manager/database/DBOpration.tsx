@@ -420,6 +420,8 @@ const insertWallet = (
     } );
   } );
 };
+
+
 //update
 const updateWalletAnswerDetails = (
   tblName: string,
@@ -444,6 +446,8 @@ const updateWalletAnswerDetails = (
     }
   } );
 };
+
+
 
 const updateWalletAppHealthStatus = (
   tblName: string,
