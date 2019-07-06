@@ -818,7 +818,6 @@ export default class WalletScreen extends React.Component {
                     let backupType = JSON.parse( walletDetails.appHealthStatus );
                     if ( backupType != "" ) {
                       this.props.navigation.push( "HealthOfTheAppNavigator" );
-                      //this.props.navigation.push( "BackUpYourWalletSecoundTimeNavigator" );
                     } else {
                       this.setState( {
                         arr_ModelBackupYourWallet: [ {
@@ -1031,16 +1030,16 @@ export default class WalletScreen extends React.Component {
                 modalVisible: false,
               } ]
             } )
-            let appHealthStatus = {};
-            appHealthStatus.backupType = "share";
-            let resUpdateAppHealthStatus = await dbOpration.updateWalletAppHealthStatus(
-              localDB.tableName.tblWallet,
-              appHealthStatus
-            );
-            if ( resUpdateAppHealthStatus ) {
-              await comFunDBRead.readTblWallet();
-              this.props.navigation.push( "HealthOfTheAppNavigator" );
-            }
+            this.props.navigation.push( "HealthOfTheAppNavigator" );
+            // let appHealthStatus = {};
+            // appHealthStatus.backupType = "share";
+            // let resUpdateAppHealthStatus = await dbOpration.updateWalletAppHealthStatus(
+            //   localDB.tableName.tblWallet,
+            //   appHealthStatus
+            // );
+            // if ( resUpdateAppHealthStatus ) {
+            //   await comFunDBRead.readTblWallet();
+            // }
           } }
         />
         <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
