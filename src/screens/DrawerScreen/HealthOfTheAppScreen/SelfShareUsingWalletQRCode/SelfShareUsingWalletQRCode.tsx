@@ -83,7 +83,7 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
     goBack() {
         const { navigation } = this.props;
         navigation.goBack();
-        // navigation.state.params.onSelect( { selected: true } );
+        navigation.state.params.onSelect( { selected: true } );
     }
 
     render() {

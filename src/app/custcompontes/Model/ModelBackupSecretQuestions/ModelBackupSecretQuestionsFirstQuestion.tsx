@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Dimensions, Platform, Image } from 'react-native';
+import { Modal, TouchableHighlight, View, Alert, StyleSheet, Dimensions, Platform, Image, TextInput } from 'react-native';
 import {
     Container,
     Header,
@@ -12,8 +12,6 @@ import {
     Right,
     Body,
     Text,
-    Picker,
-    Icon
 } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import { Avatar } from 'react-native-elements';
@@ -59,11 +57,11 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
 
 
     componentWillReceiveProps( nextProps: any ) {
-        let data = nextProps.data[ 0 ];
-        //        console.log( { data } );
+        var data = nextProps.data[ 0 ];
+        data = data.data[ 0 ];
         this.setState( {
-            firstQuestion: data.data.firstQuestion,
-            anwser: data.data.firstAnswer
+            firstQuestion: data.Question,
+            anwser: data.Answer
         } );
     }
 
@@ -104,8 +102,7 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
     }
 
     render() {
-        let { flag_DisableBtnNext, answerBorderColor, anwser, firstAnswer } = this.state;
-        const itemList = <Picker.Item label={ this.state.firstQuestion } value={ this.state.firstQuestion } />;
+        let { flag_DisableBtnNext, answerBorderColor, anwser, firstQuestion, firstAnswer } = this.state;
         return (
             <Modal
                 transparent
@@ -142,27 +139,14 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20 } ] }>Health Check</Text>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, margin: 10 } ] }>Security Questions</Text>
                                 <Text note style={ { textAlign: "center" } }>Answer the questions exactly as you did at the time of setting up the wallet</Text>
-                                <View style={ styles.itemQuestionPicker }>
-                                    <Picker
-                                        enabled={ false }
-                                        renderHeader={ backAction =>
-                                            <Header style={ { backgroundColor: "#ffffff" } }>
-                                                <Left>
-                                                    <Button transparent onPress={ backAction }>
-                                                        <Icon name="arrow-back" style={ { color: "#000" } } />
-                                                    </Button>
-                                                </Left>
-                                                <Body style={ { flex: 3 } }>
-                                                    <Title style={ [ globalStyle.ffFiraSansMedium, { color: "#000" } ] }>Select Question</Title>
-                                                </Body>
-                                                <Right />
-                                            </Header> }
-                                        mode="dropdown"
-                                        style={ [ globalStyle.ffFiraSansMedium ] }
-                                        selectedValue={ this.state.firstQuestion }
-                                    >
-                                        { itemList }
-                                    </Picker>
+                                <View style={ [ styles.itemQuestionPicker, { height: 80 } ] }>
+                                    <TextInput
+                                        value={ firstQuestion }
+                                        style={ { padding: 5 } }
+                                        multiline={ true }
+                                        numberOfLines={ 10 }
+                                        editable={ false }
+                                    />
                                 </View>
                                 <Item rounded style={ styles.itemInputWalletName }>
                                     <Input

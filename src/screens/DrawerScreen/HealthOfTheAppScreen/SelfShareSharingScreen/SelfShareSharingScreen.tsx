@@ -31,6 +31,7 @@ import Toast from 'react-native-simple-toast';
 //import Mailer from 'react-native-mail';
 var Mailer = require( 'NativeModules' ).RNMail;
 import Share from "react-native-share";
+var RNFS = require( 'react-native-fs' );
 import BackgroundFetch from "react-native-background-fetch";
 
 //TODO: Custome Pages
@@ -74,24 +75,27 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
         } )
     }
 
+
     async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
         let title = this.props.navigation.getParam( "title" );
         console.log( { data } );
         let arr_History = JSON.parse( data.sssDetails.history )
+        let shareStage = data.sssDetails.shareStage;
+        let sharedDate = data.sssDetails.sharedDate;
+        console.log( { shareStage, sharedDate } );
         let flag_ShareBtnDisable, flag_ReShareBtnDisable, flag_ConfrimBtnDisable;
-
-        if ( data.sharedDate == "" || data.sssDetails.shareStage != "Good" ) {
+        if ( sharedDate == "" && shareStage != "Good" ) {
             flag_ReShareBtnDisable = false;
             flag_ConfrimBtnDisable = false;
             flag_ShareBtnDisable = true;
         }
-        else if ( data.sssDetails.shareStage != "Good" || data.sharedDate != "" ) {
+        else if ( shareStage != "Good" && sharedDate != "" ) {
             flag_ConfrimBtnDisable = true;
             flag_ReShareBtnDisable = true;
             flag_ShareBtnDisable = false;
         }
-        else if ( data.sharedDate != "" || data.sssDetails.shareStage == "Good" ) {
+        else if ( sharedDate != "" && shareStage == "Good" ) {
             flag_ReShareBtnDisable = true;
             flag_ConfrimBtnDisable = false;
             flag_ShareBtnDisable = false;
@@ -111,28 +115,55 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
         } )
     }
 
+
+
     //TODO: Sharing PDF
     click_ShareEmail( data: any ) {
+        let { title } = this.state;
         let email4shareFilePath = data.sssDetails.encryptedMetaShare.split( '"' ).join( "" );
-        console.log( { email4shareFilePath } );
-        Mailer.mail( {
-            subject: 'For 4 Share.',
-            recipients: [ 'appasahebl@bithyve.com' ],
-            body: '<b>For 4 share.Pdf password is your answer.</b>',
-            isHTML: true,
-            attachment: {
-                path: email4shareFilePath,  // The absolute path of the file from which to read data.
-                type: 'pdf',      // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-                name: 'For4Share',   // Optional: Custom filename for attachment
-            }
-        }, ( error, event ) => {
-            if ( event == "sent" ) {
-                alert.simpleOk( "Success", "Email sent success." );
-                this.updateHistory( data, "Shared." );
-            } else {
-                alert.simpleOk( "Oops", error );
-            }
-        } );
+        if ( title != "Email Share" ) {
+            let shareOptions = {
+                title: "For 5 share",
+                message: "For 5 share.Pdf password is your answer.",
+                urls: [ email4shareFilePath ],
+                subject: "For 5 share "
+            };
+            Share.open( shareOptions )
+                .then( ( res: any ) => {
+                    this.updateHistory( data, "Shared.", "" );
+                    this.setState( {
+                        flag_ShareBtnDisable: false,
+                        flag_ReShareBtnDisable: true,
+                        flag_ConfrimBtnDisable: true
+                    } );
+                } );
+        } else {
+
+            console.log( { email4shareFilePath } );
+            Mailer.mail( {
+                subject: 'For 4 Share.',
+                recipients: [ 'appasahebl@bithyve.com' ],
+                body: '<b>For 4 share.Pdf password is your answer.</b>',
+                isHTML: true,
+                attachment: {
+                    path: email4shareFilePath,  // The absolute path of the file from which to read data.
+                    type: 'pdf',      // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+                    name: 'For4Share',   // Optional: Custom filename for attachment
+                }
+            }, ( error, event ) => {
+                if ( event == "sent" ) {
+                    alert.simpleOk( "Success", "Email sent success." );
+                    this.updateHistory( data, "Shared.", "" );
+                    this.setState( {
+                        flag_ShareBtnDisable: false,
+                        flag_ReShareBtnDisable: true,
+                        flag_ConfrimBtnDisable: true
+                    } )
+                } else {
+                    alert.simpleOk( "Oops", error );
+                }
+            } );
+        }
     }
 
     //TODO: Re-Share Share
@@ -151,7 +182,9 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
     onSelect = async ( returnValue: any ) => {
         if ( returnValue.data == returnValue.result ) {
             let { data } = this.state;
-            this.updateHistory( data, "Confirmed." );
+            let filePath = JSON.parse( data.sssDetails.encryptedMetaShare );
+            console.log( { filePath } );
+            this.updateHistory( data, "Confirmed.", filePath );
             let walletDetails = await utils.getWalletDetails();
             let sssDetails = await utils.getSSSDetails();
             let encrShares = [];
@@ -173,10 +206,8 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
 
     }
 
-
-
     //TODO: update histroy
-    updateHistory = async ( data: any, title: string ) => {
+    updateHistory = async ( data: any, title: string, filePath: any ) => {
         let arr_History = JSON.parse( data.sssDetails.history );
         const dateTime = Date.now();
         let JsonData = {};
@@ -197,6 +228,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
             this.setState( {
                 arr_History
             } );
+            await RNFS.unlink( filePath );
         }
         console.log( { resUpdateHistroyAndSharedDate } );
     }
