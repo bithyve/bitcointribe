@@ -1,447 +1,558 @@
-import React, { Component } from "react";
+import React from "react";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert } from "react-native";
 import {
-    StyleSheet,
-    View,
-    AsyncStorage,
-    Platform,
-    Dimensions,
-    Image,
-    Keyboard,
-    StatusBar,
-    Linking,
-    Alert,
-    ImageBackground,
-    SafeAreaView,
-    FlatList,
-    TouchableOpacity,
-} from "react-native";
-import { RkCard } from "react-native-ui-kitten";
-import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text, Button, Card, CardItem } from 'native-base';
-import { StackActions, NavigationActions } from "react-navigation";
-import IconFontAwe from "react-native-vector-icons/FontAwesome";
+    Container,
+    Header,
+    Title,
+    Content,
+    Item,
+    Input,
+    Button,
+    Left,
+    Right,
+    Body,
+    Text,
+    List, ListItem,
+} from "native-base";
+import { Icon } from 'react-native-elements'
 import { SvgIcon } from "@up-shared/components";
+import { RkCard } from "react-native-ui-kitten";
+import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Modal from 'react-native-modalbox';
+import Permissions from 'react-native-permissions';
 import { Avatar } from 'react-native-elements';
-import Permissions from 'react-native-permissions'
-import SendSMS from 'react-native-sms';
+import ShimmerPlaceHolder from 'react-native-shimmer-placeholder'
+import TimerCountdown from "react-native-timer-countdown";
+var converter = require( 'number-to-words' );
 var Mailer = require( 'NativeModules' ).RNMail;
+import Modal from 'react-native-modalbox';
+//import SimpleShare from "react-native-simple-share";
+import Share, { ShareSheet } from 'react-native-share';
+import { SocialIcon } from 'react-native-elements'
 
 
-//TODO: Custome Compontes  
+
+//TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import ModelSelectedContactsList from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelSelectedContactsList";
+import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 
+//TODO: Custome model  
 
-
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
-//TODO: Custome Compontes
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-
 //TODO: Custome Object
-import {
-    colors,
-    images,
-    localDB,
-    asyncStorageKeys
-} from "HexaWallet/src/app/constants/Constants";
-import utils from "HexaWallet/src/app/constants/Utils";
-import Singleton from "HexaWallet/src/app/constants/Singleton";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+var utils = require( "HexaWallet/src/app/constants/Utils" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
-//TODO: Common Funciton
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+
+//TODO: Common Funciton   
+var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
-   
-//localization
-import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
-export default class RestoreSelectedContactsListScreen extends Component {
+
+export default class RestoreSelectedContactsListScreen extends React.Component<any, any> {
     constructor ( props: any ) {
-        super( props );
-        this.state = {
-            arr_ModelSelectedContact: [],
-            arr_ModelSelectedPersonRequestSent: [],
-            arr_SelectedContact: [],
-            arr_WalletDetails: [],
-            arr_SSSDetails: [],
-            selectedIndex: 0,
-              flag_DisableBtnNext: true
-            //flag_DisableBtnNext: false
-        };
-    }   
-    
-    componentDidMount() {
-        this.setState( {
-            arr_KeeperInfo: [],
+        super( props )
+        this.state = ( {
+            arr_TrustedContacts: [ {
+                thumbnailPath: "user",
+                givenName: "Select Contact 1",
+                familyName: "",
+                statusMsgColor: "#ff0000",
+                statusMsg: "Not confirmed",
+                opt: undefined,
+            }, {
+                thumbnailPath: "user",
+                givenName: "Select Contact 2",
+                familyName: "",
+                statusMsgColor: "#ff0000",
+                statusMsg: "Not confirmed",
+                opt: undefined,
+            } ],
+            arr_SelfShare: [ {
+                thumbnailPath: "bars",
+                givenName: "Wallet",
+                familyName: "",
+                statusMsgColor: "#ff0000",
+                statusMsg: "Not confirmed",
+            }, {
+                thumbnailPath: "bars",
+                givenName: "Email",
+                familyName: "",
+                statusMsgColor: "#ff0000",
+                statusMsg: "Not confirmed",
+            }, {
+                thumbnailPath: "bars",
+                givenName: "iCloud Share",
+                familyName: "",
+                statusMsgColor: "#ff0000",
+                statusMsg: "Not confirmed",
+            } ],
+            //flag   
+            flag_isTrustedContacts: true,
+            flag_SelfShare: true,
+            flag_SelfShareDisable: true,
+            flag_isSetupTrustedContact: true,
+            flag_DisableBtnNext: true,
+            flag_Loading: false,
         } )
-        if ( Platform.OS == "android" ) {
-            Permissions.request( 'readSms' ).then( ( response: any ) => {
-                console.log( response );
-            } );
-            Permissions.request( 'camera' ).then( ( response: any ) => {
-                console.log( response );
-            } );
-        }
     }
 
-    async  componentWillMount() {
-        let resSSSDetails = await comFunDBRead.readTblSSSDetails();
-        let arr_WalletDetails = await comFunDBRead.readTblWallet();
-        console.log( { resSSSDetails } );
-        console.log( { arr_WalletDetails } );
-        let arr_KeeperInfo = [];
-        let count_AcceptedSecret = 0;
-        for ( let i = 0; i < resSSSDetails.length; i++ ) {
-            let data = {};
-            let fullInfo = resSSSDetails[ i ]
-            let keerInfo = JSON.parse( resSSSDetails[ i ].keeperInfo );
-            data.thumbnailPath = keerInfo.thumbnailPath;
-            data.givenName = keerInfo.givenName;
-            data.familyName = keerInfo.familyName;
-            data.phoneNumbers = keerInfo.phoneNumbers;
-            data.emailAddresses = keerInfo.emailAddresses;
-            data.recordId = fullInfo.recordId;
-            console.log( fullInfo.sharedDate );
-            if ( fullInfo.sharedDate == "" && fullInfo.acceptedDate == "" ) {
-                data.btnTitle = "Request";
-                data.flag_BtnTitle = true;
-            } else if ( fullInfo.sharedDate != "" && fullInfo.acceptedDate == "" ) {
-                data.btnTitle = "Re-Request";
-                data.flag_BtnTitle = true;
-            } else if ( fullInfo.sharedDate != "" && fullInfo.acceptedDate != "" ) {
-                data.successMsg = "Secret Receieved";
-                data.flag_BtnTitle = false;
-            } else {
-                data.btnTitle = "Request";
-                data.flag_BtnTitle = true;
+    async componentWillMount() {
+        this.willFocusSubscription = this.props.navigation.addListener(
+            "willFocus",
+            () => {
+                this.loaddata();
             }
-            if ( fullInfo.acceptedDate != "" ) {
-                count_AcceptedSecret = count_AcceptedSecret + 1;
+        );
+    }
+
+    componentWillUnmount() {
+        this.willFocusSubscription.remove();
+    }
+
+    loaddata = async () => {
+        this.setState( {
+            flag_Loading: true
+        } )
+        let flag_Loading = true;
+        let dateTime = Date.now();
+        let walletDetails = await utils.getWalletDetails();
+        let sssDetails = await utils.getSSSDetails();
+        console.log( { sssDetails } );
+        console.log( { walletDetails, sssDetails } );
+        //flag   
+        let flag_isSetupTrustedContact, flag_isSecretQuestions;
+        //array  
+        let arr_TrustedContacts = [];
+        let history = [];
+        let tempOpt = [];
+        let temp = [];
+        //Trusted Contacts
+        if ( sssDetails.length > 0 ) {
+            for ( let i = 0; i <= 1; i++ ) {
+                let keeperInfo = JSON.parse( sssDetails[ i ].keeperInfo );
+                let data = {};
+                data.emailAddresses = keeperInfo.emailAddresses;
+                data.phoneNumbers = keeperInfo.phoneNumbers;
+                data.history = JSON.parse( sssDetails[ i ].history );
+                data.recordID = keeperInfo.recordID;
+                data.thumbnailPath = keeperInfo.thumbnailPath
+                data.givenName = keeperInfo.givenName;
+                data.familyName = keeperInfo.familyName;
+                data.sssDetails = sssDetails[ i ];
+                let sharedDate = parseInt( sssDetails[ i ].sharedDate );
+                console.warn( 'sharedDate date =' + sharedDate.toString() );
+                var startDate = new Date( dateTime );
+                var endDate = new Date( sharedDate );
+                //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
+                var diff = Math.abs( startDate.getTime() - endDate.getTime() );
+                //console.warn( 'diff' + diff.toString() );  
+                const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
+                const seconds: any = Math.floor( diff / 1000 % 60 );
+                //console.log( { minutes, seconds } );
+                //console.warn( minutes.toString() )
+                const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
+                data.totalSec = 540 - totalSec;
+                //for history get opt     
+                for ( let i = 0; i < 2; i++ ) {
+                    let eachHistory = JSON.parse( sssDetails[ i ].history );
+                    let eachHistoryLength = eachHistory.length;
+                    var otp;
+                    if ( eachHistory[ eachHistoryLength - 1 ] != undefined ) {
+                        otp = eachHistory[ eachHistoryLength - 1 ].otp;
+                    } else {
+                        otp = undefined;
+                    }
+                    tempOpt.push( otp );
+                }
+
+                console.log( { tempOpt } );
+
+                if ( totalSec < 540 && sssDetails[ i ].shareStage == "Ugly" ) {
+                    data.statusMsg = "Shared";
+                    data.statusMsgColor = "#C07710";
+                    data.flag_timer = true;
+                    data.opt = tempOpt[ i ];
+                } else if ( totalSec >= 540 && sssDetails[ i ].shareStage == "Ugly" ) {
+                    data.statusMsg = "Shared OTP expired.";
+                    data.statusMsgColor = "#C07710";
+                    data.flag_timer = false;
+                } else if ( sssDetails[ i ].shareStage == "Good" ) {
+                    data.statusMsg = "Share accessible";
+                    data.statusMsgColor = "#008000";
+                    data.flag_timer = false;
+                } else if ( sssDetails[ i ].shareStage == "Bad" ) {
+                    data.statusMsg = "Share not accessible";
+                    data.statusMsgColor = "#ff0000";
+                    data.flag_timer = false;
+                } else if ( sssDetails[ i ].shareStage == "Ugly" && sssDetails[ i ].sharedDate != "" ) {
+                    data.statusMsg = "Share not accessible";
+                    data.statusMsgColor = "#ff0000";
+                    data.flag_timer = false;
+                }
+                else {
+                    data.statusMsg = "Not Confirmed";
+                    data.statusMsgColor = "#ff0000";
+                    data.flag_timer = false;
+                }
+                arr_TrustedContacts.push( data );
             }
-            arr_KeeperInfo.push( data );
-        }
-        if ( count_AcceptedSecret > 1 ) {
+
+            //Self Share  
+            let arr_SelfShare = [];
+            let arrTitle = [ "", "", "Wallet", "Email", "iCloud" ];
+            for ( let i = 0; i < sssDetails.length; i++ ) {
+                if ( i > 1 ) {
+                    console.log( { data: sssDetails[ i ] } );
+                    let sharedDate = sssDetails[ i ].sharedDate;
+                    let shareStage = sssDetails[ i ].shareStage;
+                    let statusMsg = this.getMsgAndColor( sharedDate, shareStage )[ 0 ];
+                    let statusColor = this.getMsgAndColor( sharedDate, shareStage )[ 1 ];
+                    console.log( { statusMsg, statusColor } );
+                    let data = {};
+                    data.thumbnailPath = "bars";
+                    data.givenName = arrTitle[ i ];
+                    data.familyName = "";
+                    data.statusMsgColor = statusColor;
+                    data.statusMsg = statusMsg;
+                    data.sssDetails = sssDetails[ i ];
+                    arr_SelfShare.push( data );
+                }
+            }
+
+            flag_Loading = false
             this.setState( {
-                flag_DisableBtnNext: false
+                flag_isSetupTrustedContact,
+                arr_TrustedContacts,
+                flag_isSecretQuestions,
+                arr_SelfShare,
             } )
-        }
-        this.setState( {
-            arr_KeeperInfo,
-            arr_WalletDetails,
-            arr_SSSDetails: resSSSDetails
-        } )
-    }
-
-    //TODO: model  in request click
-    click_Request = async ( item: any, index: number ) => {
-        console.log( { item, index } );
-
-        this.setState( {
-            arr_SelectedContact: item,
-            selectedIndex: index
-        } )
-        this.refs.modal4.open();
-    }
-
-    click_Next() {
-         this.props.navigation.push( "RestoreWalletUsingTrustedContactQueAndAnwScreen" );
-        //this.props.navigation.push( "ResotreSecureAccountNavigator" );
-    }
-
-    click_SentRequest( type: string, val: any ) {
-        console.log( { val } );
-
-        let walletDetails = this.state.arr_WalletDetails;
-        let script = {};
-        script.wn = walletDetails.walletType
-        var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
-        encpScript = encpScript.split( "/" ).join( "_+_" );
-        this.refs.modal4.close();
-        if ( type == "SMS" ) {
-            SendSMS.send( {
-                body: 'https://prime-sign-230407.appspot.com/sss/rtb/' + encpScript,
-                recipients: [ val.length != 0 ? val[ 0 ].number : "" ],
-                successTypes: [ 'sent', 'queued' ]
-            }, ( completed, cancelled, error ) => {
-                if ( completed ) {
-                    console.log( 'SMS Sent Completed' );
-                    setTimeout( () => {
-                        Alert.alert(
-                            'Success',
-                            'SMS Sent Completed.',
-                            [
-                                {
-                                    text: 'OK', onPress: () => {
-                                        this.reloadList( "SMS" );
-                                    }
-                                },
-
-                            ],
-                            { cancelable: false }
-                        )
-                    }, 1000 );
-                } else if ( cancelled ) {
-                    console.log( 'SMS Sent Cancelled' );
-                } else if ( error ) {
-                    console.log( 'Some error occured' );
-                }
-            } );
-        } else if ( type == "EMAIL" ) {
-            Mailer.mail( {
-                subject: 'Hexa Wallet SSS Restore',
-                recipients: [ val.length != 0 ? val[ 0 ].email : "" ],
-                body: 'https://prime-sign-230407.appspot.com/sss/rtb/' + encpScript,
-                isHTML: true,
-            }, ( error, event ) => {
-                console.log( { event, error } );
-                if ( event == "sent" ) {
-                    setTimeout( () => {
-                        Alert.alert(
-                            'Success',
-                            'Email Sent Completed.',
-                            [
-                                {
-                                    text: 'OK', onPress: () => {
-                                        this.reloadList( "EMAIL" );
-                                    }
-                                },
-
-                            ],
-                            { cancelable: false }
-                        )
-
-                    }, 1000 );
-                }
-            } );
-            if ( Platform.OS == "android" ) {
-                setTimeout( () => {
-                    Alert.alert(
-                        'Success',
-                        'Email Sent Completed.',
-                        [
-                            {
-                                text: 'OK', onPress: () => {
-                                    this.reloadList( "EMAIL" );
-                                }
-                            },
-
-                        ],
-                        { cancelable: false }
-                    )
-                }, 1000 );
-
-            }
         } else {
-            this.props.navigation.push( "QRCodeScanScreen", { onSelect: this.onSelect } );
-            this.refs.modal4.close();
+            flag_Loading = false
+        }
+        this.setState( {
+            flag_Loading
+        } );
+    }
+
+    getMsgAndColor( sharedDate: string, shareStage: string ) {
+        if ( sharedDate == "" && shareStage != "Good" ) {
+            return [ "Not Confirmed", "#ff0000" ];
+        } else if ( sharedDate != "" && shareStage != "Good" ) {
+            return [ "Shared", "#C07710" ];
+        } else {
+            return [ "Confirmed", "#008000" ];
+        }
+    }
+
+    //TODO: func click_Item
+    click_AssociateContactItem = ( item: any ) => {
+        if ( item.givenName == "Select Contact 1" || item.givenName == "Select Contact 2" ) {
+            this.props.navigation.push( "RestoreAllContactListScreen" );
+        } else {
+            this.props.navigation.push( "RestoreTrustedContactsShareScreen", { data: item, title: item.givenName + " Share" } )
         }
 
     }
 
-    //TODO: func backQrCodeScreen
-    onSelect = ( data: any ) => {
-        console.log( { data } );
-        this.reloadList( "QR" );
-    };
-
-    //TODO: Deep{ling sent then reload data
-    reloadList = async ( type: string ) => {
-        const dateTime = Date.now();
-        let selectedItem = this.state.arr_SSSDetails[ this.state.selectedIndex ];
-        //console.log( { selectedItem } );
-        var temp = [];
-        temp = JSON.parse( selectedItem.history );
-        //console.log( { temp } );
-        let jsondata = {};
-        jsondata.title = "Secret Share using " + type.toLowerCase();;
-        jsondata.date = utils.getUnixToDateFormat( dateTime );
-        temp.push( jsondata );
-        let resupdateSSSTransferMehtodDetails = await dbOpration.updateSSSTransferMehtodDetails(
-            localDB.tableName.tblSSSDetails,
-            type,
-            dateTime,
-            temp,
-            selectedItem.recordId
-        )
-        if ( resupdateSSSTransferMehtodDetails ) {
-            this.componentWillMount();
-        }
+    //TODO: func click_FirstMenuItem
+    click_SecretQuestion( item: any ) {
+        let walletDetails = item.walletDetails;
+        let data = JSON.parse( walletDetails.setUpWalletAnswerDetails );
+        this.props.navigation.push( "BackupSecretQuestionsScreen", { data: data, walletDetails: walletDetails } );
     }
 
+    //TODO: click_SetupTrustedContacts
+    click_SetupTrustedContacts() {
+        this.setState( {
+            arr_ModelBackupYourWallet: [
+                {
+                    modalVisible: true
+                }
+            ]
+        } )
+    }
+
+
+
+    onSelect = async ( returnValue: any ) => {
+        // let walletDetails = await utils.getWalletDetails();
+        // var sssDetails = await utils.getSSSDetails();
+        // let encrShares = [];
+        // for ( let i = 0; i <= 2; i++ ) {
+        //     encrShares.push( sssDetails[ i ].shareId )
+        // }
+        // console.log( { encrShares } );
+        // let updateShareIdStatus = await comAppHealth.connection_AppHealthAndSSSUpdate( parseInt( walletDetails.lastUpdated ), encrShares );
+        // if ( updateShareIdStatus ) {
+        //     sssDetails = await utils.getSSSDetails();
+        //     let arr_SelfShare = [];
+        //     let arrTitle = [ "", "", "Wallet", "Email", "iCloud" ];
+        //     for ( let i = 0; i < sssDetails.length; i++ ) {
+        //         if ( i > 1 ) {
+        //             console.log( { data: sssDetails[ i ] } );
+        //             let sharedDate = sssDetails[ i ].sharedDate;
+        //             let shareStage = sssDetails[ i ].shareStage;
+        //             let statusMsg = this.getMsgAndColor( sharedDate, shareStage )[ 0 ];
+        //             let statusColor = this.getMsgAndColor( sharedDate, shareStage )[ 1 ];
+        //             console.log( { statusMsg, statusColor } );
+        //             let data = {};
+        //             data.thumbnailPath = "bars";
+        //             data.givenName = arrTitle[ i ];
+        //             data.familyName = "";
+        //             data.statusMsgColor = statusColor;
+        //             data.statusMsg = statusMsg;
+        //             data.sssDetails = sssDetails[ i ];
+        //             arr_SelfShare.push( data );
+        //         }
+        //     }
+        //     this.setState( {
+        //         arr_SelfShare
+        //     } )
+        // }
+    }
+
+    //TODO: Self share
+    click_SelfShare = async ( item: any ) => {
+        console.log( { item } );
+        this.props.navigation.push( "RestoreSelfShareScreen", { data: item, title: item.givenName + " Share" } );
+        // let sssDetails = await utils.getSSSDetails();
+        // console.log( { sssDetails } );
+        // let data3Share = sssDetails[ 2 ];
+        // var email4shareFilePath = sssDetails[ 3 ].encryptedMetaShare;
+
+        // console.log( { email4shareFilePath } );
+        // if ( item.givenName == "Wallet" ) {
+        //     this.props.navigation.push( "SelfShareUsingWalletQRCode", { data: data3Share, onSelect: this.onSelect } )
+        // } else if ( item.givenName == "Email" ) {
+        //     this.props.navigation.push( "SelfShareSharingScreen", { data: item, title: "Email Share" } );
+
+        // } else {
+        //     this.props.navigation.push( "SelfShareSharingScreen", { data: item, title: "iCloud Share" } );
+        // }
+    }
+
+    click_Share5Sahring( type: string ) {
+        // if ( type == "iCLOUD" ) {
+
+        // } else if ( type == "SLACK" ) {
+
+        // } else if ( type == "WHATSAPP" ) {
+
+        // }
+    }
+
+
+
+    //TODO: click next button all or 3 share conrimed
+    click_Next() {
+        console.log( 'next' );
+    }
 
 
     render() {
-        let flag_DisableBtnNext = this.state.flag_DisableBtnNext;
-        let selectedContact = this.state.arr_SelectedContact;
+        //flag
+        let { flag_isTrustedContacts, flag_isSetupTrustedContact, flag_isMnemonic, flag_isSecretQuestions, flag_isTwoFactor, flag_Loading, flag_SelfShare, flag_SelfShareDisable, flag_DisableBtnNext } = this.state;
+        //TouchableOpacity
+        let { flag_DisableSecureTwoFactor, flag_DisableSecretQuestion } = this.state;
+        //array
+        let { arr_TrustedContacts, arr_SelfShare, arr_SecretQuestion } = this.state;
         return (
-            <View style={ styles.container }>
+            <Container>
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                         <View style={ { marginLeft: 10, marginTop: 15 } }>
                             <Button
                                 transparent
-                                onPress={ () => this.props.navigation.navigate( "RestoreAndWalletSetupNavigator" ) }
+                                onPress={ () => this.props.navigation.pop() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 22 : 17, marginLeft: 0 } ] }>Selected Contacts</Text>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Restore Wallet</Text>
                             </Button>
                         </View>
-
-                        <View style={ { flex: 0.1, alignItems: "center", justifyContent: "center" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>You can request share from the selected contacts</Text>
-                        </View>
-                        <View
-                            style={ {
-                                flex: 1,
-                                margin: 10
-                            } }
+                        <KeyboardAwareScrollView
+                            enableAutomaticScroll
+                            automaticallyAdjustContentInsets={ true }
+                            keyboardOpeningTime={ 0 }
+                            enableOnAndroid={ true }
+                            contentContainerStyle={ { flexGrow: 1 } }
                         >
-                            <FlatList
-                                data={
-                                    this.state.arr_KeeperInfo
-                                }
-                                scrollEnabled={ false }
-                                renderItem={ ( { item, index } ) => (
-                                    <RkCard
-                                        rkType="shadowed"
-                                        style={ {
-                                            flex: 1,
-                                            borderRadius: 8,
-                                            marginBottom: 10,
-                                        } }
-                                    >
-                                        <View style={ { flex: 1, backgroundColor: "#ffffff", borderRadius: 8, margin: 10 } }>
-                                            <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", borderRadius: 8, } } >
-                                                { renderIf( item.thumbnailPath != "" )(
-                                                    <Avatar medium rounded source={ { uri: item.thumbnailPath } } />
-                                                ) }
-                                                { renderIf( item.thumbnailPath == "" )(
-                                                    <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
-                                                ) }
-                                                <View style={ { flexDirection: "column", justifyContent: "center", flex: 2.8 } }>
-                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
-                                                    { renderIf( item.flag_BtnTitle != true )(
-                                                        <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 12, color: "#50B48A" } ] }>{ item.successMsg }</Text>
-                                                    ) }
-                                                </View>
-                                                { renderIf( item.flag_BtnTitle == true )(
-                                                    <View style={ {
-                                                        flex: 1.5,
-                                                        alignItems: 'flex-end',
-                                                        justifyContent: 'center'
-                                                    } }>
-                                                        <Button small transparent dark style={ { backgroundColor: "#D0D0D0" } } onPress={ () => this.click_Request( item, index ) }>
-                                                            <Text style={ { fontSize: 12, color: "#000000" } }>{ item.btnTitle }</Text>
-                                                        </Button>
+                            <View style={ styles.viewTrustedContacts }>
+                                <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
+                                    <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Trusted contacts</Text>
+                                </View>
+                                <View style={ { flex: 1 } }>
+                                    <FlatList
+                                        data={
+                                            arr_TrustedContacts
+                                        }
+                                        showsVerticalScrollIndicator={ false }
+                                        renderItem={ ( { item } ) => (
+                                            <TouchableOpacity style={ {
+                                            } } onPress={ () => {
+                                                this.click_AssociateContactItem( item )
+                                            } }
+                                            >
+                                                <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
+                                                    <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
+                                                        { renderIf( item.thumbnailPath != "" )(
+                                                            flag_isSetupTrustedContact == true ? <Avatar medium rounded icon={ { name: item.thumbnailPath, type: 'font-awesome' } } /> : <Avatar medium rounded source={ { uri: item.thumbnailPath } } />
+
+                                                        ) }
+                                                        { renderIf( item.thumbnailPath == "" )(
+                                                            <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
+                                                        ) }
+                                                        <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
+                                                            <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                            <View style={ { flexDirection: "row" } }>
+                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                                { renderIf( typeof item.opt !== "undefined" )(
+                                                                    <TimerCountdown
+                                                                        initialMilliseconds={ item.totalSec * 1000 }
+                                                                        onExpire={ () => this.loaddata() }
+                                                                        formatMilliseconds={ ( milliseconds ) => {
+                                                                            const remainingSec = Math.round( milliseconds / 1000 );
+                                                                            const seconds = parseInt( ( remainingSec % 60 ).toString(), 10 );
+                                                                            const minutes = parseInt( ( ( remainingSec / 60 ) % 60 ).toString(), 10 );
+                                                                            const hours = parseInt( ( remainingSec / 3600 ).toString(), 10 );
+                                                                            const s = seconds < 10 ? '0' + seconds : seconds;
+                                                                            const m = minutes < 10 ? '0' + minutes : minutes;
+                                                                            let h = hours < 10 ? '0' + hours : hours;
+                                                                            h = h === '00' ? '' : h + ':';
+                                                                            return h + m + ':' + s;
+                                                                        } }
+                                                                        allowFontScaling={ true }
+                                                                        style={ { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } }
+                                                                    />
+                                                                ) }
+                                                            </View>
+                                                            { renderIf( typeof item.opt !== "undefined" )(
+                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>OTP { " " }{ item.opt }</Text>
+                                                            ) }
+                                                        </View>
+                                                        <View style={ {
+                                                            flex: 1,
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            flexDirection: "row"
+                                                        } }>
+                                                            <View style={ { flexDirection: "column", flex: 1, alignItems: "center" } }>
+                                                                <Text note style={ { fontSize: 14 } }>Last assessed on</Text>
+                                                                <Text style={ { fontSize: 14 } }>4/11/2019 12:23</Text>
+                                                            </View>
+                                                            <IconFontAwe name="angle-right" style={ { fontSize: 25, marginRight: 10, flex: 0.1 } } />
+                                                        </View>
                                                     </View>
-                                                ) }
-                                            </View>
-                                        </View>
-                                    </RkCard>
-                                ) }
-                                keyExtractor={ item => item.recordId }
-                                extraData={ this.state }
-                            />
-                        </View>
-                        <View style={ { flex: 0.2, justifyContent: "flex-end" } }>
-                            <FullLinearGradientButton
-                                click_Done={ () => this.click_Next() }
-                                title="Next"
-                                disabled={ flag_DisableBtnNext }
-                                style={ [ flag_DisableBtnNext == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
-                            />
-                        </View>
-                        <Modal style={ [ styles.modal, styles.modal4 ] } position={ "bottom" } ref={ "modal4" }>
-                            <View>
-                                <View style={ { flexDirection: 'column', alignItems: "center", marginTop: 10, marginBottom: 15, borderBottomColor: "#EFEFEF", borderBottomWidth: 1 } }>
-                                    { renderIf( selectedContact.thumbnailPath != "" )(
-                                        <Avatar medium rounded source={ { uri: selectedContact.thumbnailPath } } />
-                                    ) }
-                                    { renderIf( selectedContact.thumbnailPath == "" )(
-                                        <Avatar medium rounded title={ selectedContact.givenName != null && selectedContact.givenName.charAt( 0 ) } />
-                                    ) }
-                                    <Text style={ { marginBottom: 10 } }>{ selectedContact.givenName + " " + selectedContact.familyName }</Text>
+                                                </View>
+                                            </TouchableOpacity>
+                                        ) }
+                                        keyExtractor={ item => item.recordID }
+                                        extraData={ this.state }
+                                    />
                                 </View>
-
-                                <View style={ { alignItems: "center", } }>
-                                    <View style={ { flexDirection: "row", marginBottom: 10 } }>
-                                        <Button transparent
-                                            style={ [ { alignItems: "center", flex: 1 } ] }
-                                            onPress={ () => this.click_SentRequest( "SMS", selectedContact.phoneNumbers ) }
-
-
-                                        >
-                                            <View style={ { alignItems: "center", marginLeft: "20%", flexDirection: "column" } }>
-                                                <SvgIcon
-                                                    name="chat"
-                                                    color="#37A0DA"
-                                                    size={ 35 }
-                                                />
-                                                <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via SMS</Text>
-                                            </View>
-
-                                        </Button>
-                                        <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_SentRequest( "EMAIL", selectedContact.emailAddresses ) }>
-                                            <View style={ { alignItems: "center", marginLeft: "20%", flexDirection: "column" } }>
-                                                <SvgIcon
-                                                    name="mail-2"
-                                                    color="#37A0DA"
-                                                    size={ 30 }
-                                                />
-                                                <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via Email</Text>
-                                            </View>
-                                        </Button>
-                                        <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_SentRequest( "QR", selectedContact.qrCodeString ) }>
-                                            <View style={ { alignItems: "center", marginLeft: "20%", flexDirection: "column" } }>
-                                                <SvgIcon
-                                                    name="qr-code-3"
-                                                    color="#37A0DA"
-                                                    size={ 30 }
-
-                                                />
-                                                <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1", textAlign: "center" } }>Via QR</Text>
-                                            </View>
-                                        </Button>
-                                    </View>
-                                </View>
-
                             </View>
-                        </Modal>
+
+
+                            <View style={ { flex: 3 } }>
+                                <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
+                                    <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Self Share</Text>
+                                </View>
+                                <View style={ { flex: 1 } }>
+                                    <FlatList
+                                        data={
+                                            arr_SelfShare
+                                        }
+                                        showsVerticalScrollIndicator={ false }
+                                        renderItem={ ( { item } ) => (
+                                            <TouchableOpacity style={ {
+                                            } } onPress={ () => {
+                                                this.click_SelfShare( item )
+                                            } }
+                                            >
+                                                <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
+                                                    <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
+                                                        <Avatar medium rounded icon={ { name: item.thumbnailPath, type: 'font-awesome' } } />
+                                                        <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
+                                                            <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                            <View style={ { flexDirection: "row" } }>
+                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                            </View>
+                                                        </View>
+                                                        <View style={ {
+                                                            flex: 1,
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            flexDirection: "row"
+                                                        } }>
+                                                            <View style={ { flexDirection: "column", flex: 1, alignItems: "center" } }>
+                                                                <Text note style={ { fontSize: 14 } }>Last assessed on</Text>
+                                                                <Text style={ { fontSize: 14 } }>4/11/2019 12:23</Text>
+                                                            </View>
+                                                            <IconFontAwe name="angle-right" style={ { fontSize: 25, marginRight: 10, flex: 0.1 } } />
+                                                        </View>
+                                                    </View>
+                                                </View>
+                                            </TouchableOpacity>
+                                        ) }
+                                        keyExtractor={ item => item.recordID }
+                                        extraData={ this.state }
+                                    />
+                                </View>
+                            </View>
+                            <View style={ { flex: 0.2, justifyContent: "flex-end" } }>
+                                <FullLinearGradientButton
+                                    click_Done={ () => this.click_Next() }
+                                    title="Next"
+                                    disabled={ flag_DisableBtnNext }
+                                    style={ [ flag_DisableBtnNext == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
+                                />
+                            </View>
+                        </KeyboardAwareScrollView>
                     </ImageBackground>
-
                 </SafeAreaView>
-
-            </View >
+                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+            </Container >
         );
     }
-
 }
-
-let styles = StyleSheet.create( {
+const primaryColor = colors.appColor;
+const styles = StyleSheet.create( {
     container: {
+        flex: 1,
+        backgroundColor: "#F8F8F8",
+    },
+    viewTrustedContacts: {
+        flex: 1,
+    },
+    viewMnemonic: {
         flex: 1
     },
-    viewSetupWallet: {
-        flex: 4,
-        margin: 10
+    viewSecretQuestion: {
+        flex: 1
     },
-    viewAppLogo: {
-        marginTop: 20,
-        flex: 1,
-        alignItems: "center",
+    view2FactorAuto: {
+        flex: 1
     },
-    imgAppLogo: {
-        height: 70,
-        width: 70
+    itemInputWalletName: {
+        borderWidth: 0,
+        borderRadius: 10,
+        shadowOffset: { width: 2, height: 2 },
+        shadowColor: 'gray',
+        shadowOpacity: 0.3,
+        backgroundColor: '#FFFFFF'
+
     },
-    txtWhiteColor: {
-        color: "#ffffff"
-    },
+    //botom model
     modal: {
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10
@@ -449,5 +560,4 @@ let styles = StyleSheet.create( {
     modal4: {
         height: 180
     }
-
 } );
