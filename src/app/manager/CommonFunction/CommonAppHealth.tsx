@@ -49,6 +49,8 @@ const connection_AppHealthStatus = async ( qatime: number, sharesId: any ) => {
         localDB.tableName.tblWallet,
         res
     );
+    console.log( { resupdateWalletDetials } );
+
     if ( resupdateWalletDetials ) {
         return res.sharesInfo;
     }

@@ -208,11 +208,12 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                             let rescreateMetaShare2 = await sss.createMetaShare( 3, encryptedShares[ 2 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
                             let resGenerateEncryptedMetaShare3 = await sss.generateEncryptedMetaShare( rescreateMetaShare2.data.metaShare );
                             //console.log( { rescreateMetaShare2 } );
-                            //for pdf                     
+                            //for pdf                      
                             let rescreateMetaShare3 = await sss.createMetaShare( 4, encryptedShares[ 3 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
-                            console.log( { rescreateMetaShare3 } );
+                            //console.log( { rescreateMetaShare3 } );
                             if ( rescreateMetaShare3.status == 200 ) {
                                 var qrcode4share = await sss.createQR( rescreateMetaShare3.data.metaShare, 4 );
+                                // console.log( { qrcode4share } );
                                 if ( qrcode4share.status == 200 ) {
                                     qrcode4share = qrcode4share.data.qrData
                                     // console.log( { qrcode4share } );
@@ -224,28 +225,27 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                                         let rescreateMetaShare4 = await sss.createMetaShare( 5, encryptedShares[ 4 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
                                         console.log( { rescreateMetaShare4 } );
                                         if ( rescreateMetaShare4.status == 200 ) {
-                                            console.log( "I" );
-
                                             var qrcode5share = await sss.createQR( rescreateMetaShare4.data.metaShare, 5 );
                                             if ( qrcode5share.status == 200 ) {
-                                                console.log( "II" );
                                                 qrcode5share = qrcode5share.data.qrData
-                                                console.log( { qrcode5share } );
                                                 let temp = [];
                                                 temp.push( { arrQRCodeData: qrcode5share, secondaryXpub: secondaryXpub, qrData: resSetupSecureAccount.setupData.qrData, secret: resSetupSecureAccount.setupData.secret, secondaryMnemonic: getSecoundMnemonic, bhXpub: resSetupSecureAccount.setupData.bhXpub } )
                                                 let resGenerate5thsharepdf = await this.generate5thShare( temp );
                                                 console.log( { resGenerate5thsharepdf } );
                                                 if ( resGenerate5thsharepdf != "" ) {
-                                                    console.log( "III" );
                                                     let resAppHealthStatus = await comAppHealth.connection_AppHealthStatus( dateTime, shareIds )
                                                     let keeperInfo = [ { info: arr_SelectedList[ 0 ] }, { info: arr_SelectedList[ 1 ] }, { info: rescreateMetaShare2.data }, { info: qrcode4share[ 0 ] }, { info: qrcode5share[ 0 ] } ];
                                                     let recoardInfo = [ { id: arr_SelectedList[ 0 ].recordID }, { id: arr_SelectedList[ 1 ].recordID }, { id: "" }, { id: "" }, { id: "" } ];
+                                                    let arrTypes = [ { type: "Trusted Contacts" }, { type: "Trusted Contacts" }, { type: "Self Share" }, { type: "Self Share" }, { type: "Self Share" } ];
                                                     let encryptedMetaShare = [ { metaShare: resGenerateEncryptedMetaShare1.data }, { metaShare: resGenerateEncryptedMetaShare2.data }, { metaShare: resGenerateEncryptedMetaShare3.data }, { metaShare: resGenerate4thsharepdf }, { metaShare: resGenerate5thsharepdf } ]
-                                                    let temp = [ { date: dateTime, share: encryptedShares, shareId: shareIds, keeperInfo: keeperInfo, recordId: recoardInfo, encryptedMetaShare: encryptedMetaShare, shareStage: resAppHealthStatus } ]
+                                                    let temp = [ { date: dateTime, share: encryptedShares, shareId: shareIds, keeperInfo: keeperInfo, recordId: recoardInfo, encryptedMetaShare: encryptedMetaShare, shareStage: resAppHealthStatus, type: arrTypes } ]
+                                                    console.log( { temp } );
                                                     let resInsertSSSShare = await dbOpration.insertSSSShareDetails(
                                                         localDB.tableName.tblSSSDetails,
                                                         temp
                                                     );
+                                                    console.log( { resInsertSSSShare } );
+
                                                     if ( resInsertSSSShare ) {
                                                         let queTemp = [];
                                                         let questionData = {};
@@ -256,6 +256,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                                                             localDB.tableName.tblWallet,
                                                             queTemp
                                                         );
+                                                        console.log( { resUpdateWalletAns } );
 
                                                         if ( resUpdateWalletAns ) {
                                                             await comFunDBRead.readTblSSSDetails();
@@ -318,11 +319,17 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             //console.log( { res4thShare4Create } );
             let res4thShare5Create = await this.generateSahreQRCode( arrQRCodeData[ 4 ], "qrcode4thSahre5.png" );
             //console.log( { res4thShare5Create } );
+            let res4thShare6Create = await this.generateSahreQRCode( arrQRCodeData[ 5 ], "qrcode4thSahre6.png" );
+            //console.log( { res4thShare6Create } );
+            let res4thShare7Create = await this.generateSahreQRCode( arrQRCodeData[ 6 ], "qrcode4thSahre7.png" );
+            //console.log( { res4thShare7Create } );
+            let res4thShare8Create = await this.generateSahreQRCode( arrQRCodeData[ 7 ], "qrcode4thSahre8.png" );
+            //console.log( { res4thShare8Create } );
             let resSecoundXpub4Share = await this.generateXpubAnd2FAQRCode( secondaryXpub, "secoundryXpub4Share.png" );
-            // console.log( { resSecoundXpub4Share } );
+            // console.log( { resSecoundXpub4Share } );  
             let res2FASecret4Share = await this.generateXpubAnd2FAQRCode( qrData, "googleAuto2FASecret4Share.png" );
             // console.log( { res2FASecret4Share } );
-            let create4thPdf = await this.genreatePdf4Share( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, resSecoundXpub4Share, res2FASecret4Share, "SecretSharing4Share.pdf", "For 4th Shares" );
+            let create4thPdf = await this.genreatePdf4Share( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, res4thShare6Create, res4thShare7Create, res4thShare8Create, resSecoundXpub4Share, res2FASecret4Share, "SecretSharing4Share.pdf", "For 4th Shares" );
             resolve( create4thPdf );
 
         } );
@@ -348,11 +355,19 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             //console.log( { res4thShare4Create } );
             let res5thShare5Create = await this.generateSahreQRCode( arrQRCodeData[ 4 ], "qrcode5thSahre5.png" );
             //console.log( { res4thShare5Create } );
+            let res5thShare6Create = await this.generateSahreQRCode( arrQRCodeData[ 5 ], "qrcode5thSahre6.png" );
+            //console.log( { res5thShare6Create } );
+            let res5thShare7Create = await this.generateSahreQRCode( arrQRCodeData[ 6 ], "qrcode5thSahre7.png" );
+            //console.log( { res5thShare7Create } );
+            let res5thShare8Create = await this.generateSahreQRCode( arrQRCodeData[ 7 ], "qrcode5thSahre8.png" );
+            //console.log( { res5thShare8Create } );   
+
+
             let resSecoundXpub5Share = await this.generateXpubAnd2FAQRCode( secondaryXpub, "secoundryXpub5Share.png" );
             // console.log( { resSecoundXpub4Share } );
             let res2FASecret5Share = await this.generateXpubAnd2FAQRCode( qrData, "googleAuto2FASecret5Share.png" );
             // console.log( { res2FASecret4Share } );
-            let create5thPdf = await this.genreatePdf4Share( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, resSecoundXpub5Share, res2FASecret5Share, "SecretSharing5Share.pdf", "For 5th Shares" );
+            let create5thPdf = await this.genreatePdf4Share( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, res5thShare6Create, res5thShare7Create, res5thShare8Create, resSecoundXpub5Share, res2FASecret5Share, "SecretSharing5Share.pdf", "For 5th Shares" );
             resolve( create5thPdf );
         } );
     }
@@ -376,13 +391,14 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
             // console.log( { docsDir } );
             var path = `${ docsDir }/${ fileName }`;
-            await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + share1, {
+            await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + share1, {
             } )
                 .then( ( res: any ) => {
                     let base64Str = res.base64()
                     //console.log( { base64Str } );
                     RNFS.writeFile( path, base64Str, "base64" )
                         .then( ( success: any ) => {
+                            console.log( { path } );
                             resolve( path );
                         } )
                         .catch( ( err: any ) => {
@@ -407,13 +423,14 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
             // console.log( { docsDir } );
             var path = `${ docsDir }/${ fileName }`;
-            await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + share1, {
+            await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + share1, {
             } )
                 .then( ( res: any ) => {
                     let base64Str = res.base64()
                     // console.log( { base64Str } );
                     RNFS.writeFile( path, base64Str, "base64" )
                         .then( ( success: any ) => {
+                            console.log( { path } );
                             resolve( path );
                         } )
                         .catch( ( err: any ) => {
@@ -435,22 +452,31 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
         return chunks;
     }
 
-    genreatePdf4Share = async ( data: any, pathShare1: string, pathShare2: string, pathShare3: string, pathShare4: string, pathShare5: string, pathSecoundXpub: string, path2FASecret: string, pdfFileName: string, forShare: string ) => {
+    genreatePdf4Share = async ( data: any, pathShare1: string, pathShare2: string, pathShare3: string, pathShare4: string, pathShare5: string, pathShare6: string, pathShare7: string, pathShare8: string, pathSecoundXpub: string, path2FASecret: string, pdfFileName: string, forShare: string ) => {
         return new Promise( async ( resolve, reject ) => {
             let arrQRCodeData = data.arrQRCodeData;
             let secret2FA = data.secret;
             let secondaryMnemonic = data.secondaryMnemonic;
             let bhXpub = data.bhXpub;
 
+
+
+
+
+
+
+
             //Share 1 
-            // let arrShare1 = .split();
-            // console.log( { arrShare1 } );     
-            let arrShare1 = this.chunkArray( arrQRCodeData[ 0 ], 11 );
-            let arrShare2 = this.chunkArray( arrQRCodeData[ 1 ], 11 );
-            let arrShare3 = this.chunkArray( arrQRCodeData[ 2 ], 11 );
-            let arrShare4 = this.chunkArray( arrQRCodeData[ 3 ], 11 );
-            let arrShare5 = this.chunkArray( arrQRCodeData[ 4 ], 15 );
-            //console.log( { arrShare1 } );
+            // let arrShare1 = .split();   
+            // console.log( { arrShare1 } );       
+            let arrShare1 = this.chunkArray( arrQRCodeData[ 0 ], 6 );
+            let arrShare2 = this.chunkArray( arrQRCodeData[ 1 ], 6 );
+            let arrShare3 = this.chunkArray( arrQRCodeData[ 2 ], 6 );
+            let arrShare4 = this.chunkArray( arrQRCodeData[ 3 ], 6 );
+            let arrShare5 = this.chunkArray( arrQRCodeData[ 4 ], 6 );
+            let arrShare6 = this.chunkArray( arrQRCodeData[ 4 ], 6 );
+            let arrShare7 = this.chunkArray( arrQRCodeData[ 4 ], 6 );
+            let arrShare8 = this.chunkArray( arrQRCodeData[ 4 ], 6 );
 
 
             //Secound Mnemonic
@@ -496,392 +522,387 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                     fontSize: 18
                 } )
                 .drawText( 'Share 1', {
-                    x: 25,
-                    y: 460,
+                    x: 5,
+                    y: 470,
                     fontSize: 10
                 } )
                 .drawImage(
                     pathShare1,
                     'png',
                     {
-                        x: 25,
-                        y: 300,
-                        width: 150,
-                        height: 150,
+                        x: 40,
+                        y: 310,
+                        width: 180,
+                        height: 160,
                         //source: 'assets'
                     }
                 )
                 .drawText( arrShare1[ 0 ].toString(), {
-                    x: 25,
-                    y: 290,
+                    x: 5,
+                    y: 300,
                     fontSize: 10
                 } )
                 .drawText( arrShare1[ 1 ].toString(), {
-                    x: 25,
-                    y: 280,
+                    x: 5,
+                    y: 290,
                     fontSize: 10
                 } )
                 .drawText( arrShare1[ 2 ].toString(), {
-                    x: 25,
-                    y: 270,
+                    x: 5,
+                    y: 280,
                     fontSize: 10
                 } )
                 .drawText( arrShare1[ 3 ].toString(), {
-                    x: 25,
-                    y: 260,
+                    x: 5,
+                    y: 270,
                     fontSize: 10
                 } )
                 .drawText( arrShare1[ 4 ].toString(), {
-                    x: 25,
-                    y: 250,
+                    x: 5,
+                    y: 260,
                     fontSize: 10
                 } )
                 .drawText( arrShare1[ 5 ].toString(), {
-                    x: 25,
-                    y: 240,
-                    fontSize: 10
-                } )
-                .drawText( arrShare1[ 6 ].toString(), {
-                    x: 25,
-                    y: 230,
-                    fontSize: 10
-                } )
-                .drawText( arrShare1[ 7 ].toString(), {
-                    x: 25,
-                    y: 220,
-                    fontSize: 10
-                } )
-                .drawText( arrShare1[ 8 ].toString(), {
-                    x: 25,
-                    y: 210,
-                    fontSize: 10
-                } )
-                .drawText( arrShare1[ 9 ].toString(), {
-                    x: 25,
-                    y: 200,
-                    fontSize: 10
-                } )
-                .drawText( arrShare1[ 10 ].toString(), {
-                    x: 25,
-                    y: 190,
+                    x: 5,
+                    y: 250,
                     fontSize: 10
                 } )
                 .drawText( 'Share 2', {
-                    x: 25,
-                    y: 170,
+                    x: 5,
+                    y: 230,
                     fontSize: 10
                 } )
                 .drawImage(
                     pathShare2,
                     'png',
                     {
-                        x: 25,
-                        y: 10,
-                        width: 150,
-                        height: 150,
+                        x: 40,
+                        y: 70,
+                        width: 180,
+                        height: 160,
                         // source: 'assets'
                     }
                 )
-
-            const page2 = PDFPage
-                .create()
                 .drawText( arrShare2[ 0 ].toString(), {
-                    x: 25,
-                    y: 480,
+                    x: 5,
+                    y: 60,
                     fontSize: 10
                 } )
                 .drawText( arrShare2[ 1 ].toString(), {
-                    x: 25,
-                    y: 470,
+                    x: 5,
+                    y: 50,
                     fontSize: 10
                 } )
                 .drawText( arrShare2[ 2 ].toString(), {
-                    x: 25,
-                    y: 460,
+                    x: 5,
+                    y: 40,
                     fontSize: 10
                 } )
                 .drawText( arrShare2[ 3 ].toString(), {
-                    x: 25,
-                    y: 450,
+                    x: 5,
+                    y: 30,
                     fontSize: 10
                 } )
                 .drawText( arrShare2[ 4 ].toString(), {
-                    x: 25,
-                    y: 440,
+                    x: 5,
+                    y: 20,
                     fontSize: 10
                 } )
                 .drawText( arrShare2[ 5 ].toString(), {
-                    x: 25,
-                    y: 430,
+                    x: 5,
+                    y: 10,
                     fontSize: 10
                 } )
-                .drawText( arrShare2[ 6 ].toString(), {
-                    x: 25,
-                    y: 420,
-                    fontSize: 10
-                } )
-                .drawText( arrShare2[ 7 ].toString(), {
-                    x: 25,
-                    y: 410,
-                    fontSize: 10
-                } )
-                .drawText( arrShare2[ 8 ].toString(), {
-                    x: 25,
-                    y: 400,
-                    fontSize: 10
-                } )
-                .drawText( arrShare2[ 9 ].toString(), {
-                    x: 25,
-                    y: 390,
-                    fontSize: 10
-                } )
-                .drawText( arrShare2[ 10 ].toString(), {
-                    x: 25,
-                    y: 380,
-                    fontSize: 10
-                } )
-                .drawText( "Share 3", {
-                    x: 25,
-                    y: 360,
+
+
+            const page2 = PDFPage
+                .create()
+                .drawText( 'Share 3', {
+                    x: 5,
+                    y: 470,
                     fontSize: 10
                 } )
                 .drawImage(
                     pathShare3,
                     'png',
                     {
-                        x: 25,
-                        y: 200,
-                        width: 150,
-                        height: 150,
+                        x: 40,
+                        y: 310,
+                        width: 180,
+                        height: 160,
                         //source: 'assets'
                     }
                 )
                 .drawText( arrShare3[ 0 ].toString(), {
-                    x: 25,
-                    y: 190,
+                    x: 5,
+                    y: 300,
                     fontSize: 10
                 } )
                 .drawText( arrShare3[ 1 ].toString(), {
-                    x: 25,
-                    y: 180,
+                    x: 5,
+                    y: 290,
                     fontSize: 10
                 } )
                 .drawText( arrShare3[ 2 ].toString(), {
-                    x: 25,
-                    y: 170,
+                    x: 5,
+                    y: 280,
                     fontSize: 10
                 } )
                 .drawText( arrShare3[ 3 ].toString(), {
-                    x: 25,
-                    y: 160,
+                    x: 5,
+                    y: 270,
                     fontSize: 10
                 } )
                 .drawText( arrShare3[ 4 ].toString(), {
-                    x: 25,
-                    y: 150,
+                    x: 5,
+                    y: 260,
                     fontSize: 10
                 } )
                 .drawText( arrShare3[ 5 ].toString(), {
-                    x: 25,
-                    y: 140,
+                    x: 5,
+                    y: 250,
                     fontSize: 10
                 } )
-                .drawText( arrShare3[ 6 ].toString(), {
-                    x: 25,
-                    y: 130,
-                    fontSize: 10
-                } )
-                .drawText( arrShare3[ 7 ].toString(), {
-                    x: 25,
-                    y: 120,
-                    fontSize: 10
-                } )
-                .drawText( arrShare3[ 8 ].toString(), {
-                    x: 25,
-                    y: 110,
-                    fontSize: 10
-                } )
-                .drawText( arrShare3[ 9 ].toString(), {
-                    x: 25,
-                    y: 100,
-                    fontSize: 10
-                } )
-                .drawText( arrShare3[ 10 ].toString(), {
-                    x: 25,
-                    y: 90,
-                    fontSize: 10
-                } )
-
-
-            const page3 = PDFPage
-                .create()
                 .drawText( 'Share 4', {
-                    x: 25,
-                    y: 480,
+                    x: 5,
+                    y: 230,
                     fontSize: 10
                 } )
                 .drawImage(
                     pathShare4,
                     'png',
                     {
-                        x: 25,
-                        y: 320,
-                        width: 150,
-                        height: 150,
-                        //source: 'assets'
+                        x: 40,
+                        y: 70,
+                        width: 180,
+                        height: 160,
+                        // source: 'assets'
                     }
                 )
                 .drawText( arrShare4[ 0 ].toString(), {
-                    x: 25,
-                    y: 310,
+                    x: 5,
+                    y: 60,
                     fontSize: 10
                 } )
                 .drawText( arrShare4[ 1 ].toString(), {
-                    x: 25,
-                    y: 300,
+                    x: 5,
+                    y: 50,
                     fontSize: 10
                 } )
                 .drawText( arrShare4[ 2 ].toString(), {
-                    x: 25,
-                    y: 290,
+                    x: 5,
+                    y: 40,
                     fontSize: 10
                 } )
                 .drawText( arrShare4[ 3 ].toString(), {
-                    x: 25,
-                    y: 280,
+                    x: 5,
+                    y: 30,
                     fontSize: 10
                 } )
                 .drawText( arrShare4[ 4 ].toString(), {
-                    x: 25,
-                    y: 270,
+                    x: 5,
+                    y: 20,
                     fontSize: 10
                 } )
                 .drawText( arrShare4[ 5 ].toString(), {
-                    x: 25,
-                    y: 260,
+                    x: 5,
+                    y: 10,
                     fontSize: 10
                 } )
-                .drawText( arrShare4[ 6 ].toString(), {
-                    x: 25,
-                    y: 250,
-                    fontSize: 10
-                } )
-                .drawText( arrShare4[ 7 ].toString(), {
-                    x: 25,
-                    y: 240,
-                    fontSize: 10
-                } )
-                .drawText( arrShare4[ 8 ].toString(), {
-                    x: 25,
-                    y: 230,
-                    fontSize: 10
-                } )
-                .drawText( arrShare4[ 9 ].toString(), {
-                    x: 25,
-                    y: 220,
-                    fontSize: 10
-                } )
-                .drawText( arrShare4[ 10 ].toString(), {
-                    x: 25,
-                    y: 210,
-                    fontSize: 10
-                } )
+
+            const page3 = PDFPage
+                .create()
                 .drawText( 'Share 5', {
-                    x: 25,
-                    y: 190,
+                    x: 5,
+                    y: 470,
                     fontSize: 10
                 } )
                 .drawImage(
                     pathShare5,
                     'png',
                     {
-                        x: 25,
-                        y: 30,
-                        width: 150,
-                        height: 150,
-                        // source: 'assets'
+                        x: 40,
+                        y: 310,
+                        width: 180,
+                        height: 160,
+                        //source: 'assets'
                     }
                 )
-            const page4 = PDFPage
-                .create()
                 .drawText( arrShare5[ 0 ].toString(), {
-                    x: 25,
-                    y: 480,
+                    x: 5,
+                    y: 300,
                     fontSize: 10
                 } )
                 .drawText( arrShare5[ 1 ].toString(), {
-                    x: 25,
-                    y: 470,
+                    x: 5,
+                    y: 290,
                     fontSize: 10
                 } )
                 .drawText( arrShare5[ 2 ].toString(), {
-                    x: 25,
-                    y: 460,
+                    x: 5,
+                    y: 280,
                     fontSize: 10
                 } )
                 .drawText( arrShare5[ 3 ].toString(), {
-                    x: 25,
-                    y: 450,
+                    x: 5,
+                    y: 270,
                     fontSize: 10
                 } )
                 .drawText( arrShare5[ 4 ].toString(), {
-                    x: 25,
-                    y: 440,
+                    x: 5,
+                    y: 260,
                     fontSize: 10
                 } )
                 .drawText( arrShare5[ 5 ].toString(), {
-                    x: 25,
-                    y: 430,
+                    x: 5,
+                    y: 250,
                     fontSize: 10
                 } )
-                .drawText( arrShare5[ 6 ].toString(), {
-                    x: 25,
-                    y: 420,
+                .drawText( 'Share 6', {
+                    x: 5,
+                    y: 230,
                     fontSize: 10
                 } )
-                .drawText( arrShare5[ 7 ].toString(), {
-                    x: 25,
-                    y: 410,
+                .drawImage(
+                    pathShare6,
+                    'png',
+                    {
+                        x: 40,
+                        y: 70,
+                        width: 180,
+                        height: 160,
+                        // source: 'assets'
+                    }
+                )
+                .drawText( arrShare6[ 0 ].toString(), {
+                    x: 5,
+                    y: 60,
                     fontSize: 10
                 } )
-                .drawText( arrShare5[ 8 ].toString(), {
-                    x: 25,
-                    y: 400,
+                .drawText( arrShare6[ 1 ].toString(), {
+                    x: 5,
+                    y: 50,
                     fontSize: 10
                 } )
-                .drawText( arrShare5[ 9 ].toString(), {
-                    x: 25,
-                    y: 390,
+                .drawText( arrShare6[ 2 ].toString(), {
+                    x: 5,
+                    y: 40,
                     fontSize: 10
                 } )
-                .drawText( arrShare5[ 10 ].toString(), {
-                    x: 25,
-                    y: 380,
+                .drawText( arrShare6[ 3 ].toString(), {
+                    x: 5,
+                    y: 30,
                     fontSize: 10
                 } )
-                .drawText( arrShare5[ 11 ].toString(), {
-                    x: 25,
-                    y: 370,
+                .drawText( arrShare6[ 4 ].toString(), {
+                    x: 5,
+                    y: 20,
                     fontSize: 10
                 } )
-                .drawText( arrShare5[ 12 ].toString(), {
-                    x: 25,
-                    y: 360,
+                .drawText( arrShare6[ 5 ].toString(), {
+                    x: 5,
+                    y: 10,
                     fontSize: 10
                 } )
-                .drawText( arrShare5[ 13 ].toString(), {
-                    x: 25,
-                    y: 350,
+            const page4 = PDFPage
+                .create()
+                .drawText( 'Share 7', {
+                    x: 5,
+                    y: 470,
                     fontSize: 10
                 } )
-                .drawText( arrShare5[ 14 ].toString(), {
-                    x: 25,
-                    y: 340,
+                .drawImage(
+                    pathShare7,
+                    'png',
+                    {
+                        x: 40,
+                        y: 310,
+                        width: 180,
+                        height: 160,
+                        //source: 'assets'
+                    }
+                )
+                .drawText( arrShare7[ 0 ].toString(), {
+                    x: 5,
+                    y: 300,
                     fontSize: 10
                 } )
+                .drawText( arrShare7[ 1 ].toString(), {
+                    x: 5,
+                    y: 290,
+                    fontSize: 10
+                } )
+                .drawText( arrShare7[ 2 ].toString(), {
+                    x: 5,
+                    y: 280,
+                    fontSize: 10
+                } )
+                .drawText( arrShare7[ 3 ].toString(), {
+                    x: 5,
+                    y: 270,
+                    fontSize: 10
+                } )
+                .drawText( arrShare7[ 4 ].toString(), {
+                    x: 5,
+                    y: 260,
+                    fontSize: 10
+                } )
+                .drawText( arrShare7[ 5 ].toString(), {
+                    x: 5,
+                    y: 250,
+                    fontSize: 10
+                } )
+                .drawText( 'Share 8', {
+                    x: 5,
+                    y: 230,
+                    fontSize: 10
+                } )
+                .drawImage(
+                    pathShare8,
+                    'png',
+                    {
+                        x: 40,
+                        y: 70,
+                        width: 180,
+                        height: 160,
+                        // source: 'assets'
+                    }
+                )
+                .drawText( arrShare8[ 0 ].toString(), {
+                    x: 5,
+                    y: 60,
+                    fontSize: 10
+                } )
+                .drawText( arrShare8[ 1 ].toString(), {
+                    x: 5,
+                    y: 50,
+                    fontSize: 10
+                } )
+                .drawText( arrShare8[ 2 ].toString(), {
+                    x: 5,
+                    y: 40,
+                    fontSize: 10
+                } )
+                .drawText( arrShare8[ 3 ].toString(), {
+                    x: 5,
+                    y: 30,
+                    fontSize: 10
+                } )
+                .drawText( arrShare8[ 4 ].toString(), {
+                    x: 5,
+                    y: 20,
+                    fontSize: 10
+                } )
+                .drawText( arrShare8[ 5 ].toString(), {
+                    x: 5,
+                    y: 10,
+                    fontSize: 10
+                } )
+            const page5 = PDFPage
+                .create()
                 .drawText( 'Secondary Xpub (Encrypted):', {
                     x: 5,
-                    y: 310,
+                    y: 480,
                     fontSize: 18
                 } )
                 .drawImage(
@@ -889,7 +910,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                     'png',
                     {
                         x: 25,
-                        y: 100,
+                        y: 270,
                         width: 200,
                         height: 200,
                         //source: 'assets'
@@ -897,16 +918,16 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 )
                 .drawText( 'Scan the above QR Code using your HEXA', {
                     x: 30,
-                    y: 80,
+                    y: 250,
                     fontSize: 10
                 } )
                 .drawText( 'wallet in order to restore your Secure Account.', {
                     x: 30,
-                    y: 70,
+                    y: 240,
                     fontSize: 10
                 } )
 
-            const page5 = PDFPage
+            const page6 = PDFPage
                 .create()
                 .drawText( '2FA Secret:', {
                     x: 5,
@@ -981,7 +1002,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 } )
             PDFDocument
                 .create( pdfPath )
-                .addPages( page1, page2, page3, page4, page5 )
+                .addPages( page1, page2, page3, page4, page5, page6 )
                 .write()
                 .then( ( path: any ) => {
                     console.log( 'PDF created at: ' + path );
