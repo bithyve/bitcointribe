@@ -144,10 +144,17 @@ var asyncStorageKeys = {
   s3ServiceClassObject: "s3ServiceClassObject"
 }
 
+var expaire = {
+  backup: {
+    expaire_secretquestion: Config.EXPAIRE_SECRETQUESTION
+  }
+}
+
 export {
   localDB,
   colors,
   images,
   notification,
-  asyncStorageKeys
+  asyncStorageKeys,
+  expaire
 };

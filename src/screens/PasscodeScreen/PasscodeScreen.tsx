@@ -128,23 +128,33 @@ export default class PasscodeScreen extends Component {
     let regularClassObject = await AsyncStorage.getItem( asyncStorageKeys.regularClassObject );
     let secureClassObject = await AsyncStorage.getItem( asyncStorageKeys.secureClassObject );
     let setS3ServiceObject = await AsyncStorage.getItem( asyncStorageKeys.s3ServiceClassObject );
-    //regular account   
-    const regularAccount = RegularAccount.fromJSON( regularClassObject );
-    await utils.setRegularAccountObject( regularAccount );
+
+    //regular account      
+    var regularAccount, secureAccount, s3Service;
+    if ( regularClassObject != null ) {
+      regularAccount = RegularAccount.fromJSON( regularClassObject );
+      await utils.setRegularAccountObject( regularAccount );
+    }
+
     //secure account      
-    const secureAccount = SecureAccount.fromJSON( secureClassObject );
-    await utils.setSecureAccountObject( secureAccount );
+    if ( secureAccount != null ) {
+      secureAccount = SecureAccount.fromJSON( secureClassObject );
+      await utils.setSecureAccountObject( secureAccount );
+    }
+
     //setS3Service
-    const s3Service = S3Service.fromJSON( setS3ServiceObject );
-    console.log( { s3Service } );
-    await utils.setS3ServiceObject( s3Service );
+    if ( s3Service != null ) {
+      s3Service = S3Service.fromJSON( setS3ServiceObject );
+      await utils.setS3ServiceObject( s3Service );
+    }
 
     //Wallet Details Reading
     await comFunDBRead.readTblWallet();
-    //await comFunDBRead.readTblSSSDetails();
+    await comFunDBRead.readTblSSSDetails();
 
-    //   await utils.setSecureAccountObject( secureAccount );
     let pageName = utils.getRootViewController();
+    console.log( { pageName } );
+
     if ( pageName != "TrustedPartyShareSecretNavigator" && pageName != "OTPScreenNavigator" ) {
       const resetAction = StackActions.reset( {
         index: 0, // <-- currect active route from actions array
@@ -169,6 +179,8 @@ export default class PasscodeScreen extends Component {
       this.props.navigation.dispatch( resetAction );
     }
   };
+
+
   //TODO: func urlDecription
   async urlDecription( code: any ) {
     let commonData = Singleton.getInstance();

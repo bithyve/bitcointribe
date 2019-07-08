@@ -913,7 +913,7 @@ const insertSSSShareDetails = (
         txn.executeSql(
           "INSERT INTO " +
           tblName +
-          "(dateCreated,share,shareId,keeperInfo,recordId,history,encryptedMetaShare,shareStage,lastSuccessfulCheck) VALUES (:dateCreated,:share,:shareId,:keeperInfo,:recordId,:history,:encryptedMetaShare,:shareStage,:lastSuccessfulCheck)",
+          "(dateCreated,share,shareId,keeperInfo,recordId,history,encryptedMetaShare,shareStage,lastSuccessfulCheck,type) VALUES (:dateCreated,:share,:shareId,:keeperInfo,:recordId,:history,:encryptedMetaShare,:shareStage,:lastSuccessfulCheck,:type)",
           [
             utils.encrypt(
               temp.date.toString(),
@@ -930,6 +930,7 @@ const insertSSSShareDetails = (
               temp.date.toString(),
               passcode
             ),
+            utils.encrypt( temp.type[ i ].type.toString(), passcode ),
           ]
         );
       }
@@ -941,7 +942,8 @@ const insertSSSShareDetails = (
 const insertRestoreUsingTrustedContactKeepInfo = (
   tblName: string,
   fulldate: string,
-  keepInfo: any
+  keepInfo: any,
+  type: any
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
@@ -953,11 +955,11 @@ const insertRestoreUsingTrustedContactKeepInfo = (
     db.transaction( function ( txn ) {
       for ( let i = 0; i < keepInfo.length; i++ ) {
         let data = keepInfo[ i ];
-        // console.log( { data } );
+        console.log( { data } );
         txn.executeSql(
           "INSERT INTO " +
           tblName +
-          "(dateCreated,keeperInfo,history,recordId) VALUES (:dateCreated,:keeperInfo,:history,:recordId)",
+          "(dateCreated,keeperInfo,history,recordId,lastSuccessfulCheck,type) VALUES (:dateCreated,:keeperInfo,:history,:recordId,:lastSuccessfulCheck,:type)",
           [
             utils.encrypt(
               fulldate.toString(),
@@ -966,6 +968,11 @@ const insertRestoreUsingTrustedContactKeepInfo = (
             utils.encrypt( JSON.stringify( data ).toString(), passcode ),
             utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
             utils.encrypt( data.recordID.toString(), passcode ),
+            utils.encrypt(
+              fulldate.toString(),
+              passcode
+            ),
+            utils.encrypt( type[ i ].type.toString(), passcode ),
           ]
         );
       }

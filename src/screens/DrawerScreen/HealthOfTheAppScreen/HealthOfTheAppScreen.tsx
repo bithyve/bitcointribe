@@ -52,7 +52,7 @@ let alert = new AlertSimple();
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, localDB, expaire } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
@@ -77,7 +77,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 opt: undefined,
             }, {
                 thumbnailPath: "user",
-                givenName: "Trusted Contact 1",
+                givenName: "Trusted Contact 2",
                 familyName: "",
                 statusMsgColor: "gray",
                 statusMsg: "Status",
@@ -299,8 +299,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             let data = {};
             data.icon = "timelockNew";
             data.title = "First Secret Question";
-            data.subTitle = totalSec <= 8.64e+8 ? "Backed Confirm" : "Not Backed up";
-            data.color = totalSec <= 8.64e+8 ? "#008000" : "#ff0000";
+            data.subTitle = totalSec <= expaire.backup.expaire_secretquestion ? "Backed Confirm" : "Not Backed up";
+            data.color = totalSec <= expaire.backup.expaire_secretquestion ? "#008000" : "#ff0000";
             data.walletDetails = walletDetails;
             arr_SecretQuestion.push( data )
 
