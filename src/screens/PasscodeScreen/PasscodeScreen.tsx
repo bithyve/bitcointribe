@@ -128,6 +128,7 @@ export default class PasscodeScreen extends Component {
     let regularClassObject = await AsyncStorage.getItem( asyncStorageKeys.regularClassObject );
     let secureClassObject = await AsyncStorage.getItem( asyncStorageKeys.secureClassObject );
     let setS3ServiceObject = await AsyncStorage.getItem( asyncStorageKeys.s3ServiceClassObject );
+    //console.log( { regularClassObject, secureClassObject, setS3ServiceObject } );
 
     //regular account      
     var regularAccount, secureAccount, s3Service;
@@ -137,13 +138,15 @@ export default class PasscodeScreen extends Component {
     }
 
     //secure account      
-    if ( secureAccount != null ) {
+    if ( secureClassObject != null ) {
       secureAccount = SecureAccount.fromJSON( secureClassObject );
       await utils.setSecureAccountObject( secureAccount );
     }
 
     //setS3Service
-    if ( s3Service != null ) {
+    if ( setS3ServiceObject != null ) {
+      console.log( 'calling' );
+
       s3Service = S3Service.fromJSON( setS3ServiceObject );
       await utils.setS3ServiceObject( s3Service );
     }
