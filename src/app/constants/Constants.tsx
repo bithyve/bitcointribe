@@ -41,6 +41,7 @@ var images = {
   },
   RestoreWalletUsingTrustedContact: {
     contactPassbook: require( assetsImages + "RestoreWalletUsingTrustedContact/ContactsPassbook.png" ),
+    share4and5SelfShareInfo: require( assetsImages + "RestoreWalletUsingTrustedContact/restore4and5sharebgimage.jpg" ),
   },
   WalletSetupScreen: {
     WalletScreen: {

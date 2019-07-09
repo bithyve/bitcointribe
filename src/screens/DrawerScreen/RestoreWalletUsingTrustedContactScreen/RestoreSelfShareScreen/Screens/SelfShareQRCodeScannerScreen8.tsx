@@ -50,41 +50,29 @@ var utils = require( "HexaWallet/src/app/constants/Utils" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 
-//TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
-let alert = new AlertSimple();
 
 //Custome Compontes
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+
 
 //TODO: Custome Model
 import ModelRestoreAssociateContactListForQRCodeScan from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelRestoreAssociateContactListForQRCodeScan";
 
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
-let goBackI = 0;
 
-export default class ConfirmSelfShareQRScannerScreen extends React.Component {
+export default class SelfShareQRCodeScannerScreen8 extends React.Component {
     constructor ( props: any ) {
         super( props );
-        this.state = ( {
-            data: ""
-        } )
+
+
+
     }
 
 
 
-    async componentWillMount() {
-        this.willFocusSubscription = this.props.navigation.addListener(
-            "willFocus",
-            () => {
-                goBackI = 0;
-                let data = this.props.navigation.getParam( "data" );
-                this.setState( {
-                    data
-                } )
-            } );
-    }
+
+
 
     _renderTitleBar() {
         return (
@@ -101,30 +89,18 @@ export default class ConfirmSelfShareQRScannerScreen extends React.Component {
     barcodeReceived( e: any ) {
         try {
             var result = e.data;
+            result = JSON.parse( result );
             console.log( { result } );
-            result = result.split( 'Doublequote' ).join( '"' );
-            result = result.split( 'Leftbrace' ).join( "{" );
-            result = result.split( 'Rightbrace' ).join( "}" );
-            result = result.split( '_' ).join( "/" );
-            result = result.split( '__' ).join( "," );
-            result = result.split( 'space' ).join( " " );
-            let { data } = this.state;
-            console.log( { result, data } );
-            if ( result == data ) {
-                if ( goBackI == 0 ) {
-                    const { navigation } = this.props;
-                    navigation.goBack();
-                    navigation.state.params.onSelect( { selected: true, result: result, data: data } );
-                    goBackI++;
-                }
-            } else {
-                alert.simpleOk( "Oops", "Invalid qrcode please scan first share qrcode." );
-            }
 
         } catch ( error ) {
             console.log( error );
         }
     }
+
+
+
+
+
 
     render() {
         return (
@@ -132,15 +108,6 @@ export default class ConfirmSelfShareQRScannerScreen extends React.Component {
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.props.navigation.pop() }
-                            >
-                                <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 22 : 17, marginLeft: 0 } ] }>Scan 1st Share</Text>
-                            </Button>
-                        </View>
                         < QRScannerView
                             hintText=""
                             rectHeight={ Dimensions.get( 'screen' ).height / 2.0 }
