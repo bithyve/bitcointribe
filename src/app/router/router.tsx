@@ -20,20 +20,20 @@ import RestoreAndReoverWalletScreen from "HexaWallet/src/screens/RestoreAndWalle
 
 import RestoreWalletUsingMnemonicScrren from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingMnemonicScreen/RestoreWalletUsingMnemonicScrren";
 
-
-// // Restore Wallet using Trusted Contact
+// Restore Wallet using Trusted Contact
 import RestoreWalletUsingTrustedContactScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreWalletUsingTrustedContactScreen";
 import RestoreAllContactListScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreAllContactListScreen";
 import RestoreSelectedContactsListScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreSelectedContactsListScreen";
 import RestoreWalletUsingTrustedContactQueAndAnwScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreWalletUsingTrustedContactQueAndAnwScreen";
+
 import RestoreTrustedContactsShareScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreTrustedContactsShareScreen/RestoreTrustedContactsShareScreen";
-import RestoreSelfShareScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreSelfShareScreen/RestoreSelfShareScreen";
 import RestoreTrustedContactsQRCodeScanScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreTrustedContactsShareScreen/RestoreTrustedContactsQRCodeScanScreen";
+
+
+import Restore3SelfShareScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreSelfShareScreen/Restore3SelfShareScreen";
 import Restore3SelfSahreQRCodeScannerScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreSelfShareScreen/Restore3SelfSahreQRCodeScannerScreen";
-import Restore4And5SelfShareQRCodeScannerScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreSelfShareScreen/Restore4And5SelfShareQRCodeScannerScreen";
-
-
-
+import Restore4And5SelfShareScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreSelfShareScreen/Restore4And5SelfShareScreen";
+import Restore4And5SelfShareQRCodeScanner from "../../screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreSelfShareScreen/Restore4And5SelfShareQRCodeScanner";
 
 import WalletSetupScreens from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/WalletSetupScreens/WalletSetupScreens";
 import PermissionScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/PermissionScreen/PermissionScreen";
@@ -149,6 +149,9 @@ import ConfirmAndSendPaymentScreen from "HexaWallet/src/screens/DrawerScreen/Pay
 
 
 
+
+
+
 //TODO: StackNavigator
 //TODO: StackNavigator:ONBoarding
 const OnBoardingStackNavigator = createStackNavigator(
@@ -198,16 +201,20 @@ const RestoreWalletUsingTrustedContactStackNavigator = createStackNavigator(
       screen: RestoreTrustedContactsQRCodeScanScreen,
       navigationOptions: { header: null }
     },
-    RestoreSelfShareScreen: {
-      screen: RestoreSelfShareScreen,
+    Restore3SelfShareScreen: {
+      screen: Restore3SelfShareScreen,
       navigationOptions: { header: null }
     },
     Restore3SelfSahreQRCodeScannerScreen: {
       screen: Restore3SelfSahreQRCodeScannerScreen,
       navigationOptions: { header: null }
     },
-    Restore4And5SelfShareQRCodeScannerScreen: {
-      screen: Restore4And5SelfShareQRCodeScannerScreen,
+    Restore4And5SelfShareScreen: {
+      screen: Restore4And5SelfShareScreen,
+      navigationOptions: { header: null }
+    },
+    Restore4And5SelfShareQRCodeScanner: {
+      screen: Restore4And5SelfShareQRCodeScanner,
       navigationOptions: { header: null }
     },
     RestoreWalletUsingTrustedContactQueAndAnwScreen: {

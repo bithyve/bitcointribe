@@ -91,7 +91,7 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                 statusMsg: "Not confirmed",
             }, {
                 thumbnailPath: "bars",
-                givenName: "iCloud Share",
+                givenName: "iCloud",
                 familyName: "",
                 statusMsgColor: "#ff0000",
                 statusMsg: "Not confirmed",
@@ -324,7 +324,7 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
     //TODO: Self share
     click_SelfShare = async ( item: any ) => {
         console.log( { item } );
-        this.props.navigation.push( "RestoreSelfShareScreen", { data: item, title: item.givenName + " Share" } );
+        this.props.navigation.push( "Restore4And5SelfShareScreen", { data: item, title: item.givenName + " Shares Scan" } );
         // let sssDetails = await utils.getSSSDetails();
         // console.log( { sssDetails } );
         // let data3Share = sssDetails[ 2 ];

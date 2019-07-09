@@ -62,7 +62,7 @@ var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBR
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
-export default class RestoreSelfShareScreen extends React.Component<any, any> {
+export default class Restore3SelfShareScreen extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props )
         this.state = ( {
