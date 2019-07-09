@@ -3,6 +3,8 @@ package com.hexawallet;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.swmansion.reanimated.ReanimatedPackage;
+import com.swmansion.reanimated.ReanimatedPackage;
 
 import com.hopding.pdflib.PDFLibPackage;
 // import com.RNFetchBlob.RNFetchBlobPackage;
@@ -53,7 +55,9 @@ public class MainApplication extends Application implements ReactApplication {
 
     @Override
     protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(new SQLitePluginPackage(), new MainReactPackage(), new PDFLibPackage()
+      return Arrays.<ReactPackage>asList(new SQLitePluginPackage(), new MainReactPackage(),
+            new ReanimatedPackage(),
+            new ReanimatedPackage(), new PDFLibPackage()
       // new RNFetchBlobPackage(), new RNMail(), SendSMSPackage.getInstance(), new
       // RNCWebViewPackage(),
       // new RNViewShotPackage(), new VectorIconsPackage(), new UdpSocketsModule(),

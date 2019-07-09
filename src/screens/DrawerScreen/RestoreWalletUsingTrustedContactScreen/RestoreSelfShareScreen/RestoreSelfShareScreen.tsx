@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, AsyncStorage, Clipboard } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, AsyncStorage, Image } from "react-native";
 import {
     Container,
     Header,
@@ -77,21 +77,25 @@ export default class RestoreSelfShareScreen extends React.Component<any, any> {
     async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
         let title = this.props.navigation.getParam( "title" );
+
         console.log( { data } );
-        let arr_History = JSON.parse( data.sssDetails.history )
-        let acceptedDate = data.sssDetails.acceptedDate;
-        let flag_ScanBtnDisable;
-        if ( acceptedDate != "" ) {
-            flag_ScanBtnDisable = false;
-        } else {
-            flag_ScanBtnDisable = true;
-        }
+        // let flag_History = utils.isJson( data.sssDetails.history );
+        // var arr_History = [];
+        // if ( flag_History ) {
+        //     arr_History = JSON.parse( data.sssDetails.history );
+        // }
+        // let acceptedDate = data.sssDetails.acceptedDate;
+        let flag_ScanBtnDisable = true;
+        // if ( acceptedDate != "" ) {
+        //     flag_ScanBtnDisable = false;
+        // } else {
+        //     flag_ScanBtnDisable = true;
+        // }
         console.log( { data } );
         this.setState( {
             title,
             flag_ScanBtnDisable,
-            data,
-            arr_History
+            data
         } )
     }
 
@@ -239,37 +243,14 @@ export default class RestoreSelfShareScreen extends React.Component<any, any> {
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>{ title }</Text>
                             </Button>
                         </View>
-                        <View style={ { flex: 0.1, margin: 20 } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
+                        <View style={ { flex: 0.1, padding: 20 } }>
+                            <Text numberOfLines={ 2 } note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Please sacn order 8 qrcode.</Text>
                         </View>
-                        <View style={ { flex: 2 } }>
-                            <FlatList
-                                data={
-                                    arr_History
-                                }
-                                showsVerticalScrollIndicator={ false }
-                                renderItem={ ( { item } ) => (
-                                    <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
-                                        <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                            <View style={ { flex: 0.1 } }>
-                                                <SvgIcon name="image_hexa" size={ 30 } color={ primaryColor } style={ { alignSelf: "center" } } />
-                                            </View>
-                                            <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                <View style={ { flexDirection: "row", flex: 1, } }>
-                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16, flex: 1, alignSelf: "center", } ] }>{ item.title }</Text>
-                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { alignSelf: "center", flex: 1 } ] }>{ item.date }</Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                ) }
-                                keyExtractor={ item => item.recordID }
-                                extraData={ this.state }
-                            />
+                        <View style={ { flex: 2, alignItems: "center", justifyContent: "center" } }>
+                            <Image style={ [ styles.imgAppLogo, { borderRadius: 10 } ] } source={ images.RestoreWalletUsingTrustedContact.share4and5SelfShareInfo } />
                         </View>
                         { renderIf( flag_ScanBtnDisable == true )(
-                            <View style={ { flex: 0.4 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Scan qrcode.</Text>
+                            <View style={ { flex: 0.3 } }>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_QRCode( data )
@@ -303,5 +284,10 @@ const styles = StyleSheet.create( {
     },
     modal4: {
         height: 180
-    }
+    },
+    imgAppLogo: {
+        width: "90%",
+        height: "95%",
+
+    },
 } );

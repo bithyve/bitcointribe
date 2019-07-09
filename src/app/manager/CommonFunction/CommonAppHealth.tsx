@@ -61,8 +61,11 @@ const connection_AppHealthAndSSSUpdate = async ( qatime: number, sharesId: any )
     // console.log( { qatime, sharesId } );
     sharesId = sharesId.slice( 0, 3 );
     const sss = await utils.getS3ServiceObject();
+    console.log( { sss } );
     const dateTime = Date.now();
+    console.log( { sharesId } );
     var resCheckHealth = await sss.checkHealth( sharesId );
+    console.log( { resCheckHealth } );
     if ( resCheckHealth.status == 200 ) {
         resCheckHealth = resCheckHealth.data.lastUpdateds;
     } else {

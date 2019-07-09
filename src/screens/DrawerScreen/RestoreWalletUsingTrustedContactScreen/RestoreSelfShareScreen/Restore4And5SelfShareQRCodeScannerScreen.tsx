@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, Dimensions } from "react-native";
 import {
     Container,
     Header,
@@ -12,30 +12,51 @@ import {
     Right,
     Body,
     Text,
-    Tab, Tabs, TabHeading,
-    Segment
+    Segment,
+    Icon,
+    Tab, Tabs, TabHeading
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
 import { StackActions, NavigationActions } from "react-navigation";
+import { QRScannerView } from 'ac-qrcode';
+
 
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import WalletSetUpScrolling from "HexaWallet/src/app/custcompontes/OnBoarding/WalletSetUpScrolling/WalletSetUpScrolling";
+import RestoreScanQrCode from "HexaWallet/src/app/custcompontes/OnBoarding/RestoreScanQrCode/RestoreScanQrCode";
 
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
-import WalletNameScreen from "./WalletNameScreen/WalletNameScreen";
-import FirstSecretQuestionScreen from "./FirstSecretQuestionScreen/FirstSecretQuestionScreen";
-import SecondSecretQuestion from "./SecondSecretQuestion/SecondSecretQuestion";
 
 //TODO: Custome Object
 import { colors, images } from "HexaWallet/src/app/constants/Constants";
 
+//Screen
+import SelfShareQRCodeScannerScreen1 from "./Screens/SelfShareQRCodeScannerScreen1";
+import SelfShareQRCodeScannerScreen2 from "./Screens/SelfShareQRCodeScannerScreen2";
+import SelfShareQRCodeScannerScreen3 from "./Screens/SelfShareQRCodeScannerScreen3";
+import SelfShareQRCodeScannerScreen4 from "./Screens/SelfShareQRCodeScannerScreen4";
+import SelfShareQRCodeScannerScreen5 from "./Screens/SelfShareQRCodeScannerScreen5";
+import SelfShareQRCodeScannerScreen6 from "./Screens/SelfShareQRCodeScannerScreen6";
+import SelfShareQRCodeScannerScreen7 from "./Screens/SelfShareQRCodeScannerScreen7";
+import SelfShareQRCodeScannerScreen8 from "./Screens/SelfShareQRCodeScannerScreen8";
+
+
+
+
+
 export default class Restore4And5SelfShareQRCodeScannerScreen extends React.Component<any, any> {
+    constructor ( props: any ) {
+        super( props )
+        this.state = ( {
+            selectedIndex: 0,
+        } );
+    }
+
+
 
     //TODO:click_GotoPermisionScrenn
     click_GotoPermisionScrenn() {
@@ -48,8 +69,180 @@ export default class Restore4And5SelfShareQRCodeScannerScreen extends React.Comp
         } );
         this.props.navigation.dispatch( resetAction );
     }
-    render() {
+
+
+    _renderTitleBar() {
         return (
+            <Text></Text>
+        );
+    }
+
+    _renderMenu() {
+        return (
+            <Text></Text>
+        )
+    }
+
+    barcodeReceived1( e: any ) {
+        try {
+            var result = e.data;
+            console.log( { result } );
+
+        } catch ( error ) {
+            console.log( error );
+        }
+    }
+    barcodeReceived2( e: any ) {
+        try {
+            var result = e.data;
+            console.log( { result } );
+
+        } catch ( error ) {
+            console.log( error );
+        }
+    }
+    barcodeReceived3( e: any ) {
+        try {
+            var result = e.data;
+            console.log( { result } );
+
+        } catch ( error ) {
+            console.log( error );
+        }
+    }
+    barcodeReceived4( e: any ) {
+        try {
+            var result = e.data;
+            console.log( { result } );
+
+        } catch ( error ) {
+            console.log( error );
+        }
+    }
+    barcodeReceived5( e: any ) {
+        try {
+            var result = e.data;
+            console.log( { result } );
+
+        } catch ( error ) {
+            console.log( error );
+        }
+    }
+    barcodeReceived6( e: any ) {
+        try {
+            var result = e.data;
+            console.log( { result } );
+
+        } catch ( error ) {
+            console.log( error );
+        }
+    }
+    barcodeReceived7( e: any ) {
+        try {
+            var result = e.data;
+            console.log( { result } );
+
+        } catch ( error ) {
+            console.log( error );
+        }
+    }
+    barcodeReceived8( e: any ) {
+        try {
+            var result = e.data;
+            console.log( { result } );
+
+        } catch ( error ) {
+            console.log( error );
+        }
+    }
+
+
+    render() {
+
+        const scanCode1 = () => (
+            <QRScannerView
+                hintText=""
+                scanBarColor={ colors.appColor }
+                cornerColor={ colors.appColor }
+                onScanResultReceived={ this.barcodeReceived1.bind( this ) }
+                renderTopBarView={ () => this._renderTitleBar() }
+                renderBottomMenuView={ () => this._renderMenu() }
+            />
+        );
+
+        const scanCode2 = () => (
+            <QRScannerView
+                hintText=""
+                scanBarColor={ colors.appColor }
+                cornerColor={ colors.appColor }
+                onScanResultReceived={ this.barcodeReceived2.bind( this ) }
+                renderTopBarView={ () => this._renderTitleBar() }
+                renderBottomMenuView={ () => this._renderMenu() }
+            />
+        );
+
+
+        const scanCode3 = () => ( <QRScannerView
+            hintText=""
+            scanBarColor={ colors.appColor }
+            cornerColor={ colors.appColor }
+            onScanResultReceived={ this.barcodeReceived3.bind( this ) }
+            renderTopBarView={ () => this._renderTitleBar() }
+            renderBottomMenuView={ () => this._renderMenu() }
+        />
+        );
+        const scanCode4 = () => ( <QRScannerView
+            hintText=""
+            scanBarColor={ colors.appColor }
+            cornerColor={ colors.appColor }
+            onScanResultReceived={ this.barcodeReceived4.bind( this ) }
+            renderTopBarView={ () => this._renderTitleBar() }
+            renderBottomMenuView={ () => this._renderMenu() }
+        />
+        );
+        const scanCode5 = () => ( <QRScannerView
+            hintText=""
+            scanBarColor={ colors.appColor }
+            cornerColor={ colors.appColor }
+            onScanResultReceived={ this.barcodeReceived5.bind( this ) }
+            renderTopBarView={ () => this._renderTitleBar() }
+            renderBottomMenuView={ () => this._renderMenu() }
+        />
+        );
+        const scanCode6 = () => ( <QRScannerView
+            hintText=""
+            scanBarColor={ colors.appColor }
+            cornerColor={ colors.appColor }
+            onScanResultReceived={ this.barcodeReceived6.bind( this ) }
+            renderTopBarView={ () => this._renderTitleBar() }
+            renderBottomMenuView={ () => this._renderMenu() }
+        />
+        );
+        const scanCode7 = () => ( <QRScannerView
+            hintText=""
+            scanBarColor={ colors.appColor }
+            cornerColor={ colors.appColor }
+            onScanResultReceived={ this.barcodeReceived7.bind( this ) }
+            renderTopBarView={ () => this._renderTitleBar() }
+            renderBottomMenuView={ () => this._renderMenu() }
+        />
+        );
+        const scanCode8 = () => ( <QRScannerView
+            hintText=""
+            scanBarColor={ colors.appColor }
+            cornerColor={ colors.appColor }
+            onScanResultReceived={ this.barcodeReceived8.bind( this ) }
+            renderTopBarView={ () => this._renderTitleBar() }
+            renderBottomMenuView={ () => this._renderMenu() }
+        />
+        );
+
+
+        //values
+        let { selectedIndex } = this.state;
+
+        return (
+
             <Container>
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
@@ -63,15 +256,36 @@ export default class Restore4And5SelfShareQRCodeScannerScreen extends React.Comp
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Scan QRCode</Text>
                             </Button>
                         </View>
-                        <WalletSetUpScrolling >
-                            {/* First screen */ }
-                            <Text>hi</Text>
-                            {/* Second screen */ }
-                            <Text>hi</Text>
-                            {/* Third screen */ }
-                            {/* <SecondSecretQuestion prevScreen={ () => this.click_GotoPermisionScrenn() } /> */ }
-                            <Text>hi</Text>
-                        </WalletSetUpScrolling>
+
+                        <Tabs locked={ true } page={ selectedIndex } tabBarUnderlineStyle={ { backgroundColor: "none" } }>
+                            <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
+                                <Item disabled={ true }>
+                                    <SelfShareQRCodeScannerScreen1 key="qrcode1" />
+                                </Item>
+
+                            </Tab>
+                            <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
+                                <SelfShareQRCodeScannerScreen2 key="qrcode2" />
+                            </Tab>
+                            <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
+                                <SelfShareQRCodeScannerScreen3 key="qrcode3" />
+                            </Tab>
+                            <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
+                                <SelfShareQRCodeScannerScreen4 key="qrcode4" />
+                            </Tab>
+                            <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
+                                <SelfShareQRCodeScannerScreen5 key="qrcode5" />
+                            </Tab>
+                            <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
+                                <SelfShareQRCodeScannerScreen6 key="qrcode6" />
+                            </Tab>
+                            <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
+                                <SelfShareQRCodeScannerScreen7 key="qrcode7" />
+                            </Tab>
+                            <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
+                                <SelfShareQRCodeScannerScreen8 key="qrcode8" />
+                            </Tab>
+                        </Tabs>
                     </ImageBackground>
                 </SafeAreaView>
             </Container >
