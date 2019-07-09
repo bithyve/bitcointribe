@@ -61,15 +61,10 @@ import ModelRestoreAssociateContactListForQRCodeScan from "HexaWallet/src/app/cu
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
-export default class SelfShareQRCodeScannerScreen4 extends React.Component {
+export default class Restore4And5SelfShareQRCodeScanner extends React.Component {
     constructor ( props: any ) {
         super( props );
-
-
-
     }
-
-
 
 
 
@@ -89,7 +84,6 @@ export default class SelfShareQRCodeScannerScreen4 extends React.Component {
     barcodeReceived( e: any ) {
         try {
             var result = e.data;
-            result = JSON.parse( result );
             console.log( { result } );
 
         } catch ( error ) {
@@ -97,17 +91,21 @@ export default class SelfShareQRCodeScannerScreen4 extends React.Component {
         }
     }
 
-
-
-
-
-
     render() {
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
+                        <View style={ { marginLeft: 10, marginTop: 15 } }>
+                            <Button
+                                transparent
+                                onPress={ () => this.props.navigation.pop() }
+                            >
+                                <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>{ title }</Text>
+                            </Button>
+                        </View>
                         < QRScannerView
                             hintText=""
                             rectHeight={ Dimensions.get( 'screen' ).height / 2.0 }
@@ -127,7 +125,8 @@ export default class SelfShareQRCodeScannerScreen4 extends React.Component {
 
 const styles = StyleSheet.create( {
     container: {
-        flex: 1
+        flex: 1,
+        backgroundColor: "#000000"
     },
 
 } );
