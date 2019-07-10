@@ -55,6 +55,11 @@ import Singleton from "HexaWallet/src/app/constants/Singleton";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
 
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
+
+
 //TODO: Custome Model
 import ModelRestoreAssociateContactListForQRCodeScan from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelRestoreAssociateContactListForQRCodeScan";
 
@@ -66,39 +71,10 @@ export default class RestoreTrustedContactsQRCodeScanScreen extends React.Compon
         super( props );
 
         this.state = ( {
-            item: [],
-            arr_ModelRestoreAssociateContactList: [],
-            recordId: "",
-            decryptedShare: ""
+
         } )
 
     }
-
-
-    async  componentDidMount() {
-        let resSSSDetails = await utils.getSSSDetails();
-        let arr_KeeperInfo = [];
-        for ( let i = 0; i < resSSSDetails.length; i++ ) {
-            let data = {};
-            let fullInfo = resSSSDetails[ i ]
-            if ( fullInfo.acceptedDate == "" ) {
-                let keerInfo = JSON.parse( resSSSDetails[ i ].keeperInfo );
-                data.thumbnailPath = keerInfo.thumbnailPath;
-                data.givenName = keerInfo.givenName;
-                data.familyName = keerInfo.familyName;
-                data.phoneNumbers = keerInfo.phoneNumbers;
-                data.emailAddresses = keerInfo.emailAddresses;
-                data.recordId = fullInfo.recordId;
-                arr_KeeperInfo.push( data );
-            }
-        }
-        console.log( { arr_KeeperInfo } );
-        this.setState( {
-            item: arr_KeeperInfo,
-        } )
-    }
-
-
 
     _renderTitleBar() {
         return (
@@ -116,23 +92,12 @@ export default class RestoreTrustedContactsQRCodeScanScreen extends React.Compon
         try {
             var result = e.data;
             result = JSON.parse( result );
-            // console.log( { result } );
-            if ( result.type == "SSS Restore" ) {
-                utils.setDeepLinkingType( "SSS Restore QR" );
-                let item = this.state.item;
-                this.setState( {
-                    decryptedShare: result.data,
-                    arr_ModelRestoreAssociateContactList: [
-                        {
-                            modalVisible: true,
-                            item: item
-                        }
-                    ],
+            console.log( { result } );
 
-                } )
-                //console.log( { deepLinkPara } );
-                //utils.setDeepLinkingUrl( deepLinkPara );
-                //this.props.navigation.navigate( 'WalletScreen' );
+            if ( result.type == "SSS Restore Self Share" ) {
+                console.log( { data: result } );
+            } else {
+                alert.simpleOk( "Oops", "Please scan correct self share." );
             }
         } catch ( error ) {
             console.log( error );
@@ -151,19 +116,18 @@ export default class RestoreTrustedContactsQRCodeScanScreen extends React.Compon
     //TODO: Popup select any contact 
     click_UpdateMsg = async () => {
         const dateTime = Date.now();
-        let recordId = this.state.recordId;
-        let decryptedShare = this.state.decryptedShare;
-        const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSSSRetoreDecryptedShare(
-            localDB.tableName.tblSSSDetails,
-            JSON.parse( decryptedShare ),
-            dateTime,
-            recordId
-        );
-        if ( resUpdateSSSRetoreDecryptedShare == true ) {
-            this.click_GoBack();
-        } else {
-            Alert.alert( resUpdateSSSRetoreDecryptedShare );
-        }
+
+        // const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSSSRetoreDecryptedShare(
+        //     localDB.tableName.tblSSSDetails,
+        //     JSON.parse( decryptedShare ),
+        //     dateTime,
+        //     recordId
+        // );
+        // if ( resUpdateSSSRetoreDecryptedShare == true ) {
+        //     this.click_GoBack();
+        // } else {
+        //     Alert.alert( resUpdateSSSRetoreDecryptedShare );
+        // }
     }
 
     render() {
@@ -193,19 +157,6 @@ export default class RestoreTrustedContactsQRCodeScanScreen extends React.Compon
                         />
                     </ImageBackground>
                 </SafeAreaView>
-                <ModelRestoreAssociateContactListForQRCodeScan data={ this.state.arr_ModelRestoreAssociateContactList } click_Confirm={ ( recordId: string ) => {
-                    this.setState( {
-                        recordId,
-                        arr_ModelRestoreAssociateContactList: [
-                            {
-                                modalVisible: false,
-                                item: ""
-                            }
-                        ],
-                    } )
-                    this.click_UpdateMsg()
-                }
-                } />
             </Container >
         );
     }

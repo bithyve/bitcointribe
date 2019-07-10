@@ -66,6 +66,7 @@ const readTablesData = ( tableName: any ) => {
               data.recordId = utils.decrypt( data.recordId, passcode );
               data.decryptedShare = utils.decrypt( data.decryptedShare, passcode );
               data.encryptedMetaShare = utils.decrypt( data.encryptedMetaShare, passcode );
+              data.type = utils.decrypt( data.type, passcode );
               temp.push( data );
             }
             else if ( tableName == "tblTrustedPartySSSDetails" ) {
@@ -981,6 +982,53 @@ const insertRestoreUsingTrustedContactKeepInfo = (
   } );
 };
 
+
+const insertRestoreUsingTrustedContactSelfShare = (
+  tblName: string,
+  fulldate: string,
+  shares: any,
+  type: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    let temp = [];
+    let jsonData = {};
+    jsonData.title = "Secret Created.";
+    jsonData.date = utils.getUnixToDateFormat2();;
+    temp.push( jsonData );
+    db.transaction( function ( txn ) {
+      txn.executeSql(
+        "INSERT INTO " +
+        tblName +
+        "(dateCreated,keeperInfo,history,lastSuccessfulCheck,type,sharedDate,shareStage) VALUES (:dateCreated,:keeperInfo,:history,:lastSuccessfulCheck,:type,:sharedDate,:shareStage)",
+        [
+          utils.encrypt(
+            fulldate.toString(),
+            passcode
+          ),
+          utils.encrypt( JSON.stringify( shares ).toString(), passcode ),
+          utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
+          utils.encrypt(
+            fulldate.toString(),
+            passcode
+          ),
+          utils.encrypt( type.toString(), passcode ),
+          utils.encrypt(
+            fulldate.toString(),
+            passcode
+          ),
+          utils.encrypt(
+            "Good",
+            passcode
+          ),
+        ]
+      );
+      resolve( true );
+    } );
+  } );
+};
+
+
 //update
 const updateSSSContactListDetails = (
   tblName: string,
@@ -1537,6 +1585,7 @@ module.exports = {
   readSSSTableData,
   insertSSSShareDetails,
   insertRestoreUsingTrustedContactKeepInfo,
+  insertRestoreUsingTrustedContactSelfShare,
   updateSSSContactListDetails,
   updateSSSTransferMehtodDetails,
   updateSSSShareStage,

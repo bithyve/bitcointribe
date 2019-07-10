@@ -28,7 +28,7 @@ export default class RestoreScanQrCode extends Component<Props, any> {
 
     constructor ( props: any ) {
         super( props )
-        window.EventBus.on( "swipeScreen", this.swipeScreen );
+        window.EventBus.on( "swipeScreenrestoreselfshare", this.swipeScreen );
         this.swipeScreen = this.swipeScreen.bind( this );
     }
 
