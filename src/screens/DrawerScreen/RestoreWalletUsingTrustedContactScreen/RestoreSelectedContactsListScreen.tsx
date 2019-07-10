@@ -127,115 +127,146 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
         let dateTime = Date.now();
         let walletDetails = await utils.getWalletDetails();
         let sssDetails = await utils.getSSSDetails();
+        console.log( sssDetails );
         console.log( { sssDetails } );
         console.log( { walletDetails, sssDetails } );
         //flag   
         let flag_isSetupTrustedContact, flag_isSecretQuestions;
         //array  
-        let arr_TrustedContacts = [];
+
         let history = [];
         let tempOpt = [];
         let temp = [];
         //Trusted Contacts
         if ( sssDetails.length > 0 ) {
-            for ( let i = 0; i <= 1; i++ ) {
-                let keeperInfo = JSON.parse( sssDetails[ i ].keeperInfo );
-                let data = {};
-                data.emailAddresses = keeperInfo.emailAddresses;
-                data.phoneNumbers = keeperInfo.phoneNumbers;
-                data.history = JSON.parse( sssDetails[ i ].history );
-                data.recordID = keeperInfo.recordID;
-                data.thumbnailPath = keeperInfo.thumbnailPath
-                data.givenName = keeperInfo.givenName;
-                data.familyName = keeperInfo.familyName;
-                data.sssDetails = sssDetails[ i ];
-                let sharedDate = parseInt( sssDetails[ i ].sharedDate );
-                console.warn( 'sharedDate date =' + sharedDate.toString() );
-                var startDate = new Date( dateTime );
-                var endDate = new Date( sharedDate );
-                //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
-                var diff = Math.abs( startDate.getTime() - endDate.getTime() );
-                //console.warn( 'diff' + diff.toString() );  
-                const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
-                const seconds: any = Math.floor( diff / 1000 % 60 );
-                //console.log( { minutes, seconds } );
-                //console.warn( minutes.toString() )
-                const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
-                data.totalSec = 540 - totalSec;
-                //for history get opt     
-                for ( let i = 0; i < 2; i++ ) {
-                    let eachHistory = JSON.parse( sssDetails[ i ].history );
-                    let eachHistoryLength = eachHistory.length;
-                    var otp;
-                    if ( eachHistory[ eachHistoryLength - 1 ] != undefined ) {
-                        otp = eachHistory[ eachHistoryLength - 1 ].otp;
-                    } else {
-                        otp = undefined;
+            let { arr_TrustedContacts, arr_SelfShare } = this.state;
+            var len = sssDetails.length;
+            for ( let i = 0; i < len; i++ ) {
+
+                //Trusted Contacts
+                if ( sssDetails[ i ].type === 'Trusted Contacts 1' || sssDetails[ i ].type === 'Trusted Contacts 2' ) {
+                    let keeperInfo = JSON.parse( sssDetails[ i ].keeperInfo );
+                    let data = {};
+                    data.emailAddresses = keeperInfo.emailAddresses;
+                    data.phoneNumbers = keeperInfo.phoneNumbers;
+                    data.history = JSON.parse( sssDetails[ i ].history );
+                    data.recordID = keeperInfo.recordID;
+                    data.thumbnailPath = keeperInfo.thumbnailPath
+                    data.givenName = keeperInfo.givenName;
+                    data.familyName = keeperInfo.familyName;
+                    data.sssDetails = sssDetails[ i ];
+                    let sharedDate = parseInt( sssDetails[ i ].sharedDate );
+                    console.warn( 'sharedDate date =' + sharedDate.toString() );
+                    var startDate = new Date( dateTime );
+                    var endDate = new Date( sharedDate );
+                    //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
+                    var diff = Math.abs( startDate.getTime() - endDate.getTime() );
+                    //console.warn( 'diff' + diff.toString() );  
+                    const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
+                    const seconds: any = Math.floor( diff / 1000 % 60 );
+                    //console.log( { minutes, seconds } );
+                    //console.warn( minutes.toString() )
+                    const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
+                    data.totalSec = 540 - totalSec;
+                    //for history get opt     
+                    for ( let i = 0; i < 2; i++ ) {
+                        let eachHistory = JSON.parse( sssDetails[ i ].history );
+                        let eachHistoryLength = eachHistory.length;
+                        var otp;
+                        if ( eachHistory[ eachHistoryLength - 1 ] != undefined ) {
+                            otp = eachHistory[ eachHistoryLength - 1 ].otp;
+                        } else {
+                            otp = undefined;
+                        }
+                        tempOpt.push( otp );
                     }
-                    tempOpt.push( otp );
+                    if ( totalSec < 540 && sssDetails[ i ].shareStage == "Ugly" ) {
+                        data.statusMsg = "Shared";
+                        data.statusMsgColor = "#C07710";
+                        data.flag_timer = true;
+                        data.opt = tempOpt[ i ];
+                    } else if ( totalSec >= 540 && sssDetails[ i ].shareStage == "Ugly" ) {
+                        data.statusMsg = "Shared OTP expired.";
+                        data.statusMsgColor = "#C07710";
+                        data.flag_timer = false;
+                    } else if ( sssDetails[ i ].shareStage == "Good" ) {
+                        data.statusMsg = "Share accessible";
+                        data.statusMsgColor = "#008000";
+                        data.flag_timer = false;
+                    } else if ( sssDetails[ i ].shareStage == "Bad" ) {
+                        data.statusMsg = "Share not accessible";
+                        data.statusMsgColor = "#ff0000";
+                        data.flag_timer = false;
+                    } else if ( sssDetails[ i ].shareStage == "Ugly" && sssDetails[ i ].sharedDate != "" ) {
+                        data.statusMsg = "Share not accessible";
+                        data.statusMsgColor = "#ff0000";
+                        data.flag_timer = false;
+                    }
+                    else {
+                        data.statusMsg = "Not Confirmed";
+                        data.statusMsgColor = "#ff0000";
+                        data.flag_timer = false;
+                    }
+                    if ( sssDetails[ i ].type === 'Trusted Contacts 1' ) {
+                        arr_TrustedContacts[ 0 ] = data;
+                    } else {
+                        arr_TrustedContacts[ 1 ] = data;
+                    }
                 }
-
-                console.log( { tempOpt } );
-
-                if ( totalSec < 540 && sssDetails[ i ].shareStage == "Ugly" ) {
-                    data.statusMsg = "Shared";
-                    data.statusMsgColor = "#C07710";
-                    data.flag_timer = true;
-                    data.opt = tempOpt[ i ];
-                } else if ( totalSec >= 540 && sssDetails[ i ].shareStage == "Ugly" ) {
-                    data.statusMsg = "Shared OTP expired.";
-                    data.statusMsgColor = "#C07710";
-                    data.flag_timer = false;
-                } else if ( sssDetails[ i ].shareStage == "Good" ) {
-                    data.statusMsg = "Share accessible";
-                    data.statusMsgColor = "#008000";
-                    data.flag_timer = false;
-                } else if ( sssDetails[ i ].shareStage == "Bad" ) {
-                    data.statusMsg = "Share not accessible";
-                    data.statusMsgColor = "#ff0000";
-                    data.flag_timer = false;
-                } else if ( sssDetails[ i ].shareStage == "Ugly" && sssDetails[ i ].sharedDate != "" ) {
-                    data.statusMsg = "Share not accessible";
-                    data.statusMsgColor = "#ff0000";
-                    data.flag_timer = false;
-                }
-                else {
-                    data.statusMsg = "Not Confirmed";
-                    data.statusMsgColor = "#ff0000";
-                    data.flag_timer = false;
-                }
-                arr_TrustedContacts.push( data );
-            }
-
-            //Self Share  
-            let arr_SelfShare = [];
-            let arrTitle = [ "", "", "Wallet", "Email", "iCloud" ];
-            for ( let i = 0; i < sssDetails.length; i++ ) {
-                if ( i > 1 ) {
-                    console.log( { data: sssDetails[ i ] } );
+                //Self Share  
+                else if ( sssDetails[ i ].type === 'Self Share 1' ) {
                     let sharedDate = sssDetails[ i ].sharedDate;
                     let shareStage = sssDetails[ i ].shareStage;
                     let statusMsg = this.getMsgAndColor( sharedDate, shareStage )[ 0 ];
                     let statusColor = this.getMsgAndColor( sharedDate, shareStage )[ 1 ];
-                    console.log( { statusMsg, statusColor } );
+                    //console.log( { statusMsg, statusColor } );
                     let data = {};
                     data.thumbnailPath = "bars";
-                    data.givenName = arrTitle[ i ];
+                    data.givenName = "Wallet";
                     data.familyName = "";
                     data.statusMsgColor = statusColor;
                     data.statusMsg = statusMsg;
                     data.sssDetails = sssDetails[ i ];
-                    arr_SelfShare.push( data );
+                    arr_SelfShare[ 0 ] = data;
                 }
+                else if ( sssDetails[ i ].type === 'Self Share 2' ) {
+                    let sharedDate = sssDetails[ i ].sharedDate;
+                    let shareStage = sssDetails[ i ].shareStage;
+                    let statusMsg = this.getMsgAndColor( sharedDate, shareStage )[ 0 ];
+                    let statusColor = this.getMsgAndColor( sharedDate, shareStage )[ 1 ];
+                    //console.log( { statusMsg, statusColor } );
+                    let data = {};
+                    data.thumbnailPath = "bars";
+                    data.givenName = "Email";
+                    data.familyName = "";
+                    data.statusMsgColor = statusColor;
+                    data.statusMsg = statusMsg;
+                    data.sssDetails = sssDetails[ i ];
+                    arr_SelfShare[ 1 ] = data;
+                }
+                else {
+                    let sharedDate = sssDetails[ i ].sharedDate;
+                    let shareStage = sssDetails[ i ].shareStage;
+                    let statusMsg = this.getMsgAndColor( sharedDate, shareStage )[ 0 ];
+                    let statusColor = this.getMsgAndColor( sharedDate, shareStage )[ 1 ];
+                    //console.log( { statusMsg, statusColor } );
+                    let data = {};
+                    data.thumbnailPath = "bars";
+                    data.givenName = "iCloud";
+                    data.familyName = "";
+                    data.statusMsgColor = statusColor;
+                    data.statusMsg = statusMsg;
+                    data.sssDetails = sssDetails[ i ];
+                    arr_SelfShare[ 2 ] = data;
+                }
+                flag_Loading = false
+                this.setState( {
+                    flag_isSetupTrustedContact,
+                    // arr_TrustedContacts,
+                    flag_isSecretQuestions,
+                    arr_SelfShare,
+                } )
             }
-
-            flag_Loading = false
-            this.setState( {
-                flag_isSetupTrustedContact,
-                arr_TrustedContacts,
-                flag_isSecretQuestions,
-                arr_SelfShare,
-            } )
         } else {
             flag_Loading = false
         }
@@ -323,8 +354,12 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
 
     //TODO: Self share
     click_SelfShare = async ( item: any ) => {
-        console.log( { item } );
-        this.props.navigation.push( "Restore4And5SelfShareScreen", { data: item, title: item.givenName + " Shares Scan" } );
+        if ( item.givenName == "Wallet" ) {
+            this.props.navigation.push( "Restore3SelfShareScreen", { data: item, title: item.givenName + " Shares Scan" } );
+        } else {
+            this.props.navigation.push( "Restore4And5SelfShareScreen", { data: item, title: item.givenName + " Shares Scan", type: item.givenName } );
+        }
+
         // let sssDetails = await utils.getSSSDetails();
         // console.log( { sssDetails } );
         // let data3Share = sssDetails[ 2 ];

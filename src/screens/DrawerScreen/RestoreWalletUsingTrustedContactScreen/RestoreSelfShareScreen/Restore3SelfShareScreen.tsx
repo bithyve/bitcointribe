@@ -103,12 +103,7 @@ export default class Restore3SelfShareScreen extends React.Component<any, any> {
 
     //TODO: Sharing    
     click_QRCode( data: any ) {
-        let { title } = this.state;
-        if ( title == "Wallet Share" ) {
-            this.props.navigation.push( "Restore3SelfSahreQRCodeScannerScreen" );
-        } else {
-            this.props.navigation.push( "Restore4And5SelfShareQRCodeScannerScreen" );
-        }
+        this.props.navigation.push( "Restore3SelfSahreQRCodeScannerScreen" );
         // let { title } = this.state;
         // let email4shareFilePath = data.sssDetails.encryptedMetaShare.split( '"' ).join( "" );
         // if ( title != "Email Share" ) {
@@ -244,7 +239,7 @@ export default class Restore3SelfShareScreen extends React.Component<any, any> {
                             </Button>
                         </View>
                         <View style={ { flex: 0.1, padding: 20 } }>
-                            <Text numberOfLines={ 2 } note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Please sacn order 8 qrcode.</Text>
+                            <Text numberOfLines={ 2 } note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Please sacn self share.</Text>
                         </View>
                         <View style={ { flex: 2, alignItems: "center", justifyContent: "center" } }>
                             <Image style={ [ styles.imgAppLogo, { borderRadius: 10 } ] } source={ images.RestoreWalletUsingTrustedContact.share4and5SelfShareInfo } />

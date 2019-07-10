@@ -28,11 +28,16 @@ import {
     Body,
     Text,
     List,
-    ListItem
+    ListItem,
+    Tab, Tabs, TabHeading, Icon,
 } from "native-base";
 //import BarcodeScanner from "react-native-barcode-scanners";
 import { QRScannerView } from 'ac-qrcode';
 import { SvgIcon } from "@up-shared/components";
+//NsNotification
+import BackboneEvents from "backbone-events-standalone";
+// global event bus
+window.EventBus = BackboneEvents.mixin( {} );
 
 
 
@@ -51,72 +56,123 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 
 
+
+
 //Custome Compontes
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import RestoreScanQrCode from "HexaWallet/src/app/custcompontes/OnBoarding/RestoreScanQrCode/RestoreScanQrCode"
 
-
-//TODO: Custome Model
-import ModelRestoreAssociateContactListForQRCodeScan from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelRestoreAssociateContactListForQRCodeScan";
+//Screens
+import Restore4And5SelfShareQRCodeScreen1 from "./Screens/Restore4And5SelfShareQRCodeScreen1";
+import Restore4And5SelfShareQRCodeScreen2 from "./Screens/Restore4And5SelfShareQRCodeScreen2";
+import Restore4And5SelfShareQRCodeScreen3 from "./Screens/Restore4And5SelfShareQRCodeScreen3";
+import Restore4And5SelfShareQRCodeScreen4 from "./Screens/Restore4And5SelfShareQRCodeScreen4";
+import Restore4And5SelfShareQRCodeScreen5 from "./Screens/Restore4And5SelfShareQRCodeScreen5";
+import Restore4And5SelfShareQRCodeScreen6 from "./Screens/Restore4And5SelfShareQRCodeScreen6";
+import Restore4And5SelfShareQRCodeScreen7 from "./Screens/Restore4And5SelfShareQRCodeScreen7";
+import Restore4And5SelfShareQRCodeScreen8 from "./Screens/Restore4And5SelfShareQRCodeScreen8";
 
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
+
 export default class Restore4And5SelfShareQRCodeScanner extends React.Component {
     constructor ( props: any ) {
         super( props );
+        this.state = ( {
+            data: [],
+            title: "",
+            type: "",
+            arr_Shares: [],
+            selectedIndex: 0,
+
+        } )
     }
 
+    componentWillMount() {
+        let data = this.props.navigation.getParam( "data" );
+        let type = this.props.navigation.getParam( "type" );
+        this.setState( {
+            data, type
+        } )
+    }
+
+    //TODO: Click next qrcode click on 
+    click_Next( index: number, data: any ) {
+        let arr_Shares = this.state.arr_Shares;
+        arr_Shares.push.apply( arr_Shares, data )
+        this.setState( {
+            selectedIndex: index,
+            arr_Shares
+        } )
+    }
+
+    click_Confirm = async ( type: string, data: any ) => {
+        console.log( { type, data } );
+
+        const dateTime = Date.now();
+        let arr_Shares = this.state.arr_Shares;
+        arr_Shares.push.apply( arr_Shares, data );
+        console.log( { arr_Shares } );
 
 
-
-    _renderTitleBar() {
-        return (
-            <Text></Text>
+        let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactSelfShare(
+            localDB.tableName.tblSSSDetails,
+            dateTime,
+            arr_Shares,
+            type
         );
-    }
+        console.log( { resInsertContactList } );
 
-    _renderMenu() {
-        return (
-            <Text></Text>
-        )
-    }
-
-    barcodeReceived( e: any ) {
-        try {
-            var result = e.data;
-            console.log( { result } );
-
-        } catch ( error ) {
-            console.log( error );
+        if ( resInsertContactList ) {
+            await comFunDBRead.readTblSSSDetails();
+            this.props.navigation.pop( 2 );
         }
+
     }
 
     render() {
+        //values 
+        let { selectedIndex, type } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.props.navigation.pop() }
-                            >
-                                <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>{ title }</Text>
-                            </Button>
-                        </View>
-                        < QRScannerView
-                            hintText=""
-                            rectHeight={ Dimensions.get( 'screen' ).height / 2.0 }
-                            rectWidth={ Dimensions.get( 'screen' ).width - 20 }
-                            scanBarColor={ colors.appColor }
-                            cornerColor={ colors.appColor }
-                            onScanResultReceived={ this.barcodeReceived.bind( this ) }
-                            renderTopBarView={ () => this._renderTitleBar() }
-                            renderBottomMenuView={ () => this._renderMenu() }
-                        />
-                    </ImageBackground>
+                    <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
+                    <View style={ { marginLeft: 10, marginTop: 15 } }>
+                        <Button
+                            transparent
+                            onPress={ () => this.props.navigation.pop() }
+                        >
+                            <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#ffffff" />
+                            <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#ffffff", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Scan QRCode</Text>
+                        </Button>
+                    </View>
+                    <Tabs locked={ true } page={ selectedIndex }>
+                        <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
+                            <Restore4And5SelfShareQRCodeScreen1 type={ type } click_Next={ ( val: number, data: any ) => this.click_Next( val, data ) } />
+                        </Tab>
+                        <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
+                            <Restore4And5SelfShareQRCodeScreen2 type={ type } click_Next={ ( val: number, data: any ) => this.click_Next( val, data ) } />
+                        </Tab>
+                        <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
+                            <Restore4And5SelfShareQRCodeScreen3 type={ type } click_Next={ ( val: number, data: any ) => this.click_Next( val, data ) } />
+                        </Tab>
+                        <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
+                            <Restore4And5SelfShareQRCodeScreen4 type={ type } click_Next={ ( val: number, data: any ) => this.click_Next( val, data ) } />
+                        </Tab>
+                        <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
+                            <Restore4And5SelfShareQRCodeScreen5 type={ type } click_Next={ ( val: number, data: any ) => this.click_Next( val, data ) } />
+                        </Tab>
+                        <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
+                            <Restore4And5SelfShareQRCodeScreen6 type={ type } click_Next={ ( val: number, data: any ) => this.click_Next( val, data ) } />
+                        </Tab>
+                        <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
+                            <Restore4And5SelfShareQRCodeScreen7 type={ type } click_Next={ ( val: number, data: any ) => this.click_Next( val, data ) } />
+                        </Tab>
+                        <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
+                            <Restore4And5SelfShareQRCodeScreen8 type={ type } click_Confirm={ ( type: string, data: any ) => this.click_Confirm( type, data ) } />
+                        </Tab>
+                    </Tabs>
                 </SafeAreaView>
             </Container >
         );
@@ -126,7 +182,7 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
 const styles = StyleSheet.create( {
     container: {
         flex: 1,
-        backgroundColor: "#000000"
+        backgroundColor: "gray"
     },
 
 } );

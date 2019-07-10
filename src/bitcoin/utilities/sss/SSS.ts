@@ -161,6 +161,8 @@ export default class SSS {
     //   this.cipherSpec.salt,
     //   this.cipherSpec.keyLength,
     // );
+    console.log( { key } );
+
     const decipher = crypto.createDecipheriv(
       SSS.cipherSpec.algorithm,
       key,
@@ -170,8 +172,19 @@ export default class SSS {
     try {
       let decrypted = decipher.update( encryptedMetaShare, "hex", "utf8" );
       decrypted += decipher.final( "utf8" );
+      console.log( { decrypted } );
+
       const decryptedMetaShare = JSON.parse( decrypted );
+
+      console.log( { decryptedMetaShare } );
+      console.log( "Here" );
+      console.log( { meta: decryptedMetaShare.meta } );
+
+      console.log( { validator: decryptedMetaShare.meta.validator } );
+
       if ( decryptedMetaShare.meta.validator !== "HEXA" ) {
+        console.log( "THrowing error" );
+
         throw new Error();
       }
 

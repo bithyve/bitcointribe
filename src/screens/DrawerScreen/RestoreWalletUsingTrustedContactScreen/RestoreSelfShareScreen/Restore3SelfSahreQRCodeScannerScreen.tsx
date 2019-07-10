@@ -51,6 +51,10 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 
 
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
+
 //Custome Compontes
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
@@ -61,6 +65,11 @@ import ModelRestoreAssociateContactListForQRCodeScan from "HexaWallet/src/app/cu
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
+let flag_ReadQRCode = true;
+
+//TODO: Bitcoin files
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+
 export default class Restore3SelfSahreQRCodeScannerScreen extends React.Component {
     constructor ( props: any ) {
         super( props );
@@ -70,31 +79,6 @@ export default class Restore3SelfSahreQRCodeScannerScreen extends React.Componen
             arr_ModelRestoreAssociateContactList: [],
             recordId: "",
             decryptedShare: ""
-        } )
-
-    }
-
-
-    async  componentDidMount() {
-        let resSSSDetails = await utils.getSSSDetails();
-        let arr_KeeperInfo = [];
-        for ( let i = 0; i < resSSSDetails.length; i++ ) {
-            let data = {};
-            let fullInfo = resSSSDetails[ i ]
-            if ( fullInfo.acceptedDate == "" ) {
-                let keerInfo = JSON.parse( resSSSDetails[ i ].keeperInfo );
-                data.thumbnailPath = keerInfo.thumbnailPath;
-                data.givenName = keerInfo.givenName;
-                data.familyName = keerInfo.familyName;
-                data.phoneNumbers = keerInfo.phoneNumbers;
-                data.emailAddresses = keerInfo.emailAddresses;
-                data.recordId = fullInfo.recordId;
-                arr_KeeperInfo.push( data );
-            }
-        }
-        console.log( { arr_KeeperInfo } );
-        this.setState( {
-            item: arr_KeeperInfo,
         } )
     }
 
@@ -112,28 +96,38 @@ export default class Restore3SelfSahreQRCodeScannerScreen extends React.Componen
         )
     }
 
-    barcodeReceived( e: any ) {
+    barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
             result = JSON.parse( result );
-            // console.log( { result } );
-            if ( result.type == "SSS Restore" ) {
-                utils.setDeepLinkingType( "SSS Restore QR" );
-                let item = this.state.item;
-                this.setState( {
-                    decryptedShare: result.data,
-                    arr_ModelRestoreAssociateContactList: [
-                        {
-                            modalVisible: true,
-                            item: item
-                        }
-                    ],
+            if ( flag_ReadQRCode == true ) {
+                if ( result.type == "SSS Restore Self Share" ) {
+                    let resDownlaodShare = await S3Service.downloadShare( result.data );
+                    console.log( { resDownlaodShare } );
+                    console.log( { result } );
+                    if ( resDownlaodShare.status == 200 ) {
+                        let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, result.data );
+                        console.log( { resDecryptEncMetaShare } );
 
-                } )
-                //console.log( { deepLinkPara } );
-                //utils.setDeepLinkingUrl( deepLinkPara );
-                //this.props.navigation.navigate( 'WalletScreen' );
+                        if ( resDecryptEncMetaShare.status == 200 ) {
+                            flag_ReadQRCode = false;
+                            console.log( { resDecryptEncMetaShare } );
+                        } else {
+                            flag_ReadQRCode = false;
+                            alert.simpleOk( "Oops", resDecryptEncMetaShare.err );
+                        }
+                    } else {
+                        flag_ReadQRCode = false;
+                        alert.simpleOk( "Oops", resDownlaodShare.err );
+                    }
+                } else {
+                    flag_ReadQRCode = false;
+                    alert.simpleOk( "Oops", "Please scan correct self share." );
+
+                }
+                flag_ReadQRCode = false;
             }
+
         } catch ( error ) {
             console.log( error );
         }
@@ -148,23 +142,7 @@ export default class Restore3SelfSahreQRCodeScannerScreen extends React.Componen
     }
 
 
-    //TODO: Popup select any contact 
-    click_UpdateMsg = async () => {
-        const dateTime = Date.now();
-        let recordId = this.state.recordId;
-        let decryptedShare = this.state.decryptedShare;
-        const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSSSRetoreDecryptedShare(
-            localDB.tableName.tblSSSDetails,
-            JSON.parse( decryptedShare ),
-            dateTime,
-            recordId
-        );
-        if ( resUpdateSSSRetoreDecryptedShare == true ) {
-            this.click_GoBack();
-        } else {
-            Alert.alert( resUpdateSSSRetoreDecryptedShare );
-        }
-    }
+
 
     render() {
         return (
