@@ -9,7 +9,7 @@ import {
     Icon
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
-import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
+import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Contacts from 'react-native-contacts';
 import { Avatar } from 'react-native-elements';
@@ -212,7 +212,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
     press = ( item: any ) => {
         let type = item.resSharedSecretList.type;
         if ( type == "Self Share" ) {
-            alert.simpleOk( "Oops", "Working" );
+            this.props.navigation.push( "TrustedPartySelfShareQRCode", { data: item } );
         } else {
             alert.simpleOk( "Oops", "Working" );
             // let jsonTemp = {}  
@@ -429,7 +429,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                 } }>
                     <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                            <View style={ { alignItems: "center", justifyContent: "center" } }>
+                            <View style={ { flex: 0.2, alignItems: "center", justifyContent: "center" } }>
                                 { renderIf( item.keeperInfo.thumbnailPath != "" )(
                                     <Avatar medium rounded source={ { uri: item.keeperInfo.thumbnailPath } } />
                                 ) }
@@ -437,7 +437,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                                     <Avatar medium rounded title={ item.keeperInfo.givenName != null && item.keeperInfo.givenName.charAt( 0 ) } />
                                 ) }
                             </View>
-                            <View style={ { flexDirection: "column" } }>
+                            <View style={ { flex: 1, flexDirection: "column" } }>
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10 } ] }>{ item.name }</Text>
                                 <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.mobileNo != "" ? item.mobileNo : "Not Number!" }</Text>
                                 <Text note style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.walletName }</Text>
@@ -463,6 +463,9 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                                 { renderIf( typeof item.opt !== "undefined" )(
                                     <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: "gray" } ] }>OTP { " " }{ item.opt }</Text>
                                 ) }
+                            </View>
+                            <View style={ { flex: 0.1, alignItems: "center", justifyContent: "center" } } >
+                                <IconFontAwe name="angle-right" style={ { fontSize: 25, marginRight: 10, flex: 0.1 } } />
                             </View>
                         </View>
                     </View>

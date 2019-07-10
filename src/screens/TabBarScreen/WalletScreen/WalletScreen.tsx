@@ -335,7 +335,7 @@ export default class WalletScreen extends React.Component {
               localDB.tableName.tblTrustedPartySSSDetails,
               dateTime,
               urlScript,
-              resDecryptEncMetaShare.data,
+              resDecryptEncMetaShare.data.decryptedMetaShare,
               resDecryptEncMetaShare.data.decryptedMetaShare.meta,
               resDecryptEncMetaShare.data.decryptedMetaShare.encryptedStaticNonPMDD
             );

@@ -466,12 +466,6 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             let bhXpub = data.bhXpub;
 
 
-
-
-
-
-
-
             //Share 1 
             // let arrShare1 = .split();   
             // console.log( { arrShare1 } );       
@@ -480,9 +474,9 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             let arrShare3 = this.chunkArray( arrQRCodeData[ 2 ], 6 );
             let arrShare4 = this.chunkArray( arrQRCodeData[ 3 ], 6 );
             let arrShare5 = this.chunkArray( arrQRCodeData[ 4 ], 6 );
-            let arrShare6 = this.chunkArray( arrQRCodeData[ 4 ], 6 );
-            let arrShare7 = this.chunkArray( arrQRCodeData[ 4 ], 6 );
-            let arrShare8 = this.chunkArray( arrQRCodeData[ 4 ], 6 );
+            let arrShare6 = this.chunkArray( arrQRCodeData[ 5 ], 6 );
+            let arrShare7 = this.chunkArray( arrQRCodeData[ 6 ], 6 );
+            let arrShare8 = this.chunkArray( arrQRCodeData[ 7 ], 6 );
 
 
             //Secound Mnemonic

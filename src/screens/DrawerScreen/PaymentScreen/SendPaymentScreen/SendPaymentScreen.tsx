@@ -182,8 +182,13 @@ export default class SendPaymentScreen extends React.Component<any, any> {
     }
 
 
+
+
     //TODO: Send they amount 
     click_SendAmount = async () => {
+
+
+
         this.setState( {
             flag_Loading: true
         } )
