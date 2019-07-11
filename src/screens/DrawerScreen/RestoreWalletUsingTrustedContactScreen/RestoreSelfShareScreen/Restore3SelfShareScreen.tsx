@@ -77,20 +77,7 @@ export default class Restore3SelfShareScreen extends React.Component<any, any> {
     async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
         let title = this.props.navigation.getParam( "title" );
-
-        console.log( { data } );
-        // let flag_History = utils.isJson( data.sssDetails.history );
-        // var arr_History = [];
-        // if ( flag_History ) {
-        //     arr_History = JSON.parse( data.sssDetails.history );
-        // }
-        // let acceptedDate = data.sssDetails.acceptedDate;
         let flag_ScanBtnDisable = true;
-        // if ( acceptedDate != "" ) {
-        //     flag_ScanBtnDisable = false;
-        // } else {
-        //     flag_ScanBtnDisable = true;
-        // }
         console.log( { data } );
         this.setState( {
             title,
@@ -104,118 +91,11 @@ export default class Restore3SelfShareScreen extends React.Component<any, any> {
     //TODO: Sharing    
     click_QRCode( data: any ) {
         this.props.navigation.push( "Restore3SelfSahreQRCodeScannerScreen" );
-        // let { title } = this.state;
-        // let email4shareFilePath = data.sssDetails.encryptedMetaShare.split( '"' ).join( "" );
-        // if ( title != "Email Share" ) {
-        //     let shareOptions = {
-        //         title: "For 5 share",
-        //         message: "For 5 share.Pdf password is your answer.",
-        //         urls: [ email4shareFilePath ],
-        //         subject: "For 5 share "
-        //     };
-        //     Share.open( shareOptions )
-        //         .then( ( res: any ) => {
-        //             this.updateHistory( data, "Shared.", "" );
-        //             this.setState( {
-        //                 flag_ShareBtnDisable: false,
-        //                 flag_ReShareBtnDisable: true,
-        //                 flag_ConfrimBtnDisable: true
-        //             } );
-        //         } );
-        // } else {
-        //     console.log( { email4shareFilePath } );
-        //     Mailer.mail( {
-        //         subject: 'For 4 Share.',
-        //         recipients: [ 'appasahebl@bithyve.com' ],
-        //         body: '<b>For 4 share.Pdf password is your answer.</b>',
-        //         isHTML: true,
-        //         attachment: {
-        //             path: email4shareFilePath,  // The absolute path of the file from which to read data.
-        //             type: 'pdf',      // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-        //             name: 'For4Share',   // Optional: Custom filename for attachment
-        //         }
-        //     }, ( error, event ) => {
-        //         if ( event == "sent" ) {
-        //             alert.simpleOk( "Success", "Email sent success." );
-        //             this.updateHistory( data, "Shared.", "" );
-        //             this.setState( {
-        //                 flag_ShareBtnDisable: false,
-        //                 flag_ReShareBtnDisable: true,
-        //                 flag_ConfrimBtnDisable: true
-        //             } )
-        //         } else {
-        //             alert.simpleOk( "Oops", error );
-        //         }
-        //     } );
-        // }
     }
 
     //TODO: Re-Share Share
 
-    click_ReShare( data: any ) {
-        alert.simpleOk( "Oops", "Working" );
-    }
 
-
-    onSelect = async ( returnValue: any ) => {
-        // if ( returnValue.data == returnValue.result ) {
-        //     let { data } = this.state;
-        //     let filePath = JSON.parse( data.sssDetails.encryptedMetaShare );
-        //     console.log( { filePath } );
-        //     this.updateHistory( data, "Confirmed.", filePath );
-        //     let walletDetails = await utils.getWalletDetails();
-        //     let sssDetails = await utils.getSSSDetails();
-        //     let encrShares = [];
-        //     for ( let i = 0; i < sssDetails.length; i++ ) {
-        //         let data = {};
-        //         data.shareId = sssDetails[ i ].shareId;
-        //         data.updatedAt = sssDetails[ i ].sharedDate == "" ? 0 : parseInt( sssDetails[ i ].sharedDate );
-        //         encrShares.push( data );
-        //     }
-        //     console.log( { encrShares } );
-        //     let updateShareIdStatus = await comAppHealth.connection_AppHealthForAllShare( parseInt( walletDetails.lastUpdated ), encrShares );
-        //     console.log( { updateShareIdStatus } );
-        //     this.setState( {
-        //         flag_ConfrimBtnDisable: false
-        //     } )
-        // } else {
-        //     alert.simpleOk( "Oops", "Try again." );
-        // }
-
-    }
-
-    //TODO: update histroy
-    updateHistory = async ( data: any, title: string, filePath: any ) => {
-        // let arr_History = JSON.parse( data.sssDetails.history );
-        // const dateTime = Date.now();
-        // let JsonData = {};
-        // JsonData.title = title;
-        // JsonData.date = utils.getUnixToDateFormat2();
-        // let temp = [ JsonData ];
-        // arr_History.push.apply( arr_History, temp );
-        // console.log( { arr_History } );
-        // let resUpdateHistroyAndSharedDate = await dbOpration.updateHistroyAndSharedDate(
-        //     localDB.tableName.tblSSSDetails,
-        //     arr_History,
-        //     dateTime,
-        //     data.sssDetails.id
-        // );
-        // console.log( resUpdateHistroyAndSharedDate );
-        // if ( resUpdateHistroyAndSharedDate ) {
-        //     await comFunDBRead.readTblSSSDetails();
-        //     this.setState( {
-        //         arr_History
-        //     } );
-        //     await RNFS.unlink( filePath );
-        // }
-        // console.log( { resUpdateHistroyAndSharedDate } );
-    }
-
-    //TODO: Share or Reshare button on click
-    click_SentRequest( type: string, data: any ) {
-        console.log( { type, data } );
-
-    }
 
     render() {
         //array     

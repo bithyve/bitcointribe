@@ -49,6 +49,8 @@ import PermissionScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen
 import SettingScreen from "HexaWallet/src/screens/TabBarScreen/SettingScreen/SettingScreen";
 import ContactSharedSecretList from "HexaWallet/src/screens/TabBarScreen/SettingScreen/ContactsSharedSecredYouScreen/ContactSharedSecretList";
 import TrustedPartySelfShareQRCode from "HexaWallet/src/screens/TabBarScreen/SettingScreen/ContactsSharedSecredYouScreen/TrustedPartySelfShareQRCode";
+import TrsutedPartyQRCodeScreen from "HexaWallet/src/screens/TabBarScreen/SettingScreen/ContactsSharedSecredYouScreen/TrsutedPartyQRCodeScreen";
+
 //
 // //Left DrawerScreen
 // import SecurityScreen from "bithyve/src/screens/DrawerScreen/SecurityScreen/SecurityScreen";
@@ -137,6 +139,7 @@ import ConfirmSelfShareQRScannerScreen from "HexaWallet/src/screens/DrawerScreen
 import ReceivePaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/ReceivePaymentScreen/ReceivePaymentScreen";
 import SendPaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/SendPaymentScreen/SendPaymentScreen";
 import ConfirmAndSendPaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/SendPaymentScreen/ConfirmAndSendPaymentScreen";
+
 
 
 
@@ -260,6 +263,10 @@ const TrustedPartyShareSecretStackNavigator = createStackNavigator(
     },
     TrustedPartySelfShareQRCode: {
       screen: TrustedPartySelfShareQRCode,
+      navigationOptions: { header: null }
+    },
+    TrsutedPartyQRCodeScreen: {
+      screen: TrsutedPartyQRCodeScreen,
       navigationOptions: { header: null }
     }
   },

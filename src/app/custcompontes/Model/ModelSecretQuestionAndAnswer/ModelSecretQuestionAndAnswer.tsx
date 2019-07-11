@@ -243,7 +243,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                                                     let keeperInfo = [ { info: arr_SelectedList[ 0 ] }, { info: arr_SelectedList[ 1 ] }, { info: rescreateMetaShare2.data }, { info: qrcode4share[ 0 ] }, { info: qrcode5share[ 0 ] } ];
                                                     let recoardInfo = [ { id: arr_SelectedList[ 0 ].recordID }, { id: arr_SelectedList[ 1 ].recordID }, { id: "" }, { id: "" }, { id: "" } ];
                                                     let arrTypes = [ { type: "Trusted Contacts 1" }, { type: "Trusted Contacts 2" }, { type: "Self Share 1" }, { type: "Self Share 2" }, { type: "Self Share 3" } ];
-                                                    let encryptedMetaShare = [ { metaShare: resGenerateEncryptedMetaShare1.data }, { metaShare: resGenerateEncryptedMetaShare2.data }, { metaShare: resGenerateEncryptedMetaShare3.data }, { metaShare: resGenerate4thsharepdf }, { metaShare: resGenerate5thsharepdf } ]
+                                                    let encryptedMetaShare = [ { metaShare: rescreateMetaShare.data }, { metaShare: rescreateMetaShare1.data }, { metaShare: rescreateMetaShare2.data }, { metaShare: resGenerate4thsharepdf }, { metaShare: resGenerate5thsharepdf } ]
                                                     let temp = [ { date: dateTime, share: encryptedShares, shareId: shareIds, keeperInfo: keeperInfo, recordId: recoardInfo, encryptedMetaShare: encryptedMetaShare, shareStage: resAppHealthStatus, type: arrTypes } ]
                                                     console.log( { temp } );
                                                     let resInsertSSSShare = await dbOpration.insertSSSShareDetails(

@@ -68,6 +68,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             arr_ConstactDetailsList: [],
             arr_History: [],
             arr_resSSSDetails: [],
+            arr_EncryptedMetaShare: [],
             key: "",
             otpCode: "",
             flag_OtpCodeShowStatus: false,
@@ -122,20 +123,27 @@ export default class TrustedContactScreen extends React.Component<any, any> {
     load_data = async () => {
         this.setState( {
             flag_Loading: true,
-            msg_Loading: "Message id genreating"
+            msg_Loading: "Key id genreating"
         } );
         let flag_Loading = true;
         let data = this.props.navigation.getParam( "data" );
+        console.log( { data } );
         let encryptedMetaShare = data.encryptedMetaShare;
         const sss = await utils.getS3ServiceObject();
-        const resEncryptViaOTP = sss.encryptViaOTP( encryptedMetaShare.key );
-        console.log( { resEncryptViaOTP } );
+        var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare( data.encryptedMetaShare.metaShare );
+        if ( resGenerateEncryptedMetaShare.status == 200 ) {
+            resGenerateEncryptedMetaShare = resGenerateEncryptedMetaShare.data;
+        } else {
+            alert.simpleOk( "Oops", resGenerateEncryptedMetaShare.err );
+        }
+        const resEncryptViaOTP = sss.encryptViaOTP( resGenerateEncryptedMetaShare.key );
         if ( resEncryptViaOTP.status == 200 || 400 ) {
-            const resUploadShare = await sss.uploadShare( encryptedMetaShare.encryptedMetaShare, encryptedMetaShare.messageId );
+            const resUploadShare = await sss.uploadShare( resGenerateEncryptedMetaShare.encryptedMetaShare, resGenerateEncryptedMetaShare.messageId );
             console.log( { resUploadShare } );
             if ( resUploadShare.status == 200 ) {
                 this.setState( {
-                    messageId: encryptedMetaShare.messageId,
+                    arr_EncryptedMetaShare: resGenerateEncryptedMetaShare,
+                    messageId: resGenerateEncryptedMetaShare.messageId,
                     key: resEncryptViaOTP.data.otpEncryptedData,
                     otpCode: resEncryptViaOTP.data.otp,
                     flag_Loading: false,
@@ -204,6 +212,8 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                 }, ( error, event ) => {
                     if ( event == "sent" ) {
                         console.log( { event } );
+                    } else {
+                        alert.simpleOk( "Oops", error );
                     }
                 } );
                 setTimeout( () => {
@@ -226,6 +236,8 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                 flag_OtpCodeShowStatus: true
                             } )
                         }, 1000 );
+                    } else {
+                        alert.simpleOk( "Oops", error );
                     }
                 } );
             }
@@ -283,7 +295,8 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         } else if ( type == "EMAIL" ) {
             this.click_SentURLSmsOrEmail( "EMAIL", item[ 0 ].email );
         } else {
-            this.props.navigation.push( "ShareSecretViaQRScreen", { data: item, onSelect: this.onSelect } );
+            let { arr_EncryptedMetaShare } = this.state;
+            this.props.navigation.push( "ShareSecretViaQRScreen", { data: arr_EncryptedMetaShare, onSelect: this.onSelect } );
         }
         this.refs.modal4.close();
     }
