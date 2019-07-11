@@ -55,17 +55,12 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
 
     async componentWillMount() {
         let walletDetails = utils.getWalletDetails();
-        var resSSSDetails = this.props.navigation.getParam( "data" );
-        // resSSSDetails = resSSSDetails.sssDetails;
-        // console.log( { resSSSDetails, walletDetails } );
-        let encryptedMetaShare = resSSSDetails.encryptedMetaShare;
-        // console.log( { encryptedMetaShare } );
-        // console.log( { resQRShare } );
-        // console.log( { jsonResQRShare } );
+        var data = this.props.navigation.getParam( "data" );
+        console.log( { data } );
         let qrCodeData = {};
-        qrCodeData.type = "SSS Recovery";
+        qrCodeData.type = "SSS Recovery QR";
         qrCodeData.wn = walletDetails.walletType;
-        qrCodeData.data = encryptedMetaShare.key;
+        qrCodeData.data = data.key;
         console.log( { qrCodeData } );
         this.setState( {
             data: JSON.stringify( qrCodeData ).toString()

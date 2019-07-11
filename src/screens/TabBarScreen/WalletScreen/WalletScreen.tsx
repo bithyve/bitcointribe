@@ -280,8 +280,10 @@ export default class WalletScreen extends React.Component {
   getDeepLinkingData() {
     let urlScript = utils.getDeepLinkingUrl();
     let urlType = utils.getDeepLinkingType();
+    console.log( { urlType } );
     if ( urlType != "" ) {
-      if ( urlType == "SSS Restore SMS/EMAIL" || urlType == "SSS Recovery QR" ) {
+      if ( urlType == "SSS Recovery SMS/EMAIL" || urlType == "SSS Recovery QR" ) {
+        console.log( 'email' );
         this.setState( {
           deepLinkingUrl: urlScript,
           deepLinkingUrlType: urlType,
@@ -323,10 +325,25 @@ export default class WalletScreen extends React.Component {
       urlScript.data = urlScriptDetails.data
       let walletDetails = utils.getWalletDetails();
       const sss = await utils.getS3ServiceObject();
+
+
+
       let resDownlaodShare = await S3Service.downloadShare( urlScriptDetails.data );
       console.log( { resDownlaodShare } );
       if ( resDownlaodShare.status == 200 ) {
-        let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, urlScriptDetails.data );
+        let regularAccount = await utils.getRegularAccountObject();
+        var resGetWalletId = await regularAccount.getWalletId();
+        if ( resGetWalletId.status == 200 ) {
+          resGetWalletId = resGetWalletId.data;
+        } else {
+          alert.simpleOk( "Oops", resGetWalletId.err );
+        }
+        let resTrustedParty = await comFunDBRead.readTblTrustedPartySSSDetails();
+        let arr_DecrShare = [];
+        for ( let i = 0; i < resTrustedParty.length; i++ ) {
+          arr_DecrShare.push( JSON.parse( resTrustedParty[ i ].decrShare ) );
+        }
+        let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, urlScriptDetails.data, resGetWalletId.walletId, arr_DecrShare );
         if ( resDecryptEncMetaShare.status == 200 ) {
           console.log( { resDecryptEncMetaShare } );
           const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
@@ -385,7 +402,19 @@ export default class WalletScreen extends React.Component {
     let resDownlaodShare = await S3Service.downloadShare( urlScriptDetails.data );
     console.log( { resDownlaodShare } );
     if ( resDownlaodShare.status == 200 ) {
-      let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, urlScriptDetails.data );
+      let regularAccount = await utils.getRegularAccountObject();
+      var resGetWalletId = await regularAccount.getWalletId();
+      if ( resGetWalletId.status == 200 ) {
+        resGetWalletId = resGetWalletId.data;
+      } else {
+        alert.simpleOk( "Oops", resGetWalletId.err );
+      }
+      let resTrustedParty = await comFunDBRead.readTblTrustedPartySSSDetails();
+      let arr_DecrShare = [];
+      for ( let i = 0; i < resTrustedParty.length; i++ ) {
+        arr_DecrShare.push( JSON.parse( resTrustedParty[ i ].decrShare ) );
+      }
+      let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, urlScriptDetails.data, resGetWalletId.walletId, arr_DecrShare );
       if ( resDecryptEncMetaShare.status == 200 ) {
         console.log( { resDecryptEncMetaShare } );
         const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
@@ -394,7 +423,7 @@ export default class WalletScreen extends React.Component {
             localDB.tableName.tblTrustedPartySSSDetails,
             dateTime,
             urlScript,
-            resDecryptEncMetaShare.data,
+            resDecryptEncMetaShare.data.decryptedMetaShare,
             resDecryptEncMetaShare.data.decryptedMetaShare.meta,
             resDecryptEncMetaShare.data.decryptedMetaShare.encryptedStaticNonPMDD
           );
@@ -423,9 +452,6 @@ export default class WalletScreen extends React.Component {
       flag_Loading
     } )
   }
-
-
-
 
 
   //TODO: func refresh
@@ -907,6 +933,8 @@ export default class WalletScreen extends React.Component {
             } )
           } }
           click_AcceptSecret={ ( wn: string ) => {
+            console.log( { wn } );
+
             this.setState( {
               arr_ModelAcceptOrRejectSecret: [
                 {
@@ -948,7 +976,6 @@ export default class WalletScreen extends React.Component {
             } );
             this.storeSelfShare();
           } }
-
         />
 
         <ModelBackupShareAssociateContact data={ arr_ModelBackupShareAssociateContact }

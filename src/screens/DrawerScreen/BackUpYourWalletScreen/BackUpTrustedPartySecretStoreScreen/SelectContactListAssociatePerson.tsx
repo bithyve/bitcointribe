@@ -53,6 +53,11 @@ var utils = require( "HexaWallet/src/app/constants/Utils" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus";
 
+
+
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
 export default class SelectContactListAssociatePerson extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props )
@@ -139,7 +144,19 @@ export default class SelectContactListAssociatePerson extends React.Component<an
         let resDownlaodShare = await S3Service.downloadShare( urlScriptDetails.data );
         console.log( { resDownlaodShare } );
         if ( resDownlaodShare.status == 200 ) {
-            let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, urlScriptDetails.data );
+            let regularAccount = await utils.getRegularAccountObject();
+            var resGetWalletId = await regularAccount.getWalletId();
+            if ( resGetWalletId.status == 200 ) {
+                resGetWalletId = resGetWalletId.data;
+            } else {
+                alert.simpleOk( "Oops", resGetWalletId.err );
+            }
+            let resTrustedParty = await comFunDBRead.readTblTrustedPartySSSDetails();
+            let arr_DecrShare = [];
+            for ( let i = 0; i < resTrustedParty.length; i++ ) {
+                arr_DecrShare.push( JSON.parse( resTrustedParty[ i ].decrShare ) );
+            }
+            let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, urlScriptDetails.data, resGetWalletId.walletId, arr_DecrShare );
             if ( resDecryptEncMetaShare.status == 200 ) {
                 console.log( { resDecryptEncMetaShare } );
                 const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
@@ -149,7 +166,7 @@ export default class SelectContactListAssociatePerson extends React.Component<an
                         dateTime,
                         keeperInfo,
                         urlScript,
-                        resDecryptEncMetaShare.data,
+                        resDecryptEncMetaShare.data.decryptedMetaShare,
                         resDecryptEncMetaShare.data.decryptedMetaShare.meta,
                         resDecryptEncMetaShare.data.decryptedMetaShare.encryptedStaticNonPMDD
                     );

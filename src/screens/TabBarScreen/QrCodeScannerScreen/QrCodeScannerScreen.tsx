@@ -111,8 +111,8 @@ export default class QrCodeScannerScreen extends React.Component {
             var result = e.data;
             if ( utils.isJson( result ) ) {
                 result = JSON.parse( result );
-                AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
-                if ( result.type == "SSS Recovery" ) {
+                console.log( { result});
+                if ( result.type == "SSS Recovery QR" ) {
                     utils.setDeepLinkingType( "SSS Recovery QR" );
                     let deepLinkPara = {};
                     deepLinkPara.wn = result.wn;

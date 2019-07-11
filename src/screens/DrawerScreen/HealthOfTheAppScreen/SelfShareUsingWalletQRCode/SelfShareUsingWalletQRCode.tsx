@@ -61,16 +61,22 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
     async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
         let encryptedMetaShare = JSON.parse( data.encryptedMetaShare )
+        console.log( { encryptedMetaShare } );
         let walletDetails = utils.getWalletDetails();
         const sss = await utils.getS3ServiceObject();
-        const resUploadShare = await sss.uploadShare( encryptedMetaShare.encryptedMetaShare, encryptedMetaShare.messageId );
-        console.log( { resUploadShare } );
+        var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare( encryptedMetaShare.metaShare );
+        if ( resGenerateEncryptedMetaShare.status == 200 ) {
+            resGenerateEncryptedMetaShare = resGenerateEncryptedMetaShare.data;
+        } else {
+            alert.simpleOk( "Oops", resGenerateEncryptedMetaShare.err );
+        }
+        const resUploadShare = await sss.uploadShare( resGenerateEncryptedMetaShare.encryptedMetaShare, resGenerateEncryptedMetaShare.messageId );
         if ( resUploadShare.status == 200 ) {
             let qrCodeData = {};
             qrCodeData.type = "Self Share";
             qrCodeData.wn = walletDetails.walletType;
-            qrCodeData.data = encryptedMetaShare.key;
-            //console.log( { qrCodeData } );
+            qrCodeData.data = resGenerateEncryptedMetaShare.key;
+            //console.log( { qrCodeData } );   
             this.setState( {
                 data: JSON.stringify( qrCodeData ).toString()
             } )

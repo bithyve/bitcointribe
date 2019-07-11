@@ -56,6 +56,7 @@ import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
 
 //Custome Compontes
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
 
@@ -78,7 +79,8 @@ export default class Restore3SelfSahreQRCodeScannerScreen extends React.Componen
             item: [],
             arr_ModelRestoreAssociateContactList: [],
             recordId: "",
-            decryptedShare: ""
+            decryptedShare: "",
+            flag_Loading: false
         } )
     }
 
@@ -96,40 +98,69 @@ export default class Restore3SelfSahreQRCodeScannerScreen extends React.Componen
         )
     }
 
+    click_ResetFlagRead = () => {
+        flag_ReadQRCode = true;
+    }
+
     barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
+            this.setState( {
+                flag_Loading: flag_ReadQRCode
+            } )
             result = JSON.parse( result );
-            if ( flag_ReadQRCode == true ) {
-                if ( result.type == "SSS Restore Self Share" ) {
-                    let resDownlaodShare = await S3Service.downloadShare( result.data );
-                    console.log( { resDownlaodShare } );
-                    console.log( { result } );
-                    if ( resDownlaodShare.status == 200 ) {
-                        let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, result.data );
-                        console.log( { resDecryptEncMetaShare } );
-
-                        if ( resDecryptEncMetaShare.status == 200 ) {
+            if ( result.type == "SSS Restore Self Share" ) {
+                let resDownlaodShare = await S3Service.downloadShare( result.data );
+                if ( resDownlaodShare.status == 200 ) {
+                    let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, result.data );
+                    console.log( { resDecryptEncMetaShare } );
+                    if ( resDecryptEncMetaShare.status == 200 ) {
+                        if ( flag_ReadQRCode == true ) {
                             flag_ReadQRCode = false;
-                            console.log( { resDecryptEncMetaShare } );
-                        } else {
-                            flag_ReadQRCode = false;
-                            alert.simpleOk( "Oops", resDecryptEncMetaShare.err );
+                            //console.log( { resDecryptEncMetaShare } );
+                            const dateTime = Date.now();
+                            let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactSelfShare(
+                                localDB.tableName.tblSSSDetails,
+                                dateTime,
+                                resDecryptEncMetaShare.data.decryptedMetaShare,
+                                "Self Share 1"
+                            );
+                            if ( resInsertContactList ) {
+                                await comFunDBRead.readTblSSSDetails();
+                                this.props.navigation.pop( 2 );
+                            } else {
+                                flag_ReadQRCode = false;
+                                alert.simpleOkAction( "Oops", "Please try again databse insert issue.", this.click_ResetFlagRead );
+                            }
                         }
-                    } else {
-                        flag_ReadQRCode = false;
-                        alert.simpleOk( "Oops", resDownlaodShare.err );
+                    }
+                    else {
+                        if ( flag_ReadQRCode == true ) {
+                            flag_ReadQRCode = false;
+                            alert.simpleOkAction( "Oops", resDecryptEncMetaShare.err, this.click_ResetFlagRead );
+                        }
                     }
                 } else {
-                    flag_ReadQRCode = false;
-                    alert.simpleOk( "Oops", "Please scan correct self share." );
-
+                    if ( flag_ReadQRCode == true ) {
+                        flag_ReadQRCode = false;
+                        alert.simpleOkAction( "Oops", resDownlaodShare.err, this.click_ResetFlagRead );
+                    }
                 }
-                flag_ReadQRCode = false;
-            }
+            } else {
+                if ( flag_ReadQRCode == true ) {
+                    flag_ReadQRCode = false;
+                    alert.simpleOkAction( "Oops", "Please scan correct self share.", this.click_ResetFlagRead );
+                }
 
-        } catch ( error ) {
+            }
+            this.setState( {
+                flag_Loading: flag_ReadQRCode
+            } )
+
+        }
+        catch ( error ) {
             console.log( error );
+
         }
     }
 
@@ -138,13 +169,15 @@ export default class Restore3SelfSahreQRCodeScannerScreen extends React.Componen
     click_GoBack() {
         const { navigation } = this.props;
         navigation.goBack();
-        navigation.state.params.onSelect( { selected: true } );
+        //navigation.state.params.onSelect( { selected: true } );
     }
 
 
 
 
     render() {
+        //flag
+        let { flag_Loading } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
@@ -171,19 +204,7 @@ export default class Restore3SelfSahreQRCodeScannerScreen extends React.Componen
                         />
                     </ImageBackground>
                 </SafeAreaView>
-                <ModelRestoreAssociateContactListForQRCodeScan data={ this.state.arr_ModelRestoreAssociateContactList } click_Confirm={ ( recordId: string ) => {
-                    this.setState( {
-                        recordId,
-                        arr_ModelRestoreAssociateContactList: [
-                            {
-                                modalVisible: false,
-                                item: ""
-                            }
-                        ],
-                    } )
-                    this.click_UpdateMsg()
-                }
-                } />
+                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
             </Container >
         );
     }
