@@ -63,8 +63,6 @@ export default class TrustedPartySelfShareQRCode extends React.Component<any, an
         var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare( decryptedMetaShare );
         if ( resGenerateEncryptedMetaShare.status == 200 ) {
             resGenerateEncryptedMetaShare = resGenerateEncryptedMetaShare.data;
-            console.log( { resGenerateEncryptedMetaShare } );
-
             let resUploadShare = await sss.uploadShare( resGenerateEncryptedMetaShare.encryptedMetaShare, resGenerateEncryptedMetaShare.messageId );
             if ( resUploadShare.status != 200 ) {
                 alert.simpleOk( "Oops", resUploadShare.err );

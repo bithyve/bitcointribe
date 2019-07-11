@@ -139,7 +139,7 @@ export default class Restore4And5SelfShareQRCodeScreen7 extends React.Component<
                     { renderIf( flag_qrcode == false )(
                         <Button
                             full
-                            style={ { flex: 1, margin: 5, borderRadius: 10, backgroundColor: "gray" } }
+                            style={ { flex: 1, margin: 20, borderRadius: 10, backgroundColor: "gray" } }
                             onPress={ () => this.setState( { flag_qrcode: !flag_qrcode } ) }
                         >
                             <Text style={ { color: "#000000" } }>Tab To Scan share 7</Text>

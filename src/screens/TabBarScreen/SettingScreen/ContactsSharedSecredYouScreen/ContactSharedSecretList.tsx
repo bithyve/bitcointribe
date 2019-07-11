@@ -17,6 +17,7 @@ import GridView from 'react-native-super-grid';
 import Modal from 'react-native-modalbox';
 import Permissions from 'react-native-permissions'
 import SendSMS from 'react-native-sms';
+
 var Mailer = require( 'NativeModules' ).RNMail;
 import TimerCountdown from "react-native-timer-countdown";
 
@@ -53,8 +54,11 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             arr_OrignalDetails: [],
             SelectedFakeContactList: [],
             arr_SelectedContact: [],
+            arr_ItemSeleted: [],
             messageId: "",
             otp: "",
+            key: "",
+            arr_EncryptedMetaShare: [],
             qrCodeString: "",
             walletName: "",
             flag_NextBtnDisable: true,
@@ -99,11 +103,12 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             let data = {};
             var keeperInfo = {};
             let decrShare = JSON.parse( resSharedSecretList[ i ].decrShare );
+            console.log( { decrShare } );
             let type = resSharedSecretList[ i ].type;
             if ( resSharedSecretList[ i ].keeperInfo != "" ) {
                 keeperInfo = JSON.parse( resSharedSecretList[ i ].keeperInfo );
             } else {
-                keeperInfo.givenName = decrShare.decryptedMetaShare.meta.tag;
+                keeperInfo.givenName = decrShare.meta.tag;
                 keeperInfo.familyName = "";
                 keeperInfo.phoneNumbers = [];
                 keeperInfo.thumbnailPath = "";
@@ -127,6 +132,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             }
             data.resSharedSecretList = resSharedSecretList[ i ];
             data.walletName = type == "Self Share" ? "Self Sahre (" + urlScript.walletName + ")" : urlScript.walletName;
+            data.type = type;
             data.keeperInfo = keeperInfo;
             data.name = keeperInfo.givenName != "" ? keeperInfo.givenName : "" + " " + keeperInfo.familyName != "" ? keeperInfo.familyName : "";
             let number;
@@ -209,40 +215,61 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         }
     }
 
+    load_data = async ( data: any ) => {
+        this.setState( {
+            flag_Loading: true,
+            msg_Loading: "Key genreating"
+        } );
+        let flag_Loading = true;
+        const sss = await utils.getS3ServiceObject();
+        var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare( data.resSharedSecretList.decrShare );
+        if ( resGenerateEncryptedMetaShare.status == 200 ) {
+            resGenerateEncryptedMetaShare = resGenerateEncryptedMetaShare.data;
+        } else {
+            alert.simpleOk( "Oops", resGenerateEncryptedMetaShare.err );
+        }
+        const resEncryptViaOTP = sss.encryptViaOTP( resGenerateEncryptedMetaShare.key );
+        if ( resEncryptViaOTP.status == 200 || 400 ) {
+            const resUploadShare = await sss.uploadShare( resGenerateEncryptedMetaShare.encryptedMetaShare, resGenerateEncryptedMetaShare.messageId );
+            console.log( { resUploadShare } );
+            if ( resUploadShare.status == 200 ) {
+                this.setState( {
+                    arr_EncryptedMetaShare: resGenerateEncryptedMetaShare,
+                    messageId: resGenerateEncryptedMetaShare.messageId,
+                    key: resEncryptViaOTP.data.otpEncryptedData,
+                    otp: resEncryptViaOTP.data.otp,
+                    flag_Loading: false,
+                } );
+                flag_Loading = false;
+                this.refs.modal4.open();
+            } else {
+                flag_Loading = false;
+                setTimeout( () => {
+                    alert.simpleOk( "Oops", resUploadShare.err );
+                }, 100 );
+            }
+        } else {
+            flag_Loading = false;
+            setTimeout( () => {
+                alert.simpleOk( "Oops", resEncryptViaOTP.err );
+            }, 100 );
+        }
+        this.setState( {
+            flag_Loading
+        } );
+    }
+
     press = ( item: any ) => {
+        console.log( { item } );
         let type = item.resSharedSecretList.type;
         if ( type == "Self Share" ) {
             this.props.navigation.push( "TrustedPartySelfShareQRCode", { data: item } );
         } else {
-            alert.simpleOk( "Oops", "Working" );
-            // let jsonTemp = {}  
-            // this.getMessageId( JSON.parse( item.metaData ) );
-            // jsonTemp.thumbnailPath = item.keeperInfo.thumbnailPath;
-            // jsonTemp.givenName = item.keeperInfo.givenName;
-            // jsonTemp.familyName = item.keeperInfo.familyName;
-            // let mobileNo, emial;
-            // if ( item.keeperInfo.phoneNumbers.length != 0 ) {
-            //     mobileNo = item.keeperInfo.phoneNumbers[ 0 ].number;
-            // }
-            // else if ( item.keeperInfo.emailAddresses.length != 0 ) {
-            //     emial = item.keeperInfo.emailAddresses[ 0 ].email;
-            // } else {
-            //     mobileNo = "";
-            //     emial = "";
-            // }
-            // jsonTemp.phoneNumbers = mobileNo;
-            // jsonTemp.emailAddresses = emial;
-            // jsonTemp.history = item.history;
-            // jsonTemp.sharedDate = item.sharedDate;
-            // jsonTemp.metaData = item.metaData;
-
-            // jsonTemp.id = item.id;
-            // jsonTemp.qrCodeString = "Wallet";
-            // this.setState( {
-            //     arr_SelectedContact: jsonTemp,
-            //     qrCodeString: item.metaData,
-            //     walletName: item.walletName,
-            // } )
+            this.load_data( item );
+            this.setState( {
+                arr_SelectedContact: item.keeperInfo,
+                arr_ItemSeleted: item
+            } )
             // this.refs.modal4.open();
         }
     }
@@ -292,18 +319,21 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
 
     //TODO: Deeplinking 
     click_SentRequest( type: string, val: any ) {
+        let { key, arr_EncryptedMetaShare } = this.state;
         let script = {};
-        script.mi = this.state.messageId;
+        script.key = key;
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );
-        this.refs.modal4.close();
-        if ( type == "SMS" && this.state.messageId != "" ) {
+        if ( type == "SMS" ) {
+            val = val[ 0 ].number;
+            console.log( { val } );
             SendSMS.send( {
                 body: 'https://prime-sign-230407.appspot.com/sss/rta/' + encpScript,
                 recipients: [ val != "" ? val : "" ],
                 successTypes: [ 'sent', 'queued' ]
             }, ( completed, cancelled, error ) => {
                 if ( completed ) {
+                    this.refs.modal4.close();
                     console.log( 'SMS Sent Completed' );
                     setTimeout( () => {
                         Alert.alert(
@@ -313,6 +343,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                                 {
                                     text: 'OK', onPress: () => {
                                         this.reloadList( "SMS" );
+
                                     }
                                 },
 
@@ -326,51 +357,53 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                     console.log( 'Some error occured' );
                 }
             } );
-        } else if ( type == "EMAIL" && this.state.messageId != "" ) {
-            Mailer.mail( {
-                subject: 'Hexa Wallet SSS Restore',
-                recipients: [ val != "" ? val : "" ],
-                body: 'https://prime-sign-230407.appspot.com/sss/rta/' + encpScript,
-                isHTML: true,
-            }, ( error, event ) => {
-                if ( event == "sent" ) {
-                    setTimeout( () => {
-                        Alert.alert(
-                            'Success',
-                            'Email Sent Completed.',
-                            [
-                                {
-                                    text: 'OK', onPress: () => {
-                                        this.reloadList( "EMAIL" );
-                                    }
-                                },
+        } else if ( type == "EMAIL" ) {
+            let value = val[ 0 ].email;
+            console.log( { value } );
 
-                            ],
-                            { cancelable: false }
-                        )
-
-                    }, 1000 );
-                }
-            } );
             if ( Platform.OS == "android" ) {
+                Mailer.mail( {
+                    subject: 'Hexa Wallet SSS Restore',
+                    recipients: [ value ],
+                    body: 'https://prime-sign-230407.appspot.com/sss/rta/' + encpScript,
+                    isHTML: true,
+                }, ( error, event ) => {
+                    if ( event == "sent" ) {
+                        this.reloadList( "Email" );
+                    } else {
+                        alert.simpleOk( "Oops", error );
+                    }
+                } );
                 setTimeout( () => {
-                    Alert.alert(
-                        'Success',
-                        'Email Sent Completed.',
-                        [
-                            {
-                                text: 'OK', onPress: () => {
-                                    this.reloadList( "EMAIL" );
-                                }
-                            },
-
-                        ],
-                        { cancelable: false }
-                    )
+                    this.refs.modal4.close();
+                    alert.simpleOk( "Success", "Email Sent Successfully." );
+                    this.setState( {
+                        flag_OtpCodeShowStatus: true
+                    } );
                 }, 1000 );
+            } else {
+                Mailer.mail( {
+                    subject: 'Hexa Wallet SSS Restore',
+                    recipients: [ value ],
+                    body: 'https://prime-sign-230407.appspot.com/sss/rta/' + encpScript,
+                    isHTML: true,
+                }, ( error, event ) => {
+                    if ( event == "sent" ) {
+                        setTimeout( () => {
+                            this.refs.modal4.close();
+                            Alert.alert( 'Email Sent Completed' );
+                            this.setState( {
+                                flag_OtpCodeShowStatus: true,
+                            } )
+                            this.reloadList( "Email" );
+                        }, 1000 );
+                    } else {
+                        alert.simpleOk( "Oops", error );
+                    }
+                } );
             }
-        } else if ( type == "QR" && this.state.messageId != "" ) {
-            this.props.navigation.push( "QRCodeScreen", { data: this.state.qrCodeString, walletName: this.state.walletName, onSelect: this.onSelect } );
+        } else if ( type == "QR" ) {
+            this.props.navigation.push( "TrsutedPartyQRCodeScreen", { data: arr_EncryptedMetaShare, onSelect: this.onSelect } );
             this.refs.modal4.close();
         }
     }
@@ -384,14 +417,12 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
     //TODO: Deep{ling sent then reload data
     reloadList = async ( type: string ) => {
         const dateTime = Date.now();
-        // const fulldate = Math.floor( dateTime / 1000 );
-        let selectedItem = this.state.arr_SelectedContact;
-        // console.log( { selectedItem } );
+        let selectedItem = this.state.arr_ItemSeleted;
+        console.log( { selectedItem } );
         var temp = [];
         if ( selectedItem.history != "" ) {
             temp = JSON.parse( selectedItem.history );
         }
-        //  console.log( { temp } );
         let jsondata = {};
         if ( type != "QR" ) {
             jsondata.otp = this.state.otp
@@ -399,7 +430,6 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         jsondata.title = "Secret Share using " + type.toLowerCase();;
         jsondata.date = utils.getUnixToDateFormat( dateTime );
         temp.push( jsondata );
-        // console.log( { temp } );
         let resUpdateHistroyAndSharedDate = await dbOpration.updateHistroyAndSharedDate(
             localDB.tableName.tblTrustedPartySSSDetails,
             temp,
@@ -465,7 +495,12 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                                 ) }
                             </View>
                             <View style={ { flex: 0.1, alignItems: "center", justifyContent: "center" } } >
-                                <IconFontAwe name="angle-right" style={ { fontSize: 25, marginRight: 10, flex: 0.1 } } />
+                                { renderIf( item.type != "Self Share" )(
+                                    <IconFontAwe name="angle-down" style={ { fontSize: 25, marginRight: 10, flex: 0.1 } } />
+                                ) }
+                                { renderIf( item.type == "Self Share" )(
+                                    <IconFontAwe name="angle-right" style={ { fontSize: 25, marginRight: 10, flex: 0.1 } } />
+                                ) }
                             </View>
                         </View>
                     </View>

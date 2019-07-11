@@ -162,6 +162,7 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
 
     //TODO: func click_Next
     click_Next = async () => {
+        let arr_Account = await comFunDBRead.readTblSSSDetails();
         this.setState( {
             flag_NextBtnDisable1: true
         } );
@@ -185,7 +186,14 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
                 alert.simpleOk( "Oops", "Trusted Contact not insert databse." );
             }
         } else {
-            arrTypes = [ { type: "Trusted Contacts 1" } ];
+            let type;
+            let flag_CheckShare = arr_Account.some( ( item: any ) => item.type === 'Self Share 1' );
+            if ( flag_CheckShare ) {
+                type = "Trusted Contacts 2";
+            } else {
+                type = "Trusted Contacts 1";
+            }
+            arrTypes = [ { type } ];
             let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactKeepInfo(
                 localDB.tableName.tblSSSDetails,
                 dateTime,

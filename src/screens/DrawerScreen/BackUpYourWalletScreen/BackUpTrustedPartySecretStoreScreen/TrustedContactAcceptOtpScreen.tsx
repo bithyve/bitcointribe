@@ -48,11 +48,23 @@ import Singleton from "HexaWallet/src/app/constants/Singleton";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
+
+
+
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
+
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+
+
+
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
 export default class TrustedContactAcceptOtpScreen extends Component {
     constructor ( props: any ) {
@@ -78,13 +90,7 @@ export default class TrustedContactAcceptOtpScreen extends Component {
 
     async componentDidMount() {
         let keeperInfo = this.props.navigation.getParam( "data" );
-        let script = utils.getDeepLinkingUrl();
-        let messageId = script.mi;
-        console.log( { messageId } );
-        const resDownShare = await S3Service.downloadShare( messageId );
-        console.log( { resDownShare } );
         this.setState( {
-            arr_ResDownShare: resDownShare,
             keeperInfo
         } )
     }
@@ -100,91 +106,82 @@ export default class TrustedContactAcceptOtpScreen extends Component {
         }
     }
 
+    goBack = () => {
+        utils.setDeepLinkingType( "" );
+        utils.setDeepLinkingUrl( "" );
+        this.props.navigation.navigate( 'WalletScreen' );
+    }
+
     onSuccess = async () => {
         const dateTime = Date.now();
         this.setState( {
             flag_Loading: true
         } )
-        let keeperInfo = this.state.keeperInfo;
+        let flag_Loading = true;
+        let { keeperInfo } = this.state;
         let enterOtp = this.state.otp;
         let script = utils.getDeepLinkingUrl();
-        let messageId = script.mi;
+        var resDecryptViaOTP = await S3Service.decryptViaOTP( script.key, enterOtp );
+        if ( resDecryptViaOTP.status == 200 ) {
+            resDecryptViaOTP = resDecryptViaOTP.data;
+        } else {
+            alert.simpleOk( "Oops", resDecryptViaOTP.err );
+        }
+        console.log( { resDecryptViaOTP } );
+        var resDownShare = await S3Service.downloadShare( resDecryptViaOTP.decryptedData );
+        if ( resDownShare.status == 200 ) {
+            resDownShare = resDownShare.data;
+        } else {
+            alert.simpleOk( "Oops", resDownShare.err );
+        }
+        console.log( { resDownShare } );
         let walletDetails = utils.getWalletDetails();
-        const sss = new S3Service(
-            walletDetails.mnemonic
-        );
-        //console.log( { messageId, enterOtp } );
-        let urlScript = {};
-        urlScript.walletName = script.wn;
-        let resDownShare = this.state.arr_ResDownShare;
-        //console.log( { resDownShare } );
-        const resDecryptOTPEncShare = await S3Service.decryptOTPEncShare( resDownShare, messageId, enterOtp )
-        //console.log( { resDecryptOTPEncShare } );
-        let resShareId = await sss.getShareId( resDecryptOTPEncShare.decryptedShare.encryptedShare )
-        //console.log( { resShareId } );
-
-        const { data, updated } = await sss.updateHealth( resDecryptOTPEncShare.decryptedShare.meta.walletId, resDecryptOTPEncShare.decryptedShare.encryptedShare );
-        // console.log( { data, updated } );
-
-        if ( updated ) {
-            if ( resDecryptOTPEncShare != "" || resDecryptOTPEncShare != null ) {
-                const resinsertTrustedPartyDetails = await dbOpration.insertTrustedPartyDetails(
+        const sss = await utils.getS3ServiceObject();
+        let regularAccount = await utils.getRegularAccountObject();
+        var resGetWalletId = await regularAccount.getWalletId();
+        if ( resGetWalletId.status == 200 ) {
+            resGetWalletId = resGetWalletId.data;
+        } else {
+            alert.simpleOk( "Oops", resGetWalletId.err );
+        }
+        let resTrustedParty = await comFunDBRead.readTblTrustedPartySSSDetails();
+        let arr_DecrShare = [];
+        for ( let i = 0; i < resTrustedParty.length; i++ ) {
+            arr_DecrShare.push( JSON.parse( resTrustedParty[ i ].decrShare ) );
+        }
+        let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownShare.encryptedMetaShare, resDecryptViaOTP.decryptedData, resGetWalletId.walletId, arr_DecrShare );
+        console.log( { resDecryptEncMetaShare } );
+        if ( resDecryptEncMetaShare.status == 200 ) {
+            console.log( { resDecryptEncMetaShare } );
+            const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
+            if ( resUpdateHealth.status == 200 ) {
+                const resTrustedParty = await dbOpration.insertTrustedPartyDetails(
                     localDB.tableName.tblTrustedPartySSSDetails,
                     dateTime,
                     keeperInfo,
-                    urlScript,
-                    resDecryptOTPEncShare.decryptedShare.encryptedShare,
-                    resShareId,
-                    resDecryptOTPEncShare.decryptedShare,
-                    typeof data !== "undefined" ? data : ""
+                    script,
+                    resDecryptEncMetaShare.data.decryptedMetaShare,
+                    resDecryptEncMetaShare.data.decryptedMetaShare.meta,
+                    resDecryptEncMetaShare.data.decryptedMetaShare.encryptedStaticNonPMDD
                 );
-                //console.log( { resinsertTrustedPartyDetails } );
-                if ( resinsertTrustedPartyDetails == true ) {
-                    this.setState( {
-                        flag_Loading: false
-                    } )
+                if ( resTrustedParty ) {
+                    flag_Loading = false;
                     setTimeout( () => {
-                        Alert.alert(
-                            'Success',
-                            'Decrypted share created.',
-                            [
-                                {
-                                    text: 'OK', onPress: () => {
-                                        utils.setDeepLinkingType( "" );
-                                        utils.setDeepLinkingUrl( "" );
-                                        this.props.navigation.navigate( 'WalletScreen' );
-                                    }
-                                },
+                        alert.simpleOkAction( "Success", "Decrypted share stored.", this.goBack );
+                    }, 100 );
 
-                            ],
-                            { cancelable: false }
-                        )
-                    }, 100 );
-                } else {
-                    this.setState( {
-                        flag_Loading: false
-                    } )
-                    setTimeout( () => {
-                        Alert.alert(
-                            'OH',
-                            resinsertTrustedPartyDetails,
-                            [
-                                {
-                                    text: 'OK', onPress: () => {
-                                        utils.setDeepLinkingType( "" );
-                                        utils.setDeepLinkingUrl( "" );
-                                        this.props.navigation.navigate( 'WalletScreen' );
-                                    }
-                                },
-                            ],
-                            { cancelable: false }
-                        )
-                    }, 100 );
                 }
             }
         } else {
-            Alert.alert( "updateHealth fun not working." )
+            flag_Loading = false;
+            setTimeout( () => {
+                alert.simpleOk( "Oops", resDecryptEncMetaShare.err );
+            }, 100 );
+
         }
+        this.setState( {
+            flag_Loading
+        } )
     }
 
     render() {

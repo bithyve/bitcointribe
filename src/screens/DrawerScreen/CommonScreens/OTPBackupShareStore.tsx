@@ -136,7 +136,19 @@ export default class OTPBackupShareStore extends Component {
             const resDownloadShare = await S3Service.downloadShare( resDecryptViaOTP.data.decryptedData );
             console.log( { resDownloadShare } );
             if ( resDownloadShare.status == 200 ) {
-                let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownloadShare.data.encryptedMetaShare, resDecryptViaOTP.data.decryptedData );
+                let regularAccount = await utils.getRegularAccountObject();
+                var resGetWalletId = await regularAccount.getWalletId();
+                if ( resGetWalletId.status == 200 ) {
+                    resGetWalletId = resGetWalletId.data;
+                } else {
+                    alert.simpleOk( "Oops", resGetWalletId.err );
+                }
+                let resTrustedParty = await comFunDBRead.readTblTrustedPartySSSDetails();
+                let arr_DecrShare = [];
+                for ( let i = 0; i < resTrustedParty.length; i++ ) {
+                    arr_DecrShare.push( JSON.parse( resTrustedParty[ i ].decrShare ) );
+                }
+                let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownloadShare.data.encryptedMetaShare, resDecryptViaOTP.data.decryptedData, resGetWalletId.walletId, arr_DecrShare );
                 console.log( { resDecryptEncMetaShare } );
                 if ( resDecryptEncMetaShare.status == 200 ) {
                     const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
@@ -146,7 +158,7 @@ export default class OTPBackupShareStore extends Component {
                             localDB.tableName.tblTrustedPartySSSDetails,
                             dateTime,
                             urlScript,
-                            resDecryptEncMetaShare.data,
+                            resDecryptEncMetaShare.data.decryptedMetaShare,
                             resDecryptEncMetaShare.data.decryptedMetaShare.meta,
                             resDecryptEncMetaShare.data.decryptedMetaShare.encryptedStaticNonPMDD
                         );
