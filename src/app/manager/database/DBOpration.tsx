@@ -1000,7 +1000,7 @@ const insertRestoreUsingTrustedContactSelfShare = (
       txn.executeSql(
         "INSERT INTO " +
         tblName +
-        "(dateCreated,keeperInfo,history,lastSuccessfulCheck,type,sharedDate,shareStage) VALUES (:dateCreated,:keeperInfo,:history,:lastSuccessfulCheck,:type,:sharedDate,:shareStage)",
+        "(dateCreated,decryptedShare,history,lastSuccessfulCheck,type,sharedDate,acceptedDate,shareStage) VALUES (:dateCreated,:decryptedShare,:history,:lastSuccessfulCheck,:type,:sharedDate,:acceptedDate,:shareStage)",
         [
           utils.encrypt(
             fulldate.toString(),
@@ -1018,6 +1018,10 @@ const insertRestoreUsingTrustedContactSelfShare = (
             passcode
           ),
           utils.encrypt(
+            fulldate.toString(),
+            passcode
+          ),
+          utils.encrypt(
             "Good",
             passcode
           ),
@@ -1025,6 +1029,42 @@ const insertRestoreUsingTrustedContactSelfShare = (
       );
       resolve( true );
     } );
+  } );
+};
+
+
+
+//update shareId shareStage
+const updateSSSRetoreDecryptedShare = (
+  tblName: string,
+  decryptedMetaShare: any,
+  fulldate: string,
+  id: number
+) => {
+  let passcode = getPasscode();
+  console.log( { id } );
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn: any ) {
+        txn.executeSql(
+          "update " +
+          tblName +
+          " set decryptedShare = :decryptedShare,acceptedDate =:acceptedDate,lastSuccessfulCheck =:lastSuccessfulCheck,sharedDate =:sharedDate,shareStage =:shareStage where id = :id",
+          [
+            utils.encrypt( JSON.stringify( decryptedMetaShare ).toString(), passcode ),
+            utils.encrypt( fulldate.toString(), passcode ),
+            utils.encrypt( fulldate.toString(), passcode ),
+            utils.encrypt( fulldate.toString(), passcode ),
+            utils.encrypt( "Good", passcode ),
+            id
+          ]
+        );
+        resolve( true );
+      } );
+    }
+    catch ( error ) {
+      console.log( error );
+    }
   } );
 };
 
@@ -1218,69 +1258,7 @@ const updateSSSShareStageWhereRecordId = (
   } );
 };
 
-//update shareId shareStage
-const updateSSSRetoreDecryptedShare = (
-  tblName: string,
-  decryptedShare: any,
-  fulldate: string,
-  recordID: string
-) => {
-  let passcode = getPasscode();
-  return new Promise( ( resolve, reject ) => {
-    try {
-      db.transaction( function ( txn ) {
-        console.log( { tblName, decryptedShare } );
-        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
-          var len = results.rows.length;
-          if ( len > 0 ) {
-            for ( let j = 0; j < len; j++ ) {
-              let dataNew = results.rows.item( j );
-              console.log( { dataNew } );
-              let decryptRecordId = utils.decrypt(
-                results.rows.item( j ).recordId,
-                passcode
-              );
-              let dbDecryptedShare = results.rows.item( j ).decryptedShare;
-              var decrptedShare = "";
-              if ( dbDecryptedShare != "" ) {
-                decrptedShare = JSON.parse( utils.decrypt(
-                  dbDecryptedShare,
-                  passcode
-                ) );
-              }
-              console.log( { decryptedShare, decrptedShare } );
-              if ( Object.keys( decryptedShare ) == Object.keys( decrptedShare ) ) {
-                console.log( "same data" );
-                resolve( "Already same decryptedShare stored.Please use other contact person." );
-                break;
-              } else {
-                let encpRecordId = results.rows.item( j ).recordId;
-                if ( decryptRecordId == recordID ) {
-                  txn.executeSql(
-                    "update " +
-                    tblName +
-                    " set decryptedShare = :decryptedShare,acceptedDate =:acceptedDate,lastSuccessfulCheck =:lastSuccessfulCheck where recordId = :recordId",
-                    [
-                      utils.encrypt( JSON.stringify( decryptedShare ).toString(), passcode ),
-                      utils.encrypt( fulldate.toString(), passcode ),
-                      utils.encrypt( fulldate.toString(), passcode ),
-                      encpRecordId
-                    ]
-                  );
-                  resolve( true );
-                  break;
-                }
-              }
-            }
-          }
-        } );
-      } );
-    }
-    catch ( error ) {
-      console.log( error );
-    }
-  } );
-};
+
 
 const updateHistroyAndSharedDate = (
   tblName: string,

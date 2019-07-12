@@ -36,19 +36,45 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
     constructor ( props: any ) {
         super( props )
         this.state = ( {
-            arr_QuestionList: [ {
-                "item": "Name of your first pet?"
-            }, {
-                "item": "Name of your favourite teacher?"
-            }, {
-                "item": "Name of your favourite food?"
-            }, {
-                "item": "Name of your first company?"
-            }, {
-                "item": "Name of your first employee?"
-            }
+            arr_QuestionList: [
+                {
+                    "item": "To what city did you go the first time you flew on a plane?"
+                },
+                {
+                    "item": "What is the first name of the person you first kissed?"
+                },
+                {
+                    "item": "What is the first name of your best friend in high school?"
+                },
+                {
+                    "item": "What is the first name of your oldest nephew?"
+                },
+                {
+                    "item": "What is the first name of your oldest niece?"
+                },
+                {
+                    "item": "What was the first name of your favourite childhood friend?"
+                },
+                {
+                    "item": "What was the last name of your third grade teacher?"
+                },
+                {
+                    "item": "What was the street name where your best friend in high school lived (street name only)?"
+                },
+                {
+                    "item": "In what city or town was your first job?"
+                },
+                {
+                    "item": "What was the last name of your favorite childhood teacher?"
+                },
+                {
+                    "item": "What was the name of the company where you had your first job?"
+                },
+                {
+                    "item": "What was the name of the street where you were living when you were 10 years old?"
+                }
             ],
-            firstQuestion: "Name of your first pet?",
+            firstQuestion: "To what city did you go the first time you flew on a plane?",
             firstAnswer: "",
             flag_DisableBtnNext: true
         } );
@@ -60,6 +86,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
             firstQuestion: value
         } );
     }
+
     //TODO: func check_CorrectAnswer
     check_CorrectAnswer() {
         setTimeout( () => {
@@ -80,10 +107,9 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
     render() {
         let flag_DisableBtnNext = this.state.flag_DisableBtnNext;
         let firstQuestion = this.state.firstQuestion;
-        let dataQuestionList = this.props.data.length != 0 ? this.props.data[ 0 ].arr_FirstQuestionList : "temp";
         let arr_QuestionList = this.state.arr_QuestionList != null ? this.state.arr_QuestionList : dataQuestionList;
         const itemList = arr_QuestionList.map( ( item: any, index: number ) => (
-            <Picker.Item label={ item.item } value={ item.item } />
+            <Picker.Item label={ item.item } value={ item.item } style={ { width: 40 } } />
         ) );
         return (
             <Modal
@@ -133,8 +159,9 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                                                 <Right />
                                             </Header> }
                                         mode="dropdown"
-                                        style={ [ globalStyle.ffFiraSansMedium ] }
-                                        iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -40 } } /> }
+                                        style={ [ globalStyle.ffFiraSansMedium, ] }
+                                        textStyle={ { paddingRight: 50 } }
+                                        iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -45, marginRight: 20 } } /> }
                                         selectedValue={ firstQuestion }
                                         onValueChange={ this.onValueChange.bind( this ) }
                                     >
@@ -160,22 +187,12 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
 
                                     />
                                 </Item>
-
-
-
                             </View>
                             <View style={ { flex: 1, justifyContent: "flex-end" } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>In case the answer does not match with the original answer, restoration process will fail</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
-                                        let question = this.state.firstQuestion;
-                                        var arr_QuestionList = this.state.arr_QuestionList;
-                                        for ( var i = 0; i < arr_QuestionList.length; i++ )
-                                            if ( arr_QuestionList[ i ].item === question ) {
-                                                arr_QuestionList.splice( i, 1 );
-                                                break;
-                                            }
-                                        this.props.click_Next( this.state.firstQuestion, this.state.firstAnswer, arr_QuestionList )
+                                        this.props.click_Next( this.state.firstQuestion, this.state.firstAnswer )
                                     }
                                     }
                                     title="Next"

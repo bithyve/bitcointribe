@@ -154,57 +154,18 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             arr_OrignalDetails: temp
         } );
 
-
-
         //TODO: DeepLinking open person contact detail
+        let urlScript = utils.getDeepLinkingUrl();
+        let urlType = utils.getDeepLinkingType();
+        if ( urlType == "SSS Restore SMS/EMAIL" ) {
+            let message = urlScript.mg;
+            alert.simpleOkAction( "Request", message, this.click_RemoveDeeplinkingData );
+        }
+    }
 
-        // let urlScript = utils.getDeepLinkingUrl();
-        // let urlType = utils.getDeepLinkingType();
-        // let qrCodeString, walletNa;
-        // if ( urlType == "SSS Restore SMS/EMAIL" ) {
-        //     let walletName = urlScript.wn;
-        //     let jsonTemp = {}
-        //     for ( let i = 0; i < temp.length; i++ ) {
-        //         if ( temp[ i ].walletName == walletName ) {
-        //             let data = temp[ i ];
-        //             // console.log( { data } );
-        //             if ( flagModelOpen != false ) {
-        //                 this.getMessageId( JSON.parse( data.metaData ) );
-        //                 this.refs.modal4.open();
-        //             }
-        //             jsonTemp.thumbnailPath = data.keeperInfo.thumbnailPath;
-        //             jsonTemp.givenName = data.keeperInfo.givenName;
-        //             jsonTemp.familyName = data.keeperInfo.familyName;
-        //             let mobileNo, emial;
-        //             if ( data.keeperInfo.phoneNumbers.length != 0 ) {
-        //                 mobileNo = data.keeperInfo.phoneNumbers[ 0 ].number;
-        //             }
-        //             else if ( item.keeperInfo.emailAddresses.length != 0 ) {
-        //                 emial = item.keeperInfo.emailAddresses[ 0 ].email;
-        //             } else {
-        //                 mobileNo = "";
-        //                 emial = "";
-        //             }
-        //             jsonTemp.phoneNumbers = mobileNo;
-        //             jsonTemp.emailAddresses = emial;
-        //             jsonTemp.history = data.history;
-        //             jsonTemp.sharedDate = data.sharedDate;
-        //             jsonTemp.metaData = data.metaData;
-        //             jsonTemp.id = data.id;
-        //             qrCodeString = data.metaData;
-        //             walletNa = data.walletName;
-        //             break;
-        //         } else {
-        //             Alert.alert( "This Wallet Name recoard not found!" )
-        //         }
-        //     }
-        //     this.setState( {
-        //         arr_SelectedContact: jsonTemp,
-        //         qrCodeString,
-        //         walletName: walletNa,
-        //     } )
-
-        // }
+    click_RemoveDeeplinkingData = () => {
+        let urlScript = utils.getDeepLinkingUrl();
+        let urlType = utils.getDeepLinkingType();
     }
 
     componentDidMount() {
@@ -222,7 +183,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         } );
         let flag_Loading = true;
         const sss = await utils.getS3ServiceObject();
-        var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare( data.resSharedSecretList.decrShare );
+        var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare( JSON.parse( data.resSharedSecretList.decrShare ) );
         if ( resGenerateEncryptedMetaShare.status == 200 ) {
             resGenerateEncryptedMetaShare = resGenerateEncryptedMetaShare.data;
         } else {

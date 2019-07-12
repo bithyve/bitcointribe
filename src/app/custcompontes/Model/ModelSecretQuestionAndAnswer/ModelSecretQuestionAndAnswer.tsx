@@ -62,8 +62,6 @@ var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
 let wrongEnterAnswerCount = 0;
 
-
-
 export default class ModelSecretQuestionAndAnswer extends Component<Props, any> {
     constructor ( props: any ) {
         super( props )

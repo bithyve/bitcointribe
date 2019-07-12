@@ -187,12 +187,16 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
             }
         } else {
             let type;
-            let flag_CheckShare = arr_Account.some( ( item: any ) => item.type === 'Self Share 1' );
+            let flag_CheckShare = arr_Account.some( ( item: any ) => item.type === 'Trusted Contacts 1' );
+            console.log( { flag_CheckShare } );
+
             if ( flag_CheckShare ) {
                 type = "Trusted Contacts 2";
             } else {
                 type = "Trusted Contacts 1";
             }
+            console.log( { type } );
+
             arrTypes = [ { type } ];
             let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactKeepInfo(
                 localDB.tableName.tblSSSDetails,
