@@ -58,6 +58,8 @@ var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonApp
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
 
+let counterConfirm = 0;
+
 export default class RestoreSelectedContactsListScreen extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props )
@@ -155,57 +157,17 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                     data.givenName = keeperInfo.givenName;
                     data.familyName = keeperInfo.familyName;
                     data.sssDetails = sssDetails[ i ];
-                    let sharedDate = parseInt( sssDetails[ i ].sharedDate );
-                    console.warn( 'sharedDate date =' + sharedDate.toString() );
-                    var startDate = new Date( dateTime );
-                    var endDate = new Date( sharedDate );
-                    //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
-                    var diff = Math.abs( startDate.getTime() - endDate.getTime() );
-                    //console.warn( 'diff' + diff.toString() );  
-                    const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
-                    const seconds: any = Math.floor( diff / 1000 % 60 );
-                    //console.log( { minutes, seconds } );
-                    //console.warn( minutes.toString() )
-                    const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
-                    data.totalSec = 540 - totalSec;
-                    //for history get opt     
-                    for ( let i = 0; i < 2; i++ ) {
-                        let eachHistory = JSON.parse( sssDetails[ i ].history );
-                        let eachHistoryLength = eachHistory.length;
-                        var otp;
-                        if ( eachHistory[ eachHistoryLength - 1 ] != undefined ) {
-                            otp = eachHistory[ eachHistoryLength - 1 ].otp;
-                        } else {
-                            otp = undefined;
-                        }
-                        tempOpt.push( otp );
-                    }
-                    if ( totalSec < 540 && sssDetails[ i ].shareStage == "Ugly" ) {
-                        data.statusMsg = "Shared";
-                        data.statusMsgColor = "#C07710";
-                        data.flag_timer = true;
-                        data.opt = tempOpt[ i ];
-                    } else if ( totalSec >= 540 && sssDetails[ i ].shareStage == "Ugly" ) {
-                        data.statusMsg = "Shared OTP expired.";
-                        data.statusMsgColor = "#C07710";
-                        data.flag_timer = false;
-                    } else if ( sssDetails[ i ].shareStage == "Good" ) {
-                        data.statusMsg = "Share accessible";
-                        data.statusMsgColor = "#008000";
-                        data.flag_timer = false;
-                    } else if ( sssDetails[ i ].shareStage == "Bad" ) {
-                        data.statusMsg = "Share not accessible";
-                        data.statusMsgColor = "#ff0000";
-                        data.flag_timer = false;
-                    } else if ( sssDetails[ i ].shareStage == "Ugly" && sssDetails[ i ].sharedDate != "" ) {
-                        data.statusMsg = "Share not accessible";
-                        data.statusMsgColor = "#ff0000";
-                        data.flag_timer = false;
-                    }
-                    else {
+                    let sharedDate = sssDetails[ i ].sharedDate;
+                    if ( sharedDate == "" && sssDetails[ i ].shareStage == "" ) {
                         data.statusMsg = "Not Confirmed";
                         data.statusMsgColor = "#ff0000";
-                        data.flag_timer = false;
+                    } else if ( sharedDate != "" && sssDetails[ i ].shareStage == "" ) {
+                        data.statusMsg = "Shared";
+                        data.statusMsgColor = "#C07710";
+                    } else {
+                        counterConfirm = counterConfirm + 1;
+                        data.statusMsg = "Confirmed";
+                        data.statusMsgColor = "#008000";
                     }
                     if ( sssDetails[ i ].type === 'Trusted Contacts 1' ) {
                         arr_TrustedContacts[ 0 ] = data;
@@ -219,7 +181,9 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                     let shareStage = sssDetails[ i ].shareStage;
                     let statusMsg = this.getMsgAndColor( sharedDate, shareStage )[ 0 ];
                     let statusColor = this.getMsgAndColor( sharedDate, shareStage )[ 1 ];
-                    //console.log( { statusMsg, statusColor } );
+                    if ( statusMsg == "Confirmed" ) {
+                        counterConfirm = counterConfirm + 1;
+                    }
                     let data = {};
                     data.thumbnailPath = "bars";
                     data.givenName = "Wallet";
@@ -234,7 +198,9 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                     let shareStage = sssDetails[ i ].shareStage;
                     let statusMsg = this.getMsgAndColor( sharedDate, shareStage )[ 0 ];
                     let statusColor = this.getMsgAndColor( sharedDate, shareStage )[ 1 ];
-                    //console.log( { statusMsg, statusColor } );
+                    if ( statusMsg == "Confirmed" ) {
+                        counterConfirm = counterConfirm + 1;
+                    }
                     let data = {};
                     data.thumbnailPath = "bars";
                     data.givenName = "Email";
@@ -249,7 +215,9 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                     let shareStage = sssDetails[ i ].shareStage;
                     let statusMsg = this.getMsgAndColor( sharedDate, shareStage )[ 0 ];
                     let statusColor = this.getMsgAndColor( sharedDate, shareStage )[ 1 ];
-                    //console.log( { statusMsg, statusColor } );
+                    if ( statusMsg == "Confirmed" ) {
+                        counterConfirm = counterConfirm + 1;
+                    }
                     let data = {};
                     data.thumbnailPath = "bars";
                     data.givenName = "iCloud";
@@ -260,11 +228,18 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                     arr_SelfShare[ 2 ] = data;
                 }
                 flag_Loading = false
+
+                //Next Button Enable or Didable
+                let flag_DisableBtnNext = true;
+                if ( counterConfirm >= 3 ) {
+                    flag_DisableBtnNext = false
+                }
                 this.setState( {
                     flag_isSetupTrustedContact,
-                    // arr_TrustedContacts,
+                    arr_TrustedContacts,
                     flag_isSecretQuestions,
                     arr_SelfShare,
+                    flag_DisableBtnNext
                 } )
             }
         } else {
@@ -376,22 +351,11 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
         // }
     }
 
-    click_Share5Sahring( type: string ) {
-        // if ( type == "iCLOUD" ) {
-
-        // } else if ( type == "SLACK" ) {
-
-        // } else if ( type == "WHATSAPP" ) {
-
-        // }
-    }
-
-
-
     //TODO: click next button all or 3 share conrimed
     click_Next() {
-        console.log( 'next' );
+        this.props.navigation.push( "RestoreWalletUsingTrustedContactQueAndAnwScreen" );
     }
+
 
 
     render() {
@@ -409,7 +373,7 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                         <View style={ { marginLeft: 10, marginTop: 15 } }>
                             <Button
                                 transparent
-                                onPress={ () => this.props.navigation.pop() }
+                                onPress={ () => this.props.navigation.navigate( "RestoreAndWalletSetupNavigator" ) }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Restore Wallet</Text>

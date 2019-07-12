@@ -164,7 +164,6 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
         alert.simpleOk( "Oops", "Working" );
     }
 
-
     onSelect = async ( returnValue: any ) => {
         // if ( returnValue.data == returnValue.result ) {
         //     let { data } = this.state;
@@ -189,7 +188,6 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
         // } else {
         //     alert.simpleOk( "Oops", "Try again." );
         // }
-
     }
 
     //TODO: update histroy
@@ -301,7 +299,7 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
                 } );
             }
         } else {
-            this.props.navigation.push( "RestoreTrustedContactsQRCodeScanScreen", { onSelect: this.onSelect } );
+            this.props.navigation.push( "RestoreTrustedContactsQRCodeScanScreen", { data: data, onSelect: this.onSelect } );
         }
         this.refs.modal4.close();
     }

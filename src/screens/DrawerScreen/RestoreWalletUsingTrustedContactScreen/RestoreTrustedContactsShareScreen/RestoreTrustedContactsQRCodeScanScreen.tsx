@@ -60,20 +60,37 @@ import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
 
 
+//TODO: Custome Pages
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+
 //TODO: Custome Model
 import ModelRestoreAssociateContactListForQRCodeScan from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelRestoreAssociateContactListForQRCodeScan";
 
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
+//TODO: Bitcoin files
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+
+
+let flag_ReadQRCode = true;
+
 export default class RestoreTrustedContactsQRCodeScanScreen extends React.Component {
     constructor ( props: any ) {
         super( props );
 
         this.state = ( {
-
+            data: [],
+            flag_Loading: false
         } )
 
+    }
+
+    componentWillMount() {
+        let data = this.props.navigation.getParam( "data" );
+        this.setState( {
+            data
+        } );
     }
 
     _renderTitleBar() {
@@ -88,16 +105,52 @@ export default class RestoreTrustedContactsQRCodeScanScreen extends React.Compon
         )
     }
 
-    barcodeReceived( e: any ) {
+
+
+    click_ResetFlagRead = () => {
+        flag_ReadQRCode = true;
+        this.props.navigation.pop();
+    }
+
+
+
+    barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
             result = JSON.parse( result );
-            console.log( { result } );
-
-            if ( result.type == "SSS Restore Self Share" ) {
-                console.log( { data: result } );
-            } else {
-                alert.simpleOk( "Oops", "Please scan correct self share." );
+            let { data } = this.state;
+            const dateTime = Date.now();
+            if ( result.type == "SSS Restore QR" ) {
+                if ( flag_ReadQRCode == true ) {
+                    flag_ReadQRCode = false;
+                    let resDownlaodShare = await S3Service.downloadShare( result.data );
+                    if ( resDownlaodShare.status == 200 ) {
+                        let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, result.data );
+                        if ( resDecryptEncMetaShare.status == 200 ) {
+                            const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSSSRetoreDecryptedShare(
+                                localDB.tableName.tblSSSDetails,
+                                resDecryptEncMetaShare.data.decryptedMetaShare,
+                                dateTime,
+                                data.sssDetails.id
+                            );
+                            console.log( {} );
+                            if ( resUpdateSSSRetoreDecryptedShare == true ) {
+                                flag_ReadQRCode = false;
+                                await comFunDBRead.readTblSSSDetails();
+                                this.props.navigation.pop( 2 );
+                            }
+                        } else {
+                            flag_ReadQRCode = false;
+                            alert.simpleOkAction( "Oops", resDecryptEncMetaShare.err, this.click_ResetFlagRead );
+                        }
+                    } else {
+                        flag_ReadQRCode = false;
+                        alert.simpleOkAction( "Oops", resDownlaodShare.err, this.click_ResetFlagRead );
+                    }
+                } else {
+                    flag_ReadQRCode = false;
+                    alert.simpleOkAction( "Oops", "Please scan correct qrcode.", this.click_ResetFlagRead );
+                }
             }
         } catch ( error ) {
             console.log( error );
@@ -131,6 +184,8 @@ export default class RestoreTrustedContactsQRCodeScanScreen extends React.Compon
     }
 
     render() {
+        //flag
+        let { flag_Loading } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
@@ -157,6 +212,7 @@ export default class RestoreTrustedContactsQRCodeScanScreen extends React.Compon
                         />
                     </ImageBackground>
                 </SafeAreaView>
+                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
             </Container >
         );
     }

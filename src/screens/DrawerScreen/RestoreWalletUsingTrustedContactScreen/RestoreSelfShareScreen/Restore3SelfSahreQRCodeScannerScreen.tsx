@@ -105,19 +105,16 @@ export default class Restore3SelfSahreQRCodeScannerScreen extends React.Componen
     barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
-            this.setState( {
-                flag_Loading: flag_ReadQRCode
-            } )
             result = JSON.parse( result );
             if ( result.type == "SSS Restore Self Share" ) {
-                let resDownlaodShare = await S3Service.downloadShare( result.data );
-                if ( resDownlaodShare.status == 200 ) {
-                    let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, result.data );
-                    console.log( { resDecryptEncMetaShare } );
-                    if ( resDecryptEncMetaShare.status == 200 ) {
-                        if ( flag_ReadQRCode == true ) {
-                            flag_ReadQRCode = false;
-                            //console.log( { resDecryptEncMetaShare } );
+                if ( flag_ReadQRCode == true ) {
+                    flag_ReadQRCode = false;
+                    let resDownlaodShare = await S3Service.downloadShare( result.data );
+                    if ( resDownlaodShare.status == 200 ) {
+
+                        let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, result.data );
+                        console.log( { resDecryptEncMetaShare } );
+                        if ( resDecryptEncMetaShare.status == 200 ) {
                             const dateTime = Date.now();
                             let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactSelfShare(
                                 localDB.tableName.tblSSSDetails,
@@ -133,17 +130,16 @@ export default class Restore3SelfSahreQRCodeScannerScreen extends React.Componen
                                 alert.simpleOkAction( "Oops", "Please try again databse insert issue.", this.click_ResetFlagRead );
                             }
                         }
-                    }
-                    else {
-                        if ( flag_ReadQRCode == true ) {
+                        else {
                             flag_ReadQRCode = false;
                             alert.simpleOkAction( "Oops", resDecryptEncMetaShare.err, this.click_ResetFlagRead );
+
                         }
-                    }
-                } else {
-                    if ( flag_ReadQRCode == true ) {
+                    } else {
+
                         flag_ReadQRCode = false;
                         alert.simpleOkAction( "Oops", resDownlaodShare.err, this.click_ResetFlagRead );
+
                     }
                 }
             } else {
@@ -151,12 +147,7 @@ export default class Restore3SelfSahreQRCodeScannerScreen extends React.Componen
                     flag_ReadQRCode = false;
                     alert.simpleOkAction( "Oops", "Please scan correct self share.", this.click_ResetFlagRead );
                 }
-
             }
-            this.setState( {
-                flag_Loading: flag_ReadQRCode
-            } )
-
         }
         catch ( error ) {
             console.log( error );

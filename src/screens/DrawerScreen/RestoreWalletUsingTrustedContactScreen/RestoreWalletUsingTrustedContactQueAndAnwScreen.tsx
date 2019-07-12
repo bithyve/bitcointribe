@@ -57,10 +57,16 @@ var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBR
 var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 
 
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
+
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
+
+
 
 export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Component {
 
@@ -69,19 +75,7 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
         this.state = {
             arr_WalletDetail: [],
             arr_SSSDetails: [],
-            arr_QuestionList: [],
-            arr_FirstQuestionList: [ {
-                "item": "Name of your first pet?"
-            }, {
-                "item": "Name of your favourite teacher?"
-            }, {
-                "item": "Name of your favourite food?"
-            }, {
-                "item": "Name of your first company?"
-            }, {
-                "item": "Name of your first employee?"
-            }
-            ],
+
             arr_ModelRestoreWalletFirstQuestion: [],
             arr_ModelRestoreWalletSecoundQuestion: [],
             arr_QuestionAndAnwserDetails: [],
@@ -107,113 +101,126 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
     }
 
     //TODO: Secound question click Next 
-    click_SecoundNext = async ( secoundQuestion: string, secoundAnswer: string, arr_QuestionList: any ) => {
-        this.setState( {
-            flag_Loading: true
-        } );
+    click_Next = async ( Question: string, Answer: string ) => {
+        // this.setState( {
+        //     flag_Loading: true
+        // } );
+        console.log( { Question, Answer } );
         const dateTime = Date.now();
-        let walletDetail = this.state.arr_WalletDetail;
-        let sssDetails = this.state.arr_SSSDetails;
-        console.log( { walletDetail } );
-        var temp = [];
-        temp = this.state.arr_QuestionAndAnwserDetails;
-        let data = {};
-        data.secoundQuestion = secoundQuestion;
-        data.secoundAnswer = secoundAnswer;
-        temp.push( data );
+        let walletDetail = await utils.getWalletDetails();
+        let sssDetails = await utils.getSSSDetails();
+
+
+
+        console.log( { sssDetails } );
+
+        // var temp = [];
+        // data.Question = secoundQuestion;
+        // data.secoundAnswer = secoundAnswer;
+        // temp.push( data );
+
         let decryptedShare = [];
-        let arr_RecordId = [];
-        let answers = [ temp[ 0 ].firstAnswer, temp[ 1 ].secoundAnswer ];
+        let arr_TableId = [];
+        // let answers = [ temp[ 0 ].firstAnswer, temp[ 1 ].secoundAnswer ];
+
         for ( let i = 0; i < sssDetails.length; i++ ) {
             let data = sssDetails[ i ];
             if ( data.decryptedShare != "" ) {
                 let decryptedShareJson = JSON.parse( data.decryptedShare );
-                decryptedShare.push( decryptedShareJson.encryptedShare );
+                decryptedShare.push( decryptedShareJson );
             }
-            arr_RecordId.push( data.recordId );
+            arr_TableId.push( data.id );
         }
-        console.log( { sssDetails, temp } );
-        console.log( { decryptedShare, answers } );
-        const mnemonic = await S3Service.recoverFromShares( decryptedShare, answers );
-        console.log( mnemonic )
-        let regularAccount = await utils.getRegularAccountObject();
-        await dbOpration.updateWalletMnemonicAndAnwserDetails(
-            localDB.tableName.tblWallet,
-            mnemonic,
-            temp,
-            dateTime
-        );
-        const res = await comAppHealth.connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact( dateTime, 0, decryptedShare, mnemonic, arr_RecordId );
-        // console.log( { res } );
-        const getBal = await regularAccount.getBalance();
-        let secureAccount = await utils.getSecureAccountObject();
-        // const secureAccount = new SecureAccount( mnemonic );
-        const resSetupSecureAccount = await secureAccount.setupSecureAccount();
-        //console.log( { getBal } );
-        if ( getBal.status == 200 && res ) {
-            this.setState( {
-                flag_Loading: false
-            } )
-            utils.setDeepLinkingType( "" );
-            utils.setDeepLinkingUrl( "" );
-            await dbOpration.insertCreateAccount(
-                localDB.tableName.tblAccount,
-                dateTime,
-                "",
-                getBal.data.balance / 1e8,
-                "BTC",
-                "Daily Wallet",
-                "Daily Wallet",
-                ""
-            );
-            const secondaryMnemonic = await secureAccount.getRecoveryMnemonic();
-            let arr_SecureDetails = [];
-            let secureDetails = {};
-            secureDetails.setupData = resSetupSecureAccount.data.setupData;
-            secureDetails.secondaryXpub = resSetupSecureAccount.data.secondaryXpub;
-            secureDetails.secondaryMnemonic = secondaryMnemonic;
-            secureDetails.backupDate = dateTime;
-            secureDetails.title = "Active Now";
-            secureDetails.addInfo = "";
-            arr_SecureDetails.push( secureDetails );
-            let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
-                localDB.tableName.tblAccount,
-                dateTime,
-                "",
-                "0.0",
-                "BTC",
-                "Secure Account",
-                "Secure Account",
-                arr_SecureDetails
-            );
-            if ( resInsertSecureCreateAcc ) {
-                setTimeout( () => {
-                    this.setState( {
-                        arr_QuestionAndAnwserDetails: temp,
-                        arr_ModelRestoreWalletSecoundQuestion: [
-                            {
-                                modalVisible: false,
-                                arr_QuestionList
-                            }
-                        ],
-                        arr_ModelRestoreWalletSuccessfullyUsingTrustedContact: [
-                            {
-                                modalVisible: true,
-                                walletName: walletDetail.walletType,
-                                bal: getBal.data.balance / 1e8
-                            }
-                        ]
-                    } )
-                    AsyncStorage.setItem(
-                        asyncStorageKeys.rootViewController,
-                        "TabbarBottom"
-                    );
-                }, 1000 );
-            }
+
+        console.log( { decryptedShare, Answer } );
+        const resMnemonic = await S3Service.recoverFromShares( decryptedShare, Answer );
+        if ( resMnemonic.status == 200 ) {
+
         } else {
-            Alert.alert( "App health not updated." )
+            alert.simpleOk( "Oops", resMnemonic.err );
         }
+
+        // let regularAccount = await utils.getRegularAccountObject();
+        // await dbOpration.updateWalletMnemonicAndAnwserDetails(
+        //     localDB.tableName.tblWallet,
+        //     mnemonic,
+        //     temp,
+        //     dateTime
+        // );
+        // const res = await comAppHealth.connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact( dateTime, 0, decryptedShare, mnemonic, arr_RecordId );
+        // // console.log( { res } );
+        // const getBal = await regularAccount.getBalance();
+        // let secureAccount = await utils.getSecureAccountObject();
+        // // const secureAccount = new SecureAccount( mnemonic );
+        // const resSetupSecureAccount = await secureAccount.setupSecureAccount();
+        // //console.log( { getBal } );
+        // if ( getBal.status == 200 && res ) {
+        //     this.setState( {
+        //         flag_Loading: false
+        //     } )
+        //     utils.setDeepLinkingType( "" );
+        //     utils.setDeepLinkingUrl( "" );
+        //     await dbOpration.insertCreateAccount(
+        //         localDB.tableName.tblAccount,
+        //         dateTime,
+        //         "",
+        //         getBal.data.balance / 1e8,
+        //         "BTC",
+        //         "Daily Wallet",
+        //         "Daily Wallet",
+        //         ""
+        //     );
+        //     const secondaryMnemonic = await secureAccount.getRecoveryMnemonic();
+        //     let arr_SecureDetails = [];
+        //     let secureDetails = {};
+        //     secureDetails.setupData = resSetupSecureAccount.data.setupData;
+        //     secureDetails.secondaryXpub = resSetupSecureAccount.data.secondaryXpub;
+        //     secureDetails.secondaryMnemonic = secondaryMnemonic;
+        //     secureDetails.backupDate = dateTime;
+        //     secureDetails.title = "Active Now";
+        //     secureDetails.addInfo = "";
+        //     arr_SecureDetails.push( secureDetails );
+        //     let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+        //         localDB.tableName.tblAccount,
+        //         dateTime,
+        //         "",
+        //         "0.0",
+        //         "BTC",
+        //         "Secure Account",
+        //         "Secure Account",
+        //         arr_SecureDetails
+        //     );
+        //     if ( resInsertSecureCreateAcc ) {
+        //         setTimeout( () => {
+        //             this.setState( {
+        //                 arr_QuestionAndAnwserDetails: temp,
+        //                 arr_ModelRestoreWalletSecoundQuestion: [
+        //                     {
+        //                         modalVisible: false,
+        //                         arr_QuestionList
+        //                     }
+        //                 ],
+        //                 arr_ModelRestoreWalletSuccessfullyUsingTrustedContact: [
+        //                     {
+        //                         modalVisible: true,
+        //                         walletName: walletDetail.walletType,
+        //                         bal: getBal.data.balance / 1e8
+        //                     }
+        //                 ]
+        //             } )
+        //             AsyncStorage.setItem(
+        //                 asyncStorageKeys.rootViewController,
+        //                 "TabbarBottom"
+        //             );
+        //         }, 1000 );
+        //     }
+        // } else {
+        //     Alert.alert( "App health not updated." )
+        // }
     }
+
+
+
 
     //TODO: Success Wallet Setup then skip button on click
     click_Skip() {
@@ -227,8 +234,9 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
         this.props.navigation.dispatch( resetAction );
     }
 
-
     render() {
+        //array                
+        let { arr_QuestionList } = this.state;
         return (
             <View style={ styles.container }>
                 <SafeAreaView style={ styles.container }>
@@ -241,28 +249,9 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
                             enableOnAndroid={ true }
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
-                            <ModelRestoreWalletFirstQuestion data={ this.state.arr_ModelRestoreWalletFirstQuestion } click_Next={ ( firstQuestion: string, firstAnswer: string, arr_QuestionList: any ) => {
-                                console.log( { arr_QuestionList } );
-
-                                let temp = [];
-                                let data = {};
-                                data.firstQuestion = firstQuestion;
-                                data.firstAnswer = firstAnswer;
-                                temp.push( data );
-                                this.setState( {
-                                    arr_QuestionAndAnwserDetails: temp,
-                                    arr_ModelRestoreWalletFirstQuestion: [
-                                        {
-                                            modalVisible: false
-                                        }
-                                    ],
-                                    arr_ModelRestoreWalletSecoundQuestion: [
-                                        {
-                                            modalVisible: true,
-                                            arr_QuestionList
-                                        }
-                                    ]
-                                } )
+                            <ModelRestoreWalletFirstQuestion data={ this.state.arr_ModelRestoreWalletFirstQuestion } click_Next={ ( firstQuestion: string, firstAnswer: string ) => {
+                                console.log( { firstQuestion } );
+                                this.click_Next( firstQuestion, firstAnswer );
                             }
                             }
                                 pop={ () => {
@@ -274,34 +263,6 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
                                         ]
                                     } );
                                     this.props.navigation.pop()
-                                } }
-                            />
-                            <ModelRestoreWalletSecoundQuestion data={ this.state.arr_ModelRestoreWalletSecoundQuestion }
-                                flag_Loading={ this.state.flag_Loading }
-                                click_Next={ ( secoundQuestion: string, secoundAnswer: string, arr_QuestionList: any ) => {
-                                    this.setState( {
-                                        arr_QuestionList
-                                    } )
-                                    this.click_SecoundNext( secoundQuestion, secoundAnswer, arr_QuestionList );
-                                }
-                                }
-                                pop={ () => {
-                                    let arr_FirstQuestionList = this.state.arr_FirstQuestionList;
-                                    let arr_QuestionList = this.state.arr_QuestionList;
-                                    this.setState( {
-                                        arr_ModelRestoreWalletSecoundQuestion: [
-                                            {
-                                                modalVisible: false,
-                                                arr_QuestionList
-                                            }
-                                        ],
-                                        arr_ModelRestoreWalletFirstQuestion: [
-                                            {
-                                                modalVisible: true,
-                                                arr_FirstQuestionList
-                                            }
-                                        ]
-                                    } );
                                 } }
                             />
                             <ModelRestoreWalletSuccessfullyUsingTrustedContact data={ this.state.arr_ModelRestoreWalletSuccessfullyUsingTrustedContact }
@@ -320,6 +281,7 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
                                     this.props.navigation.push( "ResotreSecureAccountNavigator", { prevScreen: "RestoreWallet" } );
                                 } }
                             />
+
                         </KeyboardAwareScrollView>
                     </ImageBackground>
                 </SafeAreaView>
