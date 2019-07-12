@@ -121,6 +121,8 @@ export default class TrustedContactAcceptOtpScreen extends Component {
         let { keeperInfo } = this.state;
         let enterOtp = this.state.otp;
         let script = utils.getDeepLinkingUrl();
+
+
         var resDecryptViaOTP = await S3Service.decryptViaOTP( script.key, enterOtp );
         if ( resDecryptViaOTP.status == 200 ) {
             resDecryptViaOTP = resDecryptViaOTP.data;
