@@ -7,6 +7,8 @@ import com.oblador.keychain.KeychainPackage;
 import com.oblador.keychain.KeychainPackage;
 import com.oblador.keychain.KeychainPackage;
 import com.oblador.keychain.KeychainPackage;
+import com.oblador.keychain.KeychainPackage;
+import com.oblador.keychain.KeychainPackage;
 import com.hopding.pdflib.PDFLibPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.chirag.RNMail.RNMail;
@@ -56,6 +58,8 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(new SQLitePluginPackage(), new MainReactPackage(),
+            new KeychainPackage(),
+            new KeychainPackage(),
             new KeychainPackage(),
             new KeychainPackage(),
             new KeychainPackage(),

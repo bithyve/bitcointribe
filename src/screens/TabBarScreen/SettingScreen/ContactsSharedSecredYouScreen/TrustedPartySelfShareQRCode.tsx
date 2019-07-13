@@ -86,8 +86,8 @@ export default class TrustedPartySelfShareQRCode extends React.Component<any, an
 
     goBack() {
         const { navigation } = this.props;
-        navigation.goBack();
-        navigation.state.params.onSelect( { selected: true } );
+        navigation.pop();
+        // navigation.state.params.onSelect( { selected: true } );
     }
 
     render() {

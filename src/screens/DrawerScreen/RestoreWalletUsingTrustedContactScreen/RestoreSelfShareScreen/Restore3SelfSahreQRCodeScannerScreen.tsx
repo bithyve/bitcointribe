@@ -112,14 +112,15 @@ export default class Restore3SelfSahreQRCodeScannerScreen extends React.Componen
                     let resDownlaodShare = await S3Service.downloadShare( result.data );
                     if ( resDownlaodShare.status == 200 ) {
 
-                        let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, result.data );
+                        var resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, result.data );
                         console.log( { resDecryptEncMetaShare } );
                         if ( resDecryptEncMetaShare.status == 200 ) {
+                            resDecryptEncMetaShare = resDecryptEncMetaShare.data;
                             const dateTime = Date.now();
                             let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactSelfShare(
                                 localDB.tableName.tblSSSDetails,
                                 dateTime,
-                                resDecryptEncMetaShare.data.decryptedMetaShare,
+                                resDecryptEncMetaShare.decryptedMetaShare,
                                 "Self Share 1"
                             );
                             if ( resInsertContactList ) {

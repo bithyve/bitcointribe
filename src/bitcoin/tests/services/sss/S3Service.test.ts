@@ -4,6 +4,7 @@ import config from "../../../Config";
 import S3Service from "../../../services/sss/S3Service";
 import {
   IBuddyStaticNonPMDD,
+  IMetaShare,
   ISocialStaticNonPMDD,
 } from "../../../utilities/Interface";
 
@@ -17,7 +18,7 @@ describe("Shamir's Secret Sharing", async () => {
   let trustedSSS: S3Service;
   let tag: string;
   let encryptedShares;
-  let encryptedStaticNonPMDD;
+  let encryptedSocialStaticNonPMDD;
   let encryptedBuddyStaticNonPMDD;
   let sharedAssets;
   let recoveredShares;
@@ -26,6 +27,7 @@ describe("Shamir's Secret Sharing", async () => {
   let userWalletId: string;
   let dummyBHXpub: string;
   let dummySecoundryXpub: string;
+  const metaShares: IMetaShare[] = [];
 
   beforeAll(() => {
     jest.setTimeout(50000);
@@ -90,66 +92,75 @@ describe("Shamir's Secret Sharing", async () => {
       secoundaryXpub: dummySecoundryXpub,
       bhXpub: dummyBHXpub,
     };
-    const buddyres = userSSS.encryptStaticNonPMDD(buddyStaticNonPMDD);
-    encryptedBuddyStaticNonPMDD = buddyres.data.encryptedStaticNonPMDD;
-    expect(buddyres.status).toBe(config.STATUS.SUCCESS);
-    expect(encryptedBuddyStaticNonPMDD).toBeTruthy();
-
     const res = userSSS.encryptStaticNonPMDD(socialStaticNonPMDD);
-    encryptedStaticNonPMDD = res.data.encryptedStaticNonPMDD;
     expect(res.status).toBe(config.STATUS.SUCCESS);
-    expect(encryptedStaticNonPMDD).toBeTruthy();
+    encryptedSocialStaticNonPMDD = res.data.encryptedStaticNonPMDD;
+    expect(encryptedSocialStaticNonPMDD).toBeTruthy();
+
+    const buddyRes = userSSS.encryptStaticNonPMDD(buddyStaticNonPMDD);
+    expect(buddyRes.status).toBe(config.STATUS.SUCCESS);
+    encryptedBuddyStaticNonPMDD = buddyRes.data.encryptedStaticNonPMDD;
+    expect(encryptedBuddyStaticNonPMDD).toBeTruthy();
   });
 
-  test("create metashare against supplied encryptedshare, encrypted static nonpmdd and encrypts the metashares(1st,2nd,3rd share)", async () => {
-    for (let itr = 0; itr < 3; itr++) {
-      const encryptedShare = encryptedShares[itr];
-      let metaRes;
-      if (itr < 2) {
-        metaRes = userSSS.createMetaShare(
-          itr + 1,
+  test("creates encrypted MetaShares against supplied encryptedShares w/ corresponding encStaticNonPMDDs)", async () => {
+    const index: number = 0;
+    for (const encryptedShare of encryptedShares) {
+      let res;
+      if (index !== 2) {
+        res = userSSS.createMetaShare(
+          index + 1,
           encryptedShare,
-          encryptedStaticNonPMDD,
+          encryptedSocialStaticNonPMDD,
           tag,
         );
       } else {
-        metaRes = userSSS.createMetaShare(
-          itr + 1,
+        res = userSSS.createMetaShare(
+          index + 1,
           encryptedShare,
           encryptedBuddyStaticNonPMDD,
           tag,
         );
       }
-      const qrRes = await userSSS.createQR(metaRes.data.metaShare, 4);
-      const recQRRes = userSSS.recoverMetaShareFromQR(qrRes.data.qrData);
-      // console.log(
-      //   recQRRes.data.recoverQRData === JSON.stringify(metaRes.data.metaShare),
-      // );
-      expect(qrRes.status).toBe(config.STATUS.SUCCESS);
-      expect(recQRRes.status).toBe(config.STATUS.SUCCESS);
-      expect(metaRes.status).toBe(config.STATUS.SUCCESS);
-      const { metaShare } = metaRes.data;
+      const { metaShare } = res.data;
       expect(metaShare).toBeTruthy();
-      const res = userSSS.generateEncryptedMetaShare(metaShare);
+      metaShares.push(metaShare);
+    }
+    expect(metaShares.length).toBe(5);
+
+    for (let itr = 0; itr < metaShares.length - 2; itr++) {
+      const res = userSSS.generateEncryptedMetaShare(metaShares[itr]);
       expect(res.status).toBe(config.STATUS.SUCCESS);
       const { encryptedMetaShare, key, messageId } = res.data;
-      if (itr < 2) {
-        const ress = userSSS.encryptViaOTP(key);
-        expect(ress.status).toBe(config.STATUS.SUCCESS);
-        expect(ress.data.otpEncryptedData).toBeTruthy();
 
-        sharedAssets.push({
-          encryptedMetaShare,
-          otpEncryptedKey: ress.data.otpEncryptedData,
-          key,
-          otp: ress.data.otp,
-          messageId,
-        });
-      }
+      const otpRes = userSSS.encryptViaOTP(key);
+      expect(otpRes.status).toBe(config.STATUS.SUCCESS);
+      expect(otpRes.data.otpEncryptedData).toBeTruthy();
+
+      sharedAssets.push({
+        encryptedMetaShare,
+        otpEncryptedKey: otpRes.data.otpEncryptedData,
+        key,
+        messageId,
+        otp: otpRes.data.otp,
+      });
     }
 
     expect(sharedAssets).toBeTruthy();
-    expect(sharedAssets.length).toEqual(2);
+    expect(sharedAssets.length).toEqual(3);
+  });
+
+  test("something that needs to be done", async () => {
+    for (let itr = 4; itr > metaShares.length - 3; itr--) {
+      const qrRes = await userSSS.createQR(metaShares[itr], itr + 1);
+      expect(qrRes.status).toBe(config.STATUS.SUCCESS);
+      console.log({ qrData: qrRes.data.qrData });
+
+      const recQRRes = userSSS.recoverMetaShareFromQR(qrRes.data.qrData);
+      expect(recQRRes.status).toBe(config.STATUS.SUCCESS);
+
+      expect(recQRRes.data.metaShare).toEqual(metaShares[itr]);
+    }
   });
 
   test("uploads the  encrypted metashare to the server (stored against the supplied messageId)", async () => {
@@ -165,7 +176,7 @@ describe("Shamir's Secret Sharing", async () => {
 
   test("downloads the metashares corresponding to the supplied messageIds and then decrypts them using encrypted key (trusted party specific)", async () => {
     for (const sharedAsset of sharedAssets) {
-      const { otpEncryptedKey, messageId, otp } = sharedAsset;
+      const { otpEncryptedKey, otp } = sharedAsset;
       const { data } = S3Service.decryptViaOTP(otpEncryptedKey, otp);
       const key = data.decryptedData;
 
@@ -187,6 +198,7 @@ describe("Shamir's Secret Sharing", async () => {
       expect(recoveredShares[itr]).toEqual(encryptedShares[itr]);
     }
   });
+
   test("encrypts and uploads the non-PMDD data to the server", async () => {
     const res = await userSSS.updateDynamicNonPMDD(dummyNonPMDD);
     expect(res.status).toBe(config.STATUS.SUCCESS);
@@ -228,10 +240,7 @@ describe("Shamir's Secret Sharing", async () => {
   });
 
   test("recovers the mnemonic from an encrypted set of shares (above threshold)", () => {
-    const res = S3Service.recoverFromShares(
-      [recoveredShares[0], recoveredShares[1], encryptedShares[3]],
-      answer,
-    );
+    const res = S3Service.recoverFromShares(recoveredShares, answer);
     expect(res.status).toBe(config.STATUS.SUCCESS);
 
     const { mnemonic } = res.data;

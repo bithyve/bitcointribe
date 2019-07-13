@@ -84,9 +84,32 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
         console.log( { secureAccountDetails, setupData } );
         // const secureAccount = new SecureAccount( resultWallet.mnemonic );
         let secureAccount = await utils.getSecureAccountObject();
+        let sss = await utils.getS3ServiceObject();
         console.log( { secureAccount } );
+        let sssDetails = await utils.getSSSDetails();
+        let encryptedStaticNonPMDD;
+        for ( let i = 0; i < sssDetails.length; i++ ) {
+            let data = sssDetails[ i ];
+            if ( data.decryptedShare != "" ) {
+                let decryptedShareJson = JSON.parse( data.decryptedShare );
+                encryptedStaticNonPMDD = decryptedShareJson.encryptedStaticNonPMDD;
+            }
+        }
 
-        var resValidateSecureAccountSetup = await secureAccount.validateSecureAccountSetup( code, setupData.setupData.secret, setupData.setupData.xIndex );
+        let resIsActive = await secureAccount.isActive()
+        if ( resIsActive.status == 200 ) {
+            resIsActive = resIsActive.data.isActive;
+            if ( resIsActive ) {
+
+            } else {
+                var resDecryptStaticNonPMDD = await sss.decryptStaticNonPMDD( encryptedStaticNonPMDD );
+                var resValidateSecureAccountSetup = await secureAccount.validateSecureAccountSetup( code, setupData.setupData.secret, setupData.setupData.xIndex );
+            }
+        } else {
+            alert.simpleOk( "Oops", resIsActive.err );
+        }
+
+
         if ( resValidateSecureAccountSetup.status == 200 ) {
             resValidateSecureAccountSetup = resValidateSecureAccountSetup.data;
         } else {

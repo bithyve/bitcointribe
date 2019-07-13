@@ -87,6 +87,10 @@ import QrCodeScannerScreen from "HexaWallet/src/screens/TabBarScreen/QrCodeScann
 //TODO: New Screen Hexa Wallet
 import WalletScreen from "HexaWallet/src/screens/TabBarScreen/WalletScreen/WalletScreen";
 
+
+//TODO: All Transaction Screen
+import AllTransactionScreen from "HexaWallet/src/screens/TabBarScreen/AllTransactionScreen/AllTransactionScreen";
+
 //TODO: Backup your Walleet Screen
 import AllContactListScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/AllContactListScreen/AllContactListScreen";
 import SecretSharingScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/SecretSharingScreen/SecretSharingScreen";
@@ -571,8 +575,8 @@ const TabNavigator = createBottomTabNavigator(
         )
       }
     },
-    Analytics: {
-      screen: WalletScreen,
+    AllTransactionScreen: {
+      screen: AllTransactionScreen,
       navigationOptions: {
         tabBarLabel: "Transaction", //localization("TabBarItem.Analytics"),
         tabBarIcon: ( { tintColor } ) => (
@@ -602,7 +606,7 @@ const TabNavigator = createBottomTabNavigator(
   },
   {
     initialRouteName: "WalletScreen",
-    order: [ 'WalletScreen', 'Analytics', 'QrCodeScannerScreen', 'Settings' ],
+    order: [ 'WalletScreen', 'AllTransactionScreen', 'QrCodeScannerScreen', 'Settings' ],
     tabBarOptions: {
       showLabel: true,
       //swipeEnabled: true,
