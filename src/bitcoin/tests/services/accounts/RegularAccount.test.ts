@@ -84,7 +84,6 @@ describe("Regular Account", async () => {
       confirmedTransactions,
       transactionDetails,
     } = res.data.transactions;
-    console.log({ totalTransactions, confirmedTransactions });
     expect(totalTransactions).toBeGreaterThanOrEqual(confirmedTransactions);
     expect(confirmedTransactions).toBeGreaterThanOrEqual(0);
     expect(transactionDetails).toBeTruthy();
@@ -96,22 +95,22 @@ describe("Regular Account", async () => {
       amount: 3500 / 1e8,
       priority: "medium",
     };
+
     const res = await importedRegularAccount.transferST1(
       transfer.recipientAddress,
       transfer.amount,
       transfer.priority,
     );
 
-    console.log({ res });
     expect(res.status).toBe(config.STATUS.SUCCESS);
-    console.log(res.data);
     expect(res.data).toBeTruthy();
 
     const { data } = await importedRegularAccount.transferST2(
       res.data.inputs,
       res.data.txb,
     );
-    expect(data.txid).toBeTruthy();
+
     console.log(data.txid);
+    expect(data.txid).toBeTruthy();
   });
 });

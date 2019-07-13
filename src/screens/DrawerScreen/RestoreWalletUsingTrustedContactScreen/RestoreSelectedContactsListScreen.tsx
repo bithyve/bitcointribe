@@ -112,6 +112,7 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
         this.willFocusSubscription = this.props.navigation.addListener(
             "willFocus",
             () => {
+                counterConfirm = 0;
                 this.loaddata();
             }
         );
@@ -230,6 +231,10 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                 flag_Loading = false
 
                 //Next Button Enable or Didable
+
+                console.log( { counterConfirm } );
+
+
                 let flag_DisableBtnNext = true;
                 if ( counterConfirm >= 3 ) {
                     flag_DisableBtnNext = false

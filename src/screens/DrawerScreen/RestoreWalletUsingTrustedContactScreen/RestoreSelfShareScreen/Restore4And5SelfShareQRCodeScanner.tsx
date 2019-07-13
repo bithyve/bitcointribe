@@ -56,7 +56,9 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 
 
-
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
 
 //Custome Compontes
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -74,6 +76,9 @@ import Restore4And5SelfShareQRCodeScreen8 from "./Screens/Restore4And5SelfShareQ
 
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
+//Bitcoin Files
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 
 export default class Restore4And5SelfShareQRCodeScanner extends React.Component {
@@ -114,20 +119,27 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
         let arr_Shares = this.state.arr_Shares;
         arr_Shares.push.apply( arr_Shares, data );
         console.log( { arr_Shares } );
+        var resRecoverMetaShareFromQR = await S3Service.recoverMetaShareFromQR( arr_Shares );
+        if ( resRecoverMetaShareFromQR.status == 200 ) {
+            resRecoverMetaShareFromQR = resRecoverMetaShareFromQR.data;
+            console.log( { resRecoverMetaShareFromQR } );
+            let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactSelfShare(
+                localDB.tableName.tblSSSDetails,
+                dateTime,
+                resRecoverMetaShareFromQR.metaShare,
+                type
+            );
+            console.log( { resInsertContactList } );
+            if ( resInsertContactList ) {
+                await comFunDBRead.readTblSSSDetails();
+                this.props.navigation.pop( 2 );
+            }
 
-
-        let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactSelfShare(
-            localDB.tableName.tblSSSDetails,
-            dateTime,
-            arr_Shares,
-            type
-        );
-        console.log( { resInsertContactList } );
-
-        if ( resInsertContactList ) {
-            await comFunDBRead.readTblSSSDetails();
-            this.props.navigation.pop( 2 );
+        } else {
+            alert.simpleOk( "Oops", resRecoverMetaShareFromQR.err );
         }
+
+
 
     }
 

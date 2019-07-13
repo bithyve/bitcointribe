@@ -325,7 +325,6 @@ export default class Bitcoin {
       }
 
       const addressesInfo = res.data;
-      console.log( { addressesInfo } );
       for ( const addressInfo of addressesInfo ) {
         console.log(
           `Appending transactions corresponding to ${ addressInfo.Address }`,
@@ -1020,7 +1019,6 @@ export default class Bitcoin {
     let totalSpent: number = 0;
 
     inputs.forEach( ( input ) => {
-      console.log( { input } );
       const addresses = input.addresses
         ? input.addresses
         : [ input.prevout.scriptpubkey_address ];

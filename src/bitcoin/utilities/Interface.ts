@@ -13,6 +13,7 @@ export interface IMetaShare {
 export interface ISocialStaticNonPMDD {
   secoundaryXpub: string;
   bhXpub: string;
+  xIndex: number;
 }
 
 export interface IBuddyStaticNonPMDD {
@@ -20,4 +21,5 @@ export interface IBuddyStaticNonPMDD {
   twoFASecret: string;
   secoundaryXpub: string;
   bhXpub: string;
+  xIndex: number;
 }

@@ -934,7 +934,6 @@ export default class WalletScreen extends React.Component {
           } }
           click_AcceptSecret={ ( wn: string ) => {
             console.log( { wn } );
-
             this.setState( {
               arr_ModelAcceptOrRejectSecret: [
                 {
@@ -951,6 +950,7 @@ export default class WalletScreen extends React.Component {
             } );
           } }
         />
+
         <ModelSelfShareAcceptAndReject
           data={ arr_ModelSelfShareAcceptAndReject }
           closeModal={ () => {
@@ -1066,7 +1066,14 @@ export default class WalletScreen extends React.Component {
             // );
             // if ( resUpdateAppHealthStatus ) {
             //   await comFunDBRead.readTblWallet();
-            // }
+            // }  
+          } }
+          closeModal={ () => {
+            this.setState( {
+              arr_ModelBackupYourWallet: [ {
+                modalVisible: false,
+              } ]
+            } )
           } }
         />
         <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />

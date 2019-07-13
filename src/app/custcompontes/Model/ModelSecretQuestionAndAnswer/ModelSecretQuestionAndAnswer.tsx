@@ -139,6 +139,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
         let { secoundAnswer, arr_SelectedList } = this.state;
         //console.log( { arr_SelectedList } );
         let secureAccount = await utils.getSecureAccountObject();
+
         var resSetupSecureAccount = await secureAccount.setupSecureAccount();
         // console.log( { resSetupSecureAccount } );
         if ( resSetupSecureAccount.status == 200 ) {
@@ -192,13 +193,13 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                         shareIds.push( sss.getShareId( share ) )
                     }
                     //console.log( { bhXpub, secondaryXpub } );
-                    const socialStaticNonPMDD = { secondaryXpub, bhXpub: resSetupSecureAccount.setupData.bhXpub }
+                    const socialStaticNonPMDD = { secondaryXpub, bhXpub: resSetupSecureAccount.setupData.bhXpub, xIndex: resSetupSecureAccount.setupData.xIndex }
                     //console.log( { socialStaticNonPMDD } );
                     var resEncryptSocialStaticNonPMDD = await sss.encryptStaticNonPMDD( socialStaticNonPMDD );
                     console.log( { shareIds, resEncryptSocialStaticNonPMDD } );
                     if ( resEncryptSocialStaticNonPMDD.status == 200 ) {
                         resEncryptSocialStaticNonPMDD = resEncryptSocialStaticNonPMDD.data.encryptedStaticNonPMDD;
-                        const buddyStaticNonPMDD = { getSecoundMnemonic, twoFASecret: resSetupSecureAccount.setupData.secret, secondaryXpub, bhXpub: resSetupSecureAccount.setupData.bhXpub };
+                        const buddyStaticNonPMDD = { getSecoundMnemonic, twoFASecret: resSetupSecureAccount.setupData.secret, secondaryXpub, bhXpub: resSetupSecureAccount.setupData.bhXpub, xIndex: resSetupSecureAccount.setupData.xIndex };
                         // console.log( { buddyStaticNonPMDD } );
                         let resEncryptBuddyStaticNonPMDD = await sss.encryptStaticNonPMDD( buddyStaticNonPMDD );
                         if ( resEncryptBuddyStaticNonPMDD.status == 200 ) {
@@ -382,10 +383,10 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             share1 = share1.split( '"' ).join( "Doublequote" );
             share1 = share1.split( '{' ).join( "Leftbrace" );
             share1 = share1.split( '}' ).join( "Rightbrace" );
-            share1 = share1.split( '/' ).join( "_" );
-            share1 = share1.split( ',' ).join( "__" );
-            share1 = share1.split( ' ' ).join( "space" );
-            // console.log( { share1 } );
+            share1 = share1.split( '/' ).join( "Slash" );
+            share1 = share1.split( ',' ).join( "Comma" );
+            share1 = share1.split( ' ' ).join( "Space" );
+            // console.log( { share1 } );   
             var docsDir;
             if ( Platform.OS == "android" ) {
                 docsDir = await RNFS.ExternalStorageDirectoryPath //RNFS.DocumentDirectoryPath;

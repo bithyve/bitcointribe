@@ -73,6 +73,11 @@ export default class Restore4And5SelfShareQRCodeScreen1 extends React.Component<
 
     }
 
+
+    componentWillUnmount() {
+        flag_ReadQRCode = true;
+    }
+
     _renderTitleBar() {
         return (
             <Text></Text>
@@ -92,17 +97,18 @@ export default class Restore4And5SelfShareQRCodeScreen1 extends React.Component<
     barcodeReceived( e: any ) {
         try {
             var result = e.data;
-            result = result.split( 'Doublequote' ).join( '"' );
-            result = result.split( 'Leftbrace' ).join( "{" );
-            result = result.split( 'Rightbrace' ).join( "}" );
-            result = result.split( '_' ).join( "/" );
-            result = result.split( '__' ).join( "," );
-            result = result.split( 'space' ).join( " " );
+            result = result.split( "Doublequote" ).join( '"' );
+            result = result.split( "Leftbrace" ).join( '{' );
+            result = result.split( "Rightbrace" ).join( '}' );
+            result = result.split( "Slash" ).join( '/' );
+            result = result.split( "Comma" ).join( ',' );
+            result = result.split( "Space" ).join( ' ' );
             let type = this.props.type;
             var firstChar = result.slice( 0, 3 );
             if ( type == "iCloud" ) {
                 if ( firstChar == "c01" ) {
                     if ( flag_ReadQRCode ) {
+                        console.log( { result } );
                         this.props.click_Next( 1, [ result ] );
                         flag_ReadQRCode = false;
                     }

@@ -364,7 +364,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                 } );
             }
         } else if ( type == "QR" ) {
-            this.props.navigation.push( "TrsutedPartyQRCodeScreen", { data: arr_EncryptedMetaShare, onSelect: this.onSelect } );
+            this.props.navigation.push( "TrsutedPartyQRCodeScreen", { data: arr_EncryptedMetaShare } );
             this.refs.modal4.close();
         }
     }
