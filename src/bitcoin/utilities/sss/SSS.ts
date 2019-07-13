@@ -161,8 +161,6 @@ export default class SSS {
     //   this.cipherSpec.salt,
     //   this.cipherSpec.keyLength,
     // );
-    console.log( { key } );
-
     const decipher = crypto.createDecipheriv(
       SSS.cipherSpec.algorithm,
       key,
@@ -172,19 +170,8 @@ export default class SSS {
     try {
       let decrypted = decipher.update( encryptedMetaShare, "hex", "utf8" );
       decrypted += decipher.final( "utf8" );
-      console.log( { decrypted } );
-
       const decryptedMetaShare = JSON.parse( decrypted );
-
-      console.log( { decryptedMetaShare } );
-      console.log( "Here" );
-      console.log( { meta: decryptedMetaShare.meta } );
-
-      console.log( { validator: decryptedMetaShare.meta.validator } );
-
       if ( decryptedMetaShare.meta.validator !== "HEXA" ) {
-        console.log( "THrowing error" );
-
         throw new Error();
       }
 
@@ -194,6 +181,25 @@ export default class SSS {
         "An error occured while decrypting the share: Invalid Key/Tampered Share",
       );
     }
+  }
+
+
+  public static recoverMetaShareFromQR = (
+    qrData: string[],
+  ): { metaShare: IMetaShare } => {
+    qrData.sort();
+    let recoveredQRData: string;
+    recoveredQRData = "";
+    for ( let itr = 0; itr < config.SSS_METASHARE_SPLITS; itr++ ) {
+      const res = qrData[ itr ].slice( 3 );
+      recoveredQRData = recoveredQRData + res;
+    }
+    console.log( { recoveredQRData } );
+
+    const metaShare = JSON.parse( recoveredQRData );
+    console.log( { metaShare } );
+
+    return { metaShare };
   }
 
   public static getMessageId = ( key: string, length: number ): string => {
@@ -531,10 +537,6 @@ export default class SSS {
     decrypted += decipher.final( "utf8" );
 
     const decryptedStaticNonPMDD = JSON.parse( decrypted );
-    console.log( { decryptedStaticNonPMDD } );
-    if ( decryptedStaticNonPMDD.meta.validator !== "HEXA" ) {
-      throw new Error( "Unable to decrypt the nonPMDD, it might be corrupt" );
-    }
     return { decryptedStaticNonPMDD };
   }
 
@@ -678,49 +680,32 @@ export default class SSS {
     metashare: IMetaShare,
     index: number,
   ): Promise<{ qrData: string[] }> => {
-    const res = JSON.stringify( metashare );
-    // this.metashareData = res;
-    let qrData: string[];
-    qrData = [];
+    const splits: number = config.SSS_METASHARE_SPLITS;
+    const metaString = JSON.stringify( metashare );
+    const slice = Math.trunc( metaString.length / splits );
+    const qrData: string[] = [];
 
     let start = 0;
-    let end = 288;
-    for ( let itr = 0; itr < 8; itr++ ) {
-      // console.log("start", start, "end", end);
-      if ( itr !== 7 ) {
-        qrData[ itr ] = res.slice( start, end );
+    let end = slice;
+    for ( let itr = 0; itr < splits; itr++ ) {
+      if ( itr !== splits - 1 ) {
+        qrData[ itr ] = metaString.slice( start, end );
       } else {
-        qrData[ itr ] = res.slice( start );
+        qrData[ itr ] = metaString.slice( start );
       }
       start = end;
-      end = end + 288;
-      if ( index === 5 ) {
-        qrData[ itr ] = "c0" + ( itr + 1 ) + qrData[ itr ];
-      } else if ( index === 4 ) {
+      end = end + slice;
+      if ( index === 4 ) {
         qrData[ itr ] = "e0" + ( itr + 1 ) + qrData[ itr ];
+      } else if ( index === 5 ) {
+        qrData[ itr ] = "c0" + ( itr + 1 ) + qrData[ itr ];
       }
-      // console.log("qrData", itr + 1, "=>", qrData[itr]);
-      QRCode.toDataURL( qrData[ itr ] )
-        .then( ( url ) => {
-          // console.log(url);
-        } )
-        .catch( ( err ) => {
-          // console.error(err);
-        } );
     }
-    // console.log(qrData);
+    console.log( qrData );
     return { qrData };
   }
-  public recoverMetaShareFromQR = ( qrData: string[] ) => {
-    qrData.sort();
-    let recoverQRData: string;
-    recoverQRData = "";
-    for ( let itr = 0; itr < 8; itr++ ) {
-      const res = qrData[ itr ].slice( 3 );
-      recoverQRData = recoverQRData + res;
-    }
-    return { recoverQRData };
-  }
+
+
 
   public encryptShares = (
     shares: string[],

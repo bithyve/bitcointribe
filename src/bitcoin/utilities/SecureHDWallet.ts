@@ -208,12 +208,12 @@ export default class SecureHDWallet extends Bitcoin {
 
   public binarySearchIterationForConsumedAddresses = async (
     index: number,
-    maxUsedIndex: number = 0,
-    minUnusedIndex: number = 100500100,
-    depth: number = 0,
+    maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
+    minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
+    depth: number = config.BSI.DEPTH.INIT,
   ) => {
     console.log( { depth } );
-    if ( depth >= 20 ) {
+    if ( depth >= config.BSI.DEPTH.LIMIT ) {
       return maxUsedIndex + 1;
     } // fail
 
@@ -256,7 +256,7 @@ export default class SecureHDWallet extends Bitcoin {
     try {
       console.log( "Executing consumed binary search" );
       this.nextFreeChildIndex = await this.binarySearchIterationForConsumedAddresses(
-        100,
+        config.BSI.INIT_INDEX,
       );
 
       this.consumedAddresses = [];
@@ -473,7 +473,7 @@ export default class SecureHDWallet extends Bitcoin {
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.get( "setup2FA" );
-      this.secondaryMnemonic = await bip39.generateMnemonic( 256 )
+      this.secondaryMnemonic = await bip39.generateMnemonic( 256 );
     } catch ( err ) {
       throw new Error( err.response.data.err );
     }

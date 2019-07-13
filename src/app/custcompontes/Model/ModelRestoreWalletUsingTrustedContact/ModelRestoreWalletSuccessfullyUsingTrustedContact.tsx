@@ -73,29 +73,28 @@ export default class ModelRestoreWalletSuccessfullyUsingTrustedContact extends C
                             <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Congratulations! You can now use your Daily Account</Text>
                             <Text note>{ data.length != 0 ? data[ 0 ].walletName : "Hexa Wallet" }</Text>
                             <View style={ { flexDirection: "row", justifyContent: "center", alignItems: "center", margin: 10 } }>
+                                <Text note style={ { fontSize: 16 } }>Daily Account: </Text>
                                 <SvgIcon name="icon_bitcoin" color="#D0D0D0" size={ 20 } />
                                 <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
-                                    { data.length != 0 ? data[ 0 ].bal : 0 }
+                                    { data.length != 0 ? " " + data[ 0 ].balR : 0 }
+                                </Text>
+                            </View>
+                            <View style={ { flexDirection: "row", justifyContent: "center", alignItems: "center", } }>
+                                <Text note style={ { fontSize: 16 } }>Secure Account: </Text>
+                                <SvgIcon name="icon_bitcoin" color="#D0D0D0" size={ 20 } />
+                                <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
+                                    { data.length != 0 ? " " + data[ 0 ].balS : 0 }
                                 </Text>
                             </View>
                             <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Restore your secure account now You can opt to do it later</Text>
                         </View>
-                        <View style={ { flex: 1, justifyContent: "flex-end" } }>
+                        <View style={ { flex: 0.4, justifyContent: "flex-end" } }>
                             <FullLinearGradientButton
-                                click_Done={ () => this.props.click_RestoreSecureAccount() }
-                                title="Restore Secure Account"
+                                click_Done={ () => this.props.click_Skip() }
+                                title="Go Wallet"
                                 disabled={ false }
                                 style={ [ { opacity: 1 }, { borderRadius: 10 } ] }
                             />
-                            <Button
-                                onPress={ () => this.props.click_Skip() }
-                                style={ [ globalStyle.ffFiraSansSemiBold, {
-                                    backgroundColor: "#838383", borderRadius: 10, margin: 5,
-                                    height: 50,
-                                } ] }
-                                full>
-                                <Text style={ { color: "#ffffff" } }>Skip</Text>
-                            </Button>
                         </View>
                     </View>
                 </View>

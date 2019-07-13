@@ -66,11 +66,17 @@ export default class TrsutedPartyQRCodeScreen extends React.Component<any, any> 
     }
 
 
+
+
+
     goBack() {
         const { navigation } = this.props;
-        navigation.goBack();
-        navigation.state.params.onSelect( { selected: true } );
+        navigation.pop();
+        //  navigation.state.params.onSelect( { selected: true } );
     }
+
+
+
 
 
     render() {

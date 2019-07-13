@@ -263,20 +263,18 @@ export default class HDSegwitWallet extends Bitcoin {
 
   public binarySearchIterationForInternalAddress = async (
     index: number,
-    maxUsedIndex: number = 0,
-    minUnusedIndex: number = 100500100,
-    depth: number = 0,
+    maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
+    minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
+    depth: number = config.BSI.DEPTH.INIT,
   ): Promise<number> => {
-    console.log( { depth } );
-    if ( depth >= 20 ) {
+    if ( depth >= config.BSI.DEPTH.LIMIT ) {
       return maxUsedIndex + 1;
     } // fail
     const txs = await this.fetchTransactionsByAddresses( [
       this.getInternalAddressByIndex( index ),
     ] );
-    console.log( txs );
+
     if ( txs.transactions.totalTransactions === 0 ) {
-      console.log( { index } );
       if ( index === 0 ) {
         return 0;
       }
@@ -304,12 +302,11 @@ export default class HDSegwitWallet extends Bitcoin {
 
   public binarySearchIterationForExternalAddress = async (
     index: number,
-    maxUsedIndex: number = 0,
-    minUnusedIndex: number = 100500100,
-    depth: number = 0,
+    maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
+    minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
+    depth: number = config.BSI.DEPTH.INIT,
   ): Promise<number> => {
-    console.log( { depth } );
-    if ( depth >= 20 ) {
+    if ( depth >= config.BSI.DEPTH.LIMIT ) {
       return maxUsedIndex + 1;
     } // fail
 
@@ -318,7 +315,6 @@ export default class HDSegwitWallet extends Bitcoin {
     ] );
 
     if ( txs.transactions.totalTransactions === 0 ) {
-      console.log( { index } );
       if ( index === 0 ) {
         return 0;
       }
@@ -351,12 +347,12 @@ export default class HDSegwitWallet extends Bitcoin {
     try {
       console.log( "Executing internal binary search" );
       this.nextFreeChangeAddressIndex = await this.binarySearchIterationForInternalAddress(
-        100,
+        config.BSI.INIT_INDEX,
       );
 
       console.log( "Executing external binary search" );
       this.nextFreeAddressIndex = await this.binarySearchIterationForExternalAddress(
-        100,
+        config.BSI.INIT_INDEX,
       );
 
       this.usedAddresses = [];
@@ -368,7 +364,6 @@ export default class HDSegwitWallet extends Bitcoin {
         this.usedAddresses.push( this.getInternalAddressByIndex( itr ) );
       }
 
-      console.log( this.usedAddresses );
       const { balance, unconfirmedBalance } = await this.getBalanceByAddresses(
         this.usedAddresses,
       );
@@ -380,10 +375,12 @@ export default class HDSegwitWallet extends Bitcoin {
 
   public fetchUtxo = async () => {
     try {
+      console.log( "USED ADDRESSES:", this.usedAddresses );
       if ( this.usedAddresses.length === 0 ) {
         // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
         await this.fetchBalance();
       }
+      console.log( "USED ADDRESSES:", this.usedAddresses );
 
       // let addresses = this.usedAddresses.join("|");
       // addresses +=
