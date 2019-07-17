@@ -55,7 +55,8 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
-//TODO: Bitcoin Files
+//TODO: Bitcoin Class
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 //TODO: Common Funciton
@@ -129,16 +130,17 @@ export default class OTPBackupShareStore extends Component {
         let urlScript = {};
         urlScript.walletName = script.wn;
         urlScript.data = script.key;
-        const sss = await utils.getS3ServiceObject();
+        const sss = await bitcoinClassState.getS3ServiceClassState();
         let resDecryptViaOTP = await S3Service.decryptViaOTP( script.key, enterOtp );
         console.log( { resDecryptViaOTP } );
         if ( resDecryptViaOTP.status == 200 ) {
             const resDownloadShare = await S3Service.downloadShare( resDecryptViaOTP.data.decryptedData );
             console.log( { resDownloadShare } );
             if ( resDownloadShare.status == 200 ) {
-                let regularAccount = await utils.getRegularAccountObject();
+                let regularAccount = await bitcoinClassState.getRegularClassState();
                 var resGetWalletId = await regularAccount.getWalletId();
                 if ( resGetWalletId.status == 200 ) {
+                    await bitcoinClassState.setRegularClassState( regularAccount );
                     resGetWalletId = resGetWalletId.data;
                 } else {
                     alert.simpleOk( "Oops", resGetWalletId.err );
@@ -154,6 +156,7 @@ export default class OTPBackupShareStore extends Component {
                     const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
                     console.log( { resUpdateHealth } );
                     if ( resUpdateHealth.status == 200 ) {
+                        await bitcoinClassState.setS3ServiceClassState( sss );
                         const resTrustedParty = await dbOpration.insertTrustedPartyDetailWithoutAssociate(
                             localDB.tableName.tblTrustedPartySSSDetails,
                             dateTime,

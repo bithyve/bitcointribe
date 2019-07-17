@@ -42,7 +42,8 @@ import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants"
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
-//TODO: Bitcoin Files
+//TODO: Bitcoin class
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 export default class TrustedPartySelfShareQRCode extends React.Component<any, any> {
@@ -59,12 +60,13 @@ export default class TrustedPartySelfShareQRCode extends React.Component<any, an
         console.log( { data } );
         let decryptedMetaShare = JSON.parse( data.resSharedSecretList.decrShare );
         console.log( { decryptedMetaShare } );
-        const sss = await utils.getS3ServiceObject();
+        const sss = await bitcoinClassState.getS3ServiceClassState();
         var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare( decryptedMetaShare );
         if ( resGenerateEncryptedMetaShare.status == 200 ) {
             resGenerateEncryptedMetaShare = resGenerateEncryptedMetaShare.data;
             let resUploadShare = await sss.uploadShare( resGenerateEncryptedMetaShare.encryptedMetaShare, resGenerateEncryptedMetaShare.messageId );
             if ( resUploadShare.status != 200 ) {
+                await bitcoinClassState.setS3ServiceClassState( sss );
                 alert.simpleOk( "Oops", resUploadShare.err );
             } else {
                 this.setState( {

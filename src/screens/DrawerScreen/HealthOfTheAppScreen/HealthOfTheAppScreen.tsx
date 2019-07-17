@@ -186,7 +186,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             for ( let i = 0; i <= 1; i++ ) {
                 let keeperInfo = JSON.parse( sssDetails[ i ].keeperInfo );
                 let data = {};
-                data.encryptedMetaShare = JSON.parse( sssDetails[ i ].encryptedMetaShare );
+                data.decryptedShare = JSON.parse( sssDetails[ i ].decryptedShare );
                 data.emailAddresses = keeperInfo.emailAddresses;
                 data.phoneNumbers = keeperInfo.phoneNumbers;
                 data.history = JSON.parse( sssDetails[ i ].history );
@@ -562,7 +562,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         let sssDetails = await utils.getSSSDetails();
         console.log( { sssDetails } );
         let data3Share = sssDetails[ 2 ];
-        var email4shareFilePath = sssDetails[ 3 ].encryptedMetaShare;
+        var email4shareFilePath = sssDetails[ 3 ].decryptedShare;
 
         console.log( { email4shareFilePath } );
         if ( item.givenName == "Wallet" ) {

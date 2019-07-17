@@ -914,7 +914,7 @@ const insertSSSShareDetails = (
         txn.executeSql(
           "INSERT INTO " +
           tblName +
-          "(dateCreated,share,shareId,keeperInfo,recordId,history,encryptedMetaShare,shareStage,lastSuccessfulCheck,type) VALUES (:dateCreated,:share,:shareId,:keeperInfo,:recordId,:history,:encryptedMetaShare,:shareStage,:lastSuccessfulCheck,:type)",
+          "(dateCreated,share,shareId,keeperInfo,recordId,history,decryptedShare,shareStage,lastSuccessfulCheck,type) VALUES (:dateCreated,:share,:shareId,:keeperInfo,:recordId,:history,:decryptedShare,:shareStage,:lastSuccessfulCheck,:type)",
           [
             utils.encrypt(
               temp.date.toString(),

@@ -14,7 +14,7 @@
 @implementation PdfPassword
 
 RCT_EXPORT_MODULE();
-
+  
 
 -(NSString*)applicationDocumentDirectory{
   //  return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
