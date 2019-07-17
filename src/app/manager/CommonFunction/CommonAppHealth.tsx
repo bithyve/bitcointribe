@@ -13,6 +13,9 @@ let alert = new AlertSimple();
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
+//TODO: Bitcoin Class
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
+
 //TODO: func connection_AppHealthStatus (WalletScreen,TrustedContactScreen)
 const connection_AppHealthStatus = async ( qatime: number, sharesId: any ) => {
     console.log( { qatime, sharesId } );
@@ -24,9 +27,10 @@ const connection_AppHealthStatus = async ( qatime: number, sharesId: any ) => {
     console.log( { temp } );
 
     const dateTime = Date.now();
-    const sss = await utils.getS3ServiceObject();
+    const sss = await bitcoinClassState.getS3ServiceClassState();
     var resCheckHealth = await sss.checkHealth( temp );
     if ( resCheckHealth.status == 200 ) {
+        await bitcoinClassState.setS3ServiceClassState( sss );
         resCheckHealth = resCheckHealth.data.lastUpdateds;
     } else {
         alert.simpleOk( "Oops", resCheckHealth.err );
@@ -60,13 +64,14 @@ const connection_AppHealthStatus = async ( qatime: number, sharesId: any ) => {
 const connection_AppHealthAndSSSUpdate = async ( qatime: number, sharesId: any ) => {
     // console.log( { qatime, sharesId } );
     sharesId = sharesId.slice( 0, 3 );
-    const sss = await utils.getS3ServiceObject();
+    const sss = await bitcoinClassState.getS3ServiceClassState();
     console.log( { sss } );
     const dateTime = Date.now();
     console.log( { sharesId } );
     var resCheckHealth = await sss.checkHealth( sharesId );
     console.log( { resCheckHealth } );
     if ( resCheckHealth.status == 200 ) {
+        await bitcoinClassState.setS3ServiceClassState( sss );
         resCheckHealth = resCheckHealth.data.lastUpdateds;
     } else {
         alert.simpleOk( "Oops", resCheckHealth.err );
@@ -119,10 +124,11 @@ const connection_AppHealthForAllShare = async ( qatime: number, shares: any ) =>
     let sortFirstSharedId = arr_ShareId.slice( 0, 3 );
     let sortShare = shares.slice( 3, 5 );
     console.log( { sortFirstSharedId, sortShare } );
-    const sss = await utils.getS3ServiceObject();
+    const sss = await bitcoinClassState.getS3ServiceClassState();
     const dateTime = Date.now();
     var resCheckHealth = await sss.checkHealth( sortFirstSharedId );
     if ( resCheckHealth.status == 200 ) {
+        await bitcoinClassState.setS3ServiceClassState( sss );
         resCheckHealth = resCheckHealth.data.lastUpdateds;
     } else {
         alert.simpleOk( "Oops", resCheckHealth.err );

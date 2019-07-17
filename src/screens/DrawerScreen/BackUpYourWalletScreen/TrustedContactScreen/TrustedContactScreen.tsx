@@ -56,7 +56,8 @@ var utils = require( "HexaWallet/src/app/constants/Utils" );
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
-//TODO: Bitcoin Files
+//TODO: Bitcoin Class
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 export default class TrustedContactScreen extends React.Component<any, any> {
@@ -128,9 +129,9 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         let flag_Loading = true;
         let data = this.props.navigation.getParam( "data" );
         console.log( { data } );
-        let encryptedMetaShare = data.encryptedMetaShare;
-        const sss = await utils.getS3ServiceObject();
-        var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare( data.encryptedMetaShare.metaShare );
+        let encryptedMetaShare = data.decryptedShare;
+        const sss = await bitcoinClassState.getS3ServiceClassState();
+        var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare( data.decryptedShare );
         if ( resGenerateEncryptedMetaShare.status == 200 ) {
             resGenerateEncryptedMetaShare = resGenerateEncryptedMetaShare.data;
         } else {
@@ -141,6 +142,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             const resUploadShare = await sss.uploadShare( resGenerateEncryptedMetaShare.encryptedMetaShare, resGenerateEncryptedMetaShare.messageId );
             console.log( { resUploadShare } );
             if ( resUploadShare.status == 200 ) {
+                await bitcoinClassState.setS3ServiceClassState( sss );
                 this.setState( {
                     arr_EncryptedMetaShare: resGenerateEncryptedMetaShare,
                     messageId: resGenerateEncryptedMetaShare.messageId,
@@ -291,9 +293,11 @@ export default class TrustedContactScreen extends React.Component<any, any> {
     //TODO: share option click
     click_SentRequest( type: string, item: any ) {
         if ( type == "SMS" ) {
-            this.click_SentURLSmsOrEmail( "SMS", item[ 0 ].number );
+            item = item.length != 0 ? item[ 0 ].number : ""
+            this.click_SentURLSmsOrEmail( "SMS", item );
         } else if ( type == "EMAIL" ) {
-            this.click_SentURLSmsOrEmail( "EMAIL", item[ 0 ].email );
+            item = item.length != 0 ? item[ 0 ].email : ""
+            this.click_SentURLSmsOrEmail( "EMAIL", item );
         } else {
             let { arr_EncryptedMetaShare } = this.state;
             this.props.navigation.push( "ShareSecretViaQRScreen", { data: arr_EncryptedMetaShare, onSelect: this.onSelect } );

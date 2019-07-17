@@ -51,6 +51,7 @@ var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
 //TODO: Bitcoin Files
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
@@ -197,17 +198,19 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         let priority = this.getPriority( tranPrio );
         console.log( { arr_SelectAccountDetails } );
         let walletDetails = await utils.getWalletDetails();
-        let regularAccount = await utils.getRegularAccountObject();
-        let secureAccount = await utils.getSecureAccountObject();
+        let regularAccount = await bitcoinClassState.getRegularClassState();
+        let secureAccount = await bitcoinClassState.getSecureClassState();
         // let regularAccount = new RegularAccount( walletDetails.mnemonic );
         var resTransferST;
         let data = {};
         if ( arr_SelectAccountDetails.accountType == "Regular Account" ) {
             //console.log( { address, amountFloat, priority } );
             resTransferST = await regularAccount.transferST1( address, amountFloat, priority );
+            await bitcoinClassState.setRegularClassState( regularAccount );
             console.log( { resTransferST } );
         } else {
             resTransferST = await secureAccount.transferST1( address, amountFloat, priority );
+            await bitcoinClassState.setSecureClassState( secureAccount );
             console.log( { resTransferST } );
         }
         if ( resTransferST.status == 200 ) {

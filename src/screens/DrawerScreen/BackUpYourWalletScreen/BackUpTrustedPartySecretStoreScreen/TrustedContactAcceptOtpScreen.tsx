@@ -58,7 +58,8 @@ let alert = new AlertSimple();
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
-//TODO: Bitcoin Files
+//TODO: Bitcoin Class
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 
@@ -138,10 +139,11 @@ export default class TrustedContactAcceptOtpScreen extends Component {
         }
         console.log( { resDownShare } );
         let walletDetails = utils.getWalletDetails();
-        const sss = await utils.getS3ServiceObject();
-        let regularAccount = await utils.getRegularAccountObject();
+        const sss = await bitcoinClassState.getS3ServiceClassState();
+        let regularAccount = await bitcoinClassState.getRegularClassState();
         var resGetWalletId = await regularAccount.getWalletId();
         if ( resGetWalletId.status == 200 ) {
+            await bitcoinClassState.setRegularClassState( regularAccount );
             resGetWalletId = resGetWalletId.data;
         } else {
             alert.simpleOk( "Oops", resGetWalletId.err );
@@ -157,6 +159,7 @@ export default class TrustedContactAcceptOtpScreen extends Component {
             console.log( { resDecryptEncMetaShare } );
             const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
             if ( resUpdateHealth.status == 200 ) {
+                await bitcoinClassState.setS3ServiceClassState( sss );
                 const resTrustedParty = await dbOpration.insertTrustedPartyDetails(
                     localDB.tableName.tblTrustedPartySSSDetails,
                     dateTime,

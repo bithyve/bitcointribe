@@ -225,7 +225,7 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );
         if ( type == "SMS" ) {
-            let number = data.phoneNumbers[ 0 ].number
+            let number = data.phoneNumbers.length != 0 ? data.phoneNumbers[ 0 ].number : ""
             SendSMS.send( {
                 body: 'https://prime-sign-230407.appspot.com/sss/rtb/' + encpScript,
                 recipients: [ number ],
@@ -256,7 +256,7 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
                 }
             } );
         } else if ( type == "EMAIL" ) {
-            let email = data.emailAddresses[ 0 ].email;
+            let email = data.emailAddresses.length != 0 ? data.emailAddresses[ 0 ].email : "";
             if ( Platform.OS == "android" ) {
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Restore',

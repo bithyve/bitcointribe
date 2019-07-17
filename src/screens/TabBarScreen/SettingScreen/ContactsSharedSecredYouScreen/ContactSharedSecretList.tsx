@@ -43,7 +43,8 @@ var utils = require( "HexaWallet/src/app/constants/Utils" );
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
-//TODO: Bitcoin Files
+//TODO: Bitcoin class
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 export default class ContactSharedSecretList extends React.Component<any, any> {
@@ -182,7 +183,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             msg_Loading: "Key genreating"
         } );
         let flag_Loading = true;
-        const sss = await utils.getS3ServiceObject();
+        const sss = await bitcoinClassState.getS3ServiceClassState();
         var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare( JSON.parse( data.resSharedSecretList.decrShare ) );
         if ( resGenerateEncryptedMetaShare.status == 200 ) {
             resGenerateEncryptedMetaShare = resGenerateEncryptedMetaShare.data;
@@ -194,6 +195,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             const resUploadShare = await sss.uploadShare( resGenerateEncryptedMetaShare.encryptedMetaShare, resGenerateEncryptedMetaShare.messageId );
             console.log( { resUploadShare } );
             if ( resUploadShare.status == 200 ) {
+                await bitcoinClassState.setS3ServiceClassState( sss );
                 this.setState( {
                     arr_EncryptedMetaShare: resGenerateEncryptedMetaShare,
                     messageId: resGenerateEncryptedMetaShare.messageId,
@@ -232,32 +234,6 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                 arr_ItemSeleted: item
             } )
             // this.refs.modal4.open();
-        }
-    }
-
-
-    //TODO: Generate Message Id
-    getMessageId = async ( metaData: any ) => {
-        this.setState( {
-            flag_Loading: true
-        } );
-        //    console.log( { metaData } );
-        let walletDetails = utils.getWalletDetails();
-        //      console.log( { walletDetails } );
-        const sss = new S3Service(
-            walletDetails.mnemonic
-        );
-        //        console.log( { sss } );
-        const { share, otp } = sss.createTransferShare( metaData );
-        //  console.log( { share, otp } );
-        const { messageId, success } = await sss.uploadShare( share );
-
-        if ( messageId != "" || messageId != null ) {
-            this.setState( {
-                messageId,
-                otp,
-                flag_Loading: false
-            } );
         }
     }
 
