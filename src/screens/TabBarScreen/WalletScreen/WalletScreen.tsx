@@ -91,6 +91,7 @@ const SLIDER_1_FIRST_ITEM = 0;
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 //TODO: Bitcoin files
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 
@@ -324,16 +325,14 @@ export default class WalletScreen extends React.Component {
       urlScript.walletName = urlScriptDetails.wn;
       urlScript.data = urlScriptDetails.data
       let walletDetails = utils.getWalletDetails();
-      const sss = await utils.getS3ServiceObject();
-
-
-
+      const sss = await bitcoinClassState.getS3ServiceClassState();
       let resDownlaodShare = await S3Service.downloadShare( urlScriptDetails.data );
       console.log( { resDownlaodShare } );
       if ( resDownlaodShare.status == 200 ) {
-        let regularAccount = await utils.getRegularAccountObject();
+        let regularAccount = await bitcoinClassState.getRegularClassState();
         var resGetWalletId = await regularAccount.getWalletId();
         if ( resGetWalletId.status == 200 ) {
+          await bitcoinClassState.setRegularClassState( regularAccount );
           resGetWalletId = resGetWalletId.data;
         } else {
           alert.simpleOk( "Oops", resGetWalletId.err );
@@ -348,6 +347,7 @@ export default class WalletScreen extends React.Component {
           console.log( { resDecryptEncMetaShare } );
           const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
           if ( resUpdateHealth.status == 200 ) {
+            await bitcoinClassState.setS3ServiceClassState( sss );
             const resTrustedParty = await dbOpration.insertTrustedPartyDetailWithoutAssociate(
               localDB.tableName.tblTrustedPartySSSDetails,
               dateTime,
@@ -398,13 +398,14 @@ export default class WalletScreen extends React.Component {
     urlScript.walletName = urlScriptDetails.wn;
     urlScript.data = urlScriptDetails.data
     console.log( { urlScript } );
-    const sss = await utils.getS3ServiceObject();
+    const sss = await bitcoinClassState.getS3ServiceClassState();
     let resDownlaodShare = await S3Service.downloadShare( urlScriptDetails.data );
     console.log( { resDownlaodShare } );
     if ( resDownlaodShare.status == 200 ) {
-      let regularAccount = await utils.getRegularAccountObject();
+      let regularAccount = await bitcoinClassState.getRegularClassState();
       var resGetWalletId = await regularAccount.getWalletId();
       if ( resGetWalletId.status == 200 ) {
+        await bitcoinClassState.setRegularClassState( regularAccount );
         resGetWalletId = resGetWalletId.data;
       } else {
         alert.simpleOk( "Oops", resGetWalletId.err );
@@ -419,6 +420,7 @@ export default class WalletScreen extends React.Component {
         console.log( { resDecryptEncMetaShare } );
         const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
         if ( resUpdateHealth.status == 200 ) {
+          await bitcoinClassState.setS3ServiceClassState( sss );
           const resTrustedParty = await dbOpration.insertTrustedPartyDetailSelfShare(
             localDB.tableName.tblTrustedPartySSSDetails,
             dateTime,
@@ -462,13 +464,15 @@ export default class WalletScreen extends React.Component {
     var resAccount = await comFunDBRead.readTblAccount();
     console.log( { resAccount } );
 
-    let regularAccount = await utils.getRegularAccountObject();
-    let secureAccount = await utils.getSecureAccountObject();
+    let regularAccount = await bitcoinClassState.getRegularClassState();
     console.log( { regularAccount } );
-
+    let secureAccount = await bitcoinClassState.getSecureClassState();
+    console.log( { secureAccount } );
     //Get Regular Account Bal
     var getBalR = await regularAccount.getBalance();
+    console.log( { getBalR } );
     if ( getBalR.status == 200 ) {
+      await bitcoinClassState.setRegularClassState( regularAccount );
       getBalR = getBalR.data;
     } else {
       alert.simpleOk( "Oops", getBalR.err );
@@ -477,24 +481,26 @@ export default class WalletScreen extends React.Component {
     const resUpdateAccountBalR = await dbOpration.updateAccountBalAddressWise(
       localDB.tableName.tblAccount,
       resAccount[ 0 ].address,
-      getBalR.balance / 1e8
-    );
-
+      getBalR.balance != 0 ? getBalR.balance / 1e8 : "0.0"
+    );   
     //Get Secure Account Bal
     let resUpdateAccountBalS;
     if ( resAccount[ 1 ].address != "" ) {
       var getBalS = await secureAccount.getBalance();
+      console.log( { getBalS } );
       if ( getBalS.status == 200 ) {
-        getBalR = getBalS.data;
+        await bitcoinClassState.setSecureClassState( secureAccount );
+        getBalS = getBalS.data;
+        resUpdateAccountBalS = await dbOpration.updateAccountBalAddressWise(
+          localDB.tableName.tblAccount,
+          resAccount[ 1 ].address,
+          getBalS.balance != 0 ? getBalS.balance / 1e8 : "0.0"
+        );
       } else {
         alert.simpleOk( "Oops", getBalS.err );
       }
-      resUpdateAccountBalS = await dbOpration.updateAccountBalAddressWise(
-        localDB.tableName.tblAccount,
-        resAccount[ 1 ].address,
-        getBalS.balance / 1e8
-      );
     }
+    console.log( { bal: getBalS.balance / 1e8 } );
 
     if ( resUpdateAccountBalR ) {
       this.setState( {

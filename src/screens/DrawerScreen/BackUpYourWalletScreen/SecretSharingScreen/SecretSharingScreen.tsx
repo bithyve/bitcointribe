@@ -120,7 +120,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                 console.log( { data: data[ i ] } );
                 let jsondata = JSON.parse( data[ i ].keeperInfo );
                 jsondata.history = JSON.parse( data[ i ].history );
-                jsondata.encryptedMetaShare = JSON.parse( data[ i ].encryptedMetaShare );
+                jsondata.decryptedShare = JSON.parse( data[ i ].decryptedShare );
                 let sharedDate = parseInt( data[ i ].sharedDate );
                 var startDate = new Date( dateTime );
                 var endDate = new Date( sharedDate );

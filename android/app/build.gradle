@@ -101,21 +101,16 @@ def enableProguardInReleaseBuilds = false
     
    
 android {  
-    // compileSdkVersion rootProject.ext.compileSdkVersion
-    // buildToolsVersion rootProject.ext.buildToolsVersion
-  
-    compileSdkVersion 28
-    buildToolsVersion "28.0.0"       
-      
-    defaultConfig {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion    
+         
+    defaultConfig {  
          //multiDexEnabled true //Add this 
-        applicationId "com.hexawallet"
-        //minSdkVersion rootProject.ext.minSdkVersion
-        //targetSdkVersion rootProject.ext.targetSdkVersion
-        minSdkVersion 16   
-        targetSdkVersion 28       
+        applicationId "com.hexawallet"  
+         minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion         
         versionCode 1                     
-        versionName "1.0.0.030719"            
+        versionName "1.0.0.170719"                
         missingDimensionStrategy 'react-native-camera', 'general'   
         ndk {     
             abiFilters "armeabi-v7a", "x86"
@@ -125,8 +120,7 @@ android {
 
        dexOptions {
       jumboMode = true
-  }   
-
+  }       
  
 
      packagingOptions {
@@ -177,9 +171,8 @@ keyAlias "hexawallet"
     
 
 configurations.all {
-     resolutionStrategy {
+     resolutionStrategy {  
         force 'org.webkit:android-jsc:r236355'
-        force 'com.android.support:support-v4:27.1.0'
  } 
    
 } 
@@ -187,18 +180,41 @@ configurations.all {
 
  
 
-dependencies {           
+dependencies {              
     compile project(':react-native-fetch-blob')  
     compile project(':react-native-pdf-lib')
     compile project(':react-native-mail')
     compile project(':react-native-sms')
     compile project(':react-native-contacts')
     compile project(':react-native-webview')
-    compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
     transitive = true;
-    }                     
+    }           
     implementation 'com.android.support:multidex:1.0.3'
-    compile project(':react-native-sqlite-storage')
+    // new lib added  
+    implementation("androidx.arch.core:core-common:2.0.0")
+    implementation("androidx.lifecycle:lifecycle-common:2.0.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.0.0")
+    implementation("com.facebook.infer.annotation:infer-annotation:0.17.0")
+    implementation("androidx.interpolator:interpolator:1.0.0")  
+    implementation("androidx.print:print:1.0.0")
+    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.0.0")
+     implementation("androidx.documentfile:documentfile:1.0.0")
+     implementation("androidx.cursoradapter:cursoradapter:1.0.0")
+     implementation("androidx.collection:collection:1.0.0")
+      implementation("com.google.zxing:core:3.3.3")
+      implementation("androidx.versionedparcelable:versionedparcelable:1.0.0")
+      implementation("androidx.drawerlayout:drawerlayout:1.0.0")  
+      implementation("androidx.arch.core:core-runtime:2.0.0")  
+      implementation("androidx.asynclayoutinflater:asynclayoutinflater:1.0.0")
+       implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
+       implementation("androidx.slidingpanelayout:slidingpanelayout:1.0.0")
+       implementation("androidx.coordinatorlayout:coordinatorlayout:1.0.0")
+        implementation("androidx.viewpager:viewpager:1.0.0")  
+        implementation("androidx.loader:loader:1.0.0")   
+         implementation("androidx.legacy:legacy-support-core-utils:1.0.0")
+
+    compile project(':react-native-sqlite-storage')    
     compile project(':react-native-view-shot')  
     compile project(':react-native-vector-icons')   
     compile project(':react-native-udp')
@@ -211,22 +227,17 @@ dependencies {
     compile project(':react-native-os')
     compile project(':react-native-linear-gradient')
     compile project(':react-native-lewin-qrcode')
-   // compile project(':react-native-keychain')
+    compile project(':react-native-keychain')
     compile project(':react-native-inappbrowser-reborn')
     compile project(':react-native-image-picker')
     compile project(':react-native-i18n')
     compile project(':react-native-gesture-handler')
-    compile project(':react-native-fs')
+    compile project(':react-native-fs')  
     compile project(':react-native-device-info')  
     compile project(':react-native-config')    
     compile project(':react-native-camera')  
-    implementation fileTree(dir: "libs", include: ["*.jar"])   
-   implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'com.google.android.gms:play-services-maps:17.0.0'
-    implementation 'com.google.android.gms:play-services-location:17.0.0'
-    implementation 'com.google.firebase:firebase-core:17.0.0'
-    implementation 'com.google.firebase:firebase-messaging:19.0.0'
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules
 }     
   

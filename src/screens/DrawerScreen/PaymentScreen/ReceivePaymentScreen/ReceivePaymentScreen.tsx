@@ -55,7 +55,8 @@ var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
-//TODO: Bitcoin Files
+//TODO: Bitcoin class
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 
 
@@ -114,10 +115,11 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
 
     //get only address qrcode string
     getQrCode = async ( address: any, option?: any ) => {
-        let regularAccount = await utils.getRegularAccountObject();
+        let regularAccount = await await bitcoinClassState.getRegularClassState();
         console.log( regularAccount );
         let resPaymentURI = await regularAccount.getPaymentURI( address, option );
         if ( resPaymentURI.status == 200 ) {
+            await bitcoinClassState.setRegularClassState( regularAccount );
             resPaymentURI = resPaymentURI.data
         } else {
             alert.simpleOk( "Oops", resPaymentURI.err );
@@ -133,7 +135,6 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
         let options = {
             amount
         }
-        let regularAccount = await utils.getRegularAccountObject();
         var getQRCodeString;
         if ( amount != "" ) {
             getQRCodeString = await this.getQrCode( address, options );

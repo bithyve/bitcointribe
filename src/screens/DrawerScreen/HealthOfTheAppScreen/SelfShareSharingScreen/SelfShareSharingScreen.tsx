@@ -119,8 +119,10 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
 
     //TODO: Sharing PDF
     click_ShareEmail( data: any ) {
+        console.log( { data } );
         let { title } = this.state;
-        let email4shareFilePath = data.sssDetails.encryptedMetaShare.split( '"' ).join( "" );
+        let email4shareFilePath = data.sssDetails.decryptedShare.split( '"' ).join( "" );
+        console.log( { email4shareFilePath } );
         if ( title != "Email Share" ) {
             let shareOptions = {
                 title: "For 5 share",
@@ -138,7 +140,6 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                     } );
                 } );
         } else {
-
             console.log( { email4shareFilePath } );
             Mailer.mail( {
                 subject: 'For 4 Share.',

@@ -49,7 +49,8 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
-//TODO: Bitcoin Files
+//TODO: Bitcoin Class
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus";
 
@@ -140,13 +141,14 @@ export default class SelectContactListAssociatePerson extends React.Component<an
         urlScript.walletName = urlScriptDetails.wn;
         urlScript.data = urlScriptDetails.data
         let walletDetails = utils.getWalletDetails();
-        const sss = await utils.getS3ServiceObject();
+        const sss = await bitcoinClassState.getS3ServiceClassState();
         let resDownlaodShare = await S3Service.downloadShare( urlScriptDetails.data );
         console.log( { resDownlaodShare } );
         if ( resDownlaodShare.status == 200 ) {
-            let regularAccount = await utils.getRegularAccountObject();
+            let regularAccount = await bitcoinClassState.getRegularClassState();
             var resGetWalletId = await regularAccount.getWalletId();
             if ( resGetWalletId.status == 200 ) {
+                await bitcoinClassState.setRegularClassState( regularAccount );
                 resGetWalletId = resGetWalletId.data;
             } else {
                 alert.simpleOk( "Oops", resGetWalletId.err );
@@ -161,6 +163,7 @@ export default class SelectContactListAssociatePerson extends React.Component<an
                 console.log( { resDecryptEncMetaShare } );
                 const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
                 if ( resUpdateHealth.status == 200 ) {
+                    await bitcoinClassState.setS3ServiceClassState( sss );
                     const resTrustedParty = await dbOpration.insertTrustedPartyDetails(
                         localDB.tableName.tblTrustedPartySSSDetails,
                         dateTime,

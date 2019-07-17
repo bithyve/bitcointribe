@@ -59,8 +59,10 @@ import Singleton from "HexaWallet/src/app/constants/Singleton";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
 
-//TODO: Bitcoin Files
+//TODO: Bitcoin Class
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+
 var flag_SendPaymentScreen = true;
 export default class QrCodeScannerScreen extends React.Component {
     constructor ( props: any ) {
@@ -111,7 +113,7 @@ export default class QrCodeScannerScreen extends React.Component {
             var result = e.data;
             if ( utils.isJson( result ) ) {
                 result = JSON.parse( result );
-                console.log( { result});
+                console.log( { value: result } );
                 if ( result.type == "SSS Recovery QR" ) {
                     utils.setDeepLinkingType( "SSS Recovery QR" );
                     let deepLinkPara = {};
@@ -130,28 +132,28 @@ export default class QrCodeScannerScreen extends React.Component {
                 } else if ( result.type == "" ) {
                     alert.simpleOk( "Oops", "Invalid qrcode.Please scan correct qrcode." );
                 }
-                else {
-                    let regularAccount = await utils.getRegularAccountObject();
-                    var resAddressDiff = await regularAccount.addressDiff( result );
-                    if ( resAddressDiff.status == 200 ) {
-                        resAddressDiff = resAddressDiff.data;
+            }
+            else {
+                let regularAccount = await bitcoinClassState.getRegularClassState();
+                var resAddressDiff = await regularAccount.addressDiff( result );
+                if ( resAddressDiff.status == 200 ) {
+                    resAddressDiff = resAddressDiff.data;
+                } else {
+                    alert.simpleOk( "Oops", resAddressDiff.err );
+                }
+                if ( resAddressDiff.type == "paymentURI" || resAddressDiff.type == "address" ) {
+                    var resDecPaymentURI = await regularAccount.decodePaymentURI( result );
+                    if ( resDecPaymentURI.status == 200 ) {
+                        await bitcoinClassState.setRegularClassState( regularAccount );
+                        resDecPaymentURI = resDecPaymentURI.data;
                     } else {
-                        alert.simpleOk( "Oops", resAddressDiff.err );
+                        alert.simpleOk( "Oops", resDecPaymentURI.err );
                     }
-                    if ( resAddressDiff.type == "paymentURI" || resAddressDiff.type == "address" ) {
-                        var resDecPaymentURI = await regularAccount.decodePaymentURI( result );
-                        if ( resDecPaymentURI.status == 200 ) {
-                            resDecPaymentURI = resDecPaymentURI.data;
-                        } else {
-                            alert.simpleOk( "Oops", resDecPaymentURI.err );
-                        }
-                        if ( flag_SendPaymentScreen == true ) {
-                            this.props.navigation.push( "SendPaymentNavigator", { data: resDecPaymentURI } );
-                            flag_SendPaymentScreen = false;
-                        }
+                    if ( flag_SendPaymentScreen == true ) {
+                        this.props.navigation.push( "SendPaymentNavigator", { data: resDecPaymentURI } );
+                        flag_SendPaymentScreen = false;
                     }
                 }
-
             }
         } catch ( error ) {
             console.log( error );

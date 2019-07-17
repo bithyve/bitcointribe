@@ -38,6 +38,7 @@ import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 
 //Bitcoin Files
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
 export default class ModelAuto6DigitCode extends Component<Props, any> {
@@ -83,75 +84,112 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
         let setupData = secureAccountDetails.setupData;
         console.log( { secureAccountDetails, setupData } );
         // const secureAccount = new SecureAccount( resultWallet.mnemonic );
-        let secureAccount = await utils.getSecureAccountObject();
-        let sss = await utils.getS3ServiceObject();
+        let secureAccount = await bitcoinClassState.getSecureClassState();
+        let sss = await bitcoinClassState.getS3ServiceClassState();
         console.log( { secureAccount } );
         let sssDetails = await utils.getSSSDetails();
         let encryptedStaticNonPMDD;
+        console.log( { sssDetails } );
         for ( let i = 0; i < sssDetails.length; i++ ) {
             let data = sssDetails[ i ];
             if ( data.decryptedShare != "" ) {
-                let decryptedShareJson = JSON.parse( data.decryptedShare );
-                encryptedStaticNonPMDD = decryptedShareJson.encryptedStaticNonPMDD;
+                if ( data.type == "Self Share 1" || data.type == "Self Share 2" || data.type == "Self Share 3" ) {
+                    let decryptedShareJson = JSON.parse( data.decryptedShare );
+                    encryptedStaticNonPMDD = decryptedShareJson.encryptedStaticNonPMDD;
+                    break;
+                }
             }
         }
-
         let resIsActive = await secureAccount.isActive()
         if ( resIsActive.status == 200 ) {
             resIsActive = resIsActive.data.isActive;
             if ( resIsActive ) {
-
+                var address = await secureAccount.getAddress();
+                if ( address.status == 200 ) {
+                    await bitcoinClassState.setSecureClassState( secureAccount );
+                    address = address.data.address
+                } else {
+                    alert.simpleOk( "Oops", address.err );
+                }
+                const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
+                    localDB.tableName.tblAccount,
+                    address,
+                    "0.0",
+                    secureAccountDetails.id
+                );
+                // let decryptedShare = [
+                //     { shareId: "0", updatedAt: 0 },
+                //     { shareId: "0", updatedAt: 0 },
+                //     { shareId: "0", updatedAt: 0 }
+                // ];  
+                // await comAppHealth.connection_AppHealthStatusSecureAccountBackup( resultWallet.lastUpdated, dateTime, decryptedShare, resultWallet.mnemonic );
+                this.setState( {
+                    flag_Loading: false
+                } )
+                if ( resUpdateSSSRetoreDecryptedShare ) {
+                    await bitcoinClassState.setS3ServiceClassState( sss );
+                    setTimeout( () => {
+                        this.props.click_Next();
+                    }, 100 );
+                } else {
+                    Alert.alert( "Secure account db not update!" )
+                }
             } else {
                 var resDecryptStaticNonPMDD = await sss.decryptStaticNonPMDD( encryptedStaticNonPMDD );
-                var resValidateSecureAccountSetup = await secureAccount.validateSecureAccountSetup( code, setupData.setupData.secret, setupData.setupData.xIndex );
+                if ( resDecryptStaticNonPMDD.status == 200 ) {
+                    resDecryptStaticNonPMDD = resDecryptStaticNonPMDD.data;
+                } else {
+                    alert.simpleOk( "Oops", resDecryptStaticNonPMDD.err );
+                }
+                var resValidateSecureAccountSetup = await secureAccount.validateSecureAccountSetup( code, resDecryptStaticNonPMDD.decryptedStaticNonPMDD.twoFASecret, resDecryptStaticNonPMDD.decryptedStaticNonPMDD.xIndex );
+                if ( resValidateSecureAccountSetup.status == 200 ) {
+                    resValidateSecureAccountSetup = resValidateSecureAccountSetup.data;
+                    if ( resValidateSecureAccountSetup.setupSuccessful ) {
+
+                        var address = await secureAccount.getAddress();
+                        if ( address.status == 200 ) {
+                            await bitcoinClassState.setSecureClassState( secureAccount );
+                            address = address.data.address
+                        } else {
+                            alert.simpleOk( "Oops", address.err );
+                        }
+                        const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
+                            localDB.tableName.tblAccount,
+                            address,
+                            "0.0",
+                            secureAccountDetails.id
+                        );
+                        // let decryptedShare = [
+                        //     { shareId: "0", updatedAt: 0 },
+                        //     { shareId: "0", updatedAt: 0 },
+                        //     { shareId: "0", updatedAt: 0 }
+                        // ];  
+                        // await comAppHealth.connection_AppHealthStatusSecureAccountBackup( resultWallet.lastUpdated, dateTime, decryptedShare, resultWallet.mnemonic );
+                        this.setState( {
+                            flag_Loading: false
+                        } )
+                        if ( resUpdateSSSRetoreDecryptedShare ) {
+                            await bitcoinClassState.setS3ServiceClassState( sss );
+                            setTimeout( () => {
+                                this.props.click_Next();
+                            }, 100 );
+                        } else {
+                            Alert.alert( "Secure account db not update!" )
+                        }
+                    }
+                } else {
+                    alert.simpleOk( "Oops", resValidateSecureAccountSetup.err );
+                }
+
             }
         } else {
             alert.simpleOk( "Oops", resIsActive.err );
         }
 
 
-        if ( resValidateSecureAccountSetup.status == 200 ) {
-            resValidateSecureAccountSetup = resValidateSecureAccountSetup.data;
-        } else {
-            alert.simpleOk( "Oops", resValidateSecureAccountSetup.err );
-        }
-        console.log( { resValidateSecureAccountSetup } );
-        if ( resValidateSecureAccountSetup.setupSuccessful ) {
-            var address = await secureAccount.getAddress();
-            if ( address.status == 200 ) {
-                address = address.data.address
-            } else {
-                alert.simpleOk( "Oops", address.err );
-            }
-            var balance = await secureAccount.getBalance();
-            if ( balance.status == 200 ) {
-                balance = balance.data;
-            } else {
-                alert.simpleOk( "Oops", balance.err );
-            }
-            const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
-                localDB.tableName.tblAccount,
-                address,
-                balance.balance / 1e8,
-                secureAccountDetails.id
-            );
-            // let decryptedShare = [
-            //     { shareId: "0", updatedAt: 0 },
-            //     { shareId: "0", updatedAt: 0 },
-            //     { shareId: "0", updatedAt: 0 }
-            // ];
-            // await comAppHealth.connection_AppHealthStatusSecureAccountBackup( resultWallet.lastUpdated, dateTime, decryptedShare, resultWallet.mnemonic );
-            this.setState( {
-                flag_Loading: false
-            } )
-            if ( resUpdateSSSRetoreDecryptedShare ) {
-                setTimeout( () => {
-                    this.props.click_Next();
-                }, 100 );
-            } else {
-                Alert.alert( "Secure account db not update!" )
-            }
-        }
+
+
+
     }
 
     render() {

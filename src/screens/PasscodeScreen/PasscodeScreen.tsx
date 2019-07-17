@@ -45,6 +45,7 @@ var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBR
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 //TODO: Bitcoin Files
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
@@ -125,31 +126,6 @@ export default class PasscodeScreen extends Component {
 
   onSuccess = async ( code: string ) => {
     const rootViewController = await AsyncStorage.getItem( asyncStorageKeys.rootViewController );
-    let regularClassObject = await AsyncStorage.getItem( asyncStorageKeys.regularClassObject );
-    let secureClassObject = await AsyncStorage.getItem( asyncStorageKeys.secureClassObject );
-    let setS3ServiceObject = await AsyncStorage.getItem( asyncStorageKeys.s3ServiceClassObject );
-    //console.log( { regularClassObject, secureClassObject, setS3ServiceObject } );
-
-    //regular account      
-    var regularAccount, secureAccount, s3Service;
-    if ( regularClassObject != null ) {
-      regularAccount = RegularAccount.fromJSON( regularClassObject );
-      await utils.setRegularAccountObject( regularAccount );
-    }
-
-    //secure account      
-    if ( secureClassObject != null ) {
-      secureAccount = SecureAccount.fromJSON( secureClassObject );
-      await utils.setSecureAccountObject( secureAccount );
-    }
-
-    //setS3Service
-    if ( setS3ServiceObject != null ) {
-      console.log( 'calling' );
-
-      s3Service = S3Service.fromJSON( setS3ServiceObject );
-      await utils.setS3ServiceObject( s3Service );
-    }
 
     //Wallet Details Reading
     await comFunDBRead.readTblWallet();
