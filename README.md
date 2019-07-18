@@ -1,19 +1,17 @@
 # Hexa Wallet
 
 Hexa Wallet is a user friendly mobile bitcoin wallet that enables p2p commerce.
-   
+
 ![Hexa Wallet](hexa.png)
-   
+
 There are various types of accounts that are supported in the Hexa Wallet:
 
 1. Savings Account: A savings account is a standard bitcoin wallet optimal for daily use
 2. Secure Account: A secure account is a bitcoin wallet secured by 2FA optimal for storing larger amounts of bitcoin
-3. Vault Account (post R1): A vault account is a bitcoin wallet that is time locked to prevent spending before the due date.
-4. Joint Account (post R1): A joint account is a 2of2 multisig bitcoin wallet.
 
 Hexa requires a pin to unlock and access funds and Accounts are protected by a seed restoration feature which can be used to import wallets from other devices or from an older version of Hexa.
-      
-### Design Considerations       
+
+### Design Considerations
 
 The various design considerations that Hexa chose to undertake are over at [the wiki](https://github.com/thecryptobee/Hexa-Wallet/wiki/Design-Considerations)
 
@@ -25,7 +23,7 @@ The various design considerations that Hexa chose to undertake are over at [the 
 - [React-Native](https://www.npmjs.com/package/react-native)] + [rn-nodeify](https://www.npmjs.com/package/rn-nodeify)
 - [Xcode](https://developer.apple.com/xcode/)
 - iOS Simulator on Xcode
-  
+
 #### Installing hexa
 ```
 git clone https://github.com/thecryptobee/Hexa-Wallet.git
