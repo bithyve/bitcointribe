@@ -75,7 +75,7 @@ const styles = StyleSheet.create( {
         justifyContent: 'center'
     },
     viewModelBody: {
-        flex: utils.getIphoneSize() == "iphone X" ? 0.7 : 0.6,
+        flex: utils.getIphoneSize() == "iphone X" ? 0.8 : 0.7,
         margin: 20,
         padding: 10,
         borderRadius: 10,

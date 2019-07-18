@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Dimensions, Platform } from 'react-native';
+import { Modal, TouchableHighlight, View, Alert, StyleSheet, Dimensions, Platform, AsyncStorage } from 'react-native';
 import {
     Container,
     Header,
@@ -29,28 +29,82 @@ interface Props {
     click_Request: Function
 }
 
+
+//TODO: Custome Pages
+import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+
+
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
+//TODO: Custome Object
+import {
+    colors,
+    images,
+    localDB,
+    asyncStorageKeys
+} from "HexaWallet/src/app/constants/Constants";
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+import utils from "HexaWallet/src/app/constants/Utils";
+
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
+
+//TODO: Bitcoin Files
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
 export default class ModelRestoreWalletFirstQuestion extends Component<Props, any> {
     constructor ( props: any ) {
         super( props )
         this.state = ( {
-            arr_QuestionList: [ {
-                "item": "Name of your first pet?"
-            }, {
-                "item": "Name of your favourite teacher?"
-            }, {
-                "item": "Name of your favourite food?"
-            }, {
-                "item": "Name of your first company?"
-            }, {
-                "item": "Name of your first employee?"
-            }
+            arr_QuestionList: [
+                {
+                    "item": "To what city did you go the first time you flew on a plane?"
+                },
+                {
+                    "item": "What is the first name of the person you first kissed?"
+                },
+                {
+                    "item": "What is the first name of your best friend in high school?"
+                },
+                {
+                    "item": "What is the first name of your oldest nephew?"
+                },
+                {
+                    "item": "What is the first name of your oldest niece?"
+                },
+                {
+                    "item": "What was the first name of your favourite childhood friend?"
+                },
+                {
+                    "item": "What was the last name of your third grade teacher?"
+                },
+                {
+                    "item": "What was the street name where your best friend in high school lived (street name only)?"
+                },
+                {
+                    "item": "In what city or town was your first job?"
+                },
+                {
+                    "item": "What was the last name of your favorite childhood teacher?"
+                },
+                {
+                    "item": "What was the name of the company where you had your first job?"
+                },
+                {
+                    "item": "What was the name of the street where you were living when you were 10 years old?"
+                }
             ],
-            firstQuestion: "Name of your first pet?",
+            firstQuestion: "To what city did you go the first time you flew on a plane?",
             firstAnswer: "",
-            flag_DisableBtnNext: true
+            flag_DisableBtnNext: true,
+            flag_Loading: false
         } );
     }
 
@@ -60,6 +114,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
             firstQuestion: value
         } );
     }
+
     //TODO: func check_CorrectAnswer
     check_CorrectAnswer() {
         setTimeout( () => {
@@ -77,13 +132,178 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
 
     }
 
+    //TODO: get bal and insert accound into local db
+    click_Next = async () => {
+        this.setState( {
+            flag_Loading: true
+        } );
+        let Question = this.state.firstQuestion;
+        let Answer = this.state.firstAnswer
+
+        const dateTime = Date.now();
+        let walletDetail = await utils.getWalletDetails();
+        let sssDetails = await utils.getSSSDetails();
+        console.log( { sssDetails } );
+        let decryptedShare = [];
+        let arr_TableId = [];
+        // let answers = [ temp[ 0 ].firstAnswer, temp[ 1 ].secoundAnswer ];
+        let walletName, encryptedStaticNonPMDD;
+        for ( let i = 0; i < sssDetails.length; i++ ) {
+            let data = sssDetails[ i ];
+            if ( data.decryptedShare != "" ) {
+                let decryptedShareJson = JSON.parse( data.decryptedShare );
+                console.log( { decryptedShareJson } );
+                decryptedShare.push( decryptedShareJson.encryptedShare );
+                walletName = decryptedShareJson.meta.tag;
+                encryptedStaticNonPMDD = decryptedShareJson.encryptedStaticNonPMDD;
+            }
+            arr_TableId.push( data.id );
+        }
+        console.log( { decryptedShare, Answer } );
+        var resMnemonic = await S3Service.recoverFromShares( decryptedShare, Answer );
+        if ( resMnemonic.status == 200 ) {
+            resMnemonic = resMnemonic.data;
+            console.log( { resMnemonic } );
+            let queTemp = [];
+            let questionData = {};
+            questionData.Question = Question;
+            questionData.Answer = Answer;
+            queTemp.push( questionData );
+            let resInsertWallet = await dbOpration.insertWallet(
+                localDB.tableName.tblWallet,
+                dateTime,
+                resMnemonic.mnemonic,
+                "",
+                "",
+                "",
+                walletName,
+                queTemp
+            );
+            await comFunDBRead.readTblWallet();
+            const regularAccount = new RegularAccount(
+                resMnemonic.mnemonic
+            );
+            const sss = new S3Service( resMnemonic.mnemonic );
+            var regularJson = JSON.stringify( regularAccount );
+            AsyncStorage.setItem(
+                asyncStorageKeys.regularClassObject,
+                regularJson
+            );
+            await utils.setRegularAccountObject( regularAccount );
+            //console.log( { secondaryMnemonic } );
+
+            var sssJson = JSON.stringify( sss );
+            AsyncStorage.setItem(
+                asyncStorageKeys.s3ServiceClassObject,
+                sssJson
+            );
+            await utils.setS3ServiceObject( sss );
+            //decryptStaticNonPMDD
+            console.log( { encryptedStaticNonPMDD } );
+            var secureAccount;
+            var resDecryptStaticNonPMDD = await sss.decryptStaticNonPMDD( encryptedStaticNonPMDD );
+            console.log( { resDecryptStaticNonPMDD } );
+
+            if ( resDecryptStaticNonPMDD.status == 200 ) {
+                resDecryptStaticNonPMDD = resDecryptStaticNonPMDD.data.decryptedStaticNonPMDD;
+                secureAccount = new SecureAccount( resMnemonic.mnemonic );
+                var secureJson = JSON.stringify( secureAccount );
+                AsyncStorage.setItem(
+                    asyncStorageKeys.secureClassObject,
+                    secureJson
+                );
+                await utils.setSecureAccountObject( secureAccount );
+                var resImportSecureAccount = await secureAccount.importSecureAccount( resDecryptStaticNonPMDD.secondaryXpub, resDecryptStaticNonPMDD.bhXpub );
+                console.log( { resImportSecureAccount } );
+
+                if ( resImportSecureAccount.status == 200 ) {
+                    resImportSecureAccount = resImportSecureAccount.data;
+                    var getBal = await regularAccount.getBalance();
+                    console.log( { getBal } );
+                    if ( getBal.status == 200 ) {
+                        getBal = getBal.data;
+                    } else {
+                        alert.simpleOk( "Oops", getBal.err );
+                    }
+
+                    var getBalSecure = await secureAccount.getBalance();
+                    console.log( { getBalSecure } );
+                    if ( getBalSecure.status == 200 ) {
+                        getBalSecure = getBalSecure.data;
+                    } else {
+                        alert.simpleOk( "Oops", getBalSecure.err );
+                    }
+                    let resInsertDailyAccount = await dbOpration.insertCreateAccount(
+                        localDB.tableName.tblAccount,
+                        dateTime,
+                        "",
+                        getBal.balance / 1e8,
+                        "BTC",
+                        "Daily Wallet",
+                        "Daily Wallet",
+                        ""
+                    );
+                    let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+                        localDB.tableName.tblAccount,
+                        dateTime,
+                        "",
+                        getBalSecure.balance / 1e8,
+                        "BTC",
+                        "Secure Account",
+                        "Secure Account",
+                        ""
+                    );
+
+                    let arr_SecureDetails = [];
+                    let secureDetails = {};
+                    secureDetails.backupDate = dateTime;
+                    secureDetails.title = "Setup";
+                    secureDetails.addInfo = "";
+                    arr_SecureDetails.push( secureDetails );
+                    let resSecureAccountUpdate = await dbOpration.updateSecureAccountAddInfo(
+                        localDB.tableName.tblAccount,
+                        dateTime,
+                        arr_SecureDetails,
+                        "2"
+                    );
+                    if ( resInsertDailyAccount && resInsertSecureCreateAcc && resSecureAccountUpdate ) {
+                        await comFunDBRead.readTblSSSDetails();
+                        await comFunDBRead.readTblAccount();
+                        this.setState( {
+                            flag_Loading: false
+                        } );
+                        setTimeout( () => {
+                            let data = {};
+                            data.walletName = walletName;
+                            data.balR = getBal.balance / 1e8;
+                            data.balS = getBalSecure.balance / 1e8;
+                            this.props.click_Next( data );
+                            AsyncStorage.setItem(
+                                asyncStorageKeys.rootViewController,
+                                "TabbarBottom"
+                            );
+                        }, 1000 );
+                    }
+                } else {
+                    alert.simpleOk( "Oops", resImportSecureAccount.err );
+                }
+            } else {
+                alert.simpleOk( "Oops", resDecryptStaticNonPMDD.err );
+            }
+            //const res = await comAppHealth.connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact( dateTime, 0, decryptedShare, mnemonic, arr_RecordId );
+            // console.log( { res } );
+        }
+    }
+
+
     render() {
+        //flag 
+        let { flag_Loading } = this.state;
         let flag_DisableBtnNext = this.state.flag_DisableBtnNext;
         let firstQuestion = this.state.firstQuestion;
-        let dataQuestionList = this.props.data.length != 0 ? this.props.data[ 0 ].arr_FirstQuestionList : "temp";
         let arr_QuestionList = this.state.arr_QuestionList != null ? this.state.arr_QuestionList : dataQuestionList;
         const itemList = arr_QuestionList.map( ( item: any, index: number ) => (
-            <Picker.Item label={ item.item } value={ item.item } />
+            <Picker.Item label={ item.item } value={ item.item } style={ { width: 40 } } />
         ) );
         return (
             <Modal
@@ -133,8 +353,9 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                                                 <Right />
                                             </Header> }
                                         mode="dropdown"
-                                        style={ [ globalStyle.ffFiraSansMedium ] }
-                                        iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -40 } } /> }
+                                        style={ [ globalStyle.ffFiraSansMedium, ] }
+                                        textStyle={ { paddingRight: 50 } }
+                                        iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -45, marginRight: 20 } } /> }
                                         selectedValue={ firstQuestion }
                                         onValueChange={ this.onValueChange.bind( this ) }
                                     >
@@ -157,25 +378,14 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                                         onKeyPress={ () =>
                                             this.check_CorrectAnswer()
                                         }
-
                                     />
                                 </Item>
-
-
-
                             </View>
                             <View style={ { flex: 1, justifyContent: "flex-end" } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>In case the answer does not match with the original answer, restoration process will fail</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
-                                        let question = this.state.firstQuestion;
-                                        var arr_QuestionList = this.state.arr_QuestionList;
-                                        for ( var i = 0; i < arr_QuestionList.length; i++ )
-                                            if ( arr_QuestionList[ i ].item === question ) {
-                                                arr_QuestionList.splice( i, 1 );
-                                                break;
-                                            }
-                                        this.props.click_Next( this.state.firstQuestion, this.state.firstAnswer, arr_QuestionList )
+                                        this.click_Next()
                                     }
                                     }
                                     title="Next"
@@ -183,6 +393,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                                     style={ [ flag_DisableBtnNext == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
                                 />
                             </View>
+                            <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
                         </View>
                     </View>
                 </KeyboardAwareScrollView>

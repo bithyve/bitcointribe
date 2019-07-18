@@ -37,7 +37,7 @@ export default class ModelRestoreAssociateContactList extends Component<Props, a
                     onPress: () => console.log( 'Cancel Pressed' ),
                     style: 'cancel',
                 },
-                { text: 'Confirm', onPress: () => this.props.click_Confirm( item.recordId ) },
+                { text: 'Confirm', onPress: () => this.props.click_Confirm( item.id ) },
             ],
             { cancelable: false },
         );
@@ -50,7 +50,7 @@ export default class ModelRestoreAssociateContactList extends Component<Props, a
             <Modal
                 transparent
                 animationType={ 'none' }
-                visible={ this.props.data.length != 0 ? this.props.data[ 0 ].modalVisible : true }
+                visible={ this.props.data.length != 0 ? this.props.data[ 0 ].modalVisible : false }
                 onRequestClose={ () =>
                     this.props.closeModal()
                 }

@@ -25,9 +25,9 @@ import { Avatar, SearchBar } from 'react-native-elements';
 // import QRCode from "react-native-qrcode";
 import QRCode from 'react-native-qrcode-svg';
 
+
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -37,10 +37,13 @@ import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants"
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
+
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
+
 export default class ShareSecretViaQRScreen extends React.Component<any, any> {
+
     constructor ( props: any ) {
         super( props )
         this.state = ( {
@@ -52,19 +55,12 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
 
     async componentWillMount() {
         let walletDetails = utils.getWalletDetails();
-        let resSSSDetails = utils.getSSSDetailsRecordIDWise();
-        console.log( { resSSSDetails, walletDetails } );
-        const sss = new S3Service(
-            walletDetails.mnemonic
-        );
-        const resQRShare = await sss.createQRShare( resSSSDetails.share, walletDetails.walletType );
-        const jsonResQRShare = JSON.parse( resQRShare );
-        // console.log( { resQRShare } );
-        // console.log( { jsonResQRShare } );
+        var data = this.props.navigation.getParam( "data" );
+        console.log( { data } );
         let qrCodeData = {};
-        qrCodeData.type = "SSS Recovery";
+        qrCodeData.type = "SSS Recovery QR";
         qrCodeData.wn = walletDetails.walletType;
-        qrCodeData.data = jsonResQRShare;
+        qrCodeData.data = data.key;
         console.log( { qrCodeData } );
         this.setState( {
             data: JSON.stringify( qrCodeData ).toString()
@@ -76,11 +72,13 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
             data: item
         } );
     }
+
     goBack() {
         const { navigation } = this.props;
         navigation.goBack();
         navigation.state.params.onSelect( { selected: true } );
     }
+
 
     render() {
         return (

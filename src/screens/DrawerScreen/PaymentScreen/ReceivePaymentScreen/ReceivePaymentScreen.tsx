@@ -25,7 +25,7 @@ import QRCode from 'react-native-qrcode-svg';
 import Toast from 'react-native-simple-toast';
 import Share from 'react-native-share';
 import RNFetchBlob from 'react-native-fetch-blob';
-
+var RNFS = require( 'react-native-fs' );
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -55,7 +55,8 @@ var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
-//TODO: Bitcoin Files
+//TODO: Bitcoin class
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 
 
@@ -67,6 +68,7 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
             accountName: "",
             accountAddress: "",
             amount: "",
+            base64string1: "",
             qrcodeAddresWithAmount: "hexa",
             flag_Loading: false,
             flag_LoadingShareBtn: false
@@ -114,10 +116,11 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
 
     //get only address qrcode string
     getQrCode = async ( address: any, option?: any ) => {
-        let regularAccount = await utils.getRegularAccountObject();
+        let regularAccount = await await bitcoinClassState.getRegularClassState();
         console.log( regularAccount );
         let resPaymentURI = await regularAccount.getPaymentURI( address, option );
         if ( resPaymentURI.status == 200 ) {
+            await bitcoinClassState.setRegularClassState( regularAccount );
             resPaymentURI = resPaymentURI.data
         } else {
             alert.simpleOk( "Oops", resPaymentURI.err );
@@ -133,7 +136,6 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
         let options = {
             amount
         }
-        let regularAccount = await utils.getRegularAccountObject();
         var getQRCodeString;
         if ( amount != "" ) {
             getQRCodeString = await this.getQrCode( address, options );
@@ -145,32 +147,48 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
             qrcodeAddresWithAmount: getQRCodeString.paymentURI.toString(),
         } )
     }
+
+    base64string1 = ( base64string1: any ) => {
+        this.setState( {
+            base64string1
+        } );
+    }
     //share qrcode image
     click_ShareQRCode = async () => {
         this.setState( {
             flag_LoadingShareBtn: true
         } )
-        var base64Str;
-        let address = this.state.qrcodeAddresWithAmount;
-        let accountName = this.state.accountName;
-        await RNFetchBlob.fetch( 'GET', "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + address, {
-        } )
-            .then( ( res: any ) => {
-                base64Str = "data:image/png;base64," + res.base64()
-                this.setState( {
-                    flag_LoadingShareBtn: false
+        this.svg1.toDataURL( this.base64string1 );
+        setTimeout( async () => {
+            let qrcodeBase64 = this.state.base64string1;
+            console.log( { qrcodeBase64 } );
+            let accountName = this.state.accountName;
+            var docsDir;
+            if ( Platform.OS == "android" ) {
+                docsDir = await RNFS.ExternalStorageDirectoryPath //;
+            } else {
+                docsDir = await RNFS.DocumentDirectoryPath;
+            }
+            console.log( { docsDir } );
+            docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
+            var path = `${ docsDir }/paymentRequestQRCode.png`;
+            RNFS.writeFile( path, qrcodeBase64, "base64" )
+                .then( ( success: any ) => {
+                    this.setState( {
+                        flag_LoadingShareBtn: false
+                    } )
+                    const shareOptions = {
+                        title: 'Hexa App',
+                        message: "This is " + accountName + " qrcode",
+                        url: path
+                    };
+                    Share.open( shareOptions );
                 } )
-            } )
-            .catch( ( errorMessage: string ) => {
-                Alert.alert( errorMessage )
-            } )
-        //console.log( { base64Str } );
-        const shareOptions = {
-            title: 'Hexa App',
-            message: "This is " + accountName + " qrcode",
-            url: base64Str
-        };
-        Share.open( shareOptions );
+                .catch( ( err: any ) => {
+                    alert.simpleOk( "Oops", err );
+                } )
+        }, 2000 );
+
     }
 
     render() {
@@ -258,6 +276,7 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
                             <View style={ { flex: 1, alignItems: "center" } }>
                                 <QRCode
                                     value={ qrcodeAddresWithAmount }
+                                    getRef={ ( c ) => ( this.svg1 = c ) }
                                     size={ Dimensions.get( 'screen' ).width - 120 }
                                 />
                                 <View style={ { flexDirection: "row", margin: 10 } }>

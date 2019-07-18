@@ -36,6 +36,10 @@ import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGra
 import ModelAcceptOrRejectSecret from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelAcceptOrRejectSecret";
 
 
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
+
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
@@ -45,9 +49,15 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
-//TODO: Bitcoin Files
+//TODO: Bitcoin Class
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus";
+
+
+
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
 export default class SelectContactListAssociatePerson extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -110,91 +120,84 @@ export default class SelectContactListAssociatePerson extends React.Component<an
         );
     }
 
+
+    goBack = () => {
+        utils.setDeepLinkingType( "" );
+        utils.setDeepLinkingUrl( "" );
+        this.props.navigation.navigate( "TabbarBottom" );
+    }
+
     //TODO: Qrcode Scan SSS Details Download Desc Sahre
     downloadDescShare = async () => {
         this.setState( {
             flag_Loading: true
         } );
+        let keeperInfo = this.state.arr_SelectedItem;
+        let flag_Loading = true;
         const dateTime = Date.now();
         let urlScriptDetails = utils.getDeepLinkingUrl();
         //console.log( { urlScriptDetails } );  
-        let urlScriptData = urlScriptDetails.data;
-        console.log( { urlScriptData } );
-        let keeperInfo = this.state.arr_SelectedItem;
         let urlScript = {};
         urlScript.walletName = urlScriptDetails.wn;
+        urlScript.data = urlScriptDetails.data
         let walletDetails = utils.getWalletDetails();
-        const sss = new S3Service(
-            walletDetails.mnemonic
-        );
-        let resShareId = await sss.getShareId( urlScriptData.encryptedShare )
-        console.log( { resShareId } );
-        const { data, updated } = await sss.updateHealth( urlScriptData.meta.walletId, urlScriptData.encryptedShare );
-        if ( updated ) {
-            const resTrustedParty = await dbOpration.insertTrustedPartyDetails(
-                localDB.tableName.tblTrustedPartySSSDetails,
-                dateTime,
-                keeperInfo,
-                urlScript,
-                urlScriptData.encryptedShare,
-                resShareId,
-                urlScriptData,
-                typeof data !== "undefined" ? data : ""
-            );
-            console.log( { resTrustedParty } );
-            this.setState( {
-                flag_Loading: false,
-                arr_ModelAcceptOrRejectSecret: [
-                    {
-                        modalVisible: false,
-                        name: "",
-                        mobileNo: "",
-                        encpShare: ""
-                    }
-                ]
-            } )
-            if ( resTrustedParty == true ) {
-                setTimeout( () => {
-                    Alert.alert(
-                        'Success',
-                        'Decrypted share created.',
-                        [
-                            {
-                                text: 'OK', onPress: () => {
-                                    utils.setDeepLinkingType( "" );
-                                    utils.setDeepLinkingUrl( "" );
-                                    this.props.navigation.pop();
-                                }
-                            },
-
-                        ],
-                        { cancelable: false }
-                    )
-                }, 100 );
+        const sss = await bitcoinClassState.getS3ServiceClassState();
+        let resDownlaodShare = await S3Service.downloadShare( urlScriptDetails.data );
+        console.log( { resDownlaodShare } );
+        if ( resDownlaodShare.status == 200 ) {
+            let regularAccount = await bitcoinClassState.getRegularClassState();
+            var resGetWalletId = await regularAccount.getWalletId();
+            if ( resGetWalletId.status == 200 ) {
+                await bitcoinClassState.setRegularClassState( regularAccount );
+                resGetWalletId = resGetWalletId.data;
             } else {
+                alert.simpleOk( "Oops", resGetWalletId.err );
+            }
+            let resTrustedParty = await comFunDBRead.readTblTrustedPartySSSDetails();
+            let arr_DecrShare = [];
+            for ( let i = 0; i < resTrustedParty.length; i++ ) {
+                arr_DecrShare.push( JSON.parse( resTrustedParty[ i ].decrShare ) );
+            }
+            let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, urlScriptDetails.data, resGetWalletId.walletId, arr_DecrShare );
+            if ( resDecryptEncMetaShare.status == 200 ) {
+                console.log( { resDecryptEncMetaShare } );
+                const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
+                if ( resUpdateHealth.status == 200 ) {
+                    await bitcoinClassState.setS3ServiceClassState( sss );
+                    const resTrustedParty = await dbOpration.insertTrustedPartyDetails(
+                        localDB.tableName.tblTrustedPartySSSDetails,
+                        dateTime,
+                        keeperInfo,
+                        urlScript,
+                        resDecryptEncMetaShare.data.decryptedMetaShare,
+                        resDecryptEncMetaShare.data.decryptedMetaShare.meta,
+                        resDecryptEncMetaShare.data.decryptedMetaShare.encryptedStaticNonPMDD
+                    );
+                    if ( resTrustedParty ) {
+                        flag_Loading = false;
+                        setTimeout( () => {
+                            alert.simpleOkAction( "Success", "Decrypted share stored.", this.goBack );
+                        }, 100 );
+
+                    }
+                }
+            } else {
+                flag_Loading = false;
                 setTimeout( () => {
-                    Alert.alert(
-                        'OH',
-                        resTrustedParty,
-                        [
-                            {
-                                text: 'OK', onPress: () => {
-                                    utils.setDeepLinkingType( "" );
-                                    utils.setDeepLinkingUrl( "" );
-                                    this.props.navigation.pop();
-                                }
-                            },
-                        ],
-                        { cancelable: false }
-                    )
+                    alert.simpleOk( "Oops", resDecryptEncMetaShare.err );
                 }, 100 );
+
             }
         } else {
-            this.setState( {
-                flag_Loading: false
-            } )
-            Alert.alert( "updateHealth func not working." )
+            flag_Loading = false;
+            setTimeout( () => {
+                alert.simpleOk( "Oops", resDownlaodShare.err );
+            }, 100 );
+
         }
+        this.setState( {
+            flag_Loading
+        } )
     }
 
     //TODO: Searching Contact List

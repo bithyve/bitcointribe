@@ -4,6 +4,7 @@ import bitcoinJS, { Network } from "bitcoinjs-lib";
 import config from "react-native-config";
 
 
+
 class Config {
   public ENVIRONMENT: string;
   public NETWORK: Network;
@@ -19,6 +20,15 @@ class Config {
     DEV: config.BIT_API_URLS_BH_SERVER_DEV,
     PROD: config.BIT_API_URLS_BH_SERVER_PROD,
   };
+  public BSI = {
+    INIT_INDEX: parseInt( config.BIT_BSI_INIT_INDEX, 10 ),
+    MAXUSEDINDEX: parseInt( config.BIT_BSI_MAXUSEDINDEX, 10 ),
+    MINUNUSEDINDEX: parseInt( config.BIT_BSI_MINUNUSEDINDEX, 10 ),
+    DEPTH: {
+      INIT: parseInt( config.BIT_BSI_DEPTH_INIT, 10 ),
+      LIMIT: parseInt( config.BIT_BSI_DEPTH_LIMIT, 10 ),
+    },
+  };
   public SSS_TOTAL: number = parseInt( config.BIT_SSS_TOTAL, 10 );
   public SSS_THRESHOLD: number = parseInt( config.BIT_SSS_THRESHOLD, 10 );
   public MSG_ID_LENGTH: number = parseInt( config.BIT_MSG_ID_LENGTH, 10 );
@@ -26,6 +36,10 @@ class Config {
   public CHECKSUM_ITR: number = parseInt( config.BIT_CHECKSUM_ITR, 10 );
   public HEXA_ID: string = config.BIT_HEXA_ID;
   public DPATH_PURPOSE: number = parseInt( config.BIT_DPATH_PURPOSE, 10 );
+  public SSS_METASHARE_SPLITS: number = parseInt(
+    config.BIT_SSS_METASHARE_SPLITS,
+    10,
+  );
   public STATUS = {
     SUCCESS: parseInt( config.BIT_SUCCESS_STATUS_CODE, 10 ),
     ERROR: parseInt( config.BIT_ERROR_STATUS_CODE, 10 ),
@@ -58,17 +72,17 @@ class Config {
       MULTIBALANCE: config.BIT_ESPLORA_TESTNET_MULTIBALANCE,
       MULTIUTXO: config.BIT_ESPLORA_TESTNET_MULTIUTXO,
       MULTITXN: config.BIT_ESPLORA_TESTNET_MULTITXN,
-      INSECURE: {
-        TXNDETAILS: config.BIT_ESPLORA_TESTNET_INSECURE_TXNDETAILS,
-      },
+      TXN_FEE: config.BIT_ESPLORA_TESTNET_TXNFEE,
+      TXNDETAILS: config.BIT_ESPLORA_TESTNET_TXNDETAILS,
+      BROADCAST_TX: config.BIT_ESPLORA_TESTNET_BROADCAST_TX,
     },
     MAINNET: {
       MULTIBALANCE: config.BIT_ESPLORA_MAINNET_MULTIBALANCE,
       MULTIUTXO: config.BIT_ESPLORA_MAINNET_MULTIUTXO,
       MULTITXN: config.BIT_ESPLORA_MAINNET_MULTITXN,
-      INSECURE: {
-        TXNDETAILS: config.BIT_ESPLORA_MAINNET_INSECURE_TXNDETAILS,
-      },
+      TXN_FEE: config.BIT_ESPLORA_MAINNET_TXNFEE,
+      TXNDETAILS: config.BIT_ESPLORA_MAINNET_TXNDETAILS,
+      BROADCAST_TX: config.BIT_ESPLORA_MAINNET_BROADCAST_TX,
     },
   };
 

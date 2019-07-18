@@ -62,6 +62,7 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
             flag_ConfirmDisableBtn: true,
             flag_Loading: false
         };
+
         window.EventBus.on( "swipeScreen", this.loadQuestionList );
         this.loadQuestionList = this.loadQuestionList.bind( this );
     }
@@ -182,12 +183,12 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                     transShare.push( sss.createTransferShare( share, walletName ) )
                 }
                 console.log( { shareIds, autoHealthShares } );
-                let resInsertSSSShare = await dbOpration.insertSSSShareAndShareId(
-                    localDB.tableName.tblSSSDetails,
-                    dateTime,
-                    autoHealthShares,
-                    shareIds
-                );
+                // let resInsertSSSShare = await dbOpration.insertSSSShareAndShareId(
+                //     localDB.tableName.tblSSSDetails,
+                //     dateTime,
+                //     autoHealthShares,
+                //     shareIds
+                // );
                 let resInsertWallet = await dbOpration.insertWallet(
                     localDB.tableName.tblWallet,
                     dateTime,
