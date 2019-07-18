@@ -84,50 +84,33 @@ describe("Regular Account", async () => {
       confirmedTransactions,
       transactionDetails,
     } = res.data.transactions;
-    console.log({ totalTransactions, confirmedTransactions });
     expect(totalTransactions).toBeGreaterThanOrEqual(confirmedTransactions);
     expect(confirmedTransactions).toBeGreaterThanOrEqual(0);
     expect(transactionDetails).toBeTruthy();
-  });
-
-  test("transacts from one btc address to another (single-stage transfer)", async () => {
-    const transfer = {
-      recipientAddress: "2NEcDodh4CyfyB7ZF87zGCxkR4CdpF6oNHm",
-      amount: Math.round(3500 / 1e8),
-    };
-
-    const res = await importedRegularAccount.transfer(
-      transfer.recipientAddress,
-      transfer.amount,
-    );
-    console.log({ res });
-    console.log({ txid: res.data.txid });
-    expect(res.status).toBe(config.STATUS.SUCCESS);
-    expect(res.data.txid).toBeTruthy();
   });
 
   test("transacts from one btc address to another (multi-stage transfer)", async () => {
     const transfer = {
       recipientAddress: "2NEcDodh4CyfyB7ZF87zGCxkR4CdpF6oNHm",
       amount: 3500 / 1e8,
-      priority: "High",
+      priority: "medium",
     };
+
     const res = await importedRegularAccount.transferST1(
       transfer.recipientAddress,
       transfer.amount,
       transfer.priority,
     );
 
-    console.log({ res });
     expect(res.status).toBe(config.STATUS.SUCCESS);
-    console.log(res.data);
     expect(res.data).toBeTruthy();
 
     const { data } = await importedRegularAccount.transferST2(
       res.data.inputs,
       res.data.txb,
     );
-    expect(data.txid).toBeTruthy();
+
     console.log(data.txid);
+    expect(data.txid).toBeTruthy();
   });
 });

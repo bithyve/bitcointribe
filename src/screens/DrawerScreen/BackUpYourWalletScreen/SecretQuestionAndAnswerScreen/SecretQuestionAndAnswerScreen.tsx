@@ -94,6 +94,7 @@ export default class SecretQuestionAndAnswerScreen extends Component {
                     "item": "What was the name of the street where you were living when you were 10 years old?"
                 }
             ],
+            arr_QuestionAndTrustList: [],
             arr_ModelSecretQuestionAndAnswer: []
         };
     }
@@ -105,6 +106,7 @@ export default class SecretQuestionAndAnswerScreen extends Component {
         jsonData.seletedContactList = data;
         jsonData.question = arr_QuestionList;
         this.setState( {
+            arr_QuestionAndTrustList: jsonData,
             arr_ModelSecretQuestionAndAnswer: [
                 {
                     modalVisible: true,
@@ -117,7 +119,7 @@ export default class SecretQuestionAndAnswerScreen extends Component {
 
     render() {
         //array
-        let { arr_QuestionList, arr_ModelSecretQuestionAndAnswer } = this.state;
+        let { arr_QuestionList, arr_ModelSecretQuestionAndAnswer, arr_QuestionAndTrustList } = this.state;
         return (
             <View style={ styles.container }>
                 <SafeAreaView style={ styles.container }>
@@ -130,21 +132,23 @@ export default class SecretQuestionAndAnswerScreen extends Component {
                             enableOnAndroid={ true }
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
-                            <ModelSecretQuestionAndAnswer data={ arr_ModelSecretQuestionAndAnswer } click_Next={ ( data: any ) => {
+                            <ModelSecretQuestionAndAnswer data={ arr_ModelSecretQuestionAndAnswer } click_Next={ () => {
                                 this.setState( {
                                     arr_ModelSecretQuestionAndAnswer: [
                                         {
-                                            modalVisible: false
+                                            modalVisible: false,
+                                            data: arr_QuestionAndTrustList
                                         }
                                     ]
                                 } );
+                                this.props.navigation.push( "SecretSharingScreen" )
                             } }
                                 pop={ () => {
                                     this.setState( {
                                         arr_ModelSecretQuestionAndAnswer: [
                                             {
                                                 modalVisible: false,
-                                                data: arr_QuestionList
+                                                data: arr_QuestionAndTrustList
                                             }
                                         ]
                                     } );

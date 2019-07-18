@@ -59,33 +59,29 @@ import Singleton from "HexaWallet/src/app/constants/Singleton";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
 
-//TODO: Bitcoin Files
+//TODO: Bitcoin Class
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
-var flag_SendPaymentScreen = true;
+
+
 export default class QrCodeScannerScreen extends React.Component {
+    public flag_SendPaymentScreen = true;
     constructor ( props: any ) {
         super( props );
         this.state = {
         };
-    }
-    componentWillMount() {
-        this.willFocusSubscription = this.props.navigation.addListener(
-            "willFocus",
-            () => {
-                flag_SendPaymentScreen = true;
-            }
-        );
-    }
-    componentWillUnmount() {
-        this.willFocusSubscription.remove();
-    }
 
+    }
     componentDidMount() {
         Permissions.request( 'camera' ).then( ( response: any ) => {
             if ( response == "authorized" ) {
                 this.render();
             }
         } );
+    }
+
+    componentWillUnmount() {
+        this.flag_SendPaymentScreen = true;
     }
 
     _renderTitleBar() {
@@ -106,39 +102,54 @@ export default class QrCodeScannerScreen extends React.Component {
         )
     }
 
-
     barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
-            let regularAccount = await utils.getRegularAccountObject();
-            var resAddressDiff = await regularAccount.addressDiff( result );
-            if ( resAddressDiff.status == 200 ) {
-                resAddressDiff = resAddressDiff.data;
-            } else {
-                alert.simpleOk( "Oops", resAddressDiff.err );
+            if ( utils.isJson( result ) ) {
+                if ( this.flag_SendPaymentScreen == true ) {
+                    this.flag_SendPaymentScreen = false;
+                    result = JSON.parse( result );
+                    console.log( { value: result } );
+                    if ( result.type == "SSS Recovery QR" ) {
+                        utils.setDeepLinkingType( "SSS Recovery QR" );
+                        let deepLinkPara = {};
+                        deepLinkPara.wn = result.wn;
+                        deepLinkPara.data = result.data;
+                        //console.log( { deepLinkPara } );
+                        utils.setDeepLinkingUrl( deepLinkPara );
+                        this.props.navigation.navigate( 'WalletScreen' );
+                    } else if ( result.type == "Self Share" ) {
+                        utils.setDeepLinkingType( "Self Share" );
+                        let deepLinkPara = {};
+                        deepLinkPara.wn = result.wn;
+                        deepLinkPara.data = result.data;
+                        utils.setDeepLinkingUrl( deepLinkPara );
+                        this.props.navigation.navigate( 'WalletScreen' );
+                    } else if ( result.type == "" ) {
+                        alert.simpleOk( "Oops", "Invalid qrcode.Please scan correct qrcode." );
+                    }
+                }
             }
-            if ( resAddressDiff.type == "paymentURI" || resAddressDiff.type == "address" ) {
-                var resDecPaymentURI = await regularAccount.decodePaymentURI( result );
-                if ( resDecPaymentURI.status == 200 ) {
-                    resDecPaymentURI = resDecPaymentURI.data;
+            else {
+                let regularAccount = await bitcoinClassState.getRegularClassState();
+                var resAddressDiff = await regularAccount.addressDiff( result );
+                if ( resAddressDiff.status == 200 ) {
+                    resAddressDiff = resAddressDiff.data;
                 } else {
-                    alert.simpleOk( "Oops", resDecPaymentURI.err );
+                    alert.simpleOk( "Oops", resAddressDiff.err );
                 }
-                if ( flag_SendPaymentScreen == true ) {
-                    this.props.navigation.push( "SendPaymentNavigator", { data: resDecPaymentURI } );
-                    flag_SendPaymentScreen = false;
-                }
-            } else {
-                result = JSON.parse( result );
-                AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
-                if ( result.type == "SSS Recovery" ) {
-                    utils.setDeepLinkingType( "SSS Recovery QR" );
-                    let deepLinkPara = {};
-                    deepLinkPara.wn = result.wn;
-                    deepLinkPara.data = result.data;
-                    //console.log( { deepLinkPara } );
-                    utils.setDeepLinkingUrl( deepLinkPara );
-                    this.props.navigation.navigate( 'WalletScreen' );
+                if ( resAddressDiff.type == "paymentURI" || resAddressDiff.type == "address" ) {
+                    var resDecPaymentURI = await regularAccount.decodePaymentURI( result );
+                    if ( resDecPaymentURI.status == 200 ) {
+                        await bitcoinClassState.setRegularClassState( regularAccount );
+                        resDecPaymentURI = resDecPaymentURI.data;
+                    } else {
+                        alert.simpleOk( "Oops", resDecPaymentURI.err );
+                    }
+                    if ( this.flag_SendPaymentScreen == true ) {
+                        this.flag_SendPaymentScreen = false;
+                        this.props.navigation.push( "SendPaymentNavigator", { data: resDecPaymentURI } );
+                    }
                 }
             }
         } catch ( error ) {

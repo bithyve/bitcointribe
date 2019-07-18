@@ -54,6 +54,11 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
+
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
+
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
@@ -80,24 +85,23 @@ export default class OTPScreen extends Component {
             keeperInfo: [],
             arr_ResDownShare: [],
             arr_ModelRestoreAssociateContactList: [],
-            recordId: "",
+            tableId: "",
         };
     }
 
 
     async componentWillMount() {
         let script = utils.getDeepLinkingUrl();
-        let messageId = script.mi;
-        console.log( { messageId } );
-        let walletDetails = utils.getWalletDetails();
-        const resDownloadShare = await S3Service.downloadShare( messageId );
+        console.log( { script } );
         let resSSSDetails = await comFunDBRead.readTblSSSDetails();
+        console.log( { resSSSDetails } );
         let arr_KeeperInfo = [];
         for ( let i = 0; i < resSSSDetails.length; i++ ) {
             let data = {};
-            let fullInfo = resSSSDetails[ i ]
-            if ( fullInfo.acceptedDate == "" ) {
+            let fullInfo = resSSSDetails[ i ];
+            if ( fullInfo.acceptedDate == "" && fullInfo.type == "Trusted Contacts 1" || fullInfo.type == "Trusted Contacts 2" ) {
                 let keerInfo = JSON.parse( resSSSDetails[ i ].keeperInfo );
+                data.id = resSSSDetails[ i ].id;
                 data.thumbnailPath = keerInfo.thumbnailPath;
                 data.givenName = keerInfo.givenName;
                 data.familyName = keerInfo.familyName;
@@ -107,18 +111,27 @@ export default class OTPScreen extends Component {
                 arr_KeeperInfo.push( data );
             }
         }
-        console.log( { arr_KeeperInfo } );
-        this.setState( {
-            arr_ModelRestoreAssociateContactList: [
-                {
-                    modalVisible: true,
-                    item: arr_KeeperInfo
-                }
-            ],
-            arr_ResDownShare: resDownloadShare
-        } )
+        if ( arr_KeeperInfo.length > 0 ) {
+            this.setState( {
+                arr_ModelRestoreAssociateContactList: [
+                    {
+                        modalVisible: true,
+                        item: arr_KeeperInfo
+                    }
+                ]
+            } )
+        } else {
+            alert.simpleOkAction( "Oops", "Please select any one trusted contact and close app and agian click link.", this.click_GoTrusteContactScreen );
+        }
     }
 
+
+    //TODO: if not sss trusted contact to going trusted contact screen for select perosn
+    click_GoTrusteContactScreen = () => {
+        utils.setDeepLinkingType( "" );
+        utils.setDeepLinkingUrl( "" );
+        this.props.navigation.navigate( 'RestoreWalletUsingTrustedContactNavigator' );
+    }
 
     _onFinishCheckingCode = async ( code: string ) => {
         console.log( { code } );
@@ -130,62 +143,68 @@ export default class OTPScreen extends Component {
         }
     }
 
+
     onSuccess = async () => {
         const dateTime = Date.now();
         this.setState( {
             flag_Loading: true
         } )
+        let flag_Loading = true;
         let enterOtp = this.state.otp;
         let script = utils.getDeepLinkingUrl();
-        let messageId = script.mi;
-        let recordId = this.state.recordId;
-        console.log( { messageId, recordId } );
+        let tableId = this.state.tableId;
+        var resDecryptViaOTP = await S3Service.decryptViaOTP( script.key, enterOtp );
+        if ( resDecryptViaOTP.status == 200 ) {
+            resDecryptViaOTP = resDecryptViaOTP.data;
+        } else {
+            this.setState( { flag_Loading: !flag_Loading } )
+            setTimeout( () => {
+                alert.simpleOk( "Oops", resDecryptViaOTP.err );
+            }, 100 );
+        }
+        console.log( { resDecryptViaOTP } );
+        var resDownShare = await S3Service.downloadShare( resDecryptViaOTP.decryptedData );
+        if ( resDownShare.status == 200 ) {
+            resDownShare = resDownShare.data;
+        } else {
+            this.setState( { flag_Loading: !flag_Loading } )
+            setTimeout( () => {
+                alert.simpleOk( "Oops", resDownShare.err );
+            }, 100 );
+        }
+        console.log( { resDownShare } );
+        let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownShare.encryptedMetaShare, resDecryptViaOTP.decryptedData );
+        console.log( { resDecryptEncMetaShare } );
+        if ( resDecryptEncMetaShare.status == 200 ) {
 
-        let resDownShare = this.state.arr_ResDownShare;
-        //console.log( { resDownShare } );
-        const resDecryptOTPEncShare = await S3Service.decryptOTPEncShare( resDownShare, messageId, enterOtp );
-        console.log( { resDecryptOTPEncShare } );
-        if ( resDecryptOTPEncShare.status == 200 ) {
+            console.log( { resDecryptEncMetaShare } );
 
             const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSSSRetoreDecryptedShare(
                 localDB.tableName.tblSSSDetails,
-                resDecryptOTPEncShare.decryptedShare,
+                resDecryptEncMetaShare.data.decryptedMetaShare,
                 dateTime,
-                recordId
+                parseInt( tableId )
             );
-            if ( resUpdateSSSRetoreDecryptedShare == true ) {
-                this.setState( {
-                    flag_Loading: false
-                } )
-                setTimeout( () => {
-                    Alert.alert(
-                        'Success',
-                        'Decrypted share created.',
-                        [
-                            {
-                                text: 'OK', onPress: () => {
-                                    utils.setDeepLinkingType( "" );
-                                    utils.setDeepLinkingUrl( "" );
-                                    this.props.navigation.navigate( 'RestoreWalletUsingTrustedContactNavigator1' );
-                                }
-                            },
-
-                        ],
-                        { cancelable: false }
-                    )
-                }, 100 );
-            } else {
-                this.setState( {
-                    flag_Loading: false
-                } )
-                Alert.alert( resUpdateSSSRetoreDecryptedShare );
+            console.log( { resUpdateSSSRetoreDecryptedShare } );
+            if ( resUpdateSSSRetoreDecryptedShare ) {
+                this.setState( { flag_Loading: !flag_Loading } )
+                utils.setDeepLinkingType( "" );
+                utils.setDeepLinkingUrl( "" );
+                await comFunDBRead.readTblSSSDetails();
+                this.props.navigation.navigate( 'RestoreWalletUsingTrustedContactNavigator' );
             }
-
+        } else {
+            this.setState( { flag_Loading: !flag_Loading } )
+            setTimeout( () => {
+                alert.simpleOk( "Oops", resDecryptEncMetaShare.err );
+            }, 100 );
         }
 
     }
 
     render() {
+        //flag 
+        let { flag_Loading } = this.state;
         return (
             <View style={ styles.container }>
                 <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
@@ -255,9 +274,9 @@ export default class OTPScreen extends Component {
                         </View>
                     </KeyboardAwareScrollView>
                 </ImageBackground>
-                <ModelRestoreAssociateContactList data={ this.state.arr_ModelRestoreAssociateContactList } click_Confirm={ ( recordId: string ) => {
+                <ModelRestoreAssociateContactList data={ this.state.arr_ModelRestoreAssociateContactList } click_Confirm={ ( tableId: string ) => {
                     this.setState( {
-                        recordId,
+                        tableId,
                         arr_ModelRestoreAssociateContactList: [
                             {
                                 modalVisible: false,
@@ -267,7 +286,7 @@ export default class OTPScreen extends Component {
                     } )
                 }
                 } />
-                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
+                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
             </View>
         );
     }

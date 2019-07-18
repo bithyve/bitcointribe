@@ -26,6 +26,10 @@ import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGra
 
 
 
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
+
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -36,12 +40,14 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
+//TODO: Common Funciton   
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
 export default class RestoreAllContactListScreen extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props )
         this.state = ( {
             data: [],
-            walletName: "",
             filterValue: "",
             arr_ContactList: [],
             SelectedFakeContactList: [],
@@ -56,11 +62,9 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
             if ( err ) {
                 throw err;
             }
-            let walletName = this.props.navigation.getParam( "walletName" );
             this.setState( {
                 data: contacts,
                 arr_ContactList: contacts,
-                walletName
             } )
         } )
     }
@@ -86,7 +90,7 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
         let seletedLength = this.state.SelectedFakeContactList.length;
         // console.log( { seletedLength } );
         this.setState( { data: this.state.data } )
-        if ( seletedLength == 3 ) {
+        if ( seletedLength <= 2 ) {
             this.setState( {
                 flag_NextBtnDisable: false,
                 filterValue: "",
@@ -119,37 +123,6 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
         }
     };
 
-    //TODO: func click_Next
-    click_Next = async () => {
-        this.setState( {
-            flag_NextBtnDisable1: true
-        } );
-        const dateTime = Date.now();
-        // const fulldate = Math.floor( dateTime / 1000 );
-        let walletName = this.state.walletName;
-        let selectedContactList = this.state.SelectedFakeContactList;
-        console.log( { selectedContactList } );
-        let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactKeepInfo(
-            localDB.tableName.tblSSSDetails,
-            dateTime,
-            selectedContactList
-        );
-        if ( resInsertContactList ) {
-            await dbOpration.insertWallet(
-                localDB.tableName.tblWallet,
-                dateTime,
-                "",
-                "",
-                "",
-                "",
-                walletName,
-                ""
-            );
-            this.props.navigation.push( "RestoreSelectedContactsListScreen" )
-        } else {
-            Alert.alert( "Data not insert in sss details table." )
-        }
-    }
 
     //TODO: Remove gird on click item
     click_RemoveGridItem( item: any ) {
@@ -176,7 +149,7 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
             data: arr_FullArrayList
         } )
         let seletedLength = this.state.SelectedFakeContactList.length;
-        if ( seletedLength == 3 ) {
+        if ( seletedLength <= 2 && seletedLength >= 1 ) {
             this.setState( {
                 flag_NextBtnDisable: false
             } )
@@ -187,6 +160,60 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
         }
     }
 
+    //TODO: func click_Next
+    click_Next = async () => {
+        let arr_Account = await comFunDBRead.readTblSSSDetails();
+        this.setState( {
+            flag_NextBtnDisable1: true
+        } );
+        let sssDetails = await utils.getSSSDetails();
+        const dateTime = Date.now();
+        var selectedContactList = this.state.SelectedFakeContactList;
+        var arrTypes = [];
+        console.log( { lenght: sssDetails.length } );
+        if ( selectedContactList.length == 2 ) {
+            arrTypes = [ { type: "Trusted Contacts 1" }, { type: "Trusted Contacts 2" } ];
+            let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactKeepInfo(
+                localDB.tableName.tblSSSDetails,
+                dateTime,
+                selectedContactList,
+                arrTypes
+            );
+            if ( resInsertContactList ) {
+                await comFunDBRead.readTblSSSDetails();
+                this.props.navigation.pop();
+            } else {
+                alert.simpleOk( "Oops", "Trusted Contact not insert databse." );
+            }
+        } else {
+            let type;
+            let flag_CheckShare = arr_Account.some( ( item: any ) => item.type === 'Trusted Contacts 1' );
+            console.log( { flag_CheckShare } );
+
+            if ( flag_CheckShare ) {
+                type = "Trusted Contacts 2";
+            } else {
+                type = "Trusted Contacts 1";
+            }
+            console.log( { type } );
+
+            arrTypes = [ { type } ];
+            let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactKeepInfo(
+                localDB.tableName.tblSSSDetails,
+                dateTime,
+                selectedContactList,
+                arrTypes
+            );
+            if ( resInsertContactList ) {
+                await comFunDBRead.readTblSSSDetails();
+                this.props.navigation.pop();
+            } else {
+                alert.simpleOk( "Oops", "Trusted Contact not insert databse." );
+            }
+        }
+    }
+
+
     render() {
         return (
             <Container>
@@ -196,7 +223,7 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
                         <View style={ { marginLeft: 10, marginTop: 15 } }>
                             <Button
                                 transparent
-                                onPress={ () => this.props.navigation.navigate( "RestoreAndWalletSetupNavigator" ) }
+                                onPress={ () => this.props.navigation.pop() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Contacts</Text>
