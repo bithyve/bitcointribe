@@ -137,13 +137,11 @@ export default class WalletScreen extends React.Component {
     this.willFocusSubscription = this.props.navigation.addListener(
       "willFocus",
       () => {
-
         // isNetwork = utils.getNetwork();
         this.connnection_FetchData();
         this.getDeepLinkingData();
-
         //calling refresh
-        //this.refresh();  
+        //this.refresh();
       }
     );
 
@@ -188,6 +186,8 @@ export default class WalletScreen extends React.Component {
   componentWillUnmount() {
     this.willFocusSubscription.remove();
   }
+
+
 
   //TODO: func connnection_FetchData
   async connnection_FetchData() {
@@ -482,12 +482,11 @@ export default class WalletScreen extends React.Component {
       localDB.tableName.tblAccount,
       resAccount[ 0 ].address,
       getBalR.balance != 0 ? getBalR.balance / 1e8 : "0.0"
-    );   
+    );
     //Get Secure Account Bal
     let resUpdateAccountBalS;
     if ( resAccount[ 1 ].address != "" ) {
       var getBalS = await secureAccount.getBalance();
-      console.log( { getBalS } );
       if ( getBalS.status == 200 ) {
         await bitcoinClassState.setSecureClassState( secureAccount );
         getBalS = getBalS.data;

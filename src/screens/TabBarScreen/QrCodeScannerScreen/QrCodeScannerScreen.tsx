@@ -63,31 +63,25 @@ import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/
 var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 
-var flag_SendPaymentScreen = true;
+
 export default class QrCodeScannerScreen extends React.Component {
+    public flag_SendPaymentScreen = true;
     constructor ( props: any ) {
         super( props );
         this.state = {
         };
-    }
-    componentWillMount() {
-        this.willFocusSubscription = this.props.navigation.addListener(
-            "willFocus",
-            () => {
-                flag_SendPaymentScreen = true;
-            }
-        );
-    }
-    componentWillUnmount() {
-        this.willFocusSubscription.remove();
-    }
 
+    }
     componentDidMount() {
         Permissions.request( 'camera' ).then( ( response: any ) => {
             if ( response == "authorized" ) {
                 this.render();
             }
         } );
+    }
+
+    componentWillUnmount() {
+        this.flag_SendPaymentScreen = true;
     }
 
     _renderTitleBar() {
@@ -112,25 +106,28 @@ export default class QrCodeScannerScreen extends React.Component {
         try {
             var result = e.data;
             if ( utils.isJson( result ) ) {
-                result = JSON.parse( result );
-                console.log( { value: result } );
-                if ( result.type == "SSS Recovery QR" ) {
-                    utils.setDeepLinkingType( "SSS Recovery QR" );
-                    let deepLinkPara = {};
-                    deepLinkPara.wn = result.wn;
-                    deepLinkPara.data = result.data;
-                    //console.log( { deepLinkPara } );
-                    utils.setDeepLinkingUrl( deepLinkPara );
-                    this.props.navigation.navigate( 'WalletScreen' );
-                } else if ( result.type == "Self Share" ) {
-                    utils.setDeepLinkingType( "Self Share" );
-                    let deepLinkPara = {};
-                    deepLinkPara.wn = result.wn;
-                    deepLinkPara.data = result.data;
-                    utils.setDeepLinkingUrl( deepLinkPara );
-                    this.props.navigation.navigate( 'WalletScreen' );
-                } else if ( result.type == "" ) {
-                    alert.simpleOk( "Oops", "Invalid qrcode.Please scan correct qrcode." );
+                if ( this.flag_SendPaymentScreen == true ) {
+                    this.flag_SendPaymentScreen = false;
+                    result = JSON.parse( result );
+                    console.log( { value: result } );
+                    if ( result.type == "SSS Recovery QR" ) {
+                        utils.setDeepLinkingType( "SSS Recovery QR" );
+                        let deepLinkPara = {};
+                        deepLinkPara.wn = result.wn;
+                        deepLinkPara.data = result.data;
+                        //console.log( { deepLinkPara } );
+                        utils.setDeepLinkingUrl( deepLinkPara );
+                        this.props.navigation.navigate( 'WalletScreen' );
+                    } else if ( result.type == "Self Share" ) {
+                        utils.setDeepLinkingType( "Self Share" );
+                        let deepLinkPara = {};
+                        deepLinkPara.wn = result.wn;
+                        deepLinkPara.data = result.data;
+                        utils.setDeepLinkingUrl( deepLinkPara );
+                        this.props.navigation.navigate( 'WalletScreen' );
+                    } else if ( result.type == "" ) {
+                        alert.simpleOk( "Oops", "Invalid qrcode.Please scan correct qrcode." );
+                    }
                 }
             }
             else {
@@ -149,9 +146,9 @@ export default class QrCodeScannerScreen extends React.Component {
                     } else {
                         alert.simpleOk( "Oops", resDecPaymentURI.err );
                     }
-                    if ( flag_SendPaymentScreen == true ) {
+                    if ( this.flag_SendPaymentScreen == true ) {
+                        this.flag_SendPaymentScreen = false;
                         this.props.navigation.push( "SendPaymentNavigator", { data: resDecPaymentURI } );
-                        flag_SendPaymentScreen = false;
                     }
                 }
             }

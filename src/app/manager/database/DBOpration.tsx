@@ -48,6 +48,7 @@ const readTablesData = ( tableName: any ) => {
               data.accountName = utils.decrypt( data.accountName, passcode );
               data.accountType = utils.decrypt( data.accountType, passcode );
               data.additionalInfo = utils.decrypt( data.additionalInfo, passcode );
+              data.isActive = utils.decrypt( data.isActive, passcode );
               data.lastUpdated = utils.decrypt( data.lastUpdated, passcode );
               temp.push( data );
             }
@@ -698,6 +699,7 @@ const updateAccountBalAddressWise = (
   } );
 };
 
+
 const updateAccountBal = (
   tblName: string,
   address: string,
@@ -741,7 +743,6 @@ const updateAccountBal = (
   } );
 };
 
-
 const updateSecureAccountAddInfo = (
   tblName: string,
   date: string,
@@ -771,12 +772,6 @@ const updateSecureAccountAddInfo = (
     }
   } );
 };
-
-
-
-
-
-
 
 //TODO: ========================================>  Transaction  Details  <========================================
 
