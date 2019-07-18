@@ -101,7 +101,7 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
             this.props.navigation.push( "RestoreWalletUsingTrustedContactNavigator" );
         }
         else {
-            this.props.navigation.push( "RestoreWalletUsingTrustedContactNavigator1" );
+            this.props.navigation.push( "RestoreWalletUsingTrustedContactNavigator" );
         }
     }
 

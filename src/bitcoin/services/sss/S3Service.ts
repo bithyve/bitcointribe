@@ -42,7 +42,7 @@ export default class S3Service {
   }
 
   public static downloadShare = async (
-    messageId: string,
+    key: string,
   ): Promise<
     | {
       status: number;
@@ -60,7 +60,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await SSS.downloadShare( messageId ),
+        data: await SSS.downloadShare( key ),
       };
     } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
@@ -69,7 +69,6 @@ export default class S3Service {
 
   public static decryptEncMetaShare = async (
     encryptedMetaShare: string,
-    messageId: string,
     key: string,
     walletId?: string,
     existingShares?: IMetaShare[],
@@ -96,6 +95,7 @@ export default class S3Service {
       if (
         SSS.validateDecryption( decryptedMetaShare, walletId, existingShares )
       ) {
+        const messageId = SSS.getMessageId( key, config.MSG_ID_LENGTH );
         const { deleted } = await SSS.affirmDecryption( messageId );
         if ( !deleted ) {
           throw new Error( "Unable to remove the share from the server" );
@@ -110,6 +110,33 @@ export default class S3Service {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
+
+
+  public static recoverMetaShareFromQR = (
+    qrData: string[],
+  ):
+    | {
+      status: number;
+      data: {
+        metaShare: IMetaShare;
+      };
+      err?: undefined;
+    }
+    | {
+      status: number;
+      err: string;
+      data?: undefined;
+    } => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: SSS.recoverMetaShareFromQR( qrData ),
+      };
+    } catch ( err ) {
+      return { status: config.STATUS.ERROR, err: err.message };
+    }
+  }
+
 
   public static decryptViaOTP = (
     otpEncryptedData: string,
@@ -266,7 +293,7 @@ export default class S3Service {
   }
 
   public checkHealth = async (
-    encryptedShares: string[],
+    shareIDs: string[],
   ): Promise<
     | {
       status: number;
@@ -287,7 +314,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.checkHealth( encryptedShares ),
+        data: await this.sss.checkHealth( shareIDs ),
       };
     } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
@@ -327,8 +354,8 @@ export default class S3Service {
     }
   }
 
-  public updateNonPMDD = async (
-    nonPMDD: IMetaShare[],
+  public updateDynamicNonPMDD = async (
+    dynamicNonPMDD: IMetaShare[],
   ): Promise<
     | {
       status: number;
@@ -344,18 +371,20 @@ export default class S3Service {
     }
   > => {
     try {
-      const { encryptedNonPMDD } = await this.sss.encryptNonPMDD( nonPMDD );
+      const { encryptedDynamicNonPMDD } = await this.sss.encryptDynamicNonPMDD(
+        dynamicNonPMDD,
+      );
 
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.updateNonPMDD( encryptedNonPMDD ),
+        data: await this.sss.updateDynamicNonPMDD( encryptedDynamicNonPMDD ),
       };
     } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
 
-  public downloadNonPMDD = async (
+  public downloadDynamicNonPMDD = async (
     walletId: string,
   ): Promise<
     | {
@@ -374,7 +403,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.fetchNonPMDD( walletId ),
+        data: await this.sss.downloadDynamicNonPMDD( walletId ),
       };
     } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
@@ -463,20 +492,8 @@ export default class S3Service {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
-  public recoverMetaShareFromQR = (
-    qrData: string[],
-  ):
-    | { status: number; data: { recoverQRData: string }; err?: undefined }
-    | { status: number; err: string; data?: undefined } => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.sss.recoverMetaShareFromQR( qrData ),
-      };
-    } catch ( err ) {
-      return { status: config.STATUS.ERROR, err: err.message };
-    }
-  }
+
+
 
   public generateEncryptedMetaShare = (
     metaShare: IMetaShare,

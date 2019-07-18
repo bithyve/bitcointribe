@@ -45,7 +45,8 @@ var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonApp
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
-//TODO: Bitcoin Files
+//TODO: Bitcoin Files  
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
@@ -88,27 +89,12 @@ export default class WalletSetupScreens extends React.Component<any, any> {
         );
         const secureAccount = new SecureAccount( mnemonic );
         const sss = new S3Service( mnemonic );
-        var regularJson = JSON.stringify( regularAccount );
-        AsyncStorage.setItem(
-            asyncStorageKeys.regularClassObject,
-            regularJson
-        );
-        await utils.setRegularAccountObject( regularAccount );
-        //console.log( { secondaryMnemonic } );
-        var secureJson = JSON.stringify( secureAccount );
-        AsyncStorage.setItem(
-            asyncStorageKeys.secureClassObject,
-            secureJson
-        );
-        await utils.setSecureAccountObject( secureAccount );
-
-        var sssJson = JSON.stringify( sss );
-        AsyncStorage.setItem(
-            asyncStorageKeys.s3ServiceClassObject,
-            sssJson
-        );
-        await utils.setS3ServiceObject( sss );
-
+        //regular account  
+        await bitcoinClassState.setRegularClassState( regularAccount );
+        //secure account  
+        await bitcoinClassState.setSecureClassState( secureAccount );
+        //s3serverice
+        await bitcoinClassState.setS3ServiceClassState( sss )
         var getAddress = await regularAccount.getAddress();
         if ( getAddress.status == 200 ) {
             getAddress = getAddress.data.address
@@ -127,6 +113,16 @@ export default class WalletSetupScreens extends React.Component<any, any> {
             ""
         );
         await comFunDBRead.readTblWallet();
+        // let shares = [
+        //     { shareId: "", updatedAt: 0 },
+        //     { shareId: "", updatedAt: 0 },
+        //     { shareId: "", updatedAt: 0 },
+        //     { shareId: "", updatedAt: 0 },
+        //     { shareId: "", updatedAt: 0 }
+        // ];
+        // let resAppHealthStatus = await comAppHealth.connection_AppHealthStatus( 0, shares )
+        // console.log( { resAppHealthStatus } );
+
         let resInsertCreateAcc = await dbOpration.insertCreateAccount(
             localDB.tableName.tblAccount,
             dateTime,
