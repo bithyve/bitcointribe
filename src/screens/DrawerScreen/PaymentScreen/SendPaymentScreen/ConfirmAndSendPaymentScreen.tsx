@@ -37,7 +37,7 @@ import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 
 //TODO: Custome model  
 import ModelConfirmSendSuccess from "HexaWallet/src/app/custcompontes/Model/ModelPaymentScreen/ModelConfirmSendScreen/ModelConfirmSendSuccess";
-
+import ModelConfirmSendSercureAccountOTP from "HexaWallet/src/app/custcompontes/Model/ModelPaymentScreen/ModelConfirmSendScreen/ModelConfirmSendSercureAccountOTP";
 
 
 //TODO: Custome Alert 
@@ -73,6 +73,7 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
         this.state = ( {
             data: [],
             arrModelConfirmSendSuccess: [],
+            arr_ModelConfirmSendSercureAccountOTP: [],
             flag_DisableSentBtn: false,
             flag_Loading: false
         } )
@@ -96,41 +97,56 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
         console.log( { data } );
         let date = Date.now();
         let regularAccount = await bitcoinClassState.getRegularClassState();
-        // let regularAccount = new RegularAccount( data.mnemonic );
+        let secureAccount = await bitcoinClassState.getSecureClassState();
         let inputs = data.resTransferST.data.inputs;
         let txb = data.resTransferST.data.txb
         console.log( { inputs, txb } );
         var resTransferST;
-        if ( data.selectedAccount.accountType == "Regular Account" ) {
+        if ( data.selectedAccount.accountName == "Regular Account" ) {
             resTransferST = await regularAccount.transferST2( data.resTransferST.data.inputs, data.resTransferST.data.txb );
             await bitcoinClassState.setRegularClassState( regularAccount );
-        }
-        console.log( { resTransferST } );
-        if ( resTransferST.status == 200 ) {
-            //Get Balance 
-            // let alert = new AlertSimple();
-            //alert.simpleOk( "Success", "Your payment sent successfully.", this.click_Ok );
-            this.setState( {
-                arrModelConfirmSendSuccess: [ {
-                    modalVisible: true,
-                    data: [ {
-                        amount: data.amount,
-                        tranFee: data.tranFee,
-                        accountName: data.accountName,
-                        txid: resTransferST.data.txid,
-                        date: utils.getUnixToDateFormat1()
+            // console.log( { resTransferST } );
+            if ( resTransferST.status == 200 ) {
+                this.setState( {
+                    arrModelConfirmSendSuccess: [ {
+                        modalVisible: true,
+                        data: [ {
+                            amount: data.amount,
+                            tranFee: data.tranFee,
+                            accountName: data.accountName,
+                            txid: resTransferST.data.txid,
+                            date: utils.getUnixToDateFormat1()
+                        } ]
                     } ]
-                } ]
-            } )
+                } )
+            } else {
+                alert.simpleOk( "Oops", resTransferST.err );
+            }
         } else {
-            alert.simpleOk( "Oops", resTransferST.err );
+            resTransferST = await secureAccount.transferST2( data.resTransferST.data.inputs, data.resTransferST.data.txb );
+            await bitcoinClassState.setSecureClassState( secureAccount );
+            if ( resTransferST.status == 200 ) { //|| resTransferST.status == 400
+                this.setState( {
+                    arr_ModelConfirmSendSercureAccountOTP: [ {
+                        modalVisible: true,
+                        data: [ {
+                            data,
+                            resTransferST
+                        } ]
+                    } ]
+                } )
+
+            } else {
+                alert.simpleOk( "Oops", resTransferST.err );
+            }
         }
+
     }
 
 
     render() {
         //array 
-        let { data, arrModelConfirmSendSuccess } = this.state;
+        let { data, arrModelConfirmSendSuccess, arr_ModelConfirmSendSercureAccountOTP } = this.state;
         //flag  
         let { flag_DisableSentBtn, flag_Loading } = this.state;
         return (
@@ -270,18 +286,47 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
                             </View>
                         </KeyboardAwareScrollView>
                     </ImageBackground>
-                    <ModelConfirmSendSuccess data={ arrModelConfirmSendSuccess }
-                        click_GoToDailyAccount={ () => {
-                            this.setState( {
-                                arrModelConfirmSendSuccess: [ {
-                                    modalVisible: false,
-                                    data: []
-                                } ]
-                            } )
-                            this.props.navigation.navigate( "TabbarBottom", { id: 1 } )
-                        } }
-                    />
                 </SafeAreaView>
+                <ModelConfirmSendSuccess data={ arrModelConfirmSendSuccess }
+                    click_GoToDailyAccount={ () => {
+                        this.setState( {
+                            arrModelConfirmSendSuccess: [ {
+                                modalVisible: false,
+                                data: []
+                            } ]
+                        } )
+                        this.props.navigation.navigate( "TabbarBottom", { id: 1 } )
+                    } }
+                />
+                <ModelConfirmSendSercureAccountOTP data={ arr_ModelConfirmSendSercureAccountOTP }
+                    closeModal={ () => {
+                        this.setState( {
+                            arr_ModelConfirmSendSercureAccountOTP: [ {
+                                modalVisible: false,
+                                data: [ null ]
+                            } ]
+                        } )
+                        this.props.navigation.pop();
+                    } }
+                    click_Next={ ( txId: any ) => {
+                        console.log( { data, txId } );
+                        this.setState( {
+                            arr_ModelConfirmSendSercureAccountOTP: [ {
+                                modalVisible: false,
+                            } ],
+                            arrModelConfirmSendSuccess: [ {
+                                modalVisible: true,
+                                data: [ {
+                                    amount: data.amount,
+                                    tranFee: data.tranFee,
+                                    accountName: data.accountName,
+                                    txid: txId.txid,
+                                    date: utils.getUnixToDateFormat1()
+                                } ]
+                            } ]
+                        } )
+                    } }
+                />
                 <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
             </Container >
         );

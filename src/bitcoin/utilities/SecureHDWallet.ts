@@ -313,7 +313,11 @@ export default class SecureHDWallet extends Bitcoin {
   }
 
   public getSigningEssentials = ( address: string ) => {
+    console.log( this.deriveChildXKey( this.primaryXpriv, 0 ) );
+
     if ( this.signingEssentialsCache[ address ] ) {
+      console.log( { se: this.signingEssentialsCache[ address ] } );
+
       return this.signingEssentialsCache[ address ];
     } // cache hit
 
@@ -323,10 +327,7 @@ export default class SecureHDWallet extends Bitcoin {
       if ( multiSig.address === address ) {
         return ( this.signingEssentialsCache[ address ] = {
           multiSig,
-          keyPair: bip32.fromBase58(
-            this.deriveChildXKey( this.primaryXpriv, itr ),
-            this.network,
-          ),
+          primaryPriv: this.deriveChildXKey( this.primaryXpriv, itr ),
           childIndex: itr,
         } );
       }
@@ -601,6 +602,7 @@ export default class SecureHDWallet extends Bitcoin {
         // insufficient input utxos to compensate for output utxos + fee
         return { fee };
       }
+      console.log( "Stage1 n/w:", this.network );
 
       const txb: TransactionBuilder = new bitcoinJS.TransactionBuilder(
         this.network,
@@ -637,17 +639,23 @@ export default class SecureHDWallet extends Bitcoin {
     }>;
   } => {
     try {
+      console.log( txb );
+
       console.log( "------ Transaction Signing ----------" );
+      console.log( "Stage 2 n/w: ", this.network );
+
       let vin = 0;
       const childIndexArray = [];
       inputs.forEach( ( input ) => {
         console.log( "Signing Input:", input );
-        const { multiSig, keyPair, childIndex } = this.getSigningEssentials(
+        const { multiSig, primaryPriv, childIndex } = this.getSigningEssentials(
           input.address,
         );
+        console.log( { multiSig, primaryPriv, childIndex } );
+
         txb.sign(
           vin,
-          keyPair,
+          bip32.fromBase58( primaryPriv, this.network ),
           Buffer.from( multiSig.scripts.redeem, "hex" ),
           null,
           input.value,
