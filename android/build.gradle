@@ -1,64 +1,40 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext {    
-        buildToolsVersion = "28.0.3"
-        minSdkVersion = 16   
-        compileSdkVersion = 28
-        targetSdkVersion = 28
-        supportLibVersion = "28.0.0"
-    }  
-    repositories {  
+    ext {
+        buildToolsVersion = "27.0.3"
+        minSdkVersion = 16
+        compileSdkVersion = 27
+        targetSdkVersion = 26
+        supportLibVersion = "27.1.1"
+    }
+    repositories {
         google()
-        jcenter()  
-            maven { url 'https://maven.fabric.io/public' }
-    }     
-    dependencies {          
-       classpath 'com.android.tools.build:gradle:3.2.1'    
-        classpath 'io.fabric.tools:gradle:1.+'          
-    }       
-}   
+        jcenter()
+    }
+    dependencies {   
+        classpath 'com.android.tools.build:gradle:3.1.4'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
 
- 
-
-allprojects {   
+allprojects {
     repositories {
 				// Add jitpack repository (added by react-native-spinkit)
-				
+				maven { url "https://jitpack.io" }
         mavenLocal()
         google()
-        jcenter() 
-        
-        maven {
-            url 'https://maven.google.com'
-            name 'Google'
-        } 
-        maven { url "https://jitpack.io" }
+        jcenter()
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url "$rootDir/../node_modules/react-native/android"
         }
-         maven {
-        // Local Maven repo containing AARs with JSC library built for Android
-        url "$rootDir/../node_modules/jsc-android/dist"
-    }
-    }   
-}      
-    
-subprojects {
-    project.configurations.all {
-        resolutionStrategy.eachDependency { details ->
-            if (details.requested.group == 'com.android.support'
-                    && !details.requested.name.contains('multidex') ) {
-                details.useVersion "26.1.0"     
-            }
-        }   
     }
 }
 
 
-
-   
- 
-       
-   
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.4'
+    distributionUrl = distributionUrl.replace("bin", "all")
+}   

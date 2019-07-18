@@ -46,6 +46,8 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
+//TODO: Classes
+import QrCodeScannerScreen from "../../../TabBarScreen/QrCodeScannerScreen/QrCodeScannerScreen";
 
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
@@ -54,6 +56,9 @@ var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBR
 var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
+
+
+
 
 
 export default class SendPaymentScreen extends React.Component<any, any> {
@@ -76,6 +81,8 @@ export default class SendPaymentScreen extends React.Component<any, any> {
     }
 
     async componentWillMount() {
+
+        //class value reset
         let data = this.props.navigation.getParam( "data" );
         console.log( { data } );
 
@@ -126,14 +133,22 @@ export default class SendPaymentScreen extends React.Component<any, any> {
     }
 
 
+
+    componentWillUnmount() {
+        //working
+        let qrcodescanner = new QrCodeScannerScreen( null );
+        qrcodescanner.flag_SendPaymentScreen = true;
+
+    }
+
     setAmount() {
         let { amount, selectedAccountBal } = this.state;
         let enterAmount = parseFloat( amount );
-        console.log( { enterAmount } );
+        console.log( { enterAmount, selectedAccountBal } );
         var flag_DisableSentBtn;
-        if ( enterAmount != 0 && enterAmount < selectedAccountBal ) {
+        if ( enterAmount != 0 && enterAmount < parseFloat( selectedAccountBal ) ) {
             flag_DisableSentBtn = false;
-        } else if ( enterAmount >= selectedAccountBal ) {
+        } else if ( enterAmount >= parseFloat( selectedAccountBal ) ) {
             flag_DisableSentBtn = true;
         } else if ( amount == "" || enterAmount == 0 ) {
             flag_DisableSentBtn = true;
@@ -147,7 +162,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
     selectAccount( index: any ) {
         let enterAmount = parseFloat( this.state.amount )
         console.log( { enterAmount } );
-        var temp = [], arr_SelectAccountDetails = [], selectAccountBal;
+        var temp = [], arr_SelectAccountDetails = [], selectedAccountBal;
         let { arr_AccountList } = this.state;
         for ( let i = 0; i < arr_AccountList.length; i++ ) {
             let item = arr_AccountList[ i ];
@@ -155,7 +170,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             if ( i == index ) {
                 data.checked = true;
                 arr_SelectAccountDetails = item;
-                selectAccountBal = parseFloat( item.balance );
+                selectedAccountBal = parseFloat( item.balance );
             } else {
                 data.checked = false;
             }
@@ -165,17 +180,20 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             data.address = item.address;
             temp.push( data );
         }
-        console.log( { selectAccountBal } );
+        console.log( { selectedAccountBal } );
         var flag_DisableSentBtn;
-        if ( enterAmount != 0 && enterAmount < selectAccountBal ) {
+        if ( enterAmount != 0 && enterAmount < selectedAccountBal ) {
             flag_DisableSentBtn = false;
-        } else if ( enterAmount >= selectAccountBal ) {
+        } else if ( enterAmount >= selectedAccountBal ) {
             flag_DisableSentBtn = true;
         } else if ( enterAmount == 0 ) {
             flag_DisableSentBtn = true;
         }
 
+        console.log( { selectedAccountBal } );
+
         this.setState( {
+            selectedAccountBal,
             arr_AccountList: temp,
             arr_SelectAccountDetails,
             flag_DisableSentBtn
@@ -187,9 +205,6 @@ export default class SendPaymentScreen extends React.Component<any, any> {
 
     //TODO: Send they amount 
     click_SendAmount = async () => {
-
-
-
         this.setState( {
             flag_Loading: true
         } )
@@ -207,11 +222,11 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             //console.log( { address, amountFloat, priority } );
             resTransferST = await regularAccount.transferST1( address, amountFloat, priority );
             await bitcoinClassState.setRegularClassState( regularAccount );
-            console.log( { resTransferST } );
+            console.log( { regualr: resTransferST } );
         } else {
             resTransferST = await secureAccount.transferST1( address, amountFloat, priority );
             await bitcoinClassState.setSecureClassState( secureAccount );
-            console.log( { resTransferST } );
+            console.log( { secure: resTransferST } );
         }
         if ( resTransferST.status == 200 ) {
             this.setState( {
