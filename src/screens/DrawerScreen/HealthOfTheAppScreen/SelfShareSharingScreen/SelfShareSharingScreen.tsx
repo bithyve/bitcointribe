@@ -183,7 +183,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
     onSelect = async ( returnValue: any ) => {
         if ( returnValue.data == returnValue.result ) {
             let { data } = this.state;
-            let filePath = JSON.parse( data.sssDetails.encryptedMetaShare );
+            let filePath = JSON.parse( data.sssDetails.decryptedShare );
             console.log( { filePath } );
             this.updateHistory( data, "Confirmed.", filePath );
             let walletDetails = await utils.getWalletDetails();

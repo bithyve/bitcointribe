@@ -48,6 +48,9 @@ var utils = require( "HexaWallet/src/app/constants/Utils" );
 var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
 export default class SelfShareUsingWalletQRCode extends React.Component<any, any> {
 
     constructor ( props: any ) {
@@ -61,11 +64,12 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
 
     async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
-        let encryptedMetaShare = JSON.parse( data.encryptedMetaShare )
-        console.log( { encryptedMetaShare } );
+        console.log( { data } );
+
         let walletDetails = utils.getWalletDetails();
         const sss = await bitcoinClassState.getS3ServiceClassState();
-        var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare( encryptedMetaShare.metaShare );
+        var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare( JSON.parse( data.decryptedShare ) );
+        console.log( { resGenerateEncryptedMetaShare } );
         if ( resGenerateEncryptedMetaShare.status == 200 ) {
             resGenerateEncryptedMetaShare = resGenerateEncryptedMetaShare.data;
         } else {
@@ -88,7 +92,8 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
     }
 
 
-    goBack() {
+    goBack = async () => {
+        await comFunDBRead.readTblSSSDetails();
         const { navigation } = this.props;
         navigation.goBack();
         navigation.state.params.onSelect( { selected: true } );

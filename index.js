@@ -197,30 +197,30 @@ export default class HexaWallet extends React.Component
     const AppContainer = createAppContainer( Layout );
     return this.state.status ? (
       <Provider store={ store }>
-        <SafeAreaView style={ styles.container }>
-          <LaunchScreen
+
+        <LaunchScreen
+          screenProps={ {
+            currentFriends: this.state.currentFriends,
+            possibleFriends: this.state.possibleFriends,
+            addFriend: this.addFriend,
+          } }
+          onComplited={ ( status: boolean, pageName: string ) =>
+            this.onComplited( status, pageName )
+          }
+        />
+
+      </Provider>
+    ) : (
+        <Provider store={ store }>
+
+          <AppContainer
             screenProps={ {
               currentFriends: this.state.currentFriends,
               possibleFriends: this.state.possibleFriends,
               addFriend: this.addFriend,
             } }
-            onComplited={ ( status: boolean, pageName: string ) =>
-              this.onComplited( status, pageName )
-            }
           />
-        </SafeAreaView>
-      </Provider>
-    ) : (
-        <Provider store={ store }>
-          <SafeAreaView style={ styles.container }>
-            <AppContainer
-              screenProps={ {
-                currentFriends: this.state.currentFriends,
-                possibleFriends: this.state.possibleFriends,
-                addFriend: this.addFriend,
-              } }
-            />
-          </SafeAreaView>
+
         </Provider>
       );
   }
@@ -229,8 +229,3 @@ export default class HexaWallet extends React.Component
 console.disableYellowBox = true;
 AppRegistry.registerComponent( appName, () => HexaWallet );
 
-let styles = StyleSheet.create( {
-  container: {
-    flex: 1
-  }
-} );
