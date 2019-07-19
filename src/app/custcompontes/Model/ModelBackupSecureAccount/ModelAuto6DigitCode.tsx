@@ -36,6 +36,7 @@ import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 
 //TODO: Common Funciton
 var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
+     
 
 //Bitcoin Files
 var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
@@ -115,7 +116,8 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
                     localDB.tableName.tblAccount,
                     address,
                     "0.0",
-                    secureAccountDetails.id
+                    secureAccountDetails.id,
+                    1
                 );
                 // let decryptedShare = [
                 //     { shareId: "0", updatedAt: 0 },
@@ -157,7 +159,8 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
                             localDB.tableName.tblAccount,
                             address,
                             "0.0",
-                            secureAccountDetails.id
+                            secureAccountDetails.id,
+                            1
                         );
                         // let decryptedShare = [
                         //     { shareId: "0", updatedAt: 0 },

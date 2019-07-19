@@ -293,6 +293,18 @@ const setS3ServiceObject = ( value: any ) => {
 }
 
 
+//Singleton Flag
+
+const getFlagQRCodeScreen = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getFlagQRCodeScreen();
+}
+const setFlagQRCodeScreen = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setFlagQRCodeScreen( value );
+  return true;
+}
+
 module.exports = {
   getUnixTimeDate,
   getUnixToDateFormat,
@@ -340,5 +352,9 @@ module.exports = {
   getSecureAccountObject,
   setSecureAccountObject,
   getS3ServiceObject,
-  setS3ServiceObject
+  setS3ServiceObject,
+
+  //Singleton Flags
+  getFlagQRCodeScreen,
+  setFlagQRCodeScreen
 };   

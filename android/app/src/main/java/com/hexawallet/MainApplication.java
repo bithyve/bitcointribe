@@ -75,8 +75,8 @@ public class MainApplication extends Application implements ReactApplication {
             new RNFetchBlobPackage(),
             new RNDeviceInfo(),
             new ReactNativeContacts(),
-            new ReactNativeConfigPackage(),
-            new RNCameraPackage()
+            new ReactNativeConfigPackage()
+
       );
     }
 

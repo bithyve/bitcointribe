@@ -55,6 +55,7 @@ var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBR
 var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 
 //TODO: Bitcoin Files
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
@@ -218,9 +219,12 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
 
                 if ( resImportSecureAccount.status == 200 ) {
                     resImportSecureAccount = resImportSecureAccount.data;
+
+
                     var getBal = await regularAccount.getBalance();
                     console.log( { getBal } );
                     if ( getBal.status == 200 ) {
+                        await bitcoinClassState.setRegularClassState( regularAccount );
                         getBal = getBal.data;
                     } else {
                         alert.simpleOk( "Oops", getBal.err );
@@ -232,6 +236,13 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                         getBalSecure = getBalSecure.data;
                     } else {
                         alert.simpleOk( "Oops", getBalSecure.err );
+                    }
+                    var address = await secureAccount.getAddress();
+                    if ( address.status == 200 ) {
+                        await bitcoinClassState.setSecureClassState( secureAccount );
+                        address = address.data.address
+                    } else {
+                        alert.simpleOk( "Oops", address.err );
                     }
                     let resInsertDailyAccount = await dbOpration.insertCreateAccount(
                         localDB.tableName.tblAccount,
@@ -246,7 +257,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                     let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
                         localDB.tableName.tblAccount,
                         dateTime,
-                        "",
+                        address,
                         getBalSecure.balance / 1e8,
                         "BTC",
                         "Secure Account",
@@ -319,7 +330,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                     automaticallyAdjustContentInsets={ true }
                     keyboardOpeningTime={ 0 }
                     enableOnAndroid={ true }
-                    contentContainerStyle={ { flexGrow: 0.7 } }
+                    contentContainerStyle={ { flexGrow: 1 } }
                 >
                     <View style={ [
                         styles.modalBackground,
