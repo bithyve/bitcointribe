@@ -71,7 +71,7 @@ export default class TrustedPartySelfShareQRCode extends React.Component<any, an
             } else {
                 this.setState( {
                     flag_Loading: false
-                } )
+                } );
             }
         } else {
             alert.simpleOk( "Oops", resGenerateEncryptedMetaShare.err );

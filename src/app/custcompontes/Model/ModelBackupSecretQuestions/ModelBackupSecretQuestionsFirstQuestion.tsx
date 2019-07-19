@@ -117,7 +117,7 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
                     automaticallyAdjustContentInsets={ true }
                     keyboardOpeningTime={ 0 }
                     enableOnAndroid={ true }
-                    contentContainerStyle={ { flexGrow: 0.7 } }
+                    contentContainerStyle={ { flexGrow: 1 } }
                 >
                     <View style={ [
                         styles.modalBackground,
@@ -255,7 +255,7 @@ const styles = StyleSheet.create( {
         flex: 1,
         justifyContent: 'center'
     },
-    viewModelBody: {
+    viewModelBody: {   
         flex: 0.7,
         margin: 20,
         padding: 10,

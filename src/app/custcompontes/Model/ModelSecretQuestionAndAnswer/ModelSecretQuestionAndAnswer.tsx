@@ -453,8 +453,8 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 let resSecoundXpub4Share = await this.generateXpubAnd2FAQRCode( this.state.base64string9, "secoundryXpub4Share.png" );
                 // console.log( { resSecoundXpub4Share } );  
                 let res2FASecret4Share = await this.generateXpubAnd2FAQRCode( this.state.base64string10, "googleAuto2FASecret4Share.png" );
-                // console.log( { res2FASecret4Share } );
-                let create4thPdf = await this.genreatePdf4Share( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, res4thShare6Create, res4thShare7Create, res4thShare8Create, resSecoundXpub4Share, res2FASecret4Share, "SecretSharing4Share.pdf", "For 4th Shares" );
+                // console.log( { res2FASecret4Share } );  
+                let create4thPdf = await this.genreatePdf( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, res4thShare6Create, res4thShare7Create, res4thShare8Create, resSecoundXpub4Share, res2FASecret4Share, "SecretSharing4Share.pdf", "For 4th Shares" );
                 resolve( create4thPdf );
             }, 2000 );
 
@@ -497,9 +497,8 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             this.svg9.toDataURL( this.base64string9 );
             this.svg10.toDataURL( this.base64string10 );
             setTimeout( async () => {
-                //        console.log( { arrQRCodeData } );
                 let res5thShare1Create = await this.generateSahreQRCode( this.state.base64string1, "qrcode5thSahre1.png" );
-                //      console.log( { res4thShare1Create } );
+                //console.log( { res5thShare1Create } );
                 let res5thShare2Create = await this.generateSahreQRCode( this.state.base64string2, "qrcode5thSahre2.png" );
                 //    console.log( { res4thShare2Create } );
                 let res5thShare3Create = await this.generateSahreQRCode( this.state.base64string3, "qrcode5thSahre3.png" );
@@ -518,7 +517,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 // console.log( { resSecoundXpub4Share } );
                 let res2FASecret5Share = await this.generateXpubAnd2FAQRCode( this.state.base64string10, "googleAuto2FASecret5Share.png" );
                 // console.log( { res2FASecret4Share } );
-                let create5thPdf = await this.genreatePdf4Share( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, res5thShare6Create, res5thShare7Create, res5thShare8Create, resSecoundXpub5Share, res2FASecret5Share, "SecretSharing5Share.pdf", "For 5th Shares" );
+                let create5thPdf = await this.genreatePdf( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, res5thShare6Create, res5thShare7Create, res5thShare8Create, resSecoundXpub5Share, res2FASecret5Share, "SecretSharing5Share.pdf", "For 5th Shares" );
                 resolve( create5thPdf );
             }, 1000 );
         } );
@@ -577,13 +576,16 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
         return chunks;
     }
 
-    genreatePdf4Share = async ( data: any, pathShare1: string, pathShare2: string, pathShare3: string, pathShare4: string, pathShare5: string, pathShare6: string, pathShare7: string, pathShare8: string, pathSecoundXpub: string, path2FASecret: string, pdfFileName: string, forShare: string ) => {
+    genreatePdf = async ( data: any, pathShare1: string, pathShare2: string, pathShare3: string, pathShare4: string, pathShare5: string, pathShare6: string, pathShare7: string, pathShare8: string, pathSecoundXpub: string, path2FASecret: string, pdfFileName: string, forShare: string ) => {
         return new Promise( async ( resolve, reject ) => {
+
+            console.log( { data, pathShare1, pathShare8, pdfFileName, forShare } );
+
+
             let arrQRCodeData = data.arrQRCodeData;
             let secret2FA = data.secret;
             let secondaryMnemonic = data.secondaryMnemonic;
             let bhXpub = data.bhXpub;
-
 
             //Share 1 
             // let arrShare1 = .split();   
@@ -1202,7 +1204,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                     automaticallyAdjustContentInsets={ true }
                     keyboardOpeningTime={ 0 }
                     enableOnAndroid={ true }
-                    contentContainerStyle={ { flexGrow: 0.7 } }
+                    contentContainerStyle={ { flexGrow: 1 } }
                 >
                     <View style={ [
                         styles.modalBackground,

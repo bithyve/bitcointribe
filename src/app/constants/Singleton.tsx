@@ -12,6 +12,9 @@ export default class Singleton {
   public s3Service: any;
 
 
+  //Tabbar Screen Flag  
+  public flagScanQRCode: boolean = true;
+
 
   //Wallet Details
   public walletJsonDetails: any;
@@ -131,6 +134,14 @@ export default class Singleton {
     this.s3Service = value;
   }
 
+
+  //Flags
+  getFlagQRCodeScreen() {
+    return this.flagScanQRCode;
+  }
+  setFlagQRCodeScreen( value: any ) {
+    this.flagScanQRCode = value;
+  }
 
 
 

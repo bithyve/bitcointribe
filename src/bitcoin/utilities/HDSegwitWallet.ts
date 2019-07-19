@@ -549,9 +549,13 @@ export default class HDSegwitWallet extends Bitcoin {
       let vin = 0;
       inputs.forEach( ( input ) => {
         console.log( "Signing Input:", input );
+        console.log( "Creating priv key" );
+        const privateKey = this.getWifForAddress( input.address );
+        console.log( { privateKey } );
 
-        const keyPair = this.getKeyPair( this.getWifForAddress( input.address ) );
+        const keyPair = this.getKeyPair( privateKey );
         console.log( { keyPair } );
+
         txb.sign(
           vin,
           keyPair,

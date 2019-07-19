@@ -391,7 +391,7 @@ export default class SecureAccount {
           priority.toLowerCase(),
         );
 
-        if ( balance < amount + fee ) {
+        if ( balance + unconfirmedBalance < amount + fee ) {
           return {
             status: config.STATUS.ERROR,
             err:
