@@ -102,7 +102,7 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
         let txb = data.resTransferST.data.txb
         console.log( { inputs, txb } );
         var resTransferST;
-        if ( data.selectedAccount.accountName == "Regular Account" ) {
+        if ( data.selectedAccount.accountType == "Regular Account" ) {
             resTransferST = await regularAccount.transferST2( data.resTransferST.data.inputs, data.resTransferST.data.txb );
             await bitcoinClassState.setRegularClassState( regularAccount );
             // console.log( { resTransferST } );
@@ -123,6 +123,7 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
                 alert.simpleOk( "Oops", resTransferST.err );
             }
         } else {
+
             resTransferST = await secureAccount.transferST2( data.resTransferST.data.inputs, data.resTransferST.data.txb );
             await bitcoinClassState.setSecureClassState( secureAccount );
             if ( resTransferST.status == 200 ) { //|| resTransferST.status == 400
@@ -141,6 +142,31 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
             }
         }
 
+    }
+
+    //TODO: Amount Sent Success
+
+    click_GoToDailyAccount = async () => {
+        let { data } = this.state;
+        let address = data.selectedAccount.address;
+        let orignalBal = data.bal;
+        let sendBal = parseFloat( data.amount ) + parseFloat( data.tranFee );
+        let totalBal = orignalBal - sendBal;
+
+        let resUpdateAccountBalR = await dbOpration.updateAccountBalAddressWise(
+            localDB.tableName.tblAccount,
+            address,
+            totalBal.toFixed( 8 )
+        );
+        if ( resUpdateAccountBalR ) {
+            this.setState( {
+                arrModelConfirmSendSuccess: [ {
+                    modalVisible: false,
+                    data: []
+                } ]
+            } );
+            this.props.navigation.navigate( "TabbarBottom", { id: 1 } )
+        }
     }
 
 
@@ -289,23 +315,16 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
                 </SafeAreaView>
                 <ModelConfirmSendSuccess data={ arrModelConfirmSendSuccess }
                     click_GoToDailyAccount={ () => {
-                        this.setState( {
-                            arrModelConfirmSendSuccess: [ {
-                                modalVisible: false,
-                                data: []
-                            } ]
-                        } )
-                        this.props.navigation.navigate( "TabbarBottom", { id: 1 } )
+                        this.click_GoToDailyAccount();
                     } }
                 />
                 <ModelConfirmSendSercureAccountOTP data={ arr_ModelConfirmSendSercureAccountOTP }
                     closeModal={ () => {
                         this.setState( {
                             arr_ModelConfirmSendSercureAccountOTP: [ {
-                                modalVisible: false,
-                                data: [ null ]
+                                modalVisible: false
                             } ]
-                        } )
+                        } );
                         this.props.navigation.pop();
                     } }
                     click_Next={ ( txId: any ) => {

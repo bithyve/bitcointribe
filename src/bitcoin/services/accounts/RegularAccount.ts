@@ -368,7 +368,7 @@ export default class RegularAccount {
           amount,
           priority.toLowerCase(),
         );
-        if ( balance < amount + fee ) {
+        if ( balance + unconfirmedBalance < amount + fee ) {
           return {
             status: config.STATUS.ERROR,
             err:
@@ -417,6 +417,9 @@ export default class RegularAccount {
     }
   > => {
     try {
+      console.log( '====================================' );
+      console.log( "Signing Begins" );
+      console.log( '====================================' );
       const signedTxb = this.hdWallet.signHDTransaction( inputs, txb );
       console.log( "---- Transaction Signed ----" );
 

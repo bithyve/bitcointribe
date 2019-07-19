@@ -48,7 +48,7 @@ const readTablesData = ( tableName: any ) => {
               data.accountName = utils.decrypt( data.accountName, passcode );
               data.accountType = utils.decrypt( data.accountType, passcode );
               data.additionalInfo = utils.decrypt( data.additionalInfo, passcode );
-              data.isActive = utils.decrypt( data.isActive, passcode );
+              data.isActive = data.isActive;
               data.lastUpdated = utils.decrypt( data.lastUpdated, passcode );
               temp.push( data );
             }
@@ -623,7 +623,8 @@ const updateSecureAccountAddressAndBal = (
   tblName: string,
   address: string,
   bal: string,
-  id: string
+  id: string,
+  isActive: number
 ) => {
   let passcode = getPasscode();
   let date = Date.now();
@@ -639,12 +640,13 @@ const updateSecureAccountAddressAndBal = (
                 txn.executeSql(
                   "update " +
                   tblName +
-                  " set address = :address,balance =:balance,lastUpdated =:lastUpdated where id = :id",
+                  " set address = :address,balance =:balance,lastUpdated =:lastUpdated,isActive =:isActive where id = :id",
                   [
                     utils.encrypt( address.toString(), passcode ),
                     utils.encrypt( bal.toString(), passcode ),
                     utils.encrypt( date.toString(), passcode ),
-                    dbId
+                    isActive,
+                    dbId,
                   ]
                 );
                 resolve( true );
