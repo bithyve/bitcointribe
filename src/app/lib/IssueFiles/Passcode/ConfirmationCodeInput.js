@@ -264,7 +264,7 @@ export default class ConfirmationCodeInput extends Component {
           keyboardType={ 'name-phone-pad' }
           returnKeyType={ 'done' }
           { ...this.props }
-          autoFocus={ autoFocus && id == 0 }
+          autoFocus={ autoFocus && id === 0 }
           onFocus={ () => this._onFocus( id ) }
           value={ this.state.codeArr[ id ] ? this.state.codeArr[ id ].toString() : '' }
           onChangeText={ text => this._onInputCode( text, id ) }
