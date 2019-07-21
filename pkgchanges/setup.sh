@@ -1,3 +1,4 @@
+#!/bin/bash
 # chmod +x pkgchanges/setup.sh
 # ./pkgchanges/setup.sh
 # rm -rf node_modules
