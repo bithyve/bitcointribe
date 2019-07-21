@@ -19,7 +19,7 @@ const store = createStore( allReducers );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 export default class HexaWallet extends React.Component
 {
-  constructor ( props )    
+  constructor ( props )
   {
     super( props );
     this.state = {
@@ -47,16 +47,16 @@ export default class HexaWallet extends React.Component
           } );
           var pageName;
           var type;
-          if ( response.pageName == "bk" )
+          if ( response.pageName === "bk" )
           {
             pageName = "TabbarBottom";
             type = "SSS Recovery SMS/EMAIL";
           }
-          else if ( response.pageName == "rtb" )  
+          else if ( response.pageName === "rtb" )
           {
             pageName = "TrustedPartyShareSecretNavigator";
             type = "SSS Restore SMS/EMAIL";
-          } else if ( response.pageName == "rta" )
+          } else if ( response.pageName === "rta" )
           {
             pageName = "OTPScreenNavigator";
             type = "SSS Restore SMS/EMAIL";
