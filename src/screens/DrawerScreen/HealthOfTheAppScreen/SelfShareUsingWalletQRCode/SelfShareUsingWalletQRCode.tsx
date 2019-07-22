@@ -57,9 +57,8 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
         super( props )
         this.state = ( {
             data: [],
-            flag_Loading: false,
-            msg_Loading: "Loading"
-        } )
+            flag_Loading: true
+        } );
     }
 
     async componentWillMount() {
@@ -84,8 +83,9 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
             qrCodeData.data = resGenerateEncryptedMetaShare.key;
             //console.log( { qrCodeData } );   
             this.setState( {
+                flag_Loading: false,
                 data: JSON.stringify( qrCodeData ).toString()
-            } )
+            } );
         } else {
             alert.simpleOk( "Oops", resUploadShare.err );
         }
@@ -136,7 +136,7 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
 
                     </ImageBackground>
                 </SafeAreaView>
-                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } message="Making QRCode" />
             </Container >
         );
     }

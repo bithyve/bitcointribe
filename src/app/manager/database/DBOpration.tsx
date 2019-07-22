@@ -3,17 +3,34 @@ import { localDB } from "../../../app/constants/Constants";
 var utils = require( "../../../app/constants/Utils" );
 import Singleton from "../../constants/Singleton";
 import "../../../assets/static/js/sugar.js";
+
 const getPasscode = () => {
   let commonData = Singleton.getInstance();
   return commonData.getPasscode();
 };
 import SQLite from "react-native-sqlite-storage";
+
+
+errorCB =(err) => {
+  console.log("SQL Error: " + err);
+}
+
+successCB =  () => {
+  console.log("SQL executed fine");
+}
+   
+openCB = () => {
+  console.log("Database OPENED");
+}
+
 var db = SQLite.openDatabase(
   localDB.dbName,
   "1.0",
   "HexaWallet Database",
-  200000
-);
+  200000,      
+  this.openCB(), this.errorCB()
+);    
+
 //TODO: Json Files
 import accountTypeData from "../../../assets/jsonfiles/tblAccountType/tblAccountType.json";
 //TODO: Select All Table Data

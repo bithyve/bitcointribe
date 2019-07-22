@@ -20,7 +20,6 @@ import { Avatar } from 'react-native-elements';
 import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-
 interface Props {
     data: [];
     closeModal: Function;
@@ -29,10 +28,8 @@ interface Props {
     click_Request: Function
 }
 
-
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-
 
 //TODO: Custome Alert 
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
@@ -54,11 +51,14 @@ import utils from "HexaWallet/src/app/constants/Utils";
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 
+
 //TODO: Bitcoin Files
 var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
+
+
 
 export default class ModelRestoreWalletFirstQuestion extends Component<Props, any> {
     constructor ( props: any ) {
@@ -162,147 +162,128 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
         }
         console.log( { decryptedShare, Answer } );
         var resMnemonic = await S3Service.recoverFromShares( decryptedShare, Answer );
+        console.log( { resMnemonic } );
         if ( resMnemonic.status == 200 ) {
             resMnemonic = resMnemonic.data;
-            console.log( { resMnemonic } );
-            let queTemp = [];
-            let questionData = {};
-            questionData.Question = Question;
-            questionData.Answer = Answer;
-            queTemp.push( questionData );
-            let resInsertWallet = await dbOpration.insertWallet(
-                localDB.tableName.tblWallet,
-                dateTime,
-                resMnemonic.mnemonic,
-                "",
-                "",
-                "",
-                walletName,
-                queTemp
-            );
-            await comFunDBRead.readTblWallet();
             const regularAccount = new RegularAccount(
                 resMnemonic.mnemonic
             );
             const sss = new S3Service( resMnemonic.mnemonic );
-            var regularJson = JSON.stringify( regularAccount );
-            AsyncStorage.setItem(
-                asyncStorageKeys.regularClassObject,
-                regularJson
-            );
-            await utils.setRegularAccountObject( regularAccount );
-            //console.log( { secondaryMnemonic } );
-
-            var sssJson = JSON.stringify( sss );
-            AsyncStorage.setItem(
-                asyncStorageKeys.s3ServiceClassObject,
-                sssJson
-            );
-            await utils.setS3ServiceObject( sss );
             //decryptStaticNonPMDD
             console.log( { encryptedStaticNonPMDD } );
             var secureAccount;
             var resDecryptStaticNonPMDD = await sss.decryptStaticNonPMDD( encryptedStaticNonPMDD );
             console.log( { resDecryptStaticNonPMDD } );
-
             if ( resDecryptStaticNonPMDD.status == 200 ) {
-                resDecryptStaticNonPMDD = resDecryptStaticNonPMDD.data.decryptedStaticNonPMDD;
-                secureAccount = new SecureAccount( resMnemonic.mnemonic );
-                var secureJson = JSON.stringify( secureAccount );
-                AsyncStorage.setItem(
-                    asyncStorageKeys.secureClassObject,
-                    secureJson
-                );
-                await utils.setSecureAccountObject( secureAccount );
-                var resImportSecureAccount = await secureAccount.importSecureAccount( resDecryptStaticNonPMDD.secondaryXpub, resDecryptStaticNonPMDD.bhXpub );
-                console.log( { resImportSecureAccount } );
+                //Generate ShareId    
+                const generateShareRes = await sss.generateShares( Answer );
+                console.log( { generateShareRes } );
+                if ( generateShareRes.status == 200 ) {
+                    await bitcoinClassState.setS3ServiceClassState( sss )
 
-                if ( resImportSecureAccount.status == 200 ) {
-                    resImportSecureAccount = resImportSecureAccount.data;
+                    // const { encryptedShares } = generateShareRes.data;
+                    // const autoHealthShares = encryptedShares.slice( 0, 3 );
+                    // const resInitializeHealthcheck = await sss.initializeHealthcheck( autoHealthShares );
+                    // console.log( { resInitializeHealthcheck } );
+                    // if ( resInitializeHealthcheck.status == 200 ) {
+                    //     const shareIds = [];
+                    //     for ( const share of encryptedShares ) {
+                    //         shareIds.push( sss.getShareId( share ) )
+                    //     }
+                    // }
+                    // const res = await comAppHealth.check_HealthRestoWalletUsingTrustedContact( dateTime, sssDetails );
+                    // console.log( { res } );
 
-
-                    var getBal = await regularAccount.getBalance();
-                    console.log( { getBal } );
-                    if ( getBal.status == 200 ) {
-                        await bitcoinClassState.setRegularClassState( regularAccount );
-                        getBal = getBal.data;
-                    } else {
-                        alert.simpleOk( "Oops", getBal.err );
-                    }
-
-                    var getBalSecure = await secureAccount.getBalance();
-                    console.log( { getBalSecure } );
-                    if ( getBalSecure.status == 200 ) {
-                        getBalSecure = getBalSecure.data;
-                    } else {
-                        alert.simpleOk( "Oops", getBalSecure.err );
-                    }
-                    var address = await secureAccount.getAddress();
-                    if ( address.status == 200 ) {
-                        await bitcoinClassState.setSecureClassState( secureAccount );
-                        address = address.data.address
-                    } else {
-                        alert.simpleOk( "Oops", address.err );
-                    }
-                    let resInsertDailyAccount = await dbOpration.insertCreateAccount(
-                        localDB.tableName.tblAccount,
+                    let queTemp = [];
+                    let questionData = {};
+                    questionData.Question = Question;
+                    questionData.Answer = Answer;
+                    queTemp.push( questionData );
+                    let resInsertWallet = await dbOpration.insertWallet(
+                        localDB.tableName.tblWallet,
                         dateTime,
+                        resMnemonic.mnemonic,
                         "",
-                        getBal.balance / 1e8,
-                        "BTC",
-                        "Daily Wallet",
-                        "Daily Wallet",
-                        ""
+                        "",
+                        "",
+                        walletName,
+                        queTemp
                     );
-                    let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
-                        localDB.tableName.tblAccount,
-                        dateTime,
-                        address,
-                        getBalSecure.balance / 1e8,
-                        "BTC",
-                        "Secure Account",
-                        "Secure Account",
-                        ""
-                    );
-
-                    let arr_SecureDetails = [];
-                    let secureDetails = {};
-                    secureDetails.backupDate = dateTime;
-                    secureDetails.title = "Setup";
-                    secureDetails.addInfo = "";
-                    arr_SecureDetails.push( secureDetails );
-                    let resSecureAccountUpdate = await dbOpration.updateSecureAccountAddInfo(
-                        localDB.tableName.tblAccount,
-                        dateTime,
-                        arr_SecureDetails,
-                        "2"
-                    );
-                    if ( resInsertDailyAccount && resInsertSecureCreateAcc && resSecureAccountUpdate ) {
-                        await comFunDBRead.readTblSSSDetails();
-                        await comFunDBRead.readTblAccount();
-                        this.setState( {
-                            flag_Loading: false
-                        } );
-                        setTimeout( () => {
-                            let data = {};
-                            data.walletName = walletName;
-                            data.balR = getBal.balance / 1e8;
-                            data.balS = getBalSecure.balance / 1e8;
-                            this.props.click_Next( data );
-                            AsyncStorage.setItem(
-                                asyncStorageKeys.rootViewController,
-                                "TabbarBottom"
-                            );
-                        }, 1000 );
+                    await comFunDBRead.readTblWallet();
+                    resDecryptStaticNonPMDD = resDecryptStaticNonPMDD.data.decryptedStaticNonPMDD;
+                    secureAccount = new SecureAccount( resMnemonic.mnemonic );
+                    var resImportSecureAccount = await secureAccount.importSecureAccount( resDecryptStaticNonPMDD.secondaryXpub, resDecryptStaticNonPMDD.bhXpub );
+                    console.log( { resImportSecureAccount } );
+                    if ( resImportSecureAccount.status == 200 ) {
+                        resImportSecureAccount = resImportSecureAccount.data;
+                        var getBal = await regularAccount.getBalance();
+                        console.log( { getBal } );
+                        if ( getBal.status == 200 ) {
+                            await bitcoinClassState.setRegularClassState( regularAccount );
+                            getBal = getBal.data;
+                        } else {
+                            alert.simpleOk( "Oops", getBal.err );
+                        }
+                        var getBalSecure = await secureAccount.getBalance();
+                        console.log( { getBalSecure } );
+                        if ( getBalSecure.status == 200 ) {
+                            getBalSecure = getBalSecure.data;
+                        } else {
+                            alert.simpleOk( "Oops", getBalSecure.err );
+                        }
+                        var address = await secureAccount.getAddress();
+                        if ( address.status == 200 ) {
+                            await bitcoinClassState.setSecureClassState( secureAccount );
+                            address = address.data.address
+                        } else {
+                            alert.simpleOk( "Oops", address.err );
+                        }
+                        let resInsertDailyAccount = await dbOpration.insertCreateAccount(
+                            localDB.tableName.tblAccount,
+                            dateTime,
+                            "",
+                            getBal.balance / 1e8,
+                            "BTC",
+                            "Daily Wallet",
+                            "Daily Wallet",
+                            ""
+                        );
+                        let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+                            localDB.tableName.tblAccount,
+                            dateTime,
+                            address,
+                            getBalSecure.balance / 1e8,
+                            "BTC",
+                            "Secure Account",
+                            "Secure Account",
+                            ""
+                        );
+                        if ( resInsertDailyAccount && resInsertSecureCreateAcc ) {
+                            await comFunDBRead.readTblSSSDetails();
+                            await comFunDBRead.readTblAccount();
+                            this.setState( {
+                                flag_Loading: false
+                            } );
+                            setTimeout( () => {
+                                let data = {};
+                                data.walletName = walletName;
+                                data.balR = getBal.balance / 1e8;
+                                data.balS = getBalSecure.balance / 1e8;
+                                this.props.click_Next( data );
+                                AsyncStorage.setItem(
+                                    asyncStorageKeys.rootViewController,
+                                    "TabbarBottom"
+                                );
+                            }, 1000 );
+                        }
+                    } else {
+                        alert.simpleOk( "Oops", resImportSecureAccount.err );
                     }
                 } else {
-                    alert.simpleOk( "Oops", resImportSecureAccount.err );
+                    alert.simpleOk( "Oops", resDecryptStaticNonPMDD.err );
                 }
-            } else {
-                alert.simpleOk( "Oops", resDecryptStaticNonPMDD.err );
+
             }
-            //const res = await comAppHealth.connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact( dateTime, 0, decryptedShare, mnemonic, arr_RecordId );
-            // console.log( { res } );
         }
     }
 
