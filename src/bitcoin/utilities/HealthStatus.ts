@@ -10,6 +10,7 @@ export default class HealthStatus {
     ugly: number;
   };
 
+
   constructor () {
     this.counter = {
       good: 0,

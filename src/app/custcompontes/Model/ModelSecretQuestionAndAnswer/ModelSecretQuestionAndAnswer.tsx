@@ -98,7 +98,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             flag_QrcodeDisaply: false,
             arr_QrCodeBase64String: [],
             answerBorderColor: "#808080",
-            flag_DisableBtnNext: true,
+            flag_DisableBtnNext: false,
             flag_Loading: false
         } );
     }
@@ -116,6 +116,10 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             } );
         }
     }
+
+
+
+
 
     //TODO: Select Picker Question List change aciton
     onValueChange( value: string ) {
@@ -211,10 +215,11 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             if ( generateShareRes.status == 200 ) {
                 const { encryptedShares } = generateShareRes.data;
                 const autoHealthShares = encryptedShares.slice( 0, 3 );
-                //console.log( { autoHealthShares, manualHealthShares } );
+
+                console.log( { autoHealthShares } );
                 const resInitializeHealthcheck = await sss.initializeHealthcheck( autoHealthShares );
                 console.log( { resInitializeHealthcheck } );
-                if ( resInitializeHealthcheck.status == 200 || resInitializeHealthcheck.status == 400 ) {
+                if ( resInitializeHealthcheck.status == 200 || resInitializeHealthcheck.status == 400 ) { //||
                     const shareIds = [];
                     // console.log( { autoHealthShares } );
                     for ( const share of encryptedShares ) {
@@ -453,8 +458,13 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 let resSecoundXpub4Share = await this.generateXpubAnd2FAQRCode( this.state.base64string9, "secoundryXpub4Share.png" );
                 // console.log( { resSecoundXpub4Share } );  
                 let res2FASecret4Share = await this.generateXpubAnd2FAQRCode( this.state.base64string10, "googleAuto2FASecret4Share.png" );
-                // console.log( { res2FASecret4Share } );  
-                let create4thPdf = await this.genreatePdf( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, res4thShare6Create, res4thShare7Create, res4thShare8Create, resSecoundXpub4Share, res2FASecret4Share, "SecretSharing4Share.pdf", "For 4th Shares" );
+                // console.log( { res2FASecret4Share } );
+                var create4thPdf;
+                if ( Platform.OS == "android" ) {
+                    create4thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode4thSahre1.png", "/storage/emulated/0/qrcode4thSahre2.png", "/storage/emulated/0/qrcode4thSahre3.png", "/storage/emulated/0/qrcode4thSahre4.png", "/storage/emulated/0/qrcode4thSahre5.png", "/storage/emulated/0/qrcode4thSahre6.png", "/storage/emulated/0/qrcode4thSahre7.png", "/storage/emulated/0/qrcode4thSahre8.png", "/storage/emulated/0/secoundryXpub4Share.png", "/storage/emulated/0/googleAuto2FASecret4Share.png", "SecretSharing4Share.pdf", "For 4th Shares" );
+                } else {
+                    create4thPdf = await this.genreatePdf( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, res4thShare6Create, res4thShare7Create, res4thShare8Create, resSecoundXpub4Share, res2FASecret4Share, "SecretSharing4Share.pdf", "For 4th Shares" );
+                }
                 resolve( create4thPdf );
             }, 2000 );
 
@@ -517,7 +527,13 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 // console.log( { resSecoundXpub4Share } );
                 let res2FASecret5Share = await this.generateXpubAnd2FAQRCode( this.state.base64string10, "googleAuto2FASecret5Share.png" );
                 // console.log( { res2FASecret4Share } );
-                let create5thPdf = await this.genreatePdf( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, res5thShare6Create, res5thShare7Create, res5thShare8Create, resSecoundXpub5Share, res2FASecret5Share, "SecretSharing5Share.pdf", "For 5th Shares" );
+                var create5thPdf;
+                if ( Platform.OS == "android" ) {
+                    create5thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode5thSahre1.png", "/storage/emulated/0/qrcode5thSahre2.png", "/storage/emulated/0/qrcode5thSahre3.png", "/storage/emulated/0/qrcode5thSahre4.png", "/storage/emulated/0/qrcode5thSahre5.png", "/storage/emulated/0/qrcode5thSahre6.png", "/storage/emulated/0/qrcode5thSahre7.png", "/storage/emulated/0/qrcode5thSahre8.png", "/storage/emulated/0/secoundryXpub5Share.png", "/storage/emulated/0/googleAuto2FASecret5Share.png", "SecretSharing5Share.pdf", "For 5th Shares" );
+                } else {
+                    create5thPdf = await this.genreatePdf( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, res5thShare6Create, res5thShare7Create, res5thShare8Create, resSecoundXpub5Share, res2FASecret5Share, "SecretSharing5Share.pdf", "For 5th Shares" );
+                }
+
                 resolve( create5thPdf );
             }, 1000 );
         } );
@@ -533,6 +549,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 docsDir = await PDFLib.getDocumentsDirectory();
             }
             docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
+            console.log( { docsDir } );
             var path = `${ docsDir }/${ fileName }`;
             RNFS.writeFile( path, share1, "base64" )
                 .then( ( success: any ) => {
@@ -632,9 +649,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 docsDir = await PDFLib.getDocumentsDirectory();
             }
             const pdfPath = `${ docsDir }/${ pdfFileName }`;
-            //console.log( { pdfPath } );
-            docsDir = Platform.OS === 'android' ? `/${ docsDir }` : docsDir;
-            // console.log( { docsDir } );
+            console.log( { pdfPath } );
             const page1 = PDFPage
                 .create()
                 .drawText( forShare, {
