@@ -50,7 +50,7 @@ signingConfig signingConfigs.release
 }  
 }
 ...
-
+   
 ###
 
 ==> mkdir -p android/app/src/main/assets

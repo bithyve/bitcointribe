@@ -408,12 +408,17 @@ export default class SSS {
 
     const { walletId } = this.getWalletId();
     let res: AxiosResponse;
+    console.log( { walletId } );
+
     try {
       res = await BH_AXIOS.post( "sharesHealthCheckInit", {
         walletID: walletId,
         shareIDs,
       } );
+      console.log( { res } )
     } catch ( err ) {
+      console.log( { err } );
+
       throw new Error( err.response.data.err );
     }
     return {

@@ -114,7 +114,27 @@ export default class SecretQuestionAndAnswerScreen extends Component {
                 }
             ]
         } )
+        if ( Platform.OS == "android" ) {
+            this.getExternalStorgePermission();
+        }
     }
+
+    getExternalStorgePermission = async () => {
+        try {
+            const grantedWrite = await PermissionsAndroid.requestMultiple( [
+                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
+            ] );
+            console.log( { grantedWrite } );
+        } catch ( err ) {
+            console.warn( err );
+        }
+    }
+
+
+
+
+
 
 
     render() {
