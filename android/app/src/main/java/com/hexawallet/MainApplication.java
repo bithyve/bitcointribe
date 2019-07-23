@@ -43,6 +43,8 @@ import com.facebook.soloader.SoLoader;
 import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
 
+import com.hexawallet.PdfPasswordPackage;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,8 +58,8 @@ public class MainApplication extends Application implements ReactApplication {
 
     @Override
     protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(new MainReactPackage(), new RandomBytesPackage(), new UdpSocketsModule(),
-          new RNDeviceInfo(), new TcpSocketsModule(), new SvgPackage(), new RNSpinkitPackage(),
+      return Arrays.<ReactPackage>asList(new MainReactPackage(), new PdfPasswordPackage(), new RandomBytesPackage(),
+          new UdpSocketsModule(), new RNDeviceInfo(), new TcpSocketsModule(), new SvgPackage(), new RNSpinkitPackage(),
           new VectorIconsPackage(), SendSMSPackage.getInstance(), new RNSharePackage(), new PDFLibPackage(),
           new RNOSModule(), new RNMail(), new LinearGradientPackage(), new QRScanReaderPackage(), new KeychainPackage(),
           new ImagePickerPackage(), new RNI18nPackage(), new RNGestureHandlerPackage(), new RNFSPackage(),
