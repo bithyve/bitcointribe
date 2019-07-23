@@ -219,7 +219,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 console.log( { autoHealthShares } );
                 const resInitializeHealthcheck = await sss.initializeHealthcheck( autoHealthShares );
                 console.log( { resInitializeHealthcheck } );
-                if ( resInitializeHealthcheck.status == 200 || resInitializeHealthcheck.status == 400 ) { //||
+                if ( resInitializeHealthcheck.status == 200 || resInitializeHealthcheck.status == 400 ) {
                     const shareIds = [];
                     // console.log( { autoHealthShares } );
                     for ( const share of encryptedShares ) {
@@ -1180,16 +1180,27 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 .create( pdfPath )
                 .addPages( page1, page2, page3, page4, page5, page6 )
                 .write()
-                .then( ( path: any ) => {
+                .then( async ( path: any ) => {
                     console.log( 'PDF created at: ' + path );
                     let pdffilePassword = this.state.secoundAnswer;
                     if ( Platform.OS == "ios" ) {
                         var PdfPassword = NativeModules.PdfPassword;
                         PdfPassword.addEvent( "/" + pdfFileName, pdffilePassword );
+                    } else {
+                        this.setPdfAndroidPasswrod( pdfFileName, pdffilePassword );
                     }
                     resolve( path );
                 } );
         } );
+    }
+
+    // async function to call the Java native method
+    async setPdfAndroidPasswrod( pdfPath: string, pdffilePassword: string ) {
+        var PdfPassword = NativeModules.PdfPassword;
+        module.exports = NativeModules.PdfPassword;
+        console.log( { PdfPassword } );
+        console.log( { pdfPath, pdffilePassword } );
+        PdfPassword.setPdfPasswrod( pdfPath, pdffilePassword, ( err ) => { console.log( err ) }, ( msg ) => { console.log( msg ) } );
     }
 
 
