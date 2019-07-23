@@ -48,7 +48,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
 //             PdfWriter writer = PdfWriter.getInstance(document, file);
 //             writer.setEncryption(USER_PASS.getBytes(), OWNER_PASS.getBytes(),
 //             PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128);
-    
+
             PdfReader reader = new PdfReader(filePath);
             PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(filePath));
             stamper.setEncryption(USER, OWNER,
