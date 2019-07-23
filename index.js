@@ -15,6 +15,9 @@ import { createStore } from 'redux';
 import allReducers from './src/redux/reducers';
 const store = createStore( allReducers );
 
+
+import { asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
+
 //TODO: Custome Object
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 export default class HexaWallet extends React.Component
@@ -29,12 +32,12 @@ export default class HexaWallet extends React.Component
     };
     StatusBar.setBarStyle( 'light-content', true );
   }
-  async componentDidMount ()
+  async componentDidMount ()    
   {
     try
     {
-      //AppState.addEventListener( "change", this._handleAppStateChange );
-      AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
+      // AppState.addEventListener( "change", this._handleAppStateChange );
+      // AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
       //TODO: Deep Linking
       DeepLinking.addScheme( "https://" );
       Linking.addEventListener( "url", this.handleUrl );
@@ -52,11 +55,11 @@ export default class HexaWallet extends React.Component
             pageName = "TabbarBottom";
             type = "SSS Recovery SMS/EMAIL";
           }
-          else if ( response.pageName == "rtb" )  
+          else if ( response.pageName == "req" )  
           {
             pageName = "TrustedPartyShareSecretNavigator";
             type = "SSS Restore SMS/EMAIL";
-          } else if ( response.pageName == "rta" )
+          } else if ( response.pageName == "res" )   
           {
             pageName = "OTPScreenNavigator";
             type = "SSS Restore SMS/EMAIL";
@@ -120,8 +123,8 @@ export default class HexaWallet extends React.Component
     try
     {
       Linking.removeEventListener( "url", this.handleUrl );
-      // AppState.removeEventListener( "change", this._handleAppStateChange );
-    } catch ( e )
+      //  AppState.removeEventListener( "change", this._handleAppStateChange );
+    } catch ( e )  
     {
       console.log( {
         e
@@ -131,13 +134,13 @@ export default class HexaWallet extends React.Component
 
   // _handleAppStateChange = async nextAppState =>
   // {
-  //   try
+  //   try     
   //   {
   //     var status = JSON.parse(
-  //       await AsyncStorage.getItem( "PasscodeCreateStatus" )
+  //       await AsyncStorage.getItem( asyncStorageKeys.flag_PasscodeCreate )
   //     );
   //     let flag_BackgoundApp = JSON.parse(
-  //       await AsyncStorage.getItem( "flag_BackgoundApp" )
+  //       await AsyncStorage.getItem( asyncStorageKeys.flag_BackgoundApp )
   //     );
   //     if ( status && flag_BackgoundApp )
   //     {

@@ -98,11 +98,10 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             flag_QrcodeDisaply: false,
             arr_QrCodeBase64String: [],
             answerBorderColor: "#808080",
-            flag_DisableBtnNext: false,
+            flag_DisableBtnNext: true,
             flag_Loading: false
         } );
     }
-
 
     componentWillReceiveProps( nextProps: any ) {
         var data = nextProps.data;
@@ -117,21 +116,12 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
         }
     }
 
-
-
-
-
     //TODO: Select Picker Question List change aciton
     onValueChange( value: string ) {
         this.setState( {
             firstQuestion: value
         } );
     }
-
-
-
-
-
 
     check_CorrectAnswer() {
         setTimeout( () => {
