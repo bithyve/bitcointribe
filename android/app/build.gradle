@@ -169,8 +169,12 @@ configurations.all {
  }  
    
    
-
-dependencies {      
+   
+dependencies {         
+  
+    compile 'com.itextpdf:itext-pdfa:5.5.10'
+    compile 'com.itextpdf:itextg:5.5.9'
+  
     compile project(':react-native-device-info')
      compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
     transitive = true;
