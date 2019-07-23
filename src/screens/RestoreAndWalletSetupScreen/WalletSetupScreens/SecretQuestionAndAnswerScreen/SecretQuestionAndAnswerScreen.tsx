@@ -161,7 +161,19 @@ export default class SecretQuestionAndAnswerScreen extends Component {
                                         }
                                     ]
                                 } );
-                                this.props.navigation.push( "SecretSharingScreen" )
+                                // this.props.navigation.push( "SecretSharingScreen" )
+                                const resetAction = StackActions.reset( {
+                                    index: 0,
+                                    key: null,
+                                    actions: [
+                                        NavigationActions.navigate( { routeName: "TabbarBottom" } )
+                                    ]
+                                } );
+                                AsyncStorage.setItem(
+                                    asyncStorageKeys.rootViewController,
+                                    "TabbarBottom"
+                                );
+                                this.props.navigation.dispatch( resetAction );
                             } }
                                 pop={ () => {
                                     this.setState( {
