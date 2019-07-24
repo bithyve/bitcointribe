@@ -214,7 +214,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
                                         />
                                     </Item>
                                 </View>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20 } ] }>Select three of your trusted contacts, make sure you can always reach this people to recover your wallet</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20 } ] }>Choose two contacts that you trust and who can help you restore the wallet in case you lose the app</Text>
                             </View>
                             <View style={ { flex: 1 } }>
                                 <GridView
