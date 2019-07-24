@@ -1221,7 +1221,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                             </View>
                             <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
                                 <Image source={ images.backupSecretQuestion.icon } style={ { width: 80, height: 80, marginTop: -30 } } />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20 } ] }>Security Questions</Text>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20 } ] }>Security Question</Text>
                                 <Text note style={ { textAlign: "center" } }>Setup your question and answer.</Text>
                                 <View style={ styles.itemQuestionPicker }>
                                     <Picker
@@ -1290,7 +1290,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                                 ) }
                             </View>
                             <View style={ { flex: 0.1, justifyContent: "flex-end" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>These answers will be required in case you need to restore your wallet</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>This answer will be required in case you want to restore your wallet</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_Next()
