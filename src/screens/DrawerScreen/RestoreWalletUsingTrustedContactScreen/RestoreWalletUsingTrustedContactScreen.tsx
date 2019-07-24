@@ -63,7 +63,7 @@ export default class RestoreWalletUsingTrustedContactScreen extends Component {
                     modalVisible: true
                 }
             ]
-        } )
+        } );
     }
 
     render() {
