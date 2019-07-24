@@ -102,6 +102,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 statusMsgColor: "#ff0000",
                 statusMsg: "Not Share",
             } ],
+            arr_SSSDetails: [],
             arr_Mnemonic: [],
             arr_MnemonicDetails: [],
             arr_SecretQuestion: [],
@@ -110,7 +111,6 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             arr_SecureAccountDetials: [],
             arr_ModelBackupYourWallet: [],
             arr_ModelFindYourTrustedContacts: [],
-
             //flag
             flag_isTrustedContacts: true,
             flag_SelfShare: true,
@@ -168,7 +168,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         let tempOpt = [];
         let temp = [];
         //Trusted Contacts
-        if ( sssDetails.length > 0 ) {
+        if ( sssDetails[ 0 ].keeperInfo != "null" && sssDetails.length > 0 ) {
             //App Health
             for ( let i = 0; i <= 2; i++ ) {
                 encrShares.push( sssDetails[ i ].shareId )
@@ -468,7 +468,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         // console.log( { arr_SecureAccountDetials } );
 
         this.setState( {
-            flag_Loading
+            flag_Loading,
+            arr_SSSDetails: sssDetails
         } )
     }
 
@@ -995,7 +996,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                             await Permissions.request( 'contacts' ).then( ( response: any ) => {
                                 console.log( response );
                                 if ( response == "authorized" ) {
-                                    this.props.navigation.push( "BackUpYourWalletNavigator" )
+                                    const arrSSSDetails = this.state.arr_SSSDetails.slice( 0, 2 );
+                                    this.props.navigation.push( "BackUpYourWalletNavigator", { data: arrSSSDetails } )
                                 } else {
                                     alert.simpleOk( "Oops", "Please add contacts permission." );
                                 }
@@ -1019,59 +1021,6 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                             } )
                         } }
                     />
-                    <Modal style={ [ styles.modal, styles.modal4 ] } position={ "bottom" } ref={ "modal4" }>
-                        <View style={ { flex: 1 } }>
-                            <View style={ { flexDirection: "row", marginTop: 20 } }>
-                                <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "iCLOUD" ) }>
-                                    <View style={ { alignItems: "center", marginLeft: "10%", flexDirection: "column" } }>
-                                        <Icon
-                                            raised
-                                            name='cloud-upload'
-                                            type='font-awesome'
-                                            color='#379FF1'
-                                        />
-                                        <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via iCloud</Text>
-                                    </View>
-                                </Button>
-                                <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "SLACK" ) }>
-                                    <View style={ { alignItems: "center", marginLeft: "10%", flexDirection: "column" } }>
-                                        <Icon
-                                            raised
-                                            name='slack'
-                                            type='font-awesome'
-                                            color='#E2A223'
-                                        />
-                                        <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via Slack</Text>
-                                    </View>
-                                </Button>
-                                <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "WHATSAPP" ) }>
-                                    <View style={ { alignItems: "center", marginLeft: "10%", flexDirection: "column" } }>
-                                        <Icon
-                                            raised
-                                            name='whatsapp'
-                                            type='font-awesome'
-                                            color='#51E46B'
-                                        />
-                                        <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1", textAlign: "center" } }>Via WhatsApp</Text>
-                                    </View>
-                                </Button>
-                            </View>
-
-                            <View style={ { flexDirection: "row", marginTop: 40 } }>
-                                <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "iCLOUD" ) }>
-                                    <View style={ { alignItems: "center", marginLeft: "2%", flexDirection: "column" } }>
-                                        <Icon
-                                            raised
-                                            name='wifi'
-                                            type='font-awesome'
-                                            color='#027AFE'
-                                        />
-                                        <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via AirDrop</Text>
-                                    </View>
-                                </Button>
-                            </View>
-                        </View>
-                    </Modal>
                 </SafeAreaView>
                 <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
             </Container >

@@ -156,7 +156,7 @@ describe("Shamir's Secret Sharing", async () => {
       expect(qrRes.status).toBe(config.STATUS.SUCCESS);
       console.log({ qrData: qrRes.data.qrData });
 
-      const recQRRes = userSSS.recoverMetaShareFromQR(qrRes.data.qrData);
+      const recQRRes = S3Service.recoverMetaShareFromQR(qrRes.data.qrData);
       expect(recQRRes.status).toBe(config.STATUS.SUCCESS);
 
       expect(recQRRes.data.metaShare).toEqual(metaShares[itr]);
