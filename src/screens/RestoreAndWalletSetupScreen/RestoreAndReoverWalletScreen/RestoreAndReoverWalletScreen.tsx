@@ -82,9 +82,9 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
         await utils.setSSSDetails( resSSSDetails );
         let temp = [];
         if ( resSSSDetails.length > 0 ) {
-            temp = [ "Continue Restoring Wallet Using Trusted Contacts", "Restore Wallet Using mnemonic" ];
+            temp = [ "Continue restoring wallet using trusted contacts", "Restore wallet using mnemonic" ];
         } else {
-            temp = [ "Restore Wallet Using Trusted Contacts", "Restore Wallet Using mnemonic" ];
+            temp = [ "Restore wallet using trusted contacts", "Restore wallet using mnemonic" ];
         }
         this.setState( {
             arr_SecoundMenu: temp
@@ -95,9 +95,9 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
     click_Card( item: any ) {
         if ( item == "Set up as a New Wallet" ) {
             this.props.navigation.push( "WalletSetupScreens" );
-        } else if ( item == "Restore Wallet Using mnemonic" ) {
+        } else if ( item == "Restore wallet using mnemonic" ) {
             this.props.navigation.push( "RestoreWalletUsingMnemonicNavigator" )
-        } else if ( item == "Restore Wallet Using Trusted Contacts" ) {
+        } else if ( item == "Restore wallet using trusted contacts" ) {
             this.props.navigation.push( "RestoreWalletUsingTrustedContactNavigator" );
         }
         else {
@@ -119,7 +119,7 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
                             <View style={ styles.viewSetupWallet }>
-                                <Text style={ [ globalStyle.ffFiraSansBold, { color: "#ffffff", marginTop: 50, fontSize: 26, textAlign: "center" } ] }>Setup Wallet</Text>
+                                <Text style={ [ globalStyle.ffFiraSansBold, { color: "#ffffff", marginTop: 50, fontSize: 26, textAlign: "center" } ] }>New Wallet</Text>
                                 <TouchableOpacity
                                     onPress={ () => this.click_Card( "Set up as a New Wallet" ) }
                                 >
@@ -157,7 +157,7 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
                                 <Text
                                     style={ [ globalStyle.ffFiraSansBold, { color: "#ffffff", marginTop: 20, fontSize: 26 } ] }
                                 >
-                                    Restore & Reover
+                                    Restore Wallet
                                </Text>
                             </View>
                             <View style={ { flex: 1, margin: 10 } }>
@@ -201,8 +201,9 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
                                 />
                             </View>
                             <View style={ { flex: 3, alignItems: "center", margin: 20 } }>
-                                <Text style={ [ styles.txtWhiteColor, globalStyle.ffFiraSansBold, { fontSize: 20 } ] }>What Does Restoring Do?</Text>
-                                <Text style={ [ styles.txtWhiteColor, globalStyle.ffFiraSansRegular, { textAlign: "center", margin: 10 } ] }>Restore & recover funds in your Hexa or other Bitcoin Wallets</Text>
+                                <Text style={ [ styles.txtWhiteColor, globalStyle.ffFiraSansBold, { fontSize: 20 } ] }>Restoring a wallet</Text>
+                                <Text style={ [ styles.txtWhiteColor, globalStyle.ffFiraSansRegular, { textAlign: "center", margin: 10 } ] }>Restoring a previously used wallet gives you back the access to your funds.</Text>
+                                <Text style={ [ styles.txtWhiteColor, globalStyle.ffFiraSansRegular, { textAlign: "center", margin: 10 } ] }>You can restore Hexa wallets using any of the methods and restore other wallet by using the mnemonic</Text>
                             </View>
                         </KeyboardAwareScrollView>
                     </ImageBackground>

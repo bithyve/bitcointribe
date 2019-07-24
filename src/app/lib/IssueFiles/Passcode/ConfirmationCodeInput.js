@@ -6,6 +6,18 @@ import _ from 'lodash';
 // if ViewPropTypes is not defined fall back to View.propType (to support RN < 0.44)
 const viewPropTypes = ViewPropTypes || View.propTypes;
 
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    marginTop: 40
+  },
+  codeInput: {
+    backgroundColor: 'transparent',
+    textAlign: 'center',
+    padding: 0
+  }
+});
+
 export default class ConfirmationCodeInput extends Component {
   static propTypes = {
     codeLength: PropTypes.number,
@@ -264,7 +276,7 @@ export default class ConfirmationCodeInput extends Component {
           keyboardType={ 'name-phone-pad' }
           returnKeyType={ 'done' }
           { ...this.props }
-          autoFocus={ autoFocus && id == 0 }
+          autoFocus={ autoFocus && id === 0 }
           onFocus={ () => this._onFocus( id ) }
           value={ this.state.codeArr[ id ] ? this.state.codeArr[ id ].toString() : '' }
           onChangeText={ text => this._onInputCode( text, id ) }
@@ -281,15 +293,3 @@ export default class ConfirmationCodeInput extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create( {
-  container: {
-    flexDirection: 'row',
-    marginTop: 40
-  },
-  codeInput: {
-    backgroundColor: 'transparent',
-    textAlign: 'center',
-    padding: 0
-  }
-} );

@@ -22,7 +22,7 @@ import { asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 export default class HexaWallet extends React.Component
 {
-  constructor ( props )    
+  constructor ( props )
   {
     super( props );
     this.state = {
@@ -67,7 +67,7 @@ export default class HexaWallet extends React.Component
           } );
           var pageName;
           var type;
-          if ( response.pageName == "bk" )
+          if ( response.pageName === "bk" )
           {
             console.log( 'nice' );
 
@@ -233,4 +233,3 @@ export default class HexaWallet extends React.Component
 
 console.disableYellowBox = true;
 AppRegistry.registerComponent( appName, () => HexaWallet );
-
