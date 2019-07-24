@@ -40,7 +40,7 @@ export default class ModelBackupYourWallet extends Component<Props, any> {
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 15 } ] }>Some information comes here, that explains the user why they need to select trusted contacts</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 15 } ] }>Its highly recommended to backup your wallet, to restore funds incase of device loss</Text>
                             <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingMnemonic.walletrestored } />
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
