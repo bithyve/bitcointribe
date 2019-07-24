@@ -44,6 +44,10 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
+
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
 export default class AllContactListScreen extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props )
@@ -129,15 +133,19 @@ export default class AllContactListScreen extends React.Component<any, any> {
             flag_NextBtnDisable1: true
         } )
         let selectedContactList = this.state.SelectedFakeContactList;
-        console.log( { selectedContactList } );
-        // const resUpdateSSSContactDetails = await dbOpration.updateSSSContactListDetails(
-        //     localDB.tableName.tblSSSDetails,
-        //     selectedContactList,
-        // );
-        // if ( resUpdateSSSContactDetails == true ) {
-
-        // }     
-        this.props.navigation.push( "SecretQuestionAndAnswerScreen", { data: selectedContactList } );
+        let arrSSSDetails = this.props.navigation.getParam( "data" );
+        let arrShareId = [ arrSSSDetails[ 0 ].shareId, arrSSSDetails[ 1 ].shareId ]
+        console.log( { selectedContactList, arrSSSDetails } );
+        const resUpdateSSSContactDetails = await dbOpration.updateSSSContactListDetails(
+            localDB.tableName.tblSSSDetails,
+            selectedContactList,
+            arrShareId
+        );
+        if ( resUpdateSSSContactDetails == true ) {
+            await comFunDBRead.readTblSSSDetails();
+            this.props.navigation.pop();
+        }
+        //this.props.navigation.push( "SecretQuestionAndAnswerScreen", { data: selectedContactList } );
     }
 
     //TODO: Remove gird on click item

@@ -36,6 +36,7 @@ import { colors, images, asyncStorageKeys } from "HexaWallet/src/app/constants/C
 
 export default class WalletSetupScreens extends React.Component<any, any> {
 
+
     //TODO:click_GotoPermisionScrenn
     goToWallet() {
         const resetAction = StackActions.reset( {
