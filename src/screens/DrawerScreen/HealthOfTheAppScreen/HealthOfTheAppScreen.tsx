@@ -73,34 +73,34 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 givenName: "Trusted Contact 1",
                 familyName: "",
                 statusMsgColor: "gray",
-                statusMsg: "Status",
+                statusMsg: "Not Shared",
                 opt: undefined,
             }, {
                 thumbnailPath: "user",
                 givenName: "Trusted Contact 2",
                 familyName: "",
                 statusMsgColor: "gray",
-                statusMsg: "Status",
+                statusMsg: "Not Shared",
                 opt: undefined,
             } ],
             arr_SelfShare: [ {
                 thumbnailPath: "bars",
-                givenName: "Wallet",
+                givenName: "Secondary Device",
                 familyName: "",
                 statusMsgColor: "#ff0000",
-                statusMsg: "Not Share",
+                statusMsg: "Not Shared",
             }, {
                 thumbnailPath: "bars",
                 givenName: "Email",
                 familyName: "",
                 statusMsgColor: "#ff0000",
-                statusMsg: "Not Share",
+                statusMsg: "Not Shared",
             }, {
                 thumbnailPath: "bars",
-                givenName: "iCloud Share",
+                givenName: "Cloud",
                 familyName: "",
                 statusMsgColor: "#ff0000",
-                statusMsg: "Not Share",
+                statusMsg: "Not Shared",
             } ],
             arr_Mnemonic: [],
             arr_MnemonicDetails: [],
@@ -222,12 +222,12 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 console.log( { tempOpt } );
                 if ( updateShareIdStatus ) {
                     if ( totalSec < 540 && sssDetails[ i ].shareStage == "Ugly" ) {
-                        data.statusMsg = "Shared";
+                        data.statusMsg = "Not Shared";
                         data.statusMsgColor = "#C07710";
                         data.flag_timer = true;
                         data.opt = tempOpt[ i ];
                     } else if ( totalSec >= 540 && sssDetails[ i ].shareStage == "Ugly" ) {
-                        data.statusMsg = "Shared OTP expired.";
+                        data.statusMsg = "OTP expired.";
                         data.statusMsgColor = "#C07710";
                         data.flag_timer = false;
                     } else if ( sssDetails[ i ].shareStage == "Good" ) {
@@ -235,11 +235,11 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                         data.statusMsgColor = "#008000";
                         data.flag_timer = false;
                     } else if ( sssDetails[ i ].shareStage == "Bad" ) {
-                        data.statusMsg = "Share accessible";
+                        data.statusMsg = "Share inaccessible";
                         data.statusMsgColor = "#C07710";
                         data.flag_timer = false;
                     } else if ( sssDetails[ i ].shareStage == "Ugly" && sssDetails[ i ].sharedDate != "" ) {
-                        data.statusMsg = "Share not accessible";
+                        data.statusMsg = "Share inaccessible";
                         data.statusMsgColor = "#ff0000";
                         data.flag_timer = false;
                     }
@@ -251,7 +251,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                     arr_TrustedContacts.push( data );
                 }
                 else {
-                    alert.simpleOk( "Oops", "App Health not update in database." );
+                    alert.simpleOk( "Sorry!", "Failed to update health of the app" );
                 }
             }
 
@@ -474,9 +474,9 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
     getMsgAndColor( sharedDate: string, shareStage: string ) {
         if ( sharedDate == "" && shareStage != "Good" ) {
-            return [ "Not Share", "#ff0000" ];
+            return [ "Not Shared", "#ff0000" ];
         } else if ( sharedDate != "" && shareStage != "Good" ) {
-            return [ "Shared", "#C07710" ];
+            return [ "Not shared", "#C07710" ];
         } else {
             return [ "Share Confirmed", "#008000" ];
         }
