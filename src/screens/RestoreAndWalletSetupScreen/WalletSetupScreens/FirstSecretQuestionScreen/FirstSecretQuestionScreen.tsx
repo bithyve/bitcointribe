@@ -1228,8 +1228,8 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                     contentContainerStyle={ { flexGrow: 1, } }
                 >
                     <View style={ styles.viewPagination }>
-                        <Text style={ [ globalStyle.ffFiraSansMedium, { fontWeight: "bold", fontSize: 22, textAlign: "center" } ] }>Step 2: Select  secret question</Text>
-                        <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>To Set up you need to select secret questions</Text>
+                        <Text style={ [ globalStyle.ffFiraSansMedium, { fontWeight: "bold", fontSize: 22, textAlign: "center" } ] }>Step 2: Select secret question</Text>
+                        <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>Select the question and specify the answer such that you always remember it and no one can easily guess it</Text>
                     </View>
                     <View style={ styles.viewInputFiled }>
 
@@ -1296,7 +1296,7 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                         </Item>
                     </View>
                     <View style={ styles.viewProcedBtn }>
-                        <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } ] } numberOfLines={ 1 }>Make sure you don’t select questions, answers to </Text>
+                        <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } ] } numberOfLines={ 1 }>The answer is never stored anywhere and even your contacts don't know this answer </Text>
                         <FullLinearGradientButton title="Go To Wallet" disabled={ this.state.flag_ConfirmDisableBtn } style={ [ this.state.flag_ConfirmDisableBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } click_Done={ () => this.click_FirstQuestion() } />
                     </View>
                     <View style={ { flexDirection: "row", marginLeft: 500, height: 10 } }>

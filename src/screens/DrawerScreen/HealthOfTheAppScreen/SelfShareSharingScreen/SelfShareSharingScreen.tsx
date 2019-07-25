@@ -256,7 +256,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                             </Button>
                         </View>
                         <View style={ { flex: 0.1, margin: 20 } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Share this pdf to an email/cloud which you can access if required to hold this secret for safekeeping </Text>
                         </View>
                         <View style={ { flex: 2 } }>
                             <FlatList
@@ -285,7 +285,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                         </View>
                         { renderIf( flag_ShareBtnDisable == true )(
                             <View style={ { flex: 0.4 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Now only sharing email.</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Do not share this pdf with anyone other than your email/cloud</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_ShareEmail( data )
@@ -297,7 +297,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                         ) }
                         { renderIf( flag_ReShareBtnDisable == true )(
                             <View style={ { flex: 0.4 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Now only sharing email.</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Do not share this pdf with anyone other than your email/cloud</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_ReShare( data )
