@@ -82,9 +82,9 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
         await utils.setSSSDetails( resSSSDetails );
         let temp = [];
         if ( resSSSDetails.length > 0 ) {
-            temp = [ "Continue restoring wallet using trusted contacts", "Restore wallet using mnemonic" ];
+            temp = [ "Continue restoring wallet using trusted source", "Restore wallet using mnemonic" ];
         } else {
-            temp = [ "Restore wallet using trusted contacts", "Restore wallet using mnemonic" ];
+            temp = [ "Restore wallet using trusted source", "Restore wallet using mnemonic" ];
         }
         this.setState( {
             arr_SecoundMenu: temp
@@ -97,7 +97,7 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
             this.props.navigation.push( "WalletSetupScreens" );
         } else if ( item == "Restore wallet using mnemonic" ) {
             this.props.navigation.push( "RestoreWalletUsingMnemonicNavigator" )
-        } else if ( item == "Restore wallet using trusted contacts" ) {
+        } else if ( item == "Restore wallet using trusted source" ) {
             this.props.navigation.push( "RestoreWalletUsingTrustedContactNavigator" );
         }
         else {

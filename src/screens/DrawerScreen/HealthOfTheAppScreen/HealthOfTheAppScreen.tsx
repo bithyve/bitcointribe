@@ -298,8 +298,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
             let data = {};
             data.icon = "timelockNew";
-            data.title = "First Secret Question";
-            data.subTitle = totalSec <= expaire.backup.expaire_secretquestion ? "Backed Confirm" : "Not Backed up";
+            data.title = "Secret Question";
+            data.subTitle = totalSec <= expaire.backup.expaire_secretquestion ? "Backup Confirm" : "Not Backed up";
             data.color = totalSec <= expaire.backup.expaire_secretquestion ? "#008000" : "#ff0000";
             data.walletDetails = walletDetails;
             arr_SecretQuestion.push( data )

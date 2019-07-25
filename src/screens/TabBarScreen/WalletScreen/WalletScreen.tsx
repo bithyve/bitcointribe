@@ -268,7 +268,7 @@ export default class WalletScreen extends React.Component {
         shiledIconPer: 1,
         arr_CustShiledIcon: [
           {
-            "title": "Looks like your app needs a quick check to maintain good health",
+            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
             "image": "sheild_1",
             "imageHeight": 80, //this.animatedShieldIconSize,
             "imageWidth": 80, //this.animatedShieldIconSize,
