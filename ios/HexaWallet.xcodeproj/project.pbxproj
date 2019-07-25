@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		001FD8F5BCF344BE99EA8AA9 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F79788E7D60A489CA04491E9 /* MaterialIcons.ttf */; };
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
@@ -1608,6 +1609,7 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = Y5TCB759QL;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 0;
@@ -2736,6 +2738,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = HexaWallet/HexaWallet.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = Y5TCB759QL;
@@ -2790,6 +2794,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.bithyve.hexa;
 				PRODUCT_NAME = HexaWallet;
+				PROVISIONING_PROFILE_SPECIFIER = "Hexa Wallet Development Profile";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -2799,6 +2804,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = HexaWallet/HexaWallet.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Y5TCB759QL;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2852,6 +2859,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.bithyve.hexa;
 				PRODUCT_NAME = HexaWallet;
+				PROVISIONING_PROFILE_SPECIFIER = "Hexa Wallet Development Profile";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;

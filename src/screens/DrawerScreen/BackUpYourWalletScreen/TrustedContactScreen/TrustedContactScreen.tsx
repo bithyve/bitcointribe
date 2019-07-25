@@ -191,7 +191,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                     console.log( 'SMS Sent Completed' );
                     setTimeout( () => {
                         this.connection_UpdateSSSDetails( "SMS" );
-                        alert.simpleOk( "Success", "SMS Sent Successfully." );
+                        alert.simpleOk( "SMS Sent Successfully." );
                         this.setState( {
                             flag_OtpCodeShowStatus: true
                         } )
@@ -323,7 +323,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                             </Button>
                         </View>
                         <View style={ { flex: 0.1, margin: 20 } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Health and history of the share will be shared with </Text>
                         </View>
                         <View style={ Platform.OS == "ios" ? { flex: 0.7 } : { flex: 0.8 } }>
                             <View style={ { flex: 1, flexDirection: 'row' } }>
