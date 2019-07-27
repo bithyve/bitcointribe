@@ -22,9 +22,6 @@ export default class ModalAllTransactionDetails extends Component<Props, any> {
             </TouchableOpacity>)
 
     }
-
-
-    
     render() {
         const { modalVisible, selectedTransaction, detailsArray } = this.props.modalData;
         return (<Modal
@@ -47,7 +44,7 @@ export default class ModalAllTransactionDetails extends Component<Props, any> {
                                 />
                             </View>
                             <View style={{ flex: 1, padding: 5 }}>
-                                <Text style={{ color: "#151515", fontWeight: "600", fontSize: 14, paddingVertical: 3 }}>{selectedTransaction.transactionType}</Text>
+                                <Text style={{ color: "#151515", fontWeight: "600", fontSize: 14, paddingVertical: 3 }}>{ selectedTransaction.transactionType === "Received" ? "To " + selectedTransaction.accountType + " Account"  : "From " + selectedTransaction.accountType + " Account" }</Text>
                                 <Text style={{ color: "#2F2F2F", fontSize: 12, fontWeight: "600" }}>{selectedTransaction.time}</Text>
                             </View>
 
@@ -64,7 +61,7 @@ export default class ModalAllTransactionDetails extends Component<Props, any> {
                                 <View style={{
                                     flex: 1, flexDirection: "row", alignItems: 'center', paddingHorizontal: 10
                                 }}>
-                                    <Text style={{ color: "#2F2F2F", fontSize: 20, fontWeight: "bold" }}>{selectedTransaction.totalReceived}</Text>
+                                    <Text style={{ color: "#2F2F2F", fontSize: 20, fontWeight: "bold" }}>{selectedTransaction.amount}</Text>
                                     <Text style={{ color: "#D0D0D0", fontSize: 15, fontWeight: "600", paddingHorizontal: 10 }}>{selectedTransaction.NumberofConfirmations}</Text>
                                 </View>
                                 <View >

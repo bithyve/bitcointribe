@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, Modal, Text } from 'react-native';
+import { StyleSheet, View, Modal, Text, Image } from 'react-native';
 import {
     MaterialIndicator
 } from 'react-native-indicators';
 import PropTypes from 'prop-types';
+import ImageLoader from "../../../assets/gif/loader.gif";
 
 const Loader = ( { loading = false, color = "#000000", size = 30, opacity = 0.4, message = "Loading" } ) => {
     return (
@@ -20,8 +21,7 @@ const Loader = ( { loading = false, color = "#000000", size = 30, opacity = 0.4,
                 ] }
             >
                 <View style={ styles.activityIndicatorWrapper }>
-                    <MaterialIndicator size={ size } color={ color } />
-                    <Text style={ { paddingBottom: 10 } }>{ message }</Text>
+                    <Image source={ImageLoader} style={{height:100,width:100}}/>
                 </View>
             </View>
         </Modal>
@@ -49,7 +49,6 @@ const styles = StyleSheet.create( {
     activityIndicatorWrapper: {
         height: 100,
         width: 100,
-        backgroundColor: "#ffffff",
         borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center'
