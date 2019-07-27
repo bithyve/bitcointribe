@@ -195,16 +195,12 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                 data.updatedAt = sssDetails[ i ].sharedDate == "" ? 0 : parseInt( sssDetails[ i ].sharedDate );
                 encrShares.push( data );
             }
-            console.log( { encrShares } );
-            let updateShareIdStatus = await comAppHealth.connection_AppHealthForAllShare( parseInt( walletDetails.lastUpdated ), encrShares );
-            console.log( { updateShareIdStatus } );
             this.setState( {
                 flag_ConfrimBtnDisable: false
             } )
         } else {
             alert.simpleOk( "Oops", "Try again." );
         }
-
     }
 
     //TODO: update histroy
@@ -217,12 +213,22 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
         let temp = [ JsonData ];
         arr_History.push.apply( arr_History, temp );
         console.log( { arr_History } );
-        let resUpdateHistroyAndSharedDate = await dbOpration.updateHistroyAndSharedDate(
-            localDB.tableName.tblSSSDetails,
-            arr_History,
-            dateTime,
-            data.sssDetails.id
-        );
+        var resUpdateHistroyAndSharedDate;
+        if ( title == "Shared." ) {
+            resUpdateHistroyAndSharedDate = await dbOpration.updateHistroyAndSharedDate(
+                localDB.tableName.tblSSSDetails,
+                arr_History,
+                dateTime,
+                data.sssDetails.id
+            );
+        } else {
+            resUpdateHistroyAndSharedDate = await dbOpration.updateHistroyAndAcceptDate(
+                localDB.tableName.tblSSSDetails,
+                arr_History,
+                dateTime,
+                data.sssDetails.id
+            );
+        }
         console.log( resUpdateHistroyAndSharedDate );
         if ( resUpdateHistroyAndSharedDate ) {
             await comFunDBRead.readTblSSSDetails();

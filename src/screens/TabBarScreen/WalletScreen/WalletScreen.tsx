@@ -120,12 +120,8 @@ export default class WalletScreen extends React.Component {
       deepLinkingUrl: "",
       deepLinkingUrlType: "",
       flag_FabActive: false,
-
-      //Circler Progress
-      progressFill: 15,
       //flag   
       flag_refreshing: false,
-      flag_cardScrolling: false,
       flag_Loading: false,
     };
     isNetwork = utils.getNetwork();
@@ -133,17 +129,14 @@ export default class WalletScreen extends React.Component {
 
   //TODO: Page Life Cycle
   componentWillMount() {
-    let { progressFill } = this.state;
     this.willFocusSubscription = this.props.navigation.addListener(
       "willFocus",
       () => {
-        // isNetwork = utils.getNetwork();
         this.connnection_FetchData();
         this.getDeepLinkingData();
-        //calling refresh
-        //this.refresh();
       }
     );
+
 
     //TODO: Animation View
     this.startHeaderHeight = 200;
@@ -154,11 +147,13 @@ export default class WalletScreen extends React.Component {
       extrapolate: "clamp"
     } );
 
+
     this.animatedMarginTopScrolling = this.animatedHeaderHeight.interpolate( {
       inputRange: [ this.endHeaderHeight, this.startHeaderHeight ],
       outputRange: [ 10, -35 ],
       extrapolate: "clamp"
     } );
+
 
     this.animatedAppTextSize = this.animatedHeaderHeight.interpolate( {
       inputRange: [ this.endHeaderHeight, this.startHeaderHeight ],
@@ -193,7 +188,8 @@ export default class WalletScreen extends React.Component {
   async connnection_FetchData() {
     //Singleton Flag value change   
     await utils.setFlagQRCodeScreen( true );
-    var resultWallet = await utils.getWalletDetails();
+    var resultWallet = await await comFunDBRead.readTblWallet();
+    console.log( { resultWallet } );
     var resAccount = await comFunDBRead.readTblAccount();
     await comFunDBRead.readTblSSSDetails();
     console.log( { resAccount } );
@@ -220,59 +216,76 @@ export default class WalletScreen extends React.Component {
         data.secureBtnTitle = ""
       temp.push( data )
     }
-    console.log( { temp } );
-    if ( resAccount.length > 4 ) {
-      this.setState( {
-        flag_cardScrolling: true
-      } )
-    }
     this.setState( {
       walletDetails: resultWallet,
       arr_accounts: temp,
     } );
 
     //TODO: appHealthStatus    
-    let appHealth = resultWallet.appHealthStatus;
-    if ( appHealth != "" ) {
-      let resAppHealthStatus = JSON.parse( resultWallet.appHealthStatus );
-      console.log( { resAppHealthStatus } );
-      if ( resAppHealthStatus.overallStatus == "1" ) {
-        this.setState( {
-          shiledIconPer: 1,
-          arr_CustShiledIcon: [
-            {
-              "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
-              "image": "sheild_1",
-              "imageHeight": 80, //this.animatedShieldIconSize,
-              "imageWidth": 80, //this.animatedShieldIconSize,
-              progressFill: 15
-            }
-          ]
-        } );
-      } else {
-        this.setState( {
-          shiledIconPer: 3,
-          arr_CustShiledIcon: [
-            {
-              "title": "Your wallet is not secure, some Information about backup comes here. Click on the icon to backup",
-              "image": "sheild_2",
-              "imageHeight": 80, //this.animatedShieldIconSize,
-              "imageWidth": 80, //this.animatedShieldIconSize,
-              progressFill: 30
-            }
-          ]
-        } );
-      }
-    } else {
+    let appHealth = JSON.parse( resultWallet.appHealthStatus );
+    console.log( { appHealth } );
+    if ( appHealth.overallStatus == "1" ) {
       this.setState( {
         shiledIconPer: 1,
         arr_CustShiledIcon: [
           {
-            "title": "Looks like your app needs a quick check to maintain good health",
+            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
             "image": "sheild_1",
-            "imageHeight": 80, //this.animatedShieldIconSize,
-            "imageWidth": 80, //this.animatedShieldIconSize,
-            progressFill: 15
+            "imageHeight": this.animatedShieldIconSize,
+            "imageWidth": this.animatedShieldIconSize,
+          }
+        ]
+      } );
+    }
+
+    else if ( appHealth.overallStatus == "2" ) {
+      this.setState( {
+        shiledIconPer: 2,
+        arr_CustShiledIcon: [
+          {
+            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
+            "image": "sheild_2",
+            "imageHeight": this.animatedShieldIconSize,
+            "imageWidth": this.animatedShieldIconSize,
+          }
+        ]
+      } );
+    }
+    else if ( appHealth.overallStatus == "3" ) {
+      this.setState( {
+        shiledIconPer: 3,
+        arr_CustShiledIcon: [
+          {
+            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
+            "image": "sheild_3",
+            "imageHeight": this.animatedShieldIconSize,
+            "imageWidth": this.animatedShieldIconSize,
+          }
+        ]
+      } );
+    }
+    else if ( appHealth.overallStatus == "4" ) {
+      this.setState( {
+        shiledIconPer: 4,
+        arr_CustShiledIcon: [
+          {
+            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
+            "image": "sheild_3",
+            "imageHeight": this.animatedShieldIconSize,
+            "imageWidth": this.animatedShieldIconSize,
+          }
+        ]
+      } );
+    }
+    else {
+      this.setState( {
+        shiledIconPer: 5,
+        arr_CustShiledIcon: [
+          {
+            "title": "Your wallet is not secure, some Information about backup comes here. Click on the icon to backup",
+            "image": "sheild_5",
+            "imageHeight": this.animatedShieldIconSize,
+            "imageWidth": this.animatedShieldIconSize,
           }
         ]
       } );
@@ -513,49 +526,6 @@ export default class WalletScreen extends React.Component {
     }
   }
 
-  // getTransactionAndBal() {
-  //   let bal, getTransactions;
-  //   if ( data.selectedAccount.accountType == "Regular Account" ) {
-  //     bal = await regularAccount.getBalance();
-  //     console.log( { bal } );
-  //   } else {
-  //   }
-  //   if ( bal.status == 200 ) {
-  //     const resUpdateAccountBal = await dbOpration.updateAccountBal(
-  //       localDB.tableName.tblAccount,
-  //       data.selectedAccount.address,
-  //       bal.data.balance / 1e8,
-  //       data.selectedAccount.id
-  //     );
-  //     if ( resUpdateAccountBal ) {
-  //       getTransactions = await regularAccount.getTransactions();
-  //       console.log( { getTransactions } );
-  //       //update db bal
-  //       const resUpdateAccountBal = await dbOpration.updateAccountBalAddressWise(
-  //         localDB.tableName.tblAccount,
-  //         resAccount[ 0 ].address,
-  //         bal.data.balance / 1e8
-  //       );
-  //     }
-  //     console.log( { resUpdateAccountBal } );
-  //   } else {
-  //     Alert.alert(
-  //       'Oops',
-  //       bal.err,
-  //       [
-  //         {
-  //           text: 'Ok', onPress: () => {
-
-  //           }
-  //         },
-  //       ],
-  //       { cancelable: false },
-  //     );
-  //   }
-  // }    
-
-
-
   _renderItem( { item, index } ) {
     return (
       <View key={ "card" + index }>
@@ -786,20 +756,13 @@ export default class WalletScreen extends React.Component {
     let { walletDetails, arr_CustShiledIcon, arr_accounts } = this.state;
     //model array
     let { arr_ModelAcceptOrRejectSecret, arr_ModelBackupShareAssociateContact, arr_ModelBackupAssociateOpenContactList, arr_ModelBackupYourWallet, arr_ModelSelfShareAcceptAndReject } = this.state;
-    //values
     //flag
-    let { flag_cardScrolling, flag_Loading, flag_refreshing } = this.state;
+    let { flag_Loading, flag_refreshing } = this.state;
     return (
       <Container>
         <Content
-          scrollEnabled={ true }
+          scrollEnabled={ false }
           contentContainerStyle={ styles.container }
-          refreshControl={
-            <RefreshControl
-              refreshing={ flag_refreshing }
-              onRefresh={ this.refresh.bind( this ) }
-            />
-          }
         >
           <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
           <SafeAreaView style={ styles.container }>
@@ -883,10 +846,15 @@ export default class WalletScreen extends React.Component {
             >
               <ScrollView
                 scrollEventThrottle={ 40 }
+                refreshControl={
+                  <RefreshControl
+                    refreshing={ flag_refreshing }
+                    onRefresh={ this.refresh.bind( this ) }
+                  />
+                }
                 contentContainerStyle={ { flex: 0 } }
                 horizontal={ false }
                 pagingEnabled={ false }
-                scrollEnabled={ flag_cardScrolling == true ? true : false }
                 onScroll={ Animated.event( [
                   {
                     nativeEvent: { contentOffset: { y: this.state.scrollY } }
@@ -896,7 +864,6 @@ export default class WalletScreen extends React.Component {
                 <FlatList
                   data={ arr_accounts }
                   showsVerticalScrollIndicator={ false }
-                  scrollEnabled={ flag_cardScrolling == true ? true : false }
                   renderItem={ this._renderItem.bind( this ) }
                   keyExtractor={ ( item, index ) => index }
                 />

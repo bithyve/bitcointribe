@@ -53,6 +53,7 @@ export default class AllTransactionScreen extends React.Component {
 
   async getTransaction() {
     this.setState( { flag_Loading: true } );
+    let flag_Loading = true;
     let regularAccount = await bitcoinClassState.getRegularClassState();
     var regularAccountTransactions = await regularAccount.getTransactions();
     if ( regularAccountTransactions.status == 200 ) {
@@ -64,11 +65,11 @@ export default class AllTransactionScreen extends React.Component {
       alert.simpleOk( "Oops", regularAccountTransactions.err );
     }
 
-
   }
   componentWillMount() {
     this.getTransaction();
   }
+
 
   setModalVisible( modalVisible ) {
     this.setState( { modalVisible } )

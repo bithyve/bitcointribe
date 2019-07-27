@@ -61,12 +61,12 @@ var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinC
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 export default class TrustedContactScreen extends React.Component<any, any> {
+
     constructor ( props: any ) {
         super( props )
         this.state = ( {
             data: [],
             arr_TrustedContactEmailAndPhoneShare: [],
-            arr_ConstactDetailsList: [],
             arr_History: [],
             arr_resSSSDetails: [],
             arr_EncryptedMetaShare: [],
@@ -81,21 +81,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
     async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
         console.log( { data } );
-        let temp = [];
-        let arr_Emails = data.emailAddresses;
-        let arr_PhoneNumbers = data.phoneNumbers;
-        for ( let i = 0; i < arr_PhoneNumbers.length; i++ ) {
-            let dataJson = {};
-            dataJson.label = arr_PhoneNumbers[ i ].label;
-            dataJson.value = arr_PhoneNumbers[ i ].number;
-            temp.push( dataJson );
-        }
-        for ( let i = 0; i < arr_Emails.length; i++ ) {
-            let dataJson = {};
-            dataJson.label = arr_Emails[ i ].label;
-            dataJson.value = arr_Emails[ i ].email;
-            temp.push( dataJson );
-        }
+
         var resSSSDetails = await dbOpration.readSSSTableData(
             localDB.tableName.tblSSSDetails,
             data.recordID
@@ -104,7 +90,6 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         await utils.setSSSDetailsRecordIDWise( resSSSDetails )
         this.setState( {
             data: data,
-            arr_ConstactDetailsList: temp,
             arr_History: data.history,
             arr_resSSSDetails: resSSSDetails
         } )
@@ -286,7 +271,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
     goBack() {
         const { navigation } = this.props;
         navigation.pop();
-        // navigation.state.params.onSelect( { selected: true } );
+        navigation.state.params.onSelect( { selected: true } );
     }
 
 

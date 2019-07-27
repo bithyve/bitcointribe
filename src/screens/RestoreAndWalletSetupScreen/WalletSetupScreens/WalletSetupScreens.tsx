@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, AsyncStorage } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, AsyncStorage, PermissionsAndroid } from "react-native";
 import {
     Container,
     Header,
@@ -35,6 +35,25 @@ import SecondSecretQuestion from "./SecondSecretQuestion/SecondSecretQuestion";
 import { colors, images, asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
 
 export default class WalletSetupScreens extends React.Component<any, any> {
+
+
+    componentDidMount() {
+        if ( Platform.OS == "android" ) {
+            this.getExternalStorgePermission();
+        }
+    }
+
+    getExternalStorgePermission = async () => {
+        try {
+            const grantedWrite = await PermissionsAndroid.requestMultiple( [
+                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
+            ] );
+            console.log( { grantedWrite } );
+        } catch ( err ) {
+            console.warn( err );
+        }
+    }
 
 
     //TODO:click_GotoPermisionScrenn

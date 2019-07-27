@@ -210,10 +210,6 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                         walletName,
                         queTemp
                     );
-
-
-
-
                     var getBal = await regularAccount.getBalance();
                     console.log( { getBal } );
                     if ( getBal.status == 200 ) {

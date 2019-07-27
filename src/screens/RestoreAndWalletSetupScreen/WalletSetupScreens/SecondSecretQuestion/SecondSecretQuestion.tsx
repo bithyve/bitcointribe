@@ -210,39 +210,39 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                 data1.secoundQuestion = secoundQuestion;
                 data1.secoundAnswer = secoundAnser;
                 temp.push( data1 );
-                let resUpdateWalletAns = await dbOpration.updateWalletAnswerDetails(
-                    localDB.tableName.tblWallet,
-                    temp
-                );
+                // let resUpdateWalletAns = await dbOpration.updateWalletAnswerDetails(
+                //     localDB.tableName.tblWallet,
+                //     temp
+                // );
                 //  console.log( { resUpdateWalletAns } );
-                let resInsertCreateAcc = await dbOpration.insertCreateAccount(
-                    localDB.tableName.tblAccount,
-                    dateTime,
-                    getAddress,
-                    "0.0",
-                    "BTC",
-                    "Daily Wallet",
-                    "Regular Account",
-                    ""
-                );
-                let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
-                    localDB.tableName.tblAccount,
-                    dateTime,
-                    "",
-                    "0.0",
-                    "BTC",
-                    "Secure Account",
-                    "Secure Account",
-                    arr_SecureDetails
-                );
-                if ( resInsertWallet && resUpdateWalletAns && resInsertSecureCreateAcc && resInsertCreateAcc ) {
-                    this.setState( {
-                        flag_Loading: false
-                    } );
-                    this.props.prevScreen();
-                } else {
-                    Alert.alert( "Local db update issue!" )
-                }
+                // let resInsertCreateAcc = await dbOpration.insertCreateAccount(
+                //     localDB.tableName.tblAccount,
+                //     dateTime,
+                //     getAddress,
+                //     "0.0",
+                //     "BTC",
+                //     "Daily Wallet",
+                //     "Regular Account",
+                //     ""
+                // );
+                // let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+                //     localDB.tableName.tblAccount,
+                //     dateTime,
+                //     "",
+                //     "0.0",
+                //     "BTC",
+                //     "Secure Account",
+                //     "Secure Account",
+                //     arr_SecureDetails
+                // );
+                // if ( resInsertWallet && resUpdateWalletAns && resInsertSecureCreateAcc && resInsertCreateAcc ) {
+                //     this.setState( {
+                //         flag_Loading: false
+                //     } );
+                //     this.props.prevScreen();
+                // } else {
+                //     Alert.alert( "Local db update issue!" )
+                // }
             }
             else {
                 alert.simpleOk( "Oops", resInitializeHealthcheck.err );

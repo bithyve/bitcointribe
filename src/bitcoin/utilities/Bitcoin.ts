@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import bip21 from "bip21";
 import bip32 from "bip32";
-import bip39 from "bip39";
+import bip39 from "react-native-bip39";
 import bip65 from "bip65";
 import Client from "bitcoin-core";
 import bitcoinJS, {
@@ -19,24 +19,24 @@ export default class Bitcoin {
   public network: Network;
   public client: Client;
 
-  constructor() {
+  constructor () {
     this.network = config.NETWORK;
     this.client = config.BITCOIN_NODE;
   }
 
-  public getKeyPair = (privateKey: string): ECPair =>
-    bitcoinJS.ECPair.fromWIF(privateKey, this.network)
+  public getKeyPair = ( privateKey: string ): ECPair =>
+    bitcoinJS.ECPair.fromWIF( privateKey, this.network )
 
-  public utcNow = (): number => Math.floor(Date.now() / 1000);
+  public utcNow = (): number => Math.floor( Date.now() / 1000 );
 
-  public getAddress = (keyPair: ECPair): string =>
-    bitcoinJS.payments.p2sh({
-      redeem: bitcoinJS.payments.p2wpkh({
+  public getAddress = ( keyPair: ECPair ): string =>
+    bitcoinJS.payments.p2sh( {
+      redeem: bitcoinJS.payments.p2wpkh( {
         pubkey: keyPair.publicKey,
         network: this.network,
-      }),
+      } ),
       network: this.network,
-    }).address
+    } ).address
 
   public generateHDWallet = (
     mnemonic: string,
@@ -49,22 +49,22 @@ export default class Bitcoin {
   } => {
     // generates a HD-Wallet from the provided mnemonic-passphrase pair
 
-    if (!bip39.validateMnemonic(mnemonic)) {
-      throw new Error("Invalid mnemonic");
+    if ( !bip39.validateMnemonic( mnemonic ) ) {
+      throw new Error( "Invalid mnemonic" );
     }
 
     const seed: Buffer = passphrase
-      ? bip39.mnemonicToSeed(mnemonic, passphrase)
-      : bip39.mnemonicToSeed(mnemonic);
+      ? bip39.mnemonicToSeed( mnemonic, passphrase )
+      : bip39.mnemonicToSeed( mnemonic );
     const path: string = "m/44'/0'/0'/0/0";
-    const root = bip32.fromSeed(seed, this.network);
-    const child1 = root.derivePath(path);
+    const root = bip32.fromSeed( seed, this.network );
+    const child1 = root.derivePath( path );
 
     const privateKey = child1.toWIF();
-    const address = this.getAddress(child1);
+    const address = this.getAddress( child1 );
 
-    console.log(`Mnemonic: ${mnemonic}`);
-    console.log(`Address: ${address}`);
+    console.log( `Mnemonic: ${ mnemonic }` );
+    console.log( `Address: ${ address }` );
 
     return {
       mnemonic,
@@ -84,8 +84,8 @@ export default class Bitcoin {
   } => {
     // creates a new HD Wallet
 
-    const mnemonic = bip39.generateMnemonic(256);
-    return this.generateHDWallet(mnemonic, passphrase);
+    const mnemonic = bip39.generateMnemonic( 256 );
+    return this.generateHDWallet( mnemonic, passphrase );
   }
 
   public getP2SH = (
@@ -98,38 +98,38 @@ export default class Bitcoin {
     input: Buffer;
     witness: Buffer[];
   } =>
-    bitcoinJS.payments.p2sh({
-      redeem: bitcoinJS.payments.p2wpkh({
+    bitcoinJS.payments.p2sh( {
+      redeem: bitcoinJS.payments.p2wpkh( {
         pubkey: keyPair.publicKey,
         network: this.network,
-      }),
+      } ),
       network: this.network,
-    })
+    } )
 
   public getBalance = async (
     address: string,
   ): Promise<
     | {
-        status: number;
-        errorMessage: string;
-        balanceData?: undefined;
-      }
+      status: number;
+      errorMessage: string;
+      balanceData?: undefined;
+    }
     | {
-        status: number;
-        balanceData: any;
-        errorMessage?: undefined;
-      }
+      status: number;
+      balanceData: any;
+      errorMessage?: undefined;
+    }
   > => {
     // fetches balance corresponding to the supplied address
 
     let res: AxiosResponse;
-    if (this.network === bitcoinJS.networks.testnet) {
+    if ( this.network === bitcoinJS.networks.testnet ) {
       try {
         res = await axios.get(
-          `${TESTNET.BALANCE_CHECK}${address}/balance?token=${config.TOKEN}`,
+          `${ TESTNET.BALANCE_CHECK }${ address }/balance?token=${ config.TOKEN }`,
         );
-      } catch (err) {
-        console.log("Error:", err.response.data);
+      } catch ( err ) {
+        console.log( "Error:", err.response.data );
         return {
           status: err.response.status,
           errorMessage: err.response.data,
@@ -139,10 +139,10 @@ export default class Bitcoin {
       // throttled endPoint (required: full node/corresponding paid service));
       try {
         res = await axios.get(
-          `${MAINNET.BALANCE_CHECK}${address}/balance?token=${config.TOKEN}`,
+          `${ MAINNET.BALANCE_CHECK }${ address }/balance?token=${ config.TOKEN }`,
         );
-      } catch (err) {
-        console.log("Error:", err.response.data);
+      } catch ( err ) {
+        console.log( "Error:", err.response.data );
         return {
           status: err.response.status,
           errorMessage: err.response.data,
@@ -164,8 +164,8 @@ export default class Bitcoin {
   }> => {
     let bal = 0;
     let unconfirmedBal = 0;
-    for (const addr of addresses) {
-      const { balanceData } = await this.getBalance(addr);
+    for ( const addr of addresses ) {
+      const { balanceData } = await this.getBalance( addr );
       bal += balanceData.balance;
       unconfirmedBal += balanceData.unconfirmed_balance;
     }
@@ -181,7 +181,7 @@ export default class Bitcoin {
   }> => {
     let res: AxiosResponse;
     try {
-      if (this.network === bitcoinJS.networks.testnet) {
+      if ( this.network === bitcoinJS.networks.testnet ) {
         // throw new Error("fabricated error");
         res = await axios.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIBALANCE,
@@ -202,13 +202,13 @@ export default class Bitcoin {
         balance: res.data.Balance,
         unconfirmedBalance: res.data.UnconfirmedBalance,
       };
-    } catch (err) {
+    } catch ( err ) {
       console.log(
         `An error occured while fetching balance via Esplora: ${
-          err.response.data.err
+        err.response.data.err
         }`,
       );
-      console.log("Using Blockcypher fallback");
+      console.log( "Using Blockcypher fallback" );
       try {
         const { bal, unconfirmedBal } = await this.blockcypherBalFallback(
           addresses,
@@ -217,22 +217,22 @@ export default class Bitcoin {
           balance: bal,
           unconfirmedBalance: unconfirmedBal,
         };
-      } catch (err) {
-        console.log("Blockcypher fallback failed aswell!");
-        throw new Error("fetching balance by addresses failed");
+      } catch ( err ) {
+        console.log( "Blockcypher fallback failed aswell!" );
+        throw new Error( "fetching balance by addresses failed" );
       }
     }
   }
 
-  public fetchAddressInfo = async (address: string): Promise<any> => {
+  public fetchAddressInfo = async ( address: string ): Promise<any> => {
     // fetches information corresponding to the  supplied address (including txns)
-    if (this.network === bitcoinJS.networks.testnet) {
+    if ( this.network === bitcoinJS.networks.testnet ) {
       return await axios.get(
-        `${TESTNET.BASE}/addrs/${address}/full?token=${config.TOKEN}`,
+        `${ TESTNET.BASE }/addrs/${ address }/full?token=${ config.TOKEN }`,
       );
     } else {
       return await axios.get(
-        `${MAINNET.BASE}/addrs/${address}/full?token=${config.TOKEN}`,
+        `${ MAINNET.BASE }/addrs/${ address }/full?token=${ config.TOKEN }`,
       );
     }
   }
@@ -241,26 +241,26 @@ export default class Bitcoin {
     address: string,
   ): Promise<
     | {
-        status: number;
-        transactions: {
-          totalTransactions: number;
-          confirmedTransactions: number;
-          unconfirmedTransactions: number;
-          transactionDetails: any[];
-          address: string;
-        };
-        errorMessage?: undefined;
-      }
+      status: number;
+      transactions: {
+        totalTransactions: number;
+        confirmedTransactions: number;
+        unconfirmedTransactions: number;
+        transactionDetails: any[];
+        address: string;
+      };
+      errorMessage?: undefined;
+    }
     | {
-        status: number;
-        errorMessage: string;
-        transactions?: undefined;
-      }
+      status: number;
+      errorMessage: string;
+      transactions?: undefined;
+    }
   > => {
     let res: AxiosResponse;
     try {
-      res = await this.fetchAddressInfo(address);
-    } catch (err) {
+      res = await this.fetchAddressInfo( address );
+    } catch ( err ) {
       return {
         status: err.response.status,
         errorMessage: err.response.data,
@@ -326,7 +326,7 @@ export default class Bitcoin {
     try {
       let res: AxiosResponse;
       try {
-        if (this.network === bitcoinJS.networks.testnet) {
+        if ( this.network === bitcoinJS.networks.testnet ) {
           res = await axios.post(
             config.ESPLORA_API_ENDPOINTS.TESTNET.MULTITXN,
             {
@@ -341,17 +341,17 @@ export default class Bitcoin {
             },
           );
         }
-      } catch (err) {
-        throw new Error(err.response.data.err);
+      } catch ( err ) {
+        throw new Error( err.response.data.err );
       }
 
       const addressesInfo = res.data;
       const txMap = new Map();
-      for (const addressInfo of addressesInfo) {
+      for ( const addressInfo of addressesInfo ) {
         console.log(
-          `Appending transactions corresponding to ${addressInfo.Address}`,
+          `Appending transactions corresponding to ${ addressInfo.Address }`,
         );
-        if (addressInfo.TotalTransactions === 0) {
+        if ( addressInfo.TotalTransactions === 0 ) {
           continue;
         }
         transactions.totalTransactions += addressInfo.TotalTransactions;
@@ -359,12 +359,12 @@ export default class Bitcoin {
         transactions.unconfirmedTransactions +=
           addressInfo.UnconfirmedTransactions;
 
-        addressInfo.Transactions.forEach((tx) => {
-          if (!txMap.has(tx.txid)) {
+        addressInfo.Transactions.forEach( ( tx ) => {
+          if ( !txMap.has( tx.txid ) ) {
             // check for duplicate tx (fetched against sending and  then again for change address)
-            txMap.set(tx.txid, true);
-            this.confirmationCat(this.categorizeTx(tx, addresses, accountType));
-            transactions.transactionDetails.push({
+            txMap.set( tx.txid, true );
+            this.confirmationCat( this.categorizeTx( tx, addresses, accountType ) );
+            transactions.transactionDetails.push( {
               txid: tx.txid,
               status: tx.confirmationType,
               confirmations: tx.NumberofConfirmations,
@@ -374,38 +374,38 @@ export default class Bitcoin {
               accountType: tx.accountType,
               recipientAddresses: tx.recipientAddresses,
               senderAddresses: tx.senderAddresses,
-            });
+            } );
           }
-        });
+        } );
       }
 
       return { transactions };
-    } catch (err) {
+    } catch ( err ) {
       console.log(
-        `An error occured while fetching transactions via Esplora Wrapper: ${err}`,
+        `An error occured while fetching transactions via Esplora Wrapper: ${ err }`,
       );
-      console.log("Using Blockcypher fallback");
+      console.log( "Using Blockcypher fallback" );
 
       try {
         const txMap = new Map();
-        for (const address of addresses) {
-          console.log(`Fetching transactions corresponding to ${address}`);
-          const txns = await this.fetchTransactionsByAddress(address);
-          console.log({ txns });
+        for ( const address of addresses ) {
+          console.log( `Fetching transactions corresponding to ${ address }` );
+          const txns = await this.fetchTransactionsByAddress( address );
+          console.log( { txns } );
           transactions.totalTransactions += txns.transactions.totalTransactions;
           transactions.confirmedTransactions +=
             txns.transactions.confirmedTransactions;
           transactions.unconfirmedTransactions +=
             txns.transactions.unconfirmedTransactions;
 
-          txns.transactions.transactionDetails.forEach((tx) => {
-            if (!txMap.has(tx.hash)) {
+          txns.transactions.transactionDetails.forEach( ( tx ) => {
+            if ( !txMap.has( tx.hash ) ) {
               // check for duplicate tx (fetched against sending and  then again for change address)
-              txMap.set(tx.hash, true);
+              txMap.set( tx.hash, true );
               this.confirmationCat(
-                this.categorizeTx(tx, addresses, accountType),
+                this.categorizeTx( tx, addresses, accountType ),
               );
-              transactions.transactionDetails.push({
+              transactions.transactionDetails.push( {
                 txid: tx.hash,
                 status: tx.confirmationType,
                 confirmations: tx.confirmations,
@@ -415,17 +415,17 @@ export default class Bitcoin {
                 accountType: tx.accountType,
                 recipientAddresses: tx.recipientAddresses,
                 senderAddresses: tx.senderAddresses,
-              });
+              } );
             }
-          });
+          } );
         }
 
         return { transactions };
-      } catch (err) {
+      } catch ( err ) {
         console.log(
-          `An error occured while fetching transactions via Blockcypher fallback as well: ${err}`,
+          `An error occured while fetching transactions via Blockcypher fallback as well: ${ err }`,
         );
-        throw new Error("Transaction fetching failed");
+        throw new Error( "Transaction fetching failed" );
       }
     }
   }
@@ -440,60 +440,60 @@ export default class Bitcoin {
     try {
       let res: AxiosResponse;
       try {
-        if (this.network === bitcoinJS.networks.testnet) {
+        if ( this.network === bitcoinJS.networks.testnet ) {
           res = await axios.post(
             config.ESPLORA_API_ENDPOINTS.TESTNET.MULTITXN,
             {
-              addresses: [address],
+              addresses: [ address ],
             },
           );
         } else {
           res = await axios.post(
             config.ESPLORA_API_ENDPOINTS.MAINNET.MULTITXN,
             {
-              addresses: [address],
+              addresses: [ address ],
             },
           );
         }
-      } catch (err) {
-        throw new Error(err.response.data.err);
+      } catch ( err ) {
+        throw new Error( err.response.data.err );
       }
 
-      const addressInfo = res.data[0];
+      const addressInfo = res.data[ 0 ];
       return {
         totalTransactions: addressInfo.TotalTransactions,
         confirmedTransactions: addressInfo.ConfirmedTransactions,
         unconfirmedTransactions: addressInfo.UnconfirmedTransactions,
       };
-    } catch (err) {
+    } catch ( err ) {
       console.log(
-        `An error occured while fetching transactions via Esplora Wrapper: ${err}`,
+        `An error occured while fetching transactions via Esplora Wrapper: ${ err }`,
       );
-      console.log("Using Blockcypher fallback");
+      console.log( "Using Blockcypher fallback" );
 
       try {
-        const txns = await this.fetchTransactionsByAddress(address);
+        const txns = await this.fetchTransactionsByAddress( address );
         return {
           totalTransactions: txns.transactions.totalTransactions,
           confirmedTransactions: txns.transactions.confirmedTransactions,
           unconfirmedTransactions: txns.transactions.unconfirmedTransactions,
         };
-      } catch (err) {
+      } catch ( err ) {
         console.log(
-          `An error occured while fetching transactions via Blockcypher fallback as well: ${err}`,
+          `An error occured while fetching transactions via Blockcypher fallback as well: ${ err }`,
         );
-        throw new Error("Transaction fetching failed");
+        throw new Error( "Transaction fetching failed" );
       }
     }
   }
 
-  public fundTestNetAddress = async (address: string) => {
+  public fundTestNetAddress = async ( address: string ) => {
     const funderAddress = "2N6aazKqLgqBRLisjeEU1DoLuieoZbDmiB8";
     const funderPriv = "cSB5QV1Tesqtou1FDZhgfKYiEH4m55H1jT1xM8hu9xKNzWSFFgAR";
-    const { balanceData } = await this.getBalance(funderAddress);
+    const { balanceData } = await this.getBalance( funderAddress );
     const { final_balance } = balanceData;
-    if (final_balance < 7000) {
-      throw new Error("Funding address is out of funds");
+    if ( final_balance < 7000 ) {
+      throw new Error( "Funding address is out of funds" );
     }
     const transfer = {
       senderAddress: funderAddress,
@@ -506,21 +506,21 @@ export default class Bitcoin {
       transfer.recipientAddress,
       transfer.amount,
     );
-    console.log("---- Transaction Created ----");
+    console.log( "---- Transaction Created ----" );
 
-    const keyPair = this.getKeyPair(funderPriv);
-    const p2sh = this.getP2SH(keyPair);
+    const keyPair = this.getKeyPair( funderPriv );
+    const p2sh = this.getP2SH( keyPair );
     const txb = this.signTransaction(
       txnObj.inputs,
       txnObj.txb,
-      [keyPair],
+      [ keyPair ],
       p2sh.redeem.output,
     );
-    console.log("---- Transaction Signed ----");
+    console.log( "---- Transaction Signed ----" );
 
     const txHex = txb.build().toHex();
-    const res = await this.broadcastTransaction(txHex);
-    console.log("---- Transaction Broadcasted ----");
+    const res = await this.broadcastTransaction( txHex );
+    console.log( "---- Transaction Broadcasted ----" );
     return res;
   }
 
@@ -548,25 +548,25 @@ export default class Bitcoin {
   } => {
     // generic multiSig address generator
 
-    if (required <= 0 || required > pubKeys.length) {
-      throw new Error("Inappropriate value for required param");
+    if ( required <= 0 || required > pubKeys.length ) {
+      throw new Error( "Inappropriate value for required param" );
     }
     // if (!network) network = bitcoinJS.networks.bitcoin;
-    const pubkeys = pubKeys.map((hex) => Buffer.from(hex, "hex"));
+    const pubkeys = pubKeys.map( ( hex ) => Buffer.from( hex, "hex" ) );
 
-    const p2ms = bitcoinJS.payments.p2ms({
+    const p2ms = bitcoinJS.payments.p2ms( {
       m: required,
       pubkeys,
       network: this.network,
-    });
-    const p2wsh = bitcoinJS.payments.p2wsh({
+    } );
+    const p2wsh = bitcoinJS.payments.p2wsh( {
       redeem: p2ms,
       network: this.network,
-    });
-    const p2sh = bitcoinJS.payments.p2sh({
+    } );
+    const p2sh = bitcoinJS.payments.p2sh( {
       redeem: p2wsh,
       network: this.network,
-    });
+    } );
 
     return {
       p2wsh,
@@ -580,19 +580,19 @@ export default class Bitcoin {
     // bitcoinfees endpoint: https://bitcoinfees.earn.com/api/v1/fees/recommended (provides time estimates)
 
     try {
-      if (this.network === bitcoinJS.networks.testnet) {
+      if ( this.network === bitcoinJS.networks.testnet ) {
         const { data } = await axios.get(
-          `${TESTNET.BASE}?token=${config.TOKEN}`,
+          `${ TESTNET.BASE }?token=${ config.TOKEN }`,
         );
         return data;
       } else {
         const { data } = await axios.get(
-          `${MAINNET.BASE}?token=${config.TOKEN}`,
+          `${ MAINNET.BASE }?token=${ config.TOKEN }`,
         );
         return data;
       }
-    } catch (err) {
-      throw new Error("Failed to fetch chain info");
+    } catch ( err ) {
+      throw new Error( "Failed to fetch chain info" );
     }
   }
 
@@ -607,39 +607,39 @@ export default class Bitcoin {
     }>
   > => {
     let data;
-    if (this.network === bitcoinJS.networks.testnet) {
+    if ( this.network === bitcoinJS.networks.testnet ) {
       const res: AxiosResponse = await axios.get(
-        `${TESTNET.UNSPENT_OUTPUTS}${address}?unspentOnly=true&token=${
-          config.TOKEN
+        `${ TESTNET.UNSPENT_OUTPUTS }${ address }?unspentOnly=true&token=${
+        config.TOKEN
         }`,
       );
       data = res.data;
     } else {
       const res: AxiosResponse = await axios.get(
-        `${MAINNET.UNSPENT_OUTPUTS}${address}?unspentOnly=true&token=${
-          config.TOKEN
+        `${ MAINNET.UNSPENT_OUTPUTS }${ address }?unspentOnly=true&token=${
+        config.TOKEN
         }`,
       );
       data = res.data;
     }
 
     let unspentOutputs = [];
-    if (data.txrefs) {
-      unspentOutputs.push(...data.txrefs);
+    if ( data.txrefs ) {
+      unspentOutputs.push( ...data.txrefs );
     }
-    if (data.unconfirmed_txrefs) {
-      unspentOutputs.push(...data.unconfirmed_txrefs);
+    if ( data.unconfirmed_txrefs ) {
+      unspentOutputs.push( ...data.unconfirmed_txrefs );
     }
-    if (unspentOutputs.length === 0) {
+    if ( unspentOutputs.length === 0 ) {
       return [];
     }
 
-    unspentOutputs = unspentOutputs.map((unspent) => ({
+    unspentOutputs = unspentOutputs.map( ( unspent ) => ( {
       txId: unspent.tx_hash,
       vout: unspent.tx_output_n,
       value: unspent.value,
       address,
-    }));
+    } ) );
     return unspentOutputs;
   }
 
@@ -655,10 +655,10 @@ export default class Bitcoin {
   > => {
     const UTXOs = [];
     // tslint:disable-next-line:forin
-    for (const address of addresses) {
-      console.log(`Fetching utxos corresponding to ${address}`);
-      const utxos = await this.fetchUnspentOutputs(address);
-      UTXOs.push(...utxos);
+    for ( const address of addresses ) {
+      console.log( `Fetching utxos corresponding to ${ address }` );
+      const utxos = await this.fetchUnspentOutputs( address );
+      UTXOs.push( ...utxos );
     }
     return UTXOs;
   }
@@ -675,7 +675,7 @@ export default class Bitcoin {
   }> => {
     try {
       let data;
-      if (this.network === bitcoinJS.networks.testnet) {
+      if ( this.network === bitcoinJS.networks.testnet ) {
         const res: AxiosResponse = await axios.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIUTXO,
           { addresses },
@@ -690,78 +690,78 @@ export default class Bitcoin {
       }
 
       const UTXOs = [];
-      for (const addressSpecificUTXOs of data) {
-        for (const utxo of addressSpecificUTXOs) {
+      for ( const addressSpecificUTXOs of data ) {
+        for ( const utxo of addressSpecificUTXOs ) {
           const { txid, vout, value, Address } = utxo;
-          UTXOs.push({
+          UTXOs.push( {
             txId: txid,
             vout,
             value,
             address: Address,
-          });
+          } );
         }
       }
       return { UTXOs };
-    } catch (err) {
-      console.log(`An error occured while connecting to Esplora: ${err}`);
-      console.log("Switching to Blockcypher UTXO fallback");
+    } catch ( err ) {
+      console.log( `An error occured while connecting to Esplora: ${ err }` );
+      console.log( "Switching to Blockcypher UTXO fallback" );
 
       try {
-        const UTXOs = await this.blockcypherUTXOFallback(addresses);
+        const UTXOs = await this.blockcypherUTXOFallback( addresses );
         return { UTXOs };
-      } catch (err) {
+      } catch ( err ) {
         console.log(
-          `Blockcypher UTXO fallback failed with the following error: ${err}`,
+          `Blockcypher UTXO fallback failed with the following error: ${ err }`,
         );
-        throw new Error("multi utxo fetch failed");
+        throw new Error( "multi utxo fetch failed" );
       }
     }
   }
 
-  public fetchTransactionDetails = async (txID: string): Promise<any> => {
+  public fetchTransactionDetails = async ( txID: string ): Promise<any> => {
     try {
       let data;
-      if (this.network === bitcoinJS.networks.testnet) {
+      if ( this.network === bitcoinJS.networks.testnet ) {
         const res: AxiosResponse = await axios.get(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.TXNDETAILS + `/${txID}`,
+          config.ESPLORA_API_ENDPOINTS.TESTNET.TXNDETAILS + `/${ txID }`,
         );
         data = res.data;
       } else {
         const res: AxiosResponse = await axios.get(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.TXNDETAILS + `/${txID}`,
+          config.ESPLORA_API_ENDPOINTS.MAINNET.TXNDETAILS + `/${ txID }`,
         );
         data = res.data;
       }
 
       return data;
-    } catch (err) {
+    } catch ( err ) {
       console.log(
-        `An error occured while fetching transaction details from Esplora: ${err}`,
+        `An error occured while fetching transaction details from Esplora: ${ err }`,
       );
-      console.log("Switching to Blockcypher fallback");
+      console.log( "Switching to Blockcypher fallback" );
       let data;
       try {
-        if (this.network === bitcoinJS.networks.testnet) {
-          const res = await axios.get(`${TESTNET.BASE}/txs/${txID}`);
+        if ( this.network === bitcoinJS.networks.testnet ) {
+          const res = await axios.get( `${ TESTNET.BASE }/txs/${ txID }` );
           data = res.data;
         } else {
-          const res = await axios.get(`${MAINNET.BASE}/txs/${txID}`);
+          const res = await axios.get( `${ MAINNET.BASE }/txs/${ txID }` );
           data = res.data;
         }
         return data;
-      } catch (err) {
+      } catch ( err ) {
         console.log(
-          `Blockcypher fetch txn details fallback failed with the following error: ${err}`,
+          `Blockcypher fetch txn details fallback failed with the following error: ${ err }`,
         );
-        throw new Error("fetch transaction detaisl failed");
+        throw new Error( "fetch transaction detaisl failed" );
       }
     }
   }
 
-  public feeRatesPerByte = async (txnPriority: string = "high") => {
+  public feeRatesPerByte = async ( txnPriority: string = "high" ) => {
     try {
       let rates;
-      if (this.network === bitcoinJS.networks.testnet) {
+      if ( this.network === bitcoinJS.networks.testnet ) {
         const res: AxiosResponse = await axios.get(
           config.ESPLORA_API_ENDPOINTS.TESTNET.TXN_FEE,
         );
@@ -772,16 +772,16 @@ export default class Bitcoin {
         );
         rates = res.data;
       }
-      if (txnPriority === "high") {
-        return Math.round(rates["2"]);
-      } else if (txnPriority === "medium") {
-        return Math.round(rates["4"]);
-      } else if (txnPriority === "low") {
-        return Math.round(rates["6"]);
+      if ( txnPriority === "high" ) {
+        return Math.round( rates[ "2" ] );
+      } else if ( txnPriority === "medium" ) {
+        return Math.round( rates[ "4" ] );
+      } else if ( txnPriority === "low" ) {
+        return Math.round( rates[ "6" ] );
       }
-    } catch (err) {
+    } catch ( err ) {
       console.log(
-        `Fee rates fetching failed @Bitcoin core: ${err}, using blockcypher fallback`,
+        `Fee rates fetching failed @Bitcoin core: ${ err }, using blockcypher fallback`,
       );
       try {
         const chainInfo = await this.fetchChainInfo();
@@ -790,30 +790,30 @@ export default class Bitcoin {
           medium_fee_per_kb,
           low_fee_per_kb,
         } = chainInfo;
-        if (txnPriority === "high") {
-          return Math.round(high_fee_per_kb / 1000);
-        } else if (txnPriority === "medium") {
-          return Math.round(medium_fee_per_kb / 1000);
-        } else if (txnPriority === "low") {
-          return Math.round(low_fee_per_kb / 1000);
+        if ( txnPriority === "high" ) {
+          return Math.round( high_fee_per_kb / 1000 );
+        } else if ( txnPriority === "medium" ) {
+          return Math.round( medium_fee_per_kb / 1000 );
+        } else if ( txnPriority === "low" ) {
+          return Math.round( low_fee_per_kb / 1000 );
         }
-      } catch (err) {
-        throw new Error("Falied to fetch feeRates");
+      } catch ( err ) {
+        throw new Error( "Falied to fetch feeRates" );
       }
     }
   }
 
-  public isValidAddress = (address: string): boolean => {
+  public isValidAddress = ( address: string ): boolean => {
     try {
-      bitcoinJS.address.toOutputScript(address, this.network);
+      bitcoinJS.address.toOutputScript( address, this.network );
       return true;
-    } catch (err) {
+    } catch ( err ) {
       return false;
     }
   }
 
-  public isPaymentURI = (paymentURI: string): boolean => {
-    if (paymentURI.slice(0, 8) === "bitcoin:") {
+  public isPaymentURI = ( paymentURI: string ): boolean => {
+    if ( paymentURI.slice( 0, 8 ) === "bitcoin:" ) {
       return true;
     }
     return false;
@@ -824,12 +824,12 @@ export default class Bitcoin {
   ): {
     type: string;
   } => {
-    if (this.isPaymentURI(scannedStr)) {
+    if ( this.isPaymentURI( scannedStr ) ) {
       return { type: "paymentURI" };
-    } else if (this.isValidAddress(scannedStr)) {
+    } else if ( this.isValidAddress( scannedStr ) ) {
       return { type: "address" };
     } else {
-      throw new Error("Invalid QR: Neither an address nor paymentURI");
+      throw new Error( "Invalid QR: Neither an address nor paymentURI" );
     }
   }
 
@@ -840,36 +840,36 @@ export default class Bitcoin {
     nSequence?: number,
     txnPriority?: string,
   ): Promise<{ inputs: object[]; txb: TransactionBuilder; fee: number }> => {
-    console.log({ senderAddress });
-    const res = await this.multiFetchUnspentOutputs([senderAddress]);
+    console.log( { senderAddress } );
+    const res = await this.multiFetchUnspentOutputs( [ senderAddress ] );
     const inputUTXOs = res.UTXOs;
-    console.log("Fetched the inputs");
-    const outputUTXOs = [{ address: recipientAddress, value: amount }];
+    console.log( "Fetched the inputs" );
+    const outputUTXOs = [ { address: recipientAddress, value: amount } ];
 
-    const txnFee = await this.feeRatesPerByte(txnPriority);
+    const txnFee = await this.feeRatesPerByte( txnPriority );
 
     const { inputs, outputs, fee } = coinselect(
       inputUTXOs,
       outputUTXOs,
       txnFee,
     );
-    console.log("-------Transaction--------");
-    console.log("\tFee", fee);
-    console.log("\tInputs:", inputs);
-    console.log("\tOutputs:", outputs);
+    console.log( "-------Transaction--------" );
+    console.log( "\tFee", fee );
+    console.log( "\tInputs:", inputs );
+    console.log( "\tOutputs:", outputs );
 
     const txb: TransactionBuilder = new bitcoinJS.TransactionBuilder(
       this.network,
     );
 
-    inputs.forEach((input) => txb.addInput(input.txId, input.vout, nSequence));
-    outputs.forEach((output) => {
-      if (!output.address) {
+    inputs.forEach( ( input ) => txb.addInput( input.txId, input.vout, nSequence ) );
+    outputs.forEach( ( output ) => {
+      if ( !output.address ) {
         output.address = senderAddress;
       }
-      console.log("Added Output:", output);
-      txb.addOutput(output.address, output.value);
-    });
+      console.log( "Added Output:", output );
+      txb.addOutput( output.address, output.value );
+    } );
 
     return {
       inputs,
@@ -885,11 +885,11 @@ export default class Bitcoin {
     redeemScript: any,
     witnessScript?: any,
   ): TransactionBuilder => {
-    console.log("------ Transaction Signing ----------");
+    console.log( "------ Transaction Signing ----------" );
     let vin = 0;
-    inputs.forEach((input) => {
-      console.log("Signing Input:", input);
-      keyPairs.forEach((keyPair) => {
+    inputs.forEach( ( input ) => {
+      console.log( "Signing Input:", input );
+      keyPairs.forEach( ( keyPair ) => {
         txb.sign(
           vin,
           keyPair,
@@ -898,9 +898,9 @@ export default class Bitcoin {
           input.value,
           witnessScript, // multiSig.p2wsh.redeem.output
         );
-      });
+      } );
       vin += 1;
-    });
+    } );
 
     return txb;
   }
@@ -913,8 +913,8 @@ export default class Bitcoin {
     witnessScript?: any,
   ): Transaction => {
     let vin = 0;
-    inputs.forEach((input) => {
-      keyPairs.forEach((keyPair) => {
+    inputs.forEach( ( input ) => {
+      keyPairs.forEach( ( keyPair ) => {
         txb.sign(
           vin,
           keyPair,
@@ -923,9 +923,9 @@ export default class Bitcoin {
           input.value,
           witnessScript, // multiSig.p2wsh.redeem.output
         );
-      });
+      } );
       vin += 1;
-    });
+    } );
 
     const txHex = txb.buildIncomplete();
     return txHex;
@@ -938,7 +938,7 @@ export default class Bitcoin {
   }> => {
     try {
       let res: AxiosResponse;
-      if (this.network === bitcoinJS.networks.testnet) {
+      if ( this.network === bitcoinJS.networks.testnet ) {
         res = await axios.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
           txHex,
@@ -956,25 +956,25 @@ export default class Bitcoin {
         );
       }
       return { txid: res.data };
-    } catch (err) {
+    } catch ( err ) {
       console.log(
-        `An error occured while broadcasting through BitHyve Node. Using the fallback mechanism. ${err}`,
+        `An error occured while broadcasting through BitHyve Node. Using the fallback mechanism. ${ err }`,
       );
       try {
         let res: AxiosResponse;
-        if (this.network === bitcoinJS.networks.testnet) {
-          res = await axios.post(TESTNET.BROADCAST, { hex: txHex });
+        if ( this.network === bitcoinJS.networks.testnet ) {
+          res = await axios.post( TESTNET.BROADCAST, { hex: txHex } );
         } else {
-          res = await axios.post(MAINNET.BROADCAST, { hex: txHex });
+          res = await axios.post( MAINNET.BROADCAST, { hex: txHex } );
         }
 
         const { txid } = res.data;
         return {
           txid,
         };
-      } catch (err) {
-        console.log(err.message);
-        throw new Error("Transaction broadcasting failed");
+      } catch ( err ) {
+        console.log( err.message );
+        throw new Error( "Transaction broadcasting failed" );
       }
     }
   }
@@ -983,56 +983,56 @@ export default class Bitcoin {
     blockNo: number,
   ): Promise<{ feerate: number; blocks: number }> => {
     try {
-      const res = await this.client.estimateSmartFee(blockNo);
+      const res = await this.client.estimateSmartFee( blockNo );
       return { feerate: res.feerate, blocks: res.blocks };
-    } catch (err) {
-      throw new Error("Failed to fetch transaction fee");
+    } catch ( err ) {
+      throw new Error( "Failed to fetch transaction fee" );
     }
   }
 
-  public decodeTransaction = async (txHash: string): Promise<void> => {
-    if (this.network === bitcoinJS.networks.testnet) {
-      const { data } = await axios.post(TESTNET.TX_DECODE, { hex: txHash });
-      console.log(JSON.stringify(data, null, 4));
+  public decodeTransaction = async ( txHash: string ): Promise<void> => {
+    if ( this.network === bitcoinJS.networks.testnet ) {
+      const { data } = await axios.post( TESTNET.TX_DECODE, { hex: txHash } );
+      console.log( JSON.stringify( data, null, 4 ) );
     } else {
-      const { data } = await axios.post(MAINNET.TX_DECODE, { hex: txHash });
-      console.log(JSON.stringify(data, null, 4));
+      const { data } = await axios.post( MAINNET.TX_DECODE, { hex: txHash } );
+      console.log( JSON.stringify( data, null, 4 ) );
     }
   }
 
   public recoverInputsFromTxHex = async (
     txHex: string,
   ): Promise<Array<{ txId: string; vout: number; value: number }>> => {
-    const regenTx: Transaction = bitcoinJS.Transaction.fromHex(txHex);
+    const regenTx: Transaction = bitcoinJS.Transaction.fromHex( txHex );
     const recoveredInputs = [];
     await Promise.all(
-      regenTx.ins.map(async (inp) => {
+      regenTx.ins.map( async ( inp ) => {
         const txId = inp.hash
-          .toString("hex")
-          .match(/.{2}/g)
+          .toString( "hex" )
+          .match( /.{2}/g )
           .reverse()
-          .join("");
+          .join( "" );
         const vout = inp.index;
-        const data = await this.fetchTransactionDetails(txId);
-        const value = data.outputs[vout].value;
-        recoveredInputs.push({ txId, vout, value });
-      }),
+        const data = await this.fetchTransactionDetails( txId );
+        const value = data.outputs[ vout ].value;
+        recoveredInputs.push( { txId, vout, value } );
+      } ),
     );
     return recoveredInputs;
   }
 
-  public fromOutputScript = (output: Buffer): string => {
-    return bitcoinJS.address.fromOutputScript(output, this.network);
+  public fromOutputScript = ( output: Buffer ): string => {
+    return bitcoinJS.address.fromOutputScript( output, this.network );
   }
 
-  public cltvCheckSigOutput = (keyPair: ECPair, lockTime: number): Buffer => {
-    return bitcoinJS.script.compile([
-      bitcoinJS.script.number.encode(lockTime),
+  public cltvCheckSigOutput = ( keyPair: ECPair, lockTime: number ): Buffer => {
+    return bitcoinJS.script.compile( [
+      bitcoinJS.script.number.encode( lockTime ),
       bitcoinJS.opcodes.OP_CHECKLOCKTIMEVERIFY,
       bitcoinJS.opcodes.OP_DROP,
       keyPair.publicKey,
       bitcoinJS.opcodes.OP_CHECKSIG,
-    ]);
+    ] );
   }
 
   public createTLC = async (
@@ -1044,26 +1044,26 @@ export default class Bitcoin {
     lockTime: number;
   }> => {
     let lockTime: any;
-    if (time && blockHeight) {
-      throw new Error("You can't specify time and block height together");
-    } else if (time) {
-      lockTime = bip65.encode({ utc: this.utcNow() + time }); // time should be specified in seconds (ex: 3600 * 3)
-    } else if (blockHeight) {
+    if ( time && blockHeight ) {
+      throw new Error( "You can't specify time and block height together" );
+    } else if ( time ) {
+      lockTime = bip65.encode( { utc: this.utcNow() + time } ); // time should be specified in seconds (ex: 3600 * 3)
+    } else if ( blockHeight ) {
       const chainInfo = await this.fetchChainInfo();
-      lockTime = bip65.encode({ blocks: chainInfo.height + blockHeight });
+      lockTime = bip65.encode( { blocks: chainInfo.height + blockHeight } );
     } else {
-      throw new Error("Please specify time or block height");
+      throw new Error( "Please specify time or block height" );
     }
 
-    const redeemScript = this.cltvCheckSigOutput(keyPair, lockTime);
-    console.log({ redeemScript });
+    const redeemScript = this.cltvCheckSigOutput( keyPair, lockTime );
+    console.log( { redeemScript } );
 
-    console.log({ redeemScript: redeemScript.toString("hex") });
+    console.log( { redeemScript: redeemScript.toString( "hex" ) } );
 
-    const p2sh = bitcoinJS.payments.p2sh({
+    const p2sh = bitcoinJS.payments.p2sh( {
       redeem: { output: redeemScript, network: this.network },
       network: this.network,
-    });
+    } );
 
     return {
       address: p2sh.address,
@@ -1075,10 +1075,10 @@ export default class Bitcoin {
     address: string,
     options?: { amount: number; label?: string; message?: string },
   ): { paymentURI: string } => {
-    if (options) {
-      return { paymentURI: bip21.encode(address, options) };
+    if ( options ) {
+      return { paymentURI: bip21.encode( address, options ) };
     } else {
-      return { paymentURI: bip21.encode(address) };
+      return { paymentURI: bip21.encode( address ) };
     }
   }
 
@@ -1092,38 +1092,38 @@ export default class Bitcoin {
       message?: string;
     };
   } => {
-    return bip21.decode(paymentURI);
+    return bip21.decode( paymentURI );
   }
 
   private rng2 = (): Buffer => {
-    return Buffer.from("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz2");
+    return Buffer.from( "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz2" );
   }
 
-  private generateTestnetKeys = (rng?): string => {
+  private generateTestnetKeys = ( rng?): string => {
     let keyPair: ECPair;
-    if (rng) {
-      keyPair = bitcoinJS.ECPair.makeRandom({
+    if ( rng ) {
+      keyPair = bitcoinJS.ECPair.makeRandom( {
         network: this.network,
         rng,
-      });
+      } );
     } else {
       // // for generating random testnet addresses
-      keyPair = bitcoinJS.ECPair.makeRandom({
+      keyPair = bitcoinJS.ECPair.makeRandom( {
         network: this.network,
-      });
+      } );
     }
     const privateKey: string = keyPair.toWIF();
-    const address: string = this.getAddress(keyPair);
+    const address: string = this.getAddress( keyPair );
 
     console.log(
-      `Private Kye[WIF]: ${privateKey} \n Generated Address: ${address} `,
+      `Private Kye[WIF]: ${ privateKey } \n Generated Address: ${ address } `,
     );
     return privateKey;
   }
 
   // deterministic RNG (testing only)
   private rng1 = (): Buffer => {
-    return Buffer.from("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz1");
+    return Buffer.from( "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz1" );
   }
 
   private categorizeTx = (
@@ -1137,45 +1137,45 @@ export default class Bitcoin {
     const probableRecipientList: string[] = [];
     const probableSenderList: string[] = [];
 
-    inputs.forEach((input) => {
-      if (!input.addresses && !input.prevout) {
+    inputs.forEach( ( input ) => {
+      if ( !input.addresses && !input.prevout ) {
         // skip it (quirks from blockcypher)
       } else {
         const address = input.addresses
-          ? input.addresses[0]
+          ? input.addresses[ 0 ]
           : input.prevout.scriptpubkey_address;
 
-        if (this.ownedAddress(address, inUseAddresses)) {
+        if ( this.ownedAddress( address, inUseAddresses ) ) {
           value -= input.prevout ? input.prevout.value : input.output_value;
         } else {
-          probableSenderList.push(address);
+          probableSenderList.push( address );
         }
       }
-    });
+    } );
 
-    outputs.forEach((output) => {
-      if (!output.addresses && !output.scriptpubkey_address) {
+    outputs.forEach( ( output ) => {
+      if ( !output.addresses && !output.scriptpubkey_address ) {
       } else {
         const address = output.addresses
-          ? output.addresses[0]
+          ? output.addresses[ 0 ]
           : output.scriptpubkey_address;
 
-        if (this.ownedAddress(address, inUseAddresses)) {
+        if ( this.ownedAddress( address, inUseAddresses ) ) {
           value += output.value;
         } else {
-          probableRecipientList.push(address); // could be the change address of the sender (in context of incoming tx)
+          probableRecipientList.push( address ); // could be the change address of the sender (in context of incoming tx)
         }
       }
-    });
+    } );
 
     tx.transactionType = value > 0 ? "Received" : "Sent";
-    if (tx.transactionType === "Sent") {
+    if ( tx.transactionType === "Sent" ) {
       value += tx.fee ? tx.fee : tx.fees;
       tx.recipientAddresses = probableRecipientList;
     } else {
       tx.senderAddresses = probableSenderList;
     }
-    tx.amount = Math.abs(value);
+    tx.amount = Math.abs( value );
     tx.accountType = accountType;
     return tx;
   }
@@ -1184,18 +1184,18 @@ export default class Bitcoin {
     address: string,
     inUseAddresses: string[],
   ): boolean => {
-    for (const addr of inUseAddresses) {
-      if (address === addr) {
+    for ( const addr of inUseAddresses ) {
+      if ( address === addr ) {
         return true;
       }
     }
     return false;
   }
 
-  private confirmationCat = (tx: any) => {
+  private confirmationCat = ( tx: any ) => {
     let confirmationType: string;
     const nConfirmations: number = tx.NumberofConfirmations || tx.confirmations;
-    if (nConfirmations === 0) {
+    if ( nConfirmations === 0 ) {
       confirmationType = "Unconfirmed";
     } else {
       confirmationType = "Confirmed";

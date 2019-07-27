@@ -32,7 +32,6 @@ import {
     Tab, Tabs, TabHeading, Icon,
 } from "native-base";
 //import BarcodeScanner from "react-native-barcode-scanners";
-import { QRScannerView } from 'ac-qrcode';
 import { SvgIcon } from "@up-shared/components";
 //NsNotification
 import BackboneEvents from "backbone-events-standalone";

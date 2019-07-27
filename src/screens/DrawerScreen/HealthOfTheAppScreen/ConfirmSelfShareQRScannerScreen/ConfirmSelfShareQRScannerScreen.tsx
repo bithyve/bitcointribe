@@ -125,6 +125,7 @@ export default class ConfirmSelfShareQRScannerScreen extends React.Component {
         }
     }
 
+
     render() {
         return (
             <Container>

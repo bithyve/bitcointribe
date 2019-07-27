@@ -190,32 +190,7 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
         // }
     }
 
-    //TODO: update histroy
-    updateHistory = async ( data: any, title: string, filePath: any ) => {
-        // let arr_History = JSON.parse( data.sssDetails.history );
-        // const dateTime = Date.now();
-        // let JsonData = {};
-        // JsonData.title = title;
-        // JsonData.date = utils.getUnixToDateFormat2();
-        // let temp = [ JsonData ];
-        // arr_History.push.apply( arr_History, temp );
-        // console.log( { arr_History } );
-        // let resUpdateHistroyAndSharedDate = await dbOpration.updateHistroyAndSharedDate(
-        //     localDB.tableName.tblSSSDetails,
-        //     arr_History,
-        //     dateTime,
-        //     data.sssDetails.id
-        // );
-        // console.log( resUpdateHistroyAndSharedDate );
-        // if ( resUpdateHistroyAndSharedDate ) {
-        //     await comFunDBRead.readTblSSSDetails();
-        //     this.setState( {
-        //         arr_History
-        //     } );
-        //     await RNFS.unlink( filePath );
-        // }
-        // console.log( { resUpdateHistroyAndSharedDate } );
-    }
+
 
     //TODO: Share or Reshare button on click
     click_SentRequest( type: string, data: any ) {

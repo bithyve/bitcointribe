@@ -24,7 +24,6 @@ import QRCode from 'react-native-qrcode-svg';
 //import QRCode from 'react-native-qrcode';
 import Toast from 'react-native-simple-toast';
 import Share from 'react-native-share';
-import RNFetchBlob from 'react-native-fetch-blob';
 var RNFS = require( 'react-native-fs' );
 
 //TODO: Custome Pages

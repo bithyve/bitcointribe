@@ -411,7 +411,8 @@ const insertWallet = (
   address: string,
   publicKey: string,
   walletType: string,
-  setUpWalletAnswerDetails: any
+  setUpWalletAnswerDetails: any,
+  appHealthStatus: any
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
@@ -423,7 +424,7 @@ const insertWallet = (
       txn.executeSql(
         "INSERT INTO " +
         tblName +
-        " (dateCreated,mnemonic,privateKey,address,publicKey,walletType,setUpWalletAnswerDetails,lastUpdated) VALUES (:dateCreated,:mnemonic,:privateKey,:address,:publicKey,:walletType,:setUpWalletAnswerDetails,:lastUpdated)",
+        " (dateCreated,mnemonic,privateKey,address,publicKey,walletType,setUpWalletAnswerDetails,appHealthStatus,lastUpdated) VALUES (:dateCreated,:mnemonic,:privateKey,:address,:publicKey,:walletType,:setUpWalletAnswerDetails,:appHealthStatus,:lastUpdated)",
         [
           utils.encrypt( fulldate.toString(), passcode ),
           utils.encrypt( mnemonicValue.toString(), passcode ),
@@ -432,6 +433,7 @@ const insertWallet = (
           utils.encrypt( publicKey.toString(), passcode ),
           utils.encrypt( walletType.toString(), passcode ),
           utils.encrypt( JSON.stringify( setUpWalletAnswerDetails ).toString(), passcode ),
+          utils.encrypt( JSON.stringify( appHealthStatus ).toString(), passcode ),
           utils.encrypt( fulldate.toString(), passcode )
         ]
       );
@@ -442,9 +444,9 @@ const insertWallet = (
 
 
 //update
-const updateWalletAnswerDetails = (
+const updateWalletBackedUpSecretQue = (
   tblName: string,
-  AnswerDetails: any
+  fulldate: string
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
@@ -453,9 +455,9 @@ const updateWalletAnswerDetails = (
         txn.executeSql(
           "update " +
           tblName +
-          " set setUpWalletAnswerDetails = :setUpWalletAnswerDetails where id = 1",
+          " set lastUpdated = :lastUpdated where id = 1",
           [
-            utils.encrypt( JSON.stringify( AnswerDetails ).toString(), passcode )
+            utils.encrypt( fulldate.toString(), passcode )
           ]
         );
         resolve( true );
@@ -1091,18 +1093,21 @@ const updateSSSContactListDetails = (
     try {
       db.transaction( function ( txn ) {
         console.log( { contactDetails } );
-        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
-          var len = results.rows.length;
-          if ( len > 0 ) {
-            for ( let i = 0; i < shareIds.length; i++ ) {
-              let shareId1 = shareIds[ 0 ];
-              let shareId2 = shareIds[ 1 ];
+        for ( let i = 0; i < shareIds.length; i++ ) {
+          console.log( { contactDetails } );
+          console.log( { shares: shareIds[ i ] } );
+          let shareId1 = shareIds[ i ];
+          txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+            var len = results.rows.length;
+            for ( let ii = 0; ii < len; ii++ ) {
               let dbdecryptShareId = utils.decrypt(
-                results.rows.item( i ).shareId,
+                results.rows.item( ii ).shareId,
                 passcode
               );
-              let encpShareId = results.rows.item( i ).shareId;
-              if ( dbdecryptShareId == shareId1 || dbdecryptShareId == shareId2 ) {
+              let encpShareId = results.rows.item( ii ).shareId;
+              console.log( { dbdecryptShareId, shareId1 } );
+              if ( dbdecryptShareId == shareId1 ) {
+                console.log( { same: encpShareId } );
                 txn.executeSql(
                   "update " +
                   tblName +
@@ -1113,13 +1118,12 @@ const updateSSSContactListDetails = (
                     encpShareId
                   ]
                 );
+                break;
               }
             }
-            resolve( true );
-          } else {
-            resolve( false );
-          }
-        } );
+          } );
+        }
+        resolve( true );
       } );
     } catch ( error ) {
       console.log( error );
@@ -1298,6 +1302,48 @@ const updateHistroyAndSharedDate = (
                   "update " +
                   tblName +
                   " set history = :history,sharedDate =:sharedDate where id = :id",
+                  [
+                    utils.encrypt( JSON.stringify( history ).toString(), passcode ),
+                    utils.encrypt( sharedDate.toString(), passcode ),
+                    id
+                  ]
+                );
+                resolve( true );
+                break;
+              }
+            }
+          }
+        } );
+
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
+
+const updateHistroyAndAcceptDate = (
+  tblName: string,
+  history: any,
+  sharedDate: string,
+  id: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        //  console.log( { tblName, history, sharedDate, id } );
+        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+          var len = results.rows.length;
+          if ( len > 0 ) {
+            for ( let j = 0; j < len; j++ ) {
+              let tableId = results.rows.item( j ).id;
+              if ( tableId == id ) {
+                txn.executeSql(
+                  "update " +
+                  tblName +
+                  " set history = :history,acceptedDate =:acceptedDate where id = :id",
                   [
                     utils.encrypt( JSON.stringify( history ).toString(), passcode ),
                     utils.encrypt( sharedDate.toString(), passcode ),
@@ -1559,7 +1605,7 @@ module.exports = {
 
   //Wallet Details
   insertWallet,
-  updateWalletAnswerDetails,
+  updateWalletBackedUpSecretQue,
   updateWalletMnemonic,
   updateWalletAppHealthStatus,
   updateWalletMnemonicAndAnwserDetails,
@@ -1592,5 +1638,6 @@ module.exports = {
   insertTrustedPartyDetails,
   insertTrustedPartyDetailWithoutAssociate,
   updateHistroyAndSharedDate,
+  updateHistroyAndAcceptDate,
   insertTrustedPartyDetailSelfShare
 };    

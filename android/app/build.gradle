@@ -106,14 +106,14 @@ android {
         applicationId "com.hexawallet"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0.0.220719"
-            multiDexEnabled true
-        ndk {
+        versionCode 1       
+        versionName "1.0.0.260719"            
+            multiDexEnabled true   
+        ndk {  
             abiFilters "armeabi-v7a", "x86"
         }
-        missingDimensionStrategy 'react-native-camera', 'general'    
-    }
+       missingDimensionStrategy 'react-native-camera', 'general'   
+    }     
 
     dexOptions {
       jumboMode = true
@@ -172,11 +172,12 @@ configurations.all {
    
 dependencies {         
   
+    //pdf password lib
     compile 'com.itextpdf:itext-pdfa:5.5.10'
     compile 'com.itextpdf:itextg:5.5.9'
-  
+               
     compile project(':react-native-device-info')
-     compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
     transitive = true;
     }     
     compile project(':react-native-randombytes')  
@@ -199,16 +200,12 @@ dependencies {
     compile project(':react-native-i18n')
     compile project(':react-native-gesture-handler')
     compile project(':react-native-fs')
-    compile project(':react-native-fetch-blob')
-            
    
-     
-    
     compile project(':react-native-contacts')
     compile project(':react-native-config')
     compile project(':react-native-camera')  
-       compile project(':react-native-sqlite-storage')
-       implementation 'com.android.support:multidex:1.0.3'
+    compile project(':react-native-sqlite-storage')
+    implementation 'com.android.support:multidex:1.0.3'
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules

@@ -24,7 +24,6 @@ import QRCode from 'react-native-qrcode-svg';
 
 import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 var RNFS = require( 'react-native-fs' );
-import RNFetchBlob from 'react-native-fetch-blob';
 
 //Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
@@ -282,21 +281,22 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                                                         questionData.Question = this.state.firstQuestion;
                                                         questionData.Answer = this.state.secoundAnswer;
                                                         queTemp.push( questionData );
-                                                        let resUpdateWalletAns = await dbOpration.updateWalletAnswerDetails(
-                                                            localDB.tableName.tblWallet,
-                                                            queTemp
-                                                        );
-                                                        console.log( { resUpdateWalletAns } );
 
-                                                        if ( resUpdateWalletAns ) {
-                                                            await bitcoinClassState.setS3ServiceClassState( sss );
-                                                            await comFunDBRead.readTblSSSDetails();
-                                                            await comFunDBRead.readTblWallet();
-                                                            this.setState( {
-                                                                flag_Loading: false
-                                                            } );
-                                                            this.props.click_Next();
-                                                        }
+                                                        // let resUpdateWalletAns = await dbOpration.updateWalletAnswerDetails(
+                                                        //     localDB.tableName.tblWallet,
+                                                        //     queTemp
+                                                        // );
+                                                        // console.log( { resUpdateWalletAns } );
+
+                                                        // if ( resUpdateWalletAns ) {
+                                                        //     await bitcoinClassState.setS3ServiceClassState( sss );
+                                                        //     await comFunDBRead.readTblSSSDetails();
+                                                        //     await comFunDBRead.readTblWallet();
+                                                        //     this.setState( {
+                                                        //         flag_Loading: false
+                                                        //     } );
+                                                        //     this.props.click_Next();
+                                                        // }
                                                     }
                                                 }
                                             } else {

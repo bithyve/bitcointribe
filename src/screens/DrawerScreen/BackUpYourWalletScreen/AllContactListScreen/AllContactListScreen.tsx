@@ -57,7 +57,6 @@ export default class AllContactListScreen extends React.Component<any, any> {
             filterValue: "",
             SelectedFakeContactList: [],
             flag_NextBtnDisable: true,
-            flag_NextBtnDisable1: false,
             flag_Loading: false,
             flag_MaxItemSeletedof3: true
         } )
@@ -95,7 +94,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
         let seletedLength = this.state.SelectedFakeContactList.length;
         // console.log( { seletedLength } );
         this.setState( { data: this.state.data } )
-        if ( seletedLength == 2 ) {
+        if ( seletedLength <= 2 ) {
             this.setState( {
                 flag_NextBtnDisable: false,
                 filterValue: "",
@@ -109,6 +108,8 @@ export default class AllContactListScreen extends React.Component<any, any> {
             } )
         }
     }
+
+
 
     //TODO: Searching Contact List
     searchFilterFunction = ( text: string ) => {
@@ -127,26 +128,37 @@ export default class AllContactListScreen extends React.Component<any, any> {
         }
     };
 
+
+
     //TODO: func click_Next
     click_Next = async () => {
-        this.setState( {
-            flag_NextBtnDisable1: true
-        } )
         let selectedContactList = this.state.SelectedFakeContactList;
         let arrSSSDetails = this.props.navigation.getParam( "data" );
-        let arrShareId = [ arrSSSDetails[ 0 ].shareId, arrSSSDetails[ 1 ].shareId ]
-        console.log( { selectedContactList, arrSSSDetails } );
+        var arrShareId = [];
+        if ( selectedContactList.length == 2 ) {
+            arrShareId = [ arrSSSDetails[ 0 ].shareId, arrSSSDetails[ 1 ].shareId ];
+        } else {
+            console.log( { arrSSSDetails } );
+            if ( arrSSSDetails[ 0 ].keeperInfo == "null" ) {
+                arrShareId = [ arrSSSDetails[ 0 ].shareId ];
+            } else {
+                arrShareId = [ arrSSSDetails[ 1 ].shareId ];
+            }
+        }
+        console.log( { arrSSSDetails, selectedContactList, arrShareId } );
         const resUpdateSSSContactDetails = await dbOpration.updateSSSContactListDetails(
             localDB.tableName.tblSSSDetails,
             selectedContactList,
             arrShareId
         );
+
         if ( resUpdateSSSContactDetails == true ) {
             await comFunDBRead.readTblSSSDetails();
             this.props.navigation.pop();
         }
-        //this.props.navigation.push( "SecretQuestionAndAnswerScreen", { data: selectedContactList } );
     }
+
+
 
     //TODO: Remove gird on click item
     click_RemoveGridItem( item: any ) {
@@ -173,7 +185,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
             data: arr_FullArrayList
         } )
         let seletedLength = this.state.SelectedFakeContactList.length;
-        if ( seletedLength == 2 ) {
+        if ( seletedLength <= 2 ) {
             this.setState( {
                 flag_NextBtnDisable: false
             } )
@@ -183,6 +195,8 @@ export default class AllContactListScreen extends React.Component<any, any> {
             } )
         }
     }
+
+
 
     render() {
         return (
@@ -294,7 +308,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
                         </KeyboardAwareScrollView>
                         { renderIf( this.state.flag_NextBtnDisable == false )(
                             <View style={ styles.btnNext }>
-                                <FullLinearGradientButton title="Next" disabled={ this.state.flag_NextBtnDisable || this.state.flag_NextBtnDisable1 } style={ [ this.state.flag_NextBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10, marginLeft: 30, marginRight: 30 } ] } click_Done={ () => this.click_Next() } />
+                                <FullLinearGradientButton title="Next" disabled={ this.state.flag_NextBtnDisable } style={ [ this.state.flag_NextBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10, marginLeft: 30, marginRight: 30 } ] } click_Done={ () => this.click_Next() } />
                             </View>
                         ) }
                     </ImageBackground>

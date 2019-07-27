@@ -254,6 +254,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         }
     };
 
+
     //TODO: Deeplinking 
     click_SentRequest( type: string, val: any ) {
         console.log( { val } );
@@ -263,11 +264,11 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );
         if ( type == "SMS" ) {
-            val = val[ 0 ].number != undefined ? val[ 0 ].number : "";
+            val = val.length != 0 ? val[ 0 ].number : ""
             console.log( { val } );
             SendSMS.send( {
                 body: 'https://prime-sign-230407.appspot.com/sss/res/' + encpScript,
-                recipients: [ val != "" ? val : "" ],
+                recipients: [ val ],
                 successTypes: [ 'sent', 'queued' ]
             }, ( completed, cancelled, error ) => {
                 if ( completed ) {
@@ -296,13 +297,11 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                 }
             } );
         } else if ( type == "EMAIL" ) {
-            let value = val[ 0 ].email != undefined ? val[ 0 ].email : "";
-            console.log( { value } );
-
+            val = val.length != 0 ? val[ 0 ].email : ""
             if ( Platform.OS == "android" ) {
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Restore',
-                    recipients: [ value ],
+                    recipients: [ val ],
                     body: 'https://prime-sign-230407.appspot.com/sss/res/' + encpScript,
                     isHTML: true,
                 }, ( error, event ) => {
@@ -322,7 +321,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             } else {
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Restore',
-                    recipients: [ value ],
+                    recipients: [ val ],
                     body: 'https://prime-sign-230407.appspot.com/sss/res/' + encpScript,
                     isHTML: true,
                 }, ( error, event ) => {
@@ -346,10 +345,13 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         }
     }
 
+
+
     //TODO: func backQrCodeScreen
     onSelect = ( data: any ) => {
         this.reloadList( "QR" );
     };
+
 
 
     //TODO: Deep{ling sent then reload data

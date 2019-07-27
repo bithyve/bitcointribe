@@ -93,12 +93,11 @@ export default class BackupSecretQuestionsScreen extends Component {
         let JsonData = {};
         JsonData.Question = arr_History[ 0 ].Question;
         JsonData.Answer = arr_History[ 0 ].Answer;
-        JsonData.backupDate = dateTime
         let temp = [ JsonData ];
         arr_History.push.apply( arr_History, temp );
-        let resUpdateWalletAns = await dbOpration.updateWalletAnswerDetails(
+        let resUpdateWalletAns = await dbOpration.updateWalletBackedUpSecretQue(
             localDB.tableName.tblWallet,
-            arr_History
+            dateTime
         );
         if ( resUpdateWalletAns ) {
             this.props.navigation.pop();

@@ -28,7 +28,6 @@ import com.imagepicker.ImagePickerPackage;
 import com.AlexanderZaytsev.RNI18n.RNI18nPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.rnfs.RNFSPackage;
-import com.RNFetchBlob.RNFetchBlobPackage;
 
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
@@ -63,8 +62,7 @@ public class MainApplication extends Application implements ReactApplication {
           new VectorIconsPackage(), SendSMSPackage.getInstance(), new RNSharePackage(), new PDFLibPackage(),
           new RNOSModule(), new RNMail(), new LinearGradientPackage(), new QRScanReaderPackage(), new KeychainPackage(),
           new ImagePickerPackage(), new RNI18nPackage(), new RNGestureHandlerPackage(), new RNFSPackage(),
-          new RNFetchBlobPackage(), new ReactNativeContacts(), new ReactNativeConfigPackage(), new RNCameraPackage(),
-          new SQLitePluginPackage());
+          new ReactNativeContacts(), new ReactNativeConfigPackage(), new RNCameraPackage(), new SQLitePluginPackage());
     }
 
     @Override

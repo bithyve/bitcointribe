@@ -24,7 +24,6 @@ import QRCode from 'react-native-qrcode-svg';
 //import QRCode from 'react-native-qrcode';
 import Toast from 'react-native-simple-toast';
 import Share from 'react-native-share';
-import RNFetchBlob from 'react-native-fetch-blob';
 import { Slider, CheckBox } from 'react-native-elements';
 
 //TODO: Custome Pages
