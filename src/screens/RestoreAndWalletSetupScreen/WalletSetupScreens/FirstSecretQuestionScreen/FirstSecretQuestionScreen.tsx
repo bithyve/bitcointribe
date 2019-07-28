@@ -167,20 +167,6 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
 
         const secureAccount = new SecureAccount( mnemonic );
         const sss = new S3Service( mnemonic );
-        var getAddress = await regularAccount.getAddress();
-        if ( getAddress.status == 200 ) {
-            getAddress = getAddress.data.address
-        } else {
-            alert.simpleOk( "Oops", getAddress.err );
-        }
-
-        var secureAddress = await secureAccount.getAddress();
-        if ( secureAddress.status == 200 ) {
-            secureAddress = secureAddress.data.address
-        } else {
-            alert.simpleOk( "Oops", secureAddress.err );
-        }
-        console.log( { getAddress, secureAddress } );
 
         //setup Check Health   
         let updateShareIdStatus = await comAppHealth.checkHealthSetupShare( dateTime );
@@ -206,7 +192,7 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
             let resInsertCreateAcc = await dbOpration.insertCreateAccount(
                 localDB.tableName.tblAccount,
                 dateTime,
-                getAddress,
+                "",
                 "0.0",
                 "BTC",
                 "Daily Wallet",
@@ -216,7 +202,7 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
             let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
                 localDB.tableName.tblAccount,
                 dateTime,
-                secureAddress,
+                "",
                 "0.0",
                 "BTC",
                 "Secure Account",
@@ -224,9 +210,9 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                 ""
             );
             if ( resInsertWallet && resInsertSecureCreateAcc && resInsertCreateAcc ) {
-                // BackgroundFetch.registerHeadlessTask( this.createPdfFile );
+                BackgroundFetch.registerHeadlessTask( this.createPdfFile );
                 await bitcoinClassState.setRegularClassState( regularAccount );
-                //secure account  
+                //secure account     
                 await bitcoinClassState.setSecureClassState( secureAccount );
                 //s3serverice
                 await bitcoinClassState.setS3ServiceClassState( sss )
@@ -247,139 +233,126 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
         const dateTime = Date.now();
         let walletDetails = await utils.getWalletDetails();
         console.log( { walletDetails } );
-        // let secureAccount = await bitcoinClassState.getSecureClassState();
-        // let sss = await bitcoinClassState.getS3ServiceClassState();
-        // var resSetupSecureAccount = await secureAccount.setupSecureAccount();
-        // if ( resSetupSecureAccount.status == 200 ) {
-        //     resSetupSecureAccount = resSetupSecureAccount.data;
-        // } else {
-        //     alert.simpleOk( "Oops", resSetupSecureAccount.err );
-        // }
-        // var secondaryXpub = await secureAccount.getSecondaryXpub();
-        // if ( secondaryXpub.status == 200 ) {
-        //     secondaryXpub = secondaryXpub.data.secondaryXpub;
-        // } else {
-        //     alert.simpleOk( "Oops", secondaryXpub.err );
-        // }
 
-        // var getSecoundMnemonic = await secureAccount.getRecoveryMnemonic();
-        // if ( getSecoundMnemonic.status == 200 ) {
-        //     await bitcoinClassState.setSecureClassState( secureAccount );
-        //     getSecoundMnemonic = getSecoundMnemonic.data.secondaryMnemonic;
-        // } else {
-        //     alert.simpleOk( "Oops", getSecoundMnemonic.err );
-        // }
-        // //Get Shares
-        // const generateShareRes = await sss.generateShares( answer );
-        // console.log( { generateShareRes } );
-        // if ( generateShareRes.status == 200 ) {
-        //     const { encryptedShares } = generateShareRes.data;
-        //     const autoHealthShares = encryptedShares.slice( 0, 3 );
-        //     //console.log( { autoHealthShares, manualHealthShares } );
-        //     const resInitializeHealthcheck = await sss.initializeHealthcheck( autoHealthShares );
-        //     console.log( { resInitializeHealthcheck } );
-        //     if ( resInitializeHealthcheck.status == 200 || resInitializeHealthcheck.status == 400 ) {
-        //         const shareIds = [];
-        //         // console.log( { autoHealthShares } );
-        //         for ( const share of encryptedShares ) {
-        //             shareIds.push( sss.getShareId( share ) )
-        //         }
-        //         const socialStaticNonPMDD = { secondaryXpub, bhXpub: resSetupSecureAccount.setupData.bhXpub }
-        //         console.log( { socialStaticNonPMDD } );
-        //         var resEncryptSocialStaticNonPMDD = await sss.encryptStaticNonPMDD( socialStaticNonPMDD );
-        //         console.log( { shareIds, resEncryptSocialStaticNonPMDD } );
-        //         if ( resEncryptSocialStaticNonPMDD.status == 200 ) {
-        //             resEncryptSocialStaticNonPMDD = resEncryptSocialStaticNonPMDD.data.encryptedStaticNonPMDD;
-        //             const buddyStaticNonPMDD = { getSecoundMnemonic, twoFASecret: resSetupSecureAccount.setupData.secret, secondaryXpub, bhXpub: resSetupSecureAccount.setupData.bhXpub };
-        //             console.log( { buddyStaticNonPMDD } );
-        //             let resEncryptBuddyStaticNonPMDD = await sss.encryptStaticNonPMDD( buddyStaticNonPMDD );
-        //             if ( resEncryptBuddyStaticNonPMDD.status == 200 ) {
-        //                 resEncryptBuddyStaticNonPMDD = resEncryptBuddyStaticNonPMDD.data.encryptedStaticNonPMDD;
-        //                 let rescreateMetaShare = await sss.createMetaShare( 1, encryptedShares[ 0 ], resEncryptSocialStaticNonPMDD, walletName );
-        //                 console.log( { encpShare: encryptedShares[ 1 ], rescreateMetaShare } );
-        //                 let resGenerateEncryptedMetaShare1 = await sss.generateEncryptedMetaShare( rescreateMetaShare.data.metaShare );
-        //                 let rescreateMetaShare1 = await sss.createMetaShare( 2, encryptedShares[ 1 ], resEncryptSocialStaticNonPMDD, walletName );
-        //                 console.log( { encpShare: encryptedShares[ 2 ], rescreateMetaShare1 } );
-        //                 let resGenerateEncryptedMetaShare2 = await sss.generateEncryptedMetaShare( rescreateMetaShare1.data.metaShare );
-        //                 let rescreateMetaShare2 = await sss.createMetaShare( 3, encryptedShares[ 2 ], resEncryptBuddyStaticNonPMDD, walletName );
-        //                 let resGenerateEncryptedMetaShare3 = await sss.generateEncryptedMetaShare( rescreateMetaShare2.data.metaShare );
-        //                 console.log( { rescreateMetaShare2 } );
-        //                 //for pdf                      
-        //                 let rescreateMetaShare3 = await sss.createMetaShare( 4, encryptedShares[ 3 ], resEncryptBuddyStaticNonPMDD, walletName );
-        //                 console.log( { rescreateMetaShare3 } );
-        //                 if ( rescreateMetaShare3.status == 200 ) {
-        //                     var qrcode4share = await sss.createQR( rescreateMetaShare3.data.metaShare, 4 );
-        //                     console.log( { qrcode4share } );
-        //                     if ( qrcode4share.status == 200 ) {
-        //                         qrcode4share = qrcode4share.data.qrData
-        //                         // console.log( { qrcode4share } );
-        //                         //creating 4th share pdf
-        //                         let temp = [];
-        //                         temp.push( { arrQRCodeData: qrcode4share, secondaryXpub: secondaryXpub, qrData: resSetupSecureAccount.setupData.qrData, secret: resSetupSecureAccount.setupData.secret, secondaryMnemonic: getSecoundMnemonic, bhXpub: resSetupSecureAccount.setupData.bhXpub } )
-        //                         let resGenerate4thsharepdf = await this.generate4thShare( temp );
-        //                         console.log( { resGenerate4thsharepdf } );
-        //                         if ( resGenerate4thsharepdf != "" ) {
+        let secureAccount = await bitcoinClassState.getSecureClassState();
+        let sss = await bitcoinClassState.getS3ServiceClassState();
+        var resSetupSecureAccount = await secureAccount.setupSecureAccount();
+        if ( resSetupSecureAccount.status == 200 ) {
+            resSetupSecureAccount = resSetupSecureAccount.data;
+        } else {
+            alert.simpleOk( "Oops", resSetupSecureAccount.err );
+        }
+        var secondaryXpub = await secureAccount.getSecondaryXpub();
+        if ( secondaryXpub.status == 200 ) {
+            secondaryXpub = secondaryXpub.data.secondaryXpub;
+        } else {
+            alert.simpleOk( "Oops", secondaryXpub.err );
+        }
 
-        //                             let rescreateMetaShare4 = await sss.createMetaShare( 5, encryptedShares[ 4 ], resEncryptBuddyStaticNonPMDD, walletName );
-        //                             console.log( { rescreateMetaShare4 } );
-        //                             if ( rescreateMetaShare4.status == 200 ) {
-        //                                 var qrcode5share = await sss.createQR( rescreateMetaShare4.data.metaShare, 5 );
-        //                                 console.log( { qrcode5share } );
-        //                                 if ( qrcode5share.status == 200 ) {
-        //                                     qrcode5share = qrcode5share.data.qrData
-        //                                     let temp = [];
-        //                                     temp.push( { arrQRCodeData: qrcode5share, secondaryXpub: secondaryXpub, qrData: resSetupSecureAccount.setupData.qrData, secret: resSetupSecureAccount.setupData.secret, secondaryMnemonic: getSecoundMnemonic, bhXpub: resSetupSecureAccount.setupData.bhXpub } )
-        //                                     console.log( { temp } );
-        //                                     let resGenerate5thsharepdf = await this.generate5thShare( temp );
-        //                                     console.log( { resGenerate5thsharepdf } );
-        //                                     if ( resGenerate5thsharepdf != "" ) {
-        //                                         let keeperInfo = [ { info: null }, { info: null }, { info: rescreateMetaShare2.data }, { info: qrcode4share[ 0 ] }, { info: qrcode5share[ 0 ] } ];
-        //                                         let arrTypes = [ { type: "Trusted Contacts 1" }, { type: "Trusted Contacts 2" }, { type: "Self Share 1" }, { type: "Self Share 2" }, { type: "Self Share 3" } ];
-        //                                         let encryptedMetaShare = [ { metaShare: rescreateMetaShare.data.metaShare }, { metaShare: rescreateMetaShare1.data.metaShare }, { metaShare: rescreateMetaShare2.data.metaShare }, { metaShare: resGenerate4thsharepdf }, { metaShare: resGenerate5thsharepdf } ]
-        //                                         let temp = [ { date: dateTime, share: encryptedShares, shareId: shareIds, keeperInfo: keeperInfo, encryptedMetaShare: encryptedMetaShare, type: arrTypes } ]
-        //                                         console.log( { temp } );
-        //                                         let resInsertSSSShare = await dbOpration.insertSSSShareDetails(
-        //                                             localDB.tableName.tblSSSDetails,
-        //                                             temp
-        //                                         );
-        //                                         console.log( { resInsertSSSShare } );
-        //                                         if ( resInsertSSSShare ) {
-        //                                             //regular account  
-        //                                             await bitcoinClassState.setRegularClassState( regularAccount );
-        //                                             //secure account  
-        //                                             await bitcoinClassState.setSecureClassState( secureAccount );
-        //                                             //s3serverice
-        //                                             await bitcoinClassState.setS3ServiceClassState( sss )
-        //                                             await comFunDBRead.readTblSSSDetails();
-        //                                             await comFunDBRead.readTblWallet();
-        //                                             this.setState( {
-        //                                                 flag_Loading: false
-        //                                             } );
-        //                                             this.props.click_Next();
-        //                                         }
-        //                                     }
-        //                                 }
-        //                             } else {
-        //                                 alert.simpleOk( "Oops", qrcode4share.err );
-        //                             }
-        //                         }
-        //                     }
-        //                 } else {
-        //                     alert.simpleOk( "Oops", qrcode4share.err );
-        //                 }
-        //             } else {
-        //                 alert.simpleOk( "Oops", resEncryptBuddyStaticNonPMDD.err );
-        //             }
+        var getSecoundMnemonic = await secureAccount.getRecoveryMnemonic();
+        if ( getSecoundMnemonic.status == 200 ) {
+            await bitcoinClassState.setSecureClassState( secureAccount );
+            getSecoundMnemonic = getSecoundMnemonic.data.secondaryMnemonic;
+        } else {
+            alert.simpleOk( "Oops", getSecoundMnemonic.err );
+        }
+        //Get Shares    
+        const generateShareRes = await sss.generateShares( walletDetails.walletType );
+        console.log( { generateShareRes } );
+        if ( generateShareRes.status == 200 ) {
+            const { encryptedShares } = generateShareRes.data;
+            const autoHealthShares = encryptedShares.slice( 0, 3 );
+            //console.log( { autoHealthShares, manualHealthShares } );
+            const resInitializeHealthcheck = await sss.initializeHealthcheck( autoHealthShares );
+            console.log( { resInitializeHealthcheck } );
+            if ( resInitializeHealthcheck.status == 200 || resInitializeHealthcheck.status == 400 ) {
+                const shareIds = [];
+                // console.log( { autoHealthShares } );
+                for ( const share of encryptedShares ) {
+                    shareIds.push( sss.getShareId( share ) )
+                }
+                const socialStaticNonPMDD = { secondaryXpub, bhXpub: resSetupSecureAccount.setupData.bhXpub }
+                console.log( { socialStaticNonPMDD } );
+                var resEncryptSocialStaticNonPMDD = await sss.encryptStaticNonPMDD( socialStaticNonPMDD );
+                console.log( { shareIds, resEncryptSocialStaticNonPMDD } );
+                if ( resEncryptSocialStaticNonPMDD.status == 200 ) {
+                    resEncryptSocialStaticNonPMDD = resEncryptSocialStaticNonPMDD.data.encryptedStaticNonPMDD;
+                    const buddyStaticNonPMDD = { getSecoundMnemonic, twoFASecret: resSetupSecureAccount.setupData.secret, secondaryXpub, bhXpub: resSetupSecureAccount.setupData.bhXpub };
+                    console.log( { buddyStaticNonPMDD } );
+                    let resEncryptBuddyStaticNonPMDD = await sss.encryptStaticNonPMDD( buddyStaticNonPMDD );
+                    if ( resEncryptBuddyStaticNonPMDD.status == 200 ) {
+                        resEncryptBuddyStaticNonPMDD = resEncryptBuddyStaticNonPMDD.data.encryptedStaticNonPMDD;
+                        let rescreateMetaShare = await sss.createMetaShare( 1, encryptedShares[ 0 ], resEncryptSocialStaticNonPMDD, walletDetails.walletType );
+                        console.log( { encpShare: encryptedShares[ 1 ], rescreateMetaShare } );
+                        let resGenerateEncryptedMetaShare1 = await sss.generateEncryptedMetaShare( rescreateMetaShare.data.metaShare );
+                        let rescreateMetaShare1 = await sss.createMetaShare( 2, encryptedShares[ 1 ], resEncryptSocialStaticNonPMDD, walletDetails.walletType );
+                        console.log( { encpShare: encryptedShares[ 2 ], rescreateMetaShare1 } );
+                        let resGenerateEncryptedMetaShare2 = await sss.generateEncryptedMetaShare( rescreateMetaShare1.data.metaShare );
+                        let rescreateMetaShare2 = await sss.createMetaShare( 3, encryptedShares[ 2 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
+                        let resGenerateEncryptedMetaShare3 = await sss.generateEncryptedMetaShare( rescreateMetaShare2.data.metaShare );
+                        console.log( { rescreateMetaShare2 } );
+                        //for pdf                      
+                        let rescreateMetaShare3 = await sss.createMetaShare( 4, encryptedShares[ 3 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
+                        console.log( { rescreateMetaShare3 } );
+                        if ( rescreateMetaShare3.status == 200 ) {
+                            var qrcode4share = await sss.createQR( rescreateMetaShare3.data.metaShare, 4 );
+                            console.log( { qrcode4share } );
+                            if ( qrcode4share.status == 200 ) {
+                                qrcode4share = qrcode4share.data.qrData
+                                // console.log( { qrcode4share } );
+                                //creating 4th share pdf
+                                let temp = [];
+                                temp.push( { arrQRCodeData: qrcode4share, secondaryXpub: secondaryXpub, qrData: resSetupSecureAccount.setupData.qrData, secret: resSetupSecureAccount.setupData.secret, secondaryMnemonic: getSecoundMnemonic, bhXpub: resSetupSecureAccount.setupData.bhXpub } )
+                                let resGenerate4thsharepdf = await this.generate4thShare( temp );
+                                console.log( { resGenerate4thsharepdf } );
+                                if ( resGenerate4thsharepdf != "" ) {
 
-        //         } else {
-        //             alert.simpleOk( "Oops", resEncryptSocialStaticNonPMDD.err );
-        //         }
-        //     } else {
-        //         alert.simpleOk( "Oops", resEncryptSocialStaticNonPMDD.err );
-        //     }
-        // } else {
-        //     alert.simpleOk( "Oops", generateShareRes.err );
-        // }
+                                    let rescreateMetaShare4 = await sss.createMetaShare( 5, encryptedShares[ 4 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
+                                    console.log( { rescreateMetaShare4 } );
+                                    if ( rescreateMetaShare4.status == 200 ) {
+                                        var qrcode5share = await sss.createQR( rescreateMetaShare4.data.metaShare, 5 );
+                                        console.log( { qrcode5share } );
+                                        if ( qrcode5share.status == 200 ) {
+                                            qrcode5share = qrcode5share.data.qrData
+                                            let temp = [];
+                                            temp.push( { arrQRCodeData: qrcode5share, secondaryXpub: secondaryXpub, qrData: resSetupSecureAccount.setupData.qrData, secret: resSetupSecureAccount.setupData.secret, secondaryMnemonic: getSecoundMnemonic, bhXpub: resSetupSecureAccount.setupData.bhXpub } )
+                                            console.log( { temp } );
+                                            let resGenerate5thsharepdf = await this.generate5thShare( temp );
+                                            console.log( { resGenerate5thsharepdf } );
+                                            if ( resGenerate5thsharepdf != "" ) {
+                                                let keeperInfo = [ { info: null }, { info: null }, { info: rescreateMetaShare2.data }, { info: qrcode4share[ 0 ] }, { info: qrcode5share[ 0 ] } ];
+                                                let arrTypes = [ { type: "Trusted Contacts 1" }, { type: "Trusted Contacts 2" }, { type: "Self Share 1" }, { type: "Self Share 2" }, { type: "Self Share 3" } ];
+                                                let encryptedMetaShare = [ { metaShare: rescreateMetaShare.data.metaShare }, { metaShare: rescreateMetaShare1.data.metaShare }, { metaShare: rescreateMetaShare2.data.metaShare }, { metaShare: resGenerate4thsharepdf }, { metaShare: resGenerate5thsharepdf } ]
+                                                let temp = [ { date: dateTime, share: encryptedShares, shareId: shareIds, keeperInfo: keeperInfo, encryptedMetaShare: encryptedMetaShare, type: arrTypes } ]
+                                                console.log( { temp } );
+                                                let resInsertSSSShare = await dbOpration.insertSSSShareDetails(
+                                                    localDB.tableName.tblSSSDetails,
+                                                    temp
+                                                );
+                                                console.log( { resInsertSSSShare } );
+                                            }
+                                        }
+                                    } else {
+                                        alert.simpleOk( "Oops", qrcode4share.err );
+                                    }
+                                }
+                            }
+                        } else {
+                            alert.simpleOk( "Oops", qrcode4share.err );
+                        }
+                    } else {
+                        alert.simpleOk( "Oops", resEncryptBuddyStaticNonPMDD.err );
+                    }
+
+                } else {
+                    alert.simpleOk( "Oops", resEncryptSocialStaticNonPMDD.err );
+                }
+            } else {
+                alert.simpleOk( "Oops", resEncryptSocialStaticNonPMDD.err );
+            }
+        } else {
+            alert.simpleOk( "Oops", generateShareRes.err );
+        }
     }
 
     base64string1 = ( base64string1: any ) => {

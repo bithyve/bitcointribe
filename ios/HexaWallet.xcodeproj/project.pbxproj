@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		001FD8F5BCF344BE99EA8AA9 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F79788E7D60A489CA04491E9 /* MaterialIcons.ttf */; };
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
@@ -72,6 +73,7 @@
 		8BC2E3E7225F265500442E2F /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BC2E3E5225F265500442E2F /* Crashlytics.framework */; };
 		8BC2E3E8225F265500442E2F /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BC2E3E6225F265500442E2F /* Fabric.framework */; };
 		8BE2C276226992C6009F5786 /* HexaWallet.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 8BE2C25322699285009F5786 /* HexaWallet.entitlements */; };
+		8BEF5F8D22EDE5C60061F6BB /* libRNBackgroundFetch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B87492722ED74EC00D1EAE9 /* libRNBackgroundFetch.a */; };
 		8E61BB40BB824EB6B636B8AD /* libQRCode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D36784344EE54C93963D531B /* libQRCode.a */; };
 		94EB2CDCF5444CFEB54B8108 /* FiraSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6312467B46FF4C75AE036FC2 /* FiraSans-SemiBold.ttf */; };
 		954AA393C8F44F209B65DDC3 /* Roboto_medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 71898628EDD94D338CA3CF62 /* Roboto_medium.ttf */; };
@@ -883,6 +885,7 @@
 				4D689860C2BD4B33A1AD2EE8 /* libRNPDFLib.a in Frameworks */,
 				8BA660D522A7B57F0010E934 /* libRCTCameraRoll.a in Frameworks */,
 				26BDB20074654DC281A70293 /* libRNSimpleShare.a in Frameworks */,
+				8BEF5F8D22EDE5C60061F6BB /* libRNBackgroundFetch.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2415,9 +2418,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = Y5TCB759QL;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -2527,9 +2528,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = Y5TCB759QL;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",

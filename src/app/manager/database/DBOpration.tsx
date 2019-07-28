@@ -1231,6 +1231,41 @@ const updateSSSShareStage = (
 
 
 
+//update shareId shareStage Id Wise 
+const updateSSSShareStageIdWise = (
+  tblName: string,
+  resCheckHealth: any,
+  sharesInfo: any,
+  arrEachShareId: any,
+  fulldate: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        //console.log( { tblName, shareInfo, fulldate } );
+        for ( let i = 0; i < arrEachShareId.length; i++ ) {
+          txn.executeSql(
+            "update " +
+            tblName +
+            " set  shareid = :shareid,  shareStage = :shareStage,lastSuccessfulCheck =:lastSuccessfulCheck where id = :id",
+            [
+              utils.encrypt( resCheckHealth[ i ].shareId.toString(), passcode ),
+              utils.encrypt( sharesInfo[ i ].shareStage.toString(), passcode ),
+              utils.encrypt( fulldate.toString(), passcode ),
+              arrEachShareId[ i ]
+            ]
+          );
+          resolve( true );
+          break;
+        }
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
 
 
 const updateSSSShareStageWhereRecordId = (
@@ -1630,6 +1665,7 @@ module.exports = {
   updateSSSContactListDetails,
   updateSSSTransferMehtodDetails,
   updateSSSShareStage,
+  updateSSSShareStageIdWise,
   updateSSSShareStageWhereRecordId,
   updateSSSRetoreDecryptedShare,
 
