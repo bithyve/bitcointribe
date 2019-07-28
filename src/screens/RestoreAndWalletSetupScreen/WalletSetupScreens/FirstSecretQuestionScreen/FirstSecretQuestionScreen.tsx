@@ -227,6 +227,22 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                 ""
             );
             if ( resInsertWallet && resInsertSecureCreateAcc && resInsertCreateAcc ) {
+
+
+
+                // await bitcoinClassState.setRegularClassState( regularAccount );
+                // //secure account  
+                // await bitcoinClassState.setSecureClassState( secureAccount );
+                // //s3serverice
+                // await bitcoinClassState.setS3ServiceClassState( sss )
+                // await comFunDBRead.readTblSSSDetails();
+                // await comFunDBRead.readTblWallet();
+                // this.setState( {
+                //     flag_Loading: false
+                // } );
+                // this.props.click_Next();
+
+
                 var secondaryXpub = await secureAccount.getSecondaryXpub();
                 if ( secondaryXpub.status == 200 ) {
                     secondaryXpub = secondaryXpub.data.secondaryXpub;
@@ -430,27 +446,28 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
 
             //set state value for qrcode
             this.setState( {
-                qrcodeImageString1: this.getCorrectFormatStirng( arrQRCodeData[ 0 ] ),
-                qrcodeImageString2: this.getCorrectFormatStirng( arrQRCodeData[ 1 ] ),
-                qrcodeImageString3: this.getCorrectFormatStirng( arrQRCodeData[ 2 ] ),
-                qrcodeImageString4: this.getCorrectFormatStirng( arrQRCodeData[ 3 ] ),
-                qrcodeImageString5: this.getCorrectFormatStirng( arrQRCodeData[ 4 ] ),
-                qrcodeImageString6: this.getCorrectFormatStirng( arrQRCodeData[ 5 ] ),
-                qrcodeImageString7: this.getCorrectFormatStirng( arrQRCodeData[ 6 ] ),
-                qrcodeImageString8: this.getCorrectFormatStirng( arrQRCodeData[ 7 ] ),
+                qrcodeImageString1: await this.getCorrectFormatStirng( arrQRCodeData[ 0 ] ),
+                qrcodeImageString2: await this.getCorrectFormatStirng( arrQRCodeData[ 1 ] ),
+                qrcodeImageString3: await this.getCorrectFormatStirng( arrQRCodeData[ 2 ] ),
+                qrcodeImageString4: await this.getCorrectFormatStirng( arrQRCodeData[ 3 ] ),
+                qrcodeImageString5: await this.getCorrectFormatStirng( arrQRCodeData[ 4 ] ),
+                qrcodeImageString6: await this.getCorrectFormatStirng( arrQRCodeData[ 5 ] ),
+                qrcodeImageString7: await this.getCorrectFormatStirng( arrQRCodeData[ 6 ] ),
+                qrcodeImageString8: await this.getCorrectFormatStirng( arrQRCodeData[ 7 ] ),
                 qrcodeImageString9: secondaryXpub,
                 qrcodeImageString10: qrData,
             } );
-            this.svg1.toDataURL( this.base64string1 );
-            this.svg2.toDataURL( this.base64string2 );
-            this.svg3.toDataURL( this.base64string3 );
-            this.svg4.toDataURL( this.base64string4 );
-            this.svg5.toDataURL( this.base64string5 );
-            this.svg6.toDataURL( this.base64string6 );
-            this.svg7.toDataURL( this.base64string7 );
-            this.svg8.toDataURL( this.base64string8 );
-            this.svg9.toDataURL( this.base64string9 );
-            this.svg10.toDataURL( this.base64string10 );
+
+            await this.svg1.toDataURL( this.base64string1 );
+            await this.svg2.toDataURL( this.base64string2 );
+            await this.svg3.toDataURL( this.base64string3 );
+            await this.svg4.toDataURL( this.base64string4 );
+            await this.svg5.toDataURL( this.base64string5 );
+            await this.svg6.toDataURL( this.base64string6 );
+            await this.svg7.toDataURL( this.base64string7 );
+            await this.svg8.toDataURL( this.base64string8 );
+            await this.svg9.toDataURL( this.base64string9 );
+            await this.svg10.toDataURL( this.base64string10 );
 
             setTimeout( async () => {
                 let res4thShare1Create = await this.generateSahreQRCode( this.state.base64string1, "qrcode4thSahre1.png" );
@@ -498,27 +515,27 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
 
             //set state value for qrcode
             this.setState( {
-                qrcodeImageString1: this.getCorrectFormatStirng( arrQRCodeData[ 0 ] ),
-                qrcodeImageString2: this.getCorrectFormatStirng( arrQRCodeData[ 1 ] ),
-                qrcodeImageString3: this.getCorrectFormatStirng( arrQRCodeData[ 2 ] ),
-                qrcodeImageString4: this.getCorrectFormatStirng( arrQRCodeData[ 3 ] ),
-                qrcodeImageString5: this.getCorrectFormatStirng( arrQRCodeData[ 4 ] ),
-                qrcodeImageString6: this.getCorrectFormatStirng( arrQRCodeData[ 5 ] ),
-                qrcodeImageString7: this.getCorrectFormatStirng( arrQRCodeData[ 6 ] ),
-                qrcodeImageString8: this.getCorrectFormatStirng( arrQRCodeData[ 7 ] ),
+                qrcodeImageString1: await this.getCorrectFormatStirng( arrQRCodeData[ 0 ] ),
+                qrcodeImageString2: await this.getCorrectFormatStirng( arrQRCodeData[ 1 ] ),
+                qrcodeImageString3: await this.getCorrectFormatStirng( arrQRCodeData[ 2 ] ),
+                qrcodeImageString4: await this.getCorrectFormatStirng( arrQRCodeData[ 3 ] ),
+                qrcodeImageString5: await this.getCorrectFormatStirng( arrQRCodeData[ 4 ] ),
+                qrcodeImageString6: await this.getCorrectFormatStirng( arrQRCodeData[ 5 ] ),
+                qrcodeImageString7: await this.getCorrectFormatStirng( arrQRCodeData[ 6 ] ),
+                qrcodeImageString8: await this.getCorrectFormatStirng( arrQRCodeData[ 7 ] ),
                 qrcodeImageString9: secondaryXpub,
                 qrcodeImageString10: qrData,
             } );
-            this.svg1.toDataURL( this.base64string1 );
-            this.svg2.toDataURL( this.base64string2 );
-            this.svg3.toDataURL( this.base64string3 );
-            this.svg4.toDataURL( this.base64string4 );
-            this.svg5.toDataURL( this.base64string5 );
-            this.svg6.toDataURL( this.base64string6 );
-            this.svg7.toDataURL( this.base64string7 );
-            this.svg8.toDataURL( this.base64string8 );
-            this.svg9.toDataURL( this.base64string9 );
-            this.svg10.toDataURL( this.base64string10 );
+            await this.svg1.toDataURL( this.base64string1 );
+            await this.svg2.toDataURL( this.base64string2 );
+            await this.svg3.toDataURL( this.base64string3 );
+            await this.svg4.toDataURL( this.base64string4 );
+            await this.svg5.toDataURL( this.base64string5 );
+            await this.svg6.toDataURL( this.base64string6 );
+            await this.svg7.toDataURL( this.base64string7 );
+            await this.svg8.toDataURL( this.base64string8 );
+            await this.svg9.toDataURL( this.base64string9 );
+            await this.svg10.toDataURL( this.base64string10 );
             setTimeout( async () => {
                 let res5thShare1Create = await this.generateSahreQRCode( this.state.base64string1, "qrcode5thSahre1.png" );
                 console.log( { res5thShare1Create } );
@@ -1185,21 +1202,42 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                     y: 80,
                     fontSize: 10
                 } )
-            PDFDocument
-                .create( pdfPath )
-                .addPages( page1, page2, page3, page4, page5, page6 )
-                .write()
-                .then( async ( path: any ) => {
-                    console.log( 'PDF created at: ' + path );
-                    let pdffilePassword = this.state.secoundAnswer;
-                    if ( Platform.OS == "ios" ) {
-                        var PdfPassword = NativeModules.PdfPassword;
-                        PdfPassword.addEvent( "/" + pdfFileName, pdffilePassword );
-                    } else {
-                        //this.setPdfAndroidPasswrod( path, pdffilePassword );
-                    }
-                    resolve( path );
-                } );
+            if ( Platform.OS == "ios" ) {
+                PDFDocument
+                    .create( pdfPath )
+                    .addPages( page1, page2, page3, page4, page5, page6 )
+                    .write()
+                    .then( async ( path: any ) => {
+                        console.log( 'PDF created at: ' + path );
+                        let pdffilePassword = this.state.secoundAnswer;
+                        if ( Platform.OS == "ios" ) {
+                            var PdfPassword = NativeModules.PdfPassword;
+                            PdfPassword.addEvent( "/" + pdfFileName, pdffilePassword );
+                        } else {
+                            //this.setPdfAndroidPasswrod( path, pdffilePassword );
+                        }
+                        resolve( path );
+                    } );
+            } else {
+                PDFDocument
+                    .create( pdfPath )
+                    .addPages( page1, page6 )
+                    .write()
+                    .then( async ( path: any ) => {
+                        console.log( 'PDF created at: ' + path );
+                        let pdffilePassword = this.state.secoundAnswer;
+                        if ( Platform.OS == "ios" ) {
+                            var PdfPassword = NativeModules.PdfPassword;
+                            PdfPassword.addEvent( "/" + pdfFileName, pdffilePassword );
+                        } else {
+                            //this.setPdfAndroidPasswrod( path, pdffilePassword );
+                        }
+                        resolve( path );
+                    } );
+            }
+
+
+
         } );
     }
 

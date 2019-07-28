@@ -96,6 +96,9 @@ import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 
 
+//TODO: Common Funciton
+var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
+
 export default class WalletScreen extends React.Component {
   constructor ( props: any ) {
     super( props );
@@ -479,7 +482,8 @@ export default class WalletScreen extends React.Component {
     } );
     var resAccount = await comFunDBRead.readTblAccount();
     console.log( { resAccount } );
-
+    let walletDetails = await utils.getWalletDetails();
+    let sssDetails = await utils.getSSSDetails();
     let regularAccount = await bitcoinClassState.getRegularClassState();
     console.log( { regularAccount } );
     let secureAccount = await bitcoinClassState.getSecureClassState();
@@ -519,6 +523,20 @@ export default class WalletScreen extends React.Component {
       }
     }
     if ( resUpdateAccountBalR ) {
+      //health Check  
+      let share = {};
+      share.trustedContShareId1 = sssDetails[ 0 ].shareId;
+      share.trustedContShareId2 = sssDetails[ 1 ].shareId;
+      share.selfshareShareId1 = sssDetails[ 2 ].shareId;
+
+      share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? sssDetails[ 3 ].acceptedDate : 0;
+      share.selfshareShareShareId2 = sssDetails[ 3 ].shareId;
+
+      share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? sssDetails[ 4 ].acceptedDate : 0;
+      share.selfshareShareId3 = sssDetails[ 4 ].shareId;
+
+      share.qatime = parseInt( walletDetails.lastUpdated );
+      await comAppHealth.checkHealthAllShare( share );
       this.setState( {
         flag_Loading: false
       } )

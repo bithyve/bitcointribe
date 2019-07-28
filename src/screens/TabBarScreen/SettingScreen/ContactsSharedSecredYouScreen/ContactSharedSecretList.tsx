@@ -275,20 +275,11 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                     this.refs.modal4.close();
                     console.log( 'SMS Sent Completed' );
                     setTimeout( () => {
-                        Alert.alert(
-                            'Success',
-                            'SMS Sent Completed.',
-                            [
-                                {
-                                    text: 'OK', onPress: () => {
-                                        this.reloadList( "SMS" );
-
-                                    }
-                                },
-
-                            ],
-                            { cancelable: false }
-                        )
+                        this.refs.modal4.close();
+                        this.setState( {
+                            flag_OtpCodeShowStatus: true,
+                        } )
+                        alert.simpleOkActionWithPara( "Success", "SMS Sent Completed.", "SMS", this.reloadList( "SMS" ) );
                     }, 1000 );
                 } else if ( cancelled ) {
                     console.log( 'SMS Sent Cancelled' );
@@ -296,48 +287,43 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                     console.log( 'Some error occured' );
                 }
             } );
-        } else if ( type == "EMAIL" ) {
-            val = val.length != 0 ? val[ 0 ].email : ""
             if ( Platform.OS == "android" ) {
-                Mailer.mail( {
-                    subject: 'Hexa Wallet SSS Restore',
-                    recipients: [ val ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/res/' + encpScript,
-                    isHTML: true,
-                }, ( error, event ) => {
-                    if ( event == "sent" ) {
-                        this.reloadList( "Email" );
-                    } else {
-                        alert.simpleOk( "Oops", error );
-                    }
-                } );
                 setTimeout( () => {
                     this.refs.modal4.close();
-                    alert.simpleOk( "Success", "Email Sent Successfully." );
                     this.setState( {
-                        flag_OtpCodeShowStatus: true
-                    } );
-                }, 1000 );
-            } else {
-                Mailer.mail( {
-                    subject: 'Hexa Wallet SSS Restore',
-                    recipients: [ val ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/res/' + encpScript,
-                    isHTML: true,
-                }, ( error, event ) => {
-                    if ( event == "sent" ) {
-                        setTimeout( () => {
-                            this.refs.modal4.close();
-                            Alert.alert( 'Email Sent Completed' );
-                            this.setState( {
-                                flag_OtpCodeShowStatus: true,
-                            } )
-                            this.reloadList( "Email" );
-                        }, 1000 );
-                    } else {
-                        alert.simpleOk( "Oops", error );
-                    }
-                } );
+                        flag_OtpCodeShowStatus: true,
+                    } )
+                    alert.simpleOkActionWithPara( "Success", "SMS Sent Completed.", "SMS", this.reloadList( "SMS" ) );
+                }, 3000 );
+            }
+        } else if ( type == "EMAIL" ) {
+            val = val.length != 0 ? val[ 0 ].email : ""
+            Mailer.mail( {
+                subject: 'Hexa Wallet SSS Restore',
+                recipients: [ val ],
+                body: 'https://prime-sign-230407.appspot.com/sss/res/' + encpScript,
+                isHTML: true,
+            }, ( error, event ) => {
+                if ( event == "sent" ) {
+                    setTimeout( () => {
+                        this.refs.modal4.close();
+                        this.setState( {
+                            flag_OtpCodeShowStatus: true,
+                        } )
+                        alert.simpleOkActionWithPara( "Success", "Email Sent Completed.", "Email", this.reloadList( "Email" ) );
+                    }, 1000 );
+                } else {
+                    alert.simpleOk( "Oops", error );
+                }
+            } );
+            if ( Platform.OS == "android" ) {
+                setTimeout( () => {
+                    this.refs.modal4.close();
+                    this.setState( {
+                        flag_OtpCodeShowStatus: true,
+                    } )
+                    alert.simpleOkActionWithPara( "Success", "Email Sent Completed.", "Email", this.reloadList( "Email" ) );
+                }, 3000 );
             }
         } else if ( type == "QR" ) {
             this.props.navigation.push( "TrsutedPartyQRCodeScreen", { data: arr_EncryptedMetaShare } );

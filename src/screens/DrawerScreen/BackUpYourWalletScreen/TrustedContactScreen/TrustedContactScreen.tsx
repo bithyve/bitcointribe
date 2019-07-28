@@ -175,62 +175,54 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                 if ( completed ) {
                     console.log( 'SMS Sent Completed' );
                     setTimeout( () => {
-                        this.connection_UpdateSSSDetails( "SMS" );
-                        alert.simpleOk( "Success", "SMS Sent Successfully." );
                         this.setState( {
                             flag_OtpCodeShowStatus: true
-                        } )
+                        } );
+                        alert.simpleOkActionWithPara( "Success", "SMS Sent Successfully.", this.connection_UpdateSSSDetails( "SMS" ) );
                     }, 1000 );
-
                 } else if ( cancelled ) {
                     console.log( 'SMS Sent Cancelled' );
                 } else if ( error ) {
                     console.log( 'Some error occured' );
                 }
             } );
-        } else {
-            this.connection_UpdateSSSDetails( "EMAIL" );
             if ( Platform.OS == "android" ) {
-                Mailer.mail( {
-                    subject: 'Hexa Wallet SSS Recovery',
-                    recipients: [ value ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
-                    isHTML: true,
-                }, ( error, event ) => {
-                    if ( event == "sent" ) {
-                        console.log( { event } );
-                    } else {
-                        alert.simpleOk( "Oops", error );
-                    }
-                } );
                 setTimeout( () => {
-                    alert.simpleOk( "Success", "Email Sent Successfully." );
                     this.setState( {
                         flag_OtpCodeShowStatus: true
                     } );
-                }, 1000 );
-            } else {
-                Mailer.mail( {
-                    subject: 'Hexa Wallet SSS Backup',
-                    recipients: [ value ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
-                    isHTML: true,
-                }, ( error, event ) => {
-                    if ( event == "sent" ) {
-                        setTimeout( () => {
-                            Alert.alert( 'Email Sent Completed' );
-                            this.setState( {
-                                flag_OtpCodeShowStatus: true
-                            } )
-                        }, 1000 );
-                    } else {
-                        alert.simpleOk( "Oops", error );
-                    }
-                } );
+                    alert.simpleOkActionWithPara( "Success", "SMS Sent Successfully.", this.connection_UpdateSSSDetails( "SMS" ) );
+                }, 3000 );
+            }
+        } else {
+            this.connection_UpdateSSSDetails( "EMAIL" );
+            Mailer.mail( {
+                subject: 'Hexa Wallet SSS Recovery',
+                recipients: [ value ],
+                body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
+                isHTML: true,
+            }, ( error, event ) => {
+                if ( event == "sent" ) {
+                    setTimeout( () => {
+                        this.setState( {
+                            flag_OtpCodeShowStatus: true
+                        } );
+                        alert.simpleOkActionWithPara( "Success", "Email Sent Completed.", this.connection_UpdateSSSDetails( "Email" ) );
+                    }, 1000 );
+                } else {
+                    alert.simpleOk( "Oops", error );
+                }
+            } );
+            if ( Platform.OS == "android" ) {
+                setTimeout( () => {
+                    this.setState( {
+                        flag_OtpCodeShowStatus: true
+                    } );
+                    alert.simpleOkActionWithPara( "Success", "Email Sent Completed.", this.connection_UpdateSSSDetails( "Email" ) );
+                }, 3000 );
             }
         }
     }
-
 
 
     //TODO: func backQrCodeScreen

@@ -121,9 +121,13 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
     click_ShareEmail( data: any ) {
         console.log( { data } );
         let { title } = this.state;
-        let email4shareFilePath = data.sssDetails.decryptedShare.split( '"' ).join( "" );
+        var email4shareFilePath = data.sssDetails.decryptedShare.split( '"' ).join( "" );
         console.log( { email4shareFilePath } );
         if ( title != "Email Share" ) {
+            if ( Platform.OS == "android" ) {
+                email4shareFilePath = "file:/" + email4shareFilePath;
+            }
+            console.log( { email4shareFilePath } );
             let shareOptions = {
                 title: "For 5 share",
                 message: "For 5 share.Pdf password is your answer.",
@@ -153,8 +157,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                 }
             }, ( error, event ) => {
                 if ( event == "sent" ) {
-                    alert.simpleOk( "Success", "Email sent success." );
-                    this.updateHistory( data, "Shared.", "" );
+                    alert.simpleOkActionWithPara( "Success", "Email Sent Successfully.", this.updateHistory( data, "Shared.", "" ) );
                     this.setState( {
                         flag_ShareBtnDisable: false,
                         flag_ReShareBtnDisable: true,
@@ -164,11 +167,20 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                     alert.simpleOk( "Oops", error );
                 }
             } );
+            if ( Platform.OS == "android" ) {
+                setTimeout( () => {
+                    alert.simpleOkActionWithPara( "Success", "Email Sent Successfully.", this.updateHistory( data, "Shared.", "" ) );
+                    this.setState( {
+                        flag_ShareBtnDisable: false,
+                        flag_ReShareBtnDisable: true,
+                        flag_ConfrimBtnDisable: true
+                    } )
+                }, 3000 );
+            }
         }
     }
 
     //TODO: Re-Share Share
-
     click_ReShare( data: any ) {
         alert.simpleOk( "Oops", "Working" );
     }
@@ -290,7 +302,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                             />
                         </View>
                         { renderIf( flag_ShareBtnDisable == true )(
-                            <View style={ { flex: 0.4 } }>
+                            <View style={ { flex: Platform.OS == "ios" ? 0.4 : 0.5 } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Now only sharing email.</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
@@ -298,15 +310,15 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                                     } }
                                     title="Share"
                                     disabled={ false }
-                                    style={ [ { borderRadius: 10 } ] } />
+                                    style={ [ { borderRadius: 10, marginBottom: 5 } ] } />
                             </View>
                         ) }
                         { renderIf( flag_ReShareBtnDisable == true )(
-                            <View style={ { flex: 0.4 } }>
+                            <View style={ { flex: Platform.OS == "ios" ? 0.4 : 0.5 } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Now only sharing email.</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
-                                        this.click_ReShare( data )
+                                        this.click_ShareEmail( data )
                                     } }
                                     title="Reshare"
                                     disabled={ false }
@@ -314,7 +326,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                             </View>
                         ) }
                         { renderIf( flag_ConfrimBtnDisable == true )(
-                            <View style={ { flex: 0.4 } }>
+                            <View style={ { flex: Platform.OS == "ios" ? 0.4 : 0.5 } }>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_Confirm( data )

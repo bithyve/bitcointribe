@@ -40,6 +40,8 @@ const checkHealthAllShare = async ( share: any ) => {
     //  console.log( { share } );
     let dateTime = Date.now();
     let temp = [ share.trustedContShareId1, share.trustedContShareId2, share.selfshareShareId1 ];
+    console.log( { temp } );
+
     const sss = await bitcoinClassState.getS3ServiceClassState();
     var resCheckHealth = await sss.checkHealth( temp );
     if ( resCheckHealth.status == 200 ) {
@@ -78,6 +80,22 @@ const checkHealthAllShare = async ( share: any ) => {
         await comFunDBRead.readTblSSSDetails();
         return resupdateSSSShareStage
     }
+}
+
+
+const checkHealthRestoreWalletTrustedContact = async ( arrShareId: any, qatime: number ) => {
+
+    console.log( { arrShareId } );
+    const sss = await bitcoinClassState.getS3ServiceClassState();
+    var resCheckHealth = await sss.checkHealth( arrShareId );
+    if ( resCheckHealth.status == 200 ) {
+        await bitcoinClassState.setS3ServiceClassState( sss );
+        resCheckHealth = resCheckHealth.data.lastUpdateds;
+    } else {
+        alert.simpleOk( "Oops", resCheckHealth.err );
+    }
+    console.log( { resCheckHealth } );
+
 }
 
 
@@ -312,7 +330,8 @@ const checkHealthAllShare = async ( share: any ) => {
 
 module.exports = {
     checkHealthSetupShare,
-    checkHealthAllShare
+    checkHealthAllShare,
+    checkHealthRestoreWalletTrustedContact
     // connection_AppHealthStatus,
     // connection_AppHealthAndSSSUpdate,
     // connection_AppHealthForAllShare,

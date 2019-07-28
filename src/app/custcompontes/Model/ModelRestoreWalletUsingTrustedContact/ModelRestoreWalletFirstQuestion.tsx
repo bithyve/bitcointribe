@@ -189,21 +189,30 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
 
                 if ( data.decryptedShare != "" ) {
                     let decryptedShareJson = JSON.parse( data.decryptedShare );
-                    if ( data.type == "Trusted Contacts 1", data.type == "Trusted Contacts 2", data.type == "Self Share 1" ) {
-                        let shareId = sss.getShareId( decryptedShareJson );
-                        shareIds.push( shareId.data.shareId )
-                    }
+                    // if ( data.type == "Trusted Contacts 1", data.type == "Trusted Contacts 2", data.type == "Self Share 1" ) {
+                    let shareId = sss.getShareId( decryptedShareJson );
+                    shareIds.push( shareId.data.shareId )
+                    // }
                 }
             }
+            if ( shareIds.length == 1 ) {
+                shareIds.push( "", "" )
+            } else if ( shareIds.length == 2 ) {
+                shareIds.push( "" )
+            }
 
-            console.log( { shareIds } );
+            await bitcoinClassState.setS3ServiceClassState( sss );
 
-
-
-
-
-            // const res = await comAppHealth.check_HealthRestoWalletUsingTrustedContact( dateTime, sssDetails );
-            // console.log( { res } );
+            var resCheckHealth = await sss.checkHealth( shareIds );
+            if ( resCheckHealth.status == 200 ) {
+                await bitcoinClassState.setS3ServiceClassState( sss );
+                resCheckHealth = resCheckHealth.data.lastUpdateds;
+            } else {
+                alert.simpleOk( "Oops", resCheckHealth.err );
+            }
+            console.log( { resCheckHealth } );
+            //const res = await comAppHealth.checkHealthRestoreWalletTrustedContact( shareIds, dateTime );
+            //  console.log( { res } );
 
             // let queTemp = [];
             // let questionData = {};
