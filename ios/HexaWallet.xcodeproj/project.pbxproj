@@ -104,6 +104,7 @@
 		ECF952C1798E4E69BA4FB762 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 51059CECCCCB4D4CBEEFD081 /* FontAwesome.ttf */; };
 		F075DA494876444F9706A52E /* rubicon-icon-font.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2EB545C435944C238EC49172 /* rubicon-icon-font.ttf */; };
 		F27F00EDC4F3449FA10C858B /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0CC5A8F7F89457A84AAD266 /* libRNFS.a */; };
+		F50F6F67E93F413890D646A0 /* RNBackgroundFetch+AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2141A9878B814A0D992765BB /* RNBackgroundFetch+AppDelegate.m */; };
 		F59CFC5F3F954F5790CCBBED /* libSafariViewManager.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 913BD2D037394413B8478041 /* libSafariViewManager.a */; };
 		F8C33CE111514405A5D0E45A /* libRNMail.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C16621D886464C44AAC0D4A6 /* libRNMail.a */; };
 		FA7A5D0089794E2190B5E3F4 /* Roboto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 175C64779F784FDE910B4636 /* Roboto.ttf */; };
@@ -404,6 +405,13 @@
 			remoteGlobalIDString = 1441618E1BD0A79300FA4F59;
 			remoteInfo = RCTContacts;
 		};
+		8B87492622ED74EC00D1EAE9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B576173960774181B396AA38 /* RNBackgroundFetch.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 835318541D52293F005738CD;
+			remoteInfo = RNBackgroundFetch;
+		};
 		8BA2C28622DDA9C700EA1ADC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A6DD33EDBD624D3482D1F93A /* RNSimpleShare.xcodeproj */;
@@ -694,6 +702,7 @@
 		1E986C0389DD4A348E6999AF /* QrCode.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = QrCode.xcodeproj; path = "../node_modules/react-native-lewin-qrcode/ios/QrCode.xcodeproj"; sourceTree = "<group>"; };
 		20899DDDC07A4FC78F5272BE /* SendSMS.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = SendSMS.xcodeproj; path = "../node_modules/react-native-sms/SendSMS.xcodeproj"; sourceTree = "<group>"; };
 		20DA0260213040549CDABE34 /* libUdpSockets.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libUdpSockets.a; sourceTree = "<group>"; };
+		2141A9878B814A0D992765BB /* RNBackgroundFetch+AppDelegate.m */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; name = "RNBackgroundFetch+AppDelegate.m"; path = "../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/RNBackgroundFetch+AppDelegate.m"; sourceTree = "<group>"; };
 		217C85E1C99846F6A3F816E0 /* OpenSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Bold.ttf"; path = "../src/assets/fonts/openSans/OpenSans-Bold.ttf"; sourceTree = "<group>"; };
 		219FAF410883470BAF178143 /* libRNImagePicker.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNImagePicker.a; sourceTree = "<group>"; };
 		27270EA821D1452AACC300F8 /* FiraSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-Regular.ttf"; path = "../src/assets/fonts/firaSans/FiraSans-Regular.ttf"; sourceTree = "<group>"; };
@@ -778,6 +787,7 @@
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
 		B23C0D2F7B9D48A2B81F2339 /* Roboto-BlackItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-BlackItalic.ttf"; path = "../src/assets/fonts/Roboto/Roboto-BlackItalic.ttf"; sourceTree = "<group>"; };
 		B2DC60DE022A444591F0D3AF /* RNRandomBytes.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNRandomBytes.xcodeproj; path = "../node_modules/react-native-randombytes/RNRandomBytes.xcodeproj"; sourceTree = "<group>"; };
+		B576173960774181B396AA38 /* RNBackgroundFetch.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNBackgroundFetch.xcodeproj; path = "../node_modules/react-native-background-fetch/ios/RNBackgroundFetch.xcodeproj"; sourceTree = "<group>"; };
 		B669CC18C9964ECE8121F7CB /* Roboto-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-LightItalic.ttf"; path = "../src/assets/fonts/Roboto/Roboto-LightItalic.ttf"; sourceTree = "<group>"; };
 		B7160825CCAA41AB80D87B4C /* Times New Roman.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Times New Roman.ttf"; path = "../node_modules/react-native-pdf-lib/assets/Times New Roman.ttf"; sourceTree = "<group>"; };
 		BCB8B197DC3A48C3A86194E1 /* Roboto-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Regular.ttf"; path = "../src/assets/fonts/Roboto/Roboto-Regular.ttf"; sourceTree = "<group>"; };
@@ -973,6 +983,7 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				8BA2C1AE22DDA97E00EA1ADC /* PdfPassword.h */,
 				8BA2C20022DDA98A00EA1ADC /* PdfPassword.m */,
+				2141A9878B814A0D992765BB /* RNBackgroundFetch+AppDelegate.m */,
 			);
 			name = HexaWallet;
 			sourceTree = "<group>";
@@ -1128,6 +1139,7 @@
 				D83A5D27028C46708EC243A9 /* RNMail.xcodeproj */,
 				60B23392C44B46DE84AC768F /* RNPDFLib.xcodeproj */,
 				A6DD33EDBD624D3482D1F93A /* RNSimpleShare.xcodeproj */,
+				B576173960774181B396AA38 /* RNBackgroundFetch.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1195,6 +1207,14 @@
 			isa = PBXGroup;
 			children = (
 				8B380ECB2265DFE100C1061E /* libRCTContacts.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8B8748F522ED74EB00D1EAE9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8B87492722ED74EC00D1EAE9 /* libRNBackgroundFetch.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1519,7 +1539,7 @@
 						DevelopmentTeam = Y5TCB759QL;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
-								enabled = 1;
+								enabled = true;
 							};
 							com.apple.SafariKeychain = {
 								enabled = 1;
@@ -1616,6 +1636,10 @@
 				{
 					ProductGroup = 8BE5749D2266F52500319736 /* Products */;
 					ProjectRef = E20E8E01A6044057BB7D5F28 /* ReactNativePermissions.xcodeproj */;
+				},
+				{
+					ProductGroup = 8B8748F522ED74EB00D1EAE9 /* Products */;
+					ProjectRef = B576173960774181B396AA38 /* RNBackgroundFetch.xcodeproj */;
 				},
 				{
 					ProductGroup = 8BC2E315225F1D9F00442E2F /* Products */;
@@ -1998,6 +2022,13 @@
 			remoteRef = 8B380ECA2265DFE100C1061E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		8B87492722ED74EC00D1EAE9 /* libRNBackgroundFetch.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNBackgroundFetch.a;
+			remoteRef = 8B87492622ED74EC00D1EAE9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		8BA2C28722DDA9C700EA1ADC /* libRNSimpleShare.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -2352,6 +2383,7 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				8BA2C20122DDA98B00EA1ADC /* PdfPassword.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				F50F6F67E93F413890D646A0 /* RNBackgroundFetch+AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2383,7 +2415,9 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = Y5TCB759QL;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -2425,6 +2459,7 @@
 					"$(SRCROOT)/../node_modules/react-native-image-base64/ios",
 					"$(SRCROOT)/../node_modules/react-native-simple-share/RNSimpleShare",
 					"$(SRCROOT)/../node_modules/react-native-html-to-pdf/ios/RNHTMLtoPDF",
+					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
 				);
 				INFOPLIST_FILE = HexaWalletTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -2492,7 +2527,9 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = Y5TCB759QL;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
@@ -2530,6 +2567,7 @@
 					"$(SRCROOT)/../node_modules/react-native-image-base64/ios",
 					"$(SRCROOT)/../node_modules/react-native-simple-share/RNSimpleShare",
 					"$(SRCROOT)/../node_modules/react-native-html-to-pdf/ios/RNHTMLtoPDF",
+					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
 				);
 				INFOPLIST_FILE = HexaWalletTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -2640,6 +2678,7 @@
 					"$(SRCROOT)/../node_modules/react-native-image-base64/ios",
 					"$(SRCROOT)/../node_modules/react-native-simple-share/RNSimpleShare",
 					"$(SRCROOT)/../node_modules/react-native-html-to-pdf/ios/RNHTMLtoPDF",
+					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
 				);
 				INFOPLIST_FILE = HexaWallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -2703,6 +2742,7 @@
 					"$(SRCROOT)/../node_modules/react-native-image-base64/ios",
 					"$(SRCROOT)/../node_modules/react-native-simple-share/RNSimpleShare",
 					"$(SRCROOT)/../node_modules/react-native-html-to-pdf/ios/RNHTMLtoPDF",
+					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
 				);
 				INFOPLIST_FILE = HexaWallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;

@@ -4,6 +4,8 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 
+import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
+
 import com.bitgo.randombytes.RandomBytesPackage;
 
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
@@ -59,12 +61,13 @@ public class MainApplication extends Application implements ShareApplication, Re
 
     @Override
     protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(new MainReactPackage(), new PdfPasswordPackage(), new RandomBytesPackage(),
-          new UdpSocketsModule(), new RNDeviceInfo(), new TcpSocketsModule(), new SvgPackage(), new RNSpinkitPackage(),
-          new VectorIconsPackage(), SendSMSPackage.getInstance(), new RNSharePackage(), new PDFLibPackage(),
-          new RNOSModule(), new RNMail(), new LinearGradientPackage(), new QRScanReaderPackage(), new KeychainPackage(),
-          new ImagePickerPackage(), new RNI18nPackage(), new RNGestureHandlerPackage(), new RNFSPackage(),
-          new ReactNativeContacts(), new ReactNativeConfigPackage(), new RNCameraPackage(), new SQLitePluginPackage());
+      return Arrays.<ReactPackage>asList(new MainReactPackage(), new RNBackgroundFetchPackage(),
+          new PdfPasswordPackage(), new RandomBytesPackage(), new UdpSocketsModule(), new RNDeviceInfo(),
+          new TcpSocketsModule(), new SvgPackage(), new RNSpinkitPackage(), new VectorIconsPackage(),
+          SendSMSPackage.getInstance(), new RNSharePackage(), new PDFLibPackage(), new RNOSModule(), new RNMail(),
+          new LinearGradientPackage(), new QRScanReaderPackage(), new KeychainPackage(), new ImagePickerPackage(),
+          new RNI18nPackage(), new RNGestureHandlerPackage(), new RNFSPackage(), new ReactNativeContacts(),
+          new ReactNativeConfigPackage(), new RNCameraPackage(), new SQLitePluginPackage());
     }
 
     @Override

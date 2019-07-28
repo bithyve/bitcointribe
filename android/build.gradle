@@ -23,6 +23,9 @@ buildscript {
 
 allprojects {
     repositories {
+		maven {
+			url "$rootDir/../node_modules/react-native-background-fetch/android/libs"
+		}
 				// Add jitpack repository (added by react-native-spinkit)
 	    maven { url "https://jitpack.io" } 
         maven { url "https://maven.google.com" } 
