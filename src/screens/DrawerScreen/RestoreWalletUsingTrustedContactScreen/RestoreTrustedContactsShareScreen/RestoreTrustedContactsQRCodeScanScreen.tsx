@@ -121,33 +121,38 @@ export default class RestoreTrustedContactsQRCodeScanScreen extends React.Compon
             let { data } = this.state;
             const dateTime = Date.now();
             if ( result.type == "SSS Restore QR" ) {
-                if ( flag_ReadQRCode == true ) {
-                    flag_ReadQRCode = false;
-                    let resDownlaodShare = await S3Service.downloadShare( result.data );
-                    if ( resDownlaodShare.status == 200 ) {
-                        let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, result.data );
-                        if ( resDecryptEncMetaShare.status == 200 ) {
-                            const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSSSRetoreDecryptedShare(
-                                localDB.tableName.tblSSSDetails,
-                                resDecryptEncMetaShare.data.decryptedMetaShare,
-                                dateTime,
-                                data.sssDetails.id
-                            );
-                            console.log( {} );
-                            if ( resUpdateSSSRetoreDecryptedShare == true ) {
+                let resDownlaodShare = await S3Service.downloadShare( result.data );
+                if ( resDownlaodShare.status == 200 ) {
+                    let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, result.data );
+                    if ( resDecryptEncMetaShare.status == 200 ) {
+                        const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSSSRetoreDecryptedShare(
+                            localDB.tableName.tblSSSDetails,
+                            resDecryptEncMetaShare.data.decryptedMetaShare,
+                            dateTime,
+                            data.sssDetails.id
+                        );
+                        console.log( {} );
+                        if ( resUpdateSSSRetoreDecryptedShare ) {
+                            if ( flag_ReadQRCode == true ) {
                                 flag_ReadQRCode = false;
                                 await comFunDBRead.readTblSSSDetails();
                                 this.props.navigation.pop( 2 );
                             }
-                        } else {
+                        }
+                    } else {
+                        if ( flag_ReadQRCode == true ) {
                             flag_ReadQRCode = false;
                             alert.simpleOkAction( "Oops", resDecryptEncMetaShare.err, this.click_ResetFlagRead );
                         }
-                    } else {
+                    }
+                } else {
+                    if ( flag_ReadQRCode == true ) {
                         flag_ReadQRCode = false;
                         alert.simpleOkAction( "Oops", resDownlaodShare.err, this.click_ResetFlagRead );
                     }
-                } else {
+                }
+            } else {
+                if ( flag_ReadQRCode == true ) {
                     flag_ReadQRCode = false;
                     alert.simpleOkAction( "Oops", "Please scan correct qrcode.", this.click_ResetFlagRead );
                 }
@@ -165,23 +170,6 @@ export default class RestoreTrustedContactsQRCodeScanScreen extends React.Compon
         navigation.state.params.onSelect( { selected: true } );
     }
 
-
-    //TODO: Popup select any contact 
-    click_UpdateMsg = async () => {
-        const dateTime = Date.now();
-
-        // const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSSSRetoreDecryptedShare(
-        //     localDB.tableName.tblSSSDetails,
-        //     JSON.parse( decryptedShare ),
-        //     dateTime,
-        //     recordId
-        // );
-        // if ( resUpdateSSSRetoreDecryptedShare == true ) {
-        //     this.click_GoBack();
-        // } else {
-        //     Alert.alert( resUpdateSSSRetoreDecryptedShare );
-        // }
-    }
 
     render() {
         //flag

@@ -15,6 +15,9 @@ import { createStore } from 'redux';
 import allReducers from './src/redux/reducers';
 const store = createStore( allReducers );
 
+
+import { asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
+
 //TODO: Custome Object
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 export default class HexaWallet extends React.Component
@@ -29,15 +32,32 @@ export default class HexaWallet extends React.Component
     };
     StatusBar.setBarStyle( 'light-content', true );
   }
-  async componentDidMount ()
+
+
+  async componentDidMount ()    
   {
-    try
+    try   
     {
-      //AppState.addEventListener( "change", this._handleAppStateChange );
-      AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
+      // AppState.addEventListener( "change", this._handleAppStateChange );
+      // AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
+
+      Linking.getInitialURL()
+        .then( ( url ) =>
+        {
+          if ( url )
+          {
+            // Alert.alert('GET INIT URL','initial url  ' + url)
+            this.resetStackToProperRoute( url )
+          }
+        } )
+        .catch( ( e ) => { } )
+
+      // This listener handles the case where the app is woken up from the Universal or Deep Linking
+      Linking.addEventListener( 'url', this.appWokeUp );
+
+
       //TODO: Deep Linking
       DeepLinking.addScheme( "https://" );
-      Linking.addEventListener( "url", this.handleUrl );
       DeepLinking.addRoute(
         "/prime-sign-230407.appspot.com/sss/:pageName/:script",
         response =>
@@ -49,14 +69,16 @@ export default class HexaWallet extends React.Component
           var type;
           if ( response.pageName === "bk" )
           {
+            console.log( 'nice' );
+
             pageName = "TabbarBottom";
             type = "SSS Recovery SMS/EMAIL";
           }
-          else if ( response.pageName === "rtb" )
+          else if ( response.pageName == "req" )  
           {
             pageName = "TrustedPartyShareSecretNavigator";
             type = "SSS Restore SMS/EMAIL";
-          } else if ( response.pageName === "rta" )
+          } else if ( response.pageName == "res" )   
           {
             pageName = "OTPScreenNavigator";
             type = "SSS Restore SMS/EMAIL";
@@ -76,17 +98,7 @@ export default class HexaWallet extends React.Component
         }
       );
 
-      Linking.getInitialURL()
-        .then( url =>
-        {
-          if ( url )
-          {
-            let uri_dec = decodeURIComponent( url );
-            Linking.openURL( url );
-            DeepLinking.evaluateUrl( uri_dec );
-          }
-        } )
-        .catch( err => console.error( "An error occurred", err ) );
+
     } catch ( error )
     {
       console.log( {
@@ -95,33 +107,26 @@ export default class HexaWallet extends React.Component
     }
   }
 
-  handleUrl = ( { url } ) =>
+  appWokeUp = ( event ) =>
   {
-    try
-    {
-      let uri_dec = decodeURIComponent( url );
-      Linking.canOpenURL( url ).then( supported =>
-      {
-        if ( supported )
-        {
-          DeepLinking.evaluateUrl( uri_dec );
-        }
-      } );
-    } catch ( e )
-    {
-      console.log( {
-        e
-      } );
-    }
-  };
+    // this handles the use case where the app is running in the background and is activated by the listener...
+    // Alert.alert('Linking Listener','url  ' + event.url)
+    this.resetStackToProperRoute( event.url )
+  }
+
+  resetStackToProperRoute = ( url ) =>
+  {
+    DeepLinking.evaluateUrl( url );
+  }
+
 
   componentWillUnmount ()
   {
     try
     {
-      Linking.removeEventListener( "url", this.handleUrl );
-      // AppState.removeEventListener( "change", this._handleAppStateChange );
-    } catch ( e )
+      Linking.removeEventListener( 'url', this.appWokeUp );
+      //  AppState.removeEventListener( "change", this._handleAppStateChange );
+    } catch ( e )  
     {
       console.log( {
         e
@@ -131,13 +136,13 @@ export default class HexaWallet extends React.Component
 
   // _handleAppStateChange = async nextAppState =>
   // {
-  //   try
+  //   try     
   //   {
   //     var status = JSON.parse(
-  //       await AsyncStorage.getItem( "PasscodeCreateStatus" )
+  //       await AsyncStorage.getItem( asyncStorageKeys.flag_PasscodeCreate )
   //     );
   //     let flag_BackgoundApp = JSON.parse(
-  //       await AsyncStorage.getItem( "flag_BackgoundApp" )
+  //       await AsyncStorage.getItem( asyncStorageKeys.flag_BackgoundApp )
   //     );
   //     if ( status && flag_BackgoundApp )
   //     {
@@ -197,30 +202,30 @@ export default class HexaWallet extends React.Component
     const AppContainer = createAppContainer( Layout );
     return this.state.status ? (
       <Provider store={ store }>
-        <SafeAreaView style={ styles.container }>
-          <LaunchScreen
+
+        <LaunchScreen
+          screenProps={ {
+            currentFriends: this.state.currentFriends,
+            possibleFriends: this.state.possibleFriends,
+            addFriend: this.addFriend,
+          } }
+          onComplited={ ( status: boolean, pageName: string ) =>
+            this.onComplited( status, pageName )
+          }
+        />
+
+      </Provider>
+    ) : (
+        <Provider store={ store }>
+
+          <AppContainer
             screenProps={ {
               currentFriends: this.state.currentFriends,
               possibleFriends: this.state.possibleFriends,
               addFriend: this.addFriend,
             } }
-            onComplited={ ( status: boolean, pageName: string ) =>
-              this.onComplited( status, pageName )
-            }
           />
-        </SafeAreaView>
-      </Provider>
-    ) : (
-        <Provider store={ store }>
-          <SafeAreaView style={ styles.container }>
-            <AppContainer
-              screenProps={ {
-                currentFriends: this.state.currentFriends,
-                possibleFriends: this.state.possibleFriends,
-                addFriend: this.addFriend,
-              } }
-            />
-          </SafeAreaView>
+
         </Provider>
       );
   }
@@ -228,9 +233,3 @@ export default class HexaWallet extends React.Component
 
 console.disableYellowBox = true;
 AppRegistry.registerComponent( appName, () => HexaWallet );
-
-let styles = StyleSheet.create( {
-  container: {
-    flex: 1
-  }
-} );

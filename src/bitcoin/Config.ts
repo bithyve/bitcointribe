@@ -3,8 +3,6 @@ import Client from "bitcoin-core";
 import bitcoinJS, { Network } from "bitcoinjs-lib";
 import config from "react-native-config";
 
-
-
 class Config {
   public ENVIRONMENT: string;
   public NETWORK: Network;
@@ -16,6 +14,7 @@ class Config {
     config.BIT_SECURE_DERIVATION_BRANCH;
   public TOKEN: string = config.BIT_BLOCKCYPHER_API_URLS_TOKEN;
   public SSS_OTP_LENGTH: string = config.BIT_SSS_OTP_LENGTH;
+  public GAP_LIMIT: number = parseInt( config.BIT_GAP_LIMIT, 10 );
   public BH_SERVER = {
     DEV: config.BIT_API_URLS_BH_SERVER_DEV,
     PROD: config.BIT_API_URLS_BH_SERVER_PROD,
@@ -134,7 +133,7 @@ class Config {
     } );
     this.BH_AXIOS = axios.create( {
       baseURL: this.SERVER,
-      headers: { hexa_id: this.HEXA_ID },
+      data: { hexa_id: this.HEXA_ID },
     } );
   }
 

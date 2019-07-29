@@ -256,16 +256,17 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
 
     //TODO: Deeplinking 
     click_SentRequest( type: string, val: any ) {
+        console.log( { val } );
         let { key, arr_EncryptedMetaShare } = this.state;
         let script = {};
         script.key = key;
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );
         if ( type == "SMS" ) {
-            val = val[ 0 ].number;
+            val = val[ 0 ].number != undefined ? val[ 0 ].number : "";
             console.log( { val } );
             SendSMS.send( {
-                body: 'https://prime-sign-230407.appspot.com/sss/rta/' + encpScript,
+                body: 'https://prime-sign-230407.appspot.com/sss/res/' + encpScript,
                 recipients: [ val != "" ? val : "" ],
                 successTypes: [ 'sent', 'queued' ]
             }, ( completed, cancelled, error ) => {
@@ -295,14 +296,14 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                 }
             } );
         } else if ( type == "EMAIL" ) {
-            let value = val[ 0 ].email;
+            let value = val[ 0 ].email != undefined ? val[ 0 ].email : "";
             console.log( { value } );
 
             if ( Platform.OS == "android" ) {
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Restore',
                     recipients: [ value ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/rta/' + encpScript,
+                    body: 'https://prime-sign-230407.appspot.com/sss/res/' + encpScript,
                     isHTML: true,
                 }, ( error, event ) => {
                     if ( event == "sent" ) {
@@ -322,7 +323,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Restore',
                     recipients: [ value ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/rta/' + encpScript,
+                    body: 'https://prime-sign-230407.appspot.com/sss/res/' + encpScript,
                     isHTML: true,
                 }, ( error, event ) => {
                     if ( event == "sent" ) {

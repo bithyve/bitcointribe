@@ -65,7 +65,6 @@ import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAcco
 
 
 export default class QrCodeScannerScreen extends React.Component {
-    public flag_SendPaymentScreen = true;
     constructor ( props: any ) {
         super( props );
         this.state = {
@@ -80,9 +79,7 @@ export default class QrCodeScannerScreen extends React.Component {
         } );
     }
 
-    componentWillUnmount() {
-        this.flag_SendPaymentScreen = true;
-    }
+
 
     _renderTitleBar() {
         return (
@@ -105,11 +102,11 @@ export default class QrCodeScannerScreen extends React.Component {
     barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
+            console.log( { result } );
             if ( utils.isJson( result ) ) {
-                if ( this.flag_SendPaymentScreen == true ) {
-                    this.flag_SendPaymentScreen = false;
+                if ( utils.getFlagQRCodeScreen() == true ) {
+                    utils.setFlagQRCodeScreen( false );
                     result = JSON.parse( result );
-                    console.log( { value: result } );
                     if ( result.type == "SSS Recovery QR" ) {
                         utils.setDeepLinkingType( "SSS Recovery QR" );
                         let deepLinkPara = {};
@@ -146,8 +143,8 @@ export default class QrCodeScannerScreen extends React.Component {
                     } else {
                         alert.simpleOk( "Oops", resDecPaymentURI.err );
                     }
-                    if ( this.flag_SendPaymentScreen == true ) {
-                        this.flag_SendPaymentScreen = false;
+                    if ( utils.getFlagQRCodeScreen() == true ) {
+                        utils.setFlagQRCodeScreen( false );
                         this.props.navigation.push( "SendPaymentNavigator", { data: resDecPaymentURI } );
                     }
                 }
