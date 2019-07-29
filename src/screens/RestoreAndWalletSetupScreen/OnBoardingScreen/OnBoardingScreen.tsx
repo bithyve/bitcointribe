@@ -83,7 +83,7 @@ export default class OnBoardingScreen extends React.Component<any, any> {
               />
               <Text style={ [ styles.header, globalStyle.ffFiraSansBold ] }>{ data[ 0 ].title }</Text>
               <Text note style={ [ styles.text, globalStyle.ffFiraSansMedium ] }>
-                { data[ 0 ].subtitle }
+                { data[ 0 ].subtitle } 
               </Text>
             </View>
             {/* Second screen */ }

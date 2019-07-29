@@ -33,8 +33,8 @@ export default class ModelFindYourTrustedContacts extends Component {
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Split and Share information about your wallet backup with contacts you choose to trust</Text>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", marginLeft: 40, marginRight: 40, marginTop: 20 } ] }>to do that you need to allow the app access your phone contacts</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Hexa requires access to phone contacts to split and share information about your wallet backup with contacts you choose to trust</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", marginLeft: 40, marginRight: 40, marginTop: 20 } ] }>allow hexa to access your phone contacts</Text>
                         </View>
                         <View
                             style={ {
@@ -47,7 +47,7 @@ export default class ModelFindYourTrustedContacts extends Component {
                         </View>
 
                         <View style={ { flex: 0.5, alignItems: "center", justifyContent: "flex-end" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Hexa requires access to your phone contacts to be able to send them messages. Hexa does not store any of your contacts</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Hexa does not store your contacts</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <FullLinearGradientButton

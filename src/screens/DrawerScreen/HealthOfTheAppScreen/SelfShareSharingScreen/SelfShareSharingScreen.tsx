@@ -256,7 +256,9 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                             </Button>
                         </View>
                         <View style={ { flex: 0.1, margin: 20 } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Share this pdf to an email/cloud which you can access if required to hold this secret for safekeeping </Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Share this pdf to an email/cloud which you can</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>access if required to hold this secret for safekeeping </Text>
+
                         </View>
                         <View style={ { flex: 2 } }>
                             <FlatList
