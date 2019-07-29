@@ -37,6 +37,8 @@ import Restore4And5SelfShareQRCodeScanner from "../../screens/DrawerScreen/Resto
 
 import WalletSetupScreens from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/WalletSetupScreens/WalletSetupScreens";
 import PermissionScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/PermissionScreen/PermissionScreen";
+import SecretQuestionAndAnswerScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/WalletSetupScreens/SecretQuestionAndAnswerScreen/SecretQuestionAndAnswerScreen";
+
 
 // import BackupPhraseScreen from "bithyve/src/screens/WalletScreen/BackupPhraseScreen/BackupPhraseScreen";
 // import VerifyBackupPhraseScreen from "bithyve/src/screens/WalletScreen/VerifyBackupPhraseScreen/VerifyBackupPhraseScreen";
@@ -96,7 +98,7 @@ import AllContactListScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYour
 import SecretSharingScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/SecretSharingScreen/SecretSharingScreen";
 import TrustedContactScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactScreen/TrustedContactScreen";
 import ShareSecretViaQRScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/ShareSecretViaQRScreen/ShareSecretViaQRScreen";
-import SecretQuestionAndAnswerScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/SecretQuestionAndAnswerScreen/SecretQuestionAndAnswerScreen";
+
 
 import SelectContactListAssociatePerson from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/BackUpTrustedPartySecretStoreScreen/SelectContactListAssociatePerson";
 import TrustedContactAcceptOtpScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/BackUpTrustedPartySecretStoreScreen/TrustedContactAcceptOtpScreen";
@@ -249,7 +251,7 @@ const RestoreAndWalletSetupStackNavigator = createStackNavigator(
     WalletSetupScreens: {
       screen: WalletSetupScreens,
       navigationOptions: { header: null }
-    }
+    },
   },
   {
     initialRouteName: "RestoreAndReoverWalletScreen"
@@ -365,10 +367,6 @@ const BackUpYourWalletStackNavigatorRouter = createStackNavigator(
   {
     AllContactListScreen: {
       screen: AllContactListScreen,
-      navigationOptions: { header: null }
-    },
-    SecretQuestionAndAnswerScreen: {
-      screen: SecretQuestionAndAnswerScreen,
       navigationOptions: { header: null }
     },
     SecretSharingScreen: {

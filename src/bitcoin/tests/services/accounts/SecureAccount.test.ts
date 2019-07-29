@@ -6,10 +6,6 @@ import SecureAccount from "../../../services/accounts/SecureAccount";
 
 describe("Secure Account", () => {
   let secureAccount: SecureAccount;
-  let validationData: {
-    secret: string;
-    xIndex: number;
-  };
 
   beforeAll(async () => {
     jest.setTimeout(200000);
@@ -20,31 +16,11 @@ describe("Secure Account", () => {
 
   test("generates the required assets and sets up the secure account", async () => {
     const res = await secureAccount.setupSecureAccount();
-    console.log({ res });
     expect(res.status).toBe(config.STATUS.SUCCESS);
 
     const { setupData } = res.data;
-
     expect(setupData.bhXpub).toBeTruthy();
     expect(setupData.secret).toBeTruthy();
-    expect(setupData.xIndex).toBeTruthy();
-
-    validationData = {
-      secret: setupData.secret,
-      xIndex: setupData.xIndex,
-    };
-  });
-
-  test("validates setup of the secure account", async () => {
-    const token = authenticator.generate(validationData.secret);
-    const res = await secureAccount.validateSecureAccountSetup(
-      token,
-      validationData.secret,
-      validationData.xIndex,
-    );
-    expect(res.status).toBe(config.STATUS.SUCCESS);
-    const { setupSuccessful } = res.data;
-    expect(setupSuccessful).toBe(true);
   });
 
   test("checks the health of the secureAccount", async () => {
@@ -80,8 +56,9 @@ describe("Secure Account", () => {
     const dummyToken = authenticator.generate(dummyTwoFASecret);
 
     const { status, data } = await secureHDAccount.importSecureAccount(
-      dummyToken,
       dummySecondaryXpub,
+      null,
+      dummyToken,
     );
     expect(status).toBe(config.STATUS.SUCCESS);
     expect(data.imported).toBe(true);
@@ -133,7 +110,11 @@ describe("Secure Account", () => {
     };
 
     const secureHDAccount = new SecureAccount(dummyMnemonic);
-    await secureHDAccount.importSecureAccount(dummyToken, dummySecondaryXpub);
+    await secureHDAccount.importSecureAccount(
+      dummySecondaryXpub,
+      null,
+      dummyToken,
+    );
     console.log(JSON.stringify(secureAccount));
     const transferST1 = await secureHDAccount.transferST1(
       transfer.recipientAddress,

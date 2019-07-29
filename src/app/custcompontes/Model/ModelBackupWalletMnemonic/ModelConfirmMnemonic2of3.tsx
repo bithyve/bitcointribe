@@ -72,7 +72,7 @@ export default class ModelConfirmMnemonic2of3 extends Component<Props, any> {
                     automaticallyAdjustContentInsets={ true }
                     keyboardOpeningTime={ 0 }
                     enableOnAndroid={ true }
-                    contentContainerStyle={ { flexGrow: utils.getIphoneSize() == "iphone X" ? 0.5 : 0.7, } }
+                    contentContainerStyle={ { flexGrow: 1 } }
                 >
                     <View style={ [
                         styles.modalBackground,

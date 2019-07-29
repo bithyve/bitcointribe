@@ -5,7 +5,7 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:prime-sign-230407.appspot.com</string>
-		<string>activitycontinuation:prime-sign-230407.appspot.com</string>
+		<string>applinks:www.prime-sign-230407.appspot.com</string>
 	</array>
 </dict>
 </plist>

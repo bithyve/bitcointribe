@@ -66,7 +66,7 @@ export default class SettingScreen extends React.Component<any, any> {
     this.setState( {
       arr_FirstListItem: [ {
         title: "Health of the App",
-        subTitle: "Lorem ipsum dolor sit amet",
+        subTitle: "Urgent action required to maintain health",
         icon: "shield"
       },
       {
@@ -76,7 +76,7 @@ export default class SettingScreen extends React.Component<any, any> {
       },
       {
         title: "Contacts that have shared secret with you",
-        subTitle: "Lorem ipsum dolor sit amet,",
+        subTitle: "Contacts you have trusted or the ones who have trusted you",
         icon: "contact-book"
       },
       {

@@ -183,7 +183,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
     onSelect = async ( returnValue: any ) => {
         if ( returnValue.data == returnValue.result ) {
             let { data } = this.state;
-            let filePath = JSON.parse( data.sssDetails.encryptedMetaShare );
+            let filePath = JSON.parse( data.sssDetails.decryptedShare );
             console.log( { filePath } );
             this.updateHistory( data, "Confirmed.", filePath );
             let walletDetails = await utils.getWalletDetails();
@@ -256,7 +256,9 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                             </Button>
                         </View>
                         <View style={ { flex: 0.1, margin: 20 } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Share this pdf to an email/cloud which you can</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>access if required to hold this secret for safekeeping </Text>
+
                         </View>
                         <View style={ { flex: 2 } }>
                             <FlatList
@@ -285,7 +287,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                         </View>
                         { renderIf( flag_ShareBtnDisable == true )(
                             <View style={ { flex: 0.4 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Now only sharing email.</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Do not share this pdf with anyone other than your email/cloud</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_ShareEmail( data )
@@ -297,7 +299,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                         ) }
                         { renderIf( flag_ReShareBtnDisable == true )(
                             <View style={ { flex: 0.4 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Now only sharing email.</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Do not share this pdf with anyone other than your email/cloud</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_ReShare( data )

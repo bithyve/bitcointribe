@@ -191,6 +191,8 @@ export default class WalletScreen extends React.Component {
 
   //TODO: func connnection_FetchData
   async connnection_FetchData() {
+    //Singleton Flag value change   
+    await utils.setFlagQRCodeScreen( true );
     var resultWallet = await utils.getWalletDetails();
     var resAccount = await comFunDBRead.readTblAccount();
     await comFunDBRead.readTblSSSDetails();
@@ -239,7 +241,7 @@ export default class WalletScreen extends React.Component {
           shiledIconPer: 1,
           arr_CustShiledIcon: [
             {
-              "title": "Looks like your app needs a quick check to maintain good health",
+              "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
               "image": "sheild_1",
               "imageHeight": 80, //this.animatedShieldIconSize,
               "imageWidth": 80, //this.animatedShieldIconSize,
@@ -252,7 +254,7 @@ export default class WalletScreen extends React.Component {
           shiledIconPer: 3,
           arr_CustShiledIcon: [
             {
-              "title": "Your wallet is not secure, some Information about backup comes here. Click on the icon to backup",
+              "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
               "image": "sheild_2",
               "imageHeight": 80, //this.animatedShieldIconSize,
               "imageWidth": 80, //this.animatedShieldIconSize,
@@ -266,7 +268,7 @@ export default class WalletScreen extends React.Component {
         shiledIconPer: 1,
         arr_CustShiledIcon: [
           {
-            "title": "Looks like your app needs a quick check to maintain good health",
+            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
             "image": "sheild_1",
             "imageHeight": 80, //this.animatedShieldIconSize,
             "imageWidth": 80, //this.animatedShieldIconSize,
@@ -416,6 +418,7 @@ export default class WalletScreen extends React.Component {
         arr_DecrShare.push( JSON.parse( resTrustedParty[ i ].decrShare ) );
       }
       let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, urlScriptDetails.data, resGetWalletId.walletId, arr_DecrShare );
+      console.log( { resDecryptEncMetaShare } );
       if ( resDecryptEncMetaShare.status == 200 ) {
         console.log( { resDecryptEncMetaShare } );
         const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
@@ -471,36 +474,37 @@ export default class WalletScreen extends React.Component {
     //Get Regular Account Bal
     var getBalR = await regularAccount.getBalance();
     console.log( { getBalR } );
+    var resUpdateAccountBalR;
     if ( getBalR.status == 200 ) {
       await bitcoinClassState.setRegularClassState( regularAccount );
       getBalR = getBalR.data;
+      console.log( { getBalR } );
+      resUpdateAccountBalR = await dbOpration.updateAccountBalAddressWise(
+        localDB.tableName.tblAccount,
+        resAccount[ 0 ].address,
+        ( getBalR.balance + getBalR.unconfirmedBalance ) / 1e8
+      );
     } else {
       alert.simpleOk( "Oops", getBalR.err );
     }
-    console.log( { getBalR } );
-    const resUpdateAccountBalR = await dbOpration.updateAccountBalAddressWise(
-      localDB.tableName.tblAccount,
-      resAccount[ 0 ].address,
-      getBalR.balance != 0 ? getBalR.balance / 1e8 : "0.0"
-    );
+
     //Get Secure Account Bal
     let resUpdateAccountBalS;
     if ( resAccount[ 1 ].address != "" ) {
       var getBalS = await secureAccount.getBalance();
+      console.log( { getBalS } );
       if ( getBalS.status == 200 ) {
         await bitcoinClassState.setSecureClassState( secureAccount );
         getBalS = getBalS.data;
         resUpdateAccountBalS = await dbOpration.updateAccountBalAddressWise(
           localDB.tableName.tblAccount,
           resAccount[ 1 ].address,
-          getBalS.balance != 0 ? getBalS.balance / 1e8 : "0.0"
+          ( getBalS.balance + getBalS.unconfirmedBalance ) / 1e8
         );
       } else {
         alert.simpleOk( "Oops", getBalS.err );
       }
     }
-    console.log( { bal: getBalS.balance / 1e8 } );
-
     if ( resUpdateAccountBalR ) {
       this.setState( {
         flag_Loading: false

@@ -48,24 +48,27 @@ var utils = require( "HexaWallet/src/app/constants/Utils" );
 var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
 export default class SelfShareUsingWalletQRCode extends React.Component<any, any> {
 
     constructor ( props: any ) {
         super( props )
         this.state = ( {
             data: [],
-            flag_Loading: false,
-            msg_Loading: "Loading"
-        } )
+            flag_Loading: true
+        } );
     }
 
     async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
-        let encryptedMetaShare = JSON.parse( data.encryptedMetaShare )
-        console.log( { encryptedMetaShare } );
+        console.log( { data } );
+
         let walletDetails = utils.getWalletDetails();
         const sss = await bitcoinClassState.getS3ServiceClassState();
-        var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare( encryptedMetaShare.metaShare );
+        var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare( JSON.parse( data.decryptedShare ) );
+        console.log( { resGenerateEncryptedMetaShare } );
         if ( resGenerateEncryptedMetaShare.status == 200 ) {
             resGenerateEncryptedMetaShare = resGenerateEncryptedMetaShare.data;
         } else {
@@ -80,15 +83,17 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
             qrCodeData.data = resGenerateEncryptedMetaShare.key;
             //console.log( { qrCodeData } );   
             this.setState( {
+                flag_Loading: false,
                 data: JSON.stringify( qrCodeData ).toString()
-            } )
+            } );
         } else {
             alert.simpleOk( "Oops", resUploadShare.err );
         }
     }
 
 
-    goBack() {
+    goBack = async () => {
+        await comFunDBRead.readTblSSSDetails();
         const { navigation } = this.props;
         navigation.goBack();
         navigation.state.params.onSelect( { selected: true } );
@@ -116,7 +121,8 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
                             extraScrollHeight={ 40 }
                         >
                             <View style={ { flex: 0.1, margin: 20 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Present this QR code to your secondary device to hold this secret for safekeeping 
+</Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center" } }>
                                 <QRCode
@@ -125,13 +131,13 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
                                 />
                             </View>
                             <View style={ { flex: 0.5, alignItems: "center" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut faucibus pulvinar elementum integer enim neque volutpat. Leo integer malesuada nunc vel. Purus faucibus ornare suspendisse sed nisi lacus sed. Et ligula ullamcorper malesuada proin libero nunc consequat. A cras semper auctor neque vitae tempus quam pellentesque. In nisl nisi scelerisque eu ultrices vitae auctor eu augue. Sed risus ultricies tristique nulla aliquet enim tortor. Curabitur gravida arcu ac tortor dignissim convallis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Porta lorem mollis aliquam ut porttitor Leo a.</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Do not share this QR code with anyone other than the secoundry device, whom you want to share the secret with</Text>
                             </View>
                         </KeyboardAwareScrollView>
 
                     </ImageBackground>
                 </SafeAreaView>
-                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } message="Making QRCode" />
             </Container >
         );
     }
