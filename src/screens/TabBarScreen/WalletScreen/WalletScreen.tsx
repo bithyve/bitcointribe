@@ -260,9 +260,44 @@ export default class WalletScreen extends React.Component {
     } );
 
     //TODO: appHealthStatus    
+<<<<<<< HEAD
     let appHealth = JSON.parse( resultWallet.appHealthStatus );
     console.log( { appHealth } );
     if ( appHealth.overallStatus == "1" ) {
+=======
+    let appHealth = resultWallet.appHealthStatus;
+    if ( appHealth != "" ) {
+      let resAppHealthStatus = JSON.parse( resultWallet.appHealthStatus );
+      console.log( { resAppHealthStatus } );
+      if ( resAppHealthStatus.overallStatus == "1" ) {
+        this.setState( {
+          shiledIconPer: 1,
+          arr_CustShiledIcon: [
+            {
+              "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
+              "image": "sheild_1",
+              "imageHeight": 80, //this.animatedShieldIconSize,
+              "imageWidth": 80, //this.animatedShieldIconSize,
+              progressFill: 15
+            }
+          ]
+        } );
+      } else {
+        this.setState( {
+          shiledIconPer: 3,
+          arr_CustShiledIcon: [
+            {
+              "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
+              "image": "sheild_2",
+              "imageHeight": 80, //this.animatedShieldIconSize,
+              "imageWidth": 80, //this.animatedShieldIconSize,
+              progressFill: 30
+            }
+          ]
+        } );
+      }
+    } else {
+>>>>>>> origin/demomessage_dev1
       this.setState( {
         shiledIconPer: 1,
         arr_CustShiledIcon: [

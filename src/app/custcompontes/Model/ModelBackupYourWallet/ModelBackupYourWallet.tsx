@@ -40,7 +40,7 @@ export default class ModelBackupYourWallet extends Component<Props, any> {
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 15 } ] }>Its highly recommended to backup your wallet, to restore funds incase of device loss</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 15 } ] }>it's highly recommended to backup your wallet, to restore funds in case of device loss</Text>
                             <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingMnemonic.walletrestored } />
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
@@ -55,7 +55,7 @@ export default class ModelBackupYourWallet extends Component<Props, any> {
                             </Button>
                             <FullLinearGradientButton
                                 click_Done={ () => this.props.click_Confirm() }
-                                title="Back up via Trusted Contacts"
+                                title="Backup via trusted source"
                                 disabled={ false }
                                 style={ [ { borderRadius: 10 } ] } />
                         </View>

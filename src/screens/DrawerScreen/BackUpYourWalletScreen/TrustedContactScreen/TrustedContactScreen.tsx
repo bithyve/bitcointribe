@@ -300,7 +300,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                             </Button>
                         </View>
                         <View style={ { flex: 0.1, margin: 20 } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Health and history of the share will be shared with </Text>
                         </View>
                         <View style={ Platform.OS == "ios" ? { flex: 0.7 } : { flex: 0.8 } }>
                             <View style={ { flex: 1, flexDirection: 'row' } }>
@@ -350,7 +350,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         </View>
                         { renderIf( this.state.flag_OtpCodeShowStatus == true )(
                             <View style={ [ Platform.OS == "ios" ? { flex: 0.6 } : { flex: 0.8 }, { marginLeft: 5, marginRight: 5 } ] }>
-                                <Text note style={ { textAlign: "center" } }>Some information about the OTP and how it works comes in this space</Text>
+                                <Text note style={ { textAlign: "center" } }>OTP and share expires in 10 minutes</Text>
                                 <View style={ { flex: 0.8, backgroundColor: "#ffffff", borderRadius: 5, flexDirection: "row", alignItems: "center", justifyContent: "center", margin: 10 } }>
                                     <Text note style={ [ globalStyle.ffFiraSansMedium, { flex: 2, marginLeft: 10 } ] }>OTP</Text>
                                     <Text style={ [ globalStyle.ffOpenSansBold, { flex: 8, letterSpacing: 30, alignSelf: "center", textAlign: "center" } ] }>{ this.state.otpCode }</Text>
@@ -390,7 +390,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         ) }
                         { renderIf( this.state.flag_OtpCodeShowStatus != true )(
                             <View style={ Platform.OS == "ios" ? { flex: 0.6 } : { flex: 0.8 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select how you want to share secret with the selected trusted contact</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select method by which you want to share secret</Text>
                                 {/* <Button
                                     onPress={ () => {
                                         this.props.navigation.push( "ShareSecretViaQRScreen", { data: data, onSelect: this.onSelect } );
