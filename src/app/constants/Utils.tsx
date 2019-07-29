@@ -29,8 +29,8 @@ const getUnixToDateFormat2 = () => {
 }
 
 //TODO: Network check
-let isNetwork;
-const onConnectivityChange = ( isConnected, timestamp, connectionInfo ) => {
+let isNetwork: boolean;
+const onConnectivityChange = ( isConnected: any, timestamp: any, connectionInfo: any ) => {
   console.log( "connection state change" );
   isNetwork = isConnected;
 };
@@ -38,11 +38,11 @@ const onConnectivityChange = ( isConnected, timestamp, connectionInfo ) => {
 ConnectivityTracker.init( {
   onConnectivityChange,
   attachConnectionInfo: false,
-  onError: msg => console.log( msg )
+  onError: ( msg: any ) => console.log( msg )
   // verifyServersAreUp: () => store.dispatch(checkOurServersAreUp()),
 } );
 
-const getNetwork = value => {
+const getNetwork = () => {
   return isNetwork;
 };
 

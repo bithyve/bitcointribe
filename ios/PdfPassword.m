@@ -32,6 +32,7 @@ RCT_EXPORT_METHOD(addEvent:(NSString *)fileName location:(NSString *)password)
                                       PDFDocumentUserPasswordOption:password,
                                       PDFDocumentOwnerPasswordOption:password
                                       }];
-}   
-
+}
+  
 @end
+

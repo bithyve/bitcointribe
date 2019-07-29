@@ -76,7 +76,7 @@ import Singleton from "HexaWallet/src/app/constants/Singleton";
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
-let isNetwork: boolean;
+
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
   "window"
 );
@@ -91,6 +91,7 @@ const sliderWidth = viewportWidth;
 const itemWidth = slideWidth + itemHorizontalMargin * 2;
 const SLIDER_1_FIRST_ITEM = 0;
 let countFileCreate = 0;
+let isNetwork: boolean;
 
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
@@ -108,7 +109,6 @@ export default class WalletScreen extends React.Component {
   constructor ( props: any ) {
     super( props );
     this.state = {
-      isNetwork: true,
       arr_accounts: [],
       arr_SSSDetails: [],
       walletDetails: [],
@@ -163,6 +163,7 @@ export default class WalletScreen extends React.Component {
     this.willFocusSubscription = this.props.navigation.addListener(
       "willFocus",
       () => {
+        console.log( { isNetwork } );
         this.connnection_FetchData();
         this.getDeepLinkingData();
       }
@@ -224,7 +225,7 @@ export default class WalletScreen extends React.Component {
     let resSSSDetails = await comFunDBRead.readTblSSSDetails();
     if ( resSSSDetails.length == 0 && countFileCreate == 0 ) {
       countFileCreate++;
-      this.createPdfFile();
+      // this.createPdfFile();
     } else {
       this.setState( {
         flag_PdfFileCreate: true
@@ -260,44 +261,9 @@ export default class WalletScreen extends React.Component {
     } );
 
     //TODO: appHealthStatus    
-<<<<<<< HEAD
     let appHealth = JSON.parse( resultWallet.appHealthStatus );
     console.log( { appHealth } );
     if ( appHealth.overallStatus == "1" ) {
-=======
-    let appHealth = resultWallet.appHealthStatus;
-    if ( appHealth != "" ) {
-      let resAppHealthStatus = JSON.parse( resultWallet.appHealthStatus );
-      console.log( { resAppHealthStatus } );
-      if ( resAppHealthStatus.overallStatus == "1" ) {
-        this.setState( {
-          shiledIconPer: 1,
-          arr_CustShiledIcon: [
-            {
-              "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
-              "image": "sheild_1",
-              "imageHeight": 80, //this.animatedShieldIconSize,
-              "imageWidth": 80, //this.animatedShieldIconSize,
-              progressFill: 15
-            }
-          ]
-        } );
-      } else {
-        this.setState( {
-          shiledIconPer: 3,
-          arr_CustShiledIcon: [
-            {
-              "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
-              "image": "sheild_2",
-              "imageHeight": 80, //this.animatedShieldIconSize,
-              "imageWidth": 80, //this.animatedShieldIconSize,
-              progressFill: 30
-            }
-          ]
-        } );
-      }
-    } else {
->>>>>>> origin/demomessage_dev1
       this.setState( {
         shiledIconPer: 1,
         arr_CustShiledIcon: [
