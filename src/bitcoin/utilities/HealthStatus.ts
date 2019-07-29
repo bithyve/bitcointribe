@@ -45,7 +45,7 @@ export default class HealthStatus {
       overallStatus = HEXA_HEALTH.STAGE2;
     } else if ( this.counter.ugly > 1 || this.counter.bad > 2 ) {
       overallStatus = HEXA_HEALTH.STAGE3;
-    } else if ( this.counter.ugly > 0 || this.counter.bad > 1 ) {
+    } else if ( this.counter.ugly >= 0 || this.counter.bad >= 1 ) {
       overallStatus = HEXA_HEALTH.STAGE4;
     } else if ( this.counter.good >= 6 ) {
       overallStatus = HEXA_HEALTH.STAGE5;

@@ -16,9 +16,13 @@ var colors = {
 
 
 const assetsImages = "../../assets/images/";
+const assetsGift = "../../assets/gif/";
 var images = {
   appBackgound: require( assetsImages + "icon/mainBackgoundImage.png" ),
   appIcon: require( assetsImages + "appLogo.png" ),
+  gif: {
+    loader: require( assetsGift + "minloader.gif" ),
+  },
   slideMenuIcon: require( assetsImages + "icon/slideMenuImage.jpg" ),
   LaunchScreen: {
     img1: require( assetsImages + "LaunchScrenn/screenbackground.png" ),

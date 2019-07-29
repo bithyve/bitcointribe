@@ -134,13 +134,10 @@ export default class Restore3SelfSahreQRCodeScannerScreen extends React.Componen
                         else {
                             flag_ReadQRCode = false;
                             alert.simpleOkAction( "Oops", resDecryptEncMetaShare.err, this.click_ResetFlagRead );
-
                         }
                     } else {
-
                         flag_ReadQRCode = false;
                         alert.simpleOkAction( "Oops", resDownlaodShare.err, this.click_ResetFlagRead );
-
                     }
                 }
             } else {

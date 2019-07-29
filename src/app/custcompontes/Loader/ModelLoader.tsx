@@ -4,7 +4,11 @@ import {
     MaterialIndicator
 } from 'react-native-indicators';
 import PropTypes from 'prop-types';
-import ImageLoader from "../../../assets/gif/loader.gif";
+
+//TODO: Custome object
+import {
+    images
+} from "HexaWallet/src/app/constants/Constants";
 
 const Loader = ( { loading = false, color = "#000000", size = 30, opacity = 0.4, message = "Loading" } ) => {
     return (
@@ -21,7 +25,7 @@ const Loader = ( { loading = false, color = "#000000", size = 30, opacity = 0.4,
                 ] }
             >
                 <View style={ styles.activityIndicatorWrapper }>
-                    <Image source={ImageLoader} style={{height:100,width:100}}/>
+                    <Image source={ images.gif.loader } style={ { height: 100, width: 100 } } />
                 </View>
             </View>
         </Modal>

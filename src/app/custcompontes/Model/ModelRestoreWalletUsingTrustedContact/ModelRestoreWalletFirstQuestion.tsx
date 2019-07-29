@@ -140,17 +140,12 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
         } );
         let Question = this.state.firstQuestion;
         let Answer = this.state.firstAnswer
-
         const dateTime = Date.now();
         let walletDetail = await utils.getWalletDetails();
         let sssDetails = await utils.getSSSDetails();
-
-
         console.log( { sssDetails } );
         let decryptedShare = [];
         let arr_TableId = [];
-        const shareIds = [];
-        // let answers = [ temp[ 0 ].firstAnswer, temp[ 1 ].secoundAnswer ];
         let walletName, encryptedStaticNonPMDD;
         for ( let i = 0; i < sssDetails.length; i++ ) {
             let data = sssDetails[ i ];
@@ -169,13 +164,12 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
         console.log( { resMnemonic } );
         if ( resMnemonic.status == 200 ) {
             resMnemonic = resMnemonic.data;
-
             const regularAccount = new RegularAccount(
                 resMnemonic.mnemonic
             );
-            const secureAccount = new SecureAccount( resMnemonic.mnemonic );
+            var secureAccount;
             const sss = new S3Service( resMnemonic.mnemonic );
-            //decryptStaticNonPMDD
+            await bitcoinClassState.setS3ServiceClassState( sss );
             console.log( { encryptedStaticNonPMDD } );
             const shareIds = [];
             const shareSelfShareIds = [];
@@ -215,16 +209,22 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                 var getBal = await regularAccount.getBalance();
                 console.log( { getBal } );
                 if ( getBal.status == 200 ) {
-                    await bitcoinClassState.setRegularClassState( regularAccount );
                     getBal = getBal.data;
                 } else {
                     alert.simpleOk( "Oops", getBal.err );
                 }
-                var resSetupSecureAccount = await secureAccount.setupSecureAccount();
-                if ( resSetupSecureAccount.status == 200 ) {
-                    resSetupSecureAccount = resSetupSecureAccount.data;
-                } else {
-                    alert.simpleOk( "Oops", resSetupSecureAccount.err );
+                var resDecryptStaticNonPMDD = await sss.decryptStaticNonPMDD( encryptedStaticNonPMDD );
+                console.log( { resDecryptStaticNonPMDD } );
+                if ( resDecryptStaticNonPMDD.status == 200 ) {
+                    resDecryptStaticNonPMDD = resDecryptStaticNonPMDD.data.decryptedStaticNonPMDD;
+                    secureAccount = new SecureAccount( resMnemonic.mnemonic );
+                    var resImportSecureAccount = await secureAccount.importSecureAccount( resDecryptStaticNonPMDD.secondaryXpub, resDecryptStaticNonPMDD.bhXpub );
+                    console.log( { resImportSecureAccount } );
+                    if ( resImportSecureAccount.status == 200 ) {
+                        resImportSecureAccount = resImportSecureAccount.data;
+                    } else {
+                        alert.simpleOk( "Oops", resImportSecureAccount.err );
+                    }
                 }
                 var getBalSecure = await secureAccount.getBalance();
                 console.log( { getBalSecure } );
@@ -254,6 +254,9 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                     ""
                 );
                 if ( resInsertDailyAccount && resInsertSecureCreateAcc ) {
+                    await bitcoinClassState.setRegularClassState( regularAccount );
+                    await bitcoinClassState.setSecureClassState( secureAccount );
+                    await bitcoinClassState.setS3ServiceClassState( sss );
                     await comFunDBRead.readTblSSSDetails();
                     await comFunDBRead.readTblAccount();
                     this.setState( {
