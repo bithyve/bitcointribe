@@ -81,16 +81,12 @@ export default class SendPaymentScreen extends React.Component<any, any> {
     }
 
     async componentWillMount() {
-
         //class value reset
         let data = this.props.navigation.getParam( "data" );
-        console.log( { data } );
-
+        //Singleton Flag value change  
         let address = data.address;
         let amount = data.options.amount.toString();
         console.log( { address, amount } );
-
-
         let walletDetails = await utils.getWalletDetails();
         let arr_AccountList = await comFunDBRead.readTblAccount();
         console.log( { arr_AccountList } );
@@ -119,8 +115,6 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         } else if ( amount != "" && amount > balDailyAccount ) {
             flag_DisableSentBtn = true;
         }
-
-
         console.log( { temp } );
         this.setState( {
             address,
@@ -130,21 +124,18 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             selectedAccountBal: balDailyAccount,
             flag_DisableSentBtn
         } )
+
     }
 
 
 
     componentWillUnmount() {
-        //working
-        let qrcodescanner = new QrCodeScannerScreen( null );
-        qrcodescanner.flag_SendPaymentScreen = true;
-
+        utils.setFlagQRCodeScreen( true );
     }
 
     setAmount() {
         let { amount, selectedAccountBal } = this.state;
         let enterAmount = parseFloat( amount );
-        console.log( { enterAmount, selectedAccountBal } );
         var flag_DisableSentBtn;
         if ( enterAmount != 0 && enterAmount < parseFloat( selectedAccountBal ) ) {
             flag_DisableSentBtn = false;
@@ -247,10 +238,11 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             this.setState( {
                 flag_Loading: false
             } )
+            let msg = resTransferST.data != undefined ? resTransferST.err + "\n Total Fee = " + resTransferST.data.fee : resTransferST.err
             setTimeout( () => {
                 Alert.alert(
                     'Oops',
-                    resTransferST.err + "\n Total Fee = " + resTransferST.data.fee,
+                    msg,
                     [
                         {
                             text: 'Ok', onPress: () => {

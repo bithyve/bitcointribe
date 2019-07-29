@@ -114,7 +114,27 @@ export default class SecretQuestionAndAnswerScreen extends Component {
                 }
             ]
         } )
+        if ( Platform.OS == "android" ) {
+            this.getExternalStorgePermission();
+        }
     }
+
+    getExternalStorgePermission = async () => {
+        try {
+            const grantedWrite = await PermissionsAndroid.requestMultiple( [
+                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
+            ] );
+            console.log( { grantedWrite } );
+        } catch ( err ) {
+            console.warn( err );
+        }
+    }
+
+
+
+
+
 
 
     render() {
@@ -141,7 +161,19 @@ export default class SecretQuestionAndAnswerScreen extends Component {
                                         }
                                     ]
                                 } );
-                                this.props.navigation.push( "SecretSharingScreen" )
+                                // this.props.navigation.push( "SecretSharingScreen" )
+                                const resetAction = StackActions.reset( {
+                                    index: 0,
+                                    key: null,
+                                    actions: [
+                                        NavigationActions.navigate( { routeName: "TabbarBottom" } )
+                                    ]
+                                } );
+                                AsyncStorage.setItem(
+                                    asyncStorageKeys.rootViewController,
+                                    "TabbarBottom"
+                                );
+                                this.props.navigation.dispatch( resetAction );
                             } }
                                 pop={ () => {
                                     this.setState( {

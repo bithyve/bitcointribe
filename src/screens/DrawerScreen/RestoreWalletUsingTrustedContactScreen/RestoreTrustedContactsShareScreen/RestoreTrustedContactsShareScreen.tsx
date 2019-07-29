@@ -227,7 +227,7 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
         if ( type == "SMS" ) {
             let number = data.phoneNumbers.length != 0 ? data.phoneNumbers[ 0 ].number : ""
             SendSMS.send( {
-                body: 'https://prime-sign-230407.appspot.com/sss/rtb/' + encpScript,
+                body: 'https://prime-sign-230407.appspot.com/sss/req/' + encpScript,
                 recipients: [ number ],
                 successTypes: [ 'sent', 'queued' ]
             }, ( completed, cancelled, error ) => {
@@ -261,7 +261,7 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Restore',
                     recipients: [ email ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/rtb/' + encpScript,
+                    body: 'https://prime-sign-230407.appspot.com/sss/req/' + encpScript,
                     isHTML: true,
                 }, ( error, event ) => {
                     if ( event == "sent" ) {
@@ -281,7 +281,7 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Restore',
                     recipients: [ email ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/rtb/' + encpScript,
+                    body: 'https://prime-sign-230407.appspot.com/sss/req/' + encpScript,
                     isHTML: true,
                 }, ( error, event ) => {
                     if ( event == "sent" ) {

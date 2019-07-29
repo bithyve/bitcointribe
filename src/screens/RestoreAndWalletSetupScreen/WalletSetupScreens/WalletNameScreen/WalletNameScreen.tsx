@@ -54,8 +54,9 @@ export default class WalletNameScreen extends React.Component<any, any> {
                 flag_ProceedBtnDisable: true
             } )
         }
-
     }
+
+
     //TODO: func click_Proceed
     async click_Proceed() {
         let SetUpDetails = {};

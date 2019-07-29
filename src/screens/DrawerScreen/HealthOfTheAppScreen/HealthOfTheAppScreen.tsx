@@ -73,35 +73,36 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 givenName: "Trusted Contact 1",
                 familyName: "",
                 statusMsgColor: "gray",
-                statusMsg: "Status",
+                statusMsg: "Not Shared",
                 opt: undefined,
             }, {
                 thumbnailPath: "user",
                 givenName: "Trusted Contact 2",
                 familyName: "",
                 statusMsgColor: "gray",
-                statusMsg: "Status",
+                statusMsg: "Not Shared",
                 opt: undefined,
             } ],
             arr_SelfShare: [ {
                 thumbnailPath: "bars",
-                givenName: "Wallet",
+                givenName: "Secondary Device",
                 familyName: "",
                 statusMsgColor: "#ff0000",
-                statusMsg: "Not Share",
+                statusMsg: "Not Shared",
             }, {
                 thumbnailPath: "bars",
                 givenName: "Email",
                 familyName: "",
                 statusMsgColor: "#ff0000",
-                statusMsg: "Not Share",
+                statusMsg: "Not Shared",
             }, {
                 thumbnailPath: "bars",
-                givenName: "iCloud Share",
+                givenName: "Cloud",
                 familyName: "",
                 statusMsgColor: "#ff0000",
-                statusMsg: "Not Share",
+                statusMsg: "Not Shared",
             } ],
+            arr_SSSDetails: [],
             arr_Mnemonic: [],
             arr_MnemonicDetails: [],
             arr_SecretQuestion: [],
@@ -110,7 +111,6 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             arr_SecureAccountDetials: [],
             arr_ModelBackupYourWallet: [],
             arr_ModelFindYourTrustedContacts: [],
-
             //flag
             flag_isTrustedContacts: true,
             flag_SelfShare: true,
@@ -168,7 +168,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         let tempOpt = [];
         let temp = [];
         //Trusted Contacts
-        if ( sssDetails.length > 0 ) {
+        if ( sssDetails[ 0 ].keeperInfo != "null" && sssDetails.length > 0 ) {
             //App Health
             for ( let i = 0; i <= 2; i++ ) {
                 encrShares.push( sssDetails[ i ].shareId )
@@ -222,12 +222,12 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 console.log( { tempOpt } );
                 if ( updateShareIdStatus ) {
                     if ( totalSec < 540 && sssDetails[ i ].shareStage == "Ugly" ) {
-                        data.statusMsg = "Shared";
+                        data.statusMsg = "Not Shared";
                         data.statusMsgColor = "#C07710";
                         data.flag_timer = true;
                         data.opt = tempOpt[ i ];
                     } else if ( totalSec >= 540 && sssDetails[ i ].shareStage == "Ugly" ) {
-                        data.statusMsg = "Shared OTP expired.";
+                        data.statusMsg = "OTP expired.";
                         data.statusMsgColor = "#C07710";
                         data.flag_timer = false;
                     } else if ( sssDetails[ i ].shareStage == "Good" ) {
@@ -235,11 +235,11 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                         data.statusMsgColor = "#008000";
                         data.flag_timer = false;
                     } else if ( sssDetails[ i ].shareStage == "Bad" ) {
-                        data.statusMsg = "Share accessible";
+                        data.statusMsg = "Share inaccessible";
                         data.statusMsgColor = "#C07710";
                         data.flag_timer = false;
                     } else if ( sssDetails[ i ].shareStage == "Ugly" && sssDetails[ i ].sharedDate != "" ) {
-                        data.statusMsg = "Share not accessible";
+                        data.statusMsg = "Share inaccessible";
                         data.statusMsgColor = "#ff0000";
                         data.flag_timer = false;
                     }
@@ -251,7 +251,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                     arr_TrustedContacts.push( data );
                 }
                 else {
-                    alert.simpleOk( "Oops", "App Health not update in database." );
+                    alert.simpleOk( "Sorry!", "Failed to update health of the app" );
                 }
             }
 
@@ -298,8 +298,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
             let data = {};
             data.icon = "timelockNew";
-            data.title = "First Secret Question";
-            data.subTitle = totalSec <= expaire.backup.expaire_secretquestion ? "Backed Confirm" : "Not Backed up";
+            data.title = "Secret Question";
+            data.subTitle = totalSec <= expaire.backup.expaire_secretquestion ? "Backup Confirm" : "Not Backed up";
             data.color = totalSec <= expaire.backup.expaire_secretquestion ? "#008000" : "#ff0000";
             data.walletDetails = walletDetails;
             arr_SecretQuestion.push( data )
@@ -468,15 +468,16 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         // console.log( { arr_SecureAccountDetials } );
 
         this.setState( {
-            flag_Loading
+            flag_Loading,
+            arr_SSSDetails: sssDetails
         } )
     }
 
     getMsgAndColor( sharedDate: string, shareStage: string ) {
         if ( sharedDate == "" && shareStage != "Good" ) {
-            return [ "Not Share", "#ff0000" ];
+            return [ "Not Shared", "#ff0000" ];
         } else if ( sharedDate != "" && shareStage != "Good" ) {
-            return [ "Shared", "#C07710" ];
+            return [ "Not shared", "#C07710" ];
         } else {
             return [ "Share Confirmed", "#008000" ];
         }
@@ -995,7 +996,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                             await Permissions.request( 'contacts' ).then( ( response: any ) => {
                                 console.log( response );
                                 if ( response == "authorized" ) {
-                                    this.props.navigation.push( "BackUpYourWalletNavigator" )
+                                    const arrSSSDetails = this.state.arr_SSSDetails.slice( 0, 2 );
+                                    this.props.navigation.push( "BackUpYourWalletNavigator", { data: arrSSSDetails } )
                                 } else {
                                     alert.simpleOk( "Oops", "Please add contacts permission." );
                                 }
@@ -1019,59 +1021,6 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                             } )
                         } }
                     />
-                    <Modal style={ [ styles.modal, styles.modal4 ] } position={ "bottom" } ref={ "modal4" }>
-                        <View style={ { flex: 1 } }>
-                            <View style={ { flexDirection: "row", marginTop: 20 } }>
-                                <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "iCLOUD" ) }>
-                                    <View style={ { alignItems: "center", marginLeft: "10%", flexDirection: "column" } }>
-                                        <Icon
-                                            raised
-                                            name='cloud-upload'
-                                            type='font-awesome'
-                                            color='#379FF1'
-                                        />
-                                        <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via iCloud</Text>
-                                    </View>
-                                </Button>
-                                <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "SLACK" ) }>
-                                    <View style={ { alignItems: "center", marginLeft: "10%", flexDirection: "column" } }>
-                                        <Icon
-                                            raised
-                                            name='slack'
-                                            type='font-awesome'
-                                            color='#E2A223'
-                                        />
-                                        <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via Slack</Text>
-                                    </View>
-                                </Button>
-                                <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "WHATSAPP" ) }>
-                                    <View style={ { alignItems: "center", marginLeft: "10%", flexDirection: "column" } }>
-                                        <Icon
-                                            raised
-                                            name='whatsapp'
-                                            type='font-awesome'
-                                            color='#51E46B'
-                                        />
-                                        <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1", textAlign: "center" } }>Via WhatsApp</Text>
-                                    </View>
-                                </Button>
-                            </View>
-
-                            <View style={ { flexDirection: "row", marginTop: 40 } }>
-                                <Button transparent style={ { alignItems: "center", flex: 1 } } onPress={ () => this.click_Share5Sahring( "iCLOUD" ) }>
-                                    <View style={ { alignItems: "center", marginLeft: "2%", flexDirection: "column" } }>
-                                        <Icon
-                                            raised
-                                            name='wifi'
-                                            type='font-awesome'
-                                            color='#027AFE'
-                                        />
-                                        <Text style={ { marginTop: 5, fontSize: 12, color: "#006EB1" } }>Via AirDrop</Text>
-                                    </View>
-                                </Button>
-                            </View>
-                        </View>
-                    </Modal>
                 </SafeAreaView>
                 <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
             </Container >

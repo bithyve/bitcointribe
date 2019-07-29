@@ -142,7 +142,8 @@ var asyncStorageKeys = {
   flag_PasscodeCreate: "flag_PasscodeCreate",
   regularClassObject: "regularClassObject",
   secureClassObject: "secureClassObject",
-  s3ServiceClassObject: "s3ServiceClassObject"
+  s3ServiceClassObject: "s3ServiceClassObject",
+  flag_BackgoundApp: "flag_BackgoundApp"
 }
 
 var expaire = {

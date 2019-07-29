@@ -170,83 +170,86 @@ const connection_AppHealthForAllShare = async ( qatime: number, shares: any ) =>
 }
 
 
+const check_HealthRestoWalletUsingTrustedContact = async ( qatime: number, share: any ) => {
+    console.log( { qatime, share } );
 
-
-const connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact = async ( qatime: number, satime: number, encrShares: any, mnemonic: any, arr_RecordId: any ) => {
-    //  console.log( { qatime, satime, encrShares, mnemonic } );
-    const dateTime = Date.now();
-    const sss = new S3Service(
-        mnemonic
-    );
-    var resCheckHealth = await sss.checkHealth( encrShares );
-    resCheckHealth = resCheckHealth.lastUpdateds;
-    if ( resCheckHealth.length == 2 ) {
-        let data = {};
-        data.shareId = "0";
-        data.updatedAt = 0;
-        resCheckHealth.push( data );
-    }
-    //console.log( { resCheckHealth } );
-    const healthStatus = new HealthStatus();
-    const res = await healthStatus.appHealthStatus( qatime, satime, resCheckHealth, 0, "share" );
-    // console.log( { res } );
-    await utils.setAppHealthStatus( res )
-    //console.log( { res } );
-    let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
-        localDB.tableName.tblWallet,
-        res
-    );
-    //console.log( { resupdateWalletDetials } );
-    let resupdateSSSShareStage = await dbOpration.updateSSSShareStageWhereRecordId(
-        localDB.tableName.tblSSSDetails,
-        res.sharesInfo,
-        arr_RecordId,
-        dateTime
-    );
-    if ( resupdateSSSShareStage ) {
-        return resupdateSSSShareStage;
-    }
-}
-
-//Secure Account Backup
-
-const connection_AppHealthStatusSecureAccountBackup = async ( qatime: number, satime: number, encrShares: any, mnemonic: any ) => {
-    //  console.log( { qatime, satime, encrShares, mnemonic } );
-    const healthStatus = new HealthStatus();
-    const res = await healthStatus.appHealthStatus( qatime, satime, encrShares, 0, "share" );
-    // console.log( { res } );
-    await utils.setAppHealthStatus( res )
-    let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
-        localDB.tableName.tblWallet,
-        res
-    );
-    if ( resupdateWalletDetials ) {
-        return resupdateWalletDetials;
-    }
 
 }
 
 
 
-const check_AppHealthStausUsingMnemonic = async ( qatime: number, satime: number, shares: any, mnemonicTime: any ) => {
-    const healthStatus = new HealthStatus();
-    const res = await healthStatus.appHealthStatus( qatime, satime, shares, mnemonicTime, "mnemonic" );
-    await utils.setAppHealthStatus( res )
-    //console.log( { res } );
-    let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
-        localDB.tableName.tblWallet,
-        res
-    );
-    if ( resupdateWalletDetials ) {
-        return resupdateWalletDetials;
-    }
-}
+
+// const connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact = async ( qatime: number, satime: number, encrShares: any, mnemonic: any, arr_RecordId: any ) => {
+//     //  console.log( { qatime, satime, encrShares, mnemonic } );
+//     const dateTime = Date.now();
+//     const sss = new S3Service(
+//         mnemonic
+//     );
+//     var resCheckHealth = await sss.checkHealth( encrShares );
+//     resCheckHealth = resCheckHealth.lastUpdateds;
+//     if ( resCheckHealth.length == 2 ) {
+//         let data = {};
+//         data.shareId = "0";
+//         data.updatedAt = 0;
+//         resCheckHealth.push( data );
+//     }
+//     //console.log( { resCheckHealth } );
+//     const healthStatus = new HealthStatus();
+//     const res = await healthStatus.appHealthStatus( qatime, satime, resCheckHealth, 0, "share" );
+//     // console.log( { res } );
+//     await utils.setAppHealthStatus( res )
+//     //console.log( { res } );
+//     let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
+//         localDB.tableName.tblWallet,
+//         res
+//     );
+//     //console.log( { resupdateWalletDetials } );
+//     let resupdateSSSShareStage = await dbOpration.updateSSSShareStageWhereRecordId(
+//         localDB.tableName.tblSSSDetails,
+//         res.sharesInfo,
+//         arr_RecordId,
+//         dateTime
+//     );
+//     if ( resupdateSSSShareStage ) {
+//         return resupdateSSSShareStage;
+//     }
+// }
+// //Secure Account Backup
+// const connection_AppHealthStatusSecureAccountBackup = async ( qatime: number, satime: number, encrShares: any, mnemonic: any ) => {
+//     //  console.log( { qatime, satime, encrShares, mnemonic } );
+//     const healthStatus = new HealthStatus();
+//     const res = await healthStatus.appHealthStatus( qatime, satime, encrShares, 0, "share" );
+//     // console.log( { res } );
+//     await utils.setAppHealthStatus( res )
+//     let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
+//         localDB.tableName.tblWallet,
+//         res
+//     );
+//     if ( resupdateWalletDetials ) {
+//         return resupdateWalletDetials;
+//     }
+
+// }
+
+
+
+// const check_AppHealthStausUsingMnemonic = async ( qatime: number, satime: number, shares: any, mnemonicTime: any ) => {
+//     const healthStatus = new HealthStatus();
+//     const res = await healthStatus.appHealthStatus( qatime, satime, shares, mnemonicTime, "mnemonic" );
+//     await utils.setAppHealthStatus( res )
+//     //console.log( { res } );
+//     let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
+//         localDB.tableName.tblWallet,
+//         res
+//     );
+//     if ( resupdateWalletDetials ) {
+//         return resupdateWalletDetials;
+//     }
+// }
 
 module.exports = {
     connection_AppHealthStatus,
     connection_AppHealthAndSSSUpdate,
     connection_AppHealthForAllShare,
-    connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact,
-    connection_AppHealthStatusSecureAccountBackup,
-    check_AppHealthStausUsingMnemonic
+    check_HealthRestoWalletUsingTrustedContact
 };

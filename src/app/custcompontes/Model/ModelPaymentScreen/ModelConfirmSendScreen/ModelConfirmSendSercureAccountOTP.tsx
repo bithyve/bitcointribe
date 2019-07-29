@@ -76,12 +76,15 @@ export default class ModelConfirmSendSercureAccountOTP extends Component<Props, 
 
     componentWillReceiveProps( nextProps: any ) {
         var data = nextProps.data[ 0 ];
+        console.log( { data } );
         if ( data != undefined ) {
-            data = data.data[ 0 ];
-            this.setState( {
-                data: data.data,
-                resTransferST: data.resTransferST
-            } )
+            if ( Array.isArray( data.data ) ) {
+                data = data.data[ 0 ];
+                this.setState( {
+                    data: data.data,
+                    resTransferST: data.resTransferST
+                } )
+            }
         }
 
     }
@@ -142,7 +145,7 @@ export default class ModelConfirmSendSercureAccountOTP extends Component<Props, 
                     automaticallyAdjustContentInsets={ true }
                     keyboardOpeningTime={ 0 }
                     enableOnAndroid={ true }
-                    contentContainerStyle={ { flexGrow: 0.7 } }
+                    contentContainerStyle={ { flexGrow: 1 } }
                 >
                     <View style={ [
                         styles.modalBackground,
@@ -216,7 +219,7 @@ const styles = StyleSheet.create( {
         justifyContent: 'center'
     },
     viewModelBody: {
-        flex: 0.9,
+        flex: 0.7,
         margin: 20,
         padding: 10,
         borderRadius: 10,

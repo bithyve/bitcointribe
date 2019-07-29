@@ -103,7 +103,6 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
         } );
     }
 
-
     componentWillReceiveProps( nextProps: any ) {
         var data = nextProps.data;
         if ( data.length != 0 ) {
@@ -123,11 +122,6 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             firstQuestion: value
         } );
     }
-
-
-
-
-
 
     check_CorrectAnswer() {
         setTimeout( () => {
@@ -211,7 +205,8 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             if ( generateShareRes.status == 200 ) {
                 const { encryptedShares } = generateShareRes.data;
                 const autoHealthShares = encryptedShares.slice( 0, 3 );
-                //console.log( { autoHealthShares, manualHealthShares } );
+
+                console.log( { autoHealthShares } );
                 const resInitializeHealthcheck = await sss.initializeHealthcheck( autoHealthShares );
                 console.log( { resInitializeHealthcheck } );
                 if ( resInitializeHealthcheck.status == 200 || resInitializeHealthcheck.status == 400 ) {
@@ -454,7 +449,12 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 // console.log( { resSecoundXpub4Share } );  
                 let res2FASecret4Share = await this.generateXpubAnd2FAQRCode( this.state.base64string10, "googleAuto2FASecret4Share.png" );
                 // console.log( { res2FASecret4Share } );
-                let create4thPdf = await this.genreatePdf4Share( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, res4thShare6Create, res4thShare7Create, res4thShare8Create, resSecoundXpub4Share, res2FASecret4Share, "SecretSharing4Share.pdf", "For 4th Shares" );
+                var create4thPdf;
+                if ( Platform.OS == "android" ) {
+                    create4thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode4thSahre1.png", "/storage/emulated/0/qrcode4thSahre2.png", "/storage/emulated/0/qrcode4thSahre3.png", "/storage/emulated/0/qrcode4thSahre4.png", "/storage/emulated/0/qrcode4thSahre5.png", "/storage/emulated/0/qrcode4thSahre6.png", "/storage/emulated/0/qrcode4thSahre7.png", "/storage/emulated/0/qrcode4thSahre8.png", "/storage/emulated/0/secoundryXpub4Share.png", "/storage/emulated/0/googleAuto2FASecret4Share.png", "SecretSharing4Share.pdf", "For 4th Shares" );
+                } else {
+                    create4thPdf = await this.genreatePdf( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, res4thShare6Create, res4thShare7Create, res4thShare8Create, resSecoundXpub4Share, res2FASecret4Share, "SecretSharing4Share.pdf", "For 4th Shares" );
+                }
                 resolve( create4thPdf );
             }, 2000 );
 
@@ -497,9 +497,8 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
             this.svg9.toDataURL( this.base64string9 );
             this.svg10.toDataURL( this.base64string10 );
             setTimeout( async () => {
-                //        console.log( { arrQRCodeData } );
                 let res5thShare1Create = await this.generateSahreQRCode( this.state.base64string1, "qrcode5thSahre1.png" );
-                //      console.log( { res4thShare1Create } );
+                //console.log( { res5thShare1Create } );
                 let res5thShare2Create = await this.generateSahreQRCode( this.state.base64string2, "qrcode5thSahre2.png" );
                 //    console.log( { res4thShare2Create } );
                 let res5thShare3Create = await this.generateSahreQRCode( this.state.base64string3, "qrcode5thSahre3.png" );
@@ -518,7 +517,13 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 // console.log( { resSecoundXpub4Share } );
                 let res2FASecret5Share = await this.generateXpubAnd2FAQRCode( this.state.base64string10, "googleAuto2FASecret5Share.png" );
                 // console.log( { res2FASecret4Share } );
-                let create5thPdf = await this.genreatePdf4Share( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, res5thShare6Create, res5thShare7Create, res5thShare8Create, resSecoundXpub5Share, res2FASecret5Share, "SecretSharing5Share.pdf", "For 5th Shares" );
+                var create5thPdf;
+                if ( Platform.OS == "android" ) {
+                    create5thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode5thSahre1.png", "/storage/emulated/0/qrcode5thSahre2.png", "/storage/emulated/0/qrcode5thSahre3.png", "/storage/emulated/0/qrcode5thSahre4.png", "/storage/emulated/0/qrcode5thSahre5.png", "/storage/emulated/0/qrcode5thSahre6.png", "/storage/emulated/0/qrcode5thSahre7.png", "/storage/emulated/0/qrcode5thSahre8.png", "/storage/emulated/0/secoundryXpub5Share.png", "/storage/emulated/0/googleAuto2FASecret5Share.png", "SecretSharing5Share.pdf", "For 5th Shares" );
+                } else {
+                    create5thPdf = await this.genreatePdf( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, res5thShare6Create, res5thShare7Create, res5thShare8Create, resSecoundXpub5Share, res2FASecret5Share, "SecretSharing5Share.pdf", "For 5th Shares" );
+                }
+
                 resolve( create5thPdf );
             }, 1000 );
         } );
@@ -534,6 +539,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 docsDir = await PDFLib.getDocumentsDirectory();
             }
             docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
+            console.log( { docsDir } );
             var path = `${ docsDir }/${ fileName }`;
             RNFS.writeFile( path, share1, "base64" )
                 .then( ( success: any ) => {
@@ -577,13 +583,16 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
         return chunks;
     }
 
-    genreatePdf4Share = async ( data: any, pathShare1: string, pathShare2: string, pathShare3: string, pathShare4: string, pathShare5: string, pathShare6: string, pathShare7: string, pathShare8: string, pathSecoundXpub: string, path2FASecret: string, pdfFileName: string, forShare: string ) => {
+    genreatePdf = async ( data: any, pathShare1: string, pathShare2: string, pathShare3: string, pathShare4: string, pathShare5: string, pathShare6: string, pathShare7: string, pathShare8: string, pathSecoundXpub: string, path2FASecret: string, pdfFileName: string, forShare: string ) => {
         return new Promise( async ( resolve, reject ) => {
+
+            console.log( { data, pathShare1, pathShare8, pdfFileName, forShare } );
+
+
             let arrQRCodeData = data.arrQRCodeData;
             let secret2FA = data.secret;
             let secondaryMnemonic = data.secondaryMnemonic;
             let bhXpub = data.bhXpub;
-
 
             //Share 1 
             // let arrShare1 = .split();   
@@ -630,9 +639,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 docsDir = await PDFLib.getDocumentsDirectory();
             }
             const pdfPath = `${ docsDir }/${ pdfFileName }`;
-            //console.log( { pdfPath } );
-            docsDir = Platform.OS === 'android' ? `/${ docsDir }` : docsDir;
-            // console.log( { docsDir } );
+            console.log( { pdfPath } );
             const page1 = PDFPage
                 .create()
                 .drawText( forShare, {
@@ -1163,16 +1170,27 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                 .create( pdfPath )
                 .addPages( page1, page2, page3, page4, page5, page6 )
                 .write()
-                .then( ( path: any ) => {
+                .then( async ( path: any ) => {
                     console.log( 'PDF created at: ' + path );
                     let pdffilePassword = this.state.secoundAnswer;
                     if ( Platform.OS == "ios" ) {
                         var PdfPassword = NativeModules.PdfPassword;
                         PdfPassword.addEvent( "/" + pdfFileName, pdffilePassword );
+                    } else {
+                        this.setPdfAndroidPasswrod( pdfFileName, pdffilePassword );
                     }
                     resolve( path );
                 } );
         } );
+    }
+
+    // async function to call the Java native method
+    async setPdfAndroidPasswrod( pdfPath: string, pdffilePassword: string ) {
+        var PdfPassword = NativeModules.PdfPassword;
+        module.exports = NativeModules.PdfPassword;
+        console.log( { PdfPassword } );
+        console.log( { pdfPath, pdffilePassword } );
+        PdfPassword.setPdfPasswrod( pdfPath, pdffilePassword, ( err ) => { console.log( err ) }, ( msg ) => { console.log( msg ) } );
     }
 
 
@@ -1202,7 +1220,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                     automaticallyAdjustContentInsets={ true }
                     keyboardOpeningTime={ 0 }
                     enableOnAndroid={ true }
-                    contentContainerStyle={ { flexGrow: 0.7 } }
+                    contentContainerStyle={ { flexGrow: 1 } }
                 >
                     <View style={ [
                         styles.modalBackground,
@@ -1221,7 +1239,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                             </View>
                             <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
                                 <Image source={ images.backupSecretQuestion.icon } style={ { width: 80, height: 80, marginTop: -30 } } />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20 } ] }>Security Questions</Text>
+                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20 } ] }>Security Question</Text>
                                 <Text note style={ { textAlign: "center" } }>Setup your question and answer.</Text>
                                 <View style={ styles.itemQuestionPicker }>
                                     <Picker
@@ -1290,7 +1308,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                                 ) }
                             </View>
                             <View style={ { flex: 0.1, justifyContent: "flex-end" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>These answers will be required in case you need to restore your wallet</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>This answer will be required in case you want to restore your wallet</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_Next()

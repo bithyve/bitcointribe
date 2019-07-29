@@ -3,17 +3,34 @@ import { localDB } from "../../../app/constants/Constants";
 var utils = require( "../../../app/constants/Utils" );
 import Singleton from "../../constants/Singleton";
 import "../../../assets/static/js/sugar.js";
+
 const getPasscode = () => {
   let commonData = Singleton.getInstance();
   return commonData.getPasscode();
 };
 import SQLite from "react-native-sqlite-storage";
+
+
+errorCB = ( err ) => {
+  console.log( "SQL Error: " + err );
+}
+
+successCB = () => {
+  console.log( "SQL executed fine" );
+}
+
+openCB = () => {
+  console.log( "Database OPENED" );
+}
+
 var db = SQLite.openDatabase(
   localDB.dbName,
   "1.0",
   "HexaWallet Database",
-  200000
+  200000,
+  this.openCB(), this.errorCB()
 );
+
 //TODO: Json Files
 import accountTypeData from "../../../assets/jsonfiles/tblAccountType/tblAccountType.json";
 //TODO: Select All Table Data
@@ -48,7 +65,7 @@ const readTablesData = ( tableName: any ) => {
               data.accountName = utils.decrypt( data.accountName, passcode );
               data.accountType = utils.decrypt( data.accountType, passcode );
               data.additionalInfo = utils.decrypt( data.additionalInfo, passcode );
-              data.isActive = utils.decrypt( data.isActive, passcode );
+              data.isActive = data.isActive;
               data.lastUpdated = utils.decrypt( data.lastUpdated, passcode );
               temp.push( data );
             }
@@ -623,7 +640,8 @@ const updateSecureAccountAddressAndBal = (
   tblName: string,
   address: string,
   bal: string,
-  id: string
+  id: string,
+  isActive: number
 ) => {
   let passcode = getPasscode();
   let date = Date.now();
@@ -639,12 +657,13 @@ const updateSecureAccountAddressAndBal = (
                 txn.executeSql(
                   "update " +
                   tblName +
-                  " set address = :address,balance =:balance,lastUpdated =:lastUpdated where id = :id",
+                  " set address = :address,balance =:balance,lastUpdated =:lastUpdated,isActive =:isActive where id = :id",
                   [
                     utils.encrypt( address.toString(), passcode ),
                     utils.encrypt( bal.toString(), passcode ),
                     utils.encrypt( date.toString(), passcode ),
-                    dbId
+                    isActive,
+                    dbId,
                   ]
                 );
                 resolve( true );
@@ -903,13 +922,12 @@ const insertSSSShareDetails = (
     histroy.push( data );
     db.transaction( function ( txn: any ) {
       for ( let i = 0; i < temp.share.length; i++ ) {
-        //console.log( { len: temp.share.length, i: i } );
-        //console.log( { date: temp.date.toString(), share: temp.share[ i ].toString(), keerinfo: JSON.stringify( temp.keeperInfo[ i ].info ).toString(), recoard: temp.recordId[ i ].id.toString(), history: JSON.stringify( histroy ).toString() } );
-        console.log( { shareSahre: temp.shareStage[ i ].shareStage } );
+        // console.log( { len: temp.share.length, i: i } );
+        // console.log( { date: temp.date.toString(), share: temp.share[ i ].toString(), keerinfo: JSON.stringify( temp.keeperInfo[ i ].info ).toString(), history: JSON.stringify( histroy ).toString() } );
         txn.executeSql(
           "INSERT INTO " +
           tblName +
-          "(dateCreated,share,shareId,keeperInfo,recordId,history,decryptedShare,shareStage,lastSuccessfulCheck,type) VALUES (:dateCreated,:share,:shareId,:keeperInfo,:recordId,:history,:decryptedShare,:shareStage,:lastSuccessfulCheck,:type)",
+          "(dateCreated,share,shareId,keeperInfo,history,decryptedShare,lastSuccessfulCheck,type) VALUES (:dateCreated,:share,:shareId,:keeperInfo,:history,:decryptedShare,:lastSuccessfulCheck,:type)",
           [
             utils.encrypt(
               temp.date.toString(),
@@ -918,10 +936,8 @@ const insertSSSShareDetails = (
             utils.encrypt( temp.share[ i ].toString(), passcode ),
             utils.encrypt( temp.shareId[ i ].data.shareId.toString(), passcode ),
             utils.encrypt( JSON.stringify( temp.keeperInfo[ i ].info ).toString(), passcode ),
-            utils.encrypt( temp.recordId[ i ].id.toString(), passcode ),
             utils.encrypt( JSON.stringify( histroy ).toString(), passcode ),
             utils.encrypt( JSON.stringify( temp.encryptedMetaShare[ i ].metaShare ).toString(), passcode ),
-            utils.encrypt( temp.shareStage[ i ].shareStage.toString(), passcode ),
             utils.encrypt(
               temp.date.toString(),
               passcode
@@ -1067,38 +1083,41 @@ const updateSSSRetoreDecryptedShare = (
 //update
 const updateSSSContactListDetails = (
   tblName: string,
-  contactDetails: any
+  contactDetails: any,
+  shareIds: any
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
     try {
       db.transaction( function ( txn ) {
         console.log( { contactDetails } );
-
         txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
           var len = results.rows.length;
           if ( len > 0 ) {
-            for ( let i = 0; i < len; i++ ) {
-              let dbdecryptShareId = results.rows.item( i ).shareId;
-              //console.log( { dbdecryptShareId } );
-              let jsonConstactDetial = JSON.stringify( contactDetails[ i ] ).toString();
-              let jsonRecordId = ( contactDetails[ i ].recordID ).toString();
-              //console.log( { jsonConstactDetial, jsonRecordId } );
-              // console.log( { jsonRecordId } );  
-              txn.executeSql(
-                "update " +
-                tblName +
-                " set keeperInfo = :keeperInfo,recordId =:recordId where shareId = :shareId",
-                [
-                  utils.encrypt( jsonConstactDetial, passcode ),
-                  utils.encrypt( jsonRecordId, passcode ),
-                  dbdecryptShareId
-                ]
+            for ( let i = 0; i < shareIds.length; i++ ) {
+              let shareId1 = shareIds[ 0 ];
+              let shareId2 = shareIds[ 1 ];
+              let dbdecryptShareId = utils.decrypt(
+                results.rows.item( i ).shareId,
+                passcode
               );
+              let encpShareId = results.rows.item( i ).shareId;
+              if ( dbdecryptShareId == shareId1 || dbdecryptShareId == shareId2 ) {
+                txn.executeSql(
+                  "update " +
+                  tblName +
+                  " set keeperInfo = :keeperInfo,recordId =:recordId where shareId = :shareId",
+                  [
+                    utils.encrypt( JSON.stringify( contactDetails[ i ] ).toString(), passcode ),
+                    utils.encrypt( contactDetails[ i ].recordID.toString(), passcode ),
+                    encpShareId
+                  ]
+                );
+              }
             }
-            console.log( "done" );
-
             resolve( true );
+          } else {
+            resolve( false );
           }
         } );
       } );
@@ -1107,6 +1126,9 @@ const updateSSSContactListDetails = (
     }
   } );
 };
+
+
+
 
 //update trnasfer method and shared date
 const updateSSSTransferMehtodDetails = (
