@@ -173,7 +173,7 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
                                 ) }
                             </View>
                             <View style={ { flex: 0.1, justifyContent: "flex-end" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>These answers will be required in case you need to restore your wallet</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Answer will be required in case you need to restore your wallet</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_Next()

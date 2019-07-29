@@ -114,7 +114,7 @@ export default class TrustedPartySelfShareQRCode extends React.Component<any, an
                             extraScrollHeight={ 40 }
                         >
                             <View style={ { flex: 0.1, margin: 20 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Present this QR code to your contact that trusted you this will help that contact to restore wallet.</Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center" } }>
                                 <QRCode
@@ -123,7 +123,7 @@ export default class TrustedPartySelfShareQRCode extends React.Component<any, an
                                 />
                             </View>
                             <View style={ { flex: 0.5, alignItems: "center" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut faucibus pulvinar elementum integer enim neque volutpat. Leo integer malesuada nunc vel. Purus faucibus ornare suspendisse sed nisi lacus sed. Et ligula ullamcorper malesuada proin libero nunc consequat. A cras semper auctor neque vitae tempus quam pellentesque. In nisl nisi scelerisque eu ultrices vitae auctor eu augue. Sed risus ultricies tristique nulla aliquet enim tortor. Curabitur gravida arcu ac tortor dignissim convallis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Porta lorem mollis aliquam ut porttitor Leo a.</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Do not share this QR code with anyone other than the that contact, whom you want to share the secret with</Text>
                             </View>
                         </KeyboardAwareScrollView>
                     </ImageBackground>

@@ -62,13 +62,13 @@ export default class ModelQuestionsSuccessfullyBackedUp extends Component<Props,
                             <Text style={ [ globalStyle.ffFiraSansMedium, {
                                 fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
                                 marginLeft: 20, marginRight: 20
-                            } ] }>Questions Successfully Backed Up</Text>
+                            } ] }>Question Successfully Backed Up</Text>
                         </View>
                         <View style={ { flex: 2, alignItems: "center", justifyContent: "center" } }>
                             <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingMnemonic.walletrestored } />
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-end" } }>
-                            <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Hexa will remind you to help remember the answers</Text>
+                            <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Hexa will remind you to help remember the answer</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <FullLinearGradientButton

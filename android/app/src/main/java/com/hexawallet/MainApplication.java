@@ -3,6 +3,8 @@ package com.hexawallet;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
+import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
 
 //import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
 
@@ -62,6 +64,8 @@ public class MainApplication extends Application implements ShareApplication, Re
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(new MainReactPackage(),
+            new RNBackgroundFetchPackage(),
+            new RNBackgroundFetchPackage(),
           // new RNBackgroundFetchPackage(),
           new PdfPasswordPackage(), new RandomBytesPackage(), new UdpSocketsModule(), new RNDeviceInfo(),
           new TcpSocketsModule(), new SvgPackage(), new RNSpinkitPackage(), new VectorIconsPackage(),

@@ -75,7 +75,7 @@ export default class WalletNameScreen extends React.Component<any, any> {
                 >
                     <View style={ styles.viewPagination }>
                         <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 22, textAlign: "center" } ] }>What do you want to call your Wallet?</Text>
-                        <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>This name will display on you wallet.</Text>
+                        <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>This name will be displayed on your wallet.</Text>
                     </View>
                     <View style={ styles.viewInputFiled }>
                         <Item rounded style={ styles.itemInputWalletName }>
