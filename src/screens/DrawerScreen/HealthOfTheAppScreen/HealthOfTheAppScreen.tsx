@@ -170,7 +170,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
         const seconds: any = Math.floor( diff / 1000 % 60 );
         const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
-        data.totalSec = 540 - totalSec;
+        data.totalSec = expaire.expaire_otptime - totalSec;
         //for history get opt     
         for ( let i = 0; i < 2; i++ ) {
             let eachHistory = JSON.parse( sssDetails[ i ].history );
@@ -184,8 +184,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             tempOpt.push( otp );
         }
         console.log( { tempOpt } );
-        if ( totalSec < 540 && sssDetails[ index ].shareStage == "Ugly" ) {
-            data.statusMsg = "Not Shared";
+        if ( totalSec < expaire.expaire_otptime && sssDetails[ index ].shareStage == "Ugly" ) {
+            data.statusMsg = "Not Shared or expired";
             data.statusMsgColor = "#C07710";
             data.flag_timer = true;
             data.opt = tempOpt[ index ];
@@ -207,7 +207,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             data.flag_timer = false;
         }
         else {
-            data.statusMsg = "Not shared";
+            data.statusMsg = "Not Shared or expired";
             data.statusMsgColor = "#ff0000";
             data.flag_timer = false;
         }

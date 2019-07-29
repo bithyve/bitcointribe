@@ -51,6 +51,7 @@ const checkHealthAllShare = async ( share: any ) => {
         alert.simpleOk( "Oops", resCheckHealth.err );
     }
     console.log( { resCheckHealth } );
+
     let shares = [
         { shareId: share.selfshareShareShareId2, updatedAt: share.selfshareShareDate2 },
         { shareId: share.selfshareShareId3, updatedAt: share.selfshareShareDate3 },
@@ -102,13 +103,11 @@ const checkHealthRestoreWalletTrustedContact = async ( arrShareId: any, shareSel
     } else {
         alert.simpleOk( "Oops", resCheckHealth.err );
     }
-
     let shares = [];
     for ( let i = 0; i < shareSelfShareIds.length; i++ ) {
         shares.push( { shareId: shareSelfShareIds[ i ].share, updatedAt: dateTime } )
         arrEachShareId.push( shareSelfShareIds[ i ].id );
     }
-
     resCheckHealth.push.apply( resCheckHealth, shares )
     let emptyShares = [
         { shareId: "", updatedAt: 0 },
@@ -139,6 +138,8 @@ const checkHealthRestoreWalletTrustedContact = async ( arrShareId: any, shareSel
         );
         console.log( { resupdateSSSShareStage } );
         return res;
+    } else {
+        return false;
     }
 }
 

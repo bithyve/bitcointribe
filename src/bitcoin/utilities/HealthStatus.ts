@@ -45,7 +45,7 @@ export default class HealthStatus {
       overallStatus = HEXA_HEALTH.STAGE2;
     } else if ( this.counter.ugly > 1 || this.counter.bad > 2 ) {
       overallStatus = HEXA_HEALTH.STAGE3;
-    } else if ( this.counter.ugly >= 0 || this.counter.bad >= 1 ) {
+    } else if ( this.counter.ugly > 0 || this.counter.bad > 1 ) {
       overallStatus = HEXA_HEALTH.STAGE4;
     } else if ( this.counter.good >= 6 ) {
       overallStatus = HEXA_HEALTH.STAGE5;
@@ -56,7 +56,7 @@ export default class HealthStatus {
   private qaHealthStatus = ( time: number ): { qaStage: string } => {
     let qaStage: string = ENTITY_HEALTH.STAGE1;
     const delta = Math.abs( Date.now() - time );
-    const numberOfDays = Math.round( delta / ( 60 * 60 * 24 * 1000 ) );
+    const numberOfDays = Math.round( delta / ( 60 * 1000 ) );
 
     if ( numberOfDays > TIME_SLOTS.SHARE_SLOT2 ) {
       qaStage = ENTITY_HEALTH.STAGE1;
@@ -101,7 +101,7 @@ export default class HealthStatus {
     }
 
     for ( let i = 0; i < numberOfDays.length; i++ ) {
-      numberOfDays[ i ] = Math.floor( delta[ i ] / ( 60 * 60 * 24 * 1000 ) );
+      numberOfDays[ i ] = Math.floor( delta[ i ] / ( 60 * 1000 ) );
       const obj = sharesInfo[ i ];
       // console.log(numberOfDays[i], TIME_SLOTS.SHARE_SLOT2);
       if ( numberOfDays[ i ] > TIME_SLOTS.SHARE_SLOT2 ) {

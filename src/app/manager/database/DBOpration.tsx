@@ -53,6 +53,8 @@ const readTablesData = ( tableName: any ) => {
               data.lastUpdated = utils.decrypt( data.lastUpdated, passcode );
               data.publicKey = utils.decrypt( data.publicKey, passcode );
               data.walletType = utils.decrypt( data.walletType, passcode );
+              data.backupType = utils.decrypt( data.backupType, passcode );
+              data.backupType = utils.decrypt( data.backupType, passcode );
               data.appHealthStatus = utils.decrypt( data.appHealthStatus, passcode );
               data.setUpWalletAnswerDetails = utils.decrypt( data.setUpWalletAnswerDetails, passcode );
               temp.push( data );
@@ -411,6 +413,8 @@ const insertWallet = (
   address: string,
   publicKey: string,
   walletType: string,
+  backupMethod: string,
+  backupType: string,
   setUpWalletAnswerDetails: any,
   appHealthStatus: any
 ) => {
@@ -424,7 +428,7 @@ const insertWallet = (
       txn.executeSql(
         "INSERT INTO " +
         tblName +
-        " (dateCreated,mnemonic,privateKey,address,publicKey,walletType,setUpWalletAnswerDetails,appHealthStatus,lastUpdated) VALUES (:dateCreated,:mnemonic,:privateKey,:address,:publicKey,:walletType,:setUpWalletAnswerDetails,:appHealthStatus,:lastUpdated)",
+        " (dateCreated,mnemonic,privateKey,address,publicKey,walletType,setUpWalletAnswerDetails,appHealthStatus,backupType,backupMethod,lastUpdated) VALUES (:dateCreated,:mnemonic,:privateKey,:address,:publicKey,:walletType,:setUpWalletAnswerDetails,:appHealthStatus,:backupType,:backupMethod,:lastUpdated)",
         [
           utils.encrypt( fulldate.toString(), passcode ),
           utils.encrypt( mnemonicValue.toString(), passcode ),
@@ -434,6 +438,8 @@ const insertWallet = (
           utils.encrypt( walletType.toString(), passcode ),
           utils.encrypt( JSON.stringify( setUpWalletAnswerDetails ).toString(), passcode ),
           utils.encrypt( JSON.stringify( appHealthStatus ).toString(), passcode ),
+          utils.encrypt( backupType.toString(), passcode ),
+          utils.encrypt( backupMethod.toString(), passcode ),
           utils.encrypt( fulldate.toString(), passcode )
         ]
       );

@@ -155,7 +155,8 @@ var asyncStorageKeys = {
 
 var expaire = {
   backup: {
-    expaire_secretquestion: Config.EXPAIRE_SECRETQUESTION
+    expaire_secretquestion: Config.EXPAIRE_SECRETQUESTION,
+    expaire_otptime: Config.EXPAIRE_OTPTIME
   }
 }
 

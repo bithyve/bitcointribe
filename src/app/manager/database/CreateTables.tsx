@@ -18,7 +18,7 @@ export default class CreateTables extends Component {
       txn.executeSql(
         "CREATE TABLE IF NOT EXISTS " +
         localDB.tableName.tblWallet +
-        "(id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT ,mnemonic TEXT,privateKey TEXT,address TEXT,publicKey TEXT,walletType TEXT,setUpWalletAnswerDetails TEXT,appHealthStatus TEXT NOT NULL DEFAULT '',lastUpdated TEXT)",
+        "(id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT ,mnemonic TEXT,privateKey TEXT,address TEXT,publicKey TEXT,walletType TEXT,setUpWalletAnswerDetails TEXT,appHealthStatus TEXT NOT NULL DEFAULT '',backupType TEXT NOT NULL DEFAULT '',backupMethod TEXT NOT NULL DEFAULT '',lastUpdated TEXT)",
         []
       );
       txn.executeSql(

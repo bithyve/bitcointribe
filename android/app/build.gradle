@@ -107,13 +107,13 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1       
-        versionName "1.0.0.260719"            
+        versionName "1.0.0.290719"                
             multiDexEnabled true   
         ndk {  
             abiFilters "armeabi-v7a", "x86"
         }
        missingDimensionStrategy 'react-native-camera', 'general'   
-    }     
+    }        
 
     dexOptions {
       jumboMode = true

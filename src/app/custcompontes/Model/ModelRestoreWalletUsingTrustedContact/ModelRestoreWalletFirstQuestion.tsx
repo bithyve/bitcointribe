@@ -195,7 +195,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                 questionData.Question = Question;
                 questionData.Answer = Answer;
                 queTemp.push( questionData );
-                let resInsertWallet = await dbOpration.insertWallet(
+                await dbOpration.insertWallet(
                     localDB.tableName.tblWallet,
                     dateTime,
                     resMnemonic.mnemonic,
@@ -203,6 +203,8 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                     "",
                     "",
                     walletName,
+                    "restore wallet using trusted contact",
+                    "share",
                     queTemp,
                     resCheackHealth
                 );
@@ -222,59 +224,61 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                     console.log( { resImportSecureAccount } );
                     if ( resImportSecureAccount.status == 200 ) {
                         resImportSecureAccount = resImportSecureAccount.data;
-                    } else {
-                        alert.simpleOk( "Oops", resImportSecureAccount.err );
-                    }
-                }
-                var getBalSecure = await secureAccount.getBalance();
-                console.log( { getBalSecure } );
-                if ( getBalSecure.status == 200 ) {
-                    getBalSecure = getBalSecure.data;
-                } else {
-                    alert.simpleOk( "Oops", getBalSecure.err );
-                }
-                let resInsertDailyAccount = await dbOpration.insertCreateAccount(
-                    localDB.tableName.tblAccount,
-                    dateTime,
-                    "",
-                    ( getBal.balance + getBal.unconfirmedBalance ) / 1e8,
-                    "BTC",
-                    "Daily Wallet",
-                    "Daily Wallet",
-                    ""
-                );
-                let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
-                    localDB.tableName.tblAccount,
-                    dateTime,
-                    "",
-                    ( getBalSecure.balance + getBalSecure.unconfirmedBalance ) / 1e8,
-                    "BTC",
-                    "Secure Account",
-                    "Secure Account",
-                    ""
-                );
-                if ( resInsertDailyAccount && resInsertSecureCreateAcc ) {
-                    await bitcoinClassState.setRegularClassState( regularAccount );
-                    await bitcoinClassState.setSecureClassState( secureAccount );
-                    await bitcoinClassState.setS3ServiceClassState( sss );
-                    await comFunDBRead.readTblSSSDetails();
-                    await comFunDBRead.readTblAccount();
-                    this.setState( {
-                        flag_Loading: false
-                    } );
-                    setTimeout( () => {
-                        let data = {};
-                        data.walletName = walletName;
-                        data.balR = ( getBal.balance + getBal.unconfirmedBalance ) / 1e8;
-                        data.balS = ( getBalSecure.balance + getBalSecure.unconfirmedBalance ) / 1e8;
-                        this.props.click_Next( data );
-                        AsyncStorage.setItem(
-                            asyncStorageKeys.rootViewController,
-                            "TabbarBottom"
+                        var getBalSecure = await secureAccount.getBalance();
+                        console.log( { getBalSecure } );
+                        if ( getBalSecure.status == 200 ) {
+                            getBalSecure = getBalSecure.data;
+                        } else {
+                            alert.simpleOk( "Oops", getBalSecure.err );
+                        }
+                        let resInsertDailyAccount = await dbOpration.insertCreateAccount(
+                            localDB.tableName.tblAccount,
+                            dateTime,
+                            "",
+                            ( getBal.balance + getBal.unconfirmedBalance ) / 1e8,
+                            "BTC",
+                            "Daily Wallet",
+                            "Daily Wallet",
+                            ""
                         );
-                    }, 1000 );
+                        let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+                            localDB.tableName.tblAccount,
+                            dateTime,
+                            "",
+                            ( getBalSecure.balance + getBalSecure.unconfirmedBalance ) / 1e8,
+                            "BTC",
+                            "Secure Account",
+                            "Secure Account",
+                            ""
+                        );
+                        if ( resInsertDailyAccount && resInsertSecureCreateAcc ) {
+                            await bitcoinClassState.setRegularClassState( regularAccount );
+                            await bitcoinClassState.setSecureClassState( secureAccount );
+                            await bitcoinClassState.setS3ServiceClassState( sss );
+                            await comFunDBRead.readTblSSSDetails();
+                            await comFunDBRead.readTblAccount();
+                            this.setState( {
+                                flag_Loading: false
+                            } );
+                            setTimeout( () => {
+                                let data = {};
+                                data.walletName = walletName;
+                                data.balR = ( getBal.balance + getBal.unconfirmedBalance ) / 1e8;
+                                data.balS = ( getBalSecure.balance + getBalSecure.unconfirmedBalance ) / 1e8;
+                                this.props.click_Next( data );
+                                AsyncStorage.setItem(
+                                    asyncStorageKeys.rootViewController,
+                                    "TabbarBottom"
+                                );
+                            }, 1000 );
+                        }
+                    }
+                } else {
+                    alert.simpleOk( "Oops", resImportSecureAccount.err );
                 }
             }
+        } else {
+            alert.simpleOk( "Oops", resMnemonic.err );
         }
     }
 

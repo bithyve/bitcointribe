@@ -163,7 +163,7 @@ export default class WalletScreen extends React.Component {
     this.willFocusSubscription = this.props.navigation.addListener(
       "willFocus",
       () => {
-        console.log( { isNetwork } );
+        isNetwork = utils.getNetwork();
         this.connnection_FetchData();
         this.getDeepLinkingData();
       }
@@ -224,8 +224,12 @@ export default class WalletScreen extends React.Component {
     var resAccount = await comFunDBRead.readTblAccount();
     let resSSSDetails = await comFunDBRead.readTblSSSDetails();
     if ( resSSSDetails.length == 0 && countFileCreate == 0 ) {
-      countFileCreate++;
-      // this.createPdfFile();
+      if ( isNetwork ) {
+        countFileCreate++;
+        this.createPdfFile();
+      } else {
+        alert.simpleOk( "Oops", "Offline. Some features may not work" );
+      }
     } else {
       this.setState( {
         flag_PdfFileCreate: true
@@ -309,7 +313,7 @@ export default class WalletScreen extends React.Component {
         arr_CustShiledIcon: [
           {
             "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
-            "image": "sheild_3",
+            "image": "sheild_4",
             "imageHeight": this.animatedShieldIconSize,
             "imageWidth": this.animatedShieldIconSize,
           }

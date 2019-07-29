@@ -316,7 +316,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                             </View>
                         ) }
                         { renderIf( flag_ReShareBtnDisable == true )(
-                            <View style={ { flex: 0.4 } }>
+                            <View style={ { flex: Platform.OS == "ios" ? 0.5 : 0.6 } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Do not share this pdf with anyone other than your email/cloud</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
@@ -328,7 +328,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                             </View>
                         ) }
                         { renderIf( flag_ConfrimBtnDisable == true )(
-                            <View style={ { flex: Platform.OS == "ios" ? 0.4 : 0.5 } }>
+                            <View style={ { flex: Platform.OS == "ios" ? 0.5 : 0.6 } }>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_Confirm( data )

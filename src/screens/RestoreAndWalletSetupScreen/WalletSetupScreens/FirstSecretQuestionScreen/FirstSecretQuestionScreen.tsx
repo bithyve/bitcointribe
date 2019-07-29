@@ -162,6 +162,8 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                 "",
                 "",
                 walletName,
+                "new wallet",
+                "share",
                 arrQustionList,
                 updateShareIdStatus
             );
@@ -301,7 +303,7 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                     </View>
                     <View style={ styles.viewProcedBtn }>
                         <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } ] } numberOfLines={ 2 }>The answer is never stored anywhere and even your contacts don't know this answer </Text>
-                        
+
                         <FullLinearGradientButton title="Go To Wallet" disabled={ this.state.flag_ConfirmDisableBtn } style={ [ this.state.flag_ConfirmDisableBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } click_Done={ () => this.click_FirstQuestion() } />
                     </View>
 
