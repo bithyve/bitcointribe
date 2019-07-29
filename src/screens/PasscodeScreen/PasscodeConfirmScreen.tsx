@@ -160,7 +160,7 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
             <Text
               style={ [ globalStyle.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
             >
-              Hello, Crypto wizard
+              Welcome to Hexa!
             </Text>
           </View>
           <View style={ styles.viewFirstPasscode }>

@@ -215,14 +215,14 @@ export default class PasscodeScreen extends Component {
             <Text
               style={ [ globalStyle.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
             >
-              Hello, Crypto wizard
+              Welcome to Hexa!
             </Text>
           </View>
           <View style={ styles.viewPasscode }>
             <Text
               style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
             >
-              Re - Enter Passcode{ " " }
+            Enter Passcode{ " " }
             </Text>
             <CodeInput
               ref="codeInputRef1"
