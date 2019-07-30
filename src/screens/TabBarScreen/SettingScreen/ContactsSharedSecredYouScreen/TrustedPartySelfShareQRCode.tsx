@@ -114,7 +114,7 @@ export default class TrustedPartySelfShareQRCode extends React.Component<any, an
                             extraScrollHeight={ 40 }
                         >
                             <View style={ { flex: 0.1, margin: 20 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Present this QR code to your contact that trusted you this will help that contact to restore wallet.</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Present this QR code to contact that trusted you, this will help that contact to restore wallet.</Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center" } }>
                                 <QRCode
@@ -123,7 +123,7 @@ export default class TrustedPartySelfShareQRCode extends React.Component<any, an
                                 />
                             </View>
                             <View style={ { flex: 0.5, alignItems: "center" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Do not share this QR code with anyone other than the that contact, whom you want to share the secret with</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Do not share this QR code with anyone other than that contact, whom you want to share the secret with</Text>
                             </View>
                         </KeyboardAwareScrollView>
                     </ImageBackground>

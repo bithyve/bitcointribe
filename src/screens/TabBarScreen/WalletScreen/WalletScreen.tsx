@@ -295,7 +295,7 @@ export default class WalletScreen extends React.Component {
         shiledIconPer: 3,
         arr_CustShiledIcon: [
           {
-            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
+            "title": "The wallet backup is not secured. Please visit the health section to improve the health of your backup",
             "image": "sheild_3",
             "imageHeight": this.animatedShieldIconSize,
             "imageWidth": this.animatedShieldIconSize,
@@ -308,8 +308,8 @@ export default class WalletScreen extends React.Component {
         shiledIconPer: 4,
         arr_CustShiledIcon: [
           {
-            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
-            "image": "sheild_3",
+            "title": "The wallet backup is not secured. Please visit the health section to improve the health of your backup",
+            "image": "sheild_4",
             "imageHeight": this.animatedShieldIconSize,
             "imageWidth": this.animatedShieldIconSize,
           }
@@ -321,7 +321,7 @@ export default class WalletScreen extends React.Component {
         shiledIconPer: 5,
         arr_CustShiledIcon: [
           {
-            "title": "Your wallet is not secure, some Information about backup comes here. Click on the icon to backup",
+            "title": "Great!! The wallet backup is secure. Keep an eye on the health of the backup here",
             "image": "sheild_5",
             "imageHeight": this.animatedShieldIconSize,
             "imageWidth": this.animatedShieldIconSize,

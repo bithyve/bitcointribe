@@ -43,7 +43,7 @@ export default class ModelBackupAssociateOpenContactList extends Component<Props
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Some information about the importance secret keeping</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Some information</Text>
                             <Avatar medium rounded title={ walletName.charAt( 0 ) } />
                             <Text style={ globalStyle.ffFiraSansMedium }>{ walletName }</Text>
                         </View>

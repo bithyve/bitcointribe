@@ -223,7 +223,7 @@ export default class OTPScreen extends Component {
                             >
                                 <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Accept Secret via OTP</Text>
                             </Button>
-                            <Text note style={ { textAlign: "center", marginTop: 10, marginRight: 10 } }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
+                            <Text note style={ { textAlign: "center", marginTop: 10, marginRight: 10 } }>Please enter the six digit OTP the owner of secret shared with you</Text>
                         </View>
                         <View style={ styles.viewPasscode }>
                             <Text
