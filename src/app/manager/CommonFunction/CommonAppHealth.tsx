@@ -64,6 +64,7 @@ const checkHealthAllShare = async ( share: any ) => {
         localDB.tableName.tblWallet,
         res
     );
+    console.log( { res } );
     if ( resupdateWalletDetials ) {
         let temp = [];
         for ( let i = 0; i < res.sharesInfo.length; i++ ) {

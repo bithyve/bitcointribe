@@ -51,6 +51,9 @@ interface Props {
 
 }
 
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+
 export default class RestoreAndReoverWalletScreen extends Component<Props, any> {
     constructor ( props: any ) {
         super( props );
@@ -68,6 +71,8 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
             }
         );
     }
+
+
 
     componentWillUnmount() {
         this.willFocusSubscription.remove();
@@ -95,12 +100,30 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
     click_Card( item: any ) {
         if ( item == "Set up as a New Wallet" ) {
             this.props.navigation.push( "WalletSetupScreens" );
-        } else if ( item == "Restore wallet using mnemonic" ) {
-            this.props.navigation.push( "RestoreWalletUsingMnemonicNavigator" )
         } else if ( item == "Restore wallet using trusted source" ) {
+            this.createSSSDetailsTableStructure();
+        } else if ( item == "Continue restoring wallet using trusted source" ) {
             this.props.navigation.push( "RestoreWalletUsingTrustedContactNavigator" );
         }
         else {
+            this.props.navigation.push( "RestoreWalletUsingMnemonicNavigator" )
+        }
+    }
+
+    createSSSDetailsTableStructure = async () => {
+        const dateTime = Date.now();
+        let keeperInfo = [ { info: null }, { info: null }, { info: null }, { info: null }, { info: null } ];
+        let encryptedMetaShare = [ { metaShare: null }, { metaShare: null }, { metaShare: null }, { metaShare: null }, { metaShare: null } ]
+        let arrTypes = [ { type: "Trusted Contacts 1" }, { type: "Trusted Contacts 2" }, { type: "Self Share 1" }, { type: "Self Share 2" }, { type: "Self Share 3" } ];
+        let temp = [ { date: dateTime, share: null, shareId: null, keeperInfo: keeperInfo, encryptedMetaShare: encryptedMetaShare, type: arrTypes } ]
+        console.log( { temp } );
+        let resInsertSSSShare = await dbOpration.insertSSSShareDetails(
+            localDB.tableName.tblSSSDetails,
+            temp
+        );
+        console.log( { resInsertSSSShare } );
+        if ( resInsertSSSShare ) {
+            await comFunDBRead.readTblSSSDetails();
             this.props.navigation.push( "RestoreWalletUsingTrustedContactNavigator" );
         }
     }

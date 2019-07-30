@@ -176,9 +176,7 @@ export default class OTPScreen extends Component {
         let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownShare.encryptedMetaShare, resDecryptViaOTP.decryptedData );
         console.log( { resDecryptEncMetaShare } );
         if ( resDecryptEncMetaShare.status == 200 ) {
-
             console.log( { resDecryptEncMetaShare } );
-
             const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSSSRetoreDecryptedShare(
                 localDB.tableName.tblSSSDetails,
                 resDecryptEncMetaShare.data.decryptedMetaShare,

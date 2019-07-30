@@ -135,151 +135,154 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
 
     //TODO: get bal and insert accound into local db
     click_Next = async () => {
-        this.setState( {
-            flag_Loading: true
-        } );
-        let Question = this.state.firstQuestion;
-        let Answer = this.state.firstAnswer
-        const dateTime = Date.now();
-        let walletDetail = await utils.getWalletDetails();
-        let sssDetails = await utils.getSSSDetails();
-        console.log( { sssDetails } );
-        let decryptedShare = [];
-        let arr_TableId = [];
-        let walletName, encryptedStaticNonPMDD;
-        for ( let i = 0; i < sssDetails.length; i++ ) {
-            let data = sssDetails[ i ];
-            if ( data.decryptedShare != "" ) {
-                let decryptedShareJson = JSON.parse( data.decryptedShare );
-                console.log( { decryptedShareJson } );
-                decryptedShare.push( decryptedShareJson.encryptedShare );
-                walletName = decryptedShareJson.meta.tag;
-                encryptedStaticNonPMDD = decryptedShareJson.encryptedStaticNonPMDD;
-            }
-            arr_TableId.push( data.id );
-        }
-        console.log( { decryptedShare, Answer } );
-        //check wallet id and index number
-        var resMnemonic = await S3Service.recoverFromShares( decryptedShare, Answer );
-        console.log( { resMnemonic } );
-        if ( resMnemonic.status == 200 ) {
-            resMnemonic = resMnemonic.data;
-            const regularAccount = new RegularAccount(
-                resMnemonic.mnemonic
-            );
-            var secureAccount;
-            const sss = new S3Service( resMnemonic.mnemonic );
-            await bitcoinClassState.setS3ServiceClassState( sss );
-            console.log( { encryptedStaticNonPMDD } );
-            const shareIds = [];
-            const shareSelfShareIds = [];
-            for ( let i = 0; i < sssDetails.length; i++ ) {
-                let data = sssDetails[ i ];
-                // console.log( { data } );
-                if ( data.decryptedShare != "" ) {
-                    let decryptedShareJson = JSON.parse( data.decryptedShare );
-                    if ( data.type == "Trusted Contacts 1" || data.type == "Trusted Contacts 2" || data.type == "Self Share 1" ) {
-                        let shareId = sss.getShareId( decryptedShareJson.encryptedShare );
-                        shareIds.push( { share: shareId.data.shareId, id: data.id } )
-                    } else {
-                        let shareId = sss.getShareId( decryptedShareJson.encryptedShare );
-                        shareSelfShareIds.push( { share: shareId.data.shareId, id: data.id } )
-                    }
-                }
-            }
-            console.log( { shareIds } );
-            const resCheackHealth = await comAppHealth.checkHealthRestoreWalletTrustedContact( shareIds, shareSelfShareIds, dateTime );
-            if ( resCheackHealth != "" ) {
-                let queTemp = [];
-                let questionData = {};
-                questionData.Question = Question;
-                questionData.Answer = Answer;
-                queTemp.push( questionData );
-                await dbOpration.insertWallet(
-                    localDB.tableName.tblWallet,
-                    dateTime,
-                    resMnemonic.mnemonic,
-                    "",
-                    "",
-                    "",
-                    walletName,
-                    "restore wallet using trusted contact",
-                    "share",
-                    queTemp,
-                    resCheackHealth
-                );
-                var getBal = await regularAccount.getBalance();
-                console.log( { getBal } );
-                if ( getBal.status == 200 ) {
-                    getBal = getBal.data;
-                } else {
-                    alert.simpleOk( "Oops", getBal.err );
-                }
-                var resDecryptStaticNonPMDD = await sss.decryptStaticNonPMDD( encryptedStaticNonPMDD );
-                console.log( { resDecryptStaticNonPMDD } );
-                if ( resDecryptStaticNonPMDD.status == 200 ) {
-                    resDecryptStaticNonPMDD = resDecryptStaticNonPMDD.data.decryptedStaticNonPMDD;
-                    secureAccount = new SecureAccount( resMnemonic.mnemonic );
-                    var resImportSecureAccount = await secureAccount.importSecureAccount( resDecryptStaticNonPMDD.secondaryXpub, resDecryptStaticNonPMDD.bhXpub );
-                    console.log( { resImportSecureAccount } );
-                    if ( resImportSecureAccount.status == 200 ) {
-                        resImportSecureAccount = resImportSecureAccount.data;
-                        var getBalSecure = await secureAccount.getBalance();
-                        console.log( { getBalSecure } );
-                        if ( getBalSecure.status == 200 ) {
-                            getBalSecure = getBalSecure.data;
-                        } else {
-                            alert.simpleOk( "Oops", getBalSecure.err );
-                        }
-                        let resInsertDailyAccount = await dbOpration.insertCreateAccount(
-                            localDB.tableName.tblAccount,
-                            dateTime,
-                            "",
-                            ( getBal.balance + getBal.unconfirmedBalance ) / 1e8,
-                            "BTC",
-                            "Daily Wallet",
-                            "Daily Wallet",
-                            ""
-                        );
-                        let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
-                            localDB.tableName.tblAccount,
-                            dateTime,
-                            "",
-                            ( getBalSecure.balance + getBalSecure.unconfirmedBalance ) / 1e8,
-                            "BTC",
-                            "Secure Account",
-                            "Secure Account",
-                            ""
-                        );
-                        if ( resInsertDailyAccount && resInsertSecureCreateAcc ) {
-                            await bitcoinClassState.setRegularClassState( regularAccount );
-                            await bitcoinClassState.setSecureClassState( secureAccount );
-                            await bitcoinClassState.setS3ServiceClassState( sss );
-                            await comFunDBRead.readTblSSSDetails();
-                            await comFunDBRead.readTblAccount();
-                            this.setState( {
-                                flag_Loading: false
-                            } );
-                            setTimeout( () => {
-                                let data = {};
-                                data.walletName = walletName;
-                                data.balR = ( getBal.balance + getBal.unconfirmedBalance ) / 1e8;
-                                data.balS = ( getBalSecure.balance + getBalSecure.unconfirmedBalance ) / 1e8;
-                                this.props.click_Next( data );
-                                AsyncStorage.setItem(
-                                    asyncStorageKeys.rootViewController,
-                                    "TabbarBottom"
-                                );
-                            }, 1000 );
-                        }
-                    }
-                } else {
-                    alert.simpleOk( "Oops", resImportSecureAccount.err );
-                }
-            }
-        } else {
-            alert.simpleOk( "Oops", resMnemonic.err );
-        }
+        alert.simpleOk( "Oops", "Working" );
+
+
+        // this.setState( {
+        //     flag_Loading: true
+        // } );
+        // let Question = this.state.firstQuestion;
+        // let Answer = this.state.firstAnswer;
+        // const dateTime = Date.now();
+        // let walletDetail = await utils.getWalletDetails();
+        // let sssDetails = await utils.getSSSDetails();
+        // console.log( { sssDetails } );
+        // let decryptedShare = [];
+        // let arr_TableId = [];
+        // let walletName, encryptedStaticNonPMDD;
+        // for ( let i = 0; i < sssDetails.length; i++ ) {
+        //     let data = sssDetails[ i ];
+        //     if ( data.decryptedShare != "" ) {
+        //         let decryptedShareJson = JSON.parse( data.decryptedShare );
+        //         console.log( { decryptedShareJson } );
+        //         decryptedShare.push( decryptedShareJson.encryptedShare );
+        //         walletName = decryptedShareJson.meta.tag;
+        //         encryptedStaticNonPMDD = decryptedShareJson.encryptedStaticNonPMDD;
+        //     }
+        //     arr_TableId.push( data.id );
+        // }
+        // console.log( { decryptedShare, Answer } );
+        // //check wallet id and index number
+        // var resMnemonic = await S3Service.recoverFromShares( decryptedShare, Answer );
+        // console.log( { resMnemonic } );
+        // if ( resMnemonic.status == 200 ) {
+        //     resMnemonic = resMnemonic.data;
+        //     const regularAccount = new RegularAccount(
+        //         resMnemonic.mnemonic
+        //     );
+        //     var secureAccount;
+        //     const sss = new S3Service( resMnemonic.mnemonic );
+        //     await bitcoinClassState.setS3ServiceClassState( sss );
+        //     console.log( { encryptedStaticNonPMDD } );
+        //     const shareIds = [];
+        //     const shareSelfShareIds = [];
+        //     for ( let i = 0; i < sssDetails.length; i++ ) {
+        //         let data = sssDetails[ i ];
+        //         // console.log( { data } );   
+        //         if ( data.decryptedShare != "" ) {
+        //             let decryptedShareJson = JSON.parse( data.decryptedShare );
+        //             if ( data.type == "Trusted Contacts 1" || data.type == "Trusted Contacts 2" || data.type == "Self Share 1" ) {
+        //                 let shareId = sss.getShareId( decryptedShareJson.encryptedShare );
+        //                 shareIds.push( { share: shareId.data.shareId, id: data.id } )
+        //             } else {
+        //                 let shareId = sss.getShareId( decryptedShareJson.encryptedShare );
+        //                 shareSelfShareIds.push( { share: shareId.data.shareId, id: data.id } )
+        //             }
+        //         }
+        //     }
+        //     console.log( { shareIds } );
+        //     const resCheackHealth = await comAppHealth.checkHealthRestoreWalletTrustedContact( shareIds, shareSelfShareIds, dateTime );
+        //     if ( resCheackHealth != "" ) {
+        //         let queTemp = [];
+        //         let questionData = {};
+        //         questionData.Question = Question;
+        //         questionData.Answer = Answer;
+        //         queTemp.push( questionData );
+        //         let arrBackupInfo = [ { backupType: "restore wallet using trusted contact" }, { backupMethod: "share" } ];
+        //         await dbOpration.insertWallet(
+        //             localDB.tableName.tblWallet,
+        //             dateTime,
+        //             resMnemonic.mnemonic,
+        //             "",
+        //             "",
+        //             "",
+        //             walletName,
+        //             arrBackupInfo,
+        //             queTemp,
+        //             resCheackHealth
+        //         );
+        //         var getBal = await regularAccount.getBalance();
+        //         console.log( { getBal } );
+        //         if ( getBal.status == 200 ) {
+        //             getBal = getBal.data;
+        //         } else {
+        //             alert.simpleOk( "Oops", getBal.err );
+        //         }
+        //         var resDecryptStaticNonPMDD = await sss.decryptStaticNonPMDD( encryptedStaticNonPMDD );
+        //         console.log( { resDecryptStaticNonPMDD } );
+        //         if ( resDecryptStaticNonPMDD.status == 200 ) {
+        //             resDecryptStaticNonPMDD = resDecryptStaticNonPMDD.data.decryptedStaticNonPMDD;
+        //             secureAccount = new SecureAccount( resMnemonic.mnemonic );
+        //             var resImportSecureAccount = await secureAccount.importSecureAccount( resDecryptStaticNonPMDD.secondaryXpub, resDecryptStaticNonPMDD.bhXpub );
+        //             console.log( { resImportSecureAccount } );
+        //             if ( resImportSecureAccount.status == 200 ) {
+        //                 resImportSecureAccount = resImportSecureAccount.data;
+        //                 var getBalSecure = await secureAccount.getBalance();
+        //                 console.log( { getBalSecure } );
+        //                 if ( getBalSecure.status == 200 ) {
+        //                     getBalSecure = getBalSecure.data;
+        //                 } else {
+        //                     alert.simpleOk( "Oops", getBalSecure.err );
+        //                 }
+        //                 let resInsertDailyAccount = await dbOpration.insertCreateAccount(
+        //                     localDB.tableName.tblAccount,
+        //                     dateTime,
+        //                     "",
+        //                     ( getBal.balance + getBal.unconfirmedBalance ) / 1e8,
+        //                     "BTC",
+        //                     "Daily Wallet",
+        //                     "Daily Wallet",
+        //                     ""
+        //                 );
+        //                 let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+        //                     localDB.tableName.tblAccount,
+        //                     dateTime,
+        //                     "",
+        //                     ( getBalSecure.balance + getBalSecure.unconfirmedBalance ) / 1e8,
+        //                     "BTC",
+        //                     "Secure Account",
+        //                     "Secure Account",
+        //                     ""
+        //                 );
+        //                 if ( resInsertDailyAccount && resInsertSecureCreateAcc ) {
+        //                     await bitcoinClassState.setRegularClassState( regularAccount );
+        //                     await bitcoinClassState.setSecureClassState( secureAccount );
+        //                     await bitcoinClassState.setS3ServiceClassState( sss );
+        //                     await comFunDBRead.readTblSSSDetails();
+        //                     await comFunDBRead.readTblAccount();
+        //                     this.setState( {
+        //                         flag_Loading: false
+        //                     } );
+        //                     setTimeout( () => {
+        //                         let data = {};
+        //                         data.walletName = walletName;
+        //                         data.balR = ( getBal.balance + getBal.unconfirmedBalance ) / 1e8;
+        //                         data.balS = ( getBalSecure.balance + getBalSecure.unconfirmedBalance ) / 1e8;
+        //                         this.props.click_Next( data );
+        //                         AsyncStorage.setItem(
+        //                             asyncStorageKeys.rootViewController,
+        //                             "TabbarBottom"
+        //                         );
+        //                     }, 1000 );
+        //                 }
+        //             }
+        //         } else {
+        //             alert.simpleOk( "Oops", resImportSecureAccount.err );
+        //         }
+        //     }    
+        // } else {
+        //     alert.simpleOk( "Oops", resMnemonic.err );
+        // }
     }
 
 

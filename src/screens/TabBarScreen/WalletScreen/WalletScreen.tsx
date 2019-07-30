@@ -50,6 +50,8 @@ import ModelBackupAssociateOpenContactList from "HexaWallet/src/app/custcomponte
 import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
 import ModelSelfShareAcceptAndReject from "HexaWallet/src/app/custcompontes/Model/ModelWalletScreen/ModelSelfShareAcceptAndReject";
 
+//TODO: Custome View
+import ViewErrorMessage from "HexaWallet/src/app/custcompontes/View/ViewErrorMessage/ViewErrorMessage";
 
 //TODO: Custome Alert 
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
@@ -102,6 +104,7 @@ import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 
 
+
 //TODO: Common Funciton
 var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 
@@ -124,6 +127,8 @@ export default class WalletScreen extends React.Component {
       arr_ModelAcceptOrRejectSecret: [],
       arr_ModelBackupYourWallet: [],
       arr_ModelSelfShareAcceptAndReject: [],
+      //Error Message
+      arrErrorMessage: [],
       //DeepLinking Param   
       deepLinkingUrl: "",
       deepLinkingUrlType: "",
@@ -163,7 +168,7 @@ export default class WalletScreen extends React.Component {
     this.willFocusSubscription = this.props.navigation.addListener(
       "willFocus",
       () => {
-        isNetwork = utils.getNetwork();
+
         this.connnection_FetchData();
         this.getDeepLinkingData();
       }
@@ -221,20 +226,31 @@ export default class WalletScreen extends React.Component {
     await utils.setFlagQRCodeScreen( true );
     var resultWallet = await await comFunDBRead.readTblWallet();
     console.log( { resultWallet } );
-    var resAccount = await comFunDBRead.readTblAccount();
+    let backupInfo = JSON.parse( resultWallet.backupInfo );
     let resSSSDetails = await comFunDBRead.readTblSSSDetails();
-    if ( resSSSDetails.length == 0 && countFileCreate == 0 ) {
+    isNetwork = utils.getNetwork();
+    if ( resSSSDetails.length == 0 && backupInfo[ 0 ].backupType == "new wallet" && countFileCreate == 0 ) {
       if ( isNetwork ) {
         countFileCreate++;
         this.createPdfFile();
       } else {
-        alert.simpleOk( "Oops", "Offline. Some features may not work" );
+        this.setState( {
+          arrErrorMessage: [ {
+            type: "offline",
+            data: [ {
+              message: "Offline. Some features may not work",
+              bgColor: "#262A2E",
+              color: "#ffffff",
+            } ]
+          } ]
+        } )
       }
     } else {
       this.setState( {
         flag_PdfFileCreate: true
       } )
     }
+    var resAccount = await comFunDBRead.readTblAccount();
     console.log( { resSSSDetails } );
     let temp = [];
     for ( let i = 0; i < resAccount.length; i++ ) {
@@ -584,7 +600,8 @@ export default class WalletScreen extends React.Component {
   }
 
 
-  //async task
+  //async task    
+
   createPdfFile = async () => {
     const dateTime = Date.now();
     let walletDetails = await utils.getWalletDetails();
@@ -612,8 +629,9 @@ export default class WalletScreen extends React.Component {
     } else {
       alert.simpleOk( "Oops", getSecoundMnemonic.err );
     }
-    //Get Shares    
-    const generateShareRes = await sss.generateShares( walletDetails.walletType );
+
+    //Get Shares         
+    const generateShareRes = await sss.generateShares( setUpWalletAnswerDetails[ 0 ].Answer );
     console.log( { generateShareRes } );
     if ( generateShareRes.status == 200 ) {
       const { encryptedShares } = generateShareRes.data;
@@ -656,7 +674,7 @@ export default class WalletScreen extends React.Component {
               if ( qrcode4share.status == 200 ) {
                 qrcode4share = qrcode4share.data.qrData
                 // console.log( { qrcode4share } );
-                //creating 4th share pdf
+                //creating 4th share pdf   
                 let temp = [];
                 temp.push( { arrQRCodeData: qrcode4share, secondaryXpub: secondaryXpub, qrData: resSetupSecureAccount.setupData.qrData, secret: resSetupSecureAccount.setupData.secret, secondaryMnemonic: getSecoundMnemonic, bhXpub: resSetupSecureAccount.setupData.bhXpub } )
                 let resGenerate4thsharepdf = await this.generate4thShare( temp, setUpWalletAnswerDetails[ 0 ].Answer );
@@ -677,8 +695,8 @@ export default class WalletScreen extends React.Component {
                       console.log( { resGenerate5thsharepdf } );
                       if ( resGenerate5thsharepdf != "" ) {
                         let keeperInfo = [ { info: null }, { info: null }, { info: rescreateMetaShare2.data }, { info: qrcode4share[ 0 ] }, { info: qrcode5share[ 0 ] } ];
-                        let arrTypes = [ { type: "Trusted Contacts 1" }, { type: "Trusted Contacts 2" }, { type: "Self Share 1" }, { type: "Self Share 2" }, { type: "Self Share 3" } ];
                         let encryptedMetaShare = [ { metaShare: rescreateMetaShare.data.metaShare }, { metaShare: rescreateMetaShare1.data.metaShare }, { metaShare: rescreateMetaShare2.data.metaShare }, { metaShare: resGenerate4thsharepdf }, { metaShare: resGenerate5thsharepdf } ]
+                        let arrTypes = [ { type: "Trusted Contacts 1" }, { type: "Trusted Contacts 2" }, { type: "Self Share 1" }, { type: "Self Share 2" }, { type: "Self Share 3" } ];
                         let temp = [ { date: dateTime, share: encryptedShares, shareId: shareIds, keeperInfo: keeperInfo, encryptedMetaShare: encryptedMetaShare, type: arrTypes } ]
                         console.log( { temp } );
                         let resInsertSSSShare = await dbOpration.insertSSSShareDetails(
@@ -716,6 +734,7 @@ export default class WalletScreen extends React.Component {
       alert.simpleOk( "Oops", generateShareRes.err );
     }
   }
+
 
   base64string1 = ( base64string1: any ) => {
     this.setState( {
@@ -789,6 +808,7 @@ export default class WalletScreen extends React.Component {
       let secondaryXpub = data.secondaryXpub;
       let qrData = data.qrData;
 
+
       //set state value for qrcode
       this.setState( {
         qrcodeImageString1: await this.getCorrectFormatStirng( arrQRCodeData[ 0 ] ),
@@ -802,6 +822,7 @@ export default class WalletScreen extends React.Component {
         qrcodeImageString9: secondaryXpub,
         qrcodeImageString10: qrData,
       } );
+
 
       await this.svg1.toDataURL( this.base64string1 );
       await this.svg2.toDataURL( this.base64string2 );
@@ -1764,11 +1785,11 @@ export default class WalletScreen extends React.Component {
 
   render() {
     //array
-    let { walletDetails, arr_CustShiledIcon, arr_accounts } = this.state;
+    let { walletDetails, arr_CustShiledIcon, arr_accounts, arrErrorMessage } = this.state;
     //model array
     let { arr_ModelAcceptOrRejectSecret, arr_ModelBackupShareAssociateContact, arr_ModelBackupAssociateOpenContactList, arr_ModelBackupYourWallet, arr_ModelSelfShareAcceptAndReject } = this.state;
     //flag
-    let { flag_Loading, flag_refreshing } = this.state;
+    let { flag_Loading, flag_refreshing, flag_PdfFileCreate } = this.state;
     //qrcode string values
     let { qrcodeImageString1, qrcodeImageString2, qrcodeImageString3, qrcodeImageString4, qrcodeImageString5, qrcodeImageString6, qrcodeImageString7, qrcodeImageString8, qrcodeImageString9, qrcodeImageString10 } = this.state;
     return (
@@ -1780,6 +1801,7 @@ export default class WalletScreen extends React.Component {
           <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
           <SafeAreaView style={ styles.container }>
             {/* Top View Animation */ }
+            {/* <ViewErrorMessage data={ arrErrorMessage } /> */ }
             <Animated.View
               style={ {
                 height: this.animatedHeaderHeight,
@@ -1824,7 +1846,6 @@ export default class WalletScreen extends React.Component {
                 } }
               >
                 <ViewShieldIcons data={ arr_CustShiledIcon } click_Image={ () => {
-                  let { flag_PdfFileCreate } = this.state;
                   if ( flag_PdfFileCreate ) {
                     let appHealthStatus = walletDetails.appHealthStatus;
                     if ( appHealthStatus != "" ) {

@@ -66,14 +66,14 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
         this.state = ( {
             arr_TrustedContacts: [ {
                 thumbnailPath: "user",
-                givenName: "Select Contact 1",
+                givenName: "Trusted Contacts 1",
                 familyName: "",
                 statusMsgColor: "#ff0000",
                 statusMsg: "Not confirmed",
                 opt: undefined,
             }, {
                 thumbnailPath: "user",
-                givenName: "Select Contact 2",
+                givenName: "Trusted Contacts 2",
                 familyName: "",
                 statusMsgColor: "#ff0000",
                 statusMsg: "Not confirmed",
@@ -122,7 +122,38 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
         this.willFocusSubscription.remove();
     }
 
+
+    getTrustedContactInfo = async ( sssDetails: any ) => {
+        let keeperInfo = JSON.parse( sssDetails.keeperInfo );
+        console.log( { keeperInfo } );
+        let data = {};
+        data.emailAddresses = keeperInfo.emailAddresses;
+        data.phoneNumbers = keeperInfo.phoneNumbers;
+        data.history = JSON.parse( sssDetails.history );
+        data.recordID = keeperInfo.recordID;
+        data.thumbnailPath = keeperInfo.thumbnailPath
+        data.givenName = keeperInfo.givenName;
+        data.familyName = keeperInfo.familyName;
+        data.sssDetails = sssDetails;
+        let sharedDate = sssDetails.sharedDate;
+        if ( sharedDate == "" && sssDetails.shareStage == "" ) {
+            data.statusMsg = "Not Confirmed";
+            data.statusMsgColor = "#ff0000";
+        } else if ( sharedDate != "" && sssDetails.shareStage == "" ) {
+            data.statusMsg = "Shared";
+            data.statusMsgColor = "#C07710";
+        } else {
+            counterConfirm = counterConfirm + 1;
+            data.statusMsg = "Confirmed";
+            data.statusMsgColor = "#008000";
+        }
+        console.log( { data } );
+
+        return [ data ];
+    }
+
     loaddata = async () => {
+
         this.setState( {
             flag_Loading: true
         } )
@@ -136,48 +167,28 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
         //flag   
         let flag_isSetupTrustedContact, flag_isSecretQuestions;
         //array  
-
         let history = [];
         let tempOpt = [];
         let temp = [];
         //Trusted Contacts
+
         if ( sssDetails.length > 0 ) {
             let { arr_TrustedContacts, arr_SelfShare } = this.state;
             var len = sssDetails.length;
             for ( let i = 0; i < len; i++ ) {
-
                 //Trusted Contacts
-                if ( sssDetails[ i ].type === 'Trusted Contacts 1' || sssDetails[ i ].type === 'Trusted Contacts 2' ) {
-                    let keeperInfo = JSON.parse( sssDetails[ i ].keeperInfo );
-                    let data = {};
-                    data.emailAddresses = keeperInfo.emailAddresses;
-                    data.phoneNumbers = keeperInfo.phoneNumbers;
-                    data.history = JSON.parse( sssDetails[ i ].history );
-                    data.recordID = keeperInfo.recordID;
-                    data.thumbnailPath = keeperInfo.thumbnailPath
-                    data.givenName = keeperInfo.givenName;
-                    data.familyName = keeperInfo.familyName;
-                    data.sssDetails = sssDetails[ i ];
-                    let sharedDate = sssDetails[ i ].sharedDate;
-                    if ( sharedDate == "" && sssDetails[ i ].shareStage == "" ) {
-                        data.statusMsg = "Not Confirmed";
-                        data.statusMsgColor = "#ff0000";
-                    } else if ( sharedDate != "" && sssDetails[ i ].shareStage == "" ) {
-                        data.statusMsg = "Shared";
-                        data.statusMsgColor = "#C07710";
-                    } else {
-                        counterConfirm = counterConfirm + 1;
-                        data.statusMsg = "Confirmed";
-                        data.statusMsgColor = "#008000";
-                    }
-                    if ( sssDetails[ i ].type === 'Trusted Contacts 1' ) {
-                        arr_TrustedContacts[ 0 ] = data;
-                    } else {
-                        arr_TrustedContacts[ 1 ] = data;
-                    }
+                if ( sssDetails[ i ].type === 'Trusted Contacts 1' && sssDetails[ i ].keeperInfo != "" ) {
+                    let data = await this.getTrustedContactInfo( sssDetails[ i ] );
+                    arr_TrustedContacts[ 0 ] = data[ 0 ];
+
                 }
+                else if ( sssDetails[ i ].type === 'Trusted Contacts 2' && sssDetails[ i ].keeperInfo != "" ) {
+                    let data = await this.getTrustedContactInfo( sssDetails[ i ] );
+                    arr_TrustedContacts[ 1 ] = data[ 0 ];
+                }
+
                 //Self Share  
-                else if ( sssDetails[ i ].type === 'Self Share 1' ) {
+                else if ( sssDetails[ i ].type === 'Self Share 1' && sssDetails[ i ].decryptedShare != "" ) {
                     let sharedDate = sssDetails[ i ].sharedDate;
                     let shareStage = sssDetails[ i ].shareStage;
                     let statusMsg = this.getMsgAndColor( sharedDate, shareStage )[ 0 ];
@@ -194,7 +205,7 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                     data.sssDetails = sssDetails[ i ];
                     arr_SelfShare[ 0 ] = data;
                 }
-                else if ( sssDetails[ i ].type === 'Self Share 2' ) {
+                else if ( sssDetails[ i ].type === 'Self Share 2' && sssDetails[ i ].decryptedShare != "" ) {
                     let sharedDate = sssDetails[ i ].sharedDate;
                     let shareStage = sssDetails[ i ].shareStage;
                     let statusMsg = this.getMsgAndColor( sharedDate, shareStage )[ 0 ];
@@ -229,12 +240,8 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                     arr_SelfShare[ 2 ] = data;
                 }
                 flag_Loading = false
-
                 //Next Button Enable or Didable
-
                 console.log( { counterConfirm } );
-
-
                 let flag_DisableBtnNext = true;
                 if ( counterConfirm >= 3 ) {
                     flag_DisableBtnNext = false
@@ -267,12 +274,11 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
 
     //TODO: func click_Item
     click_AssociateContactItem = ( item: any ) => {
-        if ( item.givenName == "Select Contact 1" || item.givenName == "Select Contact 2" ) {
-            this.props.navigation.push( "RestoreAllContactListScreen" );
+        if ( item.givenName == "Trusted Contacts 1" || item.givenName == "Trusted Contacts 2" ) {
+            this.props.navigation.push( "RestoreAllContactListScreen", { data: item.givenName } );
         } else {
             this.props.navigation.push( "RestoreTrustedContactsShareScreen", { data: item, title: item.givenName + " Share" } )
         }
-
     }
 
     //TODO: func click_FirstMenuItem
@@ -420,29 +426,7 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                                                             <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                             <View style={ { flexDirection: "row" } }>
                                                                 <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
-                                                                { renderIf( typeof item.opt !== "undefined" )(
-                                                                    <TimerCountdown
-                                                                        initialMilliseconds={ item.totalSec * 1000 }
-                                                                        onExpire={ () => this.loaddata() }
-                                                                        formatMilliseconds={ ( milliseconds ) => {
-                                                                            const remainingSec = Math.round( milliseconds / 1000 );
-                                                                            const seconds = parseInt( ( remainingSec % 60 ).toString(), 10 );
-                                                                            const minutes = parseInt( ( ( remainingSec / 60 ) % 60 ).toString(), 10 );
-                                                                            const hours = parseInt( ( remainingSec / 3600 ).toString(), 10 );
-                                                                            const s = seconds < 10 ? '0' + seconds : seconds;
-                                                                            const m = minutes < 10 ? '0' + minutes : minutes;
-                                                                            let h = hours < 10 ? '0' + hours : hours;
-                                                                            h = h === '00' ? '' : h + ':';
-                                                                            return h + m + ':' + s;
-                                                                        } }
-                                                                        allowFontScaling={ true }
-                                                                        style={ { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } }
-                                                                    />
-                                                                ) }
                                                             </View>
-                                                            { renderIf( typeof item.opt !== "undefined" )(
-                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>OTP { " " }{ item.opt }</Text>
-                                                            ) }
                                                         </View>
                                                         <View style={ {
                                                             flex: 1,

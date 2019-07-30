@@ -104,7 +104,10 @@ export default class Restore4And5SelfShareQRCodeScreen1 extends React.Component<
             result = result.split( "Comma" ).join( ',' );
             result = result.split( "Space" ).join( ' ' );
             let type = this.props.type;
+            console.log( { type } );
+
             var firstChar = result.slice( 0, 3 );
+            console.log( { firstChar } );
             if ( type == "iCloud" ) {
                 if ( firstChar == "c01" ) {
                     if ( flag_ReadQRCode ) {

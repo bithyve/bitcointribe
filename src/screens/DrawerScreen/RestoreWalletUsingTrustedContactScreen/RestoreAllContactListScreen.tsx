@@ -173,7 +173,7 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
         console.log( { lenght: sssDetails.length } );
         if ( selectedContactList.length == 2 ) {
             arrTypes = [ { type: "Trusted Contacts 1" }, { type: "Trusted Contacts 2" } ];
-            let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactKeepInfo(
+            let resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactKeepInfo(
                 localDB.tableName.tblSSSDetails,
                 dateTime,
                 selectedContactList,
@@ -186,19 +186,10 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
                 alert.simpleOk( "Oops", "Trusted Contact not insert databse." );
             }
         } else {
-            let type;
-            let flag_CheckShare = arr_Account.some( ( item: any ) => item.type === 'Trusted Contacts 1' );
-            console.log( { flag_CheckShare } );
-
-            if ( flag_CheckShare ) {
-                type = "Trusted Contacts 2";
-            } else {
-                type = "Trusted Contacts 1";
-            }
-            console.log( { type } );
-
-            arrTypes = [ { type } ];
-            let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactKeepInfo(
+            let data = this.props.navigation.getParam( "data" );
+            console.log( { data } );
+            arrTypes = [ { type: data } ];
+            let resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactKeepInfo(
                 localDB.tableName.tblSSSDetails,
                 dateTime,
                 selectedContactList,
@@ -212,7 +203,6 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
             }
         }
     }
-
 
     render() {
         return (

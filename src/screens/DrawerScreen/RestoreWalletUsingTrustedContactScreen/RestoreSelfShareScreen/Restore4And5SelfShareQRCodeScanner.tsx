@@ -96,6 +96,8 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
     componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
         let type = this.props.navigation.getParam( "type" );
+        console.log( { data, type } );
+
         this.setState( {
             data, type
         } )
@@ -112,8 +114,6 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
     }
 
     click_Confirm = async ( type: string, data: any ) => {
-        console.log( { type, data } );
-
         const dateTime = Date.now();
         let arr_Shares = this.state.arr_Shares;
         arr_Shares.push.apply( arr_Shares, data );
@@ -122,11 +122,12 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
         if ( resRecoverMetaShareFromQR.status == 200 ) {
             resRecoverMetaShareFromQR = resRecoverMetaShareFromQR.data;
             console.log( { resRecoverMetaShareFromQR } );
-            let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactSelfShare(
+            let resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactSelfShare(
                 localDB.tableName.tblSSSDetails,
                 dateTime,
                 resRecoverMetaShareFromQR.metaShare,
-                type
+                type,
+                "Good"
             );
             console.log( { resInsertContactList } );
             if ( resInsertContactList ) {
@@ -137,9 +138,6 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
         } else {
             alert.simpleOk( "Oops", resRecoverMetaShareFromQR.err );
         }
-
-
-
     }
 
     render() {

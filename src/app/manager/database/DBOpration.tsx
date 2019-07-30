@@ -53,8 +53,7 @@ const readTablesData = ( tableName: any ) => {
               data.lastUpdated = utils.decrypt( data.lastUpdated, passcode );
               data.publicKey = utils.decrypt( data.publicKey, passcode );
               data.walletType = utils.decrypt( data.walletType, passcode );
-              data.backupType = utils.decrypt( data.backupType, passcode );
-              data.backupType = utils.decrypt( data.backupType, passcode );
+              data.backupInfo = utils.decrypt( data.backupInfo, passcode );
               data.appHealthStatus = utils.decrypt( data.appHealthStatus, passcode );
               data.setUpWalletAnswerDetails = utils.decrypt( data.setUpWalletAnswerDetails, passcode );
               temp.push( data );
@@ -413,8 +412,7 @@ const insertWallet = (
   address: string,
   publicKey: string,
   walletType: string,
-  backupMethod: string,
-  backupType: string,
+  backupInfo: string,
   setUpWalletAnswerDetails: any,
   appHealthStatus: any
 ) => {
@@ -428,7 +426,7 @@ const insertWallet = (
       txn.executeSql(
         "INSERT INTO " +
         tblName +
-        " (dateCreated,mnemonic,privateKey,address,publicKey,walletType,setUpWalletAnswerDetails,appHealthStatus,backupType,backupMethod,lastUpdated) VALUES (:dateCreated,:mnemonic,:privateKey,:address,:publicKey,:walletType,:setUpWalletAnswerDetails,:appHealthStatus,:backupType,:backupMethod,:lastUpdated)",
+        " (dateCreated,mnemonic,privateKey,address,publicKey,walletType,setUpWalletAnswerDetails,appHealthStatus,backupInfo,lastUpdated) VALUES (:dateCreated,:mnemonic,:privateKey,:address,:publicKey,:walletType,:setUpWalletAnswerDetails,:appHealthStatus,:backupInfo,:lastUpdated)",
         [
           utils.encrypt( fulldate.toString(), passcode ),
           utils.encrypt( mnemonicValue.toString(), passcode ),
@@ -438,8 +436,7 @@ const insertWallet = (
           utils.encrypt( walletType.toString(), passcode ),
           utils.encrypt( JSON.stringify( setUpWalletAnswerDetails ).toString(), passcode ),
           utils.encrypt( JSON.stringify( appHealthStatus ).toString(), passcode ),
-          utils.encrypt( backupType.toString(), passcode ),
-          utils.encrypt( backupMethod.toString(), passcode ),
+          utils.encrypt( JSON.stringify( backupInfo ).toString(), passcode ),
           utils.encrypt( fulldate.toString(), passcode )
         ]
       );
@@ -922,35 +919,40 @@ const insertSSSShareDetails = (
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
     temp = temp[ 0 ];
-    console.log( { temp } );
     let histroy = [];
     let data = {};
     data.title = "Secret Created.";
     data.date = utils.getUnixToDateFormat2();;
     histroy.push( data );
     db.transaction( function ( txn: any ) {
-      for ( let i = 0; i < temp.share.length; i++ ) {
+      for ( let i = 0; i < temp.type.length; i++ ) {
+        console.log( { lenght: temp.type.length } );
+        console.log( { temp } );
         // console.log( { len: temp.share.length, i: i } );
         // console.log( { date: temp.date.toString(), share: temp.share[ i ].toString(), keerinfo: JSON.stringify( temp.keeperInfo[ i ].info ).toString(), history: JSON.stringify( histroy ).toString() } );
+        let share = temp.share != null ? temp.share[ i ].toString() : "";
+        let shareId = temp.shareId != null ? temp.shareId[ i ].data.shareId.toString() : "";
+        let keeperInfo = temp.keeperInfo[ i ].info != null ? JSON.stringify( temp.keeperInfo[ i ].info ).toString() : "";
+        let metaShare = temp.encryptedMetaShare[ i ].metaShare != null ? JSON.stringify( temp.encryptedMetaShare[ i ].metaShare ).toString() : "";
         txn.executeSql(
           "INSERT INTO " +
           tblName +
-          "(dateCreated,share,shareId,keeperInfo,history,decryptedShare,lastSuccessfulCheck,type) VALUES (:dateCreated,:share,:shareId,:keeperInfo,:history,:decryptedShare,:lastSuccessfulCheck,:type)",
+          "(dateCreated,share,shareId,keeperInfo,history,decryptedShare,type,lastSuccessfulCheck) VALUES (:dateCreated,:share,:shareId,:keeperInfo,:history,:decryptedShare,:type,:lastSuccessfulCheck)",
           [
             utils.encrypt(
               temp.date.toString(),
               passcode
             ),
-            utils.encrypt( temp.share[ i ].toString(), passcode ),
-            utils.encrypt( temp.shareId[ i ].data.shareId.toString(), passcode ),
-            utils.encrypt( JSON.stringify( temp.keeperInfo[ i ].info ).toString(), passcode ),
+            utils.encrypt( share, passcode ),
+            utils.encrypt( shareId, passcode ),
+            utils.encrypt( keeperInfo, passcode ),
             utils.encrypt( JSON.stringify( histroy ).toString(), passcode ),
-            utils.encrypt( JSON.stringify( temp.encryptedMetaShare[ i ].metaShare ).toString(), passcode ),
+            utils.encrypt( metaShare, passcode ),
+            utils.encrypt( temp.type[ i ].type.toString(), passcode ),
             utils.encrypt(
               temp.date.toString(),
               passcode
-            ),
-            utils.encrypt( temp.type[ i ].type.toString(), passcode ),
+            )
           ]
         );
       }
@@ -959,7 +961,7 @@ const insertSSSShareDetails = (
   } );
 };
 
-const insertRestoreUsingTrustedContactKeepInfo = (
+const updateRestoreUsingTrustedContactKeepInfo = (
   tblName: string,
   fulldate: string,
   keepInfo: any,
@@ -976,25 +978,36 @@ const insertRestoreUsingTrustedContactKeepInfo = (
       for ( let i = 0; i < keepInfo.length; i++ ) {
         let data = keepInfo[ i ];
         console.log( { data } );
-        txn.executeSql(
-          "INSERT INTO " +
-          tblName +
-          "(dateCreated,keeperInfo,history,recordId,lastSuccessfulCheck,type) VALUES (:dateCreated,:keeperInfo,:history,:recordId,:lastSuccessfulCheck,:type)",
-          [
-            utils.encrypt(
-              fulldate.toString(),
+        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+          var len = results.rows.length;
+          for ( let ii = 0; ii < len; ii++ ) {
+            let dbdecryptType = utils.decrypt(
+              results.rows.item( ii ).type,
               passcode
-            ),
-            utils.encrypt( JSON.stringify( data ).toString(), passcode ),
-            utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
-            utils.encrypt( data.recordID.toString(), passcode ),
-            utils.encrypt(
-              fulldate.toString(),
-              passcode
-            ),
-            utils.encrypt( type[ i ].type.toString(), passcode ),
-          ]
-        );
+            );
+            let encpType = results.rows.item( ii ).type;
+
+            if ( dbdecryptType == type[ i ].type ) {
+
+
+              txn.executeSql(
+                "update " +
+                tblName +
+                " set keeperInfo = :keeperInfo,history =:history,recordId =:recordId,lastSuccessfulCheck =:lastSuccessfulCheck where type = :type",
+                [
+                  utils.encrypt( JSON.stringify( data ).toString(), passcode ),
+                  utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
+                  utils.encrypt( data.recordID.toString(), passcode ),
+                  utils.encrypt(
+                    fulldate.toString(),
+                    passcode
+                  ),
+                  encpType
+                ]
+              );
+            }
+          }
+        } );
       }
       resolve( true );
     } );
@@ -1002,11 +1015,12 @@ const insertRestoreUsingTrustedContactKeepInfo = (
 };
 
 
-const insertRestoreUsingTrustedContactSelfShare = (
+const updateRestoreUsingTrustedContactSelfShare = (
   tblName: string,
   fulldate: string,
   shares: any,
-  type: string
+  type: string,
+  shareStage: string,
 ) => {
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
@@ -1016,36 +1030,44 @@ const insertRestoreUsingTrustedContactSelfShare = (
     jsonData.date = utils.getUnixToDateFormat2();;
     temp.push( jsonData );
     db.transaction( function ( txn ) {
-      txn.executeSql(
-        "INSERT INTO " +
-        tblName +
-        "(dateCreated,decryptedShare,history,lastSuccessfulCheck,type,sharedDate,acceptedDate,shareStage) VALUES (:dateCreated,:decryptedShare,:history,:lastSuccessfulCheck,:type,:sharedDate,:acceptedDate,:shareStage)",
-        [
-          utils.encrypt(
-            fulldate.toString(),
+      txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+        var len = results.rows.length;
+        for ( let ii = 0; ii < len; ii++ ) {
+          let dbdecryptType = utils.decrypt(
+            results.rows.item( ii ).type,
             passcode
-          ),
-          utils.encrypt( JSON.stringify( shares ).toString(), passcode ),
-          utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
-          utils.encrypt(
-            fulldate.toString(),
-            passcode
-          ),
-          utils.encrypt( type.toString(), passcode ),
-          utils.encrypt(
-            fulldate.toString(),
-            passcode
-          ),
-          utils.encrypt(
-            fulldate.toString(),
-            passcode
-          ),
-          utils.encrypt(
-            "Good",
-            passcode
-          ),
-        ]
-      );
+          );
+          let encpType = results.rows.item( ii ).type;
+          if ( dbdecryptType == type ) {
+            txn.executeSql(
+              "update " +
+              tblName +
+              " set decryptedShare = :decryptedShare,history =:history,sharedDate =:sharedDate,acceptedDate=:acceptedDate,shareStage=:shareStage,lastSuccessfulCheck =:lastSuccessfulCheck where type = :type",
+              [
+                utils.encrypt( JSON.stringify( shares ).toString(), passcode ),
+                utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
+                utils.encrypt(
+                  fulldate.toString(),
+                  passcode
+                ),
+                utils.encrypt(
+                  fulldate.toString(),
+                  passcode
+                ),
+                utils.encrypt(
+                  shareStage.toString(),
+                  passcode
+                ),
+                utils.encrypt(
+                  fulldate.toString(),
+                  passcode
+                ),
+                encpType
+              ]
+            );
+          }
+        }
+      } );
       resolve( true );
     } );
   } );
@@ -1666,8 +1688,8 @@ module.exports = {
   //SSS Details
   readSSSTableData,
   insertSSSShareDetails,
-  insertRestoreUsingTrustedContactKeepInfo,
-  insertRestoreUsingTrustedContactSelfShare,
+  updateRestoreUsingTrustedContactKeepInfo,
+  updateRestoreUsingTrustedContactSelfShare,
   updateSSSContactListDetails,
   updateSSSTransferMehtodDetails,
   updateSSSShareStage,

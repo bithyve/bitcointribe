@@ -58,7 +58,7 @@ public class MainApplication extends Application implements ShareApplication, Re
     public boolean getUseDeveloperSupport() {
       return BuildConfig.DEBUG;
     }
-
+   
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(new MainReactPackage(),

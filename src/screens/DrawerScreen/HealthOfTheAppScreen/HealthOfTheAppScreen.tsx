@@ -114,6 +114,9 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 subTitle: "Not Backed up",
                 color: "#ff0000",
             } ],
+            //values
+            backupType: "",
+            backupMethod: "",
             arr_QuestionAndAnswerDetails: [],
             arr_2FactorAuto: [],
             arr_SecureAccountDetials: [],
@@ -226,39 +229,26 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
     }
 
 
-
-    loaddata = async () => {
+    loaddata = async ( backupType: string, backupMethod: string ) => {
         let flag_Loading = true;
         let dateTime = Date.now();
         let walletDetails = await utils.getWalletDetails();
-        let setUpWalletAnswerDetails = walletDetails.setUpWalletAnswerDetails;
-        let backupType;
-        if ( utils.isJson( walletDetails.appHealthStatus ) ) {
-            backupType = JSON.parse( walletDetails.appHealthStatus );
-            backupType = backupType.backupType;
-        } else {
-            backupType = "share";
-        }
-        console.log( { backupType } );
         let sssDetails = await utils.getSSSDetails();
-
-        //array  
+        //array          
         let { arr_TrustedContacts } = this.state;
         let arr_SecretQuestion = [];
-
-        //Trusted Contacts
-        if ( sssDetails[ 0 ].keeperInfo != "null" || sssDetails[ 1 ].keeperInfo != "null" && sssDetails.length > 0 ) {
+        //Trusted Contacts   
+        if ( sssDetails[ 0 ].keeperInfo != "" || sssDetails[ 1 ].keeperInfo != "" && sssDetails.length > 0 ) {
             console.log( { sssDetails } );
             //Trusted Contact Share
-            if ( sssDetails[ 0 ].keeperInfo != "null" ) {
+            if ( sssDetails[ 0 ].keeperInfo != "" ) {
                 console.log( "frist" );
                 arr_TrustedContacts[ 0 ] = this.getTrustedContactArray( sssDetails, 0 );
             }
-            if ( sssDetails[ 1 ].keeperInfo != "null" ) {
+            if ( sssDetails[ 1 ].keeperInfo != "" ) {
                 console.log( "secound" );
                 arr_TrustedContacts[ 1 ] = this.getTrustedContactArray( sssDetails, 1 );
             }
-
             //Self Share     
             let arr_SelfShare = [];
             let arrTitle = [ "", "", "Secondary Device", "Email", "Cloud" ];
@@ -285,9 +275,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             }
             //Secret Question
             arr_SecretQuestion = this.getQuestionDetails( walletDetails )
-
             console.log( { arr_SecretQuestion } );
-
             flag_Loading = false
             this.setState( {
                 flag_Loading,
@@ -300,7 +288,6 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         } else {
             flag_Loading = false
             arr_SecretQuestion = this.getQuestionDetails( walletDetails )
-
             console.log( { notshare: arr_SecretQuestion } );
             this.setState( {
                 flag_Loading,
@@ -317,7 +304,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         if ( sharedDate == "" && acceptDate == "" && shareStage != "Good" ) {
             return [ "Not Shared", "#ff0000" ];
         } else if ( sharedDate != "" && acceptDate == "" && shareStage != "Good" ) {
-            return [ "Share", "#C07710" ];
+            return [ "Shared", "#C07710" ];
         } else {
             return [ "Share Confirmed", "#008000" ];
         }
@@ -359,6 +346,9 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             flag_Loading: true
         } );
         let walletDetails = await utils.getWalletDetails();
+        let backupInfo = JSON.parse( walletDetails.backupInfo );
+        let backupType = backupInfo[ 0 ].backupType;
+        let backupMethod = backupInfo[ 0 ].backupMethod;
         let sssDetails = await utils.getSSSDetails();
         console.log( { walletDetails, sssDetails } );
         let share = {};
@@ -375,7 +365,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         share.qatime = parseInt( walletDetails.lastUpdated );
         let resCheckHealthAllShare = await comAppHealth.checkHealthAllShare( share );
         if ( resCheckHealthAllShare ) {
-            this.loaddata();
+            this.loaddata( backupType, backupMethod );
         } else {
             this.setState( {
                 flag_Loading: false
@@ -448,19 +438,6 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             this.props.navigation.push( "SelfShareSharingScreen", { data: item, title: "Cloud Share" } );
         }
     }
-
-    click_Share5Sahring( type: string ) {
-        if ( type == "CLOUD" ) {
-
-        } else if ( type == "SLACK" ) {
-
-        } else if ( type == "WHATSAPP" ) {
-
-        }
-    }
-
-
-
 
     render() {
         //flag
