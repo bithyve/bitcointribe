@@ -70,18 +70,18 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         this.state = ( {
             arr_TrustedContacts: [ {
                 thumbnailPath: "user",
-                givenName: "Trusted Contact 1",
+                givenName: "Trusted Contacts 1",
                 familyName: "",
                 statusMsgColor: "gray",
                 statusMsg: "Not Shared",
-                opt: undefined,
+                flagAction: true,
             }, {
                 thumbnailPath: "user",
-                givenName: "Trusted Contact 2",
+                givenName: "Trusted Contacts 2",
                 familyName: "",
                 statusMsgColor: "gray",
                 statusMsg: "Not Shared",
-                opt: undefined,
+                flagAction: true,
             } ],
             arr_SelfShare: [ {
                 thumbnailPath: "bars",
@@ -89,22 +89,26 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 familyName: "",
                 statusMsgColor: "#ff0000",
                 statusMsg: "Not Shared",
-                type: "Self Share 1"
+                type: "Self Share 1",
+                flagAction: true,
             }, {
                 thumbnailPath: "bars",
                 givenName: "Email",
                 familyName: "",
                 statusMsgColor: "#ff0000",
                 statusMsg: "Not Shared",
-                type: "Self Share 2"
+                type: "Self Share 2",
+                flagAction: true,
             }, {
                 thumbnailPath: "bars",
                 givenName: "Cloud",
                 familyName: "",
                 statusMsgColor: "#ff0000",
                 statusMsg: "Not Shared",
-                type: "Self Share 3"
+                type: "Self Share 3",
+                flagAction: true,
             } ],
+            arrSelectedItem: [],
             arr_SSSDetails: [],
             arr_Mnemonic: [],
             arr_MnemonicDetails: [],
@@ -153,8 +157,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
 
     getTrustedContactArray( sssDetails: any, backupType: string ) {
-        let dateTime = Date.now();
-        let tempOpt = [];
+        console.log( { sssDetails, backupType } );
+
         let keeperInfo = JSON.parse( sssDetails.keeperInfo );
         let data = {};
         data.decryptedShare = JSON.parse( sssDetails.decryptedShare );
@@ -166,42 +170,15 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         data.givenName = keeperInfo.givenName;
         data.familyName = keeperInfo.familyName;
         data.backupType = backupType;
-        let sharedDate = parseInt( sssDetails.sharedDate );
-        var startDate = new Date( dateTime );
-        var endDate = new Date( sharedDate );
-        var diff = Math.abs( startDate.getTime() - endDate.getTime() );
-        const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
-        const seconds: any = Math.floor( diff / 1000 % 60 );
-        const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
-
-        data.totalSec = expaire.expaire_otptime - totalSec;
-        //for history get opt     
-        for ( let i = 0; i < 2; i++ ) {
-            let eachHistory = JSON.parse( sssDetails[ i ].history );
-            let eachHistoryLength = eachHistory.length;
-            var otp;
-            if ( eachHistory[ eachHistoryLength - 1 ] != undefined ) {
-                otp = eachHistory[ eachHistoryLength - 1 ].otp;
-            } else {
-                otp = undefined;
-            }
-            tempOpt.push( otp );
-        }
-        console.log( { tempOpt } );
+        data.flagAction = backupType == "new" ? false : true;
         if ( sssDetails.sharedDate == "" && sssDetails.shareStage == "Ugly" ) {
-            data.statusMsg = "Not Shared";
-            data.statusMsgColor = "#C07710";
+            data.statusMsg = backupType == "new" ? "Not Shared" : "Not Accessible";;
+            data.statusMsgColor = "#ff0000";
             data.flag_timer = false;
         } else if ( sssDetails.sharedDate != "" && sssDetails.shareStage == "Ugly" ) {
             data.statusMsg = "Shared";
             data.statusMsgColor = "#C07710";
             data.flag_timer = false;
-        }
-        else if ( totalSec < expaire.expaire_otptime && sssDetails.sharedDate != "" && sssDetails.shareStage == "Ugly" ) {
-            data.statusMsg = "Shared";
-            data.statusMsgColor = "#C07710";
-            data.flag_timer = true;
-            data.opt = tempOpt;
         }
         else if ( sssDetails.sharedDate != "" && sssDetails.shareStage == "Good" ) {
             data.statusMsg = "Share accessible";
@@ -212,12 +189,13 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             data.statusMsgColor = "#C07710";
             data.flag_timer = false;
         } else {
-            data.statusMsg = "OTP Exp.";
+            data.statusMsg = "Share inaccessible";
             data.statusMsgColor = "#C07710";
             data.flag_timer = false;
         }
         return [ data ];
     }
+
 
     getQuestionDetails( walletDetails: any, ) {
         var appHealthStatus = JSON.parse( walletDetails.appHealthStatus );
@@ -230,6 +208,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         return [ data ];
     }
 
+
     getCheackHealth = async () => {
         this.setState( {
             flag_Loading: true
@@ -241,21 +220,21 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         let sssDetails = await utils.getSSSDetails();
         console.log( { walletDetails, sssDetails } );
         let share = {};
-        share.trustedContShareId1 = sssDetails[ 0 ].shareId != "" ? sssDetails[ 0 ].shareId : "";
-        share.trustedContShareId2 = sssDetails[ 1 ].shareId != "" ? sssDetails[ 1 ].shareId : "";
-        share.selfshareShareId1 = sssDetails[ 2 ].shareId != "" ? sssDetails[ 2 ].shareId : "";
-
+        share.trustedContShareId1 = sssDetails[ 0 ].shareId != "" ? sssDetails[ 0 ].shareId : null;
+        share.trustedContShareId2 = sssDetails[ 1 ].shareId != "" ? sssDetails[ 1 ].shareId : null;
+        share.selfshareShareId1 = sssDetails[ 2 ].shareId != "" ? sssDetails[ 2 ].shareId : null;
         share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? sssDetails[ 3 ].acceptedDate : 0;
         share.selfshareShareShareId2 = sssDetails[ 3 ].shareId != "" ? sssDetails[ 3 ].shareId : "";
         share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? sssDetails[ 4 ].acceptedDate : 0;
         share.selfshareShareId3 = sssDetails[ 4 ].shareId != "" ? sssDetails[ 4 ].shareId : "";
         share.qatime = parseInt( walletDetails.lastUpdated );
         let resCheckHealthAllShare = await comAppHealth.checkHealthAllShare( share );
-        if ( resCheckHealthAllShare ) {
+        if ( resCheckHealthAllShare != "" ) {
             this.loaddata( backupType, backupMethod );
         } else {
             Alert.alert( "Check health not working." )
         }
+
     }
 
     loaddata = async ( backupType: string, backupMethod: string ) => {
@@ -293,6 +272,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                     data.sssDetails = sssDetails[ i ];
                     data.type = sssDetails[ i ].type;
                     data.backupType = backupType;
+                    data.flagAction = backupType == "new" ? false : true;
                     arr_SelfShare[ 0 ] = data;
                 }
                 else if ( sssDetails[ i ].type === 'Self Share 2' && sssDetails[ i ].decryptedShare != "" ) {
@@ -312,6 +292,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                     data.sssDetails = sssDetails[ i ];
                     data.type = sssDetails[ i ].type;
                     data.backupType = backupType;
+                    data.flagAction = backupType == "new" ? false : true;
                     arr_SelfShare[ 1 ] = data;
                 }
                 else {
@@ -331,9 +312,10 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                     data.sssDetails = sssDetails[ i ];
                     data.type = sssDetails[ i ].type;
                     data.backupType = backupType;
+                    data.flagAction = backupType == "new" ? false : true;
                     arr_SelfShare[ 2 ] = data;
                 }
-                //Secret Question
+                //Secret Question  
                 arr_SecretQuestion = this.getQuestionDetails( walletDetails )
                 this.setState( {
                     flag_Loading: false,
@@ -368,12 +350,12 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
     //secret quesiton message
     getQuestonHealth( share: string ) {
         if ( share == "Good" ) {
-            return [ "Backed Confirm", "#008000" ];
+            return [ "Accessible", "#008000" ];
         }
         else if ( share == "Bad" ) {
-            return [ "Confirm Again", "#C07710" ];
+            return [ "Inaccessible", "#C07710" ];
         } else {
-            return [ "Not Backed up", "#ff0000" ];
+            return [ "Inaccessible", "#ff0000" ];
         }
     }
 
@@ -381,8 +363,9 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
     //TODO: func click_Item
     click_Item = ( item: any ) => {
         console.log( { item } );
-        if ( item.givenName == "Trusted Contact 1" || item.givenName == "Trusted Contact 2" ) {
+        if ( item.givenName == "Trusted Contacts 1" || item.givenName == "Trusted Contacts 2" ) {
             this.setState( {
+                arrSelectedItem: item,
                 arr_ModelFindYourTrustedContacts: [
                     {
                         modalVisible: true
@@ -491,6 +474,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                 } } onPress={ () => {
                                                     this.click_Item( item )
                                                 } }
+                                                    disabled={ item.flagAction }
                                                 >
                                                     <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                                                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
@@ -505,29 +489,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                                 <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                                 <View style={ { flexDirection: "row" } }>
                                                                     <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
-                                                                    { renderIf( typeof item.opt !== "undefined" )(
-                                                                        <TimerCountdown
-                                                                            initialMilliseconds={ item.totalSec * 1000 }
-                                                                            onExpire={ () => this.loaddata() }
-                                                                            formatMilliseconds={ ( milliseconds ) => {
-                                                                                const remainingSec = Math.round( milliseconds / 1000 );
-                                                                                const seconds = parseInt( ( remainingSec % 60 ).toString(), 10 );
-                                                                                const minutes = parseInt( ( ( remainingSec / 60 ) % 60 ).toString(), 10 );
-                                                                                const hours = parseInt( ( remainingSec / 3600 ).toString(), 10 );
-                                                                                const s = seconds < 10 ? '0' + seconds : seconds;
-                                                                                const m = minutes < 10 ? '0' + minutes : minutes;
-                                                                                let h = hours < 10 ? '0' + hours : hours;
-                                                                                h = h === '00' ? '' : h + ':';
-                                                                                return h + m + ':' + s;
-                                                                            } }
-                                                                            allowFontScaling={ true }
-                                                                            style={ { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } }
-                                                                        />
-                                                                    ) }
                                                                 </View>
-                                                                { renderIf( typeof item.opt !== "undefined" )(
-                                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>OTP { " " }{ item.opt }</Text>
-                                                                ) }
                                                             </View>
                                                             <View style={ {
                                                                 flex: 1,
@@ -568,7 +530,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                 } } onPress={ () => {
                                                     this.click_SelfShare( item )
                                                 } }
-                                                    disabled={ flag_SelfShareActionDisable }
+                                                    disabled={ item.flagAction }
                                                 >
                                                     <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                                                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
@@ -799,8 +761,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                             await Permissions.request( 'contacts' ).then( ( response: any ) => {
                                 console.log( response );
                                 if ( response == "authorized" ) {
-                                    const arrSSSDetails = this.state.arr_SSSDetails.slice( 0, 2 );
-                                    this.props.navigation.push( "BackUpYourWalletNavigator", { data: arrSSSDetails } )
+                                    const { arrSelectedItem } = this.state;
+                                    this.props.navigation.push( "BackUpYourWalletNavigator", { arrSelectedItem } )
                                 } else {
                                     alert.simpleOk( "Oops", "Please add contacts permission." );
                                 }
@@ -812,7 +774,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                     }
                                 ]
                             } )
-                        } }
+                        }
+                        }
                         closeModal={ () => {
                             this.setState( {
                                 arr_ModelFindYourTrustedContacts: [

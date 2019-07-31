@@ -154,7 +154,7 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
             questionData.Question = question;
             questionData.Answer = answer;
             arrQustionList.push( questionData );
-            let arrBackupInfo = [ { backupType: "new wallet" }, { backupMethod: "share" } ];
+            let arrBackupInfo = [ { backupType: "new" }, { backupMethod: "share" } ];
             let resInsertWallet = await dbOpration.insertWallet(
                 localDB.tableName.tblWallet,
                 dateTime,
@@ -188,8 +188,10 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                 "Secure Account",
                 ""
             );
-            if ( resInsertWallet && resInsertSecureCreateAcc && resInsertCreateAcc ) {
-
+            let resDeleteTableData = await dbOpration.deleteTableData(
+                localDB.tableName.tblSSSDetails
+            );
+            if ( resInsertWallet && resInsertSecureCreateAcc && resInsertCreateAcc && resDeleteTableData ) {
                 await bitcoinClassState.setRegularClassState( regularAccount );
                 //secure account     
                 await bitcoinClassState.setSecureClassState( secureAccount );

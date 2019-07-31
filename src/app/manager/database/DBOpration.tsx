@@ -235,6 +235,7 @@ const readTableAcccountType = async (
   } );
 };
 
+
 //TODO: Select Recent Transaciton Address Wise
 const readRecentTransactionAddressWise = (
   tableName: string,
@@ -683,9 +684,9 @@ const updateSecureAccountAddressAndBal = (
   } );
 };
 
-const updateAccountBalAddressWise = (
+const updateAccountBalAccountTypeWise = (
   tblName: string,
-  address: string,
+  accountType: string,
   bal: string
 ) => {
   let passcode = getPasscode();
@@ -696,19 +697,19 @@ const updateAccountBalAddressWise = (
           var len = results.rows.length;
           if ( len > 0 ) {
             for ( let i = 0; i < len; i++ ) {
-              let dbdecryptAddress = utils.decrypt(
-                results.rows.item( i ).address,
+              let dbdecryptAccountType = utils.decrypt(
+                results.rows.item( i ).accountType,
                 passcode
               );
-              let dbAddress = results.rows.item( i ).address;
-              if ( dbdecryptAddress == address ) {
+              let encpAccountType = results.rows.item( i ).accountType;
+              if ( dbdecryptAccountType == accountType ) {
                 txn.executeSql(
                   "update " +
                   tblName +
-                  " set balance =:balance where address = :address",
+                  " set balance =:balance where accountType = :accountType",
                   [
                     utils.encrypt( bal.toString(), passcode ),
-                    dbAddress
+                    encpAccountType
                   ]
                 );
                 resolve( true );
@@ -986,10 +987,7 @@ const updateRestoreUsingTrustedContactKeepInfo = (
               passcode
             );
             let encpType = results.rows.item( ii ).type;
-
             if ( dbdecryptType == type[ i ].type ) {
-
-
               txn.executeSql(
                 "update " +
                 tblName +
@@ -1110,54 +1108,7 @@ const updateSSSRetoreDecryptedShare = (
 };
 
 
-//update
-const updateSSSContactListDetails = (
-  tblName: string,
-  contactDetails: any,
-  shareIds: any
-) => {
-  let passcode = getPasscode();
-  return new Promise( ( resolve, reject ) => {
-    try {
-      db.transaction( function ( txn ) {
-        console.log( { contactDetails } );
-        for ( let i = 0; i < shareIds.length; i++ ) {
-          console.log( { contactDetails } );
-          console.log( { shares: shareIds[ i ] } );
-          let shareId1 = shareIds[ i ];
-          txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
-            var len = results.rows.length;
-            for ( let ii = 0; ii < len; ii++ ) {
-              let dbdecryptShareId = utils.decrypt(
-                results.rows.item( ii ).shareId,
-                passcode
-              );
-              let encpShareId = results.rows.item( ii ).shareId;
-              console.log( { dbdecryptShareId, shareId1 } );
-              if ( dbdecryptShareId == shareId1 ) {
-                console.log( { same: encpShareId } );
-                txn.executeSql(
-                  "update " +
-                  tblName +
-                  " set keeperInfo = :keeperInfo,recordId =:recordId where shareId = :shareId",
-                  [
-                    utils.encrypt( JSON.stringify( contactDetails[ i ] ).toString(), passcode ),
-                    utils.encrypt( contactDetails[ i ].recordID.toString(), passcode ),
-                    encpShareId
-                  ]
-                );
-                break;
-              }
-            }
-          } );
-        }
-        resolve( true );
-      } );
-    } catch ( error ) {
-      console.log( error );
-    }
-  } );
-};
+
 
 
 
@@ -1204,6 +1155,53 @@ const updateSSSTransferMehtodDetails = (
             }
           }
         } );
+      } );
+    } catch ( error ) {
+      console.log( error );
+    }
+  } );
+};
+
+
+//update shareId shareStage
+const updateSSSShareId = (
+  tblName: string,
+  fulldate: string,
+  shareId: string,
+  type: string
+) => {
+  let passcode = getPasscode();
+  return new Promise( ( resolve, reject ) => {
+    try {
+      db.transaction( function ( txn ) {
+        //console.log( { tblName, shareInfo, fulldate } );
+        txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+          var len = results.rows.length;
+          if ( len > 0 ) {
+            for ( let j = 0; j < len; j++ ) {
+              let decryptType = utils.decrypt(
+                results.rows.item( j ).type,
+                passcode
+              );
+              let encpType = results.rows.item( j ).type;
+              if ( decryptType == type ) {
+                txn.executeSql(
+                  "update " +
+                  tblName +
+                  " set shareid = :shareid,lastSuccessfulCheck =:lastSuccessfulCheck where type = :type",
+                  [
+                    utils.encrypt( shareId.toString(), passcode ),
+                    utils.encrypt( fulldate.toString(), passcode ),
+                    encpType
+                  ]
+                );
+                resolve( true );
+                break;
+              }
+            }
+          }
+        } );
+
       } );
     } catch ( error ) {
       console.log( error );
@@ -1659,6 +1657,21 @@ const insertTrustedPartyDetailSelfShare = (
   } );
 };
 
+
+//TODO: ========================================>  For All Table   <========================================
+const deleteTableData = (
+  tblName: string,
+) => {
+  return new Promise( ( resolve, reject ) => {
+    db.transaction( function ( txn ) {
+      txn.executeSql( "delete from " + tblName, [], ( tx, results ) => {
+        resolve( true );
+      } );
+    } );
+  } );
+};
+
+
 module.exports = {
   readTablesData,
   readAccountTablesData,
@@ -1678,7 +1691,7 @@ module.exports = {
   insertLastBeforeCreateAccount,
   updateSecureAccountAddressAndBal,
   updateAccountBal,
-  updateAccountBalAddressWise,
+  updateAccountBalAccountTypeWise,
   updateSecureAccountAddInfo,
 
   //Transation Details
@@ -1690,9 +1703,9 @@ module.exports = {
   insertSSSShareDetails,
   updateRestoreUsingTrustedContactKeepInfo,
   updateRestoreUsingTrustedContactSelfShare,
-  updateSSSContactListDetails,
   updateSSSTransferMehtodDetails,
   updateSSSShareStage,
+  updateSSSShareId,
   updateSSSShareStageIdWise,
   updateSSSShareStageWhereRecordId,
   updateSSSRetoreDecryptedShare,
@@ -1703,5 +1716,8 @@ module.exports = {
   insertTrustedPartyDetailWithoutAssociate,
   updateHistroyAndSharedDate,
   updateHistroyAndAcceptDate,
-  insertTrustedPartyDetailSelfShare
+  insertTrustedPartyDetailSelfShare,
+
+  //For All Table Operation
+  deleteTableData
 };    

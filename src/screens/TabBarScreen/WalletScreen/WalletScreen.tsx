@@ -13,7 +13,8 @@ import {
   RefreshControl,
   ImageBackground,
   NativeModules,
-  Platform
+  Platform,
+  ActivityIndicator
 } from "react-native";
 import {
   Container,
@@ -158,6 +159,9 @@ export default class WalletScreen extends React.Component {
       base64string9: "",
       base64string10: "",
       flag_QrcodeDisaply: false,
+      //Loading Flags
+      flag_Offline: false,
+      flag_GetBal: false,
       flag_PdfFileCreate: false
     };
     isNetwork = utils.getNetwork();
@@ -168,13 +172,36 @@ export default class WalletScreen extends React.Component {
     this.willFocusSubscription = this.props.navigation.addListener(
       "willFocus",
       () => {
-
         this.connnection_FetchData();
         this.getDeepLinkingData();
       }
     );
+    //TODO: Animation 
+    this.changeAnimaiton();
+    // async task
+    isNetwork = utils.getNetwork();
+    if ( isNetwork ) {
+      this.setState( {
+        flag_Offline: false
+      } )
+      this.asyncTask();
+    } else {
+      this.setState( {
+        flag_Offline: true,
+        arrErrorMessage: [ {
+          type: "offline",
+          data: [ {
+            message: "Offline. Some features may not work",
+            bgColor: "#262A2E",
+            color: "#ffffff",
+          } ]
+        } ]
+      } )
+    }
+  }
 
-    //TODO: Animation View
+
+  changeAnimaiton() {
     this.startHeaderHeight = 200;
     this.endHeaderHeight = 100;
     this.animatedHeaderHeight = this.state.scrollY.interpolate( {
@@ -182,21 +209,16 @@ export default class WalletScreen extends React.Component {
       outputRange: [ this.startHeaderHeight, this.endHeaderHeight ],
       extrapolate: "clamp"
     } );
-
-
     this.animatedMarginTopScrolling = this.animatedHeaderHeight.interpolate( {
       inputRange: [ this.endHeaderHeight, this.startHeaderHeight ],
       outputRange: [ 10, -35 ],
       extrapolate: "clamp"
     } );
-
-
     this.animatedAppTextSize = this.animatedHeaderHeight.interpolate( {
       inputRange: [ this.endHeaderHeight, this.startHeaderHeight ],
       outputRange: [ 18, 24 ],
       extrapolate: "clamp"
     } );
-
     this.animatedTextOpacity = this.animatedHeaderHeight.interpolate( {
       inputRange: [ this.endHeaderHeight, this.startHeaderHeight ],
       outputRange: [ 0, 1 ],
@@ -214,7 +236,27 @@ export default class WalletScreen extends React.Component {
     } );
   }
 
-
+  asyncTask = async () => {
+    let resultWallet = await utils.getWalletDetails();
+    let resSSSDetails = await utils.getSSSDetails();
+    let backupInfo = JSON.parse( resultWallet.backupInfo );
+    if ( backupInfo[ 0 ].backupType == "new" ) {
+      if ( resSSSDetails.length == 0 ) {
+        this.generateSSSDetails();
+      } else {
+        this.getBalAndHealth();
+        this.setState( {
+          flag_PdfFileCreate: false
+        } )
+      }
+    }
+    else {
+      this.getBalAndHealth();
+      this.setState( {
+        flag_PdfFileCreate: false
+      } )
+    }
+  }
 
   componentWillUnmount() {
     this.willFocusSubscription.remove();
@@ -226,30 +268,7 @@ export default class WalletScreen extends React.Component {
     await utils.setFlagQRCodeScreen( true );
     var resultWallet = await await comFunDBRead.readTblWallet();
     console.log( { resultWallet } );
-    let backupInfo = JSON.parse( resultWallet.backupInfo );
     let resSSSDetails = await comFunDBRead.readTblSSSDetails();
-    isNetwork = utils.getNetwork();
-    if ( resSSSDetails.length == 0 && backupInfo[ 0 ].backupType == "new wallet" && countFileCreate == 0 ) {
-      if ( isNetwork ) {
-        countFileCreate++;
-        this.createPdfFile();
-      } else {
-        this.setState( {
-          arrErrorMessage: [ {
-            type: "offline",
-            data: [ {
-              message: "Offline. Some features may not work",
-              bgColor: "#262A2E",
-              color: "#ffffff",
-            } ]
-          } ]
-        } )
-      }
-    } else {
-      this.setState( {
-        flag_PdfFileCreate: true
-      } )
-    }
     var resAccount = await comFunDBRead.readTblAccount();
     console.log( { resSSSDetails } );
     let temp = [];
@@ -531,78 +550,22 @@ export default class WalletScreen extends React.Component {
   }
 
 
-  //TODO: func refresh
-  refresh = async () => {
-    this.setState( {
-      flag_Loading: true
-    } );
-    var resAccount = await comFunDBRead.readTblAccount();
-    console.log( { resAccount } );
-    let walletDetails = await utils.getWalletDetails();
-    let sssDetails = await utils.getSSSDetails();
-    let regularAccount = await bitcoinClassState.getRegularClassState();
-    console.log( { regularAccount } );
-    let secureAccount = await bitcoinClassState.getSecureClassState();
-    console.log( { secureAccount } );
-    //Get Regular Account Bal
-    var getBalR = await regularAccount.getBalance();
-    console.log( { getBalR } );
-    var resUpdateAccountBalR;
-    if ( getBalR.status == 200 ) {
-      await bitcoinClassState.setRegularClassState( regularAccount );
-      getBalR = getBalR.data;
-      console.log( { getBalR } );
-      resUpdateAccountBalR = await dbOpration.updateAccountBalAddressWise(
-        localDB.tableName.tblAccount,
-        resAccount[ 0 ].address,
-        ( getBalR.balance + getBalR.unconfirmedBalance ) / 1e8
-      );
-    } else {
-      alert.simpleOk( "Oops", getBalR.err );
-    }
-    //Get Secure Account Bal
-    let resUpdateAccountBalS;
-    if ( resAccount[ 1 ].address != "" ) {
-      var getBalS = await secureAccount.getBalance();
-      console.log( { getBalS } );
-      if ( getBalS.status == 200 ) {
-        await bitcoinClassState.setSecureClassState( secureAccount );
-        getBalS = getBalS.data;
-        resUpdateAccountBalS = await dbOpration.updateAccountBalAddressWise(
-          localDB.tableName.tblAccount,
-          resAccount[ 1 ].address,
-          ( getBalS.balance + getBalS.unconfirmedBalance ) / 1e8
-        );
-      } else {
-        alert.simpleOk( "Oops", getBalS.err );
-      }
-    }
-    if ( resUpdateAccountBalR ) {
-      //health Check  
-      let share = {};
-      share.trustedContShareId1 = sssDetails[ 0 ].shareId;
-      share.trustedContShareId2 = sssDetails[ 1 ].shareId;
-      share.selfshareShareId1 = sssDetails[ 2 ].shareId;
 
-      share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? sssDetails[ 3 ].acceptedDate : 0;
-      share.selfshareShareShareId2 = sssDetails[ 3 ].shareId;
-
-      share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? sssDetails[ 4 ].acceptedDate : 0;
-      share.selfshareShareId3 = sssDetails[ 4 ].shareId;
-
-      share.qatime = parseInt( walletDetails.lastUpdated );
-      await comAppHealth.checkHealthAllShare( share );
-      this.setState( {
-        flag_Loading: false
-      } )
-      this.connnection_FetchData();
-    }
-  }
 
 
   //async task    
-
-  createPdfFile = async () => {
+  generateSSSDetails = async () => {
+    this.setState( {
+      flag_PdfFileCreate: true,
+      arrErrorMessage: [ {
+        type: "asyncTask",
+        data: [ {
+          message: "Your backup is being built, wait for sometime",
+          bgColor: "#262A2E",
+          color: "#ffffff",
+        } ]
+      } ]
+    } );
     const dateTime = Date.now();
     let walletDetails = await utils.getWalletDetails();
     let setUpWalletAnswerDetails = JSON.parse( walletDetails.setUpWalletAnswerDetails );
@@ -629,7 +592,6 @@ export default class WalletScreen extends React.Component {
     } else {
       alert.simpleOk( "Oops", getSecoundMnemonic.err );
     }
-
     //Get Shares         
     const generateShareRes = await sss.generateShares( setUpWalletAnswerDetails[ 0 ].Answer );
     console.log( { generateShareRes } );
@@ -680,7 +642,6 @@ export default class WalletScreen extends React.Component {
                 let resGenerate4thsharepdf = await this.generate4thShare( temp, setUpWalletAnswerDetails[ 0 ].Answer );
                 console.log( { resGenerate4thsharepdf } );
                 if ( resGenerate4thsharepdf != "" ) {
-
                   let rescreateMetaShare4 = await sss.createMetaShare( 5, encryptedShares[ 4 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
                   console.log( { rescreateMetaShare4 } );
                   if ( rescreateMetaShare4.status == 200 ) {
@@ -706,7 +667,7 @@ export default class WalletScreen extends React.Component {
                         if ( resInsertSSSShare ) {
                           await comFunDBRead.readTblSSSDetails();
                           this.setState( {
-                            flag_PdfFileCreate: true
+                            flag_PdfFileCreate: false
                           } )
                         }
                         console.log( { resInsertSSSShare } );
@@ -734,8 +695,6 @@ export default class WalletScreen extends React.Component {
       alert.simpleOk( "Oops", generateShareRes.err );
     }
   }
-
-
   base64string1 = ( base64string1: any ) => {
     this.setState( {
       base64string1
@@ -786,7 +745,6 @@ export default class WalletScreen extends React.Component {
       base64string10
     } );
   }
-
   //qrstring modify
   getCorrectFormatStirng( share1: string ) {
     share1 = share1.split( '"' ).join( "Doublequote" );
@@ -797,7 +755,6 @@ export default class WalletScreen extends React.Component {
     share1 = share1.split( ' ' ).join( "Space" );
     return share1;
   }
-
   //For 4th Share
   generate4thShare = async ( data: any, password: string ) => {
     console.log( { password } );
@@ -867,8 +824,6 @@ export default class WalletScreen extends React.Component {
 
     } );
   }
-
-
   //for 5th share
   generate5thShare = async ( data: any, password: string ) => {
     return new Promise( async ( resolve, reject ) => {
@@ -934,7 +889,6 @@ export default class WalletScreen extends React.Component {
       }, 1000 );
     } );
   }
-
   generateSahreQRCode = async ( share1: any, fileName: string ) => {
     return new Promise( async ( resolve, reject ) => {
 
@@ -959,7 +913,6 @@ export default class WalletScreen extends React.Component {
         } )
     } );
   }
-
   generateXpubAnd2FAQRCode = async ( share1: string, fileName: string ) => {
     return new Promise( async ( resolve, reject ) => {
       console.log( { xpuband2fa: share1, fileName } );
@@ -981,7 +934,6 @@ export default class WalletScreen extends React.Component {
         } )
     } );
   }
-
   chunkArray( arr: any, n: any ) {
     var chunkLength = Math.max( arr.length / n, 1 );
     var chunks = [];
@@ -990,7 +942,6 @@ export default class WalletScreen extends React.Component {
     }
     return chunks;
   }
-
   genreatePdf = async ( data: any, pathShare1: string, pathShare2: string, pathShare3: string, pathShare4: string, pathShare5: string, pathShare6: string, pathShare7: string, pathShare8: string, pathSecoundXpub: string, path2FASecret: string, pdfFileName: string, forShare: string, password: string ) => {
     return new Promise( async ( resolve, reject ) => {
 
@@ -1606,7 +1557,6 @@ export default class WalletScreen extends React.Component {
     } );
   }
 
-
   // async function to call the Java native method
   async setPdfAndroidPasswrod( pdfPath: string, pdffilePassword: string ) {
     var PdfPassword = NativeModules.PdfPassword;
@@ -1617,7 +1567,71 @@ export default class WalletScreen extends React.Component {
   }
 
 
+  //TODO: Get All Account Bal
+  getBalAndHealth = async () => {
+    this.setState( {
+      flag_GetBal: true,
+      arrErrorMessage: [ {
+        type: "asyncTask",
+        data: [ {
+          message: "Getting bal, wait for sometime",
+          bgColor: "#262A2E",
+          color: "#ffffff",
+        } ]
+      } ]
+    } )
+    let walletDetails = await utils.getWalletDetails();
+    let sssDetails = await utils.getSSSDetails();
+    let regularAccount = await bitcoinClassState.getRegularClassState();
+    console.log( { regularAccount } );
+    let secureAccount = await bitcoinClassState.getSecureClassState();
+    console.log( { secureAccount } );
+    //Get Regular Account Bal
+    var getBalR = await regularAccount.getBalance();
+    console.log( { getBalR } );
+    if ( getBalR.status == 200 ) {
+      await bitcoinClassState.setRegularClassState( regularAccount );
+      getBalR = getBalR.data;
+      await dbOpration.updateAccountBalAccountTypeWise(
+        localDB.tableName.tblAccount,
+        "Regular Account",
+        ( getBalR.balance + getBalR.unconfirmedBalance ) / 1e8
+      );
+    } else {
+      alert.simpleOk( "Oops", getBalR.err );
+    }
+    //Get Secure Account Bal
+    var getBalS = await secureAccount.getBalance();
+    console.log( { getBalS } );
+    if ( getBalS.status == 200 ) {
+      await bitcoinClassState.setSecureClassState( secureAccount );
+      getBalS = getBalS.data;
+      await dbOpration.updateAccountBalAccountTypeWise(
+        localDB.tableName.tblAccount,
+        "Secure Account",
+        ( getBalS.balance + getBalS.unconfirmedBalance ) / 1e8
+      );
+    }
+    //health Check  
+    let share = {};
+    share.trustedContShareId1 = sssDetails[ 0 ].shareId != "" ? sssDetails[ 0 ].shareId : null;
+    share.trustedContShareId2 = sssDetails[ 1 ].shareId != "" ? sssDetails[ 1 ].shareId : null;
+    share.selfshareShareId1 = sssDetails[ 2 ].shareId != "" ? sssDetails[ 2 ].shareId : null;
+    share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? sssDetails[ 3 ].acceptedDate : 0;
+    share.selfshareShareShareId2 = sssDetails[ 3 ].shareId != "" ? sssDetails[ 3 ].shareId : null;
+    share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? sssDetails[ 4 ].acceptedDate : 0;
+    share.selfshareShareId3 = sssDetails[ 4 ].shareId != "" ? sssDetails[ 4 ].shareId : null;
+    share.qatime = parseInt( walletDetails.lastUpdated );
+    await comAppHealth.checkHealthAllShare( share );
+    this.setState( {
+      flag_GetBal: false
+    } )
+    this.connnection_FetchData();
+  }
+
+
   _renderItem( { item, index } ) {
+    let { flag_GetBal, flag_PdfFileCreate } = this.state;
     return (
       <View key={ "card" + index }>
         { renderIf( item.accountType != "Secure Account" )(
@@ -1635,6 +1649,7 @@ export default class WalletScreen extends React.Component {
               rkCardHeader
               style={ {
                 flex: 1,
+                justifyContent: "center",
                 borderBottomColor: "#F5F5F5",
                 borderBottomWidth: 1
               } }
@@ -1654,7 +1669,10 @@ export default class WalletScreen extends React.Component {
               >
                 { item.accountName }
               </Text>
-              <SvgIcon name="icon_more" color="gray" size={ 15 } />
+              <View style={ { flexDirection: "row" } }>
+                <ActivityIndicator animating={ flag_GetBal } size="small" color="gray" style={ { marginTop: -25 } } />
+                <SvgIcon name="icon_more" color="gray" size={ 15 } />
+              </View>
             </View>
             <View
               rkCardContent
@@ -1666,7 +1684,7 @@ export default class WalletScreen extends React.Component {
               <View
                 style={ {
                   flex: 1,
-                  justifyContent: "center"
+                  justifyContent: "center",
                 } }
               >
                 <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
@@ -1676,6 +1694,7 @@ export default class WalletScreen extends React.Component {
                 <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
                   { item.balance }
                 </Text>
+
               </View>
               <View
                 style={ {
@@ -1733,7 +1752,10 @@ export default class WalletScreen extends React.Component {
               >
                 { item.accountName }
               </Text>
-              <SvgIcon name="icon_more" color="gray" size={ 15 } />
+              <View style={ { flexDirection: "row" } }>
+                <ActivityIndicator animating={ flag_GetBal || flag_PdfFileCreate } size="small" color="gray" style={ { marginTop: -25 } } />
+                <SvgIcon name="icon_more" color="gray" size={ 15 } />
+              </View>
             </View>
             <View
               rkCardContent
@@ -1789,7 +1811,7 @@ export default class WalletScreen extends React.Component {
     //model array
     let { arr_ModelAcceptOrRejectSecret, arr_ModelBackupShareAssociateContact, arr_ModelBackupAssociateOpenContactList, arr_ModelBackupYourWallet, arr_ModelSelfShareAcceptAndReject } = this.state;
     //flag
-    let { flag_Loading, flag_refreshing, flag_PdfFileCreate } = this.state;
+    let { flag_Loading, flag_refreshing, flag_Offline, flag_GetBal, flag_PdfFileCreate } = this.state;
     //qrcode string values
     let { qrcodeImageString1, qrcodeImageString2, qrcodeImageString3, qrcodeImageString4, qrcodeImageString5, qrcodeImageString6, qrcodeImageString7, qrcodeImageString8, qrcodeImageString9, qrcodeImageString10 } = this.state;
     return (
@@ -1801,7 +1823,9 @@ export default class WalletScreen extends React.Component {
           <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
           <SafeAreaView style={ styles.container }>
             {/* Top View Animation */ }
-            {/* <ViewErrorMessage data={ arrErrorMessage } /> */ }
+            { renderIf( flag_Offline == true || flag_PdfFileCreate == true || flag_GetBal == true )(
+              <ViewErrorMessage data={ arrErrorMessage } />
+            ) }
             <Animated.View
               style={ {
                 height: this.animatedHeaderHeight,
@@ -1846,7 +1870,7 @@ export default class WalletScreen extends React.Component {
                 } }
               >
                 <ViewShieldIcons data={ arr_CustShiledIcon } click_Image={ () => {
-                  if ( flag_PdfFileCreate ) {
+                  if ( !flag_PdfFileCreate ) {
                     let appHealthStatus = walletDetails.appHealthStatus;
                     if ( appHealthStatus != "" ) {
                       let backupType = JSON.parse( walletDetails.appHealthStatus );
@@ -1889,7 +1913,7 @@ export default class WalletScreen extends React.Component {
                 refreshControl={
                   <RefreshControl
                     refreshing={ flag_refreshing }
-                    onRefresh={ this.refresh.bind( this ) }
+                    onRefresh={ this.getBalAndHealth.bind( this ) }
                   />
                 }
                 contentContainerStyle={ { flex: 0 } }

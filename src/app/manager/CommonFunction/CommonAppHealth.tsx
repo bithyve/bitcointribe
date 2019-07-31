@@ -51,7 +51,6 @@ const checkHealthAllShare = async ( share: any ) => {
         alert.simpleOk( "Oops", resCheckHealth.err );
     }
     console.log( { resCheckHealth } );
-
     let shares = [
         { shareId: share.selfshareShareShareId2, updatedAt: share.selfshareShareDate2 },
         { shareId: share.selfshareShareId3, updatedAt: share.selfshareShareDate3 },
@@ -80,71 +79,9 @@ const checkHealthAllShare = async ( share: any ) => {
         );
         await comFunDBRead.readTblWallet();
         await comFunDBRead.readTblSSSDetails();
-        return resupdateSSSShareStage
+        return res
     }
 }
-
-
-
-const checkHealthRestoreWalletTrustedContact = async ( arrShareId: any, shareSelfShareIds: any, qatime: number ) => {
-    console.log( { arrShareId } );
-    const dateTime = Date.now();
-    const sss = await bitcoinClassState.getS3ServiceClassState();
-    let arrShare = [];
-    let arrEachShareId = [];
-    for ( let i = 0; i < arrShareId.length; i++ ) {
-        arrShare.push( arrShareId[ i ].share );
-        arrEachShareId.push( arrShareId[ i ].id );
-    }
-    console.log( { arrShare } );
-    var resCheckHealth = await sss.checkHealth( arrShare );
-    if ( resCheckHealth.status == 200 ) {
-        await bitcoinClassState.setS3ServiceClassState( sss );
-        resCheckHealth = resCheckHealth.data.lastUpdateds;
-    } else {
-        alert.simpleOk( "Oops", resCheckHealth.err );
-    }
-    let shares = [];
-    for ( let i = 0; i < shareSelfShareIds.length; i++ ) {
-        shares.push( { shareId: shareSelfShareIds[ i ].share, updatedAt: dateTime } )
-        arrEachShareId.push( shareSelfShareIds[ i ].id );
-    }
-    resCheckHealth.push.apply( resCheckHealth, shares )
-    let emptyShares = [
-        { shareId: "", updatedAt: 0 },
-    ];
-    let emptyShares2 = [
-        { shareId: "", updatedAt: 0 },
-        { shareId: "", updatedAt: 0 },
-    ];
-    if ( resCheckHealth.length == 3 ) {
-        resCheckHealth.push.apply( resCheckHealth, emptyShares2 )
-    }
-    if ( resCheckHealth.length == 4 ) {
-        resCheckHealth.push.apply( resCheckHealth, emptyShares )
-    }
-    const healthStatus = new HealthStatus();
-    const res = await healthStatus.appHealthStatus( qatime, resCheckHealth );
-    let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
-        localDB.tableName.tblWallet,
-        res
-    );
-    if ( resupdateWalletDetials ) {
-        let resupdateSSSShareStage = await dbOpration.updateSSSShareStageIdWise(
-            localDB.tableName.tblSSSDetails,
-            resCheckHealth,
-            res.sharesInfo,
-            arrEachShareId,
-            dateTime
-        );
-        console.log( { resupdateSSSShareStage } );
-        return res;
-    } else {
-        return false;
-    }
-}
-
-
 
 
 //TODO: func connection_AppHealthStatus (WalletScreen,TrustedContactScreen)
@@ -378,8 +315,7 @@ const checkHealthRestoreWalletTrustedContact = async ( arrShareId: any, shareSel
 
 module.exports = {
     checkHealthSetupShare,
-    checkHealthAllShare,
-    checkHealthRestoreWalletTrustedContact
+    checkHealthAllShare
     // connection_AppHealthStatus,
     // connection_AppHealthAndSSSUpdate,
     // connection_AppHealthForAllShare,

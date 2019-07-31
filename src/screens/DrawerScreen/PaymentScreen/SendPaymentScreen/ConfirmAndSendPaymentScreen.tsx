@@ -147,14 +147,14 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
 
     click_GoToDailyAccount = async () => {
         let { data } = this.state;
-        let address = data.selectedAccount.address;
+        let accountType = data.selectedAccount.accountType;
         let orignalBal = data.bal;
         let sendBal = parseFloat( data.amount ) + parseFloat( data.tranFee );
         let totalBal = orignalBal - sendBal;
 
-        let resUpdateAccountBalR = await dbOpration.updateAccountBalAddressWise(
+        let resUpdateAccountBalR = await dbOpration.updateAccountBalAccountTypeWise(
             localDB.tableName.tblAccount,
-            address,
+            accountType,
             totalBal.toFixed( 8 )
         );
         if ( resUpdateAccountBalR ) {

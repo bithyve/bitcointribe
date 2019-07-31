@@ -35,6 +35,10 @@ import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGra
 
 
 
+//TODO: Custome Alert 
+import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+let alert = new AlertSimple();
+
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
@@ -61,6 +65,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
             flag_MaxItemSeletedof3: true
         } )
     }
+
     componentWillMount() {
         Contacts.getAll( ( err, contacts ) => {
             if ( err ) {
@@ -73,6 +78,7 @@ export default class AllContactListScreen extends React.Component<any, any> {
             } )
         } )
     }
+
     press = ( hey ) => {
         this.state.data.map( ( item, index ) => {
             if ( item.recordID === hey.recordID ) {
@@ -109,8 +115,6 @@ export default class AllContactListScreen extends React.Component<any, any> {
         }
     }
 
-
-
     //TODO: Searching Contact List
     searchFilterFunction = ( text: string ) => {
         if ( text.length > 0 ) {
@@ -132,29 +136,39 @@ export default class AllContactListScreen extends React.Component<any, any> {
 
     //TODO: func click_Next
     click_Next = async () => {
+        const dateTime = Date.now();
         let selectedContactList = this.state.SelectedFakeContactList;
-        let arrSSSDetails = this.props.navigation.getParam( "data" );
-        var arrShareId = [];
+        let selectedItem = this.props.navigation.getParam( "arrSelectedItem" );
+        var arrTypes = [];
         if ( selectedContactList.length == 2 ) {
-            arrShareId = [ arrSSSDetails[ 0 ].shareId, arrSSSDetails[ 1 ].shareId ];
-        } else {
-            console.log( { arrSSSDetails } );
-            if ( arrSSSDetails[ 0 ].keeperInfo == "null" ) {
-                arrShareId = [ arrSSSDetails[ 0 ].shareId ];
+            arrTypes = [ { type: "Trusted Contacts 1" }, { type: "Trusted Contacts 2" } ];
+            let resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactKeepInfo(
+                localDB.tableName.tblSSSDetails,
+                dateTime,
+                selectedContactList,
+                arrTypes
+            );
+            if ( resInsertContactList ) {
+                await comFunDBRead.readTblSSSDetails();
+                this.props.navigation.pop();
             } else {
-                arrShareId = [ arrSSSDetails[ 1 ].shareId ];
+                alert.simpleOk( "Oops", "Trusted Contact not insert databse." );
             }
-        }
-        console.log( { arrSSSDetails, selectedContactList, arrShareId } );
-        const resUpdateSSSContactDetails = await dbOpration.updateSSSContactListDetails(
-            localDB.tableName.tblSSSDetails,
-            selectedContactList,
-            arrShareId
-        );
+        } else {
+            arrTypes = [ { type: selectedItem.givenName } ];
 
-        if ( resUpdateSSSContactDetails == true ) {
-            await comFunDBRead.readTblSSSDetails();
-            this.props.navigation.pop();
+            let resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactKeepInfo(
+                localDB.tableName.tblSSSDetails,
+                dateTime,
+                selectedContactList,
+                arrTypes
+            );
+            if ( resInsertContactList ) {
+                await comFunDBRead.readTblSSSDetails();
+                this.props.navigation.pop();
+            } else {
+                alert.simpleOk( "Oops", "Trusted Contact not insert databse." );
+            }
         }
     }
 

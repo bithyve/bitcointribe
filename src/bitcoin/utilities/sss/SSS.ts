@@ -465,7 +465,7 @@ export default class SSS {
     try {
       res = await BH_AXIOS.post( "checkSharesHealth", {
         walletID: walletId,
-        shareIDs,
+        shareIDs: shareIDs.filter( ( shareId ) => shareId !== null ),
       } );
     } catch ( err ) {
       throw new Error( err.response.data.err );

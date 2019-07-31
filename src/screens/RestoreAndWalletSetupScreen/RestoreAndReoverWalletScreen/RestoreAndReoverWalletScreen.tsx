@@ -117,14 +117,19 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
         let arrTypes = [ { type: "Trusted Contacts 1" }, { type: "Trusted Contacts 2" }, { type: "Self Share 1" }, { type: "Self Share 2" }, { type: "Self Share 3" } ];
         let temp = [ { date: dateTime, share: null, shareId: null, keeperInfo: keeperInfo, encryptedMetaShare: encryptedMetaShare, type: arrTypes } ]
         console.log( { temp } );
-        let resInsertSSSShare = await dbOpration.insertSSSShareDetails(
-            localDB.tableName.tblSSSDetails,
-            temp
+        let resDeleteTableData = await dbOpration.deleteTableData(
+            localDB.tableName.tblSSSDetails
         );
-        console.log( { resInsertSSSShare } );
-        if ( resInsertSSSShare ) {
-            await comFunDBRead.readTblSSSDetails();
-            this.props.navigation.push( "RestoreWalletUsingTrustedContactNavigator" );
+        if ( resDeleteTableData ) {
+            let resInsertSSSShare = await dbOpration.insertSSSShareDetails(
+                localDB.tableName.tblSSSDetails,
+                temp
+            );
+            console.log( { resInsertSSSShare } );
+            if ( resInsertSSSShare ) {
+                await comFunDBRead.readTblSSSDetails();
+                this.props.navigation.push( "RestoreWalletUsingTrustedContactNavigator" );
+            }
         }
     }
 
