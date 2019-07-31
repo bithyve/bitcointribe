@@ -69,7 +69,7 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
             amount: "",
             base64string1: "",
             qrcodeAddresWithAmount: "hexa",
-            flag_Loading: false,
+            flag_Loading: true,
             flag_LoadingShareBtn: false
         } )
     }
@@ -79,43 +79,59 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
         console.log( { walletDetails } );
         let arr_AccountList = await comFunDBRead.readTblAccount();
         console.log( { arr_AccountList } );
-
-        for ( var i = 0; i < arr_AccountList.length; i++ )
-            if ( arr_AccountList[ i ].address === "" ) {
-                arr_AccountList.splice( i, 1 );
-            }
-        var paymentQRCode = await this.getQrCode( arr_AccountList[ 0 ].address );
+        let regularAccount = await bitcoinClassState.getRegularClassState();
+        var address = await regularAccount.getAddress();
+        if ( address.status == 200 ) {
+            address = address.data;
+        } else {
+            alert.simpleOk( "Oops", address.err );
+        }
+        // var paymentQRCode = await this.getQrCode( address.address );
         console.log( { arr_AccountList } );
         this.setState( {
+            flag_Loading: false,
             arr_AccountList,
             accountName: arr_AccountList[ 0 ].accountName,
-            accountAddress: arr_AccountList[ 0 ].address,
-            qrcodeAddresWithAmount: paymentQRCode.paymentURI.toString(),
+            accountAddress: address.address,
+            qrcodeAddresWithAmount: address.address.toString()
         } )
     }
 
     //Dropdown select account name
     onValueChange = async ( value: string ) => {
-        let arr_AccountList = this.state.arr_AccountList;
-        console.log( { value } );
-        let index: number = 0;
-        for ( var i = 0; i < arr_AccountList.length; i++ )
-            if ( arr_AccountList[ i ].accountName === value ) {
-                index = i;
-                break;
-            }
-        var paymentQRCode = await this.getQrCode( arr_AccountList[ index ].address );
         this.setState( {
+            flag_Loading: true
+        } )
+        let regularAccount = await bitcoinClassState.getRegularClassState();
+        let secureAccount = await bitcoinClassState.getSecureClassState();
+        var address;
+        if ( value == "Daily Wallet" ) {
+            address = await regularAccount.getAddress();
+            if ( address.status == 200 ) {
+                address = address.data;
+            } else {
+                alert.simpleOk( "Oops", address.err );
+            }
+        } else {
+            address = await secureAccount.getAddress();
+            if ( address.status == 200 ) {
+                address = address.data;
+            } else {
+                alert.simpleOk( "Oops", address.err );
+            }
+        }
+        this.setState( {
+            flag_Loading: false,
             accountName: value,
             amount: "",
-            accountAddress: arr_AccountList[ index ].address,
-            qrcodeAddresWithAmount: paymentQRCode.paymentURI.toString(),
+            accountAddress: address.address,
+            qrcodeAddresWithAmount: address.address.toString(),
         } );
     }
 
     //get only address qrcode string
     getQrCode = async ( address: any, option?: any ) => {
-        let regularAccount = await await bitcoinClassState.getRegularClassState();
+        let regularAccount = await bitcoinClassState.getRegularClassState();
         console.log( regularAccount );
         let resPaymentURI = await regularAccount.getPaymentURI( address, option );
         if ( resPaymentURI.status == 200 ) {

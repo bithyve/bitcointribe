@@ -12,8 +12,8 @@ import {
     Right,
     Body,
     Text,
-    List, ListItem,
 } from "native-base";
+import { Card, ListItem } from 'react-native-elements'
 import { Icon } from 'react-native-elements'
 import { SvgIcon } from "@up-shared/components";
 import { RkCard } from "react-native-ui-kitten";
@@ -161,7 +161,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
         let keeperInfo = JSON.parse( sssDetails.keeperInfo );
         let data = {};
-        data.decryptedShare = JSON.parse( sssDetails.decryptedShare );
+        let decryptedShare = JSON.parse( sssDetails.decryptedShare );
+        data.decryptedShare = decryptedShare;
         data.emailAddresses = keeperInfo.emailAddresses;
         data.phoneNumbers = keeperInfo.phoneNumbers;
         data.history = JSON.parse( sssDetails.history );
@@ -170,7 +171,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         data.givenName = keeperInfo.givenName;
         data.familyName = keeperInfo.familyName;
         data.backupType = backupType;
-        data.flagAction = backupType == "new" ? false : true;
+        data.flagAction = decryptedShare != "" ? false : true;
         if ( sssDetails.sharedDate == "" && sssDetails.shareStage == "Ugly" ) {
             data.statusMsg = backupType == "new" ? "Not Shared" : "Not Accessible";;
             data.statusMsgColor = "#ff0000";
@@ -272,7 +273,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                     data.sssDetails = sssDetails[ i ];
                     data.type = sssDetails[ i ].type;
                     data.backupType = backupType;
-                    data.flagAction = backupType == "new" ? false : true;
+                    data.flagAction = sssDetails[ i ].decryptedShare != "" ? false : true;
                     arr_SelfShare[ 0 ] = data;
                 }
                 else if ( sssDetails[ i ].type === 'Self Share 2' && sssDetails[ i ].decryptedShare != "" ) {
@@ -292,7 +293,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                     data.sssDetails = sssDetails[ i ];
                     data.type = sssDetails[ i ].type;
                     data.backupType = backupType;
-                    data.flagAction = backupType == "new" ? false : true;
+                    data.flagAction = sssDetails[ i ].decryptedShare != "" ? false : true;
                     arr_SelfShare[ 1 ] = data;
                 }
                 else {
@@ -312,7 +313,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                     data.sssDetails = sssDetails[ i ];
                     data.type = sssDetails[ i ].type;
                     data.backupType = backupType;
-                    data.flagAction = backupType == "new" ? false : true;
+                    data.flagAction = sssDetails[ i ].decryptedShare != "" ? false : true;
                     arr_SelfShare[ 2 ] = data;
                 }
                 //Secret Question  
@@ -460,64 +461,115 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
                             { renderIf( flag_isTrustedContacts == true )(
                                 <View style={ styles.viewTrustedContacts }>
-                                    <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
-                                        <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Trusted Contacts</Text>
-                                    </View>
-                                    <View style={ { flex: 1 } }>
-                                        <FlatList
-                                            data={
-                                                arr_TrustedContacts
-                                            }
-                                            showsVerticalScrollIndicator={ false }
-                                            renderItem={ ( { item } ) => (
-                                                <TouchableOpacity style={ {
-                                                } } onPress={ () => {
-                                                    this.click_Item( item )
-                                                } }
-                                                    disabled={ item.flagAction }
-                                                >
-                                                    <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
-                                                        <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                                            { renderIf( item.thumbnailPath != "" )(
-                                                                flag_isSetupTrustedContact == true ? <Avatar medium rounded icon={ { name: item.thumbnailPath, type: 'font-awesome' } } /> : <Avatar medium rounded source={ { uri: item.thumbnailPath } } />
+                                    <RkCard
+                                        rkType="shadowed"
+                                        style={ {
+                                            flex: 1,
+                                            margin: 5,
+                                            borderRadius: 10
+                                        } }
+                                    >
+                                        <View
+                                            style={ {
+                                                flex: 1,
+                                                backgroundColor: "#ffffff",
+                                                marginLeft: 10,
+                                                marginRight: 10,
+                                                marginBottom: 15,
+                                                borderRadius: 10,
+                                                borderBottomColor: "#F5F5F5",
+                                                borderBottomWidth: 1
+                                            } }>
+                                            <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
+                                                <SvgIcon
+                                                    name="trustedcontacts"
+                                                    color="gray"
+                                                    size={ 20 }
+                                                />
+                                                <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
+                                                    <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 18 } ] }>Trusted Contacts</Text>
+                                                    <View style={ { flexDirection: "row" } }>
+                                                        <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>Shares you have trusted with your friends and family</Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        </View>
+                                        <View style={ { flex: 1 } }>
+                                            <FlatList
+                                                data={
+                                                    arr_TrustedContacts
+                                                }
+                                                showsVerticalScrollIndicator={ false }
+                                                renderItem={ ( { item } ) => (
+                                                    <TouchableOpacity style={ {
+                                                    } } onPress={ () => {
+                                                        this.click_Item( item )
+                                                    } }
+                                                        disabled={ item.flagAction }
+                                                    >
+                                                        <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
+                                                            <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
+                                                                { renderIf( item.thumbnailPath != "" )(
+                                                                    flag_isSetupTrustedContact == true ? <Avatar medium rounded icon={ { name: item.thumbnailPath, type: 'font-awesome' } } /> : <Avatar medium rounded source={ { uri: item.thumbnailPath } } />
 
-                                                            ) }
-                                                            { renderIf( item.thumbnailPath == "" )(
-                                                                <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
-                                                            ) }
-                                                            <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                                <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
-                                                                <View style={ { flexDirection: "row" } }>
-                                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                                ) }
+                                                                { renderIf( item.thumbnailPath == "" )(
+                                                                    <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
+                                                                ) }
+                                                                <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
+                                                                    <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                                    <View style={ { flexDirection: "row" } }>
+                                                                        <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                                    </View>
                                                                 </View>
-                                                            </View>
-                                                            <View style={ {
-                                                                flex: 1,
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center',
-                                                                flexDirection: "row"
-                                                            } }>
-                                                                <View style={ { flexDirection: "column", flex: 1, alignItems: "center" } }>
-                                                                    <Text note style={ { fontSize: 14 } }>Last assessed on</Text>
-                                                                    <Text style={ { fontSize: 14 } }>4/11/2019 12:23</Text>
+                                                                <View style={ {
+                                                                    flex: 0.1,
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    flexDirection: "row"
+                                                                } }>
+                                                                    <IconFontAwe name="angle-right" style={ { fontSize: 25 } } />
                                                                 </View>
-                                                                <IconFontAwe name="angle-right" style={ { fontSize: 25, marginRight: 10, flex: 0.1 } } />
                                                             </View>
                                                         </View>
-                                                    </View>
-                                                </TouchableOpacity>
-                                            ) }
-                                            keyExtractor={ item => item.recordID }
-                                            extraData={ this.state }
-                                        />
-                                    </View>
+                                                    </TouchableOpacity>
+                                                ) }
+                                                keyExtractor={ item => item.recordID }
+                                                extraData={ this.state }
+                                            />
+                                        </View>
+                                    </RkCard>
                                 </View>
                             ) }
 
                             { renderIf( flag_SelfShare == true )(
-                                <View style={ { flex: 3 } }>
-                                    <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
-                                        <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Self Share</Text>
+                                <RkCard
+                                    rkType="shadowed"
+                                    style={ {
+                                        flex: 3,
+                                        margin: 5,
+                                        borderRadius: 10
+                                    } }
+                                >
+                                    <View
+                                        style={ {
+                                            flex: 1, backgroundColor: "#ffffff",
+                                            marginLeft: 10,
+                                            marginRight: 10,
+                                            marginBottom: 16,
+                                            borderRadius: 10,
+                                            borderBottomColor: "#F5F5F5",
+                                            borderBottomWidth: 1
+                                        } }>
+                                        <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
+                                            <Avatar medium rounded icon={ { name: "user", type: 'font-awesome' } } />
+                                            <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
+                                                <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 18 } ] }>Self Share</Text>
+                                                <View style={ { flexDirection: "row" } }>
+                                                    <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>Shares you self guard  on multiple devices and platforms.</Text>
+                                                </View>
+                                            </View>
+                                        </View>
                                     </View>
                                     <View style={ { flex: 1 } }>
                                         <FlatList
@@ -542,16 +594,12 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                                 </View>
                                                             </View>
                                                             <View style={ {
-                                                                flex: 1,
+                                                                flex: 0.1,
                                                                 alignItems: 'center',
                                                                 justifyContent: 'center',
                                                                 flexDirection: "row"
                                                             } }>
-                                                                <View style={ { flexDirection: "column", flex: 1, alignItems: "center" } }>
-                                                                    <Text note style={ { fontSize: 14 } }>Last assessed on</Text>
-                                                                    <Text style={ { fontSize: 14 } }>4/11/2019 12:23</Text>
-                                                                </View>
-                                                                <IconFontAwe name="angle-right" style={ { fontSize: 25, marginRight: 10, flex: 0.1 } } />
+                                                                <IconFontAwe name="angle-right" style={ { fontSize: 25 } } />
                                                             </View>
                                                         </View>
                                                     </View>
@@ -562,7 +610,8 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                         />
                                     </View>
 
-                                </View>
+
+                                </RkCard>
                             ) }
 
                             { renderIf( flag_isMnemonic == true )(
@@ -628,9 +677,34 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                             ) }
 
                             { renderIf( flag_isSecretQuestions == true )(
-                                <View style={ { flex: 1 } }>
-                                    <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
-                                        <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Secret Questions</Text>
+                                <RkCard
+                                    rkType="shadowed"
+                                    style={ {
+                                        flex: 1,
+                                        margin: 5,
+                                        borderRadius: 10
+                                    } }
+                                >
+                                    <View
+                                        style={ {
+                                            flex: 1,
+                                            backgroundColor: "#ffffff",
+                                            marginLeft: 10,
+                                            marginRight: 10,
+                                            marginBottom: 15,
+                                            borderRadius: 10,
+                                            borderBottomColor: "#F5F5F5",
+                                            borderBottomWidth: 1
+                                        } }>
+                                        <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
+                                            <Avatar medium rounded icon={ { name: "user", type: 'font-awesome' } } />
+                                            <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
+                                                <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 18 } ] }>Secret Questions</Text>
+                                                <View style={ { flexDirection: "row" } }>
+                                                    <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>Answer to the question is used to password protect your shares & PDF.</Text>
+                                                </View>
+                                            </View>
+                                        </View>
                                     </View>
                                     <View style={ { flex: 1 } }>
                                         <FlatList
@@ -641,52 +715,31 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                 <TouchableOpacity
                                                     onPress={ () => this.click_SecretQuestion( item ) }
                                                 >
-                                                    <RkCard
-                                                        rkType="shadowed"
-                                                        style={ {
-                                                            flex: 1,
-                                                            borderRadius: 8,
-                                                            marginLeft: 8,
-                                                            marginRight: 8,
-                                                            marginBottom: 4,
-                                                        } }
-                                                    >
-                                                        <View
-                                                            rkCardHeader
-                                                            style={ {
-                                                                flex: 1,
-                                                            } }
-                                                        >
-                                                            <View style={ { flex: 0.2, justifyContent: "center", alignItems: "flex-start" } }>
-                                                                <SvgIcon
-                                                                    name={ item.icon }
-                                                                    color="#BABABA"
-                                                                    size={ 30 }
-                                                                />
+                                                    <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
+                                                        <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
+                                                            <Avatar medium rounded icon={ { name: "lock", type: 'font-awesome' } } />
+                                                            <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
+                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.title }</Text>
+                                                                <View style={ { flexDirection: "row" } }>
+                                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.color } ] }>{ item.subTitle }</Text>
+                                                                </View>
                                                             </View>
-                                                            <View style={ { flex: 1, flexDirection: "column" } }>
-                                                                <Text
-                                                                    style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] }
-                                                                >
-                                                                    { item.title }
-                                                                </Text>
-                                                                <Text note numberOfLines={ 1 } style={ { fontSize: 11, color: item.color } }>{ item.subTitle }</Text>
-                                                            </View>
-                                                            <View style={ { flex: 0.2, justifyContent: "center", alignItems: "flex-end" } }>
-                                                                <SvgIcon
-                                                                    name="icon_forword"
-                                                                    color="#BABABA"
-                                                                    size={ 20 }
-                                                                />
+                                                            <View style={ {
+                                                                flex: 0.1,
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                flexDirection: "row"
+                                                            } }>
+                                                                <IconFontAwe name="angle-right" style={ { fontSize: 25 } } />
                                                             </View>
                                                         </View>
-                                                    </RkCard>
+                                                    </View>
                                                 </TouchableOpacity>
                                             ) }
                                             keyExtractor={ ( item, index ) => index }
                                         />
                                     </View>
-                                </View>
+                                </RkCard>
                             ) }
 
 

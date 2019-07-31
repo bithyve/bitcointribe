@@ -218,13 +218,6 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                     queTemp,
                     resCheckHealthAllShare
                 );
-                var getBal = await regularAccount.getBalance();
-                console.log( { getBal } );
-                if ( getBal.status == 200 ) {
-                    getBal = getBal.data;
-                } else {
-                    alert.simpleOk( "Oops", getBal.err );
-                }
                 var resDecryptStaticNonPMDD = await sss.decryptStaticNonPMDD( encryptedStaticNonPMDD );
                 console.log( { resDecryptStaticNonPMDD } );
                 if ( resDecryptStaticNonPMDD.status == 200 ) {
@@ -234,18 +227,11 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                     console.log( { resImportSecureAccount } );
                     if ( resImportSecureAccount.status == 200 ) {
                         resImportSecureAccount = resImportSecureAccount.data;
-                        var getBalSecure = await secureAccount.getBalance();
-                        console.log( { getBalSecure } );
-                        if ( getBalSecure.status == 200 ) {
-                            getBalSecure = getBalSecure.data;
-                        } else {
-                            alert.simpleOk( "Oops", getBalSecure.err );
-                        }
                         let resInsertDailyAccount = await dbOpration.insertCreateAccount(
                             localDB.tableName.tblAccount,
                             dateTime,
                             "",
-                            ( getBal.balance + getBal.unconfirmedBalance ) / 1e8,
+                            "0.0",
                             "BTC",
                             "Daily Wallet",
                             "Daily Wallet",
@@ -255,7 +241,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                             localDB.tableName.tblAccount,
                             dateTime,
                             "",
-                            ( getBalSecure.balance + getBalSecure.unconfirmedBalance ) / 1e8,
+                            "0.0",
                             "BTC",
                             "Secure Account",
                             "Secure Account",
@@ -273,8 +259,6 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                             setTimeout( () => {
                                 let data = {};
                                 data.walletName = walletName;
-                                data.balR = ( getBal.balance + getBal.unconfirmedBalance ) / 1e8;
-                                data.balS = ( getBalSecure.balance + getBalSecure.unconfirmedBalance ) / 1e8;
                                 this.props.click_Next( data );
                                 AsyncStorage.setItem(
                                     asyncStorageKeys.rootViewController,

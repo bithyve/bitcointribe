@@ -1566,7 +1566,6 @@ export default class WalletScreen extends React.Component {
     PdfPassword.setPdfPasswrod( pdfPath, pdffilePassword, ( err: any ) => { console.log( err ) }, ( msg: any ) => { console.log( msg ) } );
   }
 
-
   //TODO: Get All Account Bal
   getBalAndHealth = async () => {
     this.setState( {
