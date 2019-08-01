@@ -21,17 +21,17 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import * as Animatable from "react-native-animatable";
 import Accordion from "react-native-collapsible/Accordion";
 
-//TODO: Custome Pages
+//TODO: Custome Pages    
 import { colors, images } from "bithyve/src/app/constants/Constants";
-var utils = require("bithyve/src/app/constants/Utils");
+var utils = require( "bithyve/src/app/constants/Utils" );
 import renderIf from "bithyve/src/app/constants/validation/renderIf";
 
 //localization
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
 
 export default class RecentTransactionsScreen extends React.Component {
-  constructor(props: any) {
-    super(props);
+  constructor ( props: any ) {
+    super( props );
     this.state = {
       activeSections: [],
       recentRrasactionDetials: [],
@@ -42,24 +42,24 @@ export default class RecentTransactionsScreen extends React.Component {
 
   componentWillMount() {
     const { navigation } = this.props;
-    let recentTrans = navigation.getParam("transationDetails");
+    let recentTrans = navigation.getParam( "transationDetails" );
     let sentAndReceivedOn;
-    if (recentTrans.transactionType == "Sent") {
+    if ( recentTrans.transactionType == "Sent" ) {
       sentAndReceivedOn = "Recipient";
     } else {
       sentAndReceivedOn = "Received On";
     }
     var temp = [
       {
-        title: localization("TransactionDetailsWebViewScreen.txtHash"),
+        title: localization( "TransactionDetailsWebViewScreen.txtHash" ),
         content: recentTrans.transactionHash
       },
       {
-        title: localization("TransactionDetailsWebViewScreen.txtDate"),
-        content: utils.getUnixToDateFormat(recentTrans.lastUpdated)
+        title: localization( "TransactionDetailsWebViewScreen.txtDate" ),
+        content: utils.getUnixToDateFormat( recentTrans.lastUpdated )
       },
       {
-        title: localization("TransactionDetailsWebViewScreen.txtAmount"),
+        title: localization( "TransactionDetailsWebViewScreen.txtAmount" ),
         content: recentTrans.balance / 1e8
       },
       // {
@@ -67,78 +67,78 @@ export default class RecentTransactionsScreen extends React.Component {
       //   content: "pending"
       // },
       {
-        title: localization("TransactionDetailsWebViewScreen.txtFee"),
+        title: localization( "TransactionDetailsWebViewScreen.txtFee" ),
         content: recentTrans.fees / 1e8
       }
     ];
 
-    this.setState({
+    this.setState( {
       recentRrasactionDetials: temp,
       transType: recentTrans.transactionType
-    });
+    } );
   }
 
-  renderHeader = (section, _, isActive) => {
+  renderHeader = ( section, _, isActive ) => {
     return (
       <Animatable.View
-        duration={400}
-        style={[styles.header, isActive ? styles.active : styles.inactive]}
+        duration={ 400 }
+        style={ [ styles.header, isActive ? styles.active : styles.inactive ] }
         transition="backgroundColor"
       >
-        <Text style={styles.headerText}>{section.title}</Text>
+        <Text style={ styles.headerText }>{ section.title }</Text>
       </Animatable.View>
     );
   };
 
   //TODO: func openHashDetails
-  async openHashDetails(hashKey) {
-    this.props.navigation.push("TransactionDetailsWebViewScreen", {
+  async openHashDetails( hashKey ) {
+    this.props.navigation.push( "TransactionDetailsWebViewScreen", {
       url: "https://live.blockcypher.com/btc-testnet/tx/" + hashKey
-    });
+    } );
   }
 
-  renderContent(section, _, isActive) {
+  renderContent( section, _, isActive ) {
     return (
       <Animatable.View
-        duration={400}
-        style={[styles.content, isActive ? styles.active : styles.inactive]}
+        duration={ 400 }
+        style={ [ styles.content, isActive ? styles.active : styles.inactive ] }
         transition="backgroundColor"
       >
-        {renderIf(
+        { renderIf(
           section.title ==
-            localization("TransactionDetailsWebViewScreen.txtHash")
+          localization( "TransactionDetailsWebViewScreen.txtHash" )
         )(
           <TouchableOpacity
-            key={section.content}
-            onPress={() => this.openHashDetails([section.content])}
+            key={ section.content }
+            onPress={ () => this.openHashDetails( [ section.content ] ) }
           >
-            <View style={styles.viewHashContent}>
+            <View style={ styles.viewHashContent }>
               <Animatable.Text
-                style={[styles.content, { flex: 9 }]}
-                animation={isActive ? "bounceIn" : undefined}
+                style={ [ styles.content, { flex: 9 } ] }
+                animation={ isActive ? "bounceIn" : undefined }
               >
-                {section.content}
+                { section.content }
               </Animatable.Text>
               <Icon
-                style={{ flex: 1, alignSelf: "center" }}
+                style={ { flex: 1, alignSelf: "center" } }
                 name="safari"
-                size={25}
-                color={colors.appColor}
+                size={ 25 }
+                color={ colors.appColor }
               />
             </View>
           </TouchableOpacity>
-        )}
-        {renderIf(
+        ) }
+        { renderIf(
           section.title !=
-            localization("TransactionDetailsWebViewScreen.txtHash")
+          localization( "TransactionDetailsWebViewScreen.txtHash" )
         )(
           <Animatable.Text
-            style={styles.content}
-            animation={isActive ? "bounceIn" : undefined}
+            style={ styles.content }
+            animation={ isActive ? "bounceIn" : undefined }
           >
-            {section.content}
+            { section.content }
           </Animatable.Text>
-        )}
+        ) }
       </Animatable.View>
     );
   }
@@ -148,46 +148,46 @@ export default class RecentTransactionsScreen extends React.Component {
     return (
       <Container>
         <ImageBackground
-          source={images.appBackgound}
-          style={styles.backgroundImage}
+          source={ images.appBackgound }
+          style={ styles.backgroundImage }
         >
           <Header transparent>
             <Left>
               <Button
                 transparent
-                onPress={() => this.props.navigation.goBack()}
+                onPress={ () => this.props.navigation.goBack() }
               >
-                <Icon name="chevron-left" size={25} color="#ffffff" />
+                <Icon name="chevron-left" size={ 25 } color="#ffffff" />
               </Button>
             </Left>
-            <Body style={{ flex: 0, alignItems: "center" }}>
+            <Body style={ { flex: 0, alignItems: "center" } }>
               <Title
-                adjustsFontSizeToFit={true}
-                numberOfLines={1}
-                style={styles.titleUserName}
+                adjustsFontSizeToFit={ true }
+                numberOfLines={ 1 }
+                style={ styles.titleUserName }
               >
-                {localization("TransactionDetailsWebViewScreen.headerTitle")}
+                { localization( "TransactionDetailsWebViewScreen.headerTitle" ) }
               </Title>
             </Body>
             <Right />
           </Header>
           <Content
-            contentContainerStyle={styles.container}
-            scrollEnabled={false}
+            contentContainerStyle={ styles.container }
+            scrollEnabled={ false }
           >
             <ScrollView>
-              <Text style={[styles.title]}>
-                {localization("TransactionDetailsWebViewScreen.tranType", {
+              <Text style={ [ styles.title ] }>
+                { localization( "TransactionDetailsWebViewScreen.tranType", {
                   transType: this.state.transType
-                })}
+                } ) }
               </Text>
               <Accordion
-                activeSections={activeSections}
-                sections={this.state.recentRrasactionDetials}
-                renderHeader={this.renderHeader}
-                renderContent={this.renderContent.bind(this)}
-                duration={400}
-                collapsed={false}
+                activeSections={ activeSections }
+                sections={ this.state.recentRrasactionDetials }
+                renderHeader={ this.renderHeader }
+                renderContent={ this.renderContent.bind( this ) }
+                duration={ 400 }
+                collapsed={ false }
               />
             </ScrollView>
           </Content>
@@ -197,7 +197,7 @@ export default class RecentTransactionsScreen extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1,
     backgroundColor: "rgba(245,252,255,1)"
@@ -239,4 +239,4 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row"
   }
-});
+} );

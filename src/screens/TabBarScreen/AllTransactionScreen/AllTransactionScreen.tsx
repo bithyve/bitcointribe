@@ -27,7 +27,7 @@ import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
 
 //TODO: Bitcoin Class
-import { getRegularClassState, setRegularClassState, getSecureClassState, setSecureClassState } from "HexaWallet/src/app/manager/ClassState/BitcoinClassState";
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 
 export default class AllTransactionScreen extends React.Component {
   state = {
@@ -67,10 +67,10 @@ export default class AllTransactionScreen extends React.Component {
 
   async getRegularTransaction() {
     this.setState( { flag_Loading: true } );
-    let regularAccount = await getRegularClassState();
+    let regularAccount = await bitcoinClassState.getRegularClassState();
     var regularAccountTransactions = await regularAccount.getTransactions();
     if ( regularAccountTransactions.status == 200 ) {
-      await setRegularClassState( regularAccount );
+      await bitcoinClassState.setRegularClassState( regularAccount );
       regularAccountTransactions = regularAccountTransactions.data;
       this.setState( { recentRegularTransactions: regularAccountTransactions.transactions.transactionDetails } )
     } else {
@@ -79,10 +79,10 @@ export default class AllTransactionScreen extends React.Component {
   }
 
   async getSecureTransaction() {
-    let secureAccount = await getSecureClassState();
+    let secureAccount = await bitcoinClassState.getSecureClassState();
     var secureAccountTransactions = await secureAccount.getTransactions();
     if ( secureAccountTransactions.status == 200 ) {
-      await setSecureClassState( secureAccount );
+      await bitcoinClassState.setSecureClassState( secureAccount );
       secureAccountTransactions = secureAccountTransactions.data;
       this.setState( { recentSecureTransactions: secureAccountTransactions.transactions.transactionDetails } )
     } else {

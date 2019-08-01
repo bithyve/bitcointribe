@@ -18,6 +18,7 @@ import { Icon } from 'react-native-elements'
 import { SvgIcon } from "@up-shared/components";
 import { RkCard } from "react-native-ui-kitten";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
+import ImageSVG from 'react-native-remote-svg';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Permissions from 'react-native-permissions';
 import { Avatar } from 'react-native-elements';
@@ -52,7 +53,7 @@ let alert = new AlertSimple();
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Custome Object
-import { colors, images, localDB, expaire } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, svgIcon, localDB, expaire } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
@@ -74,17 +75,17 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 familyName: "",
                 statusMsgColor: "gray",
                 statusMsg: "Not Shared",
-                flagAction: true,
+                flagAction: false,
             }, {
                 thumbnailPath: "user",
                 givenName: "Trusted Contacts 2",
                 familyName: "",
                 statusMsgColor: "gray",
                 statusMsg: "Not Shared",
-                flagAction: true,
+                flagAction: false,
             } ],
             arr_SelfShare: [ {
-                thumbnailPath: "bars",
+                thumbnailPath: "wallet",
                 givenName: "Secondary Device",
                 familyName: "",
                 statusMsgColor: "#ff0000",
@@ -92,7 +93,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 type: "Self Share 1",
                 flagAction: true,
             }, {
-                thumbnailPath: "bars",
+                thumbnailPath: "email",
                 givenName: "Email",
                 familyName: "",
                 statusMsgColor: "#ff0000",
@@ -100,7 +101,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 type: "Self Share 2",
                 flagAction: true,
             }, {
-                thumbnailPath: "bars",
+                thumbnailPath: "cloudstorage",
                 givenName: "Cloud",
                 familyName: "",
                 statusMsgColor: "#ff0000",
@@ -156,6 +157,14 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
     }
 
 
+    getActionTrustedCont( backupType: string, decryptedShare: string ) {
+        if ( backupType != "new" && decryptedShare == "" ) {
+            return true
+        } else {
+            return false
+        }
+    }
+
     getTrustedContactArray( sssDetails: any, backupType: string ) {
         console.log( { sssDetails, backupType } );
 
@@ -171,9 +180,9 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         data.givenName = keeperInfo.givenName;
         data.familyName = keeperInfo.familyName;
         data.backupType = backupType;
-        data.flagAction = decryptedShare != "" ? false : true;
+        data.flagAction = this.getActionTrustedCont( backupType, decryptedShare );
         if ( sssDetails.sharedDate == "" && sssDetails.shareStage == "Ugly" ) {
-            data.statusMsg = backupType == "new" ? "Not Shared" : "Not Accessible";;
+            data.statusMsg = "Not Shared";
             data.statusMsgColor = "#ff0000";
             data.flag_timer = false;
         } else if ( sssDetails.sharedDate != "" && sssDetails.shareStage == "Ugly" ) {
@@ -265,7 +274,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                     let statusColor = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 1 ];
                     console.log( { statusMsg, statusColor } );
                     let data = {};
-                    data.thumbnailPath = "bars";
+                    data.thumbnailPath = "wallet";
                     data.givenName = "Secondary Device";
                     data.familyName = "";
                     data.statusMsgColor = statusColor;
@@ -285,7 +294,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                     let statusColor = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 1 ];
                     console.log( { statusMsg, statusColor } );
                     let data = {};
-                    data.thumbnailPath = "bars";
+                    data.thumbnailPath = "email";
                     data.givenName = "Email";
                     data.familyName = "";
                     data.statusMsgColor = statusColor;
@@ -305,7 +314,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                     let statusColor = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 1 ];
                     console.log( { statusMsg, statusColor } );
                     let data = {};
-                    data.thumbnailPath = "bars";
+                    data.thumbnailPath = "cloudstorage";
                     data.givenName = "Cloud";
                     data.familyName = "";
                     data.statusMsgColor = statusColor;
@@ -458,7 +467,6 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                             enableOnAndroid={ true }
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
-
                             { renderIf( flag_isTrustedContacts == true )(
                                 <View style={ styles.viewTrustedContacts }>
                                     <RkCard
@@ -480,16 +488,11 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                 borderBottomColor: "#F5F5F5",
                                                 borderBottomWidth: 1
                                             } }>
-                                            <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                                <SvgIcon
-                                                    name="trustedcontacts"
-                                                    color="gray"
-                                                    size={ 20 }
-                                                />
+                                            <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, marginLeft: -3, borderRadius: 10 } } >
                                                 <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                    <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 18 } ] }>Trusted Contacts</Text>
+                                                    <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Trusted Contacts</Text>
                                                     <View style={ { flexDirection: "row" } }>
-                                                        <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>Shares you have trusted with your friends and family</Text>
+                                                        <Text note numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Shares with your friends and family</Text>
                                                     </View>
                                                 </View>
                                             </View>
@@ -509,17 +512,21 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                     >
                                                         <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                                                             <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                                                { renderIf( item.thumbnailPath != "" )(
-                                                                    flag_isSetupTrustedContact == true ? <Avatar medium rounded icon={ { name: item.thumbnailPath, type: 'font-awesome' } } /> : <Avatar medium rounded source={ { uri: item.thumbnailPath } } />
-
+                                                                { renderIf( item.givenName == "Trusted Contacts 1" || item.givenName == "Trusted Contacts 2" )(
+                                                                    <ImageSVG
+                                                                        style={ { width: 55, height: 55 } }
+                                                                        source={
+                                                                            svgIcon.healthoftheapp.selectcontacts
+                                                                        }
+                                                                    />
                                                                 ) }
-                                                                { renderIf( item.thumbnailPath == "" )(
-                                                                    <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
+                                                                { renderIf( item.givenName != "Trusted Contacts 1" && item.givenName != "Trusted Contacts 2" )(
+                                                                    <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } titleStyle={ { color: colors.appColor } } />
                                                                 ) }
                                                                 <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                                    <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                                    <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                                     <View style={ { flexDirection: "row" } }>
-                                                                        <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                                        <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
                                                                     </View>
                                                                 </View>
                                                                 <View style={ {
@@ -561,12 +568,11 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                             borderBottomColor: "#F5F5F5",
                                             borderBottomWidth: 1
                                         } }>
-                                        <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                            <Avatar medium rounded icon={ { name: "user", type: 'font-awesome' } } />
+                                        <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, marginLeft: -3, borderRadius: 10 } } >
                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 18 } ] }>Self Share</Text>
+                                                <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Self Share</Text>
                                                 <View style={ { flexDirection: "row" } }>
-                                                    <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>Shares you self guard  on multiple devices and platforms.</Text>
+                                                    <Text note numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Shares you self guard</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -586,11 +592,16 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                 >
                                                     <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                                                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                                            <Avatar medium rounded icon={ { name: item.thumbnailPath, type: 'font-awesome' } } />
+                                                            <ImageSVG
+                                                                style={ { width: 55, height: 55 } }
+                                                                source={
+                                                                    svgIcon.healthoftheapp[ item.thumbnailPath ]
+                                                                }
+                                                            />
                                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                                 <View style={ { flexDirection: "row" } }>
-                                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                                    <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
                                                                 </View>
                                                             </View>
                                                             <View style={ {
@@ -696,12 +707,11 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                             borderBottomColor: "#F5F5F5",
                                             borderBottomWidth: 1
                                         } }>
-                                        <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                            <Avatar medium rounded icon={ { name: "user", type: 'font-awesome' } } />
+                                        <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, marginLeft: -3, borderRadius: 10 } } >
                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 18 } ] }>Secret Questions</Text>
+                                                <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Secret Questions</Text>
                                                 <View style={ { flexDirection: "row" } }>
-                                                    <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>Answer to the question is used to password protect your shares & PDF.</Text>
+                                                    <Text note numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Answer is used to protect your shares and PDF</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -717,11 +727,16 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                 >
                                                     <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                                                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                                            <Avatar medium rounded icon={ { name: "lock", type: 'font-awesome' } } />
+                                                            <ImageSVG
+                                                                style={ { width: 55, height: 55 } }
+                                                                source={
+                                                                    svgIcon.healthoftheapp.question
+                                                                }
+                                                            />
                                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.title }</Text>
+                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.title }</Text>
                                                                 <View style={ { flexDirection: "row" } }>
-                                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.color } ] }>{ item.subTitle }</Text>
+                                                                    <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.color } ] }>{ item.subTitle }</Text>
                                                                 </View>
                                                             </View>
                                                             <View style={ {

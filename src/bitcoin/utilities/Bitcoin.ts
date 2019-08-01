@@ -523,6 +523,26 @@ export default class Bitcoin {
     console.log( "---- Transaction Broadcasted ----" );
     return res;
   }
+  public testnetFaucet = async (
+    recipientAddress: string,
+  ): Promise<{
+    txid: any;
+    funded: any;
+  }> => {
+    const amount = Math.trunc( Math.random() * 1e5 ) / 1e8;
+    console.log( { amount } );
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post( "/testnetFaucet", {
+        recipientAddress,
+        amount,
+      } );
+    } catch ( err ) {
+      throw new Error( err.response.data.err );
+    }
+    const { txid, funded } = res.data;
+    return { txid, funded };
+  }
 
   public generateMultiSig = (
     required: number,

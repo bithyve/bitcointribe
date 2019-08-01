@@ -272,6 +272,31 @@ export default class SecureAccount {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
+  public getTestcoins = async (): Promise<
+    | {
+      status: number;
+      data: {
+        txid: any;
+        funded: any;
+      };
+      err?: undefined;
+    }
+    | {
+      status: number;
+      err: string;
+      data?: undefined;
+    }
+  > => {
+    try {
+      const { address } = await this.secureHDWallet.getReceivingAddress();
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.secureHDWallet.testnetFaucet( address ),
+      };
+    } catch ( err ) {
+      return { status: config.STATUS.ERROR, err: err.message };
+    }
+  }
 
   public setupSecureAccount = async (): Promise<
     | {

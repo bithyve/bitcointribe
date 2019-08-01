@@ -18,6 +18,7 @@ import { Icon } from 'react-native-elements'
 import { SvgIcon } from "@up-shared/components";
 import { RkCard } from "react-native-ui-kitten";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
+import ImageSVG from 'react-native-remote-svg';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Permissions from 'react-native-permissions';
 import { Avatar } from 'react-native-elements';
@@ -47,7 +48,7 @@ let alert = new AlertSimple();
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, svgIcon, localDB } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
@@ -80,19 +81,19 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                 opt: undefined,
             } ],
             arr_SelfShare: [ {
-                thumbnailPath: "bars",
+                thumbnailPath: "wallet",
                 givenName: "Wallet",
                 familyName: "",
                 statusMsgColor: "#ff0000",
                 statusMsg: "Not confirmed",
             }, {
-                thumbnailPath: "bars",
+                thumbnailPath: "email",
                 givenName: "Email",
                 familyName: "",
                 statusMsgColor: "#ff0000",
                 statusMsg: "Not confirmed",
             }, {
-                thumbnailPath: "bars",
+                thumbnailPath: "cloudstorage",
                 givenName: "iCloud",
                 familyName: "",
                 statusMsgColor: "#ff0000",
@@ -197,7 +198,7 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                         counterConfirm = counterConfirm + 1;
                     }
                     let data = {};
-                    data.thumbnailPath = "bars";
+                    data.thumbnailPath = "wallet";
                     data.givenName = "Wallet";
                     data.familyName = "";
                     data.statusMsgColor = statusColor;
@@ -214,7 +215,7 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                         counterConfirm = counterConfirm + 1;
                     }
                     let data = {};
-                    data.thumbnailPath = "bars";
+                    data.thumbnailPath = "email";
                     data.givenName = "Email";
                     data.familyName = "";
                     data.statusMsgColor = statusColor;
@@ -231,7 +232,7 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                         counterConfirm = counterConfirm + 1;
                     }
                     let data = {};
-                    data.thumbnailPath = "bars";
+                    data.thumbnailPath = "cloudstorage";
                     data.givenName = "iCloud";
                     data.familyName = "";
                     data.statusMsgColor = statusColor;
@@ -397,9 +398,39 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                             enableOnAndroid={ true }
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
-                            <View style={ styles.viewTrustedContacts }>
-                                <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
-                                    <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Trusted contacts</Text>
+                            <RkCard
+                                rkType="shadowed"
+                                style={ {
+                                    flex: 1,
+                                    margin: 5,
+                                    borderRadius: 10
+                                } }
+                            >
+                                <View
+                                    style={ {
+                                        flex: 1,
+                                        backgroundColor: "#ffffff",
+                                        marginLeft: 10,
+                                        marginRight: 10,
+                                        marginBottom: 15,
+                                        borderRadius: 10,
+                                        borderBottomColor: "#F5F5F5",
+                                        borderBottomWidth: 1
+                                    } }>
+                                    <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
+                                        <ImageSVG
+                                            style={ { width: 55, height: 55 } }
+                                            source={
+                                                svgIcon.healthoftheapp.trustedcontacts
+                                            }
+                                        />
+                                        <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
+                                            <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Trusted Contacts</Text>
+                                            <View style={ { flexDirection: "row" } }>
+                                                <Text note style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Shares you have trusted with your friends and family</Text>
+                                            </View>
+                                        </View>
+                                    </View>
                                 </View>
                                 <View style={ { flex: 1 } }>
                                     <FlatList
@@ -415,30 +446,31 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                                             >
                                                 <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                                                     <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                                        { renderIf( item.thumbnailPath != "" )(
-                                                            flag_isSetupTrustedContact == true ? <Avatar medium rounded icon={ { name: item.thumbnailPath, type: 'font-awesome' } } /> : <Avatar medium rounded source={ { uri: item.thumbnailPath } } />
-
+                                                        { renderIf( item.givenName == "Trusted Contacts 1" || item.givenName == "Trusted Contacts 2" )(
+                                                            <ImageSVG
+                                                                style={ { width: 55, height: 55 } }
+                                                                source={
+                                                                    svgIcon.healthoftheapp.selectcontacts
+                                                                }
+                                                            />
                                                         ) }
-                                                        { renderIf( item.thumbnailPath == "" )(
-                                                            <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
+                                                        { renderIf( item.givenName != "Trusted Contacts 1" && item.givenName != "Trusted Contacts 2" )(
+                                                            <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } titleStyle={ { color: colors.appColor } } />
                                                         ) }
                                                         <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                            <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                            <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                             <View style={ { flexDirection: "row" } }>
-                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                                <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
                                                             </View>
                                                         </View>
                                                         <View style={ {
-                                                            flex: 1,
+                                                            flex: 0.1,
                                                             alignItems: 'center',
                                                             justifyContent: 'center',
                                                             flexDirection: "row"
                                                         } }>
-                                                            <View style={ { flexDirection: "column", flex: 1, alignItems: "center" } }>
-                                                                <Text note style={ { fontSize: 14 } }>Last assessed on</Text>
-                                                                <Text style={ { fontSize: 14 } }>4/11/2019 12:23</Text>
-                                                            </View>
-                                                            <IconFontAwe name="angle-right" style={ { fontSize: 25, marginRight: 10, flex: 0.1 } } />
+
+                                                            <IconFontAwe name="angle-right" style={ { fontSize: 25 } } />
                                                         </View>
                                                     </View>
                                                 </View>
@@ -448,12 +480,41 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                                         extraData={ this.state }
                                     />
                                 </View>
-                            </View>
+                            </RkCard>
 
 
-                            <View style={ { flex: 3 } }>
-                                <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
-                                    <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Self Share</Text>
+                            <RkCard
+                                rkType="shadowed"
+                                style={ {
+                                    flex: 3,
+                                    margin: 5,
+                                    borderRadius: 10
+                                } }
+                            >
+                                <View
+                                    style={ {
+                                        flex: 1, backgroundColor: "#ffffff",
+                                        marginLeft: 10,
+                                        marginRight: 10,
+                                        marginBottom: 16,
+                                        borderRadius: 10,
+                                        borderBottomColor: "#F5F5F5",
+                                        borderBottomWidth: 1
+                                    } }>
+                                    <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
+                                        <ImageSVG
+                                            style={ { width: 55, height: 55 } }
+                                            source={
+                                                svgIcon.healthoftheapp.selfshare
+                                            }
+                                        />
+                                        <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
+                                            <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Self Share</Text>
+                                            <View style={ { flexDirection: "row" } }>
+                                                <Text note style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Shares you self guard  on multiple devices and platforms.</Text>
+                                            </View>
+                                        </View>
+                                    </View>
                                 </View>
                                 <View style={ { flex: 1 } }>
                                     <FlatList
@@ -469,11 +530,16 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                                             >
                                                 <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                                                     <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                                        <Avatar medium rounded icon={ { name: item.thumbnailPath, type: 'font-awesome' } } />
+                                                        <ImageSVG
+                                                            style={ { width: 55, height: 55 } }
+                                                            source={
+                                                                svgIcon.healthoftheapp[ item.thumbnailPath ]
+                                                            }
+                                                        />
                                                         <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                            <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                            <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                             <View style={ { flexDirection: "row" } }>
-                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                                <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
                                                             </View>
                                                         </View>
                                                         <View style={ {
@@ -496,7 +562,8 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                                         extraData={ this.state }
                                     />
                                 </View>
-                            </View>
+                            </RkCard>
+
                             <View style={ { flex: 0.2, justifyContent: "flex-end" } }>
                                 <FullLinearGradientButton
                                     click_Done={ () => this.click_Next() }

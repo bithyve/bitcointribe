@@ -85,7 +85,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         //Singleton Flag value change  
         let address = data.address;
         let amount = data.options.amount.toString();
-        console.log( { address, amount } );
+        console.log( { amount } );
         let walletDetails = await utils.getWalletDetails();
         let arr_AccountList = await comFunDBRead.readTblAccount();
         console.log( { arr_AccountList } );
@@ -103,10 +103,8 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             }
             data.balance = item.balance;
             data.accountName = item.accountName;
-            data.address = item.address;
-            if ( data.address != "" ) {
-                temp.push( data );
-            }
+            temp.push( data );
+
         }
         //Sent button Enable and Disable
         if ( amount != "" && amount < balDailyAccount ) {
@@ -165,9 +163,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
                 data.checked = false;
             }
             data.balance = item.balance;
-
             data.accountName = item.accountName;
-            data.address = item.address;
             temp.push( data );
         }
         console.log( { selectedAccountBal } );

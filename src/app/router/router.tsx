@@ -150,6 +150,10 @@ import ConfirmAndSendPaymentScreen from "HexaWallet/src/screens/DrawerScreen/Pay
 
 
 
+//TODO: Account Transaction Screen
+import TransactionScreen from "HexaWallet/src/screens/DrawerScreen/TransactionScreen/TransactionScreen";
+
+
 
 
 
@@ -280,86 +284,6 @@ const TrustedPartyShareSecretStackNavigator = createStackNavigator(
     initialRouteName: "ContactSharedSecretList"
   }
 );
-
-//TODO: StackNavigator: JointAccountStackRouter
-// const JointAccountStackRouter = createStackNavigator(
-//   {
-//     CreateJointAccountScreen: {
-//       screen: CreateJointAccountScreen,
-//       navigationOptions: { header: null }
-//     },
-//     ReceiveMoneyScreen: {
-//       screen: ReceiveMoneyScreen,
-//       navigationOptions: { header: null }
-//     },
-//     QrcodeScannerScreen: {
-//       screen: QrcodeScannerScreen,
-//       navigationOptions: { header: null }
-//     },
-//     MergeConfirmJointAccountScreen: {
-//       screen: MergeConfirmJointAccountScreen,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "CreateJointAccountScreen"
-//   }
-// );
-
-//TODO: StackNavigator:AccountDetailsOnboardingRouter
-
-// const AccountDetailsOnboardingRouter = createStackNavigator(
-//   {
-//     AccountDetailsOnboardingScreen: {
-//       screen: AccountDetailsOnboardingScreen,
-//       navigationOptions: { header: null }
-//     },
-//     SecureAccountScreen: {
-//       screen: SecureAccountScreen,
-//       navigationOptions: { header: null }
-//     },
-//     SecureSecretKeyScreen: {
-//       screen: SecureSecretKeyScreen,
-//       navigationOptions: { header: null }
-//     },
-//     ValidateSecureAccountScreen: {
-//       screen: ValidateSecureAccountScreen,
-//       navigationOptions: { header: null }
-//     },
-//     CreateJointAccountScreen: {
-//       screen: JointAccountStackRouter,
-//       navigationOptions: { header: null }
-//     },
-//     VaultAccountScreen: {
-//       screen: VaultAccountScreen,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "AccountDetailsOnboardingScreen"
-//   }
-// );
-
-//TODO: StackNavigator:AccountStackNavigatorRouter
-// const AccountStackNavigatorRouter = createStackNavigator(
-//   {
-//     AccountsScreen: {
-//       screen: AccountsScreen,
-//       navigationOptions: { header: null }
-//     },
-//     RecentTransactionsScreen: {
-//       screen: RecentTransactionsScreen,
-//       navigationOptions: { header: null }
-//     },
-//     TransactionDetailsWebViewScreen: {
-//       screen: TransactionDetailsWebViewScreen,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "AccountsScreen"
-//   }
-// );
 
 
 //TODO: FirstTimeWalletSetupStackNavigatorRouter
@@ -558,6 +482,17 @@ const SendPaymentStackNavigator = createStackNavigator(
 )
 
 
+//TODO: Account Transaction StackNavigator
+const AccountTransactionStackNavigator = createStackNavigator( {
+  TransactionScreen: {
+    screen: TransactionScreen,
+    navigationOptions: { header: null }
+  }
+},
+  {
+    initialRouteName: "TransactionScreen"
+  } )
+
 
 //TODO: TabNavigator
 //TODO: TabNavigator:TabNavigator
@@ -622,35 +557,6 @@ const TabNavigator = createBottomTabNavigator(
   }
 );
 
-//TODO: DrawerNavigator
-//TODO: DrawerNavigator:LeftDrawerNavigator
-// const LeftDrawerNavigator = createDrawerNavigator(
-//   {
-//     Home: {
-//       screen: TabNavigator,
-//       navigationOptions: {
-//         drawerLabel: "Home",
-//         drawerIcon: ( { tintColor } ) => <Icon name="home" size={ 17 } />
-//       }
-//     }
-//   },
-
-//   {
-//     initialRouteName: "Home",
-//     //  contentComponent: DrawerScreen,
-//     drawerPosition: "left",
-//     drawerOpenRoute: "DrawerOpen",
-//     drawerCloseRoute: "DrawerClose",
-//     drawerToggleRoute: "DrawerToggle",
-//     contentOptions: {
-//       activeTintColor: "#e91e63",
-//       style: {
-//         flex: 1,
-//         paddingTop: 15
-//       }
-//     }
-//   }
-// );
 
 //TODO: RootNavigator
 //TODO: RootNavigator:createRootNavigator
@@ -751,6 +657,11 @@ export const createRootNavigator = (
       //SentPayment    
       SendPaymentNavigator: {
         screen: SendPaymentStackNavigator,
+        navigationOptions: { header: null }
+      },
+      //TODO: Transaction Navigation
+      AccountTransactionNavigator: {
+        screen: AccountTransactionStackNavigator,
         navigationOptions: { header: null }
       }
       //Drwaer Navigation

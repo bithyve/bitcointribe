@@ -298,6 +298,31 @@ export default class RegularAccount {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
+  public getTestcoins = async (): Promise<
+    | {
+      status: number;
+      data: {
+        txid: any;
+        funded: any;
+      };
+      err?: undefined;
+    }
+    | {
+      status: number;
+      err: string;
+      data?: undefined;
+    }
+  > => {
+    try {
+      const { address } = await this.hdWallet.getReceivingAddress();
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.hdWallet.testnetFaucet( address ),
+      };
+    } catch ( err ) {
+      return { status: config.STATUS.ERROR, err: err.message };
+    }
+  }
 
   public getTransactions = async (): Promise<
     | {

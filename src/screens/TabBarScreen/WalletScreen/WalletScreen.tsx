@@ -14,14 +14,15 @@ import {
   ImageBackground,
   NativeModules,
   Platform,
-  ActivityIndicator
+  ActivityIndicator,
+  TouchableOpacity
 } from "react-native";
 import {
   Container,
   Header,
   Title,
-  Content,
   Button,
+  Content,
   Left,
   Right,
   Body,
@@ -35,6 +36,7 @@ import { RkCard } from "react-native-ui-kitten";
 import DropdownAlert from "react-native-dropdownalert";
 import { SvgIcon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
+import ImageSVG from 'react-native-remote-svg';
 import Permissions from 'react-native-permissions';
 import BackgroundFetch from "react-native-background-fetch";
 import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
@@ -69,6 +71,7 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 import {
   colors,
   images,
+  svgIcon,
   localDB
 } from "HexaWallet/src/app/constants/Constants";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
@@ -103,6 +106,7 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+
 
 
 
@@ -277,7 +281,7 @@ export default class WalletScreen extends React.Component {
       let additionalInfo = JSON.parse( dataAccount.additionalInfo );
       //console.log( { additionalInfo } );
       let setupData = additionalInfo != "" ? additionalInfo[ 0 ] : "";
-      //console.log( { setupData } );
+      //console.log( { setupData } );    
       let data = {};
       data.id = dataAccount.id;
       data.accountName = dataAccount.accountName;
@@ -288,10 +292,11 @@ export default class WalletScreen extends React.Component {
       data.lastUpdated = dataAccount.lastUpdated;
       data.unit = dataAccount.unit;
       data.setupData = setupData;
-      if ( setupData != "" )
-        data.secureBtnTitle = setupData.title;
+      if ( data.accountType == "Regular Account" )
+        data.svgIcon = "dailyAccount"
       else
-        data.secureBtnTitle = ""
+        data.svgIcon = "secureAccount"
+
       temp.push( data )
     }
     this.setState( {
@@ -745,6 +750,8 @@ export default class WalletScreen extends React.Component {
       base64string10
     } );
   }
+
+
   //qrstring modify
   getCorrectFormatStirng( share1: string ) {
     share1 = share1.split( '"' ).join( "Doublequote" );
@@ -1557,6 +1564,7 @@ export default class WalletScreen extends React.Component {
     } );
   }
 
+
   // async function to call the Java native method
   async setPdfAndroidPasswrod( pdfPath: string, pdffilePassword: string ) {
     var PdfPassword = NativeModules.PdfPassword;
@@ -1629,177 +1637,198 @@ export default class WalletScreen extends React.Component {
   }
 
 
+
+  //TODO: getTestcoins
+  getTestcoins = async () => {
+    let regularAccount = await bitcoinClassState.getRegularClassState();
+    console.log( { regularAccount } );
+    let secureAccount = await bitcoinClassState.getSecureClassState();
+    var resCoins = await regularAccount.getTestcoins();
+  }
+
+
+
+
+  //TODO: Show account details transaction
+  click_AccountDetails = async ( item: any ) => {
+    let { walletDetails } = this.state;
+    this.props.navigation.push( "AccountTransactionNavigator", { data: item, walletDetails } );
+  }
+
+
   _renderItem( { item, index } ) {
-    let { flag_GetBal, flag_PdfFileCreate } = this.state;
+    let { flag_GetBal } = this.state;
     return (
       <View key={ "card" + index }>
-        { renderIf( item.accountType != "Secure Account" )(
-          <RkCard
-            rkType="shadowed"
-            style={ {
-              flex: 1,
-              margin: 10,
-              height: 145,
-              borderRadius: 10
-            } }
-          >
-
-            <View
-              rkCardHeader
+        <TouchableOpacity onPress={ () => this.click_AccountDetails( item ) }>
+          { renderIf( item.accountType != "Secure Account" )(
+            <RkCard
+              rkType="shadowed"
               style={ {
                 flex: 1,
-                justifyContent: "center",
-                borderBottomColor: "#F5F5F5",
-                borderBottomWidth: 1
-              } }
-            >
-
-              <SvgIcon
-                name="icon_dailywallet"
-                color="#37A0DA"
-                size={ 40 }
-              />
-              <Text
-                style={ [ globalStyle.ffFiraSansMedium, {
-                  flex: 2,
-                  fontSize: 16,
-                  marginLeft: 10
-                } ] }
-              >
-                { item.accountName }
-              </Text>
-              <View style={ { flexDirection: "row" } }>
-                <ActivityIndicator animating={ flag_GetBal } size="small" color="gray" style={ { marginTop: -25 } } />
-                <SvgIcon name="icon_more" color="gray" size={ 15 } />
-              </View>
-            </View>
-            <View
-              rkCardContent
-              style={ {
-                flex: 1,
-                flexDirection: "row"
+                margin: 10,
+                height: 145,
+                borderRadius: 10
               } }
             >
               <View
+                rkCardHeader
                 style={ {
                   flex: 1,
                   justifyContent: "center",
+                  borderBottomColor: "#F5F5F5",
+                  borderBottomWidth: 1
                 } }
               >
-                <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
-              </View>
-              <View style={ { flex: 4 } }>
-                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
-                <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
-                  { item.balance }
+                <ImageSVG
+                  style={ { width: 50, height: 50 } }
+                  source={
+                    svgIcon.walletScreen[ item.svgIcon ]
+                  }
+                />
+                <Text
+                  style={ [ globalStyle.ffFiraSansMedium, {
+                    flex: 2,
+                    fontSize: 16,
+                    marginLeft: 10
+                  } ] }
+                >
+                  { item.accountName }
                 </Text>
-
+                <View style={ { flexDirection: "row" } }>
+                  <ActivityIndicator animating={ flag_GetBal } size="small" color="gray" style={ { marginTop: -25 } } />
+                  <SvgIcon name="icon_more" color="gray" size={ 15 } />
+                </View>
               </View>
               <View
+                rkCardContent
                 style={ {
                   flex: 1,
-                  flexDirection: "row",
-                  alignItems: "flex-end",
-                  justifyContent: "flex-end"
+                  flexDirection: "row"
                 } }
               >
-                <Button transparent>
-                  <SvgIcon
-                    name="timelockNew"
-                    color="gray"
-                    size={ 20 }
-                  />
-                </Button>
-                <Button transparent style={ { marginLeft: 10 } }>
-                  <SvgIcon name="icon_multisig" color="gray" size={ 20 } />
-                </Button>
+                <View
+                  style={ {
+                    flex: 1,
+                    justifyContent: "center",
+                  } }
+                >
+                  <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
+                </View>
+                <View style={ { flex: 4 } }>
+                  <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
+                  <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
+                    { item.balance }
+                  </Text>
+
+                </View>
+                <View
+                  style={ {
+                    flex: 1,
+                    flexDirection: "row",
+                    alignItems: "flex-end",
+                    justifyContent: "flex-end"
+                  } }
+                >
+                  <Button transparent>
+                    <SvgIcon
+                      name="timelockNew"
+                      color="gray"
+                      size={ 20 }
+                    />
+                  </Button>
+                  <Button transparent style={ { marginLeft: 10 } }>
+                    <SvgIcon name="icon_multisig" color="gray" size={ 20 } />
+                  </Button>
+                </View>
+
               </View>
 
-            </View>
-
-          </RkCard>
-        ) }
-        { renderIf( item.accountType == "Secure Account" )(
-          <RkCard
-            rkType="shadowed"
-            style={ {
-              flex: 1,
-              margin: 10,
-              height: 145,
-              borderRadius: 10
-            } }
-          >
-            <View
-              rkCardHeader
+            </RkCard>
+          ) }
+          { renderIf( item.accountType == "Secure Account" )(
+            <RkCard
+              rkType="shadowed"
               style={ {
                 flex: 1,
-                borderBottomColor: "#F5F5F5",
-                borderBottomWidth: 1
-              } }
-            >
-              <SvgIcon
-                name="icon_dailywallet"
-                color="#37A0DA"
-                size={ 40 }
-              />
-              <Text
-                style={ [ globalStyle.ffFiraSansMedium, {
-                  flex: 2,
-                  fontSize: 16,
-                  marginLeft: 10
-                } ] }
-              >
-                { item.accountName }
-              </Text>
-              <View style={ { flexDirection: "row" } }>
-                <ActivityIndicator animating={ flag_GetBal || flag_PdfFileCreate } size="small" color="gray" style={ { marginTop: -25 } } />
-                <SvgIcon name="icon_more" color="gray" size={ 15 } />
-              </View>
-            </View>
-            <View
-              rkCardContent
-              style={ {
-                flex: 1,
-                flexDirection: "row"
+                margin: 10,
+                height: 145,
+                borderRadius: 10
               } }
             >
               <View
+                rkCardHeader
                 style={ {
                   flex: 1,
-                  justifyContent: "center"
+                  borderBottomColor: "#F5F5F5",
+                  borderBottomWidth: 1
                 } }
               >
-                <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
-              </View>
-              <View style={ { flex: 4 } }>
-                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
-                <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
-                  { item.balance }
+                <ImageSVG
+                  style={ { width: 50, height: 50 } }
+                  source={
+                    svgIcon.walletScreen[ item.svgIcon ]
+                  }
+                />
+                <Text
+                  style={ [ globalStyle.ffFiraSansMedium, {
+                    flex: 2,
+                    fontSize: 16,
+                    marginLeft: 10
+                  } ] }
+                >
+                  { item.accountName }
                 </Text>
+                <View style={ { flexDirection: "row" } }>
+                  <ActivityIndicator animating={ flag_GetBal } size="small" color="gray" style={ { marginTop: -25 } } />
+                  <SvgIcon name="icon_more" color="gray" size={ 15 } />
+                </View>
               </View>
               <View
+                rkCardContent
                 style={ {
                   flex: 1,
-                  flexDirection: "row",
-                  alignItems: "flex-end",
-                  justifyContent: "flex-end"
+                  flexDirection: "row"
                 } }
               >
-                <Button transparent>
-                  <SvgIcon
-                    name="timelockNew"
-                    color="gray"
-                    size={ 20 }
-                  />
-                </Button>
-                <Button transparent style={ { marginLeft: 10 } }>
-                  <SvgIcon name="icon_multisig" color="gray" size={ 20 } />
-                </Button>
-              </View>
+                <View
+                  style={ {
+                    flex: 1,
+                    justifyContent: "center"
+                  } }
+                >
+                  <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
+                </View>
+                <View style={ { flex: 4 } }>
+                  <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
+                  <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
+                    { item.balance }
+                  </Text>
+                </View>
+                <View
+                  style={ {
+                    flex: 1,
+                    flexDirection: "row",
+                    alignItems: "flex-end",
+                    justifyContent: "flex-end"
+                  } }
+                >
+                  <Button transparent>
+                    <SvgIcon
+                      name="timelockNew"
+                      color="gray"
+                      size={ 20 }
+                    />
+                  </Button>
+                  <Button transparent style={ { marginLeft: 10 } }>
+                    <SvgIcon name="icon_multisig" color="gray" size={ 20 } />
+                  </Button>
+                </View>
 
-            </View>
-          </RkCard>
-        ) }
+              </View>
+            </RkCard>
+          ) }
+        </TouchableOpacity>
       </View>
     );
   }
@@ -1997,27 +2026,18 @@ export default class WalletScreen extends React.Component {
           </SafeAreaView>
         </Content>
         <DropdownAlert ref={ ref => ( this.dropdown = ref ) } />
-        <Button transparent style={ styles.plusButtonBottom }>
-          <Fab
-            active={ this.state.flag_FabActive }
-            direction="up"
-            containerStyle={ {} }
-            style={ { backgroundColor: colors.appColor } }
-            position="bottomRight"
-            onPress={ () => this.setState( { flag_FabActive: !this.state.flag_FabActive } ) }>
-            <Icon name="add" />
-            <Button style={ { backgroundColor: '#34A34F' } }>
-              <Icon name="logo-whatsapp" />
-            </Button>
-            <Button style={ { backgroundColor: '#3B5998' } }>
-              <Icon name="logo-facebook" />
-            </Button>
-            <Button disabled style={ { backgroundColor: '#DD5144' } }>
-              <Icon name="mail" />
-            </Button>
-          </Fab>
+        <Button
+          transparent
+          style={ styles.plusButtonBottom }
+          onPress={ () => this.getTestcoins() }
+        >
+          <ImageSVG
+            style={ { width: 110, height: 110 } }
+            source={
+              svgIcon.walletScreen.addAccounts
+            }
+          />
         </Button>
-
         <ModelAcceptOrRejectSecret
           data={ arr_ModelAcceptOrRejectSecret }
           closeModal={ () => {
@@ -2050,7 +2070,6 @@ export default class WalletScreen extends React.Component {
             } );
           } }
         />
-
         <ModelSelfShareAcceptAndReject
           data={ arr_ModelSelfShareAcceptAndReject }
           closeModal={ () => {
@@ -2077,7 +2096,6 @@ export default class WalletScreen extends React.Component {
             this.storeSelfShare();
           } }
         />
-
         <ModelBackupShareAssociateContact data={ arr_ModelBackupShareAssociateContact }
           click_AssociateContact={ ( walletName: string ) => {
             Permissions.request( 'contacts' ).then( ( response: any ) => {
@@ -2122,7 +2140,6 @@ export default class WalletScreen extends React.Component {
             } )
           } }
         />
-
         <ModelBackupAssociateOpenContactList data={ arr_ModelBackupAssociateOpenContactList }
           click_OpenContact={ () => {
             this.setState( {
@@ -2158,15 +2175,6 @@ export default class WalletScreen extends React.Component {
               } ]
             } )
             this.props.navigation.push( "HealthOfTheAppNavigator" );
-            // let appHealthStatus = {};
-            // appHealthStatus.backupType = "share";
-            // let resUpdateAppHealthStatus = await dbOpration.updateWalletAppHealthStatus(
-            //   localDB.tableName.tblWallet,
-            //   appHealthStatus
-            // );
-            // if ( resUpdateAppHealthStatus ) {
-            //   await comFunDBRead.readTblWallet();
-            // }  
           } }
           closeModal={ () => {
             this.setState( {
@@ -2192,8 +2200,8 @@ const styles = StyleSheet.create( {
   },
   plusButtonBottom: {
     position: "absolute",
-    bottom: 5,
-    right: 5,
+    bottom: 20,
+    right: -10,
   },
   svgImage: {
     width: "100%",

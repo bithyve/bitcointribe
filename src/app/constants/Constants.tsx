@@ -21,7 +21,7 @@ var images = {
   appBackgound: require( assetsImages + "icon/mainBackgoundImage.png" ),
   appIcon: require( assetsImages + "appLogo.png" ),
   gif: {
-    loader: require( assetsGift + "minloader.gif" ),
+    loader: require( assetsGift + "loader.gif" ),
   },
   slideMenuIcon: require( assetsImages + "icon/slideMenuImage.jpg" ),
   LaunchScreen: {
@@ -125,6 +125,32 @@ var images = {
   }
 };
 
+const assetsSVG = "../../assets/svg/";
+const svgIcon = {
+  healthoftheapp: {
+    trustedcontacts: require( assetsSVG + "healthoftheapp/trustedcontacts.svg" ),
+    selectcontacts: require( assetsSVG + "healthoftheapp/selectcontacts.svg" ),
+    selfshare: require( assetsSVG + "healthoftheapp/selfshare.svg" ),
+    wallet: require( assetsSVG + "healthoftheapp/wallet.svg" ),
+    email: require( assetsSVG + "healthoftheapp/email.svg" ),
+    cloudstorage: require( assetsSVG + "healthoftheapp/cloudstorage.svg" ),
+    secretquestions: require( assetsSVG + "healthoftheapp/secretquestions.svg" ),
+    question: require( assetsSVG + "healthoftheapp/question.svg" ),
+  },
+  walletScreen: {
+    dailyAccount: require( assetsSVG + "walletscreen/icon_dailywallet.svg" ),
+    secureAccount: require( assetsSVG + "walletscreen/icon_securewallet.svg" ),
+    addAccounts: require( assetsSVG + "walletscreen/icon_add.svg" ),
+  },
+  transactionScreen: {
+    1: require( assetsSVG + "transactionScreen/icon_shieldyellow.svg" ),
+    2: require( assetsSVG + "transactionScreen/icon_shieldyellow.svg" ),
+    3: require( assetsSVG + "transactionScreen/icon_shieldyellow.svg" ),
+    4: require( assetsSVG + "transactionScreen/icon_shieldyellow.svg" ),
+    5: require( assetsSVG + "transactionScreen/icon_shieldyellow.svg" )
+  }
+}
+
 
 //Local Database
 var localDB = {
@@ -164,6 +190,7 @@ export {
   localDB,
   colors,
   images,
+  svgIcon,
   notification,
   asyncStorageKeys,
   expaire
