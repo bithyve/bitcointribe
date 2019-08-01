@@ -30,7 +30,7 @@ export default class ModelRestoreAssociateContactListForQRCodeScan extends Compo
     click_SelectContact( item: any ) {
         Alert.alert(
             'Are you sure?',
-            item.givenName + ' ' + item.familyName + ' this contact associate ?',
+           'you want to associate '+ item.givenName + ' ' + item.familyName + '?',
             [
                 {
                     text: 'Cancel',

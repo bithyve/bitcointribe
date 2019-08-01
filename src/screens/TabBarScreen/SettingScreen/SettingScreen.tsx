@@ -75,13 +75,13 @@ export default class SettingScreen extends React.Component<any, any> {
         icon: "shield"
       },
       {
-        title: "Contacts that have shared secret with you",
+        title: "Address Book",
         subTitle: "Contacts you have trusted or the ones who have trusted you",
         icon: "contact-book"
       },
       {
         title: "Settings",
-        subTitle: "Lorem ipsum dolor sit amet",
+        subTitle: "Advanced Settings",
         icon: "settings"
       },
       ],

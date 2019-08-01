@@ -301,7 +301,7 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
                             </Button>
                         </View>
                         <View style={ { flex: 0.1, margin: 20 } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Request back your secret share from trusted contacts</Text>
                         </View>
                         <View style={ { flex: 2 } }>
                             <FlatList
@@ -330,24 +330,24 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
                         </View>
                         { renderIf( flag_ShareBtnDisable == true )(
                             <View style={ { flex: 0.4 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Now only sharing email.</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select method to request share from trusted contact</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_Share( data )
                                     } }
-                                    title="Share"
+                                    title="Request Share"
                                     disabled={ false }
                                     style={ [ { borderRadius: 10 } ] } />
                             </View>
                         ) }
                         { renderIf( flag_ReShareBtnDisable == true )(
                             <View style={ { flex: 0.4 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Now only sharing email.</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select method to request share from trusted contact</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_ReShare( data )
                                     } }
-                                    title="Reshare"
+                                    title="Request Share"
                                     disabled={ false }
                                     style={ [ { borderRadius: 10 } ] } />
                             </View>

@@ -250,7 +250,7 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
                                             autoCorrect={ false } />
                                     </Item>
                                 </View>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20 } ] }>Search contact</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20 } ] }>Select the upto two contacts you trusted at the time of setting up your wallet</Text>
                             </View>
                             <View style={ { flex: 1 } }>
                                 <GridView

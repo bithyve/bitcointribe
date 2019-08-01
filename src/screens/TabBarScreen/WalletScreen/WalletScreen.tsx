@@ -295,7 +295,7 @@ export default class WalletScreen extends React.Component {
         shiledIconPer: 3,
         arr_CustShiledIcon: [
           {
-            "title": "The wallet backup is not secured. Please visit the health section to improve the health of your backup",
+            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
             "image": "sheild_3",
             "imageHeight": this.animatedShieldIconSize,
             "imageWidth": this.animatedShieldIconSize,
@@ -308,7 +308,7 @@ export default class WalletScreen extends React.Component {
         shiledIconPer: 4,
         arr_CustShiledIcon: [
           {
-            "title": "The wallet backup is not secured. Please visit the health section to improve the health of your backup",
+            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
             "image": "sheild_4",
             "imageHeight": this.animatedShieldIconSize,
             "imageWidth": this.animatedShieldIconSize,
@@ -1647,7 +1647,7 @@ export default class WalletScreen extends React.Component {
                 <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
               </View>
               <View style={ { flex: 4 } }>
-                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
+                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } ></Text>
                 <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
                   { item.balance }
                 </Text>
@@ -1726,7 +1726,7 @@ export default class WalletScreen extends React.Component {
                 <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
               </View>
               <View style={ { flex: 4 } }>
-                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
+                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } ></Text>
                 <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
                   { item.balance }
                 </Text>
@@ -1843,7 +1843,7 @@ export default class WalletScreen extends React.Component {
                     }
                   }
                   else {
-                    alert.simpleOk( "Oops", "Wait pdf file creating" );
+                    alert.simpleOk( "Please come back later, Hexa is still working" );
                   }
                 }
                 } />

@@ -71,7 +71,7 @@ export default class ModelWalletSuccessfullyRestored extends Component<Props, an
                             <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingMnemonic.walletrestored } />
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-end" } }>
-                            <Text note style={ styles.txtNotes }>Your Wallet has been recovered successfully</Text>
+                            <Text note style={ styles.txtNotes }>Congratulations! Wallet successfully restored</Text>
                             <Text note>{ data.length != 0 ? data[ 0 ].walletName : "Hexa Wallet" }</Text>
                             <View style={ { flexDirection: "row", justifyContent: "center", alignItems: "center", margin: 10 } }>
                                 <SvgIcon name="icon_bitcoin" color="#D0D0D0" size={ 20 } />
@@ -79,7 +79,7 @@ export default class ModelWalletSuccessfullyRestored extends Component<Props, an
                                     { data.length != 0 ? data[ 0 ].bal : 0 }
                                 </Text>
                             </View>
-                            <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Restore your secure account now You can opt to do it later</Text>
+                            <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }></Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <FullLinearGradientButton
