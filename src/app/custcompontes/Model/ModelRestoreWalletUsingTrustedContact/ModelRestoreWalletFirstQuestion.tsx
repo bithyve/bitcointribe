@@ -120,7 +120,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
     check_CorrectAnswer() {
         setTimeout( () => {
             let firstAns = this.state.firstAnswer;
-            if ( firstAns.length >= 6 ) {
+            if ( firstAns.length >= 3 ) {
                 this.setState( {
                     flag_DisableBtnNext: false
                 } )
@@ -251,6 +251,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                             await bitcoinClassState.setRegularClassState( regularAccount );
                             await bitcoinClassState.setSecureClassState( secureAccount );
                             await bitcoinClassState.setS3ServiceClassState( sss );
+                            await comFunDBRead.readTblWallet();
                             await comFunDBRead.readTblSSSDetails();
                             await comFunDBRead.readTblAccount();
                             this.setState( {

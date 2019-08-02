@@ -148,6 +148,12 @@ const svgIcon = {
     3: require( assetsSVG + "transactionScreen/icon_shieldyellow.svg" ),
     4: require( assetsSVG + "transactionScreen/icon_shieldyellow.svg" ),
     5: require( assetsSVG + "transactionScreen/icon_shieldyellow.svg" )
+  },
+  moreScreen: {
+    health: require( assetsSVG + "moreScreen/icon_health.svg" ),
+    backupMethod: require( assetsSVG + "moreScreen/secretcontacts.svg" ),
+    addressBook: require( assetsSVG + "moreScreen/icon_contacts.svg" ),
+    settings: require( assetsSVG + "moreScreen/icon_settings.svg" ),
   }
 }
 

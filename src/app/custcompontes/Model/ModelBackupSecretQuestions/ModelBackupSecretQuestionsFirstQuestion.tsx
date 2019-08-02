@@ -70,7 +70,7 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
     check_CorrectAnswer() {
         setTimeout( () => {
             let firstAns = this.state.firstAnswer;
-            if ( firstAns.length >= 6 ) {
+            if ( firstAns.length >= 3 ) {
                 this.setState( {
                     flag_DisableBtnNext: false
                 } )
@@ -255,7 +255,7 @@ const styles = StyleSheet.create( {
         flex: 1,
         justifyContent: 'center'
     },
-    viewModelBody: {   
+    viewModelBody: {
         flex: 0.7,
         margin: 20,
         padding: 10,

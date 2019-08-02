@@ -43,6 +43,7 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
 //TODO: Bitcoin class
 var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
@@ -57,6 +58,7 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
         super( props )
         this.state = ( {
             data: [],
+            arrShareDetials: [],
             flag_Loading: true
         } );
     }
@@ -82,12 +84,26 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
             qrCodeData.wn = walletDetails.walletType;
             qrCodeData.data = resGenerateEncryptedMetaShare.key;
             this.setState( {
+                arrShareDetials: data,
                 flag_Loading: false,
                 data: JSON.stringify( qrCodeData ).toString()
+            }, () => {
+                this.updateSharedDate();
             } );
         } else {
             alert.simpleOk( "Oops", resUploadShare.err );
         }
+    }
+
+    updateSharedDate = async () => {
+        let { arrShareDetials } = this.state;
+        const dateTime = Date.now();
+        await dbOpration.updateHistroyAndSharedDate(
+            localDB.tableName.tblSSSDetails,
+            "Shared",
+            dateTime,
+            arrShareDetials.id
+        );
     }
 
 

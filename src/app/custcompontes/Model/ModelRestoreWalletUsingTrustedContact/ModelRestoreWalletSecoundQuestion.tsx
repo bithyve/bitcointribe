@@ -64,7 +64,7 @@ export default class ModelRestoreWalletSecoundQuestion extends Component<Props, 
     check_CorrectAnswer() {
         setTimeout( () => {
             let firstAns = this.state.secoundAnswer;
-            if ( firstAns.length >= 6 ) {
+            if ( firstAns.length >= 3 ) {
                 this.setState( {
                     flag_DisableBtnNext: false
                 } )

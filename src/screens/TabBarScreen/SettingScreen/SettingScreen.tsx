@@ -15,6 +15,7 @@ import {
   List, ListItem,
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
+import ImageSVG from 'react-native-remote-svg';
 import { RkCard } from "react-native-ui-kitten";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -32,7 +33,7 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, localDB, svgIcon } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 
@@ -67,22 +68,22 @@ export default class SettingScreen extends React.Component<any, any> {
       arr_FirstListItem: [ {
         title: "Health of the App",
         subTitle: "Urgent action required to maintain health",
-        icon: "shield"
+        svgIcon: "health"
       },
       {
         title: "Change Backup Method",
         subTitle: subTitle,
-        icon: "shield"
+        svgIcon: "backupMethod"
       },
       {
         title: "Address Book",
         subTitle: "Contacts you have trusted or the ones who have trusted you",
-        icon: "contact-book"
+        svgIcon: "addressBook"
       },
       {
         title: "Settings",
         subTitle: "Advanced Settings",
-        icon: "settings"
+        svgIcon: "settings"
       },
       ],
       arr_SecondtListItem: [ {
@@ -160,11 +161,12 @@ export default class SettingScreen extends React.Component<any, any> {
                             flex: 1,
                           } }
                         >
-                          <View style={ { flex: 0.2, justifyContent: "center", alignItems: "flex-start" } }>
-                            <SvgIcon
-                              name={ item.icon }
-                              color="#BABABA"
-                              size={ 30 }
+                          <View style={ { flex: 0.23, justifyContent: "center", alignItems: "flex-start" } }>
+                            <ImageSVG
+                              style={ { width: 40, height: 40 } }
+                              source={
+                                svgIcon.moreScreen[ item.svgIcon ]
+                              }
                             />
                           </View>
                           <View style={ { flex: 1, flexDirection: "column" } }>
