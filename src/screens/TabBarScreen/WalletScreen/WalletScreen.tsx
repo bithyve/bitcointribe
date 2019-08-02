@@ -1644,6 +1644,8 @@ export default class WalletScreen extends React.Component {
     console.log( { regularAccount } );
     let secureAccount = await bitcoinClassState.getSecureClassState();
     var resCoins = await regularAccount.getTestcoins();
+    console.log( { resCoins } );
+
   }
 
 

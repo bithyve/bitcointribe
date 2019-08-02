@@ -67,7 +67,6 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             arr_AccountList: [],
             arr_SelectAccountDetails: [],
             address: "",
-            selfAddress: "",
             amount: "0.0",
             memo: "",
             selectedAccountBal: 0.0,
@@ -86,10 +85,12 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         let selectedAccount = this.props.navigation.getParam( "selectedAccount" );
         console.log( { selectedAccount } );
 
+        console.log( { data } );
+
         //Singleton Flag value change    
         let address = data != undefined ? data.address : "";
-        let amount = data != undefined ? data.options.amount.toString() : "0.0";
-        console.log( { amount } );
+        let amount = data != undefined ? data.amount.toString() : "0.0";
+        console.log( { amount, address } );
         let walletDetails = await utils.getWalletDetails();
         let arr_AccountList = await comFunDBRead.readTblAccount();
         console.log( { arr_AccountList } );
@@ -277,9 +278,23 @@ export default class SendPaymentScreen extends React.Component<any, any> {
     }
 
     //TODO: When qrcode  scan 
-    getAddressWithBal( e: any ) {
+    getAddressWithBal = ( e: any ) => {
         console.log( { e } );
+        let data = e.data;
+        console.log( { data } );
+        let address = data != undefined ? data.address : "";
+        console.log( { address } );
+        if ( address != "" ) {
+            this.setAmountAndAddress( address, data.amount != undefined ? data.amount.toString() : "0.0" );
+        }
+    }
 
+    setAmountAndAddress( address: string, amount: string ) {
+        console.log( { address, amount } );
+        this.setState( {
+            address,
+            amount: amount
+        } )
     }
 
     _renderItem( { item, index } ) {
@@ -330,7 +345,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         //array
         let { arr_AccountList } = this.state;
         //values
-        let { amount, tranPrio, memoMsg, memo } = this.state;
+        let { amount, tranPrio, memoMsg, memo, address } = this.state;
         //flag
         let { flag_Memo, flag_DisableSentBtn, flag_Loading } = this.state;
         return (
@@ -423,14 +438,14 @@ export default class SendPaymentScreen extends React.Component<any, any> {
                                 <View style={ [ styles.itemQuestionPicker ] }>
                                     <View style={ { flexDirection: "row" } }>
                                         <Input
-                                            value={ memo }
+                                            value={ address }
                                             keyboardType="default"
                                             placeholder="Address"
                                             placeholderTextColor="#D0D0D0"
                                             returnKeyType="done"
                                             onChangeText={ ( val ) => {
                                                 this.setState( {
-                                                    selfAddress: val
+                                                    address: val
                                                 } )
                                             } }
                                             style={ [ globalStyle.ffOpenSansBold, { flex: 1, fontSize: 18 } ] }
@@ -439,7 +454,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
                                             transparent
                                             style={ { flex: 0.15 } }
                                             onPress={ () => {
-                                                this.props.navigation.push( "SendPaymentAddressScanScreen", { onSelect: this.getAddressWithBal } )
+                                                this.props.navigation.push( "SendPaymentAddressScanScreen", { onSelect: this.getAddressWithBal.bind( this ) } )
                                             } }>
                                             <SvgIcon name="qr-codes" color="#000000" size={ 30 } />
                                         </Button>

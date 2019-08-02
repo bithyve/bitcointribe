@@ -13,6 +13,7 @@ import bitcoinJS, {
 import coinselect from "coinselect";
 import config from "../Config";
 
+
 const { TESTNET, MAINNET } = config.API_URLS;
 
 export default class Bitcoin {
@@ -530,13 +531,14 @@ export default class Bitcoin {
     funded: any;
   }> => {
     const amount = Math.trunc( Math.random() * 1e5 ) / 1e8;
-    console.log( { amount } );
+    console.log( { amount, recipientAddress } );
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post( "/testnetFaucet", {
         recipientAddress,
         amount,
       } );
+      console.log( { res } );
     } catch ( err ) {
       throw new Error( err.response.data.err );
     }

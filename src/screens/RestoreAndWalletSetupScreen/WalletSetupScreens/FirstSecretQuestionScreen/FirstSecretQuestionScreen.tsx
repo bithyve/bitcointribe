@@ -174,7 +174,7 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                 "",
                 "0.0",
                 "BTC",
-                "Daily Account",
+                "Regular Account",
                 "Regular Account",
                 ""
             );

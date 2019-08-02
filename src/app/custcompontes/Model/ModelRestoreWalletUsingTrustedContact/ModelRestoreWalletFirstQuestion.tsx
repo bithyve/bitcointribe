@@ -233,7 +233,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                             "",
                             "0.0",
                             "BTC",
-                            "Daily Account",
+                            "Regular Account",
                             "Regular Account",
                             ""
                         );

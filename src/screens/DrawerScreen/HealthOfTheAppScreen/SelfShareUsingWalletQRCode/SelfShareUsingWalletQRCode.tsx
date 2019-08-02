@@ -81,7 +81,6 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
             qrCodeData.type = "Self Share";
             qrCodeData.wn = walletDetails.walletType;
             qrCodeData.data = resGenerateEncryptedMetaShare.key;
-            //console.log( { qrCodeData } );   
             this.setState( {
                 flag_Loading: false,
                 data: JSON.stringify( qrCodeData ).toString()
@@ -121,7 +120,7 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
                             extraScrollHeight={ 40 }
                         >
                             <View style={ { flex: 0.1, margin: 20 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Present this QR code to your secondary device to hold this secret for safekeeping 
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Present this QR code to your secondary device to hold this secret for safekeeping
 </Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center" } }>

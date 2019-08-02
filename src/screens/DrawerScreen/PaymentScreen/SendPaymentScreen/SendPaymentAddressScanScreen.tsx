@@ -67,6 +67,10 @@ export default class SendPaymentAddressScanScreen extends React.Component {
 
     }
 
+    componentWillMount() {
+        flagGoback = true;
+    }
+
     _renderTitleBar() {
         return (
             <Text></Text>

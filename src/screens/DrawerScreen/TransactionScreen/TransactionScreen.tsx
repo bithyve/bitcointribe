@@ -3,7 +3,8 @@ import React from "react";
 import {
     StyleSheet, ImageBackground, View,
     FlatList, SafeAreaView, TouchableOpacity,
-    Alert
+    Alert,
+    RefreshControl
 } from "react-native";
 
 import {
@@ -55,6 +56,7 @@ export default class TransactionScreen extends React.Component<any, any> {
             arrSelectedAccount: [],
             walletDetails: [],
             appHealthInfo: [],
+            arrTransaction: [],
             flag_Loading: false
         } );
     }
@@ -65,156 +67,115 @@ export default class TransactionScreen extends React.Component<any, any> {
         let walletDetails = this.props.navigation.getParam( "walletDetails" );
         let appHealthInfo = JSON.parse( walletDetails.appHealthStatus )
         console.log( { appHealthInfo } );
-
         console.log( { data } );
         this.setState( {
             arrSelectedAccount: data,
             walletDetails,
             appHealthInfo
-        } )
+        }, () => {
+            this.getRegularTransaction();
+        } );
+
     }
 
 
+    click_StopLoader = () => {
+        this.setState( { flag_Loading: false } );
+    }
 
 
+    async getRegularTransaction() {
+        let { arrSelectedAccount } = this.state;
+        this.setState( { flag_Loading: true } );
+        let regularAccount = await bitcoinClassState.getRegularClassState();
+        let secureAccount = await bitcoinClassState.getSecureClassState();
+        var resTransaction;
+        if ( arrSelectedAccount.accountType == "Regular Account" ) {
+            resTransaction = await regularAccount.getTransactions();
+            if ( resTransaction.status == 200 ) {
+                resTransaction = resTransaction.data;
+            } else {
+                alert.simpleOkAction( "Oops", resTransaction.err, this.click_StopLoader );
+            }
+        } else {
+            resTransaction = await secureAccount.getTransactions();
+            if ( resTransaction.status == 200 ) {
+                resTransaction = resTransaction.data;
+            } else {
+                alert.simpleOkAction( "Oops", resTransaction.err, this.click_StopLoader );
+            }
+        }
+        this.setState( {
+            flag_Loading: false,
+            arrTransaction: resTransaction.transactions.transactionDetails
+        } )
+    }
 
-    // async getTransaction() {
-    //     await this.getRegularTransaction();
-    //     await this.getSecureTransaction();
-    //     this.filterTransaction()
-    // }
+    _renderItem = ( { item, index } ) => {
+        return (
+            <View style={ { padding: 5 } }>
 
-    // filterTransaction() {
-    //     let results = [ ...this.state.recentRegularTransactions, ...this.state.recentSecureTransactions ];
-    //     results = results.sort( ( a, b ) => { return a.confirmations - b.confirmations } )
+                <View style={ { flexDirection: "row", alignItems: "center" } }>
+                    <View>
+                        <SvgIcon
+                            name="icon_dailywallet"
+                            color="#37A0DA"
+                            size={ 50 }
+                        />
+                    </View>
 
-    //     this.setState( { recentTransactions: results } )
-    // }
+                    <View style={ { flex: 1, padding: 5 } }>
+                        <Text style={ { color: "#151515", fontWeight: "600", fontSize: 14, paddingVertical: 3 } }>{ item.transactionType === "Received" ? "To " + item.accountType + " Account" : "From " + item.accountType + " Account" }</Text>
+                        <Text style={ { color: "#8B8B8B", fontSize: 12, fontWeight: "600" } }>{ "-" }</Text>
+                    </View>
 
-    // async getRegularTransaction() {
-    //     this.setState( { flag_Loading: true } );
-    //     let regularAccount = await bitcoinClassState.getRegularClassState();
-    //     var regularAccountTransactions = await regularAccount.getTransactions();
-    //     if ( regularAccountTransactions.status == 200 ) {
-    //         await bitcoinClassState.setRegularClassState( regularAccount );
-    //         regularAccountTransactions = regularAccountTransactions.data;
-    //         this.setState( { recentRegularTransactions: regularAccountTransactions.transactions.transactionDetails } )
-    //     } else {
-    //         alert.simpleOk( "Oops", regularAccountTransactions.err );
-    //     }
-    // }
+                    <View style={ { paddingHorizontal: 10 } }>
+                        <Icon
+                            name={ item.transactionType === "Received" ? "long-arrow-down" : "long-arrow-up" }
+                            color={ item.transactionType === "Received" ? "#51B48A" : "#E64545" }
+                            size={ 25 }
+                        />
+                    </View>
+                </View>
+                <View style={ { flexDirection: "row", alignItems: "center", padding: 5 } }>
+                    <View style={ { alignItems: "center", justifyContent: "center" } }>
+                        <SvgIcon
+                            name="icon_more"
+                            color="#E2E2E2"
+                            size={ 50 }
+                        />
+                    </View>
+                    <View
+                        style={ styles.amountView }
+                    >
+                        <SvgIcon
+                            name="icon_bitcoin"
+                            color="#d0d0d0"
+                            size={ 30 }
+                        />
+                        <View style={ {
+                            flex: 1, flexDirection: "row", alignItems: 'center', paddingHorizontal: 10
+                        } }>
+                            <Text style={ { color: "#2F2F2F", fontSize: 20, fontWeight: "bold" } }>{ item.amount / 1e8 }</Text>
+                            <Text style={ { color: "#D0D0D0", fontSize: 15, fontWeight: "600", paddingHorizontal: 10 } }>{ item.confirmations }</Text>
+                        </View>
 
-    // async getSecureTransaction() {
-    //     let secureAccount = await bitcoinClassState.getSecureClassState();
-    //     var secureAccountTransactions = await secureAccount.getTransactions();
-    //     if ( secureAccountTransactions.status == 200 ) {
-    //         await bitcoinClassState.setSecureClassState( secureAccount );
-    //         secureAccountTransactions = secureAccountTransactions.data;
-    //         this.setState( { recentSecureTransactions: secureAccountTransactions.transactions.transactionDetails } )
-    //     } else {
-    //         alert.simpleOk( "Oops", secureAccountTransactions.err );
-    //     }
-    //     this.setState( { flag_Loading: false } )
-    // }
+                        <SvgIcon
+                            name="icon_forword"
+                            color="#C4C4C4"
+                            size={ 18 }
+                        />
+                    </View>
+                </View>
+            </View> )
+    }
 
-    // componentWillMount() {
-    //     this.getTransaction()
-    // }
-
-    // setModalVisible( modalVisible ) {
-    //     this.setState( { modalVisible } )
-    // }
-    // updateModalData( item ) {
-    //     var detailsArray = [
-    //         { title: "To", value: item.transactionType === "Sent" ? item.recipientAddresses : item.accountType + " Account" },
-    //         { title: "From", value: item.transactionType === "Received" ? item.senderAddresses : item.accountType + " Account" },
-    //         { title: "Amount", value: item.amount / 1e8 },
-    //         { title: "Fees", value: item.fee / 1e8 },
-    //         { title: "Transaction ID", value: item.txid },
-    //         { title: "Confirmations", value: item.confirmations },
-    //     ];
-    //     var selectedTransaction = {
-    //         transactionType: item.transactionType,
-    //         amount: item.amount / 1e8,
-    //         time: "-",
-    //         confirmations: item.confirmations,
-    //         recipientAddresses: item.recipientAddresses,
-    //         senderAddresses: item.senderAddresses,
-    //         accountType: item.accountType
-    //     }
-    //     this.setState( { detailsArray, selectedTransaction } )
-    // }
-    // Recent Transaction Item view
-
-
-    // _renderItem = ( { item, index } ) => {
-    //     return (
-    //         <View style={ { padding: 5 } }>
-
-    //             <View style={ { flexDirection: "row", alignItems: "center" } }>
-    //                 <View>
-    //                     <SvgIcon
-    //                         name="icon_dailywallet"
-    //                         color="#37A0DA"
-    //                         size={ 50 }
-    //                     />
-    //                 </View>
-
-    //                 <View style={ { flex: 1, padding: 5 } }>
-    //                     <Text style={ { color: "#151515", fontWeight: "600", fontSize: 14, paddingVertical: 3 } }>{ item.transactionType === "Received" ? "To " + item.accountType + " Account" : "From " + item.accountType + " Account" }</Text>
-    //                     <Text style={ { color: "#8B8B8B", fontSize: 12, fontWeight: "600" } }>{ "-" }</Text>
-    //                 </View>
-
-    //                 <View style={ { paddingHorizontal: 10 } }>
-    //                     <Icon
-    //                         name={ item.transactionType === "Received" ? "long-arrow-down" : "long-arrow-up" }
-    //                         color={ item.transactionType === "Received" ? "#51B48A" : "#E64545" }
-    //                         size={ 25 }
-    //                     />
-    //                 </View>
-    //             </View>
-    //             <View style={ { flexDirection: "row", alignItems: "center", padding: 5 } }>
-    //                 <View style={ { alignItems: "center", justifyContent: "center" } }>
-    //                     <SvgIcon
-    //                         name="icon_more"
-    //                         color="#E2E2E2"
-    //                         size={ 50 }
-    //                     />
-    //                 </View>
-    //                 <TouchableOpacity
-    //                     style={ styles.amountView }
-    //                     activeOpacity={ 1 }
-    //                     onPress={ () => {
-    //                         this.updateModalData( item );
-    //                         this.setModalVisible( true );
-    //                     } }>
-
-    //                     <SvgIcon
-    //                         name="icon_bitcoin"
-    //                         color="#d0d0d0"
-    //                         size={ 30 }
-    //                     />
-    //                     <View style={ {
-    //                         flex: 1, flexDirection: "row", alignItems: 'center', paddingHorizontal: 10
-    //                     } }>
-    //                         <Text style={ { color: "#2F2F2F", fontSize: 20, fontWeight: "bold" } }>{ item.amount / 1e8 }</Text>
-    //                         <Text style={ { color: "#D0D0D0", fontSize: 15, fontWeight: "600", paddingHorizontal: 10 } }>{ item.confirmations }</Text>
-    //                     </View>
-
-    //                     <SvgIcon
-    //                         name="icon_forword"
-    //                         color="#C4C4C4"
-    //                         size={ 18 }
-    //                     />
-
-    //                 </TouchableOpacity>
-    //             </View>
-    //         </View> )
-    // }
 
     render() {
         //array
-        let { arrSelectedAccount, appHealthInfo } = this.state;
+        let { arrSelectedAccount, appHealthInfo, arrTransaction } = this.state;
+        //flag
+        let { flag_Loading } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
@@ -322,7 +283,25 @@ export default class TransactionScreen extends React.Component<any, any> {
                         </RkCard>
                         <View style={ { flex: 1.8 } }>
                             <Text note style={ { textAlign: "center" } }>Recent Transaction</Text>
+                            {
+                                !flag_Loading && arrTransaction.length === 0 ?
 
+                                    <View style={ { justifyContent: "center", alignItems: "center", padding: 20, paddingTop: 50 } }>
+                                        <Text style={ { textAlign: "center", color: "#838383" } }>{ "Start transactions to see your recent transactions history ." }</Text>
+                                    </View> : null
+                            }
+                            <FlatList
+                                style={ { flex: 1, padding: 10 } }
+                                data={ arrTransaction }
+                                renderItem={ this._renderItem }
+                                keyExtractor={ ( item, index ) => index.toString() }
+                                refreshControl={
+                                    <RefreshControl
+                                        onRefresh={ () => { this.getRegularTransaction() } }
+                                        refreshing={ false }
+                                    ></RefreshControl>
+                                }
+                            />
                         </View>
                         <View style={ { flex: 0.4 } }>
                             <FullLinearGradientTransactionScreenThreeOpt
@@ -343,30 +322,8 @@ export default class TransactionScreen extends React.Component<any, any> {
                                 }
                             />
                         </View>
-                        {/* <FlatList
-                            style={ { flex: 1, padding: 10 } }
-                            data={ this.state.recentTransactions }
-                            renderItem={ this._renderItem }
-                            keyExtractor={ ( item, index ) => index.toString() }
-                            refreshControl={
-                                <RefreshControl
-                                    onRefresh={ () => { this.getTransaction() } }
-                                    refreshing={ false }
-                                ></RefreshControl>
-                            }
-                        /> */}
+
                     </ImageBackground>
-
-                    {/* <Modal
-                        setModalVisible={ this.setModalVisible.bind( this ) }
-                        modalData={ {
-                            selectedTransaction: this.state.selectedTransaction,
-                            detailsArray: this.state.detailsArray,
-                            modalVisible: this.state.modalVisible,
-                        }
-                        }
-
-                    /> */}
                 </SafeAreaView>
                 <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
             </Container >

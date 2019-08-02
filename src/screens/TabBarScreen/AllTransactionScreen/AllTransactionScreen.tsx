@@ -29,30 +29,38 @@ let alert = new AlertSimple();
 //TODO: Bitcoin Class
 var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 
-export default class AllTransactionScreen extends React.Component {
-  state = {
-    modalVisible: false,
-    detailsArray: [
-      { title: "To Address", value: "8572308235034623" },
-      { title: "From Address", value: "234255609325230" },
-      { title: "Amount", value: "0.0" },
-      { title: "Fees", value: "0.0" },
-      { title: "Transaction ID", value: "" },
-      { title: "Confirmations", value: "" },
-    ],
-    selectedTransaction: {
-      transactionType: "",
-      totalReceived: 0,
-      time: "-",
-      NumberofConfirmations: ""
-    },
-    recentRegularTransactions: [],
-    recentSecureTransactions: [],
-    recentTransactions: [],
-    flag_Loading: false
+export default class AllTransactionScreen extends React.Component<any, any> {
+  constructor ( props: any ) {
+    super( props )
+    this.state = ( {
+      modalVisible: false,
+      detailsArray: [
+        { title: "To Address", value: "8572308235034623" },
+        { title: "From Address", value: "234255609325230" },
+        { title: "Amount", value: "0.0" },
+        { title: "Fees", value: "0.0" },
+        { title: "Transaction ID", value: "" },
+        { title: "Confirmations", value: "" },
+      ],
+      selectedTransaction: {
+        transactionType: "",
+        totalReceived: 0,
+        time: "-",
+        NumberofConfirmations: ""
+      },
+      recentRegularTransactions: [],
+      recentSecureTransactions: [],
+      recentTransactions: [],
+      flag_Loading: false
+    } );
+  }
+
+  componentWillMount() {
+    this.getTransaction()
   }
 
   async getTransaction() {
+    this.setState( { flag_Loading: true } );
     await this.getRegularTransaction();
     await this.getSecureTransaction();
     this.filterTransaction()
@@ -61,12 +69,17 @@ export default class AllTransactionScreen extends React.Component {
   filterTransaction() {
     let results = [ ...this.state.recentRegularTransactions, ...this.state.recentSecureTransactions ];
     results = results.sort( ( a, b ) => { return a.confirmations - b.confirmations } )
+    this.setState( {
+      flag_Loading: false,
+      recentTransactions: results
+    } )
+  }
 
-    this.setState( { recentTransactions: results } )
+  click_StopLoader = () => {
+    this.setState( { flag_Loading: false } );
   }
 
   async getRegularTransaction() {
-    this.setState( { flag_Loading: true } );
     let regularAccount = await bitcoinClassState.getRegularClassState();
     var regularAccountTransactions = await regularAccount.getTransactions();
     if ( regularAccountTransactions.status == 200 ) {
@@ -74,7 +87,7 @@ export default class AllTransactionScreen extends React.Component {
       regularAccountTransactions = regularAccountTransactions.data;
       this.setState( { recentRegularTransactions: regularAccountTransactions.transactions.transactionDetails } )
     } else {
-      alert.simpleOk( "Oops", regularAccountTransactions.err );
+      alert.simpleOkAction( "Oops", regularAccountTransactions.err, this.click_StopLoader );
     }
   }
 
@@ -86,19 +99,17 @@ export default class AllTransactionScreen extends React.Component {
       secureAccountTransactions = secureAccountTransactions.data;
       this.setState( { recentSecureTransactions: secureAccountTransactions.transactions.transactionDetails } )
     } else {
-      alert.simpleOk( "Oops", secureAccountTransactions.err );
+      alert.simpleOkAction( "Oops", secureAccountTransactions.err, this.click_StopLoader );
     }
-    this.setState( { flag_Loading: false } )
   }
 
-  componentWillMount() {
-    this.getTransaction()
-  }
 
-  setModalVisible( modalVisible ) {
+
+  setModalVisible( modalVisible: any ) {
     this.setState( { modalVisible } )
   }
-  updateModalData( item ) {
+
+  updateModalData( item: any ) {
     var detailsArray = [
       { title: "To", value: item.transactionType === "Sent" ? item.recipientAddresses : item.accountType + " Account" },
       { title: "From", value: item.transactionType === "Received" ? item.senderAddresses : item.accountType + " Account" },
@@ -234,7 +245,6 @@ export default class AllTransactionScreen extends React.Component {
               modalVisible: this.state.modalVisible,
             }
             }
-
           />
         </SafeAreaView>
         <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
@@ -276,4 +286,4 @@ const styles = StyleSheet.create( {
     fontSize: 15,
     paddingVertical: 10
   }
-} );
+} );   

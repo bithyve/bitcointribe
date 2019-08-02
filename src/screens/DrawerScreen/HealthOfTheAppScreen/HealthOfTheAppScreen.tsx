@@ -344,13 +344,13 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
     //self share message
     getMsgAndColor( sharedDate: string, acceptDate: string, shareStage: string ) {
-        if ( sharedDate == "" && acceptDate == "" && shareStage == "Ugly" ) {
+        if ( sharedDate == "" && shareStage == "Ugly" ) {
             return [ "Not Shared", "#ff0000" ];
         }
-        else if ( sharedDate != "" && acceptDate == "" && shareStage == "Ugly" ) {
+        else if ( sharedDate != "" && shareStage == "Ugly" ) {
             return [ "Shared", "#C07710" ];
         }
-        else if ( sharedDate != "" && acceptDate != "" && shareStage == "Good" ) {
+        else if ( sharedDate != "" && shareStage == "Good" ) {
             return [ "Share Confirmed", "#008000" ];
         } else {
             return [ "Confirme Again", "#C07710" ];

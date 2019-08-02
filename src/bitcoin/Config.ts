@@ -3,6 +3,8 @@ import Client from "bitcoin-core";
 import bitcoinJS, { Network } from "bitcoinjs-lib";
 import config from "react-native-config";
 
+
+
 class Config {
   public ENVIRONMENT: string;
   public NETWORK: Network;
@@ -42,6 +44,11 @@ class Config {
   public STATUS = {
     SUCCESS: parseInt( config.BIT_SUCCESS_STATUS_CODE, 10 ),
     ERROR: parseInt( config.BIT_ERROR_STATUS_CODE, 10 ),
+  };
+  public STANDARD = {
+    BIP44: parseInt( config.BIT_STANDARD_BIP44, 10 ),
+    BIP49: parseInt( config.BIT_STANDARD_BIP49, 10 ),
+    BIP84: parseInt( config.BIT_STANDARD_BIP84, 10 ),
   };
 
   public HEALTH_STATUS = {

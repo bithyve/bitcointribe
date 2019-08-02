@@ -146,26 +146,34 @@ export default class QrCodeScannerScreen extends React.Component {
                         alert.simpleOkAction( "Oops", resAddressDiff.err, this.click_ResetFlag );
                     }
                 }
-                if ( resAddressDiff.type == "paymentURI" || resAddressDiff.type == "address" ) {
+                let data = {};
+                if ( resAddressDiff.type == "paymentURI" ) {
                     var resDecPaymentURI = await regularAccount.decodePaymentURI( result );
                     if ( resDecPaymentURI.status == 200 ) {
                         await bitcoinClassState.setRegularClassState( regularAccount );
                         resDecPaymentURI = resDecPaymentURI.data;
                     } else {
-                        alert.simpleOkAction( "Oops", resDecPaymentURI.err, this.click_ResetFlag );
+                        if ( utils.getFlagQRCodeScreen() == true ) {
+                            utils.setFlagQRCodeScreen( false );
+                            alert.simpleOkAction( "Oops", resDecPaymentURI.err, this.click_ResetFlag );
+                        }
                     }
-                    if ( utils.getFlagQRCodeScreen() == true ) {
-                        utils.setFlagQRCodeScreen( false );
-                        this.props.navigation.push( "SendPaymentNavigator", { data: resDecPaymentURI } );
-                    }
+                    data.address = resDecPaymentURI.address;
+                    data.amount = resDecPaymentURI.options.amount;
+                    data.type = "paymentURI";
+                } else {
+                    data.address = result;
+                    data.type = "address";
+                }
+                if ( utils.getFlagQRCodeScreen() == true ) {
+                    utils.setFlagQRCodeScreen( false );
+                    this.props.navigation.push( "SendPaymentNavigator", { data: data } );
                 }
             }
         } catch ( error ) {
             console.log( error );
         }
     }
-
-
 
     render() {
         return (
