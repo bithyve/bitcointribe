@@ -180,6 +180,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         data.givenName = keeperInfo.givenName;
         data.familyName = keeperInfo.familyName;
         data.backupType = backupType;
+        data.sssDetails = sssDetails;
         data.flagAction = this.getActionTrustedCont( backupType, decryptedShare );
         if ( sssDetails.sharedDate == "" && sssDetails.shareStage == "Ugly" ) {
             data.statusMsg = "Not Shared";
@@ -353,7 +354,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         else if ( sharedDate != "" && shareStage == "Good" ) {
             return [ "Share Confirmed", "#008000" ];
         } else {
-            return [ "Confirme Again", "#C07710" ];
+            return [ "Not Shared", "#ff0000" ];
         }
     }
 

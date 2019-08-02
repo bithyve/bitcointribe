@@ -42,7 +42,7 @@ import BackgroundFetch from "react-native-background-fetch";
 import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 var RNFS = require( 'react-native-fs' );
 import QRCode from 'react-native-qrcode-svg';
-//Custome Compontes
+//Custome Compontes   
 import ViewShieldIcons from "HexaWallet/src/app/custcompontes/View/ViewShieldIcons/ViewShieldIcons";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
@@ -1638,11 +1638,32 @@ export default class WalletScreen extends React.Component {
 
   //TODO: getTestcoins
   getTestcoins = async () => {
+    this.setState( {
+      flag_GetBal: true,
+      arrErrorMessage: [ {
+        type: "asyncTask",
+        data: [ {
+          message: "Getting bal, wait for sometime",
+          bgColor: "#262A2E",
+          color: "#ffffff",
+        } ]
+      } ]
+    } );
     let regularAccount = await bitcoinClassState.getRegularClassState();
-    console.log( { regularAccount } );
     let secureAccount = await bitcoinClassState.getSecureClassState();
     var resCoins = await regularAccount.getTestcoins();
-    console.log( { resCoins } );
+    if ( resCoins.status == 200 ) {
+      resCoins = resCoins.data;
+    } else {
+      alert.simpleOk( "Oops", resCoins.err );
+    }
+    resCoins = await secureAccount.getTestcoins();
+    if ( resCoins.status == 200 ) {
+      resCoins = resCoins.data;
+    } else {
+      alert.simpleOk( "Oops", resCoins.err );
+    }
+    this.getBalAndHealth();
   }
 
   //TODO: Show account details transaction
@@ -1847,7 +1868,10 @@ export default class WalletScreen extends React.Component {
           <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
           <SafeAreaView style={ styles.container }>
             {/* Top View Animation */ }
-            { renderIf( flag_Offline == true || flag_PdfFileCreate == true || flag_GetBal == true )(
+            { renderIf( flag_Offline == true || flag_PdfFileCreate == true )(
+              <ViewErrorMessage data={ arrErrorMessage } />
+            ) }
+            { renderIf( flag_GetBal == true )(
               <ViewErrorMessage data={ arrErrorMessage } />
             ) }
             <Animated.View
@@ -1937,7 +1961,20 @@ export default class WalletScreen extends React.Component {
                 refreshControl={
                   <RefreshControl
                     refreshing={ flag_refreshing }
-                    onRefresh={ this.getBalAndHealth.bind( this ) }
+                    onRefresh={ () => {
+                      this.setState( {
+                        flag_GetBal: true,
+                        arrErrorMessage: [ {
+                          type: "asyncTask",
+                          data: [ {
+                            message: "Getting bal, wait for sometime",
+                            bgColor: "#262A2E",
+                            color: "#ffffff",
+                          } ]
+                        } ]
+                      } );
+                      this.getBalAndHealth.bind( this )
+                    } }
                   />
                 }
                 contentContainerStyle={ { flex: 0 } }

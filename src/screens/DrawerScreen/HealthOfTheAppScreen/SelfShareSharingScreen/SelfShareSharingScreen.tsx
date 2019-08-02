@@ -149,7 +149,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                 console.log( { email4shareFilePath } );
                 Mailer.mail( {
                     subject: 'For 4 Share.',
-                    recipients: [ 'appasahebl@bithyve.com' ],
+                    recipients: [ '' ],
                     body: '<b>For 4 share.Pdf password is your answer.</b>',
                     isHTML: true,
                     attachment: {

@@ -12,6 +12,7 @@ import bitcoinJS, {
 } from "bitcoinjs-lib";
 import coinselect from "coinselect";
 import config from "../Config";
+const { BH_AXIOS } = config;
 
 
 const { TESTNET, MAINNET } = config.API_URLS;

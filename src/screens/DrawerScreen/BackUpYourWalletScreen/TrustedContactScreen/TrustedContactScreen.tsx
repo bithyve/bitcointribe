@@ -19,6 +19,7 @@ import {
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
+import ImageSVG from 'react-native-remote-svg';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Contacts from 'react-native-contacts';
 import { Avatar } from 'react-native-elements';
@@ -48,7 +49,7 @@ let alert = new AlertSimple();
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, localDB, svgIcon } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
@@ -81,6 +82,41 @@ export default class TrustedContactScreen extends React.Component<any, any> {
     async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
         console.log( { data } );
+
+        //otp history
+        let arrHistory = data.history;
+        let eachHistoryLength = arrHistory.length;
+        var otp;
+        if ( arrHistory[ eachHistoryLength - 1 ] != undefined ) {
+            otp = arrHistory[ eachHistoryLength - 1 ].otp;
+        } else {
+            otp = undefined;
+        }
+        if ( otp != undefined ) {
+            let dateTime = Date.now();
+            let sharedDate = parseInt( data.sssDetails.sharedDate );
+            var startDate = new Date( dateTime );
+            var endDate = new Date( sharedDate );
+            console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
+            var diff = Math.abs( startDate.getTime() - endDate.getTime() );
+            //console.warn( 'diff' + diff.toString() );  
+            const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
+            const seconds: any = Math.floor( diff / 1000 % 60 );
+            //console.log( { minutes, seconds } );
+            //console.warn( minutes.toString() )
+            const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
+            console.log( { totalSec } );
+            if ( totalSec < 540 && data.sssDetails.shareStage == "Ugly" || data.sssDetails.shareStage == "Bad" ) {
+                this.setState( {
+                    flag_OtpCodeShowStatus: true,
+                    otpCode: otp
+                } )
+            }
+        }
+        console.log( { otp } );
+
+        //tempOpt.push( otp );
+
 
         var resSSSDetails = await dbOpration.readSSSTableData(
             localDB.tableName.tblSSSDetails,
@@ -333,6 +369,12 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                     <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
                                             <View style={ { flex: 0.1 } }>
+                                                {/* <ImageSVG
+                                                    style={ { width: 60, height: 60 } }
+                                                    source={
+                                                        svgIcon.common.histroy_Hexa
+                                                    }
+                                                /> */}
                                                 <SvgIcon name="image_hexa" size={ 30 } color={ primaryColor } style={ { alignSelf: "center" } } />
                                             </View>
                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
@@ -349,7 +391,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                             />
                         </View>
                         { renderIf( this.state.flag_OtpCodeShowStatus == true )(
-                            <View style={ [ Platform.OS == "ios" ? { flex: 0.6 } : { flex: 0.8 }, { marginLeft: 5, marginRight: 5 } ] }>
+                            <View style={ [ Platform.OS == "ios" ? { flex: 1 } : { flex: 1 }, { marginLeft: 5, marginRight: 5 } ] }>
                                 <Text note style={ { textAlign: "center" } }>OTP and share expires in 10 minutes</Text>
                                 <View style={ { flex: 0.8, backgroundColor: "#ffffff", borderRadius: 5, flexDirection: "row", alignItems: "center", justifyContent: "center", margin: 10 } }>
                                     <Text note style={ [ globalStyle.ffFiraSansMedium, { flex: 2, marginLeft: 10 } ] }>OTP</Text>
@@ -368,41 +410,19 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                             />
                                         </TouchableOpacity>
                                     </View>
-
                                 </View>
-                                {/* <FullLinearGradientButton
+                                <FullLinearGradientButton
                                     click_Done={ () => {
-                                        let shareOptions = {
-                                            title: "OTP",
-                                            message: "sss opt:" + this.state.otpCode,
-                                            url: "\nhttps://bithyve.com/",
-                                            subject: "sss opt " //  for email
-                                        };
-                                        Share.open( shareOptions )
-                                            .then( res => {
-                                                console.log( res );
-                                            } )
+                                        this.load_data();
                                     } }
-                                    title="Share OTP with Trusted Contact"
+                                    title="Reshare Secret"
                                     disabled={ false }
-                                    style={ [ { borderRadius: 10 } ] } /> */}
+                                    style={ [ { borderRadius: 10 } ] } />
                             </View>
                         ) }
                         { renderIf( this.state.flag_OtpCodeShowStatus != true )(
                             <View style={ Platform.OS == "ios" ? { flex: 0.6 } : { flex: 0.8 } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select method by which you want to share secret</Text>
-                                {/* <Button
-                                    onPress={ () => {
-                                        this.props.navigation.push( "ShareSecretViaQRScreen", { data: data, onSelect: this.onSelect } );
-                                    } }
-                                    style={ [ globalStyle.ffFiraSansSemiBold, {
-                                        backgroundColor: "#838383", borderRadius: 10, margin: 5,
-                                        height: 50,
-                                    } ] }
-                                    full
-                                >
-                                    <Text>Share secret via QR code</Text>
-                                </Button> */}
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.load_data();

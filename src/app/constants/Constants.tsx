@@ -127,6 +127,9 @@ var images = {
 
 const assetsSVG = "../../assets/svg/";
 const svgIcon = {
+  common: {
+    histroy_Hexa: require( assetsSVG + "common/image_hexa.svg" ),
+  },
   healthoftheapp: {
     trustedcontacts: require( assetsSVG + "healthoftheapp/trustedcontacts.svg" ),
     selectcontacts: require( assetsSVG + "healthoftheapp/selectcontacts.svg" ),
@@ -154,7 +157,7 @@ const svgIcon = {
     backupMethod: require( assetsSVG + "moreScreen/secretcontacts.svg" ),
     addressBook: require( assetsSVG + "moreScreen/icon_contacts.svg" ),
     settings: require( assetsSVG + "moreScreen/icon_settings.svg" ),
-  }
+  },
 }
 
 
