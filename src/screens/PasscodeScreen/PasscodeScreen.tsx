@@ -44,6 +44,12 @@ var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBR
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
+//TODO: Bitcoin Files
+var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
+
 export default class PasscodeScreen extends Component {
 
   constructor ( props: any ) {
@@ -118,12 +124,16 @@ export default class PasscodeScreen extends Component {
     }
   }
 
-
   onSuccess = async ( code: string ) => {
     const rootViewController = await AsyncStorage.getItem( asyncStorageKeys.rootViewController );
-    // console.log( { rootViewController } );
+
+    //Wallet Details Reading
+    await comFunDBRead.readTblWallet();
+    await comFunDBRead.readTblSSSDetails();
+
     let pageName = utils.getRootViewController();
-    let walletDetails = await comFunDBRead.readTblWallet();
+    console.log( { pageName } );
+
     if ( pageName != "TrustedPartyShareSecretNavigator" && pageName != "OTPScreenNavigator" ) {
       const resetAction = StackActions.reset( {
         index: 0, // <-- currect active route from actions array
@@ -147,9 +157,7 @@ export default class PasscodeScreen extends Component {
       } );
       this.props.navigation.dispatch( resetAction );
     }
-
   };
-
 
 
   //TODO: func urlDecription
@@ -207,14 +215,14 @@ export default class PasscodeScreen extends Component {
             <Text
               style={ [ globalStyle.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
             >
-              Hello, Crypto wizard
+              Welcome to Hexa!
             </Text>
           </View>
           <View style={ styles.viewPasscode }>
             <Text
               style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
             >
-              Re - Enter Passcode{ " " }
+            Enter Passcode{ " " }
             </Text>
             <CodeInput
               ref="codeInputRef1"
@@ -237,7 +245,7 @@ export default class PasscodeScreen extends Component {
                 justifyContent: "center",
                 height: Platform.OS == "ios" ? 0 : 40,
               } }
-              onFulfill={ ( isValid, code ) =>
+              onFulfill={ ( isValid: any, code: any ) =>
                 this._onFinishCheckingCode( isValid, code )
               }
               type='withoutcharacters'

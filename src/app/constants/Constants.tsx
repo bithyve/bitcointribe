@@ -41,6 +41,7 @@ var images = {
   },
   RestoreWalletUsingTrustedContact: {
     contactPassbook: require( assetsImages + "RestoreWalletUsingTrustedContact/ContactsPassbook.png" ),
+    share4and5SelfShareInfo: require( assetsImages + "RestoreWalletUsingTrustedContact/restore4and5sharebgimage.jpg" ),
   },
   WalletSetupScreen: {
     WalletScreen: {
@@ -138,7 +139,17 @@ var notification = {
 
 var asyncStorageKeys = {
   rootViewController: "rootViewController",
-  flag_PasscodeCreate: "flag_PasscodeCreate"
+  flag_PasscodeCreate: "flag_PasscodeCreate",
+  regularClassObject: "regularClassObject",
+  secureClassObject: "secureClassObject",
+  s3ServiceClassObject: "s3ServiceClassObject",
+  flag_BackgoundApp: "flag_BackgoundApp"
+}
+
+var expaire = {
+  backup: {
+    expaire_secretquestion: Config.EXPAIRE_SECRETQUESTION
+  }
 }
 
 export {
@@ -146,5 +157,6 @@ export {
   colors,
   images,
   notification,
-  asyncStorageKeys
+  asyncStorageKeys,
+  expaire
 };

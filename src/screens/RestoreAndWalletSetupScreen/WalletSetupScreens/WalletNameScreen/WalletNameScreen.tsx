@@ -54,8 +54,9 @@ export default class WalletNameScreen extends React.Component<any, any> {
                 flag_ProceedBtnDisable: true
             } )
         }
-
     }
+
+
     //TODO: func click_Proceed
     async click_Proceed() {
         let SetUpDetails = {};
@@ -73,7 +74,7 @@ export default class WalletNameScreen extends React.Component<any, any> {
                     contentContainerStyle={ { flexGrow: 1, } }
                 >
                     <View style={ styles.viewPagination }>
-                        <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 22, textAlign: "center" } ] }>Step 1: What do you want to call your Wallet?</Text>
+                        <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 22, textAlign: "center" } ] }>What do you want to call your Wallet?</Text>
                         <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>This name will display on you wallet.</Text>
                     </View>
                     <View style={ styles.viewInputFiled }>

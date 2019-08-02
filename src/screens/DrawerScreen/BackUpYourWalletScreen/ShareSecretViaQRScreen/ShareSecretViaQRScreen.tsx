@@ -25,9 +25,9 @@ import { Avatar, SearchBar } from 'react-native-elements';
 // import QRCode from "react-native-qrcode";
 import QRCode from 'react-native-qrcode-svg';
 
+
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -37,10 +37,13 @@ import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants"
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
+
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
+
 export default class ShareSecretViaQRScreen extends React.Component<any, any> {
+
     constructor ( props: any ) {
         super( props )
         this.state = ( {
@@ -52,19 +55,12 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
 
     async componentWillMount() {
         let walletDetails = utils.getWalletDetails();
-        let resSSSDetails = utils.getSSSDetailsRecordIDWise();
-        console.log( { resSSSDetails, walletDetails } );
-        const sss = new S3Service(
-            walletDetails.mnemonic
-        );
-        const resQRShare = await sss.createQRShare( resSSSDetails.share, walletDetails.walletType );
-        const jsonResQRShare = JSON.parse( resQRShare );
-        // console.log( { resQRShare } );
-        // console.log( { jsonResQRShare } );
+        var data = this.props.navigation.getParam( "data" );
+        console.log( { data } );
         let qrCodeData = {};
-        qrCodeData.type = "SSS Recovery";
+        qrCodeData.type = "SSS Recovery QR";
         qrCodeData.wn = walletDetails.walletType;
-        qrCodeData.data = jsonResQRShare;
+        qrCodeData.data = data.key;
         console.log( { qrCodeData } );
         this.setState( {
             data: JSON.stringify( qrCodeData ).toString()
@@ -76,11 +72,13 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
             data: item
         } );
     }
+
     goBack() {
         const { navigation } = this.props;
         navigation.goBack();
         navigation.state.params.onSelect( { selected: true } );
     }
+
 
     render() {
         return (
@@ -102,7 +100,7 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
                             extraScrollHeight={ 40 }
                         >
                             <View style={ { flex: 0.1, margin: 20 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Present this QR code to trusted contact to hold this secret for safekeeping </Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center" } }>
                                 {/* <QRCode
@@ -120,7 +118,7 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
 
                             </View>
                             <View style={ { flex: 0.5, alignItems: "center" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut faucibus pulvinar elementum integer enim neque volutpat. Leo integer malesuada nunc vel. Purus faucibus ornare suspendisse sed nisi lacus sed. Et ligula ullamcorper malesuada proin libero nunc consequat. A cras semper auctor neque vitae tempus quam pellentesque. In nisl nisi scelerisque eu ultrices vitae auctor eu augue. Sed risus ultricies tristique nulla aliquet enim tortor. Curabitur gravida arcu ac tortor dignissim convallis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Porta lorem mollis aliquam ut porttitor Leo a.</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Do not share this QR code with anyone other than the trusted contact whom you want to share the secret with </Text>
                             </View>
                         </KeyboardAwareScrollView>
 

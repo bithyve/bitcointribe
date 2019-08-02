@@ -17,7 +17,16 @@ const getUnixToDateFormat = unixDate => {
 };
 const getUnixToNormaDateFormat = unixDate => {
   return moment.unix( unixDate ).format( "DD-MM-YYYY" );
+
 };
+
+const getUnixToDateFormat1 = () => {
+  return moment().format( 'hh:mm a , DD MMM YYYY' );
+}
+
+const getUnixToDateFormat2 = () => {
+  return moment().format( 'DD MMM YYYY , hh:mm a' );
+}
 
 //TODO: Network check
 let isNetwork;
@@ -152,6 +161,15 @@ const getMnemonic = () => {
   return mnemonic.split( " " );
 }
 
+const isJson = ( str: string ) => {
+  try {
+    JSON.parse( str );
+  } catch ( e ) {
+    return false;
+  }
+  return true;
+}
+
 //Get and Set WalletDetails
 const getWalletDetails = () => {
   let commonData = Singleton.getInstance();
@@ -240,13 +258,59 @@ const setAppHealthStatus = ( value: any ) => {
   return true;
 }
 
+//TODO: Singleton Bitcoin Class
 
 
+const getRegularAccountObject = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getRegularAccountObject();
+}
+
+const setRegularAccountObject = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setRegularAccountObject( value );
+  return true;
+}
+
+const getSecureAccountObject = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getSecureAccountObject();
+}
+const setSecureAccountObject = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setSecureAccountObject( value );
+  return true;
+}
+
+const getS3ServiceObject = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getS3ServiceObject();
+}
+const setS3ServiceObject = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setS3ServiceObject( value );
+  return true;
+}
+
+
+//Singleton Flag
+
+const getFlagQRCodeScreen = () => {
+  let commonData = Singleton.getInstance();
+  return commonData.getFlagQRCodeScreen();
+}
+const setFlagQRCodeScreen = ( value: any ) => {
+  let commonData = Singleton.getInstance();
+  commonData.setFlagQRCodeScreen( value );
+  return true;
+}
 
 module.exports = {
   getUnixTimeDate,
   getUnixToDateFormat,
   getUnixToNormaDateFormat,
+  getUnixToDateFormat1,
+  getUnixToDateFormat2,
   getNetwork,
   encrypt,
   encryptAgain,
@@ -257,7 +321,9 @@ module.exports = {
   getDeviceModel,
   getStatusBarHeight,
   getIphoneSize,
-  //Singleton       
+  isJson,
+
+  //Singleton          
   getMnemonic,
   getWalletDetails,
   setWalletDetails,
@@ -280,5 +346,15 @@ module.exports = {
   getAppHealthStatus,
   setAppHealthStatus,
 
+  //Singleton Bitcoin Class
+  getRegularAccountObject,
+  setRegularAccountObject,
+  getSecureAccountObject,
+  setSecureAccountObject,
+  getS3ServiceObject,
+  setS3ServiceObject,
 
-};
+  //Singleton Flags
+  getFlagQRCodeScreen,
+  setFlagQRCodeScreen
+};   

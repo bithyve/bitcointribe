@@ -16,17 +16,6 @@ SCLAlertSubtitle.defaultProps = {
   subtitleStyle: {}
 };
 
-function SCLAlertSubtitle(props) {
-  return (
-    <View style={[styles.container, props.subtitleContainerStyle]}>
-      <Text numberOfLines={10} style={[styles.subtitle, props.subtitleStyle]}>
-        {" "}
-        {props.subtitle}{" "}
-      </Text>{" "}
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
@@ -39,5 +28,16 @@ const styles = StyleSheet.create({
     fontWeight: "300"
   }
 });
+
+function SCLAlertSubtitle(props) {
+  return (
+    <View style={[styles.container, props.subtitleContainerStyle]}>
+      <Text numberOfLines={10} style={[styles.subtitle, props.subtitleStyle]}>
+        {" "}
+        {props.subtitle}{" "}
+      </Text>{" "}
+    </View>
+  );
+}
 
 export default SCLAlertSubtitle;

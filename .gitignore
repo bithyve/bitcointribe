@@ -1,5 +1,6 @@
 # OSX
 .DS_Store
+.vscode
 
 # Xcode
 build/
@@ -43,6 +44,9 @@ env.dev
 
 #Documents
 /src/assets/Documents
+
+#Bitcoin Files
+*/bitcoin.zip
 
 # BUCK
 buck-out/

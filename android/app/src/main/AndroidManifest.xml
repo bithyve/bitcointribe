@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hexawallet">
-  
+
+    
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
    <uses-permission android:name="android.permission.CAMERA" />
@@ -12,22 +13,22 @@
 <uses-permission android:name="android.permission.READ_SMS"/>
 <uses-permission android:name="android.permission.VIBRATE"/>
 <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-                                            
- 
-  
+      
     <application
       android:name=".MainApplication"
-      android:label="@string/app_name"
+      android:hardwareAccelerated="false"
+      android:label="@string/app_name"  
+       android:largeHeap="true"   
       android:icon="@mipmap/ic_launcher"
       android:allowBackup="false"
       android:theme="@style/AppTheme">
-      <activity
+      <activity  
         android:name=".MainActivity"
         android:label="@string/app_name"
         android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
         android:windowSoftInputMode="adjustResize"
            android:launchMode="singleTop"  
-        >
+        >  
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
@@ -41,7 +42,7 @@
 </intent-filter>
       </activity>
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
-        <meta-data
+      <meta-data
             android:name="io.fabric.ApiKey"
             android:value="2d0b58f102661fcabd3be54e6516854e2b0983f6" />
     </application>  

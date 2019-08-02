@@ -36,8 +36,9 @@ import { colors, images, asyncStorageKeys } from "HexaWallet/src/app/constants/C
 
 export default class WalletSetupScreens extends React.Component<any, any> {
 
+
     //TODO:click_GotoPermisionScrenn
-    click_GotoPermisionScrenn() {
+    goToWallet() {
         const resetAction = StackActions.reset( {
             index: 0, // <-- currect active route from actions array
             key: null,
@@ -66,13 +67,11 @@ export default class WalletSetupScreens extends React.Component<any, any> {
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Set up your wallet</Text>
                             </Button>
                         </View>
-                        <WalletSetUpScrolling >
+                        <WalletSetUpScrolling>
                             {/* First screen */ }
                             <WalletNameScreen />
                             {/* Second screen */ }
-                            <FirstSecretQuestionScreen />
-                            {/* Third screen */ }
-                            <SecondSecretQuestion prevScreen={ () => this.click_GotoPermisionScrenn() } />
+                            <FirstSecretQuestionScreen click_Next={ () => this.goToWallet() } />
                         </WalletSetUpScrolling>
                     </ImageBackground>
                 </SafeAreaView>

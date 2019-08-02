@@ -77,9 +77,7 @@ export default class ModelEnterAndConfirmMnemonic extends Component<Props, any> 
                 flag_ConfirmBtnAnimating: true
             } );
             let mnemonic = this.state.mnemonic;
-            const regularAccount = new RegularAccount(
-                this.state.mnemonic
-            );
+            let regularAccount = await utils.getRegularAccountObject();
             const getBal = await regularAccount.getBalance();
             console.log( { getBal } );
 
@@ -124,7 +122,7 @@ export default class ModelEnterAndConfirmMnemonic extends Component<Props, any> 
                     automaticallyAdjustContentInsets={ true }
                     keyboardOpeningTime={ 0 }
                     enableOnAndroid={ true }
-                    contentContainerStyle={ { flexGrow: utils.getIphoneSize() == "iphone X" ? 0.6 : 0.8 } }
+                    contentContainerStyle={ { flexGrow: 1 } }
                 >
                     <View style={ [
                         styles.modalBackground,
@@ -144,7 +142,7 @@ export default class ModelEnterAndConfirmMnemonic extends Component<Props, any> 
                                 } ] }>Enter the Passphrase</Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Enter the mnemonic in the order that you noted at the tome of setting up your wallet. In case of any typo the wallet restoration will fail</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Enter the mnemonic in the order that you noted at the time of setting up your wallet. In case of any typo the wallet restoration will fail</Text>
                             </View>
                             <View
                                 style={ {

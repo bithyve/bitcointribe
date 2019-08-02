@@ -41,7 +41,7 @@ import {
     colors
 } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-
+import utils from "HexaWallet/src/app/constants/Utils";
 
 let wrongEnterAnswerCount = 0;
 
@@ -49,7 +49,10 @@ export default class ModelSecureTwoFactorSecretThreeCode extends Component<Props
     constructor ( props: any ) {
         super( props )
         this.state = ( {
+            secret: "",
+            enterSecret: "",
             otp: "",
+            message: "First three letter your secure account secret for the PDF",
             passcodeStyle: [
                 {
                     activeColor: colors.black,
@@ -57,34 +60,69 @@ export default class ModelSecureTwoFactorSecretThreeCode extends Component<Props
                     cellBorderWidth: 0
                 }
             ],
+            success: "Secret does not match!",
             flag_DisableBtnNext: true
         } );
     }
 
-
     componentWillReceiveProps( nextProps: any ) {
-        let data = nextProps.data[ 0 ];
-        console.log( { data } );
-
-    }
-
-    //TODO: Otp enter after
-    _onFinishCheckingCode( code: any ) {
-        console.log( { code } );
-        if ( code.length == 3 ) {
+        let date = Date.now();
+        var data = nextProps.data[ 0 ];
+        data = data.data[ 0 ];
+        if ( data != null ) {
+            let secret = data.secret;
+            let secretCount = secret.length;
+            let secretCode, message;
+            console.log( { secret, secretCount } );
+            if ( date % 2 == 0 ) {
+                secretCode = secret.substring( 0, 3 );
+                message = "First three letter your secure account secret for the PDF";
+            } else {
+                secretCode = secret.slice( -3 );
+                message = "Last three letter your secure account secret for the PDF";
+            }
+            console.log( { secretCode } );
             this.setState( {
-                otp: code,
-                flag_DisableBtnNext: false
+                secret: secret,
+                otp: secretCode,
+                message
             } )
         }
     }
 
+    //TODO: Otp enter after
+    _onFinishCheckingCode( isValid: boolean, code: any ) {
+        if ( isValid ) {
+            this.setState( {
+                passcodeStyle: [
+                    {
+                        activeColor: colors.black,
+                        inactiveColor: colors.black,
+                        cellBorderWidth: 0
+                    }
+                ],
+                flag_DisableBtnNext: false
+            } );
+        } else {
+            this.setState( {
+                passcodeStyle: [
+                    {
+                        activeColor: "red",
+                        inactiveColor: "red",
+                        cellBorderWidth: 1
+                    }
+                ],
+                flag_DisableBtnNext: true
+            } );
+        }
+    }
+
     click_Next() {
-        Alert.alert( 'working' );
+        this.props.click_Next();
     }
 
     render() {
-        let { passcodeStyle, flag_DisableBtnNext } = this.state;
+        let { passcodeStyle, flag_DisableBtnNext, message, otp } = this.state;
         return (
             <Modal
                 transparent
@@ -99,7 +137,7 @@ export default class ModelSecureTwoFactorSecretThreeCode extends Component<Props
                     automaticallyAdjustContentInsets={ true }
                     keyboardOpeningTime={ 0 }
                     enableOnAndroid={ true }
-                    contentContainerStyle={ { flexGrow: 0.7 } }
+                    contentContainerStyle={ { flexGrow: 1 } }
                 >
                     <View style={ [
                         styles.modalBackground,
@@ -132,6 +170,7 @@ export default class ModelSecureTwoFactorSecretThreeCode extends Component<Props
                                         inactiveColor={ passcodeStyle[ 0 ].inactiveColor }
                                         className="border-box"
                                         cellBorderWidth={ passcodeStyle[ 0 ].cellBorderWidth }
+                                        compareWithCode={ otp }
                                         autoFocus={ false }
                                         inputPosition="center"
                                         space={ 40 }
@@ -142,16 +181,19 @@ export default class ModelSecureTwoFactorSecretThreeCode extends Component<Props
                                             justifyContent: "center",
                                             height: Platform.OS == "ios" ? 0 : 40,
                                         } }
-                                        onFulfill={ ( code: any ) =>
-                                            this._onFinishCheckingCode( code )
+                                        onFulfill={ ( isValid: any, code: any ) =>
+                                            this._onFinishCheckingCode( isValid, code )
                                         }
                                         type='withoutcharacters'
                                     />
+                                    { renderIf( passcodeStyle[ 0 ].activeColor == "red" )(
+                                        <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 5 } ] }>{ this.state.success }</Text>
+                                    ) }
 
                                 </View>
                             </View>
                             <View style={ { flex: 0.1, justifyContent: "flex-end" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Answer 1+Answer2 to your secret questions is the password for the PDF</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>{ message }</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_Next()

@@ -23,14 +23,10 @@ import Permissions from 'react-native-permissions'
 import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-
-
-
 //TODO: Custome Compontes
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import ModelWalletName from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelWalletName";
 import ModelContactPermission from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelContactPermission";
-
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -50,10 +46,6 @@ import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
-
-
-
-
 export default class RestoreWalletUsingTrustedContactScreen extends Component {
     constructor ( props: any ) {
         super( props );
@@ -63,6 +55,7 @@ export default class RestoreWalletUsingTrustedContactScreen extends Component {
             walletName: "",
         };
     }
+
     componentDidMount() {
         this.setState( {
             arr_ModelWalletName: [
@@ -70,7 +63,7 @@ export default class RestoreWalletUsingTrustedContactScreen extends Component {
                     modalVisible: true
                 }
             ]
-        } )
+        } );
     }
 
     render() {
@@ -95,15 +88,8 @@ export default class RestoreWalletUsingTrustedContactScreen extends Component {
                                             modalVisible: false
                                         }
                                     ],
-                                    arr_ModelContactPermission: [
-                                        {
-                                            modalVisible: true
-                                        }
-                                    ]
                                 } );
-                                Permissions.request( 'contacts' ).then( ( response: any ) => {
-                                    console.log( response );
-                                } );
+                                this.props.navigation.push( "RestoreSelectedContactsListScreen", { walletName: val } );
                             }
                             }
                                 pop={ () => {
@@ -125,7 +111,7 @@ export default class RestoreWalletUsingTrustedContactScreen extends Component {
                                         }
                                     ],
                                 } );
-                                this.props.navigation.push( "RestoreAllContactListScreen", { walletName: this.state.walletName } );
+
                             }
                             }
                                 pop={ () => {

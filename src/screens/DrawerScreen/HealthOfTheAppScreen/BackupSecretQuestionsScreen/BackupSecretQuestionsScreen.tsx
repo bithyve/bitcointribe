@@ -58,6 +58,8 @@ export default class BackupSecretQuestionsScreen extends Component {
     constructor ( props: any ) {
         super( props );
         this.state = {
+            data: [],
+            walletDetails: [],
             arr_ModelBackupSecretQuestionsFirstQuestion: [],
             arr_ModelQuestionsSuccessfullyBackedUp: []
         };
@@ -65,8 +67,11 @@ export default class BackupSecretQuestionsScreen extends Component {
 
     componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
+        let walletDetails = this.props.navigation.getParam( "walletDetails" );
         setTimeout( () => {
             this.setState( {
+                data,
+                walletDetails,
                 arr_ModelBackupSecretQuestionsFirstQuestion: [ {
                     modalVisible: true,
                     data
@@ -75,7 +80,34 @@ export default class BackupSecretQuestionsScreen extends Component {
         }, 100 );
     }
 
+
+
+
+    //TODO: Click Sucess Popup click_GoToWallet
+
+    click_GoToWallet = async () => {
+        let { walletDetails } = this.state;
+        let arr_History = JSON.parse( walletDetails.setUpWalletAnswerDetails );
+        console.log( { arr_History } );
+        const dateTime = Date.now();
+        let JsonData = {};
+        JsonData.Question = arr_History[ 0 ].Question;
+        JsonData.Answer = arr_History[ 0 ].Answer;
+        JsonData.backupDate = dateTime
+        let temp = [ JsonData ];
+        arr_History.push.apply( arr_History, temp );
+        let resUpdateWalletAns = await dbOpration.updateWalletAnswerDetails(
+            localDB.tableName.tblWallet,
+            arr_History
+        );
+        if ( resUpdateWalletAns ) {
+            this.props.navigation.pop();
+        }
+    }
+
     render() {
+        //array
+        let { data, arr_ModelBackupSecretQuestionsFirstQuestion, arr_ModelQuestionsSuccessfullyBackedUp } = this.state;
         return (
             <View style={ styles.container }>
                 <SafeAreaView style={ styles.container }>
@@ -88,12 +120,12 @@ export default class BackupSecretQuestionsScreen extends Component {
                             enableOnAndroid={ true }
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
-                            <ModelBackupSecretQuestionsFirstQuestion data={ this.state.arr_ModelBackupSecretQuestionsFirstQuestion } click_Next={ () => {
+                            <ModelBackupSecretQuestionsFirstQuestion data={ arr_ModelBackupSecretQuestionsFirstQuestion } click_Next={ () => {
                                 this.setState( {
                                     arr_ModelBackupSecretQuestionsFirstQuestion: [
                                         {
                                             modalVisible: false,
-                                            data: []
+                                            data
                                         }
                                     ],
                                     arr_ModelQuestionsSuccessfullyBackedUp: [ {
@@ -106,21 +138,22 @@ export default class BackupSecretQuestionsScreen extends Component {
                                         arr_ModelBackupSecretQuestionsFirstQuestion: [
                                             {
                                                 modalVisible: false,
-                                                data: []
+                                                data
                                             }
                                         ]
                                     } );
                                     this.props.navigation.pop()
                                 } }
                             />
-                            <ModelQuestionsSuccessfullyBackedUp data={ this.state.arr_ModelQuestionsSuccessfullyBackedUp }
+                            <ModelQuestionsSuccessfullyBackedUp data={ arr_ModelQuestionsSuccessfullyBackedUp }
                                 click_GoToWallet={ () => {
                                     this.setState( {
                                         arr_ModelQuestionsSuccessfullyBackedUp: [ {
                                             modalVisible: false,
                                         } ]
                                     } )
-                                    this.props.navigation.pop();
+                                    this.click_GoToWallet();
+
                                 } }
                             />
                         </KeyboardAwareScrollView>
