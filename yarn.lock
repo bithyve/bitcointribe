@@ -3659,6 +3659,11 @@ event-target-shim@^1.0.5:
   resolved "https://registry.yarnpkg.com/event-target-shim/-/event-target-shim-1.1.1.tgz#a86e5ee6bdaa16054475da797ccddf0c55698491"
   integrity sha1-qG5e5r2qFgVEddp5fM3fDFVphJE=
 
+eventemitter3@^1.1.1:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-1.2.0.tgz#1c86991d816ad1e504750e73874224ecf3bec508"
+  integrity sha1-HIaZHYFq0eUEdQ5zh0Ik7PO+xQg=
+
 eventemitter3@^3.0.0:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-3.1.2.tgz#2d3d48f9c346698fce83a85d7d664e98535df6e7"
@@ -8000,6 +8005,13 @@ react-native-linear-gradient@^2.5.4:
   resolved "https://registry.yarnpkg.com/react-native-linear-gradient/-/react-native-linear-gradient-2.5.4.tgz#dce133526f5a5510a639af94544f1ed0c984bd1e"
   integrity sha512-FF1NhlerA4uBiS0gFIHa4FBp8/aftv4vPj14Y47lGNkYjSI94tnI6oYO3EfUxXjEyCUPiOVNKZOB9kScyjc5Ew==
 
+react-native-link@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-link/-/react-native-link-4.1.0.tgz#057a6be8b480c37b09b3dc9d4edfb94f5e08d3b4"
+  integrity sha1-BXpr6LSAw3sJs9ydTt+5T14I07Q=
+  dependencies:
+    react-native-url-handler "^0.4.2"
+
 react-native-mail@^3.0.7:
   version "3.0.7"
   resolved "https://registry.yarnpkg.com/react-native-mail/-/react-native-mail-3.0.7.tgz#07e6aca43f6f1f85f3e58e96e7fcd16b31a927b8"
@@ -8402,6 +8414,14 @@ react-native-ultimate-listview@^3.3.0:
   resolved "https://registry.yarnpkg.com/react-native-ultimate-listview/-/react-native-ultimate-listview-3.3.0.tgz#92fd0dbe5b291681fc679c1016a180f2da805334"
   integrity sha512-xAVtG6ztziADYCYwpA2LY5mflM+Sq0f23EwDHHks1SoUhSekBs9IHbMeBNiaZGKcuicxrwjRBtvPi7hx0aWJhw==
 
+react-native-url-handler@^0.4.2:
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/react-native-url-handler/-/react-native-url-handler-0.4.3.tgz#385d818414a2208bda6f051a842dd673fe9c237f"
+  integrity sha1-OF2BhBSiIIvabwUahC3Wc/6cI38=
+  dependencies:
+    eventemitter3 "^1.1.1"
+    url "^0.11.0"
+
 react-native-vector-icons@6.1.0:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-6.1.0.tgz#770a3f8ced692d75deb3afbb9829195ceed1eedd"
@@ -8420,10 +8440,10 @@ react-native-vector-icons@^6.1.0:
     prop-types "^15.6.2"
     yargs "^13.2.2"
 
-react-native-webview@^5.12.1:
-  version "5.12.1"
-  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-5.12.1.tgz#5e2b124e9087d64fc40040d911c10ee5744b5d4d"
-  integrity sha512-pFYzyNUG+k7Jk2a0Z3S1+OL9qtp0VQxVP08d1ume/O6l1Xibi0K0hRZms7zPUHqQc2uWEfjZ0FOa17MIN7vruw==
+react-native-webview@^6.5.1:
+  version "6.5.1"
+  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-6.5.1.tgz#022c5d22df54167ac214de9267353661b73ff357"
+  integrity sha512-MI1pmB+bLXgU6caBJGAILxE+pOwDtQhcsL5pSV9Sl04EUZpwb1HHx3PC7zb7lFOvg16qLNt6FSE5wXlWACkCcQ==
   dependencies:
     escape-string-regexp "1.0.5"
     invariant "2.2.4"
