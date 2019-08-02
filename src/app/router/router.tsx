@@ -145,13 +145,14 @@ import ConfirmSelfShareQRScannerScreen from "HexaWallet/src/screens/DrawerScreen
 import ReceivePaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/ReceivePaymentScreen/ReceivePaymentScreen";
 import SendPaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/SendPaymentScreen/SendPaymentScreen";
 import ConfirmAndSendPaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/SendPaymentScreen/ConfirmAndSendPaymentScreen";
-
+import SendPaymentAddressScanScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/SendPaymentScreen/SendPaymentAddressScanScreen";
 
 
 
 
 //TODO: Account Transaction Screen
 import TransactionScreen from "HexaWallet/src/screens/DrawerScreen/TransactionScreen/TransactionScreen";
+
 
 
 
@@ -474,6 +475,10 @@ const SendPaymentStackNavigator = createStackNavigator(
     ConfirmAndSendPaymentScreen: {
       screen: ConfirmAndSendPaymentScreen,
       navigationOptions: { header: null }
+    },
+    SendPaymentAddressScanScreen: {
+      screen: SendPaymentAddressScanScreen,
+      navigationOptions: { header: null }
     }
   },
   {
@@ -486,6 +491,14 @@ const SendPaymentStackNavigator = createStackNavigator(
 const AccountTransactionStackNavigator = createStackNavigator( {
   TransactionScreen: {
     screen: TransactionScreen,
+    navigationOptions: { header: null }
+  },
+  RecieveNavigation: {
+    screen: ReceivePaymentStackNavigator,
+    navigationOptions: { header: null }
+  },
+  SendPaymentNavigation: {
+    screen: SendPaymentStackNavigator,
     navigationOptions: { header: null }
   }
 },

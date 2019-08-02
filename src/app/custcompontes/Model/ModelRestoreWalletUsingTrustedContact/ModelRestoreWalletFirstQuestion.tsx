@@ -233,8 +233,8 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                             "",
                             "0.0",
                             "BTC",
-                            "Daily Wallet",
-                            "Daily Wallet",
+                            "Daily Account",
+                            "Regular Account",
                             ""
                         );
                         let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(

@@ -67,6 +67,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             arr_AccountList: [],
             arr_SelectAccountDetails: [],
             address: "",
+            selfAddress: "",
             amount: "0.0",
             memo: "",
             selectedAccountBal: 0.0,
@@ -82,34 +83,45 @@ export default class SendPaymentScreen extends React.Component<any, any> {
     async componentWillMount() {
         //class value reset
         let data = this.props.navigation.getParam( "data" );
-        //Singleton Flag value change  
-        let address = data.address;
-        let amount = data.options.amount.toString();
+        let selectedAccount = this.props.navigation.getParam( "selectedAccount" );
+        console.log( { selectedAccount } );
+
+        //Singleton Flag value change    
+        let address = data != undefined ? data.address : "";
+        let amount = data != undefined ? data.options.amount.toString() : "0.0";
         console.log( { amount } );
         let walletDetails = await utils.getWalletDetails();
         let arr_AccountList = await comFunDBRead.readTblAccount();
         console.log( { arr_AccountList } );
-
-        var temp = [], arr_SelectAccountDetails = [], balDailyAccount, flag_DisableSentBtn;
+        var temp = [], arr_SelectAccountDetails = [], accountbal, flag_DisableSentBtn;
         for ( let i = 0; i < arr_AccountList.length; i++ ) {
             let item = arr_AccountList[ i ];
-            let data = {};
-            if ( i == 0 ) {
-                data.checked = true;
-                arr_SelectAccountDetails = item;
-                balDailyAccount = item.balance;
+            let jsonData = {};
+            if ( data != undefined ) {
+                if ( i == 0 ) {
+                    jsonData.checked = true;
+                    arr_SelectAccountDetails = item;
+                    accountbal = item.balance;
+                } else {
+                    jsonData.checked = false;
+                }
             } else {
-                data.checked = false;
+                if ( item.accountType == selectedAccount.accountType ) {
+                    jsonData.checked = true;
+                    arr_SelectAccountDetails = item;
+                    accountbal = item.balance;
+                } else {
+                    jsonData.checked = false;
+                }
             }
-            data.balance = item.balance;
-            data.accountName = item.accountName;
-            temp.push( data );
-
+            jsonData.balance = item.balance;
+            jsonData.accountName = item.accountName;
+            temp.push( jsonData );
         }
         //Sent button Enable and Disable
-        if ( amount != "" && amount < balDailyAccount ) {
+        if ( amount != "" && amount < accountbal ) {
             flag_DisableSentBtn = false;
-        } else if ( amount != "" && amount > balDailyAccount ) {
+        } else if ( amount != "" && amount > accountbal ) {
             flag_DisableSentBtn = true;
         }
         console.log( { temp } );
@@ -118,17 +130,16 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             amount,
             arr_AccountList: temp,
             arr_SelectAccountDetails,
-            selectedAccountBal: balDailyAccount,
+            selectedAccountBal: accountbal,
             flag_DisableSentBtn
         } )
-
     }
-
 
 
     componentWillUnmount() {
         utils.setFlagQRCodeScreen( true );
     }
+
 
     setAmount() {
         let { amount, selectedAccountBal } = this.state;
@@ -265,6 +276,12 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         }
     }
 
+    //TODO: When qrcode  scan 
+    getAddressWithBal( e: any ) {
+        console.log( { e } );
+
+    }
+
     _renderItem( { item, index } ) {
         return (
             <View key={ "card" + index }>
@@ -303,6 +320,8 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             </View>
         );
     }
+
+
 
 
 
@@ -401,6 +420,31 @@ export default class SendPaymentScreen extends React.Component<any, any> {
                                         />
                                     </View>
                                 ) }
+                                <View style={ [ styles.itemQuestionPicker ] }>
+                                    <View style={ { flexDirection: "row" } }>
+                                        <Input
+                                            value={ memo }
+                                            keyboardType="default"
+                                            placeholder="Address"
+                                            placeholderTextColor="#D0D0D0"
+                                            returnKeyType="done"
+                                            onChangeText={ ( val ) => {
+                                                this.setState( {
+                                                    selfAddress: val
+                                                } )
+                                            } }
+                                            style={ [ globalStyle.ffOpenSansBold, { flex: 1, fontSize: 18 } ] }
+                                        />
+                                        <Button
+                                            transparent
+                                            style={ { flex: 0.15 } }
+                                            onPress={ () => {
+                                                this.props.navigation.push( "SendPaymentAddressScanScreen", { onSelect: this.getAddressWithBal } )
+                                            } }>
+                                            <SvgIcon name="qr-codes" color="#000000" size={ 30 } />
+                                        </Button>
+                                    </View>
+                                </View>
                             </View>
                             <View style={ { flex: 1 } } >
                                 <Text style={ { margin: 20 } }>Transaction Priority</Text>

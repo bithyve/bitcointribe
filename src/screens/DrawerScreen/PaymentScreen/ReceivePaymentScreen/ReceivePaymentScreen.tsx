@@ -75,6 +75,7 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
     }
 
     async componentWillMount() {
+        let selectedAccount = this.props.navigation.getParam( "selectedAccount" );
         let walletDetails = await utils.getWalletDetails();
         console.log( { walletDetails } );
         let arr_AccountList = await comFunDBRead.readTblAccount();

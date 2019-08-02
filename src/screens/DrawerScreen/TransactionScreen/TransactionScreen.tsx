@@ -329,11 +329,17 @@ export default class TransactionScreen extends React.Component<any, any> {
                                 style={ [ { opacity: 1 }, { borderRadius: 10, height: 55 } ] }
                                 disabled={ false }
                                 title="Send"
-                                click_Sent={ () => console.log( 'hi' )
+                                click_Sent={ () => {
+                                    this.props.navigation.push( "SendPaymentNavigation", { selectedAccount: arrSelectedAccount } )
                                 }
-                                click_Transfer={ () => Alert.alert( "Working" )
                                 }
-                                click_Recieve={ () => Alert.alert( "Working" )
+                                click_Transfer={ () => {
+                                    Alert.alert( "Working" )
+                                }
+                                }
+                                click_Recieve={ () => {
+                                    this.props.navigation.push( "RecieveNavigation", { selectedAccount: arrSelectedAccount } )
+                                }
                                 }
                             />
                         </View>

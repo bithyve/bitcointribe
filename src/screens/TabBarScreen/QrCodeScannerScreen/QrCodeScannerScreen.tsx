@@ -99,6 +99,11 @@ export default class QrCodeScannerScreen extends React.Component {
         )
     }
 
+
+    click_ResetFlag = async () => {
+        utils.setFlagQRCodeScreen( true );
+    }
+
     barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
@@ -123,7 +128,10 @@ export default class QrCodeScannerScreen extends React.Component {
                         utils.setDeepLinkingUrl( deepLinkPara );
                         this.props.navigation.navigate( 'WalletScreen' );
                     } else if ( result.type == "" ) {
-                        alert.simpleOk( "Oops", "Invalid qrcode.Please scan correct qrcode." );
+                        if ( utils.getFlagQRCodeScreen() == true ) {
+                            utils.setFlagQRCodeScreen( false );
+                            alert.simpleOkAction( "Oops", "Invalid qrcode.Please scan correct qrcode.", this.click_ResetFlag );
+                        }
                     }
                 }
             }
@@ -133,7 +141,10 @@ export default class QrCodeScannerScreen extends React.Component {
                 if ( resAddressDiff.status == 200 ) {
                     resAddressDiff = resAddressDiff.data;
                 } else {
-                    alert.simpleOk( "Oops", resAddressDiff.err );
+                    if ( utils.getFlagQRCodeScreen() == true ) {
+                        utils.setFlagQRCodeScreen( false );
+                        alert.simpleOkAction( "Oops", resAddressDiff.err, this.click_ResetFlag );
+                    }
                 }
                 if ( resAddressDiff.type == "paymentURI" || resAddressDiff.type == "address" ) {
                     var resDecPaymentURI = await regularAccount.decodePaymentURI( result );
@@ -141,7 +152,7 @@ export default class QrCodeScannerScreen extends React.Component {
                         await bitcoinClassState.setRegularClassState( regularAccount );
                         resDecPaymentURI = resDecPaymentURI.data;
                     } else {
-                        alert.simpleOk( "Oops", resDecPaymentURI.err );
+                        alert.simpleOkAction( "Oops", resDecPaymentURI.err, this.click_ResetFlag );
                     }
                     if ( utils.getFlagQRCodeScreen() == true ) {
                         utils.setFlagQRCodeScreen( false );
@@ -153,6 +164,7 @@ export default class QrCodeScannerScreen extends React.Component {
             console.log( error );
         }
     }
+
 
 
     render() {
@@ -172,7 +184,6 @@ export default class QrCodeScannerScreen extends React.Component {
                             renderTopBarView={ () => this._renderTitleBar() }
                             renderBottomMenuView={ () => this._renderMenu() }
                         />
-
                     </ImageBackground>
                 </SafeAreaView>
             </Container >
