@@ -70,14 +70,14 @@ export default class ModelRestoreWalletSuccessfullyUsingTrustedContact extends C
                             <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingMnemonic.walletrestored } />
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-end" } }>
-                            <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Congratulations! You can now use your Daily Account</Text>
+                            <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Congratulations! Your wallet is successfully restored</Text>
                             <Text note>{ data.length != 0 ? data[ 0 ].walletName : "Hexa Wallet" }</Text>
                             <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Restore your secure account now You can opt to do it later</Text>
                         </View>
                         <View style={ { flex: 0.4, justifyContent: "flex-end" } }>
                             <FullLinearGradientButton
                                 click_Done={ () => this.props.click_Skip() }
-                                title="Go Wallet"
+                                title="Go to Wallet"
                                 disabled={ false }
                                 style={ [ { opacity: 1 }, { borderRadius: 10 } ] }
                             />

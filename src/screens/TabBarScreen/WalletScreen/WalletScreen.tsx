@@ -365,7 +365,7 @@ export default class WalletScreen extends React.Component {
         shiledIconPer: 5,
         arr_CustShiledIcon: [
           {
-            "title": "Your wallet is not secure, some Information about backup comes here. Click on the icon to backup",
+            "title": "Great!! The wallet backup is secure. Keep an eye on the health of the backup here",
             "image": "sheild_5",
             "imageHeight": this.animatedShieldIconSize,
             "imageWidth": this.animatedShieldIconSize,
@@ -1920,7 +1920,7 @@ export default class WalletScreen extends React.Component {
                     }
                   }
                   else {
-                    alert.simpleOk( "Oops", "Wait pdf file creating" );
+                    alert.simpleOk( "Please come back later, Hexa is still working" );
                   }
                 }
                 } />

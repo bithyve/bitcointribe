@@ -41,7 +41,8 @@ export default class ModelSelfShareAcceptAndReject extends Component<Props, any>
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Some information about the importance secret keeping</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Please keep this share safe, the sender might need this share to restore wallet in case of device loss
+</Text>
                             <Avatar medium rounded title={ walletName.charAt( 0 ) } />
                             <Text style={ globalStyle.ffFiraSansMedium } note>{ walletName }</Text>
                         </View>

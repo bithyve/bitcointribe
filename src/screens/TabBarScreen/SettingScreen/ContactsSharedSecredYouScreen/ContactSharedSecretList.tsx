@@ -482,7 +482,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                                             autoCorrect={ false } />
                                     </Item>
                                 </View>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20, textAlign: "center" } ] }>Send trusted friends wallets details.</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20, textAlign: "center" } ] }>Click on wallet name of trusted contact to send back share</Text>
                             </View>
                             <View style={ { flex: 1 } }>
                                 { secretList }

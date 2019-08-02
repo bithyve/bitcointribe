@@ -35,18 +35,18 @@ export default class ModelAcceptOrRejectSecret extends Component<Props, any> {
                 ] }>
                     <View style={ styles.viewModelBody }>
                         <View style={ { flexDirection: "row", flex: 0.5 } }>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>{ walletName } has selected you as his trusted contact</Text>
+                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>{ walletName } wallet has selected you as trusted contact</Text>
                             <Button light iconLeft style={ { width: 40, height: 40, borderRadius: 20 } } onPress={ () => this.props.closeModal() }>
                                 <Icon name='close' style={ { alignSelf: "center" } } />
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Some information about the importance secret keeping</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>This secret is required if {walletName} want to retore wallet in case of loss</Text>
                             <Avatar medium rounded title={ walletName.charAt( 0 ) } />
                             <Text style={ globalStyle.ffFiraSansMedium } note>{ walletName }</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>You will need to open the Hexa application on your device once in two weeks to make sure the secret is still accessible</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>You are requested to open the Hexa application once in two weeks to make sure the secret is still accessible</Text>
                             <Button
                                 onPress={ () => this.props.closeModal() }
                                 style={ [ globalStyle.ffFiraSansSemiBold, {
