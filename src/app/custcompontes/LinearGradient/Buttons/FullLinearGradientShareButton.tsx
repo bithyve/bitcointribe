@@ -31,7 +31,6 @@ export default class FullLinearGradientShareButton extends Component<Props, any>
                         disabled={ this.props.disabled }
                         onPress={ () => this.props.click_Done() }
                     >
-                        <IconFontAwe name={ this.props.iconName } color={ this.props.iconColor } size={ this.props.iconSize } />
                         <Text style={ styles.textWhite }>{ "  " + this.props.title }</Text>
                     </Button>
                     <View style={ { flex: 0.2, flexDirection: "row" } }>

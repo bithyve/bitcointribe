@@ -39,6 +39,11 @@ import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientShareButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientShareButton";
 
+
+//TODO: Custome Model
+import ModelBottomSingleButton from "HexaWallet/src/app/custcompontes/ModelBottom/ModelBottomSingleButton/ModelBottomSingleButton";
+
+
 //TODO: Custome Alert 
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
@@ -60,6 +65,7 @@ var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBR
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
+
 export default class SelfShareSharingScreen extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props )
@@ -67,6 +73,8 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
             data: [],
             title: "Share",
             arr_History: [],
+            arr_ModelBottomSingleButton: [],
+            //flag
             flag_ShareBtnDisable: true,
             flag_ReShareBtnDisable: false,
             flag_ConfrimBtnDisable: false
@@ -258,11 +266,11 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
     }
 
     render() {
-        //array     
-        let { data, arr_History } = this.state;
-        //Value
+        //array       
+        let { data, arr_History, arr_ModelBottomSingleButton } = this.state;
+        //Value   
         let { title } = this.state;
-        //flag
+        //flag   
         let { flag_ShareBtnDisable, flag_ReShareBtnDisable, flag_ConfrimBtnDisable } = this.state;
         return (
             <Container>
@@ -308,42 +316,33 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                                 extraData={ this.state }
                             />
                         </View>
-                        { renderIf( flag_ShareBtnDisable == true )(
-                            <View style={ { flex: Platform.OS == "ios" ? 0.5 : 0.6 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Do not share this pdf with anyone other than your email/cloud</Text>
-                                <FullLinearGradientShareButton
-                                    click_Done={ () => {
-                                        this.click_ShareEmail( data )
-                                    } }
-                                    title="Share"
-                                    disabled={ false }
-                                    style={ [ { borderRadius: 10, marginBottom: 5 } ] } />
-                            </View>
-                        ) }
-                        { renderIf( flag_ReShareBtnDisable == true )(
-                            <View style={ { flex: Platform.OS == "ios" ? 0.5 : 0.6 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Do not share this pdf with anyone other than your email/cloud</Text>
-                                <FullLinearGradientShareButton
-                                    click_Done={ () => {
-                                        this.click_ShareEmail( data )
-                                    } }
-                                    title="Reshare"
-                                    disabled={ false }
-                                    style={ [ { borderRadius: 10 } ] } />
-                            </View>
-                        ) }
-                        { renderIf( flag_ConfrimBtnDisable == true )(
-                            <View style={ { flex: Platform.OS == "ios" ? 0.5 : 0.6 } }>
-                                <FullLinearGradientShareButton
-                                    click_Done={ () => {
-                                        this.click_Confirm( data )
-                                    } }
-                                    title="Confirm"
-                                    disabled={ false }
-                                    style={ [ { borderRadius: 10 } ] } />
-                            </View>
-                        ) }
+                        <View style={ { flex: Platform.OS == "ios" ? 0.5 : 0.6 } }>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Do not share this pdf with anyone other than your email/cloud</Text>
+                            <FullLinearGradientShareButton
+                                click_Done={ () => {
+                                    this.click_ShareEmail( data )
+                                } }
+                                click_Option={ () => {
+                                    this.setState( {
+                                        arr_ModelBottomSingleButton: [ {
+                                            modalVisible: true,
+                                            title: "OPTION",
+                                            subTitle: "Select any one option"
+                                        } ]
+                                    } )
+                                } }
+                                title="Share"
+                                disabled={ false }
+                                style={ [ { borderRadius: 10, marginBottom: 5 } ] } />
+                        </View>
                     </ImageBackground>
+
+                    <ModelBottomSingleButton
+                        data={ arr_ModelBottomSingleButton }
+
+                    />
+
+
                 </SafeAreaView>
                 <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
             </Container >

@@ -51,10 +51,29 @@ export default class ModelBottomSingleButton extends Component<Props, any> {
         } )
     }
 
+
+    componentWillReceiveProps = ( nextProps: any ) => {
+        let data = nextProps.data;
+        console.log( { data } );
+        if ( data != undefined ) {
+            this.setState( {
+                data: data[ 0 ]
+            } )
+        }
+    }
+
+
+    click_Clsoe = () => {
+        this.setState( {
+            data: []
+        } )
+    }
+
+
     render() {
         let { data } = this.state;
         return (
-            <Modal style={ [ styles.modal, styles.modal4 ] } position={ "bottom" } ref={ "modal4" }>
+            <Modal style={ [ styles.modal, styles.modal4 ] } position={ "bottom" } isOpen={ data.modalVisible } onClosed={ () => this.click_Clsoe() }>
                 <View>
                     <View style={ { flexDirection: 'column', alignItems: "center", marginTop: 10, marginBottom: 15, borderBottomColor: "#EFEFEF", borderBottomWidth: 1 } }>
                         <Text style={ { fontSize: 16 } }>{ data.title }</Text>
