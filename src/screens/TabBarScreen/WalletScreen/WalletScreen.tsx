@@ -1733,8 +1733,7 @@ export default class WalletScreen extends React.Component {
                   <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
                 </View>
                 <View style={ { flex: 4 } }>
-                  <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
-                  <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
+                  <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 30 } ] }>
                     { item.balance }
                   </Text>
 
@@ -1817,8 +1816,7 @@ export default class WalletScreen extends React.Component {
                   <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
                 </View>
                 <View style={ { flex: 4 } }>
-                  <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
-                  <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
+                  <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 30 } ] }>
                     { item.balance }
                   </Text>
                 </View>

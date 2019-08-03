@@ -37,7 +37,7 @@ import BackgroundFetch from "react-native-background-fetch";
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientSelfShareShareButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientSelfShareShareButton";
+import FullLinearGradientShareButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientShareButton";
 
 //TODO: Custome Alert 
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
@@ -311,7 +311,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                         { renderIf( flag_ShareBtnDisable == true )(
                             <View style={ { flex: Platform.OS == "ios" ? 0.5 : 0.6 } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Do not share this pdf with anyone other than your email/cloud</Text>
-                                <FullLinearGradientSelfShareShareButton
+                                <FullLinearGradientShareButton
                                     click_Done={ () => {
                                         this.click_ShareEmail( data )
                                     } }
@@ -323,7 +323,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                         { renderIf( flag_ReShareBtnDisable == true )(
                             <View style={ { flex: Platform.OS == "ios" ? 0.5 : 0.6 } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Do not share this pdf with anyone other than your email/cloud</Text>
-                                <FullLinearGradientSelfShareShareButton
+                                <FullLinearGradientShareButton
                                     click_Done={ () => {
                                         this.click_ShareEmail( data )
                                     } }
@@ -334,7 +334,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                         ) }
                         { renderIf( flag_ConfrimBtnDisable == true )(
                             <View style={ { flex: Platform.OS == "ios" ? 0.5 : 0.6 } }>
-                                <FullLinearGradientSelfShareShareButton
+                                <FullLinearGradientShareButton
                                     click_Done={ () => {
                                         this.click_Confirm( data )
                                     } }

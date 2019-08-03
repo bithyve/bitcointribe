@@ -375,7 +375,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                                         svgIcon.common.histroy_Hexa
                                                     }
                                                 /> */}
-                                                <SvgIcon name="image_hexa" size={ 30 } color={ primaryColor } style={ { alignSelf: "center" } } />
+                                                <SvgIcon name="image_hexa" size={ 20 } color={ primaryColor } style={ { alignSelf: "center" } } />
                                             </View>
                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
                                                 <View style={ { flexDirection: "row", flex: 1, } }>
