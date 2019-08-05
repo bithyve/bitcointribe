@@ -116,65 +116,72 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
 
 
     //TODO: Sharing PDF
-    click_ShareEmail( data: any ) {
-        console.log( { data } );
-        let { title } = this.state;
-        var email4shareFilePath = data.sssDetails.decryptedShare.split( '"' ).join( "" );
-        console.log( { email4shareFilePath } );
-        if ( title != "Email Share" ) {
-            if ( Platform.OS == "android" ) {
-                email4shareFilePath = "file:/" + email4shareFilePath;
-            }
+    click_ShareEmail = async ( data: any ) => {
+        let resultWallet = await utils.getWalletDetails();
+        let backupInfo = JSON.parse( resultWallet.backupInfo );
+        if ( backupInfo[ 0 ].backupType == "new" ) {
+            console.log( { data } );
+            let { title } = this.state;
+            var email4shareFilePath = data.sssDetails.decryptedShare.split( '"' ).join( "" );
             console.log( { email4shareFilePath } );
-            let shareOptions = {
-                title: "For 5 share",
-                message: "For 5 share.Pdf password is your answer.",
-                urls: [ email4shareFilePath ],
-                subject: "For 5 share "
-            };
-            Share.open( shareOptions )
-                .then( ( res: any ) => {
-                    this.updateHistory( data, "Shared.", "" );
-                    this.setState( {
-                        flag_ShareBtnDisable: false,
-                        flag_ReShareBtnDisable: true,
-                        flag_ConfrimBtnDisable: true
+            console.log( { email4shareFilePath } );
+            if ( title != "Email Share" ) {
+                if ( Platform.OS == "android" ) {
+                    email4shareFilePath = "file:/" + email4shareFilePath;
+                }
+                console.log( { email4shareFilePath } );
+                let shareOptions = {
+                    title: "For 5 share",
+                    message: "For 5 share.Pdf password is your answer.",
+                    urls: [ email4shareFilePath ],
+                    subject: "For 5 share "
+                };
+                Share.open( shareOptions )
+                    .then( ( res: any ) => {
+                        this.updateHistory( data, "Shared.", "" );
+                        this.setState( {
+                            flag_ShareBtnDisable: false,
+                            flag_ReShareBtnDisable: true,
+                            flag_ConfrimBtnDisable: true
+                        } );
                     } );
+            } else {
+                console.log( { email4shareFilePath } );
+                Mailer.mail( {
+                    subject: 'For 4 Share.',
+                    recipients: [ 'appasahebl@bithyve.com' ],
+                    body: '<b>For 4 share.Pdf password is your answer.</b>',
+                    isHTML: true,
+                    attachment: {
+                        path: email4shareFilePath,  // The absolute path of the file from which to read data.
+                        type: 'pdf',      // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+                        name: 'For4Share',   // Optional: Custom filename for attachment
+                    }
+                }, ( error, event ) => {
+                    if ( event == "sent" ) {
+                        alert.simpleOkActionWithPara( "Success", "Email Sent Successfully.", this.updateHistory( data, "Shared.", "" ) );
+                        this.setState( {
+                            flag_ShareBtnDisable: false,
+                            flag_ReShareBtnDisable: true,
+                            flag_ConfrimBtnDisable: true
+                        } )
+                    } else {
+                        alert.simpleOk( "Oops", error );
+                    }
                 } );
-        } else {
-            console.log( { email4shareFilePath } );
-            Mailer.mail( {
-                subject: 'For 4 Share.',
-                recipients: [ 'appasahebl@bithyve.com' ],
-                body: '<b>For 4 share.Pdf password is your answer.</b>',
-                isHTML: true,
-                attachment: {
-                    path: email4shareFilePath,  // The absolute path of the file from which to read data.
-                    type: 'pdf',      // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-                    name: 'For4Share',   // Optional: Custom filename for attachment
+                if ( Platform.OS == "android" ) {
+                    setTimeout( () => {
+                        alert.simpleOkActionWithPara( "Success", "Email Sent Successfully.", this.updateHistory( data, "Shared.", "" ) );
+                        this.setState( {
+                            flag_ShareBtnDisable: false,
+                            flag_ReShareBtnDisable: true,
+                            flag_ConfrimBtnDisable: true
+                        } )
+                    }, 3000 );
                 }
-            }, ( error, event ) => {
-                if ( event == "sent" ) {
-                    alert.simpleOkActionWithPara( "Success", "Email Sent Successfully.", this.updateHistory( data, "Shared.", "" ) );
-                    this.setState( {
-                        flag_ShareBtnDisable: false,
-                        flag_ReShareBtnDisable: true,
-                        flag_ConfrimBtnDisable: true
-                    } )
-                } else {
-                    alert.simpleOk( "Oops", error );
-                }
-            } );
-            if ( Platform.OS == "android" ) {
-                setTimeout( () => {
-                    alert.simpleOkActionWithPara( "Success", "Email Sent Successfully.", this.updateHistory( data, "Shared.", "" ) );
-                    this.setState( {
-                        flag_ShareBtnDisable: false,
-                        flag_ReShareBtnDisable: true,
-                        flag_ConfrimBtnDisable: true
-                    } )
-                }, 3000 );
             }
+        } else {
+            Alert.alert( "Working" );
         }
     }
 

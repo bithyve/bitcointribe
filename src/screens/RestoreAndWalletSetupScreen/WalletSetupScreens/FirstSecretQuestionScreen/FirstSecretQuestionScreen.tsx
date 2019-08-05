@@ -112,7 +112,7 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
         setTimeout( () => {
             let firstAns = this.state.firstAnswer;
             let secoundAns = this.state.secoundAnswer;
-            if ( firstAns == secoundAns && firstAns.length >= 6 ) {
+            if ( firstAns == secoundAns && firstAns.length >= 3 ) {
                 this.setState( {
                     flag_ConfirmDisableBtn: false
                 } )

@@ -1586,7 +1586,7 @@ export default class WalletScreen extends React.Component {
           color: "#ffffff",
         } ]
       } ]
-    } )
+    } );
     let walletDetails = await utils.getWalletDetails();
     let sssDetails = await utils.getSSSDetails();
     let regularAccount = await bitcoinClassState.getRegularClassState();
@@ -1636,8 +1636,6 @@ export default class WalletScreen extends React.Component {
     this.connnection_FetchData();
   }
 
-
-
   //TODO: getTestcoins
   getTestcoins = async () => {
     let regularAccount = await bitcoinClassState.getRegularClassState();
@@ -1645,11 +1643,7 @@ export default class WalletScreen extends React.Component {
     let secureAccount = await bitcoinClassState.getSecureClassState();
     var resCoins = await regularAccount.getTestcoins();
     console.log( { resCoins } );
-
   }
-
-
-
 
   //TODO: Show account details transaction
   click_AccountDetails = async ( item: any ) => {

@@ -126,7 +126,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
         setTimeout( () => {
             let firstAns = this.state.firstAnswer;
             let secoundAns = this.state.secoundAnswer;
-            if ( secoundAns.length >= 6 && firstAns.length >= 6 ) {
+            if ( secoundAns.length >= 3 && firstAns.length >= 3 ) {
                 if ( secoundAns != firstAns ) {
                     this.setState( {
                         flag_DisableBtnNext: true,
