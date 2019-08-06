@@ -268,11 +268,11 @@ export default class SendPaymentScreen extends React.Component<any, any> {
     //buz bitcoin need small letter 
     getPriority( no: any ) {
         if ( no == 0 ) {
-            return "High"
+            return "Low"
         } else if ( no == 1 ) {
             return "Medium"
         } else {
-            return "Low"
+            return "High"
         }
     }
 
@@ -280,12 +280,18 @@ export default class SendPaymentScreen extends React.Component<any, any> {
     //TODO: When qrcode  scan 
     getAddressWithBal = ( e: any ) => {
         console.log( { e } );
+        let { amount } = this.state;
         let data = e.data;
         console.log( { data } );
         let address = data != undefined ? data.address : "";
         console.log( { address } );
         if ( address != "" ) {
-            this.setAmountAndAddress( address, data.amount != undefined ? data.amount.toString() : "0.0" );
+            if ( data.type != "address" ) {
+                this.setAmountAndAddress( address, data.amount != undefined ? data.amount.toString() : "0.0" );
+            } else {
+                this.setAmountAndAddress( address, amount.toString() );
+            }
+
         }
     }
 

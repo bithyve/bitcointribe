@@ -98,7 +98,7 @@ const itemHorizontalMargin = wp( 2 );
 const sliderWidth = viewportWidth;
 const itemWidth = slideWidth + itemHorizontalMargin * 2;
 const SLIDER_1_FIRST_ITEM = 0;
-let countFileCreate = 0;
+let flag_CreatePdfFile = true;
 let isNetwork: boolean;
 
 //localization
@@ -284,9 +284,7 @@ export default class WalletScreen extends React.Component {
     await utils.setFlagQRCodeScreen( true );
     var resultWallet = await await comFunDBRead.readTblWallet();
     console.log( { resultWallet } );
-    let resSSSDetails = await comFunDBRead.readTblSSSDetails();
     var resAccount = await comFunDBRead.readTblAccount();
-    console.log( { resSSSDetails } );
     let temp = [];
     for ( let i = 0; i < resAccount.length; i++ ) {
       let dataAccount = resAccount[ i ];
@@ -315,78 +313,14 @@ export default class WalletScreen extends React.Component {
     this.setState( {
       walletDetails: resultWallet,
       arr_accounts: temp,
-    }, () => {
-      this.checkNetworkAndAsyncTask()
+    }, async () => {
+      if ( flag_CreatePdfFile ) {
+        flag_CreatePdfFile = false;
+        this.checkNetworkAndAsyncTask()
+      }
+      await comFunDBRead.readTblSSSDetails();
     } );
-    //TODO: appHealthStatus    
-    let appHealth = JSON.parse( resultWallet.appHealthStatus );
-    console.log( { appHealth } );
-    if ( appHealth.overallStatus == "1" ) {
-      this.setState( {
-        shiledIconPer: 1,
-        arr_CustShiledIcon: [
-          {
-            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
-            "image": "sheild_1",
-            "imageHeight": this.animatedShieldIconSize,
-            "imageWidth": this.animatedShieldIconSize,
-          }
-        ]
-      } );
-    }
-
-    else if ( appHealth.overallStatus == "2" ) {
-      this.setState( {
-        shiledIconPer: 2,
-        arr_CustShiledIcon: [
-          {
-            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
-            "image": "sheild_2",
-            "imageHeight": this.animatedShieldIconSize,
-            "imageWidth": this.animatedShieldIconSize,
-          }
-        ]
-      } );
-    }
-    else if ( appHealth.overallStatus == "3" ) {
-      this.setState( {
-        shiledIconPer: 3,
-        arr_CustShiledIcon: [
-          {
-            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
-            "image": "sheild_3",
-            "imageHeight": this.animatedShieldIconSize,
-            "imageWidth": this.animatedShieldIconSize,
-          }
-        ]
-      } );
-    }
-    else if ( appHealth.overallStatus == "4" ) {
-      this.setState( {
-        shiledIconPer: 4,
-        arr_CustShiledIcon: [
-          {
-            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
-            "image": "sheild_4",
-            "imageHeight": this.animatedShieldIconSize,
-            "imageWidth": this.animatedShieldIconSize,
-          }
-        ]
-      } );
-    }
-    else {
-      this.setState( {
-        shiledIconPer: 5,
-        arr_CustShiledIcon: [
-          {
-            "title": "Great!! The wallet backup is secure. Keep an eye on the health of the backup here",
-            "image": "sheild_5",
-            "imageHeight": this.animatedShieldIconSize,
-            "imageWidth": this.animatedShieldIconSize,
-          }
-        ]
-      } );
-    }
+    this.setHealthCheakIcon();
   }
 
   //TODO: func get Deeplinking data 
@@ -567,10 +501,6 @@ export default class WalletScreen extends React.Component {
       flag_Loading
     } )
   }
-
-
-
-
 
   //async task    
   generateSSSDetails = async () => {
@@ -765,7 +695,6 @@ export default class WalletScreen extends React.Component {
       base64string10
     } );
   }
-
 
   //qrstring modify
   getCorrectFormatStirng( share1: string ) {
@@ -1597,6 +1526,7 @@ export default class WalletScreen extends React.Component {
     this.setState( {
       flag_GetBal: true,
       arr_accounts,
+      flag_ReloadAccounts: false,
       arrErrorMessage: [ {
         type: "asyncTask",
         data: [ {
@@ -1605,10 +1535,11 @@ export default class WalletScreen extends React.Component {
           color: "#ffffff",
         } ]
       } ]
+    }, () => {
+      this.getBalReularAccount();
     } );
-    await this.getBalReularAccount();
-  }
 
+  }
 
   getBalReularAccount = async () => {
     let { arr_accounts } = this.state;
@@ -1637,9 +1568,9 @@ export default class WalletScreen extends React.Component {
             color: "#ffffff",
           } ]
         } ]
+      }, () => {
+        this.getBalSecureAccount();
       } );
-      this.getBalSecureAccount();
-      //      console.log( { getBalR, arr_accounts } );
     } else {
       alert.simpleOk( "Oops", getBalR.err );
     }
@@ -1673,8 +1604,10 @@ export default class WalletScreen extends React.Component {
             color: "#ffffff",
           } ]
         } ]
+      }, () => {
+        this.checkHealthStatus();
       } );
-      this.checkHealthStatus();
+
       return true;
     } else {
       alert.simpleOk( "Oops", getBalS.err );
@@ -1695,15 +1628,84 @@ export default class WalletScreen extends React.Component {
     share.selfshareShareId3 = sssDetails[ 4 ].shareId != "" ? sssDetails[ 4 ].shareId : null;
     share.qatime = parseInt( walletDetails.lastUpdated );
     await comAppHealth.checkHealthAllShare( share );
+    this.setHealthCheakIcon();
     this.setState( {
       flag_GetBal: false,
     } )
   }
 
+  setHealthCheakIcon = async () => {
+    let walletDetails = await utils.getWalletDetails();
+    //TODO: appHealthStatus    
+    let appHealth = JSON.parse( walletDetails.appHealthStatus );
+    console.log( { appHealth } );
+    if ( appHealth.overallStatus == "1" ) {
+      this.setState( {
+        shiledIconPer: 1,
+        arr_CustShiledIcon: [
+          {
+            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
+            "image": "sheild_1",
+            "imageHeight": this.animatedShieldIconSize,
+            "imageWidth": this.animatedShieldIconSize,
+          }
+        ]
+      } );
+    }
 
-
-
-
+    else if ( appHealth.overallStatus == "2" ) {
+      this.setState( {
+        shiledIconPer: 2,
+        arr_CustShiledIcon: [
+          {
+            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
+            "image": "sheild_2",
+            "imageHeight": this.animatedShieldIconSize,
+            "imageWidth": this.animatedShieldIconSize,
+          }
+        ]
+      } );
+    }
+    else if ( appHealth.overallStatus == "3" ) {
+      this.setState( {
+        shiledIconPer: 3,
+        arr_CustShiledIcon: [
+          {
+            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
+            "image": "sheild_3",
+            "imageHeight": this.animatedShieldIconSize,
+            "imageWidth": this.animatedShieldIconSize,
+          }
+        ]
+      } );
+    }
+    else if ( appHealth.overallStatus == "4" ) {
+      this.setState( {
+        shiledIconPer: 4,
+        arr_CustShiledIcon: [
+          {
+            "title": "The wallet backup is not secured. Please complete the setup to safeguard against loss of funds",
+            "image": "sheild_4",
+            "imageHeight": this.animatedShieldIconSize,
+            "imageWidth": this.animatedShieldIconSize,
+          }
+        ]
+      } );
+    }
+    else {
+      this.setState( {
+        shiledIconPer: 5,
+        arr_CustShiledIcon: [
+          {
+            "title": "Great!! The wallet backup is secure. Keep an eye on the health of the backup here",
+            "image": "sheild_5",
+            "imageHeight": this.animatedShieldIconSize,
+            "imageWidth": this.animatedShieldIconSize,
+          }
+        ]
+      } );
+    }
+  }
 
   //TODO: getTestcoins
   getTestcoins = async () => {
@@ -1740,7 +1742,6 @@ export default class WalletScreen extends React.Component {
     let { walletDetails } = this.state;
     this.props.navigation.push( "AccountTransactionNavigator", { data: item, walletDetails } );
   }
-
 
   _renderItem( { item, index } ) {
     return (
@@ -1806,28 +1807,7 @@ export default class WalletScreen extends React.Component {
                   </Text>
 
                 </View>
-                <View
-                  style={ {
-                    flex: 1,
-                    flexDirection: "row",
-                    alignItems: "flex-end",
-                    justifyContent: "flex-end"
-                  } }
-                >
-                  <Button transparent>
-                    <SvgIcon
-                      name="timelockNew"
-                      color="gray"
-                      size={ 20 }
-                    />
-                  </Button>
-                  <Button transparent style={ { marginLeft: 10 } }>
-                    <SvgIcon name="icon_multisig" color="gray" size={ 20 } />
-                  </Button>
-                </View>
-
               </View>
-
             </RkCard>
           ) }
           { renderIf( item.accountType == "Secure Account" )(
@@ -1903,11 +1883,7 @@ export default class WalletScreen extends React.Component {
                       size={ 20 }
                     />
                   </Button>
-                  <Button transparent style={ { marginLeft: 10 } }>
-                    <SvgIcon name="icon_multisig" color="gray" size={ 20 } />
-                  </Button>
                 </View>
-
               </View>
             </RkCard>
           ) }
@@ -1934,12 +1910,10 @@ export default class WalletScreen extends React.Component {
           <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
           <SafeAreaView style={ styles.container }>
             {/* Top View Animation */ }
-            { renderIf( flag_Offline == true || flag_PdfFileCreate == true )(
+            { renderIf( flag_Offline == true || flag_PdfFileCreate == true || flag_GetBal == true )(
               <ViewErrorMessage data={ arrErrorMessage } />
             ) }
-            { renderIf( flag_GetBal == true )(
-              <ViewErrorMessage data={ arrErrorMessage } />
-            ) }
+
             <Animated.View
               style={ {
                 height: this.animatedHeaderHeight,
@@ -2024,17 +1998,17 @@ export default class WalletScreen extends React.Component {
             >
               <ScrollView
                 scrollEventThrottle={ 40 }
+                contentContainerStyle={ { flex: 0 } }
+                horizontal={ false }
+                pagingEnabled={ false }
                 refreshControl={
                   <RefreshControl
                     refreshing={ flag_refreshing }
                     onRefresh={ () => {
-                      this.getBalAndHealth.bind( this )
+                      this.getBalAndHealth()
                     } }
                   />
                 }
-                contentContainerStyle={ { flex: 0 } }
-                horizontal={ false }
-                pagingEnabled={ false }
                 onScroll={ Animated.event( [
                   {
                     nativeEvent: { contentOffset: { y: this.state.scrollY } }
@@ -2046,7 +2020,8 @@ export default class WalletScreen extends React.Component {
                   extraData={ flag_ReloadAccounts }
                   showsVerticalScrollIndicator={ false }
                   renderItem={ this._renderItem.bind( this ) }
-                  keyExtractor={ ( item, index ) => index }
+
+                  keyExtractor={ ( item, index ) => index.toString() }
                 />
               </ScrollView>
             </Animated.View>
@@ -2126,6 +2101,7 @@ export default class WalletScreen extends React.Component {
               svgIcon.walletScreen.addAccounts
             }
           />
+
         </Button>
         <ModelAcceptOrRejectSecret
           data={ arr_ModelAcceptOrRejectSecret }
@@ -2185,7 +2161,8 @@ export default class WalletScreen extends React.Component {
             this.storeSelfShare();
           } }
         />
-        <ModelBackupShareAssociateContact data={ arr_ModelBackupShareAssociateContact }
+        <ModelBackupShareAssociateContact
+          data={ arr_ModelBackupShareAssociateContact }
           click_AssociateContact={ ( walletName: string ) => {
             Permissions.request( 'contacts' ).then( ( response: any ) => {
               console.log( response );
@@ -2229,7 +2206,8 @@ export default class WalletScreen extends React.Component {
             } )
           } }
         />
-        <ModelBackupAssociateOpenContactList data={ arr_ModelBackupAssociateOpenContactList }
+        <ModelBackupAssociateOpenContactList
+          data={ arr_ModelBackupAssociateOpenContactList }
           click_OpenContact={ () => {
             this.setState( {
               arr_ModelBackupAssociateOpenContactList: [

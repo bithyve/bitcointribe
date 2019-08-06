@@ -1448,66 +1448,28 @@ const insertTrustedPartyDetails = (
     jsonData.date = utils.getUnixToDateFormat( fulldate );
     temp.push( jsonData );
     db.transaction( function ( txn ) {
-      txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
-        var len = results.rows.length;
-        if ( len > 0 ) {
-          for ( let i = 0; i < len; i++ ) {
-            let dbdecryptNonPMDDData = utils.decrypt(
-              results.rows.item( i ).nonPMDDData,
-              passcode
-            );
-            // console.log( { dbdecryptrecordID } );
-            if ( dbdecryptNonPMDDData == nonPMDDData ) {
-              resolve( "Already same nonPMDDData stored." );
-            } else {
-              txn.executeSql(
-                "INSERT INTO " +
-                tblName +
-                "(dateCreated,keeperInfo,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)",
-                [
-                  utils.encrypt(
-                    fulldate.toString(),
-                    passcode
-                  ),
-                  utils.encrypt( JSON.stringify( keeperInfo ).toString(), passcode ),
-                  utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
-                  utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
-                  utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
-                  utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
-                  utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
-                  utils.encrypt( "With Associate Contact", passcode )
-                ]
-              );
-              resolve( true );
-            }
-          }
-        } else {
-          txn.executeSql(
-            "INSERT INTO " +
-            tblName +
-            "(dateCreated,keeperInfo,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)",
-            [
-              utils.encrypt(
-                fulldate.toString(),
-                passcode
-              ),
-              utils.encrypt( JSON.stringify( keeperInfo ).toString(), passcode ),
-              utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
-              utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
-              utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
-              utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
-              utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
-              utils.encrypt( "With Associate Contact", passcode )
-            ]
-          );
-          resolve( true );
-        }
-      } );
+      txn.executeSql(
+        "INSERT INTO " +
+        tblName +
+        "(dateCreated,keeperInfo,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)",
+        [
+          utils.encrypt(
+            fulldate.toString(),
+            passcode
+          ),
+          utils.encrypt( JSON.stringify( keeperInfo ).toString(), passcode ),
+          utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
+          utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
+          utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
+          utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
+          utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
+          utils.encrypt( "With Associate Contact", passcode )
+        ]
+      );
+      resolve( true );
     } );
   } );
 };
-
-
 
 const insertTrustedPartyDetailWithoutAssociate = (
   tblName: string,
@@ -1525,64 +1487,27 @@ const insertTrustedPartyDetailWithoutAssociate = (
     jsonData.date = utils.getUnixToDateFormat( fulldate );
     temp.push( jsonData );
     db.transaction( function ( txn ) {
-      txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
-        var len = results.rows.length;
-        if ( len > 0 ) {
-          for ( let i = 0; i < len; i++ ) {
-            let dbdecryptNonPMDDData = utils.decrypt(
-              results.rows.item( i ).nonPMDDData,
-              passcode
-            );
-            // console.log( { dbdecryptrecordID } );
-            if ( dbdecryptNonPMDDData == nonPMDDData ) {
-              resolve( "Already same nonPMDDData stored." );
-            } else {
-              txn.executeSql(
-                "INSERT INTO " +
-                tblName +
-                "(dateCreated,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)",
-                [
-                  utils.encrypt(
-                    fulldate.toString(),
-                    passcode
-                  ),
-                  utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
-                  utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
-                  utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
-                  utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
-                  utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
-                  utils.encrypt( "Without Associate Contact", passcode )
-                ]
-              );
-              resolve( true );
-            }
-          }
-        } else {
-          txn.executeSql(
-            "INSERT INTO " +
-            tblName +
-            "(dateCreated,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)",
-            [
-              utils.encrypt(
-                fulldate.toString(),
-                passcode
-              ),
-              utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
-              utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
-              utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
-              utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
-              utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
-              utils.encrypt( "Without Associate Contact", passcode )
-            ]
-          );
-          resolve( true );
-        }
-      } );
+      txn.executeSql(
+        "INSERT INTO " +
+        tblName +
+        "(dateCreated,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)",
+        [
+          utils.encrypt(
+            fulldate.toString(),
+            passcode
+          ),
+          utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
+          utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
+          utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
+          utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
+          utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
+          utils.encrypt( "Without Associate Contact", passcode )
+        ]
+      );
+      resolve( true );
     } );
   } );
 };
-
-
 
 const insertTrustedPartyDetailSelfShare = (
   tblName: string,
@@ -1600,59 +1525,24 @@ const insertTrustedPartyDetailSelfShare = (
     jsonData.date = utils.getUnixToDateFormat( fulldate );
     temp.push( jsonData );
     db.transaction( function ( txn ) {
-      txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
-        var len = results.rows.length;
-        if ( len > 0 ) {
-          for ( let i = 0; i < len; i++ ) {
-            let dbdecryptNonPMDDData = utils.decrypt(
-              results.rows.item( i ).nonPMDDData,
-              passcode
-            );
-            // console.log( { dbdecryptrecordID } );
-            if ( dbdecryptNonPMDDData == nonPMDDData ) {
-              resolve( "Already same nonPMDDData stored." );
-            } else {
-              txn.executeSql(
-                "INSERT INTO " +
-                tblName +
-                "(dateCreated,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)",
-                [
-                  utils.encrypt(
-                    fulldate.toString(),
-                    passcode
-                  ),
-                  utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
-                  utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
-                  utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
-                  utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
-                  utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
-                  utils.encrypt( "Self Share", passcode )
-                ]
-              );
-              resolve( true );
-            }
-          }
-        } else {
-          txn.executeSql(
-            "INSERT INTO " +
-            tblName +
-            "(dateCreated,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)",
-            [
-              utils.encrypt(
-                fulldate.toString(),
-                passcode
-              ),
-              utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
-              utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
-              utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
-              utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
-              utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
-              utils.encrypt( "Self Share", passcode )
-            ]
-          );
-          resolve( true );
-        }
-      } );
+      txn.executeSql(
+        "INSERT INTO " +
+        tblName +
+        "(dateCreated,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)",
+        [
+          utils.encrypt(
+            fulldate.toString(),
+            passcode
+          ),
+          utils.encrypt( JSON.stringify( urlScript ).toString(), passcode ),
+          utils.encrypt( JSON.stringify( decrShare ).toString(), passcode ),
+          utils.encrypt( JSON.stringify( metaData ).toString(), passcode ),
+          utils.encrypt( JSON.stringify( nonPMDDData ).toString(), passcode ),
+          utils.encrypt( JSON.stringify( temp ).toString(), passcode ),
+          utils.encrypt( "Self Share", passcode )
+        ]
+      );
+      resolve( true );
     } );
   } );
 };
@@ -1670,6 +1560,7 @@ const deleteTableData = (
     } );
   } );
 };
+
 
 
 module.exports = {

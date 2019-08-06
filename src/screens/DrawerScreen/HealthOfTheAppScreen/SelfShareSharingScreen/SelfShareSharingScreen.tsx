@@ -138,6 +138,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                 };
                 Share.open( shareOptions )
                     .then( ( res: any ) => {
+                        this.click_CloseModel();
                         this.updateHistory( data, "Shared.", "" );
                         this.setState( {
                             btnShareTitle: "Confirm"
@@ -157,6 +158,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                     }
                 }, ( error, event ) => {
                     if ( event == "sent" ) {
+                        this.click_CloseModel();
                         alert.simpleOkActionWithPara( "Success", "Email Sent Successfully.", this.updateHistory( data, "Shared.", "" ) );
                         this.setState( {
                             btnShareTitle: "Confirm"
@@ -167,6 +169,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                 } );
                 if ( Platform.OS == "android" ) {
                     setTimeout( () => {
+                        this.click_CloseModel();
                         alert.simpleOkActionWithPara( "Success", "Email Sent Successfully.", this.updateHistory( data, "Shared.", "" ) );
                         this.setState( {
                             btnShareTitle: "Confirm"

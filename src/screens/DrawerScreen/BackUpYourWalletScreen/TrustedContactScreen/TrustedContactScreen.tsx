@@ -216,10 +216,10 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                 if ( completed ) {
                     console.log( 'SMS Sent Completed' );
                     setTimeout( () => {
+                        alert.simpleOkActionWithPara( "Success", "SMS Sent Successfully.", this.connection_UpdateSSSDetails( "SMS" ) );
                         this.setState( {
                             flag_OtpCodeShowStatus: true
                         } );
-                        alert.simpleOkActionWithPara( "Success", "SMS Sent Successfully.", this.connection_UpdateSSSDetails( "SMS" ) );
                     }, 1000 );
                 } else if ( cancelled ) {
                     console.log( 'SMS Sent Cancelled' );
@@ -229,14 +229,13 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             } );
             if ( Platform.OS == "android" ) {
                 setTimeout( () => {
+                    alert.simpleOkActionWithPara( "Success", "SMS Sent Successfully.", this.connection_UpdateSSSDetails( "SMS" ) );
                     this.setState( {
                         flag_OtpCodeShowStatus: true
                     } );
-                    alert.simpleOkActionWithPara( "Success", "SMS Sent Successfully.", this.connection_UpdateSSSDetails( "SMS" ) );
                 }, 3000 );
             }
         } else {
-            this.connection_UpdateSSSDetails( "EMAIL" );
             Mailer.mail( {
                 subject: 'Hexa Wallet SSS Recovery',
                 recipients: [ value ],
@@ -245,10 +244,10 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             }, ( error, event ) => {
                 if ( event == "sent" ) {
                     setTimeout( () => {
+                        alert.simpleOkActionWithPara( "Success", "Email Sent Completed.", this.connection_UpdateSSSDetails( "Email" ) );
                         this.setState( {
                             flag_OtpCodeShowStatus: true
                         } );
-                        alert.simpleOkActionWithPara( "Success", "Email Sent Completed.", this.connection_UpdateSSSDetails( "Email" ) );
                     }, 1000 );
                 } else {
                     alert.simpleOk( "Oops", error );
@@ -256,10 +255,10 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             } );
             if ( Platform.OS == "android" ) {
                 setTimeout( () => {
+                    alert.simpleOkActionWithPara( "Success", "Email Sent Completed.", this.connection_UpdateSSSDetails( "Email" ) );
                     this.setState( {
                         flag_OtpCodeShowStatus: true
                     } );
-                    alert.simpleOkActionWithPara( "Success", "Email Sent Completed.", this.connection_UpdateSSSDetails( "Email" ) );
                 }, 3000 );
             }
         }
