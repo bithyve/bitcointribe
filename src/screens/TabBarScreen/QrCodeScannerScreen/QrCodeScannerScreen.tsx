@@ -100,9 +100,11 @@ export default class QrCodeScannerScreen extends React.Component {
     }
 
 
+
     click_ResetFlag = async () => {
         utils.setFlagQRCodeScreen( true );
     }
+
 
     barcodeReceived = async ( e: any ) => {
         try {

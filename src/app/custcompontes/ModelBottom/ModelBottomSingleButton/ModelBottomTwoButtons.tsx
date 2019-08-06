@@ -25,14 +25,14 @@ import {
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
-
 interface Props {
     data: [];
     closeModal: Function;
     click_Done: Function;
+    click_Option1: Function;
+    click_Option2: Function;
     pop: Function;
 }
-
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
@@ -44,7 +44,9 @@ var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonApp
 var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
-export default class ModelBottomSingleButton extends Component<Props, any> {
+
+export default class ModelBottomTwoButtons extends Component<Props, any> {
+
 
     constructor ( props: any ) {
         super( props );
@@ -75,26 +77,50 @@ export default class ModelBottomSingleButton extends Component<Props, any> {
     render() {
         let { data } = this.state;
         return (
-            <Modal style={ [ styles.modal, styles.modal4 ] } position={ "bottom" } isOpen={ data != undefined ? data.modalVisible : false } onClosed={ () => this.click_Clsoe() }>
+            <Modal style={ [ styles.modal, styles.modal4 ] } position={ "bottom" } isOpen={ data.modalVisible != undefined ? data.modalVisible : false } onClosed={ () => this.click_Clsoe() }>
                 <View>
                     <View style={ { flexDirection: 'column', alignItems: "center", marginTop: 10, paddingBottom: 10, borderBottomColor: "#EFEFEF", borderBottomWidth: 1 } }>
-                        <Text style={ { fontSize: 16 } }>{ data != undefined ? data.title : "" }</Text>
-                        <Text note style={ { fontSize: 14 } }>{ data != undefined ? data.subTitle : "" }</Text>
+                        <Text style={ { fontSize: 16 } }>{ data.title }</Text>
+                        <Text note style={ { fontSize: 14 } }>{ data.subTitle }</Text>
                     </View>
                     <View>
-                        <View style={ { flexDirection: "row", justifyContent: "center", backgroundColor: colors.appColor, height: 80, margin: 20, borderRadius: 10 } }>
+                        <View style={ { flexDirection: "row", backgroundColor: colors.appColor, height: 80, margin: 20, borderRadius: 10 } }>
                             <Button
                                 transparent
-                                style={ { alignSelf: "center", marginBottom: -10 } }
-                                onPress={ () => this.props.click_Done() }>
+                                style={ { flex: 1, justifyContent: "center", alignSelf: "center", marginBottom: -10 } }
+                                onPress={ () => this.props.click_Option1() }>
                                 <View style={ { alignSelf: "center", justifyContent: "center", alignItems: "center" } }>
                                     <ImageSVG
-                                        style={ { width: 55, height: 55 } }
+                                        style={ { width: 40, height: 40 } }
                                         source={
-                                            svgIcon.bottomModel[ data != undefined ? data.svgIcon : "recreate" ]
+                                            svgIcon.bottomModel[ data.svgIcon1 ]
                                         }
                                     />
-                                    <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 12, color: "#ffffff" } ] }>{ data != undefined ? data.btnTitle : "" }</Text>
+                                    <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 12, color: "#ffffff" } ] }>{ data.btnTitle1 }</Text>
+                                </View>
+                            </Button>
+                            <View
+                                style={ {
+                                    flex: 0.02,
+                                    height: 50,
+                                    width: 1,
+                                    alignSelf: "center",
+                                    justifyContent: "center",
+                                    backgroundColor: "#ffffff"
+                                } }
+                            />
+                            <Button
+                                transparent
+                                style={ { flex: 1, justifyContent: 'center', alignSelf: "center", marginBottom: -10 } }
+                                onPress={ () => this.props.click_Option2() }>
+                                <View style={ { alignSelf: "center", justifyContent: "center", alignItems: "center" } }>
+                                    <ImageSVG
+                                        style={ { width: 45, height: 45 } }
+                                        source={
+                                            svgIcon.bottomModel[ data.svgIcon2 ]
+                                        }
+                                    />
+                                    <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 12, color: "#ffffff" } ] }>{ data.btnTitle2 }</Text>
                                 </View>
                             </Button>
                         </View>

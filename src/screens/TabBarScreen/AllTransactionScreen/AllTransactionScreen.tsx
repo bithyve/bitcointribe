@@ -2,13 +2,14 @@ import React from "react";
 import { StyleSheet, ImageBackground, View, FlatList, Text, SafeAreaView, TouchableOpacity, RefreshControl } from "react-native";
 
 import Icon from "react-native-vector-icons/FontAwesome";
+import ImageSVG from 'react-native-remote-svg';
 
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 //TODO: Common Funciton
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 //TODO: Custome Pages
-import { images, colors } from "HexaWallet/src/app/constants/Constants";
+import { images, colors, svgIcon } from "HexaWallet/src/app/constants/Constants";
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
@@ -68,6 +69,7 @@ export default class AllTransactionScreen extends React.Component<any, any> {
 
   filterTransaction() {
     let results = [ ...this.state.recentRegularTransactions, ...this.state.recentSecureTransactions ];
+    console.log( { results } );
     results = results.sort( ( a, b ) => { return a.confirmations - b.confirmations } )
     this.setState( {
       flag_Loading: false,
@@ -136,10 +138,11 @@ export default class AllTransactionScreen extends React.Component<any, any> {
 
         <View style={ { flexDirection: "row", alignItems: "center" } }>
           <View>
-            <SvgIcon
-              name="icon_dailywallet"
-              color="#37A0DA"
-              size={ 50 }
+            <ImageSVG
+              style={ { width: 50, height: 50 } }
+              source={
+                svgIcon.walletScreen[ item.accountType == "Regular" ? "dailyAccount" : "secureAccount" ]
+              }
             />
           </View>
 

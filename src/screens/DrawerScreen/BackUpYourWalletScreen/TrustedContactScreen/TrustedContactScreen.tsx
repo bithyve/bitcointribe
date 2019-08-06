@@ -38,6 +38,10 @@ import BackgroundFetch from "react-native-background-fetch";
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import FullLinearGradientShareButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientShareButton";
+
+//TODO: Custome  Model
+import ModelBottomSingleButton from "HexaWallet/src/app/custcompontes/ModelBottom/ModelBottomSingleButton/ModelBottomSingleButton";
 import ModelTrustedContactEmailAndPhoneShare from "HexaWallet/src/app/custcompontes/Model/ModelTrustedContactEmailAndPhoneShare/ModelTrustedContactEmailAndPhoneShare";
 
 
@@ -71,6 +75,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             arr_History: [],
             arr_resSSSDetails: [],
             arr_EncryptedMetaShare: [],
+            arr_ModelBottomSingleButton: [],
             key: "",
             otpCode: "",
             flag_OtpCodeShowStatus: false,
@@ -318,9 +323,19 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         this.refs.modal4.close();
     }
 
+    //TODO: Close all model
+    //TODO: Close all model
+    click_CloseModel() {
+        this.setState( {
+            arr_ModelBottomSingleButton: [ {
+                modalVisible: false
+            } ]
+        } );
+    }
+
     render() {
         //array   
-        let { data } = this.state;
+        let { data, arr_ModelBottomSingleButton } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
@@ -411,27 +426,60 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                         </TouchableOpacity>
                                     </View>
                                 </View>
-                                <FullLinearGradientButton
-                                    click_Done={ () => {
+                                <FullLinearGradientShareButton
+                                    click_Done={ ( title: string ) => {
+                                        this.click_CloseModel();
                                         this.load_data();
                                     } }
-                                    title="Reshare Secret"
+                                    click_Option={ ( title: string ) => {
+                                        this.setState( {
+                                            arr_ModelBottomSingleButton: [ {
+                                                modalVisible: true,
+                                                title: "OPTION",
+                                                subTitle: "Select option",
+                                                svgIcon: "recreate",
+                                                btnTitle: "SETTINGS"
+                                            } ]
+                                        } )
+                                    } }
+                                    title="Reshare"
                                     disabled={ false }
-                                    style={ [ { borderRadius: 10 } ] } />
+                                    style={ [ { borderRadius: 10, margin: 10 } ] } />
+
                             </View>
                         ) }
                         { renderIf( this.state.flag_OtpCodeShowStatus != true )(
                             <View style={ Platform.OS == "ios" ? { flex: 0.6 } : { flex: 0.8 } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select method by which you want to share secret</Text>
-                                <FullLinearGradientButton
-                                    click_Done={ () => {
+                                <FullLinearGradientShareButton
+                                    click_Done={ ( title: string ) => {
+                                        this.click_CloseModel();
                                         this.load_data();
+                                    } }
+                                    click_Option={ ( title: string ) => {
+                                        this.setState( {
+                                            arr_ModelBottomSingleButton: [ {
+                                                modalVisible: true,
+                                                title: "OPTION",
+                                                subTitle: "Select option",
+                                                svgIcon: "recreate",
+                                                btnTitle: "SETTINGS"
+                                            } ]
+                                        } )
                                     } }
                                     title="Share Secret"
                                     disabled={ false }
-                                    style={ [ { borderRadius: 10 } ] } />
+                                    style={ [ { borderRadius: 10, margin: 10 } ] } />
                             </View>
                         ) }
+                        <ModelBottomSingleButton
+                            data={ arr_ModelBottomSingleButton }
+                            click_Done={ () => {
+                                this.click_CloseModel();
+                                Alert.alert( "Working" )
+                            }
+                            }
+                        />
                         <ModelTrustedContactEmailAndPhoneShare
                             data={ this.state.arr_TrustedContactEmailAndPhoneShare }
                             click_Confirm={ ( val: any ) => {
@@ -514,7 +562,6 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                         </Button>
                                     </View>
                                 </View>
-
                             </View>
                         </Modal>
                     </ImageBackground>

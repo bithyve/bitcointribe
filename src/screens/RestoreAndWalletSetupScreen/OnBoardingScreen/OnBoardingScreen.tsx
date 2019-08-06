@@ -1,13 +1,13 @@
 import React from "react";
-import { StyleSheet, View, SafeAreaView, Image, StatusBar, AsyncStorage } from "react-native";
+import { StyleSheet, View, SafeAreaView, Image, StatusBar, AsyncStorage, Dimensions } from "react-native";
 import { Text } from "native-base";
 import { StackActions, NavigationActions } from "react-navigation";
 import CreateTables from "HexaWallet/src/app/manager/database/CreateTables";
-
+import IconFontAwe from "react-native-vector-icons/FontAwesome";
 //Custome Compontes
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import OnBoarding from "HexaWallet/src/app/custcompontes/OnBoarding/OnBoarding";
-
+import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 
 //TODO: Custome StyleSheet Files       
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
@@ -73,8 +73,7 @@ export default class OnBoardingScreen extends React.Component<any, any> {
       <View style={ styles.container }>
         <CustomeStatusBar backgroundColor={ colors.white } barStyle="dark-content" />
         <SafeAreaView style={ styles.container }>
-          <OnBoarding click_GetStarted={ () => this.click_Done() }>
-            {/* First screen */ }
+          {/* <OnBoarding click_GetStarted={ () => this.click_Done() }>
             <View style={ [ styles.slide ] }>
               <Image
                 style={ { width: 240, height: 240 } }
@@ -86,7 +85,6 @@ export default class OnBoardingScreen extends React.Component<any, any> {
                 { data[ 0 ].subtitle } 
               </Text>
             </View>
-            {/* Second screen */ }
             <View style={ [ styles.slide ] }>
               <Image
                 style={ { width: 240, height: 240 } }
@@ -98,7 +96,6 @@ export default class OnBoardingScreen extends React.Component<any, any> {
                 { data[ 1 ].subtitle }
               </Text>
             </View>
-            {/* Third screen */ }
             <View style={ [ styles.slide ] }>
               <Image
                 style={ { width: 240, height: 240 } }
@@ -110,9 +107,33 @@ export default class OnBoardingScreen extends React.Component<any, any> {
                 { data[ 2 ].subtitle }
               </Text>
             </View>
-          </OnBoarding>
+          </OnBoarding> */}
+          <View style={ { flex: 1, alignItems: "center", justifyContent: "center" } }>
+            <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 30 } ] }>Wallet Reimagined</Text>
+            <View style={ { flexDirection: "row", margin: 20, justifyContent: "center", alignContent: "center", alignItems: "center" } }>
+              <Text note style={ { margin: 10 } }>Simple</Text>
+              <IconFontAwe name="circle" color="#2F2F2F" size={ 8 } />
+              <Text note style={ { margin: 10 } }>Smart</Text>
+              <IconFontAwe name="circle" color="#2F2F2F" size={ 8 } />
+              <Text note style={ { margin: 10 } }>Secure</Text>
+            </View>
+          </View>
+          <View style={ { flex: 1, alignItems: "center" } }>
+            <Image
+              style={ { width: Dimensions.get( 'screen' ).width, height: 300 } }
+              resizeMode="contain"
+              source={ images.onBoardingScreen.simpleSecureSmart }
+            />
+          </View>
+          <View style={ { flex: 1, justifyContent: "flex-end" } }>
+            <FullLinearGradientButton
+              title="Get Started"
+              disabled={ this.state.flag_ConfirmDisableBtn }
+              style={ [ { opacity: 1 }, { borderRadius: 10, margin: 10 } ] }
+              click_Done={ () => this.click_Done() }
+            />
+          </View>
           <CreateTables />
-          {/* <PushController /> */ }
         </SafeAreaView>
       </View>
     );
@@ -121,7 +142,8 @@ export default class OnBoardingScreen extends React.Component<any, any> {
 
 const styles = StyleSheet.create( {
   container: {
-    flex: 1
+    flex: 1,
+
   },
   slide: {
     flex: 1, // Take up all screen

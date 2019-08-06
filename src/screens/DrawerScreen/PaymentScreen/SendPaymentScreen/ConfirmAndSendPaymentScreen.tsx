@@ -27,6 +27,7 @@ import Toast from 'react-native-simple-toast';
 import Share from 'react-native-share';
 import { Slider, CheckBox } from 'react-native-elements';
 import { StackActions, NavigationActions } from "react-navigation";
+import ImageSVG from 'react-native-remote-svg';
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -48,7 +49,7 @@ let alert = new AlertSimple();
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, localDB, svgIcon } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
@@ -80,20 +81,20 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
 
     async componentWillMount() {
         var data = this.props.navigation.getParam( "data" );
+        console.log( { selectedAccount: data } );
         data = data[ 0 ]
-        console.log( { data } );
-        let walletDetails = await utils.getWalletDetails();
-        let arr_AccountList = await comFunDBRead.readTblAccount();
-
+        console.log( { selectedAccountFirstIndex: data } );
         this.setState( {
             data: data
-        } )
+        } );
     }
+
+
     //TODO: Sent amount
     click_SentAmount = async () => {
         //this.setState( { flag_Loading:true})
         let { data } = this.state;
-        console.log( { data } );
+        console.log( { selectedAccount: data } );
         let date = Date.now();
         let regularAccount = await bitcoinClassState.getRegularClassState();
         let secureAccount = await bitcoinClassState.getSecureClassState();
@@ -101,7 +102,7 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
         let txb = data.resTransferST.data.txb
         console.log( { inputs, txb } );
         var resTransferST;
-        if ( data.selectedAccount.accountType == "Regular Account" ) {
+        if ( data.selectedAccount.accountName == "Regular Account" ) {
             resTransferST = await regularAccount.transferST2( data.resTransferST.data.inputs, data.resTransferST.data.txb );
             await bitcoinClassState.setRegularClassState( regularAccount );
             // console.log( { resTransferST } );
@@ -122,7 +123,6 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
                 alert.simpleOk( "Oops", resTransferST.err );
             }
         } else {
-
             resTransferST = await secureAccount.transferST2( data.resTransferST.data.inputs, data.resTransferST.data.txb );
             await bitcoinClassState.setSecureClassState( secureAccount );
             if ( resTransferST.status == 200 ) { //|| resTransferST.status == 400
@@ -143,15 +143,14 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
 
     }
 
-    //TODO: Amount Sent Success
 
+    //TODO: Amount Sent Success
     click_GoToDailyAccount = async () => {
         let { data } = this.state;
-        let accountType = data.selectedAccount.accountType;
+        let accountType = data.selectedAccount.accountName;
         let orignalBal = data.bal;
         let sendBal = parseFloat( data.amount ) + parseFloat( data.tranFee );
         let totalBal = orignalBal - sendBal;
-
         let resUpdateAccountBalR = await dbOpration.updateAccountBalAccountTypeWise(
             localDB.tableName.tblAccount,
             accountType,
@@ -203,11 +202,11 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
                             <View style={ { flex: 1 } }>
                                 <View style={ { flex: 1, justifyContent: "center", marginLeft: 20, marginRight: 20 } }>
                                     <View style={ { flexDirection: "row" } }>
-                                        <SvgIcon
-                                            name="icon_dailywallet"
-                                            color="#D0D0D0"
-                                            size={ 40 }
-                                            style={ { flex: 0.25 } }
+                                        <ImageSVG
+                                            style={ { width: 50, height: 50 } }
+                                            source={
+                                                svgIcon.walletScreen[ data.selectedAccount.accountName == "Regular Account" ? "dailyAccount" : "secureAccount" ]
+                                            }
                                         />
                                         <View style={ { flexDirection: "column" } }>
                                             <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 16 } ] }>{ data.accountName }</Text>

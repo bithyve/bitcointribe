@@ -196,7 +196,7 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
     click_SentRequest( type: string, data: any ) {
         console.log( { data } );
         let script = {};
-        script.mg = "Please sent return share.";
+        script.mg = "Please select requested share to return back";
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );
         if ( type == "SMS" ) {

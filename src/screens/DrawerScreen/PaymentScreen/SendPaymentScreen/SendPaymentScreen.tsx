@@ -84,9 +84,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         let data = this.props.navigation.getParam( "data" );
         let selectedAccount = this.props.navigation.getParam( "selectedAccount" );
         console.log( { selectedAccount } );
-
         console.log( { data } );
-
         //Singleton Flag value change    
         let address = data != undefined ? data.address : "";
         let amount = data != undefined ? data.amount.toString() : "0.0";
@@ -164,6 +162,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         console.log( { enterAmount } );
         var temp = [], arr_SelectAccountDetails = [], selectedAccountBal;
         let { arr_AccountList } = this.state;
+        console.log( { arr_AccountList } );
         for ( let i = 0; i < arr_AccountList.length; i++ ) {
             let item = arr_AccountList[ i ];
             let data = {};
@@ -187,9 +186,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         } else if ( enterAmount == 0 ) {
             flag_DisableSentBtn = true;
         }
-
         console.log( { selectedAccountBal } );
-
         this.setState( {
             selectedAccountBal,
             arr_AccountList: temp,
@@ -213,10 +210,9 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         let walletDetails = await utils.getWalletDetails();
         let regularAccount = await bitcoinClassState.getRegularClassState();
         let secureAccount = await bitcoinClassState.getSecureClassState();
-        // let regularAccount = new RegularAccount( walletDetails.mnemonic );
         var resTransferST;
         let data = {};
-        if ( arr_SelectAccountDetails.accountType == "Regular Account" ) {
+        if ( arr_SelectAccountDetails.accountName == "Regular Account" ) {
             //console.log( { address, amountFloat, priority } );
             resTransferST = await regularAccount.transferST1( address, amountFloat, priority );
             await bitcoinClassState.setRegularClassState( regularAccount );
@@ -266,6 +262,9 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         }
     }
 
+
+
+
     //buz bitcoin need small letter 
     getPriority( no: any ) {
         if ( no == 0 ) {
@@ -276,6 +275,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             return "Low"
         }
     }
+
 
     //TODO: When qrcode  scan 
     getAddressWithBal = ( e: any ) => {
@@ -289,6 +289,8 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         }
     }
 
+
+
     setAmountAndAddress( address: string, amount: string ) {
         console.log( { address, amount } );
         this.setState( {
@@ -296,6 +298,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             amount: amount
         } )
     }
+
 
     _renderItem( { item, index } ) {
         return (
@@ -335,11 +338,6 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             </View>
         );
     }
-
-
-
-
-
 
     render() {
         //array

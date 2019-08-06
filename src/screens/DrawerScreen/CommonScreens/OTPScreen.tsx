@@ -148,7 +148,7 @@ export default class OTPScreen extends Component {
         const dateTime = Date.now();
         this.setState( {
             flag_Loading: true
-        } )
+        } );
         let flag_Loading = true;
         let enterOtp = this.state.otp;
         let script = utils.getDeepLinkingUrl();
@@ -159,7 +159,7 @@ export default class OTPScreen extends Component {
         } else {
             this.setState( { flag_Loading: !flag_Loading } )
             setTimeout( () => {
-                alert.simpleOk( "Oops", resDecryptViaOTP.err );
+                alert.simpleOkAction( "Oops", resDecryptViaOTP.err, this.click_StopLoading );
             }, 100 );
         }
         console.log( { resDecryptViaOTP } );
@@ -169,7 +169,7 @@ export default class OTPScreen extends Component {
         } else {
             this.setState( { flag_Loading: !flag_Loading } )
             setTimeout( () => {
-                alert.simpleOk( "Oops", resDownShare.err );
+                alert.simpleOkAction( "Oops", resDownShare.err, this.click_StopLoading );
             }, 100 );
         }
         console.log( { resDownShare } );
@@ -194,10 +194,18 @@ export default class OTPScreen extends Component {
         } else {
             this.setState( { flag_Loading: !flag_Loading } )
             setTimeout( () => {
-                alert.simpleOk( "Oops", resDecryptEncMetaShare.err );
+                alert.simpleOkAction( "Oops", resDecryptEncMetaShare.err, this.click_StopLoading );
             }, 100 );
         }
 
+    }
+
+
+
+    click_StopLoading = () => {
+        this.setState( {
+            flag_Loading: false
+        } )
     }
 
     render() {

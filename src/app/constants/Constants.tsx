@@ -35,7 +35,8 @@ var images = {
     onB1: require( assetsImages +
       "onBoardingScreen/illustration_multipleaccounts.png" ),
     onB2: require( assetsImages + "onBoardingScreen/illustration_security.png" ),
-    onB3: require( assetsImages + "onBoardingScreen/illustration_share.png" )
+    onB3: require( assetsImages + "onBoardingScreen/illustration_share.png" ),
+    simpleSecureSmart: require( assetsImages + "onBoardingScreen/illustration.png" ),
   },
   RestoreRecoverScreen: {
     restore: require( assetsImages + "RestoreAndRecoverScreen/restore.png" ),
@@ -46,6 +47,7 @@ var images = {
   RestoreWalletUsingTrustedContact: {
     contactPassbook: require( assetsImages + "RestoreWalletUsingTrustedContact/ContactsPassbook.png" ),
     share4and5SelfShareInfo: require( assetsImages + "RestoreWalletUsingTrustedContact/restore4and5sharebgimage.jpg" ),
+    successImage: require( assetsImages + "RestoreWalletUsingTrustedContact/restoreWalletTrustedContactSuccess.png" ),
   },
   WalletSetupScreen: {
     WalletScreen: {
@@ -125,6 +127,7 @@ var images = {
   }
 };
 
+
 const assetsSVG = "../../assets/svg/";
 const svgIcon = {
   common: {
@@ -146,11 +149,11 @@ const svgIcon = {
     addAccounts: require( assetsSVG + "walletscreen/icon_add.svg" ),
   },
   transactionScreen: {
-    1: require( assetsSVG + "transactionScreen/icon_shieldyellow.svg" ),
-    2: require( assetsSVG + "transactionScreen/icon_shieldyellow.svg" ),
+    1: require( assetsSVG + "transactionScreen/icon_shieldred_mark.svg" ),
+    2: require( assetsSVG + "transactionScreen/icon_shieldred.svg" ),
     3: require( assetsSVG + "transactionScreen/icon_shieldyellow.svg" ),
-    4: require( assetsSVG + "transactionScreen/icon_shieldyellow.svg" ),
-    5: require( assetsSVG + "transactionScreen/icon_shieldyellow.svg" )
+    4: require( assetsSVG + "transactionScreen/icon_shieldgreen.svg" ),
+    5: require( assetsSVG + "transactionScreen/icon_shieldred_mark.svg" )
   },
   moreScreen: {
     health: require( assetsSVG + "moreScreen/icon_health.svg" ),
@@ -158,6 +161,10 @@ const svgIcon = {
     addressBook: require( assetsSVG + "moreScreen/icon_contacts.svg" ),
     settings: require( assetsSVG + "moreScreen/icon_settings.svg" ),
   },
+  bottomModel: {
+    recreate: require( assetsSVG + "bottomModel/recreate.svg" ),
+    reshare: require( assetsSVG + "bottomModel/reshare.svg" ),
+  }
 }
 
 

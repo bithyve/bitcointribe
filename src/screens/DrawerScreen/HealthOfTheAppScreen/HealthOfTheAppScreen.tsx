@@ -352,7 +352,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             return [ "Shared", "#C07710" ];
         }
         else if ( sharedDate != "" && shareStage == "Good" ) {
-            return [ "Share Confirmed", "#008000" ];
+            return [ "Share Accessible", "#008000" ];
         } else {
             return [ "Not Shared", "#ff0000" ];
         }

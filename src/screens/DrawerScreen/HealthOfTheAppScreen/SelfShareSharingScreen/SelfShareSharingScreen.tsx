@@ -42,6 +42,7 @@ import FullLinearGradientShareButton from "HexaWallet/src/app/custcompontes/Line
 
 //TODO: Custome Model
 import ModelBottomSingleButton from "HexaWallet/src/app/custcompontes/ModelBottom/ModelBottomSingleButton/ModelBottomSingleButton";
+import ModelBottomTwoButtons from "HexaWallet/src/app/custcompontes/ModelBottom/ModelBottomSingleButton/ModelBottomTwoButtons";
 
 
 //TODO: Custome Alert 
@@ -66,6 +67,7 @@ var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBR
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 
+
 export default class SelfShareSharingScreen extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props )
@@ -74,10 +76,9 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
             title: "Share",
             arr_History: [],
             arr_ModelBottomSingleButton: [],
+            arr_ModelBottomTwoButtons: [],
             //flag
-            flag_ShareBtnDisable: true,
-            flag_ReShareBtnDisable: false,
-            flag_ConfrimBtnDisable: false
+            btnShareTitle: "Share"
         } )
     }
 
@@ -86,36 +87,27 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
         let data = this.props.navigation.getParam( "data" );
         let title = this.props.navigation.getParam( "title" );
         console.log( { data } );
+        let { btnShareTitle } = this.state;
         let arr_History = JSON.parse( data.sssDetails.history )
         let shareStage = data.sssDetails.shareStage;
         let sharedDate = data.sssDetails.sharedDate;
         console.log( { shareStage, sharedDate } );
         let flag_ShareBtnDisable, flag_ReShareBtnDisable, flag_ConfrimBtnDisable;
         if ( sharedDate == "" && shareStage != "Good" ) {
-            flag_ReShareBtnDisable = false;
-            flag_ConfrimBtnDisable = false;
-            flag_ShareBtnDisable = true;
+            btnShareTitle = "Share";
         }
         else if ( shareStage != "Good" && sharedDate != "" ) {
-            flag_ConfrimBtnDisable = true;
-            flag_ReShareBtnDisable = true;
-            flag_ShareBtnDisable = false;
+            btnShareTitle = "Confirm";
         }
         else if ( sharedDate != "" && shareStage == "Good" ) {
-            flag_ReShareBtnDisable = true;
-            flag_ConfrimBtnDisable = false;
-            flag_ShareBtnDisable = false;
+            btnShareTitle = "Confirm";
         } else {
-            flag_ShareBtnDisable = true;
-            flag_ReShareBtnDisable = false;
-            flag_ConfrimBtnDisable = false;
+            btnShareTitle = "Share";
         }
         console.log( { data } );
         this.setState( {
             title,
-            flag_ShareBtnDisable,
-            flag_ReShareBtnDisable,
-            flag_ConfrimBtnDisable,
+            btnShareTitle,
             data,
             arr_History
         } )
@@ -148,9 +140,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                     .then( ( res: any ) => {
                         this.updateHistory( data, "Shared.", "" );
                         this.setState( {
-                            flag_ShareBtnDisable: false,
-                            flag_ReShareBtnDisable: true,
-                            flag_ConfrimBtnDisable: true
+                            btnShareTitle: "Confirm"
                         } );
                     } );
             } else {
@@ -169,9 +159,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                     if ( event == "sent" ) {
                         alert.simpleOkActionWithPara( "Success", "Email Sent Successfully.", this.updateHistory( data, "Shared.", "" ) );
                         this.setState( {
-                            flag_ShareBtnDisable: false,
-                            flag_ReShareBtnDisable: true,
-                            flag_ConfrimBtnDisable: true
+                            btnShareTitle: "Confirm"
                         } )
                     } else {
                         alert.simpleOk( "Oops", error );
@@ -181,9 +169,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                     setTimeout( () => {
                         alert.simpleOkActionWithPara( "Success", "Email Sent Successfully.", this.updateHistory( data, "Shared.", "" ) );
                         this.setState( {
-                            flag_ShareBtnDisable: false,
-                            flag_ReShareBtnDisable: true,
-                            flag_ConfrimBtnDisable: true
+                            btnShareTitle: "Confirm"
                         } )
                     }, 3000 );
                 }
@@ -265,13 +251,25 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
         console.log( { resUpdateHistroyAndSharedDate } );
     }
 
+    //TODO: Close all model
+    click_CloseModel() {
+        this.setState( {
+            arr_ModelBottomSingleButton: [ {
+                modalVisible: false
+            } ],
+            arr_ModelBottomTwoButtons: [ {
+                modalVisible: false
+            } ]
+        } );
+    }
+
     render() {
         //array       
-        let { data, arr_History, arr_ModelBottomSingleButton } = this.state;
+        let { data, arr_History, arr_ModelBottomSingleButton, arr_ModelBottomTwoButtons } = this.state;
         //Value   
         let { title } = this.state;
         //flag   
-        let { flag_ShareBtnDisable, flag_ReShareBtnDisable, flag_ConfrimBtnDisable } = this.state;
+        let { btnShareTitle } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
@@ -319,30 +317,73 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                         <View style={ { flex: Platform.OS == "ios" ? 0.5 : 0.6 } }>
                             <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Do not share this pdf with anyone other than your email/cloud</Text>
                             <FullLinearGradientShareButton
-                                click_Done={ () => {
-                                    this.click_ShareEmail( data )
+                                click_Done={ ( title: string ) => {
+                                    if ( title == "Share" ) {
+                                        this.click_ShareEmail( data )
+                                    } else {
+                                        this.click_Confirm( data )
+                                    }
+
                                 } }
-                                click_Option={ () => {
-                                    this.setState( {
-                                        arr_ModelBottomSingleButton: [ {
-                                            modalVisible: true,
-                                            title: "OPTION",
-                                            subTitle: "Select any one option"
-                                        } ]
-                                    } )
+                                click_Option={ ( title: string ) => {
+                                    console.log( { title } );
+                                    if ( title === "Share" ) {
+                                        this.setState( {
+                                            arr_ModelBottomSingleButton: [ {
+                                                modalVisible: true,
+                                                title: "OPTION",
+                                                subTitle: "Select option",
+                                                svgIcon: "recreate",
+                                                btnTitle: "RECREATE SHARES"
+                                            } ],
+                                            arr_ModelBottomTwoButtons: [ {
+                                                modalVisible: false,
+                                            } ]
+                                        } )
+                                    } else {
+                                        this.setState( {
+                                            arr_ModelBottomSingleButton: [ {
+                                                modalVisible: false
+                                            } ],
+                                            arr_ModelBottomTwoButtons: [ {
+                                                modalVisible: true,
+                                                title: "OPTION",
+                                                subTitle: "Select any one option",
+                                                svgIcon1: "reshare",
+                                                svgIcon2: "recreate",
+                                                btnTitle1: "RESHARE",
+                                                btnTitle2: "RECREATE SHARES"
+                                            } ]
+                                        } )
+                                    }
                                 } }
-                                title="Share"
+                                title={ btnShareTitle }
                                 disabled={ false }
-                                style={ [ { borderRadius: 10, marginBottom: 5 } ] } />
+                                style={ [ { borderRadius: 10, margin: 10 } ] } />
                         </View>
                     </ImageBackground>
-
                     <ModelBottomSingleButton
                         data={ arr_ModelBottomSingleButton }
+                        click_Done={ () => {
+                            this.click_CloseModel();
+                            Alert.alert( "Working" )
+                        }
 
+                        }
                     />
-
-
+                    <ModelBottomTwoButtons
+                        data={ arr_ModelBottomTwoButtons }
+                        click_Option1={ () => {
+                            this.click_CloseModel();
+                            this.click_ShareEmail( data )
+                        }
+                        }
+                        click_Option2={ () => {
+                            this.click_CloseModel();
+                            Alert.alert( "Working" )
+                        }
+                        }
+                    />
                 </SafeAreaView>
                 <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
             </Container >

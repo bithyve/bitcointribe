@@ -95,7 +95,7 @@ export default class ModelConfirmSendSuccess extends Component<Props, any> {
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <FullLinearGradientButton
                                 click_Done={ () => this.props.click_GoToDailyAccount() }
-                                title="Go to Daily Account"
+                                title="Go to Regular Account"
                                 disabled={ false }
                                 style={ [ { opacity: 1 }, { borderRadius: 10 } ] }
                             />

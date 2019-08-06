@@ -29,7 +29,7 @@ export default class FullLinearGradientShareButton extends Component<Props, any>
                         transparent
                         style={ { flex: 1, justifyContent: "center" } }
                         disabled={ this.props.disabled }
-                        onPress={ () => this.props.click_Done() }
+                        onPress={ () => this.props.click_Done( this.props.title ) }
                     >
                         <Text style={ styles.textWhite }>{ "  " + this.props.title }</Text>
                     </Button>
@@ -48,7 +48,7 @@ export default class FullLinearGradientShareButton extends Component<Props, any>
                             transparent
                             style={ { flex: 1, justifyContent: "center", } }
                             disabled={ this.props.disabled }
-                            onPress={ () => this.props.click_Option() }
+                            onPress={ () => this.props.click_Option( this.props.title ) }
                         >
                             <SvgIcon name="more-icon" color="#ffffff" size={ 22 } />
                         </Button>

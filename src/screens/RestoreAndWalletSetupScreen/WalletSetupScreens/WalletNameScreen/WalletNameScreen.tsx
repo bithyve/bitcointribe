@@ -45,7 +45,7 @@ export default class WalletNameScreen extends React.Component<any, any> {
 
     //TODO: Wallet Name
     ckeckWalletName( val: string ) {
-        if ( val.length >= 3 ) {
+        if ( val.length >= 0 ) {
             this.setState( {
                 flag_ProceedBtnDisable: false
             } )
@@ -56,7 +56,6 @@ export default class WalletNameScreen extends React.Component<any, any> {
         }
     }
 
-
     //TODO: func click_Proceed
     async click_Proceed() {
         let SetUpDetails = {};
@@ -64,6 +63,7 @@ export default class WalletNameScreen extends React.Component<any, any> {
         await utils.setSetupWallet( SetUpDetails );
         window.EventBus.trigger( "swipeScreen", "optional event info" );
     }
+
 
     render() {
         return (

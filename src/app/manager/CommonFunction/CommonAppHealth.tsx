@@ -77,6 +77,7 @@ const checkHealthAllShare = async ( share: any ) => {
             temp,
             dateTime
         );
+        console.log( { resupdateSSSShareStage } );
         await comFunDBRead.readTblWallet();
         await comFunDBRead.readTblSSSDetails();
         return res

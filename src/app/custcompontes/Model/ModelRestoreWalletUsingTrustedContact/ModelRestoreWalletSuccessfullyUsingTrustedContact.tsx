@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Image } from 'react-native';
+import { Modal, TouchableHighlight, View, Alert, StyleSheet, Image, Dimensions } from 'react-native';
 import { Button, Icon, Text, Textarea, Form } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import { SvgIcon } from "@up-shared/components";
@@ -67,7 +67,7 @@ export default class ModelRestoreWalletSuccessfullyUsingTrustedContact extends C
                             } ] }>Wallet Successfully Restored</Text>
                         </View>
                         <View style={ { flex: 2, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingMnemonic.walletrestored } />
+                            <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingTrustedContact.successImage } />
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-end" } }>
                             <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Congratulations! Your wallet is successfully restored</Text>
@@ -96,8 +96,8 @@ const styles = StyleSheet.create( {
 
     },
     imgAppLogo: {
-        width: 150,
-        height: 170
+        width: Dimensions.get( 'screen' ).width - 80,
+        height: 250
     },
     txtNotes: {
         margin: 20

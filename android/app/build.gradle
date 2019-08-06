@@ -175,6 +175,7 @@ dependencies {
     //pdf password lib   
     compile 'com.itextpdf:itext-pdfa:5.5.10'
     compile 'com.itextpdf:itextg:5.5.9'
+    
     compile project(':react-native-webview')
     compile project(':react-native-background-fetch')     
     compile project(':react-native-device-info')

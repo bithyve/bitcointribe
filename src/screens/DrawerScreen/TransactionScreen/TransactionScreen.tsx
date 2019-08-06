@@ -117,10 +117,11 @@ export default class TransactionScreen extends React.Component<any, any> {
 
                 <View style={ { flexDirection: "row", alignItems: "center" } }>
                     <View>
-                        <SvgIcon
-                            name="icon_dailywallet"
-                            color="#37A0DA"
-                            size={ 50 }
+                        <ImageSVG
+                            style={ { width: 50, height: 50 } }
+                            source={
+                                svgIcon.walletScreen[ item.accountType == "Regular" ? "dailyAccount" : "secureAccount" ]
+                            }
                         />
                     </View>
 

@@ -39,9 +39,11 @@ import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import ImageSVG from 'react-native-remote-svg';
 import Permissions from 'react-native-permissions';
 import BackgroundFetch from "react-native-background-fetch";
+
 import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 var RNFS = require( 'react-native-fs' );
 import QRCode from 'react-native-qrcode-svg';
+
 //Custome Compontes   
 import ViewShieldIcons from "HexaWallet/src/app/custcompontes/View/ViewShieldIcons/ViewShieldIcons";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
@@ -166,7 +168,9 @@ export default class WalletScreen extends React.Component {
       //Loading Flags
       flag_Offline: false,
       flag_GetBal: false,
-      flag_PdfFileCreate: false
+      flag_PdfFileCreate: false,
+      //flags
+      flag_ReloadAccounts: false
     };
     isNetwork = utils.getNetwork();
   }
@@ -182,27 +186,10 @@ export default class WalletScreen extends React.Component {
     );
     //TODO: Animation 
     this.changeAnimaiton();
-    // async task
-    isNetwork = utils.getNetwork();
-    if ( isNetwork ) {
-      this.setState( {
-        flag_Offline: false
-      } )
-      this.asyncTask();
-    } else {
-      this.setState( {
-        flag_Offline: true,
-        arrErrorMessage: [ {
-          type: "offline",
-          data: [ {
-            message: "Offline. Some features may not work",
-            bgColor: "#262A2E",
-            color: "#ffffff",
-          } ]
-        } ]
-      } )
-    }
   }
+
+
+
 
 
   changeAnimaiton() {
@@ -239,6 +226,31 @@ export default class WalletScreen extends React.Component {
       extrapolate: "clamp"
     } );
   }
+
+  checkNetworkAndAsyncTask = () => {
+    // async task
+    isNetwork = utils.getNetwork();
+    if ( isNetwork ) {
+      this.setState( {
+        flag_Offline: false
+      } )
+      this.asyncTask();
+    } else {
+      this.setState( {
+        flag_Offline: true,
+        arrErrorMessage: [ {
+          type: "offline",
+          data: [ {
+            message: "Offline. Some features may not work",
+            bgColor: "#262A2E",
+            color: "#ffffff",
+          } ]
+        } ]
+      } )
+    }
+  }
+
+
 
   asyncTask = async () => {
     let resultWallet = await utils.getWalletDetails();
@@ -291,19 +303,21 @@ export default class WalletScreen extends React.Component {
       data.dateCreated = dataAccount.dateCreated;
       data.lastUpdated = dataAccount.lastUpdated;
       data.unit = dataAccount.unit;
+      data.indicator = false;
       data.setupData = setupData;
       if ( data.accountType == "Regular Account" )
         data.svgIcon = "dailyAccount"
       else
         data.svgIcon = "secureAccount"
-
       temp.push( data )
     }
+    console.log( { temp } );
     this.setState( {
       walletDetails: resultWallet,
       arr_accounts: temp,
+    }, () => {
+      this.checkNetworkAndAsyncTask()
     } );
-
     //TODO: appHealthStatus    
     let appHealth = JSON.parse( resultWallet.appHealthStatus );
     console.log( { appHealth } );
@@ -565,7 +579,7 @@ export default class WalletScreen extends React.Component {
       arrErrorMessage: [ {
         type: "asyncTask",
         data: [ {
-          message: "Your backup is being built, wait for sometime",
+          message: "Creating your wallet backup",
           bgColor: "#262A2E",
           color: "#ffffff",
         } ]
@@ -700,6 +714,7 @@ export default class WalletScreen extends React.Component {
       alert.simpleOk( "Oops", generateShareRes.err );
     }
   }
+
   base64string1 = ( base64string1: any ) => {
     this.setState( {
       base64string1
@@ -1574,25 +1589,30 @@ export default class WalletScreen extends React.Component {
     PdfPassword.setPdfPasswrod( pdfPath, pdffilePassword, ( err: any ) => { console.log( err ) }, ( msg: any ) => { console.log( msg ) } );
   }
 
-  //TODO: Get All Account Bal
+  //TODO: Get All Accoun t Bal
   getBalAndHealth = async () => {
+    let { arr_accounts } = this.state;
+    arr_accounts[ 0 ].indicator = true;
+    arr_accounts[ 1 ].indicator = true;
     this.setState( {
       flag_GetBal: true,
+      arr_accounts,
       arrErrorMessage: [ {
         type: "asyncTask",
         data: [ {
-          message: "Getting bal, wait for sometime",
+          message: "Fetching your regualr account balance",
           bgColor: "#262A2E",
           color: "#ffffff",
         } ]
       } ]
     } );
-    let walletDetails = await utils.getWalletDetails();
-    let sssDetails = await utils.getSSSDetails();
+    await this.getBalReularAccount();
+  }
+
+
+  getBalReularAccount = async () => {
+    let { arr_accounts } = this.state;
     let regularAccount = await bitcoinClassState.getRegularClassState();
-    console.log( { regularAccount } );
-    let secureAccount = await bitcoinClassState.getSecureClassState();
-    console.log( { secureAccount } );
     //Get Regular Account Bal
     var getBalR = await regularAccount.getBalance();
     console.log( { getBalR } );
@@ -1604,9 +1624,31 @@ export default class WalletScreen extends React.Component {
         "Regular Account",
         ( getBalR.balance + getBalR.unconfirmedBalance ) / 1e8
       );
+      arr_accounts[ 0 ].balance = ( ( getBalR.balance + getBalR.unconfirmedBalance ) / 1e8 ).toString();
+      arr_accounts[ 0 ].indicator = false;
+      this.setState( {
+        arr_accounts,
+        flag_ReloadAccounts: true,
+        arrErrorMessage: [ {
+          type: "asyncTask",
+          data: [ {
+            message: "Fetching your secure account balance",
+            bgColor: "#262A2E",
+            color: "#ffffff",
+          } ]
+        } ]
+      } );
+      this.getBalSecureAccount();
+      //      console.log( { getBalR, arr_accounts } );
     } else {
       alert.simpleOk( "Oops", getBalR.err );
     }
+  }
+
+  getBalSecureAccount = async () => {
+    let { arr_accounts } = this.state;
+    console.log( { arr_accounts } );
+    let secureAccount = await bitcoinClassState.getSecureClassState();
     //Get Secure Account Bal
     var getBalS = await secureAccount.getBalance();
     console.log( { getBalS } );
@@ -1618,7 +1660,30 @@ export default class WalletScreen extends React.Component {
         "Secure Account",
         ( getBalS.balance + getBalS.unconfirmedBalance ) / 1e8
       );
+      arr_accounts[ 1 ].balance = ( ( getBalS.balance + getBalS.unconfirmedBalance ) / 1e8 ).toString();
+      arr_accounts[ 1 ].indicator = false;
+      this.setState( {
+        arr_accounts,
+        flag_ReloadAccounts: false,
+        arrErrorMessage: [ {
+          type: "asyncTask",
+          data: [ {
+            message: "Health checking",
+            bgColor: "#262A2E",
+            color: "#ffffff",
+          } ]
+        } ]
+      } );
+      this.checkHealthStatus();
+      return true;
+    } else {
+      alert.simpleOk( "Oops", getBalS.err );
     }
+  }
+
+  checkHealthStatus = async () => {
+    let walletDetails = await utils.getWalletDetails();
+    let sssDetails = await utils.getSSSDetails();
     //health Check  
     let share = {};
     share.trustedContShareId1 = sssDetails[ 0 ].shareId != "" ? sssDetails[ 0 ].shareId : null;
@@ -1631,10 +1696,14 @@ export default class WalletScreen extends React.Component {
     share.qatime = parseInt( walletDetails.lastUpdated );
     await comAppHealth.checkHealthAllShare( share );
     this.setState( {
-      flag_GetBal: false
+      flag_GetBal: false,
     } )
-    this.connnection_FetchData();
   }
+
+
+
+
+
 
   //TODO: getTestcoins
   getTestcoins = async () => {
@@ -1643,7 +1712,7 @@ export default class WalletScreen extends React.Component {
       arrErrorMessage: [ {
         type: "asyncTask",
         data: [ {
-          message: "Getting bal, wait for sometime",
+          message: "Fetching your balances",
           bgColor: "#262A2E",
           color: "#ffffff",
         } ]
@@ -1674,7 +1743,6 @@ export default class WalletScreen extends React.Component {
 
 
   _renderItem( { item, index } ) {
-    let { flag_GetBal } = this.state;
     return (
       <View key={ "card" + index }>
         <TouchableOpacity onPress={ () => this.click_AccountDetails( item ) }>
@@ -1713,7 +1781,7 @@ export default class WalletScreen extends React.Component {
                   { item.accountName }
                 </Text>
                 <View style={ { flexDirection: "row" } }>
-                  <ActivityIndicator animating={ flag_GetBal } size="small" color="gray" style={ { marginTop: -25 } } />
+                  <ActivityIndicator animating={ item.indicator } size="small" color="gray" style={ { marginTop: -25 } } />
                   <SvgIcon name="icon_more" color="gray" size={ 15 } />
                 </View>
               </View>
@@ -1796,7 +1864,7 @@ export default class WalletScreen extends React.Component {
                   { item.accountName }
                 </Text>
                 <View style={ { flexDirection: "row" } }>
-                  <ActivityIndicator animating={ flag_GetBal } size="small" color="gray" style={ { marginTop: -25 } } />
+                  <ActivityIndicator animating={ item.indicator } size="small" color="gray" style={ { marginTop: -25 } } />
                   <SvgIcon name="icon_more" color="gray" size={ 15 } />
                 </View>
               </View>
@@ -1854,7 +1922,7 @@ export default class WalletScreen extends React.Component {
     //model array
     let { arr_ModelAcceptOrRejectSecret, arr_ModelBackupShareAssociateContact, arr_ModelBackupAssociateOpenContactList, arr_ModelBackupYourWallet, arr_ModelSelfShareAcceptAndReject } = this.state;
     //flag
-    let { flag_Loading, flag_refreshing, flag_Offline, flag_GetBal, flag_PdfFileCreate } = this.state;
+    let { flag_Loading, flag_refreshing, flag_Offline, flag_GetBal, flag_PdfFileCreate, flag_ReloadAccounts } = this.state;
     //qrcode string values
     let { qrcodeImageString1, qrcodeImageString2, qrcodeImageString3, qrcodeImageString4, qrcodeImageString5, qrcodeImageString6, qrcodeImageString7, qrcodeImageString8, qrcodeImageString9, qrcodeImageString10 } = this.state;
     return (
@@ -1960,17 +2028,6 @@ export default class WalletScreen extends React.Component {
                   <RefreshControl
                     refreshing={ flag_refreshing }
                     onRefresh={ () => {
-                      this.setState( {
-                        flag_GetBal: true,
-                        arrErrorMessage: [ {
-                          type: "asyncTask",
-                          data: [ {
-                            message: "Getting bal, wait for sometime",
-                            bgColor: "#262A2E",
-                            color: "#ffffff",
-                          } ]
-                        } ]
-                      } );
                       this.getBalAndHealth.bind( this )
                     } }
                   />
@@ -1986,6 +2043,7 @@ export default class WalletScreen extends React.Component {
               >
                 <FlatList
                   data={ arr_accounts }
+                  extraData={ flag_ReloadAccounts }
                   showsVerticalScrollIndicator={ false }
                   renderItem={ this._renderItem.bind( this ) }
                   keyExtractor={ ( item, index ) => index }
@@ -2238,4 +2296,4 @@ const styles = StyleSheet.create( {
     width: "100%",
     height: "100%"
   }
-} );  
+} );     
