@@ -248,7 +248,7 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                     contentContainerStyle={ { flexGrow: 1, } }
                 >
                     <View style={ styles.viewPagination }>
-                        <Text style={ [ globalStyle.ffFiraSansMedium, { fontWeight: "bold", fontSize: 22, textAlign: "center" } ] }>Step 2: Select secret question</Text>
+                        <Text style={ [ globalStyle.ffFiraSansMedium, { fontWeight: "bold", fontSize: 22, textAlign: "center" } ] }>Step 2: Select security question</Text>
                         <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>Select the question and specify the answer at least three characters long such that you always remember it and no one can easily guess it</Text>
                     </View>
                     <View style={ styles.viewInputFiled }>

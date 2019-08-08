@@ -264,11 +264,11 @@ export default class TransactionScreen extends React.Component<any, any> {
                             </View>
                         </RkCard>
                         <View style={ { flex: 1.8 } }>
-                            <Text note style={ { textAlign: "center" } }>Recent Transaction</Text>
+                            <Text note style={ { textAlign: "center" } }>Recent Transactions</Text>
                             {
                                 !flag_Loading && arrTransaction.length === 0 ?
                                     <View style={ { justifyContent: "center", alignItems: "center", padding: 20, paddingTop: 50 } }>
-                                        <Text style={ { textAlign: "center", color: "#838383" } }>{ "Start transactions to see your recent transactions history ." }</Text>
+                                        <Text style={ { textAlign: "center", color: "#838383" } }>{ "Start transactions to see your recent transactions history." }</Text>
                                     </View> : null
                             }
                             <FlatList

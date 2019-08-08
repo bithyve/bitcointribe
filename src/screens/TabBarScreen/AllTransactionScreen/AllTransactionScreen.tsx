@@ -228,7 +228,7 @@ export default class AllTransactionScreen extends React.Component<any, any> {
               !this.state.flag_Loading && this.state.recentTransactions.length === 0 ?
 
                 <View style={ { justifyContent: "center", alignItems: "center", padding: 20, paddingTop: 50 } }>
-                  <Text style={ { textAlign: "center", color: "#838383" } }>{ "Start transactions to see your recent transactions history ." }</Text>
+                  <Text style={ { textAlign: "center", color: "#838383" } }>{ "Start transactions to see your recent transactions history." }</Text>
                 </View> : null
             }
             <FlatList

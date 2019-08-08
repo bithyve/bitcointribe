@@ -726,7 +726,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                         } }>
                                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, marginLeft: -3, borderRadius: 10 } } >
                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Secret Questions</Text>
+                                                <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Security Question</Text>
                                                 <View style={ { flexDirection: "row" } }>
                                                     <Text note numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Answer is used to protect your shares and PDF</Text>
                                                 </View>
