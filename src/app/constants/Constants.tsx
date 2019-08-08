@@ -147,6 +147,7 @@ const svgIcon = {
     dailyAccount: require( assetsSVG + "walletscreen/icon_dailywallet.svg" ),
     secureAccount: require( assetsSVG + "walletscreen/icon_securewallet.svg" ),
     addAccounts: require( assetsSVG + "walletscreen/icon_add.svg" ),
+    testCoins: require( assetsSVG + "walletscreen/coins.svg" ),
   },
   transactionScreen: {
     1: require( assetsSVG + "transactionScreen/icon_shieldred_mark.svg" ),

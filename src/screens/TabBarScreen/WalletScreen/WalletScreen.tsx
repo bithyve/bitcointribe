@@ -170,7 +170,8 @@ export default class WalletScreen extends React.Component {
       flag_GetBal: false,
       flag_PdfFileCreate: false,
       //flags
-      flag_ReloadAccounts: false
+      flag_ReloadAccounts: false,
+      flag_Fabactive: false
     };
     isNetwork = utils.getNetwork();
   }
@@ -1598,7 +1599,7 @@ export default class WalletScreen extends React.Component {
         arrErrorMessage: [ {
           type: "asyncTask",
           data: [ {
-            message: "Health checking",
+            message: "Checking health of your wallet",
             bgColor: "#262A2E",
             color: "#ffffff",
           } ]
@@ -2090,19 +2091,43 @@ export default class WalletScreen extends React.Component {
           </SafeAreaView>
         </Content>
         <DropdownAlert ref={ ref => ( this.dropdown = ref ) } />
-        <Button
-          transparent
-          style={ styles.plusButtonBottom }
-          onPress={ () => this.getTestcoins() }
-        >
+        <Fab
+          active={ this.state.flag_Fabactive }
+          direction="up"
+          style={ [ styles.plusButtonBottom, { backgroundColor: 'transparent' } ] }
+          position="bottomRight"
+          onPress={ () => this.setState( { flag_Fabactive: !this.state.flag_Fabactive } ) }>
           <ImageSVG
-            style={ { width: 110, height: 110 } }
+            style={ { width: 110, height: 110, marginRight: 20 } }
             source={
               svgIcon.walletScreen.addAccounts
             }
           />
+          <Button
+            style={ { backgroundColor: '#37A0DA' } }
+            onPress={ () => {
+              Alert.alert( "Working" )
+            } }
+          >
+            <IconFontAwe name="users" size={ 20 } color="#ffffff" />
+          </Button>
+          <Button
+            onPress={ () => {
+              this.getTestcoins()
+            } }
+            style={ { backgroundColor: '#705BA8' } }
+          >
+            <ImageSVG
+              style={ { width: 20, height: 20 } }
+              source={
+                svgIcon.walletScreen.testCoins
+              }
+            />
+          </Button>
+        </Fab>
 
-        </Button>
+
+
         <ModelAcceptOrRejectSecret
           data={ arr_ModelAcceptOrRejectSecret }
           closeModal={ () => {

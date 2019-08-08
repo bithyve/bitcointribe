@@ -543,7 +543,7 @@ const TabNavigator = createBottomTabNavigator(
     Settings: {
       screen: SettingScreen,
       navigationOptions: {
-        tabBarLabel: "Settings", //localization("TabBarItem.More"),
+        tabBarLabel: "More", //localization("TabBarItem.More"),
         tabBarIcon: ( { tintColor } ) => (
           <SvgIcon name="more-icon" color={ tintColor } size={ 22 } />
         ),
