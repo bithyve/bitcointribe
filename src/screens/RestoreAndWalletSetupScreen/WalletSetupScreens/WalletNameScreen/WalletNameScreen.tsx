@@ -100,7 +100,7 @@ export default class WalletNameScreen extends React.Component<any, any> {
                         </Item>
                     </View>
                     <View style={ styles.viewProcedBtn }>
-                        <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } ] } numberOfLines={ 1 }>Lorem ipsum dolor sit amet, consectetur adipiscing </Text>
+                        <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } ] } numberOfLines={ 1 }>Wallet name must be at least three characters long</Text>
                         <FullLinearGradientButton title="Proceed" disabled={ this.state.flag_ProceedBtnDisable } style={ [ this.state.flag_ProceedBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } click_Done={ () => this.click_Proceed() } />
                     </View>
                 </KeyboardAwareScrollView>
