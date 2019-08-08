@@ -114,7 +114,7 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
                 resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
                     localDB.tableName.tblAccount,
                     address,
-                    balance.data.balance / 1e8,
+                    balance.data.balance,
                     2
                 );
             } else {
@@ -122,7 +122,7 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
                 resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
                     localDB.tableName.tblAccount,
                     address,
-                    balance.data.balance / 1e8,
+                    balance.data.balance,
                     prevData.id
                 );
 

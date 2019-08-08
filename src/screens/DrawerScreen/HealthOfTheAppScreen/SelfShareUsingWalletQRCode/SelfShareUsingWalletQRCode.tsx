@@ -77,6 +77,7 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
             alert.simpleOk( "Oops", resGenerateEncryptedMetaShare.err );
         }
         const resUploadShare = await sss.uploadShare( resGenerateEncryptedMetaShare.encryptedMetaShare, resGenerateEncryptedMetaShare.messageId );
+        console.log( { resUploadShare } );
         if ( resUploadShare.status == 200 ) {
             await bitcoinClassState.setS3ServiceClassState( sss );
             let qrCodeData = {};

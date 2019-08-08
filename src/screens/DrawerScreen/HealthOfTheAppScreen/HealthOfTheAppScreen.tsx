@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert } from "react-native";
+import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import {
     Container,
     Header,
@@ -38,6 +38,9 @@ import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import WalletSetUpScrolling from "HexaWallet/src/app/custcompontes/OnBoarding/WalletSetUpScrolling/WalletSetUpScrolling";
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+
+//TODO: Custome View
+import ViewErrorMessage from "HexaWallet/src/app/custcompontes/View/ViewErrorMessage/ViewErrorMessage";
 
 //TODO: Custome model  
 import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
@@ -127,6 +130,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             arr_SecureAccountDetials: [],
             arr_ModelBackupYourWallet: [],
             arr_ModelFindYourTrustedContacts: [],
+            arrErrorMessage: [],
             //flag
             flag_isTrustedContacts: true,
             flag_SelfShare: true,
@@ -138,8 +142,10 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             flag_Loading: false,
             //TouchableOpacity Disable
             flag_DisableSecureTwoFactor: true,
-            flag_DisableSecretQuestion: true
-        } )
+            flag_DisableSecretQuestion: true,
+            flag_SSSAndPdfFileCreate: false,
+            flag_ShareAction: true
+        } );
     }
 
     async componentWillMount() {
@@ -165,9 +171,9 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         }
     }
 
+
     getTrustedContactArray( sssDetails: any, backupType: string ) {
         console.log( { sssDetails, backupType } );
-
         let keeperInfo = JSON.parse( sssDetails.keeperInfo );
         let data = {};
         let decryptedShare = JSON.parse( sssDetails.decryptedShare );
@@ -221,127 +227,132 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
 
     getCheackHealth = async () => {
-        this.setState( {
-            flag_Loading: true
-        } );
-        let walletDetails = await utils.getWalletDetails();
-        let backupInfo = JSON.parse( walletDetails.backupInfo );
-        let backupType = backupInfo[ 0 ].backupType;
-        let backupMethod = backupInfo[ 0 ].backupMethod;
         let sssDetails = await utils.getSSSDetails();
-        console.log( { walletDetails, sssDetails } );
-        let share = {};
-        share.trustedContShareId1 = sssDetails[ 0 ].shareId != "" ? sssDetails[ 0 ].shareId : null;
-        share.trustedContShareId2 = sssDetails[ 1 ].shareId != "" ? sssDetails[ 1 ].shareId : null;
-        share.selfshareShareId1 = sssDetails[ 2 ].shareId != "" ? sssDetails[ 2 ].shareId : null;
-        share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? sssDetails[ 3 ].acceptedDate : 0;
-        share.selfshareShareShareId2 = sssDetails[ 3 ].shareId != "" ? sssDetails[ 3 ].shareId : "";
-        share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? sssDetails[ 4 ].acceptedDate : 0;
-        share.selfshareShareId3 = sssDetails[ 4 ].shareId != "" ? sssDetails[ 4 ].shareId : "";
-        share.qatime = parseInt( walletDetails.lastUpdated );
-        let resCheckHealthAllShare = await comAppHealth.checkHealthAllShare( share );
-        if ( resCheckHealthAllShare != "" ) {
-            this.loaddata( backupType, backupMethod );
-        } else {
-            Alert.alert( "Check health not working." )
+        if ( sssDetails.length > 0 ) {
+            this.setState( {
+                flag_ShareAction: false,
+                flag_Loading: true
+            } );
+            let walletDetails = await utils.getWalletDetails();
+            let backupInfo = JSON.parse( walletDetails.backupInfo );
+            let backupType = backupInfo[ 0 ].backupType;
+            let backupMethod = backupInfo[ 0 ].backupMethod;
+            let sssDetails = await utils.getSSSDetails();
+            console.log( { walletDetails, sssDetails } );
+            let share = {};
+            share.trustedContShareId1 = sssDetails[ 0 ].shareId != "" ? sssDetails[ 0 ].shareId : null;
+            share.trustedContShareId2 = sssDetails[ 1 ].shareId != "" ? sssDetails[ 1 ].shareId : null;
+            share.selfshareShareId1 = sssDetails[ 2 ].shareId != "" ? sssDetails[ 2 ].shareId : null;
+            share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? sssDetails[ 3 ].acceptedDate : 0;
+            share.selfshareShareShareId2 = sssDetails[ 3 ].shareId != "" ? sssDetails[ 3 ].shareId : "";
+            share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? sssDetails[ 4 ].acceptedDate : 0;
+            share.selfshareShareId3 = sssDetails[ 4 ].shareId != "" ? sssDetails[ 4 ].shareId : "";
+            share.qatime = parseInt( walletDetails.lastUpdated );
+            let resCheckHealthAllShare = await comAppHealth.checkHealthAllShare( share );
+            if ( resCheckHealthAllShare != "" ) {
+                this.loaddata( backupType, backupMethod );
+            } else {
+                Alert.alert( "Check health not working." )
+            }
         }
-
+        else {
+            this.setState( {
+                flag_SSSAndPdfFileCreate: true,
+                flag_ShareAction: true
+            } );
+        }
     }
+
 
     loaddata = async ( backupType: string, backupMethod: string ) => {
         let walletDetails = await utils.getWalletDetails();
         let sssDetails = await utils.getSSSDetails();
-        if ( sssDetails.length > 0 ) {
-            let { arr_TrustedContacts, arr_SelfShare } = this.state;
-            let arr_SecretQuestion = [];
-            var len = sssDetails.length;
-            for ( let i = 0; i < len; i++ ) {
-                //Trusted Contacts
-                if ( sssDetails[ i ].type === 'Trusted Contacts 1' && sssDetails[ i ].keeperInfo != "" ) {
-                    let data = await this.getTrustedContactArray( sssDetails[ i ], backupType );
-                    arr_TrustedContacts[ 0 ] = data[ 0 ];
-                }
-                else if ( sssDetails[ i ].type === 'Trusted Contacts 2' && sssDetails[ i ].keeperInfo != "" ) {
-                    let data = await this.getTrustedContactArray( sssDetails[ i ], backupType );
-                    arr_TrustedContacts[ 1 ] = data[ 0 ];
-                }
-                //Self Share  
-                else if ( sssDetails[ i ].type === 'Self Share 1' && sssDetails[ i ].decryptedShare != "" ) {
-                    let sharedDate = sssDetails[ i ].sharedDate;
-                    let acceptDate = sssDetails[ i ].acceptedDate;
-                    let shareStage = sssDetails[ i ].shareStage;
-                    console.log( { sharedDate, acceptDate, shareStage } );
-                    let statusMsg = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 0 ];
-                    let statusColor = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 1 ];
-                    console.log( { statusMsg, statusColor } );
-                    let data = {};
-                    data.thumbnailPath = "wallet";
-                    data.givenName = "Secondary Device";
-                    data.familyName = "";
-                    data.statusMsgColor = statusColor;
-                    data.statusMsg = statusMsg;
-                    data.sssDetails = sssDetails[ i ];
-                    data.type = sssDetails[ i ].type;
-                    data.backupType = backupType;
-                    data.flagAction = sssDetails[ i ].decryptedShare != "" ? false : true;
-                    arr_SelfShare[ 0 ] = data;
-                }
-                else if ( sssDetails[ i ].type === 'Self Share 2' && sssDetails[ i ].decryptedShare != "" ) {
-                    let sharedDate = sssDetails[ i ].sharedDate;
-                    let acceptDate = sssDetails[ i ].acceptedDate;
-                    let shareStage = sssDetails[ i ].shareStage;
-                    console.log( { sharedDate, acceptDate, shareStage } );
-                    let statusMsg = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 0 ];
-                    let statusColor = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 1 ];
-                    console.log( { statusMsg, statusColor } );
-                    let data = {};
-                    data.thumbnailPath = "email";
-                    data.givenName = "Email";
-                    data.familyName = "";
-                    data.statusMsgColor = statusColor;
-                    data.statusMsg = statusMsg;
-                    data.sssDetails = sssDetails[ i ];
-                    data.type = sssDetails[ i ].type;
-                    data.backupType = backupType;
-                    data.flagAction = sssDetails[ i ].decryptedShare != "" ? false : true;
-                    arr_SelfShare[ 1 ] = data;
-                }
-                else {
-                    let sharedDate = sssDetails[ i ].sharedDate;
-                    let acceptDate = sssDetails[ i ].acceptedDate;
-                    let shareStage = sssDetails[ i ].shareStage;
-                    console.log( { sharedDate, acceptDate, shareStage } );
-                    let statusMsg = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 0 ];
-                    let statusColor = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 1 ];
-                    console.log( { statusMsg, statusColor } );
-                    let data = {};
-                    data.thumbnailPath = "cloudstorage";
-                    data.givenName = "Cloud";
-                    data.familyName = "";
-                    data.statusMsgColor = statusColor;
-                    data.statusMsg = statusMsg;
-                    data.sssDetails = sssDetails[ i ];
-                    data.type = sssDetails[ i ].type;
-                    data.backupType = backupType;
-                    data.flagAction = sssDetails[ i ].decryptedShare != "" ? false : true;
-                    arr_SelfShare[ 2 ] = data;
-                }
-                //Secret Question  
-                arr_SecretQuestion = this.getQuestionDetails( walletDetails )
-                this.setState( {
-                    flag_Loading: false,
-                    flag_SelfShareActionDisable: false,
-                    arr_TrustedContacts,
-                    arr_SelfShare,
-                    arr_SSSDetails: sssDetails,
-                    arr_SecretQuestion
-                } )
+        let { arr_TrustedContacts, arr_SelfShare } = this.state;
+        let arr_SecretQuestion = [];
+        var len = sssDetails.length;
+        for ( let i = 0; i < len; i++ ) {
+            //Trusted Contacts
+            if ( sssDetails[ i ].type === 'Trusted Contacts 1' && sssDetails[ i ].keeperInfo != "" ) {
+                let data = await this.getTrustedContactArray( sssDetails[ i ], backupType );
+                arr_TrustedContacts[ 0 ] = data[ 0 ];
             }
-        } else {
-            console.log( 'not  sssdetails found' );
+            else if ( sssDetails[ i ].type === 'Trusted Contacts 2' && sssDetails[ i ].keeperInfo != "" ) {
+                let data = await this.getTrustedContactArray( sssDetails[ i ], backupType );
+                arr_TrustedContacts[ 1 ] = data[ 0 ];
+            }
+            //Self Share  
+            else if ( sssDetails[ i ].type === 'Self Share 1' && sssDetails[ i ].decryptedShare != "" ) {
+                let sharedDate = sssDetails[ i ].sharedDate;
+                let acceptDate = sssDetails[ i ].acceptedDate;
+                let shareStage = sssDetails[ i ].shareStage;
+                console.log( { sharedDate, acceptDate, shareStage } );
+                let statusMsg = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 0 ];
+                let statusColor = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 1 ];
+                console.log( { statusMsg, statusColor } );
+                let data = {};
+                data.thumbnailPath = "wallet";
+                data.givenName = "Secondary Device";
+                data.familyName = "";
+                data.statusMsgColor = statusColor;
+                data.statusMsg = statusMsg;
+                data.sssDetails = sssDetails[ i ];
+                data.type = sssDetails[ i ].type;
+                data.backupType = backupType;
+                data.flagAction = sssDetails[ i ].decryptedShare != "" ? false : true;
+                arr_SelfShare[ 0 ] = data;
+            }
+            else if ( sssDetails[ i ].type === 'Self Share 2' && sssDetails[ i ].decryptedShare != "" ) {
+                let sharedDate = sssDetails[ i ].sharedDate;
+                let acceptDate = sssDetails[ i ].acceptedDate;
+                let shareStage = sssDetails[ i ].shareStage;
+                console.log( { sharedDate, acceptDate, shareStage } );
+                let statusMsg = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 0 ];
+                let statusColor = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 1 ];
+                console.log( { statusMsg, statusColor } );
+                let data = {};
+                data.thumbnailPath = "email";
+                data.givenName = "Email";
+                data.familyName = "";
+                data.statusMsgColor = statusColor;
+                data.statusMsg = statusMsg;
+                data.sssDetails = sssDetails[ i ];
+                data.type = sssDetails[ i ].type;
+                data.backupType = backupType;
+                data.flagAction = sssDetails[ i ].decryptedShare != "" ? false : true;
+                arr_SelfShare[ 1 ] = data;
+            }
+            else {
+                let sharedDate = sssDetails[ i ].sharedDate;
+                let acceptDate = sssDetails[ i ].acceptedDate;
+                let shareStage = sssDetails[ i ].shareStage;
+                console.log( { sharedDate, acceptDate, shareStage } );
+                let statusMsg = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 0 ];
+                let statusColor = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 1 ];
+                console.log( { statusMsg, statusColor } );
+                let data = {};
+                data.thumbnailPath = "cloudstorage";
+                data.givenName = "Cloud";
+                data.familyName = "";
+                data.statusMsgColor = statusColor;
+                data.statusMsg = statusMsg;
+                data.sssDetails = sssDetails[ i ];
+                data.type = sssDetails[ i ].type;
+                data.backupType = backupType;
+                data.flagAction = sssDetails[ i ].decryptedShare != "" ? false : true;
+                arr_SelfShare[ 2 ] = data;
+            }
+            //Secret Question  
+            arr_SecretQuestion = this.getQuestionDetails( walletDetails )
+            this.setState( {
+                flag_Loading: false,
+                flag_SelfShareActionDisable: false,
+                arr_TrustedContacts,
+                arr_SelfShare,
+                arr_SSSDetails: sssDetails,
+                arr_SecretQuestion
+            } )
         }
     }
-
 
     //self share message
     getMsgAndColor( sharedDate: string, acceptDate: string, shareStage: string ) {
@@ -357,7 +368,6 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             return [ "Not Shared", "#ff0000" ];
         }
     }
-
     //secret quesiton message
     getQuestonHealth( share: string ) {
         if ( share == "Good" ) {
@@ -369,8 +379,6 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             return [ "Inaccessible", "#ff0000" ];
         }
     }
-
-
     //TODO: func click_Item
     click_Item = ( item: any ) => {
         console.log( { item } );
@@ -442,16 +450,24 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
     render() {
         //flag
-        let { flag_isTrustedContacts, flag_isSetupTrustedContact, flag_isMnemonic, flag_isSecretQuestions, flag_isTwoFactor, flag_Loading, flag_SelfShare, flag_SelfShareActionDisable } = this.state;
+        let { flag_isTrustedContacts, flag_isMnemonic, flag_isSecretQuestions, flag_isTwoFactor, flag_Loading, flag_SelfShare, flag_SSSAndPdfFileCreate, flag_ShareAction } = this.state;
         //TouchableOpacity
         let { flag_DisableSecureTwoFactor, flag_DisableSecretQuestion } = this.state;
         //array
-        let { arr_TrustedContacts, arr_SelfShare, arr_SecretQuestion } = this.state;
+        let { arr_TrustedContacts, arr_SelfShare, arr_SecretQuestion, arrErrorMessage } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
+                        { renderIf( flag_SSSAndPdfFileCreate == true )(
+                            <View>
+                                <View style={ { backgroundColor: "#262A2E", flexDirection: "row", alignItems: "center", padding: 10 } }>
+                                    <Text style={ { textAlign: "center", flex: 1, color: "#ffffff" } }>Please come back later, Hexa is still working</Text>
+                                    <ActivityIndicator size="small" color="#ffffff" />
+                                </View>
+                            </View>
+                        ) }
                         <View style={ { marginLeft: 10, marginTop: 15 } }>
                             <Button
                                 transparent
@@ -509,7 +525,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                     } } onPress={ () => {
                                                         this.click_Item( item )
                                                     } }
-                                                        disabled={ item.flagAction }
+                                                        disabled={ item.flagAction && flag_ShareAction }
                                                     >
                                                         <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                                                             <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
@@ -589,7 +605,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                 } } onPress={ () => {
                                                     this.click_SelfShare( item )
                                                 } }
-                                                    disabled={ item.flagAction }
+                                                    disabled={ item.flagAction && flag_ShareAction }
                                                 >
                                                     <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                                                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >

@@ -163,7 +163,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         } else {
             alert.simpleOk( "Oops", resGenerateEncryptedMetaShare.err );
         }
-        const resEncryptViaOTP = sss.encryptViaOTP( resGenerateEncryptedMetaShare.key );
+        const resEncryptViaOTP = S3Service.encryptViaOTP( resGenerateEncryptedMetaShare.key );
         if ( resEncryptViaOTP.status == 200 || 400 ) {
             const resUploadShare = await sss.uploadShare( resGenerateEncryptedMetaShare.encryptedMetaShare, resGenerateEncryptedMetaShare.messageId );
             console.log( { resUploadShare } );

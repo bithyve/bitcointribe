@@ -19,6 +19,7 @@ import ImageSVG from 'react-native-remote-svg';
 import { RkCard } from "react-native-ui-kitten";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import RCTSFSafariViewController from 'react-native-sfsafariviewcontroller';
 
 
 //TODO: Custome Pages
@@ -222,24 +223,29 @@ export default class SettingScreen extends React.Component<any, any> {
               <View style={ { flex: 0.4, alignItems: "center", marginTop: 20 } }>
                 <Text note style={ [ globalStyle.ffFiraSansMedium ] }>Follow Us</Text>
                 <View style={ { alignItems: "center", flexDirection: "row" } }>
+
                   <SvgIcon
                     name="twitter-logo-silhouette"
                     color="#BABABA"
                     size={ 20 }
                     style={ styles.btnSocial }
                   />
+
                   <SvgIcon
                     name="linkedin-logo"
                     color="#BABABA"
                     size={ 20 }
                     style={ styles.btnSocial }
                   />
+
                   <SvgIcon
                     name="medium-size"
                     color="#BABABA"
                     size={ 20 }
                     style={ styles.btnSocial }
                   />
+
+
                 </View>
                 <Text note>© 2019  All Rights Reserved. Bithyve | www.bithyve.com</Text>
               </View>

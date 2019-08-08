@@ -50,7 +50,9 @@ const checkHealthAllShare = async ( share: any ) => {
     } else {
         alert.simpleOk( "Oops", resCheckHealth.err );
     }
+
     console.log( { resCheckHealth } );
+
     let shares = [
         { shareId: share.selfshareShareShareId2, updatedAt: share.selfshareShareDate2 },
         { shareId: share.selfshareShareId3, updatedAt: share.selfshareShareDate3 },

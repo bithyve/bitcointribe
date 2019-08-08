@@ -110,7 +110,7 @@ export default class HexaWallet extends React.Component
   appWokeUp = ( event ) =>
   {
     // this handles the use case where the app is running in the background and is activated by the listener...
-    // Alert.alert('Linking Listener','url  ' + event.url)
+    Alert.alert( 'Linking Listener', 'url  ' + event.url )
     this.resetStackToProperRoute( event.url )
   }
 

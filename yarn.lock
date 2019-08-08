@@ -8186,6 +8186,11 @@ react-native-rsa@^0.0.3:
   resolved "https://registry.yarnpkg.com/react-native-rsa/-/react-native-rsa-0.0.3.tgz#c3b5b85278e8a1a3ef22b4206a7d6aa04a26d99b"
   integrity sha1-w7W4UnjooaPvIrQgan1qoEom2Zs=
 
+react-native-safari-view-controller@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-safari-view-controller/-/react-native-safari-view-controller-1.0.0.tgz#0f79ef8493a9c7bd95bcbb5181a85420b14d0175"
+  integrity sha512-ufwClDVL0gK4MtkQiMQAT0FWGt8XmA3qJOjza+g0jBuJIy1naQoCKFdWhKyOX8V2CHxz7UdQqtyGnGjiw+RBFQ==
+
 react-native-safari-view@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/react-native-safari-view/-/react-native-safari-view-2.1.0.tgz#1e0cd12c62bce79bc1759c7e281646b08b61c959"

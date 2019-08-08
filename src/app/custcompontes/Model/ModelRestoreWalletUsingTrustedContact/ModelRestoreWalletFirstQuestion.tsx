@@ -177,7 +177,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                 let data = sssDetails[ i ];
                 if ( data.decryptedShare != "" ) {
                     let decryptedShareJson = JSON.parse( data.decryptedShare );
-                    let shareId = sss.getShareId( decryptedShareJson.encryptedShare );
+                    let shareId = S3Service.getShareId( decryptedShareJson.encryptedShare );
                     await dbOpration.updateSSSShareId(
                         localDB.tableName.tblSSSDetails,
                         dateTime,

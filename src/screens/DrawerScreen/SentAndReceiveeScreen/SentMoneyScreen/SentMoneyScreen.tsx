@@ -37,7 +37,7 @@ import {
   errorMessage,
   errorValidMsg
 } from "bithyve/src/app/constants/Constants";
-var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
+var dbOpration = require( "bithyve/src/app/manager/database/DBOpration" );
 
 //TODO: Wallets
 import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
@@ -49,13 +49,13 @@ import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
 
 //localization
 import { localization } from "bithyve/src/app/manager/Localization/i18n";
-let arr_AppConfigPopPupMsg = localization("appConfig.popUp");
-let arr_amountTrnasfer = arr_AppConfigPopPupMsg[0].amountTrnasfer;
-let arr_successMsg = arr_amountTrnasfer[0].successMsg;
-let arr_failedMsg = arr_amountTrnasfer[0].failedMsg;
+let arr_AppConfigPopPupMsg = localization( "appConfig.popUp" );
+let arr_amountTrnasfer = arr_AppConfigPopPupMsg[ 0 ].amountTrnasfer;
+let arr_successMsg = arr_amountTrnasfer[ 0 ].successMsg;
+let arr_failedMsg = arr_amountTrnasfer[ 0 ].failedMsg;
 export default class SentMoneyScreen extends Component<any, any> {
-  constructor(props: any) {
-    super(props);
+  constructor ( props: any ) {
+    super( props );
     this.state = {
       data: [],
       walletJSON: [],
@@ -72,15 +72,15 @@ export default class SentMoneyScreen extends Component<any, any> {
 
   componentWillMount() {
     const { navigation } = this.props;
-    let data = navigation.getParam("data");
-    let walletJSON = navigation.getParam("waletteData");
+    let data = navigation.getParam( "data" );
+    let walletJSON = navigation.getParam( "waletteData" );
 
-    console.log({ data, walletJSON });
+    console.log( { data, walletJSON } );
 
-    this.setState({
+    this.setState( {
       data: data,
       walletJSON: walletJSON
-    });
+    } );
   }
 
   async componentDidMount() {
@@ -89,8 +89,8 @@ export default class SentMoneyScreen extends Component<any, any> {
       "willFocus",
       () => {
         try {
-          AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(false));
-        } catch (error) {
+          AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
+        } catch ( error ) {
           // Error saving data
         }
       }
@@ -100,54 +100,54 @@ export default class SentMoneyScreen extends Component<any, any> {
   async componentWillUnmount() {
     try {
       this.willFocusSubscription.remove();
-      AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(false));
-      this.setState({
+      AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
+      this.setState( {
         isLoading: false
-      });
-    } catch (error) {
-      console.log(error);
+      } );
+    } catch ( error ) {
+      console.log( error );
     }
   }
 
   //TODO: func validation
-  validation(val, type) {
-    if (type == "address") {
-      this.setState({
+  validation( val, type ) {
+    if ( type == "address" ) {
+      this.setState( {
         recipientAddress: val
-      });
+      } );
     } else {
-      this.setState({
+      this.setState( {
         amount: val
-      });
+      } );
     }
     if (
       this.state.recipientAddress.length > 0 &&
       this.state.amount.length > 0
     ) {
-      this.setState({
+      this.setState( {
         sentBtnColor: colors.appColor,
         sentBtnStatus: false
-      });
+      } );
     }
     if (
       this.state.recipientAddress.length < 0 ||
       this.state.amount.length < 0 ||
       val == ""
     ) {
-      this.setState({
+      this.setState( {
         sentBtnColor: "gray",
         sentBtnStatus: true
-      });
+      } );
     }
   }
 
   //TODO: func click_SentMoney
   async click_SentMoney() {
     let isLoading = false;
-    if (this.state.data.accountType == "Secure") {
+    if ( this.state.data.accountType == "Secure" ) {
       try {
-        AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(true));
-        this.setState({
+        AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
+        this.setState( {
           arr_SecureAuthPopupData: [
             {
               visible: true,
@@ -156,36 +156,36 @@ export default class SentMoneyScreen extends Component<any, any> {
               secureRecipientAddress: this.state.recipientAddress
             }
           ]
-        });
-      } catch (error) {
-        console.log(error);
+        } );
+      } catch ( error ) {
+        console.log( error );
       }
-    } else if (this.state.data.accountType == "Vault") {
+    } else if ( this.state.data.accountType == "Vault" ) {
       const { navigation } = this.props;
       const dateTime = Date.now();
-      const lastUpdateDate = Math.floor(dateTime / 1000);
-      let additionalInfo = JSON.parse(this.state.data.additionalInfo);
+      const lastUpdateDate = Math.floor( dateTime / 1000 );
+      let additionalInfo = JSON.parse( this.state.data.additionalInfo );
       let res = await vaultAccount.transfer(
         this.state.data.address,
         this.state.recipientAddress,
-        parseFloat(this.state.amount) * 1e8,
+        parseFloat( this.state.amount ) * 1e8,
         additionalInfo.lockTime,
         additionalInfo.privateKey
       );
-      if (res.statusCode == 200) {
+      if ( res.statusCode == 200 ) {
         const bal = await RegularAccount.getBalance(
-          navigation.getParam("address")
+          navigation.getParam( "address" )
         );
-        if (bal) {
+        if ( bal ) {
           const resultUpdateTblAccount = await dbOpration.updateTableData(
             localDB.tableName.tblAccount,
-            bal.balanceData.final_balance / 1e8,
-            navigation.getParam("address"),
+            bal.balanceData.final_balance,
+            navigation.getParam( "address" ),
             lastUpdateDate
           );
-          if (resultUpdateTblAccount) {
+          if ( resultUpdateTblAccount ) {
             isLoading = false;
-            this.setState({
+            this.setState( {
               alertPopupData: [
                 {
                   theme: "success",
@@ -196,10 +196,10 @@ export default class SentMoneyScreen extends Component<any, any> {
                   goBackStatus: true
                 }
               ]
-            });
+            } );
           } else {
-            (isLoading = false),
-              this.setState({
+            ( isLoading = false ),
+              this.setState( {
                 alertPopupData: [
                   {
                     theme: "danger",
@@ -210,59 +210,59 @@ export default class SentMoneyScreen extends Component<any, any> {
                     goBackStatus: false
                   }
                 ]
-              });
+              } );
           }
         }
       }
-    } else if (this.state.data.accountType == "Joint") {
+    } else if ( this.state.data.accountType == "Joint" ) {
       const { navigation } = this.props;
-      let additionalInfo = JSON.parse(this.state.data.additionalInfo);
-      console.log({ additionalInfo });
+      let additionalInfo = JSON.parse( this.state.data.additionalInfo );
+      console.log( { additionalInfo } );
       let scripts = additionalInfo.scripts;
 
-      const resJointAccount = await jointAccount.initJointTxn({
-        senderAddress: navigation.getParam("address"),
+      const resJointAccount = await jointAccount.initJointTxn( {
+        senderAddress: navigation.getParam( "address" ),
         recipientAddress: this.state.recipientAddress,
-        amount: parseFloat(this.state.amount) * 1e8,
-        privateKey: this.state.walletJSON[0].privateKey,
+        amount: parseFloat( this.state.amount ) * 1e8,
+        privateKey: this.state.walletJSON[ 0 ].privateKey,
         scripts: scripts
-      });
-      if (resJointAccount.statusCode == 200) {
-        this.props.navigation.push("ReceiveMoneyScreen", {
+      } );
+      if ( resJointAccount.statusCode == 200 ) {
+        this.props.navigation.push( "ReceiveMoneyScreen", {
           page: "SentMoneyScreen",
           data: resJointAccount.data
-        });
+        } );
       }
     } else {
       isLoading = true;
-      this.setState({
+      this.setState( {
         isLoading: isLoading
-      });
+      } );
       var recAddress = this.state.recipientAddress;
       var amountValue = this.state.amount;
       const dateTime = Date.now();
-      const lastUpdateDate = Math.floor(dateTime / 1000);
+      const lastUpdateDate = Math.floor( dateTime / 1000 );
       const { navigation } = this.props;
       const res = await RegularAccount.transfer(
-        navigation.getParam("address"),
+        navigation.getParam( "address" ),
         recAddress,
-        parseFloat(amountValue) * 1e8,
-        this.state.walletJSON[0].privateKey
+        parseFloat( amountValue ) * 1e8,
+        this.state.walletJSON[ 0 ].privateKey
       );
-      if (res.statusCode == 200) {
+      if ( res.statusCode == 200 ) {
         const bal = await RegularAccount.getBalance(
-          navigation.getParam("address")
+          navigation.getParam( "address" )
         );
-        if (bal) {
+        if ( bal ) {
           const resultUpdateTblAccount = await dbOpration.updateTableData(
             localDB.tableName.tblAccount,
             bal.balanceData.final_balance / 1e8,
-            navigation.getParam("address"),
+            navigation.getParam( "address" ),
             lastUpdateDate
           );
-          if (resultUpdateTblAccount) {
-            (isLoading = false),
-              this.setState({
+          if ( resultUpdateTblAccount ) {
+            ( isLoading = false ),
+              this.setState( {
                 alertPopupData: [
                   {
                     theme: "success",
@@ -273,10 +273,10 @@ export default class SentMoneyScreen extends Component<any, any> {
                     goBackStatus: true
                   }
                 ]
-              });
+              } );
           } else {
-            (isLoading = false),
-              this.setState({
+            ( isLoading = false ),
+              this.setState( {
                 alertPopupData: [
                   {
                     theme: "danger",
@@ -287,66 +287,66 @@ export default class SentMoneyScreen extends Component<any, any> {
                     goBackStatus: false
                   }
                 ]
-              });
+              } );
           }
         }
       }
     }
-    this.setState({
+    this.setState( {
       isLoading: isLoading
-    });
+    } );
   }
 
   //TODO: func openQRCodeScanner
   async openQRCodeScanner() {
-    this.props.navigation.navigate("QrcodeScannerScreen", {
+    this.props.navigation.navigate( "QrcodeScannerScreen", {
       onSelect: this.onSelect
-    });
+    } );
   }
 
   onSelect = data => {
-    this.setState({
+    this.setState( {
       recipientAddress: data.barcode
-    });
+    } );
   };
 
   //TODO: func click
-  async click_SecureAccountSendMoney(txt2fa: string) {
-    var mnemonic = this.state.walletJSON[0].mnemonic.replace(/,/g, " ");
+  async click_SecureAccountSendMoney( txt2fa: string ) {
+    var mnemonic = this.state.walletJSON[ 0 ].mnemonic.replace( /,/g, " " );
     var amountValue = this.state.amount;
     var tokenNo = txt2fa;
     const dateTime = Date.now();
-    const lastUpdateDate = Math.floor(dateTime / 1000);
+    const lastUpdateDate = Math.floor( dateTime / 1000 );
     const { navigation } = this.props;
-    const data = JSON.parse(this.state.data.additionalInfo);
-    const res = await secureAccount.secureTransaction({
+    const data = JSON.parse( this.state.data.additionalInfo );
+    const res = await secureAccount.secureTransaction( {
       senderAddress: data.multiSig.address,
       recipientAddress: this.state.recipientAddress,
-      amount: parseFloat(amountValue) * 1e8,
+      amount: parseFloat( amountValue ) * 1e8,
       primaryXpriv: data.xpriv.primary,
       scripts: data.multiSig.scripts,
-      token: parseInt(tokenNo),
+      token: parseInt( tokenNo ),
       walletID: data.walletID,
       childIndex: 0
-    });
-    if (res.statusCode == 200) {
+    } );
+    if ( res.statusCode == 200 ) {
       try {
-        AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(false));
-      } catch (error) {
-        console.log(error);
+        AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
+      } catch ( error ) {
+        console.log( error );
       }
       const bal = await RegularAccount.getBalance(
-        navigation.getParam("address")
+        navigation.getParam( "address" )
       );
-      if (bal) {
+      if ( bal ) {
         const resultUpdateTblAccount = await dbOpration.updateTableData(
           localDB.tableName.tblAccount,
           bal.balanceData.final_balance / 1e8,
-          navigation.getParam("address"),
+          navigation.getParam( "address" ),
           lastUpdateDate
         );
-        if (resultUpdateTblAccount) {
-          this.setState({
+        if ( resultUpdateTblAccount ) {
+          this.setState( {
             isLoading: false,
             alertPopupData: [
               {
@@ -358,9 +358,9 @@ export default class SentMoneyScreen extends Component<any, any> {
                 goBackStatus: true
               }
             ]
-          });
+          } );
         } else {
-          this.setState({
+          this.setState( {
             isLoading: false,
             alertPopupData: [
               {
@@ -372,11 +372,11 @@ export default class SentMoneyScreen extends Component<any, any> {
                 goBackStatus: false
               }
             ]
-          });
+          } );
         }
       }
     } else {
-      this.setState({
+      this.setState( {
         isLoading: false,
         alertPopupData: [
           {
@@ -388,150 +388,150 @@ export default class SentMoneyScreen extends Component<any, any> {
             goBackStatus: false
           }
         ]
-      });
+      } );
     }
   }
 
   render() {
     return (
       <Container>
-        <ImageBackground source={images.appBackgound} style={styles.container}>
+        <ImageBackground source={ images.appBackgound } style={ styles.container }>
           <Header transparent>
             <Left>
               <Button
                 transparent
-                onPress={() => this.props.navigation.goBack()}
+                onPress={ () => this.props.navigation.goBack() }
               >
-                <Icon name="chevron-left" size={25} color="#ffffff" />
+                <Icon name="chevron-left" size={ 25 } color="#ffffff" />
               </Button>
             </Left>
 
             <Body>
               <Title
-                adjustsFontSizeToFit={true}
-                numberOfLines={1}
-                style={styles.txtTitle}
+                adjustsFontSizeToFit={ true }
+                numberOfLines={ 1 }
+                style={ styles.txtTitle }
               >
-                {localization("SentMoneyScreen.headerTitle")}
+                { localization( "SentMoneyScreen.headerTitle" ) }
               </Title>
             </Body>
             <Right />
           </Header>
           <Content padder>
-            <View style={styles.selectQRCodeOption}>
+            <View style={ styles.selectQRCodeOption }>
               <Input
-                name={this.state.recipientAddress}
-                value={this.state.recipientAddress}
-                keyboardType={"default"}
-                placeholder={localization(
+                name={ this.state.recipientAddress }
+                value={ this.state.recipientAddress }
+                keyboardType={ "default" }
+                placeholder={ localization(
                   "SentMoneyScreen.txtInputAddressPlaceholder"
-                )}
+                ) }
                 placeholderTextColor="#ffffff"
-                style={styles.input}
-                onChangeText={val => this.validation(val, "address")}
-                onChange={val => this.validation(val, "address")}
+                style={ styles.input }
+                onChangeText={ val => this.validation( val, "address" ) }
+                onChange={ val => this.validation( val, "address" ) }
               />
               <TouchableOpacity
-                onPress={() => {
+                onPress={ () => {
                   try {
                     AsyncStorage.setItem(
                       "flag_BackgoundApp",
-                      JSON.stringify(false)
+                      JSON.stringify( false )
                     );
-                  } catch (error) {
+                  } catch ( error ) {
                     // Error saving data
                   }
                   this.openQRCodeScanner();
-                }}
+                } }
               >
                 <Icon
-                  style={{ alignItems: "flex-end", justifyContent: "flex-end" }}
+                  style={ { alignItems: "flex-end", justifyContent: "flex-end" } }
                   name="barcode"
-                  size={35}
-                  color={"#000000"}
+                  size={ 35 }
+                  color={ "#000000" }
                 />
               </TouchableOpacity>
             </View>
             <View>
               <Input
-                name={this.state.amount}
-                value={this.state.amount}
-                keyboardType={"numeric"}
-                placeholder={localization(
+                name={ this.state.amount }
+                value={ this.state.amount }
+                keyboardType={ "numeric" }
+                placeholder={ localization(
                   "SentMoneyScreen.txtInputAmountPlaceholder"
-                )}
+                ) }
                 placeholderTextColor="#ffffff"
-                style={styles.input}
-                onChangeText={val => this.validation(val, "amount")}
-                onChange={val => this.validation(val, "amount")}
+                style={ styles.input }
+                onChangeText={ val => this.validation( val, "amount" ) }
+                onChange={ val => this.validation( val, "amount" ) }
               />
             </View>
             <Button
-              style={[
+              style={ [
                 styles.btnSent,
                 { backgroundColor: this.state.sentBtnColor }
-              ]}
+              ] }
               full
-              disabled={this.state.sentBtnStatus}
-              onPress={() => this.click_SentMoney()}
+              disabled={ this.state.sentBtnStatus }
+              onPress={ () => this.click_SentMoney() }
             >
-              <Text> {localization("SentMoneyScreen.btnSend")} </Text>
+              <Text> { localization( "SentMoneyScreen.btnSend" ) } </Text>
             </Button>
           </Content>
 
           <DialogSecureAccountAuthentication
-            data={this.state.arr_SecureAuthPopupData}
-            click_Sent={(txt2fa: string) => {
-              if (txt2fa.length != 6) {
+            data={ this.state.arr_SecureAuthPopupData }
+            click_Sent={ ( txt2fa: string ) => {
+              if ( txt2fa.length != 6 ) {
                 this.dropdown.alertWithType(
                   "error",
                   "OH",
                   errorValidMsg.enterToken
                 );
               } else {
-                this.setState({
+                this.setState( {
                   isLoading: true,
                   arr_SecureAuthPopupData: [
                     {
                       visible: false
                     }
                   ]
-                });
-                this.click_SecureAccountSendMoney(txt2fa);
+                } );
+                this.click_SecureAccountSendMoney( txt2fa );
               }
-            }}
-            click_Cancel={() =>
-              this.setState({
+            } }
+            click_Cancel={ () =>
+              this.setState( {
                 arr_SecureAuthPopupData: [
                   {
                     visible: false
                   }
                 ]
-              })
+              } )
             }
           />
         </ImageBackground>
         <SCLAlertOk
-          data={this.state.alertPopupData}
-          click_Ok={(status: boolean) => {
-            status ? this.props.navigation.goBack() : console.log(status),
-              this.setState({
+          data={ this.state.alertPopupData }
+          click_Ok={ ( status: boolean ) => {
+            status ? this.props.navigation.goBack() : console.log( status ),
+              this.setState( {
                 alertPopupData: [
                   {
                     status: false
                   }
                 ]
-              });
-          }}
+              } );
+          } }
         />
-        <DropdownAlert ref={ref => (this.dropdown = ref)} />
-        <Loader loading={this.state.isLoading} color={colors.appColor} />
+        <DropdownAlert ref={ ref => ( this.dropdown = ref ) } />
+        <Loader loading={ this.state.isLoading } color={ colors.appColor } />
       </Container>
     );
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1,
     backgroundColor: "#fff"
@@ -609,4 +609,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-end"
   }
-});
+} );

@@ -1,5 +1,9 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, FlatList, Text, SafeAreaView, TouchableOpacity, RefreshControl } from "react-native";
+import { StyleSheet, ImageBackground, View, FlatList, SafeAreaView, TouchableOpacity, RefreshControl } from "react-native";
+import {
+  Container,
+  Text
+} from "native-base";
 
 import Icon from "react-native-vector-icons/FontAwesome";
 import ImageSVG from 'react-native-remote-svg';
@@ -17,9 +21,7 @@ import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 //TODO: ModalAllTransaction
 import Modal from "HexaWallet/src/app/custcompontes/Model/ModalAllTransactions/ModalAllTransactionDetails.tsx";
 
-import {
-  Container,
-} from "native-base";
+
 import { SvgIcon } from "@up-shared/components";
 
 
@@ -115,14 +117,14 @@ export default class AllTransactionScreen extends React.Component<any, any> {
     var detailsArray = [
       { title: "To", value: item.transactionType === "Sent" ? item.recipientAddresses : item.accountType + " Account" },
       { title: "From", value: item.transactionType === "Received" ? item.senderAddresses : item.accountType + " Account" },
-      { title: "Amount", value: item.amount / 1e8 },
-      { title: "Fees", value: item.fee / 1e8 },
+      { title: "Amount", value: item.amount },
+      { title: "Fees", value: item.fee },
       { title: "Transaction ID", value: item.txid },
       { title: "Confirmations", value: item.confirmations },
     ];
     var selectedTransaction = {
       transactionType: item.transactionType,
-      amount: item.amount / 1e8,
+      amount: item.amount,
       time: "-",
       confirmations: item.confirmations,
       recipientAddresses: item.recipientAddresses,
@@ -131,11 +133,12 @@ export default class AllTransactionScreen extends React.Component<any, any> {
     }
     this.setState( { detailsArray, selectedTransaction } )
   }
+
+
   // Recent Transaction Item view
   _renderItem = ( { item, index } ) => {
     return (
       <View style={ { padding: 5 } }>
-
         <View style={ { flexDirection: "row", alignItems: "center" } }>
           <View>
             <ImageSVG
@@ -145,12 +148,10 @@ export default class AllTransactionScreen extends React.Component<any, any> {
               }
             />
           </View>
-
           <View style={ { flex: 1, padding: 5 } }>
             <Text style={ { color: "#151515", fontWeight: "600", fontSize: 14, paddingVertical: 3 } }>{ item.transactionType === "Received" ? "To " + item.accountType + " Account" : "From " + item.accountType + " Account" }</Text>
             <Text style={ { color: "#8B8B8B", fontSize: 12, fontWeight: "600" } }>{ "-" }</Text>
           </View>
-
           <View style={ { paddingHorizontal: 10 } }>
             <Icon
               name={ item.transactionType === "Received" ? "long-arrow-down" : "long-arrow-up" }
@@ -183,7 +184,10 @@ export default class AllTransactionScreen extends React.Component<any, any> {
             <View style={ {
               flex: 1, flexDirection: "row", alignItems: 'center', paddingHorizontal: 10
             } }>
-              <Text style={ { color: "#2F2F2F", fontSize: 20, fontWeight: "bold" } }>{ item.amount / 1e8 }</Text>
+              <Text style={ { color: "#2F2F2F", fontSize: 20, fontWeight: "bold" } }>
+                { item.amount }
+                <Text note> sats</Text>
+              </Text>
               <Text style={ { color: "#D0D0D0", fontSize: 15, fontWeight: "600", paddingHorizontal: 10 } }>{ item.confirmations }</Text>
             </View>
 

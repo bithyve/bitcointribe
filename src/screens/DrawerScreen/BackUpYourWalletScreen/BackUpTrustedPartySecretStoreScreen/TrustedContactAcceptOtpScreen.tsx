@@ -157,7 +157,8 @@ export default class TrustedContactAcceptOtpScreen extends Component {
         console.log( { resDecryptEncMetaShare } );
         if ( resDecryptEncMetaShare.status == 200 ) {
             console.log( { resDecryptEncMetaShare } );
-            const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
+            arr_DecrShare.length != 0 ? arr_DecrShare.push( resDecryptEncMetaShare.data.decryptedMetaShare ) : arr_DecrShare.push( resDecryptEncMetaShare.data.decryptedMetaShare );
+            const resUpdateHealth = await S3Service.updateHealth( arr_DecrShare );
             if ( resUpdateHealth.status == 200 ) {
                 await bitcoinClassState.setS3ServiceClassState( sss );
                 const resTrustedParty = await dbOpration.insertTrustedPartyDetails(
@@ -172,7 +173,7 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                 if ( resTrustedParty ) {
                     flag_Loading = false;
                     setTimeout( () => {
-                        alert.simpleOkAction( "Success", "Decrypted share stored.", this.goBack );
+                        alert.simpleOkAction( "Success", "Share stored successfully", this.goBack );
                     }, 100 );
 
                 }

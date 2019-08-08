@@ -181,9 +181,8 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
                                 </TouchableOpacity>
                             </View>
                             <View style={ styles.viewAppLogo }>
-                                <Image style={ styles.imgAppLogo } source={ images.RestoreRecoverScreen.restore } />
                                 <Text
-                                    style={ [ globalStyle.ffFiraSansBold, { color: "#ffffff", marginTop: 20, fontSize: 26 } ] }
+                                    style={ [ globalStyle.ffFiraSansBold, { color: "#ffffff", marginTop: 20, marginBottom: 20, fontSize: 26 } ] }
                                 >
                                     Restore Wallet
                                </Text>

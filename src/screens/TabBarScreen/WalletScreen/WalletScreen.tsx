@@ -142,7 +142,7 @@ export default class WalletScreen extends React.Component {
       flag_FabActive: false,
       //flag   
       flag_refreshing: false,
-      flag_Loading: false,
+      flag_Loading: true,
       //pdf
       qrcodeImageString1: "hexa",
       qrcodeImageString2: "hexa",
@@ -175,6 +175,7 @@ export default class WalletScreen extends React.Component {
     isNetwork = utils.getNetwork();
   }
 
+
   //TODO: Page Life Cycle
   componentWillMount() {
     this.willFocusSubscription = this.props.navigation.addListener(
@@ -186,10 +187,27 @@ export default class WalletScreen extends React.Component {
     );
     //TODO: Animation 
     this.changeAnimaiton();
+    //TODO: Async Task and Get Bal   
+    isNetwork = utils.getNetwork();
+    if ( isNetwork ) {
+      this.setState( {
+        flag_Offline: false
+      } );
+      this.asyncTask();
+    } else {
+      this.setState( {
+        flag_Offline: true,
+        arrErrorMessage: [ {
+          type: "offline",
+          data: [ {
+            message: "Offline. Some features may not work",
+            bgColor: "#262A2E",
+            color: "#ffffff",
+          } ]
+        } ]
+      } )
+    }
   }
-
-
-
 
 
   changeAnimaiton() {
@@ -226,31 +244,6 @@ export default class WalletScreen extends React.Component {
       extrapolate: "clamp"
     } );
   }
-
-  checkNetworkAndAsyncTask = () => {
-    // async task
-    isNetwork = utils.getNetwork();
-    if ( isNetwork ) {
-      this.setState( {
-        flag_Offline: false
-      } )
-      this.asyncTask();
-    } else {
-      this.setState( {
-        flag_Offline: true,
-        arrErrorMessage: [ {
-          type: "offline",
-          data: [ {
-            message: "Offline. Some features may not work",
-            bgColor: "#262A2E",
-            color: "#ffffff",
-          } ]
-        } ]
-      } )
-    }
-  }
-
-
 
   asyncTask = async () => {
     let resultWallet = await utils.getWalletDetails();
@@ -309,16 +302,10 @@ export default class WalletScreen extends React.Component {
         data.svgIcon = "secureAccount"
       temp.push( data )
     }
-    console.log( { temp } );
     this.setState( {
       walletDetails: resultWallet,
       arr_accounts: temp,
-    }, async () => {
-      if ( flag_CreatePdfFile ) {
-        flag_CreatePdfFile = false;
-        this.checkNetworkAndAsyncTask()
-      }
-      await comFunDBRead.readTblSSSDetails();
+      flag_Loading: false
     } );
     this.setHealthCheakIcon();
   }
@@ -381,7 +368,7 @@ export default class WalletScreen extends React.Component {
           await bitcoinClassState.setRegularClassState( regularAccount );
           resGetWalletId = resGetWalletId.data;
         } else {
-          alert.simpleOk( "Oops", resGetWalletId.err );
+          alert.simpleOkAction( "Oops", resGetWalletId.err, this.click_StopLoader );
         }
         let resTrustedParty = await comFunDBRead.readTblTrustedPartySSSDetails();
         let arr_DecrShare = [];
@@ -391,7 +378,8 @@ export default class WalletScreen extends React.Component {
         let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, urlScriptDetails.data, resGetWalletId.walletId, arr_DecrShare );
         if ( resDecryptEncMetaShare.status == 200 ) {
           console.log( { resDecryptEncMetaShare } );
-          const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
+          arr_DecrShare.length != 0 ? arr_DecrShare.push( resDecryptEncMetaShare.data.decryptedMetaShare ) : arr_DecrShare.push( resDecryptEncMetaShare.data.decryptedMetaShare );
+          const resUpdateHealth = await S3Service.updateHealth( arr_DecrShare );
           if ( resUpdateHealth.status == 200 ) {
             await bitcoinClassState.setS3ServiceClassState( sss );
             const resTrustedParty = await dbOpration.insertTrustedPartyDetailWithoutAssociate(
@@ -407,20 +395,20 @@ export default class WalletScreen extends React.Component {
               utils.setDeepLinkingType( "" );
               utils.setDeepLinkingUrl( "" );
               setTimeout( () => {
-                alert.simpleOk( "Success", "Decrypted share stored." );
+                alert.simpleOkAction( "Success", "Share stored successfully", this.click_StopLoader );
               }, 100 );
             }
           }
         } else {
           flag_Loading = false;
           setTimeout( () => {
-            alert.simpleOk( "Oops", resDecryptEncMetaShare.err );
+            alert.simpleOkAction( "Oops", resDecryptEncMetaShare.err, this.click_StopLoader );
           }, 100 );
         }
       } else {
         flag_Loading = false;
         setTimeout( () => {
-          alert.simpleOk( "Oops", resDownlaodShare.err );
+          alert.simpleOkAction( "Oops", resDownlaodShare.err, this.click_StopLoader );
         }, 100 );
       }
       this.setState( {
@@ -454,18 +442,22 @@ export default class WalletScreen extends React.Component {
         await bitcoinClassState.setRegularClassState( regularAccount );
         resGetWalletId = resGetWalletId.data;
       } else {
-        alert.simpleOk( "Oops", resGetWalletId.err );
+        alert.simpleOkAction( "Oops", resGetWalletId.err, this.click_StopLoader );
       }
       let resTrustedParty = await comFunDBRead.readTblTrustedPartySSSDetails();
       let arr_DecrShare = [];
       for ( let i = 0; i < resTrustedParty.length; i++ ) {
         arr_DecrShare.push( JSON.parse( resTrustedParty[ i ].decrShare ) );
       }
+      console.log( { readdbshare: arr_DecrShare } );
       let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, urlScriptDetails.data, resGetWalletId.walletId, arr_DecrShare );
       console.log( { resDecryptEncMetaShare } );
       if ( resDecryptEncMetaShare.status == 200 ) {
         console.log( { resDecryptEncMetaShare } );
-        const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
+        arr_DecrShare.length != 0 ? arr_DecrShare.push( resDecryptEncMetaShare.data.decryptedMetaShare ) : arr_DecrShare.push( resDecryptEncMetaShare.data.decryptedMetaShare );
+        console.log( { appedshare: arr_DecrShare } );
+        const resUpdateHealth = await S3Service.updateHealth( arr_DecrShare );
+        console.log( { resUpdateHealth } );
         if ( resUpdateHealth.status == 200 ) {
           await bitcoinClassState.setS3ServiceClassState( sss );
           const resTrustedParty = await dbOpration.insertTrustedPartyDetailSelfShare(
@@ -481,20 +473,20 @@ export default class WalletScreen extends React.Component {
             utils.setDeepLinkingType( "" );
             utils.setDeepLinkingUrl( "" );
             setTimeout( () => {
-              alert.simpleOk( "Success", "Self share stored." );
+              alert.simpleOkAction( "Success", "Share stored successfully", this.click_StopLoader );
             }, 100 );
           }
         }
       } else {
         flag_Loading = false;
         setTimeout( () => {
-          alert.simpleOk( "Oops", resDecryptEncMetaShare.err );
+          alert.simpleOkAction( "Oops", resDecryptEncMetaShare.err, this.click_StopLoader );
         }, 100 );
       }
     } else {
       flag_Loading = false;
       setTimeout( () => {
-        alert.simpleOk( "Oops", resDownlaodShare.err );
+        alert.simpleOkAction( "Oops", resDownlaodShare.err, this.click_StopLoader );
       }, 100 );
     }
     this.setState( {
@@ -525,13 +517,13 @@ export default class WalletScreen extends React.Component {
     if ( resSetupSecureAccount.status == 200 ) {
       resSetupSecureAccount = resSetupSecureAccount.data;
     } else {
-      alert.simpleOk( "Oops", resSetupSecureAccount.err );
+      alert.simpleOkAction( "Oops", resSetupSecureAccount.err, this.click_StopLoader );
     }
     var secondaryXpub = await secureAccount.getSecondaryXpub();
     if ( secondaryXpub.status == 200 ) {
       secondaryXpub = secondaryXpub.data.secondaryXpub;
     } else {
-      alert.simpleOk( "Oops", secondaryXpub.err );
+      alert.simpleOkAction( "Oops", secondaryXpub.err, this.click_StopLoader );
     }
 
     var getSecoundMnemonic = await secureAccount.getRecoveryMnemonic();
@@ -539,7 +531,7 @@ export default class WalletScreen extends React.Component {
       await bitcoinClassState.setSecureClassState( secureAccount );
       getSecoundMnemonic = getSecoundMnemonic.data.secondaryMnemonic;
     } else {
-      alert.simpleOk( "Oops", getSecoundMnemonic.err );
+      alert.simpleOkAction( "Oops", getSecoundMnemonic.err, this.click_StopLoader );
     }
     //Get Shares         
     const generateShareRes = await sss.generateShares( setUpWalletAnswerDetails[ 0 ].Answer );
@@ -554,7 +546,7 @@ export default class WalletScreen extends React.Component {
         const shareIds = [];
         // console.log( { autoHealthShares } );
         for ( const share of encryptedShares ) {
-          shareIds.push( sss.getShareId( share ) )
+          shareIds.push( S3Service.getShareId( share ) )
         }
         const socialStaticNonPMDD = { secondaryXpub, bhXpub: resSetupSecureAccount.setupData.bhXpub }
         console.log( { socialStaticNonPMDD } );
@@ -623,25 +615,25 @@ export default class WalletScreen extends React.Component {
                       }
                     }
                   } else {
-                    alert.simpleOk( "Oops", qrcode4share.err );
+                    alert.simpleOkAction( "Oops", qrcode4share.err, this.click_StopLoader );
                   }
                 }
               }
             } else {
-              alert.simpleOk( "Oops", qrcode4share.err );
+              alert.simpleOkAction( "Oops", qrcode4share.err, this.click_StopLoader );
             }
           } else {
-            alert.simpleOk( "Oops", resEncryptBuddyStaticNonPMDD.err );
+            alert.simpleOkAction( "Oops", resEncryptBuddyStaticNonPMDD.err, this.click_StopLoader );
           }
 
         } else {
-          alert.simpleOk( "Oops", resEncryptSocialStaticNonPMDD.err );
+          alert.simpleOkAction( "Oops", resEncryptSocialStaticNonPMDD.err, this.click_StopLoader );
         }
       } else {
-        alert.simpleOk( "Oops", resEncryptSocialStaticNonPMDD.err );
+        alert.simpleOkAction( "Oops", resEncryptSocialStaticNonPMDD.err, this.click_StopLoader );
       }
     } else {
-      alert.simpleOk( "Oops", generateShareRes.err );
+      alert.simpleOkAction( "Oops", generateShareRes.err, this.click_StopLoader );
     }
   }
 
@@ -1520,12 +1512,13 @@ export default class WalletScreen extends React.Component {
 
   //TODO: Get All Accoun t Bal
   getBalAndHealth = async () => {
-    let { arr_accounts } = this.state;
-    arr_accounts[ 0 ].indicator = true;
-    arr_accounts[ 1 ].indicator = true;
+    // let { arr_accounts } = this.state;
+    // arr_accounts[ 0 ].indicator = true;
+    // arr_accounts[ 1 ].indicator = true;
     this.setState( {
+      flag_Loading: false,
       flag_GetBal: true,
-      arr_accounts,
+      // arr_accounts,   
       flag_ReloadAccounts: false,
       arrErrorMessage: [ {
         type: "asyncTask",
@@ -1536,13 +1529,19 @@ export default class WalletScreen extends React.Component {
         } ]
       } ]
     }, () => {
+      this.connnection_FetchData();
       this.getBalReularAccount();
     } );
-
+    let resTrustedParty = await comFunDBRead.readTblTrustedPartySSSDetails();
+    let arr_DecrShare = [];
+    for ( let i = 0; i < resTrustedParty.length; i++ ) {
+      arr_DecrShare.push( JSON.parse( resTrustedParty[ i ].decrShare ) );
+    }
+    arr_DecrShare.length != 0 ? this.updateHealth( arr_DecrShare ) : null;
   }
 
   getBalReularAccount = async () => {
-    let { arr_accounts } = this.state;
+    //  let { arr_accounts } = this.state;
     let regularAccount = await bitcoinClassState.getRegularClassState();
     //Get Regular Account Bal
     var getBalR = await regularAccount.getBalance();
@@ -1553,12 +1552,12 @@ export default class WalletScreen extends React.Component {
       await dbOpration.updateAccountBalAccountTypeWise(
         localDB.tableName.tblAccount,
         "Regular Account",
-        ( getBalR.balance + getBalR.unconfirmedBalance ) / 1e8
+        ( getBalR.balance + getBalR.unconfirmedBalance )
       );
-      arr_accounts[ 0 ].balance = ( ( getBalR.balance + getBalR.unconfirmedBalance ) / 1e8 ).toString();
-      arr_accounts[ 0 ].indicator = false;
+      // arr_accounts[ 0 ].balance = ( ( getBalR.balance + getBalR.unconfirmedBalance ) / 1e8 ).toString();
+      // arr_accounts[ 0 ].indicator = false;  
       this.setState( {
-        arr_accounts,
+        // arr_accounts,
         flag_ReloadAccounts: true,
         arrErrorMessage: [ {
           type: "asyncTask",
@@ -1569,16 +1568,16 @@ export default class WalletScreen extends React.Component {
           } ]
         } ]
       }, () => {
+        this.connnection_FetchData();
         this.getBalSecureAccount();
       } );
     } else {
-      alert.simpleOk( "Oops", getBalR.err );
+      alert.simpleOkAction( "Oops", getBalR.err, this.click_StopLoader );
     }
   }
 
   getBalSecureAccount = async () => {
-    let { arr_accounts } = this.state;
-    console.log( { arr_accounts } );
+    //let { arr_accounts } = this.state;
     let secureAccount = await bitcoinClassState.getSecureClassState();
     //Get Secure Account Bal
     var getBalS = await secureAccount.getBalance();
@@ -1589,12 +1588,12 @@ export default class WalletScreen extends React.Component {
       await dbOpration.updateAccountBalAccountTypeWise(
         localDB.tableName.tblAccount,
         "Secure Account",
-        ( getBalS.balance + getBalS.unconfirmedBalance ) / 1e8
+        ( getBalS.balance + getBalS.unconfirmedBalance )
       );
-      arr_accounts[ 1 ].balance = ( ( getBalS.balance + getBalS.unconfirmedBalance ) / 1e8 ).toString();
-      arr_accounts[ 1 ].indicator = false;
+      // arr_accounts[ 1 ].balance = ( ( getBalS.balance + getBalS.unconfirmedBalance ) / 1e8 ).toString();
+      // arr_accounts[ 1 ].indicator = false;
       this.setState( {
-        arr_accounts,
+        //   arr_accounts,
         flag_ReloadAccounts: false,
         arrErrorMessage: [ {
           type: "asyncTask",
@@ -1605,19 +1604,17 @@ export default class WalletScreen extends React.Component {
           } ]
         } ]
       }, () => {
+        this.connnection_FetchData();
         this.checkHealthStatus();
       } );
-
-      return true;
     } else {
-      alert.simpleOk( "Oops", getBalS.err );
+      alert.simpleOkAction( "Oops", getBalS.err, this.click_StopLoader );
     }
   }
 
   checkHealthStatus = async () => {
     let walletDetails = await utils.getWalletDetails();
     let sssDetails = await utils.getSSSDetails();
-    //health Check  
     let share = {};
     share.trustedContShareId1 = sssDetails[ 0 ].shareId != "" ? sssDetails[ 0 ].shareId : null;
     share.trustedContShareId2 = sssDetails[ 1 ].shareId != "" ? sssDetails[ 1 ].shareId : null;
@@ -1707,18 +1704,18 @@ export default class WalletScreen extends React.Component {
     }
   }
 
+  //TODO: upload Health Check
+  updateHealth = async ( arr_DecrShare: any ) => {
+    const resUpdateHealth = await S3Service.updateHealth( arr_DecrShare );
+    if ( resUpdateHealth.status != 200 ) {
+      alert.simpleOkAction( "Oops", resUpdateHealth.err, this.click_StopLoader );
+    }
+  }
+
   //TODO: getTestcoins
   getTestcoins = async () => {
     this.setState( {
-      flag_GetBal: true,
-      arrErrorMessage: [ {
-        type: "asyncTask",
-        data: [ {
-          message: "Fetching your balances",
-          bgColor: "#262A2E",
-          color: "#ffffff",
-        } ]
-      } ]
+      flag_Loading: true
     } );
     let regularAccount = await bitcoinClassState.getRegularClassState();
     let secureAccount = await bitcoinClassState.getSecureClassState();
@@ -1726,15 +1723,15 @@ export default class WalletScreen extends React.Component {
     if ( resCoins.status == 200 ) {
       resCoins = resCoins.data;
     } else {
-      alert.simpleOk( "Oops", resCoins.err );
+      alert.simpleOkAction( "Oops", resCoins.err, this.click_StopLoader );
     }
     resCoins = await secureAccount.getTestcoins();
     if ( resCoins.status == 200 ) {
       resCoins = resCoins.data;
+      this.getBalAndHealth();
     } else {
-      alert.simpleOk( "Oops", resCoins.err );
+      alert.simpleOkAction( "Oops", resCoins.err, this.click_StopLoader );
     }
-    this.getBalAndHealth();
   }
 
   //TODO: Show account details transaction
@@ -1742,6 +1739,13 @@ export default class WalletScreen extends React.Component {
     let { walletDetails } = this.state;
     this.props.navigation.push( "AccountTransactionNavigator", { data: item, walletDetails } );
   }
+
+  click_StopLoader = () => {
+    this.setState( {
+      flag_Loading: false
+    } );
+  }
+
 
   _renderItem( { item, index } ) {
     return (
@@ -1775,13 +1779,14 @@ export default class WalletScreen extends React.Component {
                 <Text
                   style={ [ globalStyle.ffFiraSansMedium, {
                     flex: 2,
-                    fontSize: 16,
+                    fontSize: 18,
+                    alignSelf: "center",
                     marginLeft: 10
                   } ] }
                 >
                   { item.accountName }
                 </Text>
-                <View style={ { flexDirection: "row" } }>
+                <View style={ { alignSelf: "center", flexDirection: "row" } }>
                   <ActivityIndicator animating={ item.indicator } size="small" color="gray" style={ { marginTop: -25 } } />
                   <SvgIcon name="icon_more" color="gray" size={ 15 } />
                 </View>
@@ -1803,9 +1808,8 @@ export default class WalletScreen extends React.Component {
                 </View>
                 <View style={ { flex: 4 } }>
                   <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 30 } ] }>
-                    { item.balance }
+                    { item.balance } <Text note>sats</Text>
                   </Text>
-
                 </View>
               </View>
             </RkCard>
@@ -1837,13 +1841,14 @@ export default class WalletScreen extends React.Component {
                 <Text
                   style={ [ globalStyle.ffFiraSansMedium, {
                     flex: 2,
-                    fontSize: 16,
+                    fontSize: 18,
+                    alignSelf: "center",
                     marginLeft: 10
                   } ] }
                 >
                   { item.accountName }
                 </Text>
-                <View style={ { flexDirection: "row" } }>
+                <View style={ { alignSelf: "center", flexDirection: "row" } }>
                   <ActivityIndicator animating={ item.indicator } size="small" color="gray" style={ { marginTop: -25 } } />
                   <SvgIcon name="icon_more" color="gray" size={ 15 } />
                 </View>
@@ -1865,7 +1870,7 @@ export default class WalletScreen extends React.Component {
                 </View>
                 <View style={ { flex: 4 } }>
                   <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 30 } ] }>
-                    { item.balance }
+                    { item.balance } <Text note>sats</Text>
                   </Text>
                 </View>
                 <View
@@ -1958,19 +1963,11 @@ export default class WalletScreen extends React.Component {
                 } }
               >
                 <ViewShieldIcons data={ arr_CustShiledIcon } click_Image={ () => {
-                  if ( !flag_PdfFileCreate ) {
-                    let appHealthStatus = walletDetails.appHealthStatus;
-                    if ( appHealthStatus != "" ) {
-                      let backupType = JSON.parse( walletDetails.appHealthStatus );
-                      if ( backupType != "" ) {
-                        this.props.navigation.push( "HealthOfTheAppNavigator" );
-                      } else {
-                        this.setState( {
-                          arr_ModelBackupYourWallet: [ {
-                            modalVisible: true
-                          } ]
-                        } )
-                      }
+                  let appHealthStatus = walletDetails.appHealthStatus;
+                  if ( appHealthStatus != "" ) {
+                    let backupType = JSON.parse( walletDetails.appHealthStatus );
+                    if ( backupType != "" ) {
+                      this.props.navigation.push( "HealthOfTheAppNavigator" );
                     } else {
                       this.setState( {
                         arr_ModelBackupYourWallet: [ {
@@ -1978,9 +1975,12 @@ export default class WalletScreen extends React.Component {
                         } ]
                       } )
                     }
-                  }
-                  else {
-                    alert.simpleOk( "Please come back later, Hexa is still working" );
+                  } else {
+                    this.setState( {
+                      arr_ModelBackupYourWallet: [ {
+                        modalVisible: true
+                      } ]
+                    } )
                   }
                 }
                 } />

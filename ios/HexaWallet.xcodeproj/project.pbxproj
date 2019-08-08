@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		001FD8F5BCF344BE99EA8AA9 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F79788E7D60A489CA04491E9 /* MaterialIcons.ttf */; };
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
@@ -54,6 +55,7 @@
 		5D087D2DC59F4B31A9156356 /* libLRDRCTSimpleToast.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FD310308004AE7AF908854 /* libLRDRCTSimpleToast.a */; };
 		5E6A8CBC19664885AC0272FD /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 88461CE8B4084922AF584415 /* Roboto-Bold.ttf */; };
 		64124680D74747159D3E0015 /* OpenSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 35C5495272FF4DE3848C3E71 /* OpenSans-Italic.ttf */; };
+		6738BE7022CD42279FE9BA85 /* libRCTSFSafariViewController.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A92426CA2625471485DB47C7 /* libRCTSFSafariViewController.a */; };
 		6DFC72604B8F4443B69B6008 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 217C85E1C99846F6A3F816E0 /* OpenSans-Bold.ttf */; };
 		7D81AE9904FB45A59C8EC5C4 /* libRNKeychain.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C90D3C23D4B8444CB83322E5 /* libRNKeychain.a */; };
 		83156ABA9CEF4AC0BA325594 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D3F2C344CA734A728140F0EB /* OpenSans-Regular.ttf */; };
@@ -406,6 +408,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNPdfLib;
+		};
+		8B30657D22F9AA8A009CA184 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E3D4348BF27C4D11969F0161 /* RCTSFSafariViewController.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6524D40F1D2FAE0F0060C92E;
+			remoteInfo = RCTSFSafariViewController;
 		};
 		8B380ECA2265DFE100C1061E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -792,6 +801,7 @@
 		9E299B3C19FC4AAA97EDC1FE /* RNSpinkit.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSpinkit.xcodeproj; path = "../node_modules/react-native-spinkit/ios/RNSpinkit.xcodeproj"; sourceTree = "<group>"; };
 		A6DD33EDBD624D3482D1F93A /* RNSimpleShare.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSimpleShare.xcodeproj; path = "../node_modules/react-native-simple-share/RNSimpleShare/RNSimpleShare.xcodeproj"; sourceTree = "<group>"; };
 		A861416FFC424E8883F88030 /* libReactNativeConfig.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libReactNativeConfig.a; sourceTree = "<group>"; };
+		A92426CA2625471485DB47C7 /* libRCTSFSafariViewController.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTSFSafariViewController.a; sourceTree = "<group>"; };
 		A9E853E665D0400894C0E659 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		A9F93F96206C4AFB8089A249 /* RNCamera.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNCamera.xcodeproj; path = "../node_modules/react-native-camera/ios/RNCamera.xcodeproj"; sourceTree = "<group>"; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
@@ -821,6 +831,7 @@
 		DFBBB02C29744B75B24F5A16 /* libSplashScreen.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libSplashScreen.a; sourceTree = "<group>"; };
 		E20E8E01A6044057BB7D5F28 /* ReactNativePermissions.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = ReactNativePermissions.xcodeproj; path = "../node_modules/react-native-permissions/ios/ReactNativePermissions.xcodeproj"; sourceTree = "<group>"; };
 		E33DEDD7CB84416D9EB554EB /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/native-base/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
+		E3D4348BF27C4D11969F0161 /* RCTSFSafariViewController.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTSFSafariViewController.xcodeproj; path = "../node_modules/react-native-safari-view-controller/RCTSFSafariViewController.xcodeproj"; sourceTree = "<group>"; };
 		E4AA9C4CC6C347688C673F60 /* Roboto-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-BoldItalic.ttf"; path = "../src/assets/fonts/Roboto/Roboto-BoldItalic.ttf"; sourceTree = "<group>"; };
 		EB0965F822114777AF50BA1B /* libRNSimpleShare.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNSimpleShare.a; sourceTree = "<group>"; };
 		EBE44572EED44979B5CC46A2 /* libRNVectorIcons-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNVectorIcons-tvOS.a"; sourceTree = "<group>"; };
@@ -895,6 +906,7 @@
 				26BDB20074654DC281A70293 /* libRNSimpleShare.a in Frameworks */,
 				8BEF5F8D22EDE5C60061F6BB /* libRNBackgroundFetch.a in Frameworks */,
 				8B0D500022F1D2FF001C7611 /* libRNCWebView.a in Frameworks */,
+				6738BE7022CD42279FE9BA85 /* libRCTSFSafariViewController.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1153,6 +1165,7 @@
 				A6DD33EDBD624D3482D1F93A /* RNSimpleShare.xcodeproj */,
 				B576173960774181B396AA38 /* RNBackgroundFetch.xcodeproj */,
 				5D25E45A4A7D4AB88BEAA880 /* RNCWebView.xcodeproj */,
+				E3D4348BF27C4D11969F0161 /* RCTSFSafariViewController.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1220,6 +1233,14 @@
 			isa = PBXGroup;
 			children = (
 				8B214D6122A672AA004EFBF0 /* libRNPDFLib.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8B30656622F9AA8A009CA184 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8B30657E22F9AA8A009CA184 /* libRCTSFSafariViewController.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1303,6 +1324,7 @@
 				EB0965F822114777AF50BA1B /* libRNSimpleShare.a */,
 				F3B4E28949CE4898AC1AA4B7 /* libRNHTMLtoPDF.a */,
 				412C74AA75674E339F1BE297 /* RNHTMLtoPDFTests.xctest */,
+				A92426CA2625471485DB47C7 /* libRCTSFSafariViewController.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -1634,6 +1656,10 @@
 				{
 					ProductGroup = 139105B71AF99BAD00B5F7CC /* Products */;
 					ProjectRef = 139105B61AF99BAD00B5F7CC /* RCTSettings.xcodeproj */;
+				},
+				{
+					ProductGroup = 8B30656622F9AA8A009CA184 /* Products */;
+					ProjectRef = E3D4348BF27C4D11969F0161 /* RCTSFSafariViewController.xcodeproj */;
 				},
 				{
 					ProductGroup = 832341B11AAA6A8300B99B32 /* Products */;
@@ -2048,6 +2074,13 @@
 			remoteRef = 8B214D6022A672AA004EFBF0 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		8B30657E22F9AA8A009CA184 /* libRCTSFSafariViewController.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTSFSafariViewController.a;
+			remoteRef = 8B30657D22F9AA8A009CA184 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		8B380ECB2265DFE100C1061E /* libRCTContacts.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -2448,9 +2481,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = Y5TCB759QL;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -2494,12 +2525,14 @@
 					"$(SRCROOT)/../node_modules/react-native-html-to-pdf/ios/RNHTMLtoPDF",
 					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
 					"$(SRCROOT)/../node_modules/react-native-webview/ios",
+					"$(SRCROOT)/../node_modules/react-native-safari-view-controller",
 				);
 				INFOPLIST_FILE = HexaWalletTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -2561,9 +2594,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = Y5TCB759QL;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
@@ -2603,12 +2634,14 @@
 					"$(SRCROOT)/../node_modules/react-native-html-to-pdf/ios/RNHTMLtoPDF",
 					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
 					"$(SRCROOT)/../node_modules/react-native-webview/ios",
+					"$(SRCROOT)/../node_modules/react-native-safari-view-controller",
 				);
 				INFOPLIST_FILE = HexaWalletTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -2717,6 +2750,7 @@
 					"$(SRCROOT)/../node_modules/react-native-html-to-pdf/ios/RNHTMLtoPDF",
 					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
 					"$(SRCROOT)/../node_modules/react-native-webview/ios",
+					"$(SRCROOT)/../node_modules/react-native-safari-view-controller",
 				);
 				INFOPLIST_FILE = HexaWallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -2785,6 +2819,7 @@
 					"$(SRCROOT)/../node_modules/react-native-html-to-pdf/ios/RNHTMLtoPDF",
 					"$(SRCROOT)/../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/**",
 					"$(SRCROOT)/../node_modules/react-native-webview/ios",
+					"$(SRCROOT)/../node_modules/react-native-safari-view-controller",
 				);
 				INFOPLIST_FILE = HexaWallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;

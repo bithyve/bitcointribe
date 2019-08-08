@@ -22,6 +22,7 @@ var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 //TODO: Bitcoin files
 var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
+import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 import WalletScreen from "HexaWallet/src/screens/TabBarScreen/WalletScreen/WalletScreen";
 
@@ -95,7 +96,7 @@ export default class WalletScreenModel extends Component<any, any> {
                 const shareIds = [];
                 // console.log( { autoHealthShares } );
                 for ( const share of encryptedShares ) {
-                    shareIds.push( sss.getShareId( share ) )
+                    shareIds.push( S3Service.getShareId( share ) )
                 }
                 const socialStaticNonPMDD = { secondaryXpub, bhXpub: resSetupSecureAccount.setupData.bhXpub }
                 console.log( { socialStaticNonPMDD } );

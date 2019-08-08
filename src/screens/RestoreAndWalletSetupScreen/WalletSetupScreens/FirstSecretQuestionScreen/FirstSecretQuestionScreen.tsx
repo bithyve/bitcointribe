@@ -38,6 +38,7 @@ import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 //TODO: Custome Object  
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
+var inputValidation = require( "HexaWallet/src/app/constants/validation/inputValidation" );
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
 
@@ -122,6 +123,18 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                 } )
             }
         }, 100 );
+    }
+
+    restrict = ( event: any ) => {
+        console.log( { event } );
+        const regex = new RegExp( "/^[^!-{-~]@+$/;" );
+        const key = "A";// String.fromCharCode( !event.charCode ? event.which : event.charCode );
+        console.log( { key } );
+        if ( !regex.test( key ) ) {
+            console.log( 'false return' );
+            event.preventDefault();
+            return false;
+        }
     }
 
 
@@ -229,7 +242,6 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
         ) );
         return (
             <View style={ styles.container }>
-
                 <KeyboardAwareScrollView
                     enableOnAndroid
                     extraScrollHeight={ 40 }
@@ -240,8 +252,7 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                         <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>Select the question and specify the answer such that you always remember it and no one can easily guess it</Text>
                     </View>
                     <View style={ styles.viewInputFiled }>
-
-                        <View style={ styles.itemQuestionPicker }>
+                        <View style={ [ styles.itemQuestionPicker ] }>
                             <Picker
                                 renderHeader={ backAction =>
                                     <Header style={ { backgroundColor: "#ffffff" } }>
@@ -264,8 +275,6 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                                 { itemList }
                             </Picker>
                         </View>
-
-
                         <Item rounded style={ styles.itemInputWalletName }>
                             <Input
                                 secureTextEntry
@@ -274,15 +283,14 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
                                 placeholder='Write your answer here'
                                 style={ [ globalStyle.ffFiraSansMedium ] }
                                 placeholderTextColor="#B7B7B7"
+                                onKeyPress={ () =>
+                                    this.check_CorrectAnswer()
+                                }
                                 onChangeText={ ( val ) => {
                                     this.setState( {
                                         firstAnswer: val
                                     } )
                                 } }
-                                onKeyPress={ () =>
-                                    this.check_CorrectAnswer()
-                                }
-
                             />
                         </Item>
                         <Item rounded style={ styles.itemInputWalletName }>
@@ -308,7 +316,6 @@ export default class FirstSecretQuestionScreen extends React.Component<any, any>
 
                         <FullLinearGradientButton title="Go To Wallet" disabled={ this.state.flag_ConfirmDisableBtn } style={ [ this.state.flag_ConfirmDisableBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } click_Done={ () => this.click_FirstQuestion() } />
                     </View>
-
                 </KeyboardAwareScrollView>
                 <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
             </View>

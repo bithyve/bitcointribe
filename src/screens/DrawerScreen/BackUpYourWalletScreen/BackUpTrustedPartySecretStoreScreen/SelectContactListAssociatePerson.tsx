@@ -99,7 +99,7 @@ export default class SelectContactListAssociatePerson extends React.Component<an
         let urlType = utils.getDeepLinkingType();
         Alert.alert(
             'Are you sure?',
-            'you want to associate '+name + '?',
+            'you want to associate ' + name + '?',
             [
                 {
                     text: 'Cancel',
@@ -158,10 +158,14 @@ export default class SelectContactListAssociatePerson extends React.Component<an
             for ( let i = 0; i < resTrustedParty.length; i++ ) {
                 arr_DecrShare.push( JSON.parse( resTrustedParty[ i ].decrShare ) );
             }
+
             let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, urlScriptDetails.data, resGetWalletId.walletId, arr_DecrShare );
             if ( resDecryptEncMetaShare.status == 200 ) {
                 console.log( { resDecryptEncMetaShare } );
-                const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
+                arr_DecrShare.length != 0 ? arr_DecrShare.push( resDecryptEncMetaShare.data.decryptedMetaShare ) : arr_DecrShare.push( resDecryptEncMetaShare.data.decryptedMetaShare );
+                console.log( { arr_DecrShare } );
+                const resUpdateHealth = await S3Service.updateHealth( arr_DecrShare );
+                console.log( { resUpdateHealth } );
                 if ( resUpdateHealth.status == 200 ) {
                     await bitcoinClassState.setS3ServiceClassState( sss );
                     const resTrustedParty = await dbOpration.insertTrustedPartyDetails(
@@ -176,7 +180,7 @@ export default class SelectContactListAssociatePerson extends React.Component<an
                     if ( resTrustedParty ) {
                         flag_Loading = false;
                         setTimeout( () => {
-                            alert.simpleOkAction( "Success", "Decrypted share stored.", this.goBack );
+                            alert.simpleOkAction( "Success", "Share stored successfully", this.goBack );
                         }, 100 );
 
                     }

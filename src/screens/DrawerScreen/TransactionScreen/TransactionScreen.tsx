@@ -55,7 +55,7 @@ export default class TransactionScreen extends React.Component<any, any> {
         this.state = ( {
             arrSelectedAccount: [],
             walletDetails: [],
-            appHealthInfo: [],
+            appHealthInfo: {},
             arrTransaction: [],
             flag_Loading: false
         } );
@@ -66,7 +66,7 @@ export default class TransactionScreen extends React.Component<any, any> {
         let data = this.props.navigation.getParam( "data" );
         let walletDetails = this.props.navigation.getParam( "walletDetails" );
         let appHealthInfo = JSON.parse( walletDetails.appHealthStatus )
-        console.log( { appHealthInfo } );
+        console.log( { accoundDetappInfo: appHealthInfo } );
         console.log( { data } );
         this.setState( {
             arrSelectedAccount: data,
@@ -124,7 +124,6 @@ export default class TransactionScreen extends React.Component<any, any> {
                             }
                         />
                     </View>
-
                     <View style={ { flex: 1, padding: 5 } }>
                         <Text style={ { color: "#151515", fontWeight: "600", fontSize: 14, paddingVertical: 3 } }>{ item.transactionType === "Received" ? "To " + item.accountType + " Account" : "From " + item.accountType + " Account" }</Text>
                         <Text style={ { color: "#8B8B8B", fontSize: 12, fontWeight: "600" } }>{ "-" }</Text>
@@ -157,7 +156,10 @@ export default class TransactionScreen extends React.Component<any, any> {
                         <View style={ {
                             flex: 1, flexDirection: "row", alignItems: 'center', paddingHorizontal: 10
                         } }>
-                            <Text style={ { color: "#2F2F2F", fontSize: 20, fontWeight: "bold" } }>{ item.amount / 1e8 }</Text>
+                            <Text style={ { color: "#2F2F2F", fontSize: 20, fontWeight: "bold" } }>
+                                { item.amount }
+                                <Text note> sats</Text>
+                            </Text>
                             <Text style={ { color: "#D0D0D0", fontSize: 15, fontWeight: "600", paddingHorizontal: 10 } }>{ item.confirmations }</Text>
                         </View>
 
@@ -175,7 +177,7 @@ export default class TransactionScreen extends React.Component<any, any> {
     render() {
         //array
         let { arrSelectedAccount, appHealthInfo, arrTransaction } = this.state;
-        //flag
+        //flag  
         let { flag_Loading } = this.state;
         return (
             <Container>
@@ -255,30 +257,9 @@ export default class TransactionScreen extends React.Component<any, any> {
                                     <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
                                 </View>
                                 <View style={ { flex: 4 } }>
-                                    <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] } >Anant's Savings</Text>
-                                    <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
+                                    <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 30 } ] }>
                                         { arrSelectedAccount.balance }
                                     </Text>
-
-                                </View>
-                                <View
-                                    style={ {
-                                        flex: 1,
-                                        flexDirection: "row",
-                                        alignItems: "flex-end",
-                                        justifyContent: "flex-end"
-                                    } }
-                                >
-                                    <Button transparent>
-                                        <SvgIcon
-                                            name="timelockNew"
-                                            color="gray"
-                                            size={ 20 }
-                                        />
-                                    </Button>
-                                    <Button transparent style={ { marginLeft: 10 } }>
-                                        <SvgIcon name="icon_multisig" color="gray" size={ 20 } />
-                                    </Button>
                                 </View>
                             </View>
                         </RkCard>
@@ -286,7 +267,6 @@ export default class TransactionScreen extends React.Component<any, any> {
                             <Text note style={ { textAlign: "center" } }>Recent Transaction</Text>
                             {
                                 !flag_Loading && arrTransaction.length === 0 ?
-
                                     <View style={ { justifyContent: "center", alignItems: "center", padding: 20, paddingTop: 50 } }>
                                         <Text style={ { textAlign: "center", color: "#838383" } }>{ "Start transactions to see your recent transactions history ." }</Text>
                                     </View> : null

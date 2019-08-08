@@ -58,8 +58,13 @@ export default class WalletNameScreen extends React.Component<any, any> {
 
     //TODO: func click_Proceed
     async click_Proceed() {
+        let walletName = this.state.walletName;
+        var n = walletName.includes( "Wallet" ) || walletName.includes( "wallet" );
+        if ( !n ) {
+            walletName = walletName + " Wallet";
+        }
         let SetUpDetails = {};
-        SetUpDetails.walletName = this.state.walletName;
+        SetUpDetails.walletName = walletName;
         await utils.setSetupWallet( SetUpDetails );
         window.EventBus.trigger( "swipeScreen", "optional event info" );
     }

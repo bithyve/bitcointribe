@@ -126,7 +126,7 @@ export default class OTPBackupShareStore extends Component {
         let messageId = script.key;
         console.log( { messageId, enterOtp } );
         //let resDownShare = this.state.arr_ResDownShare;
-        //console.log( { resDownShare } );
+        //console.log( { resDownShare } );   
         let urlScript = {};
         urlScript.walletName = script.wn;
         urlScript.data = script.key;
@@ -146,14 +146,19 @@ export default class OTPBackupShareStore extends Component {
                     alert.simpleOk( "Oops", resGetWalletId.err );
                 }
                 let resTrustedParty = await comFunDBRead.readTblTrustedPartySSSDetails();
-                let arr_DecrShare = [];
+                var arr_DecrShare = [];
                 for ( let i = 0; i < resTrustedParty.length; i++ ) {
                     arr_DecrShare.push( JSON.parse( resTrustedParty[ i ].decrShare ) );
                 }
+                console.log( { arr_DecrShare } );
                 let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownloadShare.data.encryptedMetaShare, resDecryptViaOTP.data.decryptedData, resGetWalletId.walletId, arr_DecrShare );
                 console.log( { resDecryptEncMetaShare } );
                 if ( resDecryptEncMetaShare.status == 200 ) {
-                    const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
+                    console.log( { lenght: arr_DecrShare.length } );
+                    arr_DecrShare.length != 0 ? arr_DecrShare.push( resDecryptEncMetaShare.data.decryptedMetaShare ) : arr_DecrShare.push( resDecryptEncMetaShare.data.decryptedMetaShare );
+                    console.log( { nexttimearray: arr_DecrShare } );
+                    const resUpdateHealth = await S3Service.updateHealth( arr_DecrShare );
+                    console.log( { resUpdateHealth } );
                     console.log( { resUpdateHealth } );
                     if ( resUpdateHealth.status == 200 ) {
                         await bitcoinClassState.setS3ServiceClassState( sss );
@@ -168,7 +173,7 @@ export default class OTPBackupShareStore extends Component {
                         if ( resTrustedParty ) {
                             flag_Loading = false;
                             setTimeout( () => {
-                                alert.simpleOkAction( "Success", "Decrypted share stored.", this.goBack );
+                                alert.simpleOkAction( "Success", "Share stored successfully", this.goBack );
                             }, 100 );
                         }
                     } else {
