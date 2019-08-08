@@ -1890,13 +1890,12 @@ export default class WalletScreen extends React.Component {
                     justifyContent: "flex-end"
                   } }
                 >
-                  <Button transparent>
-                    <SvgIcon
-                      name="timelockNew"
-                      color="gray"
-                      size={ 20 }
-                    />
-                  </Button>
+                  <ImageSVG
+                    style={ { width: 30, height: 30 } }
+                    source={
+                      svgIcon.walletScreen.secureAccount2FA
+                    }
+                  />
                 </View>
               </View>
             </RkCard>
