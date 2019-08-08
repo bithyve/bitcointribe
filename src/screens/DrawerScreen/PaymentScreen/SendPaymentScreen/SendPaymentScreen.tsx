@@ -28,7 +28,7 @@ import { Slider, CheckBox } from 'react-native-elements';
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import FullLinearGradientLoadingButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientLoadingButton";
 import WalletSetUpScrolling from "HexaWallet/src/app/custcompontes/OnBoarding/WalletSetUpScrolling/WalletSetUpScrolling";
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 
@@ -75,6 +75,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             //flag
             flag_Memo: false,
             flag_DisableSentBtn: true,
+            flag_SentBtnAnimation: false,
             flag_Loading: false
         } )
     }
@@ -117,13 +118,16 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             jsonData.accountName = item.accountName;
             temp.push( jsonData );
         }
+
+        console.log( { amount, accountbal, address } );
+
         //Sent button Enable and Disable
-        if ( amount != "" && amount < accountbal ) {
+        if ( amount != "" && parseFloat( amount ) > parseFloat( accountbal ) && address != "" ) {
             flag_DisableSentBtn = false;
-        } else if ( amount != "" && amount > accountbal ) {
+        } else {
             flag_DisableSentBtn = true;
         }
-        console.log( { temp } );
+        console.log( { temp, flag_DisableSentBtn } );
         this.setState( {
             address,
             amount,
@@ -137,6 +141,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
 
     componentWillUnmount() {
         utils.setFlagQRCodeScreen( true );
+
     }
 
 
@@ -201,7 +206,9 @@ export default class SendPaymentScreen extends React.Component<any, any> {
     //TODO: Send they amount 
     click_SendAmount = async () => {
         this.setState( {
-            flag_Loading: true
+            flag_Loading: true,
+            flag_DisableSentBtn: true,
+            flag_SentBtnAnimation: true
         } )
         let { arr_SelectAccountDetails, address, amount, tranPrio } = this.state;
         let amountFloat = parseFloat( amount );
@@ -224,7 +231,9 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         }
         if ( resTransferST.status == 200 ) {
             this.setState( {
-                flag_Loading: false
+                flag_Loading: false,
+                flag_DisableSentBtn: false,
+                flag_SentBtnAnimation: false
             } );
             data.mnemonic = walletDetails.mnemonic;
             data.amount = this.state.amount;
@@ -239,7 +248,9 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             this.props.navigation.push( "ConfirmAndSendPaymentScreen", { data: [ data ] } );
         } else {
             this.setState( {
-                flag_Loading: false
+                flag_Loading: false,
+                flag_DisableSentBtn: false,
+                flag_SentBtnAnimation: false
             } )
             let msg = resTransferST.data != undefined ? resTransferST.err + "\n Total Fee = " + resTransferST.data.fee : resTransferST.err
             setTimeout( () => {
@@ -295,16 +306,20 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         }
     }
 
-
-
     setAmountAndAddress( address: string, amount: string ) {
+        let { selectedAccountBal, flag_DisableSentBtn } = this.state;
+        if ( amount != "0.0" && parseFloat( amount ) < parseFloat( selectedAccountBal ) && address != "" ) {
+            flag_DisableSentBtn = false;
+        } else {
+            flag_DisableSentBtn = true;
+        }
         console.log( { address, amount } );
         this.setState( {
             address,
-            amount: amount
+            amount: amount,
+            flag_DisableSentBtn
         } )
     }
-
 
     _renderItem( { item, index } ) {
         return (
@@ -351,7 +366,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         //values
         let { amount, tranPrio, memoMsg, memo, address } = this.state;
         //flag
-        let { flag_Memo, flag_DisableSentBtn, flag_Loading } = this.state;
+        let { flag_Memo, flag_DisableSentBtn, flag_Loading, flag_SentBtnAnimation } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
@@ -385,7 +400,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
                                         <Input
                                             value={ amount }
                                             keyboardType="numeric"
-                                            placeholder="Amount"
+                                            placeholder="Amount Sats"
                                             placeholderTextColor="#D0D0D0"
                                             returnKeyType="done"
                                             onChangeText={ ( val ) => {
@@ -496,14 +511,14 @@ export default class SendPaymentScreen extends React.Component<any, any> {
                                     renderItem={ this._renderItem.bind( this ) }
                                     keyExtractor={ ( item, index ) => index }
                                 />
-
                             </View>
                             <View style={ { flex: 1 } }>
-                                <Text note style={ { textAlign: "center", margin: 20 } }>Transaction fee will be calculated in the next step according to the amount of money being sent.</Text>
-                                <FullLinearGradientButton
-                                    style={ [ flag_DisableSentBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
+                                <Text note style={ { textAlign: "center", margin: 10 } }>Transaction fee will be calculated in the next step according to the amount of money being sent.</Text>
+                                <FullLinearGradientLoadingButton
+                                    style={ [ flag_DisableSentBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10, margin: 10 } ] }
                                     disabled={ flag_DisableSentBtn }
-                                    title="Send"
+                                    animating={ flag_SentBtnAnimation }
+                                    title=" Send"
                                     click_Done={ () => this.click_SendAmount() }
                                 />
                             </View>

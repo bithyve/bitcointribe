@@ -450,7 +450,7 @@ export default class SecureAccount {
   > => {
     try {
       if ( this.secureHDWallet.isValidAddress( recipientAddress ) ) {
-        amount = Math.round( amount * 1e8 ); // converting into sats
+        amount = Math.round( amount );
         console.log( "---- Creating Transaction ----" );
         const {
           inputs,
@@ -468,14 +468,14 @@ export default class SecureAccount {
             status: config.STATUS.ERROR,
             err:
               "Insufficient balance to compensate for transfer amount and the txn fee",
-            data: { fee: fee / 1e8 },
+            data: { fee: fee },
           };
         }
         if ( inputs && txb ) {
           console.log( "---- Transaction Created ----" );
           return {
             status: config.STATUS.SUCCESS,
-            data: { inputs, txb, fee: fee / 1e8 },
+            data: { inputs, txb, fee: fee },
           };
         } else {
           throw new Error(

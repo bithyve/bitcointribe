@@ -170,41 +170,51 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
         } );
     }
     //share qrcode image
-    click_ShareQRCode = async () => {
-        this.setState( {
-            flag_LoadingShareBtn: true
-        } )
-        this.svg1.toDataURL( this.base64string1 );
-        setTimeout( async () => {
-            let qrcodeBase64 = this.state.base64string1;
-            console.log( { qrcodeBase64 } );
-            let accountName = this.state.accountName;
-            var docsDir;
-            if ( Platform.OS == "android" ) {
-                docsDir = await RNFS.ExternalStorageDirectoryPath //;
-            } else {
-                docsDir = await RNFS.DocumentDirectoryPath;
-            }
-            console.log( { docsDir } );
-            docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
-            var path = `${ docsDir }/paymentRequestQRCode.png`;
-            RNFS.writeFile( path, qrcodeBase64, "base64" )
-                .then( ( success: any ) => {
-                    this.setState( {
-                        flag_LoadingShareBtn: false
-                    } )
-                    const shareOptions = {
-                        title: 'Hexa App',
-                        message: "This is " + accountName + " qrcode",
-                        url: path
-                    };
-                    Share.open( shareOptions );
-                } )
-                .catch( ( err: any ) => {
-                    alert.simpleOk( "Oops", err );
-                } )
-        }, 2000 );
+    click_ShareAddress = async () => {
+        let { qrcodeAddresWithAmount } = this.state;
+        // this.setState( {
+        //     flag_LoadingShareBtn: true
+        // } )
+        // this.svg1.toDataURL( this.base64string1 );
+        // setTimeout( async () => {
+        //     let qrcodeBase64 = this.state.base64string1;
+        //     console.log( { qrcodeBase64 } );
+        //     let accountName = this.state.accountName;
+        //     var docsDir;
+        //     if ( Platform.OS == "android" ) {
+        //         docsDir = await RNFS.ExternalStorageDirectoryPath //;
+        //     } else {
+        //         docsDir = await RNFS.DocumentDirectoryPath;
+        //     }
+        //     console.log( { docsDir } );
+        //     docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
+        //     var path = `${ docsDir }/paymentRequestQRCode.png`;
+        //     RNFS.writeFile( path, qrcodeBase64, "base64" )
+        //         .then( ( success: any ) => {
+        //             this.setState( {
+        //                 flag_LoadingShareBtn: false
+        //             } )
+        //             const shareOptions = {
+        //                 title: 'Hexa App',
+        //                 message: "This is " + accountName + " qrcode",
+        //                 url: path
+        //             };
+        //             Share.open( shareOptions );
+        //         } )
+        //         .catch( ( err: any ) => {
+        //             alert.simpleOk( "Oops", err );
+        //         } )
+        // }, 2000 );
 
+
+        const shareOptions = {
+            title: 'Payment Address',
+            message: qrcodeAddresWithAmount,
+            url: 'https://hexawallet.io',
+        };
+        Share.open( shareOptions )
+            .then( ( res: any ) => { Toast.show( 'address send' ); } )
+            .catch( ( err: any ) => { err && console.log( err ); } );
     }
 
     render() {
@@ -273,7 +283,7 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
                                         <Input
                                             value={ amount }
                                             keyboardType="numeric"
-                                            placeholder="Amount"
+                                            placeholder="Amount Sats"
                                             placeholderTextColor="#D0D0D0"
                                             returnKeyType="done"
                                             onChangeText={ ( val ) => {
@@ -312,8 +322,8 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
                             <View style={ { flex: 1 } }>
                                 <Text note style={ { textAlign: "center", margin: 5 } }>Share this address to receive founds</Text>
                                 <FullLinearGradientIconWithLoadingButton
-                                    click_Done={ () => this.click_ShareQRCode() }
-                                    title="Share QRCode"
+                                    click_Done={ () => this.click_ShareAddress() }
+                                    title="Share"
                                     iconName="share"
                                     iconColor={ "#ffffff" }
                                     iconSize={ 20 }

@@ -67,6 +67,7 @@ export default class SendPaymentAddressScanScreen extends React.Component {
 
     }
 
+
     componentWillMount() {
         flagGoback = true;
     }
@@ -97,7 +98,7 @@ export default class SendPaymentAddressScanScreen extends React.Component {
             if ( resAddressDiff.status == 200 ) {
                 resAddressDiff = resAddressDiff.data;
             } else {
-                if ( flagGoback ) {
+                if ( flagGoback == true ) {
                     flagGoback = false;
                     alert.simpleOkAction( "Oops", resAddressDiff.err, this.click_ResetFlag );
                 }
@@ -109,7 +110,7 @@ export default class SendPaymentAddressScanScreen extends React.Component {
                     await bitcoinClassState.setRegularClassState( regularAccount );
                     resDecPaymentURI = resDecPaymentURI.data;
                 } else {
-                    if ( flagGoback ) {
+                    if ( flagGoback == true ) {
                         flagGoback = false;
                         alert.simpleOkAction( "Oops", resDecPaymentURI.err, this.click_ResetFlag );
                     }
@@ -121,14 +122,14 @@ export default class SendPaymentAddressScanScreen extends React.Component {
                 data.address = result;
                 data.type = "address";
             }
-            if ( flagGoback ) {
+            if ( flagGoback == true ) {
                 flagGoback = false;
                 const { navigation } = this.props;
                 navigation.goBack();
                 navigation.state.params.onSelect( { selected: true, data: data } );
             }
         } catch ( error ) {
-            if ( flagGoback ) {
+            if ( flagGoback == true ) {
                 flagGoback = false;
                 alert.simpleOkAction( "Oops", error, this.click_ResetFlag );
             }
@@ -141,9 +142,6 @@ export default class SendPaymentAddressScanScreen extends React.Component {
         navigation.goBack();
         navigation.state.params.onSelect( { selected: true } );
     }
-
-
-
 
     render() {
         return (

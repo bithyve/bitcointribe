@@ -31,7 +31,7 @@ import ImageSVG from 'react-native-remote-svg';
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import FullLinearGradientLoadingButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientLoadingButton";
 import WalletSetUpScrolling from "HexaWallet/src/app/custcompontes/OnBoarding/WalletSetUpScrolling/WalletSetUpScrolling";
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 
@@ -75,6 +75,7 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
             arrModelConfirmSendSuccess: [],
             arr_ModelConfirmSendSercureAccountOTP: [],
             flag_DisableSentBtn: false,
+            flag_SentBtnAnimation: false,
             flag_Loading: false
         } )
     }
@@ -93,6 +94,10 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
     //TODO: Sent amount
     click_SentAmount = async () => {
         //this.setState( { flag_Loading:true})
+        this.setState( {
+            flag_SentBtnAnimation: true,
+            flag_DisableSentBtn: true,
+        } )
         let { data } = this.state;
         console.log( { selectedAccount: data } );
         let date = Date.now();
@@ -108,6 +113,8 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
             // console.log( { resTransferST } );
             if ( resTransferST.status == 200 ) {
                 this.setState( {
+                    flag_SentBtnAnimation: false,
+                    flag_DisableSentBtn: false,
                     arrModelConfirmSendSuccess: [ {
                         modalVisible: true,
                         data: [ {
@@ -127,6 +134,8 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
             await bitcoinClassState.setSecureClassState( secureAccount );
             if ( resTransferST.status == 200 ) { //|| resTransferST.status == 400
                 this.setState( {
+                    flag_SentBtnAnimation: false,
+                    flag_DisableSentBtn: false,
                     arr_ModelConfirmSendSercureAccountOTP: [ {
                         modalVisible: true,
                         data: [ {
@@ -154,7 +163,7 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
         let resUpdateAccountBalR = await dbOpration.updateAccountBalAccountTypeWise(
             localDB.tableName.tblAccount,
             accountType,
-            totalBal.toFixed( 8 )
+            totalBal
         );
         if ( resUpdateAccountBalR ) {
             this.setState( {
@@ -172,7 +181,7 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
         //array 
         let { data, arrModelConfirmSendSuccess, arr_ModelConfirmSendSercureAccountOTP } = this.state;
         //flag  
-        let { flag_DisableSentBtn, flag_Loading } = this.state;
+        let { flag_DisableSentBtn, flag_SentBtnAnimation, flag_Loading } = this.state;
         return (
             <Container>
                 <SafeAreaView style={ styles.container }>
@@ -301,10 +310,11 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
                                 </View>
                             </View>
                             <View style={ { flex: 1 } }>
-                                <FullLinearGradientButton
+                                <FullLinearGradientLoadingButton
                                     style={ [ flag_DisableSentBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
                                     disabled={ flag_DisableSentBtn }
-                                    title="Send"
+                                    animating={ flag_SentBtnAnimation }
+                                    title=" Send"
                                     click_Done={ () => this.click_SentAmount() }
                                 />
                             </View>

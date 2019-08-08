@@ -1524,7 +1524,7 @@ export default class WalletScreen extends React.Component {
       arrErrorMessage: [ {
         type: "asyncTask",
         data: [ {
-          message: "Fetching your regualr account balance",
+          message: "Fetching your regular account balance",
           bgColor: "#262A2E",
           color: "#ffffff",
         } ]
@@ -1716,7 +1716,15 @@ export default class WalletScreen extends React.Component {
   //TODO: getTestcoins
   getTestcoins = async () => {
     this.setState( {
-      flag_Loading: true
+      flag_GetBal: true,
+      arrErrorMessage: [ {
+        type: "asyncTask",
+        data: [ {
+          message: "Fetching testcoins of your wallet",
+          bgColor: "#262A2E",
+          color: "#ffffff",
+        } ]
+      } ]
     } );
     let regularAccount = await bitcoinClassState.getRegularClassState();
     let secureAccount = await bitcoinClassState.getSecureClassState();
@@ -2085,7 +2093,6 @@ export default class WalletScreen extends React.Component {
                 value={ qrcodeImageString10 }
                 getRef={ ( c ) => ( this.svg10 = c ) }
                 size={ 200 }
-
               />
             </View>
           </SafeAreaView>

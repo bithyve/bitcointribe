@@ -207,7 +207,7 @@ export default class TransactionScreen extends React.Component<any, any> {
                         <RkCard
                             rkType="shadowed"
                             style={ {
-                                flex: 1,
+                                flex: 0.8,
                                 margin: 10,
                                 marginTop: -120,
                                 borderRadius: 10
@@ -231,13 +231,14 @@ export default class TransactionScreen extends React.Component<any, any> {
                                 <Text
                                     style={ [ globalStyle.ffFiraSansMedium, {
                                         flex: 2,
-                                        fontSize: 16,
+                                        fontSize: 18,
+                                        alignSelf: "center",
                                         marginLeft: 10
                                     } ] }
                                 >
                                     { arrSelectedAccount.accountName }
                                 </Text>
-                                <View style={ { flexDirection: "row" } }>
+                                <View style={ { alignSelf: "center", flexDirection: "row" } }>
                                     <SvgIcon name="icon_settings" color="gray" size={ 15 } />
                                 </View>
                             </View>

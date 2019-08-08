@@ -395,7 +395,7 @@ export default class RegularAccount {
   > => {
     try {
       if ( this.hdWallet.isValidAddress( recipientAddress ) ) {
-        amount = Math.round( amount * 1e8 ); // converting into sats
+        amount = Math.round( amount );
         const {
           inputs,
           txb,
@@ -412,7 +412,7 @@ export default class RegularAccount {
             status: config.STATUS.ERROR,
             err:
               "Insufficient balance to compensate for transfer amount and the txn fee",
-            data: { fee: fee / 1e8 },
+            data: { fee: fee },
           };
         }
 
@@ -420,7 +420,7 @@ export default class RegularAccount {
           console.log( "---- Transaction Created ----" );
           return {
             status: config.STATUS.SUCCESS,
-            data: { inputs, txb, fee: fee / 1e8 },
+            data: { inputs, txb, fee: fee },
           };
         } else {
           throw new Error(
