@@ -137,8 +137,8 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
                             <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
                                 <Image source={ images.backupSecretQuestion.icon } style={ { width: 80, height: 80, marginTop: -30 } } />
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20 } ] }>Health Check</Text>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, margin: 10 } ] }>Security Questions</Text>
-                                <Text note style={ { textAlign: "center" } }>Answer the questions exactly as you did at the time of setting up the wallet</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, margin: 10 } ] }>Security Question</Text>
+                                <Text note style={ { textAlign: "center" } }>Answer the question exactly as you did at the time of setting up the wallet</Text>
                                 <View style={ [ styles.itemQuestionPicker, { height: 80 } ] }>
                                     <TextInput
                                         value={ firstQuestion }

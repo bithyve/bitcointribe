@@ -79,8 +79,8 @@ export default class WalletNameScreen extends React.Component<any, any> {
                     contentContainerStyle={ { flexGrow: 1, } }
                 >
                     <View style={ styles.viewPagination }>
-                        <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 22, textAlign: "center" } ] }>What do you want to call your Wallet?</Text>
-                        <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>This name will be displayed on your wallet.</Text>
+                        <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 22, textAlign: "center" } ] }>Give it a name</Text>
+                        <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>You can put anything here - a nick name, the name of your fav character, or anything random.</Text>
                     </View>
                     <View style={ styles.viewInputFiled }>
                         <Item rounded style={ styles.itemInputWalletName }>
@@ -100,7 +100,7 @@ export default class WalletNameScreen extends React.Component<any, any> {
                         </Item>
                     </View>
                     <View style={ styles.viewProcedBtn }>
-                        <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } ] } numberOfLines={ 1 }>Wallet name must be at least three characters long</Text>
+                        <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } ] } numberOfLines={ 3 }>We don't store this information. This is so that your contacts can recognize the sender when they get a request or message from the hexa app.</Text>
                         <FullLinearGradientButton title="Proceed" disabled={ this.state.flag_ProceedBtnDisable } style={ [ this.state.flag_ProceedBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } click_Done={ () => this.click_Proceed() } />
                     </View>
                 </KeyboardAwareScrollView>

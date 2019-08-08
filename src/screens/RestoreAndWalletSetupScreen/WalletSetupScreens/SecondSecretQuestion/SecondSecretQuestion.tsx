@@ -281,8 +281,8 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                     contentContainerStyle={ { flexGrow: 1, } }
                 >
                     <View style={ styles.viewPagination }>
-                        <Text style={ [ globalStyle.ffFiraSansMedium, { fontWeight: "bold", fontSize: 22, textAlign: "center" } ] }>Step 3: Select second secret question</Text>
-                        <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>To Set up you need to select two secret questions</Text>
+                        <Text style={ [ globalStyle.ffFiraSansMedium, { fontWeight: "bold", fontSize: 22, textAlign: "center" } ] }>Step 3: Select second security question</Text>
+                        <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>To Set up you need to select one security question</Text>
                     </View>
                     <View style={ styles.viewInputFiled }>
                         <View style={ styles.itemQuestionPicker }>
