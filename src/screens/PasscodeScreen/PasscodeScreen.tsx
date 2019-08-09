@@ -224,7 +224,7 @@ export default class PasscodeScreen extends Component {
               <Text
                 style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
               >
-                Enter Passcode{ " " }
+                Enter Pin{ " " }
               </Text>
               <CodeInput
                 ref="codeInputRef1"

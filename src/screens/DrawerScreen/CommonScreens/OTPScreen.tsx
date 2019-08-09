@@ -270,7 +270,7 @@ export default class OTPScreen extends Component {
                                 ) }
                             </View>
                             <View style={ styles.viewBtnProceed }>
-                                <Text note style={ { textAlign: "center", marginBottom: 30 } }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
+                                <Text note style={ { textAlign: "center", marginBottom: 30 } }></Text>
                                 <FullLinearGradientButton
                                     style={ [
                                         this.state.statusConfirmBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 },

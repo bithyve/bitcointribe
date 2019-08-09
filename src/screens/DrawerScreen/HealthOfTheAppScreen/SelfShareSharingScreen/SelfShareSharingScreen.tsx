@@ -129,10 +129,10 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                 }
                 console.log( { email4shareFilePath } );
                 let shareOptions = {
-                    title: "For 5 share",
-                    message: "For 5 share.Pdf password is your answer.",
+                    title: "5th share",
+                    message: "Please find attached the 5th share pdf, it is password protected by the answer to the security question.",
                     urls: [ email4shareFilePath ],
-                    subject: "For 5 share "
+                    subject: "5th share pdf"
                 };
                 Share.open( shareOptions )
                     .then( ( res: any ) => {
@@ -145,9 +145,9 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
             } else {
                 console.log( { email4shareFilePath } );
                 Mailer.mail( {
-                    subject: 'For 4 Share.',
+                    subject: '4th Share',
                     recipients: [ '' ],
-                    body: '<b>For 4 share.Pdf password is your answer.</b>',
+                    body: '<b>Please find attached the 5th share pdf, it is password protected by the answer to the security question.</b>',
                     isHTML: true,
                     attachment: {
                         path: email4shareFilePath,  // The absolute path of the file from which to read data.

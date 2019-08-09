@@ -132,7 +132,7 @@ export default class ModelPasscode extends Component<Props, any> {
                             <Text
                                 style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
                             >
-                                Re - Enter Passcode{ " " }
+                                Re - Enter Pin{ " " }
                             </Text>
                             <CodeInput
                                 ref="codeInputRef1"

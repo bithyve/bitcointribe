@@ -248,7 +248,7 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                                 ) }
                             </View>
                             <View style={ styles.viewBtnProceed }>
-                                <Text note style={ { textAlign: "center", marginBottom: 30 } }>Lorem ipsum dolor sit amet, consectetur adipiscing elit,</Text>
+                                <Text note style={ { textAlign: "center", marginBottom: 30 } }></Text>
                                 <FullLinearGradientButton
                                     style={ [
                                         this.state.statusConfirmBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 },

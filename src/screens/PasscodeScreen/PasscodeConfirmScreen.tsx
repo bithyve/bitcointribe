@@ -170,7 +170,7 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
                 style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
                 note
               >
-                Create Passcode
+                Create Pin
             </Text>
               <CodeInput
                 ref="codeInputRef"
@@ -202,7 +202,7 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
               <Text
                 style={ { marginTop: 10, fontWeight: "bold", color: "#8B8B8B" } }
               >
-                Re - Enter Passcode{ " " }
+                Re - Enter Pin{ " " }
               </Text>
               <CodeInput
                 ref="codeInputRef1"
