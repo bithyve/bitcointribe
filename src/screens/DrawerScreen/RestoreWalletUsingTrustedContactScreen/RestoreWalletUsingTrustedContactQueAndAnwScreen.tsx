@@ -137,8 +137,8 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
         let { arr_QuestionList, arr_ModelRestoreWalletFirstQuestion, arr_ModelRestoreWalletSuccessfullyUsingTrustedContact } = this.state;
         return (
             <View style={ styles.container }>
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                 <SafeAreaView style={ styles.container }>
-                    <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <KeyboardAwareScrollView
                             enableAutomaticScroll
@@ -172,7 +172,6 @@ export default class RestoreWalletUsingTrustedContactQueAndAnwScreen extends Com
                         </KeyboardAwareScrollView>
                     </ImageBackground>
                 </SafeAreaView>
-
             </View >
         );
     }

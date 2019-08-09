@@ -181,8 +181,8 @@ export default class TransactionScreen extends React.Component<any, any> {
         let { flag_Loading } = this.state;
         return (
             <Container>
+                <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
                 <SafeAreaView style={ styles.container }>
-                    <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <View style={ { flex: 1, backgroundColor: colors.appColor } }>
                             <View style={ { flexDirection: "row", alignItems: "flex-start", marginLeft: 20, marginRight: 20 } }>

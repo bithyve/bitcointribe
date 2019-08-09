@@ -8,6 +8,7 @@ import {
     Image,
     Keyboard,
     StatusBar,
+    SafeAreaView,
     Linking,
     ImageBackground,
     Alert
@@ -259,72 +260,74 @@ export default class OTPBackupShareStore extends Component {
     render() {
         return (
             <View style={ styles.container }>
-                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                    <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                    <KeyboardAwareScrollView
-                        enableAutomaticScroll
-                        automaticallyAdjustContentInsets={ true }
-                        keyboardOpeningTime={ 0 }
-                        enableOnAndroid={ true }
-                        contentContainerStyle={ { flexGrow: 1 } }
-                    >
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.props.navigation.pop() }
-                            >
-                                <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }></Text>
-                            </Button>
-                            <Text note style={ { textAlign: "center", marginTop: 10, marginRight: 10 } }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
-                        </View>
-                        <View style={ styles.viewPasscode }>
-                            <Text
-                                style={ { marginTop: 100, fontWeight: "bold", color: "#8B8B8B" } }
-                            >
-                                Enter OTP
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
+                <SafeAreaView style={ styles.container }>
+                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                        <KeyboardAwareScrollView
+                            enableAutomaticScroll
+                            automaticallyAdjustContentInsets={ true }
+                            keyboardOpeningTime={ 0 }
+                            enableOnAndroid={ true }
+                            contentContainerStyle={ { flexGrow: 1 } }
+                        >
+                            <View style={ { marginLeft: 10, marginTop: 15 } }>
+                                <Button
+                                    transparent
+                                    onPress={ () => this.props.navigation.pop() }
+                                >
+                                    <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }></Text>
+                                </Button>
+                                <Text note style={ { textAlign: "center", marginTop: 10, marginRight: 10 } }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
+                            </View>
+                            <View style={ styles.viewPasscode }>
+                                <Text
+                                    style={ { marginTop: 100, fontWeight: "bold", color: "#8B8B8B" } }
+                                >
+                                    Enter OTP
                         </Text>
-                            <CodeInput
-                                ref="codeInputRef1"
-                                secureTextEntry
-                                keyboardType="default"
-                                autoCapitalize="sentences"
-                                codeLength={ 6 }
-                                activeColor={ this.state.passcodeStyle[ 0 ].activeColor }
-                                inactiveColor={ this.state.passcodeStyle[ 0 ].inactiveColor }
-                                className="border-box"
-                                cellBorderWidth={ this.state.passcodeStyle[ 0 ].cellBorderWidth }
-                                autoFocus={ true }
-                                inputPosition="center"
-                                space={ 5 }
-                                size={ 50 }
-                                codeInputStyle={ { borderRadius: 5, backgroundColor: "#F1F1F1" } }
-                                containerStyle={ {
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    height: Platform.OS == "ios" ? 0 : 40,
-                                } }
-                                onFulfill={ ( code ) =>
-                                    this._onFinishCheckingCode( code )
-                                }
-                                type='characters'
-                            />
-                            { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
-                                <Text style={ { color: "red", marginTop: 44 } }>{ this.state.success }</Text>
-                            ) }
-                        </View>
-                        <View style={ styles.viewBtnProceed }>
-                            <Text note style={ { textAlign: "center", marginBottom: 30 } }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
-                            <FullLinearGradientButton
-                                style={ [
-                                    this.state.statusConfirmBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 },
-                                    { borderRadius: 5 } ] }
-                                disabled={ this.state.statusConfirmBtnDisable }
-                                title="Confirm & Proceed"
-                                click_Done={ () => this.onSuccess() }
-                            />
-                        </View>
-                    </KeyboardAwareScrollView>
-                </ImageBackground>
+                                <CodeInput
+                                    ref="codeInputRef1"
+                                    secureTextEntry
+                                    keyboardType="default"
+                                    autoCapitalize="sentences"
+                                    codeLength={ 6 }
+                                    activeColor={ this.state.passcodeStyle[ 0 ].activeColor }
+                                    inactiveColor={ this.state.passcodeStyle[ 0 ].inactiveColor }
+                                    className="border-box"
+                                    cellBorderWidth={ this.state.passcodeStyle[ 0 ].cellBorderWidth }
+                                    autoFocus={ true }
+                                    inputPosition="center"
+                                    space={ 5 }
+                                    size={ 50 }
+                                    codeInputStyle={ { borderRadius: 5, backgroundColor: "#F1F1F1" } }
+                                    containerStyle={ {
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        height: Platform.OS == "ios" ? 0 : 40,
+                                    } }
+                                    onFulfill={ ( code ) =>
+                                        this._onFinishCheckingCode( code )
+                                    }
+                                    type='characters'
+                                />
+                                { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
+                                    <Text style={ { color: "red", marginTop: 44 } }>{ this.state.success }</Text>
+                                ) }
+                            </View>
+                            <View style={ styles.viewBtnProceed }>
+                                <Text note style={ { textAlign: "center", marginBottom: 30 } }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
+                                <FullLinearGradientButton
+                                    style={ [
+                                        this.state.statusConfirmBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 },
+                                        { borderRadius: 5 } ] }
+                                    disabled={ this.state.statusConfirmBtnDisable }
+                                    title="Confirm & Proceed"
+                                    click_Done={ () => this.onSuccess() }
+                                />
+                            </View>
+                        </KeyboardAwareScrollView>
+                    </ImageBackground>
+                </SafeAreaView>
                 <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
             </View>
         );

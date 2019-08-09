@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import { StyleSheet, ImageBackground, View, RefreshControl, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import {
     Container,
     Header,
@@ -152,16 +152,99 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         this.willFocusSubscription = this.props.navigation.addListener(
             "willFocus",
             () => {
-                this.getCheackHealth();
+                this.getCheackHealthWithoutServer();
             }
         );
     }
-
 
     componentWillUnmount() {
         this.willFocusSubscription.remove();
     }
 
+    getCheackHealthWithoutServer = async () => {
+        let sssDetails = await utils.getSSSDetails();
+        if ( sssDetails.length > 0 ) {
+            this.setState( {
+                flag_ShareAction: false,
+            } );
+            let walletDetails = await utils.getWalletDetails();
+            let backupInfo = JSON.parse( walletDetails.backupInfo );
+            let backupType = backupInfo[ 0 ].backupType;
+            let backupMethod = backupInfo[ 0 ].backupMethod;
+            let sssDetails = await utils.getSSSDetails();
+            console.log( { walletDetails, sssDetails } );
+            let share = {};
+            share.trustedContShareId1 = sssDetails[ 0 ].shareId != "" ? sssDetails[ 0 ].shareId : null;
+            share.trustedContDate1 = sssDetails[ 0 ].acceptedDate != "" ? parseInt( sssDetails[ 0 ].acceptedDate ) : 0;
+
+            share.trustedContShareId2 = sssDetails[ 1 ].shareId != "" ? sssDetails[ 1 ].shareId : null;
+            share.trustedContDate2 = sssDetails[ 1 ].acceptedDate != "" ? parseInt( sssDetails[ 1 ].acceptedDate ) : 0;
+
+            share.selfshareShareId1 = sssDetails[ 2 ].shareId != "" ? sssDetails[ 2 ].shareId : null;
+            share.selfshareDate1 = sssDetails[ 2 ].acceptedDate != "" ? parseInt( sssDetails[ 2 ].acceptedDate ) : 0;
+
+            share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? sssDetails[ 3 ].acceptedDate : 0;
+            share.selfshareShareShareId2 = sssDetails[ 3 ].shareId != "" ? sssDetails[ 3 ].shareId : "";
+
+            share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? sssDetails[ 4 ].acceptedDate : 0;
+            share.selfshareShareId3 = sssDetails[ 4 ].shareId != "" ? sssDetails[ 4 ].shareId : "";
+
+            share.qatime = parseInt( walletDetails.lastUpdated );
+
+            let resCheckHealthAllShare = await comAppHealth.checkHealthWithServerAllShare( share );
+            if ( resCheckHealthAllShare != "" ) {
+                this.loaddata( backupType, backupMethod );
+            } else {
+                Alert.alert( "Check health not working." )
+            }
+        }
+        else {
+            this.setState( {
+                flag_SSSAndPdfFileCreate: true,
+                flag_ShareAction: true
+            } );
+        }
+    }
+
+
+
+
+    getCheackHealth = async () => {
+        let sssDetails = await utils.getSSSDetails();
+        if ( sssDetails.length > 0 ) {
+            this.setState( {
+                flag_ShareAction: false,
+                flag_Loading: true
+            } );
+            let walletDetails = await utils.getWalletDetails();
+            let backupInfo = JSON.parse( walletDetails.backupInfo );
+            let backupType = backupInfo[ 0 ].backupType;
+            let backupMethod = backupInfo[ 0 ].backupMethod;
+            let sssDetails = await utils.getSSSDetails();
+            console.log( { walletDetails, sssDetails } );
+            let share = {};
+            share.trustedContShareId1 = sssDetails[ 0 ].shareId != "" ? sssDetails[ 0 ].shareId : null;
+            share.trustedContShareId2 = sssDetails[ 1 ].shareId != "" ? sssDetails[ 1 ].shareId : null;
+            share.selfshareShareId1 = sssDetails[ 2 ].shareId != "" ? sssDetails[ 2 ].shareId : null;
+            share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? sssDetails[ 3 ].acceptedDate : 0;
+            share.selfshareShareShareId2 = sssDetails[ 3 ].shareId != "" ? sssDetails[ 3 ].shareId : "";
+            share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? sssDetails[ 4 ].acceptedDate : 0;
+            share.selfshareShareId3 = sssDetails[ 4 ].shareId != "" ? sssDetails[ 4 ].shareId : "";
+            share.qatime = parseInt( walletDetails.lastUpdated );
+            let resCheckHealthAllShare = await comAppHealth.checkHealthAllShare( share );
+            if ( resCheckHealthAllShare != "" ) {
+                this.loaddata( backupType, backupMethod );
+            } else {
+                Alert.alert( "Check health not working." )
+            }
+        }
+        else {
+            this.setState( {
+                flag_SSSAndPdfFileCreate: true,
+                flag_ShareAction: true
+            } );
+        }
+    }
 
     getActionTrustedCont( backupType: string, decryptedShare: string ) {
         if ( backupType != "new" && decryptedShare == "" ) {
@@ -226,42 +309,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
     }
 
 
-    getCheackHealth = async () => {
-        let sssDetails = await utils.getSSSDetails();
-        if ( sssDetails.length > 0 ) {
-            this.setState( {
-                flag_ShareAction: false,
-                flag_Loading: true
-            } );
-            let walletDetails = await utils.getWalletDetails();
-            let backupInfo = JSON.parse( walletDetails.backupInfo );
-            let backupType = backupInfo[ 0 ].backupType;
-            let backupMethod = backupInfo[ 0 ].backupMethod;
-            let sssDetails = await utils.getSSSDetails();
-            console.log( { walletDetails, sssDetails } );
-            let share = {};
-            share.trustedContShareId1 = sssDetails[ 0 ].shareId != "" ? sssDetails[ 0 ].shareId : null;
-            share.trustedContShareId2 = sssDetails[ 1 ].shareId != "" ? sssDetails[ 1 ].shareId : null;
-            share.selfshareShareId1 = sssDetails[ 2 ].shareId != "" ? sssDetails[ 2 ].shareId : null;
-            share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? sssDetails[ 3 ].acceptedDate : 0;
-            share.selfshareShareShareId2 = sssDetails[ 3 ].shareId != "" ? sssDetails[ 3 ].shareId : "";
-            share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? sssDetails[ 4 ].acceptedDate : 0;
-            share.selfshareShareId3 = sssDetails[ 4 ].shareId != "" ? sssDetails[ 4 ].shareId : "";
-            share.qatime = parseInt( walletDetails.lastUpdated );
-            let resCheckHealthAllShare = await comAppHealth.checkHealthAllShare( share );
-            if ( resCheckHealthAllShare != "" ) {
-                this.loaddata( backupType, backupMethod );
-            } else {
-                Alert.alert( "Check health not working." )
-            }
-        }
-        else {
-            this.setState( {
-                flag_SSSAndPdfFileCreate: true,
-                flag_ShareAction: true
-            } );
-        }
-    }
+
 
 
     loaddata = async ( backupType: string, backupMethod: string ) => {
@@ -379,6 +427,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             return [ "Inaccessible", "#ff0000" ];
         }
     }
+
     //TODO: func click_Item
     click_Item = ( item: any ) => {
         console.log( { item } );
@@ -393,7 +442,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             } );
         } else {
             this.props.navigation.push( "TrustedContactNavigator", {
-                data: item, onSelect: this.getCheackHealth
+                data: item, onSelect: this.getCheackHealthWithoutServer
             } );
         }
     }
@@ -430,7 +479,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
     }
 
     onSelect = async ( returnValue: any ) => {
-        this.getCheackHealth();
+        this.getCheackHealthWithoutServer();
     }
 
     //TODO: Self share
@@ -457,9 +506,9 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         let { arr_TrustedContacts, arr_SelfShare, arr_SecretQuestion, arrErrorMessage } = this.state;
         return (
             <Container>
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                         { renderIf( flag_SSSAndPdfFileCreate == true )(
                             <View>
                                 <View style={ { backgroundColor: "#262A2E", flexDirection: "row", alignItems: "center", padding: 10 } }>
@@ -468,7 +517,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                 </View>
                             </View>
                         ) }
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
+                        <View style={ { marginLeft: 10 } }>
                             <Button
                                 transparent
                                 onPress={ () => this.props.navigation.pop() }
@@ -481,6 +530,14 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                             enableAutomaticScroll
                             automaticallyAdjustContentInsets={ true }
                             keyboardOpeningTime={ 0 }
+                            refreshControl={
+                                <RefreshControl
+                                    refreshing={ false }
+                                    onRefresh={ () => {
+                                        this.getCheackHealth()
+                                    } }
+                                />
+                            }
                             enableOnAndroid={ true }
                             contentContainerStyle={ { flexGrow: 1 } }
                         >

@@ -8,7 +8,10 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome";
 import ImageSVG from 'react-native-remote-svg';
 
+//TODO: Custome view
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+
 //TODO: Common Funciton
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
@@ -40,8 +43,8 @@ export default class AllTransactionScreen extends React.Component<any, any> {
       detailsArray: [
         { title: "To Address", value: "8572308235034623" },
         { title: "From Address", value: "234255609325230" },
-        { title: "Amount", value: "0.0" },
-        { title: "Fees", value: "0.0" },
+        { title: "Amount", value: "0" },
+        { title: "Fees", value: "0" },
         { title: "Transaction ID", value: "" },
         { title: "Confirmations", value: "" },
       ],
@@ -206,10 +209,11 @@ export default class AllTransactionScreen extends React.Component<any, any> {
   render() {
     return (
       <Container>
+        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ true } barStyle="dark-content" />
         <SafeAreaView style={ styles.container }>
           <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-            <View>
-              <View style={ { flexDirection: "row", padding: 20 } }>
+            <View style={ { marginLeft: 5, marginRight: 5 } }>
+              <View style={ { flexDirection: "row" } }>
                 <Text style={ { color: "#2F2F2F", fontSize: 28, fontWeight: "600", flex: 1 } }>{ "Transactions" }</Text>
                 <View style={ styles.filterView }>
                   <Icon

@@ -1,11 +1,11 @@
-rootProject.name = 'HexaWallet'       
+rootProject.name = 'HexaWallet'     
+  
 include ':react-native-webview'
 project(':react-native-webview').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-webview/android')
 include ':react-native-background-fetch'
 project(':react-native-background-fetch').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-background-fetch/android')
 
-//include ':react-native-background-fetch'
-//project(':react-native-background-fetch').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-background-fetch/android')
+
 
 include ':react-native-device-info'  
 project(':react-native-device-info').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-device-info/android')

@@ -166,6 +166,7 @@ export default class QrCodeScannerScreen extends React.Component {
                 } else {
                     data.address = result;
                     data.type = "address";
+                    data.amount = "0";
                 }
                 if ( utils.getFlagQRCodeScreen() == true ) {
                     utils.setFlagQRCodeScreen( false );
@@ -181,9 +182,9 @@ export default class QrCodeScannerScreen extends React.Component {
         return (
             <Container>
                 <StatusBar hidden />
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                         < QRScannerView
                             hintText=""
                             rectHeight={ Dimensions.get( 'screen' ).height / 2.0 }

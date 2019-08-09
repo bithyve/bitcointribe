@@ -87,6 +87,45 @@ const checkHealthAllShare = async ( share: any ) => {
 }
 
 
+const checkHealthWithServerAllShare = async ( share: any ) => {
+    //  console.log( { share } );
+    let dateTime = Date.now();
+    let resCheckHealth = [
+        { shareId: share.trustedContShareId1, updatedAt: share.trustedContDate1 },
+        { shareId: share.trustedContShareId2, updatedAt: share.trustedContDate2 },
+        { shareId: share.selfshareShareId1, updatedAt: share.selfshareDate1 },
+        { shareId: share.selfshareShareShareId2, updatedAt: share.selfshareShareDate2 },
+        { shareId: share.selfshareShareId3, updatedAt: share.selfshareShareDate3 },
+    ];
+    console.log( { resCheckHealth } );
+    const healthStatus = new HealthStatus();
+    const res = await healthStatus.appHealthStatus( share.qatime, resCheckHealth );
+    let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
+        localDB.tableName.tblWallet,
+        res
+    );
+    console.log( { res } );
+    if ( resupdateWalletDetials ) {
+        let temp = [];
+        for ( let i = 0; i < res.sharesInfo.length; i++ ) {
+            let data = {};
+            data.shareId = res.sharesInfo[ i ].shareId;
+            data.shareStage = res.sharesInfo[ i ].shareStage;
+            temp.push( data );
+        }
+        let resupdateSSSShareStage = await dbOpration.updateSSSShareStage(
+            localDB.tableName.tblSSSDetails,
+            temp,
+            dateTime
+        );
+        console.log( { resupdateSSSShareStage } );
+        await comFunDBRead.readTblWallet();
+        await comFunDBRead.readTblSSSDetails();
+        return res
+    }
+}
+
+
 //TODO: func connection_AppHealthStatus (WalletScreen,TrustedContactScreen)
 // const connection_AppHealthStatus = async ( qatime: number, sharesId: any ) => {
 //     console.log( { qatime, sharesId } );
@@ -318,7 +357,8 @@ const checkHealthAllShare = async ( share: any ) => {
 
 module.exports = {
     checkHealthSetupShare,
-    checkHealthAllShare
+    checkHealthAllShare,
+    checkHealthWithServerAllShare
     // connection_AppHealthStatus,
     // connection_AppHealthAndSSSUpdate,
     // connection_AppHealthForAllShare,

@@ -120,13 +120,33 @@ export default class SettingScreen extends React.Component<any, any> {
   }
 
 
+
+  //TODO: Open social site
+  click_OpenSocialUrl( type: string ) {
+    if ( type == "Twitter" ) {
+      RCTSFSafariViewController.open( 'https://twitter.com/HexaWallet', {
+        tintColor: colors.appColor,
+      } );
+    } else if ( type == "Linked" ) {
+      RCTSFSafariViewController.open( 'https://www.linkedin.com/company/bithyve', {
+        tintColor: colors.appColor,
+      } );
+    } else {
+      RCTSFSafariViewController.open( 'https://medium.com/bitbees', {
+        readerMode: true,
+        tintColor: colors.appColor,
+        barTintColor: colors.appColor,
+      } );
+    }
+  }
+
   render() {
     let arr_FirstListItem = this.state.arr_FirstListItem;
     return (
       <Container>
+        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
         <SafeAreaView style={ styles.container }>
           <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-            <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
             <KeyboardAwareScrollView
               enableAutomaticScroll
               automaticallyAdjustContentInsets={ true }
@@ -134,7 +154,7 @@ export default class SettingScreen extends React.Component<any, any> {
               enableOnAndroid={ true }
               contentContainerStyle={ { flexGrow: 1 } }
             >
-              <View style={ { flex: 1, marginLeft: 10, marginTop: 30 } }>
+              <View style={ { flex: 1, marginLeft: 10 } }>
                 <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 28, marginLeft: 0 } ] }>More</Text>
               </View>
               <View style={ { flex: 0.7 } }>
@@ -189,7 +209,7 @@ export default class SettingScreen extends React.Component<any, any> {
                       </RkCard>
                     </TouchableOpacity>
                   ) }
-                  keyExtractor={ ( item, index ) => index }
+                  keyExtractor={ ( item, index ) => index.toString() }
                 />
               </View>
               <View style={ { flex: 0.61, backgroundColor: "#ffffff", borderRadius: 10, margin: 8 } }>
@@ -223,27 +243,40 @@ export default class SettingScreen extends React.Component<any, any> {
               <View style={ { flex: 0.4, alignItems: "center", marginTop: 20 } }>
                 <Text note style={ [ globalStyle.ffFiraSansMedium ] }>Follow Us</Text>
                 <View style={ { alignItems: "center", flexDirection: "row" } }>
-
-                  <SvgIcon
-                    name="twitter-logo-silhouette"
-                    color="#BABABA"
-                    size={ 20 }
+                  <Button
+                    transparent
                     style={ styles.btnSocial }
-                  />
+                    onPress={ () => this.click_OpenSocialUrl( "Twitter" ) }
+                  >
+                    <SvgIcon
+                      name="twitter-logo-silhouette"
+                      color="#BABABA"
+                      size={ 20 }
+                    />
+                  </Button>
 
-                  <SvgIcon
-                    name="linkedin-logo"
-                    color="#BABABA"
-                    size={ 20 }
+                  <Button
+                    transparent
                     style={ styles.btnSocial }
-                  />
-
-                  <SvgIcon
-                    name="medium-size"
-                    color="#BABABA"
-                    size={ 20 }
+                    onPress={ () => this.click_OpenSocialUrl( "Linked" ) }
+                  >
+                    <SvgIcon
+                      name="linkedin-logo"
+                      color="#BABABA"
+                      size={ 20 }
+                    />
+                  </Button>
+                  <Button
+                    transparent
                     style={ styles.btnSocial }
-                  />
+                    onPress={ () => this.click_OpenSocialUrl( "Medium" ) }
+                  >
+                    <SvgIcon
+                      name="medium-size"
+                      color="#BABABA"
+                      size={ 20 }
+                    />
+                  </Button>
 
 
                 </View>

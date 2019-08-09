@@ -109,8 +109,8 @@ export default class BackupSecretQuestionsScreen extends Component {
         let { data, arr_ModelBackupSecretQuestionsFirstQuestion, arr_ModelQuestionsSuccessfullyBackedUp } = this.state;
         return (
             <View style={ styles.container }>
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                 <SafeAreaView style={ styles.container }>
-                    <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <KeyboardAwareScrollView
                             enableAutomaticScroll

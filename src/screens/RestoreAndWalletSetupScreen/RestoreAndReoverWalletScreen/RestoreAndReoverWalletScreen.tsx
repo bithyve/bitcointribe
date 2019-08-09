@@ -136,8 +136,8 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
     render() {
         return (
             <View style={ styles.container }>
+                <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
                 <SafeAreaView style={ styles.container }>
-                    <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <KeyboardAwareScrollView
                             enableAutomaticScroll

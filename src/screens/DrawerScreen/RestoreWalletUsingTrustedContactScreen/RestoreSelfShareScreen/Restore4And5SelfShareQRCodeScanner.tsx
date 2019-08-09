@@ -145,9 +145,9 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
         let { selectedIndex, type } = this.state;
         return (
             <Container>
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                 <SafeAreaView style={ styles.container }>
-                    <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                    <View style={ { marginLeft: 10, marginTop: 15 } }>
+                    <View style={ { marginLeft: 10 } }>
                         <Button
                             transparent
                             onPress={ () => this.props.navigation.pop() }

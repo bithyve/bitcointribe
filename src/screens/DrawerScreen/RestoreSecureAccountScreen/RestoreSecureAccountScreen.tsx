@@ -98,8 +98,8 @@ export default class RestoreSecureAccountScreen extends Component {
     render() {
         return (
             <View style={ styles.container }>
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                 <SafeAreaView style={ styles.container }>
-                    <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <KeyboardAwareScrollView
                             enableAutomaticScroll

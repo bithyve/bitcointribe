@@ -113,8 +113,6 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
         } )
     }
 
-
-
     //TODO: Sharing PDF
     click_ShareEmail = async ( data: any ) => {
         let resultWallet = await utils.getWalletDetails();
@@ -196,6 +194,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
 
     onSelect = async ( returnValue: any ) => {
         if ( returnValue.data == returnValue.result ) {
+            this.click_CloseModel();
             let { data } = this.state;
             let filePath = JSON.parse( data.sssDetails.decryptedShare );
             console.log( { filePath } );
@@ -258,10 +257,10 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
     click_CloseModel() {
         this.setState( {
             arr_ModelBottomSingleButton: [ {
-                modalVisible: false
+                modalVisible: false,
             } ],
             arr_ModelBottomTwoButtons: [ {
-                modalVisible: false
+                modalVisible: false,
             } ]
         } );
     }
@@ -275,10 +274,10 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
         let { btnShareTitle } = this.state;
         return (
             <Container>
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
+                        <View style={ { marginLeft: 10 } }>
                             <Button
                                 transparent
                                 onPress={ () => this.props.navigation.pop() }

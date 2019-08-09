@@ -46,9 +46,9 @@ import {
 } from "HexaWallet/src/app/constants/Constants";
 import utils from "HexaWallet/src/app/constants/Utils";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
-var dbOpration = require("HexaWallet/src/app/manager/database/DBOpration");
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var comAppHealth = require("HexaWallet/src/app/manager/CommonFunction/CommonAppHealth");
+var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 
 //localization
 import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
@@ -61,8 +61,8 @@ import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus"
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
 export default class RestoreWalletUsingMnemonicScrren extends Component {
-    constructor(props: any) {
-        super(props);
+    constructor ( props: any ) {
+        super( props );
         this.state = {
             arr_ModelWalletName: [],
             arr_ConfirmPassphrase: [],
@@ -153,39 +153,39 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
     //     } );
     //     this.props.navigation.dispatch( resetAction );
     // }
-    _renderItem = ({item, index}) => (
-        <View style={{flex:1, backgroundColor:"white", alignItems:"center", justifyContent:"center", borderRadius:10, margin:5}}>
-          <TextInput
-    style={{height:30}}
-    placeholder={"Word " + (index+1)}
-          />
+    _renderItem = ( { item, index } ) => (
+        <View style={ { flex: 1, backgroundColor: "white", alignItems: "center", justifyContent: "center", borderRadius: 10, margin: 5 } }>
+            <TextInput
+                style={ { height: 30 } }
+                placeholder={ "Word " + ( index + 1 ) }
+            />
         </View>
-     );
+    );
     render() {
         return (
-            <View style={styles.container}>
-                <SafeAreaView style={styles.container}>
-                    <CustomeStatusBar backgroundColor={colors.white} flagShowStatusBar={false} barStyle="dark-content" />
-                    <ImageBackground source={images.WalletSetupScreen.WalletScreen.backgoundImage} style={styles.container}>
+            <View style={ styles.container }>
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
+                <SafeAreaView style={ styles.container }>
+                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <KeyboardAwareScrollView
                             enableAutomaticScroll
-                            automaticallyAdjustContentInsets={true}
-                            keyboardOpeningTime={0}
-                            enableOnAndroid={true}
-                            contentContainerStyle={{ flexGrow: 1 }}
+                            automaticallyAdjustContentInsets={ true }
+                            keyboardOpeningTime={ 0 }
+                            enableOnAndroid={ true }
+                            contentContainerStyle={ { flexGrow: 1 } }
                         >
                             <View>
                                 <View></View>
-                                <Text style={{textAlign:"center", fontSize:22,fontWeight:"600"}}>Enter the Mnemonic</Text>
+                                <Text style={ { textAlign: "center", fontSize: 22, fontWeight: "600" } }>Enter the Mnemonic</Text>
                             </View>
-                            <Text style={{textAlign:"center", padding:10}}>Enter the mnemonic in the order</Text>
+                            <Text style={ { textAlign: "center", padding: 10 } }>Enter the mnemonic in the order</Text>
                             <FlatList
-                                style={{ flex: 1 }}
-                                data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,18,19,20,21,22,23,24]}
-                                renderItem={this._renderItem}
-                                numColumns={3}
+                                style={ { flex: 1 } }
+                                data={ [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ] }
+                                renderItem={ this._renderItem }
+                                numColumns={ 3 }
                             />
-                            <Loader loading={this.state.flag_Loading} color={colors.appColor} size={30} />
+                            <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
                         </KeyboardAwareScrollView>
                     </ImageBackground>
                 </SafeAreaView>
@@ -194,10 +194,10 @@ export default class RestoreWalletUsingMnemonicScrren extends Component {
     }
 }
 
-let styles = StyleSheet.create({
+let styles = StyleSheet.create( {
     container: {
         flex: 1,
-        backgroundColor:"rgba(252,252,252,1)"
+        backgroundColor: "rgba(252,252,252,1)"
     },
     viewSetupWallet: {
         flex: 4,
@@ -216,4 +216,4 @@ let styles = StyleSheet.create({
         color: "#ffffff"
     }
 
-});
+} );

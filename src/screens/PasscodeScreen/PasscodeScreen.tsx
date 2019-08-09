@@ -7,6 +7,7 @@ import {
   Platform,
   Dimensions,
   Image,
+  SafeAreaView,
   Keyboard,
   StatusBar,
   Linking
@@ -203,68 +204,70 @@ export default class PasscodeScreen extends Component {
     return (
       <View style={ styles.container }>
         <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ true } barStyle="dark-content" />
-        <KeyboardAwareScrollView
-          enableAutomaticScroll
-          automaticallyAdjustContentInsets={ true }
-          keyboardOpeningTime={ 0 }
-          enableOnAndroid={ true }
-          contentContainerStyle={ { flexGrow: 1 } }
-        >
-          <View style={ styles.viewAppLogo }>
-            <Image style={ styles.imgAppLogo } source={ images.appIcon } />
-            <Text
-              style={ [ globalStyle.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
-            >
-              Welcome to Hexa!
+        <SafeAreaView style={ styles.container }>
+          <KeyboardAwareScrollView
+            enableAutomaticScroll
+            automaticallyAdjustContentInsets={ true }
+            keyboardOpeningTime={ 0 }
+            enableOnAndroid={ true }
+            contentContainerStyle={ { flexGrow: 1 } }
+          >
+            <View style={ styles.viewAppLogo }>
+              <Image style={ styles.imgAppLogo } source={ images.appIcon } />
+              <Text
+                style={ [ globalStyle.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
+              >
+                Welcome to Hexa!
             </Text>
-          </View>
-          <View style={ styles.viewPasscode }>
-            <Text
-              style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
-            >
-            Enter Passcode{ " " }
-            </Text>
-            <CodeInput
-              ref="codeInputRef1"
-              secureTextEntry
-              keyboardType="numeric"
-              codeLength={ 5 }
-              compareWithCode={ this.state.pincode }
-              activeColor={ this.state.passcodeStyle[ 0 ].activeColor }
-              inactiveColor={ this.state.passcodeStyle[ 0 ].inactiveColor }
-              className="border-box"
-              cellBorderWidth={ this.state.passcodeStyle[ 0 ].cellBorderWidth }
-              compareWithCode={ this.state.pincode }
-              autoFocus={ true }
-              inputPosition="center"
-              space={ 10 }
-              size={ 55 }
-              codeInputStyle={ { borderRadius: 5, backgroundColor: "#F1F1F1" } }
-              containerStyle={ {
-                alignItems: "center",
-                justifyContent: "center",
-                height: Platform.OS == "ios" ? 0 : 40,
-              } }
-              onFulfill={ ( isValid: any, code: any ) =>
-                this._onFinishCheckingCode( isValid, code )
-              }
-              type='withoutcharacters'
-            />
-            { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
-              <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>
-            ) }
-          </View>
-          <View style={ styles.viewBtnProceed }>
-            <FullLinearGradientButton
-              style={ [
-                this.state.status == true ? { opacity: 1 } : { opacity: 0.4 },
-                { borderRadius: 5 } ] }
-              disabled={ this.state.status == true ? false : true }
-              title="LOGIN"
-              click_Done={ () => this.onSuccess( this.state.pincode ) }
-            />
-          </View>
-        </KeyboardAwareScrollView>
+            </View>
+            <View style={ styles.viewPasscode }>
+              <Text
+                style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
+              >
+                Enter Passcode{ " " }
+              </Text>
+              <CodeInput
+                ref="codeInputRef1"
+                secureTextEntry
+                keyboardType="numeric"
+                codeLength={ 5 }
+                compareWithCode={ this.state.pincode }
+                activeColor={ this.state.passcodeStyle[ 0 ].activeColor }
+                inactiveColor={ this.state.passcodeStyle[ 0 ].inactiveColor }
+                className="border-box"
+                cellBorderWidth={ this.state.passcodeStyle[ 0 ].cellBorderWidth }
+                compareWithCode={ this.state.pincode }
+                autoFocus={ true }
+                inputPosition="center"
+                space={ 10 }
+                size={ 55 }
+                codeInputStyle={ { borderRadius: 5, backgroundColor: "#F1F1F1" } }
+                containerStyle={ {
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: Platform.OS == "ios" ? 0 : 40,
+                } }
+                onFulfill={ ( isValid: any, code: any ) =>
+                  this._onFinishCheckingCode( isValid, code )
+                }
+                type='withoutcharacters'
+              />
+              { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
+                <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>
+              ) }
+            </View>
+            <View style={ styles.viewBtnProceed }>
+              <FullLinearGradientButton
+                style={ [
+                  this.state.status == true ? { opacity: 1 } : { opacity: 0.4 },
+                  { borderRadius: 5 } ] }
+                disabled={ this.state.status == true ? false : true }
+                title="LOGIN"
+                click_Done={ () => this.onSuccess( this.state.pincode ) }
+              />
+            </View>
+          </KeyboardAwareScrollView>
+        </SafeAreaView>
       </View>
     );
   }

@@ -205,10 +205,10 @@ export default class Restore4And5SelfShareScreen extends React.Component<any, an
         let { flag_ScanBtnDisable } = this.state;
         return (
             <Container>
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
+                        <View style={ { marginLeft: 10 } }>
                             <Button
                                 transparent
                                 onPress={ () => this.props.navigation.pop() }

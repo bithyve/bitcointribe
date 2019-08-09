@@ -133,7 +133,6 @@ export default class AllContactListScreen extends React.Component<any, any> {
     };
 
 
-
     //TODO: func click_Next
     click_Next = async () => {
         const dateTime = Date.now();
@@ -215,10 +214,10 @@ export default class AllContactListScreen extends React.Component<any, any> {
     render() {
         return (
             <Container>
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
+                        <View style={ { marginLeft: 10 } }>
                             <Button
                                 transparent
                                 onPress={ () => this.props.navigation.pop() }

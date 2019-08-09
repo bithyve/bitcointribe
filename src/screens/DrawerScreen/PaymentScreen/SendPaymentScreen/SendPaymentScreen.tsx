@@ -67,9 +67,9 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             arr_AccountList: [],
             arr_SelectAccountDetails: [],
             address: "",
-            amount: "0.0",
+            amount: "0",
             memo: "",
-            selectedAccountBal: 0.0,
+            selectedAccountBal: 0,
             memoMsg: "Add Memo",
             tranPrio: 1,
             //flag
@@ -88,7 +88,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         console.log( { data } );
         //Singleton Flag value change    
         let address = data != undefined ? data.address : "";
-        let amount = data != undefined ? data.amount.toString() : "0.0";
+        let amount = data != undefined ? data.amount.toString() : "0";
         console.log( { amount, address } );
         let walletDetails = await utils.getWalletDetails();
         let arr_AccountList = await comFunDBRead.readTblAccount();
@@ -298,7 +298,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         console.log( { address } );
         if ( address != "" ) {
             if ( data.type != "address" ) {
-                this.setAmountAndAddress( address, data.amount != undefined ? data.amount.toString() : "0.0" );
+                this.setAmountAndAddress( address, data.amount != undefined ? data.amount.toString() : "0" );
             } else {
                 this.setAmountAndAddress( address, amount.toString() );
             }
@@ -308,7 +308,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
 
     setAmountAndAddress( address: string, amount: string ) {
         let { selectedAccountBal, flag_DisableSentBtn } = this.state;
-        if ( amount != "0.0" && parseFloat( amount ) < parseFloat( selectedAccountBal ) && address != "" ) {
+        if ( amount != "0" && parseFloat( amount ) < parseFloat( selectedAccountBal ) && address != "" ) {
             flag_DisableSentBtn = false;
         } else {
             flag_DisableSentBtn = true;
@@ -369,10 +369,10 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         let { flag_Memo, flag_DisableSentBtn, flag_Loading, flag_SentBtnAnimation } = this.state;
         return (
             <Container>
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
+                        <View style={ { marginLeft: 10 } }>
                             <Button
                                 transparent
                                 onPress={ () => this.props.navigation.pop() }

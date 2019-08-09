@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Image,
   StatusBar,
+  SafeAreaView,
   Alert
 } from "react-native";
 import { StackActions, NavigationActions } from "react-navigation";
@@ -150,99 +151,101 @@ export default class PasscodeConfirmScreen extends Component<any, any> {
     return (
       <View style={ styles.container }>
         <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ true } barStyle="dark-content" />
-        <KeyboardAwareScrollView
-          enableOnAndroid
-          extraScrollHeight={ 40 }
-          contentContainerStyle={ { flexGrow: 1, } }
-        >
-          <View style={ styles.viewAppLogo }>
-            <Image style={ styles.imgAppLogo } source={ images.appIcon } />
-            <Text
-              style={ [ globalStyle.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
-            >
-              Welcome to Hexa!
+        <SafeAreaView style={ styles.container }>
+          <KeyboardAwareScrollView
+            enableOnAndroid
+            extraScrollHeight={ 40 }
+            contentContainerStyle={ { flexGrow: 1, } }
+          >
+            <View style={ styles.viewAppLogo }>
+              <Image style={ styles.imgAppLogo } source={ images.appIcon } />
+              <Text
+                style={ [ globalStyle.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
+              >
+                Welcome to Hexa!
             </Text>
-          </View>
-          <View style={ styles.viewFirstPasscode }>
-            <Text
-              style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
-              note
-            >
-              Create Passcode
+            </View>
+            <View style={ styles.viewFirstPasscode }>
+              <Text
+                style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
+                note
+              >
+                Create Passcode
             </Text>
-            <CodeInput
-              ref="codeInputRef"
-              secureTextEntry
-              keyboardType="numeric"
-              codeLength={ 5 }
-              activeColor={ colors.black }
-              inactiveColor={ colors.black }
-              className="border-box"
-              cellBorderWidth={ 0 }
-              autoFocus={ true }
-              inputPosition="center"
-              space={ 10 }
-              size={ 55 }
-              containerStyle={ {
-                alignItems: "center",
-                justifyContent: "center",
-                height: Platform.OS == "ios" ? 0 : 40,
-              } }
-              codeInputStyle={ {
-                borderRadius: 5,
-                backgroundColor: "#F1F1F1"
-              } }
-              onFulfill={ code => this.onCheckPincode( code ) }
-              type='withoutcharacters'
-            />
-          </View>
-          <View style={ styles.viewSecoundPasscode }>
-            <Text
-              style={ { marginTop: 10, fontWeight: "bold", color: "#8B8B8B" } }
-            >
-              Re - Enter Passcode{ " " }
-            </Text>
-            <CodeInput
-              ref="codeInputRef1"
-              secureTextEntry
-              keyboardType="numeric"
-              codeLength={ 5 }
-              activeColor={ this.state.passcodeSecoundStyle[ 0 ].activeColor }
-              inactiveColor={ this.state.passcodeSecoundStyle[ 0 ].inactiveColor }
-              className="border-box"
-              cellBorderWidth={
-                this.state.passcodeSecoundStyle[ 0 ].cellBorderWidth
-              }
-              compareWithCode={ this.state.pincode }
-              autoFocus={ false }
-              inputPosition="center"
-              space={ 10 }
-              size={ 55 }
-              codeInputStyle={ { borderRadius: 5, backgroundColor: "#F1F1F1" } }
-              containerStyle={ {
-                alignItems: "center",
-                justifyContent: "center",
-                height: Platform.OS == "ios" ? 0 : 40,
-              } }
-              onFulfill={ ( isValid, code ) =>
-                this._onFinishCheckingCode2( isValid, code )
-              }
-              type='withoutcharacters'
-            />
-            { renderIf( this.state.passcodeSecoundStyle[ 0 ].activeColor == "red" )(
-              <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>
-            ) }
-          </View>
-          <View style={ styles.viewBtnProceed }>
-            <FullLinearGradientButton
-              style={ [
-                this.state.status == true ? { opacity: 1 } : { opacity: 0.4 }, { borderRadius: 5 } ] }
-              disabled={ this.state.status == true ? false : true }
-              title="PROCEED"
-              click_Done={ () => this.saveData() }
-            />
-          </View>
-        </KeyboardAwareScrollView>
+              <CodeInput
+                ref="codeInputRef"
+                secureTextEntry
+                keyboardType="numeric"
+                codeLength={ 5 }
+                activeColor={ colors.black }
+                inactiveColor={ colors.black }
+                className="border-box"
+                cellBorderWidth={ 0 }
+                autoFocus={ true }
+                inputPosition="center"
+                space={ 10 }
+                size={ 55 }
+                containerStyle={ {
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: Platform.OS == "ios" ? 0 : 40,
+                } }
+                codeInputStyle={ {
+                  borderRadius: 5,
+                  backgroundColor: "#F1F1F1"
+                } }
+                onFulfill={ code => this.onCheckPincode( code ) }
+                type='withoutcharacters'
+              />
+            </View>
+            <View style={ styles.viewSecoundPasscode }>
+              <Text
+                style={ { marginTop: 10, fontWeight: "bold", color: "#8B8B8B" } }
+              >
+                Re - Enter Passcode{ " " }
+              </Text>
+              <CodeInput
+                ref="codeInputRef1"
+                secureTextEntry
+                keyboardType="numeric"
+                codeLength={ 5 }
+                activeColor={ this.state.passcodeSecoundStyle[ 0 ].activeColor }
+                inactiveColor={ this.state.passcodeSecoundStyle[ 0 ].inactiveColor }
+                className="border-box"
+                cellBorderWidth={
+                  this.state.passcodeSecoundStyle[ 0 ].cellBorderWidth
+                }
+                compareWithCode={ this.state.pincode }
+                autoFocus={ false }
+                inputPosition="center"
+                space={ 10 }
+                size={ 55 }
+                codeInputStyle={ { borderRadius: 5, backgroundColor: "#F1F1F1" } }
+                containerStyle={ {
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: Platform.OS == "ios" ? 0 : 40,
+                } }
+                onFulfill={ ( isValid, code ) =>
+                  this._onFinishCheckingCode2( isValid, code )
+                }
+                type='withoutcharacters'
+              />
+              { renderIf( this.state.passcodeSecoundStyle[ 0 ].activeColor == "red" )(
+                <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>
+              ) }
+            </View>
+            <View style={ styles.viewBtnProceed }>
+              <FullLinearGradientButton
+                style={ [
+                  this.state.status == true ? { opacity: 1 } : { opacity: 0.4 }, { borderRadius: 5 } ] }
+                disabled={ this.state.status == true ? false : true }
+                title="PROCEED"
+                click_Done={ () => this.saveData() }
+              />
+            </View>
+          </KeyboardAwareScrollView>
+        </SafeAreaView>
         <Loader loading={ this.state.isLoading } color={ colors.appColor } size={ 30 } />
       </View>
     );

@@ -55,6 +55,9 @@ import ModelBackupAssociateOpenContactList from "HexaWallet/src/app/custcomponte
 import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
 import ModelSelfShareAcceptAndReject from "HexaWallet/src/app/custcompontes/Model/ModelWalletScreen/ModelSelfShareAcceptAndReject";
 
+//TODO: Custome Bottom Model
+import ModelBottomAddTestCoinsAndAccounts from "HexaWallet/src/app/custcompontes/ModelBottom/ModelBottomWalletScreen/ModelBottomAddTestCoinsAndAccounts/ModelBottomAddTestCoinsAndAccounts";
+
 //TODO: Custome View
 import ViewErrorMessage from "HexaWallet/src/app/custcompontes/View/ViewErrorMessage/ViewErrorMessage";
 
@@ -112,6 +115,7 @@ import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAcco
 
 
 
+
 //TODO: Common Funciton
 var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
 
@@ -134,6 +138,7 @@ export default class WalletScreen extends React.Component {
       arr_ModelAcceptOrRejectSecret: [],
       arr_ModelBackupYourWallet: [],
       arr_ModelSelfShareAcceptAndReject: [],
+      arrModelBottomAddTestCoinsAndAccounts: [],
       //Error Message
       arrErrorMessage: [],
       //DeepLinking Param   
@@ -254,7 +259,7 @@ export default class WalletScreen extends React.Component {
       if ( resSSSDetails.length == 0 ) {
         this.generateSSSDetails();
       } else {
-        this.getBalAndHealth();
+        // this.getBalAndHealth();
         this.setState( {
           flag_PdfFileCreate: false
         } )
@@ -581,7 +586,7 @@ export default class WalletScreen extends React.Component {
                 //creating 4th share pdf   
                 let temp = [];
                 temp.push( { arrQRCodeData: qrcode4share, secondaryXpub: secondaryXpub, qrData: resSetupSecureAccount.setupData.qrData, secret: resSetupSecureAccount.setupData.secret, secondaryMnemonic: getSecoundMnemonic, bhXpub: resSetupSecureAccount.setupData.bhXpub } )
-                let resGenerate4thsharepdf = await this.generate4thShare( temp, setUpWalletAnswerDetails[ 0 ].Answer );
+                let resGenerate4thsharepdf = await this.generate4thShare( temp, setUpWalletAnswerDetails[ 0 ].Answer, walletDetails );
                 console.log( { resGenerate4thsharepdf } );
                 if ( resGenerate4thsharepdf != "" ) {
                   let rescreateMetaShare4 = await sss.createMetaShare( 5, encryptedShares[ 4 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
@@ -594,7 +599,7 @@ export default class WalletScreen extends React.Component {
                       let temp = [];
                       temp.push( { arrQRCodeData: qrcode5share, secondaryXpub: secondaryXpub, qrData: resSetupSecureAccount.setupData.qrData, secret: resSetupSecureAccount.setupData.secret, secondaryMnemonic: getSecoundMnemonic, bhXpub: resSetupSecureAccount.setupData.bhXpub } )
                       console.log( { temp } );
-                      let resGenerate5thsharepdf = await this.generate5thShare( temp, setUpWalletAnswerDetails[ 0 ].Answer );
+                      let resGenerate5thsharepdf = await this.generate5thShare( temp, setUpWalletAnswerDetails[ 0 ].Answer, walletDetails );
                       console.log( { resGenerate5thsharepdf } );
                       if ( resGenerate5thsharepdf != "" ) {
                         let keeperInfo = [ { info: null }, { info: null }, { info: rescreateMetaShare2.data }, { info: qrcode4share[ 0 ] }, { info: qrcode5share[ 0 ] } ];
@@ -700,8 +705,8 @@ export default class WalletScreen extends React.Component {
     return share1;
   }
   //For 4th Share
-  generate4thShare = async ( data: any, password: string ) => {
-    console.log( { password } );
+  generate4thShare = async ( data: any, password: string, walletDetails: any ) => {
+    console.log( { password, walletDetails } );
 
     return new Promise( async ( resolve, reject ) => {
       data = data[ 0 ];
@@ -759,17 +764,16 @@ export default class WalletScreen extends React.Component {
         // console.log( { res2FASecret4Share } );
         var create4thPdf;
         if ( Platform.OS == "android" ) {
-          create4thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode4thSahre1.png", "/storage/emulated/0/qrcode4thSahre2.png", "/storage/emulated/0/qrcode4thSahre3.png", "/storage/emulated/0/qrcode4thSahre4.png", "/storage/emulated/0/qrcode4thSahre5.png", "/storage/emulated/0/qrcode4thSahre6.png", "/storage/emulated/0/qrcode4thSahre7.png", "/storage/emulated/0/qrcode4thSahre8.png", "/storage/emulated/0/secoundryXpub4Share.png", "/storage/emulated/0/googleAuto2FASecret4Share.png", "SecretSharing4Share.pdf", "For 4th Shares", password );
+          create4thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode4thSahre1.png", "/storage/emulated/0/qrcode4thSahre2.png", "/storage/emulated/0/qrcode4thSahre3.png", "/storage/emulated/0/qrcode4thSahre4.png", "/storage/emulated/0/qrcode4thSahre5.png", "/storage/emulated/0/qrcode4thSahre6.png", "/storage/emulated/0/qrcode4thSahre7.png", "/storage/emulated/0/qrcode4thSahre8.png", "/storage/emulated/0/secoundryXpub4Share.png", "/storage/emulated/0/googleAuto2FASecret4Share.png", walletDetails.walletType + "4thShare.pdf", "4th Shares", password );
         } else {
-          create4thPdf = await this.genreatePdf( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, res4thShare6Create, res4thShare7Create, res4thShare8Create, resSecoundXpub4Share, res2FASecret4Share, "SecretSharing4Share.pdf", "For 4th Shares", password );
+          create4thPdf = await this.genreatePdf( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, res4thShare6Create, res4thShare7Create, res4thShare8Create, resSecoundXpub4Share, res2FASecret4Share, walletDetails.walletType + "4thShare.pdf", "4th Shares", password );
         }
         resolve( create4thPdf );
       }, 2000 );
-
     } );
   }
   //for 5th share
-  generate5thShare = async ( data: any, password: string ) => {
+  generate5thShare = async ( data: any, password: string, walletDetails: any ) => {
     return new Promise( async ( resolve, reject ) => {
       data = data[ 0 ];
       let arrQRCodeData = data.arrQRCodeData;
@@ -825,9 +829,9 @@ export default class WalletScreen extends React.Component {
         // console.log( { res2FASecret4Share } );
         var create5thPdf;
         if ( Platform.OS == "android" ) {
-          create5thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode5thSahre1.png", "/storage/emulated/0/qrcode5thSahre2.png", "/storage/emulated/0/qrcode5thSahre3.png", "/storage/emulated/0/qrcode5thSahre4.png", "/storage/emulated/0/qrcode5thSahre5.png", "/storage/emulated/0/qrcode5thSahre6.png", "/storage/emulated/0/qrcode5thSahre7.png", "/storage/emulated/0/qrcode5thSahre8.png", "/storage/emulated/0/secoundryXpub5Share.png", "/storage/emulated/0/googleAuto2FASecret5Share.png", "SecretSharing5Share.pdf", "For 5th Shares", password );
+          create5thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode5thSahre1.png", "/storage/emulated/0/qrcode5thSahre2.png", "/storage/emulated/0/qrcode5thSahre3.png", "/storage/emulated/0/qrcode5thSahre4.png", "/storage/emulated/0/qrcode5thSahre5.png", "/storage/emulated/0/qrcode5thSahre6.png", "/storage/emulated/0/qrcode5thSahre7.png", "/storage/emulated/0/qrcode5thSahre8.png", "/storage/emulated/0/secoundryXpub5Share.png", "/storage/emulated/0/googleAuto2FASecret5Share.png", walletDetails.walletType + "5thShare.pdf", "5th Shares", password );
         } else {
-          create5thPdf = await this.genreatePdf( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, res5thShare6Create, res5thShare7Create, res5thShare8Create, resSecoundXpub5Share, res2FASecret5Share, "SecretSharing5Share.pdf", "For 5th Shares", password );
+          create5thPdf = await this.genreatePdf( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, res5thShare6Create, res5thShare7Create, res5thShare8Create, resSecoundXpub5Share, res2FASecret5Share, walletDetails.walletType + "5thShare.pdf", "5th Shares", password );
         }
         resolve( create5thPdf );
       }, 1000 );
@@ -958,9 +962,9 @@ export default class WalletScreen extends React.Component {
           'png',
           {
             x: 40,
-            y: 310,
-            width: 180,
-            height: 160,
+            y: 320,
+            width: 160,
+            height: 140,
             //source: 'assets'
           }
         )
@@ -1009,9 +1013,9 @@ export default class WalletScreen extends React.Component {
           'png',
           {
             x: 40,
-            y: 70,
-            width: 180,
-            height: 160,
+            y: 80,
+            width: 160,
+            height: 140,
             // source: 'assets'
           }
         )
@@ -1063,9 +1067,9 @@ export default class WalletScreen extends React.Component {
           'png',
           {
             x: 40,
-            y: 310,
-            width: 180,
-            height: 160,
+            y: 320,
+            width: 160,
+            height: 140,
             //source: 'assets'
           }
         )
@@ -1114,9 +1118,9 @@ export default class WalletScreen extends React.Component {
           'png',
           {
             x: 40,
-            y: 70,
-            width: 180,
-            height: 160,
+            y: 80,
+            width: 160,
+            height: 140,
             // source: 'assets'
           }
         )
@@ -1167,9 +1171,9 @@ export default class WalletScreen extends React.Component {
           'png',
           {
             x: 40,
-            y: 310,
-            width: 180,
-            height: 160,
+            y: 320,
+            width: 160,
+            height: 140,
             //source: 'assets'
           }
         )
@@ -1218,9 +1222,9 @@ export default class WalletScreen extends React.Component {
           'png',
           {
             x: 40,
-            y: 70,
-            width: 180,
-            height: 160,
+            y: 80,
+            width: 160,
+            height: 140,
             // source: 'assets'
           }
         )
@@ -1271,9 +1275,9 @@ export default class WalletScreen extends React.Component {
           'png',
           {
             x: 40,
-            y: 310,
-            width: 180,
-            height: 160,
+            y: 320,
+            width: 160,
+            height: 140,
             //source: 'assets'
           }
         )
@@ -1322,9 +1326,9 @@ export default class WalletScreen extends React.Component {
           'png',
           {
             x: 40,
-            y: 70,
-            width: 180,
-            height: 160,
+            y: 80,
+            width: 160,
+            height: 140,
             // source: 'assets'
           }
         )
@@ -1375,9 +1379,9 @@ export default class WalletScreen extends React.Component {
           'png',
           {
             x: 25,
-            y: 270,
-            width: 200,
-            height: 200,
+            y: 300,
+            width: 160,
+            height: 140,
             //source: 'assets'
           }
         )
@@ -1404,9 +1408,9 @@ export default class WalletScreen extends React.Component {
           'png',
           {
             x: 25,
-            y: 272,
-            width: 200,
-            height: 200,
+            y: 300,
+            width: 160,
+            height: 140,
             // source: 'assets'
           }
         )
@@ -1907,7 +1911,7 @@ export default class WalletScreen extends React.Component {
 
   render() {
     //array
-    let { walletDetails, arr_CustShiledIcon, arr_accounts, arrErrorMessage } = this.state;
+    let { walletDetails, arr_CustShiledIcon, arr_accounts, arrErrorMessage, arrModelBottomAddTestCoinsAndAccounts } = this.state;
     //model array
     let { arr_ModelAcceptOrRejectSecret, arr_ModelBackupShareAssociateContact, arr_ModelBackupAssociateOpenContactList, arr_ModelBackupYourWallet, arr_ModelSelfShareAcceptAndReject } = this.state;
     //flag
@@ -1916,11 +1920,11 @@ export default class WalletScreen extends React.Component {
     let { qrcodeImageString1, qrcodeImageString2, qrcodeImageString3, qrcodeImageString4, qrcodeImageString5, qrcodeImageString6, qrcodeImageString7, qrcodeImageString8, qrcodeImageString9, qrcodeImageString10 } = this.state;
     return (
       <Container>
+        <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
         <Content
           scrollEnabled={ false }
           contentContainerStyle={ styles.container }
         >
-          <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
           <SafeAreaView style={ styles.container }>
             {/* Top View Animation */ }
             { renderIf( flag_Offline == true || flag_PdfFileCreate == true || flag_GetBal == true )(
@@ -1949,7 +1953,7 @@ export default class WalletScreen extends React.Component {
                     marginBottom: 30
                   } ] }
                 >
-                  { walletDetails.walletType != null ? walletDetails.walletType : "Hexa Wallet" }
+                  { walletDetails.walletType != null ? walletDetails.walletType : "Wallet" }
                 </Animated.Text>
                 <Animated.Text
                   style={ [ globalStyle.ffFiraSansRegular, {
@@ -2097,6 +2101,30 @@ export default class WalletScreen extends React.Component {
           </SafeAreaView>
         </Content>
         <DropdownAlert ref={ ref => ( this.dropdown = ref ) } />
+
+        {/* <Button
+          transparent
+          onPress={ () => {
+            this.setState( {
+              arrModelBottomAddTestCoinsAndAccounts: [ {
+                modalVisible: true,
+                title: "OPTION",
+                subTitle: "Select any one option",
+                svgIcon: "recreate",
+                btnTitle: "RECREATE SHARES"
+              } ],
+            } );
+            // this.getTestcoins()
+          } }
+          style={ styles.plusButtonBottom }
+        >
+          <ImageSVG
+            style={ { width: 110, height: 110, marginRight: 20 } }
+            source={
+              svgIcon.walletScreen.addAccounts
+            }
+          />
+        </Button> */}
         <Fab
           active={ this.state.flag_Fabactive }
           direction="up"
@@ -2104,7 +2132,7 @@ export default class WalletScreen extends React.Component {
           position="bottomRight"
           onPress={ () => this.setState( { flag_Fabactive: !this.state.flag_Fabactive } ) }>
           <ImageSVG
-            style={ { width: 110, height: 110, marginRight: 20 } }
+            style={ { width: 110, height: 110, marginRight: 60 } }
             source={
               svgIcon.walletScreen.addAccounts
             }
@@ -2131,7 +2159,6 @@ export default class WalletScreen extends React.Component {
             />
           </Button>
         </Fab>
-
 
 
         <ModelAcceptOrRejectSecret
@@ -2282,6 +2309,9 @@ export default class WalletScreen extends React.Component {
             } )
           } }
         />
+        <ModelBottomAddTestCoinsAndAccounts
+          data={ arrModelBottomAddTestCoinsAndAccounts }
+        />
         <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
       </Container>
     );
@@ -2299,7 +2329,7 @@ const styles = StyleSheet.create( {
   plusButtonBottom: {
     position: "absolute",
     bottom: 20,
-    right: -10,
+    right: -30,
   },
   svgImage: {
     width: "100%",
