@@ -218,7 +218,7 @@ export default class Restore4And5SelfShareScreen extends React.Component<any, an
                             </Button>
                         </View>
                         <View style={ { flex: 0.1, padding: 20 } }>
-                            <Text numberOfLines={ 2 } note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Please sacn 8 qrcode.</Text>
+                            <Text numberOfLines={ 2 } note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Tab on Scan QRCode to scan 8 QR code  </Text>
                         </View>
                         <View style={ { flex: 2, alignItems: "center", justifyContent: "center" } }>
                             <Image style={ [ styles.imgAppLogo, { borderRadius: 10 } ] } source={ images.RestoreWalletUsingTrustedContact.share4and5SelfShareInfo } />

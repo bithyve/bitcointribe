@@ -258,6 +258,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
     //TODO: Deeplinking 
     click_SentRequest( type: string, val: any ) {
         console.log( { val } );
+         let walletDetails = utils.getWalletDetails();  
         let { key, arr_EncryptedMetaShare } = this.state;
         let script = {};
         script.key = key;
@@ -300,22 +301,22 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
             val = val.length != 0 ? val[ 0 ].email : ""
             Mailer.mail( {
                 subject: 'Hexa Wallet SSS Restore',
-                recipients: [ val ],
-                body: 'https://prime-sign-230407.appspot.com/sss/res/' + encpScript,
-                isHTML: true,
-            }, ( error, event ) => {
+                recipients: [ val ],  
+                body: walletDetails.walletType+" hexa wallet returned your secret share. Tap on link to store your secret share back <br/> https://prime-sign-230407.appspot.com/sss/res/" + encpScript,
+                isHTML: true,        
+            }, ( error, event ) => {     
                 if ( event == "sent" ) {
                     setTimeout( () => {
                         this.refs.modal4.close();
                         this.setState( {
                             flag_OtpCodeShowStatus: true,
-                        } )
+                        } );
                         alert.simpleOkActionWithPara( "Success", "Email Sent Completed.", "Email", this.reloadList( "Email" ) );
                     }, 1000 );
                 } else {
                     alert.simpleOk( "Oops", error );
                 }
-            } );
+            } );  
             if ( Platform.OS == "android" ) {
                 setTimeout( () => {
                     this.refs.modal4.close();

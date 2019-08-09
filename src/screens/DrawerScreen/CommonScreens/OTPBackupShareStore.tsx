@@ -277,7 +277,7 @@ export default class OTPBackupShareStore extends Component {
                                 >
                                     <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }></Text>
                                 </Button>
-                                <Text note style={ { textAlign: "center", marginTop: 10, marginRight: 10 } }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
+                                <Text note style={ { textAlign: "center", marginTop: 10, marginRight: 10 } }>Please enter the six digit OTP shared with trusted contact</Text>
                             </View>
                             <View style={ styles.viewPasscode }>
                                 <Text
@@ -315,7 +315,7 @@ export default class OTPBackupShareStore extends Component {
                                 ) }
                             </View>
                             <View style={ styles.viewBtnProceed }>
-                                <Text note style={ { textAlign: "center", marginBottom: 30 } }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
+                                <Text note style={ { textAlign: "center", marginBottom: 30 } }></Text>
                                 <FullLinearGradientButton
                                     style={ [
                                         this.state.statusConfirmBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 },

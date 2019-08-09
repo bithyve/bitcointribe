@@ -319,7 +319,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Restore wallet using Trusted Contacts</Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                                <Text note style={ { textAlign: "center" } }>Select the question and specify the answer as you did at the time of setting up the wallet</Text>
+                                <Text style={ { textAlign: "center" } }>Select the question and specify the answer as you did at the time of setting up the wallet</Text>
                                 <View style={ styles.itemQuestionPicker }>
                                     <Picker
                                         renderHeader={ backAction =>

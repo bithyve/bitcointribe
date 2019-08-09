@@ -764,8 +764,8 @@ export default class WalletScreen extends React.Component {
         // console.log( { res2FASecret4Share } );
         var create4thPdf;
         if ( Platform.OS == "android" ) {
-          create4thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode4thSahre1.png", "/storage/emulated/0/qrcode4thSahre2.png", "/storage/emulated/0/qrcode4thSahre3.png", "/storage/emulated/0/qrcode4thSahre4.png", "/storage/emulated/0/qrcode4thSahre5.png", "/storage/emulated/0/qrcode4thSahre6.png", "/storage/emulated/0/qrcode4thSahre7.png", "/storage/emulated/0/qrcode4thSahre8.png", "/storage/emulated/0/secoundryXpub4Share.png", "/storage/emulated/0/googleAuto2FASecret4Share.png", walletDetails.walletType + "4thShare.pdf", "4th Shares", password );
-        } else {
+          create4thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode4thSahre1.png", "/storage/emulated/0/qrcode4thSahre2.png", "/storage/emulated/0/qrcode4thSahre3.png", "/storage/emulated/0/qrcode4thSahre4.png", "/storage/emulated/0/qrcode4thSahre5.png", "/storage/emulated/0/qrcode4thSahre6.png", "/storage/emulated/0/qrcode4thSahre7.png", "/storage/emulated/0/qrcode4thSahre8.png", "/storage/emulated/0/secoundryXpub4Share.png", "/storage/emulated/0/googleAuto2FASecret4Share.png", walletDetails.walletType + "4thShare.pdf", "4th Share", password );
+        } else {  
           create4thPdf = await this.genreatePdf( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, res4thShare6Create, res4thShare7Create, res4thShare8Create, resSecoundXpub4Share, res2FASecret4Share, walletDetails.walletType + "4thShare.pdf", "4th Shares", password );
         }
         resolve( create4thPdf );
@@ -830,8 +830,8 @@ export default class WalletScreen extends React.Component {
         var create5thPdf;
         if ( Platform.OS == "android" ) {
           create5thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode5thSahre1.png", "/storage/emulated/0/qrcode5thSahre2.png", "/storage/emulated/0/qrcode5thSahre3.png", "/storage/emulated/0/qrcode5thSahre4.png", "/storage/emulated/0/qrcode5thSahre5.png", "/storage/emulated/0/qrcode5thSahre6.png", "/storage/emulated/0/qrcode5thSahre7.png", "/storage/emulated/0/qrcode5thSahre8.png", "/storage/emulated/0/secoundryXpub5Share.png", "/storage/emulated/0/googleAuto2FASecret5Share.png", walletDetails.walletType + "5thShare.pdf", "5th Shares", password );
-        } else {
-          create5thPdf = await this.genreatePdf( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, res5thShare6Create, res5thShare7Create, res5thShare8Create, resSecoundXpub5Share, res2FASecret5Share, walletDetails.walletType + "5thShare.pdf", "5th Shares", password );
+        } else {  
+          create5thPdf = await this.genreatePdf( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, res5thShare6Create, res5thShare7Create, res5thShare8Create, resSecoundXpub5Share, res2FASecret5Share, walletDetails.walletType + "5thShare.pdf", "5th Share", password );
         }
         resolve( create5thPdf );
       }, 1000 );
@@ -952,7 +952,7 @@ export default class WalletScreen extends React.Component {
           y: 480,
           fontSize: 18
         } )
-        .drawText( 'Share 1', {
+        .drawText( 'Part 1', {
           x: 5,
           y: 470,
           fontSize: 10
@@ -1003,7 +1003,7 @@ export default class WalletScreen extends React.Component {
           y: 240,
           fontSize: 10
         } )
-        .drawText( 'Share 2', {
+        .drawText( 'Part 2', {
           x: 5,
           y: 230,
           fontSize: 10
@@ -1057,7 +1057,7 @@ export default class WalletScreen extends React.Component {
 
       const page2 = PDFPage
         .create()
-        .drawText( 'Share 3', {
+        .drawText( 'Part 3', {
           x: 5,
           y: 470,
           fontSize: 10
@@ -1108,7 +1108,7 @@ export default class WalletScreen extends React.Component {
           y: 240,
           fontSize: 10
         } )
-        .drawText( 'Share 4', {
+        .drawText( 'Part 4', {
           x: 5,
           y: 230,
           fontSize: 10
@@ -1161,7 +1161,7 @@ export default class WalletScreen extends React.Component {
         } )
       const page3 = PDFPage
         .create()
-        .drawText( 'Share 5', {
+        .drawText( 'Part 5', {
           x: 5,
           y: 470,
           fontSize: 10
@@ -1212,7 +1212,7 @@ export default class WalletScreen extends React.Component {
           y: 240,
           fontSize: 10
         } )
-        .drawText( 'Share 6', {
+        .drawText( 'Part 6', {
           x: 5,
           y: 230,
           fontSize: 10
@@ -1265,7 +1265,7 @@ export default class WalletScreen extends React.Component {
         } )
       const page4 = PDFPage
         .create()
-        .drawText( 'Share 7', {
+        .drawText( 'Part 7', {
           x: 5,
           y: 470,
           fontSize: 10
@@ -1316,7 +1316,7 @@ export default class WalletScreen extends React.Component {
           y: 240,
           fontSize: 10
         } )
-        .drawText( 'Share 8', {
+        .drawText( 'Part 8', {
           x: 5,
           y: 230,
           fontSize: 10

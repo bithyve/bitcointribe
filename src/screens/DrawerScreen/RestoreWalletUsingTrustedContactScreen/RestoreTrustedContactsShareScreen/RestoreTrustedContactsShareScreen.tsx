@@ -235,8 +235,8 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
             if ( Platform.OS == "android" ) {
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Restore',
-                    recipients: [ email ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/req/' + encpScript,
+                    recipients: [ email ],  
+                    body: "Hexa wallet request you it's share back to restore wallet. Please tap on the link to return share <br> https://prime-sign-230407.appspot.com/sss/req/" + encpScript,
                     isHTML: true,
                 }, ( error, event ) => {
                     if ( event == "sent" ) {
@@ -256,7 +256,7 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Restore',
                     recipients: [ email ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/req/' + encpScript,
+                     body: "Hexa wallet request you it's share back to restore wallet. Please tap on the link to return share <br> https://prime-sign-230407.appspot.com/sss/req/" + encpScript,
                     isHTML: true,
                 }, ( error, event ) => {
                     if ( event == "sent" ) {

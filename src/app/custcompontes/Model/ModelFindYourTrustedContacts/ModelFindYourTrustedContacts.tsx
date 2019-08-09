@@ -47,7 +47,7 @@ export default class ModelFindYourTrustedContacts extends Component {
                         </View>
 
                         <View style={ { flex: 0.5, alignItems: "center", justifyContent: "flex-end" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Hexa does not store your contacts</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ]}>Hexa does not store your contacts</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <FullLinearGradientButton

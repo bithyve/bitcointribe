@@ -320,7 +320,7 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
                                 </View>
                             </View>
                             <View style={ { flex: 1 } }>
-                                <Text note style={ { textAlign: "center", margin: 5 } }>Share this address to receive founds</Text>
+                                <Text note style={ { textAlign: "center", margin: 5 } }>Share this address to receive funds</Text>
                                 <FullLinearGradientIconWithLoadingButton
                                     click_Done={ () => this.click_ShareAddress() }
                                     title="Share"

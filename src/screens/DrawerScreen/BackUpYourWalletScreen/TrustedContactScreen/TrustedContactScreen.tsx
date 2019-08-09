@@ -197,18 +197,18 @@ export default class TrustedContactScreen extends React.Component<any, any> {
 
 
     //TODO: click on model confirm button 
-    click_SentURLSmsOrEmail( type: string, value: any ) {
+    click_SentURLSmsOrEmail( type: string, value: any ) {  
         // AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
         var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-        let walletDetails = utils.getWalletDetails();
+        let walletDetails = utils.getWalletDetails();  
         let script = {};
         script.wn = walletDetails.walletType;
         script.key = this.state.key;
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );
         console.log( { encpScript } );
-        if ( type == "SMS" ) {
-            SendSMS.send( {
+        if ( type == "SMS" ) {       
+            SendSMS.send( {  
                 body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
                 recipients: [ value ],
                 successTypes: [ 'sent', 'queued' ]
@@ -234,13 +234,13 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         flag_OtpCodeShowStatus: true
                     } );
                 }, 3000 );
-            }
+            }  
         } else {
             Mailer.mail( {
                 subject: 'Hexa Wallet SSS Recovery',
-                recipients: [ value ],
-                body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
-                isHTML: true,
+                recipients: [ value ],            
+                body: walletDetails.walletType+" hexa wallet request you to store it's secret share, tap on the link to accept it  <br/> https://prime-sign-230407.appspot.com/sss/bk/" + encpScript,
+                isHTML: true,      
             }, ( error, event ) => {
                 if ( event == "sent" ) {
                     setTimeout( () => {
@@ -248,7 +248,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         this.setState( {
                             flag_OtpCodeShowStatus: true
                         } );
-                    }, 1000 );
+                    }, 1000 );  
                 } else {
                     alert.simpleOk( "Oops", error );
                 }

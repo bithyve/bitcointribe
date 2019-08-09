@@ -206,7 +206,7 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
                             <View style={ { flex: 1, marginTop: 20, alignItems: "center" } }>
                                 <Text note>FUNDS BEING TRANSFERRED TO</Text>
                                 <Text style={ [ { margin: 10, fontWeight: "bold", textAlign: "center", fontSize: 14 } ] }>{ data.respAddress }</Text>
-                                <Text note style={ { textAlign: "center", margin: 10 } }>Kindly confirm the address. Founds once transferred can not be recovered.</Text>
+                                <Text note style={ { textAlign: "center", margin: 10 } }>Kindly confirm the address. Funds once transferred can not be recovered.</Text>
                             </View>
                             <View style={ { flex: 1 } }>
                                 <View style={ { flex: 1, justifyContent: "center", marginLeft: 20, marginRight: 20 } }>

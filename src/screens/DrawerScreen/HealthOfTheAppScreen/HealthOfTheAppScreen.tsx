@@ -512,7 +512,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                         { renderIf( flag_SSSAndPdfFileCreate == true )(
                             <View>
                                 <View style={ { backgroundColor: "#262A2E", flexDirection: "row", alignItems: "center", padding: 10 } }>
-                                    <Text style={ { textAlign: "center", flex: 1, color: "#ffffff" } }>Please come back later, Hexa is still working</Text>
+                                    <Text style={ { textAlign: "center", flex: 1, color: "#ffffff" } }>Hexa is creating your shares</Text>
                                     <ActivityIndicator size="small" color="#ffffff" />
                                 </View>
                             </View>
