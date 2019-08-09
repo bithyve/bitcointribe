@@ -4,7 +4,7 @@ import bip39 from "react-native-bip39";
 import bitcoinJS, { TransactionBuilder } from "bitcoinjs-lib";
 import coinselect from "coinselect";
 import crypto from "crypto";
-import config from "../Config";
+import config from "../../Config";
 import Bitcoin from "./Bitcoin";
 
 const { BH_AXIOS } = config;
@@ -54,7 +54,8 @@ export default class SecureHDWallet extends Bitcoin {
     const { walletId } = this.getWalletId();
     this.walletID = walletId;
     this.secondaryMnemonic = stateVars
-      ? stateVars.secondaryMnemonic : undefined;
+      ? stateVars.secondaryMnemonic
+      : undefined;
     this.consumedAddresses = stateVars ? stateVars.consumedAddresses : [];
     this.nextFreeChildIndex = stateVars ? stateVars.nextFreeChildIndex : 0;
     this.multiSigCache = stateVars ? stateVars.multiSigCache : {};
@@ -71,24 +72,6 @@ export default class SecureHDWallet extends Bitcoin {
       keyLength: 24,
       iv: Buffer.alloc( 16, 0 ),
     };
-  }
-
-  public deriveChildXKey = (
-    extendedKey: string,
-    childIndex: number,
-  ): string => {
-    const xKey = bip32.fromBase58( extendedKey, this.network );
-    const childXKey = xKey.derive( childIndex );
-    return childXKey.toBase58();
-  }
-
-  public validateXpub = async ( xpub: string ) => {
-    try {
-      bip32.fromBase58( xpub, this.network );
-      return true;
-    } catch ( err ) {
-      return false;
-    }
   }
 
   public importBHXpub = async (
@@ -113,11 +96,6 @@ export default class SecureHDWallet extends Bitcoin {
     };
   }
 
-  public getPub = ( extendedKey: string ): string => {
-    const xKey = bip32.fromBase58( extendedKey, this.network );
-    return xKey.publicKey.toString( "hex" );
-  }
-
   public getWalletId = (): { walletId: string } => {
     const hash = crypto.createHash( "sha512" );
     const seed = bip39.mnemonicToSeed( this.primaryMnemonic );
@@ -131,25 +109,6 @@ export default class SecureHDWallet extends Bitcoin {
 
   public getSecondaryXpub = (): { secondaryXpub: string } => {
     return { secondaryXpub: this.xpubs.secondary };
-  }
-
-  public getRecoverableXKey = (
-    mnemonic: string,
-    path: string,
-    priv?: boolean,
-  ): string => {
-    const seed = bip39.mnemonicToSeed( mnemonic );
-    const root = bip32.fromSeed( seed, this.network );
-    if ( !priv ) {
-      const xpub = root
-        .derivePath( "m/" + path )
-        .neutered()
-        .toBase58();
-      return xpub;
-    } else {
-      const xpriv = root.derivePath( "m/" + path ).toBase58();
-      return xpriv;
-    }
   }
 
   public getAccountId = (): { accountId: string } => {
@@ -206,84 +165,6 @@ export default class SecureHDWallet extends Bitcoin {
     return { isValid: res.data.isValid };
   }
 
-  public binarySearchIterationForConsumedAddresses = async (
-    index: number,
-    maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
-    minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
-    depth: number = config.BSI.DEPTH.INIT,
-  ) => {
-    console.log( { depth } );
-    if ( depth >= config.BSI.DEPTH.LIMIT ) {
-      return maxUsedIndex + 1;
-    } // fail
-
-    const multiSig = this.createSecureMultiSig( index );
-    const txs = await this.getTx( multiSig.address );
-
-    console.log( txs );
-    if ( txs.totalTransactions === 0 ) {
-      console.log( { index } );
-      if ( index === 0 ) {
-        return 0;
-      }
-      minUnusedIndex = Math.min( minUnusedIndex, index ); // set
-      index = Math.floor( ( index - maxUsedIndex ) / 2 + maxUsedIndex );
-    } else {
-      maxUsedIndex = Math.max( maxUsedIndex, index ); // set
-      const nextMultiSig = this.createSecureMultiSig( index + 1 );
-      const txs2 = await this.getTx( nextMultiSig.address );
-      if ( txs2.totalTransactions === 0 ) {
-        return index + 1;
-      } // thats our next free address
-
-      index = Math.round( ( minUnusedIndex - index ) / 2 + index );
-    }
-
-    return this.binarySearchIterationForConsumedAddresses(
-      index,
-      maxUsedIndex,
-      minUnusedIndex,
-      depth + 1,
-    );
-  }
-
-  public gapLimitCatchUp = async () => {
-    // scanning future addressess in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
-    let tryAgain = false;
-
-    const multiSig = this.createSecureMultiSig(
-      this.nextFreeChildIndex + this.gapLimit - 1,
-    );
-
-    const txs = await this.getTx( multiSig.address );
-    console.log( { txs } );
-    if ( txs.totalTransactions > 0 ) {
-      //  someone uses our wallet outside! better catch up
-      this.nextFreeChildIndex += this.gapLimit;
-      tryAgain = true;
-    }
-
-    if ( tryAgain ) {
-      return this.gapLimitCatchUp();
-    }
-  }
-
-  public isWalletEmpty = async (): Promise<boolean> => {
-    if ( this.nextFreeChildIndex === 0 ) {
-      // assuming that this is freshly created wallet, with no funds and default internal variables
-      let emptyWallet = false;
-      const multiSig = this.createSecureMultiSig( 0 );
-      const txs = await this.getTx( multiSig.address );
-
-      if ( txs.totalTransactions === 0 ) {
-        emptyWallet = true;
-      }
-      return emptyWallet;
-    } else {
-      return false;
-    }
-  }
-
   public fetchBalance = async (): Promise<{
     balance: number;
     unconfirmedBalance: number;
@@ -324,6 +205,7 @@ export default class SecureHDWallet extends Bitcoin {
         status: string;
         confirmations: number;
         fee: string;
+        date: string;
         transactionType: string;
         amount: number;
         accountType: string;
@@ -343,49 +225,6 @@ export default class SecureHDWallet extends Bitcoin {
     );
   }
 
-  public fetchUtxo = async (): Promise<
-    Array<{
-      txId: string;
-      vout: number;
-      value: number;
-      address: string;
-    }>
-  > => {
-    try {
-      if ( this.consumedAddresses.length === 0 ) {
-        // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
-        await this.fetchBalance();
-      }
-
-      const { UTXOs } = await this.multiFetchUnspentOutputs(
-        this.consumedAddresses,
-      );
-      return UTXOs;
-    } catch ( err ) {
-      throw new Error( `Fetch UTXOs failed: ${ err.message }` );
-    }
-  }
-
-  public getSigningEssentials = ( address: string ) => {
-    if ( this.signingEssentialsCache[ address ] ) {
-      return this.signingEssentialsCache[ address ];
-    } // cache hit
-
-    for ( let itr = 0; itr <= this.nextFreeChildIndex + this.gapLimit; itr++ ) {
-      const multiSig = this.createSecureMultiSig( itr );
-
-      if ( multiSig.address === address ) {
-        return ( this.signingEssentialsCache[ address ] = {
-          multiSig,
-          primaryPriv: this.deriveChildXKey( this.primaryXpriv, itr ),
-          childIndex: itr,
-        } );
-      }
-    }
-
-    throw new Error( "Could not find WIF for " + address );
-  }
-
   public getReceivingAddress = async (): Promise<{ address: string }> => {
     try {
       // looking for free external address
@@ -399,8 +238,8 @@ export default class SecureHDWallet extends Bitcoin {
           this.nextFreeChildIndex + itr,
         );
 
-        const txs = await this.getTx( address );
-        if ( txs.totalTransactions === 0 ) {
+        const txCounts = await this.getTxCounts( [ address ] );
+        if ( txCounts[ address ] === 0 ) {
           // free address found
           freeAddress = address;
           this.nextFreeChildIndex += itr;
@@ -424,91 +263,6 @@ export default class SecureHDWallet extends Bitcoin {
     } catch ( err ) {
       throw new Error( `Unable to generate receiving address: ${ err.message }` );
     }
-  }
-
-  public derivePath = ( bhXpub: string ): string => {
-    const bhxpub = bip32.fromBase58( bhXpub, this.network );
-    let path;
-    if ( bhxpub.index === 0 ) {
-      path = config.SECURE_DERIVATION_BRANCH;
-    } else {
-      path = config.SECURE_WALLET_XPUB_PATH + config.SECURE_DERIVATION_BRANCH;
-    }
-    return path;
-  }
-
-  public prepareSecureAccount = (
-    bhXpub: string,
-    secondaryXpub?: string,
-  ): { prepared: boolean } => {
-    try {
-      const path = this.derivePath( bhXpub );
-      const primaryXpub = this.getRecoverableXKey( this.primaryMnemonic, path );
-
-      if ( !secondaryXpub ) {
-        secondaryXpub = this.getRecoverableXKey( this.secondaryMnemonic, path );
-      }
-
-      this.primaryXpriv = this.getRecoverableXKey(
-        this.primaryMnemonic,
-        path,
-        true,
-      );
-
-      this.xpubs = {
-        primary: primaryXpub,
-        secondary: secondaryXpub,
-        bh: bhXpub,
-      };
-
-      return {
-        prepared: true,
-      };
-    } catch ( err ) {
-      return {
-        prepared: false,
-      };
-    }
-  }
-
-  public createSecureMultiSig = (
-    childIndex: number,
-  ): {
-    scripts: {
-      redeem: string;
-      witness: string;
-    };
-    address: string;
-  } => {
-    if ( this.multiSigCache[ childIndex ] ) {
-      return this.multiSigCache[ childIndex ];
-    } // cache hit
-
-    console.log( `creating multiSig against index: ${ childIndex }` );
-
-    const childPrimaryPub = this.getPub(
-      this.deriveChildXKey( this.xpubs.primary, childIndex ),
-    );
-    const childRecoveryPub = this.getPub(
-      this.deriveChildXKey( this.xpubs.secondary, childIndex ),
-    );
-    const childBHPub = this.getPub(
-      this.deriveChildXKey( this.xpubs.bh, childIndex ),
-    );
-
-    // public keys should be aligned in the following way: [bhPub, primaryPub, recoveryPub]
-    // for generating ga_recovery based recoverable multiSigs
-    const pubs = [ childBHPub, childPrimaryPub, childRecoveryPub ];
-    // console.log({ pubs });
-    const multiSig = this.generateMultiSig( 2, pubs );
-
-    return ( this.multiSigCache[ childIndex ] = {
-      scripts: {
-        redeem: multiSig.p2sh.redeem.output.toString( "hex" ),
-        witness: multiSig.p2wsh.redeem.output.toString( "hex" ),
-      },
-      address: multiSig.address,
-    } );
   }
 
   public setupSecureAccount = async (): Promise<{
@@ -608,7 +362,7 @@ export default class SecureHDWallet extends Bitcoin {
     return outputs;
   }
 
-  public createSecureHDTransaction = async (
+  public createHDTransaction = async (
     recipientAddress: string,
     amount: number,
     txnPriority?: string,
@@ -722,58 +476,6 @@ export default class SecureHDWallet extends Bitcoin {
     }
   }
 
-  public txnCreationAndInitialSigning = async (
-    recipientAddress: string,
-    amount: number,
-  ): Promise<{
-    txHex: string;
-    childIndexArray: Array<{
-      childIndex: number;
-      inputIdentifier: {
-        txId: string;
-        vout: number;
-      };
-    }>;
-  }> => {
-    try {
-      if ( this.isValidAddress( recipientAddress ) ) {
-        amount = amount * 1e8; // converting into sats
-        const { balance } = await this.fetchBalance();
-
-        console.log( "---- Creating Transaction ----" );
-        const { inputs, txb, fee } = await this.createSecureHDTransaction(
-          recipientAddress,
-          amount,
-        );
-
-        console.log( "---- Transaction Created ----" );
-
-        if ( balance < amount + fee ) {
-          throw new Error(
-            "Insufficient balance to compensate for transfer amount and the txn fee",
-          );
-        }
-
-        const { signedTxb, childIndexArray } = await this.signHDTransaction(
-          inputs,
-          txb,
-        );
-
-        const txHex = signedTxb.buildIncomplete().toHex();
-
-        console.log(
-          "---- Transaction signed by the user (1st sig for 2/3 MultiSig)----",
-        );
-
-        return { txHex, childIndexArray };
-      } else {
-        throw new Error( "Recipient address is wrong" );
-      }
-    } catch ( err ) {
-      throw new Error( `Unable to transfer: ${ err.message }` );
-    }
-  }
-
   public serverSigningAndBroadcast = async (
     token: number,
     txHex: string,
@@ -812,6 +514,255 @@ export default class SecureHDWallet extends Bitcoin {
     } catch ( err ) {
       throw new Error( `Unable to transfer: ${ err.message }` );
     }
+  }
+
+  public prepareSecureAccount = (
+    bhXpub: string,
+    secondaryXpub?: string,
+  ): { prepared: boolean } => {
+    try {
+      const path = this.derivePath( bhXpub );
+      const primaryXpub = this.getRecoverableXKey( this.primaryMnemonic, path );
+
+      if ( !secondaryXpub ) {
+        secondaryXpub = this.getRecoverableXKey( this.secondaryMnemonic, path );
+      }
+
+      this.primaryXpriv = this.getRecoverableXKey(
+        this.primaryMnemonic,
+        path,
+        true,
+      );
+
+      this.xpubs = {
+        primary: primaryXpub,
+        secondary: secondaryXpub,
+        bh: bhXpub,
+      };
+
+      return {
+        prepared: true,
+      };
+    } catch ( err ) {
+      return {
+        prepared: false,
+      };
+    }
+  }
+
+  private getSigningEssentials = ( address: string ) => {
+    if ( this.signingEssentialsCache[ address ] ) {
+      return this.signingEssentialsCache[ address ];
+    } // cache hit
+
+    for ( let itr = 0; itr <= this.nextFreeChildIndex + this.gapLimit; itr++ ) {
+      const multiSig = this.createSecureMultiSig( itr );
+
+      if ( multiSig.address === address ) {
+        return ( this.signingEssentialsCache[ address ] = {
+          multiSig,
+          primaryPriv: this.deriveChildXKey( this.primaryXpriv, itr ),
+          childIndex: itr,
+        } );
+      }
+    }
+
+    throw new Error( "Could not find WIF for " + address );
+  }
+
+  private fetchUtxo = async (): Promise<
+    Array<{
+      txId: string;
+      vout: number;
+      value: number;
+      address: string;
+    }>
+  > => {
+    try {
+      if ( this.consumedAddresses.length === 0 ) {
+        // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
+        await this.fetchBalance();
+      }
+
+      const { UTXOs } = await this.multiFetchUnspentOutputs(
+        this.consumedAddresses,
+      );
+      return UTXOs;
+    } catch ( err ) {
+      throw new Error( `Fetch UTXOs failed: ${ err.message }` );
+    }
+  }
+
+  private gapLimitCatchUp = async () => {
+    // scanning future addressess in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
+    let tryAgain = false;
+
+    const multiSig = this.createSecureMultiSig(
+      this.nextFreeChildIndex + this.gapLimit - 1,
+    );
+
+    const txCounts = await this.getTxCounts( [ multiSig.address ] );
+    if ( txCounts[ multiSig.address ] > 0 ) {
+      //  someone uses our wallet outside! better catch up
+      this.nextFreeChildIndex += this.gapLimit;
+      tryAgain = true;
+    }
+
+    if ( tryAgain ) {
+      return this.gapLimitCatchUp();
+    }
+  }
+
+  private isWalletEmpty = async (): Promise<boolean> => {
+    if ( this.nextFreeChildIndex === 0 ) {
+      // assuming that this is freshly created wallet, with no funds and default internal variables
+      let emptyWallet = false;
+      const multiSig = this.createSecureMultiSig( 0 );
+      const txCounts = await this.getTxCounts( [ multiSig.address ] );
+
+      if ( txCounts[ multiSig.address ] === 0 ) {
+        emptyWallet = true;
+      }
+      return emptyWallet;
+    } else {
+      return false;
+    }
+  }
+
+  private binarySearchIterationForConsumedAddresses = async (
+    index: number,
+    maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
+    minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
+    depth: number = config.BSI.DEPTH.INIT,
+  ) => {
+    console.log( { depth } );
+    if ( depth >= config.BSI.DEPTH.LIMIT ) {
+      return maxUsedIndex + 1;
+    } // fail
+
+    const indexMultiSig = this.createSecureMultiSig( index );
+    const adjacentMultiSig = this.createSecureMultiSig( index + 1 );
+
+    const txCounts = await this.getTxCounts( [
+      indexMultiSig.address,
+      adjacentMultiSig.address,
+    ] );
+
+    if ( txCounts[ indexMultiSig.address ] === 0 ) {
+      console.log( { index } );
+      if ( index === 0 ) {
+        return 0;
+      }
+      minUnusedIndex = Math.min( minUnusedIndex, index ); // set
+      index = Math.floor( ( index - maxUsedIndex ) / 2 + maxUsedIndex );
+    } else {
+      maxUsedIndex = Math.max( maxUsedIndex, index ); // set
+      if ( txCounts[ adjacentMultiSig.address ] === 0 ) {
+        return index + 1;
+      } // thats our next free address
+
+      index = Math.round( ( minUnusedIndex - index ) / 2 + index );
+    }
+
+    return this.binarySearchIterationForConsumedAddresses(
+      index,
+      maxUsedIndex,
+      minUnusedIndex,
+      depth + 1,
+    );
+  }
+
+  private getRecoverableXKey = (
+    mnemonic: string,
+    path: string,
+    priv?: boolean,
+  ): string => {
+    const seed = bip39.mnemonicToSeed( mnemonic );
+    const root = bip32.fromSeed( seed, this.network );
+    if ( !priv ) {
+      const xpub = root
+        .derivePath( "m/" + path )
+        .neutered()
+        .toBase58();
+      return xpub;
+    } else {
+      const xpriv = root.derivePath( "m/" + path ).toBase58();
+      return xpriv;
+    }
+  }
+
+  private getPub = ( extendedKey: string ): string => {
+    const xKey = bip32.fromBase58( extendedKey, this.network );
+    return xKey.publicKey.toString( "hex" );
+  }
+
+  private deriveChildXKey = (
+    extendedKey: string,
+    childIndex: number,
+  ): string => {
+    const xKey = bip32.fromBase58( extendedKey, this.network );
+    const childXKey = xKey.derive( childIndex );
+    return childXKey.toBase58();
+  }
+
+  private validateXpub = async ( xpub: string ) => {
+    try {
+      bip32.fromBase58( xpub, this.network );
+      return true;
+    } catch ( err ) {
+      return false;
+    }
+  }
+
+  private derivePath = ( bhXpub: string ): string => {
+    const bhxpub = bip32.fromBase58( bhXpub, this.network );
+    let path;
+    if ( bhxpub.index === 0 ) {
+      path = config.SECURE_DERIVATION_BRANCH;
+    } else {
+      path = config.SECURE_WALLET_XPUB_PATH + config.SECURE_DERIVATION_BRANCH;
+    }
+    return path;
+  }
+
+  private createSecureMultiSig = (
+    childIndex: number,
+  ): {
+    scripts: {
+      redeem: string;
+      witness: string;
+    };
+    address: string;
+  } => {
+    if ( this.multiSigCache[ childIndex ] ) {
+      return this.multiSigCache[ childIndex ];
+    } // cache hit
+
+    console.log( `creating multiSig against index: ${ childIndex }` );
+
+    const childPrimaryPub = this.getPub(
+      this.deriveChildXKey( this.xpubs.primary, childIndex ),
+    );
+    const childRecoveryPub = this.getPub(
+      this.deriveChildXKey( this.xpubs.secondary, childIndex ),
+    );
+    const childBHPub = this.getPub(
+      this.deriveChildXKey( this.xpubs.bh, childIndex ),
+    );
+
+    // public keys should be aligned in the following way: [bhPub, primaryPub, recoveryPub]
+    // for generating ga_recovery based recoverable multiSigs
+    const pubs = [ childBHPub, childPrimaryPub, childRecoveryPub ];
+    // console.log({ pubs });
+    const multiSig = this.generateMultiSig( 2, pubs );
+
+    return ( this.multiSigCache[ childIndex ] = {
+      scripts: {
+        redeem: multiSig.p2sh.redeem.output.toString( "hex" ),
+        witness: multiSig.p2wsh.redeem.output.toString( "hex" ),
+      },
+      address: multiSig.address,
+    } );
   }
 
   private generateKey = ( psuedoKey: string ): string => {

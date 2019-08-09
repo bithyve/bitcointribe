@@ -1,4 +1,4 @@
-import config from "../Config";
+import config from "../../Config";
 const HEXA_HEALTH = config.HEALTH_STATUS.HEXA_HEALTH;
 const ENTITY_HEALTH = config.HEALTH_STATUS.ENTITY_HEALTH;
 const TIME_SLOTS = config.HEALTH_STATUS.TIME_SLOTS;
@@ -84,7 +84,16 @@ export default class HealthStatus {
     } else if ( this.counter.good === 3 ) {
       overallStatus = HEXA_HEALTH.STAGE5;
     }
-    console.log( "mnemonic", mnemonicStatus, "qaStatus", qaStatus, "secureAcStatus", secureAcStatus, "overallStatus", overallStatus );
+    console.log(
+      "mnemonic",
+      mnemonicStatus,
+      "qaStatus",
+      qaStatus,
+      "secureAcStatus",
+      secureAcStatus,
+      "overallStatus",
+      overallStatus,
+    );
     return {
       mnemonicStatus,
       qaStatus,
@@ -171,7 +180,7 @@ export default class HealthStatus {
       const obj = shares[ itr ];
       if ( obj === null ) {
         sharesInfo.push( {
-          shareId: "",
+          shareId: null,
           shareStage: ENTITY_HEALTH.STAGE1,
         } );
       } else {
@@ -184,11 +193,10 @@ export default class HealthStatus {
     const delta: number[] = new Array( 5 );
     const numberOfDays: number[] = new Array( 5 );
     for ( let i = 0; i < delta.length; i++ ) {
-      const obj = shares[ i ]; i
+      const obj = shares[ i ];
       if ( obj === null ) {
         delta[ i ] = Math.abs( Date.now() - 0 );
-      }
-      else {
+      } else {
         delta[ i ] = Math.abs( Date.now() - obj.updatedAt );
       }
     }
@@ -213,4 +221,3 @@ export default class HealthStatus {
     return { sharesInfo };
   }
 }
-

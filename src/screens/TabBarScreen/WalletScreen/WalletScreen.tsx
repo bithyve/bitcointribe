@@ -1719,17 +1719,6 @@ export default class WalletScreen extends React.Component {
 
   //TODO: getTestcoins
   getTestcoins = async () => {
-    this.setState( {
-      flag_GetBal: true,
-      arrErrorMessage: [ {
-        type: "asyncTask",
-        data: [ {
-          message: "Fetching testcoins of your wallet",
-          bgColor: "#262A2E",
-          color: "#ffffff",
-        } ]
-      } ]
-    } );
     let regularAccount = await bitcoinClassState.getRegularClassState();
     let secureAccount = await bitcoinClassState.getSecureClassState();
     var resCoins = await regularAccount.getTestcoins();
@@ -1746,6 +1735,8 @@ export default class WalletScreen extends React.Component {
       alert.simpleOkAction( "Oops", resCoins.err, this.click_StopLoader );
     }
   }
+
+
 
   //TODO: Show account details transaction
   click_AccountDetails = async ( item: any ) => {
@@ -1953,7 +1944,7 @@ export default class WalletScreen extends React.Component {
                     marginBottom: 30
                   } ] }
                 >
-                  { walletDetails.walletType != null ? walletDetails.walletType : "Wallet" }
+                  { walletDetails.walletType != null ? walletDetails.walletType : "" }
                 </Animated.Text>
                 <Animated.Text
                   style={ [ globalStyle.ffFiraSansRegular, {
@@ -2147,7 +2138,19 @@ export default class WalletScreen extends React.Component {
           </Button>
           <Button
             onPress={ () => {
-              this.getTestcoins()
+              this.setState( {
+                flag_GetBal: true,
+                arrErrorMessage: [ {
+                  type: "asyncTask",
+                  data: [ {
+                    message: "Fetching testcoins of your wallet",
+                    bgColor: "#262A2E",
+                    color: "#ffffff",
+                  } ]
+                } ]
+              }, () => {
+                this.getTestcoins()
+              } );
             } }
             style={ { backgroundColor: '#705BA8' } }
           >

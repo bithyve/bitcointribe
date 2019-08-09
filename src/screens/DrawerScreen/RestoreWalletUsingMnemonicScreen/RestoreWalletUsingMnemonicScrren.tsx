@@ -57,7 +57,7 @@ import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
 
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
-import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus"
+import HealthStatus from "HexaWallet/src/bitcoin/utilities/sss/HealthStatus"
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
 export default class RestoreWalletUsingMnemonicScrren extends Component {

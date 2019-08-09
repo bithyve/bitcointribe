@@ -52,7 +52,7 @@ var utils = require( "HexaWallet/src/app/constants/Utils" );
 //TODO: Bitcoin Class
 var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
-import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus";
+import HealthStatus from "HexaWallet/src/bitcoin/utilities/sss/HealthStatus";
 
 
 

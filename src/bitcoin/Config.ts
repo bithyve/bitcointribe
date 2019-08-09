@@ -3,8 +3,6 @@ import Client from "bitcoin-core";
 import bitcoinJS, { Network } from "bitcoinjs-lib";
 import config from "react-native-config";
 
-
-
 class Config {
   public ENVIRONMENT: string;
   public NETWORK: Network;

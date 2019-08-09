@@ -5,7 +5,7 @@ var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 //TODO: Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
-import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus"
+import HealthStatus from "HexaWallet/src/bitcoin/utilities/sss/HealthStatus"
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
 

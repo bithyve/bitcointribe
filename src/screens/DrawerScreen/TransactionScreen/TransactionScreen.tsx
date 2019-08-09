@@ -45,6 +45,9 @@ import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 
 let alert = new AlertSimple();
 
+//TODO: Common Funciton
+var comFunTran = require( "HexaWallet/src/app/manager/CommonFunction/CommonTransaction" );
+
 //TODO: Bitcoin Class
 var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
 
@@ -87,29 +90,44 @@ export default class TransactionScreen extends React.Component<any, any> {
     async getRegularTransaction() {
         let { arrSelectedAccount } = this.state;
         this.setState( { flag_Loading: true } );
+
+        var resTransaction = [];
+        if ( arrSelectedAccount.accountType == "Regular Account" ) {
+            resTransaction = await comFunTran.getSecAccountTran( "Regular" );
+            resTransaction.length != 0 ? resTransaction : resTransaction = await this.getAccountTrans( "Regular" )
+            console.log( { resTransaction } );
+        } else {
+            resTransaction = await comFunTran.getSecAccountTran( "Secure" );
+            resTransaction.length != 0 ? resTransaction : resTransaction = await this.getAccountTrans( "Secure" )
+        }
+        this.setState( {
+            flag_Loading: false,
+            arrTransaction: resTransaction
+        } )
+    }
+
+    getAccountTrans = async ( type: string ) => {
+        await comFunTran.getAccountTransaction();
         let regularAccount = await bitcoinClassState.getRegularClassState();
         let secureAccount = await bitcoinClassState.getSecureClassState();
-        var resTransaction;
-        if ( arrSelectedAccount.accountType == "Regular Account" ) {
+        let resTransaction = [];
+        if ( type == "Regular" ) {
             resTransaction = await regularAccount.getTransactions();
             if ( resTransaction.status == 200 ) {
-                resTransaction = resTransaction.data;
+                return resTransaction.data.transactions.transactionDetails;
             } else {
                 alert.simpleOkAction( "Oops", resTransaction.err, this.click_StopLoader );
             }
         } else {
             resTransaction = await secureAccount.getTransactions();
             if ( resTransaction.status == 200 ) {
-                resTransaction = resTransaction.data;
+                return resTransaction.data.transactions.transactionDetails;
             } else {
                 alert.simpleOkAction( "Oops", resTransaction.err, this.click_StopLoader );
             }
         }
-        this.setState( {
-            flag_Loading: false,
-            arrTransaction: resTransaction.transactions.transactionDetails
-        } )
     }
+
 
     _renderItem = ( { item, index } ) => {
         return (

@@ -1,6 +1,6 @@
 import { TransactionBuilder } from "bitcoinjs-lib";
 import config from "../../Config";
-import SecureHDWallet from "../../utilities/SecureHDWallet";
+import SecureHDWallet from "../../utilities/accounts/SecureHDWallet";
 
 export default class SecureAccount {
   public static fromJSON = ( json: string ) => {
@@ -63,6 +63,126 @@ export default class SecureAccount {
     },
   ) {
     this.secureHDWallet = new SecureHDWallet( primaryMnemonic, stateVars );
+  }
+
+  public setupSecureAccount = async (): Promise<
+    | {
+      status: number;
+      data: {
+        setupData: {
+          qrData: string;
+          secret: string;
+          bhXpub: string;
+        };
+      };
+      err?: undefined;
+    }
+    | {
+      status: number;
+      err: string;
+      data?: undefined;
+    }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.secureHDWallet.setupSecureAccount(),
+      };
+    } catch ( err ) {
+      return { status: config.STATUS.ERROR, err: err.message };
+    }
+  }
+
+  public importSecureAccount = async (
+    secondaryXpub: string,
+    bhXpub?: string,
+    token?: number,
+  ): Promise<
+    | {
+      status: number;
+      data: {
+        imported: boolean;
+      };
+      err?: undefined;
+    }
+    | {
+      status: number;
+      err: string;
+      data?: undefined;
+    }
+  > => {
+    try {
+      if ( !bhXpub ) {
+        if ( !token ) {
+          throw new Error( "Neither a bhXpub nor a token is provided" );
+        }
+        const res = await this.secureHDWallet.importBHXpub( token );
+        bhXpub = res.bhXpub;
+      }
+      const { prepared } = this.secureHDWallet.prepareSecureAccount(
+        bhXpub,
+        secondaryXpub,
+      );
+
+      if ( !prepared ) {
+        throw new Error( "Import failed: unable to prepare secure account." );
+      }
+      return { status: config.STATUS.SUCCESS, data: { imported: true } };
+    } catch ( err ) {
+      return { status: config.STATUS.ERROR, err: err.message };
+    }
+  }
+
+  public decryptSecondaryXpub = (
+    encryptedSecXpub: string,
+  ):
+    | {
+      status: number;
+      data: {
+        secondaryXpub: string;
+      };
+      err?: undefined;
+    }
+    | {
+      status: number;
+      err: string;
+      data?: undefined;
+    } => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: this.secureHDWallet.decryptSecondaryXpub( encryptedSecXpub ),
+      };
+    } catch ( err ) {
+      return { status: config.STATUS.ERROR, err: err.message };
+    }
+  }
+
+  public checkHealth = async (
+    chunk: string,
+    pos: number,
+  ): Promise<
+    | {
+      status: number;
+      data: {
+        isValid: boolean;
+      };
+      err?: undefined;
+    }
+    | {
+      status: number;
+      err: string;
+      data?: undefined;
+    }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.secureHDWallet.checkHealth( chunk, pos ),
+      };
+    } catch ( err ) {
+      return { status: config.STATUS.ERROR, err: err.message };
+    }
   }
 
   public isActive = async (): Promise<
@@ -247,6 +367,7 @@ export default class SecureAccount {
             status: string;
             confirmations: number;
             fee: string;
+            date: string;
             transactionType: string;
             amount: number;
             accountType: string;
@@ -272,6 +393,31 @@ export default class SecureAccount {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
+
+  public getTransactionDetails = async (
+    txHash: string,
+  ): Promise<
+    | {
+      status: number;
+      data: any;
+      err?: undefined;
+    }
+    | {
+      status: number;
+      err: string;
+      data?: undefined;
+    }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.secureHDWallet.fetchTransactionDetails( txHash ),
+      };
+    } catch ( err ) {
+      return { status: config.STATUS.ERROR, err: err.message };
+    }
+  }
+
   public getTestcoins = async (): Promise<
     | {
       status: number;
@@ -292,126 +438,6 @@ export default class SecureAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.testnetFaucet( address ),
-      };
-    } catch ( err ) {
-      return { status: config.STATUS.ERROR, err: err.message };
-    }
-  }
-
-  public setupSecureAccount = async (): Promise<
-    | {
-      status: number;
-      data: {
-        setupData: {
-          qrData: string;
-          secret: string;
-          bhXpub: string;
-        };
-      };
-      err?: undefined;
-    }
-    | {
-      status: number;
-      err: string;
-      data?: undefined;
-    }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.setupSecureAccount(),
-      };
-    } catch ( err ) {
-      return { status: config.STATUS.ERROR, err: err.message };
-    }
-  }
-
-  public importSecureAccount = async (
-    secondaryXpub: string,
-    bhXpub?: string,
-    token?: number,
-  ): Promise<
-    | {
-      status: number;
-      data: {
-        imported: boolean;
-      };
-      err?: undefined;
-    }
-    | {
-      status: number;
-      err: string;
-      data?: undefined;
-    }
-  > => {
-    try {
-      if ( !bhXpub ) {
-        if ( !token ) {
-          throw new Error( "Neither a bhXpub nor a token is provided" );
-        }
-        const res = await this.secureHDWallet.importBHXpub( token );
-        bhXpub = res.bhXpub;
-      }
-      const { prepared } = this.secureHDWallet.prepareSecureAccount(
-        bhXpub,
-        secondaryXpub,
-      );
-
-      if ( !prepared ) {
-        throw new Error( "Import failed: unable to prepare secure account." );
-      }
-      return { status: config.STATUS.SUCCESS, data: { imported: true } };
-    } catch ( err ) {
-      return { status: config.STATUS.ERROR, err: err.message };
-    }
-  }
-
-  public decryptSecondaryXpub = (
-    encryptedSecXpub: string,
-  ):
-    | {
-      status: number;
-      data: {
-        secondaryXpub: string;
-      };
-      err?: undefined;
-    }
-    | {
-      status: number;
-      err: string;
-      data?: undefined;
-    } => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.secureHDWallet.decryptSecondaryXpub( encryptedSecXpub ),
-      };
-    } catch ( err ) {
-      return { status: config.STATUS.ERROR, err: err.message };
-    }
-  }
-
-  public checkHealth = async (
-    chunk: string,
-    pos: number,
-  ): Promise<
-    | {
-      status: number;
-      data: {
-        isValid: boolean;
-      };
-      err?: undefined;
-    }
-    | {
-      status: number;
-      err: string;
-      data?: undefined;
-    }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.checkHealth( chunk, pos ),
       };
     } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
@@ -450,14 +476,16 @@ export default class SecureAccount {
   > => {
     try {
       if ( this.secureHDWallet.isValidAddress( recipientAddress ) ) {
+        // amount = Math.round(amount * 1e8); // converting into sats
         amount = Math.round( amount );
+
         console.log( "---- Creating Transaction ----" );
         const {
           inputs,
           txb,
           fee,
           balance,
-        } = await this.secureHDWallet.createSecureHDTransaction(
+        } = await this.secureHDWallet.createHDTransaction(
           recipientAddress,
           amount,
           priority.toLowerCase(),
@@ -468,14 +496,14 @@ export default class SecureAccount {
             status: config.STATUS.ERROR,
             err:
               "Insufficient balance to compensate for transfer amount and the txn fee",
-            data: { fee: fee },
+            data: { fee },
           };
         }
         if ( inputs && txb ) {
           console.log( "---- Transaction Created ----" );
           return {
             status: config.STATUS.SUCCESS,
-            data: { inputs, txb, fee: fee },
+            data: { inputs, txb, fee },
           };
         } else {
           throw new Error(

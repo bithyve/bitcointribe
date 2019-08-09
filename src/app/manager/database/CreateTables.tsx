@@ -36,7 +36,7 @@ export default class CreateTables extends Component {
       txn.executeSql(
         "CREATE TABLE IF NOT EXISTS " +
         localDB.tableName.tblTransaction +
-        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,accountAddress TEXT,transactionHash TEXT,balance INTEGER,unit TEXT,fees INTEGER,transactionType TEXT,confirmationType TEXT,lastUpdated TEXT)",
+        " (id  INTEGER PRIMARY KEY AUTOINCREMENT,dateCreated TEXT,accountType TEXT,amount TEXT,confimation TEXT,tranDate TEXT,fees TEXT,receipientAddress TEXT,senderAddress TEXT,status TEXT,transactionType TEXT,txid TEXT,lastUpdated TEXT)",
         []
       );
       txn.executeSql(

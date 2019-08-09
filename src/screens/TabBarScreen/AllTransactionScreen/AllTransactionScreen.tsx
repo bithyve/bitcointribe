@@ -16,7 +16,8 @@ import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 //TODO: Custome Pages
-import { images, colors, svgIcon } from "HexaWallet/src/app/constants/Constants";
+import { localDB, images, colors, svgIcon } from "HexaWallet/src/app/constants/Constants";
+var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
@@ -31,6 +32,9 @@ import { SvgIcon } from "@up-shared/components";
 //TODO: Custome Alert 
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
+
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
 //TODO: Bitcoin Class
 var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
@@ -65,28 +69,25 @@ export default class AllTransactionScreen extends React.Component<any, any> {
     this.getTransaction()
   }
 
-  async getTransaction() {
+  getTransaction = async () => {
+    var resTranList = await comFunDBRead.readTblTransaction();
+    resTranList.length != 0 ? this.dbDataShow( resTranList ) : this.getReloadData()
+  }
+
+  dbDataShow( resTranList: any ) {
+    this.setState( {
+      recentTransactions: resTranList
+    } );
+  }
+
+
+  getReloadData = async () => {
     this.setState( { flag_Loading: true } );
-    await this.getRegularTransaction();
-    await this.getSecureTransaction();
+    await this.getAccountTransaction();
     this.filterTransaction()
   }
 
-  filterTransaction() {
-    let results = [ ...this.state.recentRegularTransactions, ...this.state.recentSecureTransactions ];
-    console.log( { results } );
-    results = results.sort( ( a, b ) => { return a.confirmations - b.confirmations } )
-    this.setState( {
-      flag_Loading: false,
-      recentTransactions: results
-    } )
-  }
-
-  click_StopLoader = () => {
-    this.setState( { flag_Loading: false } );
-  }
-
-  async getRegularTransaction() {
+  async getAccountTransaction() {
     let regularAccount = await bitcoinClassState.getRegularClassState();
     var regularAccountTransactions = await regularAccount.getTransactions();
     if ( regularAccountTransactions.status == 200 ) {
@@ -96,9 +97,6 @@ export default class AllTransactionScreen extends React.Component<any, any> {
     } else {
       alert.simpleOkAction( "Oops", regularAccountTransactions.err, this.click_StopLoader );
     }
-  }
-
-  async getSecureTransaction() {
     let secureAccount = await bitcoinClassState.getSecureClassState();
     var secureAccountTransactions = await secureAccount.getTransactions();
     if ( secureAccountTransactions.status == 200 ) {
@@ -110,6 +108,27 @@ export default class AllTransactionScreen extends React.Component<any, any> {
     }
   }
 
+  filterTransaction = async () => {
+    let dateTime = Date.now();
+    let results = [ ...this.state.recentRegularTransactions, ...this.state.recentSecureTransactions ];
+    results = results.sort( ( a, b ) => { return a.confirmations - b.confirmations } )
+    let resStoreTrna = await dbOpration.insertTblTransation(
+      localDB.tableName.tblTransaction,
+      results,
+      dateTime
+    );
+    if ( resStoreTrna ) {
+      this.setState( {
+        flag_Loading: false,
+        recentTransactions: results
+      } );
+    }
+  }
+
+
+  click_StopLoader = () => {
+    this.setState( { flag_Loading: false } );
+  }
 
 
   setModalVisible( modalVisible: any ) {
@@ -205,7 +224,6 @@ export default class AllTransactionScreen extends React.Component<any, any> {
       </View> )
   }
 
-
   render() {
     return (
       <Container>
@@ -242,7 +260,7 @@ export default class AllTransactionScreen extends React.Component<any, any> {
               keyExtractor={ ( item, index ) => index.toString() }
               refreshControl={
                 <RefreshControl
-                  onRefresh={ () => { this.getTransaction() } }
+                  onRefresh={ () => { this.getReloadData() } }
                   refreshing={ false }
                 ></RefreshControl>
               }

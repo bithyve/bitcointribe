@@ -45,7 +45,7 @@ export default class WalletNameScreen extends React.Component<any, any> {
 
     //TODO: Wallet Name
     ckeckWalletName( val: string ) {
-        if ( val.length >= 0 ) {
+        if ( val.length > 0 ) {
             this.setState( {
                 flag_ProceedBtnDisable: false
             } )

@@ -11,16 +11,14 @@ import bitcoinJS, {
   TransactionBuilder,
 } from "bitcoinjs-lib";
 import coinselect from "coinselect";
-import config from "../Config";
+import config from "../../Config";
+
 const { BH_AXIOS } = config;
-
-
 const { TESTNET, MAINNET } = config.API_URLS;
 
 export default class Bitcoin {
   public network: Network;
   public client: Client;
-
   constructor () {
     this.network = config.NETWORK;
     this.client = config.BITCOIN_NODE;
@@ -31,14 +29,30 @@ export default class Bitcoin {
 
   public utcNow = (): number => Math.floor( Date.now() / 1000 );
 
-  public getAddress = ( keyPair: ECPair ): string =>
-    bitcoinJS.payments.p2sh( {
-      redeem: bitcoinJS.payments.p2wpkh( {
+  public getAddress = ( keyPair: ECPair, standard: number ): string => {
+    if ( standard === config.STANDARD.BIP44 ) {
+      return bitcoinJS.payments.p2pkh( {
         pubkey: keyPair.publicKey,
         network: this.network,
-      } ),
-      network: this.network,
-    } ).address
+      } ).address;
+    } else if ( standard === config.STANDARD.BIP49 ) {
+      return bitcoinJS.payments.p2sh( {
+        redeem: bitcoinJS.payments.p2wpkh( {
+          pubkey: keyPair.publicKey,
+          network: this.network,
+        } ),
+        network: this.network,
+      } ).address;
+    } else if ( standard === config.STANDARD.BIP84 ) {
+      return bitcoinJS.payments.p2wpkh( {
+        pubkey: keyPair.publicKey,
+        network: this.network,
+      } ).address;
+    }
+  }
+
+  // public getAddress = (keyPair: ECPair): string =>
+  //   bitcoinJS.payments.p2pkh({ pubkey: keyPair.publicKey }).address
 
   public generateHDWallet = (
     mnemonic: string,
@@ -58,12 +72,12 @@ export default class Bitcoin {
     const seed: Buffer = passphrase
       ? bip39.mnemonicToSeed( mnemonic, passphrase )
       : bip39.mnemonicToSeed( mnemonic );
-    const path: string = "m/44'/0'/0'/0/0";
+    const path: string = "m/44'/1'/0'/0/0";
     const root = bip32.fromSeed( seed, this.network );
     const child1 = root.derivePath( path );
 
     const privateKey = child1.toWIF();
-    const address = this.getAddress( child1 );
+    const address = this.getAddress( child1, config.STANDARD.BIP49 );
 
     console.log( `Mnemonic: ${ mnemonic }` );
     console.log( `Address: ${ address }` );
@@ -76,17 +90,17 @@ export default class Bitcoin {
     };
   }
 
-  public createHDWallet = (
+  public createHDWallet = async (
     passphrase?: string,
-  ): {
+  ): Promise<{
     mnemonic: string;
     keyPair: bitcoinJS.ECPair;
     address: string;
     privateKey: string;
-  } => {
+  }> => {
     // creates a new HD Wallet
 
-    const mnemonic = bip39.generateMnemonic( 256 );
+    const mnemonic = await bip39.generateMnemonic( 256 );
     return this.generateHDWallet( mnemonic, passphrase );
   }
 
@@ -296,6 +310,7 @@ export default class Bitcoin {
         status: string;
         confirmations: number;
         fee: string;
+        date: string;
         transactionType: string;
         amount: number;
         accountType: string;
@@ -313,6 +328,8 @@ export default class Bitcoin {
         status: string;
         confirmations: number;
         fee: string;
+        blockTime: number,
+        date: string;
         transactionType: string;
         amount: number;
         accountType: string;
@@ -371,6 +388,8 @@ export default class Bitcoin {
               status: tx.confirmationType,
               confirmations: tx.NumberofConfirmations,
               fee: tx.fee,
+              blockTime: tx.Status.block_time,
+              date: new Date( tx.Status.block_time * 1000 ).toUTCString(),
               transactionType: tx.transactionType,
               amount: tx.amount,
               accountType: tx.accountType,
@@ -412,6 +431,7 @@ export default class Bitcoin {
                 status: tx.confirmationType,
                 confirmations: tx.confirmations,
                 fee: tx.fees,
+                date: new Date( tx.confirmed ).toUTCString(),
                 transactionType: tx.transactionType,
                 amount: tx.amount,
                 accountType: tx.accountType,
@@ -432,13 +452,8 @@ export default class Bitcoin {
     }
   }
 
-  public getTx = async (
-    address: string,
-  ): Promise<{
-    totalTransactions: number;
-    confirmedTransactions: number;
-    unconfirmedTransactions: number;
-  }> => {
+  public getTxCounts = async ( addresses: string[] ) => {
+    const txCounts = {};
     try {
       let res: AxiosResponse;
       try {
@@ -446,14 +461,14 @@ export default class Bitcoin {
           res = await axios.post(
             config.ESPLORA_API_ENDPOINTS.TESTNET.MULTITXN,
             {
-              addresses: [ address ],
+              addresses,
             },
           );
         } else {
           res = await axios.post(
             config.ESPLORA_API_ENDPOINTS.MAINNET.MULTITXN,
             {
-              addresses: [ address ],
+              addresses,
             },
           );
         }
@@ -461,12 +476,12 @@ export default class Bitcoin {
         throw new Error( err.response.data.err );
       }
 
-      const addressInfo = res.data[ 0 ];
-      return {
-        totalTransactions: addressInfo.TotalTransactions,
-        confirmedTransactions: addressInfo.ConfirmedTransactions,
-        unconfirmedTransactions: addressInfo.UnconfirmedTransactions,
-      };
+      const addressesInfo = res.data;
+      for ( const addressInfo of addressesInfo ) {
+        txCounts[ addressInfo.Address ] = addressInfo.TotalTransactions;
+      }
+
+      return txCounts;
     } catch ( err ) {
       console.log(
         `An error occured while fetching transactions via Esplora Wrapper: ${ err }`,
@@ -474,12 +489,11 @@ export default class Bitcoin {
       console.log( "Using Blockcypher fallback" );
 
       try {
-        const txns = await this.fetchTransactionsByAddress( address );
-        return {
-          totalTransactions: txns.transactions.totalTransactions,
-          confirmedTransactions: txns.transactions.confirmedTransactions,
-          unconfirmedTransactions: txns.transactions.unconfirmedTransactions,
-        };
+        for ( const address of addresses ) {
+          const txns = await this.fetchTransactionsByAddress( address );
+          txCounts[ address ] = txns.transactions.totalTransactions;
+        }
+        return txCounts;
       } catch ( err ) {
         console.log(
           `An error occured while fetching transactions via Blockcypher fallback as well: ${ err }`,
@@ -525,6 +539,7 @@ export default class Bitcoin {
     console.log( "---- Transaction Broadcasted ----" );
     return res;
   }
+
   public testnetFaucet = async (
     recipientAddress: string,
   ): Promise<{
@@ -532,17 +547,17 @@ export default class Bitcoin {
     funded: any;
   }> => {
     const amount = Math.trunc( Math.random() * 1e5 ) / 1e8;
-    console.log( { amount, recipientAddress } );
+    console.log( { amount } );
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post( "/testnetFaucet", {
         recipientAddress,
         amount,
       } );
-      console.log( { res } );
     } catch ( err ) {
       throw new Error( err.response.data.err );
     }
+
     const { txid, funded } = res.data;
     return { txid, funded };
   }
@@ -1116,37 +1131,6 @@ export default class Bitcoin {
     };
   } => {
     return bip21.decode( paymentURI );
-  }
-
-  private rng2 = (): Buffer => {
-    return Buffer.from( "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz2" );
-  }
-
-  private generateTestnetKeys = ( rng?): string => {
-    let keyPair: ECPair;
-    if ( rng ) {
-      keyPair = bitcoinJS.ECPair.makeRandom( {
-        network: this.network,
-        rng,
-      } );
-    } else {
-      // // for generating random testnet addresses
-      keyPair = bitcoinJS.ECPair.makeRandom( {
-        network: this.network,
-      } );
-    }
-    const privateKey: string = keyPair.toWIF();
-    const address: string = this.getAddress( keyPair );
-
-    console.log(
-      `Private Kye[WIF]: ${ privateKey } \n Generated Address: ${ address } `,
-    );
-    return privateKey;
-  }
-
-  // deterministic RNG (testing only)
-  private rng1 = (): Buffer => {
-    return Buffer.from( "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz1" );
   }
 
   private categorizeTx = (

@@ -1,9 +1,9 @@
 import bitcoinJS, { Transaction, TransactionBuilder } from "bitcoinjs-lib";
-import Bitcoin from "../../utilities/Bitcoin";
+import Bitcoin from "../../utilities/accounts/Bitcoin";
 
 export default class JointAccount {
   public bitcoin: Bitcoin;
-  constructor () {
+  constructor() {
     this.bitcoin = new Bitcoin();
   }
 
@@ -11,8 +11,8 @@ export default class JointAccount {
     mnemonic: string,
     details: { creator: string; walletName: string },
   ) => {
-    const { keyPair } = this.bitcoin.generateHDWallet( mnemonic );
-    const publicKey = keyPair.publicKey.toString( "hex" );
+    const { keyPair } = this.bitcoin.generateHDWallet(mnemonic);
+    const publicKey = keyPair.publicKey.toString("hex");
 
     const jointDetails = {
       cn: details.creator, // creator's name
@@ -21,67 +21,67 @@ export default class JointAccount {
       typ: "conf",
     };
 
-    return JSON.stringify( jointDetails );
+    return JSON.stringify(jointDetails);
   }
 
   public mergeJointAccount = (
     mnemonic: string,
     details: { jointDetails: string; merger: string },
   ) => {
-    const { keyPair } = this.bitcoin.generateHDWallet( mnemonic );
-    const publicKey = keyPair.publicKey.toString( "hex" );
-    const jointDetails = JSON.parse( details.jointDetails );
+    const { keyPair } = this.bitcoin.generateHDWallet(mnemonic);
+    const publicKey = keyPair.publicKey.toString("hex");
+    const jointDetails = JSON.parse(details.jointDetails);
 
     jointDetails.mpk = publicKey; // merger's public key
     jointDetails.mn = details.merger; // merger's name
 
-    const pubs = [ jointDetails.cpk, jointDetails.mpk ];
-    const initMultiSig = this.bitcoin.generateMultiSig( pubs.length, pubs );
+    const pubs = [jointDetails.cpk, jointDetails.mpk];
+    const initMultiSig = this.bitcoin.generateMultiSig(pubs.length, pubs);
 
     const multiSig = {
       scripts: {
-        redeem: initMultiSig.p2sh.redeem.output.toString( "hex" ),
-        witness: initMultiSig.p2wsh.redeem.output.toString( "hex" ),
+        redeem: initMultiSig.p2sh.redeem.output.toString("hex"),
+        witness: initMultiSig.p2wsh.redeem.output.toString("hex"),
       },
       address: initMultiSig.address,
     };
 
     jointDetails.typ = "imp";
-    return { multiSig, mergeJSON: JSON.stringify( jointDetails ) };
+    return { multiSig, mergeJSON: JSON.stringify(jointDetails) };
   }
 
-  public ackDetails = ( jointDetails: string ) => {
-    const details = JSON.parse( jointDetails );
+  public ackDetails = (jointDetails: string) => {
+    const details = JSON.parse(jointDetails);
     delete details.cpk;
     details.typ = "ack";
-    return JSON.stringify( details );
+    return JSON.stringify(details);
   }
 
   public createInitiatedJointAccount = (
     mnemonic: string,
     details: { jointDetails: string },
   ) => {
-    const { keyPair } = this.bitcoin.generateHDWallet( mnemonic );
-    const publicKey = keyPair.publicKey.toString( "hex" );
+    const { keyPair } = this.bitcoin.generateHDWallet(mnemonic);
+    const publicKey = keyPair.publicKey.toString("hex");
 
-    const jointDetails = JSON.parse( details.jointDetails );
+    const jointDetails = JSON.parse(details.jointDetails);
     jointDetails.cpk = publicKey;
-    const pubs = [ jointDetails.cpk, jointDetails.mpk ];
-    const initMultiSig = this.bitcoin.generateMultiSig( pubs.length, pubs );
+    const pubs = [jointDetails.cpk, jointDetails.mpk];
+    const initMultiSig = this.bitcoin.generateMultiSig(pubs.length, pubs);
 
     const multiSig = {
       scripts: {
-        redeem: initMultiSig.p2sh.redeem.output.toString( "hex" ),
-        witness: initMultiSig.p2wsh.redeem.output.toString( "hex" ),
+        redeem: initMultiSig.p2sh.redeem.output.toString("hex"),
+        witness: initMultiSig.p2wsh.redeem.output.toString("hex"),
       },
       address: initMultiSig.address,
     };
     jointDetails.add = multiSig.address;
     jointDetails.typ = "imp";
-    return { multiSig, creationJSON: JSON.stringify( jointDetails ) };
+    return { multiSig, creationJSON: JSON.stringify(jointDetails) };
   }
 
-  public initJointTxn = async ( {
+  public initJointTxn = async ({
     senderAddress,
     recipientAddress,
     amount,
@@ -93,20 +93,20 @@ export default class JointAccount {
     amount: number;
     privateKey: string;
     scripts: any;
-  } ) => {
-    if ( this.bitcoin.isValidAddress( recipientAddress ) ) {
-      const { balanceData } = await this.bitcoin.getBalance( senderAddress );
-      console.log( { balance: balanceData.final_balance } );
+  }) => {
+    if (this.bitcoin.isValidAddress(recipientAddress)) {
+      const { balanceData } = await this.bitcoin.getBalance(senderAddress);
+      console.log({ balance: balanceData.final_balance });
 
-      console.log( "---- Creating Transaction ----" );
+      console.log("---- Creating Transaction ----");
       const { inputs, txb, fee } = await this.bitcoin.createTransaction(
         senderAddress,
         recipientAddress,
         amount,
       );
-      console.log( "---- Transaction Created ----" );
+      console.log("---- Transaction Created ----");
 
-      if ( parseInt( balanceData.final_balance, 10 ) + fee < amount ) {
+      if (parseInt(balanceData.final_balance, 10) + fee < amount) {
         throw new Error(
           "Insufficient balance to compensate for transfer amount and the txn fee",
         );
@@ -115,13 +115,13 @@ export default class JointAccount {
       const signedTxb = this.bitcoin.signTransaction(
         inputs,
         txb,
-        [ this.bitcoin.getKeyPair( privateKey ) ],
-        Buffer.from( scripts.redeem, "hex" ),
-        Buffer.from( scripts.witness, "hex" ),
+        [this.bitcoin.getKeyPair(privateKey)],
+        Buffer.from(scripts.redeem, "hex"),
+        Buffer.from(scripts.witness, "hex"),
       );
 
       const txHex = signedTxb.buildIncomplete().toHex();
-      console.log( { txHex } );
+      console.log({ txHex });
       return {
         status: 200,
         data: txHex,
@@ -134,25 +134,25 @@ export default class JointAccount {
     }
   }
 
-  public recoverTxnDetails = async ( txHex: string ) => {
-    const regenTx: Transaction = bitcoinJS.Transaction.fromHex( txHex );
+  public recoverTxnDetails = async (txHex: string) => {
+    const regenTx: Transaction = bitcoinJS.Transaction.fromHex(txHex);
 
     const sender = this.bitcoin.fromOutputScript(
-      regenTx.outs[ 1 ].script, // considering that the output remains consistent
+      regenTx.outs[1].script, // considering that the output remains consistent
     );
-    const recipient = this.bitcoin.fromOutputScript( regenTx.outs[ 0 ].script );
-    const amount = regenTx.outs[ 0 ].value;
+    const recipient = this.bitcoin.fromOutputScript(regenTx.outs[0].script);
+    const amount = regenTx.outs[0].value;
 
-    const recoveredInputs = await this.bitcoin.recoverInputsFromTxHex( txHex );
+    const recoveredInputs = await this.bitcoin.recoverInputsFromTxHex(txHex);
     let valueIn: number = 0;
-    recoveredInputs.forEach( ( input ) => {
+    recoveredInputs.forEach((input) => {
       valueIn += input.value;
-    } );
+    });
 
     let valueOut: number = 0;
-    regenTx.outs.forEach( ( output ) => {
+    regenTx.outs.forEach((output) => {
       valueOut += output.value;
-    } );
+    });
     const txnFee = valueIn - valueOut;
 
     return {
@@ -163,14 +163,14 @@ export default class JointAccount {
     };
   }
 
-  public authorizeJointTxn = async ( txHex: string, privateKey: string ) => {
-    const regenTx: Transaction = bitcoinJS.Transaction.fromHex( txHex );
-    const recoveredInputs = await this.bitcoin.recoverInputsFromTxHex( txHex );
+  public authorizeJointTxn = async (txHex: string, privateKey: string) => {
+    const regenTx: Transaction = bitcoinJS.Transaction.fromHex(txHex);
+    const recoveredInputs = await this.bitcoin.recoverInputsFromTxHex(txHex);
 
     // recover p2sh and p2wsh redeem scripts from the regenTxn
     const recoveredScripts = {
-      p2sh: regenTx.ins[ 0 ].script.slice( 1 ), // slicing because the first element of the buffer isn't actually a part of the redeem script
-      p2wsh: regenTx.ins[ 0 ].witness[ regenTx.ins[ 0 ].witness.length - 1 ], // confirm that it's always the 5th element
+      p2sh: regenTx.ins[0].script.slice(1), // slicing because the first element of the buffer isn't actually a part of the redeem script
+      p2wsh: regenTx.ins[0].witness[regenTx.ins[0].witness.length - 1], // confirm that it's always the 5th element
     };
 
     const regenTxb: TransactionBuilder = bitcoinJS.TransactionBuilder.fromTransaction(
@@ -181,14 +181,14 @@ export default class JointAccount {
     const regenSignTx = this.bitcoin.signTransaction(
       recoveredInputs,
       regenTxb,
-      [ this.bitcoin.getKeyPair( privateKey ) ],
+      [this.bitcoin.getKeyPair(privateKey)],
       recoveredScripts.p2sh,
       recoveredScripts.p2wsh,
     );
 
     const reHex = regenSignTx.build().toHex();
-    console.log( { txHex: reHex } );
-    const res = await this.bitcoin.broadcastTransaction( reHex );
+    console.log({ txHex: reHex });
+    const res = await this.bitcoin.broadcastTransaction(reHex);
     return res;
   }
 }

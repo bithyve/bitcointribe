@@ -31,6 +31,13 @@ const readTblSSSDetails = async () => {
     return resSSSDetails;
 }
 
+const readTblTransaction = async () => {
+    var resTranList = await dbOpration.readTablesData(
+        localDB.tableName.tblTransaction
+    );
+    return resTranList.temp;
+}
+
 
 const readTblTrustedPartySSSDetails = async () => {
     var resSharedSecretList = await dbOpration.readTablesData(
@@ -46,5 +53,6 @@ module.exports = {
     readTblWallet,
     readTblAccount,
     readTblSSSDetails,
+    readTblTransaction,
     readTblTrustedPartySSSDetails
 };

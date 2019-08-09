@@ -198,7 +198,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 Alert.alert( "Check health not working." )
             }
         }
-        else {
+        else {   
             this.setState( {
                 flag_SSSAndPdfFileCreate: true,
                 flag_ShareAction: true

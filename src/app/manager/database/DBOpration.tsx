@@ -88,6 +88,22 @@ const readTablesData = ( tableName: any ) => {
               data.type = utils.decrypt( data.type, passcode );
               temp.push( data );
             }
+            else if ( tableName == "tblTransaction" ) {
+              data.id = data.id;
+              data.dateCreated = utils.decrypt( data.dateCreated, passcode );
+              data.accountType = utils.decrypt( data.accountType, passcode );
+              data.amount = utils.decrypt( data.amount, passcode );
+              data.confimation = utils.decrypt( data.confimation, passcode );
+              data.tranDate = utils.decrypt( data.tranDate, passcode );
+              data.fees = utils.decrypt( data.fees, passcode );
+              data.receipientAddress = utils.decrypt( data.receipientAddress, passcode );
+              data.senderAddress = utils.decrypt( data.senderAddress, passcode );
+              data.status = utils.decrypt( data.status, passcode );
+              data.transactionType = utils.decrypt( data.transactionType, passcode );
+              data.txid = utils.decrypt( data.txid, passcode );
+              data.lastUpdated = utils.decrypt( data.lastUpdated, passcode );
+              temp.push( data );
+            }
             else if ( tableName == "tblTrustedPartySSSDetails" ) {
               data.id = data.id;
               data.dateCreated = utils.decrypt( data.dateCreated, passcode );
@@ -799,72 +815,52 @@ const updateSecureAccountAddInfo = (
 };
 
 //TODO: ========================================>  Transaction  Details  <========================================
-
-
-//TODO: insert Transaction
+//TODO: insert Transaction   
 const insertTblTransation = (
   tblName: string,
   transactionDetails: any,
-  address: string,
   fulldate: string
 ) => {
-  let bal;
   let passcode = getPasscode();
   return new Promise( ( resolve, reject ) => {
-    db.transaction( function ( txn ) {
-      let accountId: number;
-      txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
-        let len = results.rows.length;
-        if ( len > 0 ) {
-          for ( let i = 0; i < len; i++ ) {
-            let dbdecryptAddress = utils.decrypt(
-              results.rows.item( i ).accountAddress,
-              passcode
-            );
-            if ( dbdecryptAddress == address ) {
-              accountId = parseInt( results.rows.item( i ).id );
-              //delete
-              txn.executeSql(
-                "DELETE FROM " + tblName + " WHERE id = " + accountId + ""
-              );
-            }
-          }
-        }
-      } );
-      //insert
+    db.transaction( function ( txn: any ) {
+      txn.executeSql(
+        "DELETE FROM " + tblName
+      );
       for ( let i = 0; i < transactionDetails.length; i++ ) {
-        if ( transactionDetails[ i ].transactionType == "Received" ) {
-          bal = transactionDetails[ i ].totalReceived;
-        } else {
-          bal = transactionDetails[ i ].totalSpent;
-        }
+        console.log( { trna: transactionDetails[ i ] } );
+        console.log( { amount: parseInt( transactionDetails[ i ].amount ) } );
+        console.log( { re: JSON.stringify( transactionDetails[ i ].senderAddresses ) } );
+
         txn.executeSql(
           "INSERT INTO " +
           tblName +
-          "(dateCreated,accountAddress,transactionHash,balance,unit,fees,transactionType,confirmationType,lastUpdated) VALUES (:dateCreated,:accountAddress,:transactionHash,:balance,:unit,:fees,:transactionType,:confirmationType,:lastUpdated)",
+          "(dateCreated,accountType,amount,confimation,tranDate,fees,receipientAddress,senderAddress,status,transactionType,txid,lastUpdated) VALUES (:dateCreated,:accountType,:amount,:confimation,:tranDate,:fees,:receipientAddress,:senderAddress,:status,:transactionType,:txid,:lastUpdated)",
           [
+            utils.encrypt( fulldate.toString(), passcode ),
+            utils.encrypt( transactionDetails[ i ].accountType.toString(), passcode ),
+            utils.encrypt( transactionDetails[ i ].amount.toString(), passcode ),
+            utils.encrypt( transactionDetails[ i ].confirmations.toString(), passcode ),
+            utils.encrypt( transactionDetails[ i ].date.toString(), passcode ),
+            utils.encrypt( transactionDetails[ i ].fee.toString(), passcode ),
+            utils.encrypt( transactionDetails[ i ].recipientAddresses != undefined ? transactionDetails[ i ].recipientAddresses.toString() : "", passcode ),
+            utils.encrypt( JSON.stringify( transactionDetails[ i ].senderAddresses ).toString(), passcode ),
             utils.encrypt(
-              utils.getUnixTimeDate( transactionDetails[ i ].received ).toString(),
+              transactionDetails[ i ].status.toString(),
               passcode
             ),
-            utils.encrypt( address.toString(), passcode ),
-            utils.encrypt( transactionDetails[ i ].hash.toString(), passcode ),
-            utils.encrypt( bal.toString(), passcode ),
-            utils.encrypt( "BTC", passcode ),
-            utils.encrypt( transactionDetails[ i ].fees.toString(), passcode ),
             utils.encrypt(
               transactionDetails[ i ].transactionType.toString(),
               passcode
             ),
             utils.encrypt(
-              transactionDetails[ i ].confirmationType.toString(),
+              transactionDetails[ i ].txid.toString(),
               passcode
             ),
             utils.encrypt( fulldate.toString(), passcode )
           ]
         );
       }
-
       resolve( true );
     } );
   } );

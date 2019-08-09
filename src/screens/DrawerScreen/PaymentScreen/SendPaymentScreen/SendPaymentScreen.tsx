@@ -13,6 +13,7 @@ import {
     Body,
     Text,
     List, ListItem,
+
     Picker,
     Icon,
 } from "native-base";
@@ -369,7 +370,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         let { flag_Memo, flag_DisableSentBtn, flag_Loading, flag_SentBtnAnimation } = this.state;
         return (
             <Container>
-                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ true } barStyle="dark-content" />
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <View style={ { marginLeft: 10 } }>

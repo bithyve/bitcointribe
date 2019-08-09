@@ -147,7 +147,7 @@ export default class SendPaymentAddressScanScreen extends React.Component {
     render() {
         return (
             <Container>
-                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ true } barStyle="light-content" />
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <View style={ { marginLeft: 10 } }>

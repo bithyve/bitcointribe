@@ -184,7 +184,7 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
         let { flag_DisableSentBtn, flag_SentBtnAnimation, flag_Loading } = this.state;
         return (
             <Container>
-                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ true } barStyle="light-content" />
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <View style={ { marginLeft: 10 } }>
