@@ -72,6 +72,7 @@ const checkHealthAllShare = async ( share: any ) => {
             let data = {};
             data.shareId = res.sharesInfo[ i ].shareId;
             data.shareStage = res.sharesInfo[ i ].shareStage;
+            data.acceptedDate = resCheckHealth[ i ].updatedAt;
             temp.push( data );
         }
         let resupdateSSSShareStage = await dbOpration.updateSSSShareStage(
@@ -111,6 +112,7 @@ const checkHealthWithServerAllShare = async ( share: any ) => {
             let data = {};
             data.shareId = res.sharesInfo[ i ].shareId;
             data.shareStage = res.sharesInfo[ i ].shareStage;
+            data.acceptedDate = resCheckHealth[ i ].updatedAt;
             temp.push( data );
         }
         let resupdateSSSShareStage = await dbOpration.updateSSSShareStage(

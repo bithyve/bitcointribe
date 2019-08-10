@@ -1230,8 +1230,9 @@ const updateSSSShareStage = (
                   txn.executeSql(
                     "update " +
                     tblName +
-                    " set shareStage = :shareStage,lastSuccessfulCheck =:lastSuccessfulCheck where shareid = :shareid",
+                    " set acceptedDate= :acceptedDate ,shareStage = :shareStage,lastSuccessfulCheck =:lastSuccessfulCheck where shareid = :shareid",
                     [
+                      utils.encrypt( shareInfo[ i ].acceptedDate.toString(), passcode ),
                       utils.encrypt( shareInfo[ i ].shareStage.toString(), passcode ),
                       utils.encrypt( fulldate.toString(), passcode ),
                       shareId

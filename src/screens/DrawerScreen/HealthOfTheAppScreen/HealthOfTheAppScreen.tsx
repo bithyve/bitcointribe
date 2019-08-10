@@ -183,10 +183,10 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             share.selfshareShareId1 = sssDetails[ 2 ].shareId != "" ? sssDetails[ 2 ].shareId : null;
             share.selfshareDate1 = sssDetails[ 2 ].acceptedDate != "" ? parseInt( sssDetails[ 2 ].acceptedDate ) : 0;
 
-            share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? sssDetails[ 3 ].acceptedDate : 0;
+            share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? parseInt( sssDetails[ 3 ].acceptedDate ) : 0;
             share.selfshareShareShareId2 = sssDetails[ 3 ].shareId != "" ? sssDetails[ 3 ].shareId : "";
 
-            share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? sssDetails[ 4 ].acceptedDate : 0;
+            share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? parseInt( sssDetails[ 4 ].acceptedDate ) : 0;
             share.selfshareShareId3 = sssDetails[ 4 ].shareId != "" ? sssDetails[ 4 ].shareId : "";
 
             share.qatime = parseInt( walletDetails.lastUpdated );
@@ -198,7 +198,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                 Alert.alert( "Check health not working." )
             }
         }
-        else {   
+        else {
             this.setState( {
                 flag_SSSAndPdfFileCreate: true,
                 flag_ShareAction: true
@@ -226,9 +226,9 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             share.trustedContShareId1 = sssDetails[ 0 ].shareId != "" ? sssDetails[ 0 ].shareId : null;
             share.trustedContShareId2 = sssDetails[ 1 ].shareId != "" ? sssDetails[ 1 ].shareId : null;
             share.selfshareShareId1 = sssDetails[ 2 ].shareId != "" ? sssDetails[ 2 ].shareId : null;
-            share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? sssDetails[ 3 ].acceptedDate : 0;
+            share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? parseInt( sssDetails[ 3 ].acceptedDate ) : 0;
             share.selfshareShareShareId2 = sssDetails[ 3 ].shareId != "" ? sssDetails[ 3 ].shareId : "";
-            share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? sssDetails[ 4 ].acceptedDate : 0;
+            share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? parseInt( sssDetails[ 4 ].acceptedDate ) : 0;
             share.selfshareShareId3 = sssDetails[ 4 ].shareId != "" ? sssDetails[ 4 ].shareId : "";
             share.qatime = parseInt( walletDetails.lastUpdated );
             let resCheckHealthAllShare = await comAppHealth.checkHealthAllShare( share );

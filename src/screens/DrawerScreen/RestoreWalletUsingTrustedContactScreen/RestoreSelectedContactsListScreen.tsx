@@ -418,12 +418,6 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                                         borderBottomWidth: 1
                                     } }>
                                     <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                        <ImageSVG
-                                            style={ { width: 55, height: 55 } }
-                                            source={
-                                                svgIcon.healthoftheapp.trustedcontacts
-                                            }
-                                        />
                                         <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
                                             <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Trusted Contacts</Text>
                                             <View style={ { flexDirection: "row" } }>
@@ -502,12 +496,6 @@ export default class RestoreSelectedContactsListScreen extends React.Component<a
                                         borderBottomWidth: 1
                                     } }>
                                     <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                        <ImageSVG
-                                            style={ { width: 55, height: 55 } }
-                                            source={
-                                                svgIcon.healthoftheapp.selfshare
-                                            }
-                                        />
                                         <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
                                             <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Self Share</Text>
                                             <View style={ { flexDirection: "row" } }>

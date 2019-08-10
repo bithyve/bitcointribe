@@ -6,6 +6,7 @@ import {
     Alert,
     RefreshControl
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import {
     Container,
@@ -90,15 +91,31 @@ export default class TransactionScreen extends React.Component<any, any> {
     async getRegularTransaction() {
         let { arrSelectedAccount } = this.state;
         this.setState( { flag_Loading: true } );
-
         var resTransaction = [];
         if ( arrSelectedAccount.accountType == "Regular Account" ) {
             resTransaction = await comFunTran.getSecAccountTran( "Regular" );
-            resTransaction.length != 0 ? resTransaction : resTransaction = await this.getAccountTrans( "Regular" )
-            console.log( { resTransaction } );
+            // resTransaction.length != 0 ? resTransaction : resTransaction = await this.getAccountTrans( "Regular" )
+            //console.log( { resTransaction } );
         } else {
             resTransaction = await comFunTran.getSecAccountTran( "Secure" );
-            resTransaction.length != 0 ? resTransaction : resTransaction = await this.getAccountTrans( "Secure" )
+            /// resTransaction.length != 0 ? resTransaction : resTransaction = await this.getAccountTrans( "Secure" )
+        }
+        this.setState( {
+            flag_Loading: false,
+            arrTransaction: resTransaction
+        } )
+    }
+
+
+    getNewTrnasaction = async () => {
+        this.setState( { flag_Loading: true } );
+        var resTransaction = [];
+        let { arrSelectedAccount } = this.state;
+        if ( arrSelectedAccount.accountType == "Regular Account" ) {
+            resTransaction = await this.getAccountTrans( "Regular" )
+        }
+        else {
+            resTransaction = await this.getAccountTrans( "Secure" )
         }
         this.setState( {
             flag_Loading: false,
@@ -282,28 +299,44 @@ export default class TransactionScreen extends React.Component<any, any> {
                                 </View>
                             </View>
                         </RkCard>
-                        <View style={ { flex: 1.8 } }>
-                            <Text note style={ { textAlign: "center" } }>Recent Transactions</Text>
-                            {
-                                !flag_Loading && arrTransaction.length === 0 ?
-                                    <View style={ { justifyContent: "center", alignItems: "center", padding: 20, paddingTop: 50 } }>
-                                        <Text style={ { textAlign: "center", color: "#838383" } }>{ "Start transactions to see your recent transactions history." }</Text>
-                                    </View> : null
+                        <KeyboardAwareScrollView
+                            enableAutomaticScroll
+                            automaticallyAdjustContentInsets={ true }
+                            keyboardOpeningTime={ 0 }
+                            refreshControl={
+                                <RefreshControl
+                                    refreshing={ false }
+                                    onRefresh={ () => {
+                                        this.getNewTrnasaction()
+                                    } }
+                                />
                             }
-                            <FlatList
-                                style={ { flex: 1, padding: 10 } }
-                                data={ arrTransaction }
-                                renderItem={ this._renderItem }
-                                keyExtractor={ ( item, index ) => index.toString() }
-                                refreshControl={
-                                    <RefreshControl
-                                        onRefresh={ () => { this.getRegularTransaction() } }
-                                        refreshing={ false }
-                                    ></RefreshControl>
+                            enableOnAndroid={ true }
+                            contentContainerStyle={ { flexGrow: 1.8 } }
+                        >
+                            <View style={ { flex: 1.8 } }>
+                                <Text note style={ { textAlign: "center" } }>Recent Transactions</Text>
+                                {
+                                    !flag_Loading && arrTransaction.length === 0 ?
+                                        <View style={ { justifyContent: "center", alignItems: "center", padding: 20, paddingTop: 50 } }>
+                                            <Text style={ { textAlign: "center", color: "#838383" } }>{ "Start transactions to see your recent transactions history." }</Text>
+                                        </View> : null
                                 }
-                            />
-                        </View>
-                        <View style={ { flex: 0.4 } }>
+                                <FlatList
+                                    style={ { flex: 1, padding: 10 } }
+                                    data={ arrTransaction }
+                                    renderItem={ this._renderItem }
+                                    keyExtractor={ ( item, index ) => index.toString() }
+                                    refreshControl={
+                                        <RefreshControl
+                                            onRefresh={ () => { this.getNewTrnasaction() } }
+                                            refreshing={ false }
+                                        ></RefreshControl>
+                                    }
+                                />
+                            </View>
+                        </KeyboardAwareScrollView>
+                        <View style={ { flex: 0.33 } }>
                             <FullLinearGradientTransactionScreenThreeOpt
                                 style={ [ { opacity: 1 }, { borderRadius: 10, height: 55 } ] }
                                 disabled={ false }
@@ -322,7 +355,6 @@ export default class TransactionScreen extends React.Component<any, any> {
                                 }
                             />
                         </View>
-
                     </ImageBackground>
                 </SafeAreaView>
                 <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />

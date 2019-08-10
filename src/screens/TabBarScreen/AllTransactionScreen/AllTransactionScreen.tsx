@@ -7,6 +7,7 @@ import {
 
 import Icon from "react-native-vector-icons/FontAwesome";
 import ImageSVG from 'react-native-remote-svg';
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //TODO: Custome view
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
@@ -71,7 +72,7 @@ export default class AllTransactionScreen extends React.Component<any, any> {
 
   getTransaction = async () => {
     var resTranList = await comFunDBRead.readTblTransaction();
-    resTranList.length != 0 ? this.dbDataShow( resTranList ) : this.getReloadData()
+    this.dbDataShow( resTranList );
   }
 
   dbDataShow( resTranList: any ) {
@@ -246,25 +247,41 @@ export default class AllTransactionScreen extends React.Component<any, any> {
                 <Text style={ styles.subTitleText }>{ "Recent Transactions" }</Text>
               </View>
             </View>
-            {
-              !this.state.flag_Loading && this.state.recentTransactions.length === 0 ?
-
-                <View style={ { justifyContent: "center", alignItems: "center", padding: 20, paddingTop: 50 } }>
-                  <Text style={ { textAlign: "center", color: "#838383" } }>{ "Start transactions to see your recent transactions history." }</Text>
-                </View> : null
-            }
-            <FlatList
-              style={ { flex: 1, padding: 10 } }
-              data={ this.state.recentTransactions }
-              renderItem={ this._renderItem }
-              keyExtractor={ ( item, index ) => index.toString() }
+            <KeyboardAwareScrollView
+              enableAutomaticScroll
+              automaticallyAdjustContentInsets={ true }
+              keyboardOpeningTime={ 0 }
               refreshControl={
                 <RefreshControl
-                  onRefresh={ () => { this.getReloadData() } }
                   refreshing={ false }
-                ></RefreshControl>
+                  onRefresh={ () => {
+                    this.getReloadData()
+                  } }
+                />
               }
-            />
+              enableOnAndroid={ true }
+              contentContainerStyle={ { flexGrow: 1 } }
+            >
+              {
+                !this.state.flag_Loading && this.state.recentTransactions.length === 0 ?
+
+                  <View style={ { justifyContent: "center", alignItems: "center", padding: 20, paddingTop: 50 } }>
+                    <Text style={ { textAlign: "center", color: "#838383" } }>{ "Start transactions to see your recent transactions history." }</Text>
+                  </View> : null
+              }
+              <FlatList
+                style={ { flex: 1, padding: 10 } }
+                data={ this.state.recentTransactions }
+                renderItem={ this._renderItem }
+                keyExtractor={ ( item, index ) => index.toString() }
+                refreshControl={
+                  <RefreshControl
+                    onRefresh={ () => { this.getReloadData() } }
+                    refreshing={ false }
+                  ></RefreshControl>
+                }
+              />
+            </KeyboardAwareScrollView>
           </ImageBackground>
           <Modal
             setModalVisible={ this.setModalVisible.bind( this ) }

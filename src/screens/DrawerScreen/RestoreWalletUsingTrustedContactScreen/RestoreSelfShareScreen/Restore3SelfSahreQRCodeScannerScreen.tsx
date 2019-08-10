@@ -107,39 +107,38 @@ export default class Restore3SelfSahreQRCodeScannerScreen extends React.Componen
             var result = e.data;
             result = JSON.parse( result );
             if ( result.type == "SSS Restore Self Share" ) {
-                if ( flag_ReadQRCode == true ) {
-                    flag_ReadQRCode = false;
-                    let resDownlaodShare = await S3Service.downloadShare( result.data );
-                    if ( resDownlaodShare.status == 200 ) {
-
-                        var resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, result.data );
-                        console.log( { resDecryptEncMetaShare } );
-                        if ( resDecryptEncMetaShare.status == 200 ) {
-                            resDecryptEncMetaShare = resDecryptEncMetaShare.data;
-                            const dateTime = Date.now();
-                            let resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactSelfShare(
-                                localDB.tableName.tblSSSDetails,
-                                dateTime,
-                                resDecryptEncMetaShare.decryptedMetaShare,
-                                "Self Share 1",
-                                "Good"
-                            );
-                            if ( resInsertContactList ) {
+                let resDownlaodShare = await S3Service.downloadShare( result.data );
+                if ( resDownlaodShare.status == 200 ) {
+                    var resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, result.data );
+                    console.log( { resDecryptEncMetaShare } );
+                    if ( resDecryptEncMetaShare.status == 200 ) {
+                        resDecryptEncMetaShare = resDecryptEncMetaShare.data;
+                        const dateTime = Date.now();
+                        let resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactSelfShare(
+                            localDB.tableName.tblSSSDetails,
+                            dateTime,
+                            resDecryptEncMetaShare.decryptedMetaShare,
+                            "Self Share 1",
+                            "Good"
+                        );
+                        if ( resInsertContactList ) {
+                            if ( flag_ReadQRCode == true ) {
+                                flag_ReadQRCode = false;
                                 await comFunDBRead.readTblSSSDetails();
                                 this.props.navigation.pop( 2 );
-                            } else {
-                                flag_ReadQRCode = false;
-                                alert.simpleOkAction( "Oops", "Please try again databse insert issue.", this.click_ResetFlagRead );
                             }
-                        }
-                        else {
+                        } else {
                             flag_ReadQRCode = false;
-                            alert.simpleOkAction( "Oops", resDecryptEncMetaShare.err, this.click_ResetFlagRead );
+                            alert.simpleOkAction( "Oops", "Please try again databse insert issue.", this.click_ResetFlagRead );
                         }
-                    } else {
-                        flag_ReadQRCode = false;
-                        alert.simpleOkAction( "Oops", resDownlaodShare.err, this.click_ResetFlagRead );
                     }
+                    else {
+                        flag_ReadQRCode = false;
+                        alert.simpleOkAction( "Oops", resDecryptEncMetaShare.err, this.click_ResetFlagRead );
+                    }
+                } else {
+                    flag_ReadQRCode = false;
+                    alert.simpleOkAction( "Oops", resDownlaodShare.err, this.click_ResetFlagRead );
                 }
             } else {
                 if ( flag_ReadQRCode == true ) {

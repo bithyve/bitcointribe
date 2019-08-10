@@ -310,10 +310,10 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                         this.refs.modal4.close();
                         this.setState( {
                             flag_OtpCodeShowStatus: true,
-                        } );
+                        } );   
                         alert.simpleOkActionWithPara( "Success", "Email Sent Completed.", "Email", this.reloadList( "Email" ) );
                     }, 1000 );
-                } else {
+                } else {  
                     alert.simpleOk( "Oops", error );
                 }
             } );  
