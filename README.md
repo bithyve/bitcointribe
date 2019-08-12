@@ -30,7 +30,7 @@ git clone https://github.com/thecryptobee/Hexa-Wallet.git
 cd Hexa-Wallet
 sudo yarn install
 chmod +x pkgchanges/setup.sh
-./pkgchanges/setup.sh
+sudo ./pkgchanges/setup.sh
 ```
 
 Make sure you have a `.env.dev` similar to `.env.example` in your project's root directory before running hexa. If this file is absent, you will be faced with a red screen on the iOS Simulator.
