@@ -830,7 +830,7 @@ const insertTblTransation = (
       for ( let i = 0; i < transactionDetails.length; i++ ) {
         console.log( { trna: transactionDetails[ i ] } );
         console.log( { amount: parseInt( transactionDetails[ i ].amount ) } );
-        console.log( { re: JSON.stringify( transactionDetails[ i ].senderAddresses ) } );
+        console.log( { re: transactionDetails[ i ].senderAddresses != undefined ? JSON.stringify( transactionDetails[ i ].senderAddresses ) : "" } );
 
         txn.executeSql(
           "INSERT INTO " +
@@ -844,7 +844,7 @@ const insertTblTransation = (
             utils.encrypt( transactionDetails[ i ].date.toString(), passcode ),
             utils.encrypt( transactionDetails[ i ].fee.toString(), passcode ),
             utils.encrypt( transactionDetails[ i ].recipientAddresses != undefined ? transactionDetails[ i ].recipientAddresses.toString() : "", passcode ),
-            utils.encrypt( JSON.stringify( transactionDetails[ i ].senderAddresses ).toString(), passcode ),
+            utils.encrypt( ( transactionDetails[ i ].senderAddresses != undefined ? JSON.stringify( transactionDetails[ i ].senderAddresses ) : "" ).toString(), passcode ),
             utils.encrypt(
               transactionDetails[ i ].status.toString(),
               passcode
@@ -1609,3 +1609,4 @@ module.exports = {
   //For All Table Operation
   deleteTableData
 };    
+
