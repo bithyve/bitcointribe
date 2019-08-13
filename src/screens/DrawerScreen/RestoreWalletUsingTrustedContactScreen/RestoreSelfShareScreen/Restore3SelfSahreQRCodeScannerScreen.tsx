@@ -128,17 +128,23 @@ export default class Restore3SelfSahreQRCodeScannerScreen extends React.Componen
                                 this.props.navigation.pop( 2 );
                             }
                         } else {
-                            flag_ReadQRCode = false;
-                            alert.simpleOkAction( "Oops", "Please try again databse insert issue.", this.click_ResetFlagRead );
+                            if ( flag_ReadQRCode == true ) {
+                                flag_ReadQRCode = false;
+                                alert.simpleOkAction( "Oops", "Please try again databse insert issue.", this.click_ResetFlagRead );
+                            }
                         }
                     }
                     else {
-                        flag_ReadQRCode = false;
-                        alert.simpleOkAction( "Oops", resDecryptEncMetaShare.err, this.click_ResetFlagRead );
+                        if ( flag_ReadQRCode == true ) {
+                            flag_ReadQRCode = false;
+                            alert.simpleOkAction( "Oops", resDecryptEncMetaShare.err, this.click_ResetFlagRead );
+                        }
                     }
                 } else {
-                    flag_ReadQRCode = false;
-                    alert.simpleOkAction( "Oops", resDownlaodShare.err, this.click_ResetFlagRead );
+                    if ( flag_ReadQRCode == true ) {
+                        flag_ReadQRCode = false;
+                        alert.simpleOkAction( "Oops", resDownlaodShare.err, this.click_ResetFlagRead );
+                    }
                 }
             } else {
                 if ( flag_ReadQRCode == true ) {

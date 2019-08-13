@@ -311,7 +311,7 @@ export default class ConfirmAndSendPaymentScreen extends React.Component<any, an
                             </View>
                             <View style={ { flex: 1 } }>
                                 <FullLinearGradientLoadingButton
-                                    style={ [ flag_DisableSentBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
+                                    style={ [ flag_DisableSentBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10, margin: 10 } ] }
                                     disabled={ flag_DisableSentBtn }
                                     animating={ flag_SentBtnAnimation }
                                     title=" Send"

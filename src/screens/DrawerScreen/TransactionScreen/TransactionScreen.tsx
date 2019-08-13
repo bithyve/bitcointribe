@@ -219,7 +219,7 @@ export default class TransactionScreen extends React.Component<any, any> {
                 <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <View style={ { flex: 1, backgroundColor: colors.appColor } }>
+                        <View style={ { flex: 0.8, backgroundColor: colors.appColor } }>
                             <View style={ { flexDirection: "row", alignItems: "flex-start", marginLeft: 20, marginRight: 20 } }>
                                 <View style={ { flex: 1, alignItems: "flex-start" } }>
                                     <Button
@@ -239,104 +239,109 @@ export default class TransactionScreen extends React.Component<any, any> {
                                 </View>
                             </View>
                         </View>
-                        <RkCard
-                            rkType="shadowed"
-                            style={ {
-                                flex: 0.8,
-                                margin: 10,
-                                marginTop: -120,
-                                borderRadius: 10
-                            } }
-                        >
-                            <View
-                                rkCardHeader
+                        <View style={ { flex: 0.3 } }>
+                            <RkCard
+                                rkType="shadowed"
                                 style={ {
-                                    flex: 0.4,
-                                    justifyContent: "center",
-                                    borderBottomColor: "#F5F5F5",
-                                    borderBottomWidth: 1
-                                } }
-                            >
-                                <ImageSVG
-                                    style={ { width: 50, height: 50 } }
-                                    source={
-                                        svgIcon.walletScreen[ arrSelectedAccount.svgIcon ]
-                                    }
-                                />
-                                <Text
-                                    style={ [ globalStyle.ffFiraSansMedium, {
-                                        flex: 2,
-                                        fontSize: 18,
-                                        alignSelf: "center",
-                                        marginLeft: 10
-                                    } ] }
-                                >
-                                    { arrSelectedAccount.accountName }
-                                </Text>
-                                <View style={ { alignSelf: "center", flexDirection: "row" } }>
-                                    <SvgIcon name="icon_settings" color="gray" size={ 15 } />
-                                </View>
-                            </View>
-                            <View
-                                rkCardContent
-                                style={ {
-                                    flex: 0.4,
-                                    flexDirection: "row"
+                                    flex: 1,
+                                    margin: 10,
+                                    marginTop: -120,
+                                    borderRadius: 10
                                 } }
                             >
                                 <View
+                                    rkCardHeader
                                     style={ {
-                                        flex: 1,
+                                        flex: 0.4,
                                         justifyContent: "center",
+                                        borderBottomColor: "#F5F5F5",
+                                        borderBottomWidth: 1
                                     } }
                                 >
-                                    <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
-                                </View>
-                                <View style={ { flex: 4 } }>
-                                    <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 30 } ] }>
-                                        { arrSelectedAccount.balance }
+                                    <ImageSVG
+                                        style={ { width: 50, height: 50 } }
+                                        source={
+                                            svgIcon.walletScreen[ arrSelectedAccount.svgIcon ]
+                                        }
+                                    />
+                                    <Text
+                                        style={ [ globalStyle.ffFiraSansMedium, {
+                                            flex: 2,
+                                            fontSize: 18,
+                                            alignSelf: "center",
+                                            marginLeft: 10
+                                        } ] }
+                                    >
+                                        { arrSelectedAccount.accountName }
                                     </Text>
+                                    <View style={ { alignSelf: "center", flexDirection: "row" } }>
+                                        <SvgIcon name="icon_settings" color="gray" size={ 15 } />
+                                    </View>
                                 </View>
-                            </View>
-                        </RkCard>
-                        <KeyboardAwareScrollView
-                            enableAutomaticScroll
-                            automaticallyAdjustContentInsets={ true }
-                            keyboardOpeningTime={ 0 }
-                            refreshControl={
-                                <RefreshControl
-                                    refreshing={ false }
-                                    onRefresh={ () => {
-                                        this.getNewTrnasaction()
+                                <View
+                                    rkCardContent
+                                    style={ {
+                                        flex: 0.4,
+                                        flexDirection: "row"
                                     } }
-                                />
-                            }
-                            enableOnAndroid={ true }
-                            contentContainerStyle={ { flexGrow: 1.8 } }
-                        >
-                            <View style={ { flex: 1.8 } }>
-                                <Text note style={ { textAlign: "center" } }>Recent Transactions</Text>
-                                {
-                                    !flag_Loading && arrTransaction.length === 0 ?
-                                        <View style={ { justifyContent: "center", alignItems: "center", padding: 20, paddingTop: 50 } }>
-                                            <Text style={ { textAlign: "center", color: "#838383" } }>{ "Start transactions to see your recent transactions history." }</Text>
-                                        </View> : null
+                                >
+                                    <View
+                                        style={ {
+                                            flex: 1,
+                                            justifyContent: "center",
+                                        } }
+                                    >
+                                        <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
+                                    </View>
+                                    <View style={ { flex: 4 } }>
+                                        <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 30 } ] }>
+                                            { arrSelectedAccount.balance }
+                                        </Text>
+                                    </View>
+                                </View>
+                            </RkCard>
+                        </View>
+                        <View style={ { flex: 1.8 } }>
+                            <KeyboardAwareScrollView
+                                enableAutomaticScroll
+                                automaticallyAdjustContentInsets={ true }
+                                keyboardOpeningTime={ 0 }
+                                refreshControl={
+                                    <RefreshControl
+                                        refreshing={ false }
+                                        onRefresh={ () => {
+                                            this.getNewTrnasaction()
+                                        } }
+                                    />
                                 }
-                                <FlatList
-                                    style={ { flex: 1, padding: 10 } }
-                                    data={ arrTransaction }
-                                    renderItem={ this._renderItem }
-                                    keyExtractor={ ( item, index ) => index.toString() }
-                                    refreshControl={
-                                        <RefreshControl
-                                            onRefresh={ () => { this.getNewTrnasaction() } }
-                                            refreshing={ false }
-                                        ></RefreshControl>
+                                enableOnAndroid={ true }
+                                contentContainerStyle={ { flexGrow: 1 } }
+                            >
+                                <View style={ { flex: 1.8 } }>
+                                    <Text note style={ { textAlign: "center" } }>Recent Transactions</Text>
+                                    {
+                                        !flag_Loading && arrTransaction.length === 0 ?
+                                            <View style={ { justifyContent: "center", alignItems: "center", padding: 20, paddingTop: 50 } }>
+                                                <Text style={ { textAlign: "center", color: "#838383" } }>{ "Start transactions to see your recent transactions history." }</Text>
+                                            </View> : null
                                     }
-                                />
-                            </View>
-                        </KeyboardAwareScrollView>
-                        <View style={ { flex: 0.33 } }>
+                                    <FlatList
+                                        style={ { flex: 1, padding: 10 } }
+                                        data={ arrTransaction }
+                                        renderItem={ this._renderItem }
+                                        keyExtractor={ ( item, index ) => index.toString() }
+                                        refreshControl={
+                                            <RefreshControl
+                                                onRefresh={ () => { this.getNewTrnasaction() } }
+                                                refreshing={ false }
+                                            ></RefreshControl>
+                                        }
+                                    />
+                                </View>
+                            </KeyboardAwareScrollView>
+                        </View>
+
+                        <View style={ { flex: 0.18 } }>
                             <FullLinearGradientTransactionScreenThreeOpt
                                 style={ [ { opacity: 1 }, { borderRadius: 10, height: 55 } ] }
                                 disabled={ false }

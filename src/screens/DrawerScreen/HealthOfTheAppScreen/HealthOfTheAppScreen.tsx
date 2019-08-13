@@ -157,9 +157,20 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         );
     }
 
+
+
+
+
+
+
+
     componentWillUnmount() {
         this.willFocusSubscription.remove();
     }
+
+
+
+
 
     getCheackHealthWithoutServer = async () => {
         let sssDetails = await utils.getSSSDetails();
@@ -176,21 +187,16 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             let share = {};
             share.trustedContShareId1 = sssDetails[ 0 ].shareId != "" ? sssDetails[ 0 ].shareId : null;
             share.trustedContDate1 = sssDetails[ 0 ].acceptedDate != "" ? parseInt( sssDetails[ 0 ].acceptedDate ) : 0;
-
             share.trustedContShareId2 = sssDetails[ 1 ].shareId != "" ? sssDetails[ 1 ].shareId : null;
             share.trustedContDate2 = sssDetails[ 1 ].acceptedDate != "" ? parseInt( sssDetails[ 1 ].acceptedDate ) : 0;
-
             share.selfshareShareId1 = sssDetails[ 2 ].shareId != "" ? sssDetails[ 2 ].shareId : null;
             share.selfshareDate1 = sssDetails[ 2 ].acceptedDate != "" ? parseInt( sssDetails[ 2 ].acceptedDate ) : 0;
-
             share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? parseInt( sssDetails[ 3 ].acceptedDate ) : 0;
             share.selfshareShareShareId2 = sssDetails[ 3 ].shareId != "" ? sssDetails[ 3 ].shareId : "";
-
             share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? parseInt( sssDetails[ 4 ].acceptedDate ) : 0;
             share.selfshareShareId3 = sssDetails[ 4 ].shareId != "" ? sssDetails[ 4 ].shareId : "";
-
             share.qatime = parseInt( walletDetails.lastUpdated );
-
+            console.log( { share } );
             let resCheckHealthAllShare = await comAppHealth.checkHealthWithServerAllShare( share );
             if ( resCheckHealthAllShare != "" ) {
                 this.loaddata( backupType, backupMethod );
@@ -259,7 +265,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         console.log( { sssDetails, backupType } );
         let keeperInfo = JSON.parse( sssDetails.keeperInfo );
         let data = {};
-        let decryptedShare = JSON.parse( sssDetails.decryptedShare );
+        let decryptedShare = sssDetails.decryptedShare != "" ? JSON.parse( sssDetails.decryptedShare ) : "";
         data.decryptedShare = decryptedShare;
         data.emailAddresses = keeperInfo.emailAddresses;
         data.phoneNumbers = keeperInfo.phoneNumbers;

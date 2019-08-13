@@ -765,7 +765,7 @@ export default class WalletScreen extends React.Component {
         var create4thPdf;
         if ( Platform.OS == "android" ) {
           create4thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode4thSahre1.png", "/storage/emulated/0/qrcode4thSahre2.png", "/storage/emulated/0/qrcode4thSahre3.png", "/storage/emulated/0/qrcode4thSahre4.png", "/storage/emulated/0/qrcode4thSahre5.png", "/storage/emulated/0/qrcode4thSahre6.png", "/storage/emulated/0/qrcode4thSahre7.png", "/storage/emulated/0/qrcode4thSahre8.png", "/storage/emulated/0/secoundryXpub4Share.png", "/storage/emulated/0/googleAuto2FASecret4Share.png", walletDetails.walletType + "4thShare.pdf", "4th Share", password );
-        } else {  
+        } else {
           create4thPdf = await this.genreatePdf( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, res4thShare6Create, res4thShare7Create, res4thShare8Create, resSecoundXpub4Share, res2FASecret4Share, walletDetails.walletType + "4thShare.pdf", "4th Shares", password );
         }
         resolve( create4thPdf );
@@ -830,7 +830,7 @@ export default class WalletScreen extends React.Component {
         var create5thPdf;
         if ( Platform.OS == "android" ) {
           create5thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode5thSahre1.png", "/storage/emulated/0/qrcode5thSahre2.png", "/storage/emulated/0/qrcode5thSahre3.png", "/storage/emulated/0/qrcode5thSahre4.png", "/storage/emulated/0/qrcode5thSahre5.png", "/storage/emulated/0/qrcode5thSahre6.png", "/storage/emulated/0/qrcode5thSahre7.png", "/storage/emulated/0/qrcode5thSahre8.png", "/storage/emulated/0/secoundryXpub5Share.png", "/storage/emulated/0/googleAuto2FASecret5Share.png", walletDetails.walletType + "5thShare.pdf", "5th Shares", password );
-        } else {  
+        } else {
           create5thPdf = await this.genreatePdf( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, res5thShare6Create, res5thShare7Create, res5thShare8Create, resSecoundXpub5Share, res2FASecret5Share, walletDetails.walletType + "5thShare.pdf", "5th Share", password );
         }
         resolve( create5thPdf );
@@ -2119,6 +2119,7 @@ export default class WalletScreen extends React.Component {
         <Fab
           active={ this.state.flag_Fabactive }
           direction="up"
+          hitSlop={ { top: 20, bottom: 10, left: 20, right: -20 } }
           style={ [ styles.plusButtonBottom, { backgroundColor: 'transparent' } ] }
           position="bottomRight"
           onPress={ () => this.setState( { flag_Fabactive: !this.state.flag_Fabactive } ) }>
