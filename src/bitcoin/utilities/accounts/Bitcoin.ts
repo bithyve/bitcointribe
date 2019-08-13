@@ -399,7 +399,7 @@ export default class Bitcoin {
           }
         } );
       }
-
+      
       return { transactions };
     } catch ( err ) {
       console.log(
