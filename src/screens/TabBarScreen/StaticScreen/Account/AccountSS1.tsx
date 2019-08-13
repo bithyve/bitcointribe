@@ -6,7 +6,7 @@ const AccountSS1 = ({ navigation }) => {
     <View style={{ flex: 1 }}>
       <TouchableOpacity onPress={() => navigation.navigate("AccountSS2")}>
         <Image
-          source={require("../../../assets/images/staticScreen/AccountScreen1.png")}
+          source={require("../../../../assets/images/staticScreen/AccountScreen1.png")}
           style={{ width: "100%", height: "100%" }}
         />
       </TouchableOpacity>

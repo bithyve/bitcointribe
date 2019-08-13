@@ -6,7 +6,7 @@ const ContactSS3 = ({ navigation }) => {
     <View style={{ flex: 1 }}>
       <TouchableOpacity onPress={() => navigation.navigate("TabbarBottom")}>
         <Image
-          source={require("../../../assets/images/staticScreen/ContactScreen3.png")}
+          source={require("../../../../assets/images/staticScreen/ContactScreen3.png")}
           style={{ width: "100%", height: "100%" }}
         />
       </TouchableOpacity>

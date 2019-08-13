@@ -2135,7 +2135,15 @@ export default class WalletScreen extends React.Component {
                this.props.navigation.push( "AccountSSNavigator" )
             } }
           >
-            <IconFontAwe name="users" size={ 20 } color="#ffffff" />
+            <IconFontAwe name="cube" size={ 20 } color="#ffffff" />
+          </Button>
+          <Button
+            style={ { backgroundColor: '#37A0DA' } }
+            onPress={ () => {
+               this.props.navigation.push( "ContactSSNavigator" )
+            } }
+          >
+            <IconFontAwe name="address-book" size={ 20 } color="#ffffff" />
           </Button>
           <Button
             onPress={ () => {
