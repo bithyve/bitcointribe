@@ -2124,7 +2124,7 @@ export default class WalletScreen extends React.Component {
           position="bottomRight"
           onPress={ () => this.setState( { flag_Fabactive: !this.state.flag_Fabactive } ) }>
           <ImageSVG
-            style={ { width: 110, height: 110, marginRight: 60} }
+            style={ { width: 110, height: 110, marginRight: 60,} }
             source={
               svgIcon.walletScreen.addAccounts
             }
@@ -2132,7 +2132,7 @@ export default class WalletScreen extends React.Component {
           <Button
             style={ { backgroundColor: '#37A0DA' } }
             onPress={ () => {
-              Alert.alert( "Working" )
+               this.props.navigation.push( "AccountSSNavigator" )
             } }
           >
             <IconFontAwe name="users" size={ 20 } color="#ffffff" />
