@@ -274,7 +274,7 @@ const styles = StyleSheet.create( {
     marginTop: 20
   },
   imgAppLogo: {
-    height: 200,
-    width: 200
+    height: 150,
+    width: 150
   }
 } );

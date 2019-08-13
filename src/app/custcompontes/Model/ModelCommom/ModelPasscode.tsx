@@ -203,8 +203,8 @@ const styles = StyleSheet.create( {
         marginTop: 50
     },
     imgAppLogo: {
-        height: 200,
-        width: 200
+        height: 150,
+        width: 150
     },
     viewPasscode: {
         flex: 1,

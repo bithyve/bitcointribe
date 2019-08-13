@@ -172,8 +172,8 @@ let styles = StyleSheet.create( {
         alignItems: "center",
     },
     imgAppLogo: {
-        height: 200,
-        width: 200
+        height: 150,
+        width: 150
     },
     viewBtnProceed: {
         flex: 3,
