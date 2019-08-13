@@ -6,7 +6,6 @@ import {
     Alert,
     RefreshControl
 } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import {
     Container,
@@ -45,9 +44,6 @@ import { SvgIcon } from "@up-shared/components";
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 
 let alert = new AlertSimple();
-
-//TODO: Common Funciton
-var comFunTran = require( "HexaWallet/src/app/manager/CommonFunction/CommonTransaction" );
 
 //TODO: Bitcoin Class
 var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
@@ -91,22 +87,29 @@ export default class TransactionScreen extends React.Component<any, any> {
     async getRegularTransaction() {
         let { arrSelectedAccount } = this.state;
         this.setState( { flag_Loading: true } );
-        var resTransaction = [];
+        let regularAccount = await bitcoinClassState.getRegularClassState();
+        let secureAccount = await bitcoinClassState.getSecureClassState();
+        var resTransaction;
         if ( arrSelectedAccount.accountType == "Regular Account" ) {
-            resTransaction = await comFunTran.getSecAccountTran( "Regular" );
-            // resTransaction.length != 0 ? resTransaction : resTransaction = await this.getAccountTrans( "Regular" )
-            //console.log( { resTransaction } );
+            resTransaction = await regularAccount.getTransactions();
+            if ( resTransaction.status == 200 ) {
+                resTransaction = resTransaction.data;
+            } else {
+                alert.simpleOkAction( "Oops", resTransaction.err, this.click_StopLoader );
+            }
         } else {
-            resTransaction = await comFunTran.getSecAccountTran( "Secure" );
-            /// resTransaction.length != 0 ? resTransaction : resTransaction = await this.getAccountTrans( "Secure" )
+            resTransaction = await secureAccount.getTransactions();
+            if ( resTransaction.status == 200 ) {
+                resTransaction = resTransaction.data;
+            } else {
+                alert.simpleOkAction( "Oops", resTransaction.err, this.click_StopLoader );
+            }
         }
         this.setState( {
             flag_Loading: false,
-            arrTransaction: resTransaction
+            arrTransaction: resTransaction.transactions.transactionDetails
         } )
     }
-
-
     getNewTrnasaction = async () => {
         this.setState( { flag_Loading: true } );
         var resTransaction = [];
@@ -144,7 +147,6 @@ export default class TransactionScreen extends React.Component<any, any> {
             }
         }
     }
-
 
     _renderItem = ( { item, index } ) => {
         return (
@@ -216,8 +218,8 @@ export default class TransactionScreen extends React.Component<any, any> {
         let { flag_Loading } = this.state;
         return (
             <Container>
-                <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
                 <SafeAreaView style={ styles.container }>
+                    <CustomeStatusBar backgroundColor={ colors.appColor } flagShowStatusBar={ true } barStyle="light-content" />
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <View style={ { flex: 1, backgroundColor: colors.appColor } }>
                             <View style={ { flexDirection: "row", alignItems: "flex-start", marginLeft: 20, marginRight: 20 } }>
@@ -299,44 +301,30 @@ export default class TransactionScreen extends React.Component<any, any> {
                                 </View>
                             </View>
                         </RkCard>
-                        <KeyboardAwareScrollView
-                            enableAutomaticScroll
-                            automaticallyAdjustContentInsets={ true }
-                            keyboardOpeningTime={ 0 }
-                            refreshControl={
-                                <RefreshControl
+                        <View style={ { flex: 1.8 } }>
+                            <Text note style={ { textAlign: "center" } }>Recent Transactions</Text>
+                            {
+                                !flag_Loading && arrTransaction.length === 0 ?
+                                    <View style={ { justifyContent: "center", alignItems: "center", padding: 20, paddingTop: 50 } }>
+                                        <Text style={ { textAlign: "center", color: "#838383" } }>{ "Start transactions to see your recent transactions history." }</Text>
+                                    </View> : null
+                            }
+                            <FlatList
+                                style={ { flex: 1, padding: 10 } }
+                                data={ arrTransaction }
+                                renderItem={ this._renderItem }
+                                keyExtractor={ ( item, index ) => index.toString() }
+                                refreshControl={
+                                    <RefreshControl
                                     refreshing={ false }
                                     onRefresh={ () => {
                                         this.getNewTrnasaction()
                                     } }
                                 />
-                            }
-                            enableOnAndroid={ true }
-                            contentContainerStyle={ { flexGrow: 1.8 } }
-                        >
-                            <View style={ { flex: 1.8 } }>
-                                <Text note style={ { textAlign: "center" } }>Recent Transactions</Text>
-                                {
-                                    !flag_Loading && arrTransaction.length === 0 ?
-                                        <View style={ { justifyContent: "center", alignItems: "center", padding: 20, paddingTop: 50 } }>
-                                            <Text style={ { textAlign: "center", color: "#838383" } }>{ "Start transactions to see your recent transactions history." }</Text>
-                                        </View> : null
                                 }
-                                <FlatList
-                                    style={ { flex: 1, padding: 10 } }
-                                    data={ arrTransaction }
-                                    renderItem={ this._renderItem }
-                                    keyExtractor={ ( item, index ) => index.toString() }
-                                    refreshControl={
-                                        <RefreshControl
-                                            onRefresh={ () => { this.getNewTrnasaction() } }
-                                            refreshing={ false }
-                                        ></RefreshControl>
-                                    }
-                                />
-                            </View>
-                        </KeyboardAwareScrollView>
-                        <View style={ { flex: 0.33 } }>
+                            />
+                        </View>
+                        <View style={ { flex: 0.4 } }>
                             <FullLinearGradientTransactionScreenThreeOpt
                                 style={ [ { opacity: 1 }, { borderRadius: 10, height: 55 } ] }
                                 disabled={ false }
@@ -355,6 +343,7 @@ export default class TransactionScreen extends React.Component<any, any> {
                                 }
                             />
                         </View>
+
                     </ImageBackground>
                 </SafeAreaView>
                 <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
