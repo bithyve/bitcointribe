@@ -283,8 +283,8 @@ let styles = StyleSheet.create( {
     marginTop: 50
   },
   imgAppLogo: {
-    height: 150,
-    width: 150
+    height: 200,
+    width: 200
   },
   viewPasscode: {
     flex: 1,
