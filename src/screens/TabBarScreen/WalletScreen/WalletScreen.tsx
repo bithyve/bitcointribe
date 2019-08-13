@@ -2119,11 +2119,12 @@ export default class WalletScreen extends React.Component {
         <Fab
           active={ this.state.flag_Fabactive }
           direction="up"
+          hitSlop={{top: 20, bottom: 10, left: 20, right: -20}}
           style={ [ styles.plusButtonBottom, { backgroundColor: 'transparent' } ] }
           position="bottomRight"
           onPress={ () => this.setState( { flag_Fabactive: !this.state.flag_Fabactive } ) }>
           <ImageSVG
-            style={ { width: 110, height: 110, marginRight: 60 } }
+            style={ { width: 110, height: 110, marginRight: 60} }
             source={
               svgIcon.walletScreen.addAccounts
             }
