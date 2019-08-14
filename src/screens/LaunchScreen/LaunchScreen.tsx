@@ -82,7 +82,7 @@ export default class LaunchScreen extends Component<Props, any> {
         >
           <Animated.Image
             source={ this.state.centerLogo }
-            style={ [ animatedOpcity, { height: 200, width: 200 } ] }
+            style={ [ animatedOpcity, { height: 400, width: 400 } ] }
           />
         </ImageBackground>
       </View>
