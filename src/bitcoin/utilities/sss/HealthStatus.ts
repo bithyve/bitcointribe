@@ -104,7 +104,7 @@ export default class HealthStatus {
   private mnemonicHealthStatus = ( time: number ): { mnemonicStage: string } => {
     let mnemonicStage = ENTITY_HEALTH.STAGE1;
     const delta = Math.abs( Date.now() - time );
-    const numberOfDays = Math.round( delta / ( 60 * 60 * 24 * 1000 ) );
+    const numberOfDays = Math.round( delta / TIME_SLOTS.DIVIDE_BY);
     if ( numberOfDays > 2 * TIME_SLOTS.MNEMONIC_SLOT ) {
       mnemonicStage = ENTITY_HEALTH.STAGE1;
       this.counter.ugly++;
@@ -126,7 +126,7 @@ export default class HealthStatus {
   ): { secureAcStage: string } => {
     let secureAcStage = ENTITY_HEALTH.STAGE1;
     const delta = Math.abs( Date.now() - time );
-    const numberOfDays = Math.floor( delta / ( 60 * 60 * 24 * 1000 ) );
+    const numberOfDays = Math.floor( delta / TIME_SLOTS.DIVIDE_BY );
     if ( numberOfDays > TIME_SLOTS.SHARE_SLOT2 ) {
       secureAcStage = ENTITY_HEALTH.STAGE1;
       this.counter.ugly++;
@@ -146,7 +146,7 @@ export default class HealthStatus {
   private qaHealthStatus = ( time: number ): { qaStage: string } => {
     let qaStage: string = ENTITY_HEALTH.STAGE1;
     const delta = Math.abs( Date.now() - time );
-    const numberOfDays = Math.round( delta / ( 60 * 60 * 24 * 1000 ) );
+    const numberOfDays = Math.round( delta / TIME_SLOTS.DIVIDE_BY );
 
     if ( numberOfDays > TIME_SLOTS.SHARE_SLOT2 ) {
       qaStage = ENTITY_HEALTH.STAGE1;
@@ -172,9 +172,7 @@ export default class HealthStatus {
       { shareId: string; updatedAt: number } | null,
       { shareId: string; updatedAt: number } | null
     ],
-  ): {
-    sharesInfo: Array<{ shareId: number; shareStage: string }>;
-  } => {
+  ) => {
     const sharesInfo = [];
     for ( let itr = 0; itr < shares.length; itr++ ) {
       const obj = shares[ itr ];
@@ -202,8 +200,9 @@ export default class HealthStatus {
     }
 
     for ( let i = 0; i < numberOfDays.length; i++ ) {
-      numberOfDays[ i ] = Math.floor( delta[ i ] / ( 60 * 60 * 24 * 1000 ) );
+      numberOfDays[ i ] = Math.floor( delta[ i ] / TIME_SLOTS.DIVIDE_BY );
       const obj = sharesInfo[ i ];
+      
       if ( numberOfDays[ i ] > TIME_SLOTS.SHARE_SLOT2 ) {
         obj.shareStage = ENTITY_HEALTH.STAGE1;
         this.counter.ugly++;
