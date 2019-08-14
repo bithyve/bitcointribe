@@ -59,9 +59,14 @@ export default class WalletNameScreen extends React.Component<any, any> {
     //TODO: func click_Proceed
     async click_Proceed() {
         let walletName = this.state.walletName;
-        var n = walletName.includes( "Wallet" ) || walletName.includes( "wallet" );
-        if ( !n ) {
-            walletName = walletName + "'s Wallet";
+        var hasWallet = walletName.includes( "Wallet" ) || walletName.includes( "wallet" );
+        if ( !hasWallet ) {
+            if(walletName.includes("'s")) {
+                walletName = walletName + " Wallet";
+            }
+            else {
+                walletName = walletName + "'s Wallet";
+            }
         }
         let SetUpDetails = {};
         SetUpDetails.walletName = walletName;
