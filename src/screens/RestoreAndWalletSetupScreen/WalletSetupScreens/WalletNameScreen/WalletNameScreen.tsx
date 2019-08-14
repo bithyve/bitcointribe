@@ -61,7 +61,7 @@ export default class WalletNameScreen extends React.Component<any, any> {
         let walletName = this.state.walletName;
         var hasWallet = walletName.includes( "Wallet" ) || walletName.includes( "wallet" );
         if ( !hasWallet ) {
-            if(walletName.includes("'s")) {
+            if(walletName.includes("'s") || walletName.includes("’s")) {
                 walletName = walletName + " Wallet";
             }
             else {
