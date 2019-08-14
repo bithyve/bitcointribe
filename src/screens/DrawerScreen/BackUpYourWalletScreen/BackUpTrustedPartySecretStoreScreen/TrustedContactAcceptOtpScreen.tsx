@@ -207,6 +207,7 @@ export default class TrustedContactAcceptOtpScreen extends Component {
                             <View style={ { marginLeft: 10, marginTop: 15 } }>
                                 <Button
                                     transparent
+                                    hitSlop={{top: 5, bottom: 8, left: 10, right: 15}}
                                     onPress={ () => this.props.navigation.pop() }
                                 >
                                     <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />

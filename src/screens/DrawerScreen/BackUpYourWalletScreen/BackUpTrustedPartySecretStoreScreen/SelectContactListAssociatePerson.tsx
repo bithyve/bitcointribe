@@ -231,6 +231,7 @@ export default class SelectContactListAssociatePerson extends React.Component<an
                         <View style={ { marginLeft: 10 } }>
                             <Button
                                 transparent
+                                hitSlop={{top: 5, bottom: 8, left: 10, right: 15}}
                                 onPress={ () => {
                                     utils.setDeepLinkingType( "" );
                                     utils.setDeepLinkingUrl( "" );

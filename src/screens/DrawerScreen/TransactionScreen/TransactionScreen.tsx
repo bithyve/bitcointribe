@@ -220,13 +220,14 @@ export default class TransactionScreen extends React.Component<any, any> {
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <View style={ { flex: 0.8, backgroundColor: colors.appColor } }>
-                            <View style={ { flexDirection: "row", alignItems: "flex-start", marginLeft: 20, marginRight: 20 } }>
+                            <View  style={ { flexDirection: "row", alignItems: "flex-start", marginLeft: 20, marginRight: 20 } }>
                                 <View style={ { flex: 1, alignItems: "flex-start" } }>
                                     <Button
+                                    hitSlop={{top: 5, bottom: 8, left: 10, right: 15}}
                                         transparent
                                         onPress={ () => this.props.navigation.navigate( "TabbarBottom" ) }
                                     >
-                                        <SvgIcon name="icon_back" size={ 25 } color="#ffffff" />
+                                        <SvgIcon  name="icon_back" size={ 25 }  color="#ffffff" />
                                     </Button>
                                 </View>
                                 <View style={ { flex: 0.1, alignItems: "flex-end" } }>

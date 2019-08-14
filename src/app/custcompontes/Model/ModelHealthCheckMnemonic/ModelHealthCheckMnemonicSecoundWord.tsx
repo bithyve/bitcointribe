@@ -125,7 +125,9 @@ export default class ModelHealthCheckMnemonicSecoundWord extends Component<Props
                         <View style={ styles.viewModelBody }>
                             <View style={ { flexDirection: "row", flex: 0.5 } }>
                                 <Button
+                                
                                     transparent
+                                    hitSlop={{top: 5, bottom: 8, left: 10, right: 15}}
                                     onPress={ () => this.props.pop() }
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />

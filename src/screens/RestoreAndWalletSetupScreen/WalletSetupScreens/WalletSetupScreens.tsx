@@ -80,6 +80,7 @@ export default class WalletSetupScreens extends React.Component<any, any> {
                         <View style={ { marginLeft: 10 } }>
                             <Button
                                 transparent
+                                hitSlop={{top: 5, bottom: 8, left: 10, right: 15}}
                                 onPress={ () => this.props.navigation.pop() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
