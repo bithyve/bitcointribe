@@ -295,7 +295,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             data.statusMsgColor = "#C07710";
             data.flag_timer = false;
         } else  if (sssDetails.sharedDate != "" && (sssDetails.acceptDate!="0" || sssDetails.acceptedDate!="0") && sssDetails.shareStage == "Ugly"){
-            data.statusMsg = "Share Inaccesible";
+            data.statusMsg = "Share Inaccessible";
             data.statusMsgColor = "#ff0000";
             data.flag_timer = false;
         }
@@ -420,10 +420,10 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
             return [ "Share Accessible", "#008000" ];
         } 
         else if (sharedDate != "" && acceptDate!="0" && shareStage == "Bad"){
-            return [ "Share Inaccesible", "#C07710" ];
+            return [ "Share Inaccessible", "#C07710" ];
         } 
         else if(sharedDate !="" && acceptDate!="0" && shareStage =="Ugly"){
-            return [ "Share Inaccesible", "#ff0000" ];
+            return [ "Share Inaccessible", "#ff0000" ];
         }
     }
     //secret quesiton message
