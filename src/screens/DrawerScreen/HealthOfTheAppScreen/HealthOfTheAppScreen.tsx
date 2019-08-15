@@ -277,26 +277,26 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         data.backupType = backupType;
         data.sssDetails = sssDetails;
         data.flagAction = this.getActionTrustedCont( backupType, decryptedShare );
-        if ( sssDetails.sharedDate == "" && sssDetails.shareStage == "Ugly" ) {
+        if ( sssDetails.sharedDate == "" && (sssDetails.acceptDate =="0" || sssDetails.acceptedDate=="0") && sssDetails.shareStage == "Ugly" ) {
             data.statusMsg = "Not Shared";
             data.statusMsgColor = "#ff0000";
             data.flag_timer = false;
-        } else if ( sssDetails.sharedDate != "" && sssDetails.shareStage == "Ugly" ) {
+        } else if ( sssDetails.sharedDate != "" && (sssDetails.acceptDate=="0"||sssDetails.acceptedDate=="0") && sssDetails.shareStage == "Ugly" )  {
             data.statusMsg = "Shared";
             data.statusMsgColor = "#C07710";
             data.flag_timer = false;
         }
-        else if ( sssDetails.sharedDate != "" && sssDetails.shareStage == "Good" ) {
-            data.statusMsg = "Share accessible";
+        else if ( sssDetails.sharedDate != "" && (sssDetails.acceptDate!="0"||sssDetails.acceptedDate!="0") && sssDetails.shareStage == "Good" ) {
+            data.statusMsg = "Share Accessible";
             data.statusMsgColor = "#008000";
             data.flag_timer = false;
-        } else if ( sssDetails.sharedDate != "" && sssDetails.shareStage == "Bad" ) {
-            data.statusMsg = "Share inaccessible";
+        } else if ( sssDetails.sharedDate != "" && (sssDetails.acceptDate!="0"||sssDetails.acceptedDate!="0") && sssDetails.shareStage == "Bad" ) {
+            data.statusMsg = "Share Inaccessible";
             data.statusMsgColor = "#C07710";
             data.flag_timer = false;
-        } else {
-            data.statusMsg = "Share inaccessible";
-            data.statusMsgColor = "#C07710";
+        } else  if (sssDetails.sharedDate != "" && (sssDetails.acceptDate!="0" || sssDetails.acceptedDate!="0") && sssDetails.shareStage == "Ugly"){
+            data.statusMsg = "Share Inaccesible";
+            data.statusMsgColor = "#ff0000";
             data.flag_timer = false;
         }
         return [ data ];
@@ -410,16 +410,20 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
     //self share message
     getMsgAndColor( sharedDate: string, acceptDate: string, shareStage: string ) {
-        if ( sharedDate == "" && shareStage == "Ugly" ) {
+        if ( sharedDate == "" && acceptDate =="0"&& shareStage == "Ugly" ) {
             return [ "Not Shared", "#ff0000" ];
         }
-        else if ( sharedDate != "" && shareStage == "Ugly" ) {
-            return [ "Shared", "#C07710" ];
+        else if ( sharedDate != "" && acceptDate=="0" && shareStage == "Ugly" ) {
+            return [ "Shared ", "#C07710" ];
         }
-        else if ( sharedDate != "" && shareStage == "Good" ) {
+        else if ( sharedDate != "" && acceptDate!="0" && shareStage == "Good" ) {
             return [ "Share Accessible", "#008000" ];
-        } else {
-            return [ "Not Shared", "#ff0000" ];
+        } 
+        else if (sharedDate != "" && acceptDate!="0" && shareStage == "Bad"){
+            return [ "Share Inaccesible", "#C07710" ];
+        } 
+        else if(sharedDate !="" && acceptDate!="0" && shareStage =="Ugly"){
+            return [ "Share Inaccesible", "#ff0000" ];
         }
     }
     //secret quesiton message

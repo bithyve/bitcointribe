@@ -65,6 +65,7 @@ class Config {
     },
 
     TIME_SLOTS: {
+      DIVIDE_BY: parseInt(config.BIT_UNIX_TIME_DIVIDE_BY,10),
       SHARE_SLOT1: parseInt( config.BIT_SHARE_HEALTH_TIME_SLOT1, 10 ),
       SHARE_SLOT2: parseInt( config.BIT_SHARE_HEALTH_TIME_SLOT2, 10 ),
       MNEMONIC_SLOT: parseInt( config.BIT_MNEMONIC_HEALTH_TIME_SLOT, 10 ),
