@@ -62,7 +62,7 @@ import ModelRestoreAssociateContactListForQRCodeScan from "HexaWallet/src/app/cu
 
 //TODO: Common Funciton
 var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
-let goBackI = 0;
+let flag_ReadQRCode = true;
 
 export default class ConfirmSelfShareQRScannerScreen extends React.Component {
     constructor ( props: any ) {
@@ -78,8 +78,9 @@ export default class ConfirmSelfShareQRScannerScreen extends React.Component {
         this.willFocusSubscription = this.props.navigation.addListener(
             "willFocus",
             () => {
-                goBackI = 0;
+                flag_ReadQRCode = true;
                 let data = this.props.navigation.getParam( "data" );
+                console.log( { data } );
                 this.setState( {
                     data
                 } )
@@ -98,6 +99,11 @@ export default class ConfirmSelfShareQRScannerScreen extends React.Component {
         )
     }
 
+
+    click_resetFlag = () => {
+        flag_ReadQRCode = true;
+    }
+
     barcodeReceived( e: any ) {
         try {
             var result = e.data;
@@ -110,20 +116,23 @@ export default class ConfirmSelfShareQRScannerScreen extends React.Component {
             let { data } = this.state;
             console.log( { result, data } );
             if ( result == data ) {
-                if ( goBackI == 0 ) {
+                if ( flag_ReadQRCode ) {
+                    flag_ReadQRCode = false;
                     const { navigation } = this.props;
                     navigation.goBack();
                     navigation.state.params.onSelect( { selected: true, result: result, data: data } );
-                    goBackI++;
                 }
             } else {
-                alert.simpleOk( "Oops", "Invalid qrcode please scan first share qrcode." );
+                if ( flag_ReadQRCode ) {
+                    flag_ReadQRCode = false;
+                    alert.simpleOkAction( "Oops", "Invalid qrcode please scan first share qrcode.", this.click_resetFlag );
+                }
             }
-
         } catch ( error ) {
             console.log( error );
         }
     }
+
 
 
     render() {
@@ -135,7 +144,7 @@ export default class ConfirmSelfShareQRScannerScreen extends React.Component {
                         <View style={ { marginLeft: 10 } }>
                             <Button
                                 transparent
-                                hitSlop={{top: 5, bottom: 8, left: 10, right: 15}}
+                                hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                 onPress={ () => this.props.navigation.pop() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />

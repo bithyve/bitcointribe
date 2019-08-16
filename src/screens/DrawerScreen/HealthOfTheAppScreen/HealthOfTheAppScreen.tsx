@@ -277,31 +277,30 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         data.backupType = backupType;
         data.sssDetails = sssDetails;
         data.flagAction = this.getActionTrustedCont( backupType, decryptedShare );
-        if ( sssDetails.sharedDate == "" && (sssDetails.acceptDate =="0" || sssDetails.acceptedDate=="0") && sssDetails.shareStage == "Ugly" ) {
+        if ( sssDetails.sharedDate == "" && ( sssDetails.acceptDate == "0" || sssDetails.acceptedDate == "0" ) && sssDetails.shareStage == "Ugly" ) {
             data.statusMsg = "Not Shared";
             data.statusMsgColor = "#ff0000";
             data.flag_timer = false;
-        } else if ( sssDetails.sharedDate != "" && (sssDetails.acceptDate=="0"||sssDetails.acceptedDate=="0") && sssDetails.shareStage == "Ugly" )  {
+        } else if ( sssDetails.sharedDate != "" && ( sssDetails.acceptDate == "0" || sssDetails.acceptedDate == "0" ) && sssDetails.shareStage == "Ugly" ) {
             data.statusMsg = "Shared";
             data.statusMsgColor = "#C07710";
             data.flag_timer = false;
         }
-        else if ( sssDetails.sharedDate != "" && (sssDetails.acceptDate!="0"||sssDetails.acceptedDate!="0") && sssDetails.shareStage == "Good" ) {
+        else if ( sssDetails.sharedDate != "" && ( sssDetails.acceptDate != "0" || sssDetails.acceptedDate != "0" ) && sssDetails.shareStage == "Good" ) {
             data.statusMsg = "Share Accessible";
             data.statusMsgColor = "#008000";
             data.flag_timer = false;
-        } else if ( sssDetails.sharedDate != "" && (sssDetails.acceptDate!="0"||sssDetails.acceptedDate!="0") && sssDetails.shareStage == "Bad" ) {
+        } else if ( sssDetails.sharedDate != "" && ( sssDetails.acceptDate != "0" || sssDetails.acceptedDate != "0" ) && sssDetails.shareStage == "Bad" ) {
             data.statusMsg = "Share Inaccessible";
             data.statusMsgColor = "#C07710";
             data.flag_timer = false;
-        } else  if (sssDetails.sharedDate != "" && (sssDetails.acceptDate!="0" || sssDetails.acceptedDate!="0") && sssDetails.shareStage == "Ugly"){
+        } else if ( sssDetails.sharedDate != "" && ( sssDetails.acceptDate != "0" || sssDetails.acceptedDate != "0" ) && sssDetails.shareStage == "Ugly" ) {
             data.statusMsg = "Share Inaccessible";
             data.statusMsgColor = "#ff0000";
             data.flag_timer = false;
         }
         return [ data ];
     }
-
 
     getQuestionDetails( walletDetails: any, ) {
         var appHealthStatus = JSON.parse( walletDetails.appHealthStatus );
@@ -313,10 +312,6 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         data.walletDetails = walletDetails;
         return [ data ];
     }
-
-
-
-
 
     loaddata = async ( backupType: string, backupMethod: string ) => {
         let walletDetails = await utils.getWalletDetails();
@@ -410,19 +405,19 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 
     //self share message
     getMsgAndColor( sharedDate: string, acceptDate: string, shareStage: string ) {
-        if ( sharedDate == "" && acceptDate =="0"&& shareStage == "Ugly" ) {
+        if ( sharedDate == "" && acceptDate == "0" && shareStage == "Ugly" ) {
             return [ "Not Shared", "#ff0000" ];
         }
-        else if ( sharedDate != "" && acceptDate=="0" && shareStage == "Ugly" ) {
+        else if ( sharedDate != "" && acceptDate == "0" && shareStage == "Ugly" ) {
             return [ "Shared ", "#C07710" ];
         }
-        else if ( sharedDate != "" && acceptDate!="0" && shareStage == "Good" ) {
+        else if ( sharedDate != "" && acceptDate != "0" && shareStage == "Good" ) {
             return [ "Share Accessible", "#008000" ];
-        } 
-        else if (sharedDate != "" && acceptDate!="0" && shareStage == "Bad"){
+        }
+        else if ( sharedDate != "" && acceptDate != "0" && shareStage == "Bad" ) {
             return [ "Share Inaccessible", "#C07710" ];
-        } 
-        else if(sharedDate !="" && acceptDate!="0" && shareStage =="Ugly"){
+        }
+        else if ( sharedDate != "" && acceptDate != "0" && shareStage == "Ugly" ) {
             return [ "Share Inaccessible", "#ff0000" ];
         }
     }
@@ -530,7 +525,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                         <View style={ { marginLeft: 10 } }>
                             <Button
                                 transparent
-                                hitSlop={{top: 5, bottom: 8, left: 10, right: 15}}
+                                hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                 onPress={ () => this.props.navigation.pop() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />

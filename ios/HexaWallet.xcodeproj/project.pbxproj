@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		001FD8F5BCF344BE99EA8AA9 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F79788E7D60A489CA04491E9 /* MaterialIcons.ttf */; };
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
@@ -65,6 +66,7 @@
 		89A871027C4542AB8BF1DA49 /* FontAwesome5_Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4714510228B74465AB49D886 /* FontAwesome5_Regular.ttf */; };
 		8B00EC4A2268A8B700BAD109 /* Messages.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B00EBFA2268A8B700BAD109 /* Messages.framework */; };
 		8B00EC4B2268A8B700BAD109 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B00EC492268A8B700BAD109 /* MessageUI.framework */; };
+		8B793D432306B97E004F06D0 /* libReactNativeConfig.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BC2E33A225F1D9F00442E2F /* libReactNativeConfig.a */; };
 		8BA2C20122DDA98B00EA1ADC /* PdfPassword.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BA2C20022DDA98A00EA1ADC /* PdfPassword.m */; };
 		8BA2C20322DDA99900EA1ADC /* PDFKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BA2C20222DDA99900EA1ADC /* PDFKit.framework */; };
 		8BA2C20522DDA99F00EA1ADC /* FileProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BA2C20422DDA99F00EA1ADC /* FileProvider.framework */; };
@@ -914,6 +916,7 @@
 				26BDB20074654DC281A70293 /* libRNSimpleShare.a in Frameworks */,
 				8BEF5F8D22EDE5C60061F6BB /* libRNBackgroundFetch.a in Frameworks */,
 				6738BE7022CD42279FE9BA85 /* libRCTSFSafariViewController.a in Frameworks */,
+				8B793D432306B97E004F06D0 /* libReactNativeConfig.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2507,9 +2510,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = Y5TCB759QL;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -2623,9 +2624,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = Y5TCB759QL;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",

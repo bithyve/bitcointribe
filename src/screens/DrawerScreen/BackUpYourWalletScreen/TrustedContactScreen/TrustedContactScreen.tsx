@@ -53,7 +53,7 @@ let alert = new AlertSimple();
 import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Custome Object
-import { colors, images, localDB, svgIcon } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, localDB, svgIcon, expaire } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
@@ -88,6 +88,10 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         let data = this.props.navigation.getParam( "data" );
         console.log( { data } );
 
+
+
+
+
         //otp history
         let arrHistory = data.history;
         let eachHistoryLength = arrHistory.length;
@@ -111,7 +115,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             //console.warn( minutes.toString() )
             const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
             console.log( { totalSec } );
-            if ( totalSec < 540 && data.sssDetails.shareStage == "Ugly" || data.sssDetails.shareStage == "Bad" ) {
+            if ( totalSec < parseInt( expaire.trustedContactScreen.expaire_otptime ) && data.sssDetails.shareStage == "Ugly" || data.sssDetails.shareStage == "Bad" ) {
                 this.setState( {
                     flag_OtpCodeShowStatus: true,
                     otpCode: otp
@@ -119,9 +123,6 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             }
         }
         console.log( { otp } );
-
-        //tempOpt.push( otp );
-
 
         var resSSSDetails = await dbOpration.readSSSTableData(
             localDB.tableName.tblSSSDetails,
@@ -135,8 +136,6 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             arr_resSSSDetails: resSSSDetails
         } )
     }
-
-
 
     componentDidMount() {
         if ( Platform.OS == "android" ) {
@@ -197,18 +196,18 @@ export default class TrustedContactScreen extends React.Component<any, any> {
 
 
     //TODO: click on model confirm button 
-    click_SentURLSmsOrEmail( type: string, value: any ) {  
+    click_SentURLSmsOrEmail( type: string, value: any ) {
         // AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
         var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-        let walletDetails = utils.getWalletDetails();  
+        let walletDetails = utils.getWalletDetails();
         let script = {};
         script.wn = walletDetails.walletType;
         script.key = this.state.key;
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );
         console.log( { encpScript } );
-        if ( type == "SMS" ) {       
-            SendSMS.send( {  
+        if ( type == "SMS" ) {
+            SendSMS.send( {
                 body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
                 recipients: [ value ],
                 successTypes: [ 'sent', 'queued' ]
@@ -234,13 +233,13 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         flag_OtpCodeShowStatus: true
                     } );
                 }, 3000 );
-            }  
+            }
         } else {
             Mailer.mail( {
                 subject: 'Hexa Wallet SSS Recovery',
-                recipients: [ value ],            
-                body: walletDetails.walletType+" hexa wallet request you to store it's secret share, tap on the link to accept it  <br/> https://prime-sign-230407.appspot.com/sss/bk/" + encpScript,
-                isHTML: true,      
+                recipients: [ value ],
+                body: walletDetails.walletType + " hexa wallet request you to store it's secret share, tap on the link to accept it  <br/> https://prime-sign-230407.appspot.com/sss/bk/" + encpScript,
+                isHTML: true,
             }, ( error, event ) => {
                 if ( event == "sent" ) {
                     setTimeout( () => {
@@ -248,7 +247,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         this.setState( {
                             flag_OtpCodeShowStatus: true
                         } );
-                    }, 1000 );  
+                    }, 1000 );
                 } else {
                     alert.simpleOk( "Oops", error );
                 }
@@ -343,7 +342,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         <View style={ { marginLeft: 10 } }>
                             <Button
                                 transparent
-                                hitSlop={{top: 5, bottom: 8, left: 10, right: 15}}
+                                hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                 onPress={ () => this.goBack() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
@@ -407,7 +406,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                         </View>
                         { renderIf( this.state.flag_OtpCodeShowStatus == true )(
                             <View style={ [ Platform.OS == "ios" ? { flex: 1 } : { flex: 1 }, { marginLeft: 5, marginRight: 5 } ] }>
-                                <Text note style={ { textAlign: "center" } }>OTP and share expires in 10 minutes</Text>
+                                <Text note style={ { textAlign: "center" } }>OTP and share expires in { parseInt( expaire.trustedContactScreen.expaire_otptime ) / 60 } minutes</Text>
                                 <View style={ { flex: 0.8, backgroundColor: "#ffffff", borderRadius: 5, flexDirection: "row", alignItems: "center", justifyContent: "center", margin: 10 } }>
                                     <Text note style={ [ globalStyle.ffFiraSansMedium, { flex: 2, marginLeft: 10 } ] }>OTP</Text>
                                     <Text style={ [ globalStyle.ffOpenSansBold, { flex: 8, letterSpacing: 30, alignSelf: "center", textAlign: "center" } ] }>{ this.state.otpCode }</Text>

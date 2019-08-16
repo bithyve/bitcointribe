@@ -126,7 +126,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
             if ( title != "Email Share" ) {
                 if ( Platform.OS == "android" ) {
                     email4shareFilePath = "file:/" + email4shareFilePath;
-                }  
+                }
                 console.log( { email4shareFilePath } );
                 let shareOptions = {
                     title: "5th share",
@@ -218,14 +218,16 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
 
     //TODO: update histroy
     updateHistory = async ( data: any, title: string, filePath: any ) => {
-        let arr_History = JSON.parse( data.sssDetails.history );
+        let { arr_History } = this.state;
         const dateTime = Date.now();
         let JsonData = {};
         JsonData.title = title;
         JsonData.date = utils.getUnixToDateFormat2();
         let temp = [ JsonData ];
         arr_History.push.apply( arr_History, temp );
+
         console.log( { arr_History } );
+
         var resUpdateHistroyAndSharedDate;
         if ( title == "Shared." ) {
             resUpdateHistroyAndSharedDate = await dbOpration.updateHistroyAndSharedDate(
@@ -280,7 +282,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                         <View style={ { marginLeft: 10 } }>
                             <Button
                                 transparent
-                                hitSlop={{top: 5, bottom: 8, left: 10, right: 15}}
+                                hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                 onPress={ () => this.props.navigation.pop() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
