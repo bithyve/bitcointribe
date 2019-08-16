@@ -155,7 +155,7 @@ const svgIcon = {
     2: require( assetsSVG + "transactionScreen/icon_shieldred.svg" ),
     3: require( assetsSVG + "transactionScreen/icon_shieldyellow.svg" ),
     4: require( assetsSVG + "transactionScreen/icon_shieldgreen.svg" ),
-    5: require( assetsSVG + "transactionScreen/icon_shieldred_mark.svg" )
+    5: require( assetsSVG + "transactionScreen/icon_shieldgreen_tick.svg" )
   },
   moreScreen: {
     health: require( assetsSVG + "moreScreen/icon_health.svg" ),
