@@ -91,7 +91,7 @@ export default class OTPScreen extends Component {
     }
 
 
-    async componentWillMount() {
+    async componentDidMount() {
         let script = utils.getDeepLinkingUrl();
         console.log( { script } );
         let resSSSDetails = await comFunDBRead.readTblSSSDetails();
