@@ -165,8 +165,8 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
     }
 
     click_RemoveDeeplinkingData = () => {
-        let urlScript = utils.getDeepLinkingUrl();
-        let urlType = utils.getDeepLinkingType();
+        utils.setDeepLinkingUrl( "" );
+        utils.setDeepLinkingType( "" );
     }
 
     componentDidMount() {
@@ -453,7 +453,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                         <View style={ { marginLeft: 10, marginTop: 15 } }>
                             <Button
                                 transparent
-                                hitSlop={{top: 5, bottom: 8, left: 10, right: 15}}
+                                hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                 onPress={ () => {
                                     let urlScript = utils.getDeepLinkingUrl();
                                     if ( urlScript != "" ) {

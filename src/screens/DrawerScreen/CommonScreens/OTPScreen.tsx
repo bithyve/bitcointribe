@@ -100,7 +100,8 @@ export default class OTPScreen extends Component {
         for ( let i = 0; i < resSSSDetails.length; i++ ) {
             let data = {};
             let fullInfo = resSSSDetails[ i ];
-            if ( fullInfo.acceptedDate == "" && fullInfo.type == "Trusted Contacts 1" || fullInfo.type == "Trusted Contacts 2" ) {
+            console.log( { fullInfo } );
+            if ( resSSSDetails[ i ].keeperInfo != "" && ( fullInfo.type == "Trusted Contacts 1" || fullInfo.type == "Trusted Contacts 2" ) ) {
                 let keerInfo = JSON.parse( resSSSDetails[ i ].keeperInfo );
                 data.id = resSSSDetails[ i ].id;
                 data.thumbnailPath = keerInfo.thumbnailPath;
