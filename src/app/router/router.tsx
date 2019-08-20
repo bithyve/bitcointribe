@@ -515,8 +515,8 @@ const TabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
         drawerLockMode: "locked-open",
-        tabBarIcon: ({ tintColor }) => (
-          <SvgIcon name="wallet" color={tintColor} size={22} />
+        tabBarIcon: ( { tintColor } ) => (
+          <SvgIcon name="wallet" color={ tintColor } size={ 22 } />
         )
       }
     },
@@ -524,8 +524,8 @@ const TabNavigator = createBottomTabNavigator(
       screen: AllTransactionScreen,
       navigationOptions: {
         tabBarLabel: "Transaction", //localization("TabBarItem.Analytics"),
-        tabBarIcon: ({ tintColor }) => (
-          <SvgIcon name="icon_transactions" color={tintColor} size={22} />
+        tabBarIcon: ( { tintColor } ) => (
+          <SvgIcon name="icon_transactions" color={ tintColor } size={ 22 } />
         )
       }
     },
@@ -533,8 +533,8 @@ const TabNavigator = createBottomTabNavigator(
       screen: QrCodeScannerScreen,
       navigationOptions: {
         tabBarLabel: "QR", //localization("TabBarItem.Accounts"),
-        tabBarIcon: ({ tintColor }) => (
-          <SvgIcon name="qr-codes" color={tintColor} size={22} />
+        tabBarIcon: ( { tintColor } ) => (
+          <SvgIcon name="qr-codes" color={ tintColor } size={ 22 } />
         )
       }
     },
@@ -543,8 +543,8 @@ const TabNavigator = createBottomTabNavigator(
       screen: SettingScreen,
       navigationOptions: {
         tabBarLabel: "More", //localization("TabBarItem.More"),
-        tabBarIcon: ({ tintColor }) => (
-          <SvgIcon name="more-icon" color={tintColor} size={22} />
+        tabBarIcon: ( { tintColor } ) => (
+          <SvgIcon name="more-icon" color={ tintColor } size={ 22 } />
         )
       }
     }

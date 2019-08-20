@@ -98,52 +98,57 @@ export default class Restore3SelfSahreQRCodeScannerScreen extends React.Componen
         )
     }
 
+
     click_ResetFlagRead = () => {
         flag_ReadQRCode = true;
     }
+
 
     barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
             result = JSON.parse( result );
             if ( result.type == "SSS Restore Self Share" ) {
-                let resDownlaodShare = await S3Service.downloadShare( result.data );
-                if ( resDownlaodShare.status == 200 ) {
-                    var resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, result.data );
-                    console.log( { resDecryptEncMetaShare } );
-                    if ( resDecryptEncMetaShare.status == 200 ) {
-                        resDecryptEncMetaShare = resDecryptEncMetaShare.data;
-                        const dateTime = Date.now();
-                        let resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactSelfShare(
-                            localDB.tableName.tblSSSDetails,
-                            dateTime,
-                            resDecryptEncMetaShare.decryptedMetaShare,
-                            "Self Share 1",
-                            "Good"
-                        );
-                        if ( resInsertContactList ) {
-                            if ( flag_ReadQRCode == true ) {
-                                flag_ReadQRCode = false;
-                                await comFunDBRead.readTblSSSDetails();
-                                this.props.navigation.pop( 2 );
+                if ( flag_ReadQRCode == true ) {
+                    let resDownlaodShare = await S3Service.downloadShare( result.data );
+                    if ( resDownlaodShare.status == 200 ) {
+                        var resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownlaodShare.data.encryptedMetaShare, result.data );
+                        console.log( { resDecryptEncMetaShare } );
+                        if ( resDecryptEncMetaShare.status == 200 ) {
+                            resDecryptEncMetaShare = resDecryptEncMetaShare.data;
+                            const dateTime = Date.now();
+                            let resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactSelfShare(
+                                localDB.tableName.tblSSSDetails,
+                                dateTime,
+                                resDecryptEncMetaShare.decryptedMetaShare,
+                                "Self Share 1",
+                                "Good"
+                            );
+                            if ( resInsertContactList ) {
+                                if ( flag_ReadQRCode == true ) {
+                                    flag_ReadQRCode = false;
+                                    await comFunDBRead.readTblSSSDetails();
+                                    this.props.navigation.pop( 2 );
+                                }
+                            } else {
+                                if ( flag_ReadQRCode == true ) {
+                                    flag_ReadQRCode = false;
+                                    alert.simpleOkAction( "Oops", "Please try again databse insert issue.", this.click_ResetFlagRead );
+                                }
                             }
-                        } else {
+                        }
+                        else {
                             if ( flag_ReadQRCode == true ) {
                                 flag_ReadQRCode = false;
-                                alert.simpleOkAction( "Oops", "Please try again databse insert issue.", this.click_ResetFlagRead );
+                                alert.simpleOkAction( "Oops", resDecryptEncMetaShare.err, this.click_ResetFlagRead );
                             }
                         }
                     }
                     else {
                         if ( flag_ReadQRCode == true ) {
                             flag_ReadQRCode = false;
-                            alert.simpleOkAction( "Oops", resDecryptEncMetaShare.err, this.click_ResetFlagRead );
+                            alert.simpleOkAction( "Oops", resDownlaodShare.err, this.click_ResetFlagRead );
                         }
-                    }
-                } else {
-                    if ( flag_ReadQRCode == true ) {
-                        flag_ReadQRCode = false;
-                        alert.simpleOkAction( "Oops", resDownlaodShare.err, this.click_ResetFlagRead );
                     }
                 }
             } else {
@@ -181,7 +186,7 @@ export default class Restore3SelfSahreQRCodeScannerScreen extends React.Componen
                         <View style={ { marginLeft: 10 } }>
                             <Button
                                 transparent
-                                hitSlop={{top: 5, bottom: 8, left: 10, right: 15}}
+                                hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                 onPress={ () => this.click_GoBack() }
                             >
                                 <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
