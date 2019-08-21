@@ -71,11 +71,11 @@ export default class SettingScreen extends React.Component<any, any> {
         subTitle: "Urgent action required to maintain health",
         svgIcon: "health"
       },
-      {
-        title: "Change Backup Method",
-        subTitle: subTitle,
-        svgIcon: "backupMethod"
-      },
+      // {
+      //   title: "Change Backup Method",
+      //   subTitle: subTitle,
+      //   svgIcon: "backupMethod"
+      // },
       {
         title: "Address Book",
         subTitle: "Contacts you have trusted or the ones who have trusted you",

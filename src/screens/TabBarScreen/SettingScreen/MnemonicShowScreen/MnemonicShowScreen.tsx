@@ -81,7 +81,7 @@ export default class MnemonicShowScreen extends React.Component<any, any> {
                         <View style={ { marginLeft: 10 } }>
                             <Button
                                 transparent
-                                hitSlop={{top: 5, bottom: 8, left: 10, right: 15}}
+                                hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                 onPress={ () =>
                                     this.props.navigation.pop() }
                             >
@@ -139,30 +139,6 @@ export default class MnemonicShowScreen extends React.Component<any, any> {
                                         </TouchableOpacity>
                                     ) }
                                     keyExtractor={ ( item, index ) => index }
-                                />
-                            </View>
-                            <View style={ { flex: 1, margin: 10 } }>
-                                <Text style={ { textAlign: "center" } }>{ walletDetails.mnemonic } </Text>
-                                <FullLinearGradientButton
-                                    click_Done={ () => {
-                                        Clipboard.setString( walletDetails.mnemonic );
-                                        Toast.show( 'Mnemonic coped!' );
-                                    } }
-                                    title="Copy Mnemonic"
-                                    disabled={ false }
-                                    style={ [ { opacity: 1, borderRadius: 10, marginTop: 20 } ] }
-                                />
-                            </View>
-                            <View style={ { flex: 1 } }>
-                                <Text style={ { textAlign: "center" } }>{ accountDetails.address } </Text>
-                                <FullLinearGradientButton
-                                    click_Done={ () => {
-                                        Clipboard.setString( accountDetails.address );
-                                        Toast.show( 'Mnemonic Address!' );
-                                    } }
-                                    title="Copy Address"
-                                    disabled={ false }
-                                    style={ [ { opacity: 1, borderRadius: 10, marginTop: 20 } ] }
                                 />
                             </View>
                         </KeyboardAwareScrollView>

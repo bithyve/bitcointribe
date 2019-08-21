@@ -3,6 +3,7 @@ package com.hexawallet;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
 
@@ -33,7 +34,9 @@ import com.rnfs.RNFSPackage;
 
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
+
 import org.reactnative.camera.RNCameraPackage;
+
 import org.pgsqlite.SQLitePluginPackage;
 
 import com.facebook.react.ReactNativeHost;

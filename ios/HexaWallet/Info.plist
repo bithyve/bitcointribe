@@ -19,7 +19,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.0.200819</string>
+	<string>1.0.0.210819</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
@@ -35,7 +35,7 @@
 		</array>
 	</dict>
 	<key>LSApplicationCategoryType</key>
-	<string></string>
+	<string/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>whatsapp</string>
@@ -129,6 +129,7 @@
 		<string>Roboto-Regular.ttf</string>
 		<string>Roboto-Thin.ttf</string>
 		<string>Roboto-ThinItalic.ttf</string>
+		<string>Fontisto.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

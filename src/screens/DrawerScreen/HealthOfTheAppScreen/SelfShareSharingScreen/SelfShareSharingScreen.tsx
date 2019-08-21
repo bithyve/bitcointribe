@@ -152,12 +152,12 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                     attachment: {
                         path: email4shareFilePath,  // The absolute path of the file from which to read data.
                         type: 'pdf',      // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-                        name: 'For4Share',   // Optional: Custom filename for attachment
+                        name: resultWallet.walletType.split( " " )[ 0 ] + " Hexa wallet Share 4.pdf",   // Optional: Custom filename for attachment
                     }
                 }, ( error, event ) => {
                     if ( event == "sent" ) {
                         this.click_CloseModel();
-                        alert.simpleOkActionWithPara( "Success", "Email Sent Successfully.", this.updateHistory( data, "Shared.", "" ) );
+                        alert.simpleOkActionWithPara( "Success", "Please permanently delete the email from the sent folder", this.updateHistory( data, "Shared.", "" ) );
                         this.setState( {
                             btnShareTitle: "Confirm"
                         } )
@@ -168,7 +168,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                 if ( Platform.OS == "android" ) {
                     setTimeout( () => {
                         this.click_CloseModel();
-                        alert.simpleOkActionWithPara( "Success", "Email Sent Successfully.", this.updateHistory( data, "Shared.", "" ) );
+                        alert.simpleOkActionWithPara( "Success", "Please permanently delete the email from the sent folder", this.updateHistory( data, "Shared.", "" ) );
                         this.setState( {
                             btnShareTitle: "Confirm"
                         } )

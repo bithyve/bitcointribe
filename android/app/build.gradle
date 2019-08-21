@@ -71,14 +71,19 @@ apply plugin: 'io.fabric'
  *   extraPackagerArgs: []
  * ]   
  */  
-
 project.ext.react = [
-    entryFile: "index.js"
+    entryFile: "index.js",
+    enableHermes: false,  // clean and rebuild if changing
 ]
+
 project.ext.vectoricons = [       
     iconFontNames: [ 'icomoon.ttf' ] // Name of the font files you want to copy
 ]  
-    
+
+
+
+
+
 apply from: "../../node_modules/react-native/react.gradle"
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
@@ -97,10 +102,16 @@ def enableSeparateBuildPerCPUArchitecture = false
  * Run Proguard to shrink the Java bytecode in release builds.
  */
 def enableProguardInReleaseBuilds = false
+def jscFlavor = 'org.webkit:android-jsc:+'
+def enableHermes = project.ext.react.get("enableHermes", false);
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+
+  compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }   
 
     defaultConfig {
         applicationId "com.hexawallet"
@@ -108,29 +119,10 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1       
         versionName "1.0.0.020819"                  
-            multiDexEnabled true   
-        ndk {  
-            abiFilters "armeabi-v7a", "x86"
-        }
        missingDimensionStrategy 'react-native-camera', 'general'   
     }        
   
-    dexOptions {
-      jumboMode = true
-  }
 
-      packagingOptions {
-        pickFirst '**/libgnustl_shared.so'
-    }
-
-    splits {
-        abi {
-            reset()
-            enable enableSeparateBuildPerCPUArchitecture
-            universalApk false  // If true, also generate a universal APK
-            include "armeabi-v7a", "x86"
-        }
-    }
     signingConfigs {
 release {
 storeFile file("hexawallet.keystore")
@@ -139,6 +131,24 @@ keyAlias "hexawallet"
  keyPassword "developer"
  }  
  }
+
+   splits {
+        abi {
+            reset()
+            enable enableSeparateBuildPerCPUArchitecture
+            universalApk false  // If true, also generate a universal APK
+            include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
+        }
+    }
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+
     buildTypes {
         release {
             aaptOptions.cruncherEnabled=false // here
@@ -148,25 +158,29 @@ keyAlias "hexawallet"
         }
     }
     // applicationVariants are e.g. debug, release
-    applicationVariants.all { variant ->
+     applicationVariants.all { variant ->
         variant.outputs.each { output ->
             // For each separate APK per architecture, set a unique version code as described here:
-            // http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
-            def versionCodes = ["armeabi-v7a":1, "x86":2]
+            // https://developer.android.com/studio/build/configure-apk-splits.html
+            def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
             def abi = output.getFilter(OutputFile.ABI)
             if (abi != null) {  // null for the universal-debug, universal-release variants
                 output.versionCodeOverride =
                         versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
             }
+
         }
+    }
+    packagingOptions {
+        pickFirst '**/armeabi-v7a/libc++_shared.so'
+        pickFirst '**/x86/libc++_shared.so'
+        pickFirst '**/arm64-v8a/libc++_shared.so'
+        pickFirst '**/x86_64/libc++_shared.so'
+        pickFirst '**/x86/libjsc.so'
+        pickFirst '**/armeabi-v7a/libjsc.so'
     }
 }
 
-configurations.all {
- resolutionStrategy {
-        force 'org.webkit:android-jsc:r236355'
-     }
- }  
    
    
    
@@ -175,13 +189,14 @@ dependencies {
     //pdf password lib   
     compile 'com.itextpdf:itext-pdfa:5.5.10'
     compile 'com.itextpdf:itextg:5.5.9'
-    
-    compile project(':react-native-webview')
+        
+    compile project(':react-native-webview')  
+       
     compile project(':react-native-background-fetch')     
     compile project(':react-native-device-info')
     compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
     transitive = true;
-    }     
+    }       
     compile project(':react-native-randombytes')  
     compile project(':react-native-udp')
     compile project(':react-native-tcp')
@@ -204,12 +219,23 @@ dependencies {
    
     compile project(':react-native-contacts')
     compile project(':react-native-config')
-    compile project(':react-native-camera')  
+
+    compile project(':react-native-camera') 
+     
     compile project(':react-native-sqlite-storage')
     implementation 'com.android.support:multidex:1.0.3'
     implementation fileTree(dir: "libs", include: ["*.jar"])  
+  
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules
+
+    if (enableHermes) {
+      def hermesPath = "../../node_modules/hermesvm/android/";
+      debugImplementation files(hermesPath + "hermes-debug.aar")
+      releaseImplementation files(hermesPath + "hermes-release.aar")
+    } else {
+      implementation jscFlavor
+    }   
 }              
    
 // Run this once to be able to run the application with BUCK
@@ -218,3 +244,5 @@ task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
 }
+
+apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

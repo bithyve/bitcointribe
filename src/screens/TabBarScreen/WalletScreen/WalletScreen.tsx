@@ -764,14 +764,15 @@ export default class WalletScreen extends React.Component {
         // console.log( { res2FASecret4Share } );
         var create4thPdf;
         if ( Platform.OS == "android" ) {
-          create4thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode4thSahre1.png", "/storage/emulated/0/qrcode4thSahre2.png", "/storage/emulated/0/qrcode4thSahre3.png", "/storage/emulated/0/qrcode4thSahre4.png", "/storage/emulated/0/qrcode4thSahre5.png", "/storage/emulated/0/qrcode4thSahre6.png", "/storage/emulated/0/qrcode4thSahre7.png", "/storage/emulated/0/qrcode4thSahre8.png", "/storage/emulated/0/secoundryXpub4Share.png", "/storage/emulated/0/googleAuto2FASecret4Share.png", walletDetails.walletType + "4thShare.pdf", "4th Share", password );
+          create4thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode4thSahre1.png", "/storage/emulated/0/qrcode4thSahre2.png", "/storage/emulated/0/qrcode4thSahre3.png", "/storage/emulated/0/qrcode4thSahre4.png", "/storage/emulated/0/qrcode4thSahre5.png", "/storage/emulated/0/qrcode4thSahre6.png", "/storage/emulated/0/qrcode4thSahre7.png", "/storage/emulated/0/qrcode4thSahre8.png", "/storage/emulated/0/secoundryXpub4Share.png", "/storage/emulated/0/googleAuto2FASecret4Share.png", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 4.pdf", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 4", password );
         } else {
-          create4thPdf = await this.genreatePdf( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, res4thShare6Create, res4thShare7Create, res4thShare8Create, resSecoundXpub4Share, res2FASecret4Share, walletDetails.walletType + "4thShare.pdf", "4th Shares", password );
+          create4thPdf = await this.genreatePdf( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, res4thShare6Create, res4thShare7Create, res4thShare8Create, resSecoundXpub4Share, res2FASecret4Share, walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 4.pdf", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 4", password );
         }
         resolve( create4thPdf );
       }, 2000 );
     } );
   }
+
   //for 5th share
   generate5thShare = async ( data: any, password: string, walletDetails: any ) => {
     return new Promise( async ( resolve, reject ) => {
@@ -829,14 +830,15 @@ export default class WalletScreen extends React.Component {
         // console.log( { res2FASecret4Share } );
         var create5thPdf;
         if ( Platform.OS == "android" ) {
-          create5thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode5thSahre1.png", "/storage/emulated/0/qrcode5thSahre2.png", "/storage/emulated/0/qrcode5thSahre3.png", "/storage/emulated/0/qrcode5thSahre4.png", "/storage/emulated/0/qrcode5thSahre5.png", "/storage/emulated/0/qrcode5thSahre6.png", "/storage/emulated/0/qrcode5thSahre7.png", "/storage/emulated/0/qrcode5thSahre8.png", "/storage/emulated/0/secoundryXpub5Share.png", "/storage/emulated/0/googleAuto2FASecret5Share.png", walletDetails.walletType + "5thShare.pdf", "5th Shares", password );
+          create5thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode5thSahre1.png", "/storage/emulated/0/qrcode5thSahre2.png", "/storage/emulated/0/qrcode5thSahre3.png", "/storage/emulated/0/qrcode5thSahre4.png", "/storage/emulated/0/qrcode5thSahre5.png", "/storage/emulated/0/qrcode5thSahre6.png", "/storage/emulated/0/qrcode5thSahre7.png", "/storage/emulated/0/qrcode5thSahre8.png", "/storage/emulated/0/secoundryXpub5Share.png", "/storage/emulated/0/googleAuto2FASecret5Share.png", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 5.pdf", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 5", password );
         } else {
-          create5thPdf = await this.genreatePdf( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, res5thShare6Create, res5thShare7Create, res5thShare8Create, resSecoundXpub5Share, res2FASecret5Share, walletDetails.walletType + "5thShare.pdf", "5th Share", password );
+          create5thPdf = await this.genreatePdf( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, res5thShare6Create, res5thShare7Create, res5thShare8Create, resSecoundXpub5Share, res2FASecret5Share, walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 5.pdf", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 5", password );
         }
         resolve( create5thPdf );
       }, 1000 );
     } );
   }
+
   generateSahreQRCode = async ( share1: any, fileName: string ) => {
     return new Promise( async ( resolve, reject ) => {
 
