@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, SafeAreaView, Image, AsyncStorage, Dimensions, Alert } from "react-native";
+import { StyleSheet, View, SafeAreaView, Image, AsyncStorage, Dimensions, Alert, NativeModules } from "react-native";
 import { Text } from "native-base";
 import { StackActions, NavigationActions } from "react-navigation";
 import CreateTables from "HexaWallet/src/app/manage/database/CreateTables";
@@ -27,11 +27,24 @@ export default class OnBoardingScreen extends React.Component<any, any> {
 
   componentWillMount() {
     try {
+
       this.setState( {
         data: localization( "OnBoardingScreen.onBoarding" )
       } );
     } catch ( error ) {
       Alert.alert( error )
+    }
+  }
+
+  componentDidMount() {
+    try {
+      console.log( 'calling' );
+      var NativeModulesUtils = NativeModules.Utils;
+      NativeModulesUtils.disableScreenShort();
+
+    } catch ( error ) {
+      console.log( { error } );
+
     }
   }
 
