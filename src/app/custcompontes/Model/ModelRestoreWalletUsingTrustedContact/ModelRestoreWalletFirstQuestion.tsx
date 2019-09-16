@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Dimensions, Platform, AsyncStorage } from 'react-native';
+import { Modal, View, Alert, StyleSheet, Dimensions, Platform, AsyncStorage } from 'react-native';
 import {
-    Container,
     Header,
     Title,
-    Content,
     Item,
     Input,
     Button,
@@ -15,8 +13,7 @@ import {
     Picker,
     Icon
 } from "native-base";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import { Avatar } from 'react-native-elements';
+
 import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
@@ -30,30 +27,33 @@ interface Props {
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+import FullLinearGradientLoadingButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientLoadingButton";
 
 //TODO: Custome Alert 
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import {
     colors,
-    images,
     localDB,
     asyncStorageKeys
 } from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
 import utils from "HexaWallet/src/app/constants/Utils";
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
-var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
+var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comAppHealth = require( "HexaWallet/src/app/manage/CommonFunction/CommonAppHealth" );
 
+
+//TODO: Custome Validation
+import { validationService } from "HexaWallet/src/app/validation/service";
 
 //TODO: Bitcoin Files
-var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
+var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
@@ -64,6 +64,12 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
     constructor ( props: any ) {
         super( props )
         this.state = ( {
+            inputs: {
+                answer: {
+                    type: "answer",
+                    value: ""
+                }
+            },
             arr_QuestionList: [
                 {
                     "item": "To what city did you go the first time you flew on a plane?"
@@ -105,8 +111,11 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
             firstQuestion: "To what city did you go the first time you flew on a plane?",
             firstAnswer: "",
             flag_DisableBtnNext: true,
-            flag_Loading: false
+            flag_NextBtnAnimation: false,
+            flag_Loading: false,
         } );
+        this.onInputChange = validationService.onInputChange.bind( this );
+        this.getFormValidation = validationService.getFormValidation.bind( this );
     }
 
     //TODO: Select Picker Question List change aciton
@@ -120,7 +129,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
     check_CorrectAnswer() {
         setTimeout( () => {
             let firstAns = this.state.firstAnswer;
-            if ( firstAns.length >= 6 ) {
+            if ( firstAns.length >= 3 ) {
                 this.setState( {
                     flag_DisableBtnNext: false
                 } )
@@ -135,72 +144,82 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
 
     //TODO: get bal and insert accound into local db
     click_Next = async () => {
-        this.setState( {
-            flag_Loading: true
-        } );
-        let Question = this.state.firstQuestion;
-        let Answer = this.state.firstAnswer
-
-        const dateTime = Date.now();
-        let walletDetail = await utils.getWalletDetails();
-        let sssDetails = await utils.getSSSDetails();
-        console.log( { sssDetails } );
-        let decryptedShare = [];
-        let arr_TableId = [];
-        // let answers = [ temp[ 0 ].firstAnswer, temp[ 1 ].secoundAnswer ];
-        let walletName, encryptedStaticNonPMDD;
-        for ( let i = 0; i < sssDetails.length; i++ ) {
-            let data = sssDetails[ i ];
-            if ( data.decryptedShare != "" ) {
-                let decryptedShareJson = JSON.parse( data.decryptedShare );
-                console.log( { decryptedShareJson } );
-                decryptedShare.push( decryptedShareJson.encryptedShare );
-                walletName = decryptedShareJson.meta.tag;
-                encryptedStaticNonPMDD = decryptedShareJson.encryptedStaticNonPMDD;
+        try {
+            this.getFormValidation();
+            this.setState( {
+                flag_Loading: true,
+                flag_DisableBtnNext: true,
+                flag_NextBtnAnimation: true,
+            } );
+            let Question = this.state.firstQuestion;
+            let Answer = this.state.firstAnswer;
+            const dateTime = Date.now();
+            let walletDetail = await utils.getWalletDetails();
+            var sssDetails = await utils.getSSSDetails();
+            //console.log( { sssDetails } );
+            let decryptedShare = [];
+            let arr_TableId = [];
+            let walletName, encryptedStaticNonPMDD;
+            for ( let i = 0; i < sssDetails.length; i++ ) {
+                let data = sssDetails[ i ];
+                if ( data.decryptedShare != "" ) {
+                    let decryptedShareJson = JSON.parse( data.decryptedShare );
+                    //console.log( { decryptedShareJson } );
+                    decryptedShare.push( decryptedShareJson.encryptedShare );
+                    walletName = decryptedShareJson.meta.tag;
+                    encryptedStaticNonPMDD = decryptedShareJson.encryptedStaticNonPMDD;
+                }
+                arr_TableId.push( data.id );
             }
-            arr_TableId.push( data.id );
-        }
-        console.log( { decryptedShare, Answer } );
-        var resMnemonic = await S3Service.recoverFromShares( decryptedShare, Answer );
-        console.log( { resMnemonic } );
-        if ( resMnemonic.status == 200 ) {
-            resMnemonic = resMnemonic.data;
-            const regularAccount = new RegularAccount(
-                resMnemonic.mnemonic
-            );
-            const secureAccount = new SecureAccount( resMnemonic.mnemonic );
-            const sss = new S3Service( resMnemonic.mnemonic );
-            //decryptStaticNonPMDD
-            console.log( { encryptedStaticNonPMDD } );
+            //console.log( { decryptedShare, Answer } );
+            //check wallet id and index number
+            var resMnemonic = await S3Service.recoverFromShares( decryptedShare, Answer );
+            //console.log( { resMnemonic } );
+            if ( resMnemonic.status == 200 ) {
+                resMnemonic = resMnemonic.data;
+                const regularAccount = new RegularAccount(
+                    resMnemonic.mnemonic
+                );
+                var secureAccount;
+                const sss = new S3Service( resMnemonic.mnemonic );
+                await bitcoinClassState.setS3ServiceClassState( sss );
+                //console.log( { encryptedStaticNonPMDD } );
+                const shareIds = [];
+                const shareSelfShareIds = [];
+                for ( let i = 0; i < sssDetails.length; i++ ) {
+                    let data = sssDetails[ i ];
+                    if ( data.decryptedShare != "" ) {
+                        let decryptedShareJson = JSON.parse( data.decryptedShare );
+                        let shareId = S3Service.getShareId( decryptedShareJson.encryptedShare );
+                        await dbOpration.updateSSSShareId(
+                            localDB.tableName.tblSSSDetails,
+                            dateTime,
+                            shareId.data.shareId,
+                            data.type
+                        );
+                    }
+                }
+                sssDetails = await comFunDBRead.readTblSSSDetails();
+                let share = {};
+                share.trustedContShareId1 = sssDetails[ 0 ].shareId != "" ? sssDetails[ 0 ].shareId : null;
+                share.trustedContShareId2 = sssDetails[ 1 ].shareId != "" ? sssDetails[ 1 ].shareId : null;
+                share.selfshareShareId1 = sssDetails[ 2 ].shareId != "" ? sssDetails[ 2 ].shareId : null;
 
-            var resDecryptStaticNonPMDD = await sss.decryptStaticNonPMDD( encryptedStaticNonPMDD );
-            console.log( { resDecryptStaticNonPMDD } );
-            if ( resDecryptStaticNonPMDD.status == 200 ) {
-                //Generate ShareId    
-                const generateShareRes = await sss.generateShares( Answer );
-                console.log( { generateShareRes } );
-                if ( generateShareRes.status == 200 ) {
-                    await bitcoinClassState.setS3ServiceClassState( sss )
-
-                    // const { encryptedShares } = generateShareRes.data;
-                    // const autoHealthShares = encryptedShares.slice( 0, 3 );
-                    // const resInitializeHealthcheck = await sss.initializeHealthcheck( autoHealthShares );
-                    // console.log( { resInitializeHealthcheck } );
-                    // if ( resInitializeHealthcheck.status == 200 ) {
-                    //     const shareIds = [];
-                    //     for ( const share of encryptedShares ) {
-                    //         shareIds.push( sss.getShareId( share ) )
-                    //     }
-                    // }
-                    // const res = await comAppHealth.check_HealthRestoWalletUsingTrustedContact( dateTime, sssDetails );
-                    // console.log( { res } );
-
+                share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? sssDetails[ 3 ].acceptedDate : 0;
+                share.selfshareShareShareId2 = sssDetails[ 3 ].shareId != "" ? sssDetails[ 3 ].shareId : "";
+                share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? sssDetails[ 4 ].acceptedDate : 0;
+                share.selfshareShareId3 = sssDetails[ 4 ].shareId != "" ? sssDetails[ 4 ].shareId : "";
+                share.qatime = parseInt( dateTime );
+                let resCheckHealthAllShare = await comAppHealth.checkHealthAllShare( share );
+                //console.log( { resCheckHealthAllShare } );
+                if ( resCheckHealthAllShare != "" ) {
                     let queTemp = [];
                     let questionData = {};
                     questionData.Question = Question;
                     questionData.Answer = Answer;
                     queTemp.push( questionData );
-                    let resInsertWallet = await dbOpration.insertWallet(
+                    let arrBackupInfo = [ { backupType: "restore" }, { backupMethod: "share" } ];
+                    await dbOpration.insertWallet(
                         localDB.tableName.tblWallet,
                         dateTime,
                         resMnemonic.mnemonic,
@@ -208,92 +227,86 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                         "",
                         "",
                         walletName,
-                        queTemp
+                        arrBackupInfo,
+                        queTemp,
+                        resCheckHealthAllShare
                     );
-
-
-
-
-                    var getBal = await regularAccount.getBalance();
-                    console.log( { getBal } );
-                    if ( getBal.status == 200 ) {
-                        await bitcoinClassState.setRegularClassState( regularAccount );
-                        getBal = getBal.data;
-                    } else {
-                        alert.simpleOk( "Oops", getBal.err );
-                    }
-
-                    var resSetupSecureAccount = await secureAccount.setupSecureAccount();
-                    if ( resSetupSecureAccount.status == 200 ) {
-                        resSetupSecureAccount = resSetupSecureAccount.data;
-                    } else {
-                        alert.simpleOk( "Oops", resSetupSecureAccount.err );
-                    }
-                    var getBalSecure = await secureAccount.getBalance();
-                    console.log( { getBalSecure } );
-                    if ( getBalSecure.status == 200 ) {
-                        getBalSecure = getBalSecure.data;
-                    } else {
-                        alert.simpleOk( "Oops", getBalSecure.err );
-                    }
-                    var address = await secureAccount.getAddress();
-                    if ( address.status == 200 ) {
-                        await bitcoinClassState.setSecureClassState( secureAccount );
-                        address = address.data.address
-                    } else {
-                        alert.simpleOk( "Oops", address.err );
-                    }
-                    let resInsertDailyAccount = await dbOpration.insertCreateAccount(
-                        localDB.tableName.tblAccount,
-                        dateTime,
-                        "",
-                        getBal.balance / 1e8,
-                        "BTC",
-                        "Daily Wallet",
-                        "Daily Wallet",
-                        ""
-                    );
-                    let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
-                        localDB.tableName.tblAccount,
-                        dateTime,
-                        address,
-                        getBalSecure.balance / 1e8,
-                        "BTC",
-                        "Secure Account",
-                        "Secure Account",
-                        ""
-                    );
-                    if ( resInsertDailyAccount && resInsertSecureCreateAcc ) {
-                        await comFunDBRead.readTblSSSDetails();
-                        await comFunDBRead.readTblAccount();
-                        this.setState( {
-                            flag_Loading: false
-                        } );
-                        setTimeout( () => {
-                            let data = {};
-                            data.walletName = walletName;
-                            data.balR = getBal.balance / 1e8;
-                            data.balS = getBalSecure.balance / 1e8;
-                            this.props.click_Next( data );
-                            AsyncStorage.setItem(
-                                asyncStorageKeys.rootViewController,
-                                "TabbarBottom"
+                    var resDecryptStaticNonPMDD = await sss.decryptStaticNonPMDD( encryptedStaticNonPMDD );
+                    //console.log( { resDecryptStaticNonPMDD } );
+                    if ( resDecryptStaticNonPMDD.status == 200 ) {
+                        resDecryptStaticNonPMDD = resDecryptStaticNonPMDD.data.decryptedStaticNonPMDD;
+                        secureAccount = new SecureAccount( resMnemonic.mnemonic );
+                        var resImportSecureAccount = await secureAccount.importSecureAccount( resDecryptStaticNonPMDD.secondaryXpub, resDecryptStaticNonPMDD.bhXpub );
+                        //console.log( { resImportSecureAccount } );
+                        if ( resImportSecureAccount.status == 200 ) {
+                            resImportSecureAccount = resImportSecureAccount.data;
+                            let resInsertDailyAccount = await dbOpration.insertCreateAccount(
+                                localDB.tableName.tblAccount,
+                                dateTime,
+                                "",
+                                "0",
+                                "BTC",
+                                "Regular Account",
+                                "Regular Account",
+                                ""
                             );
-                        }, 1000 );
+                            let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+                                localDB.tableName.tblAccount,
+                                dateTime,
+                                "",
+                                "0",
+                                "BTC",
+                                "Secure Account",
+                                "Secure Account",
+                                ""
+                            );
+                            if ( resInsertDailyAccount && resInsertSecureCreateAcc ) {
+                                await bitcoinClassState.setRegularClassState( regularAccount );
+                                await bitcoinClassState.setSecureClassState( secureAccount );
+                                await bitcoinClassState.setS3ServiceClassState( sss );
+                                await comFunDBRead.readTblWallet();
+                                await comFunDBRead.readTblSSSDetails();
+                                await comFunDBRead.readTblAccount();
+                                this.setState( {
+                                    flag_Loading: false,
+                                    flag_DisableBtnNext: false,
+                                    flag_NextBtnAnimation: false,
+                                } );
+                                setTimeout( () => {
+                                    let data = {};
+                                    data.walletName = walletName;
+                                    this.props.click_Next( data );
+                                    AsyncStorage.setItem(
+                                        asyncStorageKeys.rootViewController,
+                                        "TabbarBottom"
+                                    );
+                                }, 1000 );
+                            }
+                        }
+                    } else {
+                        alert.simpleOk( "Oops", resImportSecureAccount.err );
                     }
                 }
             } else {
-                alert.simpleOk( "Oops", resDecryptStaticNonPMDD.err );
+                alert.simpleOk( "Oops", resMnemonic.err );
             }
-
-
+        } catch ( error ) {
+            Alert.alert( error )
         }
     }
 
 
+    renderError( id: any ) {
+        const { inputs } = this.state;
+        if ( inputs[ id ].errorLabel ) {
+            return <Text style={ [ validationService.styles.error, { marginBottom: 5 } ] }>{ inputs[ id ].errorLabel }</Text>;
+        }
+        return null;
+    }
+
     render() {
         //flag 
-        let { flag_Loading } = this.state;
+        let { flag_Loading, flag_NextBtnAnimation } = this.state;
         let flag_DisableBtnNext = this.state.flag_DisableBtnNext;
         let firstQuestion = this.state.firstQuestion;
         let arr_QuestionList = this.state.arr_QuestionList != null ? this.state.arr_QuestionList : dataQuestionList;
@@ -325,6 +338,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                             <View style={ { flexDirection: "row", flex: 0.5 } }>
                                 <Button
                                     transparent
+                                    hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                     onPress={ () => this.props.pop() }
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />
@@ -332,7 +346,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Restore wallet using Trusted Contacts</Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                                <Text note style={ { textAlign: "center" } }>Enter the first question and answer you chose at the time of setting up the wallet</Text>
+                                <Text style={ { textAlign: "center" } }>Select the question and specify the answer as you did at the time of setting up the wallet</Text>
                                 <View style={ styles.itemQuestionPicker }>
                                     <Picker
                                         renderHeader={ backAction =>
@@ -361,30 +375,35 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                                     <Input
                                         secureTextEntry
                                         keyboardType="default"
-                                        autoCapitalize='sentences'
+                                        autoCapitalize='none'
+                                        autoCorrect={ false }
+                                        autoFocus={ true }
                                         placeholder='Write your answer here'
                                         style={ [ globalStyle.ffFiraSansMedium ] }
                                         placeholderTextColor="#B7B7B7"
-                                        onChangeText={ ( val ) => {
+                                        onChangeText={ ( value ) => {
                                             this.setState( {
-                                                firstAnswer: val
+                                                firstAnswer: value
                                             } )
+                                            this.onInputChange( { id: "answer", value } );
                                         } }
                                         onKeyPress={ () =>
                                             this.check_CorrectAnswer()
                                         }
                                     />
                                 </Item>
+                                { this.renderError( "answer" ) }
                             </View>
                             <View style={ { flex: 1, justifyContent: "flex-end" } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>In case the answer does not match with the original answer, restoration process will fail</Text>
-                                <FullLinearGradientButton
+                                <FullLinearGradientLoadingButton
                                     click_Done={ () => {
                                         this.click_Next()
                                     }
                                     }
-                                    title="Next"
+                                    title=" Next"
                                     disabled={ flag_DisableBtnNext }
+                                    animating={ flag_NextBtnAnimation }
                                     style={ [ flag_DisableBtnNext == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
                                 />
                             </View>

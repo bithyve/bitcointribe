@@ -1,47 +1,32 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert } from "react-native";
+import { StyleSheet, ImageBackground, View, RefreshControl, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, ActivityIndicator, AsyncStorage } from "react-native";
 import {
     Container,
-    Header,
-    Title,
-    Content,
-    Item,
-    Input,
-    Button,
-    Left,
-    Right,
-    Body,
-    Text,
-    List, ListItem,
+    Text
 } from "native-base";
-import { Icon } from 'react-native-elements'
 import { SvgIcon } from "@up-shared/components";
 import { RkCard } from "react-native-ui-kitten";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
+import ImageSVG from "HexaWallet/src/screens/Custome/ImageSVG/ImageSVG";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Permissions from 'react-native-permissions';
 import { Avatar } from 'react-native-elements';
-import ShimmerPlaceHolder from 'react-native-shimmer-placeholder'
-import TimerCountdown from "react-native-timer-countdown";
-var converter = require( 'number-to-words' );
-var Mailer = require( 'NativeModules' ).RNMail;
-import Modal from 'react-native-modalbox';
-//import SimpleShare from "react-native-simple-share";
-import Share, { ShareSheet } from 'react-native-share';
-import { SocialIcon } from 'react-native-elements'
+
 
 
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import WalletSetUpScrolling from "HexaWallet/src/app/custcompontes/OnBoarding/WalletSetUpScrolling/WalletSetUpScrolling";
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+
+//TODO: Custome View
+import ViewErrorMessage from "HexaWallet/src/app/custcompontes/View/ViewErrorMessage/ViewErrorMessage";
 
 //TODO: Custome model  
-import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
-import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model/ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
 
+import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model/ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
+import ModelHelperScreen from "HexaWallet/src/app/custcompontes/Model/ModelHelperScreen/ModelHelperScreen";
 
 
 //TODO: Custome Alert 
@@ -49,19 +34,19 @@ import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
-import { colors, images, localDB, expaire } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, svgIcon, asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+
 
 
 //TODO: Common Funciton
-var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+var comAppHealth = require( "HexaWallet/src/app/manage/CommonFunction/CommonAppHealth" );
+
 
 
 export default class HealthOfTheAppScreen extends React.Component<any, any> {
@@ -70,428 +55,392 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         this.state = ( {
             arr_TrustedContacts: [ {
                 thumbnailPath: "user",
-                givenName: "Trusted Contact 1",
+                givenName: "Trusted Contacts 1",
                 familyName: "",
-                statusMsgColor: "gray",
+                statusMsgColor: "#ff0000",
                 statusMsg: "Not Shared",
-                opt: undefined,
+                flagAction: false,
             }, {
                 thumbnailPath: "user",
-                givenName: "Trusted Contact 2",
+                givenName: "Trusted Contacts 2",
                 familyName: "",
-                statusMsgColor: "gray",
+                statusMsgColor: "#ff0000",
                 statusMsg: "Not Shared",
-                opt: undefined,
+                flagAction: false,
             } ],
             arr_SelfShare: [ {
-                thumbnailPath: "bars",
+                thumbnailPath: Platform.OS == "ios" ? "walletSVG" : "walletPNG",
                 givenName: "Secondary Device",
                 familyName: "",
                 statusMsgColor: "#ff0000",
                 statusMsg: "Not Shared",
+                type: "Self Share 1",
+                flagAction: true,
             }, {
-                thumbnailPath: "bars",
+                thumbnailPath: Platform.OS == "ios" ? "emailSVG" : "emailPNG",
                 givenName: "Email",
                 familyName: "",
                 statusMsgColor: "#ff0000",
                 statusMsg: "Not Shared",
+                type: "Self Share 2",
+                flagAction: true,
             }, {
-                thumbnailPath: "bars",
+                thumbnailPath: Platform.OS == "ios" ? "cloudstorageSVG" : "cloudstoragePNG",
                 givenName: "Cloud",
                 familyName: "",
                 statusMsgColor: "#ff0000",
                 statusMsg: "Not Shared",
+                type: "Self Share 3",
+                flagAction: true,
             } ],
+            arrSelectedItem: [],
             arr_SSSDetails: [],
             arr_Mnemonic: [],
             arr_MnemonicDetails: [],
-            arr_SecretQuestion: [],
+            arr_SecretQuestion: [ {
+                icon: "timelockNew",
+                title: "Secret Question",
+                subTitle: "Not Backed up",
+                color: "#ff0000",
+            } ],
+            //values
+            backupType: "",
+            backupMethod: "",
             arr_QuestionAndAnswerDetails: [],
             arr_2FactorAuto: [],
             arr_SecureAccountDetials: [],
             arr_ModelBackupYourWallet: [],
             arr_ModelFindYourTrustedContacts: [],
+            arrErrorMessage: [],
+            arrModelHelperScreen: [],
             //flag
             flag_isTrustedContacts: true,
             flag_SelfShare: true,
-            flag_SelfShareDisable: true,
+            flag_SelfShareActionDisable: true,
             flag_isSetupTrustedContact: true,
             flag_isMnemonic: false,
-            flag_isSecretQuestions: false,
+            flag_isSecretQuestions: true,
             flag_isTwoFactor: false,
             flag_Loading: false,
             //TouchableOpacity Disable
             flag_DisableSecureTwoFactor: true,
-            flag_DisableSecretQuestion: true
-        } )
+            flag_DisableSecretQuestion: true,
+            flag_SSSAndPdfFileCreate: false,
+            flag_ShareAction: true
+        } );
     }
 
     async componentWillMount() {
         this.willFocusSubscription = this.props.navigation.addListener(
             "willFocus",
             () => {
-                this.loaddata();
+                this.getCheackHealthWithoutServer();
             }
         );
     }
-
 
     componentWillUnmount() {
         this.willFocusSubscription.remove();
     }
 
-    loaddata = async () => {
-        this.setState( {
-            flag_Loading: true
-        } )
-        let flag_Loading = true;
-        let dateTime = Date.now();
-        let walletDetails = await utils.getWalletDetails();
-        let setUpWalletAnswerDetails = walletDetails.setUpWalletAnswerDetails;
-        let backupType;
-        if ( utils.isJson( walletDetails.appHealthStatus ) ) {
-            backupType = JSON.parse( walletDetails.appHealthStatus );
-            backupType = backupType.backupType;
-        } else {
-            backupType = "share";
+    getCheackHealthWithoutServer = async () => {
+        try {
+            let value = await AsyncStorage.getItem( asyncStorageKeys.flagHealthOfTheAppScreen );
+            let status = JSON.parse( value );
+            console.log( { status } );
+            if ( !status ) {
+                this.setState( {
+                    arrModelHelperScreen: [ {
+                        modalVisible: true,
+                        images: [ "helper4", "helper5", "helper6" ]
+                    } ]
+                } );
+            }
+            let sssDetails = await utils.getSSSDetails();
+            if ( sssDetails.length > 0 ) {
+                this.setState( {
+                    flag_ShareAction: false,
+                } );
+                let walletDetails = await utils.getWalletDetails();
+                let backupInfo = JSON.parse( walletDetails.backupInfo );
+                let backupType = backupInfo[ 0 ].backupType;
+                let backupMethod = backupInfo[ 0 ].backupMethod;
+                let sssDetails = await utils.getSSSDetails();
+                //console.log( { walletDetails, sssDetails } );
+                let share = {};
+                share.trustedContShareId1 = sssDetails[ 0 ].shareId != "" ? sssDetails[ 0 ].shareId : null;
+                share.trustedContDate1 = sssDetails[ 0 ].acceptedDate != "" ? parseInt( sssDetails[ 0 ].acceptedDate ) : 0;
+                share.trustedContShareId2 = sssDetails[ 1 ].shareId != "" ? sssDetails[ 1 ].shareId : null;
+                share.trustedContDate2 = sssDetails[ 1 ].acceptedDate != "" ? parseInt( sssDetails[ 1 ].acceptedDate ) : 0;
+                share.selfshareShareId1 = sssDetails[ 2 ].shareId != "" ? sssDetails[ 2 ].shareId : null;
+                share.selfshareDate1 = sssDetails[ 2 ].acceptedDate != "" ? parseInt( sssDetails[ 2 ].acceptedDate ) : 0;
+                share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? parseInt( sssDetails[ 3 ].acceptedDate ) : 0;
+                share.selfshareShareShareId2 = sssDetails[ 3 ].shareId != "" ? sssDetails[ 3 ].shareId : "";
+                share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? parseInt( sssDetails[ 4 ].acceptedDate ) : 0;
+                share.selfshareShareId3 = sssDetails[ 4 ].shareId != "" ? sssDetails[ 4 ].shareId : "";
+                share.qatime = parseInt( walletDetails.lastUpdated );
+                //console.log( { share } );
+                let resCheckHealthAllShare = await comAppHealth.checkHealthWithServerAllShare( share );
+                if ( resCheckHealthAllShare != "" ) {
+                    this.loaddata( backupType, backupMethod );
+                } else {
+                    Alert.alert( "Check health not working." )
+                }
+            }
+            else {
+                this.setState( {
+                    flag_SSSAndPdfFileCreate: true,
+                    flag_ShareAction: true
+                } );
+            }
+        } catch ( error ) {
+
         }
-        console.log( { backupType } );
+    }
+
+
+
+
+    getCheackHealth = async () => {
         let sssDetails = await utils.getSSSDetails();
-        console.log( { sssDetails } );
-        let encrShares = [];
-        console.log( { walletDetails, sssDetails } );
-        //flag   
-        let flag_isSetupTrustedContact, flag_isSecretQuestions, flag_isMnemonic;
-        //array  
-        let arr_TrustedContacts = [], arr_SecretQuestion = [];
-        let history = [];
-        let tempOpt = [];
-        let temp = [];
-        //Trusted Contacts
-        if ( sssDetails[ 0 ].keeperInfo != "null" && sssDetails.length > 0 ) {
-            //App Health
-            for ( let i = 0; i <= 2; i++ ) {
-                encrShares.push( sssDetails[ i ].shareId )
-            }
-            console.log( { encrShares } );
-
-            let updateShareIdStatus = await comAppHealth.connection_AppHealthAndSSSUpdate( parseInt( walletDetails.lastUpdated ), encrShares );
-            //setup sss
-            if ( sssDetails[ 0 ].keeperInfo == "" ) {
-                flag_isSetupTrustedContact = true;
-            } else {
-                flag_isSetupTrustedContact = false;
-            }
-
-            for ( let i = 0; i <= 1; i++ ) {
-                let keeperInfo = JSON.parse( sssDetails[ i ].keeperInfo );
-                let data = {};
-                data.decryptedShare = JSON.parse( sssDetails[ i ].decryptedShare );
-                data.emailAddresses = keeperInfo.emailAddresses;
-                data.phoneNumbers = keeperInfo.phoneNumbers;
-                data.history = JSON.parse( sssDetails[ i ].history );
-                data.recordID = keeperInfo.recordID;
-                data.thumbnailPath = keeperInfo.thumbnailPath
-                data.givenName = keeperInfo.givenName;
-                data.familyName = keeperInfo.familyName;
-                let sharedDate = parseInt( sssDetails[ i ].sharedDate );
-                console.warn( 'sharedDate date =' + sharedDate.toString() );
-                var startDate = new Date( dateTime );
-                var endDate = new Date( sharedDate );
-                //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
-                var diff = Math.abs( startDate.getTime() - endDate.getTime() );
-                //console.warn( 'diff' + diff.toString() );  
-                const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
-                const seconds: any = Math.floor( diff / 1000 % 60 );
-                //console.log( { minutes, seconds } );
-                //console.warn( minutes.toString() )
-                const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
-                data.totalSec = 540 - totalSec;
-                //for history get opt     
-                for ( let i = 0; i < 2; i++ ) {
-                    let eachHistory = JSON.parse( sssDetails[ i ].history );
-                    let eachHistoryLength = eachHistory.length;
-                    var otp;
-                    if ( eachHistory[ eachHistoryLength - 1 ] != undefined ) {
-                        otp = eachHistory[ eachHistoryLength - 1 ].otp;
-                    } else {
-                        otp = undefined;
-                    }
-                    tempOpt.push( otp );
-                }
-                console.log( { tempOpt } );
-                if ( updateShareIdStatus ) {
-                    if ( totalSec < 540 && sssDetails[ i ].shareStage == "Ugly" ) {
-                        data.statusMsg = "Not Shared";
-                        data.statusMsgColor = "#C07710";
-                        data.flag_timer = true;
-                        data.opt = tempOpt[ i ];
-                    } else if ( totalSec >= 540 && sssDetails[ i ].shareStage == "Ugly" ) {
-                        data.statusMsg = "OTP expired.";
-                        data.statusMsgColor = "#C07710";
-                        data.flag_timer = false;
-                    } else if ( sssDetails[ i ].shareStage == "Good" ) {
-                        data.statusMsg = "Share accessible";
-                        data.statusMsgColor = "#008000";
-                        data.flag_timer = false;
-                    } else if ( sssDetails[ i ].shareStage == "Bad" ) {
-                        data.statusMsg = "Share inaccessible";
-                        data.statusMsgColor = "#C07710";
-                        data.flag_timer = false;
-                    } else if ( sssDetails[ i ].shareStage == "Ugly" && sssDetails[ i ].sharedDate != "" ) {
-                        data.statusMsg = "Share inaccessible";
-                        data.statusMsgColor = "#ff0000";
-                        data.flag_timer = false;
-                    }
-                    else {
-                        data.statusMsg = "Not shared";
-                        data.statusMsgColor = "#ff0000";
-                        data.flag_timer = false;
-                    }
-                    arr_TrustedContacts.push( data );
-                }
-                else {
-                    alert.simpleOk( "Sorry!", "Failed to update health of the app" );
-                }
-            }
-
-            //Self Share  
-            let arr_SelfShare = [];
-            let arrTitle = [ "", "", "Wallet", "Email", "iCloud" ];
-            for ( let i = 0; i < sssDetails.length; i++ ) {
-                if ( i > 1 ) {
-                    console.log( { data: sssDetails[ i ] } );
-                    let sharedDate = sssDetails[ i ].sharedDate;
-                    let shareStage = sssDetails[ i ].shareStage;
-                    let statusMsg = this.getMsgAndColor( sharedDate, shareStage )[ 0 ];
-                    let statusColor = this.getMsgAndColor( sharedDate, shareStage )[ 1 ];
-                    console.log( { statusMsg, statusColor } );
-                    let data = {};
-                    data.thumbnailPath = "bars";
-                    data.givenName = arrTitle[ i ];
-                    data.familyName = "";
-                    data.statusMsgColor = statusColor;
-                    data.statusMsg = statusMsg;
-                    data.sssDetails = sssDetails[ i ];
-                    arr_SelfShare.push( data );
-                }
-            }
-
-
-
-            //secret question
-            console.log( { setUpWalletAnswerDetails } );
-            if ( setUpWalletAnswerDetails == "" ) {
-                flag_isSecretQuestions = false
-            } else {
-                flag_isSecretQuestions = true
-            }
-            var setUpWalletAnswer = JSON.parse( walletDetails.setUpWalletAnswerDetails );
-            setUpWalletAnswer = setUpWalletAnswer.slice( -1 ).pop();
-            let secretQueUpdateDate = setUpWalletAnswer.backupDate != undefined ? setUpWalletAnswer.backupDate : 0;
-
-            var startDate = new Date( dateTime );
-            var endDate = new Date( secretQueUpdateDate );
-            var diff = Math.abs( startDate.getTime() - endDate.getTime() );
-            const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
-            const seconds: any = Math.floor( diff / 1000 % 60 );
-            const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
-            let data = {};
-            data.icon = "timelockNew";
-            data.title = "Secret Question";
-            data.subTitle = totalSec <= expaire.backup.expaire_secretquestion ? "Backup Confirm" : "Not Backed up";
-            data.color = totalSec <= expaire.backup.expaire_secretquestion ? "#008000" : "#ff0000";
-            data.walletDetails = walletDetails;
-            arr_SecretQuestion.push( data )
-
-
-            console.log( { arr_SecretQuestion } );
-
-
-            flag_Loading = false
+        if ( sssDetails.length > 0 ) {
             this.setState( {
-                flag_isSetupTrustedContact,
+                flag_ShareAction: false,
+                flag_Loading: true
+            } );
+            let walletDetails = await utils.getWalletDetails();
+            let backupInfo = JSON.parse( walletDetails.backupInfo );
+            let backupType = backupInfo[ 0 ].backupType;
+            let backupMethod = backupInfo[ 0 ].backupMethod;
+            let sssDetails = await utils.getSSSDetails();
+            //console.log( { walletDetails, sssDetails } );
+            let share = {};
+            share.trustedContShareId1 = sssDetails[ 0 ].shareId != "" ? sssDetails[ 0 ].shareId : null;
+            share.trustedContShareId2 = sssDetails[ 1 ].shareId != "" ? sssDetails[ 1 ].shareId : null;
+            share.selfshareShareId1 = sssDetails[ 2 ].shareId != "" ? sssDetails[ 2 ].shareId : null;
+            share.selfshareShareDate2 = sssDetails[ 3 ].acceptedDate != "" ? parseInt( sssDetails[ 3 ].acceptedDate ) : 0;
+            share.selfshareShareShareId2 = sssDetails[ 3 ].shareId != "" ? sssDetails[ 3 ].shareId : "";
+            share.selfshareShareDate3 = sssDetails[ 4 ].acceptedDate != "" ? parseInt( sssDetails[ 4 ].acceptedDate ) : 0;
+            share.selfshareShareId3 = sssDetails[ 4 ].shareId != "" ? sssDetails[ 4 ].shareId : "";
+            share.qatime = parseInt( walletDetails.lastUpdated );
+            let resCheckHealthAllShare = await comAppHealth.checkHealthAllShare( share );
+            if ( resCheckHealthAllShare != "" ) {
+                this.loaddata( backupType, backupMethod );
+            } else {
+                Alert.alert( "Check health not working." )
+            }
+        }
+        else {
+            this.setState( {
+                flag_SSSAndPdfFileCreate: true,
+                flag_ShareAction: true
+            } );
+        }
+    }
+
+    getActionTrustedCont( backupType: string, decryptedShare: string ) {
+        if ( backupType != "new" && decryptedShare == "" ) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+
+    getTrustedContactArray( sssDetails: any, backupType: string ) {
+        //console.log( { sssDetails, backupType } );
+        let keeperInfo = JSON.parse( sssDetails.keeperInfo );
+        let data = {};
+        let decryptedShare = sssDetails.decryptedShare != "" ? JSON.parse( sssDetails.decryptedShare ) : "";
+        data.decryptedShare = decryptedShare;
+        data.emailAddresses = keeperInfo.emailAddresses;
+        data.phoneNumbers = keeperInfo.phoneNumbers;
+        data.history = JSON.parse( sssDetails.history );
+        data.recordID = keeperInfo.recordID;
+        data.thumbnailPath = keeperInfo.thumbnailPath
+        data.givenName = keeperInfo.givenName;
+        data.familyName = keeperInfo.familyName;
+        data.backupType = backupType;
+        data.sssDetails = sssDetails;
+        data.flagAction = this.getActionTrustedCont( backupType, decryptedShare );
+        if ( sssDetails.sharedDate == "" && ( sssDetails.acceptDate == "0" || sssDetails.acceptedDate == "0" ) && sssDetails.shareStage == "Ugly" ) {
+            data.statusMsg = "Not Shared";
+            data.statusMsgColor = "#ff0000";
+            data.flag_timer = false;
+        } else if ( sssDetails.sharedDate != "" && ( sssDetails.acceptDate == "0" || sssDetails.acceptedDate == "0" ) && sssDetails.shareStage == "Ugly" ) {
+            data.statusMsg = "Shared";
+            data.statusMsgColor = "#C07710";
+            data.flag_timer = false;
+        }
+        else if ( sssDetails.sharedDate != "" && ( sssDetails.acceptDate != "0" || sssDetails.acceptedDate != "0" ) && sssDetails.shareStage == "Good" ) {
+            data.statusMsg = "Share Accessible";
+            data.statusMsgColor = "#008000";
+            data.flag_timer = false;
+        } else if ( sssDetails.sharedDate != "" && ( sssDetails.acceptDate != "0" || sssDetails.acceptedDate != "0" ) && sssDetails.shareStage == "Bad" ) {
+            data.statusMsg = "Share Inaccessible";
+            data.statusMsgColor = "#C07710";
+            data.flag_timer = false;
+        } else if ( sssDetails.sharedDate != "" && ( sssDetails.acceptDate != "0" || sssDetails.acceptedDate != "0" ) && sssDetails.shareStage == "Ugly" ) {
+            data.statusMsg = "Share Inaccessible";
+            data.statusMsgColor = "#ff0000";
+            data.flag_timer = false;
+        }
+        return [ data ];
+    }
+
+    getQuestionDetails( walletDetails: any, ) {
+        var appHealthStatus = JSON.parse( walletDetails.appHealthStatus );
+        let data = {};
+        data.icon = "timelockNew";
+        data.title = "Secret Question";
+        data.subTitle = this.getQuestonHealth( appHealthStatus.qaStatus )[ 0 ];
+        data.color = this.getQuestonHealth( appHealthStatus.qaStatus )[ 1 ];
+        data.walletDetails = walletDetails;
+        return [ data ];
+    }
+
+    loaddata = async ( backupType: string, backupMethod: string ) => {
+        let walletDetails = await utils.getWalletDetails();
+        let sssDetails = await utils.getSSSDetails();
+        let { arr_TrustedContacts, arr_SelfShare } = this.state;
+        let arr_SecretQuestion = [];
+        var len = sssDetails.length;
+        for ( let i = 0; i < len; i++ ) {
+            //Trusted Contacts
+            if ( sssDetails[ i ].type === 'Trusted Contacts 1' && sssDetails[ i ].keeperInfo != "" ) {
+                let data = await this.getTrustedContactArray( sssDetails[ i ], backupType );
+                arr_TrustedContacts[ 0 ] = data[ 0 ];
+            }
+            else if ( sssDetails[ i ].type === 'Trusted Contacts 2' && sssDetails[ i ].keeperInfo != "" ) {
+                let data = await this.getTrustedContactArray( sssDetails[ i ], backupType );
+                arr_TrustedContacts[ 1 ] = data[ 0 ];
+            }
+            //Self Share    
+            else if ( sssDetails[ i ].type === 'Self Share 1' && sssDetails[ i ].decryptedShare != "" ) {
+                let sharedDate = sssDetails[ i ].sharedDate;
+                let acceptDate = sssDetails[ i ].acceptedDate;
+                let shareStage = sssDetails[ i ].shareStage;
+                //console.log( { sharedDate, acceptDate, shareStage } );
+                let statusMsg = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 0 ];
+                let statusColor = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 1 ];
+                //console.log( { statusMsg, statusColor } );
+                let data = {};
+                data.thumbnailPath = Platform.OS == "ios" ? "walletSVG" : "walletPNG";
+                data.givenName = "Secondary Device";
+                data.familyName = "";
+                data.statusMsgColor = statusColor;
+                data.statusMsg = statusMsg;
+                data.sssDetails = sssDetails[ i ];
+                data.type = sssDetails[ i ].type;
+                data.backupType = backupType;
+                data.flagAction = sssDetails[ i ].decryptedShare != "" ? false : true;
+                arr_SelfShare[ 0 ] = data;
+            }
+            else if ( sssDetails[ i ].type === 'Self Share 2' && sssDetails[ i ].decryptedShare != "" ) {
+                let sharedDate = sssDetails[ i ].sharedDate;
+                let acceptDate = sssDetails[ i ].acceptedDate;
+                let shareStage = sssDetails[ i ].shareStage;
+                //console.log( { sharedDate, acceptDate, shareStage } );
+                let statusMsg = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 0 ];
+                let statusColor = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 1 ];
+                //console.log( { statusMsg, statusColor } );
+                let data = {};
+                data.thumbnailPath = Platform.OS == "ios" ? "emailSVG" : "emailPNG";
+                data.givenName = "Email";
+                data.familyName = "";
+                data.statusMsgColor = statusColor;
+                data.statusMsg = statusMsg;
+                data.sssDetails = sssDetails[ i ];
+                data.type = sssDetails[ i ].type;
+                data.backupType = backupType;
+                data.flagAction = sssDetails[ i ].decryptedShare != "" ? false : true;
+                arr_SelfShare[ 1 ] = data;
+            }
+            else if ( sssDetails[ i ].type === 'Self Share 3' && sssDetails[ i ].decryptedShare != "" ) {
+                let sharedDate = sssDetails[ i ].sharedDate;
+                let acceptDate = sssDetails[ i ].acceptedDate;
+                let shareStage = sssDetails[ i ].shareStage;
+                //console.log( { sharedDate, acceptDate, shareStage } );
+                let statusMsg = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 0 ];
+                let statusColor = this.getMsgAndColor( sharedDate, acceptDate, shareStage )[ 1 ];
+                //console.log( { statusMsg, statusColor } );
+                let data = {};
+                data.thumbnailPath = Platform.OS == "ios" ? "cloudstorageSVG" : "cloudstoragePNG";
+                data.givenName = "Cloud";
+                data.familyName = "";
+                data.statusMsgColor = statusColor;
+                data.statusMsg = statusMsg;
+                data.sssDetails = sssDetails[ i ];
+                data.type = sssDetails[ i ].type;
+                data.backupType = backupType;
+                data.flagAction = sssDetails[ i ].decryptedShare != "" ? false : true;
+                arr_SelfShare[ 2 ] = data;
+            }
+            //Secret Question  
+            arr_SecretQuestion = this.getQuestionDetails( walletDetails )
+            this.setState( {
+                flag_Loading: false,
+                flag_SelfShareActionDisable: false,
                 arr_TrustedContacts,
-                flag_isSecretQuestions,
-                arr_SecretQuestion,
                 arr_SelfShare,
+                arr_SSSDetails: sssDetails,
+                arr_SecretQuestion
             } )
-        } else {
-            flag_Loading = false
         }
-        // //Trusted Contacts list
-        // for ( let i = 0; i < sssDetails.length; i++ ) {
-        //     encrShares.push( sssDetails[ i ].share )
-        //     history.push( JSON.parse( sssDetails[ i ].history ) )
-        // }
-        // //for history get opt
-        // for ( let i = 0; i < history.length; i++ ) {
-        //     let eachHistory = history[ i ];
-        //     let eachHistoryLength = eachHistory.length;
-        //     let otp = eachHistory[ eachHistoryLength - 1 ].otp;
-        //     tempOpt.push( otp )
-        // }
-        // //console.log( parseInt( walletDetails.lastUpdated ) );
-        // let updateShareIdStatus = await comAppHealth.connection_AppHealthStatus( parseInt( walletDetails.lastUpdated ), 0, encrShares, walletDetails.mnemonic );
-        // // console.log( { updateShareIdStatus } );
-        // if ( updateShareIdStatus ) {
-        //     var data = await dbOpration.readTablesData(
-        //         localDB.tableName.tblSSSDetails
-        //     );
-        //     data = data.temp;
-        //     //console.log( { data } );
-        //     const dateTime = Date.now();
-        //     //const fulldate = Math.floor( dateTime / 1000 );
-        //     for ( let i = 0; i < data.length; i++ ) {
-        //         let jsondata = JSON.parse( data[ i ].keeperInfo );
-        //         jsondata.history = JSON.parse( data[ i ].history );
-        //         let sharedDate = parseInt( data[ i ].sharedDate );
-        //         // console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
-        //         var startDate = new Date( dateTime );
-        //         var endDate = new Date( sharedDate );
-        //         //console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
-        //         var diff = Math.abs( startDate.getTime() - endDate.getTime() );
-        //         //console.warn( 'diff' + diff.toString() );  
-        //         const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
-        //         const seconds: any = Math.floor( diff / 1000 % 60 );
-        //         //console.log( { minutes, seconds } );
-        //         //console.warn( minutes.toString() )
-        //         const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
-        //         let mesData = data[ i ];
-        //         //  console.log( { totalSec, mesData } );
-        //         jsondata.totalSec = 540 - totalSec;
-        //         if ( totalSec < 540 && data[ i ].shareStage == "Ugly" ) {
-        //             jsondata.statusMsg = "Shared";
-        //             jsondata.statusMsgColor = "#C07710";
-        //             jsondata.flag_timer = true;
-        //             jsondata.opt = tempOpt[ i ];
-        //         } else if ( totalSec >= 540 && data[ i ].shareStage == "Ugly" ) {
-        //             jsondata.statusMsg = "Shared OTP expired.";
-        //             jsondata.statusMsgColor = "#C07710";
-        //             jsondata.flag_timer = false;
-        //         } else if ( data[ i ].shareStage == "Good" ) {
-        //             jsondata.statusMsg = "Share accessible";
-        //             jsondata.statusMsgColor = "#008000";
-        //             jsondata.flag_timer = false;
-        //         } else if ( data[ i ].shareStage == "Bad" ) {
-        //             jsondata.statusMsg = "Share accessible";
-        //             jsondata.statusMsgColor = "#C07710";
-        //             jsondata.flag_timer = false;
-        //         } else if ( data[ i ].shareStage == "Ugly" && data[ i ].sharedDate != "" ) {
-        //             jsondata.statusMsg = "Share not accessible";
-        //             jsondata.statusMsgColor = "#ff0000";
-        //             jsondata.flag_timer = false;
-        //         }
-        //         else {
-        //             jsondata.statusMsg = "Not shared";
-        //             jsondata.statusMsgColor = "#ff0000";
-        //             jsondata.flag_timer = false;
-        //         }
-        //         temp.push( jsondata )
-        //     }
-        // } else {
-        //     Alert.alert( "ShareId status not changed." )
-        // }
-        //}
-        // } else {
-        //     flag_isMnemonic = true;
-        // }
-        //Mnemonic
-        // if ( backupType.backupType != "share" ) {
-        //     flag_isMnemonic = true;
-        // } else {
-        //     flag_isMnemonic = false;
-        // }
-        // let arr_Mnemonic = [
-        //     {
-        //         title: "Mnemonic",
-        //         subTitle: "Not backed up",
-        //         color: "#ff0000",
-        //         icon: "shield"
-        //     }
-        // ];
-        // let dbMnemonic = walletDetails.mnemonic;
-        // let arr_CheckMnemonic = dbMnemonic.split( ' ' );
-        // let arr_randomNo = utils.getRandomBetweenNumber( 1, arr_CheckMnemonic.length );
-        // console.log( { arr_CheckMnemonic, arr_randomNo } );
-        // let arr_MnemonicNumbers = [ converter.toOrdinal( arr_randomNo[ 0 ] ), converter.toOrdinal( arr_randomNo[ 1 ] ), converter.toOrdinal( arr_randomNo[ 2 ] ) ]
-        // let arr_MnemoicWords = [ arr_CheckMnemonic[ arr_randomNo[ 0 ] - 1 ], arr_CheckMnemonic[ arr_randomNo[ 1 ] - 1 ], arr_CheckMnemonic[ arr_randomNo[ 2 ] - 1 ] ]
-        // var arr_MnemonicDetails = [];
-        // arr_MnemonicDetails = [ arr_MnemonicNumbers, arr_MnemoicWords ];
-        // console.log( { arr_MnemonicDetails } );
-
-
-        // //Secret Questions  
-        // let flag_DisableSecretQuestion, subTitleQA;
-        // let setUpWalletAnswerDetails = JSON.parse( walletDetails.setUpWalletAnswerDetails );
-        // if ( setUpWalletAnswerDetails != "" ) {
-        //     flag_DisableSecretQuestion = false;
-        //     subTitleQA = "Not backed up";
-        // } else {
-        //     flag_DisableSecretQuestion = true;
-        //     subTitleQA = "Please first setup your Secret Questions.";
-        // }
-        // let arr_SecretQuestion = [
-        //     {
-        //         title: "First Secret Question",
-        //         subTitle: subTitleQA,
-        //         color: "#ff0000",
-        //         icon: "shield"
-        //     }
-        // ];
-
-        // //Secure Two Factor Auto
-        // let flag_DisableSecureTwoFactor, subTitleTwoFactor;
-        // //Two Factor Autoentication
-        // let secureAccountDetails = resAccountDetails[ 1 ];
-        // if ( secureAccountDetails.address != "" ) {
-        //     flag_DisableSecureTwoFactor = false
-        //     subTitleTwoFactor = "Not backed up";
-        // } else {
-        //     flag_DisableSecureTwoFactor = true;
-        //     subTitleTwoFactor = "Please first active Secure Account.";
-        // }
-
-        // let arr_2FactorAuto = [
-        //     {
-        //         title: "2 Factor Aunthentication",
-        //         subTitle: subTitleTwoFactor,
-        //         color: "#ff0000",
-        //         icon: "shield"
-        //     }
-        // ];
-        // let secureAdditionalInfo = JSON.parse( resAccountDetails[ 1 ].additionalInfo );
-        // let arr_SecureAccountDetials = [ {
-        //     secret: secureAdditionalInfo[ 0 ].setupData.secret
-        // } ];
-
-        // console.log( { arr_SecureAccountDetials } );
-
-        this.setState( {
-            flag_Loading,
-            arr_SSSDetails: sssDetails
-        } )
     }
 
-    getMsgAndColor( sharedDate: string, shareStage: string ) {
-        if ( sharedDate == "" && shareStage != "Good" ) {
+    //self share message
+    getMsgAndColor( sharedDate: string, acceptDate: string, shareStage: string ) {
+        // console.log( 'cheing' );
+        // console.log( { sharedDate, acceptDate, shareStage } );
+        if ( sharedDate == "" && acceptDate == "0" && shareStage == "Ugly" ) {
             return [ "Not Shared", "#ff0000" ];
-        } else if ( sharedDate != "" && shareStage != "Good" ) {
-            return [ "Not shared", "#C07710" ];
-        } else {
-            return [ "Share Confirmed", "#008000" ];
+        }
+        else if ( sharedDate != "" && acceptDate == "0" && shareStage == "Ugly" ) {
+            return [ "Shared ", "#C07710" ];
+        }
+        else if ( sharedDate != "" && acceptDate != "0" && shareStage == "Good" ) {
+            return [ "Share Accessible", "#008000" ];
+        }
+        else if ( sharedDate != "" && acceptDate != "0" && shareStage == "Bad" ) {
+            return [ "Share Inaccessible", "#C07710" ];
+        }
+        else if ( sharedDate != "" && acceptDate != "0" && shareStage == "Ugly" ) {
+            return [ "Share Inaccessible", "#ff0000" ];
         }
     }
-
-
-
+    //secret quesiton message
+    getQuestonHealth( share: string ) {
+        if ( share == "Good" ) {
+            return [ "Accessible", "#008000" ];
+        }
+        else if ( share == "Bad" ) {
+            return [ "Inaccessible", "#C07710" ];
+        } else {
+            return [ "Inaccessible", "#ff0000" ];
+        }
+    }
 
     //TODO: func click_Item
     click_Item = ( item: any ) => {
-        this.props.navigation.push( "TrustedContactNavigator", {
-            data: item
-        } );
+        //console.log( { item } );
+        if ( item.givenName == "Trusted Contacts 1" || item.givenName == "Trusted Contacts 2" ) {
+            this.setState( {
+                arrSelectedItem: item,
+                arr_ModelFindYourTrustedContacts: [
+                    {
+                        modalVisible: true
+                    }
+                ]
+            } );
+        } else {
+            this.props.navigation.push( "TrustedContactNavigator", {
+                data: item, onSelect: this.getCheackHealthWithoutServer
+            } );
+        }
     }
+
+
 
     //TODO: func click_FirstMenuItem
     click_SecretQuestion( item: any ) {
@@ -511,6 +460,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
         } )
     }
 
+
     //TODO: Setup Two Factor 
     click_TwoFactorSetup() {
         this.props.navigation.push( "BackupSecureTwoFactorAutoScreen", { data: this.state.arr_SecureAccountDetials } );
@@ -522,234 +472,168 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
     }
 
     onSelect = async ( returnValue: any ) => {
-        let walletDetails = await utils.getWalletDetails();
-        var sssDetails = await utils.getSSSDetails();
-        let encrShares = [];
-        for ( let i = 0; i <= 2; i++ ) {
-            encrShares.push( sssDetails[ i ].shareId )
-        }
-        console.log( { encrShares } );
-        let updateShareIdStatus = await comAppHealth.connection_AppHealthAndSSSUpdate( parseInt( walletDetails.lastUpdated ), encrShares );
-        if ( updateShareIdStatus ) {
-            sssDetails = await utils.getSSSDetails();
-            let arr_SelfShare = [];
-            let arrTitle = [ "", "", "Wallet", "Email", "iCloud" ];
-            for ( let i = 0; i < sssDetails.length; i++ ) {
-                if ( i > 1 ) {
-                    console.log( { data: sssDetails[ i ] } );
-                    let sharedDate = sssDetails[ i ].sharedDate;
-                    let shareStage = sssDetails[ i ].shareStage;
-                    let statusMsg = this.getMsgAndColor( sharedDate, shareStage )[ 0 ];
-                    let statusColor = this.getMsgAndColor( sharedDate, shareStage )[ 1 ];
-                    console.log( { statusMsg, statusColor } );
-                    let data = {};
-                    data.thumbnailPath = "bars";
-                    data.givenName = arrTitle[ i ];
-                    data.familyName = "";
-                    data.statusMsgColor = statusColor;
-                    data.statusMsg = statusMsg;
-                    data.sssDetails = sssDetails[ i ];
-                    arr_SelfShare.push( data );
-                }
-            }
-            this.setState( {
-                arr_SelfShare
-            } )
-        }
+        this.getCheackHealthWithoutServer();
     }
 
     //TODO: Self share
     click_SelfShare = async ( item: any ) => {
         let sssDetails = await utils.getSSSDetails();
-        console.log( { sssDetails } );
+        //console.log( { sssDetails, item } );
         let data3Share = sssDetails[ 2 ];
         var email4shareFilePath = sssDetails[ 3 ].decryptedShare;
-
-        console.log( { email4shareFilePath } );
-        if ( item.givenName == "Wallet" ) {
+        if ( item.type == "Self Share 1" ) {
             this.props.navigation.push( "SelfShareUsingWalletQRCode", { data: data3Share, onSelect: this.onSelect } )
-        } else if ( item.givenName == "Email" ) {
+        } else if ( item.type == "Self Share 2" ) {
             this.props.navigation.push( "SelfShareSharingScreen", { data: item, title: "Email Share" } );
-
         } else {
-            this.props.navigation.push( "SelfShareSharingScreen", { data: item, title: "iCloud Share" } );
-            // this.refs.modal4.open();
-            // let shareOptions = {
-            //     title: "React Native",
-            //     message: "Hola mundo",
-            //     url: "http://facebook.github.io/react-native/",
-            //     subject: "Share Link" //  for email
-            // };
-            // Share.shareSingle( Object.assign( shareOptions, {
-            //     "social": "twitter"
-            // } ) );
-            // try {
-            //     const result = await SimpleShare.share( {
-            //         message:
-            //             "React Native | A framework for building native apps using React"
-            //     } ); if ( result.action === SimpleShare.sharedAction ) {
-            //         if ( result.activityType ) {
-            //             // shared with activity type of result.activityType
-            //             console.log( "result", result );
-            //         } else {
-            //             // shared
-            //             console.log( "result", result );
-            //         }
-            //     } else if ( result.action === SimpleShare.dismissedAction ) {
-            //         // dismissed
-            //         console.log( "dismissed" );
-            //     }
-            // } catch ( error ) {
-            //     console.log( "error", error.message );
-            // }
+            this.props.navigation.push( "SelfShareSharingScreen", { data: item, title: "Cloud Share" } );
         }
     }
-
-    click_Share5Sahring( type: string ) {
-        if ( type == "iCLOUD" ) {
-
-        } else if ( type == "SLACK" ) {
-
-        } else if ( type == "WHATSAPP" ) {
-
-        }
-    }
-
-
-
 
     render() {
         //flag
-        let { flag_isTrustedContacts, flag_isSetupTrustedContact, flag_isMnemonic, flag_isSecretQuestions, flag_isTwoFactor, flag_Loading, flag_SelfShare, flag_SelfShareDisable } = this.state;
+        let { flag_isTrustedContacts, flag_isMnemonic, flag_isSecretQuestions, flag_isTwoFactor, flag_Loading, flag_SelfShare, flag_SSSAndPdfFileCreate, flag_ShareAction } = this.state;
         //TouchableOpacity
         let { flag_DisableSecureTwoFactor, flag_DisableSecretQuestion } = this.state;
         //array
-        let { arr_TrustedContacts, arr_SelfShare, arr_SecretQuestion } = this.state;
+        let { arr_TrustedContacts, arr_SelfShare, arr_SecretQuestion, arrErrorMessage, arrModelHelperScreen } = this.state;
         return (
             <Container>
-                <SafeAreaView style={ styles.container }>
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.props.navigation.pop() }
-                            >
-                                <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Health of the App</Text>
-                            </Button>
-                        </View>
+                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <HeaderTitle title="Health of the App" pop={ () => this.props.navigation.pop() } />
+                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
+                        { renderIf( flag_SSSAndPdfFileCreate == true )(
+                            <View>
+                                <View style={ { backgroundColor: "#262A2E", flexDirection: "row", alignItems: "center", padding: 10 } }>
+                                    <Text style={ { textAlign: "center", flex: 1, color: "#ffffff" } }>Hexa is creating your shares</Text>
+                                    <ActivityIndicator size="small" color="#ffffff" />
+                                </View>
+                            </View>
+                        ) }
                         <KeyboardAwareScrollView
                             enableAutomaticScroll
                             automaticallyAdjustContentInsets={ true }
                             keyboardOpeningTime={ 0 }
+                            refreshControl={
+                                <RefreshControl
+                                    refreshing={ false }
+                                    onRefresh={ () => {
+                                        this.getCheackHealth()
+                                    } }
+                                />
+                            }
                             enableOnAndroid={ true }
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
-
                             { renderIf( flag_isTrustedContacts == true )(
                                 <View style={ styles.viewTrustedContacts }>
-                                    <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
-                                        <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Trusted Contacts</Text>
-                                    </View>
-                                    <View style={ { flex: 1 } }>
-                                        <FlatList
-                                            data={
-                                                arr_TrustedContacts
-                                            }
-                                            showsVerticalScrollIndicator={ false }
-                                            renderItem={ ( { item } ) => (
-                                                <TouchableOpacity style={ {
-                                                } } onPress={ () => {
-                                                    this.click_Item( item )
-                                                } }
-                                                    disabled={ flag_isSetupTrustedContact }
-                                                >
-                                                    <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
-                                                        <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                                            { renderIf( item.thumbnailPath != "" )(
-                                                                flag_isSetupTrustedContact == true ? <Avatar medium rounded icon={ { name: item.thumbnailPath, type: 'font-awesome' } } /> : <Avatar medium rounded source={ { uri: item.thumbnailPath } } />
-
-                                                            ) }
-                                                            { renderIf( item.thumbnailPath == "" )(
-                                                                <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
-                                                            ) }
-                                                            <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                                <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
-                                                                <View style={ { flexDirection: "row" } }>
-                                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
-                                                                    { renderIf( typeof item.opt !== "undefined" )(
-                                                                        <TimerCountdown
-                                                                            initialMilliseconds={ item.totalSec * 1000 }
-                                                                            onExpire={ () => this.loaddata() }
-                                                                            formatMilliseconds={ ( milliseconds ) => {
-                                                                                const remainingSec = Math.round( milliseconds / 1000 );
-                                                                                const seconds = parseInt( ( remainingSec % 60 ).toString(), 10 );
-                                                                                const minutes = parseInt( ( ( remainingSec / 60 ) % 60 ).toString(), 10 );
-                                                                                const hours = parseInt( ( remainingSec / 3600 ).toString(), 10 );
-                                                                                const s = seconds < 10 ? '0' + seconds : seconds;
-                                                                                const m = minutes < 10 ? '0' + minutes : minutes;
-                                                                                let h = hours < 10 ? '0' + hours : hours;
-                                                                                h = h === '00' ? '' : h + ':';
-                                                                                return h + m + ':' + s;
-                                                                            } }
-                                                                            allowFontScaling={ true }
-                                                                            style={ { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } }
-                                                                        />
-                                                                    ) }
-                                                                </View>
-                                                                { renderIf( typeof item.opt !== "undefined" )(
-                                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>OTP { " " }{ item.opt }</Text>
+                                    <RkCard
+                                        rkType="shadowed"
+                                        style={ {
+                                            flex: 1,
+                                            margin: 5,
+                                            borderRadius: 10
+                                        } }
+                                    >
+                                        <View
+                                            style={ {
+                                                flex: 1,
+                                                backgroundColor: "#ffffff",
+                                                marginLeft: 10,
+                                                marginRight: 10,
+                                                marginBottom: 15,
+                                                borderRadius: 10,
+                                                borderBottomColor: "#F5F5F5",
+                                                borderBottomWidth: 1
+                                            } }>
+                                            <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, marginLeft: -3, borderRadius: 10 } } >
+                                                <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
+                                                    <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Trusted Contacts</Text>
+                                                    <View style={ { flexDirection: "row" } }>
+                                                        <Text note numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Shares with your friends and family</Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        </View>
+                                        <View style={ { flex: 1 } }>
+                                            <FlatList
+                                                data={
+                                                    arr_TrustedContacts
+                                                }
+                                                showsVerticalScrollIndicator={ false }
+                                                renderItem={ ( { item } ) => (
+                                                    <TouchableOpacity style={ {
+                                                    } } onPress={ () => {
+                                                        this.click_Item( item )
+                                                    } }
+                                                        disabled={ item.flagAction && flag_ShareAction }
+                                                    >
+                                                        <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
+                                                            <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
+                                                                { renderIf( item.givenName == "Trusted Contacts 1" || item.givenName == "Trusted Contacts 2" )(
+                                                                    <ImageSVG
+                                                                        size={ 55 }
+                                                                        source={
+                                                                            Platform.OS == "ios" ? svgIcon.healthoftheapp.selectcontactsSVG : svgIcon.healthoftheapp.selectcontactsPNG
+                                                                        }
+                                                                    />
                                                                 ) }
-                                                            </View>
-                                                            <View style={ {
-                                                                flex: 1,
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center',
-                                                                flexDirection: "row"
-                                                            } }>
-                                                                <View style={ { flexDirection: "column", flex: 1, alignItems: "center" } }>
-                                                                    <Text note style={ { fontSize: 14 } }>Last assessed on</Text>
-                                                                    <Text style={ { fontSize: 14 } }>4/11/2019 12:23</Text>
+                                                                { renderIf( item.givenName != "Trusted Contacts 1" && item.givenName != "Trusted Contacts 2" )(
+                                                                    <Avatar size={ 55 } rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } titleStyle={ { color: colors.appColor } } />
+                                                                ) }
+                                                                <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
+                                                                    <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                                    <View style={ { flexDirection: "row" } }>
+                                                                        <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                                    </View>
                                                                 </View>
-                                                                <IconFontAwe name="angle-right" style={ { fontSize: 25, marginRight: 10, flex: 0.1 } } />
+                                                                <View style={ {
+                                                                    flex: 0.1,
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    flexDirection: "row"
+                                                                } }>
+                                                                    <IconFontAwe name="angle-right" style={ { fontSize: 25 } } />
+                                                                </View>
                                                             </View>
                                                         </View>
-                                                    </View>
-                                                </TouchableOpacity>
-                                            ) }
-                                            keyExtractor={ item => item.recordID }
-                                            extraData={ this.state }
-                                        />
-                                    </View>
-                                    { renderIf( flag_isSetupTrustedContact == true )(
-                                        <View style={ { flex: 1 } }>
-                                            <Button
-                                                onPress={ () => {
-                                                    this.setState( {
-                                                        arr_ModelFindYourTrustedContacts: [
-                                                            {
-                                                                modalVisible: true
-                                                            }
-                                                        ]
-                                                    } );
-                                                } }
-                                                style={ [ globalStyle.ffFiraSansSemiBold, {
-                                                    backgroundColor: "#838383", borderRadius: 10, margin: 5,
-                                                    height: 40,
-                                                } ] }
-                                                full>
-                                                <Text style={ { color: "#ffffff" } }>Setup your SSS</Text>
-                                            </Button>
+                                                    </TouchableOpacity>
+                                                ) }
+                                                keyExtractor={ item => item.recordID }
+                                                extraData={ this.state }
+                                            />
                                         </View>
-                                    ) }
+                                    </RkCard>
                                 </View>
                             ) }
 
                             { renderIf( flag_SelfShare == true )(
-                                <View style={ { flex: 3 } }>
-                                    <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
-                                        <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Self Share</Text>
+                                <RkCard
+                                    rkType="shadowed"
+                                    style={ {
+                                        flex: 3,
+                                        margin: 5,
+                                        borderRadius: 10
+                                    } }
+                                >
+                                    <View
+                                        style={ {
+                                            flex: 1, backgroundColor: "#ffffff",
+                                            marginLeft: 10,
+                                            marginRight: 10,
+                                            marginBottom: 16,
+                                            borderRadius: 10,
+                                            borderBottomColor: "#F5F5F5",
+                                            borderBottomWidth: 1
+                                        } }>
+                                        <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, marginLeft: -3, borderRadius: 10 } } >
+                                            <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
+                                                <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Self Share</Text>
+                                                <View style={ { flexDirection: "row" } }>
+                                                    <Text note numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Shares you self guard</Text>
+                                                </View>
+                                            </View>
+                                        </View>
                                     </View>
                                     <View style={ { flex: 1 } }>
                                         <FlatList
@@ -762,28 +646,29 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                 } } onPress={ () => {
                                                     this.click_SelfShare( item )
                                                 } }
-                                                    disabled={ flag_isSetupTrustedContact }
+                                                    disabled={ item.flagAction && flag_ShareAction }
                                                 >
                                                     <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                                                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
-                                                            <Avatar medium rounded icon={ { name: item.thumbnailPath, type: 'font-awesome' } } />
+                                                            <ImageSVG
+                                                                size={ 55 }
+                                                                source={
+                                                                    svgIcon.healthoftheapp[ item.thumbnailPath ]
+                                                                }
+                                                            />
                                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                                 <View style={ { flexDirection: "row" } }>
-                                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                                    <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
                                                                 </View>
                                                             </View>
                                                             <View style={ {
-                                                                flex: 1,
+                                                                flex: 0.1,
                                                                 alignItems: 'center',
                                                                 justifyContent: 'center',
                                                                 flexDirection: "row"
                                                             } }>
-                                                                <View style={ { flexDirection: "column", flex: 1, alignItems: "center" } }>
-                                                                    <Text note style={ { fontSize: 14 } }>Last assessed on</Text>
-                                                                    <Text style={ { fontSize: 14 } }>4/11/2019 12:23</Text>
-                                                                </View>
-                                                                <IconFontAwe name="angle-right" style={ { fontSize: 25, marginRight: 10, flex: 0.1 } } />
+                                                                <IconFontAwe name="angle-right" style={ { fontSize: 25 } } />
                                                             </View>
                                                         </View>
                                                     </View>
@@ -794,11 +679,9 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                         />
                                     </View>
 
-                                </View>
+
+                                </RkCard>
                             ) }
-
-
-
 
                             { renderIf( flag_isMnemonic == true )(
                                 <View style={ styles.viewMnemonic }>
@@ -862,11 +745,34 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                 </View>
                             ) }
 
-
                             { renderIf( flag_isSecretQuestions == true )(
-                                <View style={ { flex: 1 } }>
-                                    <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
-                                        <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Secret Questions</Text>
+                                <RkCard
+                                    rkType="shadowed"
+                                    style={ {
+                                        flex: 1,
+                                        margin: 5,
+                                        borderRadius: 10
+                                    } }
+                                >
+                                    <View
+                                        style={ {
+                                            flex: 1,
+                                            backgroundColor: "#ffffff",
+                                            marginLeft: 10,
+                                            marginRight: 10,
+                                            marginBottom: 15,
+                                            borderRadius: 10,
+                                            borderBottomColor: "#F5F5F5",
+                                            borderBottomWidth: 1
+                                        } }>
+                                        <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, marginLeft: -3, borderRadius: 10 } } >
+                                            <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
+                                                <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Security Question</Text>
+                                                <View style={ { flexDirection: "row" } }>
+                                                    <Text note numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Answer is used to protect your shares and PDF</Text>
+                                                </View>
+                                            </View>
+                                        </View>
                                     </View>
                                     <View style={ { flex: 1 } }>
                                         <FlatList
@@ -877,53 +783,38 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                 <TouchableOpacity
                                                     onPress={ () => this.click_SecretQuestion( item ) }
                                                 >
-                                                    <RkCard
-                                                        rkType="shadowed"
-                                                        style={ {
-                                                            flex: 1,
-                                                            borderRadius: 8,
-                                                            marginLeft: 8,
-                                                            marginRight: 8,
-                                                            marginBottom: 4,
-                                                        } }
-                                                    >
-                                                        <View
-                                                            rkCardHeader
-                                                            style={ {
-                                                                flex: 1,
-                                                            } }
-                                                        >
-                                                            <View style={ { flex: 0.2, justifyContent: "center", alignItems: "flex-start" } }>
-                                                                <SvgIcon
-                                                                    name={ item.icon }
-                                                                    color="#BABABA"
-                                                                    size={ 30 }
-                                                                />
+                                                    <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
+                                                        <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
+                                                            <ImageSVG
+                                                                size={ 55 }
+                                                                source={
+                                                                    Platform.OS == "ios" ? svgIcon.healthoftheapp.questionSVG : svgIcon.healthoftheapp.questionPNG
+                                                                }
+                                                            />
+                                                            <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
+                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.title }</Text>
+                                                                <View style={ { flexDirection: "row" } }>
+                                                                    <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.color } ] }>{ item.subTitle }</Text>
+                                                                </View>
                                                             </View>
-                                                            <View style={ { flex: 1, flexDirection: "column" } }>
-                                                                <Text
-                                                                    style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] }
-                                                                >
-                                                                    { item.title }
-                                                                </Text>
-                                                                <Text note numberOfLines={ 1 } style={ { fontSize: 11, color: item.color } }>{ item.subTitle }</Text>
-                                                            </View>
-                                                            <View style={ { flex: 0.2, justifyContent: "center", alignItems: "flex-end" } }>
-                                                                <SvgIcon
-                                                                    name="icon_forword"
-                                                                    color="#BABABA"
-                                                                    size={ 20 }
-                                                                />
+                                                            <View style={ {
+                                                                flex: 0.1,
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                flexDirection: "row"
+                                                            } }>
+                                                                <IconFontAwe name="angle-right" style={ { fontSize: 25 } } />
                                                             </View>
                                                         </View>
-                                                    </RkCard>
+                                                    </View>
                                                 </TouchableOpacity>
                                             ) }
                                             keyExtractor={ ( item, index ) => index }
                                         />
                                     </View>
-                                </View>
+                                </RkCard>
                             ) }
+
 
                             { renderIf( flag_isTwoFactor == true )(
                                 <View style={ styles.view2FactorAuto }>
@@ -987,42 +878,58 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                     </View>
                                 </View>
                             ) }
-
                         </KeyboardAwareScrollView>
-                    </ImageBackground>
-                    <ModelFindYourTrustedContacts
-                        data={ this.state.arr_ModelFindYourTrustedContacts }
-                        click_Confirm={ async () => {
-                            await Permissions.request( 'contacts' ).then( ( response: any ) => {
-                                console.log( response );
-                                if ( response == "authorized" ) {
-                                    const arrSSSDetails = this.state.arr_SSSDetails.slice( 0, 2 );
-                                    this.props.navigation.push( "BackUpYourWalletNavigator", { data: arrSSSDetails } )
-                                } else {
-                                    alert.simpleOk( "Oops", "Please add contacts permission." );
+                    </SafeAreaView>
+                </ImageBackground>
+                <ModelFindYourTrustedContacts
+                    data={ this.state.arr_ModelFindYourTrustedContacts }
+                    click_Confirm={ async () => {
+                        await Permissions.request( 'contacts' ).then( ( response: any ) => {
+                            // console.log( response );
+                            if ( response == "authorized" ) {
+                                const { arrSelectedItem } = this.state;
+                                this.props.navigation.push( "BackUpYourWalletNavigator", { arrSelectedItem } )
+                            } else {
+                                alert.simpleOk( "Oops", "Please add contacts permission." );
+                            }
+                        } );
+                        this.setState( {
+                            arr_ModelFindYourTrustedContacts: [
+                                {
+                                    modalVisible: false
                                 }
-                            } );
-                            this.setState( {
-                                arr_ModelFindYourTrustedContacts: [
-                                    {
-                                        modalVisible: false
-                                    }
-                                ]
-                            } )
+                            ]
+                        } )
+                    }
+                    }
+                    closeModal={ () => {
+                        this.setState( {
+                            arr_ModelFindYourTrustedContacts: [
+                                {
+                                    modalVisible: false
+                                }
+                            ]
+                        } )
+                    } }
+                />
+                <ModelHelperScreen
+                    data={ arrModelHelperScreen }
+                    closeModal={ async () => {
+                        AsyncStorage.setItem(
+                            asyncStorageKeys.flagHealthOfTheAppScreen,
+                            JSON.stringify( true )
+                        );
+                        this.setState( {
+                            arrModelHelperScreen: [ {
+                                modalVisible: false,
+                                images: [ "helper4" ]
+                            } ]
+                        } )
+                    } }
+                />
 
-                        } }
-                        closeModal={ () => {
-                            this.setState( {
-                                arr_ModelFindYourTrustedContacts: [
-                                    {
-                                        modalVisible: false
-                                    }
-                                ]
-                            } )
-                        } }
-                    />
-                </SafeAreaView>
                 <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }
@@ -1030,8 +937,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
 const primaryColor = colors.appColor;
 const styles = StyleSheet.create( {
     container: {
-        flex: 1,
-        backgroundColor: "#F8F8F8",
+        flex: 1
     },
     viewTrustedContacts: {
         flex: 1,

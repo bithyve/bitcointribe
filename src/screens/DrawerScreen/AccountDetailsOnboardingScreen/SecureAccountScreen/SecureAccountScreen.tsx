@@ -17,17 +17,17 @@ import Loader from "react-native-modal-loader";
 
 //TODO: Custome class
 import { colors, images, localDB } from "bithyve/src/app/constants/Constants";
-var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
+var dbOpration = require( "bithyve/src/app/manage/database/DBOpration" );
 
 //TODO: Bitcoin Files
 //import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
 
 //localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+import { localization } from "bithyve/src/app/manage/Localization/i18n";
 
 export default class SecureAccountScreen extends React.Component {
-  constructor(props: any) {
-    super(props);
+  constructor ( props: any ) {
+    super( props );
     this.state = {
       isLoading: false
     };
@@ -71,61 +71,61 @@ export default class SecureAccountScreen extends React.Component {
     const { activeSections } = this.state;
     return (
       <Container>
-        <Content contentContainerStyle={styles.container} scrollEnabled={false}>
+        <Content contentContainerStyle={ styles.container } scrollEnabled={ false }>
           <ImageBackground
-            source={images.appBackgound}
-            style={styles.backgroundImage}
+            source={ images.appBackgound }
+            style={ styles.backgroundImage }
           >
             <Header transparent>
               <Left>
-                <Button transparent onPress={() => this.props.navigation.pop()}>
-                  <Icon name="chevron-left" size={25} color="#ffffff" />
+                <Button transparent onPress={ () => this.props.navigation.pop() }>
+                  <Icon name="chevron-left" size={ 25 } color="#ffffff" />
                 </Button>
               </Left>
-              <Body style={{ flex: 0, alignItems: "center" }}>
+              <Body style={ { flex: 0, alignItems: "center" } }>
                 <Title />
               </Body>
               <Right />
             </Header>
 
-            <View style={styles.logoSecureAccount}>
+            <View style={ styles.logoSecureAccount }>
               <Image
-                style={styles.secureLogo}
-                source={images.secureAccount.secureLogo}
+                style={ styles.secureLogo }
+                source={ images.secureAccount.secureLogo }
               />
-              <Text style={styles.txtTitle}>
-                {localization("SecureAccountScreen.title")}
+              <Text style={ styles.txtTitle }>
+                { localization( "SecureAccountScreen.title" ) }
               </Text>
-              <Text style={styles.txtNote} />
+              <Text style={ styles.txtNote } />
             </View>
-            <View style={styles.createAccountBtn}>
+            <View style={ styles.createAccountBtn }>
               <Button
                 transparent
-                style={{
+                style={ {
                   backgroundColor: colors.appColor,
                   flexDirection: "row",
                   paddingLeft: 20,
                   paddingRight: 10,
                   borderRadius: 5
-                }}
-                onPress={() => this.click_CreateSecureAccount()}
+                } }
+                onPress={ () => this.click_CreateSecureAccount() }
               >
-                <Text style={styles.txtBtnTitle}>
-                  {localization("SecureAccountScreen.btnCreateAccount")}
+                <Text style={ styles.txtBtnTitle }>
+                  { localization( "SecureAccountScreen.btnCreateAccount" ) }
                 </Text>
-                <Icon name="chevron-right" size={25} color="#ffffff" />
+                <Icon name="chevron-right" size={ 25 } color="#ffffff" />
               </Button>
             </View>
           </ImageBackground>
         </Content>
-        <Loader loading={this.state.isLoading} color={colors.appColor} />
-        <DropdownAlert ref={ref => (this.dropdown = ref)} />
+        <Loader loading={ this.state.isLoading } color={ colors.appColor } />
+        <DropdownAlert ref={ ref => ( this.dropdown = ref ) } />
       </Container>
     );
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1
   },
@@ -159,4 +159,4 @@ const styles = StyleSheet.create({
   txtBtnTitle: {
     color: colors.white
   }
-});
+} );

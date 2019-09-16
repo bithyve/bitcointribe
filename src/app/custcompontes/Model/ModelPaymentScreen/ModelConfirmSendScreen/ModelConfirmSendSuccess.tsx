@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Image } from 'react-native';
-import { Button, Icon, Text, Textarea, Form } from "native-base";
+import { Modal, View, StyleSheet, Image } from 'react-native';
+import { Text } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import { SvgIcon } from "@up-shared/components";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import {
@@ -54,16 +54,15 @@ export default class ModelConfirmSendSuccess extends Component<Props, any> {
                     { backgroundColor: `rgba(0,0,0,0.4)` }
                 ] }>
                     <View style={ styles.viewModelBody }>
-                        <View style={ { flexDirection: "row", flex: 0.6, margin: 20 } }>
+                        <View style={ { flex: 0.4, alignItems: "center" } }>
                             <Text style={ [ globalStyle.ffFiraSansMedium, {
-                                fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
-                                marginLeft: 20, marginRight: 20
+                                fontSize: 20, color: "#2F2F2F",
                             } ] }>Send Successful</Text>
                         </View>
-                        <View style={ { flex: 3, alignItems: "center", justifyContent: "flex-start" } }>
+                        <View style={ { flex: 3, alignItems: "center", justifyContent: "center" } }>
                             <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingMnemonic.walletrestored } />
                         </View>
-                        <View style={ { flex: 1.2, alignItems: "center" } }>
+                        <View style={ { flex: 0.9, alignItems: "center" } }>
                             <View style={ { flexDirection: "row", alignItems: "center", margin: 5 } }>
                                 <SvgIcon
                                     name="icon_bitcoin"
@@ -80,29 +79,28 @@ export default class ModelConfirmSendSuccess extends Component<Props, any> {
                                     size={ 15 }
                                 />
                                 <Text note style={ { fontSize: 12, marginLeft: -0.01 } }>{ details != undefined ? details.tranFee : "" }</Text>
-
                             </View>
                         </View>
                         <View style={ { flex: 1, alignItems: "center" } }>
                             <Text note>Transferred Successfully to</Text>
                             <Text>{ details != undefined ? details.accountName : "" }</Text>
                         </View>
-                        <View style={ { flex: 2, alignItems: "center" } }>
-                            <Text note style={ { marginBottom: -15 } }>Wallet Transactions id</Text>
-                            <Text style={ { textAlign: "center", marginLeft: 10, marginRight: 10 } }> { details != undefined ? details.txid : "" }</Text>
+                        <View style={ { flex: 2, alignItems: "center", } }>
+                            <Text note>Wallet Transactions id</Text>
+                            <Text style={ { textAlign: "center" } }> { details != undefined ? details.txid : "" }</Text>
                             <Text note>{ details != undefined ? details.date : "" }</Text>
                         </View>
-                        <View style={ { flex: 1, justifyContent: "flex-end" } }>
+                        <View style={ { flex: 0.4, justifyContent: "flex-end" } }>
                             <FullLinearGradientButton
                                 click_Done={ () => this.props.click_GoToDailyAccount() }
-                                title="Go to Daily Account"
+                                title="Go to wallet"
                                 disabled={ false }
                                 style={ [ { opacity: 1 }, { borderRadius: 10 } ] }
                             />
                         </View>
                     </View>
                 </View>
-            </Modal>
+            </Modal >
         );
     }
 }
@@ -111,7 +109,6 @@ const styles = StyleSheet.create( {
     modalBackground: {
         flex: 1,
         justifyContent: 'center',
-
     },
     imgAppLogo: {
         width: 150,

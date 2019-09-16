@@ -42,17 +42,17 @@ public class PdfPassword extends ReactContextBaseJavaModule {
     @ReactMethod
     public void setPdfPasswrod(String filePath, String password, Callback errorCallback, Callback successCallback) {
         try {
-//             File sdcard = Environment.getExternalStorageDirectory();
-//             OutputStream file = new FileOutputStream(new File(sdcard,filePath));
-//             Document document = new Document();
-//             PdfWriter writer = PdfWriter.getInstance(document, file);
-//             writer.setEncryption(USER_PASS.getBytes(), OWNER_PASS.getBytes(),
-//             PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128);
+            // File sdcard = Environment.getExternalStorageDirectory();
+            // OutputStream file = new FileOutputStream(new File(sdcard,filePath));
+            // Document document = new Document();
+            // PdfWriter writer = PdfWriter.getInstance(document, file);
+            // writer.setEncryption(USER_PASS.getBytes(), OWNER_PASS.getBytes(),
+            // PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128);
 
             PdfReader reader = new PdfReader(filePath);
             PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(filePath));
-            stamper.setEncryption(USER, OWNER,
-                    PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128 | PdfWriter.DO_NOT_ENCRYPT_METADATA);
+            stamper.setEncryption(USER, OWNER, PdfWriter.ALLOW_PRINTING,
+                    PdfWriter.ENCRYPTION_AES_128 | PdfWriter.DO_NOT_ENCRYPT_METADATA);
             stamper.close();
             reader.close();
 
@@ -66,8 +66,8 @@ public class PdfPassword extends ReactContextBaseJavaModule {
     public void encryptPdf(String src, String dest) throws IOException, DocumentException {
         PdfReader reader = new PdfReader(src);
         PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(dest));
-        stamper.setEncryption(USER, OWNER,
-                PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128 | PdfWriter.DO_NOT_ENCRYPT_METADATA);
+        stamper.setEncryption(USER, OWNER, PdfWriter.ALLOW_PRINTING,
+                PdfWriter.ENCRYPTION_AES_128 | PdfWriter.DO_NOT_ENCRYPT_METADATA);
         stamper.close();
         reader.close();
     }

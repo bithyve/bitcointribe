@@ -2,25 +2,9 @@ import React, { Component } from "react";
 import {
     StyleSheet,
     View,
-    AsyncStorage,
-    Platform,
-    Dimensions,
-    Image,
-    Keyboard,
-    StatusBar,
-    Linking,
-    Alert,
     ImageBackground,
-    SafeAreaView,
-    FlatList,
-    TouchableOpacity,
+    SafeAreaView
 } from "react-native";
-import { RkCard } from "react-native-ui-kitten";
-import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text, Button } from 'native-base';
-import { StackActions, NavigationActions } from "react-navigation";
-import IconFontAwe from "react-native-vector-icons/FontAwesome";
-import Permissions from 'react-native-permissions'
-import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 var converter = require( 'number-to-words' );
 
@@ -31,26 +15,21 @@ import ModelConfirmMnemonic1of3 from "HexaWallet/src/app/custcompontes/Model/Mod
 import ModelConfirmMnemonic2of3 from "HexaWallet/src/app/custcompontes/Model/ModelBackupWalletMnemonic/ModelConfirmMnemonic2of3";
 import ModelConfirmMnemonic3of3 from "HexaWallet/src/app/custcompontes/Model/ModelBackupWalletMnemonic/ModelConfirmMnemonic3of3";
 import ModelWalletSuccessfullyBackedUp from "HexaWallet/src/app/custcompontes/Model/ModelBackupWalletMnemonic/ModelWalletSuccessfullyBackedUp";
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+
 
 //TODO: Custome Object
 import {
     colors,
-    images,
-    localDB,
-    asyncStorageKeys
+    images
 } from "HexaWallet/src/app/constants/Constants";
 import utils from "HexaWallet/src/app/constants/Utils";
-import Singleton from "HexaWallet/src/app/constants/Singleton";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+
 
 //localization       
-import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
+import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
 
 export default class BackupWalletMnemonicConfirmMnemonicScreen extends Component {
     constructor ( props: any ) {
@@ -69,8 +48,8 @@ export default class BackupWalletMnemonicConfirmMnemonicScreen extends Component
         let mnemonic = resultWallet.mnemonic;
         let arr_Mnemonic = mnemonic.split( ' ' );
         let arr_randomNo = utils.getRandomBetweenNumber( 1, arr_Mnemonic.length );
-        console.log( { arr_Mnemonic, arr_randomNo } );
-        console.log( arr_randomNo[ 0 ] - 1 );
+        //console.log( { arr_Mnemonic, arr_randomNo } );
+        //console.log( arr_randomNo[ 0 ] - 1 );
 
         this.setState( {
             arr_randomNo,
@@ -91,16 +70,15 @@ export default class BackupWalletMnemonicConfirmMnemonicScreen extends Component
 
         return (
             <View style={ styles.container }>
-                <SafeAreaView style={ styles.container }>
-                    <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <KeyboardAwareScrollView
-                            enableAutomaticScroll
-                            automaticallyAdjustContentInsets={ true }
-                            keyboardOpeningTime={ 0 }
-                            enableOnAndroid={ true }
-                            contentContainerStyle={ { flexGrow: 1 } }
-                        >
+                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <KeyboardAwareScrollView
+                        enableAutomaticScroll
+                        automaticallyAdjustContentInsets={ true }
+                        keyboardOpeningTime={ 0 }
+                        enableOnAndroid={ true }
+                        contentContainerStyle={ { flexGrow: 1 } }
+                    >
+                        <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
                             <ModelConfirmMnemonic1of3 data={ this.state.arr_ModelConfirmMnemonic1of3 } click_Next={ () => {
                                 this.setState( {
                                     arr_ModelConfirmMnemonic1of3: [
@@ -200,9 +178,10 @@ export default class BackupWalletMnemonicConfirmMnemonicScreen extends Component
                                 } )
                                 this.props.navigation.navigate( "TabbarBottom" );
                             } } />
-                        </KeyboardAwareScrollView>
-                    </ImageBackground>
-                </SafeAreaView>
+                        </SafeAreaView>
+                    </KeyboardAwareScrollView>
+                </ImageBackground>
+                <CustomeStatusBar backgroundColor={ colors.appColor } hidden={ false } barStyle="light-content" />
             </View >
         );
     }

@@ -22,16 +22,16 @@ import { images, errorValidMsg } from "bithyve/src/app/constants/Constants";
 import menuData from "bithyve/src/assets/jsonfiles/drawerScreen/leftMenuList.json";
 
 //localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+import { localization } from "bithyve/src/app/manage/Localization/i18n";
 
 class DrawerScreen extends Component {
-  constructor(props: any) {
-    super(props);
+  constructor ( props: any ) {
+    super( props );
     this.state = {
       menuBarList: [],
       confirmPopupData: []
     };
-    this.click_Logout = this.click_Logout.bind(this);
+    this.click_Logout = this.click_Logout.bind( this );
   }
 
   //TODO: Page Life Cycle
@@ -39,92 +39,92 @@ class DrawerScreen extends Component {
     this.getLeftMenuList();
   }
   getLeftMenuList() {
-    this.setState({
-      menuBarList: localization("DrawerScreen.menus")
-    });
+    this.setState( {
+      menuBarList: localization( "DrawerScreen.menus" )
+    } );
   }
   //TODO: Func show logout popup
   click_Logout() {
-    const navigateAction = NavigationActions.navigate({
+    const navigateAction = NavigationActions.navigate( {
       routeName: "PasscodeScreen"
-    });
-    this.props.navigation.dispatch(navigateAction);
-    this.props.navigation.dispatch(DrawerActions.closeDrawer());
+    } );
+    this.props.navigation.dispatch( navigateAction );
+    this.props.navigation.dispatch( DrawerActions.closeDrawer() );
   }
 
   //TODO:  function NavigateToScreen
   navigateToScreen = route => () => {
-    if (route == "Home") {
-      const navigateAction = NavigationActions.navigate({
+    if ( route == "Home" ) {
+      const navigateAction = NavigationActions.navigate( {
         routeName: route
-      });
-      this.props.navigation.dispatch(navigateAction);
-      this.props.navigation.dispatch(DrawerActions.closeDrawer());
-    } else if (route == "LogoutScreen") {
-      this.setState({
+      } );
+      this.props.navigation.dispatch( navigateAction );
+      this.props.navigation.dispatch( DrawerActions.closeDrawer() );
+    } else if ( route == "LogoutScreen" ) {
+      this.setState( {
         confirmPopupData: [
           {
             status: true,
             icon: "check-circle",
-            title: localization("DrawerScreen.LogoutConfirmPopup.title"),
-            subtitle: localization("DrawerScreen.LogoutConfirmPopup.body"),
+            title: localization( "DrawerScreen.LogoutConfirmPopup.title" ),
+            subtitle: localization( "DrawerScreen.LogoutConfirmPopup.body" ),
             confirmTitle: localization(
               "DrawerScreen.LogoutConfirmPopup.btnConfirm"
             )
           }
         ]
-      });
+      } );
     } else {
-      this.props.navigation.push(route);
-      this.props.navigation.dispatch(DrawerActions.closeDrawer());
+      this.props.navigation.push( route );
+      this.props.navigation.dispatch( DrawerActions.closeDrawer() );
     }
   };
 
   render() {
     return (
       <Container>
-        <ImageBackground source={images.slideMenuIcon} style={styles.container}>
-          <ScrollView style={styles.viewScrollingList}>
+        <ImageBackground source={ images.slideMenuIcon } style={ styles.container }>
+          <ScrollView style={ styles.viewScrollingList }>
             <View>
               <FlatList
-                data={this.state.menuBarList}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item }) => (
+                data={ this.state.menuBarList }
+                showsVerticalScrollIndicator={ false }
+                renderItem={ ( { item } ) => (
                   <TouchableOpacity
-                    onPress={this.navigateToScreen(item.pageName)}
+                    onPress={ this.navigateToScreen( item.pageName ) }
                   >
-                    <View style={styles.menuItem}>
-                      <Icon name={item.icon} size={30} color="#ffffff" />
-                      <Text style={styles.txtMenuItem}>{item.title}</Text>
+                    <View style={ styles.menuItem }>
+                      <Icon name={ item.icon } size={ 30 } color="#ffffff" />
+                      <Text style={ styles.txtMenuItem }>{ item.title }</Text>
                     </View>
                   </TouchableOpacity>
-                )}
-                keyExtractor={(item, index) => index}
+                ) }
+                keyExtractor={ ( item, index ) => index }
               />
             </View>
           </ScrollView>
         </ImageBackground>
         <SCLAlertSimpleConfirmation
-          data={this.state.confirmPopupData}
-          click_Ok={(status: boolean) => {
-            if (status) {
+          data={ this.state.confirmPopupData }
+          click_Ok={ ( status: boolean ) => {
+            if ( status ) {
               this.click_Logout();
             }
-            this.setState({
+            this.setState( {
               confirmPopupData: [
                 {
                   status: false
                 }
               ]
-            });
-          }}
+            } );
+          } }
         />
       </Container>
     );
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1,
     paddingTop: 30
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   viewScrollingList: {
     flex: 1
   }
-});
+} );
 
 DrawerScreen.propTypes = {
   navigation: PropTypes.object

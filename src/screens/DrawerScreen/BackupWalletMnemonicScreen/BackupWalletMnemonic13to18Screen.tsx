@@ -1,22 +1,11 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, Platform, SafeAreaView, FlatList, TouchableOpacity } from "react-native";
+import { StyleSheet, View, FlatList } from "react-native";
 import {
-    Container,
-    Header,
-    Title,
-    Content,
-    Item,
-    Input,
     Button,
-    Left,
-    Right,
-    Body,
     Text,
     List,
     ListItem
 } from "native-base";
-import { Icon } from "@up-shared/components";
-import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //NsNotification
@@ -25,15 +14,10 @@ import BackboneEvents from "backbone-events-standalone";
 window.EventBus = BackboneEvents.mixin( {} );
 
 //TODO: Custome Pages
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
-
-//TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 export default class BackupWalletMnemonic13to18Screen extends React.Component<any, any> {
 

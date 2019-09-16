@@ -4,9 +4,7 @@ import {
     Platform, // Detects platform running the app
     ScrollView, // Handles navigation between screens
     StyleSheet, // CSS-like styles
-    View,
-    Text,
-    StatusBar
+    View
 } from "react-native";
 
 //TODO: NsNotification
@@ -15,8 +13,6 @@ import BackboneEvents from "backbone-events-standalone";
 window.EventBus = BackboneEvents.mixin( {} );
 
 
-//TODO: Custome object
-import { colors } from "HexaWallet/src/app/constants/Constants";
 // Detect screen width and height
 const { width, height } = Dimensions.get( "screen" );
 

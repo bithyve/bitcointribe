@@ -1,26 +1,12 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, YellowBox } from "react-native";
+import { StyleSheet, ImageBackground, View, Platform, SafeAreaView, FlatList, TouchableOpacity } from "react-native";
 import {
     Container,
-    Header,
-    Title,
-    Content,
-    Item,
-    Input,
     Button,
-    Left,
-    Right,
-    Body,
-    Text,
-    Icon,
-    List,
-    ListItem,
-    Thumbnail
+    Text
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Contacts from 'react-native-contacts';
 import { Avatar, SearchBar } from 'react-native-elements';
 import TimerCountdown from "react-native-timer-countdown";
 
@@ -29,7 +15,7 @@ import TimerCountdown from "react-native-timer-countdown";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Alert 
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
@@ -39,19 +25,15 @@ let alert = new AlertSimple();
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+import { colors, images } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
-var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
+var comAppHealth = require( "HexaWallet/src/app/manage/CommonFunction/CommonAppHealth" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
 
-//TODO: Bitcoin Files
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
-import HealthStatus from "HexaWallet/src/bitcoin/utilities/HealthStatus";
 
 
 export default class SecretSharingScreen extends React.Component<any, any> {
@@ -84,7 +66,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
         } );
         const resultWallet = await utils.getWalletDetails();
         const resSSSDetails = await comFunDBRead.readTblSSSDetails();
-        console.log( { resSSSDetails } );
+        //console.log( { resSSSDetails } );
         let encrShares = [];
         let history = [];
         //for histroy
@@ -111,13 +93,13 @@ export default class SecretSharingScreen extends React.Component<any, any> {
         }
         //console.log( { tempOpt, encrShares } );
         let updateShareIdStatus = await comAppHealth.connection_AppHealthAndSSSUpdate( parseInt( resultWallet.lastUpdated ), encrShares );
-        console.log( { updateShareIdStatus } );
+        //console.log( { updateShareIdStatus } );
         if ( updateShareIdStatus ) {
             var data = await utils.getSSSDetails();
             const dateTime = Date.now();
             let temp = [];
             for ( let i = 0; i <= 1; i++ ) {
-                console.log( { data: data[ i ] } );
+                //console.log( { data: data[ i ] } );
                 let jsondata = JSON.parse( data[ i ].keeperInfo );
                 jsondata.history = JSON.parse( data[ i ].history );
                 jsondata.decryptedShare = JSON.parse( data[ i ].decryptedShare );
@@ -129,7 +111,7 @@ export default class SecretSharingScreen extends React.Component<any, any> {
                 const seconds: any = Math.floor( diff / 1000 % 60 );
                 const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
                 jsondata.totalSec = 540 - totalSec;
-                console.log( { jsondata } );
+                //console.log( { jsondata } );
                 if ( totalSec < 540 && data[ i ].shareStage == "Ugly" ) {
                     jsondata.statusMsg = "Shared";
                     jsondata.statusMsgColor = "#C07710";
@@ -179,12 +161,13 @@ export default class SecretSharingScreen extends React.Component<any, any> {
         let { flag_Loading } = this.state;
         return (
             <Container>
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
+                        <View style={ { marginLeft: 10 } }>
                             <Button
                                 transparent
+                                hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                 onPress={ () => {
                                     this.props.navigation.navigate( "HealthOfTheAppNavigator" );
                                 } }

@@ -5,16 +5,16 @@ import {
   View,
   AsyncStorage,
   Platform,
-  Dimensions,
   Image,
+  SafeAreaView,
   Keyboard,
-  StatusBar,
-  Linking
+  ImageBackground,
+  Alert
 } from "react-native";
 import { StackActions, NavigationActions } from "react-navigation";
 import CodeInput from "react-native-confirmation-code-input";
 import * as Keychain from "react-native-keychain";
-import DeepLinking from "react-native-deep-linking";
+
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
@@ -24,7 +24,7 @@ import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGra
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import {
@@ -35,20 +35,16 @@ import {
 } from "HexaWallet/src/app/constants/Constants";
 import utils from "HexaWallet/src/app/constants/Utils";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
 
 //localization
-import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
+import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
-//TODO: Bitcoin Files
-var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
-import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
-import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
+
 
 export default class PasscodeScreen extends Component {
 
@@ -72,15 +68,23 @@ export default class PasscodeScreen extends Component {
 
   //TODO: Page Life Cycle
   componentWillMount() {
-    this.retrieveData();
+    try {
+      this.retrieveData();
+    } catch ( error ) {
+      Alert.alert( error )
+    }
   }
 
   async componentDidMount() {
-    const resultWallet = await dbOpration.readTablesData(
-      localDB.tableName.tblWallet
-    );
-    console.log( { resultWallet } );
-    await utils.setWalletDetails( resultWallet.temp[ 0 ] );
+    try {
+      const resultWallet = await dbOpration.readTablesData(
+        localDB.tableName.tblWallet
+      );
+      console.log( { resultWallet } );
+      await utils.setWalletDetails( resultWallet.temp[ 0 ] );
+    } catch ( error ) {
+      Alert.alert( error )
+    }
   }
 
   retrieveData = async () => {
@@ -100,171 +104,189 @@ export default class PasscodeScreen extends Component {
   }
 
   _onFinishCheckingCode( isValid: boolean, code: string ) {
-    if ( isValid ) {
-      this.setState( {
-        status: true,
-        passcodeStyle: [
-          {
-            activeColor: colors.black,
-            inactiveColor: colors.black,
-            cellBorderWidth: 0
-          }
-        ]
-      } );
-    } else {
-      this.setState( {
-        passcodeStyle: [
-          {
-            activeColor: "red",
-            inactiveColor: "red",
-            cellBorderWidth: 1
-          }
-        ]
-      } );
+    try {
+      if ( isValid ) {
+        this.setState( {
+          status: true,
+          passcodeStyle: [
+            {
+              activeColor: colors.black,
+              inactiveColor: colors.black,
+              cellBorderWidth: 0
+            }
+          ]
+        } );
+      } else {
+        this.setState( {
+          passcodeStyle: [
+            {
+              activeColor: "red",
+              inactiveColor: "red",
+              cellBorderWidth: 1
+            }
+          ]
+        } );
+      }
+    } catch ( error ) {
+      Alert.alert( error )
     }
   }
 
   onSuccess = async ( code: string ) => {
-    const rootViewController = await AsyncStorage.getItem( asyncStorageKeys.rootViewController );
-
-    //Wallet Details Reading
-    await comFunDBRead.readTblWallet();
-    await comFunDBRead.readTblSSSDetails();
-
-    let pageName = utils.getRootViewController();
-    console.log( { pageName } );
-
-    if ( pageName != "TrustedPartyShareSecretNavigator" && pageName != "OTPScreenNavigator" ) {
-      const resetAction = StackActions.reset( {
-        index: 0, // <-- currect active route from actions array
-        key: null,
-        actions: [
-          NavigationActions.navigate( {
-            routeName: rootViewController
-          } )
-        ]
-      } );
-      this.props.navigation.dispatch( resetAction );
-    } else {
-      const resetAction = StackActions.reset( {
-        index: 0, // <-- currect active route from actions array
-        key: null,
-        actions: [
-          NavigationActions.navigate( {
-            routeName: pageName
-          } )
-        ]
-      } );
-      this.props.navigation.dispatch( resetAction );
-    }
-  };
+    try {
 
 
-  //TODO: func urlDecription
-  async urlDecription( code: any ) {
-    let commonData = Singleton.getInstance();
-    let pageName = commonData.getRootViewController();
-    var script = commonData.getDeepLinkingUrl();
-    script = script.split( "_+_" ).join( "/" );
-    let deepLinkingUrl = utils.decrypt( script, code.toString() );
-    if ( deepLinkingUrl ) {
-      const resultWallet = await dbOpration.readTablesData(
-        localDB.tableName.tblWallet
-      );
-      console.log( { resultWallet } );
-      let publicKey = resultWallet.temp[ 0 ].publicKey;
-      let JsonDeepLinkingData = JSON.parse( deepLinkingUrl );
-      if ( publicKey == JsonDeepLinkingData.cpk ) {
-        console.log( "same public key" );
-        Keyboard.dismiss();
+      const rootViewController = await AsyncStorage.getItem( asyncStorageKeys.rootViewController );
+
+      //Wallet Details Reading
+      await comFunDBRead.readTblWallet();
+      await comFunDBRead.readTblSSSDetails();
+
+      let pageName = utils.getRootViewController();
+      console.log( { pageName } );
+
+      if ( pageName != "TrustedPartyShareSecretNavigator" && pageName != "OTPScreenNavigator" ) {
+        const resetAction = StackActions.reset( {
+          index: 0, // <-- currect active route from actions array
+          key: null,
+          actions: [
+            NavigationActions.navigate( {
+              routeName: rootViewController
+            } )
+          ]
+        } );
+        this.props.navigation.dispatch( resetAction );
       } else {
         const resetAction = StackActions.reset( {
           index: 0, // <-- currect active route from actions array
           key: null,
           actions: [
             NavigationActions.navigate( {
-              routeName: pageName,
-              params: {
-                data: deepLinkingUrl
-              }
+              routeName: pageName
             } )
           ]
         } );
         this.props.navigation.dispatch( resetAction );
       }
-      commonData.setRootViewController( "TabbarBottom" );
-      this.setState( { flag_dialogShow: false } );
-    } else {
-      this.refs.codeInputRefUrlEncp.clear();
+    } catch ( error ) {
+      Alert.alert( error )
+    }
+  };
+
+
+  //TODO: func urlDecription
+  async urlDecription( code: any ) {
+    try {
+      let commonData = Singleton.getInstance();
+      let pageName = commonData.getRootViewController();
+      var script = commonData.getDeepLinkingUrl();
+      script = script.split( "_+_" ).join( "/" );
+      let deepLinkingUrl = utils.decrypt( script, code.toString() );
+      if ( deepLinkingUrl ) {
+        const resultWallet = await dbOpration.readTablesData(
+          localDB.tableName.tblWallet
+        );
+        console.log( { resultWallet } );
+        let publicKey = resultWallet.temp[ 0 ].publicKey;
+        let JsonDeepLinkingData = JSON.parse( deepLinkingUrl );
+        if ( publicKey == JsonDeepLinkingData.cpk ) {
+          console.log( "same public key" );
+          Keyboard.dismiss();
+        } else {
+          const resetAction = StackActions.reset( {
+            index: 0, // <-- currect active route from actions array
+            key: null,
+            actions: [
+              NavigationActions.navigate( {
+                routeName: pageName,
+                params: {
+                  data: deepLinkingUrl
+                }
+              } )
+            ]
+          } );
+          this.props.navigation.dispatch( resetAction );
+        }
+        commonData.setRootViewController( "TabbarBottom" );
+        this.setState( { flag_dialogShow: false } );
+      } else {
+        this.refs.codeInputRefUrlEncp.clear();
+      }
+    } catch ( error ) {
+      Alert.alert( error )
     }
   }
 
   render() {
     return (
       <View style={ styles.container }>
-        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ true } barStyle="dark-content" />
-        <KeyboardAwareScrollView
-          enableAutomaticScroll
-          automaticallyAdjustContentInsets={ true }
-          keyboardOpeningTime={ 0 }
-          enableOnAndroid={ true }
-          contentContainerStyle={ { flexGrow: 1 } }
-        >
-          <View style={ styles.viewAppLogo }>
-            <Image style={ styles.imgAppLogo } source={ images.appIcon } />
-            <Text
-              style={ [ globalStyle.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
+        <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+          <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
+            <KeyboardAwareScrollView
+              enableAutomaticScroll
+              automaticallyAdjustContentInsets={ true }
+              keyboardOpeningTime={ 0 }
+              enableOnAndroid={ true }
+              contentContainerStyle={ { flexGrow: 1 } }
             >
-              Welcome to Hexa!
+              <View style={ styles.viewAppLogo }>
+                <Image style={ styles.imgAppLogo } source={ images.appIcon } />
+                <Text
+                  style={ [ globalStyle.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
+                >
+                  Welcome to Hexa!
             </Text>
-          </View>
-          <View style={ styles.viewPasscode }>
-            <Text
-              style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
-            >
-            Enter Passcode{ " " }
-            </Text>
-            <CodeInput
-              ref="codeInputRef1"
-              secureTextEntry
-              keyboardType="numeric"
-              codeLength={ 5 }
-              compareWithCode={ this.state.pincode }
-              activeColor={ this.state.passcodeStyle[ 0 ].activeColor }
-              inactiveColor={ this.state.passcodeStyle[ 0 ].inactiveColor }
-              className="border-box"
-              cellBorderWidth={ this.state.passcodeStyle[ 0 ].cellBorderWidth }
-              compareWithCode={ this.state.pincode }
-              autoFocus={ true }
-              inputPosition="center"
-              space={ 10 }
-              size={ 55 }
-              codeInputStyle={ { borderRadius: 5, backgroundColor: "#F1F1F1" } }
-              containerStyle={ {
-                alignItems: "center",
-                justifyContent: "center",
-                height: Platform.OS == "ios" ? 0 : 40,
-              } }
-              onFulfill={ ( isValid: any, code: any ) =>
-                this._onFinishCheckingCode( isValid, code )
-              }
-              type='withoutcharacters'
-            />
-            { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
-              <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>
-            ) }
-          </View>
-          <View style={ styles.viewBtnProceed }>
-            <FullLinearGradientButton
-              style={ [
-                this.state.status == true ? { opacity: 1 } : { opacity: 0.4 },
-                { borderRadius: 5 } ] }
-              disabled={ this.state.status == true ? false : true }
-              title="LOGIN"
-              click_Done={ () => this.onSuccess( this.state.pincode ) }
-            />
-          </View>
-        </KeyboardAwareScrollView>
+              </View>
+              <View style={ styles.viewPasscode }>
+                <Text
+                  style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
+                >
+                  Enter Pin{ " " }
+                </Text>
+                <CodeInput
+                  ref="codeInputRef1"
+                  secureTextEntry
+                  keyboardType="numeric"
+                  codeLength={ 5 }
+                  compareWithCode={ this.state.pincode }
+                  activeColor={ this.state.passcodeStyle[ 0 ].activeColor }
+                  inactiveColor={ this.state.passcodeStyle[ 0 ].inactiveColor }
+                  className="border-box"
+                  cellBorderWidth={ this.state.passcodeStyle[ 0 ].cellBorderWidth }
+                  compareWithCode={ this.state.pincode }
+                  autoFocus={ true }
+                  inputPosition="center"
+                  space={ 10 }
+                  size={ 55 }
+                  codeInputStyle={ { borderRadius: 5, backgroundColor: "#F1F1F1" } }
+                  containerStyle={ {
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: Platform.OS == "ios" ? 0 : 40,
+                  } }
+                  onFulfill={ ( isValid: any, code: any ) =>
+                    this._onFinishCheckingCode( isValid, code )
+                  }
+                  type='withoutcharacters'
+                />
+                { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
+                  <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>
+                ) }
+              </View>
+              <View style={ styles.viewBtnProceed }>
+                <FullLinearGradientButton
+                  style={ [
+                    this.state.status == true ? { opacity: 1 } : { opacity: 0.4 },
+                    { borderRadius: 5 } ] }
+                  disabled={ this.state.status == true ? false : true }
+                  title="PROCEED"
+                  click_Done={ () => this.onSuccess( this.state.pincode ) }
+                />
+              </View>
+            </KeyboardAwareScrollView>
+          </SafeAreaView>
+        </ImageBackground>
+        <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
       </View>
     );
   }

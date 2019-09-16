@@ -1,13 +1,9 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Dimensions, Alert } from "react-native";
+import { StyleSheet, ImageBackground, View, SafeAreaView, FlatList, TouchableOpacity, Dimensions } from "react-native";
 import {
     Container,
-    Header,
-    Title,
-    Content,
     Item,
     Input,
-    Button,
     Text,
     Icon
 } from "native-base";
@@ -23,6 +19,7 @@ import GridView from 'react-native-super-grid';
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
 
 
 
@@ -32,16 +29,16 @@ let alert = new AlertSimple();
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 //TODO: Common Funciton   
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
 
 export default class RestoreAllContactListScreen extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -173,7 +170,7 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
         console.log( { lenght: sssDetails.length } );
         if ( selectedContactList.length == 2 ) {
             arrTypes = [ { type: "Trusted Contacts 1" }, { type: "Trusted Contacts 2" } ];
-            let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactKeepInfo(
+            let resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactKeepInfo(
                 localDB.tableName.tblSSSDetails,
                 dateTime,
                 selectedContactList,
@@ -186,19 +183,10 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
                 alert.simpleOk( "Oops", "Trusted Contact not insert databse." );
             }
         } else {
-            let type;
-            let flag_CheckShare = arr_Account.some( ( item: any ) => item.type === 'Trusted Contacts 1' );
-            console.log( { flag_CheckShare } );
-
-            if ( flag_CheckShare ) {
-                type = "Trusted Contacts 2";
-            } else {
-                type = "Trusted Contacts 1";
-            }
-            console.log( { type } );
-
-            arrTypes = [ { type } ];
-            let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactKeepInfo(
+            let data = this.props.navigation.getParam( "data" );
+            console.log( { data } );
+            arrTypes = [ { type: data } ];
+            let resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactKeepInfo(
                 localDB.tableName.tblSSSDetails,
                 dateTime,
                 selectedContactList,
@@ -213,22 +201,14 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
         }
     }
 
-
     render() {
         return (
             <Container>
-                <SafeAreaView style={ styles.container }>
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.props.navigation.pop() }
-                            >
-                                <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Contacts</Text>
-                            </Button>
-                        </View>
+                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <HeaderTitle title="Contacts"
+                        pop={ () => this.props.navigation.pop() }
+                    />
+                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
                         <KeyboardAwareScrollView
                             enableOnAndroid
                             extraScrollHeight={ 40 }
@@ -250,7 +230,7 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
                                             autoCorrect={ false } />
                                     </Item>
                                 </View>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20 } ] }>Select three of your trusted contacts, make sure you can always reach this people to recover your wallet</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20 } ] }>Select the upto two contacts you trusted at the time of setting up your wallet</Text>
                             </View>
                             <View style={ { flex: 1 } }>
                                 <GridView
@@ -325,9 +305,10 @@ export default class RestoreAllContactListScreen extends React.Component<any, an
                                 <FullLinearGradientButton title="Next" disabled={ this.state.flag_NextBtnDisable || this.state.flag_NextBtnDisable1 } style={ [ this.state.flag_NextBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10, marginLeft: 30, marginRight: 30 } ] } click_Done={ () => this.click_Next() } />
                             </View>
                         ) }
-                    </ImageBackground>
-                </SafeAreaView>
+                    </SafeAreaView>
+                </ImageBackground>
                 <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message="Loading" />
+                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

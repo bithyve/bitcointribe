@@ -20,22 +20,21 @@ export default class BankAccountScreen extends React.Component {
   render() {
     return (
       <Container>
-        <ImageBackground source={images.appBackgound} style={styles.container}>
+        <ImageBackground source={ images.appBackgound } style={ styles.container }>
           <Header transparent>
             <Left>
               <Button
                 transparent
-                onPress={() => this.props.navigation.goBack()}
+                onPress={ () => this.props.navigation.goBack() }
               >
-                <Icon name="chevron-left" size={25} color="#ffffff" />
+                <Icon name="chevron-left" size={ 25 } color="#ffffff" />
               </Button>
             </Left>
-
-            <Body style={{ flex: 3, alignItems: "center" }}>
+            <Body style={ { flex: 3, alignItems: "center" } }>
               <Title
-                adjustsFontSizeToFit={true}
-                numberOfLines={1}
-                style={styles.titleUserName}
+                adjustsFontSizeToFit={ true }
+                numberOfLines={ 1 }
+                style={ styles.titleUserName }
               >
                 Bank Account
               </Title>
@@ -51,7 +50,7 @@ export default class BankAccountScreen extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1,
     backgroundColor: "#fff"
@@ -59,4 +58,4 @@ const styles = StyleSheet.create({
   titleUserName: {
     color: "#ffffff"
   }
-});
+} );

@@ -2,33 +2,15 @@ import React, { Component } from "react";
 import {
     StyleSheet,
     View,
-    AsyncStorage,
     Platform,
-    Dimensions,
-    Image,
-    Keyboard,
-    StatusBar,
-    Linking,
-    ImageBackground,
-    Alert
+    SafeAreaView,
+    ImageBackground
 } from "react-native";
 import {
-    Container,
-    Header,
-    Title,
-    Content,
-    Item,
-    Input,
-    Button,
-    Left,
-    Right,
-    Body,
     Text
 } from "native-base";
-import { StackActions, NavigationActions } from "react-navigation";
 import CodeInput from "react-native-confirmation-code-input";
-import * as Keychain from "react-native-keychain";
-import { SvgIcon } from "@up-shared/components";
+
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
@@ -40,6 +22,9 @@ let alert = new AlertSimple();
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+
+
 
 //TODO: Custome Object   
 import {
@@ -48,19 +33,18 @@ import {
     localDB
 } from "HexaWallet/src/app/constants/Constants";
 import utils from "HexaWallet/src/app/constants/Utils";
-import Singleton from "HexaWallet/src/app/constants/Singleton";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
 //localization
-import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
+import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
 //TODO: Bitcoin Class
-var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
+var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
 
 export default class OTPBackupShareStore extends Component {
     constructor ( props: any ) {
@@ -85,20 +69,10 @@ export default class OTPBackupShareStore extends Component {
     }
 
 
-    async componentWillMount() {
-        // let script = utils.getDeepLinkingUrl();
-        // let key = script.key;
-        // console.log( { key } );
-        // const resDownloadShare = await S3Service.downloadShare( key );
-        // console.log( { resDownloadShare } );
-        // this.setState( {
-        //     arr_ResDownShare: resDownloadShare
-        // } )
 
-    }
 
     _onFinishCheckingCode = async ( code: string ) => {
-        console.log( { code } );
+        //console.log( { code } );
         if ( code.length == 6 ) {
             this.setState( {
                 otp: code,
@@ -115,7 +89,7 @@ export default class OTPBackupShareStore extends Component {
 
     onSuccess = async () => {
         const dateTime = Date.now();
-        console.log( { dateTime } );
+        //console.log( { dateTime } );
 
         this.setState( {
             flag_Loading: true
@@ -124,18 +98,16 @@ export default class OTPBackupShareStore extends Component {
         let enterOtp = this.state.otp;
         let script = utils.getDeepLinkingUrl();
         let messageId = script.key;
-        console.log( { messageId, enterOtp } );
-        //let resDownShare = this.state.arr_ResDownShare;
-        //console.log( { resDownShare } );
+        //console.log( { messageId, enterOtp } );
         let urlScript = {};
         urlScript.walletName = script.wn;
         urlScript.data = script.key;
         const sss = await bitcoinClassState.getS3ServiceClassState();
         let resDecryptViaOTP = await S3Service.decryptViaOTP( script.key, enterOtp );
-        console.log( { resDecryptViaOTP } );
+        //console.log( { resDecryptViaOTP } );
         if ( resDecryptViaOTP.status == 200 ) {
             const resDownloadShare = await S3Service.downloadShare( resDecryptViaOTP.data.decryptedData );
-            console.log( { resDownloadShare } );
+            //console.log( { resDownloadShare } );
             if ( resDownloadShare.status == 200 ) {
                 let regularAccount = await bitcoinClassState.getRegularClassState();
                 var resGetWalletId = await regularAccount.getWalletId();
@@ -146,15 +118,20 @@ export default class OTPBackupShareStore extends Component {
                     alert.simpleOk( "Oops", resGetWalletId.err );
                 }
                 let resTrustedParty = await comFunDBRead.readTblTrustedPartySSSDetails();
-                let arr_DecrShare = [];
+                var arr_DecrShare = [];
                 for ( let i = 0; i < resTrustedParty.length; i++ ) {
                     arr_DecrShare.push( JSON.parse( resTrustedParty[ i ].decrShare ) );
                 }
+                //console.log( { arr_DecrShare } );
                 let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare( resDownloadShare.data.encryptedMetaShare, resDecryptViaOTP.data.decryptedData, resGetWalletId.walletId, arr_DecrShare );
-                console.log( { resDecryptEncMetaShare } );
+                //console.log( { resDecryptEncMetaShare } );
                 if ( resDecryptEncMetaShare.status == 200 ) {
-                    const resUpdateHealth = await sss.updateHealth( resDecryptEncMetaShare.data.decryptedMetaShare.meta.walletId, resDecryptEncMetaShare.data.decryptedMetaShare.encryptedShare );
-                    console.log( { resUpdateHealth } );
+                    //console.log( { lenght: arr_DecrShare.length } );
+                    arr_DecrShare.length != 0 ? arr_DecrShare.push( resDecryptEncMetaShare.data.decryptedMetaShare ) : arr_DecrShare.push( resDecryptEncMetaShare.data.decryptedMetaShare );
+                    //console.log( { nexttimearray: arr_DecrShare } );
+                    const resUpdateHealth = await S3Service.updateHealth( arr_DecrShare );
+                    //console.log( { resUpdateHealth } );
+                    //console.log( { resUpdateHealth } );
                     if ( resUpdateHealth.status == 200 ) {
                         await bitcoinClassState.setS3ServiceClassState( sss );
                         const resTrustedParty = await dbOpration.insertTrustedPartyDetailWithoutAssociate(
@@ -168,7 +145,7 @@ export default class OTPBackupShareStore extends Component {
                         if ( resTrustedParty ) {
                             flag_Loading = false;
                             setTimeout( () => {
-                                alert.simpleOkAction( "Success", "Decrypted share stored.", this.goBack );
+                                alert.simpleOkAction( "Success", "Share stored successfully", this.goBack );
                             }, 100 );
                         }
                     } else {
@@ -196,55 +173,6 @@ export default class OTPBackupShareStore extends Component {
                 alert.simpleOk( "Oops", resDecryptViaOTP.err );
             }, 100 );
         }
-        // const resDecryptOTPEncShare = await S3Service.decryptOTPEncShare( resDownShare, messageId, enterOtp );
-        // let walletDetails = utils.getWalletDetails();
-        // const sss = new S3Service(
-        //     walletDetails.mnemonic
-        // );
-        // console.log( { resDecryptOTPEncShare } );
-        // let resShareId = await sss.getShareId( resDecryptOTPEncShare.decryptedShare.encryptedShare )
-        // console.log( { resShareId } );
-        // const { data, updated } = await sss.updateHealth( resDecryptOTPEncShare.decryptedShare.meta.walletId, resDecryptOTPEncShare.decryptedShare.encryptedShare );
-        // console.log( { resDecryptOTPEncShare } );
-        // if ( resDecryptOTPEncShare.status == 200 ) {
-        //     const resUpdateSSSRetoreDecryptedShare = await dbOpration.insertTrustedPartyDetailWithoutAssociate(
-        //         localDB.tableName.tblTrustedPartySSSDetails,
-        //         dateTime,
-        //         urlScript,
-        //         resDecryptOTPEncShare.decryptedShare,
-        //         resShareId,
-        //         resDecryptOTPEncShare,
-        //         typeof data !== "undefined" ? data : ""
-        //     );
-        //     if ( resUpdateSSSRetoreDecryptedShare == true ) {
-        //         this.setState( {
-        //             flag_Loading: false
-        //         } );
-        //         setTimeout( () => {
-        //             Alert.alert(
-        //                 'Success',
-        //                 'Decrypted share created.',
-        //                 [
-        //                     {
-        //                         text: 'OK', onPress: () => {
-        //                             utils.setDeepLinkingType( "" );
-        //                             utils.setDeepLinkingUrl( "" );
-        //                             this.props.navigation.navigate( 'TabbarBottom' );
-        //                         }
-        //                     },
-
-        //                 ],
-        //                 { cancelable: false }
-        //             )
-        //         }, 100 );
-        //     } else {
-        //         this.setState( {
-        //             flag_Loading: false
-        //         } )
-        //         Alert.alert( resUpdateSSSRetoreDecryptedShare );
-        //     }
-
-        // }
         this.setState( {
             flag_Loading
         } )
@@ -255,72 +183,68 @@ export default class OTPBackupShareStore extends Component {
         return (
             <View style={ styles.container }>
                 <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                    <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                    <KeyboardAwareScrollView
-                        enableAutomaticScroll
-                        automaticallyAdjustContentInsets={ true }
-                        keyboardOpeningTime={ 0 }
-                        enableOnAndroid={ true }
-                        contentContainerStyle={ { flexGrow: 1 } }
-                    >
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.props.navigation.pop() }
-                            >
-                                <Text style={ { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0, fontFamily: "FiraSans-Medium" } }>Accept Secret via OTP</Text>
-                            </Button>
-                            <Text note style={ { textAlign: "center", marginTop: 10, marginRight: 10 } }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
-                        </View>
-                        <View style={ styles.viewPasscode }>
-                            <Text
-                                style={ { marginTop: 100, fontWeight: "bold", color: "#8B8B8B" } }
-                            >
-                                Enter OTP
+                    <HeaderTitle title="Enter OTP"
+                        pop={ () => this.props.navigation.pop() }
+                    />
+                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
+                        <KeyboardAwareScrollView
+                            enableAutomaticScroll
+                            automaticallyAdjustContentInsets={ true }
+                            keyboardOpeningTime={ 0 }
+                            enableOnAndroid={ true }
+                            contentContainerStyle={ { flexGrow: 1 } }
+                        >
+                            <View style={ styles.viewPasscode }>
+                                <Text
+                                    style={ { fontWeight: "bold", color: "#8B8B8B" } }
+                                >
+                                    Enter OTP
                         </Text>
-                            <CodeInput
-                                ref="codeInputRef1"
-                                secureTextEntry
-                                keyboardType="default"
-                                autoCapitalize="sentences"
-                                codeLength={ 6 }
-                                activeColor={ this.state.passcodeStyle[ 0 ].activeColor }
-                                inactiveColor={ this.state.passcodeStyle[ 0 ].inactiveColor }
-                                className="border-box"
-                                cellBorderWidth={ this.state.passcodeStyle[ 0 ].cellBorderWidth }
-                                autoFocus={ true }
-                                inputPosition="center"
-                                space={ 5 }
-                                size={ 50 }
-                                codeInputStyle={ { borderRadius: 5, backgroundColor: "#F1F1F1" } }
-                                containerStyle={ {
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    height: Platform.OS == "ios" ? 0 : 40,
-                                } }
-                                onFulfill={ ( code ) =>
-                                    this._onFinishCheckingCode( code )
-                                }
-                                type='characters'
-                            />
-                            { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
-                                <Text style={ { color: "red", marginTop: 44 } }>{ this.state.success }</Text>
-                            ) }
-                        </View>
-                        <View style={ styles.viewBtnProceed }>
-                            <Text note style={ { textAlign: "center", marginBottom: 30 } }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
-                            <FullLinearGradientButton
-                                style={ [
-                                    this.state.statusConfirmBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 },
-                                    { borderRadius: 5 } ] }
-                                disabled={ this.state.statusConfirmBtnDisable }
-                                title="Confirm & Proceed"
-                                click_Done={ () => this.onSuccess() }
-                            />
-                        </View>
-                    </KeyboardAwareScrollView>
+                                <CodeInput
+                                    ref="codeInputRef"
+                                    secureTextEntry
+                                    keyboardType="default"
+                                    autoCapitalize="sentences"
+                                    codeLength={ 6 }
+                                    activeColor={ this.state.passcodeStyle[ 0 ].activeColor }
+                                    inactiveColor={ this.state.passcodeStyle[ 0 ].inactiveColor }
+                                    className="border-box"
+                                    cellBorderWidth={ this.state.passcodeStyle[ 0 ].cellBorderWidth }
+                                    autoFocus={ true }
+                                    inputPosition="center"
+                                    space={ 5 }
+                                    size={ 50 }
+                                    codeInputStyle={ { borderRadius: 5, backgroundColor: "#F1F1F1" } }
+                                    containerStyle={ {
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        height: Platform.OS == "ios" ? 0 : 40,
+                                    } }
+                                    onFulfill={ ( code ) =>
+                                        this._onFinishCheckingCode( code )
+                                    }
+                                    type='characters'
+                                />
+                                { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
+                                    <Text style={ { color: "red", marginTop: 44 } }>{ this.state.success }</Text>
+                                ) }
+                            </View>
+                            <View style={ styles.viewBtnProceed }>
+                                <Text note style={ { textAlign: "center", marginBottom: 30 } }></Text>
+                                <FullLinearGradientButton
+                                    style={ [
+                                        this.state.statusConfirmBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 },
+                                        { borderRadius: 5 } ] }
+                                    disabled={ this.state.statusConfirmBtnDisable }
+                                    title="Confirm & Proceed"
+                                    click_Done={ () => this.onSuccess() }
+                                />
+                            </View>
+                        </KeyboardAwareScrollView>
+                    </SafeAreaView>
                 </ImageBackground>
                 <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
+                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </View>
         );
     }

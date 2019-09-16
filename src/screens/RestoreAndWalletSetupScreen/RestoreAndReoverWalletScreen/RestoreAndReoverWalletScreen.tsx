@@ -2,13 +2,7 @@ import React, { Component } from "react";
 import {
     StyleSheet,
     View,
-    AsyncStorage,
     Platform,
-    Dimensions,
-    Image,
-    Keyboard,
-    StatusBar,
-    Linking,
     Alert,
     ImageBackground,
     SafeAreaView,
@@ -16,10 +10,7 @@ import {
     TouchableOpacity
 } from "react-native";
 import { RkCard } from "react-native-ui-kitten";
-import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text } from 'native-base';
-import { StackActions, NavigationActions } from "react-navigation";
-import IconFontAwe from "react-native-vector-icons/FontAwesome";
-import Permissions from 'react-native-permissions'
+import { Text } from 'native-base';
 import { SvgIcon } from "@up-shared/components";
 
 
@@ -27,11 +18,11 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import {
@@ -40,16 +31,16 @@ import {
     localDB
 } from "HexaWallet/src/app/constants/Constants";
 import utils from "HexaWallet/src/app/constants/Utils";
-import Singleton from "HexaWallet/src/app/constants/Singleton";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
+
 
 //localization
-import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
+import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
-interface Props {
 
-}
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+
 
 export default class RestoreAndReoverWalletScreen extends Component<Props, any> {
     constructor ( props: any ) {
@@ -59,58 +50,102 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
         };
     }
 
-
     async componentWillMount() {
-        this.willFocusSubscription = this.props.navigation.addListener(
-            "willFocus",
-            () => {
-                this.loadData();
-            }
-        );
+        try {
+            this.willFocusSubscription = this.props.navigation.addListener(
+                "willFocus",
+                () => {
+                    this.loadData();
+                }
+            );
+        } catch ( error ) {
+            Alert.alert( error )
+        }
     }
 
     componentWillUnmount() {
-        this.willFocusSubscription.remove();
+        try {
+            this.willFocusSubscription.remove();
+        } catch ( error ) {
+            Alert.alert( error )
+        }
     }
 
     loadData = async () => {
-        var resSSSDetails = await dbOpration.readTablesData(
-            localDB.tableName.tblSSSDetails
-        );
-        resSSSDetails = resSSSDetails.temp;
-        console.log( { resSSSDetails } );
-        await utils.setSSSDetails( resSSSDetails );
-        let temp = [];
-        if ( resSSSDetails.length > 0 ) {
-            temp = [ "Continue restoring wallet using trusted source", "Restore wallet using mnemonic" ];
-        } else {
-            temp = [ "Restore wallet using trusted source", "Restore wallet using mnemonic" ];
+        try {
+            var resSSSDetails = await dbOpration.readTablesData(
+                localDB.tableName.tblSSSDetails
+            );
+            resSSSDetails = resSSSDetails.temp;
+            console.log( { resSSSDetails } );
+            await utils.setSSSDetails( resSSSDetails );
+            let temp = [];
+            if ( resSSSDetails.length > 0 ) {
+                temp = [ "Continue restoring wallet using trusted source" ];
+            } else {
+                temp = [ "Restore wallet using trusted source" ];
+            }
+            this.setState( {
+                arr_SecoundMenu: temp
+            } )
+        } catch ( error ) {
+            Alert.alert( error )
         }
-        this.setState( {
-            arr_SecoundMenu: temp
-        } )
     }
 
     //TODO: func click on list card item
     click_Card( item: any ) {
-        if ( item == "Set up as a New Wallet" ) {
-            this.props.navigation.push( "WalletSetupScreens" );
-        } else if ( item == "Restore wallet using mnemonic" ) {
-            this.props.navigation.push( "RestoreWalletUsingMnemonicNavigator" )
-        } else if ( item == "Restore wallet using trusted source" ) {
-            this.props.navigation.push( "RestoreWalletUsingTrustedContactNavigator" );
+        try {
+            if ( item == "Set up as a New Wallet" ) {
+                this.props.navigation.push( "WalletSetupScreens" );
+            } else if ( item == "Restore wallet using trusted source" ) {
+                this.createSSSDetailsTableStructure();
+            } else if ( item == "Continue restoring wallet using trusted source" ) {
+                this.props.navigation.push( "RestoreWalletUsingTrustedContactNavigator" );
+            }
+            else {
+                this.props.navigation.push( "RestoreWalletUsingMnemonicNavigator" )
+            }
+        } catch ( error ) {
+            Alert.alert( error )
         }
-        else {
-            this.props.navigation.push( "RestoreWalletUsingTrustedContactNavigator" );
+    }
+
+    createSSSDetailsTableStructure = async () => {
+        try {
+            const dateTime = Date.now();
+            let keeperInfo = [ { info: null }, { info: null }, { info: null }, { info: null }, { info: null } ];
+            let encryptedMetaShare = [ { metaShare: null }, { metaShare: null }, { metaShare: null }, { metaShare: null }, { metaShare: null } ]
+            let arrTypes = [ { type: "Trusted Contacts 1" }, { type: "Trusted Contacts 2" }, { type: "Self Share 1" }, { type: "Self Share 2" }, { type: "Self Share 3" } ];
+            let temp = [ { date: dateTime, share: null, shareId: null, keeperInfo: keeperInfo, encryptedMetaShare: encryptedMetaShare, type: arrTypes } ]
+            console.log( { temp } );
+            let resDeleteTableData = await dbOpration.deleteTableData(
+                localDB.tableName.tblSSSDetails
+            );
+            if ( resDeleteTableData ) {
+                let resInsertSSSShare = await dbOpration.insertSSSShareDetails(
+                    localDB.tableName.tblSSSDetails,
+                    temp
+                );
+                console.log( { resInsertSSSShare } );
+                if ( resInsertSSSShare ) {
+                    await comFunDBRead.readTblSSSDetails();
+                    if ( Platform.OS == "android" )
+                        this.props.navigation.push( "RestoreWalletUsingTrustedContactAndroidNavigator", { flow: "Restore Wallet Using Trusted Contact" } );
+                    else
+                        this.props.navigation.push( "RestoreWalletUsingTrustedContactNavigator" );
+                }
+            }
+        } catch ( error ) {
+            Alert.alert( error )
         }
     }
 
     render() {
         return (
             <View style={ styles.container }>
-                <SafeAreaView style={ styles.container }>
-                    <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
                         <KeyboardAwareScrollView
                             enableAutomaticScroll
                             automaticallyAdjustContentInsets={ true }
@@ -146,16 +181,15 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
                                                 name="icon_forword"
                                                 color="#BABABA"
                                                 size={ 20 }
-                                                style={ { flex: 0.2, alignSelf: "center" } }
+                                                style={ { flex: 0.25, alignSelf: "center" } }
                                             />
                                         </View>
                                     </RkCard>
                                 </TouchableOpacity>
                             </View>
                             <View style={ styles.viewAppLogo }>
-                                <Image style={ styles.imgAppLogo } source={ images.RestoreRecoverScreen.restore } />
                                 <Text
-                                    style={ [ globalStyle.ffFiraSansBold, { color: "#ffffff", marginTop: 20, fontSize: 26 } ] }
+                                    style={ [ globalStyle.ffFiraSansBold, { color: "#ffffff", marginTop: 20, marginBottom: 20, fontSize: 26 } ] }
                                 >
                                     Restore Wallet
                                </Text>
@@ -191,7 +225,7 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
                                                         name="icon_forword"
                                                         color="#BABABA"
                                                         size={ 20 }
-                                                        style={ { flex: 0.2, alignSelf: "center" } }
+                                                        style={ { flex: 0.25, alignSelf: "center" } }
                                                     />
                                                 </View>
                                             </RkCard>
@@ -206,8 +240,9 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
                                 <Text style={ [ styles.txtWhiteColor, globalStyle.ffFiraSansRegular, { textAlign: "center", margin: 10 } ] }>You can restore Hexa wallets using any of the methods and restore other wallet by using the mnemonic</Text>
                             </View>
                         </KeyboardAwareScrollView>
-                    </ImageBackground>
-                </SafeAreaView>
+                    </SafeAreaView>
+                </ImageBackground>
+                <CustomeStatusBar backgroundColor={ colors.appColor } hidden={ false } barStyle="light-content" />
             </View >
         );
     }

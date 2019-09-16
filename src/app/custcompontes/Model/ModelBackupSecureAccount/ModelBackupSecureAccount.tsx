@@ -1,31 +1,23 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Image, Platform, CameraRoll } from 'react-native';
-import { Button, Icon, Text } from "native-base";
+import { Modal, View, StyleSheet, Image } from 'react-native';
+import { Button, Text } from "native-base";
 
-
-
-
-
-//TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 
 //TODO: Custome Compontes  
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import FullLinearGradientIconWithLoadingButton from 'HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientIconWithLoadingButton';
+
 
 
 import { SvgIcon } from "@up-shared/components";
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 //TODO: Custome Object
 import {
-    colors,
     images
 } from "HexaWallet/src/app/constants/Constants";
 
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 
@@ -41,8 +33,6 @@ interface Props {
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
 
-//TODO: Bitcoin Files
-import SecurePDFGen from 'HexaWallet/src/bitcoin/utilities/securePDFGenerator';
 
 
 export default class ModelBackupSecureAccount extends Component<Props, any> {
@@ -68,7 +58,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
         //this point use backgound task
         setTimeout( () => {
             let data = nextProps.data;
-            console.log( { data } );
+            //console.log( { data } );
             if ( data[ 0 ].modalVisible == true ) {
                 this.setState( {
                     data: data[ 0 ].secureAccountDetails
@@ -96,6 +86,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
                         <View style={ { flexDirection: "row", flex: 0.2 } }>
                             <Button
                                 transparent
+                                hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                 onPress={ () => this.props.pop() }
                             >
                                 <SvgIcon name="icon_back" size={ 25 } color="gray" />
