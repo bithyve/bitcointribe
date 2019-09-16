@@ -7,8 +7,8 @@ Hexa Wallet is a user friendly mobile bitcoin wallet that enables p2p commerce.
 There are various types of accounts that are supported in the Hexa Wallet:
 
 1. Savings Account: A savings account is a standard bitcoin wallet optimal for daily use
-2. Secure Account: A secure account is a bitcoin wallet secured by 2FA optimal for storing larger amounts of bitcoin
-
+2. Secure Account: A secure account is a bitcoin wallet secured by 2FA optimal for storing larger amounts of bitcoin  
+   
 Hexa requires a pin to unlock and access funds and Accounts are protected by a seed restoration feature which can be used to import wallets from other devices or from an older version of Hexa.
 
 ### Design Considerations

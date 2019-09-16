@@ -34,6 +34,10 @@ class Config {
   public SCHUNK_SIZE: number = parseInt( config.BIT_SCHUNK_SIZE, 10 );
   public CHECKSUM_ITR: number = parseInt( config.BIT_CHECKSUM_ITR, 10 );
   public HEXA_ID: string = config.BIT_HEXA_ID;
+
+
+
+
   public DPATH_PURPOSE: number = parseInt( config.BIT_DPATH_PURPOSE, 10 );
   public SSS_METASHARE_SPLITS: number = parseInt(
     config.BIT_SSS_METASHARE_SPLITS,
@@ -42,6 +46,11 @@ class Config {
   public STATUS = {
     SUCCESS: parseInt( config.BIT_SUCCESS_STATUS_CODE, 10 ),
     ERROR: parseInt( config.BIT_ERROR_STATUS_CODE, 10 ),
+  };
+  public STANDARD = {
+    BIP44: parseInt( config.BIT_STANDARD_BIP44, 10 ),
+    BIP49: parseInt( config.BIT_STANDARD_BIP49, 10 ),
+    BIP84: parseInt( config.BIT_STANDARD_BIP84, 10 ),
   };
 
   public HEALTH_STATUS = {
@@ -60,6 +69,7 @@ class Config {
     },
 
     TIME_SLOTS: {
+      DIVIDE_BY: parseInt( config.BIT_UNIX_TIME_DIVIDE_BY, 10 ),
       SHARE_SLOT1: parseInt( config.BIT_SHARE_HEALTH_TIME_SLOT1, 10 ),
       SHARE_SLOT2: parseInt( config.BIT_SHARE_HEALTH_TIME_SLOT2, 10 ),
       MNEMONIC_SLOT: parseInt( config.BIT_MNEMONIC_HEALTH_TIME_SLOT, 10 ),
@@ -123,6 +133,8 @@ class Config {
   constructor ( env: string ) {
     this.ENVIRONMENT = env;
     this.setNetwork();
+    console.log( { id: this.HEXA_ID } );
+
     this.BITCOIN_NODE = new Client( {
       network:
         this.NETWORK === bitcoinJS.networks.bitcoin ? "mainnet" : "testnet",

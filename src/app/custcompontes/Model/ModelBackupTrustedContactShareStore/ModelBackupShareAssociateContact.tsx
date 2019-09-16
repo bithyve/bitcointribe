@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet } from 'react-native';
+import { Modal, View, StyleSheet } from 'react-native';
 import { Button, Icon, Text } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import { Avatar } from 'react-native-elements';
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 
 
@@ -44,7 +44,7 @@ export default class ModelBackupShareAssociateContact extends Component<Props, a
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Some information about the importance secret keeping</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Please keep this share safe, the sender might need this share to restore wallet in case of device loss</Text>
                             <Avatar medium rounded title={ walletName.length != 0 ? walletName.charAt( 0 ) : "" } />
                             <Text style={ globalStyle.ffFiraSansMedium }>{ walletName }</Text>
                         </View>
@@ -78,7 +78,7 @@ const styles = StyleSheet.create( {
         justifyContent: 'center'
     },
     viewModelBody: {
-        flex: utils.getIphoneSize() == "iphone X" ? 0.7 : 0.6,
+        flex: utils.getIphoneSize() == "iphone X" ? 0.7 : 0.7,
         margin: 20,
         padding: 10,
         borderRadius: 10,

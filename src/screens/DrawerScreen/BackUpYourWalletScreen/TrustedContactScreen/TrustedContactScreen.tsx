@@ -1,42 +1,29 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, AsyncStorage, Clipboard } from "react-native";
+import { StyleSheet, ImageBackground, View, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, AsyncStorage, Clipboard } from "react-native";
 import {
     Container,
-    Header,
-    Title,
-    Content,
-    Item,
-    Input,
     Button,
-    Left,
-    Right,
-    Body,
-    Text,
-    Icon,
-    List,
-    ListItem,
-    Thumbnail
+    Text
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Contacts from 'react-native-contacts';
 import { Avatar } from 'react-native-elements';
 import SendSMS from 'react-native-sms';
 import Permissions from 'react-native-permissions'
 import Modal from 'react-native-modalbox';
-import Toast from 'react-native-simple-toast';
 
 
 //import Mailer from 'react-native-mail';
 var Mailer = require( 'NativeModules' ).RNMail;
-import Share from "react-native-share";
-import BackgroundFetch from "react-native-background-fetch";
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import FullLinearGradientShareButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientShareButton";
+import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+
+//TODO: Custome  Model
+import ModelBottomSingleButton from "HexaWallet/src/app/custcompontes/ModelBottom/ModelBottomSingleButton/ModelBottomSingleButton";
 import ModelTrustedContactEmailAndPhoneShare from "HexaWallet/src/app/custcompontes/Model/ModelTrustedContactEmailAndPhoneShare/ModelTrustedContactEmailAndPhoneShare";
 
 
@@ -45,31 +32,32 @@ import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, localDB, svgIcon, expaire } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
 
 //TODO: Bitcoin Class
-var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
+var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 export default class TrustedContactScreen extends React.Component<any, any> {
+
     constructor ( props: any ) {
         super( props )
         this.state = ( {
             data: [],
             arr_TrustedContactEmailAndPhoneShare: [],
-            arr_ConstactDetailsList: [],
             arr_History: [],
             arr_resSSSDetails: [],
             arr_EncryptedMetaShare: [],
+            arr_ModelBottomSingleButton: [],
             key: "",
             otpCode: "",
             flag_OtpCodeShowStatus: false,
@@ -81,21 +69,43 @@ export default class TrustedContactScreen extends React.Component<any, any> {
     async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
         console.log( { data } );
-        let temp = [];
-        let arr_Emails = data.emailAddresses;
-        let arr_PhoneNumbers = data.phoneNumbers;
-        for ( let i = 0; i < arr_PhoneNumbers.length; i++ ) {
-            let dataJson = {};
-            dataJson.label = arr_PhoneNumbers[ i ].label;
-            dataJson.value = arr_PhoneNumbers[ i ].number;
-            temp.push( dataJson );
+
+
+
+
+
+        //otp history
+        let arrHistory = data.history;
+        let eachHistoryLength = arrHistory.length;
+        var otp;
+        if ( arrHistory[ eachHistoryLength - 1 ] != undefined ) {
+            otp = arrHistory[ eachHistoryLength - 1 ].otp;
+        } else {
+            otp = undefined;
         }
-        for ( let i = 0; i < arr_Emails.length; i++ ) {
-            let dataJson = {};
-            dataJson.label = arr_Emails[ i ].label;
-            dataJson.value = arr_Emails[ i ].email;
-            temp.push( dataJson );
+        if ( otp != undefined ) {
+            let dateTime = Date.now();
+            let sharedDate = parseInt( data.sssDetails.sharedDate );
+            var startDate = new Date( dateTime );
+            var endDate = new Date( sharedDate );
+            console.warn( 'sart date =' + startDate.toString() + "end date = " + endDate.toString() )
+            var diff = Math.abs( startDate.getTime() - endDate.getTime() );
+            //console.warn( 'diff' + diff.toString() );  
+            const minutes: any = Math.floor( ( diff / 1000 ) / 60 );
+            const seconds: any = Math.floor( diff / 1000 % 60 );
+            //console.log( { minutes, seconds } );
+            //console.warn( minutes.toString() )
+            const totalSec = parseInt( minutes * 60 ) + parseInt( seconds );
+            //console.log( { totalSec } );
+            if ( totalSec < parseInt( expaire.trustedContactScreen.expaire_otptime ) && data.sssDetails.shareStage == "Ugly" || data.sssDetails.shareStage == "Bad" ) {
+                this.setState( {
+                    flag_OtpCodeShowStatus: true,
+                    otpCode: otp
+                } )
+            }
         }
+        //console.log( { otp } );
+
         var resSSSDetails = await dbOpration.readSSSTableData(
             localDB.tableName.tblSSSDetails,
             data.recordID
@@ -104,18 +114,15 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         await utils.setSSSDetailsRecordIDWise( resSSSDetails )
         this.setState( {
             data: data,
-            arr_ConstactDetailsList: temp,
             arr_History: data.history,
             arr_resSSSDetails: resSSSDetails
         } )
     }
 
-
-
     componentDidMount() {
         if ( Platform.OS == "android" ) {
             Permissions.request( 'readSms' ).then( ( response: any ) => {
-                console.log( response );
+                //console.log( response );
             } );
         }
     }
@@ -128,7 +135,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         } );
         let flag_Loading = true;
         let data = this.props.navigation.getParam( "data" );
-        console.log( { data } );
+        //console.log( { data } );
         let encryptedMetaShare = data.decryptedShare;
         const sss = await bitcoinClassState.getS3ServiceClassState();
         var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare( data.decryptedShare );
@@ -137,10 +144,10 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         } else {
             alert.simpleOk( "Oops", resGenerateEncryptedMetaShare.err );
         }
-        const resEncryptViaOTP = sss.encryptViaOTP( resGenerateEncryptedMetaShare.key );
+        const resEncryptViaOTP = S3Service.encryptViaOTP( resGenerateEncryptedMetaShare.key );
         if ( resEncryptViaOTP.status == 200 || 400 ) {
             const resUploadShare = await sss.uploadShare( resGenerateEncryptedMetaShare.encryptedMetaShare, resGenerateEncryptedMetaShare.messageId );
-            console.log( { resUploadShare } );
+            //console.log( { resUploadShare } );
             if ( resUploadShare.status == 200 ) {
                 await bitcoinClassState.setS3ServiceClassState( sss );
                 this.setState( {
@@ -180,7 +187,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         script.key = this.state.key;
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );
-        console.log( { encpScript } );
+        //console.log( { encpScript } );
         if ( type == "SMS" ) {
             SendSMS.send( {
                 body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
@@ -188,64 +195,55 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                 successTypes: [ 'sent', 'queued' ]
             }, ( completed, cancelled, error ) => {
                 if ( completed ) {
-                    console.log( 'SMS Sent Completed' );
+                    //console.log( 'SMS Sent Completed' );
                     setTimeout( () => {
-                        this.connection_UpdateSSSDetails( "SMS" );
-                        alert.simpleOk( "SMS Sent Successfully." );
+                        alert.simpleOkActionWithPara( "Success", "SMS Sent Successfully.", this.connection_UpdateSSSDetails( "SMS" ) );
                         this.setState( {
                             flag_OtpCodeShowStatus: true
-                        } )
+                        } );
                     }, 1000 );
-
                 } else if ( cancelled ) {
-                    console.log( 'SMS Sent Cancelled' );
+                    //console.log( 'SMS Sent Cancelled' );
                 } else if ( error ) {
-                    console.log( 'Some error occured' );
+                    //console.log( 'Some error occured' );
                 }
             } );
-        } else {
-            this.connection_UpdateSSSDetails( "EMAIL" );
             if ( Platform.OS == "android" ) {
-                Mailer.mail( {
-                    subject: 'Hexa Wallet SSS Recovery',
-                    recipients: [ value ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
-                    isHTML: true,
-                }, ( error, event ) => {
-                    if ( event == "sent" ) {
-                        console.log( { event } );
-                    } else {
-                        alert.simpleOk( "Oops", error );
-                    }
-                } );
                 setTimeout( () => {
-                    alert.simpleOk( "Success", "Email Sent Successfully." );
+                    alert.simpleOkActionWithPara( "Success", "SMS Sent Successfully.", this.connection_UpdateSSSDetails( "SMS" ) );
                     this.setState( {
                         flag_OtpCodeShowStatus: true
                     } );
-                }, 1000 );
-            } else {
-                Mailer.mail( {
-                    subject: 'Hexa Wallet SSS Backup',
-                    recipients: [ value ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
-                    isHTML: true,
-                }, ( error, event ) => {
-                    if ( event == "sent" ) {
-                        setTimeout( () => {
-                            Alert.alert( 'Email Sent Completed' );
-                            this.setState( {
-                                flag_OtpCodeShowStatus: true
-                            } )
-                        }, 1000 );
-                    } else {
-                        alert.simpleOk( "Oops", error );
-                    }
-                } );
+                }, 3000 );
+            }
+        } else {
+            Mailer.mail( {
+                subject: 'Hexa Wallet SSS Recovery',
+                recipients: [ value ],
+                body: walletDetails.walletType + " hexa wallet request you to store it's secret share, tap on the link to accept it  <br/> https://prime-sign-230407.appspot.com/sss/bk/" + encpScript,
+                isHTML: true,
+            }, ( error, event ) => {
+                if ( event == "sent" ) {
+                    setTimeout( () => {
+                        alert.simpleOkActionWithPara( "Success", "Email Sent Completed.", this.connection_UpdateSSSDetails( "Email" ) );
+                        this.setState( {
+                            flag_OtpCodeShowStatus: true
+                        } );
+                    }, 1000 );
+                } else {
+                    alert.simpleOk( "Oops", error );
+                }
+            } );
+            if ( Platform.OS == "android" ) {
+                setTimeout( () => {
+                    alert.simpleOkActionWithPara( "Success", "Email Sent Completed.", this.connection_UpdateSSSDetails( "Email" ) );
+                    this.setState( {
+                        flag_OtpCodeShowStatus: true
+                    } );
+                }, 3000 );
             }
         }
     }
-
 
 
     //TODO: func backQrCodeScreen
@@ -286,7 +284,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
     goBack() {
         const { navigation } = this.props;
         navigation.pop();
-        // navigation.state.params.onSelect( { selected: true } );
+        navigation.state.params.onSelect( { selected: true } );
     }
 
 
@@ -305,23 +303,24 @@ export default class TrustedContactScreen extends React.Component<any, any> {
         this.refs.modal4.close();
     }
 
+    //TODO: Close all model
+    //TODO: Close all model
+    click_CloseModel() {
+        this.setState( {
+            arr_ModelBottomSingleButton: [ {
+                modalVisible: false
+            } ]
+        } );
+    }
+
     render() {
         //array   
-        let { data } = this.state;
+        let { data, arr_ModelBottomSingleButton } = this.state;
         return (
             <Container>
-                <SafeAreaView style={ styles.container }>
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.goBack() }
-                            >
-                                <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Trusted Contact</Text>
-                            </Button>
-                        </View>
+                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <HeaderTitle title="Trusted Contact" pop={ () => this.goBack() } />
+                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
                         <View style={ { flex: 0.1, margin: 20 } }>
                             <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Health and history of the share will be shared with </Text>
                         </View>
@@ -356,7 +355,13 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                     <View style={ { flex: 1, backgroundColor: "#ffffff", marginLeft: 10, marginRight: 10, marginBottom: 10, borderRadius: 10 } }>
                                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
                                             <View style={ { flex: 0.1 } }>
-                                                <SvgIcon name="image_hexa" size={ 30 } color={ primaryColor } style={ { alignSelf: "center" } } />
+                                                {/* <ImageSVG
+                                                    style={ { width: 60, height: 60 } }
+                                                    source={
+                                                        svgIcon.common.histroy_Hexa
+                                                    }
+                                                /> */}
+                                                <SvgIcon name="image_hexa" size={ 20 } color={ primaryColor } style={ { alignSelf: "center" } } />
                                             </View>
                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
                                                 <View style={ { flexDirection: "row", flex: 1, } }>
@@ -372,15 +377,15 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                             />
                         </View>
                         { renderIf( this.state.flag_OtpCodeShowStatus == true )(
-                            <View style={ [ Platform.OS == "ios" ? { flex: 0.6 } : { flex: 0.8 }, { marginLeft: 5, marginRight: 5 } ] }>
-                                <Text note style={ { textAlign: "center" } }>OTP and share expires in 10 minutes</Text>
+                            <View style={ [ Platform.OS == "ios" ? { flex: 1 } : { flex: 1 }, { marginLeft: 5, marginRight: 5 } ] }>
+                                <Text note style={ { textAlign: "center" } }>OTP and share expires in { parseInt( expaire.trustedContactScreen.expaire_otptime ) / 60 } minutes</Text>
                                 <View style={ { flex: 0.8, backgroundColor: "#ffffff", borderRadius: 5, flexDirection: "row", alignItems: "center", justifyContent: "center", margin: 10 } }>
                                     <Text note style={ [ globalStyle.ffFiraSansMedium, { flex: 2, marginLeft: 10 } ] }>OTP</Text>
                                     <Text style={ [ globalStyle.ffOpenSansBold, { flex: 8, letterSpacing: 30, alignSelf: "center", textAlign: "center" } ] }>{ this.state.otpCode }</Text>
                                     <View style={ { flex: 1, alignItems: "center" } }>
                                         <TouchableOpacity onPress={ () => {
                                             Clipboard.setString( this.state.otpCode );
-                                            Toast.show( 'OTP copied.' );
+                                            //  Toast.show( 'OTP copied.' );
                                         } }
                                         >
                                             <IconFontAwe
@@ -391,50 +396,61 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                             />
                                         </TouchableOpacity>
                                     </View>
-
                                 </View>
-                                {/* <FullLinearGradientButton
-                                    click_Done={ () => {
-                                        let shareOptions = {
-                                            title: "OTP",
-                                            message: "sss opt:" + this.state.otpCode,
-                                            url: "\nhttps://bithyve.com/",
-                                            subject: "sss opt " //  for email
-                                        };
-                                        Share.open( shareOptions )
-                                            .then( res => {
-                                                console.log( res );
-                                            } )
+                                <FullLinearGradientShareButton
+                                    click_Done={ ( title: string ) => {
+                                        this.click_CloseModel();
+                                        this.load_data();
                                     } }
-                                    title="Share OTP with Trusted Contact"
+                                    click_Option={ ( title: string ) => {
+                                        this.setState( {
+                                            arr_ModelBottomSingleButton: [ {
+                                                modalVisible: true,
+                                                title: "OPTION",
+                                                subTitle: "Select option",
+                                                svgIcon: "recreate",
+                                                btnTitle: "SETTINGS"
+                                            } ]
+                                        } )
+                                    } }
+                                    title="Reshare"
                                     disabled={ false }
-                                    style={ [ { borderRadius: 10 } ] } /> */}
+                                    style={ [ { borderRadius: 10, margin: 10 } ] } />
+
                             </View>
                         ) }
                         { renderIf( this.state.flag_OtpCodeShowStatus != true )(
                             <View style={ Platform.OS == "ios" ? { flex: 0.6 } : { flex: 0.8 } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select method by which you want to share secret</Text>
-                                {/* <Button
-                                    onPress={ () => {
-                                        this.props.navigation.push( "ShareSecretViaQRScreen", { data: data, onSelect: this.onSelect } );
-                                    } }
-                                    style={ [ globalStyle.ffFiraSansSemiBold, {
-                                        backgroundColor: "#838383", borderRadius: 10, margin: 5,
-                                        height: 50,
-                                    } ] }
-                                    full
-                                >
-                                    <Text>Share secret via QR code</Text>
-                                </Button> */}
-                                <FullLinearGradientButton
-                                    click_Done={ () => {
+                                <FullLinearGradientShareButton
+                                    click_Done={ ( title: string ) => {
+                                        this.click_CloseModel();
                                         this.load_data();
+                                    } }
+                                    click_Option={ ( title: string ) => {
+                                        this.setState( {
+                                            arr_ModelBottomSingleButton: [ {
+                                                modalVisible: true,
+                                                title: "OPTION",
+                                                subTitle: "Select option",
+                                                svgIcon: "recreate",
+                                                btnTitle: "SETTINGS"
+                                            } ]
+                                        } )
                                     } }
                                     title="Share Secret"
                                     disabled={ false }
-                                    style={ [ { borderRadius: 10 } ] } />
+                                    style={ [ { borderRadius: 10, margin: 10 } ] } />
                             </View>
                         ) }
+                        <ModelBottomSingleButton
+                            data={ arr_ModelBottomSingleButton }
+                            click_Done={ () => {
+                                this.click_CloseModel();
+                                Alert.alert( "Working" )
+                            }
+                            }
+                        />
                         <ModelTrustedContactEmailAndPhoneShare
                             data={ this.state.arr_TrustedContactEmailAndPhoneShare }
                             click_Confirm={ ( val: any ) => {
@@ -517,12 +533,12 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                                         </Button>
                                     </View>
                                 </View>
-
                             </View>
                         </Modal>
-                    </ImageBackground>
-                </SafeAreaView>
+                    </SafeAreaView>
+                </ImageBackground>
                 <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
+                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }
@@ -534,8 +550,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
 const primaryColor = colors.appColor;
 const styles = StyleSheet.create( {
     container: {
-        flex: 1,
-        backgroundColor: "#F8F8F8",
+        flex: 1
     },
     //botom model
     modal: {

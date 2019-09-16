@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Image } from 'react-native';
-import { Button, Icon, Text, Textarea, Form } from "native-base";
+import { Modal, View, StyleSheet, Image } from 'react-native';
+import { Text } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import { SvgIcon } from "@up-shared/components";
+
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import {
@@ -31,7 +31,7 @@ export default class ModelQuestionsSuccessfullyBackedUp extends Component<Props,
 
     //TODO: Wallet Name
     ckeckWalletName( val: string ) {
-        if ( val.length >= 6 ) {
+        if ( val.length >= 3 ) {
             this.setState( {
                 flag_DisableBtnNext: false
             } )
@@ -62,13 +62,13 @@ export default class ModelQuestionsSuccessfullyBackedUp extends Component<Props,
                             <Text style={ [ globalStyle.ffFiraSansMedium, {
                                 fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
                                 marginLeft: 20, marginRight: 20
-                            } ] }>Questions Successfully Backed Up</Text>
+                            } ] }>Question Successfully Backed Up</Text>
                         </View>
                         <View style={ { flex: 2, alignItems: "center", justifyContent: "center" } }>
                             <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingMnemonic.walletrestored } />
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-end" } }>
-                            <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Hexa will remind you to help remember the answers</Text>
+                            <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Hexa will remind you to help remember the answer</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <FullLinearGradientButton

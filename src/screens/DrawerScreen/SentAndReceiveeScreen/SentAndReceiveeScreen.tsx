@@ -33,8 +33,8 @@ var db = SQLite.openDatabase(
 import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
 
 export default class SentAndReceiveeScreen extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor ( props ) {
+    super( props );
     this.state = {
       addressKey: "",
       privateKey: "",
@@ -43,51 +43,51 @@ export default class SentAndReceiveeScreen extends React.Component {
     };
     this.getLocalDBAddress();
     // loaderHandler.showLoader("Loading");
-    setTimeout(() => {
+    setTimeout( () => {
       this.getAddressBal();
-    }, 100);
+    }, 100 );
   }
 
   getLocalDBAddress() {
-    db.transaction(tx => {
+    db.transaction( tx => {
       tx.executeSql(
         "SELECT * FROM " + localDB.tableName.tblWallet,
         [],
-        (tx, results) => {
+        ( tx, results ) => {
           // Get rows with Web SQL Database spec compliance.
           var len = results.rows.length;
           var addressValue;
           var privateKeyValue;
-          if (len > 0) {
-            for (let i = 0; i < len; i++) {
-              let row = results.rows.item(i);
+          if ( len > 0 ) {
+            for ( let i = 0; i < len; i++ ) {
+              let row = results.rows.item( i );
               this.addressValues = row.address;
               addressValue = row.address;
               privateKeyValue = row.privateKey;
             }
 
-            console.log(addressValue);
+            console.log( addressValue );
 
-            this.setState({
+            this.setState( {
               addressKey: addressValue,
               privateKey: privateKeyValue
-            });
+            } );
           } else {
-            Alert.alert(errorMessage.addressNotFound);
+            Alert.alert( errorMessage.addressNotFound );
           }
         }
       );
-    });
+    } );
   }
 
   async getAddressBal() {
-    if (this.state.addressKey != "") {
-      const bal = await RegularAccount.getBalance(this.state.addressKey);
-      console.log("fin bal" + bal.balanceData.final_balance);
-      this.setState({
-        finalBal: "Final Balance: " + bal.balanceData.final_balance / 1e8,
-        totalRec: "Total Recieved: " + bal.balanceData.total_received / 1e8
-      });
+    if ( this.state.addressKey != "" ) {
+      const bal = await RegularAccount.getBalance( this.state.addressKey );
+      console.log( "fin bal" + bal.balanceData.final_balance );
+      this.setState( {
+        finalBal: "Final Balance: " + bal.balanceData.final_balance,
+        totalRec: "Total Recieved: " + bal.balanceData.total_received
+      } );
       //loaderHandler.hideLoader();
     }
   }
@@ -95,64 +95,64 @@ export default class SentAndReceiveeScreen extends React.Component {
   render() {
     return (
       <Container>
-        <ImageBackground source={images.appBackgound} style={styles.container}>
-          <Header transparent style={{ backgroundColor: colors.appColor }}>
+        <ImageBackground source={ images.appBackgound } style={ styles.container }>
+          <Header transparent style={ { backgroundColor: colors.appColor } }>
             <Left>
               <Button
                 transparent
-                onPress={() => this.props.navigation.goBack()}
+                onPress={ () => this.props.navigation.goBack() }
               >
-                <Icon name="chevron-left" size={25} color="#ffffff" />
+                <Icon name="chevron-left" size={ 25 } color="#ffffff" />
               </Button>
             </Left>
-            <Body style={{ flex: 0, alignItems: "center" }}>
+            <Body style={ { flex: 0, alignItems: "center" } }>
               <Title>Hexa Wallet</Title>
             </Body>
           </Header>
           <Content padder>
-            <Card style={styles.cardSentandRec}>
+            <Card style={ styles.cardSentandRec }>
               <CardItem>
-                <View style={styles.viewAppIcon}>
+                <View style={ styles.viewAppIcon }>
                   <Image
-                    style={styles.imgappIcon}
+                    style={ styles.imgappIcon }
                     resizeMode="contain"
-                    source={images.appIcon}
+                    source={ images.appIcon }
                   />
-                  <View style={styles.viewInline}>
-                    <Text style={styles.txtBal}> {this.state.finalBal}</Text>
-                    <Text style={styles.txtExcRate}>
-                      {" "}
-                      {this.state.totalRec}
+                  <View style={ styles.viewInline }>
+                    <Text style={ styles.txtBal }> { this.state.finalBal }</Text>
+                    <Text style={ styles.txtExcRate }>
+                      { " " }
+                      { this.state.totalRec }
                     </Text>
                   </View>
                 </View>
               </CardItem>
               <CardItem footer>
-                <View style={styles.viewButtonSaveRec} />
+                <View style={ styles.viewButtonSaveRec } />
 
                 <Button
-                  style={styles.btnSentAndRec}
-                  onPress={() =>
-                    this.props.navigation.push("SentMoneyScreen", {
+                  style={ styles.btnSentAndRec }
+                  onPress={ () =>
+                    this.props.navigation.push( "SentMoneyScreen", {
                       address: this.state.addressKey,
                       privateKey: this.state.privateKey
-                    })
+                    } )
                   }
                 >
-                  <Text style={styles.txtButtonTitle}> SEND </Text>
+                  <Text style={ styles.txtButtonTitle }> SEND </Text>
                 </Button>
                 <Button
-                  style={styles.btnSentAndRec}
-                  onPress={() => {
+                  style={ styles.btnSentAndRec }
+                  onPress={ () => {
                     let jsonData = {};
                     jsonData.address = this.state.addressKey;
-                    this.props.navigation.push("ReceiveMoneyScreen", {
+                    this.props.navigation.push( "ReceiveMoneyScreen", {
                       page: "SentAndReceiveScreen",
                       data: jsonData
-                    });
-                  }}
+                    } );
+                  } }
                 >
-                  <Text style={styles.txtButtonTitle}> RECEIVE </Text>
+                  <Text style={ styles.txtButtonTitle }> RECEIVE </Text>
                 </Button>
               </CardItem>
             </Card>
@@ -163,7 +163,7 @@ export default class SentAndReceiveeScreen extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1,
     backgroundColor: "#fff"
@@ -206,4 +206,4 @@ const styles = StyleSheet.create({
     backgroundColor: colors.appColor
   },
   txtButtonTitle: {}
-});
+} );

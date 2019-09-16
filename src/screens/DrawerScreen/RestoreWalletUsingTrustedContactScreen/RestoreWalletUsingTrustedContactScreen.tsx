@@ -2,25 +2,9 @@ import React, { Component } from "react";
 import {
     StyleSheet,
     View,
-    AsyncStorage,
-    Platform,
-    Dimensions,
-    Image,
-    Keyboard,
-    StatusBar,
-    Linking,
-    Alert,
     ImageBackground,
-    SafeAreaView,
-    FlatList,
-    TouchableOpacity,
+    SafeAreaView
 } from "react-native";
-import { RkCard } from "react-native-ui-kitten";
-import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text, Button } from 'native-base';
-import { StackActions, NavigationActions } from "react-navigation";
-import IconFontAwe from "react-native-vector-icons/FontAwesome";
-import Permissions from 'react-native-permissions'
-import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //TODO: Custome Compontes
@@ -28,23 +12,16 @@ import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/
 import ModelWalletName from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelWalletName";
 import ModelContactPermission from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelContactPermission";
 
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import {
     colors,
-    images,
-    localDB,
-    asyncStorageKeys
+    images
 } from "HexaWallet/src/app/constants/Constants";
-import utils from "HexaWallet/src/app/constants/Utils";
-import Singleton from "HexaWallet/src/app/constants/Singleton";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+
 
 //localization
-import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
+import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
 export default class RestoreWalletUsingTrustedContactScreen extends Component {
     constructor ( props: any ) {
@@ -69,9 +46,8 @@ export default class RestoreWalletUsingTrustedContactScreen extends Component {
     render() {
         return (
             <View style={ styles.container }>
-                <SafeAreaView style={ styles.container }>
-                    <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
                         <KeyboardAwareScrollView
                             enableAutomaticScroll
                             automaticallyAdjustContentInsets={ true }
@@ -132,12 +108,12 @@ export default class RestoreWalletUsingTrustedContactScreen extends Component {
                                 } }
                             />
                         </KeyboardAwareScrollView>
-                    </ImageBackground>
-                </SafeAreaView>
+                    </SafeAreaView>
+                </ImageBackground>
+                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </View >
         );
     }
-
 }
 
 let styles = StyleSheet.create( {

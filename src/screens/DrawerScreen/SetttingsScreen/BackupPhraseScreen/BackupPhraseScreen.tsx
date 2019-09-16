@@ -26,15 +26,15 @@ import Share from "react-native-share";
 
 //TODO: Custome Pages
 import { images, localDB } from "bithyve/src/app/constants/Constants";
-var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
+var dbOpration = require( "bithyve/src/app/manage/database/DBOpration" );
 
 //localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+import { localization } from "bithyve/src/app/manage/Localization/i18n";
 
 export default class BackupPhraseScreen extends React.Component {
-  constructor(props) {
-    super(props);
-    StatusBar.setHidden(false);
+  constructor ( props ) {
+    super( props );
+    StatusBar.setHidden( false );
     this.state = {
       mnemonicValues: [],
       visible: false
@@ -47,9 +47,9 @@ export default class BackupPhraseScreen extends React.Component {
 
   componentWillUnmount() {
     try {
-      AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(true));
-    } catch (e) {
-      console.log(e);
+      AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( true ) );
+    } catch ( e ) {
+      console.log( e );
     }
   }
 
@@ -58,32 +58,32 @@ export default class BackupPhraseScreen extends React.Component {
       localDB.tableName.tblWallet
     );
     let data = resultWallet.temp;
-    let mnemonicValue = data[0].mnemonic;
-    this.setState({
-      mnemonicValues: mnemonicValue.split(",")
-    });
-    console.log(this.state.mnemonicValues);
-    if (this.state.mnemonicValues.length > 0) {
-      this.setState({
+    let mnemonicValue = data[ 0 ].mnemonic;
+    this.setState( {
+      mnemonicValues: mnemonicValue.split( "," )
+    } );
+    console.log( this.state.mnemonicValues );
+    if ( this.state.mnemonicValues.length > 0 ) {
+      this.setState( {
         spinner: false
-      });
+      } );
     }
   }
 
   onCancel() {
-    this.setState({ visible: false });
+    this.setState( { visible: false } );
   }
   onOpen() {
-    this.setState({ visible: true });
+    this.setState( { visible: true } );
   }
 
   render() {
-    const textSecurityKey = this.state.mnemonicValues.map((type, index) => (
-      <Text key={index} style={styles.secrityChar}>
-        {" "}
-        {type}{" "}
+    const textSecurityKey = this.state.mnemonicValues.map( ( type, index ) => (
+      <Text key={ index } style={ styles.secrityChar }>
+        { " " }
+        { type }{ " " }
       </Text>
-    ));
+    ) );
     var numanicKey = this.state.mnemonicValues.toString();
     let shareOptions = {
       title: "Numeric key",
@@ -94,100 +94,100 @@ export default class BackupPhraseScreen extends React.Component {
 
     return (
       <Container>
-        <ImageBackground source={images.appBackgound} style={styles.container}>
+        <ImageBackground source={ images.appBackgound } style={ styles.container }>
           <Header transparent>
             <Left>
               <Button
                 transparent
-                onPress={() => this.props.navigation.goBack()}
+                onPress={ () => this.props.navigation.goBack() }
               >
-                <Icon name="chevron-left" size={25} color="#ffffff" />
+                <Icon name="chevron-left" size={ 25 } color="#ffffff" />
               </Button>
             </Left>
 
-            <Body style={{ flex: 0, alignItems: "center" }}>
+            <Body style={ { flex: 0, alignItems: "center" } }>
               <Title
-                adjustsFontSizeToFit={true}
-                numberOfLines={1}
-                style={styles.titleUserName}
+                adjustsFontSizeToFit={ true }
+                numberOfLines={ 1 }
+                style={ styles.titleUserName }
               >
-                {localization("BackupPhraseScreen.headerTitle")}
+                { localization( "BackupPhraseScreen.headerTitle" ) }
               </Title>
             </Body>
             <Right />
           </Header>
-          <Content contentContainerStyle={styles.container}>
-            <View style={styles.viewImageAndTitle}>
+          <Content contentContainerStyle={ styles.container }>
+            <View style={ styles.viewImageAndTitle }>
               <Image
-                style={styles.backupImg}
+                style={ styles.backupImg }
                 resizeMode="contain"
-                source={images.backupPhraseScreen.backupPhraseLogo}
+                source={ images.backupPhraseScreen.backupPhraseLogo }
               />
-              <Text style={styles.desc}>
-                {localization("BackupPhraseScreen.bodyMsg1")}
+              <Text style={ styles.desc }>
+                { localization( "BackupPhraseScreen.bodyMsg1" ) }
               </Text>
-              <Text style={styles.desc}>
-                {localization("BackupPhraseScreen.bodyMsg2")}
+              <Text style={ styles.desc }>
+                { localization( "BackupPhraseScreen.bodyMsg2" ) }
               </Text>
             </View>
-            <View style={styles.viewNumanicValue}>{textSecurityKey}</View>
+            <View style={ styles.viewNumanicValue }>{ textSecurityKey }</View>
             <View>
               <Button
                 transparent
-                style={styles.btnCopy}
-                onPress={() => {
+                style={ styles.btnCopy }
+                onPress={ () => {
                   try {
                     AsyncStorage.setItem(
                       "flag_BackgoundApp",
-                      JSON.stringify(false)
+                      JSON.stringify( false )
                     );
 
-                    Share.open(shareOptions)
-                      .then(res => {
-                        if (Platform.OS == "ios") {
+                    Share.open( shareOptions )
+                      .then( res => {
+                        if ( Platform.OS == "ios" ) {
                           AsyncStorage.setItem(
                             "flag_BackgoundApp",
-                            JSON.stringify(true)
+                            JSON.stringify( true )
                           );
                         }
-                      })
-                      .catch(err => {
-                        err && console.log(err);
-                      });
-                  } catch (e) {
-                    console.log(e);
+                      } )
+                      .catch( err => {
+                        err && console.log( err );
+                      } );
+                  } catch ( e ) {
+                    console.log( e );
                   }
-                }}
+                } }
               >
                 <Text
-                  style={{
+                  style={ {
                     fontWeight: "bold",
                     fontSize: 16,
                     color: "#F5951D"
-                  }}
+                  } }
                 >
-                  {localization("BackupPhraseScreen.btnCopy")}
+                  { localization( "BackupPhraseScreen.btnCopy" ) }
                 </Text>
               </Button>
             </View>
           </Content>
-          <Footer style={styles.footer}>
+          <Footer style={ styles.footer }>
             <Button
-              style={styles.btnNext}
-              onPress={() =>
-                this.props.navigation.push("VerifyBackupPhraseScreen", {
+              style={ styles.btnNext }
+              onPress={ () =>
+                this.props.navigation.push( "VerifyBackupPhraseScreen", {
                   numanicValues: this.state.mnemonicValues
-                })
+                } )
               }
             >
               <Text
-                style={{
+                style={ {
                   fontWeight: "bold",
                   fontSize: 16,
                   textAlign: "center"
-                }}
+                } }
               >
-                {localization("BackupPhraseScreen.btnNext")}
+                { localization( "BackupPhraseScreen.btnNext" ) }
               </Text>
             </Button>
           </Footer>
@@ -197,7 +197,7 @@ export default class BackupPhraseScreen extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1,
     backgroundColor: "#ffffff"
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   //next button style
   btnNext: {
     backgroundColor: "#F5951D",
-    width: Dimensions.get("screen").width - 50,
+    width: Dimensions.get( "screen" ).width - 50,
     height: 40,
     borderColor: "transparent",
     borderWidth: 0,
@@ -251,4 +251,4 @@ const styles = StyleSheet.create({
   footer: {
     backgroundColor: "transparent"
   }
-});
+} );

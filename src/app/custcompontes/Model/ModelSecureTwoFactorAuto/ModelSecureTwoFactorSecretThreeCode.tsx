@@ -1,27 +1,14 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Dimensions, Platform, Image } from 'react-native';
+import { Modal, View, StyleSheet, Platform, Image } from 'react-native';
 import {
-    Container,
-    Header,
-    Title,
-    Content,
-    Item,
-    Input,
     Button,
-    Left,
-    Right,
-    Body,
-    Text,
-    Picker,
-    Icon
+    Text
 } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import CodeInput from "react-native-confirmation-code-input";
 import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-//TODO: Custome Model
-import ModelPasscode from '../ModelCommom/ModelPasscode';
 
 
 interface Props {
@@ -33,7 +20,7 @@ interface Props {
 }
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import {
@@ -41,9 +28,6 @@ import {
     colors
 } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-import utils from "HexaWallet/src/app/constants/Utils";
-
-let wrongEnterAnswerCount = 0;
 
 export default class ModelSecureTwoFactorSecretThreeCode extends Component<Props, any> {
     constructor ( props: any ) {
@@ -73,7 +57,7 @@ export default class ModelSecureTwoFactorSecretThreeCode extends Component<Props
             let secret = data.secret;
             let secretCount = secret.length;
             let secretCode, message;
-            console.log( { secret, secretCount } );
+            //console.log( { secret, secretCount } );
             if ( date % 2 == 0 ) {
                 secretCode = secret.substring( 0, 3 );
                 message = "First three letter your secure account secret for the PDF";
@@ -81,7 +65,7 @@ export default class ModelSecureTwoFactorSecretThreeCode extends Component<Props
                 secretCode = secret.slice( -3 );
                 message = "Last three letter your secure account secret for the PDF";
             }
-            console.log( { secretCode } );
+            //console.log( { secretCode } );
             this.setState( {
                 secret: secret,
                 otp: secretCode,
@@ -148,6 +132,7 @@ export default class ModelSecureTwoFactorSecretThreeCode extends Component<Props
                             <View style={ { flexDirection: "row", flex: 0.5 } }>
                                 <Button
                                     transparent
+                                    hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                     onPress={ () => this.props.pop() }
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />

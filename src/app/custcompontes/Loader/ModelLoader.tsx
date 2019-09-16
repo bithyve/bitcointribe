@@ -1,9 +1,11 @@
 import React from 'react';
-import { StyleSheet, View, Modal, Text } from 'react-native';
-import {
-    MaterialIndicator
-} from 'react-native-indicators';
+import { StyleSheet, View, Modal, Image } from 'react-native';
 import PropTypes from 'prop-types';
+
+//TODO: Custome object
+import {
+    images
+} from "HexaWallet/src/app/constants/Constants";
 
 const Loader = ( { loading = false, color = "#000000", size = 30, opacity = 0.4, message = "Loading" } ) => {
     return (
@@ -16,12 +18,11 @@ const Loader = ( { loading = false, color = "#000000", size = 30, opacity = 0.4,
             <View
                 style={ [
                     styles.modalBackground,
-                    { backgroundColor: `rgba(0,0,0,${ opacity })` }
+
                 ] }
             >
                 <View style={ styles.activityIndicatorWrapper }>
-                    <MaterialIndicator size={ size } color={ color } />
-                    <Text style={ { paddingBottom: 10 } }>{ message }</Text>
+                    <Image source={ images.gif.loader } style={ { height: 100, width: 100 } } />
                 </View>
             </View>
         </Modal>
@@ -49,7 +50,6 @@ const styles = StyleSheet.create( {
     activityIndicatorWrapper: {
         height: 100,
         width: 100,
-        backgroundColor: "#ffffff",
         borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center'

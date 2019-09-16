@@ -1,38 +1,33 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Dimensions, Clipboard, Alert } from "react-native";
+import { StyleSheet, ImageBackground, View, Platform, SafeAreaView, TouchableOpacity, Dimensions, Clipboard, Alert } from "react-native";
 import {
     Container,
     Header,
     Title,
-    Content,
-    Item,
     Input,
     Button,
     Left,
     Right,
     Body,
     Text,
-    List, ListItem,
     Picker,
     Icon,
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
-import { RkCard } from "react-native-ui-kitten";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import QRCode from 'react-native-qrcode-svg';
 //import QRCode from 'react-native-qrcode';
-import Toast from 'react-native-simple-toast';
 import Share from 'react-native-share';
-import RNFetchBlob from 'react-native-fetch-blob';
-var RNFS = require( 'react-native-fs' );
+
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import WalletSetUpScrolling from "HexaWallet/src/app/custcompontes/OnBoarding/WalletSetUpScrolling/WalletSetUpScrolling";
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import FullLinearGradientIconWithLoadingButton from 'HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientIconWithLoadingButton';
+import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+
+
 
 
 
@@ -42,22 +37,20 @@ import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+import { colors, images } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+
 
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
 
 //TODO: Bitcoin class
-var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
-import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
+
 
 
 export default class ReceivePaymentScreen extends React.Component<any, any> {
@@ -70,54 +63,71 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
             amount: "",
             base64string1: "",
             qrcodeAddresWithAmount: "hexa",
-            flag_Loading: false,
+            flag_Loading: true,
             flag_LoadingShareBtn: false
         } )
     }
 
     async componentWillMount() {
+        let selectedAccount = this.props.navigation.getParam( "selectedAccount" );
         let walletDetails = await utils.getWalletDetails();
-        console.log( { walletDetails } );
+        //console.log( { walletDetails } );
         let arr_AccountList = await comFunDBRead.readTblAccount();
-        console.log( { arr_AccountList } );
-
-        for ( var i = 0; i < arr_AccountList.length; i++ )
-            if ( arr_AccountList[ i ].address === "" ) {
-                arr_AccountList.splice( i, 1 );
-            }
-        var paymentQRCode = await this.getQrCode( arr_AccountList[ 0 ].address );
-        console.log( { arr_AccountList } );
+        //console.log( { arr_AccountList } );
+        let regularAccount = await bitcoinClassState.getRegularClassState();
+        var address = await regularAccount.getAddress();
+        if ( address.status == 200 ) {
+            address = address.data;
+        } else {
+            alert.simpleOk( "Oops", address.err );
+        }
+        // var paymentQRCode = await this.getQrCode( address.address );
+        //console.log( { arr_AccountList } );
         this.setState( {
+            flag_Loading: false,
             arr_AccountList,
             accountName: arr_AccountList[ 0 ].accountName,
-            accountAddress: arr_AccountList[ 0 ].address,
-            qrcodeAddresWithAmount: paymentQRCode.paymentURI.toString(),
+            accountAddress: address.address,
+            qrcodeAddresWithAmount: address.address.toString()
         } )
     }
 
     //Dropdown select account name
     onValueChange = async ( value: string ) => {
-        let arr_AccountList = this.state.arr_AccountList;
-        console.log( { value } );
-        let index: number = 0;
-        for ( var i = 0; i < arr_AccountList.length; i++ )
-            if ( arr_AccountList[ i ].accountName === value ) {
-                index = i;
-                break;
-            }
-        var paymentQRCode = await this.getQrCode( arr_AccountList[ index ].address );
         this.setState( {
+            flag_Loading: true
+        } )
+        let regularAccount = await bitcoinClassState.getRegularClassState();
+        let secureAccount = await bitcoinClassState.getSecureClassState();
+        var address;
+        if ( value == "Daily Wallet" ) {
+            address = await regularAccount.getAddress();
+            if ( address.status == 200 ) {
+                address = address.data;
+            } else {
+                alert.simpleOk( "Oops", address.err );
+            }
+        } else {
+            address = await secureAccount.getAddress();
+            if ( address.status == 200 ) {
+                address = address.data;
+            } else {
+                alert.simpleOk( "Oops", address.err );
+            }
+        }
+        this.setState( {
+            flag_Loading: false,
             accountName: value,
             amount: "",
-            accountAddress: arr_AccountList[ index ].address,
-            qrcodeAddresWithAmount: paymentQRCode.paymentURI.toString(),
+            accountAddress: address.address,
+            qrcodeAddresWithAmount: address.address.toString(),
         } );
     }
 
     //get only address qrcode string
     getQrCode = async ( address: any, option?: any ) => {
-        let regularAccount = await await bitcoinClassState.getRegularClassState();
-        console.log( regularAccount );
+        let regularAccount = await bitcoinClassState.getRegularClassState();
+        //console.log( regularAccount );
         let resPaymentURI = await regularAccount.getPaymentURI( address, option );
         if ( resPaymentURI.status == 200 ) {
             await bitcoinClassState.setRegularClassState( regularAccount );
@@ -132,7 +142,7 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
     getQrCodeWithAmount = async () => {
         let address = this.state.accountAddress;
         let amount = this.state.amount;
-        console.log( { amount, address } );
+        //console.log( { amount, address } );
         let options = {
             amount
         }
@@ -142,7 +152,7 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
         } else {
             getQRCodeString = await this.getQrCode( address );
         }
-        console.log( { getQRCodeString } );
+        // console.log( { getQRCodeString } );
         this.setState( {
             qrcodeAddresWithAmount: getQRCodeString.paymentURI.toString(),
         } )
@@ -154,41 +164,51 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
         } );
     }
     //share qrcode image
-    click_ShareQRCode = async () => {
-        this.setState( {
-            flag_LoadingShareBtn: true
-        } )
-        this.svg1.toDataURL( this.base64string1 );
-        setTimeout( async () => {
-            let qrcodeBase64 = this.state.base64string1;
-            console.log( { qrcodeBase64 } );
-            let accountName = this.state.accountName;
-            var docsDir;
-            if ( Platform.OS == "android" ) {
-                docsDir = await RNFS.ExternalStorageDirectoryPath //;
-            } else {
-                docsDir = await RNFS.DocumentDirectoryPath;
-            }
-            console.log( { docsDir } );
-            docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
-            var path = `${ docsDir }/paymentRequestQRCode.png`;
-            RNFS.writeFile( path, qrcodeBase64, "base64" )
-                .then( ( success: any ) => {
-                    this.setState( {
-                        flag_LoadingShareBtn: false
-                    } )
-                    const shareOptions = {
-                        title: 'Hexa App',
-                        message: "This is " + accountName + " qrcode",
-                        url: path
-                    };
-                    Share.open( shareOptions );
-                } )
-                .catch( ( err: any ) => {
-                    alert.simpleOk( "Oops", err );
-                } )
-        }, 2000 );
+    click_ShareAddress = async () => {
+        let { qrcodeAddresWithAmount } = this.state;
+        // this.setState( {
+        //     flag_LoadingShareBtn: true
+        // } )
+        // this.svg1.toDataURL( this.base64string1 );
+        // setTimeout( async () => {
+        //     let qrcodeBase64 = this.state.base64string1;
+        //     console.log( { qrcodeBase64 } );
+        //     let accountName = this.state.accountName;
+        //     var docsDir;
+        //     if ( Platform.OS == "android" ) {
+        //         docsDir = await RNFS.ExternalStorageDirectoryPath //;
+        //     } else {
+        //         docsDir = await RNFS.DocumentDirectoryPath;
+        //     }
+        //     console.log( { docsDir } );
+        //     docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
+        //     var path = `${ docsDir }/paymentRequestQRCode.png`;
+        //     RNFS.writeFile( path, qrcodeBase64, "base64" )
+        //         .then( ( success: any ) => {
+        //             this.setState( {
+        //                 flag_LoadingShareBtn: false
+        //             } )
+        //             const shareOptions = {
+        //                 title: 'Hexa App',
+        //                 message: "This is " + accountName + " qrcode",
+        //                 url: path
+        //             };
+        //             Share.open( shareOptions );
+        //         } )
+        //         .catch( ( err: any ) => {
+        //             alert.simpleOk( "Oops", err );
+        //         } )
+        // }, 2000 );
 
+
+        const shareOptions = {
+            title: 'Payment Address',
+            message: qrcodeAddresWithAmount,
+            url: 'https://hexawallet.io',
+        };
+        Share.open( shareOptions )
+            .then( ( res: any ) => { Alert.alert( 'address send' ); } )
+            .catch( ( err: any ) => { err && console.log( err ); } );
     }
 
     render() {
@@ -203,18 +223,11 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
         ) );
         return (
             <Container>
-                <SafeAreaView style={ styles.container }>
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.props.navigation.pop() }
-                            >
-                                <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Receive</Text>
-                            </Button>
-                        </View>
+                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <HeaderTitle title="Receive"
+                        pop={ () => this.props.navigation.pop() }
+                    />
+                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
                         <KeyboardAwareScrollView
                             enableAutomaticScroll
                             automaticallyAdjustContentInsets={ true }
@@ -222,7 +235,7 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
                             enableOnAndroid={ true }
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
-                            <View style={ { flex: 1, alignItems: "center", marginTop: 50, marginBottom: 20 } }>
+                            <View style={ { flex: 1, alignItems: "center", marginBottom: 20 } }>
                                 <View style={ styles.itemQuestionPicker }>
                                     <Picker
                                         renderHeader={ backAction =>
@@ -257,7 +270,7 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
                                         <Input
                                             value={ amount }
                                             keyboardType="numeric"
-                                            placeholder="Amount"
+                                            placeholder="Amount Sats"
                                             placeholderTextColor="#D0D0D0"
                                             returnKeyType="done"
                                             onChangeText={ ( val ) => {
@@ -283,7 +296,7 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
                                     <Text numberOfLines={ 1 } style={ { flex: 0.9, color: "#1378B7", textAlign: "center", marginLeft: 10, } }>{ qrcodeAddresWithAmount + "  " } </Text>
                                     <TouchableOpacity onPress={ () => {
                                         Clipboard.setString( qrcodeAddresWithAmount );
-                                        Toast.show( 'address copied' );
+                                        Alert.alert( 'address copied' );
                                     } }>
                                         <IconFontAwe
                                             name="copy"
@@ -294,10 +307,10 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
                                 </View>
                             </View>
                             <View style={ { flex: 1 } }>
-                                <Text note style={ { textAlign: "center", margin: 5 } }>Share this address to receive founds</Text>
+                                <Text note style={ { textAlign: "center", margin: 5 } }>Share this address to receive funds</Text>
                                 <FullLinearGradientIconWithLoadingButton
-                                    click_Done={ () => this.click_ShareQRCode() }
-                                    title="Share QRCode"
+                                    click_Done={ () => this.click_ShareAddress() }
+                                    title="Share"
                                     iconName="share"
                                     iconColor={ "#ffffff" }
                                     iconSize={ 20 }
@@ -306,10 +319,11 @@ export default class ReceivePaymentScreen extends React.Component<any, any> {
                                     style={ [ { borderRadius: 10, margin: 10 } ] } />
                             </View>
                         </KeyboardAwareScrollView>
-                    </ImageBackground>
-                </SafeAreaView>
+                    </SafeAreaView>
+                </ImageBackground>
                 <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
-            </Container >
+                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+            </Container>
         );
     }
 }
