@@ -26,8 +26,8 @@ The various design considerations that Hexa chose to undertake are over at [the 
 
 #### Installing hexa
 ```
-git clone https://github.com/thecryptobee/Hexa-Wallet.git
-cd Hexa-Wallet
+git clone https://github.com/bithyve/hexa.git
+cd hexa
 sudo yarn install
 chmod +x pkgchanges/setup.sh
 ./pkgchanges/setup.sh
