@@ -35,11 +35,18 @@ chmod +x pkgchanges/setup.sh
 
 Make sure you have a `.env.dev` similar to `.env.example` in your project's root directory before running hexa. If this file is absent, you will be faced with a red screen on the iOS Simulator.
 
-#### Running hexa
+#### Running hexa android
 ```
-npm run ios
+npm run android-dev
 ```
-
+  
+#### Running hexa ios 
+        
+```
+pod install   
+open project xcode then run
+```
+   
 ### Contributing
 Please feel free to open a pull requests and issues with bugfixes and suggestions.
 
