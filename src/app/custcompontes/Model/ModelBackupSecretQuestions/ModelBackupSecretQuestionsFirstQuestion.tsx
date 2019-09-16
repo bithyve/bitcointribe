@@ -1,20 +1,12 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Dimensions, Platform, Image, TextInput } from 'react-native';
+import { Modal, View, Alert, StyleSheet, Dimensions, Platform, Image, TextInput } from 'react-native';
 import {
-    Container,
-    Header,
-    Title,
-    Content,
     Item,
     Input,
     Button,
-    Left,
-    Right,
-    Body,
     Text,
 } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import { Avatar } from 'react-native-elements';
 import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
@@ -31,7 +23,7 @@ interface Props {
 }
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import {
@@ -58,11 +50,13 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
 
     componentWillReceiveProps( nextProps: any ) {
         var data = nextProps.data[ 0 ];
-        data = data.data[ 0 ];
-        this.setState( {
-            firstQuestion: data.Question,
-            anwser: data.Answer
-        } );
+        if ( data != undefined ) {
+            data = data.data[ 0 ];
+            this.setState( {
+                firstQuestion: data.Question,
+                anwser: data.Answer
+            } );
+        }
     }
 
 
@@ -70,7 +64,7 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
     check_CorrectAnswer() {
         setTimeout( () => {
             let firstAns = this.state.firstAnswer;
-            if ( firstAns.length >= 6 ) {
+            if ( firstAns.length >= 3 ) {
                 this.setState( {
                     flag_DisableBtnNext: false
                 } )
@@ -93,12 +87,10 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
                 answerBorderColor: "#E64545",
             } )
             wrongEnterAnswerCount = wrongEnterAnswerCount + 1;
-            console.log( { wrongEnterAnswerCount } );
-
+            //console.log( { wrongEnterAnswerCount } );
         } else {
             this.props.click_Next();
         }
-        // console.log( { answer, enterAnswer } );
     }
 
     render() {
@@ -121,13 +113,14 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
                 >
                     <View style={ [
                         styles.modalBackground,
-                        { backgroundColor: `rgba(0,0,0,0.4)` }
+                        { backgroundColor: 'rgba(0, 0, 0, 0.4)' }
                     ] }
                     >
                         <View style={ styles.viewModelBody }>
                             <View style={ { flexDirection: "row", flex: 0.5 } }>
                                 <Button
                                     transparent
+                                    hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                     onPress={ () => this.props.pop() }
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />
@@ -137,8 +130,8 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
                             <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
                                 <Image source={ images.backupSecretQuestion.icon } style={ { width: 80, height: 80, marginTop: -30 } } />
                                 <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20 } ] }>Health Check</Text>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, margin: 10 } ] }>Security Questions</Text>
-                                <Text note style={ { textAlign: "center" } }>Answer the questions exactly as you did at the time of setting up the wallet</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, margin: 10 } ] }>Security Question</Text>
+                                <Text note style={ { textAlign: "center" } }>Answer the question exactly as you did at the time of setting up the wallet</Text>
                                 <View style={ [ styles.itemQuestionPicker, { height: 80 } ] }>
                                     <TextInput
                                         value={ firstQuestion }
@@ -173,7 +166,7 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
                                 ) }
                             </View>
                             <View style={ { flex: 0.1, justifyContent: "flex-end" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>These answers will be required in case you need to restore your wallet</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Answer will be required in case you need to restore your wallet</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_Next()
@@ -224,7 +217,7 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
                                         [
                                             {
                                                 text: 'Ok', onPress: () => {
-                                                    console.log( 'ok' );
+                                                    // console.log( 'ok' );
                                                 }
                                             }
                                         ],
@@ -255,7 +248,7 @@ const styles = StyleSheet.create( {
         flex: 1,
         justifyContent: 'center'
     },
-    viewModelBody: {   
+    viewModelBody: {
         flex: 0.7,
         margin: 20,
         padding: 10,

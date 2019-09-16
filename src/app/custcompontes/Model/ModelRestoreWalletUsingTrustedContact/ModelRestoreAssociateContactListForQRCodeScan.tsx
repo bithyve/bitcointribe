@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { Button, Icon, Text } from "native-base";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import { Modal, View, Alert, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { Text } from "native-base";
 import { Avatar } from 'react-native-elements';
 import { RkCard } from "react-native-ui-kitten";
 
@@ -13,24 +12,18 @@ interface Props {
     click_Request: Function
 }
 
-//TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 
-//TODO: Custome Object 
-import {
-    colors
-} from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 export default class ModelRestoreAssociateContactListForQRCodeScan extends Component<Props, any> {
     //TODO: list item click any perosn
     click_SelectContact( item: any ) {
         Alert.alert(
             'Are you sure?',
-            item.givenName + ' ' + item.familyName + ' this contact associate ?',
+            'you want to associate ' + item.givenName + ' ' + item.familyName + '?',
             [
                 {
                     text: 'Cancel',

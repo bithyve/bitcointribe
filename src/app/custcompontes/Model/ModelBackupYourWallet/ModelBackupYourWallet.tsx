@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Platform, Image } from 'react-native';
+import { Modal, View, StyleSheet, Platform, Image } from 'react-native';
 import { Button, Icon, Text } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 
@@ -9,7 +9,7 @@ import {
 } from "HexaWallet/src/app/constants/Constants";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 interface Props {
     click_UseOtherMethod: Function;

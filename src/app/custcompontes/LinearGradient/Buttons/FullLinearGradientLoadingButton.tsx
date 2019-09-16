@@ -23,6 +23,7 @@ export default class FullLinearGradientLoadingButton extends Component<Props, an
                 <ActivityIndicator animating={ this.props.animating } size="small" color="#ffffff" />
                 <Button
                     transparent
+                    hitSlop={{top: 5, bottom: 5, left: 150, right: 150}}
                     full
                     disabled={ this.props.disabled }
                     onPress={ () => this.props.click_Done() }

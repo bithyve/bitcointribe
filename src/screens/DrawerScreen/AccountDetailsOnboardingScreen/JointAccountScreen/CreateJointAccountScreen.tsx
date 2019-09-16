@@ -28,9 +28,8 @@ import {
   Footer
 } from "native-base";
 import Icon from "react-native-vector-icons/FontAwesome";
-import Toast from "react-native-simple-toast";
 let flag_createJoinAccount: boolean = true;
-var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
+var dbOpration = require( "bithyve/src/app/manage/database/DBOpration" );
 
 //TODO: Custome Pages
 import {
@@ -41,17 +40,17 @@ import {
 } from "bithyve/src/app/constants/Constants";
 import SCLAlertOk from "bithyve/src/app/custcompontes/alert/SCLAlertOk";
 
-const { width } = Dimensions.get("screen");
+const { width } = Dimensions.get( "screen" );
 
 //TODO: Bitcoin Files
 //import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
 
 //localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+import { localization } from "bithyve/src/app/manage/Localization/i18n";
 
 export default class CreateJointAccountScreen extends React.Component {
-  constructor(props: any) {
-    super(props);
+  constructor ( props: any ) {
+    super( props );
     this.state = {
       name: "",
       accountName: "",
@@ -127,8 +126,8 @@ export default class CreateJointAccountScreen extends React.Component {
     address: string,
     data: any
   ) {
-    console.log("create account");
-    console.log({ data });
+    //console.log( "create account" );
+    //console.log( { data } );
     const resultCreateAccount = await dbOpration.insertLastBeforeCreateAccount(
       localDB.tableName.tblAccount,
       fulldate,
@@ -138,218 +137,218 @@ export default class CreateJointAccountScreen extends React.Component {
       "Joint",
       data
     );
-    if (resultCreateAccount) {
-      this.setState({
+    if ( resultCreateAccount ) {
+      this.setState( {
         isLoading: false,
         alertPopupData: [
           {
             theme: "success",
             status: true,
             icon: "smile",
-            title: localization("CreateJointAccountScreen.popupTitle"),
-            subtitle: localization("CreateJointAccountScreen.popupBody"),
+            title: localization( "CreateJointAccountScreen.popupTitle" ),
+            subtitle: localization( "CreateJointAccountScreen.popupBody" ),
             goBackStatus: true
           }
         ]
-      });
+      } );
     }
   }
 
   onSelect = data => {
-    this.setState({
+    this.setState( {
       JsonString: data.barcode
-    });
-    let jointDetails = JSON.parse(data.barcode);
-    if (jointDetails.typ == "conf") {
-      this.props.navigation.push("MergeConfirmJointAccountScreen", {
+    } );
+    let jointDetails = JSON.parse( data.barcode );
+    if ( jointDetails.typ == "conf" ) {
+      this.props.navigation.push( "MergeConfirmJointAccountScreen", {
         data: data.barcode
-      });
-    } else if (jointDetails.typ == "ack") {
-      this.selfCreateJointAccount(data.barcode);
-    } else if (jointDetails.typ == "imp") {
-      Toast.show(msg.jointAccountImport, Toast.SHORT);
+      } );
+    } else if ( jointDetails.typ == "ack" ) {
+      this.selfCreateJointAccount( data.barcode );
+    } else if ( jointDetails.typ == "imp" ) {
+      // Toast.show(msg.jointAccountImport, Toast.SHORT);
     } else {
-      Toast.show("Error qr code", Toast.SHORT);
+      // Toast.show("Error qr code", Toast.SHORT);
     }
   };
 
   //TODO: func validationText
-  validationText(text, type) {
-    if (type == "name") {
-      this.setState({
+  validationText( text, type ) {
+    if ( type == "name" ) {
+      this.setState( {
         name: text
-      });
+      } );
     } else {
-      this.setState({
+      this.setState( {
         accountName: text
-      });
+      } );
     }
-    if (this.state.name.length > 0 && this.state.accountName.length > 0) {
-      this.setState({
+    if ( this.state.name.length > 0 && this.state.accountName.length > 0 ) {
+      this.setState( {
         flag_createAccountBtnStatus: false
-      });
+      } );
     }
     if (
       this.state.name.length < 0 ||
       this.state.accountName.length < 0 ||
       text == ""
     ) {
-      this.setState({
+      this.setState( {
         flag_createAccountBtnStatus: true
-      });
+      } );
     }
   }
 
-  click_MargeAccount() {}
+  click_MargeAccount() { }
 
   //TODO: func click_openQrCodeScannerScreen
   async click_openQrCodeScannerScreen() {
     try {
-      AsyncStorage.setItem("flag_BackgoundApp", JSON.stringify(false));
-      this.props.navigation.push("QrcodeScannerScreen", {
+      AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
+      this.props.navigation.push( "QrcodeScannerScreen", {
         onSelect: this.onSelect
-      });
-    } catch (error) {
-      console.log(error);
+      } );
+    } catch ( error ) {
+      //console.log( error );
     }
   }
 
   render() {
     return (
       <Container>
-        <ImageBackground source={images.appBackgound} style={styles.container}>
+        <ImageBackground source={ images.appBackgound } style={ styles.container }>
           <Header transparent>
             <Left>
-              <Button transparent onPress={() => this.props.navigation.pop()}>
-                <Icon name="chevron-left" size={25} color="#ffffff" />
+              <Button transparent onPress={ () => this.props.navigation.pop() }>
+                <Icon name="chevron-left" size={ 25 } color="#ffffff" />
               </Button>
             </Left>
 
-            <Body style={{ flex: 0, alignItems: "center" }}>
+            <Body style={ { flex: 0, alignItems: "center" } }>
               <Title
-                adjustsFontSizeToFit={true}
-                numberOfLines={1}
-                style={styles.titleUserName}
+                adjustsFontSizeToFit={ true }
+                numberOfLines={ 1 }
+                style={ styles.titleUserName }
               />
             </Body>
             <Right />
           </Header>
-          <Content contentContainerStyle={styles.container}>
-            <View style={styles.logoJointAccount}>
+          <Content contentContainerStyle={ styles.container }>
+            <View style={ styles.logoJointAccount }>
               <Image
-                style={styles.jointLogo}
-                source={images.secureAccount.secureLogo}
+                style={ styles.jointLogo }
+                source={ images.secureAccount.secureLogo }
               />
-              <Text style={styles.txtTitle}>
-                {localization("CreateJointAccountScreen.title")}
+              <Text style={ styles.txtTitle }>
+                { localization( "CreateJointAccountScreen.title" ) }
               </Text>
-              <Text style={styles.txtLorem} />
+              <Text style={ styles.txtLorem } />
             </View>
 
-            <View style={styles.jointAccountInput}>
-              <View style={{ height: 50 }}>
+            <View style={ styles.jointAccountInput }>
+              <View style={ { height: 50 } }>
                 <Input
-                  name={this.state.name}
-                  value={this.state.name}
-                  placeholder={localization(
+                  name={ this.state.name }
+                  value={ this.state.name }
+                  placeholder={ localization(
                     "CreateJointAccountScreen.txtInputNamePlaceholder"
-                  )}
-                  keyboardType={"default"}
-                  placeholderTextColor={Platform.OS == "ios" ? "#000" : "#000"}
-                  style={styles.input}
-                  onChangeText={text => this.validationText(text, "name")}
+                  ) }
+                  keyboardType={ "default" }
+                  placeholderTextColor={ Platform.OS == "ios" ? "#000" : "#000" }
+                  style={ styles.input }
+                  onChangeText={ text => this.validationText( text, "name" ) }
                 />
               </View>
-              <View style={{ height: 50 }}>
+              <View style={ { height: 50 } }>
                 <Input
-                  name={this.state.accountName}
-                  value={this.state.accountName}
-                  placeholder={localization(
+                  name={ this.state.accountName }
+                  value={ this.state.accountName }
+                  placeholder={ localization(
                     "CreateJointAccountScreen.txtInputAccountName"
-                  )}
-                  keyboardType={"default"}
-                  placeholderTextColor={Platform.OS == "ios" ? "#000" : "#000"}
-                  style={styles.input}
-                  onChangeText={text =>
-                    this.validationText(text, "accountName")
+                  ) }
+                  keyboardType={ "default" }
+                  placeholderTextColor={ Platform.OS == "ios" ? "#000" : "#000" }
+                  style={ styles.input }
+                  onChangeText={ text =>
+                    this.validationText( text, "accountName" )
                   }
                 />
               </View>
               <Button
                 full
-                disabled={this.state.flag_createAccountBtnStatus}
-                style={[
+                disabled={ this.state.flag_createAccountBtnStatus }
+                style={ [
                   styles.btnCreateJointAccount,
                   this.state.flag_createAccountBtnStatus
                     ? { backgroundColor: "gray" }
                     : { backgroundColor: colors.appColor }
-                ]}
-                onPress={() => {
+                ] }
+                onPress={ () => {
                   let data = {};
                   data.name = this.state.name;
                   data.walletName = this.state.accountName;
-                  this.props.navigation.push("ReceiveMoneyScreen", {
+                  this.props.navigation.push( "ReceiveMoneyScreen", {
                     page: "CreateJointAccountScreen",
                     data: data
-                  });
-                }}
+                  } );
+                } }
               >
-                <Text style={{ color: "#ffffff" }}>
-                  {localization("CreateJointAccountScreen.btnInitiate")}
+                <Text style={ { color: "#ffffff" } }>
+                  { localization( "CreateJointAccountScreen.btnInitiate" ) }
                 </Text>
               </Button>
               <Text
-                style={{
+                style={ {
                   color: "#000",
                   textAlign: "center",
                   justifyContent: "center",
                   marginTop: 15,
                   paddingTop: 5,
                   fontWeight: "bold"
-                }}
+                } }
               >
-                {localization("CreateJointAccountScreen.or")}
+                { localization( "CreateJointAccountScreen.or" ) }
               </Text>
               <Button
                 full
-                style={[
+                style={ [
                   styles.btnCreateJointAccount,
                   ,
                   {
                     backgroundColor: colors.appColor
                   }
-                ]}
-                onPress={() => this.click_openQrCodeScannerScreen()}
+                ] }
+                onPress={ () => this.click_openQrCodeScannerScreen() }
               >
-                <Text style={{ color: "#ffffff" }}>
-                  {" "}
-                  {localization("CreateJointAccountScreen.btnMerge")}
+                <Text style={ { color: "#ffffff" } }>
+                  { " " }
+                  { localization( "CreateJointAccountScreen.btnMerge" ) }
                 </Text>
               </Button>
             </View>
           </Content>
         </ImageBackground>
         <SCLAlertOk
-          data={this.state.alertPopupData}
-          click_Ok={(status: boolean) => {
+          data={ this.state.alertPopupData }
+          click_Ok={ ( status: boolean ) => {
             status
-              ? this.props.navigation.navigate("TabbarBottom")
-              : console.log(status),
-              this.setState({
+              ? this.props.navigation.navigate( "TabbarBottom" )
+              : console.log( status ),
+              this.setState( {
                 alertPopupData: [
                   {
                     status: false
                   }
                 ]
-              });
-          }}
+              } );
+          } }
         />
       </Container>
     );
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1
   },
@@ -390,4 +389,4 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 10
   }
-});
+} );

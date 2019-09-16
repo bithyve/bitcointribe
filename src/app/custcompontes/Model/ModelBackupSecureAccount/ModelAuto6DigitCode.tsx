@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, TextInput } from 'react-native';
-import { Button, Icon, Text, Textarea, Form } from "native-base";
+import { Modal, View, Alert, StyleSheet, TextInput } from 'react-native';
+import { Button, Text } from "native-base";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
@@ -12,8 +12,8 @@ import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+
 
 //TODO: Custome Object
 import {
@@ -21,7 +21,7 @@ import {
     localDB
 } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
 
 interface Props {
     data: [];
@@ -35,11 +35,11 @@ interface Props {
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 
 //TODO: Common Funciton
-var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
-     
+var comAppHealth = require( "HexaWallet/src/app/manage/CommonFunction/CommonAppHealth" );
+
 
 //Bitcoin Files
-var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
+var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
 export default class ModelAuto6DigitCode extends Component<Props, any> {
@@ -77,20 +77,20 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
         } )
         const dateTime = Date.now();
         let resultWallet = await utils.getWalletDetails();
-        console.log( { resultWallet } );
+        //console.log( { resultWallet } );
         let code = this.state.code;
         let data = this.props.data.length != 0 ? this.props.data : [];
         let secureAccountDetails = data[ 0 ].data;
-        console.log( { data } );
+        //console.log( { data } );
         let setupData = secureAccountDetails.setupData;
-        console.log( { secureAccountDetails, setupData } );
+        //console.log( { secureAccountDetails, setupData } );
         // const secureAccount = new SecureAccount( resultWallet.mnemonic );
         let secureAccount = await bitcoinClassState.getSecureClassState();
         let sss = await bitcoinClassState.getS3ServiceClassState();
-        console.log( { secureAccount } );
+        //console.log( { secureAccount } );
         let sssDetails = await utils.getSSSDetails();
         let encryptedStaticNonPMDD;
-        console.log( { sssDetails } );
+        //console.log( { sssDetails } );
         for ( let i = 0; i < sssDetails.length; i++ ) {
             let data = sssDetails[ i ];
             if ( data.decryptedShare != "" ) {
@@ -115,7 +115,7 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
                 const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
                     localDB.tableName.tblAccount,
                     address,
-                    "0.0",
+                    "0",
                     secureAccountDetails.id,
                     1
                 );
@@ -158,7 +158,7 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
                         const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
                             localDB.tableName.tblAccount,
                             address,
-                            "0.0",
+                            "0",
                             secureAccountDetails.id,
                             1
                         );
@@ -224,6 +224,7 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
                             <View style={ { flexDirection: "row", flex: 0.6 } }>
                                 <Button
                                     transparent
+                                    hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                     onPress={ () => this.props.pop() }
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />

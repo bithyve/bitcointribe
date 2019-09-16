@@ -36,7 +36,7 @@ import {
   images,
   localDB
 } from "bithyve/src/app/constants/Constants";
-var dbOpration = require( "bithyve/src/app/manager/database/DBOpration" );
+var dbOpration = require( "bithyve/src/app/manage/database/DBOpration" );
 var utils = require( "bithyve/src/app/constants/Utils" );
 import renderIf from "bithyve/src/app/constants/validation/renderIf";
 import Singleton from "bithyve/src/app/constants/Singleton";
@@ -61,7 +61,7 @@ const SLIDER_1_FIRST_ITEM = 0;
 //import RegularAccount from "bithyve/src/bitcoin/services/RegularAccount";
 
 //localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+import { localization } from "bithyve/src/app/manage/Localization/i18n";
 
 export default class AccountsScreen extends React.Component<any, any> {
   constructor ( props: any ) {

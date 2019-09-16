@@ -1,59 +1,24 @@
 import React from "react";
 import {
     View,
-    ImageBackground,
-    Dimensions,
-    StatusBar,
-    TouchableOpacity,
-    TouchableHighlight,
-    StyleSheet,
-    RefreshControl,
-    Platform,
-    SafeAreaView,
-    FlatList,
-    ScrollView,
-    Animated,
-    LayoutAnimation,
-    AsyncStorage,
-    Alert
+    StyleSheet
 } from "react-native";
 import {
     Container,
-    Header,
-    Title,
-    Content,
     Button,
-    Left,
-    Right,
-    Body,
-    Text,
-    List,
-    ListItem
+    Text
 } from "native-base";
-//import BarcodeScanner from "react-native-barcode-scanners";
-import { QRScannerView } from 'ac-qrcode';
+import QRCodeScanner from 'react-native-qrcode-scanner';
 
 
-
-
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Custome Alert    
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
 
 
-//TODO: Custome object
-import {
-    colors,
-    images,
-    localDB
-} from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
-var utils = require( "HexaWallet/src/app/constants/Utils" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-import Singleton from "HexaWallet/src/app/constants/Singleton";
+
 
 
 interface Props {
@@ -93,7 +58,7 @@ export default class Restore4And5SelfShareQRCodeScreen5 extends React.Component<
         flag_ReadQRCode = true;
     }
 
-    barcodeReceived( e: any ) {
+    barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
             result = result.split( "Doublequote" ).join( '"' );
@@ -152,15 +117,15 @@ export default class Restore4And5SelfShareQRCodeScreen5 extends React.Component<
                         </Button>
                     ) }
                     { renderIf( flag_qrcode == true )(
-                        <QRScannerView
-                            hintText=""
-                            rectHeight={ Dimensions.get( 'screen' ).height / 2.0 }
-                            rectWidth={ Dimensions.get( 'screen' ).width - 20 }
-                            scanBarColor={ colors.appColor }
-                            cornerColor={ colors.appColor }
-                            onScanResultReceived={ this.barcodeReceived.bind( this ) }
-                            renderTopBarView={ () => this._renderTitleBar() }
-                            renderBottomMenuView={ () => this._renderMenu() }
+                        <QRCodeScanner
+                            onRead={ this.barcodeReceived }
+                            topContent={ this._renderTitleBar() }
+                            bottomContent={
+                                this._renderMenu()
+                            }
+                            cameraType="back"
+                            showMarker={ true }
+                            vibrate={ true }
                         />
                     ) }
                 </View>

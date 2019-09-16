@@ -1,44 +1,27 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, AsyncStorage, Clipboard } from "react-native";
+import { StyleSheet, ImageBackground, View, Platform, SafeAreaView, FlatList, Alert } from "react-native";
 import {
     Container,
-    Header,
-    Title,
-    Content,
-    Item,
-    Input,
     Button,
-    Left,
-    Right,
-    Body,
-    Text,
-    Icon,
-    List,
-    ListItem,
-    Thumbnail
+    Text
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
-import IconFontAwe from "react-native-vector-icons/FontAwesome";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Contacts from 'react-native-contacts';
 import { Avatar } from 'react-native-elements';
 import SendSMS from 'react-native-sms';
-import Permissions from 'react-native-permissions'
 import Modal from 'react-native-modalbox';
-import Toast from 'react-native-simple-toast';
+
 
 
 //import Mailer from 'react-native-mail';
 var Mailer = require( 'NativeModules' ).RNMail;
-import Share from "react-native-share";
-var RNFS = require( 'react-native-fs' );
-import BackgroundFetch from "react-native-background-fetch";
+
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import ModelTrustedContactEmailAndPhoneShare from "HexaWallet/src/app/custcompontes/Model/ModelTrustedContactEmailAndPhoneShare/ModelTrustedContactEmailAndPhoneShare";
+import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+
 
 
 //TODO: Custome Alert 
@@ -46,21 +29,14 @@ import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+import { colors, images } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 
-//TODO: Common Funciton
-var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
-
-//TODO: Bitcoin Files
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 export default class RestoreTrustedContactsShareScreen extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -73,7 +49,6 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
             flag_ReShareBtnDisable: false
         } )
     }
-
 
     async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
@@ -190,38 +165,13 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
         // }
     }
 
-    //TODO: update histroy
-    updateHistory = async ( data: any, title: string, filePath: any ) => {
-        // let arr_History = JSON.parse( data.sssDetails.history );
-        // const dateTime = Date.now();
-        // let JsonData = {};
-        // JsonData.title = title;
-        // JsonData.date = utils.getUnixToDateFormat2();
-        // let temp = [ JsonData ];
-        // arr_History.push.apply( arr_History, temp );
-        // console.log( { arr_History } );
-        // let resUpdateHistroyAndSharedDate = await dbOpration.updateHistroyAndSharedDate(
-        //     localDB.tableName.tblSSSDetails,
-        //     arr_History,
-        //     dateTime,
-        //     data.sssDetails.id
-        // );
-        // console.log( resUpdateHistroyAndSharedDate );
-        // if ( resUpdateHistroyAndSharedDate ) {
-        //     await comFunDBRead.readTblSSSDetails();
-        //     this.setState( {
-        //         arr_History
-        //     } );
-        //     await RNFS.unlink( filePath );
-        // }
-        // console.log( { resUpdateHistroyAndSharedDate } );
-    }
+
 
     //TODO: Share or Reshare button on click
     click_SentRequest( type: string, data: any ) {
         console.log( { data } );
         let script = {};
-        script.mg = "Please sent return share.";
+        script.mg = "Please select requested share to return back";
         var encpScript = utils.encrypt( JSON.stringify( script ), "122334" )
         encpScript = encpScript.split( "/" ).join( "_+_" );
         if ( type == "SMS" ) {
@@ -261,7 +211,7 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Restore',
                     recipients: [ email ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/req/' + encpScript,
+                    body: "Hexa wallet request you it's share back to restore wallet. Please tap on the link to return share <br> https://prime-sign-230407.appspot.com/sss/req/" + encpScript,
                     isHTML: true,
                 }, ( error, event ) => {
                     if ( event == "sent" ) {
@@ -281,7 +231,7 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
                 Mailer.mail( {
                     subject: 'Hexa Wallet SSS Restore',
                     recipients: [ email ],
-                    body: 'https://prime-sign-230407.appspot.com/sss/req/' + encpScript,
+                    body: "Hexa wallet request you it's share back to restore wallet. Please tap on the link to return share <br> https://prime-sign-230407.appspot.com/sss/req/" + encpScript,
                     isHTML: true,
                 }, ( error, event ) => {
                     if ( event == "sent" ) {
@@ -313,20 +263,13 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
         let { flag_ShareBtnDisable, flag_ReShareBtnDisable } = this.state;
         return (
             <Container>
-                <SafeAreaView style={ styles.container }>
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.props.navigation.pop() }
-                            >
-                                <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>{ title }</Text>
-                            </Button>
-                        </View>
+                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <HeaderTitle title={ title }
+                        pop={ () => this.props.navigation.pop() }
+                    />
+                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
                         <View style={ { flex: 0.1, margin: 20 } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Request back your secret share from trusted contacts</Text>
                         </View>
                         <View style={ { flex: 2 } }>
                             <FlatList
@@ -355,24 +298,24 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
                         </View>
                         { renderIf( flag_ShareBtnDisable == true )(
                             <View style={ { flex: 0.4 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Now only sharing email.</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select method to request share from trusted contact</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_Share( data )
                                     } }
-                                    title="Share"
+                                    title="Request Share"
                                     disabled={ false }
                                     style={ [ { borderRadius: 10 } ] } />
                             </View>
                         ) }
                         { renderIf( flag_ReShareBtnDisable == true )(
                             <View style={ { flex: 0.4 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Now only sharing email.</Text>
+                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select method to request share from trusted contact</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_ReShare( data )
                                     } }
-                                    title="Reshare"
+                                    title="Request Share"
                                     disabled={ false }
                                     style={ [ { borderRadius: 10 } ] } />
                             </View>
@@ -428,9 +371,10 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
                                 </View>
                             </View>
                         </Modal>
-                    </ImageBackground>
-                </SafeAreaView>
+                    </SafeAreaView>
+                </ImageBackground>
                 <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
+                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

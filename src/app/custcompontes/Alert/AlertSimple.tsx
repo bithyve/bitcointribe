@@ -31,4 +31,21 @@ export default class AlertSimple {
         );
     }
 
+    public simpleOkActionWithPara( title: string, subtile: string, click_Ok: Function ) {
+        {
+            Alert.alert(
+                title,
+                subtile,
+                [
+                    {
+                        text: 'Ok', onPress: () => {
+                            function click_Ok( value: any ) {
+                            }
+                        }
+                    },
+                ],
+                { cancelable: false },
+            );
+        }
+    }
 }

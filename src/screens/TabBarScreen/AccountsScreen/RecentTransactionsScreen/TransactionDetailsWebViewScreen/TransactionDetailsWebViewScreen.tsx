@@ -15,59 +15,59 @@ import Loader from "react-native-modal-loader";
 import { colors, images } from "bithyve/src/app/constants/Constants";
 
 //localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+import { localization } from "bithyve/src/app/manage/Localization/i18n";
 export default class TransactionDetailsWebViewScreen extends Component {
-  constructor(props: any) {
-    super(props);
+  constructor ( props: any ) {
+    super( props );
     this.state = {
       isLoading: true
     };
   }
   render() {
     const { navigation } = this.props;
-    let url = navigation.getParam("url");
+    let url = navigation.getParam( "url" );
     return (
       <Container>
         <ImageBackground
-          source={images.appBackgound}
-          style={styles.backgroundImage}
+          source={ images.appBackgound }
+          style={ styles.backgroundImage }
         >
           <Header transparent>
             <Left>
               <Button
                 transparent
-                onPress={() => this.props.navigation.goBack()}
+                onPress={ () => this.props.navigation.goBack() }
               >
-                <Icon name="chevron-left" size={25} color="#ffffff" />
+                <Icon name="chevron-left" size={ 25 } color="#ffffff" />
               </Button>
             </Left>
-            <Body style={{ flex: 0, alignItems: "center" }}>
+            <Body style={ { flex: 0, alignItems: "center" } }>
               <Title
-                adjustsFontSizeToFit={true}
-                numberOfLines={1}
-                style={styles.txtAppTitle}
+                adjustsFontSizeToFit={ true }
+                numberOfLines={ 1 }
+                style={ styles.txtAppTitle }
               >
-                {localization("TransactionDetailsWebViewScreen.headerTitle")}
+                { localization( "TransactionDetailsWebViewScreen.headerTitle" ) }
               </Title>
             </Body>
             <Right />
           </Header>
           <Content
-            contentContainerStyle={styles.container}
-            scrollEnabled={false}
+            contentContainerStyle={ styles.container }
+            scrollEnabled={ false }
           >
             <WebView
-              onLoad={() => this.setState({ isLoading: false })}
-              source={{ uri: url }}
+              onLoad={ () => this.setState( { isLoading: false } ) }
+              source={ { uri: url } }
             />
           </Content>
         </ImageBackground>
-        <Loader loading={this.state.isLoading} color={colors.appColor} />
+        <Loader loading={ this.state.isLoading } color={ colors.appColor } />
       </Container>
     );
   }
 }
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1
   },
@@ -77,4 +77,4 @@ const styles = StyleSheet.create({
   txtAppTitle: {
     color: "#fff"
   }
-});
+} );

@@ -1,11 +1,11 @@
-import bip39 from "bip39";
+import bip39 from "react-native-bip39";
 import { TransactionBuilder } from "bitcoinjs-lib";
 import config from "../../Config";
-import HDSegwitWallet from "../../utilities/HDSegwitWallet";
+import HDSegwitWallet from "../../utilities/accounts/HDSegwitWallet";
 
 export default class RegularAccount {
-  public static fromJSON = (json: string) => {
-    const { hdWallet } = JSON.parse(json);
+  public static fromJSON = ( json: string ) => {
+    const { hdWallet } = JSON.parse( json );
     const {
       mnemonic,
       passphrase,
@@ -30,7 +30,7 @@ export default class RegularAccount {
       gapLimit: number;
     } = hdWallet;
 
-    return new RegularAccount(mnemonic, passphrase, purpose, {
+    return new RegularAccount( mnemonic, passphrase, purpose, {
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
@@ -38,12 +38,12 @@ export default class RegularAccount {
       externalAddressesCache,
       addressToWIFCache,
       gapLimit,
-    });
+    } );
   }
   private hdWallet: HDSegwitWallet;
 
-  constructor(
-    mnemonic?: string,
+  constructor (
+    mnemonic: string,
     passphrase?: string,
     dPathPurpose?: number,
     stateVars?: {
@@ -56,111 +56,91 @@ export default class RegularAccount {
       gapLimit: number;
     },
   ) {
-    if (mnemonic) {
-      if (bip39.validateMnemonic(mnemonic)) {
-        this.hdWallet = new HDSegwitWallet(
-          mnemonic,
-          passphrase,
-          dPathPurpose,
-          stateVars,
-        );
-      } else {
-        throw new Error("Invalid Mnemonic");
-      }
+    console.log( '====================================' );
+    console.log( { mnemonic } );
+    console.log( bip39.validateMnemonic );
+
+    console.log( '====================================' );
+    if ( bip39.validateMnemonic( mnemonic ) ) {
+      console.log( "Here" );
+
+      this.hdWallet = new HDSegwitWallet(
+        mnemonic,
+        passphrase,
+        dPathPurpose,
+        stateVars,
+      );
     } else {
-      this.hdWallet = new HDSegwitWallet();
+      throw new Error( "Invalid Mnemonic" );
     }
+
   }
 
   public getMnemonic = ():
     | {
-        status: number;
-        data: {
-          mnemonic: string;
-        };
-        err?: undefined;
-      }
+      status: number;
+      data: {
+        mnemonic: string;
+      };
+      err?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        data?: undefined;
-      } => {
+      status: number;
+      err: string;
+      data?: undefined;
+    } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
         data: this.hdWallet.getMnemonic(),
       };
-    } catch (err) {
+    } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
 
   public getWalletId = ():
     | {
-        status: number;
-        data: {
-          walletId: string;
-        };
-        err?: undefined;
-      }
+      status: number;
+      data: {
+        walletId: string;
+      };
+      err?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        data?: undefined;
-      } => {
+      status: number;
+      err: string;
+      data?: undefined;
+    } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
         data: this.hdWallet.getWalletId(),
       };
-    } catch (err) {
+    } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
 
   public getAccountId = ():
     | {
-        status: number;
-        data: {
-          accountId: string;
-        };
-        err?: undefined;
-      }
+      status: number;
+      data: {
+        accountId: string;
+      };
+      err?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        data?: undefined;
-      } => {
+      status: number;
+      err: string;
+      data?: undefined;
+    } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
         data: this.hdWallet.getAccountId(),
       };
-    } catch (err) {
-      return { status: config.STATUS.ERROR, err: err.message };
-    }
-  }
-
-  public getAddress = async (): Promise<
-    | {
-        status: number;
-        data: {
-          address: string;
-        };
-        err?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.getReceivingAddress(),
-      };
-    } catch (err) {
+    } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -174,48 +154,23 @@ export default class RegularAccount {
     },
   ):
     | {
-        status: number;
-        data: {
-          paymentURI: string;
-        };
-        err?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        data?: undefined;
-      } => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.hdWallet.generatePaymentURI(address, options),
+      status: number;
+      data: {
+        paymentURI: string;
       };
-    } catch (err) {
-      return { status: config.STATUS.ERROR, err: err.message };
+      err?: undefined;
     }
-  }
-
-  public addressDiff = (
-    scannedStr: string,
-  ):
     | {
-        status: number;
-        data: {
-          type: string;
-        };
-        err?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        data?: undefined;
-      } => {
+      status: number;
+      err: string;
+      data?: undefined;
+    } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.addressDiff(scannedStr),
+        data: this.hdWallet.generatePaymentURI( address, options ),
       };
-    } catch (err) {
+    } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -224,53 +179,142 @@ export default class RegularAccount {
     paymentURI: string,
   ):
     | {
-        status: number;
-        data: {
-          address: string;
-          options: {
-            amount?: number;
-            label?: string;
-            message?: string;
-          };
+      status: number;
+      data: {
+        address: string;
+        options: {
+          amount?: number;
+          label?: string;
+          message?: string;
         };
-        err?: undefined;
-      }
+      };
+      err?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        data?: undefined;
-      } => {
+      status: number;
+      err: string;
+      data?: undefined;
+    } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.decodePaymentURI(paymentURI),
+        data: this.hdWallet.decodePaymentURI( paymentURI ),
       };
-    } catch (err) {
+    } catch ( err ) {
+      return { status: config.STATUS.ERROR, err: err.message };
+    }
+  }
+
+  public addressDiff = (
+    scannedStr: string,
+  ):
+    | {
+      status: number;
+      data: {
+        type: string;
+      };
+      err?: undefined;
+    }
+    | {
+      status: number;
+      err: string;
+      data?: undefined;
+    } => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: this.hdWallet.addressDiff( scannedStr ),
+      };
+    } catch ( err ) {
+      return { status: config.STATUS.ERROR, err: err.message };
+    }
+  }
+
+  public getAddress = async (): Promise<
+    | {
+      status: number;
+      data: {
+        address: string;
+      };
+      err?: undefined;
+    }
+    | {
+      status: number;
+      err: string;
+      data?: undefined;
+    }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.hdWallet.getReceivingAddress(),
+      };
+    } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
 
   public getBalance = async (): Promise<
     | {
-        status: number;
-        data: {
-          balance: number;
-          unconfirmedBalance: number;
-        };
-        err?: undefined;
-      }
+      status: number;
+      data: {
+        balance: number;
+        unconfirmedBalance: number;
+      };
+      err?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.hdWallet.fetchBalance(),
       };
-    } catch (err) {
+    } catch ( err ) {
+      return { status: config.STATUS.ERROR, err: err.message };
+    }
+  }
+
+  public getTransactions = async (): Promise<
+    | {
+      status: number;
+      data: {
+        transactions: {
+          totalTransactions: number;
+          confirmedTransactions: number;
+          unconfirmedTransactions: number;
+          transactionDetails: Array<{
+            txid: string;
+            status: string;
+            confirmations: number;
+            fee: string;
+            date: string;
+            transactionType: string;
+            amount: number;
+            accountType: string;
+            recipientAddresses?: string[];
+            senderAddresses?: string[];
+          }>;
+        };
+      };
+      err?: undefined;
+    }
+    | {
+      status: number;
+      err: string;
+      data?: undefined;
+    }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.hdWallet.fetchTransactions(),
+      };
+    } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -279,61 +323,48 @@ export default class RegularAccount {
     txHash: string,
   ): Promise<
     | {
-        status: number;
-        data: any;
-        err?: undefined;
-      }
+      status: number;
+      data: any;
+      err?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      data?: undefined;
+    }
   > => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.fetchTransactionDetails(txHash),
+        data: await this.hdWallet.fetchTransactionDetails( txHash ),
       };
-    } catch (err) {
+    } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
 
-  public getTransactions = async (): Promise<
+  public getTestcoins = async (): Promise<
     | {
-        status: number;
-        data: {
-          transactions: {
-            totalTransactions: number;
-            confirmedTransactions: number;
-            unconfirmedTransactions: number;
-            transactionDetails: Array<{
-              txid: string;
-              status: string;
-              confirmations: number;
-              fee: string;
-              transactionType: string;
-              amount: number;
-              accountType: string;
-              recipientAddresses?: string[];
-              senderAddresses?: string[];
-            }>;
-          };
-        };
-        err?: undefined;
-      }
+      status: number;
+      data: {
+        txid: any;
+        funded: any;
+      };
+      err?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      data?: undefined;
+    }
   > => {
     try {
+      const { address } = await this.hdWallet.getReceivingAddress();
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.fetchTransactions(),
+        data: await this.hdWallet.testnetFaucet( address ),
       };
-    } catch (err) {
+    } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -344,33 +375,35 @@ export default class RegularAccount {
     priority?: string,
   ): Promise<
     | {
-        status: number;
-        err: string;
-        data: {
-          fee: number;
-          inputs?: undefined;
-          txb?: undefined;
-        };
-      }
+      status: number;
+      err: string;
+      data: {
+        fee: number;
+        inputs?: undefined;
+        txb?: undefined;
+      };
+    }
     | {
-        status: number;
-        data: {
-          inputs: Array<{
-            txId: string;
-            vout: number;
-            value: number;
-            address: string;
-          }>;
-          txb: TransactionBuilder;
-          fee: number;
-        };
-        err?: undefined;
-      }
+      status: number;
+      data: {
+        inputs: Array<{
+          txId: string;
+          vout: number;
+          value: number;
+          address: string;
+        }>;
+        txb: TransactionBuilder;
+        fee: number;
+      };
+      err?: undefined;
+    }
     | { status: number; err: string; data?: undefined }
   > => {
     try {
-      if (this.hdWallet.isValidAddress(recipientAddress)) {
-        amount = Math.round(amount * 1e8); // converting into sats
+      if ( this.hdWallet.isValidAddress( recipientAddress ) ) {
+        // amount = Math.round(amount); // converting into sats
+        amount = Math.round( amount );
+
         const {
           inputs,
           txb,
@@ -382,20 +415,20 @@ export default class RegularAccount {
           priority.toLowerCase(),
         );
 
-        if (balance < amount + fee) {
+        if ( balance < amount + fee ) {
           return {
             status: config.STATUS.ERROR,
             err:
               "Insufficient balance to compensate for transfer amount and the txn fee",
-            data: { fee: fee / 1e8 },
+            data: { fee },
           };
         }
 
-        if (inputs && txb) {
-          console.log("---- Transaction Created ----");
+        if ( inputs && txb ) {
+          console.log( "---- Transaction Created ----" );
           return {
             status: config.STATUS.SUCCESS,
-            data: { inputs, txb, fee: fee / 1e8 },
+            data: { inputs, txb, fee },
           };
         } else {
           throw new Error(
@@ -403,9 +436,9 @@ export default class RegularAccount {
           );
         }
       } else {
-        throw new Error("Recipient address is wrong");
+        throw new Error( "Recipient address is wrong" );
       }
-    } catch (err) {
+    } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
@@ -420,56 +453,29 @@ export default class RegularAccount {
     txb: TransactionBuilder,
   ): Promise<
     | {
-        status: number;
-        data: {
-          txid: string;
-        };
-        err?: undefined;
-      }
+      status: number;
+      data: {
+        txid: string;
+      };
+      err?: undefined;
+    }
     | {
-        status: number;
-        err: string;
-        data?: undefined;
-      }
+      status: number;
+      err: string;
+      data?: undefined;
+    }
   > => {
     try {
-      const signedTxb = this.hdWallet.signHDTransaction(inputs, txb);
-      console.log("---- Transaction Signed ----");
+      const signedTxb = this.hdWallet.signHDTransaction( inputs, txb );
+      console.log( "---- Transaction Signed ----" );
 
       const txHex = signedTxb.build().toHex();
-      console.log({ txHex });
-      const { txid } = await this.hdWallet.broadcastTransaction(txHex);
-      console.log("---- Transaction Broadcasted ----");
+      console.log( { txHex } );
+      const { txid } = await this.hdWallet.broadcastTransaction( txHex );
+      console.log( "---- Transaction Broadcasted ----" );
 
       return { status: config.STATUS.SUCCESS, data: { txid } };
-    } catch (err) {
-      return { status: config.STATUS.ERROR, err: err.message };
-    }
-  }
-
-  public transfer = async (
-    recipientAddress: string,
-    amount: number,
-  ): Promise<
-    | {
-        status: number;
-        data: {
-          txid: string;
-        };
-        err?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.transfer(recipientAddress, amount),
-      };
-    } catch (err) {
+    } catch ( err ) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }

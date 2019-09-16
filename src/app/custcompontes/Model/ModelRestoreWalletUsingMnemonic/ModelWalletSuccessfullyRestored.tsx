@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Image } from 'react-native';
-import { Button, Icon, Text, Textarea, Form } from "native-base";
+import { Modal, View, StyleSheet, Image } from 'react-native';
+import { Button, Text } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import { SvgIcon } from "@up-shared/components";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import {
@@ -33,7 +33,7 @@ export default class ModelWalletSuccessfullyRestored extends Component<Props, an
 
     //TODO: Wallet Name
     ckeckWalletName( val: string ) {
-        if ( val.length >= 6 ) {
+        if ( val.length >= 3 ) {
             this.setState( {
                 flag_DisableBtnNext: false
             } )
@@ -71,7 +71,7 @@ export default class ModelWalletSuccessfullyRestored extends Component<Props, an
                             <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingMnemonic.walletrestored } />
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-end" } }>
-                            <Text note style={ styles.txtNotes }>Your Wallet has been recovered successfully</Text>
+                            <Text note style={ styles.txtNotes }>Congratulations! Wallet successfully restored</Text>
                             <Text note>{ data.length != 0 ? data[ 0 ].walletName : "Hexa Wallet" }</Text>
                             <View style={ { flexDirection: "row", justifyContent: "center", alignItems: "center", margin: 10 } }>
                                 <SvgIcon name="icon_bitcoin" color="#D0D0D0" size={ 20 } />
@@ -79,7 +79,7 @@ export default class ModelWalletSuccessfullyRestored extends Component<Props, an
                                     { data.length != 0 ? data[ 0 ].bal : 0 }
                                 </Text>
                             </View>
-                            <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Restore your secure account now You can opt to do it later</Text>
+                            <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }></Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <FullLinearGradientButton

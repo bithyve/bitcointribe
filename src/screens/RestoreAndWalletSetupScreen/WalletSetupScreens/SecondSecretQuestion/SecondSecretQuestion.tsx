@@ -26,14 +26,14 @@ import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 
 //TODO: Custome Object
 import { colors, images, localDB, asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
-var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
+var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
+var comAppHealth = require( "HexaWallet/src/app/manage/CommonFunction/CommonAppHealth" );
 
 
 //TODO: Custome Alert
@@ -210,39 +210,39 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                 data1.secoundQuestion = secoundQuestion;
                 data1.secoundAnswer = secoundAnser;
                 temp.push( data1 );
-                let resUpdateWalletAns = await dbOpration.updateWalletAnswerDetails(
-                    localDB.tableName.tblWallet,
-                    temp
-                );
+                // let resUpdateWalletAns = await dbOpration.updateWalletAnswerDetails(
+                //     localDB.tableName.tblWallet,
+                //     temp
+                // );
                 //  console.log( { resUpdateWalletAns } );
-                let resInsertCreateAcc = await dbOpration.insertCreateAccount(
-                    localDB.tableName.tblAccount,
-                    dateTime,
-                    getAddress,
-                    "0.0",
-                    "BTC",
-                    "Daily Wallet",
-                    "Regular Account",
-                    ""
-                );
-                let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
-                    localDB.tableName.tblAccount,
-                    dateTime,
-                    "",
-                    "0.0",
-                    "BTC",
-                    "Secure Account",
-                    "Secure Account",
-                    arr_SecureDetails
-                );
-                if ( resInsertWallet && resUpdateWalletAns && resInsertSecureCreateAcc && resInsertCreateAcc ) {
-                    this.setState( {
-                        flag_Loading: false
-                    } );
-                    this.props.prevScreen();
-                } else {
-                    Alert.alert( "Local db update issue!" )
-                }
+                // let resInsertCreateAcc = await dbOpration.insertCreateAccount(
+                //     localDB.tableName.tblAccount,
+                //     dateTime,
+                //     getAddress,
+                //     "0.0",
+                //     "BTC",
+                //     "Daily Wallet",
+                //     "Regular Account",
+                //     ""
+                // );
+                // let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+                //     localDB.tableName.tblAccount,
+                //     dateTime,
+                //     "",
+                //     "0.0",
+                //     "BTC",
+                //     "Secure Account",
+                //     "Secure Account",
+                //     arr_SecureDetails
+                // );
+                // if ( resInsertWallet && resUpdateWalletAns && resInsertSecureCreateAcc && resInsertCreateAcc ) {
+                //     this.setState( {
+                //         flag_Loading: false
+                //     } );
+                //     this.props.prevScreen();
+                // } else {
+                //     Alert.alert( "Local db update issue!" )
+                // }
             }
             else {
                 alert.simpleOk( "Oops", resInitializeHealthcheck.err );
@@ -281,8 +281,8 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                     contentContainerStyle={ { flexGrow: 1, } }
                 >
                     <View style={ styles.viewPagination }>
-                        <Text style={ [ globalStyle.ffFiraSansMedium, { fontWeight: "bold", fontSize: 22, textAlign: "center" } ] }>Step 3: Select second secret question</Text>
-                        <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>To Set up you need to select two secret questions</Text>
+                        <Text style={ [ globalStyle.ffFiraSansMedium, { fontWeight: "bold", fontSize: 22, textAlign: "center" } ] }>Step 3: Select second security question</Text>
+                        <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>To Set up you need to select one security question</Text>
                     </View>
                     <View style={ styles.viewInputFiled }>
                         <View style={ styles.itemQuestionPicker }>
@@ -312,7 +312,7 @@ export default class SecondSecretQuestion extends React.Component<any, any> {
                             <Input
                                 secureTextEntry
                                 keyboardType="default"
-                                autoCapitalize='sentences'
+                                autoCapitalize='none'
                                 placeholder='Write your answer here'
                                 style={ [ globalStyle.ffFiraSansMedium ] }
                                 placeholderTextColor="#B7B7B7"
