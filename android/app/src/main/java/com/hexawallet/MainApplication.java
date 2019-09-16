@@ -38,6 +38,7 @@ import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
 
 import com.hexawallet.PdfPasswordPackage;
+import com.hexawallet.UtilsPackage;
 
 import java.util.List;
 
@@ -61,6 +62,7 @@ public class MainApplication extends Application implements ShareApplication, Re
       // Packages that cannot be autolinked yet can be added manually here, for
       // example:
       packages.add(new PdfPasswordPackage());
+      packages.add(new UtilsPackage());
       return packages;
     }
 

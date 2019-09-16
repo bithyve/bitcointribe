@@ -2480,7 +2480,7 @@ class WalletScreen extends React.Component {
                 modalVisible: false,
                 images: [ "helper1" ]
               } ]
-            }, () => this.asyncTask() )
+            }, () => console.log( 'hi' ) )//this.asyncTask() )
           } }
         />
         <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
