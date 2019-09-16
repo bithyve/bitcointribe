@@ -5,7 +5,7 @@ import {
     Input,
     Text
 } from "native-base";
-import { Icon } from "@up-shared/components";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 
 

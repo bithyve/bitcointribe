@@ -40,11 +40,12 @@ Make sure you have a `.env.dev` similar to `.env.example` in your project's root
 npm run android-dev
 ```
   
-#### Running hexa ios 
-          
+#### Running hexa ios    
+            
 ```
+cd ios
 pod install   
-ios/HexaWallet.xcworkspace
+ios/HexaWallet.xcworkspace   
 open project xcode then run
 ```
      
