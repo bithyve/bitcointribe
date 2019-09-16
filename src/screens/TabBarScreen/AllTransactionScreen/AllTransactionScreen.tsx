@@ -1,24 +1,33 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, FlatList, Text, SafeAreaView, TouchableOpacity } from "react-native";
+import { StyleSheet, ImageBackground, View, FlatList, SafeAreaView, TouchableOpacity, RefreshControl, Platform } from "react-native";
+import {
+  Container,
+  Text
+} from "native-base";
 
 import Icon from "react-native-vector-icons/FontAwesome";
+import ImageSVG from "HexaWallet/src/screens/Custome/ImageSVG/ImageSVG";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-//TODO: Common Funciton
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+//TODO: Custome view
+import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+
+
+
+//TODO: Custome StyleSheet Files       
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Pages
-import { images, colors } from "HexaWallet/src/app/constants/Constants";
+import { localDB, images, colors, svgIcon } from "HexaWallet/src/app/constants/Constants";
+var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 
-//TODO: ModalAllTransaction
-import Modal from "HexaWallet/src/app/custcompontes/Model/ModalAllTransactions/ModalAllTransactionDetails.tsx";
+//TODO: ModalAllTransaction  
+import Modal from "HexaWallet/src/app/custcompontes/Model/ModalAllTransactions/ModalAllTransactionDetails";
 
-import {
-  Container,
-} from "native-base";
+
 import { SvgIcon } from "@up-shared/components";
 
 
@@ -26,89 +35,147 @@ import { SvgIcon } from "@up-shared/components";
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
 
+//TODO: Common Funciton
+var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+
 //TODO: Bitcoin Class
-var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
+var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
 
-
-export default class AllTransactionScreen extends React.Component {
-  state = {
-    modalVisible: false,
-    detailsArray: [
-      { title: "To Address", value: "8572308235034623" },
-      { title: "From Address", value: "234255609325230" },
-      { title: "Amount", value: "0.0" },
-      { title: "Fees", value: "0.0" },
-      { title: "Transaction ID", value: "" },
-      { title: "Confirmations", value: "" },
-    ],
-    selectedTransaction: {
-      transactionType: "",
-      totalReceived: 0,
-      time: "30 April '19 11:00AM",
-      NumberofConfirmations: ""
-    },
-    recentTransactions: [],
-    flag_Loading: false
+export default class AllTransactionScreen extends React.Component<any, any> {
+  constructor ( props: any ) {
+    super( props )
+    this.state = ( {
+      modalVisible: false,
+      detailsArray: [
+        { title: "To Address", value: "8572308235034623" },
+        { title: "From Address", value: "234255609325230" },
+        { title: "Amount", value: "0" },
+        { title: "Fees", value: "0" },
+        { title: "Transaction ID", value: "" },
+        { title: "Confirmations", value: "" },
+      ],
+      selectedTransaction: {
+        transactionType: "",
+        totalReceived: 0,
+        time: "-",
+        NumberofConfirmations: ""
+      },
+      recentRegularTransactions: [],
+      recentSecureTransactions: [],
+      recentTransactions: [],
+      flag_Loading: false
+    } );
   }
 
-  async getTransaction() {
+  componentWillMount() {
+    this.getTransaction()
+  }
+
+  getTransaction = async () => {
+    var resTranList = await comFunDBRead.readTblTransaction();
+    this.dbDataShow( resTranList );
+  }
+
+  dbDataShow( resTranList: any ) {
+    this.setState( {
+      recentTransactions: resTranList
+    } );
+  }
+
+
+  getReloadData = async () => {
     this.setState( { flag_Loading: true } );
+    await this.getAccountTransaction();
+    this.filterTransaction()
+  }
+
+  async getAccountTransaction() {
     let regularAccount = await bitcoinClassState.getRegularClassState();
     var regularAccountTransactions = await regularAccount.getTransactions();
     if ( regularAccountTransactions.status == 200 ) {
       await bitcoinClassState.setRegularClassState( regularAccount );
       regularAccountTransactions = regularAccountTransactions.data;
-      this.setState( { recentTransactions: regularAccountTransactions.transactions.transactionDetails } )
-      this.setState( { flag_Loading: false } )
+      this.setState( { recentRegularTransactions: regularAccountTransactions.transactions.transactionDetails } )
     } else {
-      alert.simpleOk( "Oops", regularAccountTransactions.err );
+      alert.simpleOkAction( "Oops", regularAccountTransactions.err, this.click_StopLoader );
     }
-
-
+    let secureAccount = await bitcoinClassState.getSecureClassState();
+    var secureAccountTransactions = await secureAccount.getTransactions();
+    if ( secureAccountTransactions.status == 200 ) {
+      await bitcoinClassState.setSecureClassState( secureAccount );
+      secureAccountTransactions = secureAccountTransactions.data;
+      this.setState( { recentSecureTransactions: secureAccountTransactions.transactions.transactionDetails } )
+    } else {
+      alert.simpleOkAction( "Oops", secureAccountTransactions.err, this.click_StopLoader );
+    }
   }
-  componentWillMount() {
-    this.getTransaction();
+
+  filterTransaction = async () => {
+    let dateTime = Date.now();
+    let results = [ ...this.state.recentRegularTransactions, ...this.state.recentSecureTransactions ];
+    results = results.sort( ( a, b ) => { return a.confirmations - b.confirmations } )
+    let resStoreTrna = await dbOpration.insertTblTransation(
+      localDB.tableName.tblTransaction,
+      results,
+      dateTime
+    );
+    if ( resStoreTrna ) {
+      this.setState( {
+        flag_Loading: false,
+        recentTransactions: results
+      } );
+    }
   }
 
-  setModalVisible( modalVisible ) {
+
+  click_StopLoader = () => {
+    this.setState( { flag_Loading: false } );
+  }
+
+
+  setModalVisible( modalVisible: any ) {
     this.setState( { modalVisible } )
   }
-  updateModalData( item ) {
+
+  updateModalData( item: any ) {
     var detailsArray = [
-      { title: "To Address", value: "8572308235034623" },
-      { title: "From Address", value: "234255609325230" },
-      { title: "Amount", value: item.totalReceived / 1e8 },
-      { title: "Fees", value: item.fee / 1e8 },
+      { title: "To", value: item.transactionType === "Sent" ? item.recipientAddresses : item.accountType + " Account" },
+      { title: "From", value: item.transactionType === "Received" ? item.senderAddresses : item.accountType + " Account" },
+      { title: "Amount", value: item.amount },
+      { title: "Fees", value: item.fee },
       { title: "Transaction ID", value: item.txid },
-      { title: "Confirmations", value: item.NumberofConfirmations },
+      { title: "Confirmations", value: item.confirmations },
     ];
     var selectedTransaction = {
       transactionType: item.transactionType,
-      totalReceived: item.totalReceived / 1e8,
-      time: "30 April '19 11:00AM",
-      NumberofConfirmations: item.NumberofConfirmations
+      amount: item.amount,
+      time: "-",
+      confirmations: item.confirmations,
+      recipientAddresses: item.recipientAddresses,
+      senderAddresses: item.senderAddresses,
+      accountType: item.accountType
     }
     this.setState( { detailsArray, selectedTransaction } )
   }
+
+
   // Recent Transaction Item view
   _renderItem = ( { item, index } ) => {
     return (
       <View style={ { padding: 5 } }>
-
         <View style={ { flexDirection: "row", alignItems: "center" } }>
           <View>
-            <SvgIcon
-              name="icon_dailywallet"
-              color="#37A0DA"
+            <ImageSVG
               size={ 50 }
+              source={
+                svgIcon.walletScreen[ item.accountType == "Regular" ? Platform.OS == "ios" ? "dailyAccountSVG" : "dailyAccountPNG" : Platform.OS == "ios" ? "secureAccountSVG" : "secureAccountPNG" ]
+              }
             />
           </View>
-
           <View style={ { flex: 1, padding: 5 } }>
-            <Text style={ { color: "#151515", fontWeight: "600", fontSize: 14, paddingVertical: 3 } }>{ item.transactionType }</Text>
-            <Text style={ { color: "#8B8B8B", fontSize: 12, fontWeight: "600" } }>{ "30 April '19 11:00AM" }</Text>
+            <Text style={ { color: "#151515", fontWeight: "600", fontSize: 14, paddingVertical: 3 } }>{ item.transactionType === "Received" ? "To " + item.accountType + " Account" : "From " + item.accountType + " Account" }</Text>
+            <Text style={ { color: "#8B8B8B", fontSize: 12, fontWeight: "600" } }>{ "-" }</Text>
           </View>
-
           <View style={ { paddingHorizontal: 10 } }>
             <Icon
               name={ item.transactionType === "Received" ? "long-arrow-down" : "long-arrow-up" }
@@ -141,8 +208,11 @@ export default class AllTransactionScreen extends React.Component {
             <View style={ {
               flex: 1, flexDirection: "row", alignItems: 'center', paddingHorizontal: 10
             } }>
-              <Text style={ { color: "#2F2F2F", fontSize: 20, fontWeight: "bold" } }>{ item.totalReceived / 1e8 }</Text>
-              <Text style={ { color: "#D0D0D0", fontSize: 15, fontWeight: "600", paddingHorizontal: 10 } }>{ item.NumberofConfirmations }</Text>
+              <Text style={ { color: "#2F2F2F", fontSize: 20, fontWeight: "bold" } }>
+                { item.amount }
+                <Text note> sats</Text>
+              </Text>
+              <Text style={ { color: "#D0D0D0", fontSize: 15, fontWeight: "600", paddingHorizontal: 10 } }>{ item.confirmations }</Text>
             </View>
 
             <SvgIcon
@@ -156,15 +226,14 @@ export default class AllTransactionScreen extends React.Component {
       </View> )
   }
 
-
   render() {
     return (
       <Container>
-        <SafeAreaView style={ styles.container }>
-          <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-            <View>
-              <View style={ { flexDirection: "row", padding: 20 } }>
-                <Text style={ { color: "#2F2F2F", fontSize: 28, fontWeight: "600", flex: 1 } }>{ "Transactions" }</Text>
+        <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+          <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
+            <View style={ { margin: 10, marginTop: 30 } }>
+              <View style={ { flexDirection: "row" } }>
+                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#2F2F2F", fontSize: 28, fontWeight: "600", flex: 1 } ] }>{ "Transactions" }</Text>
                 <View style={ styles.filterView }>
                   <Icon
                     name="filter"
@@ -178,25 +247,55 @@ export default class AllTransactionScreen extends React.Component {
                 <Text style={ styles.subTitleText }>{ "Recent Transactions" }</Text>
               </View>
             </View>
-            <FlatList
-              style={ { flex: 1, padding: 10 } }
-              data={ this.state.recentTransactions }
-              renderItem={ this._renderItem }
-              keyExtractor={ ( item, index ) => index.toString() }
-            />
-          </ImageBackground>
-          <Modal
-            setModalVisible={ this.setModalVisible.bind( this ) }
-            modalData={ {
-              selectedTransaction: this.state.selectedTransaction,
-              detailsArray: this.state.detailsArray,
-              modalVisible: this.state.modalVisible,
-            }
-            }
+            <KeyboardAwareScrollView
+              enableAutomaticScroll
+              automaticallyAdjustContentInsets={ true }
+              keyboardOpeningTime={ 0 }
+              refreshControl={
+                <RefreshControl
+                  refreshing={ false }
+                  onRefresh={ () => {
+                    this.getReloadData()
+                  } }
+                />
+              }
+              enableOnAndroid={ true }
+              contentContainerStyle={ { flexGrow: 1 } }
+            >
+              {
+                !this.state.flag_Loading && this.state.recentTransactions.length === 0 ?
 
-          />
-        </SafeAreaView>
+                  <View style={ { justifyContent: "center", alignItems: "center", padding: 20, paddingTop: 50 } }>
+                    <Text style={ { textAlign: "center", color: "#838383", marginBottom: 10 } }>{ "Start transactions to see your recent transactions history." }</Text>
+                    <Text style={ [ globalStyle.ffFiraSansRegular, { textAlign: "center", marginTop: 10 } ] }>Please pull down to refresh, if all transactions are not visible.</Text>
+                  </View> : null
+              }
+              <FlatList
+                style={ { flex: 1, padding: 10 } }
+                data={ this.state.recentTransactions }
+                renderItem={ this._renderItem }
+                keyExtractor={ ( item, index ) => index.toString() }
+                refreshControl={
+                  <RefreshControl
+                    onRefresh={ () => { this.getReloadData() } }
+                    refreshing={ false }
+                  ></RefreshControl>
+                }
+              />
+            </KeyboardAwareScrollView>
+          </SafeAreaView>
+        </ImageBackground>
+        <Modal
+          setModalVisible={ this.setModalVisible.bind( this ) }
+          modalData={ {
+            selectedTransaction: this.state.selectedTransaction,
+            detailsArray: this.state.detailsArray,
+            modalVisible: this.state.modalVisible,
+          }
+          }
+        />
         <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
+        <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
       </Container >
     );
   }
@@ -235,4 +334,4 @@ const styles = StyleSheet.create( {
     fontSize: 15,
     paddingVertical: 10
   }
-} );
+} );   

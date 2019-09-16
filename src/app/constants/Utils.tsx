@@ -1,8 +1,17 @@
 import moment from "moment";
-import ConnectivityTracker from "react-native-connectivity-tracker";
+//import ConnectivityTracker from "react-native-connectivity-tracker";
 let CryptoJS = require( "crypto-js" );
 import DeviceInfo from "react-native-device-info";
 import bip39 from "bip39";
+import {
+  AsyncStorage
+} from "react-native";
+
+
+import {
+  asyncStorageKeys
+} from "HexaWallet/src/app/constants/Constants";
+
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 //TODO: Date Format
 
@@ -28,22 +37,22 @@ const getUnixToDateFormat2 = () => {
   return moment().format( 'DD MMM YYYY , hh:mm a' );
 }
 
-//TODO: Network check
-let isNetwork;
-const onConnectivityChange = ( isConnected, timestamp, connectionInfo ) => {
-  console.log( "connection state change" );
-  isNetwork = isConnected;
-};
+// //TODO: Network check
+// let isNetwork: boolean;
+// const onConnectivityChange = ( isConnected: any, timestamp: any, connectionInfo: any ) => {
+//   console.log( "connection state change" );
+//   isNetwork = isConnected;
+// };
 
-ConnectivityTracker.init( {
-  onConnectivityChange,
-  attachConnectionInfo: false,
-  onError: msg => console.log( msg )
-  // verifyServersAreUp: () => store.dispatch(checkOurServersAreUp()),
-} );
+// ConnectivityTracker.init( {
+//   onConnectivityChange,
+//   attachConnectionInfo: false,
+//   onError: ( msg: any ) => console.log( msg )
+//   // verifyServersAreUp: () => store.dispatch(checkOurServersAreUp()),
+// } );
 
-const getNetwork = value => {
-  return isNetwork;
+const getNetwork = () => {
+  return true //isNetwork;  
 };
 
 const encrypt = ( data: any, password: string ) => {
@@ -55,7 +64,7 @@ const encryptAgain = ( data: any, password: string ) => {
   let ciphertext = CryptoJS.AES.encrypt( data, password, {
     mode: CryptoJS.mode.ECB
   } );
-  console.log( { ciphertext } );
+
   return ciphertext.toString();
 };
 
@@ -140,7 +149,7 @@ const getStatusBarHeight = () => {
 
 const getIphoneSize = () => {
   let model = DeviceInfo.getModel();
-  var iphoneSeries = "IPhone X";
+  var iphoneSeries = "iphone X";
   if (
     model == "iPhone XS" ||
     model == "iPhone XS Max" ||
@@ -305,6 +314,30 @@ const setFlagQRCodeScreen = ( value: any ) => {
   return true;
 }
 
+// AsyncStorage values get and set
+
+const getAsyncStorage = async ( name: any ) => {
+  console.log( { value: await AsyncStorage.getItem( asyncStorageKeys[ name ] ) } );
+  return await AsyncStorage.getItem( asyncStorageKeys[ name ] );
+}
+
+const setAsyncStorage = ( name: any, value: any ) => {
+  AsyncStorage.setItem(
+    asyncStorageKeys[ name ],
+    value
+  );
+  return true;
+}
+
+
+
+
+
+
+
+
+
+
 module.exports = {
   getUnixTimeDate,
   getUnixToDateFormat,
@@ -356,5 +389,9 @@ module.exports = {
 
   //Singleton Flags
   getFlagQRCodeScreen,
-  setFlagQRCodeScreen
+  setFlagQRCodeScreen,
+
+  //AsyncStorage
+  getAsyncStorage,
+  setAsyncStorage
 };   

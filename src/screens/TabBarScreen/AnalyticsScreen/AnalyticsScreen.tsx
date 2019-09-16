@@ -16,33 +16,33 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { images, colors } from "bithyve/src/app/constants/Constants";
 
 //localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+import { localization } from "bithyve/src/app/manage/Localization/i18n";
 
 export default class AnalyticsScreen extends React.Component {
   render() {
     return (
       <Container>
-        <StatusBar backgroundColor={colors.appColor} barStyle="dark-content" />
-        <ImageBackground source={images.appBackgound} style={styles.container}>
+        <StatusBar backgroundColor={ colors.appColor } barStyle="dark-content" />
+        <ImageBackground source={ images.appBackgound } style={ styles.container }>
           <Header transparent>
             <Left>
               <Button
                 transparent
-                onPress={() => this.props.navigation.toggleDrawer()}
+                onPress={ () => this.props.navigation.toggleDrawer() }
               >
-                <Icon name="bars" size={25} color="#ffffff" />
+                <Icon name="bars" size={ 25 } color="#ffffff" />
               </Button>
             </Left>
 
-            <Body style={{ flex: 0, alignItems: "center" }}>
-              <Title>{localization("appConfig.appName")}</Title>
+            <Body style={ { flex: 0, alignItems: "center" } }>
+              <Title>{ localization( "appConfig.appName" ) }</Title>
             </Body>
             <Right>
               <Button transparent>
-                <Icon name="bell" size={15} color="#ffffff" />
+                <Icon name="bell" size={ 15 } color="#ffffff" />
               </Button>
               <Button transparent>
-                <Icon name="plus" size={25} color="#ffffff" />
+                <Icon name="plus" size={ 25 } color="#ffffff" />
               </Button>
             </Right>
           </Header>
@@ -53,9 +53,9 @@ export default class AnalyticsScreen extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1,
     backgroundColor: "#fff"
   }
-});
+} );

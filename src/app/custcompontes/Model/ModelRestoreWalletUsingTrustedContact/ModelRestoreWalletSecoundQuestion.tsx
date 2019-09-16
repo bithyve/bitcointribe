@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Dimensions, Platform } from 'react-native';
+import { Modal, View, StyleSheet, Dimensions, Platform } from 'react-native';
 import {
-    Container,
     Header,
     Title,
-    Content,
     Item,
     Input,
     Button,
@@ -16,7 +14,7 @@ import {
     Icon
 } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import { Avatar } from 'react-native-elements';
+
 import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
@@ -38,7 +36,7 @@ import {
 } from "HexaWallet/src/app/constants/Constants";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 
 export default class ModelRestoreWalletSecoundQuestion extends Component<Props, any> {
@@ -64,7 +62,7 @@ export default class ModelRestoreWalletSecoundQuestion extends Component<Props, 
     check_CorrectAnswer() {
         setTimeout( () => {
             let firstAns = this.state.secoundAnswer;
-            if ( firstAns.length >= 6 ) {
+            if ( firstAns.length >= 3 ) {
                 this.setState( {
                     flag_DisableBtnNext: false
                 } )
@@ -114,6 +112,7 @@ export default class ModelRestoreWalletSecoundQuestion extends Component<Props, 
                             <View style={ { flexDirection: "row", flex: 0.5 } }>
                                 <Button
                                     transparent
+                                    hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                     onPress={ () => this.props.pop() }
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />
@@ -149,7 +148,7 @@ export default class ModelRestoreWalletSecoundQuestion extends Component<Props, 
                                     <Input
                                         secureTextEntry
                                         keyboardType="default"
-                                        autoCapitalize='sentences'
+                                        autoCapitalize='none'
                                         placeholder='Write your answer here'
                                         style={ [ globalStyle.ffFiraSansMedium ] }
                                         placeholderTextColor="#B7B7B7"

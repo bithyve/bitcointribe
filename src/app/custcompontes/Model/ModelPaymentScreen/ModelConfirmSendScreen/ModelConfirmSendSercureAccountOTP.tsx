@@ -1,27 +1,15 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Dimensions, Platform, Image } from 'react-native';
+import { Modal, View, StyleSheet, Platform } from 'react-native';
 import {
-    Container,
-    Header,
-    Title,
-    Content,
-    Item,
-    Input,
     Button,
-    Left,
-    Right,
-    Body,
     Text,
-    Picker,
     Icon
 } from "native-base";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import FullLinearGradientLoadingButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientLoadingButton";
 import CodeInput from "react-native-confirmation-code-input";
-import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-//TODO: Custome Model
-import ModelPasscode from '../ModelCommom/ModelPasscode';
+
 
 
 interface Props {
@@ -33,7 +21,7 @@ interface Props {
 }
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Alert 
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
@@ -41,15 +29,14 @@ let alert = new AlertSimple();
 
 //TODO: Custome Object
 import {
-    images,
     colors
 } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-import utils from "HexaWallet/src/app/constants/Utils";
+
 
 
 //TODO: Bitcoin class
-var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
+var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
 
 export default class ModelConfirmSendSercureAccountOTP extends Component<Props, any> {
     constructor ( props: any ) {
@@ -69,14 +56,15 @@ export default class ModelConfirmSendSercureAccountOTP extends Component<Props, 
                 }
             ],
             success: "Secret does not match!",
-            flag_DisableBtnNext: true
+            flag_DisableBtnNext: true,
+            flag_NextBtnAnimation: false
         } );
     }
 
 
     componentWillReceiveProps( nextProps: any ) {
         var data = nextProps.data[ 0 ];
-        console.log( { data } );
+        //console.log( { data } );
         if ( data != undefined ) {
             if ( Array.isArray( data.data ) ) {
                 data = data.data[ 0 ];
@@ -114,23 +102,37 @@ export default class ModelConfirmSendSercureAccountOTP extends Component<Props, 
         // } );
     }
 
+    click_StopLoader = () => {
+        this.setState( {
+            flag_NextBtnAnimation: false,
+            flag_DisableBtnNext: false,
+        } );
+    }
+
+
     click_Next = async () => {
+        this.setState( {
+            flag_NextBtnAnimation: true,
+            flag_DisableBtnNext: true,
+        } )
         let { data, token, resTransferST } = this.state;
         let secureAccount = await bitcoinClassState.getSecureClassState();
-        console.log( { token, txHex: resTransferST.data.txHex } );
-
+        //console.log( { token, txHex: resTransferST.data.txHex } );
         var resultTransferST = await secureAccount.transferST3( token, resTransferST.data.txHex, resTransferST.data.childIndexArray );
-        console.log( { resultTransferST } );
+        //console.log( { resultTransferST } );
         if ( resultTransferST.status == 200 ) {
             resultTransferST = resultTransferST.data;
+            this.click_StopLoader();
             this.props.click_Next( resultTransferST );
         } else {
-            alert.simpleOk( "Oops", resultTransferST.err );
+            alert.simpleOkAction( "Oops", resultTransferST.err, this.click_StopLoader );
         }
     }
 
     render() {
         let { passcodeStyle, flag_DisableBtnNext, message, otp } = this.state;
+        //flag
+        let { flag_NextBtnAnimation } = this.state;
         return (
             <Modal
                 transparent
@@ -195,13 +197,14 @@ export default class ModelConfirmSendSercureAccountOTP extends Component<Props, 
                             </View>
                             <View style={ { flex: 0.1, justifyContent: "flex-end" } }>
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>For security reasons please setup the Google Authenticator on another device.</Text>
-                                <FullLinearGradientButton
+                                <FullLinearGradientLoadingButton
                                     click_Done={ () => {
                                         this.click_Next()
                                     }
                                     }
-                                    title="Next"
+                                    title=" Next"
                                     disabled={ flag_DisableBtnNext }
+                                    animating={ flag_NextBtnAnimation }
                                     style={ [ flag_DisableBtnNext == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
                                 />
                             </View>

@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Dimensions, Platform, Image, NativeModules } from 'react-native';
+import { Modal, View, StyleSheet, Dimensions, Platform, Image, NativeModules } from 'react-native';
 import {
-    Container,
     Header,
     Title,
-    Content,
     Item,
     Input,
     Button,
@@ -16,7 +14,6 @@ import {
     Icon
 } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import { Avatar } from 'react-native-elements';
 import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import QRCode from 'react-native-qrcode-svg';
@@ -24,7 +21,6 @@ import QRCode from 'react-native-qrcode-svg';
 
 import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 var RNFS = require( 'react-native-fs' );
-import RNFetchBlob from 'react-native-fetch-blob';
 
 //Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
@@ -33,8 +29,7 @@ import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
 
-//TODO: Custome Model
-import ModelPasscode from '../ModelCommom/ModelPasscode';
+
 
 interface Props {
     data: [];
@@ -45,11 +40,11 @@ interface Props {
 }
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Common Funciton
-var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+var comAppHealth = require( "HexaWallet/src/app/manage/CommonFunction/CommonAppHealth" );
+var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
 
 //TODO: Custome Object
 import {
@@ -59,12 +54,12 @@ import {
 } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
 
 let wrongEnterAnswerCount = 0;
 
 //Bitcoin Class
-var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
+var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
 
 export default class ModelSecretQuestionAndAnswer extends Component<Props, any> {
     constructor ( props: any ) {
@@ -127,7 +122,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
         setTimeout( () => {
             let firstAns = this.state.firstAnswer;
             let secoundAns = this.state.secoundAnswer;
-            if ( secoundAns.length >= 6 && firstAns.length >= 6 ) {
+            if ( secoundAns.length >= 3 && firstAns.length >= 3 ) {
                 if ( secoundAns != firstAns ) {
                     this.setState( {
                         flag_DisableBtnNext: true,
@@ -282,21 +277,22 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                                                         questionData.Question = this.state.firstQuestion;
                                                         questionData.Answer = this.state.secoundAnswer;
                                                         queTemp.push( questionData );
-                                                        let resUpdateWalletAns = await dbOpration.updateWalletAnswerDetails(
-                                                            localDB.tableName.tblWallet,
-                                                            queTemp
-                                                        );
-                                                        console.log( { resUpdateWalletAns } );
 
-                                                        if ( resUpdateWalletAns ) {
-                                                            await bitcoinClassState.setS3ServiceClassState( sss );
-                                                            await comFunDBRead.readTblSSSDetails();
-                                                            await comFunDBRead.readTblWallet();
-                                                            this.setState( {
-                                                                flag_Loading: false
-                                                            } );
-                                                            this.props.click_Next();
-                                                        }
+                                                        // let resUpdateWalletAns = await dbOpration.updateWalletAnswerDetails(
+                                                        //     localDB.tableName.tblWallet,
+                                                        //     queTemp
+                                                        // );
+                                                        // console.log( { resUpdateWalletAns } );
+
+                                                        // if ( resUpdateWalletAns ) {
+                                                        //     await bitcoinClassState.setS3ServiceClassState( sss );
+                                                        //     await comFunDBRead.readTblSSSDetails();
+                                                        //     await comFunDBRead.readTblWallet();
+                                                        //     this.setState( {
+                                                        //         flag_Loading: false
+                                                        //     } );
+                                                        //     this.props.click_Next();
+                                                        // }
                                                     }
                                                 }
                                             } else {
@@ -1231,6 +1227,7 @@ export default class ModelSecretQuestionAndAnswer extends Component<Props, any> 
                             <View style={ { flexDirection: "row", flex: 0.5 } }>
                                 <Button
                                     transparent
+                                    hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                     onPress={ () => this.props.pop() }
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />

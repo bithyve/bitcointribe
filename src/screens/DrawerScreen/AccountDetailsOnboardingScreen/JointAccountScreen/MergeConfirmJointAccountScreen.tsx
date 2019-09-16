@@ -34,19 +34,19 @@ import {
   localDB,
   msg
 } from "bithyve/src/app/constants/Constants";
-var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
+var dbOpration = require( "bithyve/src/app/manage/database/DBOpration" );
 
 //TODO: Bitcoin Files
 //import jointAccount from "bithyve/src/bitcoin/services/JointAccount";
 
-const { width } = Dimensions.get("window");
+const { width } = Dimensions.get( "window" );
 
 //localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+import { localization } from "bithyve/src/app/manage/Localization/i18n";
 
 export default class MergeConfirmJointAccountScreen extends React.Component {
-  constructor(props: any) {
-    super(props);
+  constructor ( props: any ) {
+    super( props );
     this.state = {
       data: [],
       name: "",
@@ -57,12 +57,12 @@ export default class MergeConfirmJointAccountScreen extends React.Component {
   }
 
   componentWillMount() {
-    console.log(this.props.navigation.getParam("data"));
-    let jointDetails = JSON.parse(this.props.navigation.getParam("data"));
-    console.log({ jointDetails });
-    this.setState({
+    //console.log(this.props.navigation.getParam("data"));
+    let jointDetails = JSON.parse( this.props.navigation.getParam( "data" ) );
+    //console.log({ jointDetails });
+    this.setState( {
       data: jointDetails
-    });
+    } );
   }
 
   // async CreateMultisigAndStore(joint: string, name: string) {
@@ -131,132 +131,132 @@ export default class MergeConfirmJointAccountScreen extends React.Component {
       "Joint",
       data
     );
-    if (resultCreateAccount) {
-      this.setState({
+    if ( resultCreateAccount ) {
+      this.setState( {
         isLoading: false,
         alertPopupData: [
           {
             theme: "success",
             status: true,
             icon: "smile",
-            title: localization("MergeConfirmJointAccountScreen.popupTitle"),
-            subtitle: localization("MergeConfirmJointAccountScreen.popupBody"),
+            title: localization( "MergeConfirmJointAccountScreen.popupTitle" ),
+            subtitle: localization( "MergeConfirmJointAccountScreen.popupBody" ),
             goBackStatus: true
           }
         ]
-      });
+      } );
     }
   }
 
   render() {
     return (
       <Container>
-        <ImageBackground source={images.appBackgound} style={styles.container}>
+        <ImageBackground source={ images.appBackgound } style={ styles.container }>
           <Header transparent>
             <Left>
               <Button
                 transparent
-                onPress={() => this.props.navigation.goBack()}
+                onPress={ () => this.props.navigation.goBack() }
               >
-                <Icon name="chevron-left" size={25} color="#ffffff" />
+                <Icon name="chevron-left" size={ 25 } color="#ffffff" />
               </Button>
             </Left>
-            <Body style={{ flex: 0, alignItems: "center" }}>
+            <Body style={ { flex: 0, alignItems: "center" } }>
               <Title
-                adjustsFontSizeToFit={true}
-                numberOfLines={1}
-                style={styles.titleUserName}
+                adjustsFontSizeToFit={ true }
+                numberOfLines={ 1 }
+                style={ styles.titleUserName }
               >
-                {localization("MergeConfirmJointAccountScreen.headerTitle")}
+                { localization( "MergeConfirmJointAccountScreen.headerTitle" ) }
               </Title>
             </Body>
             <Right />
           </Header>
-          <Content contentContainerStyle={styles.container} padder>
-            <View style={styles.viewMergeLogo}>
+          <Content contentContainerStyle={ styles.container } padder>
+            <View style={ styles.viewMergeLogo }>
               <Image
-                style={styles.logoMerge}
-                source={images.secureAccount.secureLogo}
+                style={ styles.logoMerge }
+                source={ images.secureAccount.secureLogo }
               />
-              <Text style={styles.txtTitle}>
-                {localization("MergeConfirmJointAccountScreen.jointbody", {
+              <Text style={ styles.txtTitle }>
+                { localization( "MergeConfirmJointAccountScreen.jointbody", {
                   nameInitiate: this.state.data.cn
-                })}
-                {localization("MergeConfirmJointAccountScreen.jointbody1", {
+                } ) }
+                { localization( "MergeConfirmJointAccountScreen.jointbody1", {
                   nameAccountName: this.state.data.wn
-                })}
+                } ) }
               </Text>
             </View>
 
-            <View style={styles.viewInputValues}>
-              <View style={{ height: 50 }}>
+            <View style={ styles.viewInputValues }>
+              <View style={ { height: 50 } }>
                 <Input
-                  name={this.state.name}
-                  value={this.state.name}
-                  placeholder={localization(
+                  name={ this.state.name }
+                  value={ this.state.name }
+                  placeholder={ localization(
                     "MergeConfirmJointAccountScreen.txtInputName"
-                  )}
-                  keyboardType={"default"}
-                  placeholderTextColor={Platform.OS == "ios" ? "#000" : "#000"}
-                  style={styles.input}
-                  onChangeText={text => {
-                    this.setState({ name: text });
+                  ) }
+                  keyboardType={ "default" }
+                  placeholderTextColor={ Platform.OS == "ios" ? "#000" : "#000" }
+                  style={ styles.input }
+                  onChangeText={ text => {
+                    this.setState( { name: text } );
                     let flag_disableValue: boolean;
-                    if (text == "" || this.state.name == "") {
+                    if ( text == "" || this.state.name == "" ) {
                       flag_disableValue = true;
                     } else {
                       flag_disableValue = false;
                     }
-                    this.setState({
+                    this.setState( {
                       flag_disableMergeBtn: flag_disableValue
-                    });
-                  }}
+                    } );
+                  } }
                 />
               </View>
               <Button
                 full
-                style={styles.btnMerge}
-                disabled={this.state.flag_disableMergeBtn}
-                style={[
+                style={ styles.btnMerge }
+                disabled={ this.state.flag_disableMergeBtn }
+                style={ [
                   styles.btnMerge,
                   this.state.flag_disableMergeBtn
                     ? { backgroundColor: "gray" }
                     : { backgroundColor: colors.appColor }
-                ]}
-                onPress={() => this.click_JointAccount()}
+                ] }
+                onPress={ () => this.click_JointAccount() }
               >
                 <Text>
-                  {" "}
-                  {localization("MergeConfirmJointAccountScreen.btnMerge")}{" "}
+                  { " " }
+                  { localization( "MergeConfirmJointAccountScreen.btnMerge" ) }{ " " }
                 </Text>
               </Button>
             </View>
           </Content>
         </ImageBackground>
         <SCLAlertOk
-          data={this.state.alertPopupData}
-          click_Ok={(status: boolean) => {
+          data={ this.state.alertPopupData }
+          click_Ok={ ( status: boolean ) => {
             status
-              ? this.props.navigation.push("ReceiveMoneyScreen", {
-                  page: "MergeConfirmJointAccountScreen",
-                  data: this.state.ackJSON
-                })
-              : console.log(status),
-              this.setState({
+              ? this.props.navigation.push( "ReceiveMoneyScreen", {
+                page: "MergeConfirmJointAccountScreen",
+                data: this.state.ackJSON
+              } )
+              : console.log( status ),
+              this.setState( {
                 alertPopupData: [
                   {
                     status: false
                   }
                 ]
-              });
-          }}
+              } );
+          } }
         />
       </Container>
     );
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1
   },
@@ -293,4 +293,4 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 10
   }
-});
+} );

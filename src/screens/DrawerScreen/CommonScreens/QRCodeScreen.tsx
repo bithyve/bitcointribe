@@ -1,44 +1,25 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Dimensions } from "react-native";
+import { StyleSheet, ImageBackground, View, SafeAreaView, Dimensions } from "react-native";
 import {
     Container,
-    Header,
-    Title,
-    Content,
-    Item,
-    Input,
-    Button,
-    Left,
-    Right,
-    Body,
-    Text,
-    Icon,
-    List,
-    ListItem,
-    Thumbnail
+    Text
 } from "native-base";
-import { SvgIcon } from "@up-shared/components";
-import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Contacts from 'react-native-contacts';
-import { Avatar, SearchBar } from 'react-native-elements';
 // import QRCode from "react-native-qrcode";
 import QRCode from 'react-native-qrcode-svg';
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+import { colors, images } from "HexaWallet/src/app/constants/Constants";
 
-//TODO: Bitcoin Files
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+
 
 export default class QRCodeScreen extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -59,7 +40,7 @@ export default class QRCodeScreen extends React.Component<any, any> {
         qrCodeData.wn = walletName;
         // qrCodeData.mo = mobileNo;
         qrCodeData.data = data.toString();
-        console.log( { qrCodeData } );
+        //console.log( { qrCodeData } );
         this.setState( {
             data: JSON.stringify( qrCodeData ).toString()
         } )
@@ -74,18 +55,11 @@ export default class QRCodeScreen extends React.Component<any, any> {
     render() {
         return (
             <Container>
-                <SafeAreaView style={ styles.container }>
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.goBack() }
-                            >
-                                <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Share via QR</Text>
-                            </Button>
-                        </View>
+                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <HeaderTitle title="Share via QR"
+                        pop={ () => this.goBack() }
+                    />
+                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
                         <KeyboardAwareScrollView
                             enableOnAndroid
                             extraScrollHeight={ 40 }
@@ -103,9 +77,9 @@ export default class QRCodeScreen extends React.Component<any, any> {
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut faucibus pulvinar elementum integer enim neque volutpat. Leo integer malesuada nunc vel. Purus faucibus ornare suspendisse sed nisi lacus sed. Et ligula ullamcorper malesuada proin libero nunc consequat. A cras semper auctor neque vitae tempus quam pellentesque. In nisl nisi scelerisque eu ultrices vitae auctor eu augue. Sed risus ultricies tristique nulla aliquet enim tortor. Curabitur gravida arcu ac tortor dignissim convallis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Porta lorem mollis aliquam ut porttitor Leo a.</Text>
                             </View>
                         </KeyboardAwareScrollView>
-
-                    </ImageBackground>
-                </SafeAreaView>
+                    </SafeAreaView>
+                </ImageBackground>
+                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

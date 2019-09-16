@@ -1,37 +1,29 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Image, Platform, StatusBar, Dimensions } from 'react-native';
-import { Button, Icon, Text } from "native-base";
+import { Modal, View, StyleSheet, Image, Platform } from 'react-native';
+import { Button, Text } from "native-base";
 import CodeInput from "react-native-confirmation-code-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as Keychain from "react-native-keychain";
 
 
 
-var Mailer = require( 'NativeModules' ).RNMail;
-import Share from "react-native-share";
-
 
 //TODO: Custome Compontes  
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import FullLinearGradientIconButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientIconButton";
-import { SvgIcon } from "@up-shared/components";
+
+
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import {
     colors,
     images
 } from "HexaWallet/src/app/constants/Constants";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
-//TODO: Common Function
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
-
-//Bitcoin Files
-import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
 interface Props {
     data: [];
@@ -56,15 +48,20 @@ export default class ModelPasscode extends Component<Props, any> {
         } );
     }
 
+    componentWillMount() {
+        this.componentWillReceiveProps( null )
+    }
+
     componentWillReceiveProps = async ( nextProps: any ) => {
         const credentials = await Keychain.getGenericPassword();
-        // console.log( { credentials } );
+        //console.log( { credentials } );
         this.setState( {
             pincode: credentials.password
         } );
     }
 
-    _onFinishCheckingCode( isValid: boolean, code: string ) {
+    onFinishCheckingCode = ( isValid: boolean, code: string ) => {
+        //console.log( { isValid, code } );
         if ( isValid ) {
             this.setState( {
                 status: true,
@@ -78,6 +75,7 @@ export default class ModelPasscode extends Component<Props, any> {
             } );
         } else {
             this.setState( {
+                status: false,
                 passcodeStyle: [
                     {
                         activeColor: "red",
@@ -108,7 +106,6 @@ export default class ModelPasscode extends Component<Props, any> {
                 }
                 presentationStyle="fullScreen"
             >
-                <StatusBar hidden={ true } />
                 <View style={ [
                     styles.modalBackground,
                     { backgroundColor: 'rgba(0,0,0,0.7)' }
@@ -118,7 +115,7 @@ export default class ModelPasscode extends Component<Props, any> {
                         automaticallyAdjustContentInsets={ true }
                         keyboardOpeningTime={ 0 }
                         enableOnAndroid={ true }
-                        contentContainerStyle={ { flexGrow: 1 } }
+                        contentContainerStyle={ { flexGrow: 1, backgroundColor: "#ffffff" } }
                     >
                         <View style={ styles.viewAppLogo }>
                             <Image style={ styles.imgAppLogo } source={ images.appIcon } />
@@ -132,19 +129,18 @@ export default class ModelPasscode extends Component<Props, any> {
                             <Text
                                 style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
                             >
-                                Re - Enter Passcode{ " " }
+                                Enter Pin{ " " }
                             </Text>
                             <CodeInput
                                 ref="codeInputRef1"
                                 secureTextEntry
                                 keyboardType="numeric"
                                 codeLength={ 5 }
-                                compareWithCode={ this.state.pincode }
+                                compareWithCode={ pincode }
                                 activeColor={ passcodeStyle[ 0 ].activeColor }
                                 inactiveColor={ passcodeStyle[ 0 ].inactiveColor }
                                 className="border-box"
                                 cellBorderWidth={ passcodeStyle[ 0 ].cellBorderWidth }
-                                compareWithCode={ pincode }
                                 autoFocus={ true }
                                 inputPosition="center"
                                 space={ 10 }
@@ -155,8 +151,11 @@ export default class ModelPasscode extends Component<Props, any> {
                                     justifyContent: "center",
                                     height: Platform.OS == "ios" ? 0 : 40,
                                 } }
-                                onFulfill={ ( isValid: any, code: any ) =>
-                                    this._onFinishCheckingCode( isValid, code )
+                                onFulfill={ ( isValid: any, code: any ) => {
+                                    //console.log( { isValid, code, pincode } );
+                                    this.onFinishCheckingCode( isValid, code )
+                                }
+
                                 }
                                 type='withoutcharacters'
                             />
@@ -176,7 +175,6 @@ export default class ModelPasscode extends Component<Props, any> {
                             <Button
                                 onPress={ () => {
                                     this.props.closeModal()
-
                                 } }
                                 style={ [ globalStyle.ffFiraSansSemiBold, {
                                     backgroundColor: "#838383", borderRadius: 10, margin: 5,

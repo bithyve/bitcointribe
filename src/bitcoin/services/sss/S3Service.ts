@@ -3,7 +3,7 @@ import {
   IBuddyStaticNonPMDD,
   IMetaShare,
   ISocialStaticNonPMDD,
-} from "../../utilities/Interface";
+} from "../../utilities/sss/Interface";
 import SSS from "../../utilities/sss/SSS";
 
 export default class S3Service {
@@ -166,6 +166,112 @@ export default class S3Service {
     }
   }
 
+  public static updateHealth = async (
+    metaShares: IMetaShare[],
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          updationInfo: Array<{
+            walletId: string;
+            shareId: string;
+            updated: boolean;
+            dynamicNonPMDD?: string;
+            err?: string;
+          }>;
+        };
+        err?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await SSS.updateHealth(metaShares),
+      };
+    } catch (err) {
+      return { status: config.STATUS.ERROR, err: err.message };
+    }
+  }
+
+  public static getShareId = (
+    encryptedShare: string,
+  ):
+    | {
+        status: number;
+        data: {
+          shareId: string;
+        };
+        err?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        data?: undefined;
+      } => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: SSS.getShareId(encryptedShare),
+      };
+    } catch (err) {
+      return { status: config.STATUS.ERROR, err: err.message };
+    }
+  }
+
+  public static generateKey = ():
+    | {
+        status: number;
+        data: {
+          key: string;
+        };
+        err?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        data?: undefined;
+      } => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: { key: SSS.makeKey(SSS.cipherSpec.keyLength) },
+      };
+    } catch (err) {
+      return { status: config.STATUS.ERROR, err: err.message };
+    }
+  }
+
+  public static encryptViaOTP = (
+    key: string,
+  ):
+    | {
+        status: number;
+        data: {
+          otpEncryptedData: string;
+          otp: string;
+        };
+        err?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        data?: undefined;
+      } => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: SSS.encryptViaOTP(key),
+      };
+    } catch (err) {
+      return { status: config.STATUS.ERROR, err: err.message };
+    }
+  }
+
   private sss: SSS;
   constructor(mnemonic: string, encryptedShares?: string[]) {
     this.sss = new SSS(mnemonic, encryptedShares);
@@ -243,39 +349,12 @@ export default class S3Service {
     }
   }
 
-  public getShareId = (
-    encryptedShare: string,
-  ):
-    | {
-        status: number;
-        data: {
-          shareId: string;
-        };
-        err?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        data?: undefined;
-      } => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.sss.getShareId(encryptedShare),
-      };
-    } catch (err) {
-      return { status: config.STATUS.ERROR, err: err.message };
-    }
-  }
-
   public initializeHealthcheck = async (
     encryptedShares: string[],
   ): Promise<
     | {
         status: number;
-        data: {
-          success: boolean;
-        };
+        data: any;
         err?: undefined;
       }
     | {
@@ -317,39 +396,6 @@ export default class S3Service {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.sss.checkHealth(shareIDs),
-      };
-    } catch (err) {
-      return { status: config.STATUS.ERROR, err: err.message };
-    }
-  }
-
-  public updateHealth = async (
-    walletId: string,
-    encryptedShare: string,
-  ): Promise<
-    | {
-        status: number;
-        data:
-          | {
-              updated: boolean;
-              nonPMDD: string;
-            }
-          | {
-              updated: boolean;
-              nonPMDD?: string;
-            };
-        err?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.sss.updateHealth(walletId, encryptedShare),
       };
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
@@ -496,6 +542,7 @@ export default class S3Service {
       return { status: config.STATUS.ERROR, err: err.message };
     }
   }
+
   public createQR = async (
     metashare: IMetaShare,
     index: number,
@@ -523,6 +570,7 @@ export default class S3Service {
 
   public generateEncryptedMetaShare = (
     metaShare: IMetaShare,
+    key?: string,
   ):
     | {
         status: number;
@@ -541,33 +589,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.sss.encryptMetaShare(metaShare),
-      };
-    } catch (err) {
-      return { status: config.STATUS.ERROR, err: err.message };
-    }
-  }
-
-  public encryptViaOTP = (
-    key: string,
-  ):
-    | {
-        status: number;
-        data: {
-          otpEncryptedData: string;
-          otp: string;
-        };
-        err?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        data?: undefined;
-      } => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.sss.encryptViaOTP(key),
+        data: this.sss.encryptMetaShare(metaShare, key),
       };
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };

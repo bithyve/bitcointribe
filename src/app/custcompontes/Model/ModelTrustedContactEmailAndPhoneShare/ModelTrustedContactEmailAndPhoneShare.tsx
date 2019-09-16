@@ -1,17 +1,16 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { Modal, View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { Button, Icon, Text } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import { SvgIcon } from "@up-shared/components";
 import { Avatar } from 'react-native-elements';
-import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
+
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+import { colors } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
 export default class ModelTrustedContactEmailAndPhoneShare extends Component {
@@ -45,7 +44,7 @@ export default class ModelTrustedContactEmailAndPhoneShare extends Component {
                 animationType={ 'none' }
                 visible={ this.props.data.length != 0 ? this.props.data[ 0 ].modalVisible : false }
                 onRequestClose={ () => {
-                    console.log( "call" );
+                    //console.log( "call" );
                     this.props.closeModal()
                 }
 

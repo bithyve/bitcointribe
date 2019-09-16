@@ -22,23 +22,22 @@ import {
 } from "native-base";
 import Icon from "react-native-vector-icons/FontAwesome";
 import GridView from "react-native-super-grid";
-import Toast from "react-native-simple-toast";
 
 //TODO: Custome Pages
 import { images } from "bithyve/src/app/constants/Constants";
 
 //localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+import { localization } from "bithyve/src/app/manage/Localization/i18n";
 
 export default class VerifyBackupPhraseScreen extends React.Component {
-  constructor(props: any) {
-    super(props);
-    StatusBar.setHidden(false);
-    var verifyArray = [[]];
+  constructor ( props: any ) {
+    super( props );
+    StatusBar.setHidden( false );
+    var verifyArray = [ [] ];
     this.state = {
-      numanicValues: [[]],
-      verifyNumanic: [[]],
-      verifyNumanicValues: [[]],
+      numanicValues: [ [] ],
+      verifyNumanic: [ [] ],
+      verifyNumanicValues: [ [] ],
       visible: false,
       btnDoneBgColor: "gray",
       btnDoneDisbleFlag: true
@@ -48,102 +47,102 @@ export default class VerifyBackupPhraseScreen extends React.Component {
   //TODO: Page Life Cycle
   componentWillMount() {
     const { navigation } = this.props;
-    const secoundGridArray = navigation.getParam("numanicValues");
+    const secoundGridArray = navigation.getParam( "numanicValues" );
     this.verifyArray = secoundGridArray;
     var temp = [];
     var len = secoundGridArray.length;
-    if (len > 0) {
-      for (let i = 0; i < len; i++) {
-        var data = secoundGridArray[i];
+    if ( len > 0 ) {
+      for ( let i = 0; i < len; i++ ) {
+        var data = secoundGridArray[ i ];
         var joined = { name: data };
-        temp.push(joined);
+        temp.push( joined );
       }
-      temp = this.shuffle(temp);
-      this.setState({
+      temp = this.shuffle( temp );
+      this.setState( {
         numanicValues: temp
-      });
+      } );
     }
   }
 
   componentDidMount() {
-    this.setState({
+    this.setState( {
       verifyNumanicValues: [],
       verifyNumanic: []
-    });
+    } );
   }
 
   //TODO: randomise  array show
-  shuffle(array) {
+  shuffle( array ) {
     var currentIndex = array.length,
       temporaryValue,
       randomIndex;
-    while (0 !== currentIndex) {
-      randomIndex = Math.floor(Math.random() * currentIndex);
+    while ( 0 !== currentIndex ) {
+      randomIndex = Math.floor( Math.random() * currentIndex );
       currentIndex -= 1;
-      temporaryValue = array[currentIndex];
-      array[currentIndex] = array[randomIndex];
-      array[randomIndex] = temporaryValue;
+      temporaryValue = array[ currentIndex ];
+      array[ currentIndex ] = array[ randomIndex ];
+      array[ randomIndex ] = temporaryValue;
     }
     return array;
   }
 
   //TODO: function secound grid click
-  click_SecoundGridItem(item) {
+  click_SecoundGridItem( item ) {
     // First Grid add Values
     var temp = [];
     var joined = { name: item };
-    temp.push(joined);
-    var joinedCat = this.state.verifyNumanicValues.concat(temp);
-    this.setState({
+    temp.push( joined );
+    var joinedCat = this.state.verifyNumanicValues.concat( temp );
+    this.setState( {
       verifyNumanicValues: joinedCat
-    });
+    } );
     //Secound Grid remove values
-    var temp1 = [[]];
+    var temp1 = [ [] ];
     temp1 = this.state.numanicValues;
     // var index = this.functiontofindIndexByKeyValue(temp1, "name", item);
     let selectedIndex = temp1.findIndex(
-      filterCarObj => filterCarObj["name"] === item
+      filterCarObj => filterCarObj[ "name" ] === item
     );
-    temp1.splice(selectedIndex, 1);
-    this.setState({
+    temp1.splice( selectedIndex, 1 );
+    this.setState( {
       numanicValues: temp1
-    });
-    this.condition_DoneButtonCheckDiaEna(false);
+    } );
+    this.condition_DoneButtonCheckDiaEna( false );
   }
   //TODO: Function First Grid Click
-  click_FirstGridItem(item) {
+  click_FirstGridItem( item ) {
     // First Grid add Values
     var temp = [];
     var joined = { name: item };
-    temp.push(joined);
-    var joinedCat = this.state.numanicValues.concat(temp);
-    this.setState({
+    temp.push( joined );
+    var joinedCat = this.state.numanicValues.concat( temp );
+    this.setState( {
       numanicValues: joinedCat
-    });
+    } );
     //Secound Grid remove values
-    var temp1 = [[]];
+    var temp1 = [ [] ];
     temp1 = this.state.verifyNumanicValues;
     let selectedIndex = temp1.findIndex(
-      filterCarObj => filterCarObj["name"] === item
+      filterCarObj => filterCarObj[ "name" ] === item
     );
-    temp1.splice(selectedIndex, 1);
-    this.setState({
+    temp1.splice( selectedIndex, 1 );
+    this.setState( {
       verifyNumanicValues: temp1
-    });
-    this.condition_DoneButtonCheckDiaEna(true);
+    } );
+    this.condition_DoneButtonCheckDiaEna( true );
   }
 
-  condition_DoneButtonCheckDiaEna(flag) {
-    if (this.state.numanicValues.length == 0 && flag == false) {
-      this.setState({
+  condition_DoneButtonCheckDiaEna( flag ) {
+    if ( this.state.numanicValues.length == 0 && flag == false ) {
+      this.setState( {
         btnDoneBgColor: "#F5951D",
         btnDoneDisbleFlag: false
-      });
+      } );
     } else {
-      this.setState({
+      this.setState( {
         btnDoneBgColor: "gray",
         btnDoneDisbleFlag: true
-      });
+      } );
     }
   }
 
@@ -151,18 +150,18 @@ export default class VerifyBackupPhraseScreen extends React.Component {
   click_Done() {
     var temp = [];
     var len = this.verifyArray.length;
-    if (len > 0) {
-      for (let i = 0; i < len; i++) {
-        var data = this.verifyArray[i];
+    if ( len > 0 ) {
+      for ( let i = 0; i < len; i++ ) {
+        var data = this.verifyArray[ i ];
         var joined = { name: data };
-        temp.push(joined);
+        temp.push( joined );
       }
-      this.setState({ verifyNumanic: temp }, function() {
+      this.setState( { verifyNumanic: temp }, function () {
         if (
-          JSON.stringify(this.state.verifyNumanic) ===
-          JSON.stringify(this.state.verifyNumanicValues)
+          JSON.stringify( this.state.verifyNumanic ) ===
+          JSON.stringify( this.state.verifyNumanicValues )
         ) {
-          Toast.show("Thanks", Toast.SHORT);
+          // Toast.show("Thanks", Toast.SHORT);
           // const actionToDispatch = StackActions.reset({
           //     index: 0,
           //     key: null,
@@ -176,98 +175,98 @@ export default class VerifyBackupPhraseScreen extends React.Component {
           //     // Error saving data
           // }
         } else {
-          Toast.show("Invalid order.Try again!", Toast.SHORT);
+          // Toast.show( "Invalid order.Try again!", Toast.SHORT );
         }
-      });
+      } );
     }
   }
 
   render() {
     return (
       <Container>
-        <ImageBackground source={images.appBackgound} style={styles.container}>
+        <ImageBackground source={ images.appBackgound } style={ styles.container }>
           <Header transparent>
             <Left>
               <Button
                 transparent
-                onPress={() => this.props.navigation.goBack()}
+                onPress={ () => this.props.navigation.goBack() }
               >
-                <Icon name="chevron-left" size={25} color="#ffffff" />
+                <Icon name="chevron-left" size={ 25 } color="#ffffff" />
               </Button>
             </Left>
 
-            <Body style={{ flex: 0, alignItems: "center" }}>
+            <Body style={ { flex: 0, alignItems: "center" } }>
               <Title
-                adjustsFontSizeToFit={true}
-                numberOfLines={1}
-                style={styles.titleUserName}
+                adjustsFontSizeToFit={ true }
+                numberOfLines={ 1 }
+                style={ styles.titleUserName }
               >
-                {localization("VerifyBackupPhraseScreen.headerTitle")}
+                { localization( "VerifyBackupPhraseScreen.headerTitle" ) }
               </Title>
             </Body>
             <Right />
           </Header>
-          <Content contentContainerStyle={styles.container}>
-            <View style={styles.viewTitle}>
+          <Content contentContainerStyle={ styles.container }>
+            <View style={ styles.viewTitle }>
               <Image
-                style={styles.backupImg}
+                style={ styles.backupImg }
                 resizeMode="contain"
-                source={images.verifyBackupPhraseScreen.verifyBackupPhraseLogo}
+                source={ images.verifyBackupPhraseScreen.verifyBackupPhraseLogo }
               />
-              <Text style={styles.desc}>
-                {localization("VerifyBackupPhraseScreen.bodyMsg1")}
+              <Text style={ styles.desc }>
+                { localization( "VerifyBackupPhraseScreen.bodyMsg1" ) }
               </Text>
             </View>
-            <View style={styles.viewNumanicValueConfi}>
+            <View style={ styles.viewNumanicValueConfi }>
               <GridView
-                itemDimension={100}
-                items={this.state.verifyNumanicValues}
-                style={styles.gridViewFirst}
-                renderItem={item => (
+                itemDimension={ 100 }
+                items={ this.state.verifyNumanicValues }
+                style={ styles.gridViewFirst }
+                renderItem={ item => (
                   <TouchableOpacity
-                    onPress={() => this.click_FirstGridItem(item.name)}
+                    onPress={ () => this.click_FirstGridItem( item.name ) }
                   >
-                    <View style={styles.itemContainerSecound}>
-                      <Text style={styles.itemName}>{item.name}</Text>
+                    <View style={ styles.itemContainerSecound }>
+                      <Text style={ styles.itemName }>{ item.name }</Text>
                     </View>
                   </TouchableOpacity>
-                )}
+                ) }
               />
             </View>
-            <View style={styles.viewNumanicValue}>
+            <View style={ styles.viewNumanicValue }>
               <GridView
-                itemDimension={100}
-                items={this.state.numanicValues}
-                style={styles.gridViewSecound}
-                renderItem={item => (
+                itemDimension={ 100 }
+                items={ this.state.numanicValues }
+                style={ styles.gridViewSecound }
+                renderItem={ item => (
                   <TouchableOpacity
-                    onPress={() => this.click_SecoundGridItem(item.name)}
+                    onPress={ () => this.click_SecoundGridItem( item.name ) }
                   >
-                    <View style={styles.itemContainerSecound}>
-                      <Text style={styles.itemName}>{item.name}</Text>
+                    <View style={ styles.itemContainerSecound }>
+                      <Text style={ styles.itemName }>{ item.name }</Text>
                     </View>
                   </TouchableOpacity>
-                )}
+                ) }
               />
             </View>
           </Content>
-          <Footer style={styles.footer}>
+          <Footer style={ styles.footer }>
             <Button
-              style={[
+              style={ [
                 styles.btnNext,
                 { backgroundColor: this.state.btnDoneBgColor }
-              ]}
-              disabled={this.state.btnDoneDisbleFlag}
-              onPress={() => this.click_Done()}
+              ] }
+              disabled={ this.state.btnDoneDisbleFlag }
+              onPress={ () => this.click_Done() }
             >
               <Text
-                style={{
+                style={ {
                   fontWeight: "bold",
                   fontSize: 16,
                   textAlign: "center"
-                }}
+                } }
               >
-                {localization("VerifyBackupPhraseScreen.btnDone")}
+                { localization( "VerifyBackupPhraseScreen.btnDone" ) }
               </Text>
             </Button>
           </Footer>
@@ -277,7 +276,7 @@ export default class VerifyBackupPhraseScreen extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1,
     backgroundColor: "#ffffff"
@@ -324,7 +323,7 @@ const styles = StyleSheet.create({
   },
   //next button style
   btnNext: {
-    width: Dimensions.get("screen").width - 50,
+    width: Dimensions.get( "screen" ).width - 50,
     height: 40,
     borderColor: "transparent",
     borderWidth: 0,
@@ -345,4 +344,4 @@ const styles = StyleSheet.create({
   footer: {
     backgroundColor: "transparent"
   }
-});
+} );

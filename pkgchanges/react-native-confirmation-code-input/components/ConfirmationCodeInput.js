@@ -82,6 +82,7 @@ export default class ConfirmationCodeInput extends Component
     this.codeInputRefs[ index ].focus();
   }
 
+
   _blur ( index )
   {
     this.codeInputRefs[ index ].blur();
@@ -89,6 +90,7 @@ export default class ConfirmationCodeInput extends Component
 
   _onFocus ( index )
   {
+    //console.log( { index } );
     let newCodeArr = _.clone( this.state.codeArr );
     const currentEmptyIndex = _.findIndex( newCodeArr, c => !c );
     if ( currentEmptyIndex !== -1 && currentEmptyIndex < index )
@@ -102,7 +104,7 @@ export default class ConfirmationCodeInput extends Component
         newCodeArr[ i ] = '';
       }
     }
-
+    //console.log( { newCodeArr, index } );
     this.setState( {
       codeArr: newCodeArr,
       currentIndex: index
@@ -117,6 +119,8 @@ export default class ConfirmationCodeInput extends Component
     }
     return code == compareWithCode;
   }
+
+
 
   _getContainerStyle ( size, position )
   {
@@ -220,18 +224,25 @@ export default class ConfirmationCodeInput extends Component
   {
     if ( e.nativeEvent.key === 'Backspace' )
     {
+      // Return if duration between previous key press and backspace is less than 20ms
+      if ( Math.abs( this.lastKeyEventTimestamp - e.timeStamp ) < 20 ) return;
+
       const { currentIndex } = this.state;
       const nextIndex = currentIndex > 0 ? currentIndex - 1 : 0;
       this._setFocus( nextIndex );
+    } else
+    {
+      // Record non-backspace key event time stamp
+      this.lastKeyEventTimestamp = e.timeStamp;
     }
   }
 
   _onInputCode ( character, index )
   {
+    let { currentIndex } = this.state;
     const { codeLength, onFulfill, compareWithCode, ignoreCase } = this.props;
     let newCodeArr = _.clone( this.state.codeArr );
     newCodeArr[ index ] = character
-
     if ( index == codeLength - 1 )
     {
       const code = newCodeArr.join( '' );
@@ -245,12 +256,14 @@ export default class ConfirmationCodeInput extends Component
       {
         onFulfill( code );
       }
-      this._blur( this.state.currentIndex );
+      this._blur( currentIndex );
     } else
     {
-      this._setFocus( this.state.currentIndex + 1 );
+      setTimeout( () =>
+      {
+        this._setFocus( currentIndex + 1 );
+      }, 100 );
     }
-
     this.setState( prevState =>
     {
       return {
@@ -328,7 +341,6 @@ export default class ConfirmationCodeInput extends Component
             />
           ) }
         </View>
-
       )
     }
 

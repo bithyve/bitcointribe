@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Image, Platform } from 'react-native';
-import { Button, Icon, Text } from "native-base";
+import { Modal, View, StyleSheet, Platform } from 'react-native';
+import { Button, Text } from "native-base";
 import CodeInput from "react-native-confirmation-code-input";
 
 
-var Mailer = require( 'NativeModules' ).RNMail;
-import Share from "react-native-share";
+
 
 
 //TODO: Custome Compontes  
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import FullLinearGradientIconButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientIconButton";
 import { SvgIcon } from "@up-shared/components";
 
 
@@ -18,14 +16,13 @@ import { SvgIcon } from "@up-shared/components";
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 //TODO: Custome Object
 import {
     colors,
-    images,
     localDB
 } from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
 
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 interface Props {
@@ -37,8 +34,7 @@ interface Props {
 
 
 //Bitcoin Files
-import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
 
 export default class ModelRestoreGAVerificationCode extends Component<Props, any> {
 
@@ -78,7 +74,7 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
 
     //TODO: Otp enter after
     _onFinishCheckingCode( code: any ) {
-        console.log( { code } );
+        //console.log( { code } );
         if ( code.length == 6 ) {
             this.setState( {
                 otp: code,
@@ -103,9 +99,9 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
         let resImportSecureAccount = await secureAccount.importSecureAccount( code, xPub );
         if ( resImportSecureAccount.imported == true ) {
             const address = await secureAccount.getAddress();
-            console.log( { address } );
+            //console.log( { address } );
             const balance = await secureAccount.getBalance();
-            console.log( { balance } );
+            //console.log( { balance } );
             //reading wallet details
             await comFunDBRead.readTblWallet();
             //Secure account insert
@@ -114,7 +110,7 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
                 resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
                     localDB.tableName.tblAccount,
                     address,
-                    balance.data.balance / 1e8,
+                    balance.data.balance,
                     2
                 );
             } else {
@@ -122,7 +118,7 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
                 resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
                     localDB.tableName.tblAccount,
                     address,
-                    balance.data.balance / 1e8,
+                    balance.data.balance,
                     prevData.id
                 );
 
@@ -160,6 +156,7 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
                         <View style={ { flexDirection: "row", flex: 0.2 } }>
                             <Button
                                 transparent
+                                hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                 onPress={ () => this.props.pop() }
                             >
                                 <SvgIcon name="icon_back" size={ 25 } color="gray" />
