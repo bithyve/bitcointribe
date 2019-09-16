@@ -2,28 +2,13 @@ import React, { Component } from "react";
 import {
     StyleSheet,
     View,
-    AsyncStorage,
     Platform,
-    Dimensions,
-    Image,
-    Keyboard,
-    StatusBar,
-    Linking,
-    Alert,
     ImageBackground,
     SafeAreaView,
-    FlatList,
-    TouchableOpacity,
     PermissionsAndroid
 } from "react-native";
-import { RkCard } from "react-native-ui-kitten";
-import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text, Button } from 'native-base';
-import { StackActions, NavigationActions } from "react-navigation";
-import IconFontAwe from "react-native-vector-icons/FontAwesome";
-import Permissions from 'react-native-permissions'
-import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-var converter = require( 'number-to-words' );
+
 
 
 //TODO: Custome Compontes
@@ -34,32 +19,16 @@ import ModelSecureAccountSucessBackup from "HexaWallet/src/app/custcompontes/Mod
 import ModelSecureAccountFailedBackup from "HexaWallet/src/app/custcompontes/Model/ModelBackupSecureAccount/ModelSecureAccountFailedBackup";
 
 
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import {
     colors,
     images,
-    localDB,
-    asyncStorageKeys
 } from "HexaWallet/src/app/constants/Constants";
-import utils from "HexaWallet/src/app/constants/Utils";
-import Singleton from "HexaWallet/src/app/constants/Singleton";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
 //localization       
-import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
+import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
-
-
-
-
-
-
-//TODO: Bitcoin Files
-import SecurePDFGen from "HexaWallet/src/bitcoin/utilities/securePDFGenerator";
 
 export default class BackupSecureAccountScreen extends Component {
     constructor ( props: any ) {
@@ -75,7 +44,7 @@ export default class BackupSecureAccountScreen extends Component {
 
     async componentDidMount() {
         let data = this.props.navigation.getParam( "data" );
-        console.log( { data } );
+        //console.log( { data } );
         if ( Platform.OS == "android" ) {
             try {
                 await PermissionsAndroid.request(
@@ -108,8 +77,8 @@ export default class BackupSecureAccountScreen extends Component {
     render() {
         return (
             <View style={ styles.container }>
+                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                 <SafeAreaView style={ styles.container }>
-                    <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <KeyboardAwareScrollView
                             enableAutomaticScroll

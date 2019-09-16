@@ -1,29 +1,25 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet } from 'react-native';
-import { Button, Icon, Text, Textarea, Form } from "native-base";
+import { Modal, View, Alert, StyleSheet } from 'react-native';
+import { Button, Text, Textarea } from "native-base";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 
 import { SvgIcon } from "@up-shared/components";
-import bip39 from 'react-native-bip39';
+
 
 
 //TODO: Custome Compontes
 import FullLinearGradientLoadingButton from 'HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientLoadingButton';
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 
 //TODO: Custome Object
-import {
-    colors
-} from "HexaWallet/src/app/constants/Constants";
 import renderIf from 'HexaWallet/src/app/constants/validation/renderIf';
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
-//TODO: Bitcoin files
-import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+
 
 
 interface Props {
@@ -79,10 +75,10 @@ export default class ModelEnterAndConfirmMnemonic extends Component<Props, any> 
             let mnemonic = this.state.mnemonic;
             let regularAccount = await utils.getRegularAccountObject();
             const getBal = await regularAccount.getBalance();
-            console.log( { getBal } );
+            //console.log( { getBal } );
 
             if ( getBal.status == 200 ) {
-                let bal = getBal.data.balance / 1e8;
+                let bal = getBal.data.balance;
                 this.props.click_Confirm( mnemonic, bal );
                 this.props.loadingFlag( false );
                 this.setState( {
@@ -92,14 +88,14 @@ export default class ModelEnterAndConfirmMnemonic extends Component<Props, any> 
             } else {
                 Alert.alert( "GetBalance and mnemonic wrong." );
             }
-            console.log( { getBal } );
+            //console.log( { getBal } );
         } catch ( error ) {
             this.setState( {
                 style_TextAreaBorderColor: "red",
                 flag_DisableBtnConfirm: false,
                 flag_ConfirmBtnAnimating: false
             } );
-            console.log( { error } );
+            //console.log( { error } );
         }
     }
 
@@ -132,6 +128,7 @@ export default class ModelEnterAndConfirmMnemonic extends Component<Props, any> 
                             <View style={ { flexDirection: "row", flex: 0.6 } }>
                                 <Button
                                     transparent
+                                    hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                     onPress={ () => this.props.pop() }
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />

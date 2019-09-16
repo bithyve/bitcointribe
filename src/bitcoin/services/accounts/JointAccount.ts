@@ -1,5 +1,5 @@
 import bitcoinJS, { Transaction, TransactionBuilder } from "bitcoinjs-lib";
-import Bitcoin from "../../utilities/Bitcoin";
+import Bitcoin from "../../utilities/accounts/Bitcoin";
 
 export default class JointAccount {
   public bitcoin: Bitcoin;

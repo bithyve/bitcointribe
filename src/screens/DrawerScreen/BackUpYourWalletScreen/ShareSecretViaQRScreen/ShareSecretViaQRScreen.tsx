@@ -1,45 +1,27 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Dimensions } from "react-native";
+import { StyleSheet, ImageBackground, View, SafeAreaView, Dimensions } from "react-native";
 import {
     Container,
-    Header,
-    Title,
-    Content,
-    Item,
-    Input,
-    Button,
-    Left,
-    Right,
-    Body,
-    Text,
-    Icon,
-    List,
-    ListItem,
-    Thumbnail
+    Text
 } from "native-base";
-import { SvgIcon } from "@up-shared/components";
-import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Contacts from 'react-native-contacts';
-import { Avatar, SearchBar } from 'react-native-elements';
 // import QRCode from "react-native-qrcode";
 import QRCode from 'react-native-qrcode-svg';
 
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+import { colors, images } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 
-//TODO: Bitcoin Files
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 
 export default class ShareSecretViaQRScreen extends React.Component<any, any> {
@@ -56,12 +38,12 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
     async componentWillMount() {
         let walletDetails = utils.getWalletDetails();
         var data = this.props.navigation.getParam( "data" );
-        console.log( { data } );
+        //console.log( { data } );
         let qrCodeData = {};
         qrCodeData.type = "SSS Recovery QR";
         qrCodeData.wn = walletDetails.walletType;
         qrCodeData.data = data.key;
-        console.log( { qrCodeData } );
+        //console.log( { qrCodeData } );
         this.setState( {
             data: JSON.stringify( qrCodeData ).toString()
         } )
@@ -79,22 +61,12 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
         navigation.state.params.onSelect( { selected: true } );
     }
 
-
     render() {
         return (
             <Container>
-                <SafeAreaView style={ styles.container }>
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.goBack() }
-                            >
-                                <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Share Secret via QR</Text>
-                            </Button>
-                        </View>
+                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <HeaderTitle title="Share Secret via QR" pop={ () => this.goBack() } />
+                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
                         <KeyboardAwareScrollView
                             enableOnAndroid
                             extraScrollHeight={ 40 }
@@ -121,9 +93,9 @@ export default class ShareSecretViaQRScreen extends React.Component<any, any> {
                                 <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Do not share this QR code with anyone other than the trusted contact whom you want to share the secret with </Text>
                             </View>
                         </KeyboardAwareScrollView>
-
-                    </ImageBackground>
-                </SafeAreaView>
+                    </SafeAreaView>
+                </ImageBackground>
+                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

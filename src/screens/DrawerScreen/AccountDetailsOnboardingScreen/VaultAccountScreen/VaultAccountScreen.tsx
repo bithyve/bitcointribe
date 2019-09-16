@@ -26,8 +26,8 @@ import {
   localDB,
   msg
 } from "bithyve/src/app/constants/Constants";
-var utils = require("bithyve/src/app/constants/Utils");
-var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
+var utils = require( "bithyve/src/app/constants/Utils" );
+var dbOpration = require( "bithyve/src/app/manage/database/DBOpration" );
 
 //TODO: Custome Component
 import BackButton from "bithyve/src/app/custcompontes/buttons/BackButton";
@@ -39,14 +39,14 @@ import BackButton from "bithyve/src/app/custcompontes/buttons/BackButton";
 let flag_SelectType: boolean = null;
 
 //localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
+import { localization } from "bithyve/src/app/manage/Localization/i18n";
 
 export default class VaultAccountScreen extends React.Component {
-  constructor(props: any) {
-    super(props);
+  constructor ( props: any ) {
+    super( props );
     this.state = {
       isLoading: false,
-      date: moment(new Date()).format("DD-MM-YYYY"),
+      date: moment( new Date() ).format( "DD-MM-YYYY" ),
       days: "0",
       periodType: "",
       alertPopupData: [],
@@ -56,65 +56,65 @@ export default class VaultAccountScreen extends React.Component {
   }
 
   componentWillUnmount() {
-    this.setState({
+    this.setState( {
       isLoading: false
-    });
+    } );
   }
 
   //TODO: func click_createVaultAccount
   async click_createVaultAccount() {
-    this.setState({
+    this.setState( {
       isLoading: true
-    });
-    if (flag_SelectType) {
-      let itemsValues = JSON.stringify(this.tag.itemsSelected);
-      let parseItemVaues = JSON.parse(itemsValues);
-      console.log({ parseItemVaues });
-      let days = parseItemVaues[0].days;
-      let newDate = this.addDays(new Date(), days);
-      let unitDate = utils.getUnixTimeDate(newDate);
+    } );
+    if ( flag_SelectType ) {
+      let itemsValues = JSON.stringify( this.tag.itemsSelected );
+      let parseItemVaues = JSON.parse( itemsValues );
+      //console.log({ parseItemVaues });
+      let days = parseItemVaues[ 0 ].days;
+      let newDate = this.addDays( new Date(), days );
+      let unitDate = utils.getUnixTimeDate( newDate );
       let data = {};
       data.validDate = unitDate;
       data.sec = days * 24 * 60 * 60;
       const resultWallet = await dbOpration.readTablesData(
         localDB.tableName.tblWallet
       );
-      let mnemonic = resultWallet.temp[0].mnemonic.replace(/,/g, " ");
+      let mnemonic = resultWallet.temp[ 0 ].mnemonic.replace( /,/g, " " );
       const dateTime = Date.now();
-      const fulldate = Math.floor(dateTime / 1000);
-      const blocks = parseInt(data.sec / (3600 * 10));
-      const res = await vaultAccount.createTLC(mnemonic, null, blocks);
+      const fulldate = Math.floor( dateTime / 1000 );
+      const blocks = parseInt( data.sec / ( 3600 * 10 ) );
+      const res = await vaultAccount.createTLC( mnemonic, null, blocks );
       let data1 = {};
       data1.sec = days * 24 * 60 * 60;
       data1.validDate = unitDate;
       data1.lockTime = res.lockTime;
       data1.privateKey = res.privateKey;
-      this.connection_VaultAccount(fulldate, res.address, data1);
+      this.connection_VaultAccount( fulldate, res.address, data1 );
     } else {
-      let hexDate = utils.getUnixTimeDate(this.state.date);
+      let hexDate = utils.getUnixTimeDate( this.state.date );
       const resultWallet = await dbOpration.readTablesData(
         localDB.tableName.tblWallet
       );
-      let mnemonic = resultWallet.temp[0].mnemonic.replace(/,/g, " ");
+      let mnemonic = resultWallet.temp[ 0 ].mnemonic.replace( /,/g, " " );
       const dateTime = Date.now();
-      const fulldate = Math.floor(dateTime / 1000);
+      const fulldate = Math.floor( dateTime / 1000 );
       const blocks = -30000; //parseInt(data.sec / (3600 * 10));
-      const res = await vaultAccount.createTLC(mnemonic, null, blocks);
+      const res = await vaultAccount.createTLC( mnemonic, null, blocks );
       let data1 = {};
       data1.sec = -30000; //days * 24 * 60 * 60;
       data1.validDate = hexDate; //unitDate;
       data1.lockTime = res.lockTime;
       data1.privateKey = res.privateKey;
-      this.connection_VaultAccount(fulldate, res.address, data1);
+      this.connection_VaultAccount( fulldate, res.address, data1 );
     }
   }
 
   //TODO: func add days
-  addDays(theDate, days) {
-    return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
+  addDays( theDate, days ) {
+    return new Date( theDate.getTime() + days * 24 * 60 * 60 * 1000 );
   }
   //TODO: insert db vault account
-  async connection_VaultAccount(fulldate, address, data) {
+  async connection_VaultAccount( fulldate, address, data ) {
     const resultCreateAccount = await dbOpration.insertLastBeforeCreateAccount(
       localDB.tableName.tblAccount,
       fulldate,
@@ -124,63 +124,63 @@ export default class VaultAccountScreen extends React.Component {
       "Vault",
       data
     );
-    if (resultCreateAccount) {
-      this.setState({
+    if ( resultCreateAccount ) {
+      this.setState( {
         isLoading: false,
         alertPopupData: [
           {
             theme: "success",
             status: true,
             icon: "smile",
-            title: localization("VaultAccountScreen.pupoupTitle"),
-            subtitle: localization("VaultAccountScreen.pupoupSubTitle"),
+            title: localization( "VaultAccountScreen.pupoupTitle" ),
+            subtitle: localization( "VaultAccountScreen.pupoupSubTitle" ),
             goBackStatus: true
           }
         ]
-      });
+      } );
     }
   }
 
   render() {
-    const data = localization("VaultAccountScreen.data");
+    const data = localization( "VaultAccountScreen.data" );
     return (
       <Container>
-        <Content contentContainerStyle={styles.container} scrollEnabled={true}>
+        <Content contentContainerStyle={ styles.container } scrollEnabled={ true }>
           <ImageBackground
-            source={images.appBackgound}
-            style={styles.backgroundImage}
+            source={ images.appBackgound }
+            style={ styles.backgroundImage }
           >
             <Header transparent>
               <Left>
-                <BackButton click_Done={() => this.props.navigation.goBack()} />
+                <BackButton click_Done={ () => this.props.navigation.goBack() } />
               </Left>
-              <Body style={{ flex: 0, alignItems: "center" }}>
+              <Body style={ { flex: 0, alignItems: "center" } }>
                 <Title />
               </Body>
               <Right />
             </Header>
-            <View style={styles.logoSecureAccount}>
+            <View style={ styles.logoSecureAccount }>
               <Image
-                style={styles.secureLogo}
-                source={images.secureAccount.secureLogo}
+                style={ styles.secureLogo }
+                source={ images.secureAccount.secureLogo }
               />
-              <Text style={styles.txtTitle}>
-                {localization("VaultAccountScreen.title")}
+              <Text style={ styles.txtTitle }>
+                { localization( "VaultAccountScreen.title" ) }
               </Text>
-              <Text style={styles.txtLorem} />
+              <Text style={ styles.txtLorem } />
             </View>
-            <View style={styles.viewDatePicekr}>
+            <View style={ styles.viewDatePicekr }>
               <DatePicker
-                style={{ width: "96%", borderColor: "red" }}
-                date={this.state.date}
+                style={ { width: "96%", borderColor: "red" } }
+                date={ this.state.date }
                 mode="date"
                 max
                 placeholder="select date"
                 format="DD-MM-YYYY"
-                maxDate={new Date()}
+                maxDate={ new Date() }
                 confirmBtnText="Confirm"
                 cancelBtnText="Cancel"
-                customStyles={{
+                customStyles={ {
                   dateIcon: {
                     position: "absolute",
                     left: 0,
@@ -190,78 +190,78 @@ export default class VaultAccountScreen extends React.Component {
                   dateInput: {
                     marginLeft: 36
                   }
-                }}
-                onDateChange={(date: any) => {
+                } }
+                onDateChange={ ( date: any ) => {
                   flag_SelectType = false;
-                  this.setState({
+                  this.setState( {
                     flag_createBtnstatus: false,
                     date: date
-                  });
+                  } );
                   //this.changeDate(date);
-                }}
+                } }
               />
             </View>
 
-            <View style={styles.viewSelectPeriod}>
-              <Text style={{ textAlign: "center", marginBottom: 10 }}>OR</Text>
+            <View style={ styles.viewSelectPeriod }>
+              <Text style={ { textAlign: "center", marginBottom: 10 } }>OR</Text>
               <TagSelect
                 theme="danger"
-                containerStyle={{ marginLeft: 20 }}
-                onItemPress={() => {
+                containerStyle={ { marginLeft: 20 } }
+                onItemPress={ () => {
                   flag_SelectType = true;
-                  this.setState({
+                  this.setState( {
                     flag_createBtnstatus: false
-                  });
-                }}
-                itemStyle={{
+                  } );
+                } }
+                itemStyle={ {
                   height: 50,
                   alignItems: "center",
                   justifyContent: "center"
-                }}
-                data={data}
-                max={1}
-                ref={(tag: any) => {
+                } }
+                data={ data }
+                max={ 1 }
+                ref={ ( tag: any ) => {
                   this.tag = tag;
-                }}
-                onMaxError={() => {
-                  console.log("Ops", "Max reached");
-                }}
+                } }
+                onMaxError={ () => {
+                  //console.log("Ops", "Max reached");
+                } }
               />
             </View>
-            <View style={styles.viewFotterBtn}>
+            <View style={ styles.viewFotterBtn }>
               <Button
                 full
-                disabled={this.state.flag_createBtnstatus}
-                onPress={() => this.click_createVaultAccount()}
+                disabled={ this.state.flag_createBtnstatus }
+                onPress={ () => this.click_createVaultAccount() }
               >
-                <Text>{localization("VaultAccountScreen.btnCreate")}</Text>
+                <Text>{ localization( "VaultAccountScreen.btnCreate" ) }</Text>
               </Button>
             </View>
           </ImageBackground>
         </Content>
-        <Loader loading={this.state.isLoading} color={colors.appColor} />
-        <DropdownAlert ref={ref => (this.dropdown = ref)} />
+        <Loader loading={ this.state.isLoading } color={ colors.appColor } />
+        <DropdownAlert ref={ ref => ( this.dropdown = ref ) } />
         <SCLAlertOk
-          data={this.state.alertPopupData}
-          click_Ok={(status: boolean) => {
+          data={ this.state.alertPopupData }
+          click_Ok={ ( status: boolean ) => {
             status
-              ? this.props.navigation.navigate("TabbarBottom")
-              : console.log(status),
-              this.setState({
+              ? this.props.navigation.navigate( "TabbarBottom" )
+              : console.log( status ),
+              this.setState( {
                 alertPopupData: [
                   {
                     status: false
                   }
                 ]
-              });
-          }}
+              } );
+          } }
         />
       </Container>
     );
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1
   },
@@ -295,4 +295,4 @@ const styles = StyleSheet.create({
   viewDatePicekr: {},
   //view:viewFotterBtn
   viewFotterBtn: {}
-});
+} );

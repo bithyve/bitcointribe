@@ -4,9 +4,7 @@ import {
     Platform, // Detects platform running the app
     ScrollView, // Handles navigation between screens
     StyleSheet, // CSS-like styles
-    View,
-    Text,
-    StatusBar
+    View
 } from "react-native";
 
 //TODO: NsNotification
@@ -15,8 +13,7 @@ import BackboneEvents from "backbone-events-standalone";
 window.EventBus = BackboneEvents.mixin( {} );
 
 
-//TODO: Custome object
-import { colors } from "HexaWallet/src/app/constants/Constants";
+
 // Detect screen width and height
 const { width, height } = Dimensions.get( "screen" );
 
@@ -300,11 +297,11 @@ const styles = StyleSheet.create( {
         width: width,
         backgroundColor: "transparent"
     },
-    // Main container
+    // Main container  
     container: {
         flex: 1,
         backgroundColor: "transparent",
-        position: "relative"
+        position: "relative",
     },
     // Slide
     slide: {
@@ -316,9 +313,8 @@ const styles = StyleSheet.create( {
         justifyContent: "center",
         alignItems: "flex-end",
         backgroundColor: "transparent",
-        marginTop: 40
     },
-    // Pagination dot
+    // Pagination dot   
     dot: {
         backgroundColor: "#B9B9B9",
         width: 28,

@@ -2,12 +2,8 @@ import React, { Component } from "react";
 import {
   View,
   AsyncStorage,
-  Image,
   StyleSheet,
   ImageBackground,
-  Text,
-  Alert,
-  StatusBar,
   Animated,
   Easing
 } from "react-native";
@@ -15,8 +11,12 @@ import {
 import { colors, images, asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 
+
+//TODO: Custome Object
+import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+
 //localization
-import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
+import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
 import * as Keychain from "react-native-keychain";
 interface Props {
@@ -72,7 +72,6 @@ export default class LaunchScreen extends Component<Props, any> {
     const animatedOpcity = { opacity: this.state.centerLogoOpticy }
     return (
       <View style={ styles.container }>
-        <StatusBar hidden />
         <ImageBackground
           source={ images.LaunchScreen.img1 }
           style={ styles.backgroundImage }
@@ -82,9 +81,10 @@ export default class LaunchScreen extends Component<Props, any> {
         >
           <Animated.Image
             source={ this.state.centerLogo }
-            style={ [ animatedOpcity, { height: 200, width: 200 } ] }
+            style={ [ animatedOpcity, { height: 400, width: 400 } ] }
           />
         </ImageBackground>
+        <CustomeStatusBar backgroundColor={ colors.white } hidden={ true } barStyle="dark-content" />
       </View>
     );
   }

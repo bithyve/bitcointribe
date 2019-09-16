@@ -1,44 +1,27 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, AsyncStorage, Clipboard } from "react-native";
+import { StyleSheet, ImageBackground, View, Platform, SafeAreaView, FlatList, Alert } from "react-native";
 import {
     Container,
-    Header,
-    Title,
-    Content,
-    Item,
-    Input,
-    Button,
-    Left,
-    Right,
-    Body,
-    Text,
-    Icon,
-    List,
-    ListItem,
-    Thumbnail
+    Text
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
-import IconFontAwe from "react-native-vector-icons/FontAwesome";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Contacts from 'react-native-contacts';
-import { Avatar } from 'react-native-elements';
-import SendSMS from 'react-native-sms';
-import Permissions from 'react-native-permissions'
-import Modal from 'react-native-modalbox';
-import Toast from 'react-native-simple-toast';
 
 
 //import Mailer from 'react-native-mail';
 var Mailer = require( 'NativeModules' ).RNMail;
 import Share from "react-native-share";
 var RNFS = require( 'react-native-fs' );
-import BackgroundFetch from "react-native-background-fetch";
+
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import ModelTrustedContactEmailAndPhoneShare from "HexaWallet/src/app/custcompontes/Model/ModelTrustedContactEmailAndPhoneShare/ModelTrustedContactEmailAndPhoneShare";
+import FullLinearGradientShareButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientShareButton";
+import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+
+//TODO: Custome Model
+import ModelBottomSingleButton from "HexaWallet/src/app/custcompontes/ModelBottom/ModelBottomSingleButton/ModelBottomSingleButton";
+import ModelBottomTwoButtons from "HexaWallet/src/app/custcompontes/ModelBottom/ModelBottomSingleButton/ModelBottomTwoButtons";
 
 
 //TODO: Custome Alert 
@@ -46,21 +29,18 @@ import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
 let alert = new AlertSimple();
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+
+var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 
 
 //TODO: Common Funciton
-var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
 
-//TODO: Bitcoin Files
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
 
 export default class SelfShareSharingScreen extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -69,9 +49,10 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
             data: [],
             title: "Share",
             arr_History: [],
-            flag_ShareBtnDisable: true,
-            flag_ReShareBtnDisable: false,
-            flag_ConfrimBtnDisable: false
+            arr_ModelBottomSingleButton: [],
+            arr_ModelBottomTwoButtons: [],
+            //flag
+            btnShareTitle: "Share"
         } )
     }
 
@@ -79,37 +60,28 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
     async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
         let title = this.props.navigation.getParam( "title" );
-        console.log( { data } );
+        //console.log( { data } );
+        let { btnShareTitle } = this.state;
         let arr_History = JSON.parse( data.sssDetails.history )
         let shareStage = data.sssDetails.shareStage;
         let sharedDate = data.sssDetails.sharedDate;
-        console.log( { shareStage, sharedDate } );
+        //console.log( { shareStage, sharedDate } );
         let flag_ShareBtnDisable, flag_ReShareBtnDisable, flag_ConfrimBtnDisable;
         if ( sharedDate == "" && shareStage != "Good" ) {
-            flag_ReShareBtnDisable = false;
-            flag_ConfrimBtnDisable = false;
-            flag_ShareBtnDisable = true;
+            btnShareTitle = "Share";
         }
         else if ( shareStage != "Good" && sharedDate != "" ) {
-            flag_ConfrimBtnDisable = true;
-            flag_ReShareBtnDisable = true;
-            flag_ShareBtnDisable = false;
+            btnShareTitle = "Confirm";
         }
         else if ( sharedDate != "" && shareStage == "Good" ) {
-            flag_ReShareBtnDisable = true;
-            flag_ConfrimBtnDisable = false;
-            flag_ShareBtnDisable = false;
+            btnShareTitle = "Confirm";
         } else {
-            flag_ShareBtnDisable = true;
-            flag_ReShareBtnDisable = false;
-            flag_ConfrimBtnDisable = false;
+            btnShareTitle = "Share";
         }
-        console.log( { data } );
+        //console.log( { data } );
         this.setState( {
             title,
-            flag_ShareBtnDisable,
-            flag_ReShareBtnDisable,
-            flag_ConfrimBtnDisable,
+            btnShareTitle,
             data,
             arr_History
         } )
@@ -118,73 +90,90 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
 
 
     //TODO: Sharing PDF
-    click_ShareEmail( data: any ) {
-        console.log( { data } );
-        let { title } = this.state;
-        let email4shareFilePath = data.sssDetails.decryptedShare.split( '"' ).join( "" );
-        console.log( { email4shareFilePath } );
-        if ( title != "Email Share" ) {
-            let shareOptions = {
-                title: "For 5 share",
-                message: "For 5 share.Pdf password is your answer.",
-                urls: [ email4shareFilePath ],
-                subject: "For 5 share "
-            };
-            Share.open( shareOptions )
-                .then( ( res: any ) => {
-                    this.updateHistory( data, "Shared.", "" );
-                    this.setState( {
-                        flag_ShareBtnDisable: false,
-                        flag_ReShareBtnDisable: true,
-                        flag_ConfrimBtnDisable: true
+    click_ShareEmail = async ( data: any ) => {
+        let resultWallet = await utils.getWalletDetails();
+        let backupInfo = JSON.parse( resultWallet.backupInfo );
+        if ( backupInfo[ 0 ].backupType == "new" ) {
+            // console.log( { data } );
+            let { title } = this.state;
+            var email4shareFilePath = data.sssDetails.decryptedShare.split( '"' ).join( "" );
+            //console.log( { email4shareFilePath } );
+            //console.log( { email4shareFilePath } );
+            if ( title != "Email Share" ) {
+                //console.log( { email4shareFilePath } );
+                let shareOptions = {
+                    title: "5th share",
+                    message: "Please find attached the 5th share pdf, it is password protected by the answer to the security question.",
+                    // urls: [ email4shareFilePath ],                    
+                    url: Platform.OS == 'android' ? "file://" + email4shareFilePath : email4shareFilePath,
+                    type: 'application/pdf',
+                    showAppsToView: true,
+                    subject: "5th share pdf"
+                };
+                //console.log( { shareOptions } );
+                await Share.open( shareOptions )
+                    .then( ( res: any ) => {
+                        this.click_CloseModel();
+                        this.updateHistory( data, "Shared.", "" );
+                        this.setState( {
+                            btnShareTitle: "Confirm"
+                        } );
                     } );
+            } else {
+                Mailer.mail( {
+                    subject: '4th Share',
+                    recipients: [ '' ],
+                    body: '<b>Please find attached the 4th share pdf, it is password protected by the answer to the security question.</b>',
+                    isHTML: true,
+                    attachment: {
+                        path: email4shareFilePath,  // The absolute path of the file from which to read data.
+                        type: 'pdf',      // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+                        name: resultWallet.walletType.split( " " )[ 0 ] + " Hexa wallet Share 4.pdf",   // Optional: Custom filename for attachment
+                    }
+                }, ( error, event ) => {
+                    if ( event == "sent" ) {
+                        this.click_CloseModel();
+                        alert.simpleOkActionWithPara( "Success", "Please permanently delete the email from the sent folder", this.updateHistory( data, "Shared.", "" ) );
+                        this.setState( {
+                            btnShareTitle: "Confirm"
+                        } )
+                    } else {
+                        alert.simpleOk( "Oops", error );
+                    }
                 } );
+                if ( Platform.OS == "android" ) {
+                    setTimeout( () => {
+                        this.click_CloseModel();
+                        alert.simpleOkActionWithPara( "Success", "Please permanently delete the email from the sent folder", this.updateHistory( data, "Shared.", "" ) );
+                        this.setState( {
+                            btnShareTitle: "Confirm"
+                        } )
+                    }, 3000 );
+                }
+            }
         } else {
-            console.log( { email4shareFilePath } );
-            Mailer.mail( {
-                subject: 'For 4 Share.',
-                recipients: [ 'appasahebl@bithyve.com' ],
-                body: '<b>For 4 share.Pdf password is your answer.</b>',
-                isHTML: true,
-                attachment: {
-                    path: email4shareFilePath,  // The absolute path of the file from which to read data.
-                    type: 'pdf',      // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-                    name: 'For4Share',   // Optional: Custom filename for attachment
-                }
-            }, ( error, event ) => {
-                if ( event == "sent" ) {
-                    alert.simpleOk( "Success", "Email sent success." );
-                    this.updateHistory( data, "Shared.", "" );
-                    this.setState( {
-                        flag_ShareBtnDisable: false,
-                        flag_ReShareBtnDisable: true,
-                        flag_ConfrimBtnDisable: true
-                    } )
-                } else {
-                    alert.simpleOk( "Oops", error );
-                }
-            } );
+            Alert.alert( "Working" );
         }
     }
 
     //TODO: Re-Share Share
-
     click_ReShare( data: any ) {
         alert.simpleOk( "Oops", "Working" );
     }
 
     //TODO:  Confirm
     click_Confirm( data: any ) {
-        console.log( { data } );
+        // console.log( { data } );
         let value = JSON.parse( data.sssDetails.keeperInfo );
         this.props.navigation.push( "ConfirmSelfShareQRScannerScreen", { data: value, onSelect: this.onSelect } );
     }
 
     onSelect = async ( returnValue: any ) => {
         if ( returnValue.data == returnValue.result ) {
+            this.click_CloseModel();
             let { data } = this.state;
             let filePath = JSON.parse( data.sssDetails.decryptedShare );
-            console.log( { filePath } );
+            // console.log( { filePath } );
             this.updateHistory( data, "Confirmed.", filePath );
             let walletDetails = await utils.getWalletDetails();
             let sssDetails = await utils.getSSSDetails();
@@ -195,35 +184,43 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                 data.updatedAt = sssDetails[ i ].sharedDate == "" ? 0 : parseInt( sssDetails[ i ].sharedDate );
                 encrShares.push( data );
             }
-            console.log( { encrShares } );
-            let updateShareIdStatus = await comAppHealth.connection_AppHealthForAllShare( parseInt( walletDetails.lastUpdated ), encrShares );
-            console.log( { updateShareIdStatus } );
             this.setState( {
                 flag_ConfrimBtnDisable: false
             } )
         } else {
             alert.simpleOk( "Oops", "Try again." );
         }
-
     }
 
     //TODO: update histroy
     updateHistory = async ( data: any, title: string, filePath: any ) => {
-        let arr_History = JSON.parse( data.sssDetails.history );
+        let { arr_History } = this.state;
         const dateTime = Date.now();
         let JsonData = {};
         JsonData.title = title;
         JsonData.date = utils.getUnixToDateFormat2();
         let temp = [ JsonData ];
         arr_History.push.apply( arr_History, temp );
-        console.log( { arr_History } );
-        let resUpdateHistroyAndSharedDate = await dbOpration.updateHistroyAndSharedDate(
-            localDB.tableName.tblSSSDetails,
-            arr_History,
-            dateTime,
-            data.sssDetails.id
-        );
-        console.log( resUpdateHistroyAndSharedDate );
+
+        //console.log( { arr_History } );
+
+        var resUpdateHistroyAndSharedDate;
+        if ( title == "Shared." ) {
+            resUpdateHistroyAndSharedDate = await dbOpration.updateHistroyAndSharedDate(
+                localDB.tableName.tblSSSDetails,
+                arr_History,
+                dateTime,
+                data.sssDetails.id
+            );
+        } else {
+            resUpdateHistroyAndSharedDate = await dbOpration.updateHistroyAndAcceptDate(
+                localDB.tableName.tblSSSDetails,
+                arr_History,
+                dateTime,
+                data.sssDetails.id
+            );
+        }
+        //console.log( resUpdateHistroyAndSharedDate );
         if ( resUpdateHistroyAndSharedDate ) {
             await comFunDBRead.readTblSSSDetails();
             this.setState( {
@@ -231,34 +228,36 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
             } );
             await RNFS.unlink( filePath );
         }
-        console.log( { resUpdateHistroyAndSharedDate } );
+        // console.log( { resUpdateHistroyAndSharedDate } );
+    }
+
+    //TODO: Close all model
+    click_CloseModel() {
+        this.setState( {
+            arr_ModelBottomSingleButton: [ {
+                modalVisible: false,
+            } ],
+            arr_ModelBottomTwoButtons: [ {
+                modalVisible: false,
+            } ]
+        } );
     }
 
     render() {
-        //array     
-        let { data, arr_History } = this.state;
-        //Value
+        //array          
+        let { data, arr_History, arr_ModelBottomSingleButton, arr_ModelBottomTwoButtons } = this.state;
+        //Value      
         let { title } = this.state;
-        //flag
-        let { flag_ShareBtnDisable, flag_ReShareBtnDisable, flag_ConfrimBtnDisable } = this.state;
+        //flag       
+        let { btnShareTitle } = this.state;
         return (
             <Container>
-                <SafeAreaView style={ styles.container }>
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.props.navigation.pop() }
-                            >
-                                <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>{ title }</Text>
-                            </Button>
-                        </View>
+                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <HeaderTitle title={ title } pop={ () => this.props.navigation.pop() } />
+                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
                         <View style={ { flex: 0.1, margin: 20 } }>
                             <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Share this pdf to an email/cloud which you can</Text>
                             <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>access if required to hold this secret for safekeeping </Text>
-
                         </View>
                         <View style={ { flex: 2 } }>
                             <FlatList
@@ -285,44 +284,80 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                                 extraData={ this.state }
                             />
                         </View>
-                        { renderIf( flag_ShareBtnDisable == true )(
-                            <View style={ { flex: 0.4 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Do not share this pdf with anyone other than your email/cloud</Text>
-                                <FullLinearGradientButton
-                                    click_Done={ () => {
+                        <View style={ { flex: Platform.OS == "ios" ? 0.5 : 0.6 } }>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Do not share this pdf with anyone other than your email/cloud</Text>
+                            <FullLinearGradientShareButton
+                                click_Done={ ( title: string ) => {
+                                    if ( title == "Share" ) {
                                         this.click_ShareEmail( data )
-                                    } }
-                                    title="Share"
-                                    disabled={ false }
-                                    style={ [ { borderRadius: 10 } ] } />
-                            </View>
-                        ) }
-                        { renderIf( flag_ReShareBtnDisable == true )(
-                            <View style={ { flex: 0.4 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Do not share this pdf with anyone other than your email/cloud</Text>
-                                <FullLinearGradientButton
-                                    click_Done={ () => {
-                                        this.click_ReShare( data )
-                                    } }
-                                    title="Reshare"
-                                    disabled={ false }
-                                    style={ [ { borderRadius: 10 } ] } />
-                            </View>
-                        ) }
-                        { renderIf( flag_ConfrimBtnDisable == true )(
-                            <View style={ { flex: 0.4 } }>
-                                <FullLinearGradientButton
-                                    click_Done={ () => {
+                                    } else {
                                         this.click_Confirm( data )
-                                    } }
-                                    title="Confirm"
-                                    disabled={ false }
-                                    style={ [ { borderRadius: 10 } ] } />
-                            </View>
-                        ) }
-                    </ImageBackground>
-                </SafeAreaView>
+                                    }
+
+                                } }
+                                click_Option={ ( title: string ) => {
+                                    // console.log( { title } );
+                                    if ( title === "Share" ) {
+                                        this.setState( {
+                                            arr_ModelBottomSingleButton: [ {
+                                                modalVisible: true,
+                                                title: "OPTION",
+                                                subTitle: "Select option",
+                                                svgIcon: Platform.OS == "ios" ? "recreateSVG" : "recreatePNG",
+                                                btnTitle: "RECREATE SHARES"
+                                            } ],
+                                            arr_ModelBottomTwoButtons: [ {
+                                                modalVisible: false,
+                                            } ]
+                                        } )
+                                    } else {
+                                        this.setState( {
+                                            arr_ModelBottomSingleButton: [ {
+                                                modalVisible: false
+                                            } ],
+                                            arr_ModelBottomTwoButtons: [ {
+                                                modalVisible: true,
+                                                title: "OPTION",
+                                                subTitle: "Select any one option",
+                                                svgIcon1: Platform.OS == "ios" ? "reshareSVG" : "resharePNG",
+                                                svgIcon2: Platform.OS == "ios" ? "recreateSVG" : "recreatePNG",
+                                                btnTitle1: "RESHARE",
+                                                btnTitle2: "RECREATE SHARES"
+                                            } ]
+                                        } )
+                                    }
+                                } }
+                                title={ btnShareTitle }
+                                disabled={ false }
+                                style={ [ { borderRadius: 10, margin: 10 } ] } />
+                        </View>
+                    </SafeAreaView>
+                </ImageBackground>
+                <ModelBottomSingleButton
+                    data={ arr_ModelBottomSingleButton }
+                    click_Done={ () => {
+                        this.click_CloseModel();
+                        Alert.alert( "Working" )
+                    }
+
+                    }
+                />
+                <ModelBottomTwoButtons
+                    data={ arr_ModelBottomTwoButtons }
+                    click_Option1={ () => {
+                        this.click_CloseModel();
+                        this.click_ShareEmail( data )
+                    }
+                    }
+                    click_Option2={ () => {
+                        this.click_CloseModel();
+                        Alert.alert( "Working" )
+                    }
+                    }
+                />
+
                 <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
+                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

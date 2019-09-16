@@ -1,27 +1,15 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Dimensions, Platform, Image } from 'react-native';
+import { Modal, View, StyleSheet, Dimensions, Image } from 'react-native';
 import {
-    Container,
-    Header,
-    Title,
-    Content,
-    Item,
     Input,
     Button,
-    Left,
-    Right,
-    Body,
-    Text,
-    Picker,
-    Icon
+    Text
 } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import CodeInput from "react-native-confirmation-code-input";
 import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-//TODO: Custome Model
-import ModelPasscode from '../ModelCommom/ModelPasscode';
+
 
 
 interface Props {
@@ -33,15 +21,13 @@ interface Props {
 }
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import {
-    images,
-    colors
+    images
 } from "HexaWallet/src/app/constants/Constants";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-import utils from "HexaWallet/src/app/constants/Utils";
 
 export default class ModelHealthCheckMnemonicThirdWord extends Component<Props, any> {
     constructor ( props: any ) {
@@ -56,10 +42,9 @@ export default class ModelHealthCheckMnemonicThirdWord extends Component<Props, 
     }
 
     componentWillReceiveProps( nextProps: any ) {
-        console.log( { nextProps } );
+        //console.log( { nextProps } );
         var data = nextProps.data[ 0 ];
-        console.log( { data } );
-
+        //console.log( { data } );
         if ( data != null ) {
             this.setState( {
                 number: data.number,
@@ -126,6 +111,7 @@ export default class ModelHealthCheckMnemonicThirdWord extends Component<Props, 
                             <View style={ { flexDirection: "row", flex: 0.5 } }>
                                 <Button
                                     transparent
+                                    hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                     onPress={ () => this.props.pop() }
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />

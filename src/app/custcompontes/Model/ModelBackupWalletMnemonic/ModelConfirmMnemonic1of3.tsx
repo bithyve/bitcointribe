@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, TextInput } from 'react-native';
-import { Button, Icon, Text, Textarea, Form } from "native-base";
+import { Modal, View, StyleSheet, TextInput } from 'react-native';
+import { Button, Text } from "native-base";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 
@@ -8,7 +8,7 @@ import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGra
 import { SvgIcon } from "@up-shared/components";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
 //TODO: Custome Object
@@ -84,6 +84,7 @@ export default class ModelConfirmMnemonic1of3 extends Component<Props, any> {
                             <View style={ { flexDirection: "row", flex: 0.6 } }>
                                 <Button
                                     transparent
+                                    hitSlop={ { top: 5, bottom: 8, left: 10, right: 15 } }
                                     onPress={ () => this.props.pop() }
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />

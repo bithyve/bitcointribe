@@ -31,7 +31,7 @@ import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/
 import ModelSecretQuestionAndAnswer from "HexaWallet/src/app/custcompontes/Model/ModelSecretQuestionAndAnswer/ModelSecretQuestionAndAnswer";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import {
@@ -42,11 +42,11 @@ import {
 } from "HexaWallet/src/app/constants/Constants";
 import utils from "HexaWallet/src/app/constants/Utils";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
+var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
 //localization       
-import { localization } from "HexaWallet/src/app/manager/Localization/i18n";
+import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
 //TODO: Bitcoin Files
 import SecurePDFGen from "HexaWallet/src/bitcoin/utilities/securePDFGenerator";

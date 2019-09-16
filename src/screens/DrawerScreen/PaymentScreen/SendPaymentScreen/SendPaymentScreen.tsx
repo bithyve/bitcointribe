@@ -1,64 +1,41 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, ScrollView, Platform, SafeAreaView, FlatList, TouchableOpacity, Dimensions, Clipboard, Image, Alert } from "react-native";
+import { StyleSheet, ImageBackground, View, Platform, SafeAreaView, FlatList, Dimensions, Alert } from "react-native";
 import {
     Container,
-    Header,
-    Title,
-    Content,
-    Item,
     Input,
     Button,
     Left,
-    Right,
     Body,
     Text,
-    List, ListItem,
-    Picker,
-    Icon,
+    List,
+    ListItem,
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
-import { RkCard } from "react-native-ui-kitten";
-import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import QRCode from 'react-native-qrcode-svg';
-//import QRCode from 'react-native-qrcode';
-import Toast from 'react-native-simple-toast';
-import Share from 'react-native-share';
-import RNFetchBlob from 'react-native-fetch-blob';
 import { Slider, CheckBox } from 'react-native-elements';
 
 //TODO: Custome Pages
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import WalletSetUpScrolling from "HexaWallet/src/app/custcompontes/OnBoarding/WalletSetUpScrolling/WalletSetUpScrolling";
+import FullLinearGradientLoadingButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientLoadingButton";
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-
+import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
 
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+import { colors, images } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
 import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var comAppHealth = require( "HexaWallet/src/app/manager/CommonFunction/CommonAppHealth" );
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 
-//TODO: Classes
-import QrCodeScannerScreen from "../../../TabBarScreen/QrCodeScannerScreen/QrCodeScannerScreen";
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
 
 //TODO: Bitcoin Files
-var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
-import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
-import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
-
-
-
+var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
 
 
 export default class SendPaymentScreen extends React.Component<any, any> {
@@ -68,14 +45,15 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             arr_AccountList: [],
             arr_SelectAccountDetails: [],
             address: "",
-            amount: "0.0",
+            amount: "0",
             memo: "",
-            selectedAccountBal: 0.0,
+            selectedAccountBal: 0,
             memoMsg: "Add Memo",
             tranPrio: 1,
             //flag
             flag_Memo: false,
             flag_DisableSentBtn: true,
+            flag_SentBtnAnimation: false,
             flag_Loading: false
         } )
     }
@@ -83,55 +61,67 @@ export default class SendPaymentScreen extends React.Component<any, any> {
     async componentWillMount() {
         //class value reset
         let data = this.props.navigation.getParam( "data" );
-        //Singleton Flag value change  
-        let address = data.address;
-        let amount = data.options.amount.toString();
-        console.log( { address, amount } );
+        let selectedAccount = this.props.navigation.getParam( "selectedAccount" );
+        console.log( { selectedAccount } );
+        console.log( { data } );
+        //Singleton Flag value change    
+        let address = data != undefined ? data.address : "";
+        let amount = data != undefined ? data.amount.toString() : "0";
+        console.log( { amount, address } );
         let walletDetails = await utils.getWalletDetails();
         let arr_AccountList = await comFunDBRead.readTblAccount();
         console.log( { arr_AccountList } );
-
-        var temp = [], arr_SelectAccountDetails = [], balDailyAccount, flag_DisableSentBtn;
+        var temp = [], arr_SelectAccountDetails = [], accountbal, flag_DisableSentBtn;
         for ( let i = 0; i < arr_AccountList.length; i++ ) {
             let item = arr_AccountList[ i ];
-            let data = {};
-            if ( i == 0 ) {
-                data.checked = true;
-                arr_SelectAccountDetails = item;
-                balDailyAccount = item.balance;
+            let jsonData = {};
+            if ( data != undefined ) {
+                if ( i == 0 ) {
+                    jsonData.checked = true;
+                    arr_SelectAccountDetails = item;
+                    accountbal = item.balance;
+                } else {
+                    jsonData.checked = false;
+                }
             } else {
-                data.checked = false;
+                if ( item.accountType == selectedAccount.accountType ) {
+                    jsonData.checked = true;
+                    arr_SelectAccountDetails = item;
+                    accountbal = item.balance;
+                } else {
+                    jsonData.checked = false;
+                }
             }
-            data.balance = item.balance;
-            data.accountName = item.accountName;
-            data.address = item.address;
-            if ( data.address != "" ) {
-                temp.push( data );
-            }
+            jsonData.balance = item.balance;
+            jsonData.accountName = item.accountName;
+            temp.push( jsonData );
         }
+
+        console.log( { amount, accountbal, address } );
+
         //Sent button Enable and Disable
-        if ( amount != "" && amount < balDailyAccount ) {
+        if ( amount != "" && parseFloat( amount ) > parseFloat( accountbal ) && address != "" ) {
             flag_DisableSentBtn = false;
-        } else if ( amount != "" && amount > balDailyAccount ) {
+        } else {
             flag_DisableSentBtn = true;
         }
-        console.log( { temp } );
+        console.log( { temp, flag_DisableSentBtn } );
         this.setState( {
             address,
             amount,
             arr_AccountList: temp,
             arr_SelectAccountDetails,
-            selectedAccountBal: balDailyAccount,
+            selectedAccountBal: accountbal,
             flag_DisableSentBtn
         } )
-
     }
-
 
 
     componentWillUnmount() {
         utils.setFlagQRCodeScreen( true );
+
     }
+
 
     setAmount() {
         let { amount, selectedAccountBal } = this.state;
@@ -155,6 +145,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         console.log( { enterAmount } );
         var temp = [], arr_SelectAccountDetails = [], selectedAccountBal;
         let { arr_AccountList } = this.state;
+        console.log( { arr_AccountList } );
         for ( let i = 0; i < arr_AccountList.length; i++ ) {
             let item = arr_AccountList[ i ];
             let data = {};
@@ -166,9 +157,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
                 data.checked = false;
             }
             data.balance = item.balance;
-
             data.accountName = item.accountName;
-            data.address = item.address;
             temp.push( data );
         }
         console.log( { selectedAccountBal } );
@@ -180,9 +169,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         } else if ( enterAmount == 0 ) {
             flag_DisableSentBtn = true;
         }
-
         console.log( { selectedAccountBal } );
-
         this.setState( {
             selectedAccountBal,
             arr_AccountList: temp,
@@ -192,12 +179,12 @@ export default class SendPaymentScreen extends React.Component<any, any> {
     }
 
 
-
-
     //TODO: Send they amount 
     click_SendAmount = async () => {
         this.setState( {
-            flag_Loading: true
+            flag_Loading: true,
+            flag_DisableSentBtn: true,
+            flag_SentBtnAnimation: true
         } )
         let { arr_SelectAccountDetails, address, amount, tranPrio } = this.state;
         let amountFloat = parseFloat( amount );
@@ -206,10 +193,9 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         let walletDetails = await utils.getWalletDetails();
         let regularAccount = await bitcoinClassState.getRegularClassState();
         let secureAccount = await bitcoinClassState.getSecureClassState();
-        // let regularAccount = new RegularAccount( walletDetails.mnemonic );
         var resTransferST;
         let data = {};
-        if ( arr_SelectAccountDetails.accountType == "Regular Account" ) {
+        if ( arr_SelectAccountDetails.accountName == "Regular Account" ) {
             //console.log( { address, amountFloat, priority } );
             resTransferST = await regularAccount.transferST1( address, amountFloat, priority );
             await bitcoinClassState.setRegularClassState( regularAccount );
@@ -221,7 +207,9 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         }
         if ( resTransferST.status == 200 ) {
             this.setState( {
-                flag_Loading: false
+                flag_Loading: false,
+                flag_DisableSentBtn: false,
+                flag_SentBtnAnimation: false
             } );
             data.mnemonic = walletDetails.mnemonic;
             data.amount = this.state.amount;
@@ -236,7 +224,9 @@ export default class SendPaymentScreen extends React.Component<any, any> {
             this.props.navigation.push( "ConfirmAndSendPaymentScreen", { data: [ data ] } );
         } else {
             this.setState( {
-                flag_Loading: false
+                flag_Loading: false,
+                flag_DisableSentBtn: false,
+                flag_SentBtnAnimation: false
             } )
             let msg = resTransferST.data != undefined ? resTransferST.err + "\n Total Fee = " + resTransferST.data.fee : resTransferST.err
             setTimeout( () => {
@@ -259,21 +249,55 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         }
     }
 
+
     //buz bitcoin need small letter 
     getPriority( no: any ) {
         if ( no == 0 ) {
-            return "High"
+            return "Low"
         } else if ( no == 1 ) {
             return "Medium"
         } else {
-            return "Low"
+            return "High"
         }
     }
+
+    //TODO: When qrcode  scan 
+    getAddressWithBal = ( e: any ) => {
+        console.log( { e } );
+        let { amount } = this.state;
+        let data = e.data;
+        console.log( { data } );
+        let address = data != undefined ? data.address : "";
+        console.log( { address } );
+        if ( address != "" ) {
+            if ( data.type != "address" ) {
+                this.setAmountAndAddress( address, data.amount != undefined ? data.amount.toString() : "0" );
+            } else {
+                this.setAmountAndAddress( address, amount.toString() );
+            }
+
+        }
+    }
+
+    setAmountAndAddress( address: string, amount: string ) {
+        let { selectedAccountBal, flag_DisableSentBtn } = this.state;
+        if ( amount != "0" && parseFloat( amount ) < parseFloat( selectedAccountBal ) && address != "" ) {
+            flag_DisableSentBtn = false;
+        } else {
+            flag_DisableSentBtn = true;
+        }
+        console.log( { address, amount } );
+        this.setState( {
+            address,
+            amount: amount,
+            flag_DisableSentBtn
+        } )
+    }
+
 
     _renderItem( { item, index } ) {
         return (
             <View key={ "card" + index }>
-
                 <View style={ { flex: 1, marginTop: -20 } }>
                     <List>
                         <ListItem style={ { marginRight: 18 } }>
@@ -299,7 +323,6 @@ export default class SendPaymentScreen extends React.Component<any, any> {
                                     />
                                     <Text note style={ { fontSize: 12, marginLeft: -0.01 } }>{ item.balance }</Text>
                                 </View>
-
                             </Body>
                         </ListItem>
                     </List>
@@ -309,30 +332,20 @@ export default class SendPaymentScreen extends React.Component<any, any> {
         );
     }
 
-
-
-
     render() {
         //array
         let { arr_AccountList } = this.state;
         //values
-        let { amount, tranPrio, memoMsg, memo } = this.state;
+        let { amount, tranPrio, memoMsg, memo, address } = this.state;
         //flag
-        let { flag_Memo, flag_DisableSentBtn, flag_Loading } = this.state;
+        let { flag_Memo, flag_DisableSentBtn, flag_Loading, flag_SentBtnAnimation } = this.state;
         return (
             <Container>
-                <SafeAreaView style={ styles.container }>
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10, marginTop: 15 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.props.navigation.pop() }
-                            >
-                                <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Send</Text>
-                            </Button>
-                        </View>
+                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <HeaderTitle title="Send"
+                        pop={ () => this.props.navigation.pop() }
+                    />
+                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
                         <KeyboardAwareScrollView
                             enableAutomaticScroll
                             automaticallyAdjustContentInsets={ true }
@@ -340,7 +353,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
                             enableOnAndroid={ true }
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
-                            <View style={ { flex: 0.05, marginTop: 20, alignItems: "center" } }>
+                            <View style={ { flex: 0.05, alignItems: "center" } }>
                                 <View style={ [ styles.itemQuestionPicker ] }>
                                     <View style={ { flexDirection: "row", alignItems: "center" } }>
                                         <SvgIcon
@@ -352,7 +365,7 @@ export default class SendPaymentScreen extends React.Component<any, any> {
                                         <Input
                                             value={ amount }
                                             keyboardType="numeric"
-                                            placeholder="Amount"
+                                            placeholder="Amount Sats"
                                             placeholderTextColor="#D0D0D0"
                                             returnKeyType="done"
                                             onChangeText={ ( val ) => {
@@ -406,6 +419,31 @@ export default class SendPaymentScreen extends React.Component<any, any> {
                                         />
                                     </View>
                                 ) }
+                                <View style={ [ styles.itemQuestionPicker ] }>
+                                    <View style={ { flexDirection: "row" } }>
+                                        <Input
+                                            value={ address }
+                                            keyboardType="default"
+                                            placeholder="Address"
+                                            placeholderTextColor="#D0D0D0"
+                                            returnKeyType="done"
+                                            onChangeText={ ( val ) => {
+                                                this.setState( {
+                                                    address: val
+                                                } )
+                                            } }
+                                            style={ [ globalStyle.ffOpenSansBold, { flex: 1, fontSize: 18 } ] }
+                                        />
+                                        <Button
+                                            transparent
+                                            style={ { flex: 0.15 } }
+                                            onPress={ () => {
+                                                this.props.navigation.push( "SendPaymentAddressScanScreen", { onSelect: this.getAddressWithBal.bind( this ) } )
+                                            } }>
+                                            <SvgIcon name="qr-codes" color="#000000" size={ 30 } />
+                                        </Button>
+                                    </View>
+                                </View>
                             </View>
                             <View style={ { flex: 1 } } >
                                 <Text style={ { margin: 20 } }>Transaction Priority</Text>
@@ -429,7 +467,6 @@ export default class SendPaymentScreen extends React.Component<any, any> {
                                         <Text style={ { flex: 1, textAlign: "right", marginRight: 20 } }>High </Text>
                                     </View>
                                 </View>
-
                             </View>
                             <View style={ { flex: 1 } }>
                                 <Text style={ { margin: 20 } }>Choose any option to send</Text>
@@ -438,21 +475,22 @@ export default class SendPaymentScreen extends React.Component<any, any> {
                                     renderItem={ this._renderItem.bind( this ) }
                                     keyExtractor={ ( item, index ) => index }
                                 />
-
                             </View>
                             <View style={ { flex: 1 } }>
-                                <Text note style={ { textAlign: "center", margin: 20 } }>Transaction fee will be calculated in the next step according to the amount of money being sent.</Text>
-                                <FullLinearGradientButton
-                                    style={ [ flag_DisableSentBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
+                                <Text note style={ { textAlign: "center", margin: 10 } }>Transaction fee will be calculated in the next step according to the amount of money being sent.</Text>
+                                <FullLinearGradientLoadingButton
+                                    style={ [ flag_DisableSentBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10, margin: 10 } ] }
                                     disabled={ flag_DisableSentBtn }
-                                    title="Send"
+                                    animating={ flag_SentBtnAnimation }
+                                    title=" Send"
                                     click_Done={ () => this.click_SendAmount() }
                                 />
                             </View>
                         </KeyboardAwareScrollView>
-                    </ImageBackground>
-                </SafeAreaView>
+                    </SafeAreaView>
+                </ImageBackground>
                 <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

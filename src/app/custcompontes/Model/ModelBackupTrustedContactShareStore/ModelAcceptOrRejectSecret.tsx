@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet } from 'react-native';
+import { Modal, View, StyleSheet } from 'react-native';
 import { Button, Icon, Text } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import { Avatar } from 'react-native-elements';
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 var utils = require( "HexaWallet/src/app/constants/Utils" );
@@ -35,18 +35,19 @@ export default class ModelAcceptOrRejectSecret extends Component<Props, any> {
                 ] }>
                     <View style={ styles.viewModelBody }>
                         <View style={ { flexDirection: "row", flex: 0.5 } }>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>{ walletName } has selected you as his trusted contact</Text>
+                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>{ walletName } wallet has selected you as trusted contact</Text>
                             <Button light iconLeft style={ { width: 40, height: 40, borderRadius: 20 } } onPress={ () => this.props.closeModal() }>
                                 <Icon name='close' style={ { alignSelf: "center" } } />
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Some information about the importance secret keeping</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>This secret is required if { walletName } want to retore wallet in case of loss</Text>
                             <Avatar medium rounded title={ walletName.charAt( 0 ) } />
                             <Text style={ globalStyle.ffFiraSansMedium } note>{ walletName }</Text>
+                            <Text style={ [ globalStyle.ffFiraSansRegular, { textAlign: "center", marginTop: 10 } ] }>This share will now be stored in More> Address book. Tap on it to return share when requested by owner. An OTP will also be displayed post sharing.</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>You will need to open the Hexa application on your device once in two weeks to make sure the secret is still accessible</Text>
+                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>You are requested to open the Hexa application once in two weeks to make sure the secret is still accessible</Text>
                             <Button
                                 onPress={ () => this.props.closeModal() }
                                 style={ [ globalStyle.ffFiraSansSemiBold, {
@@ -75,7 +76,7 @@ const styles = StyleSheet.create( {
         justifyContent: 'center'
     },
     viewModelBody: {
-        flex: utils.getIphoneSize() == "iphone X" ? 0.8 : 0.7,
+        flex: utils.getIphoneSize() == "iphone X" ? 0.9 : 0.9,
         margin: 20,
         padding: 10,
         borderRadius: 10,
