@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { Modal, TouchableHighlight, View, Alert, StyleSheet, Image } from 'react-native';
-import { Button, Icon, Text, Textarea, Form } from "native-base";
+import { Modal, View, StyleSheet, Image, Dimensions } from 'react-native';
+import { Text } from "native-base";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import { SvgIcon } from "@up-shared/components";
+
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import {
@@ -33,7 +33,7 @@ export default class ModelRestoreWalletSuccessfullyUsingTrustedContact extends C
 
     //TODO: Wallet Name
     ckeckWalletName( val: string ) {
-        if ( val.length >= 6 ) {
+        if ( val.length >= 3 ) {
             this.setState( {
                 flag_DisableBtnNext: false
             } )
@@ -67,31 +67,17 @@ export default class ModelRestoreWalletSuccessfullyUsingTrustedContact extends C
                             } ] }>Wallet Successfully Restored</Text>
                         </View>
                         <View style={ { flex: 2, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingMnemonic.walletrestored } />
+                            <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingTrustedContact.successImage } />
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-end" } }>
-                            <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Congratulations! You can now use your Daily Account</Text>
+                            <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Congratulations! Your wallet is successfully restored</Text>
                             <Text note>{ data.length != 0 ? data[ 0 ].walletName : "Hexa Wallet" }</Text>
-                            <View style={ { flexDirection: "row", justifyContent: "center", alignItems: "center", margin: 10 } }>
-                                <Text note style={ { fontSize: 16 } }>Daily Account: </Text>
-                                <SvgIcon name="icon_bitcoin" color="#D0D0D0" size={ 20 } />
-                                <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
-                                    { data.length != 0 ? " " + data[ 0 ].balR : 0 }
-                                </Text>
-                            </View>
-                            <View style={ { flexDirection: "row", justifyContent: "center", alignItems: "center", } }>
-                                <Text note style={ { fontSize: 16 } }>Secure Account: </Text>
-                                <SvgIcon name="icon_bitcoin" color="#D0D0D0" size={ 20 } />
-                                <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 20 } ] }>
-                                    { data.length != 0 ? " " + data[ 0 ].balS : 0 }
-                                </Text>
-                            </View>
                             <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Restore your secure account now You can opt to do it later</Text>
                         </View>
                         <View style={ { flex: 0.4, justifyContent: "flex-end" } }>
                             <FullLinearGradientButton
                                 click_Done={ () => this.props.click_Skip() }
-                                title="Go Wallet"
+                                title="Go to Wallet"
                                 disabled={ false }
                                 style={ [ { opacity: 1 }, { borderRadius: 10 } ] }
                             />
@@ -110,8 +96,8 @@ const styles = StyleSheet.create( {
 
     },
     imgAppLogo: {
-        width: 150,
-        height: 170
+        width: Dimensions.get( 'screen' ).width - 80,
+        height: 250
     },
     txtNotes: {
         margin: 20

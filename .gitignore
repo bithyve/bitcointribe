@@ -19,6 +19,7 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
+ios/Pods
 
 # Android
 build/
@@ -27,6 +28,7 @@ build/
 local.properties
 *.iml
 *.apk
+android/.gradle
 
 # node.js
 node_modules/
@@ -41,12 +43,6 @@ env.dev
 .env.prod
 .env.live
 .env.staging
-
-#Documents
-/src/assets/Documents
-
-#Bitcoin Files
-*/bitcoin.zip
 
 # BUCK
 buck-out/
@@ -63,3 +59,6 @@ buck-out/
 
 # Bundle artifact
 *.jsbundle
+
+# react-native-config codegen
+ios/tmp.xcconfig

@@ -2,41 +2,17 @@ import React from "react";
 import {
     View,
     ImageBackground,
-    Dimensions,
-    StatusBar,
-    TouchableOpacity,
-    TouchableHighlight,
     StyleSheet,
-    RefreshControl,
-    Platform,
-    SafeAreaView,
-    FlatList,
-    ScrollView,
-    Animated,
-    LayoutAnimation,
-    AsyncStorage,
-    Alert
+    SafeAreaView
 } from "react-native";
 import {
     Container,
-    Header,
-    Title,
-    Content,
     Button,
-    Left,
-    Right,
-    Body,
-    Text,
-    List,
-    ListItem
+    Text
 } from "native-base";
-//import BarcodeScanner from "react-native-barcode-scanners";
-import { QRScannerView } from 'ac-qrcode';
-import Permissions from 'react-native-permissions'
+import QRCodeScanner from 'react-native-qrcode-scanner';
 
 
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 
 //TODO: Custome Alert 
@@ -46,44 +22,41 @@ let alert = new AlertSimple();
 //TODO: Custome object
 import {
     colors,
-    images,
-    localDB
+    images
 } from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
 var utils = require( "HexaWallet/src/app/constants/Utils" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-import Singleton from "HexaWallet/src/app/constants/Singleton";
-
 
 //Custome Compontes
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
-
 //TODO: Bitcoin Class
-var bitcoinClassState = require( "HexaWallet/src/app/manager/ClassState/BitcoinClassState" );
-import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
+
 
 
 export default class QrCodeScannerScreen extends React.Component {
     constructor ( props: any ) {
         super( props );
         this.state = {
+            focusedScreen: true
         };
 
     }
-    componentDidMount() {
-        Permissions.request( 'camera' ).then( ( response: any ) => {
-            if ( response == "authorized" ) {
-                this.render();
-            }
-        } );
-    }
 
+    componentDidMount() {
+        const { navigation } = this.props;
+        navigation.addListener( 'willFocus', () =>
+            this.setState( { focusedScreen: true } )
+        );
+        navigation.addListener( 'willBlur', () =>
+            this.setState( { focusedScreen: false } )
+        );
+    }
 
 
     _renderTitleBar() {
         return (
-            <Text></Text>
+            <View style={ { height: 0 } }></View>
         );
     }
 
@@ -91,12 +64,18 @@ export default class QrCodeScannerScreen extends React.Component {
         return (
             <Button
                 full
-                style={ { margin: 15, borderRadius: 10, backgroundColor: "#ffffff" } }
+                style={ { margin: 15, borderRadius: 10, backgroundColor: colors.appColor } }
                 onPress={ () => this.props.navigation.push( "ReceivePaymentNavigator" ) }
             >
-                <Text style={ { color: "#000000" } }>Request Payment</Text>
+                <Text style={ { color: "#ffffff" } }>Request Payment</Text>
             </Button>
         )
+    }
+
+
+
+    click_ResetFlag = async () => {
+        utils.setFlagQRCodeScreen( true );
     }
 
     barcodeReceived = async ( e: any ) => {
@@ -123,7 +102,10 @@ export default class QrCodeScannerScreen extends React.Component {
                         utils.setDeepLinkingUrl( deepLinkPara );
                         this.props.navigation.navigate( 'WalletScreen' );
                     } else if ( result.type == "" ) {
-                        alert.simpleOk( "Oops", "Invalid qrcode.Please scan correct qrcode." );
+                        if ( utils.getFlagQRCodeScreen() == true ) {
+                            utils.setFlagQRCodeScreen( false );
+                            alert.simpleOkAction( "Oops", "Invalid qrcode.Please scan correct qrcode.", this.click_ResetFlag );
+                        }
                     }
                 }
             }
@@ -133,20 +115,34 @@ export default class QrCodeScannerScreen extends React.Component {
                 if ( resAddressDiff.status == 200 ) {
                     resAddressDiff = resAddressDiff.data;
                 } else {
-                    alert.simpleOk( "Oops", resAddressDiff.err );
+                    if ( utils.getFlagQRCodeScreen() == true ) {
+                        utils.setFlagQRCodeScreen( false );
+                        alert.simpleOkAction( "Oops", resAddressDiff.err, this.click_ResetFlag );
+                    }
                 }
-                if ( resAddressDiff.type == "paymentURI" || resAddressDiff.type == "address" ) {
+                let data = {};
+                if ( resAddressDiff.type == "paymentURI" ) {
                     var resDecPaymentURI = await regularAccount.decodePaymentURI( result );
                     if ( resDecPaymentURI.status == 200 ) {
                         await bitcoinClassState.setRegularClassState( regularAccount );
                         resDecPaymentURI = resDecPaymentURI.data;
                     } else {
-                        alert.simpleOk( "Oops", resDecPaymentURI.err );
+                        if ( utils.getFlagQRCodeScreen() == true ) {
+                            utils.setFlagQRCodeScreen( false );
+                            alert.simpleOkAction( "Oops", resDecPaymentURI.err, this.click_ResetFlag );
+                        }
                     }
-                    if ( utils.getFlagQRCodeScreen() == true ) {
-                        utils.setFlagQRCodeScreen( false );
-                        this.props.navigation.push( "SendPaymentNavigator", { data: resDecPaymentURI } );
-                    }
+                    data.address = resDecPaymentURI.address;
+                    data.amount = resDecPaymentURI.options.amount;
+                    data.type = "paymentURI";
+                } else {
+                    data.address = result;
+                    data.type = "address";
+                    data.amount = "0";
+                }
+                if ( utils.getFlagQRCodeScreen() == true ) {
+                    utils.setFlagQRCodeScreen( false );
+                    this.props.navigation.push( "SendPaymentNavigator", { data: data } );
                 }
             }
         } catch ( error ) {
@@ -155,26 +151,37 @@ export default class QrCodeScannerScreen extends React.Component {
     }
 
 
+
+    cameraView() {
+        return (
+            <QRCodeScanner
+                style={ { flex: 1 } }
+                onRead={ this.barcodeReceived }
+                topContent={ this._renderTitleBar() }
+                bottomContent={
+                    this._renderMenu()
+                }
+
+                cameraType="back"
+                showMarker={ true }
+                vibrate={ true }
+            />
+        )
+    }
+
     render() {
+        const { focusedScreen } = this.state;
+        if ( focusedScreen ) {
+            return ( this.cameraView() );
+        }
         return (
             <Container>
-                <StatusBar hidden />
-                <SafeAreaView style={ styles.container }>
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        < QRScannerView
-                            hintText=""
-                            rectHeight={ Dimensions.get( 'screen' ).height / 2.0 }
-                            rectWidth={ Dimensions.get( 'screen' ).width - 20 }
-                            scanBarColor={ colors.appColor }
-                            cornerColor={ colors.appColor }
-                            onScanResultReceived={ this.barcodeReceived.bind( this ) }
-                            renderTopBarView={ () => this._renderTitleBar() }
-                            renderBottomMenuView={ () => this._renderMenu() }
-                        />
-
-                    </ImageBackground>
-                </SafeAreaView>
+                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <SafeAreaView style={ styles.container }>
+                        { this.cameraView }
+                    </SafeAreaView>
+                </ImageBackground>
+                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }
@@ -182,7 +189,7 @@ export default class QrCodeScannerScreen extends React.Component {
 
 const styles = StyleSheet.create( {
     container: {
-        flex: 1
+        flex: 1,
     },
 
 } );

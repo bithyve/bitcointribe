@@ -1,0 +1,82 @@
+platform :ios, '9.0'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+target 'HexaWallet' do
+  # Pods for HexaWallet
+  use_native_modules!
+ pod 'React', :path => '../node_modules/react-native/'
+  pod 'React-Core', :path => '../node_modules/react-native/React'
+  pod 'React-DevSupport', :path => '../node_modules/react-native/React'
+  pod 'React-RCTActionSheet', :path => '../node_modules/react-native/Libraries/ActionSheetIOS'
+  pod 'React-RCTAnimation', :path => '../node_modules/react-native/Libraries/NativeAnimation'
+  pod 'React-RCTBlob', :path => '../node_modules/react-native/Libraries/Blob'
+  pod 'React-RCTImage', :path => '../node_modules/react-native/Libraries/Image'
+  pod 'React-RCTLinking', :path => '../node_modules/react-native/Libraries/LinkingIOS'
+  pod 'React-RCTNetwork', :path => '../node_modules/react-native/Libraries/Network'
+  pod 'React-RCTSettings', :path => '../node_modules/react-native/Libraries/Settings'
+  pod 'React-RCTText', :path => '../node_modules/react-native/Libraries/Text'
+  pod 'React-RCTVibration', :path => '../node_modules/react-native/Libraries/Vibration'
+  pod 'React-RCTWebSocket', :path => '../node_modules/react-native/Libraries/WebSocket'
+
+  pod 'React-cxxreact', :path => '../node_modules/react-native/ReactCommon/cxxreact'
+  pod 'React-jsi', :path => '../node_modules/react-native/ReactCommon/jsi'
+  pod 'React-jsiexecutor', :path => '../node_modules/react-native/ReactCommon/jsiexecutor'
+  pod 'React-jsinspector', :path => '../node_modules/react-native/ReactCommon/jsinspector'
+  pod 'yoga', :path => '../node_modules/react-native/ReactCommon/yoga'  
+  pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
+
+  pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
+  pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
+  pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
+
+
+   pod 'Fabric'
+  pod 'Crashlytics'
+
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
+  pod 'RNBackgroundFetch', :path => '../node_modules/react-native-background-fetch'
+
+  pod 'react-native-camera', :path => '../node_modules/react-native-camera'
+
+  pod 'react-native-contacts', :path => '../node_modules/react-native-contacts'
+
+  pod 'react-native-webview', :path => '../node_modules/react-native-webview'
+
+  pod 'RNDeviceInfo', :path => '../node_modules/react-native-device-info'
+
+  pod 'react-native-randombytes', :path => '../node_modules/react-native-randombytes'
+
+  pod 'react-native-udp', :path => '../node_modules/react-native-udp'
+
+  pod 'RNSVG', :path => '../node_modules/react-native-svg'
+
+  pod 'react-native-sms', :path => '../node_modules/react-native-sms'
+
+  pod 'RNShare', :path => '../node_modules/react-native-share'
+
+  pod 'react-native-mail', :path => '../node_modules/react-native-mail'
+
+  pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
+
+  pod 'QrCode', :path => '../node_modules/react-native-lewin-qrcode/ios'
+
+  pod 'RNKeychain', :path => '../node_modules/react-native-keychain'
+
+  pod 'react-native-image-picker', :path => '../node_modules/react-native-image-picker'
+
+  pod 'RNI18n', :path => '../node_modules/react-native-i18n'
+  
+  pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
+
+  pod 'RNFS', :path => '../node_modules/react-native-fs'
+  
+  pod 'react-native-sqlite-storage', :path => '../node_modules/react-native-sqlite-storage'
+  
+  pod 'RNReactNativePdfLib', :path => '../node_modules/react-native-pdf-lib/ios'
+  
+  pod 'RNInAppBrowser', :path => '../node_modules/react-native-inappbrowser-reborn'
+  
+end  
+
+

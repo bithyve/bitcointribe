@@ -1,39 +1,12 @@
 import React from "react";
 import {
-    View,
-    ImageBackground,
-    Dimensions,
-    StatusBar,
-    TouchableOpacity,
-    TouchableHighlight,
     StyleSheet,
-    RefreshControl,
-    Platform,
     SafeAreaView,
-    FlatList,
-    ScrollView,
-    Animated,
-    LayoutAnimation,
-    AsyncStorage,
-    Alert
 } from "react-native";
 import {
     Container,
-    Header,
-    Title,
-    Content,
-    Button,
-    Left,
-    Right,
-    Body,
-    Text,
-    List,
-    ListItem,
-    Tab, Tabs, TabHeading, Icon,
+    Tab, Tabs, TabHeading, Icon
 } from "native-base";
-//import BarcodeScanner from "react-native-barcode-scanners";
-import { QRScannerView } from 'ac-qrcode';
-import { SvgIcon } from "@up-shared/components";
 //NsNotification
 import BackboneEvents from "backbone-events-standalone";
 // global event bus
@@ -41,19 +14,14 @@ window.EventBus = BackboneEvents.mixin( {} );
 
 
 
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
 
 //TODO: Custome object
 import {
     colors,
-    images,
     localDB
 } from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
-var utils = require( "HexaWallet/src/app/constants/Utils" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-import Singleton from "HexaWallet/src/app/constants/Singleton";
+var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
+
 
 
 //TODO: Custome Alert 
@@ -62,7 +30,9 @@ let alert = new AlertSimple();
 
 //Custome Compontes
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import RestoreScanQrCode from "HexaWallet/src/app/custcompontes/OnBoarding/RestoreScanQrCode/RestoreScanQrCode"
+import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+
+
 
 //Screens
 import Restore4And5SelfShareQRCodeScreen1 from "./Screens/Restore4And5SelfShareQRCodeScreen1";
@@ -75,7 +45,7 @@ import Restore4And5SelfShareQRCodeScreen7 from "./Screens/Restore4And5SelfShareQ
 import Restore4And5SelfShareQRCodeScreen8 from "./Screens/Restore4And5SelfShareQRCodeScreen8";
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
 
 //Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
@@ -97,6 +67,8 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
     componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
         let type = this.props.navigation.getParam( "type" );
+        console.log( { data, type } );
+
         this.setState( {
             data, type
         } )
@@ -113,8 +85,6 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
     }
 
     click_Confirm = async ( type: string, data: any ) => {
-        console.log( { type, data } );
-
         const dateTime = Date.now();
         let arr_Shares = this.state.arr_Shares;
         arr_Shares.push.apply( arr_Shares, data );
@@ -123,11 +93,12 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
         if ( resRecoverMetaShareFromQR.status == 200 ) {
             resRecoverMetaShareFromQR = resRecoverMetaShareFromQR.data;
             console.log( { resRecoverMetaShareFromQR } );
-            let resInsertContactList = await dbOpration.insertRestoreUsingTrustedContactSelfShare(
+            let resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactSelfShare(
                 localDB.tableName.tblSSSDetails,
                 dateTime,
                 resRecoverMetaShareFromQR.metaShare,
-                type
+                type,
+                "Good"
             );
             console.log( { resInsertContactList } );
             if ( resInsertContactList ) {
@@ -138,9 +109,6 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
         } else {
             alert.simpleOk( "Oops", resRecoverMetaShareFromQR.err );
         }
-
-
-
     }
 
     render() {
@@ -148,17 +116,10 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
         let { selectedIndex, type } = this.state;
         return (
             <Container>
-                <SafeAreaView style={ styles.container }>
-                    <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                    <View style={ { marginLeft: 10, marginTop: 15 } }>
-                        <Button
-                            transparent
-                            onPress={ () => this.props.navigation.pop() }
-                        >
-                            <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#ffffff" />
-                            <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#ffffff", alignSelf: "center", fontSize: Platform.OS == "ios" ? 25 : 20, marginLeft: 0 } ] }>Scan QRCode</Text>
-                        </Button>
-                    </View>
+                <HeaderTitle title="Scan QRCode"
+                    pop={ () => this.props.navigation.pop() }
+                />
+                <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
                     <Tabs locked={ true } page={ selectedIndex }>
                         <Tab heading={ <TabHeading><Icon name="radio-button-on" /></TabHeading> }>
                             <Restore4And5SelfShareQRCodeScreen1 type={ type } click_Next={ ( val: number, data: any ) => this.click_Next( val, data ) } />
@@ -186,6 +147,7 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
                         </Tab>
                     </Tabs>
                 </SafeAreaView>
+                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

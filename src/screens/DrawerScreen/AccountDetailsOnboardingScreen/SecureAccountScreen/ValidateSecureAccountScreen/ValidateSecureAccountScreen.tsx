@@ -31,8 +31,8 @@ import {
   errorMessage,
   msg
 } from "bithyve/src/app/constants/Constants";
-var dbOpration = require("bithyve/src/app/manager/database/DBOpration");
-const { width } = Dimensions.get("screen");
+var dbOpration = require( "bithyve/src/app/manage/database/DBOpration" );
+const { width } = Dimensions.get( "screen" );
 
 //Custome Compontes
 import SCLAlertOk from "bithyve/src/app/custcompontes/alert/SCLAlertOk";
@@ -42,11 +42,11 @@ import SCLAlertOk from "bithyve/src/app/custcompontes/alert/SCLAlertOk";
 //import secureAccount from "bithyve/src/bitcoin/services/SecureAccount";
 
 //localization
-import { localization } from "bithyve/src/app/manager/Localization/i18n";
-let arr_PopupMsg = localization("ValidateSecureAccountScreen.popupMsg");
+import { localization } from "bithyve/src/app/manage/Localization/i18n";
+let arr_PopupMsg = localization( "ValidateSecureAccountScreen.popupMsg" );
 export default class ValidateSecureAccountScreen extends React.Component {
-  constructor(props: any) {
-    super(props);
+  constructor ( props: any ) {
+    super( props );
     this.state = {
       tokenKey: "",
       validBtnBgColor: "gray",
@@ -183,92 +183,92 @@ export default class ValidateSecureAccountScreen extends React.Component {
     return (
       <Container>
         <ImageBackground
-          source={images.appBackgound}
-          style={styles.backgroundImage}
+          source={ images.appBackgound }
+          style={ styles.backgroundImage }
         >
           <Header transparent>
             <Left>
-              <Button transparent onPress={() => this.props.navigation.pop()}>
-                <Icon name="chevron-left" size={25} color="#ffffff" />
+              <Button transparent onPress={ () => this.props.navigation.pop() }>
+                <Icon name="chevron-left" size={ 25 } color="#ffffff" />
               </Button>
             </Left>
-            <Body style={{ flex: 0, alignItems: "center" }}>
+            <Body style={ { flex: 0, alignItems: "center" } }>
               <Title
-                adjustsFontSizeToFit={true}
-                numberOfLines={1}
-                style={styles.titleUserName}
+                adjustsFontSizeToFit={ true }
+                numberOfLines={ 1 }
+                style={ styles.titleUserName }
               />
             </Body>
             <Right />
           </Header>
           <Content
-            contentContainerStyle={styles.container}
-            scrollEnabled={false}
+            contentContainerStyle={ styles.container }
+            scrollEnabled={ false }
             padder
           >
-            <View style={styles.logoSecureAccount}>
+            <View style={ styles.logoSecureAccount }>
               <Image
-                style={styles.secureLogo}
-                source={images.secureAccount.validationKey}
+                style={ styles.secureLogo }
+                source={ images.secureAccount.validationKey }
               />
-              <Text style={styles.txtTitle}>
-                {localization("ValidateSecureAccountScreen.title")}
+              <Text style={ styles.txtTitle }>
+                { localization( "ValidateSecureAccountScreen.title" ) }
               </Text>
               <Input
-                name={this.state.tokenKey}
-                value={this.state.tokenKey}
-                placeholder={localization(
+                name={ this.state.tokenKey }
+                value={ this.state.tokenKey }
+                placeholder={ localization(
                   "ValidateSecureAccountScreen.txtInputPlaceholder"
-                )}
-                keyboardType={"numeric"}
-                placeholderTextColor={Platform.OS == "ios" ? "#fff" : "#000"}
-                style={styles.input}
-                onChangeText={val => this.validation(val)}
-                onChange={val => this.validation(val)}
+                ) }
+                keyboardType={ "numeric" }
+                placeholderTextColor={ Platform.OS == "ios" ? "#fff" : "#000" }
+                style={ styles.input }
+                onChangeText={ val => this.validation( val ) }
+                onChange={ val => this.validation( val ) }
               />
             </View>
-            <View style={styles.viewValidBtn}>
+            <View style={ styles.viewValidBtn }>
               <Button
-                style={[
+                style={ [
                   styles.btnSent,
                   { backgroundColor: this.state.validBtnBgColor }
-                ]}
+                ] }
                 full
-                disabled={this.state.validBtnStaus}
-                onPress={() => this.click_Validation()}
+                disabled={ this.state.validBtnStaus }
+                onPress={ () => this.click_Validation() }
               >
                 <Text>
-                  {" "}
-                  {localization(
+                  { " " }
+                  { localization(
                     "ValidateSecureAccountScreen.btnValidation"
-                  )}{" "}
+                  ) }{ " " }
                 </Text>
               </Button>
             </View>
           </Content>
         </ImageBackground>
-        <Loader loading={this.state.isLoading} color={colors.appColor} />
+        <Loader loading={ this.state.isLoading } color={ colors.appColor } />
         <SCLAlertOk
-          data={this.state.alertPopupData}
-          click_Ok={(status: boolean) => {
+          data={ this.state.alertPopupData }
+          click_Ok={ ( status: boolean ) => {
             status
-              ? this.props.navigation.navigate("TabbarBottom")
-              : console.log(status),
-              this.setState({
+              ? this.props.navigation.navigate( "TabbarBottom" )
+              : console.log( status ),
+              this.setState( {
                 alertPopupData: [
                   {
                     status: false
                   }
                 ]
-              });
-          }}
+              } );
+          } }
         />
       </Container>
     );
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   backgroundImage: {
     flex: 1
   },
@@ -297,4 +297,4 @@ const styles = StyleSheet.create({
     flex: 3,
     marginTop: 20
   }
-});
+} );

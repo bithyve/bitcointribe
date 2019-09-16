@@ -1,54 +1,28 @@
 import React from "react";
 import {
-    View,
     ImageBackground,
-    Dimensions,
-    StatusBar,
-    TouchableOpacity,
-    TouchableHighlight,
     StyleSheet,
-    RefreshControl,
-    Platform,
-    SafeAreaView,
-    FlatList,
-    ScrollView,
-    Animated,
-    LayoutAnimation,
-    AsyncStorage,
-    Alert
+    SafeAreaView
 } from "react-native";
 import {
     Container,
-    Header,
-    Title,
-    Content,
-    Button,
-    Left,
-    Right,
-    Body,
-    Text,
-    List,
-    ListItem
+    Text
 } from "native-base";
 //import BarcodeScanner from "react-native-barcode-scanners";
-import { QRScannerView } from 'ac-qrcode';
-import { SvgIcon } from "@up-shared/components";
+import QRCodeScanner from 'react-native-qrcode-scanner';
+import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
 
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manager/Global/StyleSheet/Style";
+import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome object
 import {
     colors,
-    images,
-    localDB
+    images
 } from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manager/database/DBOpration" );
-var utils = require( "HexaWallet/src/app/constants/Utils" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-import Singleton from "HexaWallet/src/app/constants/Singleton";
+
 
 //TODO: Custome Alert 
 import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
@@ -57,12 +31,9 @@ let alert = new AlertSimple();
 //Custome Compontes
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 
-//TODO: Custome Model
-import ModelRestoreAssociateContactListForQRCodeScan from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelRestoreAssociateContactListForQRCodeScan";
 
-//TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manager/CommonFunction/CommonDBReadData" );
-let goBackI = 0;
+
+let flag_ReadQRCode = true;
 
 export default class ConfirmSelfShareQRScannerScreen extends React.Component {
     constructor ( props: any ) {
@@ -78,8 +49,9 @@ export default class ConfirmSelfShareQRScannerScreen extends React.Component {
         this.willFocusSubscription = this.props.navigation.addListener(
             "willFocus",
             () => {
-                goBackI = 0;
+                flag_ReadQRCode = true;
                 let data = this.props.navigation.getParam( "data" );
+                //console.log( { data } );
                 this.setState( {
                     data
                 } )
@@ -98,7 +70,12 @@ export default class ConfirmSelfShareQRScannerScreen extends React.Component {
         )
     }
 
-    barcodeReceived( e: any ) {
+
+    click_resetFlag = () => {
+        flag_ReadQRCode = true;
+    }
+
+    barcodeReceived = async ( e: any ) => {
         try {
             var result = e.data;
             result = result.split( "Doublequote" ).join( '"' );
@@ -108,50 +85,44 @@ export default class ConfirmSelfShareQRScannerScreen extends React.Component {
             result = result.split( "Comma" ).join( ',' );
             result = result.split( "Space" ).join( ' ' );
             let { data } = this.state;
-            console.log( { result, data } );
+            //console.log( { result, data } );
             if ( result == data ) {
-                if ( goBackI == 0 ) {
+                if ( flag_ReadQRCode ) {
+                    flag_ReadQRCode = false;
                     const { navigation } = this.props;
                     navigation.goBack();
                     navigation.state.params.onSelect( { selected: true, result: result, data: data } );
-                    goBackI++;
                 }
             } else {
-                alert.simpleOk( "Oops", "Invalid qrcode please scan first share qrcode." );
+                if ( flag_ReadQRCode ) {
+                    flag_ReadQRCode = false;
+                    alert.simpleOkAction( "Oops", "Invalid qrcode please scan first share qrcode.", this.click_resetFlag );
+                }
             }
-
         } catch ( error ) {
-            console.log( error );
+            //console.log( error );
         }
     }
 
     render() {
         return (
             <Container>
-                <SafeAreaView style={ styles.container }>
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                        <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                        <View style={ { marginLeft: 10 } }>
-                            <Button
-                                transparent
-                                onPress={ () => this.props.navigation.pop() }
-                            >
-                                <SvgIcon name="icon_back" size={ Platform.OS == "ios" ? 25 : 20 } color="#000000" />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", alignSelf: "center", fontSize: Platform.OS == "ios" ? 22 : 17, marginLeft: 0 } ] }>Scan 1st Share</Text>
-                            </Button>
-                        </View>
-                        < QRScannerView
-                            hintText=""
-                            rectHeight={ Dimensions.get( 'screen' ).height / 2.0 }
-                            rectWidth={ Dimensions.get( 'screen' ).width - 20 }
-                            scanBarColor={ colors.appColor }
-                            cornerColor={ colors.appColor }
-                            onScanResultReceived={ this.barcodeReceived.bind( this ) }
-                            renderTopBarView={ () => this._renderTitleBar() }
-                            renderBottomMenuView={ () => this._renderMenu() }
+                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <HeaderTitle title="Scan 1st Share" pop={ () => this.props.navigation.pop() } />
+                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
+                        <QRCodeScanner
+                            onRead={ this.barcodeReceived }
+                            topContent={ this._renderTitleBar() }
+                            bottomContent={
+                                this._renderMenu()
+                            }
+                            cameraType="back"
+                            showMarker={ true }
+                            vibrate={ true }
                         />
-                    </ImageBackground>
-                </SafeAreaView>
+                    </SafeAreaView>
+                </ImageBackground>
+                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

@@ -2,7 +2,7 @@ import bip32 from "bip32";
 import bip39 from "bip39";
 import bip65 from "bip65";
 import bitcoinJS from "bitcoinjs-lib";
-import Bitcoin from "../../utilities/Bitcoin";
+import Bitcoin from "../../utilities/accounts/Bitcoin";
 
 export default class VaultAccount {
   public bitcoin: Bitcoin;
