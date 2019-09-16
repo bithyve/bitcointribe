@@ -1,28 +1,15 @@
 import React from "react";
-import { StyleSheet, ImageBackground, View, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, Clipboard } from "react-native";
+import { StyleSheet, ImageBackground, SafeAreaView } from "react-native";
 import {
-    Container,
-    Item,
-    Input,
-    Button,
-    Text,
-    Icon,
-    Textarea,
-    Left,
-    Right,
-    List, ListItem,
+    Container
 } from "native-base";
-import { SvgIcon } from "@up-shared/components";
-import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-import { RkCard } from "react-native-ui-kitten";
+
 
 //TODO: Custome Pages
 import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+
 
 
 //TODO: Custome Model
@@ -30,23 +17,9 @@ import ModelPasscode from "HexaWallet/src/app/custcompontes/Model/ModelCommom/Mo
 import ModelBackupSecretQuestionsFirstQuestion from "HexaWallet/src/app/custcompontes/Model/ModelBackupSecretQuestions/ModelBackupSecretQuestionsFirstQuestion";
 import ModelMnemonicDisplay from "HexaWallet/src/app/custcompontes/Model/ModelMnemonicDisplay/ModelMnemonicDisplay";
 
-
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
-
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
+import { colors, images } from "HexaWallet/src/app/constants/Constants";
 var utils = require( "HexaWallet/src/app/constants/Utils" );
-
-//TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
-
-//TODO: Bitcoin Files
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
-
-
 
 export default class MnemonicDisplayScreen extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -71,6 +44,7 @@ export default class MnemonicDisplayScreen extends React.Component<any, any> {
             walletAnswerDetails: JSON.parse( walletDetails.setUpWalletAnswerDetails ),
             mnemonic: walletDetails.mnemonic
         } );
+
     }
 
 
