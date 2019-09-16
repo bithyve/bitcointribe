@@ -41,14 +41,15 @@ npm run android-dev
 ```
   
 #### Running hexa ios 
-        
+          
 ```
 pod install   
+ios/HexaWallet.xcworkspace
 open project xcode then run
 ```
-   
+     
 ### Contributing
 Please feel free to open a pull requests and issues with bugfixes and suggestions.
-
-### License
+  
+### License  
 [LICENSE](LICENSE)
