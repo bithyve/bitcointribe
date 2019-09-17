@@ -71,6 +71,7 @@
     "react-native-pdf-lib": "^0.2.1",
     "react-native-permissions": "^1.1.1",
     "react-native-popup-menu": "^0.15.6",
+    "react-native-privacy-snapshot": "^1.0.0",
     "react-native-qrcode": "^0.2.7",
     "react-native-qrcode-scanner": "^1.1.2",
     "react-native-qrcode-svg": "^5.1.2",

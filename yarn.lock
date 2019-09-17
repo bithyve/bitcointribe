@@ -7157,6 +7157,11 @@ react-native-popup-menu@^0.15.6:
   resolved "https://registry.yarnpkg.com/react-native-popup-menu/-/react-native-popup-menu-0.15.6.tgz#ebf885c289028e330dd66d887e685a8b0c2de970"
   integrity sha512-ILFbQEofZQThVYAtVcOEgHJ+9wvn8992J+Oy/ByX83PoP88Meq3iw3pG1AwxMOoAPm/LjihtsDBqZ1lxjvosDg==
 
+react-native-privacy-snapshot@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-privacy-snapshot/-/react-native-privacy-snapshot-1.0.0.tgz#aa8dda1d8f6b763282e31ca65f4a2dfd195dceff"
+  integrity sha1-qo3aHY9rdjKC4xymX0ot/Rldzv8=
+
 react-native-qrcode-scanner@^1.1.2:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/react-native-qrcode-scanner/-/react-native-qrcode-scanner-1.2.1.tgz#aa3949a77f6eee063a3ca25796a1f0ce17f9c4dd"

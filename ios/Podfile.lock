@@ -140,6 +140,7 @@ PODS:
     - React
   - RNVectorIcons (6.6.0):
     - React
+  - ShotBlocker (0.0.3)
   - yoga (0.60.5.React)
 
 DEPENDENCIES:
@@ -191,6 +192,7 @@ DEPENDENCIES:
   - RNSimpleShare (from `../node_modules/react-native-simple-share`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
+  - ShotBlocker
   - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -198,6 +200,7 @@ SPEC REPOS:
     - boost-for-react-native
     - Crashlytics
     - Fabric
+    - ShotBlocker
 
 EXTERNAL SOURCES:
   BVLinearGradient:
@@ -345,8 +348,9 @@ SPEC CHECKSUMS:
   RNSimpleShare: 741246a2540a2f53d3b371d8f0e730dde2da5da5
   RNSVG: a78b4c581e33a1bb72968997d167afabf72b05dc
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
+  ShotBlocker: e05c2f5b411733dddafb807250e90e7b9931c73e
   yoga: 312528f5bbbba37b4dcea5ef00e8b4033fdd9411
 
-PODFILE CHECKSUM: 4ac0720b3cbc273eb1a1d0a162c35dea5c81513a
+PODFILE CHECKSUM: 88ac3b4aac412087d9bcee69c53ccc609846bc9f
 
 COCOAPODS: 1.6.0

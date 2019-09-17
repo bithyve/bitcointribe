@@ -32,6 +32,7 @@ target 'HexaWallet' do
 
    pod 'Fabric'
   pod 'Crashlytics'
+  pod 'ShotBlocker'
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
