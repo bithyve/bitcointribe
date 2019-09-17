@@ -133,12 +133,14 @@ def jscFlavor = 'org.webkit:android-jsc:+'
 def enableHermes = project.ext.react.get("enableHermes", false);
                      
 android {   
+
     lintOptions {  
     checkReleaseBuilds false      
-    // Or, if you prefer, you can continue to check for errors in release builds,
-    // but continue the build even when errors are found:
     abortOnError false   
-  }                     
+  }   
+  dexOptions {
+      jumboMode = true
+  }                  
     compileSdkVersion rootProject.ext.compileSdkVersion
     compileOptions {   
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -216,18 +218,23 @@ keyAlias "hexawallet"
     // }
 }       
    
-dependencies {            
+dependencies {                    
     // animation image like gif
     compile 'com.facebook.fresco:animated-gif:1.+'
     compile 'com.facebook.fresco:animated-webp:1.+'
     compile 'com.facebook.fresco:webpsupport:1.+'
+       
+    //pdf  
+    implementation 'com.tom_roush:pdfbox-android:1.8.10.1'
     // pdf password   
     compile 'com.itextpdf:itext-pdfa:5.5.10'
     compile 'com.itextpdf:itextg:5.5.9'
     implementation project(':react-native-config')
     compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
     transitive = true;
-    }    
+    }           
+    
+    implementation project(':react-native-html-to-pdf')   
     implementation project(':react-native-pdf-lib')
     implementation project(':react-native-sqlite-storage')
     implementation project(':react-native-fs')
