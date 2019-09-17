@@ -29,24 +29,4 @@ public class Utils extends ReactContextBaseJavaModule {
         return "Utils";
     }
 
-    // TODO: Screen Short
-    @ReactMethod
-    public void disableScreenShort() {
-        try {
-            activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,
-                    WindowManager.LayoutParams.FLAG_SECURE);
-            System.out.println("disable screen");
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    @ReactMethod
-    public void enableScreenShort() {
-        try {
-            activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
 }

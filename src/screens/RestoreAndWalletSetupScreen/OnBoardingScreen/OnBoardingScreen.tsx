@@ -1,10 +1,11 @@
 import React from "react";
-import { StyleSheet, View, SafeAreaView, Image, AsyncStorage, Dimensions, Alert, NativeModules } from "react-native";
+import { StyleSheet, View, SafeAreaView, Image, AsyncStorage, Dimensions, Alert } from "react-native";
 import { Text } from "native-base";
 import { StackActions, NavigationActions } from "react-navigation";
 import CreateTables from "HexaWallet/src/app/manage/database/CreateTables";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
-//Custome Compontes
+//let PrivacySnapshot = require( 'react-native-privacy-snapshot' );
+//Custome Compontes  
 import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
 import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 
@@ -27,7 +28,7 @@ export default class OnBoardingScreen extends React.Component<any, any> {
 
   componentWillMount() {
     try {
-
+      //PrivacySnapshot.enabled( true );
       this.setState( {
         data: localization( "OnBoardingScreen.onBoarding" )
       } );
@@ -36,17 +37,6 @@ export default class OnBoardingScreen extends React.Component<any, any> {
     }
   }
 
-  componentDidMount() {
-    try {
-      console.log( 'calling' );
-      var NativeModulesUtils = NativeModules.Utils;
-      NativeModulesUtils.disableScreenShort();
-
-    } catch ( error ) {
-      console.log( { error } );
-
-    }
-  }
 
   //TODO: func click_Done  
   click_Done() {
