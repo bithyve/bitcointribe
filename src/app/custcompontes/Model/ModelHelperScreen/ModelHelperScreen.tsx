@@ -77,7 +77,7 @@ export default class ModelHelperScreen extends Component<Props, any> {
                         <Image
                             source={ images.helperScreen[ helperImage ] }
                             resizeMode="stretch"
-                            style={ { width: Dimensions.get( 'screen' ).width, height: Dimensions.get( 'screen' ).height } }
+                            style={ { width: Dimensions.get( 'window' ).width, height: Dimensions.get( 'window' ).height } }
                         />
 
                     </TouchableHighlight>

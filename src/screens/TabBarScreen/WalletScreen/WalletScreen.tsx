@@ -13,7 +13,8 @@ import {
   NativeModules,
   Platform,
   ActivityIndicator,
-  TouchableOpacity
+  TouchableOpacity,
+  Image
 } from "react-native";
 import {
   Container,
@@ -28,6 +29,7 @@ import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 var RNFS = require( 'react-native-fs' );
 import QRCode from 'react-native-qrcode-svg';
 import { copilot } from 'react-native-copilot';
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
 
 import { FloatingAction } from "react-native-floating-action";
 
@@ -102,6 +104,8 @@ import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 
 
+
+
 //TODO: Common Funciton
 var comAppHealth = require( "HexaWallet/src/app/manage/CommonFunction/CommonAppHealth" );
 
@@ -112,7 +116,6 @@ class WalletScreen extends React.Component {
       arr_accounts: [],
       arr_SSSDetails: [],
       walletDetails: [],
-
       //Shiled Icons
       shiledIconPer: 1,
       scrollY: new Animated.Value( 0 ),
@@ -297,17 +300,17 @@ class WalletScreen extends React.Component {
   //TODO: func connnection_FetchData   
   connnection_FetchData = async () => {
     try {
-      let value = await AsyncStorage.getItem( asyncStorageKeys.flagHelperWalletScreen );
-      let status = JSON.parse( value );
-      console.log( { status } );
-      if ( !status ) {
-        this.setState( {
-          arrModelHelperScreen: [ {
-            modalVisible: true,
-            images: [ "helper1", "helper2", "helper3" ]
-          } ]
-        } );
-      }
+      // let value = await AsyncStorage.getItem( asyncStorageKeys.flagHelperWalletScreen );
+      // let status = JSON.parse( value );
+      // console.log( { status } );
+      // if ( !status ) {
+      this.setState( {
+        arrModelHelperScreen: [ {
+          modalVisible: true,
+          images: [ "helper1", "helper2", "helper3" ]
+        } ]
+      } );
+      // }
       //Singleton Flag value change       
       await utils.setFlagQRCodeScreen( true );
       var resultWallet = await await comFunDBRead.readTblWallet();
@@ -970,7 +973,7 @@ class WalletScreen extends React.Component {
         console.log( { share1, fileName } );
         var docsDir;
         if ( Platform.OS == "android" ) {
-          docsDir = await RNFS.ExternalStorageDirectoryPath //RNFS.DocumentDirectoryPath;
+          docsDir = await RNFS.ExternalStorageDirectoryPath // RNFS.DocumentDirectoryPath; 
         } else {
           docsDir = await PDFLib.getDocumentsDirectory();
         }
@@ -997,11 +1000,13 @@ class WalletScreen extends React.Component {
         console.log( { xpuband2fa: share1, fileName } );
         var docsDir;
         if ( Platform.OS == "android" ) {
-          docsDir = await RNFS.ExternalStorageDirectoryPath //RNFS.DocumentDirectoryPath;
+          docsDir = await RNFS.ExternalStorageDirectoryPath // RNFS.DocumentDirectoryPath; //
         } else {
           docsDir = await PDFLib.getDocumentsDirectory();
         }
         docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
+        console.log( { dir: docsDir } );
+
         var path = `${ docsDir }/${ fileName }`;
         RNFS.writeFile( path, share1, "base64" )
           .then( ( success: any ) => {
@@ -1622,7 +1627,6 @@ class WalletScreen extends React.Component {
               resolve( path );
             } );
         } else {
-          // if ( Platform.Version >= 28 ) {
           PDFDocument
             .create( pdfPath )
             .addPages( page1, page2, page3, page4, page5, page6 )
@@ -1633,24 +1637,6 @@ class WalletScreen extends React.Component {
               //this.setPdfAndroidPasswrod( path, password );
               resolve( path );
             } );
-          // } else {
-          //   PDFDocument
-          //     .create( pdfPath )
-          //     .addPages( page1 )
-          //     .write()
-          //     .then( async ( path: any ) => {
-          //       console.log( 'PDF created at: ' + path );
-          //       console.log( { password } );
-
-          //       if ( Platform.OS == "ios" ) {
-          //         var PdfPassword = NativeModules.PdfPassword;
-          //         PdfPassword.addEvent( "/" + pdfFileName, password );
-          //       } else {
-          //         //this.setPdfAndroidPasswrod( path, pdffilePassword );
-          //       }
-          //       resolve( path );
-          //     } );
-          // }
         }
       } );
     } catch ( error ) {
@@ -2120,6 +2106,9 @@ class WalletScreen extends React.Component {
             { renderIf( flag_Offline == true || flag_PdfFileCreate == true || flag_GetBal == true )(
               <ViewErrorMessage data={ arrErrorMessage } />
             ) }
+
+
+
             <Text style={ { color: colors.appColor, backgroundColor: colors.appColor } }></Text>
             <Animated.View
               style={ {
@@ -2480,7 +2469,7 @@ class WalletScreen extends React.Component {
                 modalVisible: false,
                 images: [ "helper1" ]
               } ]
-            }, () => console.log( 'hi' ) )//this.asyncTask() )
+            }, () => this.asyncTask() )
           } }
         />
         <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />

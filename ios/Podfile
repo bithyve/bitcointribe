@@ -78,6 +78,8 @@ target 'HexaWallet' do
   
   pod 'RNInAppBrowser', :path => '../node_modules/react-native-inappbrowser-reborn'
   
+  pod 'react-native-html-to-pdf', :path => '../node_modules/react-native-html-to-pdf'
+
 end  
 
 
