@@ -224,6 +224,7 @@ export default class TransactionScreen extends React.Component<any, any> {
                             <View style={ { flexDirection: "row", margin: StatusBar.currentHeight } }>
                                 <View style={ { flex: 1, alignItems: "flex-start" } }>
                                     <Button
+                                        hitSlop={ { top: 20, bottom: 10, left: 20, right: -20 } }
                                         style={ Platform.OS == "ios" ? { margin: 10 } : null }
                                         transparent
                                         onPress={ () => this.props.navigation.navigate( "TabbarBottom" ) }
@@ -353,7 +354,7 @@ export default class TransactionScreen extends React.Component<any, any> {
                                 }
                                 }
                                 click_Transfer={ () => {
-                                    Alert.alert( "Working" )
+                                    Alert.alert( "coming soon" )
                                 }
                                 }
                                 click_Recieve={ () => {
