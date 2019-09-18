@@ -107,7 +107,7 @@ export default class SettingScreen extends React.Component<any, any> {
       this.props.navigation.push( "SettingsNavigator" );
     }
     else {
-      Alert.alert( "Working." );
+      Alert.alert( "coming soon." );
     }
   }
 
@@ -163,7 +163,7 @@ export default class SettingScreen extends React.Component<any, any> {
       else if ( item.title == "Contact Us" )
         url = "https://hexawallet.io/#contact"
       else
-        Alert.alert( 'working' )
+        Alert.alert( 'coming soon' )
       if ( url != "" ) {
         if ( await InAppBrowser.isAvailable() ) {
           await InAppBrowser.open( url, {

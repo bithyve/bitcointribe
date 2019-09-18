@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   RefreshControl,
-  Platform
+  Platform,
+  Alert
 } from "react-native";
 import {
   Container,
@@ -522,7 +523,7 @@ export default class AccountsScreen extends React.Component<any, any> {
                   </Text>
                 </View>
                 <View style={ styles.cardFotter }>
-                  <TouchableOpacity onPress={ () => alert( "working" ) }>
+                  <TouchableOpacity onPress={ () => Alert.alert( "coming soon" ) }>
                     <Icon name="ellipsis-v" size={ 30 } color={ colors.white } />
                   </TouchableOpacity>
                 </View>
