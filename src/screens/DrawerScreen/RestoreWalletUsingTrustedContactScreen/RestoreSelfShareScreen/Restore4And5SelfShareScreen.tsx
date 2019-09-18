@@ -120,7 +120,7 @@ export default class Restore4And5SelfShareScreen extends React.Component<any, an
     //TODO: Re-Share Share
 
     click_ReShare( data: any ) {
-        alert.simpleOk( "Oops", "Working" );
+        alert.simpleOk( "Oops", "coming soon" );
     }
 
 

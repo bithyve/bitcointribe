@@ -447,7 +447,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
                             data={ arr_ModelBottomSingleButton }
                             click_Done={ () => {
                                 this.click_CloseModel();
-                                Alert.alert( "Working" )
+                                Alert.alert( "coming soon" )
                             }
                             }
                         />

@@ -5,7 +5,8 @@ import {
   StyleSheet,
   View,
   ImageBackground,
-  TextInput
+  TextInput,
+  Alert
 } from "react-native";
 import {
   Container,
@@ -30,136 +31,136 @@ import { colors, images } from "bithyve/src/app/constants/Constants";
 import renderIf from "bithyve/src/app/constants/validation/renderIf";
 
 export default class VaultAccountScreen extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor ( props ) {
+    super( props );
     this.state = {
       isLoading: false,
-      date: moment(new Date()).format("DD-MM-YYYY"),
+      date: moment( new Date() ).format( "DD-MM-YYYY" ),
       days: "0",
       periodType: "",
       isPeriodTypeDialog: false
     };
-    this.changeDateAndroid = this.changeDateAndroid.bind(this);
+    this.changeDateAndroid = this.changeDateAndroid.bind( this );
   }
 
   //TODO: Page Life Cycle
   componentDidMount() {
-    this.setState({
-      date: moment(new Date()).format("DD-MM-YYYY"),
+    this.setState( {
+      date: moment( new Date() ).format( "DD-MM-YYYY" ),
       days: "0",
       daysText: "Total Days"
-    });
+    } );
   }
 
   //TODO: func changeDaysValue
-  changeDaysValue(val) {
-    let newDate = this.addDays(new Date(), val);
-    this.setState({
-      date: moment(newDate).format("DD-MM-YYYY"),
+  changeDaysValue( val ) {
+    let newDate = this.addDays( new Date(), val );
+    this.setState( {
+      date: moment( newDate ).format( "DD-MM-YYYY" ),
       days: val
-    });
+    } );
   }
 
   handleDatePicked = date => {
-    let start = moment(this.addDays(date, 1), "DD-MM-YYYY");
-    let end = moment(new Date(), "DD-MM-YYYY");
-    let diff = Math.round((start - end) / (1000 * 60 * 60 * 24));
-    console.log("change date =" + diff);
-    this.setState({
-      date: moment(date).format("DD-MM-YYYY"),
+    let start = moment( this.addDays( date, 1 ), "DD-MM-YYYY" );
+    let end = moment( new Date(), "DD-MM-YYYY" );
+    let diff = Math.round( ( start - end ) / ( 1000 * 60 * 60 * 24 ) );
+    console.log( "change date =" + diff );
+    this.setState( {
+      date: moment( date ).format( "DD-MM-YYYY" ),
       days: diff.toString()
-    });
+    } );
   };
 
-  changeDateAndroid(date) {
-    let start = moment(date, "DD-MM-YYYY");
-    let end = moment(new Date(), "DD-MM-YYYY");
-    let diff = Math.round((start - end) / (1000 * 60 * 60 * 24));
-    this.setState({
+  changeDateAndroid( date ) {
+    let start = moment( date, "DD-MM-YYYY" );
+    let end = moment( new Date(), "DD-MM-YYYY" );
+    let diff = Math.round( ( start - end ) / ( 1000 * 60 * 60 * 24 ) );
+    this.setState( {
       date: date,
       days: diff.toString()
-    });
+    } );
   }
 
-  addDays(theDate, days) {
-    return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
+  addDays( theDate, days ) {
+    return new Date( theDate.getTime() + days * 24 * 60 * 60 * 1000 );
   }
 
   render() {
     return (
       <Container>
-        <Content contentContainerStyle={styles.container} scrollEnabled={true}>
+        <Content contentContainerStyle={ styles.container } scrollEnabled={ true }>
           <ImageBackground
-            source={images.appBackgound}
-            style={styles.backgroundImage}
+            source={ images.appBackgound }
+            style={ styles.backgroundImage }
           >
             <Header transparent>
               <Left>
-                <Button transparent onPress={() => this.props.navigation.pop()}>
-                  <Icon name="chevron-left" size={25} color="#ffffff" />
+                <Button transparent onPress={ () => this.props.navigation.pop() }>
+                  <Icon name="chevron-left" size={ 25 } color="#ffffff" />
                 </Button>
               </Left>
-              <Body style={{ flex: 0, alignItems: "center" }}>
+              <Body style={ { flex: 0, alignItems: "center" } }>
                 <Title />
               </Body>
               <Right />
             </Header>
 
-            <View style={styles.logoSecureAccount}>
+            <View style={ styles.logoSecureAccount }>
               <Image
-                style={styles.secureLogo}
-                source={images.secureAccount.secureLogo}
+                style={ styles.secureLogo }
+                source={ images.secureAccount.secureLogo }
               />
-              <Text style={styles.txtTitle}>Vault Account</Text>
-              <Text style={styles.txtLorem}>
+              <Text style={ styles.txtTitle }>Vault Account</Text>
+              <Text style={ styles.txtLorem }>
                 Lorem Ipsum is simply dummy text of the printing and typesetting
                 industry. Lorem Ipsum has been the industry's standard dummy
                 text ever since the 1500s.
               </Text>
             </View>
 
-            <View style={styles.viewSelectPeriod}>
-              <RkCard style={styles.rkCard}>
-                <View style={styles.viewDays}>
-                  <Text style={{ flex: 3, alignSelf: "center" }}>
+            <View style={ styles.viewSelectPeriod }>
+              <RkCard style={ styles.rkCard }>
+                <View style={ styles.viewDays }>
+                  <Text style={ { flex: 3, alignSelf: "center" } }>
                     No. Days:
                   </Text>
                   <TextInput
-                    name={this.state.days}
-                    value={this.state.days}
+                    name={ this.state.days }
+                    value={ this.state.days }
                     placeholder="Total Days"
-                    keyboardType={"numeric"}
+                    keyboardType={ "numeric" }
                     placeholderTextColor="#000"
-                    style={styles.input}
-                    onChangeText={val => this.changeDaysValue(val)}
-                    onChange={val => this.changeDaysValue(val)}
+                    style={ styles.input }
+                    onChangeText={ val => this.changeDaysValue( val ) }
+                    onChange={ val => this.changeDaysValue( val ) }
                   />
                 </View>
-                <View style={styles.viewDateWise}>
-                  <Text style={{ flex: 3, alignSelf: "center" }}>
+                <View style={ styles.viewDateWise }>
+                  <Text style={ { flex: 3, alignSelf: "center" } }>
                     Mutual Date:
                   </Text>
-                  {renderIf(Platform.OS == "ios")(
+                  { renderIf( Platform.OS == "ios" )(
                     <DatePicker
-                      date={this.state.date}
+                      date={ this.state.date }
                       mode="date"
-                      showIcon={false}
-                      hideText={true}
+                      showIcon={ false }
+                      hideText={ true }
                       format="DD-MM-YYYY"
-                      minDate={new Date()}
-                      onDateChange={date => this.handleDatePicked(date)}
+                      minDate={ new Date() }
+                      onDateChange={ date => this.handleDatePicked( date ) }
                     />
-                  )}
-                  {renderIf(Platform.OS == "android")(
+                  ) }
+                  { renderIf( Platform.OS == "android" )(
                     <DatePicker
-                      date={this.state.date}
+                      date={ this.state.date }
                       mode="date"
                       placeholder="Select date"
                       format="DD-MM-YYYY"
-                      minDate={new Date()}
+                      minDate={ new Date() }
                       confirmBtnText="Confirm"
                       cancelBtnText="Cancel"
-                      customStyles={{
+                      customStyles={ {
                         dateIcon: {
                           position: "absolute",
                           left: 0,
@@ -175,54 +176,54 @@ export default class VaultAccountScreen extends React.Component {
                           borderBottomColor: "#000000"
                         }
                         // ... You can check the source to find the other keys.
-                      }}
-                      onDateChange={date => {
-                        this.changeDateAndroid(date);
-                      }}
+                      } }
+                      onDateChange={ date => {
+                        this.changeDateAndroid( date );
+                      } }
                     />
-                  )}
+                  ) }
                 </View>
 
-                <View style={{ flexDirection: "row" }}>
-                  <View style={{ flex: 3 }} />
-                  <View style={{ flex: 8 }}>
+                <View style={ { flexDirection: "row" } }>
+                  <View style={ { flex: 3 } } />
+                  <View style={ { flex: 8 } }>
                     <Text
-                      style={{ alignSelf: "center", textAlign: "center" }}
+                      style={ { alignSelf: "center", textAlign: "center" } }
                       note
                     >
-                      Date: {this.state.date} / Days : {this.state.days}
+                      Date: { this.state.date } / Days : { this.state.days }
                     </Text>
                   </View>
                 </View>
               </RkCard>
             </View>
-            <View style={[styles.viewBtnNext]}>
+            <View style={ [ styles.viewBtnNext ] }>
               <Button
-                style={[
+                style={ [
                   styles.btnSent,
                   { backgroundColor: this.state.sentBtnColor, borderRadius: 5 }
-                ]}
+                ] }
                 full
-                disabled={this.state.sentBtnStatus}
-                onPress={() => alert("working")}
+                disabled={ this.state.sentBtnStatus }
+                onPress={ () => Alert.alert( "coming soon" ) }
               >
                 <Text> NEXT </Text>
               </Button>
             </View>
           </ImageBackground>
         </Content>
-        {renderIf(this.state.isLoading)(
-          <View style={styles.loading}>
-            <SkypeIndicator color={colors.appColor} />
+        { renderIf( this.state.isLoading )(
+          <View style={ styles.loading }>
+            <SkypeIndicator color={ colors.appColor } />
           </View>
-        )}
-        <DropdownAlert ref={ref => (this.dropdown = ref)} />
+        ) }
+        <DropdownAlert ref={ ref => ( this.dropdown = ref ) } />
       </Container>
     );
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1
   },
@@ -291,4 +292,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   }
-});
+} );

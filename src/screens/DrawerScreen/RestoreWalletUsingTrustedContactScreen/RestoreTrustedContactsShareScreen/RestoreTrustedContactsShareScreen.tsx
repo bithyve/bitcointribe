@@ -136,7 +136,7 @@ export default class RestoreTrustedContactsShareScreen extends React.Component<a
     //TODO: Re-Share Share
 
     click_ReShare( data: any ) {
-        alert.simpleOk( "Oops", "Working" );
+        alert.simpleOk( "Oops", "coming soon" );
     }
 
     onSelect = async ( returnValue: any ) => {

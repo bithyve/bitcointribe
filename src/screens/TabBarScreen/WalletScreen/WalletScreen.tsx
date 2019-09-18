@@ -295,22 +295,20 @@ class WalletScreen extends React.Component {
     }
   }
 
-
-
   //TODO: func connnection_FetchData   
   connnection_FetchData = async () => {
     try {
-      // let value = await AsyncStorage.getItem( asyncStorageKeys.flagHelperWalletScreen );
-      // let status = JSON.parse( value );
-      // console.log( { status } );
-      // if ( !status ) {
-      this.setState( {
-        arrModelHelperScreen: [ {
-          modalVisible: true,
-          images: [ "helper1", "helper2", "helper3" ]
-        } ]
-      } );
-      // }
+      let value = await AsyncStorage.getItem( asyncStorageKeys.flagHelperWalletScreen );
+      let status = JSON.parse( value );
+      console.log( { status } );
+      if ( !status ) {
+        this.setState( {
+          arrModelHelperScreen: [ {
+            modalVisible: true,
+            images: [ "helper1", "helper2", "helper3" ]
+          } ]
+        } );
+      }
       //Singleton Flag value change       
       await utils.setFlagQRCodeScreen( true );
       var resultWallet = await await comFunDBRead.readTblWallet();
@@ -2290,7 +2288,8 @@ class WalletScreen extends React.Component {
           floatingIcon={ svgIcon.walletScreen.addAccountsPNG }
           iconWidth={ 120 }
           iconHeight={ 120 }
-          onPressItem={ name => {
+          onPressItem={ ( name: any ) => {
+            console.log( 'tab' );
             this.setState( {
               flag_GetBal: true,
               arrErrorMessage: [ {
@@ -2437,7 +2436,7 @@ class WalletScreen extends React.Component {
         />
         <ModelBackupYourWallet
           data={ arr_ModelBackupYourWallet }
-          click_UseOtherMethod={ () => Alert.alert( "Working" ) }
+          click_UseOtherMethod={ () => Alert.alert( "coming soon" ) }
           click_Confirm={ async () => {
             this.setState( {
               arr_ModelBackupYourWallet: [ {

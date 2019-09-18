@@ -152,13 +152,13 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                 }
             }
         } else {
-            Alert.alert( "Working" );
+            Alert.alert( "coming soon" );
         }
     }
 
     //TODO: Re-Share Share
     click_ReShare( data: any ) {
-        alert.simpleOk( "Oops", "Working" );
+        alert.simpleOk( "Oops", "coming soon" );
     }
 
     //TODO:  Confirm
@@ -337,7 +337,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                     data={ arr_ModelBottomSingleButton }
                     click_Done={ () => {
                         this.click_CloseModel();
-                        Alert.alert( "Working" )
+                        Alert.alert( "coming soon" )
                     }
 
                     }
@@ -351,7 +351,7 @@ export default class SelfShareSharingScreen extends React.Component<any, any> {
                     }
                     click_Option2={ () => {
                         this.click_CloseModel();
-                        Alert.alert( "Working" )
+                        Alert.alert( "coming soon" )
                     }
                     }
                 />
