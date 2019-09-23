@@ -167,7 +167,7 @@ android {
         }    
     }
           
-  
+      
     signingConfigs {
 release {
 storeFile file("hexawallet.keystore")

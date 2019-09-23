@@ -23,12 +23,15 @@ ios/Pods
 
 # Android
 build/
+android/app/build
 .idea
 .gradle
 local.properties
 *.iml
 *.apk
 android/.gradle
+android/app/google-services.json
+android/java_pid1017.hprof
 
 # node.js
 node_modules/
