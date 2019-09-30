@@ -202,7 +202,7 @@ rm -rf ios/build
 rm ios/Podfile.lock 
 rm -rf ~Library/Developer/Xcode/DerivedData
 
-react-native bundle --entry-file ./index.ios.js --platform ios --bundle-output ios/main.jsbundle
+react-native bundle --entry-file ./index.ios.js --platform ios --bundle-output ios/main.jsbundle  
 
 
 ## Make sure you're running a packager server or have included a .jsbundle file in your application bundle. 2019-09-10 11:21:38.429407+0530 HexaWallet[3043:17768] No bundle URL present.

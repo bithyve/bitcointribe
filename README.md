@@ -3,7 +3,7 @@
 Hexa Wallet is a user friendly mobile bitcoin wallet that enables p2p commerce.
 
 ![Hexa Wallet](hexa.png)
-
+   
 There are various types of accounts that are supported in the Hexa Wallet:
 
 1. Savings Account: A savings account is a standard bitcoin wallet optimal for daily use
