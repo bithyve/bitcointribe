@@ -971,7 +971,7 @@ class WalletScreen extends React.Component {
         console.log( { share1, fileName } );
         var docsDir;
         if ( Platform.OS == "android" ) {
-          docsDir = await RNFS.ExternalStorageDirectoryPath // RNFS.DocumentDirectoryPath; 
+          docsDir = await RNFS.ExternalStorageDirectoryPath + "/pdfFiles/"; // RNFS.DocumentDirectoryPath; 
         } else {
           docsDir = await PDFLib.getDocumentsDirectory();
         }
@@ -998,7 +998,7 @@ class WalletScreen extends React.Component {
         console.log( { xpuband2fa: share1, fileName } );
         var docsDir;
         if ( Platform.OS == "android" ) {
-          docsDir = await RNFS.ExternalStorageDirectoryPath // RNFS.DocumentDirectoryPath; //
+          docsDir = await RNFS.ExternalStorageDirectoryPath + "/pdfFiles/"; // RNFS.DocumentDirectoryPath; //
         } else {
           docsDir = await PDFLib.getDocumentsDirectory();
         }

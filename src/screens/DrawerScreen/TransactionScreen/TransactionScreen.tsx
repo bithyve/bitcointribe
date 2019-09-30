@@ -37,8 +37,6 @@ import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/
 import FullLinearGradientTransactionScreenThreeOpt from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientTransactionScreenThreeOpt";
 
 
-
-
 import { SvgIcon } from "@up-shared/components";
 
 

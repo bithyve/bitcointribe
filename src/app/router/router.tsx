@@ -717,85 +717,11 @@ export const createRootNavigator = (
         screen: AccountTransactionStackNavigator,
         navigationOptions: { header: null }
       }
-      //Drwaer Navigation
-      // SecurityScreen: {
-      //   screen: SecurityScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // HelpScreen: {
-      //   screen: HelpScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // InviteScreen: {
-      //   screen: InviteScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // BankAccountScreen: {
-      //   screen: BankAccountScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // LogoutScreen: {
-      //   screen: LogoutScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // NotificationScreen: {
-      //   screen: NotificationScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // //SentMoney And Receive Money
-      // SentAndReceiveeScreen: {
-      //   screen: SentAndReceiveeScreen,
-      //   navigationOptions: {
-      //     header: null
-      //   }
-      // },
-      // SentMoneyScreen: {
-      //   screen: SentMoneyScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // ReceiveMoneyScreen: {
-      //   screen: ReceiveMoneyScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // QrcodeScannerScreen: {
-      //   screen: QrcodeScannerScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // //Backup Phrase
-      // BackupPhraseScreen: {
-      //   screen: BackupPhraseScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // VerifyBackupPhraseScreen: {
-      //   screen: VerifyBackupPhraseScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // //AccountDetailsScrenn
-      // AccountsDetailsScreen: {
-      //   screen: AccountsDetailsScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // //AccountDetailsOnboardingRouter
-      // AccountDetailsOnboardingRouter: {
-      //   screen: AccountDetailsOnboardingRouter,
-      //   navigationOptions: { header: null }
-      // },
-      // //For DeepLinking
-      // MergeConfirmJointAccountScreen: {
-      //   screen: MergeConfirmJointAccountScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // CreateJointAccountScreen: {
-      //   screen: CreateJointAccountScreen,
-      //   navigationOptions: { header: null }
-      // }
+
     },
     {
       //initialRouteName: signedIn ? "OnBoardingNavigator" : PasscodeConfirmScreen
       initialRouteName: signedIn ? "OnBoardingNavigator" : screenName //"TabbarBottom" //
-      // initialRouteName: signedIn ? "OnBoardingNavigator" : "PermissionNavigator" //"TabbarBottom" //
-      // initialRouteName: signedIn ? "OnBoardingNavigator" : "OnBoardingNavigator"
-      // initialRouteName: signedIn ? "TabbarBottom" : "TabbarBottom"
     }
   );
 };
