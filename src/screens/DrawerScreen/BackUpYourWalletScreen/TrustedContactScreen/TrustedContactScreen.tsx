@@ -69,12 +69,7 @@ export default class TrustedContactScreen extends React.Component<any, any> {
     async componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
         console.log( { data } );
-
-
-
-
-
-        //otp history
+        //otp history   
         let arrHistory = data.history;
         let eachHistoryLength = arrHistory.length;
         var otp;
@@ -105,7 +100,6 @@ export default class TrustedContactScreen extends React.Component<any, any> {
             }
         }
         //console.log( { otp } );
-
         var resSSSDetails = await dbOpration.readSSSTableData(
             localDB.tableName.tblSSSDetails,
             data.recordID

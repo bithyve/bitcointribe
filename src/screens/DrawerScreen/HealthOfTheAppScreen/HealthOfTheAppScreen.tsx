@@ -250,6 +250,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
     getTrustedContactArray( sssDetails: any, backupType: string ) {
         //console.log( { sssDetails, backupType } );
         let keeperInfo = JSON.parse( sssDetails.keeperInfo );
+        console.log( { keeperInfo } );
         let data = {};
         let decryptedShare = sssDetails.decryptedShare != "" ? JSON.parse( sssDetails.decryptedShare ) : "";
         data.decryptedShare = decryptedShare;
@@ -579,7 +580,7 @@ export default class HealthOfTheAppScreen extends React.Component<any, any> {
                                                                     />
                                                                 ) }
                                                                 { renderIf( item.givenName != "Trusted Contacts 1" && item.givenName != "Trusted Contacts 2" )(
-                                                                    <Avatar size={ 55 } rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } titleStyle={ { color: colors.appColor } } />
+                                                                    item.thumbnailPath != "" ? <Avatar size={ 55 } medium rounded source={ { uri: item.thumbnailPath } } /> : <Avatar size={ 55 } rounded title={ item.familyName != null ? item.givenName.charAt( 0 ) + item.familyName.charAt( 0 ) : item.givenName.charAt( 0 ) } titleStyle={ { color: colors.appColor } } />
                                                                 ) }
                                                                 <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
                                                                     <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>

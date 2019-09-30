@@ -156,7 +156,7 @@ android {
         missingDimensionStrategy 'react-native-camera', 'general' 
         ndk {
             abiFilters "armeabi-v7a", "x86"
-        }         
+        }            
     }   
     splits {
         abi {
@@ -229,6 +229,7 @@ dependencies {
     // pdf password   
     compile 'com.itextpdf:itext-pdfa:5.5.10'
     compile 'com.itextpdf:itextg:5.5.9'
+    
     implementation project(':react-native-config')
     compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
     transitive = true;
