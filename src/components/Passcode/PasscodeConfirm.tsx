@@ -18,27 +18,22 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import { ModelLoader } from "hexaLoader";
+import { CustomeStatusBar } from "hexaCustomeStatusBar";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
 import {
   colors,
   images,
   asyncStorageKeys
-} from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-import Singleton from "HexaWallet/src/app/constants/Singleton";
-
-
-
-//TODO: Localization   
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
+} from "hexaConstants";
+import { renderIf } from "hexaValidation";
+import Singleton from "hexaSingleton";
 
 
 
@@ -159,14 +154,14 @@ export default class PasscodeConfirm extends Component<any, any> {
               <View style={ styles.viewAppLogo }>
                 <Image style={ styles.imgAppLogo } source={ images.appIcon } />
                 <Text
-                  style={ [ globalStyle.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
+                  style={ [ FontFamily.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
                 >
                   Welcome to Hexa!
             </Text>
               </View>
               <View style={ styles.viewFirstPasscode }>
                 <Text
-                  style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
+                  style={ [ FontFamily.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
                   note
                 >
                   Create Pin
@@ -231,7 +226,7 @@ export default class PasscodeConfirm extends Component<any, any> {
                   type='withoutcharacters'
                 />
                 { renderIf( this.state.passcodeSecoundStyle[ 0 ].activeColor == "red" )(
-                  <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>
+                  <Text style={ [ FontFamily.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>
                 ) }
               </View>
               <View style={ styles.viewBtnProceed }>
@@ -246,7 +241,7 @@ export default class PasscodeConfirm extends Component<any, any> {
             </KeyboardAwareScrollView>
           </SafeAreaView>
         </ImageBackground>
-        <Loader loading={ this.state.isLoading } color={ colors.appColor } size={ 30 } />
+        <ModelLoader loading={ this.state.isLoading } color={ colors.appColor } size={ 30 } />
         <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
       </View>
     );

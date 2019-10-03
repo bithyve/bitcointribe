@@ -62,7 +62,7 @@
   "LaunchScreen": {
     "title": "हेक्सा वॉलेट"
   },
-  "OnBoardingScreen": {
+  "OnBoarding": {
     "onBoarding": [
       {
         "backgroundColor": "#FFFFFF",

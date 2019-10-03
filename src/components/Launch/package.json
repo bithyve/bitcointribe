@@ -1,4 +1,4 @@
 {
     "name": "hexaCompLanch",
-    "main": "Launch.tsx"
+    "main": "index.tsx"
 }

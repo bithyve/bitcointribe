@@ -7,12 +7,11 @@ import {
   AsyncStorage
 } from "react-native";
 
-
 import {
   asyncStorageKeys
-} from "HexaWallet/src/app/constants/Constants";
+} from "hexaConstants";
 
-import Singleton from "HexaWallet/src/app/constants/Singleton";
+import Singleton from "hexaSingleton";
 //TODO: Date Format
 
 const getUnixTimeDate = date => {
@@ -328,15 +327,6 @@ const setAsyncStorage = ( name: any, value: any ) => {
   );
   return true;
 }
-
-
-
-
-
-
-
-
-
 
 module.exports = {
   getUnixTimeDate,
