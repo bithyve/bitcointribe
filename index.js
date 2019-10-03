@@ -5,8 +5,9 @@ import { AsyncStorage, AppState, AppRegistry, Linking, StatusBar, Alert, SafeAre
 import DeepLinking from "react-native-deep-linking";
 import "HexaWallet/shim";
 import { name as appName } from "HexaWallet/app.json";
-import { createRootNavigator } from "HexaWallet/src/app/router/router";
-import LaunchScreen from "HexaWallet/src/screens/LaunchScreen/LaunchScreen";
+
+import { createRootNavigator } from "hexaRouter";
+import Launch from "hexaCompLanch";
 
 
 //TODO: Redux
@@ -157,7 +158,7 @@ export default class HexaWallet extends React.Component
         return (
             <Provider store={ store }>
                 { status ?
-                    <LaunchScreen
+                    <Launch
                         onComplited={ ( status: boolean, pageName: string ) =>
                             this.onComplited( status, pageName )
                         }

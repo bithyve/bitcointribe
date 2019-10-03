@@ -1,0 +1,99 @@
+import React from "react";
+import { StyleSheet, ImageBackground, Platform, SafeAreaView, AsyncStorage, Alert } from "react-native";
+import {
+    Container
+} from "native-base";
+import { StackActions, NavigationActions } from "react-navigation";
+
+
+//TODO: Custome Comp
+import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import WalletSetUpScrolling from "HexaWallet/src/app/custcompontes/OnBoarding/WalletSetUpScrolling/WalletSetUpScrolling";
+import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+
+import WalletNameScreen from "./WalletNameScreen/WalletNameScreen";
+import FirstSecretQuestionScreen from "./FirstSecretQuestionScreen/FirstSecretQuestionScreen";
+
+
+//TODO: Custome Object  
+import { colors, images, asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
+
+
+export default class WalletSetup extends React.Component<any, any> {
+
+    //TODO:click_GotoPermisionScrenn
+    goToWallet() {
+        try {
+            if ( Platform.OS == "android" ) {
+                this.props.navigation.push( "PermissionAndroidScreen", { flow: "New Wallet" } );
+            } else {
+                const resetAction = StackActions.reset( {
+                    index: 0, // <-- currect active route from actions array
+                    key: null,
+                    actions: [
+                        NavigationActions.navigate( { routeName: "TabbarBottom" } )
+                    ]
+                } );
+                AsyncStorage.setItem(
+                    asyncStorageKeys.rootViewController,
+                    "TabbarBottom"
+                );
+                this.props.navigation.dispatch( resetAction );
+            }
+        } catch ( error ) {
+            Alert.alert( error )
+        }
+    }
+
+
+
+    render() {
+        return (
+            <Container>
+                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+                    <HeaderTitle title="Set up your wallet" pop={ () => this.props.navigation.pop() } />
+                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] } >
+                        <WalletSetUpScrolling>
+                            {/* First screen */ }
+                            <WalletNameScreen />
+                            {/* Second screen */ }
+                            <FirstSecretQuestionScreen click_Next={ () => this.goToWallet() } />
+                        </WalletSetUpScrolling>
+                    </SafeAreaView>
+                </ImageBackground>
+                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+            </Container >
+        );
+    }
+}
+
+const styles = StyleSheet.create( {
+    container: {
+        flex: 1,
+    },
+    viewPagination: {
+        flex: 2,
+        alignItems: "center",
+        justifyContent: "center",
+        marginLeft: 30,
+        marginRight: 30
+    },
+    viewInputFiled: {
+        flex: 3,
+        alignItems: "center",
+        margin: 10
+    },
+    itemInputWalletName: {
+        borderWidth: 0,
+        borderRadius: 10,
+        shadowOffset: { width: 2, height: 2 },
+        shadowColor: 'gray',
+        shadowOpacity: 0.3,
+        backgroundColor: '#FFFFFF'
+
+    },
+    viewProcedBtn: {
+        flex: 2,
+        justifyContent: "flex-end"
+    }
+} );
