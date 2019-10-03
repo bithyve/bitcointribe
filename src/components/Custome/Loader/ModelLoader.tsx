@@ -7,7 +7,7 @@ import {
     images
 } from "HexaWallet/src/app/constants/Constants";
 
-const Loader = ( { loading = false, color = "#000000", size = 30, opacity = 0.4, message = "Loading" } ) => {
+const ModelLoader = ( { loading = false, color = "#000000", size = 30, opacity = 0.4, message = "Loading" } ) => {
     return (
         <Modal
             transparent
@@ -29,7 +29,7 @@ const Loader = ( { loading = false, color = "#000000", size = 30, opacity = 0.4,
     );
 };
 
-Loader.propTypes = {
+ModelLoader.propTypes = {
     loading: PropTypes.bool.isRequired,
     color: PropTypes.string,
     size: PropTypes.string,
@@ -56,4 +56,4 @@ const styles = StyleSheet.create( {
     }
 } );
 
-export default Loader;
+export default ModelLoader;

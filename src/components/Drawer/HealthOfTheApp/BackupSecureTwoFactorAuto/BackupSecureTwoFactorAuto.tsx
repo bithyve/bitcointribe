@@ -28,7 +28,7 @@ import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
 
 
-export default class BackupSecureTwoFactorAutoScreen extends Component {
+export default class BackupSecureTwoFactorAuto extends Component {
     constructor ( props: any ) {
         super( props );
         this.state = {

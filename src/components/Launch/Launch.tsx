@@ -8,17 +8,17 @@ import {
   Easing
 } from "react-native";
 
-import { colors, images, asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, asyncStorageKeys } from "hexaConstants";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 
 
 //TODO: Custome Object
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import { CustomeStatusBar } from "hexaCustomeStatusBar";
 
-//localization
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
+
 
 import * as Keychain from "react-native-keychain";
+
 interface Props {
   onComplited: Function;
 }

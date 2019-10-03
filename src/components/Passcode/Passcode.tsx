@@ -19,12 +19,11 @@ import * as Keychain from "react-native-keychain";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //TODO: Custome Pages
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-
+import { CustomeStatusBar } from "hexaCustomeStatusBar";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
 import {
@@ -32,17 +31,16 @@ import {
   images,
   localDB,
   asyncStorageKeys
-} from "HexaWallet/src/app/constants/Constants";
-import utils from "HexaWallet/src/app/constants/Utils";
-import Singleton from "HexaWallet/src/app/constants/Singleton";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+} from "hexaConstants";
+import utils from "hexaUtils";
+import Singleton from "hexaSingleton";
+var dbOpration = require( "hexaDBOpration" );
+import { renderIf } from "hexaValidation";
 
-//TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+//TODO: Common Funciton  
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
-//localization
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
+
 
 
 
@@ -232,14 +230,14 @@ export default class Passcode extends Component {
               <View style={ styles.viewAppLogo }>
                 <Image style={ styles.imgAppLogo } source={ images.appIcon } />
                 <Text
-                  style={ [ globalStyle.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
+                  style={ [ FontFamily.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
                 >
                   Welcome to Hexa!
             </Text>
               </View>
               <View style={ styles.viewPasscode }>
                 <Text
-                  style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
+                  style={ [ FontFamily.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
                 >
                   Enter Pin{ " " }
                 </Text>
@@ -270,7 +268,7 @@ export default class Passcode extends Component {
                   type='withoutcharacters'
                 />
                 { renderIf( this.state.passcodeStyle[ 0 ].activeColor == "red" )(
-                  <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>
+                  <Text style={ [ FontFamily.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>
                 ) }
               </View>
               <View style={ styles.viewBtnProceed }>

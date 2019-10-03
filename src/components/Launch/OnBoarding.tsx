@@ -2,21 +2,23 @@ import React from "react";
 import { StyleSheet, View, SafeAreaView, Image, AsyncStorage, Dimensions, Alert } from "react-native";
 import { Text } from "native-base";
 import { StackActions, NavigationActions } from "react-navigation";
+
 import CreateTables from "HexaWallet/src/app/manage/database/CreateTables";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
-//let PrivacySnapshot = require( 'react-native-privacy-snapshot' );
+
+
 //Custome Compontes  
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import { CustomeStatusBar } from "hexaCustomeStatusBar";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome object  
-import { colors, images, asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, asyncStorageKeys } from "hexaConstants";
 
-//localization 
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
+//localization   
+import localization from "hexaLocalization/i18n";
 
 export default class OnBoarding extends React.Component<any, any> {
   constructor ( props: any ) {
@@ -29,9 +31,9 @@ export default class OnBoarding extends React.Component<any, any> {
   componentWillMount() {
     try {
       //PrivacySnapshot.enabled( true );
-      this.setState( {
-        data: localization( "OnBoardingScreen.onBoarding" )
-      } );
+      //   this.setState( {
+      //     data: localization( "OnBoarding.onBoarding" )
+      //   } );
     } catch ( error ) {
       Alert.alert( error )
     }
@@ -59,31 +61,31 @@ export default class OnBoarding extends React.Component<any, any> {
   }
 
   render() {
-    const data = [
-      {
-        backgroundColor: this.state.data[ 0 ].backgroundColor,
-        image: images.onBoardingScreen.onB1,
-        title: this.state.data[ 0 ].title,
-        subtitle: this.state.data[ 0 ].subtitle
-      },
-      {
-        backgroundColor: this.state.data[ 1 ].backgroundColor,
-        image: images.onBoardingScreen.onB2,
-        title: this.state.data[ 1 ].title,
-        subtitle: this.state.data[ 2 ].subtitle
-      },
-      {
-        backgroundColor: this.state.data[ 2 ].backgroundColor,
-        image: images.onBoardingScreen.onB3,
-        title: this.state.data[ 2 ].title,
-        subtitle: this.state.data[ 2 ].subtitle
-      }
-    ];
+    // const data = [
+    //   {
+    //     backgroundColor: this.state.data[ 0 ].backgroundColor,
+    //     image: images.onBoardingScreen.onB1,
+    //     title: this.state.data[ 0 ].title,
+    //     subtitle: this.state.data[ 0 ].subtitle
+    //   },
+    //   {
+    //     backgroundColor: this.state.data[ 1 ].backgroundColor,
+    //     image: images.onBoardingScreen.onB2,
+    //     title: this.state.data[ 1 ].title,
+    //     subtitle: this.state.data[ 2 ].subtitle
+    //   },
+    //   {
+    //     backgroundColor: this.state.data[ 2 ].backgroundColor,
+    //     image: images.onBoardingScreen.onB3,
+    //     title: this.state.data[ 2 ].title,
+    //     subtitle: this.state.data[ 2 ].subtitle
+    //   }
+    // ];
     return (
       <View style={ styles.container }>
         <SafeAreaView style={ styles.container }>
           <View style={ { flex: 1, alignItems: "center", justifyContent: "center" } }>
-            <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 30 } ] }>Wallet Reimagined</Text>
+            <Text style={ [ FontFamily.ffFiraSansBold, { fontSize: 30 } ] }>Wallet Reimagined</Text>
             <View style={ { flexDirection: "row", margin: 20, justifyContent: "center", alignContent: "center", alignItems: "center" } }>
               <Text note style={ { margin: 10 } }>Simple</Text>
               <IconFontAwe name="circle" color="#2F2F2F" size={ 8 } />
