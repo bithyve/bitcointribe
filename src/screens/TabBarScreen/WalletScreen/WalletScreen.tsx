@@ -311,7 +311,7 @@ class WalletScreen extends React.Component {
       }
       //Singleton Flag value change       
       await utils.setFlagQRCodeScreen( true );
-      var resultWallet = await await comFunDBRead.readTblWallet();
+      var resultWallet = await comFunDBRead.readTblWallet();
       console.log( { resultWallet } );
       var resAccount = await comFunDBRead.readTblAccount();
       let temp = [];
