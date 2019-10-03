@@ -142,6 +142,9 @@ export default class HexaWallet extends React.Component
             } );
         }
     }
+
+
+
     render ()
     {
         let { status, isStartPage } = this.state;
@@ -151,20 +154,20 @@ export default class HexaWallet extends React.Component
         );
         console.log( "first = " + status, isStartPage );
         const AppContainer = createAppContainer( Layout );
-        return status ? (
+        return (
             <Provider store={ store }>
-                <LaunchScreen
-                    onComplited={ ( status: boolean, pageName: string ) =>
-                        this.onComplited( status, pageName )
-                    }
-                />
-            </Provider>
-        ) : (
-                <Provider store={ store }>
+                { status ?
+                    <LaunchScreen
+                        onComplited={ ( status: boolean, pageName: string ) =>
+                            this.onComplited( status, pageName )
+                        }
+                    />
+                    :
                     <AppContainer
                     />
-                </Provider>
-            );
+                }
+            </Provider>
+        )
     }
 }
 
