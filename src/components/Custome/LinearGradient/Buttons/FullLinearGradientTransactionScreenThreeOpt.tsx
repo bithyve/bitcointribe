@@ -5,7 +5,7 @@ import LinearGradient from "react-native-linear-gradient";
 import { SvgIcon } from "@up-shared/components";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 interface Props {
     title: string,
@@ -34,7 +34,7 @@ export default class FullLinearGradientTransactionScreenThreeOpt extends Compone
                         >
                             <SvgIcon name="send" color="#ffffff" size={ 25 } />
                         </Button>
-                        <Text style={ [ globalStyle.ffFiraSansRegular, { color: "#ffffff", marginTop: -10 } ] }>Send</Text>
+                        <Text style={ [ FontFamily.ffFiraSansRegular, { color: "#ffffff", marginTop: -10 } ] }>Send</Text>
                     </View>
                     <View style={ { flex: 1, flexDirection: "column", alignItems: "center" } }>
                         <Button
@@ -44,7 +44,7 @@ export default class FullLinearGradientTransactionScreenThreeOpt extends Compone
                         >
                             <SvgIcon name="transfer" color="#ffffff" size={ 25 } />
                         </Button>
-                        <Text style={ [ globalStyle.ffFiraSansRegular, { color: "#ffffff", marginTop: -10 } ] }>Transfer</Text>
+                        <Text style={ [ FontFamily.ffFiraSansRegular, { color: "#ffffff", marginTop: -10 } ] }>Transfer</Text>
                     </View>
                     <View style={ { flex: 1, flexDirection: "column", alignItems: "center" } }>
                         <Button
@@ -54,7 +54,7 @@ export default class FullLinearGradientTransactionScreenThreeOpt extends Compone
                         >
                             <SvgIcon name="receive" color="#ffffff" size={ 25 } />
                         </Button>
-                        <Text style={ [ globalStyle.ffFiraSansRegular, { color: "#ffffff", marginTop: -10 } ] }>Receive</Text>
+                        <Text style={ [ FontFamily.ffFiraSansRegular, { color: "#ffffff", marginTop: -10 } ] }>Receive</Text>
                     </View>
                 </View>
             </LinearGradient>

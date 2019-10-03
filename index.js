@@ -7,7 +7,7 @@ import "HexaWallet/shim";
 import { name as appName } from "HexaWallet/app.json";
 
 import { createRootNavigator } from "hexaRouter";
-import Launch from "hexaCompLanch";
+import { Launch } from "hexaCompLanch";
 
 
 //TODO: Redux

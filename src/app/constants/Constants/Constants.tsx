@@ -16,8 +16,8 @@ var colors = {
 };
 
 
-const assetsImages = "../../assets/images/";
-const assetsGift = "../../assets/gif/";
+const assetsImages = "../../../assets/images/";
+const assetsGift = "../../../assets/gif/";
 var images = {
   appBackgound: require( assetsImages + "icon/mainBackgoundImage.png" ),
   appIcon: require( assetsImages + "appLogo.png" ),
@@ -137,7 +137,7 @@ var images = {
 };
 
 
-const assetsSVG = "../../assets/svg/";
+const assetsSVG = "../../../assets/svg/";
 const svgIcon = {
   common: {
     //png       
