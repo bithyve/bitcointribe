@@ -1,18 +1,20 @@
 import React, { Component } from 'react';
 import { Modal, View, StyleSheet, Image } from 'react-native';
 import { Button, Text } from "native-base";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+
+
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 import { SvgIcon } from "@up-shared/components";
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
 import {
     images
-} from "HexaWallet/src/app/constants/Constants";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+} from "hexaConstants";
+var utils = require( "hexaUtils" );
 
 interface Props {
     data: [];
@@ -54,13 +56,13 @@ export default class ModelContactPermission extends Component<Props, any> {
                             >
                                 <SvgIcon name="icon_back" size={ 25 } color="gray" />
                             </Button>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, {
+                            <Text style={ [ FontFamily.ffFiraSansMedium, {
                                 fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
                                 marginLeft: 20, marginRight: 20
                             } ] }>Restore Wallet Using Trusted Contacts</Text>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Hexa requires access to your contacts in order to the reach out to your trusted parties.</Text>
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Hexa requires access to your contacts in order to the reach out to your trusted parties.</Text>
                         </View>
                         <View
                             style={ {
@@ -72,7 +74,7 @@ export default class ModelContactPermission extends Component<Props, any> {
                             <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingTrustedContact.contactPassbook } />
                         </View>
                         <View style={ { flex: 0.8, alignItems: "center", justifyContent: "flex-end" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Hexa Wallet will not save your contact information externally or with any trusted party</Text>
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Hexa Wallet will not save your contact information externally or with any trusted party</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <FullLinearGradientButton

@@ -12,11 +12,10 @@ interface Props {
     click_Request: Function
 }
 
-
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+import { renderIf } from "hexaValidation";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 export default class ModelRestoreAssociateContactListForQRCodeScan extends Component<Props, any> {
     //TODO: list item click any perosn
@@ -55,7 +54,7 @@ export default class ModelRestoreAssociateContactListForQRCodeScan extends Compo
                 >
                     <View style={ styles.viewModelBody }>
                         <View style={ { flexDirection: "row", flex: 0.3 } }>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Associate Contact</Text>
+                            <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Associate Contact</Text>
                         </View>
                         <View style={ { flex: 1 } }>
                             <FlatList
@@ -82,7 +81,7 @@ export default class ModelRestoreAssociateContactListForQRCodeScan extends Compo
                                                         <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
                                                     ) }
                                                     <View style={ { flexDirection: "column", justifyContent: "center", flex: 2.8 } }>
-                                                        <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                        <Text style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
 
                                                     </View>
 

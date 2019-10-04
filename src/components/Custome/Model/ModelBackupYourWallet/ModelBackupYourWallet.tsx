@@ -1,15 +1,18 @@
 import React, { Component } from 'react';
 import { Modal, View, StyleSheet, Platform, Image } from 'react-native';
 import { Button, Icon, Text } from "native-base";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+
+
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
+
 
 //TODO: Custome Object
 import {
     images
-} from "HexaWallet/src/app/constants/Constants";
+} from "hexaConstants";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 interface Props {
     click_UseOtherMethod: Function;
@@ -34,19 +37,19 @@ export default class ModelBackupYourWallet extends Component<Props, any> {
                 ] }>
                     <View style={ styles.viewModelBody }>
                         <View style={ { flexDirection: "row", flex: 0.4 } }>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10 } ] }>Backup your Wallet</Text>
+                            <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10 } ] }>Backup your Wallet</Text>
                             <Button light iconLeft style={ { width: 40, height: 40, borderRadius: 20 } } onPress={ () => this.props.closeModal() }>
                                 <Icon name='close' style={ { alignSelf: "center" } } />
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 15 } ] }>it's highly recommended to backup your wallet, to restore funds in case of device loss</Text>
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center", margin: 15 } ] }>it's highly recommended to backup your wallet, to restore funds in case of device loss</Text>
                             <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingMnemonic.walletrestored } />
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <Button
                                 onPress={ () => this.props.click_UseOtherMethod() }
-                                style={ [ globalStyle.ffFiraSansSemiBold, {
+                                style={ [ FontFamily.ffFiraSansSemiBold, {
                                     backgroundColor: "#838383", borderRadius: 10, margin: 5,
                                     height: 50,
                                 } ] }

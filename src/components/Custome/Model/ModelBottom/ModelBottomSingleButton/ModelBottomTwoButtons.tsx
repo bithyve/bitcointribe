@@ -3,19 +3,19 @@ import { View, StyleSheet } from 'react-native';
 import { Button, Text } from "native-base";
 import Modal from 'react-native-modalbox';
 
-import ImageSVG from "HexaWallet/src/screens/Custome/ImageSVG/ImageSVG";
+import { ImageSVG } from "hexaCustImage";
 
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 
 //TODO: Custome Object
 import {
     colors,
     svgIcon
-} from "HexaWallet/src/app/constants/Constants";
+} from "hexaConstants";
 
 
 interface Props {
@@ -80,7 +80,7 @@ export default class ModelBottomTwoButtons extends Component<Props, any> {
                                             svgIcon.bottomModel[ data.svgIcon1 ]
                                         }
                                     />
-                                    <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 12, color: "#ffffff" } ] }>{ data.btnTitle1 }</Text>
+                                    <Text style={ [ FontFamily.ffFiraSansBold, { fontSize: 12, color: "#ffffff" } ] }>{ data.btnTitle1 }</Text>
                                 </View>
                             </Button>
                             <View
@@ -104,7 +104,7 @@ export default class ModelBottomTwoButtons extends Component<Props, any> {
                                             svgIcon.bottomModel[ data.svgIcon2 ]
                                         }
                                     />
-                                    <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 12, color: "#ffffff" } ] }>{ data.btnTitle2 }</Text>
+                                    <Text style={ [ FontFamily.ffFiraSansBold, { fontSize: 12, color: "#ffffff" } ] }>{ data.btnTitle2 }</Text>
                                 </View>
                             </Button>
                         </View>

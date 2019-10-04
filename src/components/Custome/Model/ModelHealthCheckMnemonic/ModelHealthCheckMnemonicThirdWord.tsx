@@ -5,9 +5,20 @@ import {
     Button,
     Text
 } from "native-base";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
+
+
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
+import { SvgIcon } from "@up-shared/components";
+//TODO: Custome StyleSheet Files       
+import FontFamily from "hexaStyles";
+
+//TODO: Custome Object
+import {
+    images
+} from "hexaConstants";
+import { renderIf } from "hexaValidation";
 
 
 
@@ -20,14 +31,6 @@ interface Props {
     click_Request: Function
 }
 
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
-
-//TODO: Custome Object
-import {
-    images
-} from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
 
 export default class ModelHealthCheckMnemonicThirdWord extends Component<Props, any> {
     constructor ( props: any ) {
@@ -116,12 +119,12 @@ export default class ModelHealthCheckMnemonicThirdWord extends Component<Props, 
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />
                                 </Button>
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }></Text>
+                                <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }></Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
                                 <Image source={ images.backupSecureTwoFactorAuto.icon } style={ { width: 80, height: 80, marginTop: -30 } } />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20 } ] }>Health Check</Text>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, margin: 10, marginBottom: 20 } ] }>Mnemonic</Text>
+                                <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 20 } ] }>Health Check</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { fontSize: 14, margin: 10, marginBottom: 20 } ] }>Mnemonic</Text>
                                 <View style={ styles.viewCodeInput }>
                                     <Text note style={ { textAlign: "center", margin: 20 } }>Enter the <Text>{ number }</Text>  word from the mnemonic.</Text>
                                     <Input
@@ -129,7 +132,7 @@ export default class ModelHealthCheckMnemonicThirdWord extends Component<Props, 
                                         autoCapitalize='none'
                                         value={ enterWord }
                                         placeholder='word'
-                                        style={ [ globalStyle.ffFiraSansMedium, wordBorderColor == "#E64545" ? { borderColor: wordBorderColor, borderWidth: 1.5, borderRadius: 8 } : { borderWidth: 0.6, borderRadius: 8 }, { width: Dimensions.get( 'screen' ).width - 80, height: 40 } ] }
+                                        style={ [ FontFamily.ffFiraSansMedium, wordBorderColor == "#E64545" ? { borderColor: wordBorderColor, borderWidth: 1.5, borderRadius: 8 } : { borderWidth: 0.6, borderRadius: 8 }, { width: Dimensions.get( 'screen' ).width - 80, height: 40 } ] }
                                         placeholderTextColor="#B7B7B7"
                                         onChangeText={ ( val ) => {
                                             this.setState( {
@@ -146,7 +149,7 @@ export default class ModelHealthCheckMnemonicThirdWord extends Component<Props, 
                                 </View>
                             </View>
                             <View style={ { flex: 0.1, justifyContent: "flex-end" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Refer to the 12-24 word mnemonic that you noted down while backing up your wallet.</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Refer to the 12-24 word mnemonic that you noted down while backing up your wallet.</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_Next()

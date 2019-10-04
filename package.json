@@ -31,7 +31,7 @@
     "domain-browser": "^1.2.0",
     "https-browserify": "0.0.1",
     "moment": "^2.24.0",
-    "native-base": "^2.13.5",
+    "native-base": "^2.13.8",
     "number-to-words": "^1.2.4",
     "path-browserify": "0.0.0",
     "punycode": "^1.4.1",

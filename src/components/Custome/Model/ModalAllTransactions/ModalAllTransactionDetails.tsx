@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, FlatList, Platform } from 'react-native';
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import { SvgIcon } from "@up-shared/components";
 import Icon from "react-native-vector-icons/FontAwesome";
-import ImageSVG from "HexaWallet/src/screens/Custome/ImageSVG/ImageSVG";
 
-//TODO: Custome Pages
-import { svgIcon } from "HexaWallet/src/app/constants/Constants";
+
+
+import { ImageSVG } from "hexaCustImage";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
+
+//TODO: Custome Pages  
+import { svgIcon } from "hexaConstants";
 
 interface Props {
     data: [];

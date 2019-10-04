@@ -4,10 +4,22 @@ import {
     Button,
     Text
 } from "native-base";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import CodeInput from "react-native-confirmation-code-input";
 import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
+
+
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
+//TODO: Custome StyleSheet Files       
+import FontFamily from "hexaStyles";
+
+//TODO: Custome Object
+import {
+    images,
+    colors
+} from "hexaConstants";
+import { renderIf } from "hexaValidation";
 
 
 
@@ -18,17 +30,6 @@ interface Props {
     pop: Function;
     click_Request: Function
 }
-
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
-
-//TODO: Custome Object
-import {
-    images,
-    colors
-} from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-
 export default class ModelSecureTwoFactorSecretThreeCode extends Component<Props, any> {
     constructor ( props: any ) {
         super( props )
@@ -137,12 +138,12 @@ export default class ModelSecureTwoFactorSecretThreeCode extends Component<Props
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />
                                 </Button>
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }></Text>
+                                <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }></Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
                                 <Image source={ images.backupSecureTwoFactorAuto.icon } style={ { width: 80, height: 80, marginTop: -30 } } />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20 } ] }>Health Check</Text>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, margin: 10 } ] }>Google Authenticator</Text>
+                                <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 20 } ] }>Health Check</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { fontSize: 14, margin: 10 } ] }>Google Authenticator</Text>
                                 <Text note style={ { textAlign: "center" } }>Enter the first three digits of your 2FA secret key from secure PDF</Text>
                                 <View style={ styles.viewCodeInput }>
                                     <CodeInput
@@ -172,13 +173,13 @@ export default class ModelSecureTwoFactorSecretThreeCode extends Component<Props
                                         type='withoutcharacters'
                                     />
                                     { renderIf( passcodeStyle[ 0 ].activeColor == "red" )(
-                                        <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 5 } ] }>{ this.state.success }</Text>
+                                        <Text style={ [ FontFamily.ffFiraSansBookItalic, { color: "red", marginTop: 5 } ] }>{ this.state.success }</Text>
                                     ) }
 
                                 </View>
                             </View>
                             <View style={ { flex: 0.1, justifyContent: "flex-end" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>{ message }</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>{ message }</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_Next()

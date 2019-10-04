@@ -12,37 +12,30 @@ import {
 import { RkCard } from "react-native-ui-kitten";
 import { Text } from 'native-base';
 import { SvgIcon } from "@up-shared/components";
-
-
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //TODO: Custome Pages
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import { CustomeStatusBar } from "hexaCustStatusBar";
 
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
 import {
     colors,
     images,
     localDB
-} from "HexaWallet/src/app/constants/Constants";
-import utils from "HexaWallet/src/app/constants/Utils";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
-
-
-//localization
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
-
+} from "hexaConstants";
+import utils from "hexaUtils";
+var dbOpration = require( "hexaDBOpration" );
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 
-export default class RestoreAndReoverWalletScreen extends Component<Props, any> {
+export default class RestoreAndReoverWallet extends Component<Props, any> {
     constructor ( props: any ) {
         super( props );
         this.state = {
@@ -97,7 +90,7 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
     click_Card( item: any ) {
         try {
             if ( item == "Set up as a New Wallet" ) {
-                this.props.navigation.push( "WalletSetupScreens" );
+                this.props.navigation.push( "WalletSetup" );
             } else if ( item == "Restore wallet using trusted source" ) {
                 this.createSSSDetailsTableStructure();
             } else if ( item == "Continue restoring wallet using trusted source" ) {
@@ -154,7 +147,7 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
                             contentContainerStyle={ { flexGrow: 1 } }
                         >
                             <View style={ styles.viewSetupWallet }>
-                                <Text style={ [ globalStyle.ffFiraSansBold, { color: "#ffffff", marginTop: 50, fontSize: 26, textAlign: "center" } ] }>New Wallet</Text>
+                                <Text style={ [ FontFamily.ffFiraSansBold, { color: "#ffffff", marginTop: 50, fontSize: 26, textAlign: "center" } ] }>New Wallet</Text>
                                 <TouchableOpacity
                                     onPress={ () => this.click_Card( "Set up as a New Wallet" ) }
                                 >
@@ -173,7 +166,7 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
                                             } }
                                         >
                                             <Text
-                                                style={ [ globalStyle.ffFiraSansMedium, { flex: 6 } ] }
+                                                style={ [ FontFamily.ffFiraSansMedium, { flex: 6 } ] }
                                             >
                                                 Set up as a New Wallet
                                             </Text>
@@ -189,7 +182,7 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
                             </View>
                             <View style={ styles.viewAppLogo }>
                                 <Text
-                                    style={ [ globalStyle.ffFiraSansBold, { color: "#ffffff", marginTop: 20, marginBottom: 20, fontSize: 26 } ] }
+                                    style={ [ FontFamily.ffFiraSansBold, { color: "#ffffff", marginTop: 20, marginBottom: 20, fontSize: 26 } ] }
                                 >
                                     Restore Wallet
                                </Text>
@@ -217,7 +210,7 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
                                                     } }
                                                 >
                                                     <Text
-                                                        style={ [ globalStyle.ffFiraSansMedium, { flex: 6 } ] }
+                                                        style={ [ FontFamily.ffFiraSansMedium, { flex: 6 } ] }
                                                     >
                                                         { item }
                                                     </Text>
@@ -235,9 +228,9 @@ export default class RestoreAndReoverWalletScreen extends Component<Props, any> 
                                 />
                             </View>
                             <View style={ { flex: 3, alignItems: "center", margin: 20 } }>
-                                <Text style={ [ styles.txtWhiteColor, globalStyle.ffFiraSansBold, { fontSize: 20 } ] }>Restoring a wallet</Text>
-                                <Text style={ [ styles.txtWhiteColor, globalStyle.ffFiraSansRegular, { textAlign: "center", margin: 10 } ] }>Restoring a previously used wallet gives you back the access to your funds.</Text>
-                                <Text style={ [ styles.txtWhiteColor, globalStyle.ffFiraSansRegular, { textAlign: "center", margin: 10 } ] }>You can restore Hexa wallets using any of the methods and restore other wallet by using the mnemonic</Text>
+                                <Text style={ [ styles.txtWhiteColor, FontFamily.ffFiraSansBold, { fontSize: 20 } ] }>Restoring a wallet</Text>
+                                <Text style={ [ styles.txtWhiteColor, FontFamily.ffFiraSansRegular, { textAlign: "center", margin: 10 } ] }>Restoring a previously used wallet gives you back the access to your funds.</Text>
+                                <Text style={ [ styles.txtWhiteColor, FontFamily.ffFiraSansRegular, { textAlign: "center", margin: 10 } ] }>You can restore Hexa wallets using any of the methods and restore other wallet by using the mnemonic</Text>
                             </View>
                         </KeyboardAwareScrollView>
                     </SafeAreaView>

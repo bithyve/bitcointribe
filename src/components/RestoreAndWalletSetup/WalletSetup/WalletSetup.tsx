@@ -6,17 +6,15 @@ import {
 import { StackActions, NavigationActions } from "react-navigation";
 
 
-//TODO: Custome Comp
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import WalletSetUpScrolling from "HexaWallet/src/app/custcompontes/OnBoarding/WalletSetUpScrolling/WalletSetUpScrolling";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+//TODO: Custome Comp   
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { WalletSetUpScrolling } from "hexaCustOnBoarding";
+import { HeaderTitle } from "hexaCustHeader";
 
-import WalletNameScreen from "./WalletNameScreen/WalletNameScreen";
-import FirstSecretQuestionScreen from "./FirstSecretQuestionScreen/FirstSecretQuestionScreen";
-
+import { WalletName, FirstSecretQuestion } from "hexaCompRestoreAndWalletSetup";
 
 //TODO: Custome Object  
-import { colors, images, asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, asyncStorageKeys } from "hexaConstants";
 
 
 export default class WalletSetup extends React.Component<any, any> {
@@ -55,9 +53,9 @@ export default class WalletSetup extends React.Component<any, any> {
                     <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] } >
                         <WalletSetUpScrolling>
                             {/* First screen */ }
-                            <WalletNameScreen />
+                            <WalletName />
                             {/* Second screen */ }
-                            <FirstSecretQuestionScreen click_Next={ () => this.goToWallet() } />
+                            <FirstSecretQuestion click_Next={ () => this.goToWallet() } />
                         </WalletSetUpScrolling>
                     </SafeAreaView>
                 </ImageBackground>

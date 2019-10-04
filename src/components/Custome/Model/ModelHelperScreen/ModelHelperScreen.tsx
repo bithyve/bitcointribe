@@ -8,7 +8,7 @@ import {
 //TODO: Custome Object
 import {
     images
-} from "HexaWallet/src/app/constants/Constants";
+} from "hexaConstants";
 
 interface Props {
     data: [];

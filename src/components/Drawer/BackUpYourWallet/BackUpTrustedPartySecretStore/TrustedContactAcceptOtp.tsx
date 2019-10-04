@@ -16,10 +16,11 @@ import CodeInput from "react-native-confirmation-code-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+import { ModelLoader } from "hexaLoader";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
+import { HeaderTitle } from "hexaCustHeader";
+
 
 //TODO: Custome Object   
 import {
@@ -237,7 +238,7 @@ export default class TrustedContactAcceptOtp extends Component {
                     </SafeAreaView>
                 </ImageBackground>
 
-                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
+                <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </View>
         );

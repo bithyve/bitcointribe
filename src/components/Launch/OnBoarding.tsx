@@ -8,7 +8,7 @@ import IconFontAwe from "react-native-vector-icons/FontAwesome";
 
 
 //Custome Compontes  
-import { CustomeStatusBar } from "hexaCustomeStatusBar";
+import { CustomeStatusBar } from "hexaCustStatusBar";
 import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 
 //TODO: Custome StyleSheet Files       

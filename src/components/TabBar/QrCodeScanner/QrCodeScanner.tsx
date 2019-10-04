@@ -16,21 +16,21 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 //TODO: Custome object
 import {
     colors,
     images
-} from "HexaWallet/src/app/constants/Constants";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+} from "hexaConstants";
+var utils = require( "hexaUtils" );
 
 //Custome Compontes
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import { CustomeStatusBar } from "hexaCustStatusBar";
 
 //TODO: Bitcoin Class
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
+var bitcoinClassState = require( "hexaClassState" );
 
 
 

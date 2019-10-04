@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { Modal, View, StyleSheet } from 'react-native';
 import { Button, Icon, Text } from "native-base";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 import { SvgIcon } from "@up-shared/components";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 export default class ModelFindYourTrustedContacts extends Component {
     render() {
@@ -24,7 +25,7 @@ export default class ModelFindYourTrustedContacts extends Component {
                 ] }>
                     <View style={ styles.viewModelBody }>
                         <View style={ { flexDirection: "row", flex: 0.6 } }>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, {
+                            <Text style={ [ FontFamily.ffFiraSansMedium, {
                                 fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
                                 marginLeft: 20, marginRight: 20
                             } ] }>Find your trusted contacts</Text>
@@ -33,8 +34,8 @@ export default class ModelFindYourTrustedContacts extends Component {
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Hexa requires access to phone contacts to split and share information about your wallet backup with contacts you choose to trust</Text>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", marginLeft: 40, marginRight: 40, marginTop: 20 } ] }>allow hexa to access your phone contacts</Text>
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Hexa requires access to phone contacts to split and share information about your wallet backup with contacts you choose to trust</Text>
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center", marginLeft: 40, marginRight: 40, marginTop: 20 } ] }>allow hexa to access your phone contacts</Text>
                         </View>
                         <View
                             style={ {
@@ -47,7 +48,7 @@ export default class ModelFindYourTrustedContacts extends Component {
                         </View>
 
                         <View style={ { flex: 0.5, alignItems: "center", justifyContent: "flex-end" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Hexa does not store your contacts</Text>
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Hexa does not store your contacts</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
                             <FullLinearGradientButton

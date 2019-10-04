@@ -6,15 +6,12 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 import Permissions from 'react-native-permissions'
 
 
-
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+import FontFamily from "hexaStyles";
+var utils = require( "hexaUtils" );
 
 //TODO: Common Function
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
-
-
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 interface Props {
     data: [];
@@ -103,7 +100,7 @@ export default class ModelQRCodeScanRestoreSecureAccount extends Component<Props
                         </Button>
                     </View>
                     <View style={ { flex: 0.8 } }>
-                        <Text style={ [ globalStyle.ffFiraSansMedium, {
+                        <Text style={ [ FontFamily.ffFiraSansMedium, {
                             fontSize: 24, color: "#ffffff", textAlign: "center", margin: 20
                         } ] }>Restore { "\n" } Secure Account</Text>
                         <Text style={ { color: "#ffffff", textAlign: "center", fontSize: 14 } }>Step 1</Text>

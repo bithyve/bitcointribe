@@ -43,7 +43,7 @@ import { More, ContactSharedSecretList, TrustedPartySelfShareQRCode, TrsutedPart
 import { QrCodeScanner } from "hexaCompTabbarQrCodeScanner";
 
 //  TODO: Wallet  
-import { Wallet } from "hexaCompTabbarWallet";
+//import { Wallet } from "hexaCompTabbarWallet";
 
 //  TODO: All Transaction     
 import { AllTransaction } from "hexaCompTabbarAllTransaction";
@@ -97,178 +97,143 @@ const OnBoardingStackNavigator = createStackNavigator(
   }
 );
 
-
-// //TODO: StackNavigator
-// const AccountSSNavigator = createStackNavigator(
-//   {
-//     AccountSS1: {
-//       screen: AccountSS1,
-//       navigationOptions: { header: null }
-//     },
-//     AccountSS2: {
-//       screen: AccountSS2,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "AccountSS1"
-//   }
-// );
-
-// const ContactSSNavigator = createStackNavigator(
-//   {
-//     ContactSS1: {
-//       screen: ContactSS1,
-//       navigationOptions: { header: null }
-//     },
-//     ContactSS2: {
-//       screen: ContactSS2,
-//       navigationOptions: { header: null }
-//     },
-//     ContactSS3: {
-//       screen: ContactSS3,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   { initialRouteName: "ContactSS1" }
-// );
-
+const RestoreAndWalletSetupStackNavigator = createStackNavigator(
+  {
+    RestoreAndReoverWallet: {
+      screen: RestoreAndReoverWallet,
+      navigationOptions: { header: null }
+    },
+    WalletSetup: {
+      screen: WalletSetup,
+      navigationOptions: { header: null }
+    },
+    PermissionAndroid: {
+      screen: PermissionAndroid,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "RestoreAndReoverWallet"
+  }
+);
 
 
 
 // const RestoreWalletUsingMnemonicStackNavigator = createStackNavigator(
 //   {
-//     RestoreWalletUsingMnemonicScrren: {
-//       screen: RestoreWalletUsingMnemonicScrren,
+//     RestoreWalletUsingMnemonic: {
+//       screen: RestoreWalletUsingMnemonic,
 //       navigationOptions: { header: null }
 //     }
 //   },
 //   {
-//     initialRouteName: "RestoreWalletUsingMnemonicScrren"
+//     initialRouteName: "RestoreWalletUsingMnemonic"
 //   }
 // );
 
 // const RestoreWalletUsingTrustedContactStackNavigator = createStackNavigator(
 //   {
-//     RestoreWalletUsingTrustedContactScreen: {
-//       screen: RestoreWalletUsingTrustedContactScreen,
+//     RestoreWalletUsingTrustedContact: {
+//       screen: RestoreWalletUsingTrustedContact,
 //       navigationOptions: { header: null }
 //     },
-//     RestoreSelectedContactsListScreen: {
-//       screen: RestoreSelectedContactsListScreen,
+//     RestoreSelectedContactsList: {
+//       screen: RestoreSelectedContactsList,
 //       navigationOptions: { header: null }
 //     },
-//     RestoreAllContactListScreen: {
-//       screen: RestoreAllContactListScreen,
+//     RestoreAllContactList: {
+//       screen: RestoreAllContactList,
 //       navigationOptions: { header: null }
 //     },
-//     RestoreTrustedContactsShareScreen: {
-//       screen: RestoreTrustedContactsShareScreen,
+//     RestoreTrustedContactsShare: {
+//       screen: RestoreTrustedContactsShare,
 //       navigationOptions: { header: null }
 //     },
-//     RestoreTrustedContactsQRCodeScanScreen: {
+//     RestoreTrustedContactsQRCodeScan: {
 //       screen: RestoreTrustedContactsQRCodeScanScreen,
 //       navigationOptions: { header: null }
 //     },
-//     Restore3SelfShareScreen: {
-//       screen: Restore3SelfShareScreen,
+//     Restore3SelfShare: {
+//       screen: Restore3SelfShare,
 //       navigationOptions: { header: null }
 //     },
-//     Restore3SelfSahreQRCodeScannerScreen: {
-//       screen: Restore3SelfSahreQRCodeScannerScreen,
+//     Restore3SelfSahreQRCodeScanner: {
+//       screen: Restore3SelfSahreQRCodeScanner,
 //       navigationOptions: { header: null }
 //     },
-//     Restore4And5SelfShareScreen: {
-//       screen: Restore4And5SelfShareScreen,
+//     Restore4And5SelfShare: {
+//       screen: Restore4And5SelfShare,
 //       navigationOptions: { header: null }
 //     },
 //     Restore4And5SelfShareQRCodeScanner: {
 //       screen: Restore4And5SelfShareQRCodeScanner,
 //       navigationOptions: { header: null }
 //     },
-//     RestoreWalletUsingTrustedContactQueAndAnwScreen: {
-//       screen: RestoreWalletUsingTrustedContactQueAndAnwScreen,
+//     RestoreWalletUsingTrustedContactQueAndAnw: {
+//       screen: RestoreWalletUsingTrustedContactQueAndAnw,
 //       navigationOptions: { header: null }
 //     }
 //   },
 //   {
-//     initialRouteName: "RestoreSelectedContactsListScreen"
+//     initialRouteName: "RestoreSelectedContactsList"
 //   }
 // );
 
 
 // const RestoreWalletUsingTrustedContactAndroidStackNavigator = createStackNavigator(
 //   {
-//     PermissionAndroidScreen: {
-//       screen: PermissionAndroidScreen,
+//     PermissionAndroid: {
+//       screen: PermissionAndroid,
 //       navigationOptions: { header: null }
 //     },
-//     RestoreWalletUsingTrustedContactScreen: {
-//       screen: RestoreWalletUsingTrustedContactScreen,
+//     RestoreWalletUsingTrustedContact: {
+//       screen: RestoreWalletUsingTrustedContact,
 //       navigationOptions: { header: null }
 //     },
-//     RestoreSelectedContactsListScreen: {
-//       screen: RestoreSelectedContactsListScreen,
+//     RestoreSelectedContactsList: {
+//       screen: RestoreSelectedContactsList,
 //       navigationOptions: { header: null }
 //     },
-//     RestoreAllContactListScreen: {
-//       screen: RestoreAllContactListScreen,
+//     RestoreAllContactList: {
+//       screen: RestoreAllContactList,
 //       navigationOptions: { header: null }
 //     },
-//     RestoreTrustedContactsShareScreen: {
-//       screen: RestoreTrustedContactsShareScreen,
+//     RestoreTrustedContactsShare: {
+//       screen: RestoreTrustedContactsShare,
 //       navigationOptions: { header: null }
 //     },
-//     RestoreTrustedContactsQRCodeScanScreen: {
+//     RestoreTrustedContactsQRCodeScan: {
 //       screen: RestoreTrustedContactsQRCodeScanScreen,
 //       navigationOptions: { header: null }
 //     },
-//     Restore3SelfShareScreen: {
-//       screen: Restore3SelfShareScreen,
+//     Restore3SelfShare: {
+//       screen: Restore3SelfShare,
 //       navigationOptions: { header: null }
 //     },
-//     Restore3SelfSahreQRCodeScannerScreen: {
-//       screen: Restore3SelfSahreQRCodeScannerScreen,
+//     Restore3SelfSahreQRCodeScanner: {
+//       screen: Restore3SelfSahreQRCodeScanner,
 //       navigationOptions: { header: null }
 //     },
-//     Restore4And5SelfShareScreen: {
-//       screen: Restore4And5SelfShareScreen,
+//     Restore4And5SelfShare: {
+//       screen: Restore4And5SelfShare,
 //       navigationOptions: { header: null }
 //     },
 //     Restore4And5SelfShareQRCodeScanner: {
 //       screen: Restore4And5SelfShareQRCodeScanner,
 //       navigationOptions: { header: null }
 //     },
-//     RestoreWalletUsingTrustedContactQueAndAnwScreen: {
-//       screen: RestoreWalletUsingTrustedContactQueAndAnwScreen,
+//     RestoreWalletUsingTrustedContactQueAndAnw: {
+//       screen: RestoreWalletUsingTrustedContactQueAndAnw,
 //       navigationOptions: { header: null }
 //     }
 //   },
 //   {
-//     initialRouteName: "PermissionAndroidScreen"
+//     initialRouteName: "PermissionAndroid"
 //   }
 // );
 
 
-// const RestoreAndWalletSetupStackNavigator = createStackNavigator(
-//   {
-//     RestoreAndReoverWalletScreen: {
-//       screen: RestoreAndReoverWalletScreen,
-//       navigationOptions: { header: null }
-//     },
-//     WalletSetupScreens: {
-//       screen: WalletSetupScreens,
-//       navigationOptions: { header: null }
-//     },
-//     PermissionAndroidScreen: {
-//       screen: PermissionAndroidScreen,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "RestoreAndReoverWalletScreen"
-//   }
-// );
+
 
 // const TrustedPartyShareSecretStackNavigator = createStackNavigator(
 //   {
@@ -283,8 +248,8 @@ const OnBoardingStackNavigator = createStackNavigator(
 //       screen: TrustedPartySelfShareQRCode,
 //       navigationOptions: { header: null }
 //     },
-//     TrsutedPartyQRCodeScreen: {
-//       screen: TrsutedPartyQRCodeScreen,
+//     TrsutedPartyQRCode: {
+//       screen: TrsutedPartyQRCode,
 //       navigationOptions: { header: null }
 //     }
 //   },
@@ -297,19 +262,19 @@ const OnBoardingStackNavigator = createStackNavigator(
 // const BackUpYourWalletStackNavigatorRouter = createStackNavigator(
 //   {
 //     AllContactListScreen: {
-//       screen: AllContactListScreen,
+//       screen: AllContactList,
 //       navigationOptions: { header: null }
 //     },
 //     SecretSharingScreen: {
-//       screen: SecretSharingScreen,
+//       screen: SecretSharing,
 //       navigationOptions: { header: null }
 //     },
 //     TrustedContactScreen: {
-//       screen: TrustedContactScreen,
+//       screen: TrustedContact,
 //       navigationOptions: { header: null }
 //     },
 //     ShareSecretViaQRScreen: {
-//       screen: ShareSecretViaQRScreen,
+//       screen: ShareSecretViaQR,
 //       navigationOptions: { header: null }
 //     }
 //   },
@@ -321,15 +286,15 @@ const OnBoardingStackNavigator = createStackNavigator(
 // const BackUpYourWalletSecoundTimeStackNavigatorRouter = createStackNavigator(
 //   {
 //     SecretSharingScreen: {
-//       screen: SecretSharingScreen,
+//       screen: SecretSharing,
 //       navigationOptions: { header: null }
 //     },
 //     TrustedContactScreen: {
-//       screen: TrustedContactScreen,
+//       screen: TrustedContact,
 //       navigationOptions: { header: null }
 //     },
 //     ShareSecretViaQRScreen: {
-//       screen: ShareSecretViaQRScreen,
+//       screen: ShareSecretViaQR,
 //       navigationOptions: { header: null }
 //     }
 //   },
@@ -341,11 +306,11 @@ const OnBoardingStackNavigator = createStackNavigator(
 // const TrustedContactStackNavigator = createStackNavigator(
 //   {
 //     TrustedContactScreen: {
-//       screen: TrustedContactScreen,
+//       screen: TrustedContact,
 //       navigationOptions: { header: null }
 //     },
 //     ShareSecretViaQRScreen: {
-//       screen: ShareSecretViaQRScreen,
+//       screen: ShareSecretViaQR,
 //       navigationOptions: { header: null }
 //     }
 //   },
@@ -361,7 +326,7 @@ const OnBoardingStackNavigator = createStackNavigator(
 //       navigationOptions: { header: null }
 //     },
 //     TrustedContactAcceptOtpScreen: {
-//       screen: TrustedContactAcceptOtpScreen,
+//       screen: TrustedContactAcceptOtp,
 //       navigationOptions: { header: null }
 //     }
 //   },
@@ -374,23 +339,23 @@ const OnBoardingStackNavigator = createStackNavigator(
 // const SettingsStackNavigator = createStackNavigator(
 //   {
 //     SettingsScreen: {
-//       screen: SettingsScreen,
+//       screen: Settings,
 //       navigationOptions: { header: null }
 //     },
 //     BackupWalletMnemonicScreen: {
-//       screen: BackupWalletMnemonicScreen,
+//       screen: BackupWalletMnemonic,
 //       navigationOptions: { header: null }
 //     },
 //     BackupWalletMnemonicConfirmMnemonicScreen: {
-//       screen: BackupWalletMnemonicConfirmMnemonicScreen,
+//       screen: BackupWalletMnemonicConfirmMnemonic,
 //       navigationOptions: { header: null }
 //     },
 //     AdvancedSettingsScreen: {
-//       screen: AdvancedSettingsScreen,
+//       screen: AdvancedSettings,
 //       navigationOptions: { header: null }
 //     },
 //     MnemonicDisplayScreen: {
-//       screen: MnemonicDisplayScreen,
+//       screen: MnemonicDisplay,
 //       navigationOptions: { header: null }
 //     }
 //   },
@@ -403,19 +368,19 @@ const OnBoardingStackNavigator = createStackNavigator(
 // const HealthOfTheAppStackNavigator = createStackNavigator(
 //   {
 //     HealthOfTheAppScreen: {
-//       screen: HealthOfTheAppScreen,
+//       screen: HealthOfTheApp,
 //       navigationOptions: { header: null }
 //     },
 //     BackupSecretQuestionsScreen: {
-//       screen: BackupSecretQuestionsScreen,
+//       screen: BackupSecretQuestions,
 //       navigationOptions: { header: null }
 //     },
 //     BackupSecureTwoFactorAutoScreen: {
-//       screen: BackupSecureTwoFactorAutoScreen,
+//       screen: BackupSecureTwoFactorAuto,
 //       navigationOptions: { header: null }
 //     },
 //     HealthCheckMnemonicScreen: {
-//       screen: HealthCheckMnemonicScreen,
+//       screen: HealthCheckMnemonic,
 //       navigationOptions: { header: null }
 //     },
 //     SelfShareUsingWalletQRCode: {
@@ -423,11 +388,11 @@ const OnBoardingStackNavigator = createStackNavigator(
 //       navigationOptions: { header: null }
 //     },
 //     SelfShareSharingScreen: {
-//       screen: SelfShareSharingScreen,
+//       screen: SelfShareSharing,
 //       navigationOptions: { header: null }
 //     },
 //     ConfirmSelfShareQRScannerScreen: {
-//       screen: ConfirmSelfShareQRScannerScreen,
+//       screen: ConfirmSelfShareQRScanner,
 //       navigationOptions: { header: null }
 //     }
 //   },
@@ -441,7 +406,7 @@ const OnBoardingStackNavigator = createStackNavigator(
 // const BackupSecureAccountWithPdfStackNavigator = createStackNavigator(
 //   {
 //     BackupSecureAccountScreen: {
-//       screen: BackupSecureAccountScreen,
+//       screen: BackupSecureAccount,
 //       navigationOptions: { header: null }
 //     }
 //   },
@@ -454,7 +419,7 @@ const OnBoardingStackNavigator = createStackNavigator(
 // const ResotreSecureAccountStackNavigator = createStackNavigator(
 //   {
 //     RestoreSecureAccountScreen: {
-//       screen: RestoreSecureAccountScreen,
+//       screen: RestoreSecureAccount,
 //       navigationOptions: { header: null }
 //     }
 //   },
@@ -468,7 +433,7 @@ const OnBoardingStackNavigator = createStackNavigator(
 // const ReceivePaymentStackNavigator = createStackNavigator(
 //   {
 //     ReceivePaymentScreen: {
-//       screen: ReceivePaymentScreen,
+//       screen: ReceivePayment,
 //       navigationOptions: { header: null }
 //     }
 //   },
@@ -481,15 +446,15 @@ const OnBoardingStackNavigator = createStackNavigator(
 // const SendPaymentStackNavigator = createStackNavigator(
 //   {
 //     SendPaymentScreen: {
-//       screen: SendPaymentScreen,
+//       screen: SendPayment,
 //       navigationOptions: { header: null }
 //     },
 //     ConfirmAndSendPaymentScreen: {
-//       screen: ConfirmAndSendPaymentScreen,
+//       screen: ConfirmAndSendPayment,
 //       navigationOptions: { header: null }
 //     },
 //     SendPaymentAddressScanScreen: {
-//       screen: SendPaymentAddressScanScreen,
+//       screen: SendPaymentAddressScan,
 //       navigationOptions: { header: null }
 //     }
 //   },
@@ -502,7 +467,7 @@ const OnBoardingStackNavigator = createStackNavigator(
 // const AccountTransactionStackNavigator = createStackNavigator(
 //   {
 //     TransactionScreen: {
-//       screen: TransactionScreen,
+//       screen: Transaction,
 //       navigationOptions: { header: null }
 //     },
 //     RecieveNavigation: {
@@ -519,67 +484,67 @@ const OnBoardingStackNavigator = createStackNavigator(
 //   }
 // );
 
-// //TODO: TabNavigator
-// //TODO: TabNavigator:TabNavigator
-// const TabNavigator = createBottomTabNavigator(
-//   {
-//     WalletScreen: {
-//       screen: WalletScreen, //PaymentScreen,
-//       navigationOptions: {
-//         tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
-//         drawerLockMode: "locked-open",
-//         tabBarIcon: ( { tintColor } ) => (
-//           <SvgIcon name="wallet" color={ tintColor } size={ 22 } />
-//         )
-//       }
-//     },
-//     AllTransactionScreen: {
-//       screen: AllTransactionScreen,
-//       navigationOptions: {
-//         tabBarLabel: "Transaction", //localization("TabBarItem.Analytics"),
-//         tabBarIcon: ( { tintColor } ) => (
-//           <SvgIcon name="icon_transactions" color={ tintColor } size={ 22 } />
-//         )
-//       }
-//     },
-//     QrCodeScannerScreen: {
-//       screen: QrCodeScannerScreen,
-//       navigationOptions: {
-//         tabBarLabel: "QR", //localization("TabBarItem.Accounts"),
-//         tabBarIcon: ( { tintColor } ) => (
-//           <SvgIcon name="qr-codes" color={ tintColor } size={ 22 } />
-//         )
-//       }
-//     },
+//TODO: TabNavigator
+//TODO: TabNavigator:TabNavigator
+const TabNavigator = createBottomTabNavigator(
+  {
+    Wallet: {
+      screen: AllTransaction, //Wallet,
+      navigationOptions: {
+        tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
+        drawerLockMode: "locked-open",
+        tabBarIcon: ( { tintColor } ) => (
+          <SvgIcon name="wallet" color={ tintColor } size={ 22 } />
+        )
+      }
+    },
+    AllTransaction: {
+      screen: AllTransaction,
+      navigationOptions: {
+        tabBarLabel: "Transaction", //localization("TabBarItem.Analytics"),
+        tabBarIcon: ( { tintColor } ) => (
+          <SvgIcon name="icon_transactions" color={ tintColor } size={ 22 } />
+        )
+      }
+    },
+    QrCodeScanner: {
+      screen: QrCodeScanner,
+      navigationOptions: {
+        tabBarLabel: "QR", //localization("TabBarItem.Accounts"),
+        tabBarIcon: ( { tintColor } ) => (
+          <SvgIcon name="qr-codes" color={ tintColor } size={ 22 } />
+        )
+      }
+    },
 
-//     More: {
-//       screen: MoreScreen,
-//       navigationOptions: {
-//         tabBarLabel: "More", //localization("TabBarItem.More"),
-//         tabBarIcon: ( { tintColor } ) => (
-//           <SvgIcon name="more-icon" color={ tintColor } size={ 22 } />
-//         )
-//       }
-//     }
-//   },
-//   {
-//     initialRouteName: "WalletScreen",
-//     tabBarOptions: {
-//       showLabel: true,
-//       //swipeEnabled: true,
-//       showIcon: true,
-//       activeTintColor: colors.appColor,
-//       labelStyle: {
-//         fontSize: 11,
-//         fontFamily: "FiraSans-Medium"
-//       },
-//       style: {
-//         backgroundColor: "#ffffff"
-//       },
-//       tabStyle: {}
-//     }
-//   }
-// );
+    More: {
+      screen: More,
+      navigationOptions: {
+        tabBarLabel: "More", //localization("TabBarItem.More"),
+        tabBarIcon: ( { tintColor } ) => (
+          <SvgIcon name="more-icon" color={ tintColor } size={ 22 } />
+        )
+      }
+    }
+  },
+  {
+    initialRouteName: "Wallet",
+    tabBarOptions: {
+      showLabel: true,
+      //swipeEnabled: true,
+      showIcon: true,
+      activeTintColor: colors.appColor,
+      labelStyle: {
+        fontSize: 11,
+        fontFamily: "FiraSans-Medium"
+      },
+      style: {
+        backgroundColor: "#ffffff"
+      },
+      tabStyle: {}
+    }
+  }
+);
 
 //TODO: RootNavigator
 //TODO: RootNavigator:createRootNavigator
@@ -601,18 +566,14 @@ export const createRootNavigator = (
         screen: Passcode,
         navigationOptions: { header: null }
       },
-      // AccountSSNavigator: {
-      //   screen: AccountSSNavigator,
-      //   navigationOptions: { header: null }
-      // },
-      // ContactSSNavigator: {
-      //   screen: ContactSSNavigator,
-      //   navigationOptions: { header: null }
-      // },
-      // RestoreAndWalletSetupNavigator: {
-      //   screen: RestoreAndWalletSetupStackNavigator,
-      //   navigationOptions: { header: null }
-      // },
+      RestoreAndWalletSetupNavigator: {
+        screen: RestoreAndWalletSetupStackNavigator,
+        navigationOptions: { header: null }
+      },
+      TabbarBottom: {
+        screen: TabNavigator,
+        navigationOptions: { header: null }
+      },
       // RestoreWalletUsingMnemonicNavigator: {
       //   screen: RestoreWalletUsingMnemonicStackNavigator,
       //   navigationOptions: { header: null }
@@ -625,10 +586,7 @@ export const createRootNavigator = (
       //   screen: RestoreWalletUsingTrustedContactAndroidStackNavigator,
       //   navigationOptions: { header: null }
       // },
-      // TabbarBottom: {
-      //   screen: TabNavigator,
-      //   navigationOptions: { header: null }
-      // },
+
       // BackUpYourWalletNavigator: {
       //   screen: BackUpYourWalletStackNavigatorRouter,
       //   navigationOptions: { header: null }
@@ -648,7 +606,7 @@ export const createRootNavigator = (
       // },
       // //TODO: Common Screens
       // OTPScreenNavigator: {
-      //   screen: OTPScreen,
+      //   screen: OTP,
       //   navigationOptions: { header: null }
       // },
       // OTPBackupShareStoreNavigator: {

@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
 import { Modal, View, StyleSheet, FlatList } from 'react-native';
 import { Button, Text } from "native-base";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+
+
 import { SvgIcon } from "@up-shared/components";
 import { Avatar } from 'react-native-elements';
 import { RkCard } from "react-native-ui-kitten";
 
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 
-var utils = require( "HexaWallet/src/app/constants/Utils" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+var utils = require( "hexaUtils" );
+import { renderIf } from "hexaValidation";
 
 
 interface Props {
@@ -59,13 +61,13 @@ export default class ModelSelectedContactsList extends Component<Props, any> {
                             >
                                 <SvgIcon name="icon_back" size={ 25 } color="gray" />
                             </Button>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, {
+                            <Text style={ [ FontFamily.ffFiraSansMedium, {
                                 fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
                                 marginLeft: 20, marginRight: 20
                             } ] }>Selected Contacts</Text>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>You can request share from the selected contacts</Text>
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>You can request share from the selected contacts</Text>
                         </View>
                         <View
                             style={ {
@@ -95,7 +97,7 @@ export default class ModelSelectedContactsList extends Component<Props, any> {
                                                     <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
                                                 ) }
                                                 <View style={ { flexDirection: "column", justifyContent: "center", flex: 2.3 } }>
-                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                    <Text style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                 </View>
                                                 <View style={ {
                                                     flex: 1,

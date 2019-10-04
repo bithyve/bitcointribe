@@ -5,7 +5,9 @@ import {
     View
 } from "react-native";
 import SVG from 'react-native-remote-svg';
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+
+
+import { renderIf } from "hexaValidation";
 
 export default class ImageSVG extends Component<any, any> {
     constructor ( props: any ) {

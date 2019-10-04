@@ -10,26 +10,26 @@ var converter = require( 'number-to-words' );
 
 
 //TODO: Custome Compontes
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import ModelConfirmMnemonic1of3 from "HexaWallet/src/app/custcompontes/Model/ModelBackupWalletMnemonic/ModelConfirmMnemonic1of3";
-import ModelConfirmMnemonic2of3 from "HexaWallet/src/app/custcompontes/Model/ModelBackupWalletMnemonic/ModelConfirmMnemonic2of3";
-import ModelConfirmMnemonic3of3 from "HexaWallet/src/app/custcompontes/Model/ModelBackupWalletMnemonic/ModelConfirmMnemonic3of3";
-import ModelWalletSuccessfullyBackedUp from "HexaWallet/src/app/custcompontes/Model/ModelBackupWalletMnemonic/ModelWalletSuccessfullyBackedUp";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+
+import {
+    ModelConfirmMnemonic1of3, ModelConfirmMnemonic2of3,
+    ModelConfirmMnemonic3of3, ModelWalletSuccessfullyBackedUp
+} from "hexaCustModel";
+
 
 
 //TODO: Custome Object
 import {
     colors,
     images
-} from "HexaWallet/src/app/constants/Constants";
-import utils from "HexaWallet/src/app/constants/Utils";
+} from "hexaConstants";
+import utils from "hexaUtils";
 
 
-//localization       
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 export default class BackupWalletMnemonicConfirmMnemonic extends Component {
     constructor ( props: any ) {

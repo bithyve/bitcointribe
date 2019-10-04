@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import { Modal, View, StyleSheet } from 'react-native';
 import { Button, Icon, Text } from "native-base";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import { Avatar } from 'react-native-elements';
 
 
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
-//TODO: Custome Object
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
+//TODO: Custome StyleSheet Files       
+import FontFamily from "hexaStyles";
+//TODO: Custome Object    
+var utils = require( "hexaUtils" );
 
 interface Props {
     data: [];
@@ -35,23 +35,23 @@ export default class ModelSelfShareAcceptAndReject extends Component<Props, any>
                 ] }>
                     <View style={ styles.viewModelBody }>
                         <View style={ { flexDirection: "row", flex: 0.5 } }>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Self Share</Text>
+                            <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Self Share</Text>
                             <Button light iconLeft style={ { width: 40, height: 40, borderRadius: 20 } } onPress={ () => this.props.closeModal() }>
                                 <Icon name='close' style={ { alignSelf: "center" } } />
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Please keep this share safe, the sender might need this share to restore wallet in case of device loss
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Please keep this share safe, the sender might need this share to restore wallet in case of device loss
 </Text>
                             <Avatar medium rounded title={ walletName.charAt( 0 ) } />
-                            <Text style={ globalStyle.ffFiraSansMedium } note>{ walletName }</Text>
-                            <Text style={ [ globalStyle.ffFiraSansRegular, { textAlign: "center", marginTop: 10 } ] }>This share will now be stored in More> Address book. Tap on it to return share</Text>
+                            <Text style={ FontFamily.ffFiraSansMedium } note>{ walletName }</Text>
+                            <Text style={ [ FontFamily.ffFiraSansRegular, { textAlign: "center", marginTop: 10 } ] }>This share will now be stored in More> Address book. Tap on it to return share</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>You will need to open the Hexa application on your device once in two weeks to make sure the secret is still accessible</Text>
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>You will need to open the Hexa application on your device once in two weeks to make sure the secret is still accessible</Text>
                             <Button
                                 onPress={ () => this.props.closeModal() }
-                                style={ [ globalStyle.ffFiraSansSemiBold, {
+                                style={ [ FontFamily.ffFiraSansSemiBold, {
                                     backgroundColor: "#838383", borderRadius: 10, margin: 5,
                                     height: 50,
                                 } ] }
