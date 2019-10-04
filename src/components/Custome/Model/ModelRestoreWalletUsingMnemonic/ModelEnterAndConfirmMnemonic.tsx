@@ -3,23 +3,17 @@ import { Modal, View, Alert, StyleSheet } from 'react-native';
 import { Button, Text, Textarea } from "native-base";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-
 import { SvgIcon } from "@up-shared/components";
 
-
-
 //TODO: Custome Compontes
-import FullLinearGradientLoadingButton from 'HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientLoadingButton';
+import { FullLinearGradientLoadingButton } from "hexaCustomeLinearGradientButton";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
-
-//TODO: Custome Object
-import renderIf from 'HexaWallet/src/app/constants/validation/renderIf';
-var utils = require( "HexaWallet/src/app/constants/Utils" );
-
-
+//TODO: Custome Object  
+import { renderIf } from "hexaValidation";
+var utils = require( "hexaUtils" );
 
 
 interface Props {
@@ -133,13 +127,13 @@ export default class ModelEnterAndConfirmMnemonic extends Component<Props, any> 
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />
                                 </Button>
-                                <Text style={ [ globalStyle.ffFiraSansMedium, {
+                                <Text style={ [ FontFamily.ffFiraSansMedium, {
                                     fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
                                     marginLeft: 20, marginRight: 20
                                 } ] }>Enter the Passphrase</Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Enter the mnemonic in the order that you noted at the time of setting up your wallet. In case of any typo the wallet restoration will fail</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Enter the mnemonic in the order that you noted at the time of setting up your wallet. In case of any typo the wallet restoration will fail</Text>
                             </View>
                             <View
                                 style={ {
@@ -148,7 +142,7 @@ export default class ModelEnterAndConfirmMnemonic extends Component<Props, any> 
                             >
                                 <Textarea
                                     value={ this.state.mnemonic }
-                                    style={ [ globalStyle.ffFiraSansMedium, { borderRadius: 8, justifyContent: "center", borderColor: this.state.style_TextAreaBorderColor } ] }
+                                    style={ [ FontFamily.ffFiraSansMedium, { borderRadius: 8, justifyContent: "center", borderColor: this.state.style_TextAreaBorderColor } ] }
                                     rowSpan={ 8 }
                                     bordered
                                     placeholder="Enter the words of passphrase in order"

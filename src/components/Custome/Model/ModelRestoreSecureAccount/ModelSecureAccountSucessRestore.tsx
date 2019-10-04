@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { Modal, View, StyleSheet, Image } from 'react-native';
 import { Text } from "native-base";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
+
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 
 
@@ -13,8 +15,8 @@ import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 //TODO: Custome Object       
 import {
     images
-} from "HexaWallet/src/app/constants/Constants";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+} from "hexaConstants";
+var utils = require( "hexaUtils" );
 
 interface Props {
     data: [];
@@ -42,7 +44,7 @@ export default class ModelSecureAccountSucessRestore extends Component<Props, an
                 ] }>
                     <View style={ styles.viewModelBody }>
                         <View style={ { flexDirection: "row", flex: 0.6, margin: 20 } }>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, {
+                            <Text style={ [ FontFamily.ffFiraSansMedium, {
                                 fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
                                 marginLeft: 20, marginRight: 20
                             } ] }>Secure Wallet Successfully Restore.</Text>

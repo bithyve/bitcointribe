@@ -12,29 +12,23 @@ import {
 import { Text } from 'native-base';
 import { StackActions, NavigationActions } from "react-navigation";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
-
-
-
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //TODO: Custome Pages
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
 import {
     colors,
     images,
     asyncStorageKeys
-} from "HexaWallet/src/app/constants/Constants";
+} from "hexaConstants";
 
-
-//localization
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
 export default class PermissionAndroid extends Component {
     constructor ( props: any ) {
@@ -128,7 +122,7 @@ export default class PermissionAndroid extends Component {
                             <View style={ styles.viewAppLogo }>
                                 <Image style={ styles.imgAppLogo } source={ images.appIcon } />
                                 <Text
-                                    style={ [ globalStyle.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
+                                    style={ [ FontFamily.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
                                 >
                                     Welcome to Hexa Wallet
                      </Text>
@@ -136,10 +130,10 @@ export default class PermissionAndroid extends Component {
                             </View>
                             <View style={ { flex: 1, alignItems: "center" } }>
                                 <View>
-                                    <Text style={ [ globalStyle.ffFiraSansRegular ] }><IconFontAwe name="circle" size={ 10 } color={ colors.appColor }></IconFontAwe>    Camera (for scanning QR)</Text>
-                                    <Text style={ [ globalStyle.ffFiraSansRegular ] }><IconFontAwe name="circle" size={ 10 } color={ colors.appColor }></IconFontAwe>    Files (for reading PDF)</Text>
-                                    <Text style={ [ globalStyle.ffFiraSansRegular ] }><IconFontAwe name="circle" size={ 10 } color={ colors.appColor }></IconFontAwe>    Contacts (for SSS and Guardians)</Text>
-                                    <Text style={ [ globalStyle.ffFiraSansRegular ] }><IconFontAwe name="circle" size={ 10 } color={ colors.appColor }></IconFontAwe>    SMS (for drafting SMS)</Text>
+                                    <Text style={ [ FontFamily.ffFiraSansRegular ] }><IconFontAwe name="circle" size={ 10 } color={ colors.appColor }></IconFontAwe>    Camera (for scanning QR)</Text>
+                                    <Text style={ [ FontFamily.ffFiraSansRegular ] }><IconFontAwe name="circle" size={ 10 } color={ colors.appColor }></IconFontAwe>    Files (for reading PDF)</Text>
+                                    <Text style={ [ FontFamily.ffFiraSansRegular ] }><IconFontAwe name="circle" size={ 10 } color={ colors.appColor }></IconFontAwe>    Contacts (for SSS and Guardians)</Text>
+                                    <Text style={ [ FontFamily.ffFiraSansRegular ] }><IconFontAwe name="circle" size={ 10 } color={ colors.appColor }></IconFontAwe>    SMS (for drafting SMS)</Text>
                                 </View>
                             </View>
                             <View style={ styles.viewBtnProceed }>

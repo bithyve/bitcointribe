@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
 import { Modal, View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { Button, Icon, Text } from "native-base";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
 import { Avatar } from 'react-native-elements';
 
 
 
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
-import { colors } from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+import { colors } from "hexaConstants";
+import { renderIf } from "hexaValidation";
 
 export default class ModelTrustedContactEmailAndPhoneShare extends Component {
 
@@ -65,7 +65,7 @@ export default class ModelTrustedContactEmailAndPhoneShare extends Component {
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Some information about the importance of trust with these contacts</Text>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "center", flexDirection: "row" } }>
                             { renderIf( contactDetails.thumbnailPath != "" )(
@@ -74,7 +74,7 @@ export default class ModelTrustedContactEmailAndPhoneShare extends Component {
                             { renderIf( contactDetails.thumbnailPath == "" )(
                                 <Avatar medium rounded title={ contactDetails.givenName != null && contactDetails.givenName.charAt( 0 ) } />
                             ) }
-                            <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, } ] } >{ contactDetails.givenName }{ " " }{ contactDetails.familyName }</Text>
+                            <Text style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, } ] } >{ contactDetails.givenName }{ " " }{ contactDetails.familyName }</Text>
                         </View>
                         <View
                             style={ {
@@ -100,8 +100,8 @@ export default class ModelTrustedContactEmailAndPhoneShare extends Component {
                                                 <Icon name='radio' style={ { alignSelf: "center" } } />
                                             </View>
                                             <View style={ { flex: 2, flexDirection: 'column' } }>
-                                                <Text note style={ [ globalStyle.ffFiraSansRegular ] }>{ item.label }</Text>
-                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginBottom: 10 } ] }>{ item.value }</Text>
+                                                <Text note style={ [ FontFamily.ffFiraSansRegular ] }>{ item.label }</Text>
+                                                <Text style={ [ FontFamily.ffFiraSansMedium, { marginBottom: 10 } ] }>{ item.value }</Text>
                                             </View>
                                         </View>
                                         <View

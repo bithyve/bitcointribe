@@ -13,7 +13,7 @@ import Singleton from "HexaWallet/src/app/constants/Singleton";
 
 
 //TODO: Custome Object
-import { CustomeStatusBar } from "hexaCustomeStatusBar";
+import { CustomeStatusBar } from "hexaCustStatusBar";
 
 
 

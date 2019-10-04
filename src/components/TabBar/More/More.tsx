@@ -9,25 +9,27 @@ import {
   List, ListItem,
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
-import ImageSVG from "HexaWallet/src/screens/Custome/ImageSVG/ImageSVG";
 import { RkCard } from "react-native-ui-kitten";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import InAppBrowser from 'react-native-inappbrowser-reborn'
 
 
+import { ImageSVG } from "hexaCustImage";
+
+
 //TODO: Custome Pages
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import { CustomeStatusBar } from "hexaCustStatusBar";
 
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 
 
 //TODO: Custome Object
-import { colors, images, svgIcon } from "HexaWallet/src/app/constants/Constants";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+import { colors, images, svgIcon } from "hexaConstants";
+var utils = require( "hexaUtils" );
 
 
 export default class Setting extends React.Component<any, any> {
@@ -218,7 +220,7 @@ export default class Setting extends React.Component<any, any> {
               contentContainerStyle={ { flexGrow: 1 } }
             >
               <View style={ { margin: 10, marginTop: 30 } }>
-                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 28, marginLeft: 0 } ] }>More</Text>
+                <Text style={ [ FontFamily.ffFiraSansMedium, { color: "#000000", fontSize: 28, marginLeft: 0 } ] }>More</Text>
               </View>
               <View style={ { flex: 0.7 } }>
                 <FlatList
@@ -255,7 +257,7 @@ export default class Setting extends React.Component<any, any> {
                           </View>
                           <View style={ { flex: 1, flexDirection: "column" } }>
                             <Text
-                              style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] }
+                              style={ [ FontFamily.ffFiraSansMedium, { fontSize: 12 } ] }
                             >
                               { item.title }
                             </Text>
@@ -300,7 +302,7 @@ export default class Setting extends React.Component<any, any> {
                 />
               </View>
               <View style={ { flex: 0.4, alignItems: "center", marginTop: 20 } }>
-                <Text note style={ [ globalStyle.ffFiraSansMedium ] }>Follow Us</Text>
+                <Text note style={ [ FontFamily.ffFiraSansMedium ] }>Follow Us</Text>
                 <View style={ { alignItems: "center", flexDirection: "row" } }>
                   <Button
                     transparent

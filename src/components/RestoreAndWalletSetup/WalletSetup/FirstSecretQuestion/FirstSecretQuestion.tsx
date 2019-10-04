@@ -15,43 +15,43 @@ import {
 } from "native-base";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import bip39 from 'react-native-bip39';
+
+
+
+
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-
-
-
-
-
-
+import { ModelLoader } from "hexaLoader";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 
 //TODO: Custome Alert
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object  
-import { colors, localDB } from "HexaWallet/src/app/constants/Constants";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
+import { colors, localDB } from "hexaConstants";
+var utils = require( "hexaUtils" );
+var dbOpration = require( "hexaDBOpration" );
 
 
-//TODO: Common Funciton
-var comAppHealth = require( "HexaWallet/src/app/manage/CommonFunction/CommonAppHealth" );
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
-
+//TODO: Common Funciton     
+var comAppHealth = require( "hexaCommonAppHealth" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 //TODO: Custome Validation
-import { validationService } from "HexaWallet/src/app/validation/service";
+import { validationService } from "hexaValidation";
 
-//TODO: Bitcoin Files  
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
+//TODO: Bitcoin Files    
+var bitcoinClassState = require( "hexaClassState" );
+//import { S3Service, RegularAccount, SecureAccount } from "hexaBitcoin";
+
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
+
 
 export default class FirstSecretQuestion extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -270,8 +270,8 @@ export default class FirstSecretQuestion extends React.Component<any, any> {
                     contentContainerStyle={ { flexGrow: 1, } }
                 >
                     <View style={ styles.viewPagination }>
-                        <Text style={ [ globalStyle.ffFiraSansMedium, { fontWeight: "bold", fontSize: 22, textAlign: "center" } ] }>Step 2: Select security question</Text>
-                        <Text style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>Select the question and specify the answer at least three characters long such that you always remember it and no one can easily guess it</Text>
+                        <Text style={ [ FontFamily.ffFiraSansMedium, { fontWeight: "bold", fontSize: 22, textAlign: "center" } ] }>Step 2: Select security question</Text>
+                        <Text style={ [ FontFamily.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>Select the question and specify the answer at least three characters long such that you always remember it and no one can easily guess it</Text>
                     </View>
                     <View style={ styles.viewInputFiled }>
                         <View style={ [ styles.itemQuestionPicker ] }>
@@ -284,12 +284,12 @@ export default class FirstSecretQuestion extends React.Component<any, any> {
                                             </Button>
                                         </Left>
                                         <Body style={ { flex: 3 } }>
-                                            <Title style={ [ globalStyle.ffFiraSansMedium, { color: "#000" } ] }>Select Question</Title>
+                                            <Title style={ [ FontFamily.ffFiraSansMedium, { color: "#000" } ] }>Select Question</Title>
                                         </Body>
                                         <Right />
                                     </Header> }
                                 mode="dropdown"
-                                style={ [ globalStyle.ffFiraSansMedium ] }
+                                style={ [ FontFamily.ffFiraSansMedium ] }
                                 iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -20 } } /> }
                                 selectedValue={ this.state.firstQuestion }
                                 onValueChange={ this.onValueChange.bind( this ) }
@@ -306,7 +306,7 @@ export default class FirstSecretQuestion extends React.Component<any, any> {
                                     autoCorrect={ false }
                                     autoFocus={ Platform.OS == "ios" ? true : false }
                                     placeholder='Write your answer here'
-                                    style={ [ globalStyle.ffFiraSansMedium ] }
+                                    style={ [ FontFamily.ffFiraSansMedium ] }
                                     placeholderTextColor="#B7B7B7"
                                     onChangeText={ ( value ) => {
                                         this.setState( {
@@ -325,7 +325,7 @@ export default class FirstSecretQuestion extends React.Component<any, any> {
                                     autoCapitalize='none'
                                     autoCorrect={ false }
                                     placeholder='Confirm answer'
-                                    style={ [ globalStyle.ffFiraSansMedium ] }
+                                    style={ [ FontFamily.ffFiraSansMedium ] }
                                     placeholderTextColor="#B7B7B7"
                                     onChangeText={ ( value ) => {
                                         this.setState( {
@@ -339,11 +339,11 @@ export default class FirstSecretQuestion extends React.Component<any, any> {
                         </View>
                     </View>
                     <View style={ styles.viewProcedBtn }>
-                        <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } ] } numberOfLines={ 2 }>The answer is never stored anywhere and even your contacts don't know this answer </Text>
+                        <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } ] } numberOfLines={ 2 }>The answer is never stored anywhere and even your contacts don't know this answer </Text>
                         <FullLinearGradientButton title="Go To Wallet" disabled={ this.state.flag_ConfirmDisableBtn } style={ [ this.state.flag_ConfirmDisableBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } click_Done={ () => this.click_FirstQuestion() } />
                     </View>
                 </KeyboardAwareScrollView>
-                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+                <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
             </View>
         );
     }

@@ -4,21 +4,20 @@ import { Button, Text } from "native-base";
 
 
 //TODO: Custome Compontes  
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 
 
 import { SvgIcon } from "@up-shared/components";
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 //TODO: Custome Object
 import {
     images
-} from "HexaWallet/src/app/constants/Constants";
+} from "hexaConstants";
 
 
 //TODO: Common Funciton
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+var utils = require( "hexaUtils" );
 
 
 interface Props {
@@ -27,12 +26,6 @@ interface Props {
     closeModal: Function;
     click_Next: Function;
 }
-
-
-//TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
-let alert = new AlertSimple();
-
 
 
 export default class ModelBackupSecureAccount extends Component<Props, any> {
@@ -91,7 +84,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
                             >
                                 <SvgIcon name="icon_back" size={ 25 } color="gray" />
                             </Button>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, {
+                            <Text style={ [ FontFamily.ffFiraSansMedium, {
                                 fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
                                 marginLeft: 20, marginRight: 20
                             } ] }>Backup Secure Wallet</Text>

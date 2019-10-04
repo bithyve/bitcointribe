@@ -16,29 +16,27 @@ import GridView from 'react-native-super-grid';
 
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+import { ModelLoader } from "hexaLoader";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
+import { HeaderTitle } from "hexaCustHeader";
 
 
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
-
-
+import { colors, images, localDB } from "hexaConstants";
+import { renderIf } from "hexaValidation";
+var dbOpration = require( "hexaDBOpration" );
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 export default class AllContactList extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -215,7 +213,7 @@ export default class AllContactList extends React.Component<any, any> {
                                         <Icon name="ios-search" color="#B7B7B7" />
                                         <Input placeholder="Enter a name to begin search"
                                             value={ this.state.filterValue }
-                                            style={ [ globalStyle.ffFiraSansMedium ] }
+                                            style={ [ FontFamily.ffFiraSansMedium ] }
                                             placeholderTextColor="#B7B7B7"
                                             onChangeText={ text => {
                                                 this.setState( {
@@ -228,7 +226,7 @@ export default class AllContactList extends React.Component<any, any> {
                                         />
                                     </Item>
                                 </View>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20 } ] }>Choose two contacts that you trust and who can help you restore the wallet in case you lose the app</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20 } ] }>Choose two contacts that you trust and who can help you restore the wallet in case you lose the app</Text>
                             </View>
                             <View style={ { flex: 1 } }>
                                 <GridView
@@ -273,7 +271,7 @@ export default class AllContactList extends React.Component<any, any> {
                                                     { renderIf( item.thumbnailPath == "" )(
                                                         <Avatar medium rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } />
                                                     ) }
-                                                    <Text style={ [ globalStyle.ffFiraSansRegular, { alignSelf: "center", marginLeft: 10 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                    <Text style={ [ FontFamily.ffFiraSansRegular, { alignSelf: "center", marginLeft: 10 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
 
                                                     <View style={ {
                                                         flex: 1,
@@ -305,7 +303,7 @@ export default class AllContactList extends React.Component<any, any> {
                         ) }
                     </SafeAreaView>
                 </ImageBackground>
-                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message="Loading" />
+                <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message="Loading" />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );

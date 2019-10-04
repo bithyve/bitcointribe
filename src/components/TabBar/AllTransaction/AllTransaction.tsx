@@ -4,42 +4,41 @@ import {
   Container,
   Text
 } from "native-base";
-
 import Icon from "react-native-vector-icons/FontAwesome";
-import ImageSVG from "HexaWallet/src/screens/Custome/ImageSVG/ImageSVG";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { SvgIcon } from "@up-shared/components";
 
+
+//TODO: Custome Image
+
+import { ImageSVG } from "hexaCustImage";
 //TODO: Custome view
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import { CustomeStatusBar } from "hexaCustStatusBar";
 
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Pages
-import { localDB, images, colors, svgIcon } from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
+import { localDB, images, colors, svgIcon } from "hexaConstants";
+var dbOpration = require( "hexaDBOpration" );
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+import { ModelLoader } from "hexaLoader";
 
 //TODO: ModalAllTransaction  
-import Modal from "HexaWallet/src/app/custcompontes/Model/ModalAllTransactions/ModalAllTransactionDetails";
-
-
-import { SvgIcon } from "@up-shared/components";
-
+import { ModalAllTransactionDetails } from "hexaCustModel";
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 //TODO: Bitcoin Class
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
+var bitcoinClassState = require( "hexaClassState" );
 
 export default class AllTransaction extends React.Component<any, any> {
   constructor ( props: any ) {
@@ -233,7 +232,7 @@ export default class AllTransaction extends React.Component<any, any> {
           <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
             <View style={ { margin: 10, marginTop: 30 } }>
               <View style={ { flexDirection: "row" } }>
-                <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#2F2F2F", fontSize: 28, fontWeight: "600", flex: 1 } ] }>{ "Transactions" }</Text>
+                <Text style={ [ FontFamily.ffFiraSansMedium, { color: "#2F2F2F", fontSize: 28, fontWeight: "600", flex: 1 } ] }>{ "Transactions" }</Text>
                 <View style={ styles.filterView }>
                   <Icon
                     name="filter"
@@ -267,7 +266,7 @@ export default class AllTransaction extends React.Component<any, any> {
 
                   <View style={ { justifyContent: "center", alignItems: "center", padding: 20, paddingTop: 50 } }>
                     <Text style={ { textAlign: "center", color: "#838383", marginBottom: 10 } }>{ "Start transactions to see your recent transactions history." }</Text>
-                    <Text style={ [ globalStyle.ffFiraSansRegular, { textAlign: "center", marginTop: 10 } ] }>Please pull down to refresh, if all transactions are not visible.</Text>
+                    <Text style={ [ FontFamily.ffFiraSansRegular, { textAlign: "center", marginTop: 10 } ] }>Please pull down to refresh, if all transactions are not visible.</Text>
                   </View> : null
               }
               <FlatList
@@ -285,7 +284,7 @@ export default class AllTransaction extends React.Component<any, any> {
             </KeyboardAwareScrollView>
           </SafeAreaView>
         </ImageBackground>
-        <Modal
+        <ModalAllTransactionDetails
           setModalVisible={ this.setModalVisible.bind( this ) }
           modalData={ {
             selectedTransaction: this.state.selectedTransaction,
@@ -294,7 +293,7 @@ export default class AllTransaction extends React.Component<any, any> {
           }
           }
         />
-        <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
+        <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
         <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
       </Container >
     );

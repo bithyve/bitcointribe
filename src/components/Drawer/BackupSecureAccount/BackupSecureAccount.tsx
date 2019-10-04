@@ -12,22 +12,20 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 
 //TODO: Custome Compontes
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import ModelBackupSecureAccount from "HexaWallet/src/app/custcompontes/Model/ModelBackupSecureAccount/ModelBackupSecureAccount";
-import ModelAuto6DigitCode from "HexaWallet/src/app/custcompontes/Model/ModelBackupSecureAccount/ModelAuto6DigitCode";
-import ModelSecureAccountSucessBackup from "HexaWallet/src/app/custcompontes/Model/ModelBackupSecureAccount/ModelSecureAccountSucessBackup";
-import ModelSecureAccountFailedBackup from "HexaWallet/src/app/custcompontes/Model/ModelBackupSecureAccount/ModelSecureAccountFailedBackup";
-
-
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import {
+    ModelBackupSecureAccount, ModelAuto6DigitCode,
+    ModelSecureAccountSucessBackup,
+    ModelSecureAccountFailedBackup
+} from "hexaCustModel";
 
 //TODO: Custome Object
 import {
     colors,
     images,
-} from "HexaWallet/src/app/constants/Constants";
+} from "hexaConstants";
 
-//localization       
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
+
 
 
 export default class BackupSecureAccount extends Component {

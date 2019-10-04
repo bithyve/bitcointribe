@@ -13,7 +13,7 @@ import {
 import { SvgIcon } from "@up-shared/components";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 
 
@@ -33,7 +33,7 @@ export default class HeaderTitle extends Component<any, any> {
                     </Button>
                 </Left>
                 <Body style={ { flex: 8 } }>
-                    <Title style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, alignSelf: "flex-start" } ] }>{ this.props.title }</Title>
+                    <Title style={ [ FontFamily.ffFiraSansMedium, { color: "#000000", fontSize: 18, alignSelf: "flex-start" } ] }>{ this.props.title }</Title>
                 </Body>
                 <Right />
             </Header>

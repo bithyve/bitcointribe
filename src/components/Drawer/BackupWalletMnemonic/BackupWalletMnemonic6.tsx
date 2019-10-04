@@ -13,10 +13,10 @@ import BackboneEvents from "backbone-events-standalone";
 window.EventBus = BackboneEvents.mixin( {} );
 
 //TODO: Custome Pages
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 
 
@@ -43,8 +43,8 @@ export default class BackupWalletMnemonic6 extends React.Component<any, any> {
                     contentContainerStyle={ { flexGrow: 1, } }
                 >
                     <View style={ styles.viewPagination }>
-                        <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 22, textAlign: "center" } ] }>Write down these words in the order indicated</Text>
-                        <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>You will be asked to confirm these words later</Text>
+                        <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 22, textAlign: "center" } ] }>Write down these words in the order indicated</Text>
+                        <Text note style={ [ FontFamily.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>You will be asked to confirm these words later</Text>
                     </View>
                     <View style={ styles.viewList }>
                         <FlatList

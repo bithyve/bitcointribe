@@ -2,20 +2,19 @@ import React, { Component } from 'react';
 import { View, StyleSheet, Platform } from 'react-native';
 import { Button, Text } from "native-base";
 import Modal from 'react-native-modalbox';
-import ImageSVG from "HexaWallet/src/screens/Custome/ImageSVG/ImageSVG";
 
 
 
 
+import { ImageSVG } from "hexaCustImage";
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
-
-
+import FontFamily from "hexaStyles";
 //TODO: Custome Object
 import {
     colors,
     svgIcon
-} from "HexaWallet/src/app/constants/Constants";
+} from "hexaConstants";
+
 
 
 
@@ -25,17 +24,6 @@ interface Props {
     click_Done: Function;
     pop: Function;
 }
-
-
-//TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-
-//TODO: Common Funciton
-var comAppHealth = require( "HexaWallet/src/app/manage/CommonFunction/CommonAppHealth" );
-
-//Bitcoin Files
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
-import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
 export default class ModelBottomSingleButton extends Component<Props, any> {
 
@@ -87,7 +75,7 @@ export default class ModelBottomSingleButton extends Component<Props, any> {
                                             svgIcon.bottomModel[ data != undefined ? data.svgIcon : Platform.OS == "ios" ? "recreateSVG" : "recreatePNG" ]
                                         }
                                     />
-                                    <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 12, color: "#ffffff" } ] }>{ data != undefined ? data.btnTitle : "" }</Text>
+                                    <Text style={ [ FontFamily.ffFiraSansBold, { fontSize: 12, color: "#ffffff" } ] }>{ data != undefined ? data.btnTitle : "" }</Text>
                                 </View>
                             </Button>
                         </View>

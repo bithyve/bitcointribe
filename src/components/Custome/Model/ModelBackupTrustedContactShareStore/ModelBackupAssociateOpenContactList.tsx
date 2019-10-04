@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
 import { Modal, View, StyleSheet } from 'react-native';
 import { Button, Icon, Text } from "native-base";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+
 import { Avatar } from 'react-native-elements';
 
 
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
+
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 
 
 //TODO: Custome Object
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+var utils = require( "hexaUtils" );
 
 interface Props {
     data: [];
@@ -37,18 +39,18 @@ export default class ModelBackupAssociateOpenContactList extends Component<Props
                 ] }>
                     <View style={ styles.viewModelBody }>
                         <View style={ { flexDirection: "row", flex: 0.5 } }>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Associate { walletName } with your contacts</Text>
+                            <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Associate { walletName } with your contacts</Text>
                             <Button light iconLeft style={ { width: 40, height: 40, borderRadius: 20 } } onPress={ () => this.props.closeModal() }>
                                 <Icon name='close' style={ { alignSelf: "center" } } />
                             </Button>
                         </View>
                         <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Some information</Text>
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Some information</Text>
                             <Avatar medium rounded title={ walletName.charAt( 0 ) } />
-                            <Text style={ globalStyle.ffFiraSansMedium }>{ walletName }</Text>
+                            <Text style={ FontFamily.ffFiraSansMedium }>{ walletName }</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-end" } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>You will need to open the Hexa application on your device once in two weeks to make sure the secret is still accessible</Text>
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>You will need to open the Hexa application on your device once in two weeks to make sure the secret is still accessible</Text>
                             <FullLinearGradientButton
                                 click_Done={ () => this.props.click_OpenContact() }
                                 title="Open Contacts"

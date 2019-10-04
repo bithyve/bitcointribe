@@ -3,15 +3,14 @@ import { Modal, View, StyleSheet } from 'react-native';
 import { Button, Text, Textarea } from "native-base";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 import { SvgIcon } from "@up-shared/components";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
-//TODO: Custome Object
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+//TODO: Custome Object  
+var utils = require( "hexaUtils" );
 
 interface Props {
     data: [];
@@ -76,13 +75,13 @@ export default class ModelWalletName extends Component<Props, any> {
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />
                                 </Button>
-                                <Text style={ [ globalStyle.ffFiraSansMedium, {
+                                <Text style={ [ FontFamily.ffFiraSansMedium, {
                                     fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
                                     marginLeft: 20, marginRight: 20
                                 } ] }>Restore Wallet using Passphrase</Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Please put in the name that you used while setting up your Hexa Wallet</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Please put in the name that you used while setting up your Hexa Wallet</Text>
                             </View>
                             <View
                                 style={ {
@@ -90,7 +89,7 @@ export default class ModelWalletName extends Component<Props, any> {
                                 } }
                             >
                                 <Textarea
-                                    style={ [ globalStyle.ffFiraSansMedium, { borderRadius: 8, justifyContent: "center" } ] }
+                                    style={ [ FontFamily.ffFiraSansMedium, { borderRadius: 8, justifyContent: "center" } ] }
                                     rowSpan={ 3 }
                                     bordered
                                     value={ this.state.walletName }
@@ -108,7 +107,7 @@ export default class ModelWalletName extends Component<Props, any> {
                                 />
                             </View>
                             <View style={ { flex: 0.5, alignItems: "center", justifyContent: "flex-end" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>In case you do not remember the name , please enter a name of your choice.</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>In case you do not remember the name , please enter a name of your choice.</Text>
                             </View>
                             <View style={ { flex: 1, justifyContent: "flex-end" } }>
                                 <FullLinearGradientButton

@@ -6,12 +6,16 @@ import {
     Button,
     Text,
 } from "native-base";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
+import { SvgIcon } from "@up-shared/components";
+
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
+
+
+
 //TODO: Custome Model
-import ModelPasscode from '../ModelCommom/ModelPasscode';
+import { ModelPasscode } from 'hexaCustModel';
 
 
 interface Props {
@@ -23,13 +27,13 @@ interface Props {
 }
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
 import {
     images
-} from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+} from "hexaConstants";
+import { renderIf } from "hexaValidation";
 
 
 let wrongEnterAnswerCount = 0;
@@ -125,12 +129,12 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />
                                 </Button>
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }></Text>
+                                <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }></Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
                                 <Image source={ images.backupSecretQuestion.icon } style={ { width: 80, height: 80, marginTop: -30 } } />
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20 } ] }>Health Check</Text>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, margin: 10 } ] }>Security Question</Text>
+                                <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 20 } ] }>Health Check</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { fontSize: 14, margin: 10 } ] }>Security Question</Text>
                                 <Text note style={ { textAlign: "center" } }>Answer the question exactly as you did at the time of setting up the wallet</Text>
                                 <View style={ [ styles.itemQuestionPicker, { height: 80 } ] }>
                                     <TextInput
@@ -148,7 +152,7 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
                                         autoCapitalize='none'
                                         value={ firstAnswer }
                                         placeholder='Enter answer to the secret question'
-                                        style={ [ globalStyle.ffFiraSansMedium, answerBorderColor == "#E64545" ? { borderColor: answerBorderColor, borderWidth: 1.5, marginTop: -1, borderRadius: 8 } : null ] }
+                                        style={ [ FontFamily.ffFiraSansMedium, answerBorderColor == "#E64545" ? { borderColor: answerBorderColor, borderWidth: 1.5, marginTop: -1, borderRadius: 8 } : null ] }
                                         placeholderTextColor="#B7B7B7"
                                         onChangeText={ ( val ) => {
                                             this.setState( {
@@ -166,7 +170,7 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
                                 ) }
                             </View>
                             <View style={ { flex: 0.1, justifyContent: "flex-end" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Answer will be required in case you need to restore your wallet</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>Answer will be required in case you need to restore your wallet</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_Next()
@@ -188,7 +192,7 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<P
                                             } );
 
                                         } }
-                                        style={ [ globalStyle.ffFiraSansSemiBold, {
+                                        style={ [ FontFamily.ffFiraSansSemiBold, {
                                             backgroundColor: "#838383", borderRadius: 10, margin: 5,
                                             height: 50,
                                         } ] }

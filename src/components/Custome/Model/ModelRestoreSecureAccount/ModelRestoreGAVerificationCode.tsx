@@ -3,28 +3,25 @@ import { Modal, View, StyleSheet, Platform } from 'react-native';
 import { Button, Text } from "native-base";
 import CodeInput from "react-native-confirmation-code-input";
 
-
-
-
-
 //TODO: Custome Compontes  
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 import { SvgIcon } from "@up-shared/components";
 
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+import { ModelLoader } from "hexaLoader";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 //TODO: Custome Object
 import {
     colors,
     localDB
-} from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
+} from "hexaConstants";
+var dbOpration = require( "hexaDBOpration" );
+var utils = require( "hexaUtils" );
 
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+
 interface Props {
     data: [];
     pop: Function;
@@ -33,8 +30,8 @@ interface Props {
 }
 
 
-//Bitcoin Files
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+//Bitcoin Files    
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 export default class ModelRestoreGAVerificationCode extends Component<Props, any> {
 
@@ -161,7 +158,7 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
                             >
                                 <SvgIcon name="icon_back" size={ 25 } color="gray" />
                             </Button>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, {
+                            <Text style={ [ FontFamily.ffFiraSansMedium, {
                                 fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
                                 marginLeft: 10, marginRight: 10
                             } ] }>Enter the GA verification code</Text>
@@ -203,7 +200,7 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
                                 disabled={ flag_NextBtnDisable }
                                 style={ [ flag_NextBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } />
                         </View>
-                        <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+                        <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
                     </View>
                 </View>
             </Modal>

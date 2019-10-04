@@ -4,7 +4,7 @@ import IconFontAwe from "react-native-vector-icons/FontAwesome";
 
 
 
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+import { renderIf } from "hexaValidation";
 export default class ViewErrorMessage extends Component<any, any> {
     constructor ( props: any ) {
         super( props )

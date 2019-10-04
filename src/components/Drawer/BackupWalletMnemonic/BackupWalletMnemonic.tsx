@@ -6,9 +6,9 @@ import {
 
 
 //TODO: Custome Pages
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import ViewBackupWalletMnemonicScrolling from "HexaWallet/src/app/custcompontes/View/ViewBackupWalletMnemonicScrolling/ViewBackupWalletMnemonicScrolling";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { ViewBackupWalletMnemonicScrolling } from "hexaCustView";
+import { HeaderTitle } from "hexaCustHeader";
 
 
 import BackupWalletMnemonic6Screen from "./BackupWalletMnemonic6Screen";
@@ -17,14 +17,10 @@ import BackupWalletMnemonic13to18Screen from "./BackupWalletMnemonic13to18Screen
 import BackupWalletMnemonic19to24Screen from "./BackupWalletMnemonic19to24Screen";
 
 //TODO: Custome Object  
-import { colors, images } from "HexaWallet/src/app/constants/Constants";
-
-
-
-
+import { colors, images } from "hexaConstants";
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 export default class BackupWalletMnemonic extends React.Component<any, any> {
 

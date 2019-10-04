@@ -1,19 +1,23 @@
 import {
     localDB
-} from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+} from "hexaConstants";
+var dbOpration = require( "hexaDBOpration" );
+var utils = require( "hexaUtils" );
+
+
+
 //TODO: Bitcoin Files
+//import { HealthStatus } from "hexaBitcoin"  
 import HealthStatus from "HexaWallet/src/bitcoin/utilities/sss/HealthStatus"
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 //TODO: Bitcoin Class
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
+var bitcoinClassState = require( "hexaClassState" );
 
 
 

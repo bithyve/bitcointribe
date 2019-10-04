@@ -9,20 +9,20 @@ import * as Keychain from "react-native-keychain";
 
 
 //TODO: Custome Compontes  
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
+
 
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
 import {
     colors,
     images
-} from "HexaWallet/src/app/constants/Constants";
-
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+} from "hexaConstants";
+import { renderIf } from "hexaValidation";
 
 
 interface Props {
@@ -120,14 +120,14 @@ export default class ModelPasscode extends Component<Props, any> {
                         <View style={ styles.viewAppLogo }>
                             <Image style={ styles.imgAppLogo } source={ images.appIcon } />
                             <Text
-                                style={ [ globalStyle.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
+                                style={ [ FontFamily.ffFiraSansBold, { color: "#000000", marginTop: 20 } ] }
                             >
                                 Welcome to Hexa!
             </Text>
                         </View>
                         <View style={ styles.viewPasscode }>
                             <Text
-                                style={ [ globalStyle.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
+                                style={ [ FontFamily.ffFiraSansMedium, { marginTop: 10, color: "#8B8B8B" } ] }
                             >
                                 Enter Pin{ " " }
                             </Text>
@@ -160,7 +160,7 @@ export default class ModelPasscode extends Component<Props, any> {
                                 type='withoutcharacters'
                             />
                             { renderIf( passcodeStyle[ 0 ].activeColor == "red" )(
-                                <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>
+                                <Text style={ [ FontFamily.ffFiraSansBookItalic, { color: "red", marginTop: 44 } ] }>{ this.state.success }</Text>
                             ) }
                         </View>
                         <View style={ styles.viewBtnProceed }>
@@ -176,7 +176,7 @@ export default class ModelPasscode extends Component<Props, any> {
                                 onPress={ () => {
                                     this.props.closeModal()
                                 } }
-                                style={ [ globalStyle.ffFiraSansSemiBold, {
+                                style={ [ FontFamily.ffFiraSansSemiBold, {
                                     backgroundColor: "#838383", borderRadius: 10, margin: 5,
                                     height: 50,
                                 } ] }

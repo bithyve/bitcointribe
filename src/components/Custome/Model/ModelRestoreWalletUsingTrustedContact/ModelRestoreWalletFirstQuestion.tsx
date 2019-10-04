@@ -26,39 +26,38 @@ interface Props {
 }
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import FullLinearGradientLoadingButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientLoadingButton";
+import { ModelLoader } from "hexaLoader";
+import { FullLinearGradientLoadingButton } from "hexaCustomeLinearGradientButton";
+
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
 import {
     colors,
     localDB,
     asyncStorageKeys
-} from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
-import utils from "HexaWallet/src/app/constants/Utils";
+} from "HhexaConstants";
+var dbOpration = require( "hexaDBOpration" );
+import utils from "hexaUtils";
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
-var comAppHealth = require( "HexaWallet/src/app/manage/CommonFunction/CommonAppHealth" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
+var comAppHealth = require( "hexaCommonAppHealth" );
 
 
 //TODO: Custome Validation
-import { validationService } from "HexaWallet/src/app/validation/service";
+import { validationService } from "hexaValidation";
 
 //TODO: Bitcoin Files
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
+var bitcoinClassState = require( "hexaClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
-
-
 
 export default class ModelRestoreWalletFirstQuestion extends Component<Props, any> {
     constructor ( props: any ) {
@@ -343,7 +342,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />
                                 </Button>
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Restore wallet using Trusted Contacts</Text>
+                                <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Restore wallet using Trusted Contacts</Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-start" } }>
                                 <Text style={ { textAlign: "center" } }>Select the question and specify the answer as you did at the time of setting up the wallet</Text>
@@ -357,12 +356,12 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                                                     </Button>
                                                 </Left>
                                                 <Body style={ { flex: 3 } }>
-                                                    <Title style={ [ globalStyle.ffFiraSansMedium, { color: "#000" } ] }>Select Question</Title>
+                                                    <Title style={ [ FontFamily.ffFiraSansMedium, { color: "#000" } ] }>Select Question</Title>
                                                 </Body>
                                                 <Right />
                                             </Header> }
                                         mode="dropdown"
-                                        style={ [ globalStyle.ffFiraSansMedium, ] }
+                                        style={ [ FontFamily.ffFiraSansMedium, ] }
                                         textStyle={ { paddingRight: 50 } }
                                         iosIcon={ <Icon name="arrow-down" style={ { fontSize: 25, marginLeft: -45, marginRight: 20 } } /> }
                                         selectedValue={ firstQuestion }
@@ -379,7 +378,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                                         autoCorrect={ false }
                                         autoFocus={ true }
                                         placeholder='Write your answer here'
-                                        style={ [ globalStyle.ffFiraSansMedium ] }
+                                        style={ [ FontFamily.ffFiraSansMedium ] }
                                         placeholderTextColor="#B7B7B7"
                                         onChangeText={ ( value ) => {
                                             this.setState( {
@@ -395,7 +394,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                                 { this.renderError( "answer" ) }
                             </View>
                             <View style={ { flex: 1, justifyContent: "flex-end" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>In case the answer does not match with the original answer, restoration process will fail</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center", fontSize: 12 } ] }>In case the answer does not match with the original answer, restoration process will fail</Text>
                                 <FullLinearGradientLoadingButton
                                     click_Done={ () => {
                                         this.click_Next()
@@ -407,7 +406,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<Props, an
                                     style={ [ flag_DisableBtnNext == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
                                 />
                             </View>
-                            <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+                            <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
                         </View>
                     </View>
                 </KeyboardAwareScrollView>
