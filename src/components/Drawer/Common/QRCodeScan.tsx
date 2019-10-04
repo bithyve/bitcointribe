@@ -11,28 +11,28 @@ import {
 } from "native-base";
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+
 
 //TODO: Custome object
 import {
     colors,
     images,
     localDB
-} from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+} from "hexaConstants";
+var dbOpration = require( "hexaDBOpration" );
+var utils = require( "hexaUtils" );
 
 //Custome Compontes
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { HeaderTitle } from "hexaCustHeader";
+
 
 
 //TODO: Custome Model
-import ModelRestoreAssociateContactListForQRCodeScan from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelRestoreAssociateContactListForQRCodeScan";
+import { ModelRestoreAssociateContactListForQRCodeScan } from "hexaCustModel";
 
-//TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+//TODO: Common Funciton  
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 export default class QRCodeScan extends React.Component {
     constructor ( props: any ) {
