@@ -3,25 +3,27 @@ import { Modal, View, Alert, StyleSheet, TextInput } from 'react-native';
 import { Button, Text } from "native-base";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 import { SvgIcon } from "@up-shared/components";
 
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+//TODO: Custome StyleSheet Files    
+import FontFamily from "hexaStyles";
+
 
 
 //TODO: Custome Object
 import {
     colors,
     localDB
-} from "HexaWallet/src/app/constants/Constants";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
+} from "hexaConstants";
+var utils = require( "hexaUtils" );
+var dbOpration = require( "hexaDBOpration" );
 
 interface Props {
     data: [];
@@ -32,15 +34,13 @@ interface Props {
 
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
+import { ModelLoader } from "hexaLoader";
 
-//TODO: Common Funciton
-var comAppHealth = require( "HexaWallet/src/app/manage/CommonFunction/CommonAppHealth" );
 
 
 //Bitcoin Files
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
-import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
+var bitcoinClassState = require( "hexaClassState" );
+
 
 export default class ModelAuto6DigitCode extends Component<Props, any> {
 
@@ -229,7 +229,7 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />
                                 </Button>
-                                <Text style={ [ globalStyle.ffFiraSansMedium, {
+                                <Text style={ [ FontFamily.ffFiraSansMedium, {
                                     fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
                                     marginLeft: 20, marginRight: 20
                                 } ] }>Enter 6 digit Code</Text>
@@ -245,7 +245,7 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
                                 } }
                             >
                                 <TextInput
-                                    style={ [ globalStyle.ffFiraSansMedium, { borderRadius: 8, justifyContent: "center", borderColor: "gray", borderWidth: 0.4, height: 60, textAlign: "center" } ] }
+                                    style={ [ FontFamily.ffFiraSansMedium, { borderRadius: 8, justifyContent: "center", borderColor: "gray", borderWidth: 0.4, height: 60, textAlign: "center" } ] }
                                     value={ this.state.code }
                                     secureTextEntry
                                     placeholder="Enter 6 digit code"
@@ -261,7 +261,7 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
                                 />
                             </View>
                             <View style={ { flex: 0.5, alignItems: "center", justifyContent: "flex-end" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>For security reasons please setup the Google Authenticator on another device.</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>For security reasons please setup the Google Authenticator on another device.</Text>
                             </View>
                             <View style={ { flex: 1, justifyContent: "flex-end" } }>
                                 <FullLinearGradientButton
@@ -274,7 +274,7 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
                                     style={ [ flag_DisableBtnNext == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] }
                                 />
                             </View>
-                            <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+                            <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
                         </View>
                     </View>
                 </KeyboardAwareScrollView>

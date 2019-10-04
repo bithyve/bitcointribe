@@ -6,26 +6,25 @@ import {
     Text
 } from "native-base";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-
-
-
 //NsNotification
 import BackboneEvents from "backbone-events-standalone";
 // global event bus
 window.EventBus = BackboneEvents.mixin( {} );
 
+
+
 //TODO: Custome Pages
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 
 
-//TODO: Custome Validation
-import { validationService } from "HexaWallet/src/app/validation/service";
+//TODO: Custome Validation  
+import { validationService } from "hexaValidation";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
-//TODO: Custome Object
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+//TODO: Custome Object  
+var utils = require( "hexaUtils" );
 
 export default class WalletName extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -108,8 +107,8 @@ export default class WalletName extends React.Component<any, any> {
                     contentContainerStyle={ { flexGrow: 1, } }
                 >
                     <View style={ styles.viewPagination }>
-                        <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 22, textAlign: "center" } ] }>Give it a name</Text>
-                        <Text note style={ [ globalStyle.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>You can put anything here - a nick name, the name of your fav character, or anything random.</Text>
+                        <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 22, textAlign: "center" } ] }>Give it a name</Text>
+                        <Text note style={ [ FontFamily.ffFiraSansMedium, { marginTop: 20, textAlign: "center" } ] }>You can put anything here - a nick name, the name of your fav character, or anything random.</Text>
                     </View>
                     <View style={ styles.viewInputFiled }>
                         <Item rounded style={ styles.itemInputWalletName }>
@@ -120,7 +119,7 @@ export default class WalletName extends React.Component<any, any> {
                                 autoCorrect={ false }
                                 autoFocus={ true }
                                 placeholder='Enter a name for your wallet'
-                                style={ [ globalStyle.ffFiraSansMedium ] }
+                                style={ [ FontFamily.ffFiraSansMedium ] }
                                 placeholderTextColor="#B7B7B7"
                                 onChangeText={ ( value ) => {
                                     this.setState( {
@@ -133,7 +132,7 @@ export default class WalletName extends React.Component<any, any> {
                         { this.renderError( "walletName" ) }
                     </View>
                     <View style={ styles.viewProcedBtn }>
-                        <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } ] } numberOfLines={ 3 }>We don't store this information. This is so that your contacts can recognize the sender when they get a request or message from the hexa app.</Text>
+                        <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center", marginLeft: 20, marginRight: 20, marginBottom: 20 } ] } numberOfLines={ 3 }>We don't store this information. This is so that your contacts can recognize the sender when they get a request or message from the hexa app.</Text>
                         <FullLinearGradientButton title="Proceed" disabled={ this.state.flag_ProceedBtnDisable } style={ [ this.state.flag_ProceedBtnDisable == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10 } ] } click_Done={ () => this.click_Proceed() } />
                     </View>
                 </KeyboardAwareScrollView>

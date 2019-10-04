@@ -18,7 +18,7 @@ interface Props {
 }
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 export default class ModelMnemonicDisplay extends Component<Props, any> {
     constructor ( props: any ) {
@@ -81,7 +81,7 @@ export default class ModelMnemonicDisplay extends Component<Props, any> {
                             >
                                 <SvgIcon name="icon_back" size={ 25 } color="gray" />
                             </Button>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Your Mnemonic</Text>
+                            <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 5, textAlign: "center", marginTop: 10 } ] }>Your Mnemonic</Text>
                         </View>
                         <View style={ { flex: 1, justifyContent: "flex-start" } }>
                             <View style={ [ styles.itemQuestionPicker, { height: 120 } ] }>

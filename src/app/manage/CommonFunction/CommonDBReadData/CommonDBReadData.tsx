@@ -1,8 +1,8 @@
 import {
     localDB
-} from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+} from "hexaConstants";
+var dbOpration = require( "hexaDBOpration" );
+var utils = require( "hexaUtils" );
 
 const readTblWallet = async () => {
     var resultWallet = await dbOpration.readTablesData(

@@ -5,11 +5,27 @@ import {
     Text,
     Icon
 } from "native-base";
-import FullLinearGradientLoadingButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientLoadingButton";
 import CodeInput from "react-native-confirmation-code-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
+import { FullLinearGradientLoadingButton } from "hexaCustomeLinearGradientButton";
 
+
+//TODO: Custome StyleSheet Files       
+import FontFamily from "hexaStyles";
+
+//TODO: Custome Alert 
+import { AlertSimple } from "hexaCustAlert";
+let alert = new AlertSimple();
+
+//TODO: Custome Object
+import {
+    colors
+} from "hexaConstants";
+import { renderIf } from "hexaValidation";
+
+//TODO: Bitcoin class
+var bitcoinClassState = require( "hexaClassState" );
 
 
 interface Props {
@@ -19,24 +35,6 @@ interface Props {
     pop: Function;
     click_Request: Function
 }
-
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
-
-//TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
-let alert = new AlertSimple();
-
-//TODO: Custome Object
-import {
-    colors
-} from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-
-
-
-//TODO: Bitcoin class
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
 
 export default class ModelConfirmSendSercureAccountOTP extends Component<Props, any> {
     constructor ( props: any ) {
@@ -156,7 +154,7 @@ export default class ModelConfirmSendSercureAccountOTP extends Component<Props, 
                     >
                         <View style={ styles.viewModelBody }>
                             <View style={ { flexDirection: "row", flex: 0.4 } }>
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10 } ] }>Enter 6 digit code</Text>
+                                <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10 } ] }>Enter 6 digit code</Text>
                                 <Button light iconLeft style={ { width: 40, height: 40, borderRadius: 20 } } onPress={ () => this.props.closeModal() }>
                                     <Icon name='close' style={ { alignSelf: "center" } } />
                                 </Button>
@@ -190,13 +188,13 @@ export default class ModelConfirmSendSercureAccountOTP extends Component<Props, 
                                         type='numeric'
                                     />
                                     { renderIf( passcodeStyle[ 0 ].activeColor == "red" )(
-                                        <Text style={ [ globalStyle.ffFiraSansBookItalic, { color: "red", marginTop: 5 } ] }>{ this.state.success }</Text>
+                                        <Text style={ [ FontFamily.ffFiraSansBookItalic, { color: "red", marginTop: 5 } ] }>{ this.state.success }</Text>
                                     ) }
 
                                 </View>
                             </View>
                             <View style={ { flex: 0.1, justifyContent: "flex-end" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>For security reasons please setup the Google Authenticator on another device.</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center", fontSize: 12, marginBottom: 20 } ] }>For security reasons please setup the Google Authenticator on another device.</Text>
                                 <FullLinearGradientLoadingButton
                                     click_Done={ () => {
                                         this.click_Next()

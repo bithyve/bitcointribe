@@ -28,43 +28,38 @@ import Permissions from 'react-native-permissions';
 import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 var RNFS = require( 'react-native-fs' );
 import QRCode from 'react-native-qrcode-svg';
-import { copilot } from 'react-native-copilot';
-import RNHTMLtoPDF from 'react-native-html-to-pdf';
+
 
 import { FloatingAction } from "react-native-floating-action";
 
-
 //Custome Compontes   
-import ViewShieldIcons from "HexaWallet/src/app/custcompontes/View/ViewShieldIcons/ViewShieldIcons";
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import ImageSVG from "HexaWallet/src/screens/Custome/ImageSVG/ImageSVG";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { ImageSVG } from "hexaCustImage";
 
 //TODO: Custome Models
-import ModelAcceptOrRejectSecret from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelAcceptOrRejectSecret";
-import ModelBackupShareAssociateContact from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelBackupShareAssociateContact";
-import ModelBackupAssociateOpenContactList from "HexaWallet/src/app/custcompontes/Model/ModelBackupTrustedContactShareStore/ModelBackupAssociateOpenContactList";
-import ModelBackupYourWallet from "HexaWallet/src/app/custcompontes/Model/ModelBackupYourWallet/ModelBackupYourWallet";
-import ModelSelfShareAcceptAndReject from "HexaWallet/src/app/custcompontes/Model/ModelWalletScreen/ModelSelfShareAcceptAndReject";
-import ModelHelperScreen from "HexaWallet/src/app/custcompontes/Model/ModelHelperScreen/ModelHelperScreen";
-
+import {
+  ModelAcceptOrRejectSecret, ModelBackupShareAssociateContact,
+  ModelBackupAssociateOpenContactList, ModelBackupYourWallet,
+  ModelSelfShareAcceptAndReject, ModelHelperScreen
+} from "hexaCustModel";
 
 //TODO: Custome Bottom Model
-import ModelBottomAddTestCoinsAndAccounts from "HexaWallet/src/app/custcompontes/ModelBottom/ModelBottomWalletScreen/ModelBottomAddTestCoinsAndAccounts/ModelBottomAddTestCoinsAndAccounts";
+import { ModelBottomAddTestCoinsAndAccounts } from "hexaCustModel";
 
-//TODO: Custome View
-import ViewErrorMessage from "HexaWallet/src/app/custcompontes/View/ViewErrorMessage/ViewErrorMessage";
+//TODO: Custome View  
+import { ViewErrorMessage, ViewShieldIcons } from "hexaCustView";
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import ModelLoaderPdfFileCreate from "HexaWallet/src/app/custcompontes/Loader/ModelLoaderPdfFileCreate";
+import { ModelLoader, ModelLoaderPdfFileCreate } from "hexaLoader";
+
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome object
 import {
@@ -73,14 +68,14 @@ import {
   localDB,
   delayTime,
   asyncStorageKeys
-} from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
-var utils = require( "HexaWallet/src/app/constants/Utils" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+} from "hexaConstants";
+var dbOpration = require( "hexaDBOpration" );
+var utils = require( "hexaUtils" );
+import { renderIf } from "hexaValidation";
 
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
@@ -91,23 +86,13 @@ function wp( percentage: number ) {
   return Math.round( value );
 }
 
-const slideWidth = wp( 75 );
-const itemHorizontalMargin = wp( 2 );
-
-
-//localization
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
 //TODO: Bitcoin files
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
+var bitcoinClassState = require( "hexaClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
-
-
-
-
-//TODO: Common Funciton
-var comAppHealth = require( "HexaWallet/src/app/manage/CommonFunction/CommonAppHealth" );
+//TODO: Common Funciton  
+var comAppHealth = require( "hexaCommonAppHealth" );
 
 class Wallet extends React.Component {
   constructor ( props: any ) {
@@ -1950,7 +1935,7 @@ class Wallet extends React.Component {
               >
                 <ImageSVG source={ svgIcon.walletScreen[ item.svgIcon ] } size={ 50 } />
                 <Text
-                  style={ [ globalStyle.ffFiraSansMedium, {
+                  style={ [ FontFamily.ffFiraSansMedium, {
                     flex: 2,
                     fontSize: 18,
                     alignSelf: "center",
@@ -1980,7 +1965,7 @@ class Wallet extends React.Component {
                   <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
                 </View>
                 <View style={ { flex: 4 } }>
-                  <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 30 } ] }>
+                  <Text style={ [ FontFamily.ffOpenSansBold, { fontSize: 30 } ] }>
                     { item.balance } <Text note>sats</Text>
                   </Text>
                 </View>
@@ -2007,7 +1992,7 @@ class Wallet extends React.Component {
               >
                 <ImageSVG source={ svgIcon.walletScreen[ item.svgIcon ] } size={ 50 } />
                 <Text
-                  style={ [ globalStyle.ffFiraSansMedium, {
+                  style={ [ FontFamily.ffFiraSansMedium, {
                     flex: 2,
                     fontSize: 18,
                     alignSelf: "center",
@@ -2037,7 +2022,7 @@ class Wallet extends React.Component {
                   <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
                 </View>
                 <View style={ { flex: 4 } }>
-                  <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 30 } ] }>
+                  <Text style={ [ FontFamily.ffOpenSansBold, { fontSize: 30 } ] }>
                     { item.balance } <Text note>sats</Text>
                   </Text>
                 </View>
@@ -2471,7 +2456,7 @@ class Wallet extends React.Component {
             }, () => this.asyncTask() )
           } }
         />
-        <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+        <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
         <ModelLoaderPdfFileCreate loading={ flag_LoadingPdfFile } color={ colors.appColor } size={ 30 } msg="Creating Wallet backup. This may take a while. Just stick around." />
         <CustomeStatusBar backgroundColor={ colors.appColor } hidden={ false } barStyle="dark-content" />
       </Container>
@@ -2497,4 +2482,4 @@ const styles = StyleSheet.create( {
   }
 } );
 
-export default copilot()( Wallet );
+export default Wallet;

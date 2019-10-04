@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
 import { Modal, View, StyleSheet, Image } from 'react-native';
 import { Text } from "native-base";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+
+
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
+
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
 import {
     images
-} from "HexaWallet/src/app/constants/Constants";
+} from "hexaConstants";
 
 
 interface Props {
@@ -42,7 +45,7 @@ export default class ModelSecureTwoFactorSuccessBackedUp extends Component<Props
                 ] }>
                     <View style={ styles.viewModelBody }>
                         <View style={ { flexDirection: "row", flex: 0.6 } }>
-                            <Text style={ [ globalStyle.ffFiraSansMedium, {
+                            <Text style={ [ FontFamily.ffFiraSansMedium, {
                                 fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
                                 marginLeft: 20, marginRight: 20
                             } ] }>2FA Secret Successfully Backed Up</Text>

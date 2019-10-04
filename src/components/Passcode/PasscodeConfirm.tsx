@@ -19,7 +19,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 //TODO: Custome Pages
 import { ModelLoader } from "hexaLoader";
-import { CustomeStatusBar } from "hexaCustomeStatusBar";
+import { CustomeStatusBar } from "hexaCustStatusBar";
 import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 
 

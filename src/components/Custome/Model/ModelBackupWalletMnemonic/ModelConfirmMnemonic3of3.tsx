@@ -4,15 +4,15 @@ import { Button, Text } from "native-base";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 import { SvgIcon } from "@up-shared/components";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+import FontFamily from "hexaStyles";
+import { renderIf } from "hexaValidation";
 
 //TODO: Custome Object
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+var utils = require( "hexaUtils" );
 
 interface Props {
     data: [];
@@ -86,7 +86,7 @@ export default class ModelConfirmMnemonic3of3 extends Component<Props, any> {
                                 >
                                     <SvgIcon name="icon_back" size={ 25 } color="gray" />
                                 </Button>
-                                <Text style={ [ globalStyle.ffFiraSansMedium, {
+                                <Text style={ [ FontFamily.ffFiraSansMedium, {
                                     fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
                                     marginLeft: 20, marginRight: 20
                                 } ] }>Confirm Mnemonic</Text>
@@ -97,7 +97,7 @@ export default class ModelConfirmMnemonic3of3 extends Component<Props, any> {
                                     <Text note style={ { fontSize: 24 } }> of </Text>
                                     <Text note style={ { fontSize: 32 } }> 3 </Text>
                                 </View>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", marginTop: 20 } ] }>Enter the  <Text>{ number }</Text> word from the mnemonic</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center", marginTop: 20 } ] }>Enter the  <Text>{ number }</Text> word from the mnemonic</Text>
                             </View>
                             <View
                                 style={ {
@@ -105,7 +105,7 @@ export default class ModelConfirmMnemonic3of3 extends Component<Props, any> {
                                 } }
                             >
                                 <TextInput
-                                    style={ [ globalStyle.ffFiraSansMedium, { borderRadius: 8, justifyContent: "center", borderColor: textBorderColor, borderWidth: 1, height: 60, textAlign: "center" } ] }
+                                    style={ [ FontFamily.ffFiraSansMedium, { borderRadius: 8, justifyContent: "center", borderColor: textBorderColor, borderWidth: 1, height: 60, textAlign: "center" } ] }
                                     value={ this.state.enterWrod }
                                     placeholder="Enter word"
                                     placeholderTextColor="#B7B7B7"
@@ -123,7 +123,7 @@ export default class ModelConfirmMnemonic3of3 extends Component<Props, any> {
                                 ) }
                             </View>
                             <View style={ { flex: 0.5, alignItems: "center", justifyContent: "flex-end" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Refer to the mnemonic you wrote down in the previous steps</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Refer to the mnemonic you wrote down in the previous steps</Text>
                             </View>
                             <View style={ { flex: 1, justifyContent: "flex-end" } }>
                                 <FullLinearGradientButton

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 //TODO: Custome object
 import {
     images
-} from "HexaWallet/src/app/constants/Constants";
+} from "hexaConstants";
 
 const ModelLoader = ( { loading = false, color = "#000000", size = 30, opacity = 0.4, message = "Loading" } ) => {
     return (

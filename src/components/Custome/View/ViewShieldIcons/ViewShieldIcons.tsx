@@ -3,7 +3,8 @@ import { StyleSheet, TouchableOpacity, Animated } from "react-native";
 
 import {
     images
-} from "HexaWallet/src/app/constants/Constants";
+} from "hexaConstants";
+
 export default class ViewShieldIcons extends Component<any, any> {
     constructor ( props: any ) {
         super( props )

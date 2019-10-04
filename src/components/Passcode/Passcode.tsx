@@ -19,7 +19,7 @@ import * as Keychain from "react-native-keychain";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //TODO: Custome Pages
-import { CustomeStatusBar } from "hexaCustomeStatusBar";
+import { CustomeStatusBar } from "hexaCustStatusBar";
 import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 
 //TODO: Custome StyleSheet Files       
