@@ -17,34 +17,33 @@ import Modal from 'react-native-modalbox';
 var Mailer = require( 'NativeModules' ).RNMail;
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientShareButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientShareButton";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+import { ModelLoader } from "hexaLoader";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { FullLinearGradientShareButton } from "hexaCustomeLinearGradientButton";
+import { HeaderTitle } from "hexaCustHeader";
+
 
 //TODO: Custome  Model
-import ModelBottomSingleButton from "HexaWallet/src/app/custcompontes/ModelBottom/ModelBottomSingleButton/ModelBottomSingleButton";
-import ModelTrustedContactEmailAndPhoneShare from "HexaWallet/src/app/custcompontes/Model/ModelTrustedContactEmailAndPhoneShare/ModelTrustedContactEmailAndPhoneShare";
-
+import { ModelBottomSingleButton, ModelTrustedContactEmailAndPhoneShare } from "hexaCustModel";
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
-import { colors, images, localDB, svgIcon, expaire } from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+import { colors, images, localDB, svgIcon, expaire } from "hexaConstants";
+import { renderIf } from "hexaValidation";
+var dbOpration = require( "hexaDBOpration" );
+var utils = require( "hexaUtils" );
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
-//TODO: Bitcoin Class
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
+//TODO: Bitcoin Class  
+var bitcoinClassState = require( "hexaClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 export default class TrustedContact extends React.Component<any, any> {
@@ -316,7 +315,7 @@ export default class TrustedContact extends React.Component<any, any> {
                     <HeaderTitle title="Trusted Contact" pop={ () => this.goBack() } />
                     <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
                         <View style={ { flex: 0.1, margin: 20 } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Health and history of the share will be shared with </Text>
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Health and history of the share will be shared with </Text>
                         </View>
                         <View style={ Platform.OS == "ios" ? { flex: 0.7 } : { flex: 0.8 } }>
                             <View style={ { flex: 1, flexDirection: 'row' } }>
@@ -330,13 +329,13 @@ export default class TrustedContact extends React.Component<any, any> {
                                 </View>
                                 <View style={ { flex: 4.4 } }>
                                     <Button bordered style={ { marginLeft: 10, height: "70%", borderColor: "#D0D0D0" } }>
-                                        <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#838383" } ] }>Change Contact</Text>
+                                        <Text style={ [ FontFamily.ffFiraSansMedium, { color: "#838383" } ] }>Change Contact</Text>
                                     </Button>
                                 </View>
                             </View>
                             <View style={ { flex: 1, alignItems: "center", marginRight: 20 } }>
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 17 } ] }>{ data.givenName }{ " " }{ data.familyName }</Text>
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14, color: data.statusMsgColor } ] }>{ data.statusMsg }</Text>
+                                <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 17 } ] }>{ data.givenName }{ " " }{ data.familyName }</Text>
+                                <Text style={ [ FontFamily.ffFiraSansMedium, { fontSize: 14, color: data.statusMsgColor } ] }>{ data.statusMsg }</Text>
                             </View>
                         </View>
                         <View style={ { flex: 2 } }>
@@ -359,8 +358,8 @@ export default class TrustedContact extends React.Component<any, any> {
                                             </View>
                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
                                                 <View style={ { flexDirection: "row", flex: 1, } }>
-                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16, flex: 1, alignSelf: "center", } ] }>{ item.title }</Text>
-                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { alignSelf: "center", flex: 1 } ] }>{ item.date }</Text>
+                                                    <Text style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, fontSize: 16, flex: 1, alignSelf: "center", } ] }>{ item.title }</Text>
+                                                    <Text style={ [ FontFamily.ffFiraSansMedium, { alignSelf: "center", flex: 1 } ] }>{ item.date }</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -374,8 +373,8 @@ export default class TrustedContact extends React.Component<any, any> {
                             <View style={ [ Platform.OS == "ios" ? { flex: 1 } : { flex: 1 }, { marginLeft: 5, marginRight: 5 } ] }>
                                 <Text note style={ { textAlign: "center" } }>OTP and share expires in { parseInt( expaire.trustedContactScreen.expaire_otptime ) / 60 } minutes</Text>
                                 <View style={ { flex: 0.8, backgroundColor: "#ffffff", borderRadius: 5, flexDirection: "row", alignItems: "center", justifyContent: "center", margin: 10 } }>
-                                    <Text note style={ [ globalStyle.ffFiraSansMedium, { flex: 2, marginLeft: 10 } ] }>OTP</Text>
-                                    <Text style={ [ globalStyle.ffOpenSansBold, { flex: 8, letterSpacing: 30, alignSelf: "center", textAlign: "center" } ] }>{ this.state.otpCode }</Text>
+                                    <Text note style={ [ FontFamily.ffFiraSansMedium, { flex: 2, marginLeft: 10 } ] }>OTP</Text>
+                                    <Text style={ [ FontFamily.ffOpenSansBold, { flex: 8, letterSpacing: 30, alignSelf: "center", textAlign: "center" } ] }>{ this.state.otpCode }</Text>
                                     <View style={ { flex: 1, alignItems: "center" } }>
                                         <TouchableOpacity onPress={ () => {
                                             Clipboard.setString( this.state.otpCode );
@@ -415,7 +414,7 @@ export default class TrustedContact extends React.Component<any, any> {
                         ) }
                         { renderIf( this.state.flag_OtpCodeShowStatus != true )(
                             <View style={ Platform.OS == "ios" ? { flex: 0.6 } : { flex: 0.8 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select method by which you want to share secret</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Select method by which you want to share secret</Text>
                                 <FullLinearGradientShareButton
                                     click_Done={ ( title: string ) => {
                                         this.click_CloseModel();
@@ -531,7 +530,7 @@ export default class TrustedContact extends React.Component<any, any> {
                         </Modal>
                     </SafeAreaView>
                 </ImageBackground>
-                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
+                <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );

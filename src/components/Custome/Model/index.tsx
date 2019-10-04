@@ -23,6 +23,12 @@ import ModelConfirmMnemonic3of3 from "./ModelBackupWalletMnemonic/ModelConfirmMn
 import ModelWalletSuccessfullyBackedUp from "./ModelBackupWalletMnemonic/ModelWalletSuccessfullyBackedUp";
 
 
+import ModelBottomSingleButton from "./ModelBottom/ModelBottomSingleButton/ModelBottomSingleButton";
+import ModelTrustedContactEmailAndPhoneShare from "./ModelTrustedContactEmailAndPhoneShare/ModelTrustedContactEmailAndPhoneShare";
+
+import ModelRestoreAssociateContactList from "./ModelRestoreWalletUsingTrustedContact/ModelRestoreAssociateContactList";
+
+import ModelRestoreAssociateContactListForQRCodeScan from "./ModelRestoreWalletUsingTrustedContact/ModelRestoreAssociateContactListForQRCodeScan";
 export {
     ModelBottomAddTestCoinsAndAccounts,
     ModelAcceptOrRejectSecret,
@@ -43,5 +49,12 @@ export {
     ModelConfirmMnemonic1of3,
     ModelConfirmMnemonic2of3,
     ModelConfirmMnemonic3of3,
-    ModelWalletSuccessfullyBackedUp
+    ModelWalletSuccessfullyBackedUp,
+
+    ModelBottomSingleButton,
+    ModelTrustedContactEmailAndPhoneShare,
+
+    ModelRestoreAssociateContactList,
+
+    ModelRestoreAssociateContactListForQRCodeScan
 }   

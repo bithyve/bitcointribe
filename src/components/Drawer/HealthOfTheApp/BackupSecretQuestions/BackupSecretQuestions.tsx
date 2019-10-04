@@ -14,8 +14,6 @@ import ModelBackupSecretQuestionsFirstQuestion from "HexaWallet/src/app/custcomp
 import ModelQuestionsSuccessfullyBackedUp from "HexaWallet/src/app/custcompontes/Model/ModelBackupSecretQuestions/ModelQuestionsSuccessfullyBackedUp";
 
 
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
 
 //TODO: Custome Object
 import {
@@ -26,8 +24,6 @@ import {
 var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
 
 
-//localization       
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
 
 
