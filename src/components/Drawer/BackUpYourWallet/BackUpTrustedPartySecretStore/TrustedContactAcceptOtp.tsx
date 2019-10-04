@@ -27,29 +27,27 @@ import {
     colors,
     images,
     localDB
-} from "HexaWallet/src/app/constants/Constants";
-import utils from "HexaWallet/src/app/constants/Utils";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+} from "hexaConstants";
+import utils from "hexaUtils";
+var dbOpration = require( "hexaDBOpration" );
+import { renderIf } from "hexaValidation";
 
 
 
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
-//localization
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
 //TODO: Bitcoin Class
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
+var bitcoinClassState = require( "hexaClassState" );
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 export default class TrustedContactAcceptOtp extends Component {
     constructor ( props: any ) {
