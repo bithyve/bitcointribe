@@ -10,31 +10,19 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 
 //TODO: Custome Compontes
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
+import { CustomeStatusBar } from "hexaCustStatusBar";
 
 //TODO: Custome Models  
-import ModelRestoreWalletFirstQuestion from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelRestoreWalletFirstQuestion";
-import ModelRestoreWalletSuccessfullyUsingTrustedContact from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelRestoreWalletSuccessfullyUsingTrustedContact";
-
-
+import { ModelRestoreWalletFirstQuestion, ModelRestoreWalletSuccessfullyUsingTrustedContact } from "hexaCustModel";
 
 //TODO: Custome Object
 import {
     colors,
     images
-} from "HexaWallet/src/app/constants/Constants";
-
-
-//localization
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
+} from "hexaConstants";
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
-
-
-
-
-
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 export default class RestoreWalletUsingTrustedContactQueAndAnw extends Component {
 

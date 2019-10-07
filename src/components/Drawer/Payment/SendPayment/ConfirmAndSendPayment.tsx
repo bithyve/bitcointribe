@@ -7,43 +7,35 @@ import {
 import { SvgIcon } from "@up-shared/components";
 import { RkCard } from "react-native-ui-kitten";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import ImageSVG from "HexaWallet/src/screens/Custome/ImageSVG/ImageSVG";
+
+import { ImageSVG } from "hexaCustImage";
 
 //TODO: Custome Pages
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientLoadingButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientLoadingButton";
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { HeaderTitle } from "hexaCustHeader";
+import { ModelLoader } from "hexaLoader";
+import { FullLinearGradientLoadingButton } from "hexaCustomeLinearGradientButton";
 
 
 //TODO: Custome model  
-import ModelConfirmSendSuccess from "HexaWallet/src/app/custcompontes/Model/ModelPaymentScreen/ModelConfirmSendScreen/ModelConfirmSendSuccess";
-import ModelConfirmSendSercureAccountOTP from "HexaWallet/src/app/custcompontes/Model/ModelPaymentScreen/ModelConfirmSendScreen/ModelConfirmSendSercureAccountOTP";
-
+import { ModelConfirmSendSuccess, ModelConfirmSendSercureAccountOTP } from "hexaCustModel";
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
-import { colors, images, localDB, svgIcon } from "HexaWallet/src/app/constants/Constants";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
-
-
-
+import { colors, images, localDB, svgIcon } from "hexaConstants";
+var utils = require( "hexaUtils" );
+import { renderIf } from "hexaValidation";
+var dbOpration = require( "hexaDBOpration" );
 
 //TODO: Bitcoin class
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
-
-
-
-
+var bitcoinClassState = require( "hexaClassState" );
 
 export default class ConfirmAndSendPayment extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -189,7 +181,7 @@ export default class ConfirmAndSendPayment extends React.Component<any, any> {
                                             }
                                         />
                                         <View style={ { flexDirection: "column" } }>
-                                            <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 16 } ] }>{ data.accountName }</Text>
+                                            <Text style={ [ FontFamily.ffFiraSansBold, { fontSize: 16 } ] }>{ data.accountName }</Text>
                                             <View style={ { flexDirection: "row", alignItems: "center" } }>
                                                 <Text note style={ [ { fontSize: 12 } ] }>Available balance</Text>
                                                 <SvgIcon
@@ -223,7 +215,7 @@ export default class ConfirmAndSendPayment extends React.Component<any, any> {
                                                     style={ { flex: 0.3, marginLeft: 20 } }
                                                 />
                                                 <View>
-                                                    <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 30 } ] }> { data.amount }</Text>
+                                                    <Text style={ [ FontFamily.ffFiraSansBold, { fontSize: 30 } ] }> { data.amount }</Text>
 
                                                     <View style={ { flexDirection: "row", alignItems: "center" } }>
                                                         <Text note style={ [ { fontSize: 12 } ] }>Transaction Fee</Text>
@@ -253,7 +245,7 @@ export default class ConfirmAndSendPayment extends React.Component<any, any> {
                                                 rkCardBody
                                             >
                                                 <View style={ { flex: 1 } }>
-                                                    <Text style={ [ globalStyle.ffFiraSansRegular, { fontSize: 14, margin: 14 } ] }>{ data.memo }</Text>
+                                                    <Text style={ [ FontFamily.ffFiraSansRegular, { fontSize: 14, margin: 14 } ] }>{ data.memo }</Text>
                                                 </View>
                                             </View>
                                         </RkCard>
@@ -274,7 +266,7 @@ export default class ConfirmAndSendPayment extends React.Component<any, any> {
                                             rkCardBody
                                         >
                                             <View style={ { flex: 1, padding: 10 } }>
-                                                <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 14 } ] }>{ data.priority } Priority</Text>
+                                                <Text style={ [ FontFamily.ffFiraSansBold, { fontSize: 14 } ] }>{ data.priority } Priority</Text>
                                             </View>
                                         </View>
                                     </RkCard>
@@ -325,7 +317,7 @@ export default class ConfirmAndSendPayment extends React.Component<any, any> {
                         } )
                     } }
                 />
-                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+                <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="light-content" />
             </Container >
         );

@@ -9,24 +9,14 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 
 //TODO: Custome Compontes
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import ModelSecureTwoFactorSecretThreeCode from "HexaWallet/src/app/custcompontes/Model/ModelSecureTwoFactorAuto/ModelSecureTwoFactorSecretThreeCode";
-import ModelSecureTwoFactorSuccessBackedUp from "HexaWallet/src/app/custcompontes/Model/ModelSecureTwoFactorAuto/ModelSecureTwoFactorSuccessBackedUp";
-
-
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { ModelSecureTwoFactorSecretThreeCode, ModelSecureTwoFactorSuccessBackedUp } from "hexaCustModel";
 
 //TODO: Custome Object
 import {
     colors,
     images
-} from "HexaWallet/src/app/constants/Constants";
-
-
-//localization       
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
-
-
-
+} from "hexaConstants";
 
 export default class BackupSecureTwoFactorAuto extends Component {
     constructor ( props: any ) {

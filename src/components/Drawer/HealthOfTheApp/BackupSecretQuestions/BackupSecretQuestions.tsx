@@ -9,19 +9,16 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 
 //TODO: Custome Compontes
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import ModelBackupSecretQuestionsFirstQuestion from "HexaWallet/src/app/custcompontes/Model/ModelBackupSecretQuestions/ModelBackupSecretQuestionsFirstQuestion";
-import ModelQuestionsSuccessfullyBackedUp from "HexaWallet/src/app/custcompontes/Model/ModelBackupSecretQuestions/ModelQuestionsSuccessfullyBackedUp";
-
-
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { ModelBackupSecretQuestionsFirstQuestion, ModelQuestionsSuccessfullyBackedUp } from "hexaCustModel";
 
 //TODO: Custome Object
 import {
     colors,
     images,
     localDB
-} from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
+} from "hexaConstants";
+var dbOpration = require( "hexaDBOpration" );
 
 
 

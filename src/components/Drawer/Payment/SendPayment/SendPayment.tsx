@@ -14,28 +14,33 @@ import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Slider, CheckBox } from 'react-native-elements';
 
+
+
+
 //TODO: Custome Pages
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientLoadingButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientLoadingButton";
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { HeaderTitle } from "hexaCustHeader";
+import { ModelLoader } from "hexaLoader";
+import { FullLinearGradientLoadingButton } from "hexaCustomeLinearGradientButton";
+
+
 
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
-import { colors, images } from "HexaWallet/src/app/constants/Constants";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+import { colors, images } from "hexaConstants";
+var utils = require( "hexaUtils" );
+import { renderIf } from "hexaValidation";
 
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 //TODO: Bitcoin Files
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
+var bitcoinClassState = require( "hexaClassState" );
 
 
 export default class SendPayment extends React.Component<any, any> {
@@ -313,7 +318,7 @@ export default class SendPayment extends React.Component<any, any> {
                                 />
                             </Left>
                             <Body style={ { flex: 1 } }>
-                                <Text style={ [ globalStyle.ffFiraSansBold, { fontSize: 16 } ] }>{ item.accountName }</Text>
+                                <Text style={ [ FontFamily.ffFiraSansBold, { fontSize: 16 } ] }>{ item.accountName }</Text>
                                 <View style={ { flexDirection: "row", alignItems: "center" } }>
                                     <Text note style={ [ { fontSize: 12 } ] }>Available balance</Text>
                                     <SvgIcon
@@ -376,7 +381,7 @@ export default class SendPayment extends React.Component<any, any> {
                                                     this.setAmount()
                                                 }, 100 );
                                             } }
-                                            style={ [ globalStyle.ffOpenSansBold, { flex: 1, fontSize: 18 } ] }
+                                            style={ [ FontFamily.ffOpenSansBold, { flex: 1, fontSize: 18 } ] }
                                         />
                                         <Button transparent onPress={ () => {
                                             this.setState( {
@@ -415,7 +420,7 @@ export default class SendPayment extends React.Component<any, any> {
                                                     memo: val
                                                 } )
                                             } }
-                                            style={ [ globalStyle.ffOpenSansBold, { flex: 1, fontSize: 18 } ] }
+                                            style={ [ FontFamily.ffOpenSansBold, { flex: 1, fontSize: 18 } ] }
                                         />
                                     </View>
                                 ) }
@@ -432,7 +437,7 @@ export default class SendPayment extends React.Component<any, any> {
                                                     address: val
                                                 } )
                                             } }
-                                            style={ [ globalStyle.ffOpenSansBold, { flex: 1, fontSize: 18 } ] }
+                                            style={ [ FontFamily.ffOpenSansBold, { flex: 1, fontSize: 18 } ] }
                                         />
                                         <Button
                                             transparent
@@ -489,7 +494,7 @@ export default class SendPayment extends React.Component<any, any> {
                         </KeyboardAwareScrollView>
                     </SafeAreaView>
                 </ImageBackground>
-                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+                <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );

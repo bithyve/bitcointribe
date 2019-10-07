@@ -5,31 +5,24 @@ import {
     Text
 } from "native-base";
 import { RkCard } from "react-native-ui-kitten";
-import IconFontAwe from "react-native-vector-icons/FontAwesome";
-import ImageSVG from "HexaWallet/src/screens/Custome/ImageSVG/ImageSVG";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Avatar } from 'react-native-elements';
 
+//TODO: Custome Pages    
+import { ImageSVG } from "hexaCustImage";
 
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { HeaderTitle } from "hexaCustHeader";
+import { ModelLoader } from "hexaLoader";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 
-
-//TODO: Custome Pages
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
-
-
-
-
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+//TODO: Custome StyleSheet Files         
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
-import { colors, images, svgIcon } from "HexaWallet/src/app/constants/Constants";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-
+import { colors, images, svgIcon } from "hexaConstants";
+var utils = require( "hexaUtils" );
+import { renderIf } from "hexaValidation";
 
 let counterConfirm = 0;
 
@@ -384,9 +377,9 @@ export default class RestoreSelectedContactsList extends React.Component<any, an
                                     } }>
                                     <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
                                         <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                            <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Trusted Contacts</Text>
+                                            <Text numberOfLines={ 1 } style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Trusted Contacts</Text>
                                             <View style={ { flexDirection: "row" } }>
-                                                <Text note style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Shares you have trusted with your friends and family</Text>
+                                                <Text note style={ [ FontFamily.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Shares you have trusted with your friends and family</Text>
                                             </View>
                                         </View>
                                     </View>
@@ -417,9 +410,9 @@ export default class RestoreSelectedContactsList extends React.Component<any, an
                                                             <Avatar size={ 55 } rounded title={ item.givenName != null && item.givenName.charAt( 0 ) } titleStyle={ { color: colors.appColor } } />
                                                         ) }
                                                         <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                            <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                            <Text numberOfLines={ 1 } style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                             <View style={ { flexDirection: "row" } }>
-                                                                <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                                <Text style={ [ FontFamily.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
                                                             </View>
                                                         </View>
                                                         <View style={ {
@@ -462,9 +455,9 @@ export default class RestoreSelectedContactsList extends React.Component<any, an
                                     } }>
                                     <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, borderRadius: 10 } } >
                                         <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                            <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Self Share</Text>
+                                            <Text numberOfLines={ 1 } style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Self Share</Text>
                                             <View style={ { flexDirection: "row" } }>
-                                                <Text note style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Shares you self guard  on multiple devices and platforms.</Text>
+                                                <Text note style={ [ FontFamily.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Shares you self guard  on multiple devices and platforms.</Text>
                                             </View>
                                         </View>
                                     </View>
@@ -490,9 +483,9 @@ export default class RestoreSelectedContactsList extends React.Component<any, an
                                                             }
                                                         />
                                                         <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                            <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                            <Text style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                             <View style={ { flexDirection: "row" } }>
-                                                                <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                                <Text style={ [ FontFamily.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
                                                             </View>
                                                         </View>
                                                         <View style={ {
@@ -528,14 +521,14 @@ export default class RestoreSelectedContactsList extends React.Component<any, an
                         </KeyboardAwareScrollView>
                     </SafeAreaView>
                 </ImageBackground>
-                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+                <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }
 }
 
-const primaryColor = colors.appColor;
+
 const styles = StyleSheet.create( {
     container: {
         flex: 1,
