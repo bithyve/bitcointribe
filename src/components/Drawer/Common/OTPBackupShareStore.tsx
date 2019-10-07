@@ -34,7 +34,7 @@ import { renderIf } from "hexaValidation";
 
 //TODO: Bitcoin Class
 var bitcoinClassState = require( "hexaClassState" );
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import { S3Service } from "hexaBitcoin";
 
 //TODO: Common Funciton
 var comFunDBRead = require( "hexaCommonDBReadData" );

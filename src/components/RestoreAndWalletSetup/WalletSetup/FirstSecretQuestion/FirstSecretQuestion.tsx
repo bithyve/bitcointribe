@@ -46,11 +46,12 @@ import { validationService } from "hexaValidation";
 
 //TODO: Bitcoin Files    
 var bitcoinClassState = require( "hexaClassState" );
-//import { S3Service, RegularAccount, SecureAccount } from "hexaBitcoin";
 
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
-import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
-import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
+
+import { S3Service, RegularAccount, SecureAccount } from "hexaBitcoin";
+// import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+// import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
+// import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
 
 export default class FirstSecretQuestion extends React.Component<any, any> {

@@ -75,7 +75,7 @@ export default class PermissionAndroid extends Component {
                     if ( navigation.getParam( "flow" ) == "New Wallet" )
                         this.gotoWallet();
                     else
-                        this.props.navigation.push( "RestoreSelectedContactsListScreen" );
+                        this.props.navigation.push( "RestoreSelectedContactsList" );
                 } else {
                     this.click_GetPermisson()
                 }

@@ -45,13 +45,13 @@ export default class OnBoarding extends React.Component<any, any> {
     try {
       AsyncStorage.setItem(
         asyncStorageKeys.rootViewController,
-        "PasscodeConfirmScreen"
+        "PasscodeConfirm"
       );
       const resetAction = StackActions.reset( {
         index: 0, // <-- currect active route from actions array
         key: null,
         actions: [
-          NavigationActions.navigate( { routeName: "PasscodeConfirmScreen" } )
+          NavigationActions.navigate( { routeName: "PasscodeConfirm" } )
         ]
       } );
       this.props.navigation.dispatch( resetAction );

@@ -23,7 +23,7 @@ export default class WalletSetup extends React.Component<any, any> {
     goToWallet() {
         try {
             if ( Platform.OS == "android" ) {
-                this.props.navigation.push( "PermissionAndroidScreen", { flow: "New Wallet" } );
+                this.props.navigation.push( "PermissionAndroid", { flow: "New Wallet" } );
             } else {
                 const resetAction = StackActions.reset( {
                     index: 0, // <-- currect active route from actions array

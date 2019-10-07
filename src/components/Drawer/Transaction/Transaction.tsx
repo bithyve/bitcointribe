@@ -15,41 +15,38 @@ import {
     Button,
     Text
 } from "native-base";
-
 import { RkCard } from "react-native-ui-kitten";
-import ImageSVG from "HexaWallet/src/screens/Custome/ImageSVG/ImageSVG";
-
 import Icon from "react-native-vector-icons/FontAwesome";
 
-//TODO: Custome Object
-import { images, colors, svgIcon } from "HexaWallet/src/app/constants/Constants";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
-
-
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
-
-//TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-
-//TODO: Custome Compontes
-import FullLinearGradientTransactionScreenThreeOpt from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientTransactionScreenThreeOpt";
-
-
+import { ImageSVG } from "hexaCustImage";
 import { SvgIcon } from "@up-shared/components";
 
 
-//TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+//TODO: Custome Object
+import { images, colors, svgIcon } from "hexaConstants";
+var utils = require( "hexaUtils" );
 
+
+//TODO: Custome StyleSheet Files       
+import FontFamily from "hexaStyles";
+
+//TODO: Custome Pages
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { ModelLoader } from "hexaLoader";
+
+
+//TODO: Custome Compontes
+
+import { FullLinearGradientTransactionScreenThreeOpt } from "hexaCustomeLinearGradientButton";
+//TODO: Custome Alert 
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 //TODO: Common Funciton
-var comFunTran = require( "HexaWallet/src/app/manage/CommonFunction/CommonTransaction" );
+var comFunTran = require( "hexaCommonTransaction" );
 
-//TODO: Bitcoin Class
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
+//TODO: Bitcoin Class   
+var bitcoinClassState = require( "hexaClassState" );
 
 export default class Transaction extends React.Component<any, any> {
 
@@ -266,7 +263,7 @@ export default class Transaction extends React.Component<any, any> {
                                         }
                                     />
                                     <Text
-                                        style={ [ globalStyle.ffFiraSansMedium, {
+                                        style={ [ FontFamily.ffFiraSansMedium, {
                                             flex: 2,
                                             fontSize: 18,
                                             alignSelf: "center",
@@ -295,7 +292,7 @@ export default class Transaction extends React.Component<any, any> {
                                         <SvgIcon name="icon_bitcoin" color="gray" size={ 40 } />
                                     </View>
                                     <View style={ { flex: 4 } }>
-                                        <Text style={ [ globalStyle.ffOpenSansBold, { fontSize: 30 } ] }>
+                                        <Text style={ [ FontFamily.ffOpenSansBold, { fontSize: 30 } ] }>
                                             { arrSelectedAccount.balance }
                                         </Text>
                                     </View>
@@ -324,7 +321,7 @@ export default class Transaction extends React.Component<any, any> {
                                         !flag_Loading && arrTransaction.length === 0 ?
                                             <View style={ { justifyContent: "center", alignItems: "center", padding: 20, paddingTop: 50 } }>
                                                 <Text style={ { textAlign: "center", color: "#838383", marginBottom: 10 } }>{ "Start transactions to see your recent transactions history." }</Text>
-                                                <Text style={ [ globalStyle.ffFiraSansRegular, { textAlign: "center", marginTop: 10 } ] }>Please pull down to refresh, if all transactions are not visible.</Text>
+                                                <Text style={ [ FontFamily.ffFiraSansRegular, { textAlign: "center", marginTop: 10 } ] }>Please pull down to refresh, if all transactions are not visible.</Text>
                                             </View> : null
                                     }
                                     <FlatList
@@ -363,7 +360,7 @@ export default class Transaction extends React.Component<any, any> {
                         </View>
                     </SafeAreaView>
                 </ImageBackground>
-                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
+                <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
                 <CustomeStatusBar backgroundColor={ colors.appColor } hidden={ false } barStyle="dark-content" />
             </Container >
         );

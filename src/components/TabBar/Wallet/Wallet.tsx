@@ -89,7 +89,7 @@ function wp( percentage: number ) {
 
 //TODO: Bitcoin files
 var bitcoinClassState = require( "hexaClassState" );
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import { S3Service } from "hexaBitcoin";
 
 //TODO: Common Funciton  
 var comAppHealth = require( "hexaCommonAppHealth" );
@@ -2109,7 +2109,7 @@ class Wallet extends React.Component {
                 } }
               >
                 <Animated.Text
-                  style={ [ globalStyle.ffFiraSansMedium, {
+                  style={ [ FontFamily.ffFiraSansMedium, {
                     color: "#fff",
                     fontSize: this.animatedAppTextSize,
                     marginTop: 20,
@@ -2120,7 +2120,7 @@ class Wallet extends React.Component {
                   { walletDetails.walletType != null ? walletDetails.walletType + " (Testnet)" : "" }
                 </Animated.Text>
                 <Animated.Text
-                  style={ [ globalStyle.ffFiraSansRegular, {
+                  style={ [ FontFamily.ffFiraSansRegular, {
                     color: "#fff",
                     fontSize: 14,
                     opacity: this.animatedTextOpacity

@@ -52,7 +52,7 @@ export default class Restore3SelfShare extends React.Component<any, any> {
 
     //TODO: Sharing    
     click_QRCode( data: any ) {
-        this.props.navigation.push( "Restore3SelfSahreQRCodeScannerScreen" );
+        this.props.navigation.push( "Restore3SelfSahreQRCodeScanner" );
     }
 
     //TODO: Re-Share Share

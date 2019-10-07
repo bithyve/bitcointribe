@@ -46,10 +46,10 @@ import Restore4And5SelfShareQRCodeScreen8 from "./Screens/Restore4And5SelfShareQ
 var comFunDBRead = require( "hexaCommonDBReadData" );
 
 //Bitcoin Files
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import { S3Service } from "hexaBitcoin";
 
 
-export default class Restore4And5SelfShareQRCode extends React.Component {
+export default class Restore4And5SelfShareQRCodeScanner extends React.Component {
     constructor ( props: any ) {
         super( props );
         this.state = ( {

@@ -44,7 +44,7 @@ export default class ShareSecretViaQR extends React.Component<any, any> {
     }
     //TODO: func click_Item
     click_Item = ( item: any ) => {
-        this.props.navigation.push( "TrustedContactScreen", {
+        this.props.navigation.push( "TrustedContact", {
             data: item
         } );
     }

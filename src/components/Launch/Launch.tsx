@@ -42,11 +42,11 @@ export default class Launch extends Component<Props, any> {
     const credentials = await Keychain.getGenericPassword();
     commonData.setPasscode( credentials.password );
     setTimeout( () => {
-      if ( rootViewController == "PasscodeConfirmScreen" ) {
+      if ( rootViewController == "PasscodeConfirm" ) {
         this.props.onComplited( false, rootViewController );
       }
       else if ( status ) {
-        this.props.onComplited( false, "PasscodeScreen" );
+        this.props.onComplited( false, "Passcode" );
       }
       else {
         this.props.onComplited( false, "OnBoardingNavigator" );

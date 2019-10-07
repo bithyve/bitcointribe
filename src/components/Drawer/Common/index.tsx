@@ -1,10 +1,10 @@
-import QRCode from "./QRCode";
+import QRCodeDisplay from "./QRCodeDisplay";
 import OTP from "./OTP";
 import QRCodeScan from "./QRCodeScan";
 import OTPBackupShareStore from "./OTPBackupShareStore";
 
 export {
-    QRCode,
+    QRCodeDisplay,
     OTP,
     QRCodeScan,
     OTPBackupShareStore
