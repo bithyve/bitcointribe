@@ -5,6 +5,7 @@ import ModelBackupShareAssociateContact from "./ModelBackupTrustedContactShareSt
 import ModelBackupAssociateOpenContactList from "./ModelBackupTrustedContactShareStore/ModelBackupAssociateOpenContactList";
 import ModelBackupYourWallet from "./ModelBackupYourWallet/ModelBackupYourWallet";
 import ModelSelfShareAcceptAndReject from "./ModelWalletScreen/ModelSelfShareAcceptAndReject";
+import ModelFindYourTrustedContacts from "./ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
 import ModelHelperScreen from "./ModelHelperScreen/ModelHelperScreen";
 
 import ModalAllTransactionDetails from "./ModalAllTransactions/ModalAllTransactionDetails";
@@ -25,10 +26,38 @@ import ModelWalletSuccessfullyBackedUp from "./ModelBackupWalletMnemonic/ModelWa
 
 import ModelBottomSingleButton from "./ModelBottom/ModelBottomSingleButton/ModelBottomSingleButton";
 import ModelTrustedContactEmailAndPhoneShare from "./ModelTrustedContactEmailAndPhoneShare/ModelTrustedContactEmailAndPhoneShare";
+import ModelBottomTwoButtons from "./ModelBottom/ModelBottomSingleButton/ModelBottomTwoButtons";
+
 
 import ModelRestoreAssociateContactList from "./ModelRestoreWalletUsingTrustedContact/ModelRestoreAssociateContactList";
 
 import ModelRestoreAssociateContactListForQRCodeScan from "./ModelRestoreWalletUsingTrustedContact/ModelRestoreAssociateContactListForQRCodeScan";
+
+import ModelBackupSecretQuestionsFirstQuestion from "./ModelBackupSecretQuestions/ModelBackupSecretQuestionsFirstQuestion";
+import ModelQuestionsSuccessfullyBackedUp from "./ModelBackupSecretQuestions/ModelQuestionsSuccessfullyBackedUp";
+
+import ModelSecureTwoFactorSecretThreeCode from "./ModelSecureTwoFactorAuto/ModelSecureTwoFactorSecretThreeCode";
+import ModelSecureTwoFactorSuccessBackedUp from "./ModelSecureTwoFactorAuto/ModelSecureTwoFactorSuccessBackedUp";
+
+import ModelHealthCheckMnemonicFirstWord from "./ModelHealthCheckMnemonic/ModelHealthCheckMnemonicFirstWord";
+import ModelHealthCheckMnemonicSecoundWord from "./ModelHealthCheckMnemonic/ModelHealthCheckMnemonicSecoundWord";
+import ModelHealthCheckMnemonicThirdWord from "./ModelHealthCheckMnemonic/ModelHealthCheckMnemonicThirdWord";
+import ModelHeackCheckMnemonicSucessBackedUp from "./ModelHealthCheckMnemonic/ModelHeackCheckMnemonicSucessBackedUp";
+
+import ModelConfirmSendSuccess from "./ModelPaymentScreen/ModelConfirmSendScreen/ModelConfirmSendSuccess";
+import ModelConfirmSendSercureAccountOTP from "./ModelPaymentScreen/ModelConfirmSendScreen/ModelConfirmSendSercureAccountOTP";
+
+import ModelWalletName from "./ModelRestoreWalletUsingTrustedContact/ModelWalletName";
+import ModelContactPermission from "./ModelRestoreWalletUsingTrustedContact/ModelContactPermission";
+
+
+import ModelRestoreWalletFirstQuestion from "./ModelRestoreWalletUsingTrustedContact/ModelRestoreWalletFirstQuestion";
+import ModelRestoreWalletSuccessfullyUsingTrustedContact from "./ModelRestoreWalletUsingTrustedContact/ModelRestoreWalletSuccessfullyUsingTrustedContact";
+
+
+
+import ModelMnemonicDisplay from "./ModelMnemonicDisplay/ModelMnemonicDisplay";
+
 export {
     ModelBottomAddTestCoinsAndAccounts,
     ModelAcceptOrRejectSecret,
@@ -36,6 +65,7 @@ export {
     ModelBackupAssociateOpenContactList,
     ModelBackupYourWallet,
     ModelSelfShareAcceptAndReject,
+    ModelFindYourTrustedContacts,
     ModelHelperScreen,
 
     ModalAllTransactionDetails,
@@ -53,8 +83,31 @@ export {
 
     ModelBottomSingleButton,
     ModelTrustedContactEmailAndPhoneShare,
+    ModelBottomTwoButtons,
 
     ModelRestoreAssociateContactList,
 
-    ModelRestoreAssociateContactListForQRCodeScan
+    ModelRestoreAssociateContactListForQRCodeScan,
+
+    ModelBackupSecretQuestionsFirstQuestion,
+    ModelQuestionsSuccessfullyBackedUp,
+
+    ModelSecureTwoFactorSecretThreeCode,
+    ModelSecureTwoFactorSuccessBackedUp,
+
+    ModelHealthCheckMnemonicFirstWord,
+    ModelHealthCheckMnemonicSecoundWord,
+    ModelHealthCheckMnemonicThirdWord,
+    ModelHeackCheckMnemonicSucessBackedUp,
+
+    ModelConfirmSendSuccess,
+    ModelConfirmSendSercureAccountOTP,
+
+    ModelWalletName,
+    ModelContactPermission,
+
+    ModelRestoreWalletFirstQuestion,
+    ModelRestoreWalletSuccessfullyUsingTrustedContact,
+
+    ModelMnemonicDisplay
 }   

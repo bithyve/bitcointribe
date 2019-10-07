@@ -6,7 +6,6 @@ import {
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
 
-
 //import Mailer from 'react-native-mail';
 var Mailer = require( 'NativeModules' ).RNMail;
 import Share from "react-native-share";
@@ -14,33 +13,31 @@ var RNFS = require( 'react-native-fs' );
 
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientShareButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientShareButton";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+import { ModelLoader } from "hexaLoader";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { FullLinearGradientShareButton } from "hexaCustomeLinearGradientButton";
+import { HeaderTitle } from "hexaCustHeader";
 
 //TODO: Custome Model
-import ModelBottomSingleButton from "HexaWallet/src/app/custcompontes/ModelBottom/ModelBottomSingleButton/ModelBottomSingleButton";
-import ModelBottomTwoButtons from "HexaWallet/src/app/custcompontes/ModelBottom/ModelBottomSingleButton/ModelBottomTwoButtons";
-
+import { ModelBottomSingleButton, ModelBottomTwoButtons } from "hexaCustModel";
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
+import { colors, images, localDB } from "hexaConstants";
 
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+var dbOpration = require( "hexaDBOpration" );
+var utils = require( "hexaUtils" );
 
 
 //TODO: Common Funciton
 
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 export default class SelfShareSharing extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -256,8 +253,8 @@ export default class SelfShareSharing extends React.Component<any, any> {
                     <HeaderTitle title={ title } pop={ () => this.props.navigation.pop() } />
                     <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
                         <View style={ { flex: 0.1, margin: 20 } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Share this pdf to an email/cloud which you can</Text>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>access if required to hold this secret for safekeeping </Text>
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Share this pdf to an email/cloud which you can</Text>
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>access if required to hold this secret for safekeeping </Text>
                         </View>
                         <View style={ { flex: 2 } }>
                             <FlatList
@@ -273,8 +270,8 @@ export default class SelfShareSharing extends React.Component<any, any> {
                                             </View>
                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
                                                 <View style={ { flexDirection: "row", flex: 1, } }>
-                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16, flex: 1, alignSelf: "center", } ] }>{ item.title }</Text>
-                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { alignSelf: "center", flex: 1 } ] }>{ item.date }</Text>
+                                                    <Text style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, fontSize: 16, flex: 1, alignSelf: "center", } ] }>{ item.title }</Text>
+                                                    <Text style={ [ FontFamily.ffFiraSansMedium, { alignSelf: "center", flex: 1 } ] }>{ item.date }</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -285,7 +282,7 @@ export default class SelfShareSharing extends React.Component<any, any> {
                             />
                         </View>
                         <View style={ { flex: Platform.OS == "ios" ? 0.5 : 0.6 } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Do not share this pdf with anyone other than your email/cloud</Text>
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Do not share this pdf with anyone other than your email/cloud</Text>
                             <FullLinearGradientShareButton
                                 click_Done={ ( title: string ) => {
                                     if ( title == "Share" ) {
@@ -356,7 +353,7 @@ export default class SelfShareSharing extends React.Component<any, any> {
                     }
                 />
 
-                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
+                <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );

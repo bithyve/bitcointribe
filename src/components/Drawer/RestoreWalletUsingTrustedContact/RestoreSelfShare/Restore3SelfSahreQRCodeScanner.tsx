@@ -19,24 +19,20 @@ import {
     colors,
     images,
     localDB
-} from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
-
-
+} from "hexaConstants";
+var dbOpration = require( "hexaDBOpration" );
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 //Custome Compontes
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
-
-
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { HeaderTitle } from "hexaCustHeader";
+import { ModelLoader } from "hexaLoader";
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 let flag_ReadQRCode = true;
 
@@ -169,7 +165,7 @@ export default class Restore3SelfSahreQRCodeScanner extends React.Component {
                         />
                     </SafeAreaView>
                 </ImageBackground>
-                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+                <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );

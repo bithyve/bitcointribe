@@ -8,18 +8,19 @@ import {
 
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { HeaderTitle } from "hexaCustHeader";
+import { ModelLoader } from "hexaLoader";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
+
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
-import { colors, images } from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+import { colors, images } from "hexaConstants";
+import { renderIf } from "hexaValidation";
 
 
 
@@ -74,7 +75,7 @@ export default class Restore3SelfShare extends React.Component<any, any> {
                     <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
 
                         <View style={ { flex: 0.1, padding: 20 } }>
-                            <Text numberOfLines={ 2 } note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Please sacn self share.</Text>
+                            <Text numberOfLines={ 2 } note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Please sacn self share.</Text>
                         </View>
                         <View style={ { flex: 2, alignItems: "center", justifyContent: "center" } }>
                             <Image style={ [ styles.imgAppLogo, { borderRadius: 10 } ] } source={ images.RestoreWalletUsingTrustedContact.share4and5SelfShareInfo } />
@@ -92,7 +93,7 @@ export default class Restore3SelfShare extends React.Component<any, any> {
                         ) }
                     </SafeAreaView>
                 </ImageBackground>
-                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
+                <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );

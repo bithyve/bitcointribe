@@ -13,32 +13,22 @@ import {
     List, ListItem,
 } from "native-base";
 import { SvgIcon } from "@up-shared/components";
-import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-
 import { RkCard } from "react-native-ui-kitten";
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
-
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { HeaderTitle } from "hexaCustHeader";
+import { ModelLoader } from "hexaLoader";
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+import { colors, images } from "hexaConstants";
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
-
-//TODO: Bitcoin Files
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 export default class AdvancedSettings extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -111,7 +101,7 @@ export default class AdvancedSettings extends React.Component<any, any> {
                                                 >
                                                     <View style={ { flex: 1, flexDirection: "column" } }>
                                                         <Text
-                                                            style={ [ globalStyle.ffFiraSansMedium, { fontSize: 14 } ] }
+                                                            style={ [ FontFamily.ffFiraSansMedium, { fontSize: 14 } ] }
                                                         >
                                                             { item.title }
                                                         </Text>
@@ -134,15 +124,13 @@ export default class AdvancedSettings extends React.Component<any, any> {
                         </KeyboardAwareScrollView>
                     </SafeAreaView>
                 </ImageBackground>
-                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message="Loading" />
+                <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message="Loading" />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }
 }
 
-const primaryColor = colors.appColor;
-const darkGrey = "#bdc3c7";
 const styles = StyleSheet.create( {
     container: {
         flex: 1,

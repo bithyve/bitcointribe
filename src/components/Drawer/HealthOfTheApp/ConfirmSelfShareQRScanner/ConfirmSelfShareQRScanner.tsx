@@ -10,28 +10,21 @@ import {
 } from "native-base";
 //import BarcodeScanner from "react-native-barcode-scanners";
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
 
 
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { HeaderTitle } from "hexaCustHeader";
 
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
-
-//TODO: Custome object
+//TODO: Custome object  
 import {
     colors,
     images
-} from "HexaWallet/src/app/constants/Constants";
+} from "hexaConstants";
 
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
-
-//Custome Compontes
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-
-
 
 let flag_ReadQRCode = true;
 

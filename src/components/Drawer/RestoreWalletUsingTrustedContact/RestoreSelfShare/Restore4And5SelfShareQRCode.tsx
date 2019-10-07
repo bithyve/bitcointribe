@@ -13,24 +13,22 @@ import BackboneEvents from "backbone-events-standalone";
 window.EventBus = BackboneEvents.mixin( {} );
 
 
-
-
 //TODO: Custome object
 import {
     colors,
     localDB
-} from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
+} from "hexaConstants";
+var dbOpration = require( "hexaDBOpration" );
 
 
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 //Custome Compontes
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { HeaderTitle } from "hexaCustHeader";
 
 
 
@@ -45,7 +43,7 @@ import Restore4And5SelfShareQRCodeScreen7 from "./Screens/Restore4And5SelfShareQ
 import Restore4And5SelfShareQRCodeScreen8 from "./Screens/Restore4And5SelfShareQRCodeScreen8";
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 //Bitcoin Files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
