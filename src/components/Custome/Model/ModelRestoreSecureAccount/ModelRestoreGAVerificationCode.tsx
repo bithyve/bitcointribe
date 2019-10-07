@@ -103,7 +103,7 @@ export default class ModelRestoreGAVerificationCode extends Component<Props, any
             await comFunDBRead.readTblWallet();
             //Secure account insert
             let resUpdateSSSRetoreDecryptedShare;
-            if ( prevScreenName != "WalletScreen" ) {
+            if ( prevScreenName != "Wallet" ) {
                 resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
                     localDB.tableName.tblAccount,
                     address,

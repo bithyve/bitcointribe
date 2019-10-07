@@ -12,7 +12,7 @@ import FontFamily from "hexaStyles";
 //TODO: Custome Object
 import {
     images
-} from "HhexaConstants";
+} from "hexaConstants";
 var utils = require( "hexaUtils" );
 
 interface Props {

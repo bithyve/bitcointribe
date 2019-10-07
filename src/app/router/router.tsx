@@ -5,12 +5,11 @@ import {
   createBottomTabNavigator
 } from "react-navigation";
 
-// import { SvgIcon } from "@up-shared/components";
+import { SvgIcon } from "@up-shared/components";
 // //localization
-// import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
+//import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
 //TODO: RestoreAndWalletSetupScreen
-//import { OnBoarding } from "hexaCompLanch";
 import { OnBoarding } from "hexaCompLanch";
 
 import { PasscodeConfirm, Passcode } from "hexaCompPasscode";
@@ -42,15 +41,15 @@ import { More, ContactSharedSecretList, TrustedPartySelfShareQRCode, TrsutedPart
 // TODO: QrcodeScan  
 import { QrCodeScanner } from "hexaCompTabbarQrCodeScanner";
 
-//  TODO: Wallet  
-//import { Wallet } from "hexaCompTabbarWallet";
+TODO: Wallet
+import { Wallet } from "hexaCompTabbarWallet";
 
 //  TODO: All Transaction     
 import { AllTransaction } from "hexaCompTabbarAllTransaction";
 
 // TODO: Backup your Wallet 
 import {
-  AllContactList, SecretSharing, TrustedContact, ShareSecretViaQR,
+  AllContactList, TrustedContact, ShareSecretViaQR,
   SelectContactListAssociatePerson, TrustedContactAcceptOtp
 } from "hexaCompBackUpYourWallet";
 
@@ -61,7 +60,7 @@ import { Settings, AdvancedSettings, MnemonicDisplay } from "hexaCompSettings";
 import { BackupWalletMnemonic, BackupWalletMnemonicConfirmMnemonic } from "hexaCompBackupWalletMnemonic";
 
 // TODO: Common Screen   
-import { QRCode, OTP, QRCodeScan, OTPBackupShareStore } from "hexaCompCommon";
+import { QRCodeDisplay, OTP, QRCodeScan, OTPBackupShareStore } from "hexaCompCommon";
 
 // TODO: Backup Secure Account
 import { BackupSecureAccount } from "hexaCompBackupSecureAccount";
@@ -119,377 +118,358 @@ const RestoreAndWalletSetupStackNavigator = createStackNavigator(
 
 
 
-// const RestoreWalletUsingMnemonicStackNavigator = createStackNavigator(
-//   {
-//     RestoreWalletUsingMnemonic: {
-//       screen: RestoreWalletUsingMnemonic,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "RestoreWalletUsingMnemonic"
-//   }
-// );
+const RestoreWalletUsingMnemonicStackNavigator = createStackNavigator(
+  {
+    RestoreWalletUsingMnemonic: {
+      screen: RestoreWalletUsingMnemonic,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "RestoreWalletUsingMnemonic"
+  }
+);
 
-// const RestoreWalletUsingTrustedContactStackNavigator = createStackNavigator(
-//   {
-//     RestoreWalletUsingTrustedContact: {
-//       screen: RestoreWalletUsingTrustedContact,
-//       navigationOptions: { header: null }
-//     },
-//     RestoreSelectedContactsList: {
-//       screen: RestoreSelectedContactsList,
-//       navigationOptions: { header: null }
-//     },
-//     RestoreAllContactList: {
-//       screen: RestoreAllContactList,
-//       navigationOptions: { header: null }
-//     },
-//     RestoreTrustedContactsShare: {
-//       screen: RestoreTrustedContactsShare,
-//       navigationOptions: { header: null }
-//     },
-//     RestoreTrustedContactsQRCodeScan: {
-//       screen: RestoreTrustedContactsQRCodeScanScreen,
-//       navigationOptions: { header: null }
-//     },
-//     Restore3SelfShare: {
-//       screen: Restore3SelfShare,
-//       navigationOptions: { header: null }
-//     },
-//     Restore3SelfSahreQRCodeScanner: {
-//       screen: Restore3SelfSahreQRCodeScanner,
-//       navigationOptions: { header: null }
-//     },
-//     Restore4And5SelfShare: {
-//       screen: Restore4And5SelfShare,
-//       navigationOptions: { header: null }
-//     },
-//     Restore4And5SelfShareQRCodeScanner: {
-//       screen: Restore4And5SelfShareQRCodeScanner,
-//       navigationOptions: { header: null }
-//     },
-//     RestoreWalletUsingTrustedContactQueAndAnw: {
-//       screen: RestoreWalletUsingTrustedContactQueAndAnw,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "RestoreSelectedContactsList"
-//   }
-// );
-
-
-// const RestoreWalletUsingTrustedContactAndroidStackNavigator = createStackNavigator(
-//   {
-//     PermissionAndroid: {
-//       screen: PermissionAndroid,
-//       navigationOptions: { header: null }
-//     },
-//     RestoreWalletUsingTrustedContact: {
-//       screen: RestoreWalletUsingTrustedContact,
-//       navigationOptions: { header: null }
-//     },
-//     RestoreSelectedContactsList: {
-//       screen: RestoreSelectedContactsList,
-//       navigationOptions: { header: null }
-//     },
-//     RestoreAllContactList: {
-//       screen: RestoreAllContactList,
-//       navigationOptions: { header: null }
-//     },
-//     RestoreTrustedContactsShare: {
-//       screen: RestoreTrustedContactsShare,
-//       navigationOptions: { header: null }
-//     },
-//     RestoreTrustedContactsQRCodeScan: {
-//       screen: RestoreTrustedContactsQRCodeScanScreen,
-//       navigationOptions: { header: null }
-//     },
-//     Restore3SelfShare: {
-//       screen: Restore3SelfShare,
-//       navigationOptions: { header: null }
-//     },
-//     Restore3SelfSahreQRCodeScanner: {
-//       screen: Restore3SelfSahreQRCodeScanner,
-//       navigationOptions: { header: null }
-//     },
-//     Restore4And5SelfShare: {
-//       screen: Restore4And5SelfShare,
-//       navigationOptions: { header: null }
-//     },
-//     Restore4And5SelfShareQRCodeScanner: {
-//       screen: Restore4And5SelfShareQRCodeScanner,
-//       navigationOptions: { header: null }
-//     },
-//     RestoreWalletUsingTrustedContactQueAndAnw: {
-//       screen: RestoreWalletUsingTrustedContactQueAndAnw,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "PermissionAndroid"
-//   }
-// );
+const RestoreWalletUsingTrustedContactStackNavigator = createStackNavigator(
+  {
+    RestoreWalletUsingTrustedContact: {
+      screen: RestoreWalletUsingTrustedContact,
+      navigationOptions: { header: null }
+    },
+    RestoreSelectedContactsList: {
+      screen: RestoreSelectedContactsList,
+      navigationOptions: { header: null }
+    },
+    RestoreAllContactList: {
+      screen: RestoreAllContactList,
+      navigationOptions: { header: null }
+    },
+    RestoreTrustedContactsShare: {
+      screen: RestoreTrustedContactsShare,
+      navigationOptions: { header: null }
+    },
+    RestoreTrustedContactsQRCodeScan: {
+      screen: RestoreTrustedContactsQRCodeScanScreen,
+      navigationOptions: { header: null }
+    },
+    Restore3SelfShare: {
+      screen: Restore3SelfShare,
+      navigationOptions: { header: null }
+    },
+    Restore3SelfSahreQRCodeScanner: {
+      screen: Restore3SelfSahreQRCodeScanner,
+      navigationOptions: { header: null }
+    },
+    Restore4And5SelfShare: {
+      screen: Restore4And5SelfShare,
+      navigationOptions: { header: null }
+    },
+    Restore4And5SelfShareQRCodeScanner: {
+      screen: Restore4And5SelfShareQRCodeScanner,
+      navigationOptions: { header: null }
+    },
+    RestoreWalletUsingTrustedContactQueAndAnw: {
+      screen: RestoreWalletUsingTrustedContactQueAndAnw,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "RestoreSelectedContactsList"
+  }
+);
 
 
+const RestoreWalletUsingTrustedContactAndroidStackNavigator = createStackNavigator(
+  {
+    PermissionAndroid: {
+      screen: PermissionAndroid,
+      navigationOptions: { header: null }
+    },
+    RestoreWalletUsingTrustedContact: {
+      screen: RestoreWalletUsingTrustedContact,
+      navigationOptions: { header: null }
+    },
+    RestoreSelectedContactsList: {
+      screen: RestoreSelectedContactsList,
+      navigationOptions: { header: null }
+    },
+    RestoreAllContactList: {
+      screen: RestoreAllContactList,
+      navigationOptions: { header: null }
+    },
+    RestoreTrustedContactsShare: {
+      screen: RestoreTrustedContactsShare,
+      navigationOptions: { header: null }
+    },
+    RestoreTrustedContactsQRCodeScan: {
+      screen: RestoreTrustedContactsQRCodeScanScreen,
+      navigationOptions: { header: null }
+    },
+    Restore3SelfShare: {
+      screen: Restore3SelfShare,
+      navigationOptions: { header: null }
+    },
+    Restore3SelfSahreQRCodeScanner: {
+      screen: Restore3SelfSahreQRCodeScanner,
+      navigationOptions: { header: null }
+    },
+    Restore4And5SelfShare: {
+      screen: Restore4And5SelfShare,
+      navigationOptions: { header: null }
+    },
+    Restore4And5SelfShareQRCodeScanner: {
+      screen: Restore4And5SelfShareQRCodeScanner,
+      navigationOptions: { header: null }
+    },
+    RestoreWalletUsingTrustedContactQueAndAnw: {
+      screen: RestoreWalletUsingTrustedContactQueAndAnw,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "PermissionAndroid"
+  }
+);
 
 
-// const TrustedPartyShareSecretStackNavigator = createStackNavigator(
-//   {
-//     ContactSharedSecretList: {
-//       screen: ContactSharedSecretList,
-//       navigationOptions: {
-//         header: null,
-//         tabBarVisible: false
-//       }
-//     },
-//     TrustedPartySelfShareQRCode: {
-//       screen: TrustedPartySelfShareQRCode,
-//       navigationOptions: { header: null }
-//     },
-//     TrsutedPartyQRCode: {
-//       screen: TrsutedPartyQRCode,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "ContactSharedSecretList"
-//   }
-// );
 
-// //TODO: FirstTimeWalletSetupStackNavigatorRouter
-// const BackUpYourWalletStackNavigatorRouter = createStackNavigator(
-//   {
-//     AllContactListScreen: {
-//       screen: AllContactList,
-//       navigationOptions: { header: null }
-//     },
-//     SecretSharingScreen: {
-//       screen: SecretSharing,
-//       navigationOptions: { header: null }
-//     },
-//     TrustedContactScreen: {
-//       screen: TrustedContact,
-//       navigationOptions: { header: null }
-//     },
-//     ShareSecretViaQRScreen: {
-//       screen: ShareSecretViaQR,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "AllContactListScreen"
-//   }
-// );
 
-// const BackUpYourWalletSecoundTimeStackNavigatorRouter = createStackNavigator(
-//   {
-//     SecretSharingScreen: {
-//       screen: SecretSharing,
-//       navigationOptions: { header: null }
-//     },
-//     TrustedContactScreen: {
-//       screen: TrustedContact,
-//       navigationOptions: { header: null }
-//     },
-//     ShareSecretViaQRScreen: {
-//       screen: ShareSecretViaQR,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "SecretSharingScreen"
-//   }
-// );
+const TrustedPartyShareSecretStackNavigator = createStackNavigator(
+  {
+    ContactSharedSecretList: {
+      screen: ContactSharedSecretList,
+      navigationOptions: {
+        header: null,
+        tabBarVisible: false
+      }
+    },
+    TrustedPartySelfShareQRCode: {
+      screen: TrustedPartySelfShareQRCode,
+      navigationOptions: { header: null }
+    },
+    TrsutedPartyQRCode: {
+      screen: TrsutedPartyQRCode,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "ContactSharedSecretList"
+  }
+);
 
-// const TrustedContactStackNavigator = createStackNavigator(
-//   {
-//     TrustedContactScreen: {
-//       screen: TrustedContact,
-//       navigationOptions: { header: null }
-//     },
-//     ShareSecretViaQRScreen: {
-//       screen: ShareSecretViaQR,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "TrustedContactScreen"
-//   }
-// );
+//TODO: FirstTimeWalletSetupStackNavigatorRouter
+const BackUpYourWalletStackNavigatorRouter = createStackNavigator(
+  {
+    AllContactList: {
+      screen: AllContactList,
+      navigationOptions: { header: null }
+    },
+    TrustedContact: {
+      screen: TrustedContact,
+      navigationOptions: { header: null }
+    },
+    ShareSecretViaQR: {
+      screen: ShareSecretViaQR,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "AllContactList"
+  }
+);
 
-// const BackupTrustedPartrySecretStoreStackNavigator = createStackNavigator(
-//   {
-//     SelectContactListAssociatePerson: {
-//       screen: SelectContactListAssociatePerson,
-//       navigationOptions: { header: null }
-//     },
-//     TrustedContactAcceptOtpScreen: {
-//       screen: TrustedContactAcceptOtp,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "SelectContactListAssociatePerson"
-//   }
-// );
+const BackUpYourWalletSecoundTimeStackNavigatorRouter = createStackNavigator(
+  {
+    TrustedContact: {
+      screen: TrustedContact,
+      navigationOptions: { header: null }
+    },
+    ShareSecretViaQR: {
+      screen: ShareSecretViaQR,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "TrustedContact"
+  }
+);
 
-// //TODO: SettingsScreen
-// const SettingsStackNavigator = createStackNavigator(
-//   {
-//     SettingsScreen: {
-//       screen: Settings,
-//       navigationOptions: { header: null }
-//     },
-//     BackupWalletMnemonicScreen: {
-//       screen: BackupWalletMnemonic,
-//       navigationOptions: { header: null }
-//     },
-//     BackupWalletMnemonicConfirmMnemonicScreen: {
-//       screen: BackupWalletMnemonicConfirmMnemonic,
-//       navigationOptions: { header: null }
-//     },
-//     AdvancedSettingsScreen: {
-//       screen: AdvancedSettings,
-//       navigationOptions: { header: null }
-//     },
-//     MnemonicDisplayScreen: {
-//       screen: MnemonicDisplay,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "AdvancedSettingsScreen"
-//   }
-// );
+const TrustedContactStackNavigator = createStackNavigator(
+  {
+    TrustedContact: {
+      screen: TrustedContact,
+      navigationOptions: { header: null }
+    },
+    ShareSecretViaQR: {
+      screen: ShareSecretViaQR,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "TrustedContact"
+  }
+);
 
-// //TODO: HealthOfTheScreen Stack Navigator
-// const HealthOfTheAppStackNavigator = createStackNavigator(
-//   {
-//     HealthOfTheAppScreen: {
-//       screen: HealthOfTheApp,
-//       navigationOptions: { header: null }
-//     },
-//     BackupSecretQuestionsScreen: {
-//       screen: BackupSecretQuestions,
-//       navigationOptions: { header: null }
-//     },
-//     BackupSecureTwoFactorAutoScreen: {
-//       screen: BackupSecureTwoFactorAuto,
-//       navigationOptions: { header: null }
-//     },
-//     HealthCheckMnemonicScreen: {
-//       screen: HealthCheckMnemonic,
-//       navigationOptions: { header: null }
-//     },
-//     SelfShareUsingWalletQRCode: {
-//       screen: SelfShareUsingWalletQRCode,
-//       navigationOptions: { header: null }
-//     },
-//     SelfShareSharingScreen: {
-//       screen: SelfShareSharing,
-//       navigationOptions: { header: null }
-//     },
-//     ConfirmSelfShareQRScannerScreen: {
-//       screen: ConfirmSelfShareQRScanner,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "HealthOfTheAppScreen"
-//   }
-// );
+const BackupTrustedPartrySecretStoreStackNavigator = createStackNavigator(
+  {
+    SelectContactListAssociatePerson: {
+      screen: SelectContactListAssociatePerson,
+      navigationOptions: { header: null }
+    },
+    TrustedContactAcceptOtp: {
+      screen: TrustedContactAcceptOtp,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "SelectContactListAssociatePerson"
+  }
+);
 
-// //TODO: Backup Secure Account Stack Navigator
+//TODO: SettingsScreen
+const SettingsStackNavigator = createStackNavigator(
+  {
+    Settings: {
+      screen: Settings,
+      navigationOptions: { header: null }
+    },
+    BackupWalletMnemonic: {
+      screen: BackupWalletMnemonic,
+      navigationOptions: { header: null }
+    },
+    BackupWalletMnemonicConfirmMnemonic: {
+      screen: BackupWalletMnemonicConfirmMnemonic,
+      navigationOptions: { header: null }
+    },
+    AdvancedSettings: {
+      screen: AdvancedSettings,
+      navigationOptions: { header: null }
+    },
+    MnemonicDisplay: {
+      screen: MnemonicDisplay,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "AdvancedSettings"
+  }
+);
 
-// const BackupSecureAccountWithPdfStackNavigator = createStackNavigator(
-//   {
-//     BackupSecureAccountScreen: {
-//       screen: BackupSecureAccount,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "BackupSecureAccountScreen"
-//   }
-// );
+//TODO: HealthOfTheScreen Stack Navigator
+const HealthOfTheAppStackNavigator = createStackNavigator(
+  {
+    HealthOfTheApp: {
+      screen: HealthOfTheApp,
+      navigationOptions: { header: null }
+    },
+    BackupSecretQuestions: {
+      screen: BackupSecretQuestions,
+      navigationOptions: { header: null }
+    },
+    BackupSecureTwoFactorAuto: {
+      screen: BackupSecureTwoFactorAuto,
+      navigationOptions: { header: null }
+    },
+    HealthCheckMnemonic: {
+      screen: HealthCheckMnemonic,
+      navigationOptions: { header: null }
+    },
+    SelfShareUsingWalletQRCode: {
+      screen: SelfShareUsingWalletQRCode,
+      navigationOptions: { header: null }
+    },
+    SelfShareSharing: {
+      screen: SelfShareSharing,
+      navigationOptions: { header: null }
+    },
+    ConfirmSelfShareQRScanner: {
+      screen: ConfirmSelfShareQRScanner,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "HealthOfTheApp"
+  }
+);
 
-// //TODO: Restore Secure Account Stack Navigator
-// const ResotreSecureAccountStackNavigator = createStackNavigator(
-//   {
-//     RestoreSecureAccountScreen: {
-//       screen: RestoreSecureAccount,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "RestoreSecureAccountScreen"
-//   }
-// );
+//TODO: Backup Secure Account Stack Navigator
 
-// //TODO: Payment Navigation
-// //Receive Payment Stack Navigator
-// const ReceivePaymentStackNavigator = createStackNavigator(
-//   {
-//     ReceivePaymentScreen: {
-//       screen: ReceivePayment,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "ReceivePaymentScreen"
-//   }
-// );
+const BackupSecureAccountWithPdfStackNavigator = createStackNavigator(
+  {
+    BackupSecureAccount: {
+      screen: BackupSecureAccount,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "BackupSecureAccount"
+  }
+);
 
-// //Send Payment Stack Navigator
-// const SendPaymentStackNavigator = createStackNavigator(
-//   {
-//     SendPaymentScreen: {
-//       screen: SendPayment,
-//       navigationOptions: { header: null }
-//     },
-//     ConfirmAndSendPaymentScreen: {
-//       screen: ConfirmAndSendPayment,
-//       navigationOptions: { header: null }
-//     },
-//     SendPaymentAddressScanScreen: {
-//       screen: SendPaymentAddressScan,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "SendPaymentScreen"
-//   }
-// );
 
-// //TODO: Account Transaction StackNavigator
-// const AccountTransactionStackNavigator = createStackNavigator(
-//   {
-//     TransactionScreen: {
-//       screen: Transaction,
-//       navigationOptions: { header: null }
-//     },
-//     RecieveNavigation: {
-//       screen: ReceivePaymentStackNavigator,
-//       navigationOptions: { header: null }
-//     },
-//     SendPaymentNavigation: {
-//       screen: SendPaymentStackNavigator,
-//       navigationOptions: { header: null }
-//     }
-//   },
-//   {
-//     initialRouteName: "TransactionScreen"
-//   }
-// );
+
+//TODO: Payment Navigation
+//Receive Payment Stack Navigator
+const ReceivePaymentStackNavigator = createStackNavigator(
+  {
+    ReceivePayment: {
+      screen: ReceivePayment,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "ReceivePayment"
+  }
+);
+
+//Send Payment Stack Navigator
+const SendPaymentStackNavigator = createStackNavigator(
+  {
+    SendPayment: {
+      screen: SendPayment,
+      navigationOptions: { header: null }
+    },
+    ConfirmAndSendPayment: {
+      screen: ConfirmAndSendPayment,
+      navigationOptions: { header: null }
+    },
+    SendPaymentAddressScan: {
+      screen: SendPaymentAddressScan,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "SendPayment"
+  }
+);
+
+//TODO: Account Transaction StackNavigator
+const AccountTransactionStackNavigator = createStackNavigator(
+  {
+    Transaction: {
+      screen: Transaction,
+      navigationOptions: { header: null }
+    },
+    RecieveNavigation: {
+      screen: ReceivePaymentStackNavigator,
+      navigationOptions: { header: null }
+    },
+    SendPaymentNavigation: {
+      screen: SendPaymentStackNavigator,
+      navigationOptions: { header: null }
+    }
+  },
+  {
+    initialRouteName: "Transaction"
+  }
+);
 
 //TODO: TabNavigator
 //TODO: TabNavigator:TabNavigator
 const TabNavigator = createBottomTabNavigator(
   {
     Wallet: {
-      screen: AllTransaction, //Wallet,
+      screen: Wallet,
       navigationOptions: {
         tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
         drawerLockMode: "locked-open",
@@ -550,7 +530,7 @@ const TabNavigator = createBottomTabNavigator(
 //TODO: RootNavigator:createRootNavigator
 export const createRootNavigator = (
   signedIn = false,
-  screenName = "PasscodeScreen"
+  screenName = "Passcode"
 ) => {
   return createStackNavigator(
     {
@@ -558,11 +538,11 @@ export const createRootNavigator = (
         screen: OnBoardingStackNavigator,
         navigationOptions: { header: null }
       },
-      PasscodeConfirmScreen: {
+      PasscodeConfirm: {
         screen: PasscodeConfirm,
         navigationOptions: { header: null }
       },
-      PasscodeScreen: {
+      Passcode: {
         screen: Passcode,
         navigationOptions: { header: null }
       },
@@ -574,88 +554,84 @@ export const createRootNavigator = (
         screen: TabNavigator,
         navigationOptions: { header: null }
       },
-      // RestoreWalletUsingMnemonicNavigator: {
-      //   screen: RestoreWalletUsingMnemonicStackNavigator,
-      //   navigationOptions: { header: null }
-      // },
-      // RestoreWalletUsingTrustedContactNavigator: {
-      //   screen: RestoreWalletUsingTrustedContactStackNavigator,
-      //   navigationOptions: { header: null }
-      // },
-      // RestoreWalletUsingTrustedContactAndroidNavigator: {
-      //   screen: RestoreWalletUsingTrustedContactAndroidStackNavigator,
-      //   navigationOptions: { header: null }
-      // },
+      RestoreWalletUsingMnemonicNavigator: {
+        screen: RestoreWalletUsingMnemonicStackNavigator,
+        navigationOptions: { header: null }
+      },
+      RestoreWalletUsingTrustedContactNavigator: {
+        screen: RestoreWalletUsingTrustedContactStackNavigator,
+        navigationOptions: { header: null }
+      },
+      RestoreWalletUsingTrustedContactAndroidNavigator: {
+        screen: RestoreWalletUsingTrustedContactAndroidStackNavigator,
+        navigationOptions: { header: null }
+      },
 
-      // BackUpYourWalletNavigator: {
-      //   screen: BackUpYourWalletStackNavigatorRouter,
-      //   navigationOptions: { header: null }
-      // },
-      // BackUpYourWalletSecoundTimeNavigator: {
-      //   screen: BackUpYourWalletSecoundTimeStackNavigatorRouter,
-      //   navigationOptions: { header: null }
-      // },
-      // BackupTrustedPartrySecretNavigator: {
-      //   screen: BackupTrustedPartrySecretStoreStackNavigator,
-      //   navigationOptions: { header: null }
-      // },
-      // //also use deepling url navigaton
-      // TrustedPartyShareSecretNavigator: {
-      //   screen: TrustedPartyShareSecretStackNavigator,
-      //   navigationOptions: { header: null }
-      // },
-      // //TODO: Common Screens
-      // OTPScreenNavigator: {
-      //   screen: OTP,
-      //   navigationOptions: { header: null }
-      // },
-      // OTPBackupShareStoreNavigator: {
-      //   screen: OTPBackupShareStore,
-      //   navigationOptions: { header: null }
-      // },
-      // //TODO: Settings
-      // SettingsNavigator: {
-      //   screen: SettingsStackNavigator,
-      //   navigationOptions: { header: null }
-      // },
-      // //TODO: HealthOfTheApp
-      // HealthOfTheAppNavigator: {
-      //   screen: HealthOfTheAppStackNavigator,
-      //   navigationOptions: { header: null }
-      // },
-      // TrustedContactNavigator: {
-      //   screen: TrustedContactStackNavigator,
-      //   navigationOptions: { header: null }
-      // },
-      // //TODO: Backup Secure Account
-      // BackupSecureAccountWithPdfNavigator: {
-      //   screen: BackupSecureAccountWithPdfStackNavigator,
-      //   navigationOptions: { header: null }
-      // },
-      // //TODO: Restore Secure Account
-      // ResotreSecureAccountNavigator: {
-      //   screen: ResotreSecureAccountStackNavigator,
-      //   navigationOptions: { header: null }
-      // },
-      // //TODO: Payment Navigation
-      // //ReceivePayment
-      // ReceivePaymentNavigator: {
-      //   screen: ReceivePaymentStackNavigator,
-      //   navigationOptions: { header: null }
-      // },
-      // //SentPayment
-      // SendPaymentNavigator: {
-      //   screen: SendPaymentStackNavigator,
-      //   navigationOptions: { header: null }
-      // },
-      // //TODO: Transaction Navigation
-      // AccountTransactionNavigator: {
-      //   screen: AccountTransactionStackNavigator,
-      //   navigationOptions: { header: null }
-      // }
+      BackUpYourWalletNavigator: {
+        screen: BackUpYourWalletStackNavigatorRouter,
+        navigationOptions: { header: null }
+      },
+      BackUpYourWalletSecoundTimeNavigator: {
+        screen: BackUpYourWalletSecoundTimeStackNavigatorRouter,
+        navigationOptions: { header: null }
+      },
+      BackupTrustedPartrySecretNavigator: {
+        screen: BackupTrustedPartrySecretStoreStackNavigator,
+        navigationOptions: { header: null }
+      },
+      //also use deepling url navigaton
+      TrustedPartyShareSecretNavigator: {
+        screen: TrustedPartyShareSecretStackNavigator,
+        navigationOptions: { header: null }
+      },
+      //TODO: Common Screens
+      OTPScreenNavigator: {
+        screen: OTP,
+        navigationOptions: { header: null }
+      },
+      OTPBackupShareStoreNavigator: {
+        screen: OTPBackupShareStore,
+        navigationOptions: { header: null }
+      },
+      //TODO: Settings
+      SettingsNavigator: {
+        screen: SettingsStackNavigator,
+        navigationOptions: { header: null }
+      },
+      //TODO: HealthOfTheApp
+      HealthOfTheAppNavigator: {
+        screen: HealthOfTheAppStackNavigator,
+        navigationOptions: { header: null }
+      },
+      TrustedContactNavigator: {
+        screen: TrustedContactStackNavigator,
+        navigationOptions: { header: null }
+      },
+      //TODO: Backup Secure Account
+      BackupSecureAccountWithPdfNavigator: {
+        screen: BackupSecureAccountWithPdfStackNavigator,
+        navigationOptions: { header: null }
+      },
+
+      //TODO: Payment Navigation
+      //ReceivePayment
+      ReceivePaymentNavigator: {
+        screen: ReceivePaymentStackNavigator,
+        navigationOptions: { header: null }
+      },
+      //SentPayment
+      SendPaymentNavigator: {
+        screen: SendPaymentStackNavigator,
+        navigationOptions: { header: null }
+      },
+      //TODO: Transaction Navigation
+      AccountTransactionNavigator: {
+        screen: AccountTransactionStackNavigator,
+        navigationOptions: { header: null }
+      }
     },
     {
-      //initialRouteName: signedIn ? "OnBoardingNavigator" : PasscodeConfirmScreen
+      //initialRouteName: signedIn ? "OnBoardingNavigator" : PasscodeConfirm
       initialRouteName: signedIn ? "OnBoardingNavigator" : screenName //"TabbarBottom" //
     }
   );

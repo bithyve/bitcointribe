@@ -44,7 +44,7 @@ var comFunDBRead = require( "hexaCommonDBReadData" );
 
 //TODO: Bitcoin Class  
 var bitcoinClassState = require( "hexaClassState" );
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import { S3Service } from "hexaBitcoin";
 
 export default class TrustedContact extends React.Component<any, any> {
 
@@ -291,7 +291,7 @@ export default class TrustedContact extends React.Component<any, any> {
             this.click_SentURLSmsOrEmail( "EMAIL", item );
         } else {
             let { arr_EncryptedMetaShare } = this.state;
-            this.props.navigation.push( "ShareSecretViaQRScreen", { data: arr_EncryptedMetaShare, onSelect: this.onSelect } );
+            this.props.navigation.push( "ShareSecretViaQR", { data: arr_EncryptedMetaShare, onSelect: this.onSelect } );
         }
         this.refs.modal4.close();
     }

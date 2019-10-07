@@ -7,14 +7,15 @@ import {
 import { SvgIcon } from "@up-shared/components";
 import { RkCard } from "react-native-ui-kitten";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
-import ImageSVG from "HexaWallet/src/screens/Custome/ImageSVG/ImageSVG";
+
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Permissions from 'react-native-permissions';
 import { Avatar } from 'react-native-elements';
 
 
 
-//TODO: Custome Pages
+//TODO: Custome Pages  
+import { ImageSVG } from "hexaCustImage";
 import { CustomeStatusBar } from "hexaCustStatusBar";
 import { HeaderTitle } from "hexaCustHeader";
 
@@ -444,7 +445,7 @@ export default class HealthOfTheApp extends React.Component<any, any> {
     click_SecretQuestion( item: any ) {
         let walletDetails = item.walletDetails;
         let data = JSON.parse( walletDetails.setUpWalletAnswerDetails );
-        this.props.navigation.push( "BackupSecretQuestionsScreen", { data: data, walletDetails: walletDetails } );
+        this.props.navigation.push( "BackupSecretQuestions", { data: data, walletDetails: walletDetails } );
     }
 
     //TODO: click_SetupTrustedContacts
@@ -461,12 +462,12 @@ export default class HealthOfTheApp extends React.Component<any, any> {
 
     //TODO: Setup Two Factor 
     click_TwoFactorSetup() {
-        this.props.navigation.push( "BackupSecureTwoFactorAutoScreen", { data: this.state.arr_SecureAccountDetials } );
+        this.props.navigation.push( "BackupSecureTwoFactorAuto", { data: this.state.arr_SecureAccountDetials } );
     }
 
     //Mnemonic click
     click_MnemoicItem() {
-        this.props.navigation.push( "HealthCheckMnemonicScreen", { data: this.state.arr_MnemonicDetails } );
+        this.props.navigation.push( "HealthCheckMnemonic", { data: this.state.arr_MnemonicDetails } );
     }
 
     onSelect = async ( returnValue: any ) => {
@@ -482,9 +483,9 @@ export default class HealthOfTheApp extends React.Component<any, any> {
         if ( item.type == "Self Share 1" ) {
             this.props.navigation.push( "SelfShareUsingWalletQRCode", { data: data3Share, onSelect: this.onSelect } )
         } else if ( item.type == "Self Share 2" ) {
-            this.props.navigation.push( "SelfShareSharingScreen", { data: item, title: "Email Share" } );
+            this.props.navigation.push( "SelfShareSharing", { data: item, title: "Email Share" } );
         } else {
-            this.props.navigation.push( "SelfShareSharingScreen", { data: item, title: "Cloud Share" } );
+            this.props.navigation.push( "SelfShareSharing", { data: item, title: "Cloud Share" } );
         }
     }
 

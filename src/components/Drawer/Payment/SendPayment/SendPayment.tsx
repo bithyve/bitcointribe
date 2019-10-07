@@ -226,7 +226,7 @@ export default class SendPayment extends React.Component<any, any> {
             data.tranFee = resTransferST.data.fee.toString();
             data.selectedAccount = arr_SelectAccountDetails;
             data.resTransferST = resTransferST;
-            this.props.navigation.push( "ConfirmAndSendPaymentScreen", { data: [ data ] } );
+            this.props.navigation.push( "ConfirmAndSendPayment", { data: [ data ] } );
         } else {
             this.setState( {
                 flag_Loading: false,
@@ -443,7 +443,7 @@ export default class SendPayment extends React.Component<any, any> {
                                             transparent
                                             style={ { flex: 0.15 } }
                                             onPress={ () => {
-                                                this.props.navigation.push( "SendPaymentAddressScanScreen", { onSelect: this.getAddressWithBal.bind( this ) } )
+                                                this.props.navigation.push( "SendPaymentAddressScan", { onSelect: this.getAddressWithBal.bind( this ) } )
                                             } }>
                                             <SvgIcon name="qr-codes" color="#000000" size={ 30 } />
                                         </Button>

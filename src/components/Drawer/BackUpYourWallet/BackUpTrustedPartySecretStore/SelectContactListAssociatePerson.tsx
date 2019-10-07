@@ -35,9 +35,9 @@ var utils = require( "hexaUtils" );
 
 //TODO: Bitcoin Class
 var bitcoinClassState = require( "hexaClassState" );
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 
+import { S3Service } from "hexaBitcoin";
 
 
 //TODO: Common Funciton
@@ -93,7 +93,7 @@ export default class SelectContactListAssociatePerson extends React.Component<an
                 {
                     text: 'Confirm', onPress: () => {
                         if ( urlType == "SSS Recovery SMS/EMAIL" ) {
-                            this.props.navigation.push( "TrustedContactAcceptOtpScreen", { data: this.state.arr_SelectedItem } )
+                            this.props.navigation.push( "TrustedContactAcceptOtp", { data: this.state.arr_SelectedItem } )
                         } else {
                             this.downloadDescShare();
                         }

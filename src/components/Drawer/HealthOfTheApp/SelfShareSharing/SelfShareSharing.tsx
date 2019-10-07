@@ -162,7 +162,7 @@ export default class SelfShareSharing extends React.Component<any, any> {
     click_Confirm( data: any ) {
         // console.log( { data } );
         let value = JSON.parse( data.sssDetails.keeperInfo );
-        this.props.navigation.push( "ConfirmSelfShareQRScannerScreen", { data: value, onSelect: this.onSelect } );
+        this.props.navigation.push( "ConfirmSelfShareQRScanner", { data: value, onSelect: this.onSelect } );
     }
 
     onSelect = async ( returnValue: any ) => {

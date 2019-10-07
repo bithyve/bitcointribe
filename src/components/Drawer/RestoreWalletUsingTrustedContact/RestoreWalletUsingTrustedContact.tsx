@@ -60,7 +60,7 @@ export default class RestoreWalletUsingTrustedContact extends Component {
                                         }
                                     ],
                                 } );
-                                this.props.navigation.push( "RestoreSelectedContactsListScreen", { walletName: val } );
+                                this.props.navigation.push( "RestoreSelectedContactsList", { walletName: val } );
                             }
                             }
                                 pop={ () => {

@@ -11,10 +11,10 @@ import { ViewBackupWalletMnemonicScrolling } from "hexaCustView";
 import { HeaderTitle } from "hexaCustHeader";
 
 
-import BackupWalletMnemonic6Screen from "./BackupWalletMnemonic6Screen";
-import BackupWalletMnemonic7to12Screen from "./BackupWalletMnemonic7to12Screen";
-import BackupWalletMnemonic13to18Screen from "./BackupWalletMnemonic13to18Screen";
-import BackupWalletMnemonic19to24Screen from "./BackupWalletMnemonic19to24Screen";
+import BackupWalletMnemonic6 from "./BackupWalletMnemonic6";
+import BackupWalletMnemonic7to12 from "./BackupWalletMnemonic7to12";
+import BackupWalletMnemonic13to18 from "./BackupWalletMnemonic13to18";
+import BackupWalletMnemonic19to24 from "./BackupWalletMnemonic19to24";
 
 //TODO: Custome Object  
 import { colors, images } from "hexaConstants";
@@ -65,7 +65,7 @@ export default class BackupWalletMnemonic extends React.Component<any, any> {
 
 
     click_Next() {
-        this.props.navigation.push( "BackupWalletMnemonicConfirmMnemonicScreen" );
+        this.props.navigation.push( "BackupWalletMnemonicConfirmMnemonic" );
     }
 
     render() {
@@ -78,13 +78,13 @@ export default class BackupWalletMnemonic extends React.Component<any, any> {
                     <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
                         <ViewBackupWalletMnemonicScrolling  >
                             {/* First screen */ }
-                            <BackupWalletMnemonic6Screen data={ this.state.arr_BackupWalletMnemonic6Screen } />
+                            <BackupWalletMnemonic6 data={ this.state.arr_BackupWalletMnemonic6Screen } />
                             {/* Second screen */ }
-                            <BackupWalletMnemonic7to12Screen data={ this.state.arr_BackupWalletMnemonic7to12Screen } />
+                            <BackupWalletMnemonic7to12 data={ this.state.arr_BackupWalletMnemonic7to12Screen } />
                             {/* Third screen */ }
-                            <BackupWalletMnemonic13to18Screen data={ this.state.arr_BackupWalletMnemonic13to18Screen } />
+                            <BackupWalletMnemonic13to18 data={ this.state.arr_BackupWalletMnemonic13to18Screen } />
                             {/* Fourth screen */ }
-                            <BackupWalletMnemonic19to24Screen data={ this.state.arr_BackupWalletMnemonic19to24Screen } click_Next={ () => this.click_Next() } />
+                            <BackupWalletMnemonic19to24 data={ this.state.arr_BackupWalletMnemonic19to24Screen } click_Next={ () => this.click_Next() } />
                         </ViewBackupWalletMnemonicScrolling>
                     </SafeAreaView>
                 </ImageBackground>

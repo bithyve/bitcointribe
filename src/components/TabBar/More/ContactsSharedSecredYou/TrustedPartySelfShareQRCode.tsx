@@ -17,36 +17,33 @@ import {
     ListItem,
     Thumbnail
 } from "native-base";
-import { SvgIcon } from "@up-shared/components";
-import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Contacts from 'react-native-contacts';
-import { Avatar, SearchBar } from 'react-native-elements';
 // import QRCode from "react-native-qrcode";
 import QRCode from 'react-native-qrcode-svg';
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { HeaderTitle } from "hexaCustHeader";
+import { ModelLoader } from "hexaLoader";
+
+
 
 
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+import { colors, images } from "hexaConstants";
+
 
 //TODO: Bitcoin class
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+var bitcoinClassState = require( "hexaClassState" );
+
 
 export default class TrustedPartySelfShareQRCode extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -109,7 +106,7 @@ export default class TrustedPartySelfShareQRCode extends React.Component<any, an
                             extraScrollHeight={ 40 }
                         >
                             <View style={ { flex: 0.1, margin: 20 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Present this QR code to contact that trusted you, this will help that contact to restore wallet.</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Present this QR code to contact that trusted you, this will help that contact to restore wallet.</Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center" } }>
                                 <QRCode
@@ -118,19 +115,19 @@ export default class TrustedPartySelfShareQRCode extends React.Component<any, an
                                 />
                             </View>
                             <View style={ { flex: 0.5, alignItems: "center" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Do not share this QR code with anyone other than that contact, whom you want to share the secret with</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Do not share this QR code with anyone other than that contact, whom you want to share the secret with</Text>
                             </View>
                         </KeyboardAwareScrollView>
                     </SafeAreaView>
                 </ImageBackground>
-                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } message="Making QRCode" />
+                <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } message="Making QRCode" />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }
 }
 
-const primaryColor = colors.appColor;
+
 const styles = StyleSheet.create( {
     container: {
         flex: 1,

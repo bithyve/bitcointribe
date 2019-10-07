@@ -57,7 +57,7 @@ export default class AdvancedSettings extends React.Component<any, any> {
     click_MenuItem( item: any ) {
         let title = item.title;
         if ( title == "Mnemonic" ) {
-            this.props.navigation.push( "MnemonicDisplayScreen" );
+            this.props.navigation.push( "MnemonicDisplay" );
         }
     }
 

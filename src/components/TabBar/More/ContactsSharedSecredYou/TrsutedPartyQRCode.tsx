@@ -17,30 +17,25 @@ import {
     ListItem,
     Thumbnail
 } from "native-base";
-import { SvgIcon } from "@up-shared/components";
-import IconFontAwe from "react-native-vector-icons/MaterialCommunityIcons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Contacts from 'react-native-contacts';
-import { Avatar, SearchBar } from 'react-native-elements';
 // import QRCode from "react-native-qrcode";
 import QRCode from 'react-native-qrcode-svg';
 
+
+
 //TODO: Custome Pages
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { HeaderTitle } from "hexaCustHeader";
 
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+import { colors, images } from "hexaConstants";
+var utils = require( "hexaUtils" );
 
-//TODO: Bitcoin Files
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 
 export default class TrsutedPartyQRCode extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -90,7 +85,7 @@ export default class TrsutedPartyQRCode extends React.Component<any, any> {
                             extraScrollHeight={ 40 }
                         >
                             <View style={ { flex: 0.1, margin: 20 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Present this QR code to contact that trusted you, this will help that contact to restore wallet. </Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Present this QR code to contact that trusted you, this will help that contact to restore wallet. </Text>
                             </View>
                             <View style={ { flex: 1, alignItems: "center" } }>
                                 <QRCode
@@ -99,7 +94,7 @@ export default class TrsutedPartyQRCode extends React.Component<any, any> {
                                 />
                             </View>
                             <View style={ { flex: 0.5, alignItems: "center" } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Do not share this QR code with anyone other than that contact, whom you want to share the secret with</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center", margin: 10 } ] }>Do not share this QR code with anyone other than that contact, whom you want to share the secret with</Text>
                             </View>
                         </KeyboardAwareScrollView>
                     </SafeAreaView>
