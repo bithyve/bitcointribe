@@ -61,10 +61,10 @@ export default class Settings extends React.Component<any, any> {
         console.log( { item } );
         let title = item.title;
         if ( title == "Backup Wallet Mnemonic" ) {
-            this.props.navigation.push( "BackupWalletMnemonicScreen" );
+            this.props.navigation.push( "BackupWalletMnemonic" );
         }
         else if ( title == "Advanced settings" ) {
-            this.props.navigation.push( "AdvancedSettingsScreen" )
+            this.props.navigation.push( "AdvancedSettings" )
         }
     }
 

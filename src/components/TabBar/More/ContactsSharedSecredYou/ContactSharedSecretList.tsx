@@ -11,43 +11,42 @@ import {
 import { SvgIcon } from "@up-shared/components";
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Contacts from 'react-native-contacts';
 import { Avatar } from 'react-native-elements';
-import GridView from 'react-native-super-grid';
 import Modal from 'react-native-modalbox';
 import Permissions from 'react-native-permissions'
 import SendSMS from 'react-native-sms';
-
 var Mailer = require( 'NativeModules' ).RNMail;
 import TimerCountdown from "react-native-timer-countdown";
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { HeaderTitle } from "hexaCustHeader";
+import { ModelLoader } from "hexaLoader";
+
+
+
 
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 //TODO: Custome Object
-import { colors, images, localDB } from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+import { colors, images, localDB } from "hexaConstants";
+import { renderIf } from "hexaValidation";
+var dbOpration = require( "hexaDBOpration" );
+var utils = require( "hexaUtils" );
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
-//TODO: Bitcoin class
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+//TODO: Bitcoin class  
+var bitcoinClassState = require( "hexaClassState" );
+import { S3Service } from "hexaBitcoin";
 
 export default class ContactSharedSecretList extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -329,7 +328,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                 }, 3000 );
             }
         } else if ( type == "QR" ) {
-            this.props.navigation.push( "TrsutedPartyQRCodeScreen", { data: arr_EncryptedMetaShare } );
+            this.props.navigation.push( "TrsutedPartyQRCode", { data: arr_EncryptedMetaShare } );
             this.refs.modal4.close();
         }
     }
@@ -397,9 +396,9 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                                 ) }
                             </View>
                             <View style={ { flex: 1, flexDirection: "column" } }>
-                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10 } ] }>{ item.name }</Text>
-                                <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.mobileNo != "" ? item.mobileNo : "Not Number!" }</Text>
-                                <Text note style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.walletName }</Text>
+                                <Text style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10 } ] }>{ item.name }</Text>
+                                <Text style={ [ FontFamily.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.mobileNo != "" ? item.mobileNo : "Not Number!" }</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansRegular, { marginLeft: 10 } ] }>{ item.walletName }</Text>
                                 { renderIf( typeof item.opt !== "undefined" )(
                                     <TimerCountdown
                                         initialMilliseconds={ item.totalSec * 1000 }
@@ -416,11 +415,11 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                                             return h + m + ':' + s;
                                         } }
                                         allowFontScaling={ true }
-                                        style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: "gray" } ] }
+                                        style={ [ FontFamily.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: "gray" } ] }
                                     />
                                 ) }
                                 { renderIf( typeof item.opt !== "undefined" )(
-                                    <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: "gray" } ] }>OTP { " " }{ item.opt }</Text>
+                                    <Text style={ [ FontFamily.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: "gray" } ] }>OTP { " " }{ item.opt }</Text>
                                 ) }
                             </View>
                             <View style={ { flex: 0.1, alignItems: "center", justifyContent: "center" } } >
@@ -472,13 +471,13 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                                     <Item style={ { borderColor: 'transparent', marginLeft: 10 } }>
                                         <Icon name="ios-search" color="#B7B7B7" />
                                         <Input placeholder="Enter a user name or wallet name"
-                                            style={ [ globalStyle.ffFiraSansMedium ] }
+                                            style={ [ FontFamily.ffFiraSansMedium ] }
                                             placeholderTextColor="#B7B7B7"
                                             onChangeText={ text => this.searchFilterFunction( text ) }
                                             autoCorrect={ false } />
                                     </Item>
                                 </View>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20, textAlign: "center" } ] }>Click on wallet name of trusted contact to send back share</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, marginRight: 10, marginBottom: 20, textAlign: "center" } ] }>Click on wallet name of trusted contact to send back share</Text>
                             </View>
                             <View style={ { flex: 1 } }>
                                 { secretList }
@@ -537,15 +536,14 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                         </Modal>
                     </SafeAreaView>
                 </ImageBackground>
-                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message="Loading" />
+                <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message="Loading" />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }
 }
 
-const primaryColor = colors.appColor;
-const darkGrey = "#bdc3c7";
+
 const styles = StyleSheet.create( {
     container: {
         flex: 1,

@@ -34,7 +34,7 @@ import { ModelLoader } from "hexaLoader";
 var comFunDBRead = require( "hexaCommonDBReadData" );
 
 //TODO: Bitcoin files
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import { S3Service } from "hexaBitcoin";
 
 
 let flag_ReadQRCode = true;

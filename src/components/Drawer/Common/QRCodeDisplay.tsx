@@ -22,7 +22,7 @@ import { colors, images } from "hexaConstants";
 
 
 
-export default class QRCode extends React.Component<any, any> {
+export default class QRCodeDisplay extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props )
         this.state = ( {

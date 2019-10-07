@@ -42,7 +42,7 @@ import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 //TODO: Bitcoin Files
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
+import { S3Service } from "hexaBitcoin";
 
 //TODO: Common Funciton
 var comFunDBRead = require( "hexaCommonDBReadData" );

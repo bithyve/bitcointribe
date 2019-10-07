@@ -250,7 +250,7 @@ export default class RestoreTrustedContactsShare extends React.Component<any, an
                 } );
             }
         } else {
-            this.props.navigation.push( "RestoreTrustedContactsQRCodeScanScreen", { data: data, onSelect: this.onSelect } );
+            this.props.navigation.push( "RestoreTrustedContactsQRCodeScan", { data: data, onSelect: this.onSelect } );
         }
         this.refs.modal4.close();
     }

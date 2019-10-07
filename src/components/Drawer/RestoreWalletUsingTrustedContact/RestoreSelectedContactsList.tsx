@@ -241,9 +241,9 @@ export default class RestoreSelectedContactsList extends React.Component<any, an
     //TODO: func click_Item
     click_AssociateContactItem = ( item: any ) => {
         if ( item.givenName == "Trusted Contacts 1" || item.givenName == "Trusted Contacts 2" ) {
-            this.props.navigation.push( "RestoreAllContactListScreen", { data: item.givenName } );
+            this.props.navigation.push( "RestoreAllContactList", { data: item.givenName } );
         } else {
-            this.props.navigation.push( "RestoreTrustedContactsShareScreen", { data: item, title: item.givenName + " Share" } )
+            this.props.navigation.push( "RestoreTrustedContactsShare", { data: item, title: item.givenName + " Share" } )
         }
     }
 
@@ -251,7 +251,7 @@ export default class RestoreSelectedContactsList extends React.Component<any, an
     click_SecretQuestion( item: any ) {
         let walletDetails = item.walletDetails;
         let data = JSON.parse( walletDetails.setUpWalletAnswerDetails );
-        this.props.navigation.push( "BackupSecretQuestionsScreen", { data: data, walletDetails: walletDetails } );
+        this.props.navigation.push( "BackupSecretQuestions", { data: data, walletDetails: walletDetails } );
     }
 
     //TODO: click_SetupTrustedContacts
@@ -307,9 +307,9 @@ export default class RestoreSelectedContactsList extends React.Component<any, an
     //TODO: Self share
     click_SelfShare = async ( item: any ) => {
         if ( item.givenName == "Wallet" ) {
-            this.props.navigation.push( "Restore3SelfShareScreen", { data: item, title: item.givenName + " Shares Scan" } );
+            this.props.navigation.push( "Restore3SelfShare", { data: item, title: item.givenName + " Shares Scan" } );
         } else {
-            this.props.navigation.push( "Restore4And5SelfShareScreen", { data: item, title: item.givenName + " Shares Scan", type: item.givenName } );
+            this.props.navigation.push( "Restore4And5SelfShare", { data: item, title: item.givenName + " Shares Scan", type: item.givenName } );
         }
 
         // let sssDetails = await utils.getSSSDetails();
@@ -330,7 +330,7 @@ export default class RestoreSelectedContactsList extends React.Component<any, an
 
     //TODO: click next button all or 3 share conrimed
     click_Next() {
-        this.props.navigation.push( "RestoreWalletUsingTrustedContactQueAndAnwScreen" );
+        this.props.navigation.push( "RestoreWalletUsingTrustedContactQueAndAnw" );
     }
 
 

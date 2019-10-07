@@ -41,7 +41,7 @@ import {
     colors,
     localDB,
     asyncStorageKeys
-} from "HhexaConstants";
+} from "hexaConstants";
 var dbOpration = require( "hexaDBOpration" );
 import utils from "hexaUtils";
 
@@ -55,9 +55,7 @@ import { validationService } from "hexaValidation";
 
 //TODO: Bitcoin Files
 var bitcoinClassState = require( "hexaClassState" );
-import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
-import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
-import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
+import { S3Service, RegularAccount, SecureAccount } from "hexaBitcoin";
 
 export default class ModelRestoreWalletFirstQuestion extends Component<Props, any> {
     constructor ( props: any ) {
