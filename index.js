@@ -12,9 +12,8 @@ import { Launch } from "hexaCompLanch";
 
 //TODO: Redux
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
-import allReducers from './src/redux/reducers';
-const store = createStore( allReducers );
+import { store } from './src/redux';
+
 
 
 //TODO: Custome Object
