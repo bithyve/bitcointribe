@@ -10,35 +10,28 @@ import {
 } from "native-base";
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
-
-
-
 //TODO: Custome object
 import {
     colors,
     images,
     localDB
-} from "HexaWallet/src/app/constants/Constants";
-var dbOpration = require( "HexaWallet/src/app/manage/database/DBOpration" );
-
-
+} from "hexaConstants";
+var dbOpration = require( "hexaDBOpration" );
 
 //Custome Compontes
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { HeaderTitle } from "hexaCustHeader";
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-
-
+import { ModelLoader } from "hexaLoader";
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 //TODO: Bitcoin files
 import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
@@ -167,7 +160,7 @@ export default class RestoreTrustedContactsQRCodeScan extends React.Component {
                         />
                     </SafeAreaView>
                 </ImageBackground>
-                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+                <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container>
         );

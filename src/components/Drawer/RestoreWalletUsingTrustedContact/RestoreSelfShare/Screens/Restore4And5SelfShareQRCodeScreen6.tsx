@@ -11,12 +11,13 @@ import {
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
 
+
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
-
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+//TODO: Custome object
+import { renderIf } from "hexaValidation";
 
 
 

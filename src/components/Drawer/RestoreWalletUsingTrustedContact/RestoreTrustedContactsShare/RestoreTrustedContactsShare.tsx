@@ -17,24 +17,25 @@ var Mailer = require( 'NativeModules' ).RNMail;
 
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import FullLinearGradientButton from "HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientButton";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { HeaderTitle } from "hexaCustHeader";
+import { ModelLoader } from "hexaLoader";
+import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
+
 
 
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
-import { colors, images } from "HexaWallet/src/app/constants/Constants";
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+import { colors, images } from "hexaConstants";
+import { renderIf } from "hexaValidation";
+var utils = require( "hexaUtils" );
 
 
 
@@ -269,7 +270,7 @@ export default class RestoreTrustedContactsShare extends React.Component<any, an
                     />
                     <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
                         <View style={ { flex: 0.1, margin: 20 } }>
-                            <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Request back your secret share from trusted contacts</Text>
+                            <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Request back your secret share from trusted contacts</Text>
                         </View>
                         <View style={ { flex: 2 } }>
                             <FlatList
@@ -285,8 +286,8 @@ export default class RestoreTrustedContactsShare extends React.Component<any, an
                                             </View>
                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
                                                 <View style={ { flexDirection: "row", flex: 1, } }>
-                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16, flex: 1, alignSelf: "center", } ] }>{ item.title }</Text>
-                                                    <Text style={ [ globalStyle.ffFiraSansMedium, { alignSelf: "center", flex: 1 } ] }>{ item.date }</Text>
+                                                    <Text style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, fontSize: 16, flex: 1, alignSelf: "center", } ] }>{ item.title }</Text>
+                                                    <Text style={ [ FontFamily.ffFiraSansMedium, { alignSelf: "center", flex: 1 } ] }>{ item.date }</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -298,7 +299,7 @@ export default class RestoreTrustedContactsShare extends React.Component<any, an
                         </View>
                         { renderIf( flag_ShareBtnDisable == true )(
                             <View style={ { flex: 0.4 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select method to request share from trusted contact</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Select method to request share from trusted contact</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_Share( data )
@@ -310,7 +311,7 @@ export default class RestoreTrustedContactsShare extends React.Component<any, an
                         ) }
                         { renderIf( flag_ReShareBtnDisable == true )(
                             <View style={ { flex: 0.4 } }>
-                                <Text note style={ [ globalStyle.ffFiraSansMedium, { textAlign: "center" } ] }>Select method to request share from trusted contact</Text>
+                                <Text note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Select method to request share from trusted contact</Text>
                                 <FullLinearGradientButton
                                     click_Done={ () => {
                                         this.click_ReShare( data )
@@ -373,7 +374,7 @@ export default class RestoreTrustedContactsShare extends React.Component<any, an
                         </Modal>
                     </SafeAreaView>
                 </ImageBackground>
-                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
+                <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );

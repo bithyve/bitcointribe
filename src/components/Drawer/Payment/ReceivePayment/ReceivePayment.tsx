@@ -22,36 +22,27 @@ import Share from 'react-native-share';
 
 
 //TODO: Custome Pages
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import FullLinearGradientIconWithLoadingButton from 'HexaWallet/src/app/custcompontes/LinearGradient/Buttons/FullLinearGradientIconWithLoadingButton';
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
-
-
-
-
-
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { HeaderTitle } from "hexaCustHeader";
+import { ModelLoader } from "hexaLoader";
+import { FullLinearGradientIconWithLoadingButton } from "hexaCustomeLinearGradientButton";
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
-import { colors, images } from "HexaWallet/src/app/constants/Constants";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
-
-
+import { colors, images } from "hexaConstants";
+var utils = require( "hexaUtils" );
 
 //TODO: Common Funciton
-var comFunDBRead = require( "HexaWallet/src/app/manage/CommonFunction/CommonDBReadData" );
+var comFunDBRead = require( "hexaCommonDBReadData" );
 
 //TODO: Bitcoin class
-var bitcoinClassState = require( "HexaWallet/src/app/manage/ClassState/BitcoinClassState" );
-
-
+var bitcoinClassState = require( "hexaClassState" );
 
 export default class ReceivePayment extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -246,12 +237,12 @@ export default class ReceivePayment extends React.Component<any, any> {
                                                     </Button>
                                                 </Left>
                                                 <Body style={ { flex: 3 } }>
-                                                    <Title style={ [ globalStyle.ffFiraSansMedium, { color: "#000" } ] }>Select Account</Title>
+                                                    <Title style={ [ FontFamily.ffFiraSansMedium, { color: "#000" } ] }>Select Account</Title>
                                                 </Body>
                                                 <Right />
                                             </Header> }
                                         mode="dropdown"
-                                        style={ [ globalStyle.ffFiraSansMedium ] }
+                                        style={ [ FontFamily.ffFiraSansMedium ] }
                                         iosIcon={ <Icon name="arrow-down" style={ { fontSize: 30, marginLeft: -10 } } /> }
                                         selectedValue={ accountName }
                                         onValueChange={ ( item: any ) => this.onValueChange( item ) }
@@ -281,7 +272,7 @@ export default class ReceivePayment extends React.Component<any, any> {
                                                     this.getQrCodeWithAmount()
                                                 }, 100 );
                                             } }
-                                            style={ [ globalStyle.ffOpenSansBold, { flex: 1, fontSize: 18 } ] }
+                                            style={ [ FontFamily.ffOpenSansBold, { flex: 1, fontSize: 18 } ] }
                                         />
                                     </View>
                                 </View>
@@ -321,7 +312,7 @@ export default class ReceivePayment extends React.Component<any, any> {
                         </KeyboardAwareScrollView>
                     </SafeAreaView>
                 </ImageBackground>
-                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+                <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container>
         );

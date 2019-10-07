@@ -8,20 +8,15 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //TODO: Custome Compontes
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import ModelWalletName from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelWalletName";
-import ModelContactPermission from "HexaWallet/src/app/custcompontes/Model/ModelRestoreWalletUsingTrustedContact/ModelContactPermission";
-
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { ModelWalletName, ModelContactPermission } from "hexaCustModel";
 
 //TODO: Custome Object
 import {
     colors,
     images
-} from "HexaWallet/src/app/constants/Constants";
+} from "hexaConstants";
 
-
-//localization
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
 export default class RestoreWalletUsingTrustedContact extends Component {
     constructor ( props: any ) {

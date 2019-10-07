@@ -9,24 +9,14 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 
 //TODO: Custome Compontes
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import ModelHealthCheckMnemonicFirstWord from "HexaWallet/src/app/custcompontes/Model/ModelHealthCheckMnemonic/ModelHealthCheckMnemonicFirstWord";
-import ModelHealthCheckMnemonicSecoundWord from "HexaWallet/src/app/custcompontes/Model/ModelHealthCheckMnemonic/ModelHealthCheckMnemonicSecoundWord";
-import ModelHealthCheckMnemonicThirdWord from "HexaWallet/src/app/custcompontes/Model/ModelHealthCheckMnemonic/ModelHealthCheckMnemonicThirdWord";
-import ModelHeackCheckMnemonicSucessBackedUp from "HexaWallet/src/app/custcompontes/Model/ModelHealthCheckMnemonic/ModelHeackCheckMnemonicSucessBackedUp";
-
-
-//TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { ModelHealthCheckMnemonicFirstWord, ModelHealthCheckMnemonicSecoundWord, ModelHealthCheckMnemonicThirdWord, ModelHeackCheckMnemonicSucessBackedUp } from "hexaCustModel";
 
 //TODO: Custome Object
 import {
     colors,
     images
-} from "HexaWallet/src/app/constants/Constants";
-
-//localization       
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
+} from "hexaConstants";
 
 
 

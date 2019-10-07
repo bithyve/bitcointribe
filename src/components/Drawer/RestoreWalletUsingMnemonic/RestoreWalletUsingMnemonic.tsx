@@ -8,23 +8,20 @@ import {
     TextInput,
 } from "react-native";
 import { Text } from 'native-base';
-
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
+
+
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-
-
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { ModelLoader } from "hexaLoader";
 
 //TODO: Custome Object
 import {
     colors,
     images
-} from "HexaWallet/src/app/constants/Constants";
+} from "hexaConstants";
 
-
-//localization
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
 
 export default class RestoreWalletUsingMnemonic extends Component {
@@ -152,7 +149,7 @@ export default class RestoreWalletUsingMnemonic extends Component {
                                 renderItem={ this._renderItem }
                                 numColumns={ 3 }
                             />
-                            <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
+                            <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
                         </KeyboardAwareScrollView>
                     </ImageBackground>
                 </SafeAreaView>

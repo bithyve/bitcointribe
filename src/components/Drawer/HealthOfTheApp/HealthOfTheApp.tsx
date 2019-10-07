@@ -14,38 +14,35 @@ import { Avatar } from 'react-native-elements';
 
 
 
+//TODO: Custome Pages
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { HeaderTitle } from "hexaCustHeader";
+
 
 //TODO: Custome Pages
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import HeaderTitle from "HexaWallet/src/app/custcompontes/Header/HeaderTitle/HeaderTitle";
-
-//TODO: Custome View
-import ViewErrorMessage from "HexaWallet/src/app/custcompontes/View/ViewErrorMessage/ViewErrorMessage";
+import { ModelLoader } from "hexaLoader";
 
 //TODO: Custome model  
 
-import ModelFindYourTrustedContacts from "HexaWallet/src/app/custcompontes/Model/ModelFindYourTrustedContacts/ModelFindYourTrustedContacts";
-import ModelHelperScreen from "HexaWallet/src/app/custcompontes/Model/ModelHelperScreen/ModelHelperScreen";
-
+import { ModelFindYourTrustedContacts, ModelHelperScreen } from "hexaCustModel";
 
 //TODO: Custome Alert 
-import AlertSimple from "HexaWallet/src/app/custcompontes/Alert/AlertSimple";
+import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 //TODO: Custome StyleSheet Files       
-import globalStyle from "HexaWallet/src/app/manage/Global/StyleSheet/Style";
+import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
-import { colors, images, svgIcon, asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
-import renderIf from "HexaWallet/src/app/constants/validation/renderIf";
+import { colors, images, svgIcon, asyncStorageKeys } from "hexaConstants";
+var utils = require( "hexaUtils" );
+import { renderIf } from "hexaValidation";
 
 
 
 
 //TODO: Common Funciton
-var comAppHealth = require( "HexaWallet/src/app/manage/CommonFunction/CommonAppHealth" );
+var comAppHealth = require( "hexaCommonAppHealth" );
 
 
 
@@ -549,9 +546,9 @@ export default class HealthOfTheApp extends React.Component<any, any> {
                                             } }>
                                             <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, marginLeft: -3, borderRadius: 10 } } >
                                                 <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                    <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Trusted Contacts</Text>
+                                                    <Text numberOfLines={ 1 } style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Trusted Contacts</Text>
                                                     <View style={ { flexDirection: "row" } }>
-                                                        <Text note numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Shares with your friends and family</Text>
+                                                        <Text note numberOfLines={ 1 } style={ [ FontFamily.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Shares with your friends and family</Text>
                                                     </View>
                                                 </View>
                                             </View>
@@ -583,9 +580,9 @@ export default class HealthOfTheApp extends React.Component<any, any> {
                                                                     item.thumbnailPath != "" ? <Avatar size={ 55 } medium rounded source={ { uri: item.thumbnailPath } } /> : <Avatar size={ 55 } rounded title={ item.familyName != null ? item.givenName.charAt( 0 ) + item.familyName.charAt( 0 ) : item.givenName.charAt( 0 ) } titleStyle={ { color: colors.appColor } } />
                                                                 ) }
                                                                 <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                                    <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                                    <Text numberOfLines={ 1 } style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                                     <View style={ { flexDirection: "row" } }>
-                                                                        <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                                        <Text style={ [ FontFamily.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
                                                                     </View>
                                                                 </View>
                                                                 <View style={ {
@@ -629,9 +626,9 @@ export default class HealthOfTheApp extends React.Component<any, any> {
                                         } }>
                                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, marginLeft: -3, borderRadius: 10 } } >
                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Self Share</Text>
+                                                <Text numberOfLines={ 1 } style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Self Share</Text>
                                                 <View style={ { flexDirection: "row" } }>
-                                                    <Text note numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Shares you self guard</Text>
+                                                    <Text note numberOfLines={ 1 } style={ [ FontFamily.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Shares you self guard</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -658,9 +655,9 @@ export default class HealthOfTheApp extends React.Component<any, any> {
                                                                 }
                                                             />
                                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
+                                                                <Text style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.givenName }{ " " }{ item.familyName }</Text>
                                                                 <View style={ { flexDirection: "row" } }>
-                                                                    <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
+                                                                    <Text style={ [ FontFamily.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.statusMsgColor } ] }>{ item.statusMsg }</Text>
                                                                 </View>
                                                             </View>
                                                             <View style={ {
@@ -687,7 +684,7 @@ export default class HealthOfTheApp extends React.Component<any, any> {
                             { renderIf( flag_isMnemonic == true )(
                                 <View style={ styles.viewMnemonic }>
                                     <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
-                                        <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Mnemonic</Text>
+                                        <Text style={ [ FontFamily.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Mnemonic</Text>
                                     </View>
                                     <View style={ { flex: 1 } }>
                                         <FlatList
@@ -723,7 +720,7 @@ export default class HealthOfTheApp extends React.Component<any, any> {
                                                             </View>
                                                             <View style={ { flex: 1, flexDirection: "column" } }>
                                                                 <Text
-                                                                    style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] }
+                                                                    style={ [ FontFamily.ffFiraSansMedium, { fontSize: 12 } ] }
                                                                 >
                                                                     { item.title }
                                                                 </Text>
@@ -768,9 +765,9 @@ export default class HealthOfTheApp extends React.Component<any, any> {
                                         } }>
                                         <View style={ { flex: 1, flexDirection: 'row', backgroundColor: "#ffffff", margin: 5, marginLeft: -3, borderRadius: 10 } } >
                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                <Text numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Security Question</Text>
+                                                <Text numberOfLines={ 1 } style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, fontSize: 16 } ] }>Security Question</Text>
                                                 <View style={ { flexDirection: "row" } }>
-                                                    <Text note numberOfLines={ 1 } style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Answer is used to protect your shares and PDF</Text>
+                                                    <Text note numberOfLines={ 1 } style={ [ FontFamily.ffFiraSansRegular, { marginLeft: 10, fontSize: 14 } ] }>Answer is used to protect your shares and PDF</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -793,9 +790,9 @@ export default class HealthOfTheApp extends React.Component<any, any> {
                                                                 }
                                                             />
                                                             <View style={ { flex: 1, flexDirection: "column", justifyContent: "center" } }>
-                                                                <Text style={ [ globalStyle.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.title }</Text>
+                                                                <Text style={ [ FontFamily.ffFiraSansMedium, { marginLeft: 10, fontSize: 14 } ] }>{ item.title }</Text>
                                                                 <View style={ { flexDirection: "row" } }>
-                                                                    <Text style={ [ globalStyle.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.color } ] }>{ item.subTitle }</Text>
+                                                                    <Text style={ [ FontFamily.ffFiraSansRegular, { marginLeft: 10, fontSize: 14, color: item.color } ] }>{ item.subTitle }</Text>
                                                                 </View>
                                                             </View>
                                                             <View style={ {
@@ -820,7 +817,7 @@ export default class HealthOfTheApp extends React.Component<any, any> {
                             { renderIf( flag_isTwoFactor == true )(
                                 <View style={ styles.view2FactorAuto }>
                                     <View style={ { flex: 0.1, marginLeft: 10, marginTop: 10, marginBottom: 10 } }>
-                                        <Text style={ [ globalStyle.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Secure Wallet Two-Factor Autoentication</Text>
+                                        <Text style={ [ FontFamily.ffFiraSansMedium, { color: "#000000", fontSize: 18, marginLeft: 0 } ] }>Secure Wallet Two-Factor Autoentication</Text>
                                     </View>
                                     <View style={ { flex: 1 } }>
                                         <FlatList
@@ -857,7 +854,7 @@ export default class HealthOfTheApp extends React.Component<any, any> {
                                                             </View>
                                                             <View style={ { flex: 1, flexDirection: "column" } }>
                                                                 <Text
-                                                                    style={ [ globalStyle.ffFiraSansMedium, { fontSize: 12 } ] }
+                                                                    style={ [ FontFamily.ffFiraSansMedium, { fontSize: 12 } ] }
                                                                 >
                                                                     { item.title }
                                                                 </Text>
@@ -929,13 +926,13 @@ export default class HealthOfTheApp extends React.Component<any, any> {
                     } }
                 />
 
-                <Loader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
+                <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }
 }
-const primaryColor = colors.appColor;
+
 const styles = StyleSheet.create( {
     container: {
         flex: 1

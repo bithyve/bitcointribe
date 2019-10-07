@@ -7,19 +7,15 @@ import {
 
 
 //TODO: Custome Pages
-import Loader from "HexaWallet/src/app/custcompontes/Loader/ModelLoader";
-import CustomeStatusBar from "HexaWallet/src/app/custcompontes/CustomeStatusBar/CustomeStatusBar";
-
-
+import { CustomeStatusBar } from "hexaCustStatusBar";
+import { ModelLoader } from "hexaLoader";
 
 //TODO: Custome Model
-import ModelPasscode from "HexaWallet/src/app/custcompontes/Model/ModelCommom/ModelPasscode";
-import ModelBackupSecretQuestionsFirstQuestion from "HexaWallet/src/app/custcompontes/Model/ModelBackupSecretQuestions/ModelBackupSecretQuestionsFirstQuestion";
-import ModelMnemonicDisplay from "HexaWallet/src/app/custcompontes/Model/ModelMnemonicDisplay/ModelMnemonicDisplay";
+import { ModelPasscode, ModelBackupSecretQuestionsFirstQuestion, ModelMnemonicDisplay } from "hexaCustModel";
 
-//TODO: Custome Object
-import { colors, images } from "HexaWallet/src/app/constants/Constants";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+//TODO: Custome Object  
+import { colors, images } from "hexaConstants";
+var utils = require( "hexaUtils" );
 
 export default class MnemonicDisplay extends React.Component<any, any> {
     constructor ( props: any ) {
@@ -115,15 +111,14 @@ export default class MnemonicDisplay extends React.Component<any, any> {
                         />
                     </SafeAreaView>
                 </ImageBackground>
-                <Loader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message="Loading" />
+                <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message="Loading" />
                 <CustomeStatusBar backgroundColor={ colors.white } hidden={ true } barStyle="dark-content" />
             </Container >
         );
     }
 }
 
-const primaryColor = colors.appColor;
-const darkGrey = "#bdc3c7";
+
 const styles = StyleSheet.create( {
     container: {
         flex: 1,
