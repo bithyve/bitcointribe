@@ -16,6 +16,10 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import bip39 from 'react-native-bip39';
 
+//TODO: Redux
+import { connect } from 'react-redux';
+import { setupAccounts } from 'HexaWallet/src/redux';
+
 
 
 
@@ -54,7 +58,7 @@ import { S3Service, RegularAccount, SecureAccount } from "hexaBitcoin";
 // import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
 
 
-export default class FirstSecretQuestion extends React.Component<any, any> {
+class FirstSecretQuestion extends React.Component<any, any> {
     constructor ( props: any ) {
         super( props );
         this.state = {
@@ -116,6 +120,10 @@ export default class FirstSecretQuestion extends React.Component<any, any> {
     }
 
 
+    componentDidMount = () => {
+        this.props.setupAccounts();
+    }
+
 
     //TODO: Select Picker Question List change aciton
     onValueChange = ( value: string ) => {
@@ -151,90 +159,86 @@ export default class FirstSecretQuestion extends React.Component<any, any> {
 
     //TODO: func click_FirstQuestion
     click_FirstQuestion = async () => {
-        try {
-            this.getFormValidation();
-            this.setState( {
-                flag_Loading: true
-            } );
-            let question = this.state.firstQuestion;
-            let answer = this.state.secoundAnswer;
-            let resWalletData = await utils.getSetupWallet();
-            const dateTime = Date.now();
-            const mnemonic = await bip39.generateMnemonic( 256 );
-            console.log( { mnemonic } );
-            let walletName = resWalletData.walletName;
-            const regularAccount = new RegularAccount(
-                mnemonic
-            );
+        const { mnemonic, regularAccount, secureAccount, sss } = this.props;
+        console.log( { mnemonic, regularAccount, secureAccount, sss } );
+        if ( !!mnemonic ) {
+            try {
+                this.getFormValidation();
+                this.setState( {
+                    flag_Loading: true
+                } );
+                let question = this.state.firstQuestion;
+                let answer = this.state.secoundAnswer;
+                let resWalletData = await utils.getSetupWallet();
+                const dateTime = Date.now();
+                let walletName = resWalletData.walletName;
 
-            const secureAccount = new SecureAccount( mnemonic );
-            const sss = new S3Service( mnemonic );
-
-            //setup Check Health   
-            let updateShareIdStatus = await comAppHealth.checkHealthSetupShare( dateTime );
-            if ( updateShareIdStatus != "" ) {
-                console.log( { updateShareIdStatus } );
-                let arrQustionList = [];
-                let questionData = {};
-                questionData.Question = question;
-                questionData.Answer = answer;
-                arrQustionList.push( questionData );
-                let arrBackupInfo = [ { backupType: "new" }, { backupMethod: "share" } ];
-                let resInsertWallet = await dbOpration.insertWallet(
-                    localDB.tableName.tblWallet,
-                    dateTime,
-                    mnemonic,
-                    "",
-                    "",
-                    "",
-                    walletName,
-                    arrBackupInfo,
-                    arrQustionList,
-                    updateShareIdStatus
-                );
-                await comFunDBRead.readTblWallet();
-                let resInsertCreateAcc = await dbOpration.insertCreateAccount(
-                    localDB.tableName.tblAccount,
-                    dateTime,
-                    "",
-                    "0",
-                    "BTC",
-                    "Regular Account",
-                    "Regular Account",
-                    ""
-                );
-                let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
-                    localDB.tableName.tblAccount,
-                    dateTime,
-                    "",
-                    "0",
-                    "BTC",
-                    "Secure Account",
-                    "Secure Account",
-                    ""
-                );
-                let resDeleteTableData = await dbOpration.deleteTableData(
-                    localDB.tableName.tblSSSDetails
-                );
-                if ( resInsertWallet && resInsertSecureCreateAcc && resInsertCreateAcc && resDeleteTableData ) {
-                    await bitcoinClassState.setRegularClassState( regularAccount );
-                    //secure account     
-                    await bitcoinClassState.setSecureClassState( secureAccount );
-                    await bitcoinClassState.setS3ServiceClassState( sss )
-                    //s3serverice
-                    await comFunDBRead.readTblSSSDetails();
+                //setup Check Health   
+                let updateShareIdStatus = await comAppHealth.checkHealthSetupShare( dateTime );
+                if ( updateShareIdStatus != "" ) {
+                    console.log( { updateShareIdStatus } );
+                    let arrQustionList = [];
+                    let questionData = {};
+                    questionData.Question = question;
+                    questionData.Answer = answer;
+                    arrQustionList.push( questionData );
+                    let arrBackupInfo = [ { backupType: "new" }, { backupMethod: "share" } ];
+                    let resInsertWallet = await dbOpration.insertWallet(
+                        localDB.tableName.tblWallet,
+                        dateTime,
+                        mnemonic,
+                        "",
+                        "",
+                        "",
+                        walletName,
+                        arrBackupInfo,
+                        arrQustionList,
+                        updateShareIdStatus
+                    );
                     await comFunDBRead.readTblWallet();
-                    this.setState( {
-                        flag_Loading: false
-                    } );
-                    this.props.click_Next();
+                    let resInsertCreateAcc = await dbOpration.insertCreateAccount(
+                        localDB.tableName.tblAccount,
+                        dateTime,
+                        "",
+                        "0",
+                        "BTC",
+                        "Regular Account",
+                        "Regular Account",
+                        ""
+                    );
+                    let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+                        localDB.tableName.tblAccount,
+                        dateTime,
+                        "",
+                        "0",
+                        "BTC",
+                        "Secure Account",
+                        "Secure Account",
+                        ""
+                    );
+                    let resDeleteTableData = await dbOpration.deleteTableData(
+                        localDB.tableName.tblSSSDetails
+                    );
+                    if ( resInsertWallet && resInsertSecureCreateAcc && resInsertCreateAcc && resDeleteTableData ) {
+                        await bitcoinClassState.setRegularClassState( regularAccount );
+                        //secure account     
+                        await bitcoinClassState.setSecureClassState( secureAccount );
+                        await bitcoinClassState.setS3ServiceClassState( sss )
+                        //s3serverice
+                        await comFunDBRead.readTblSSSDetails();
+                        await comFunDBRead.readTblWallet();
+                        this.setState( {
+                            flag_Loading: false
+                        } );
+                        this.props.click_Next();
+                    }
                 }
+                else {
+                    alert.simpleOk( "Oops", "Check Health Issue." );
+                }
+            } catch ( error ) {
+                Alert.alert( error )
             }
-            else {
-                alert.simpleOk( "Oops", "Check Health Issue." );
-            }
-        } catch ( error ) {
-            Alert.alert( error )
         }
     }
 
@@ -394,3 +398,26 @@ const styles = StyleSheet.create( {
         justifyContent: "flex-end"
     }
 } );
+
+
+const mapDispatchToProps = ( dispatch ) => {
+    return {
+        setupAccounts: () => {
+            dispatch( setupAccounts() );
+        }
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        mnemonic: state.walletReducer.mnemonic,
+        regularAccount: state.walletReducer.regularAccount,
+        secureAccount: state.walletReducer.secureAccount,
+        sss: state.walletReducer.sss,
+    };
+};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)( FirstSecretQuestion );
