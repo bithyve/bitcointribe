@@ -53,8 +53,8 @@ Double click on
 HexaWallet.xcworkspace   
 open project xcode 
 Delete this lib (react-native-config)
-![Hexa Wallet](hexa.png)   
 ```      
+![Hexa Wallet](hexa.png)  
          
 
 ### Contributing
