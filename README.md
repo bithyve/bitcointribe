@@ -58,7 +58,7 @@ Delete this lib (react-native-config)
 <!-- ![Alt text](/../HelpingIssues/src/assets/issuesImages/issue1.png?raw=true "OptionalTitle") -->   
 <!-- 
 <img src="https://github.com/bithyve/hexa/tree/HelpingIssues/src/assets/issuesImages/issue1.png">   -->   
-<img src="/src/assets/issuesImages/issue1.png" height="200" width="100">     
+<img src="/src/assets/issuesImages/issue1.png" height="50%" width="200">       
  
      
             
