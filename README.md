@@ -54,11 +54,7 @@ HexaWallet.xcworkspace
 open project xcode 
 Delete this lib (react-native-config)
 ```      
-![Alt text](/src/assets/issuesImages/issue1.png?raw=true  "Optional Title" =100x20)
-<!-- ![Alt text](/../HelpingIssues/src/assets/issuesImages/issue1.png?raw=true "OptionalTitle") -->   
-<!-- 
-<img src="https://github.com/bithyve/hexa/tree/HelpingIssues/src/assets/issuesImages/issue1.png">   -->   
-<img src="/src/assets/issuesImages/issue1.png" height="50%" width="200">       
+<img src="/src/assets/issuesImages/issue1.png" height="400" width="400">       
  
      
             
