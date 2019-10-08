@@ -31,5 +31,4 @@ export default StyleSheet.create( {
     ffOpenSansExtraBold: {
         fontFamily: "OpenSans-ExtraBold"
     }
-
 } );
