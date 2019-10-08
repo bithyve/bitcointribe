@@ -15,6 +15,12 @@
 		8B075B7A23194CAA00CE9636 /* HexaWallet.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 8BBD1978231017C4004E59C9 /* HexaWallet.entitlements */; };
 		8B24F6402330B61100CD8C30 /* libRCTPrivacySnapshot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B24F62C2330B5EF00CD8C30 /* libRCTPrivacySnapshot.a */; };
 		8B24F6432330BA8000CD8C30 /* ScreenRecordingDetector.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B24F6422330BA8000CD8C30 /* ScreenRecordingDetector.m */; };
+		8BB54E4B234C6F8B00CF154F /* FiraSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8BB54E45234C6F8A00CF154F /* FiraSans-Bold.ttf */; };
+		8BB54E4C234C6F8B00CF154F /* FiraSans-BookItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8BB54E46234C6F8A00CF154F /* FiraSans-BookItalic.ttf */; };
+		8BB54E4D234C6F8B00CF154F /* FiraSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8BB54E47234C6F8A00CF154F /* FiraSans-Italic.ttf */; };
+		8BB54E4E234C6F8B00CF154F /* FiraSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8BB54E48234C6F8A00CF154F /* FiraSans-Regular.ttf */; };
+		8BB54E4F234C6F8B00CF154F /* FiraSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8BB54E49234C6F8B00CF154F /* FiraSans-SemiBold.ttf */; };
+		8BB54E50234C6F8B00CF154F /* FiraSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8BB54E4A234C6F8B00CF154F /* FiraSans-Medium.ttf */; };
 		8BBD192623101427004E59C9 /* libReactNativeConfig.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BBD19232310141A004E59C9 /* libReactNativeConfig.a */; };
 		8BBD192723101432004E59C9 /* libRNPDFLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BBD191C2310140D004E59C9 /* libRNPDFLib.a */; };
 		8BBD199223101A90004E59C9 /* PdfPassword.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD199123101A90004E59C9 /* PdfPassword.m */; };
@@ -184,6 +190,12 @@
 		8AEC10BA56E03DB34236F63B /* Pods-HexaWallet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HexaWallet.debug.xcconfig"; path = "Target Support Files/Pods-HexaWallet/Pods-HexaWallet.debug.xcconfig"; sourceTree = "<group>"; };
 		8B24F6412330BA8000CD8C30 /* ScreenRecordingDetector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScreenRecordingDetector.h; sourceTree = "<group>"; };
 		8B24F6422330BA8000CD8C30 /* ScreenRecordingDetector.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ScreenRecordingDetector.m; sourceTree = "<group>"; };
+		8BB54E45234C6F8A00CF154F /* FiraSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "FiraSans-Bold.ttf"; path = "../src/assets/fonts/firaSans/FiraSans-Bold.ttf"; sourceTree = "<group>"; };
+		8BB54E46234C6F8A00CF154F /* FiraSans-BookItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "FiraSans-BookItalic.ttf"; path = "../src/assets/fonts/firaSans/FiraSans-BookItalic.ttf"; sourceTree = "<group>"; };
+		8BB54E47234C6F8A00CF154F /* FiraSans-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "FiraSans-Italic.ttf"; path = "../src/assets/fonts/firaSans/FiraSans-Italic.ttf"; sourceTree = "<group>"; };
+		8BB54E48234C6F8A00CF154F /* FiraSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "FiraSans-Regular.ttf"; path = "../src/assets/fonts/firaSans/FiraSans-Regular.ttf"; sourceTree = "<group>"; };
+		8BB54E49234C6F8B00CF154F /* FiraSans-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "FiraSans-SemiBold.ttf"; path = "../src/assets/fonts/firaSans/FiraSans-SemiBold.ttf"; sourceTree = "<group>"; };
+		8BB54E4A234C6F8B00CF154F /* FiraSans-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "FiraSans-Medium.ttf"; path = "../src/assets/fonts/firaSans/FiraSans-Medium.ttf"; sourceTree = "<group>"; };
 		8BBD18DE231013F7004E59C9 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
 		8BBD19172310140D004E59C9 /* RNPDFLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNPDFLib.xcodeproj; path = "../node_modules/react-native-pdf-lib/ios/RNPDFLib.xcodeproj"; sourceTree = "<group>"; };
 		8BBD191D2310141A004E59C9 /* ReactNativeConfig.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativeConfig.xcodeproj; path = "../node_modules/react-native-config/ios/ReactNativeConfig.xcodeproj"; sourceTree = "<group>"; };
@@ -363,6 +375,12 @@
 		9497E6A00FFA48EB90377A37 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8BB54E45234C6F8A00CF154F /* FiraSans-Bold.ttf */,
+				8BB54E46234C6F8A00CF154F /* FiraSans-BookItalic.ttf */,
+				8BB54E47234C6F8A00CF154F /* FiraSans-Italic.ttf */,
+				8BB54E4A234C6F8B00CF154F /* FiraSans-Medium.ttf */,
+				8BB54E48234C6F8A00CF154F /* FiraSans-Regular.ttf */,
+				8BB54E49234C6F8B00CF154F /* FiraSans-SemiBold.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -611,9 +629,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8BB54E4E234C6F8B00CF154F /* FiraSans-Regular.ttf in Resources */,
 				8B075B7A23194CAA00CE9636 /* HexaWallet.entitlements in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				8BB54E4B234C6F8B00CF154F /* FiraSans-Bold.ttf in Resources */,
+				8BB54E4F234C6F8B00CF154F /* FiraSans-SemiBold.ttf in Resources */,
+				8BB54E4D234C6F8B00CF154F /* FiraSans-Italic.ttf in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				8BB54E4C234C6F8B00CF154F /* FiraSans-BookItalic.ttf in Resources */,
+				8BB54E50234C6F8B00CF154F /* FiraSans-Medium.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -65,12 +65,13 @@ Search react-native-config and remove 6 pod file inside
 ```  
 <img src="/src/assets/issuesImages/issue2.png" height="400">   
 
-```   
+```     
 Step 3:
 Remove All Fonts in  HexaWallet => Resources
 then drag and drop all font your project like 
 ```   
-<img src="/src/assets/issuesImages/issue3.png" height="400">   
+<img src="/src/assets/issuesImages/issue3.png" height="400">  
+ 
 ```   
 Step 4:
 Click on (Add to target)
