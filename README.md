@@ -14,7 +14,7 @@ Hexa requires a pin to unlock and access funds and Accounts are protected by a s
 ### Design Considerations
 
 The various design considerations that Hexa chose to undertake are over at [the wiki](https://github.com/thecryptobee/Hexa-Wallet/wiki/Design-Considerations)
-
+  
 ### Developing locally
 
 #### Prerequisites:
@@ -44,11 +44,42 @@ npm run android-dev
             
 ```
 cd ios
-pod install   
-ios/HexaWallet.xcworkspace   
-open project xcode then run
-```
-     
+rm -rf Pods
+rm -rf build   
+rm Podfile.lock 
+rm -rf ~Library/{yourusername}/Xcode/DerivedData
+pod install      
+Double click on 
+HexaWallet.xcworkspace   
+open project xcode 
+
+Step 1:
+Delete this lib (react-native-config)
+```      
+<img src="/src/assets/issuesImages/issue1.png" height="400">   
+
+```   
+Step 2:
+Search react-native-config and remove 6 pod file inside
+"${PODS_ROOT}/Headers/Public/react-native-config" and -l"react-native-config"
+```  
+<img src="/src/assets/issuesImages/issue2.png" height="400">   
+
+```     
+Step 3:
+Remove All Fonts in  HexaWallet => Resources
+then drag and drop all font your project like 
+```   
+<img src="/src/assets/issuesImages/issue3.png" height="400">  
+ 
+```   
+Step 4:
+Click on (Add to target)
+```   
+<img src="/src/assets/issuesImages/issue4.png" height="400">   
+        
+            
+
 ### Contributing
 Please feel free to open a pull requests and issues with bugfixes and suggestions.
   
