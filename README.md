@@ -44,11 +44,19 @@ npm run android-dev
             
 ```
 cd ios
-pod install   
-ios/HexaWallet.xcworkspace   
-open project xcode then run
-```
-     
+rm -rf Pods
+rm -rf build   
+rm Podfile.lock 
+rm -rf ~Library/{yourusername}/Xcode/DerivedData
+pod install      
+Double click on 
+HexaWallet.xcworkspace   
+open project xcode 
+Delete this lib (react-native-config)
+![Hexa Wallet](hexa.png)   
+```      
+         
+
 ### Contributing
 Please feel free to open a pull requests and issues with bugfixes and suggestions.
   
