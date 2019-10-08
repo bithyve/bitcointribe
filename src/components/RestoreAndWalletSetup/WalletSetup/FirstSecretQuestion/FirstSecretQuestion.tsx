@@ -159,7 +159,7 @@ class FirstSecretQuestion extends React.Component<any, any> {
 
     //TODO: func click_FirstQuestion
     click_FirstQuestion = async () => {
-        const { mnemonic, regularAccount, secureAccount, sss } = this.props;
+        const { mnemonic, regularAccount, secureAccount, sss } = this.props.setUpAccounts;
         console.log( { mnemonic, regularAccount, secureAccount, sss } );
         if ( !!mnemonic ) {
             try {
@@ -408,12 +408,16 @@ const mapDispatchToProps = ( dispatch ) => {
     }
 }
 
+
+
 const mapStateToProps = state => {
     return {
-        mnemonic: state.walletReducer.mnemonic,
-        regularAccount: state.walletReducer.regularAccount,
-        secureAccount: state.walletReducer.secureAccount,
-        sss: state.walletReducer.sss,
+        setUpAccounts: {
+            mnemonic: state.walletReducer.mnemonic,
+            regularAccount: state.walletReducer.regularAccount,
+            secureAccount: state.walletReducer.secureAccount,
+            sss: state.walletReducer.sss,
+        }
     };
 };
 
