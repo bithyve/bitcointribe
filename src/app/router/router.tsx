@@ -5,26 +5,26 @@ import {
   createBottomTabNavigator
 } from "react-navigation";
 
-import { SvgIcon } from "@up-shared/components";
+import { SvgIcon } from "hexaComponent/Icons";
 // //localization
 //import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
 //TODO: RestoreAndWalletSetupScreen
-import { OnBoarding } from "hexaCompLanch";
+import { OnBoarding } from "hexaScreen/Launch";
 
-import { PasscodeConfirm, Passcode } from "hexaCompPasscode";
+import { PasscodeConfirm, Passcode } from "hexaScreen/Passcode";
 
 
 //  Restore And Wallet Setup
 import {
   RestoreAndReoverWallet, WalletSetup,
   PermissionAndroid
-} from "hexaCompRestoreAndWalletSetup";
+} from "hexaScreen/RestoreAndWalletSetup";
 
 
 
 //  Restore Wallet using Mnemonic
-import { RestoreWalletUsingMnemonic } from "hexaCompRestoreWalletUsingMnemonic";
+import { RestoreWalletUsingMnemonic } from "hexaScreen/Drawer/RestoreWalletUsingMnemonic";
 
 //  Restore Wallet using Trusted Contact
 import {
@@ -33,37 +33,37 @@ import {
   RestoreTrustedContactsShare, RestoreTrustedContactsQRCodeScanScreen,
   Restore3SelfShare, Restore3SelfSahreQRCodeScanner, Restore4And5SelfShare,
   Restore4And5SelfShareQRCodeScanner
-} from "hexaCompRestoreWalletUsingTrustedContact";
+} from "hexaScreen/Drawer/RestoreWalletUsingTrustedContact";
 
 //  More
-import { More, ContactSharedSecretList, TrustedPartySelfShareQRCode, TrsutedPartyQRCode } from "hexaCompTabbarMore";
+import { More, ContactSharedSecretList, TrustedPartySelfShareQRCode, TrsutedPartyQRCode } from "hexaScreen/TabBar/More";
 
 // TODO: QrcodeScan  
-import { QrCodeScanner } from "hexaCompTabbarQrCodeScanner";
+import { QrCodeScanner } from "hexaScreen/TabBar/QrCodeScanner";
 
 TODO: Wallet
-import { Wallet } from "hexaCompTabbarWallet";
+import { Wallet } from "hexaScreen/TabBar/Wallet";
 
 //  TODO: All Transaction     
-import { AllTransaction } from "hexaCompTabbarAllTransaction";
+import { AllTransaction } from "hexaScreen/TabBar/AllTransaction";
 
 // TODO: Backup your Wallet 
 import {
   AllContactList, TrustedContact, ShareSecretViaQR,
   SelectContactListAssociatePerson, TrustedContactAcceptOtp
-} from "hexaCompBackUpYourWallet";
+} from "hexaScreen/Drawer/BackUpYourWallet";
 
 // TODO: Settings    
-import { Settings, AdvancedSettings, MnemonicDisplay } from "hexaCompSettings";
+import { Settings, AdvancedSettings, MnemonicDisplay } from "hexaScreen/Drawer/Settings";
 
 // TODO: Backup Wallet Mnemonic Screen
-import { BackupWalletMnemonic, BackupWalletMnemonicConfirmMnemonic } from "hexaCompBackupWalletMnemonic";
+import { BackupWalletMnemonic, BackupWalletMnemonicConfirmMnemonic } from "hexaScreen/Drawer/BackupWalletMnemonic";
 
 // TODO: Common Screen   
-import { QRCodeDisplay, OTP, QRCodeScan, OTPBackupShareStore } from "hexaCompCommon";
+import { QRCodeDisplay, OTP, QRCodeScan, OTPBackupShareStore } from "hexaScreen/Drawer/Common";
 
 // TODO: Backup Secure Account
-import { BackupSecureAccount } from "hexaCompBackupSecureAccount";
+import { BackupSecureAccount } from "hexaScreen/Drawer/BackupSecureAccount";
 
 
 
@@ -71,15 +71,15 @@ import { BackupSecureAccount } from "hexaCompBackupSecureAccount";
 import {
   HealthOfTheApp, BackupSecretQuestions, BackupSecureTwoFactorAuto,
   HealthCheckMnemonic, SelfShareUsingWalletQRCode, SelfShareSharing, ConfirmSelfShareQRScanner
-} from "hexaCompHealthOfTheApp";
+} from "hexaScreen/Drawer/HealthOfTheApp";
 
 
 // TODO: Payment Screen
-import { ReceivePayment, SendPayment, ConfirmAndSendPayment, SendPaymentAddressScan } from "hexaCompPayment";
+import { ReceivePayment, SendPayment, ConfirmAndSendPayment, SendPaymentAddressScan } from "hexaScreen/Drawer/Payment";
 
 
 // TODO: Account Transaction Screen
-import { Transaction } from "hexaCompTransaction";
+import { Transaction } from "hexaScreen/Drawer/Transaction";
 
 
 

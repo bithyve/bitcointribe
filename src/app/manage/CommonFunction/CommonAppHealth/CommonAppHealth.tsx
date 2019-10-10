@@ -9,7 +9,7 @@ var utils = require( "hexaUtils" );
 //TODO: Bitcoin Files
 //import { HealthStatus } from "hexaBitcoin"  
 import HealthStatus from "HexaWallet/src/bitcoin/utilities/sss/HealthStatus"
-import { AlertSimple } from "hexaCustAlert";
+import { AlertSimple } from "hexaComponent/Alert";
 let alert = new AlertSimple();
 
 
