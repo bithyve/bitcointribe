@@ -7,7 +7,7 @@ import "HexaWallet/shim";
 import { name as appName } from "HexaWallet/app.json";
 
 import { createRootNavigator } from "hexaRouter";
-import { Launch } from "hexaCompLanch";
+import { Launch } from "hexaScreen/Launch";
 
 
 //TODO: Redux
@@ -17,7 +17,7 @@ import { store } from './src/redux';
 
 
 //TODO: Custome Object
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+var utils = require( "hexaUtils" );
 export default class HexaWallet extends React.Component
 {
     constructor ( props )

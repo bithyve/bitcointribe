@@ -5,7 +5,7 @@ var bitcoinClassState = require( "hexaClassState" );
 var comFunDBRead = require( "hexaCommonDBReadData" );
 
 //TODO: Custome Alert 
-import { AlertSimple } from "hexaCustAlert";
+import { AlertSimple } from "hexaComponent/Alert";;
 let alert = new AlertSimple();
 
 //TODO: Custome object 

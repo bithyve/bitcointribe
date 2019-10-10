@@ -1,6 +1,6 @@
 import { AsyncStorage } from "react-native";
-import { asyncStorageKeys } from "HexaWallet/src/app/constants/Constants";
-var utils = require( "HexaWallet/src/app/constants/Utils" );
+import { asyncStorageKeys } from "hexaConstants";
+var utils = require( "hexaUtils" );
 
 //TODO: Bitcoin Files
 import { S3Service, RegularAccount, SecureAccount } from "hexaBitcoin";

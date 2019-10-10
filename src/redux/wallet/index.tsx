@@ -107,7 +107,6 @@ function* workerSecureAccount() {
     } catch ( e ) {
         console.log( "error", e )
     }
-
 }
 
 function* workerSSS() {
