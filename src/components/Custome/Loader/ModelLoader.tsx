@@ -3,9 +3,7 @@ import { StyleSheet, View, Modal, Image } from 'react-native';
 import PropTypes from 'prop-types';
 
 //TODO: Custome object
-import {
-    images
-} from "hexaConstants";
+import { images } from "hexaConstants";
 
 const ModelLoader = ( { loading = false, color = "#000000", size = 30, opacity = 0.4, message = "Loading" } ) => {
     return (
