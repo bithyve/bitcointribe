@@ -14,28 +14,22 @@ import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Slider, CheckBox } from 'react-native-elements';
 
-
-
-
 //TODO: Custome Pages
 import { CustomeStatusBar } from "hexaCustStatusBar";
 import { HeaderTitle } from "hexaCustHeader";
 import { ModelLoader } from "hexaLoader";
 import { FullLinearGradientLoadingButton } from "hexaCustomeLinearGradientButton";
 
-
-
-
-
-//TODO: Custome StyleSheet Files       
+//TODO: Custome StyleSheet Files
 import FontFamily from "hexaStyles";
 
 //TODO: Custome Object
 import { colors, images } from "hexaConstants";
-var utils = require( "hexaUtils" );
 import { renderIf } from "hexaValidation";
 
+import { getAccountDetails, onSendAmount } from "../../../../redux/payment/controller";
 
+var utils = require( "hexaUtils" );
 //TODO: Common Funciton
 var comFunDBRead = require( "hexaCommonDBReadData" );
 
@@ -63,70 +57,73 @@ export default class SendPayment extends React.Component<any, any> {
         } )
     }
 
-    async componentWillMount() {
+    componentWillMount = async () => {
         //class value reset
-        let data = this.props.navigation.getParam( "data" );
-        let selectedAccount = this.props.navigation.getParam( "selectedAccount" );
-        console.log( { selectedAccount } );
-        console.log( { data } );
-        //Singleton Flag value change    
-        let address = data != undefined ? data.address : "";
-        let amount = data != undefined ? data.amount.toString() : "0";
-        console.log( { amount, address } );
-        let walletDetails = await utils.getWalletDetails();
-        let arr_AccountList = await comFunDBRead.readTblAccount();
-        console.log( { arr_AccountList } );
-        var temp = [], arr_SelectAccountDetails = [], accountbal, flag_DisableSentBtn;
-        for ( let i = 0; i < arr_AccountList.length; i++ ) {
-            let item = arr_AccountList[ i ];
-            let jsonData = {};
-            if ( data != undefined ) {
-                if ( i == 0 ) {
-                    jsonData.checked = true;
-                    arr_SelectAccountDetails = item;
-                    accountbal = item.balance;
-                } else {
-                    jsonData.checked = false;
-                }
-            } else {
-                if ( item.accountType == selectedAccount.accountType ) {
-                    jsonData.checked = true;
-                    arr_SelectAccountDetails = item;
-                    accountbal = item.balance;
-                } else {
-                    jsonData.checked = false;
-                }
-            }
-            jsonData.balance = item.balance;
-            jsonData.accountName = item.accountName;
-            temp.push( jsonData );
-        }
+        const { navigation } = this.props;
+        let data = navigation.getParam( "data" );
+        let selectedAccount = navigation.getParam( "selectedAccount" );
 
-        console.log( { amount, accountbal, address } );
+        const details = await getAccountDetails({ data, selectedAccount });
+        this.setState({ ...details });
+
+        // console.log( { selectedAccount } );
+        // console.log( { data } );
+        // //Singleton Flag value change    
+        // let address = data != undefined ? data.address : "";
+        // let amount = data != undefined ? data.amount.toString() : "0";
+        // console.log( { amount, address } );
+        // let walletDetails = await utils.getWalletDetails();
+        // let arr_AccountList = await comFunDBRead.readTblAccount();
+        // //console.log( { arr_AccountList } );
+        // var temp = [], arr_SelectAccountDetails = [], accountbal, flag_DisableSentBtn;
+        // for ( let i = 0; i < arr_AccountList.length; i++ ) {
+        //     let item = arr_AccountList[ i ];
+        //     let jsonData = {};
+        //     if ( data != undefined ) {
+        //         if ( i == 0 ) {
+        //             jsonData.checked = true;
+        //             arr_SelectAccountDetails = item;
+        //             accountbal = item.balance;
+        //         } else {
+        //             jsonData.checked = false;
+        //         }
+        //     } else {
+        //         if ( item.accountType == selectedAccount.accountType ) {
+        //             jsonData.checked = true;
+        //             arr_SelectAccountDetails = item;
+        //             accountbal = item.balance;
+        //         } else {
+        //             jsonData.checked = false;
+        //         }
+        //     }
+        //     jsonData.balance = item.balance;
+        //     jsonData.accountName = item.accountName;
+        //     temp.push( jsonData );
+        // }
+
+        //console.log( { amount, accountbal, address } );
 
         //Sent button Enable and Disable
-        if ( amount != "" && parseFloat( amount ) > parseFloat( accountbal ) && address != "" ) {
-            flag_DisableSentBtn = false;
-        } else {
-            flag_DisableSentBtn = true;
-        }
-        console.log( { temp, flag_DisableSentBtn } );
-        this.setState( {
-            address,
-            amount,
-            arr_AccountList: temp,
-            arr_SelectAccountDetails,
-            selectedAccountBal: accountbal,
-            flag_DisableSentBtn
-        } )
+        // if ( amount != "" && parseFloat( amount ) > parseFloat( accountbal ) && address != "" ) {
+        //     flag_DisableSentBtn = false;
+        // } else {
+        //     flag_DisableSentBtn = true;
+        // }
+        // console.log( { temp, flag_DisableSentBtn } );
+        // this.setState( {
+        //     address,
+        //     amount,
+        //     arr_AccountList: temp,
+        //     arr_SelectAccountDetails,
+        //     selectedAccountBal: accountbal,
+        //     flag_DisableSentBtn
+        // } )
     }
-
 
     componentWillUnmount() {
         utils.setFlagQRCodeScreen( true );
 
     }
-
 
     setAmount() {
         let { amount, selectedAccountBal } = this.state;
@@ -186,46 +183,20 @@ export default class SendPayment extends React.Component<any, any> {
 
     //TODO: Send they amount 
     click_SendAmount = async () => {
+        let { arr_SelectAccountDetails, address, amount, tranPrio, memo } = this.state;
         this.setState( {
             flag_Loading: true,
             flag_DisableSentBtn: true,
             flag_SentBtnAnimation: true
         } )
-        let { arr_SelectAccountDetails, address, amount, tranPrio } = this.state;
-        let amountFloat = parseFloat( amount );
-        let priority = this.getPriority( tranPrio );
-        console.log( { arr_SelectAccountDetails } );
-        let walletDetails = await utils.getWalletDetails();
-        let regularAccount = await bitcoinClassState.getRegularClassState();
-        let secureAccount = await bitcoinClassState.getSecureClassState();
-        var resTransferST;
-        let data = {};
-        if ( arr_SelectAccountDetails.accountName == "Regular Account" ) {
-            //console.log( { address, amountFloat, priority } );
-            resTransferST = await regularAccount.transferST1( address, amountFloat, priority );
-            await bitcoinClassState.setRegularClassState( regularAccount );
-            console.log( { regualr: resTransferST } );
-        } else {
-            resTransferST = await secureAccount.transferST1( address, amountFloat, priority );
-            await bitcoinClassState.setSecureClassState( secureAccount );
-            console.log( { secure: resTransferST } );
-        }
+        const { resTransferST, data } = await onSendAmount({ arr_SelectAccountDetails, address, amount, tranPrio, memo })
+
         if ( resTransferST.status == 200 ) {
             this.setState( {
                 flag_Loading: false,
                 flag_DisableSentBtn: false,
                 flag_SentBtnAnimation: false
             } );
-            data.mnemonic = walletDetails.mnemonic;
-            data.amount = this.state.amount;
-            data.respAddress = address;
-            data.bal = arr_SelectAccountDetails.balance;
-            data.accountName = arr_SelectAccountDetails.accountName;
-            data.memo = this.state.memo;
-            data.priority = priority;
-            data.tranFee = resTransferST.data.fee.toString();
-            data.selectedAccount = arr_SelectAccountDetails;
-            data.resTransferST = resTransferST;
             this.props.navigation.push( "ConfirmAndSendPayment", { data: [ data ] } );
         } else {
             this.setState( {
@@ -255,16 +226,16 @@ export default class SendPayment extends React.Component<any, any> {
     }
 
 
-    //buz bitcoin need small letter 
-    getPriority( no: any ) {
-        if ( no == 0 ) {
-            return "Low"
-        } else if ( no == 1 ) {
-            return "Medium"
-        } else {
-            return "High"
-        }
-    }
+    // //buz bitcoin need small letter 
+    // getPriority( no: any ) {
+    //     if ( no == 0 ) {
+    //         return "Low"
+    //     } else if ( no == 1 ) {
+    //         return "Medium"
+    //     } else {
+    //         return "High"
+    //     }
+    // }
 
     //TODO: When qrcode  scan 
     getAddressWithBal = ( e: any ) => {
