@@ -18,7 +18,7 @@ import bip39 from 'react-native-bip39';
 
 //TODO: Redux
 import { connect } from 'react-redux';
-import { setupAccounts } from 'HexaWallet/src/redux';
+import { setupAccounts } from 'hexaRedux';
 
 
 
