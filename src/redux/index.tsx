@@ -17,14 +17,21 @@ import {
     watcherSSS
 } from './wallet';
 
-const reducers = combineReducers( { walletReducer } );
+import {
+    onSendAmountT1,
+    paymentReducer,
+    watcherOnSendAmountT1
+} from './payment';
+
+const reducers = combineReducers( { walletReducer, paymentReducer } );
 
 const rootSaga = function* () {
     yield all( [
         fork( watcherSetupAccounts ),
         fork( watcherRegularAccount ),
         fork( watcherSecureAccount ),
-        fork( watcherSSS )
+        fork( watcherSSS ),
+        fork( watcherOnSendAmountT1 )
     ] );
 };
 
@@ -40,9 +47,10 @@ const store = createStore( reducers, {}, composeWithDevTools( applyMiddleware( .
 sagaMiddleware.run( rootSaga );
 
 export {
-    store,
-    setupAccounts,
     createRegularAccount,
     createSecureAccount,
-    createSSS
+    createSSS,
+    onSendAmountT1,
+    setupAccounts,
+    store
 };
