@@ -33,7 +33,7 @@ chmod +x pkgchanges/setup.sh
 ./pkgchanges/setup.sh
 ```
 
-Make sure you have a `.env.dev` similar to `.env.example` in your project's root directory before running hexa. If this file is absent, you will be faced with a red screen on the iOS Simulator.
+Make sure you have a `.env.dev` similar to `.env.example` in your project's root directory before running hexa. If this file is not present with the correct values the app will not run correctly.
 
 #### Running hexa android
 ```
@@ -60,15 +60,15 @@ Delete this lib (react-native-config)
 
 ```   
 Step 2:
-Search react-native-config and remove 6 pod file inside
+Search react-native-config and remove the 6 pod files inside
 "${PODS_ROOT}/Headers/Public/react-native-config" and -l"react-native-config"
 ```  
 <img src="/src/assets/issuesImages/issue2.png" height="400">   
 
 ```     
 Step 3:
-Remove All Fonts in  HexaWallet => Resources
-then drag and drop all font your project like 
+Remove All Fonts in HexaWallet => Resources
+then drag and drop all fonts to your project as shown below: 
 ```   
 <img src="/src/assets/issuesImages/issue3.png" height="400">  
  
