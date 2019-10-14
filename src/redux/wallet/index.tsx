@@ -61,7 +61,6 @@ export const walletReducer = ( state = INITIAL_STATE, action: any ) => {
 
 
 // Sagas
-
 function* workerSetupAccounts() {
     try {
         const mnemonic = yield createMnemonic();
@@ -76,7 +75,6 @@ function* workerSetupAccounts() {
     } catch ( e ) {
         console.log( "error", e )
     }
-
 }
 
 function* workerRegularAccount() {
