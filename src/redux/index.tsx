@@ -28,8 +28,10 @@ import {
 //TODO: Payment (Send and Receive)
 import {
     onSendAmountT1,
+    onSendAmountT2,
     paymentReducer,
-    watcherOnSendAmountT1
+    watcherOnSendAmountT1,
+    watcherOnSendAmountT2
 } from './payment';
 
 const reducers = combineReducers( {
@@ -38,6 +40,7 @@ const reducers = combineReducers( {
     paymentReducer
 } );
 
+
 const rootSaga = function* () {
     yield all( [
         fork( watcherSetupAccounts ),
@@ -45,6 +48,7 @@ const rootSaga = function* () {
         fork( watcherSecureAccount ),
         fork( watcherSSS ),
         fork( watcherOnSendAmountT1 ),
+        fork( watcherOnSendAmountT2 ),
         fork( watcherClassState )
     ] );
 };
@@ -70,5 +74,6 @@ export {
     createSecureAccount,
     createSSS,
     //payment   
-    onSendAmountT1
-};   
+    onSendAmountT1,
+    onSendAmountT2
+};
