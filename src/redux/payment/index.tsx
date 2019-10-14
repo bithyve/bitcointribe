@@ -1,28 +1,32 @@
 import { select, put } from "redux-saga/effects";
-import { sagaWatcherHelper } from "./controller";
-import { S3Service } from "hexaBitcoin";
+import { sagaWatcherHelper, getPriority } from "../utils";
+
+var bitcoinClassState = require( "hexaClassState" );
+var utils = require( "hexaUtils" );
 
 // Types
-const CREATE_SSS = "CREATE_SSS";
-const UPDATE_SSS = "UPDATE_SSS";
+const SEND_AMOUNT_T1 = "SEND_AMOUNT_T1";
+const UPDATE_DATA_T1 = "UPDATE_DATA_T1";
 
 const INITIAL_STATE = {
-    sss: undefined
+    sendAmountDataT1: {}
 };
 
-// Actions
 
-export const createSSS = () => {
+// Actions
+export const onSendAmountT1 = ( args ) => {
     return {
-        type: CREATE_SSS
+        type: SEND_AMOUNT_T1,
+        ...args
     };
 };
 
 
-// Reducers
-export const walletReducer = ( state = INITIAL_STATE, action: any ) => {
+//Reducers
+export const paymentReducer = ( state = INITIAL_STATE, action: any ) => {
+    console.log( action );
     switch ( action.type ) {
-        case UPDATE_SSS:
+        case UPDATE_DATA_T1:
             return { ...state, ...action.payload };
         default:
             return state;
@@ -30,21 +34,45 @@ export const walletReducer = ( state = INITIAL_STATE, action: any ) => {
 };
 
 
-// Sagas
-
-function* workerSSS() {
+function* workerOnSendAmountT1( action ) {
     const { walletReducer } = yield select( state => state );
     try {
-        const { mnemonic } = walletReducer;
-        const sss = new S3Service( mnemonic );
+        const { arr_SelectAccountDetails, address, amount, tranPrio, memo } = action;
+        const { regularAccount, secureAccount } = walletReducer;
+        console.log( { regularAccount, secureAccount } );
+        let amountFloat = parseFloat( amount );
+        let priority = getPriority( tranPrio );
+        let walletDetails = yield utils.getWalletDetails();
+        var resTransferST;
+        if ( arr_SelectAccountDetails.accountName == "Regular Account" ) {
+            resTransferST = yield regularAccount.transferST1( address, amountFloat, priority );
+            yield bitcoinClassState.setRegularClassState( regularAccount );
+        } else {
+            resTransferST = yield secureAccount.transferST1( address, amountFloat, priority );
+            yield bitcoinClassState.setSecureClassState( secureAccount );
+        }
         yield put( {
-            type: UPDATE_SSS,
-            payload: { sss }
-        } );
+            type: UPDATE_DATA_T1,
+            payload: {
+                sendAmountDataT1: {
+                    mnemonic: walletDetails.mnemonic,
+                    amount,
+                    respAddress: address,
+                    bal: arr_SelectAccountDetails.balance,
+                    accountName: arr_SelectAccountDetails.accountName,
+                    memo,
+                    priority: priority,
+                    tranFee: resTransferST.data.fee.toString(),
+                    selectedAccount: arr_SelectAccountDetails,
+                    resTransferST: resTransferST
+                }
+            }
+        } )
     } catch ( e ) {
         console.log( "error", e )
     }
 }
 
 
-export const watcherSSS = sagaWatcherHelper( workerSSS, CREATE_SSS );
+
+export const watcherOnSendAmountT1 = sagaWatcherHelper( workerOnSendAmountT1, SEND_AMOUNT_T1 ); 
