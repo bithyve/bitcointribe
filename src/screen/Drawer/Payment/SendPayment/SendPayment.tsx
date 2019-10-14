@@ -23,8 +23,8 @@ import { FullLinearGradientLoadingButton } from "hexaComponent/LinearGradient/Bu
 
 //TODO: redux
 import { connect } from 'react-redux';
-
-import { getAccountDetails, onSendAmount } from "hexaRedux/payment/controller";
+import { getAccountDetails } from "hexaRedux/payment/controller";
+import { onSendAmountT1 } from 'hexaRedux'
 
 
 
@@ -76,9 +76,17 @@ class SendPayment extends React.Component<any, any> {
     }
 
 
+    componentWillReceiveProps = ( nextProps: any ) => {
+        console.log( { nextProps } );
+    }
+
+
+
     componentWillUnmount() {
         utils.setFlagQRCodeScreen( true );
     }
+
+
 
 
     setAmount() {
@@ -139,58 +147,59 @@ class SendPayment extends React.Component<any, any> {
 
     //TODO: Send they amount 
     click_SendAmount = async () => {
+
         let { arr_SelectAccountDetails, address, amount, tranPrio, memo } = this.state;
+        const { onSendAmountT1 } = this.props;
+
         this.setState( {
             flag_Loading: true,
             flag_DisableSentBtn: true,
             flag_SentBtnAnimation: true
-        } )
-        const { resTransferST, data } = await onSendAmount( { arr_SelectAccountDetails, address, amount, tranPrio, memo } )
-        if ( resTransferST.status == 200 ) {
-            this.setState( {
-                flag_Loading: false,
-                flag_DisableSentBtn: false,
-                flag_SentBtnAnimation: false
-            } );
-            this.props.navigation.push( "ConfirmAndSendPayment", { data: [ data ] } );
-        } else {
-            this.setState( {
-                flag_Loading: false,
-                flag_DisableSentBtn: false,
-                flag_SentBtnAnimation: false
-            } )
-            let msg = resTransferST.data != undefined ? resTransferST.err + "\n Total Fee = " + resTransferST.data.fee : resTransferST.err
-            setTimeout( () => {
-                Alert.alert(
-                    'Oops',
-                    msg,
-                    [
-                        {
-                            text: 'Ok', onPress: () => {
+        } );
 
-                            }
-                        },
-                    ],
-                    { cancelable: false },
-                );
-            }, 100 );
-            this.setState( {
-                flag_DisableSentBtn: true,
-            } )
-        }
+        await onSendAmountT1( { arr_SelectAccountDetails, address, amount, tranPrio, memo } )
+        let { sendAmountDataT1 } = this.props;
+        console.log( { sendAmountDataT1 } );
+
+
+
+
+        // if ( resTransferST.status == 200 ) {
+        //     this.setState( {
+        //         flag_Loading: false,
+        //         flag_DisableSentBtn: false,
+        //         flag_SentBtnAnimation: false
+        //     } );
+        //     this.props.navigation.push( "ConfirmAndSendPayment", { data: [ data ] } );
+        // } else {
+        //     this.setState( {
+        //         flag_Loading: false,
+        //         flag_DisableSentBtn: false,
+        //         flag_SentBtnAnimation: false
+        //     } )
+        //     let msg = resTransferST.data != undefined ? resTransferST.err + "\n Total Fee = " + resTransferST.data.fee : resTransferST.err
+        //     setTimeout( () => {
+        //         Alert.alert(
+        //             'Oops',
+        //             msg,
+        //             [
+        //                 {
+        //                     text: 'Ok', onPress: () => {
+
+        //                     }
+        //                 },
+        //             ],
+        //             { cancelable: false },
+        //         );
+        //     }, 100 );
+        //     this.setState( {
+        //         flag_DisableSentBtn: true,
+        //     } )
+        // }
     }
 
 
-    //buz bitcoin need small letter 
-    getPriority( no: any ) {
-        if ( no == 0 ) {
-            return "Low"
-        } else if ( no == 1 ) {
-            return "Medium"
-        } else {
-            return "High"
-        }
-    }
+
 
     //TODO: When qrcode  scan 
     getAddressWithBal = ( e: any ) => {
@@ -448,7 +457,22 @@ const styles = StyleSheet.create( {
 } );
 
 
+const mapDispatchToProps = ( dispatch ) => {
+    return {
+        onSendAmountT1: ( args ) => {
+            dispatch( onSendAmountT1( args ) );
+        }
+    }
+}
 
+const mapStateToProps = state => {
+    return {
+        sendAmountDataT1: state.paymentReducer.sendAmountDataT1
+    };
+};
 
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)( SendPayment );
 
-export default connect( null, null )( SendPayment );
