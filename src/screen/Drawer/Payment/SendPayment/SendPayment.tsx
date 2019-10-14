@@ -192,8 +192,6 @@ class SendPayment extends React.Component<any, any> {
     }
 
 
-
-
     //TODO: When qrcode  scan 
     getAddressWithBal = ( e: any ) => {
         console.log( { e } );
@@ -208,7 +206,6 @@ class SendPayment extends React.Component<any, any> {
             } else {
                 this.setAmountAndAddress( address, amount.toString() );
             }
-
         }
     }
 

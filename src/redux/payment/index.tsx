@@ -8,10 +8,13 @@ var utils = require( "hexaUtils" );
 const SEND_AMOUNT_T1 = "SEND_AMOUNT_T1";
 const UPDATE_DATA_T1 = "UPDATE_DATA_T1";
 
-const INITIAL_STATE = {
-    sendAmountDataT1: {}
-};
+const SEND_AMOUNT_T2 = "SEND_AMOUNT_T1";
+const UPDATE_DATA_T2 = "UPDATE_DATA_T1";
 
+const INITIAL_STATE = {
+    sendAmountDataT1: {},
+    sendAmountDataT2: {}
+};
 
 // Actions
 export const onSendAmountT1 = ( args ) => {
@@ -22,11 +25,20 @@ export const onSendAmountT1 = ( args ) => {
 };
 
 
+export const onSendAmountT2 = ( args ) => {
+    return {
+        type: SEND_AMOUNT_T2,
+        ...args
+    };
+}
+
 //Reducers
 export const paymentReducer = ( state = INITIAL_STATE, action: any ) => {
     console.log( action );
     switch ( action.type ) {
         case UPDATE_DATA_T1:
+            return { ...state, ...action.payload };
+        case UPDATE_DATA_T2:
             return { ...state, ...action.payload };
         default:
             return state;
@@ -74,5 +86,35 @@ function* workerOnSendAmountT1( action ) {
 }
 
 
+function* workerOnSendAmountT2( action ) {
+    const { classStateReducer, paymentReducer } = yield select( state => state );
+    try {
+        const { data } = action;
+        console.log( { data } );
 
-export const watcherOnSendAmountT1 = sagaWatcherHelper( workerOnSendAmountT1, SEND_AMOUNT_T1 ); 
+        const { regularAccount, secureAccount } = classStateReducer;
+        const { sendAmountDataT1 } = paymentReducer;
+        var resTransferST;
+        if ( data.selectedAccount.accountName == "Regular Account" ) {
+            resTransferST = yield regularAccount.transferST2( sendAmountDataT1.resTransferST.data.inputs, sendAmountDataT1.resTransferST.data.txb );
+            yield bitcoinClassState.setRegularClassState( regularAccount );
+        } else {
+            resTransferST = yield secureAccount.transferST2( sendAmountDataT1.resTransferST.data.inputs, sendAmountDataT1.resTransferST.data.txb );
+            yield bitcoinClassState.setSecureClassState( secureAccount );
+        }
+        yield put( {
+            type: UPDATE_DATA_T2,
+            payload: {
+                sendAmountDataT2: {
+                    resTransferST
+                }
+            }
+        } )
+    } catch ( e ) {
+        console.log( "error", e )
+    }
+}
+
+export const watcherOnSendAmountT1 = sagaWatcherHelper( workerOnSendAmountT1, SEND_AMOUNT_T1 );
+
+export const watcherOnSendAmountT2 = sagaWatcherHelper( workerOnSendAmountT2, SEND_AMOUNT_T2 ); 
