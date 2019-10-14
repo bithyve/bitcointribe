@@ -10,7 +10,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 //TODO: redux
 import { connect } from 'react-redux';
-import { onSendAmountT1 } from 'hexaRedux'
+import { onSendAmountT2 } from 'hexaRedux'
 
 import { ImageSVG } from "hexaComponent/ImageSVG";
 
@@ -70,15 +70,11 @@ class ConfirmAndSendPayment extends React.Component<any, any> {
         this.setState( {
             flag_SentBtnAnimation: true,
             flag_DisableSentBtn: true,
-        } )
+        } );
         let { data } = this.state;
-        //console.log( { selectedAccount: data } );
-        let date = Date.now();
+
         let regularAccount = await bitcoinClassState.getRegularClassState();
         let secureAccount = await bitcoinClassState.getSecureClassState();
-        let inputs = data.resTransferST.data.inputs;
-        let txb = data.resTransferST.data.txb
-        //console.log( { inputs, txb } );
         var resTransferST;
         if ( data.selectedAccount.accountName == "Regular Account" ) {
             resTransferST = await regularAccount.transferST2( data.resTransferST.data.inputs, data.resTransferST.data.txb );
@@ -334,7 +330,9 @@ const styles = StyleSheet.create( {
 
 const mapDispatchToProps = ( dispatch ) => {
     return {
-
+        onSendAmountT2: ( args ) => {
+            dispatch( onSendAmountT2( args ) );
+        }
     }
 }
 
