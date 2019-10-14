@@ -78,6 +78,42 @@ class SendPayment extends React.Component<any, any> {
 
     componentWillReceiveProps = ( nextProps: any ) => {
         console.log( { nextProps } );
+        if ( nextProps.sendAmountDataT1 !== this.props.sendAmountDataT1 ) {
+            let resTransferST = nextProps.sendAmountDataT1.resTransferST;
+            console.log( { resTransferST } );
+            if ( resTransferST.status == 200 ) {
+                this.setState( {
+                    flag_Loading: false,
+                    flag_DisableSentBtn: false,
+                    flag_SentBtnAnimation: false
+                } );
+                this.props.navigation.push( "ConfirmAndSendPayment" );
+            } else {
+                this.setState( {
+                    flag_Loading: false,
+                    flag_DisableSentBtn: false,
+                    flag_SentBtnAnimation: false
+                } )
+                let msg = resTransferST.data != undefined ? resTransferST.err + "\n Total Fee = " + resTransferST.data.fee : resTransferST.err
+                setTimeout( () => {
+                    Alert.alert(
+                        'Oops',
+                        msg,
+                        [
+                            {
+                                text: 'Ok', onPress: () => {
+
+                                }
+                            },
+                        ],
+                        { cancelable: false },
+                    );
+                }, 100 );
+                this.setState( {
+                    flag_DisableSentBtn: true,
+                } )
+            }
+        }
     }
 
 
@@ -85,9 +121,6 @@ class SendPayment extends React.Component<any, any> {
     componentWillUnmount() {
         utils.setFlagQRCodeScreen( true );
     }
-
-
-
 
     setAmount() {
         let { amount, selectedAccountBal } = this.state;
@@ -104,6 +137,7 @@ class SendPayment extends React.Component<any, any> {
             flag_DisableSentBtn
         } )
     }
+
 
     //Change account details on account list
     selectAccount( index: any ) {
@@ -147,55 +181,14 @@ class SendPayment extends React.Component<any, any> {
 
     //TODO: Send they amount 
     click_SendAmount = async () => {
-
         let { arr_SelectAccountDetails, address, amount, tranPrio, memo } = this.state;
         const { onSendAmountT1 } = this.props;
-
         this.setState( {
             flag_Loading: true,
             flag_DisableSentBtn: true,
             flag_SentBtnAnimation: true
         } );
-
         await onSendAmountT1( { arr_SelectAccountDetails, address, amount, tranPrio, memo } )
-        let { sendAmountDataT1 } = this.props;
-        console.log( { sendAmountDataT1 } );
-
-
-
-
-        // if ( resTransferST.status == 200 ) {
-        //     this.setState( {
-        //         flag_Loading: false,
-        //         flag_DisableSentBtn: false,
-        //         flag_SentBtnAnimation: false
-        //     } );
-        //     this.props.navigation.push( "ConfirmAndSendPayment", { data: [ data ] } );
-        // } else {
-        //     this.setState( {
-        //         flag_Loading: false,
-        //         flag_DisableSentBtn: false,
-        //         flag_SentBtnAnimation: false
-        //     } )
-        //     let msg = resTransferST.data != undefined ? resTransferST.err + "\n Total Fee = " + resTransferST.data.fee : resTransferST.err
-        //     setTimeout( () => {
-        //         Alert.alert(
-        //             'Oops',
-        //             msg,
-        //             [
-        //                 {
-        //                     text: 'Ok', onPress: () => {
-
-        //                     }
-        //                 },
-        //             ],
-        //             { cancelable: false },
-        //         );
-        //     }, 100 );
-        //     this.setState( {
-        //         flag_DisableSentBtn: true,
-        //     } )
-        // }
     }
 
 

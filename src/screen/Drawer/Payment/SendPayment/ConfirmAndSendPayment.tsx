@@ -8,6 +8,10 @@ import { SvgIcon } from "hexaComponent/Icons";
 import { RkCard } from "react-native-ui-kitten";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
+//TODO: redux
+import { connect } from 'react-redux';
+import { onSendAmountT1 } from 'hexaRedux'
+
 import { ImageSVG } from "hexaComponent/ImageSVG";
 
 //TODO: Custome Pages
@@ -37,7 +41,8 @@ var dbOpration = require( "hexaDBOpration" );
 //TODO: Bitcoin class
 var bitcoinClassState = require( "hexaClassState" );
 
-export default class ConfirmAndSendPayment extends React.Component<any, any> {
+class ConfirmAndSendPayment extends React.Component<any, any> {
+
     constructor ( props: any ) {
         super( props )
         this.state = ( {
@@ -51,10 +56,8 @@ export default class ConfirmAndSendPayment extends React.Component<any, any> {
     }
 
     async componentWillMount() {
-        var data = this.props.navigation.getParam( "data" );
-        //console.log( { selectedAccount: data } );
-        data = data[ 0 ]
-        //console.log( { selectedAccountFirstIndex: data } );
+        var data = this.props.sendAmountDataT1;
+        console.log( { selectedAccount: data } );
         this.setState( {
             data: data
         } );
@@ -122,7 +125,6 @@ export default class ConfirmAndSendPayment extends React.Component<any, any> {
 
     }
 
-
     //TODO: Amount Sent Success
     click_GoToDailyAccount = async () => {
         let { data } = this.state;
@@ -145,7 +147,6 @@ export default class ConfirmAndSendPayment extends React.Component<any, any> {
             this.props.navigation.navigate( "TabbarBottom", { id: 1 } )
         }
     }
-
 
     render() {
         //array 
@@ -324,8 +325,26 @@ export default class ConfirmAndSendPayment extends React.Component<any, any> {
     }
 }
 
+
 const styles = StyleSheet.create( {
     container: {
         flex: 1,
     }
 } );
+
+const mapDispatchToProps = ( dispatch ) => {
+    return {
+
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        sendAmountDataT1: state.paymentReducer.sendAmountDataT1
+    };
+};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)( ConfirmAndSendPayment );

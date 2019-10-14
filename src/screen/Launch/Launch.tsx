@@ -52,7 +52,6 @@ export default class Launch extends Component<Props, any> {
         this.props.onComplited( false, "OnBoardingNavigator" );
       }
     }, 3000 );
-
     Animated.timing( this.state.centerLogoOpticy, {
       toValue: 1,
       duration: 100,
