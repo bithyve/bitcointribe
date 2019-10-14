@@ -35,10 +35,10 @@ export const paymentReducer = ( state = INITIAL_STATE, action: any ) => {
 
 
 function* workerOnSendAmountT1( action ) {
-    const { walletReducer } = yield select( state => state );
+    const { classStateReducer } = yield select( state => state );
     try {
         const { arr_SelectAccountDetails, address, amount, tranPrio, memo } = action;
-        const { regularAccount, secureAccount } = walletReducer;
+        const { regularAccount, secureAccount } = classStateReducer;
         console.log( { regularAccount, secureAccount } );
         let amountFloat = parseFloat( amount );
         let priority = getPriority( tranPrio );

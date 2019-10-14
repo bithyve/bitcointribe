@@ -14,9 +14,12 @@ import {
 import { StackActions, NavigationActions } from "react-navigation";
 import CodeInput from "react-native-confirmation-code-input";
 import * as Keychain from "react-native-keychain";
-
-
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
+//TODO: Redux
+import { connect } from 'react-redux';
+import { readClassState } from 'hexaRedux';
+
 
 //TODO: Custome Pages
 import { StatusBar } from "hexaComponent/StatusBar";
@@ -41,10 +44,7 @@ import { renderIf } from "hexaValidation";
 var comFunDBRead = require( "hexaCommonDBReadData" );
 
 
-
-
-
-export default class Passcode extends Component {
+class Passcode extends Component {
 
   constructor ( props: any ) {
     super( props );
@@ -132,17 +132,16 @@ export default class Passcode extends Component {
 
   onSuccess = async ( code: string ) => {
     try {
-
-
       const rootViewController = await AsyncStorage.getItem( asyncStorageKeys.rootViewController );
-
       //Wallet Details Reading
       await comFunDBRead.readTblWallet();
       await comFunDBRead.readTblSSSDetails();
 
+      //TODO:initial Values
+      this.props.readClassState();
+
       let pageName = utils.getRootViewController();
       console.log( { pageName } );
-
       if ( pageName != "TrustedPartyShareSecretNavigator" && pageName != "OTPScreenNavigator" ) {
         const resetAction = StackActions.reset( {
           index: 0, // <-- currect active route from actions array
@@ -214,6 +213,8 @@ export default class Passcode extends Component {
       Alert.alert( error )
     }
   }
+
+
 
   render() {
     return (
@@ -313,3 +314,21 @@ let styles = StyleSheet.create( {
     marginBottom: 20
   }
 } );
+
+const mapDispatchToProps = ( dispatch ) => {
+  return {
+    readClassState: () => {
+      dispatch( readClassState() );
+    }
+  }
+}
+
+const mapStateToProps = state => {
+  return {
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)( Passcode );

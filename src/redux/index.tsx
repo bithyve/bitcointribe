@@ -4,6 +4,15 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { all, fork } from 'redux-saga/effects';
 
 // Import from ReduxDucks.    
+
+//TODO: Class State
+import {
+    readClassState,
+    classStateReducer,
+    watcherClassState
+} from "./classState";
+
+//TODO: Wallet (Account Create)
 import {
     setupAccounts,
     createRegularAccount,
@@ -16,13 +25,18 @@ import {
     watcherSSS
 } from './wallet';
 
+//TODO: Payment (Send and Receive)
 import {
     onSendAmountT1,
     paymentReducer,
     watcherOnSendAmountT1
 } from './payment';
 
-const reducers = combineReducers( { walletReducer, paymentReducer } );
+const reducers = combineReducers( {
+    classStateReducer,
+    walletReducer,
+    paymentReducer
+} );
 
 const rootSaga = function* () {
     yield all( [
@@ -30,7 +44,8 @@ const rootSaga = function* () {
         fork( watcherRegularAccount ),
         fork( watcherSecureAccount ),
         fork( watcherSSS ),
-        fork( watcherOnSendAmountT1 )
+        fork( watcherOnSendAmountT1 ),
+        fork( watcherClassState )
     ] );
 };
 
@@ -47,11 +62,13 @@ sagaMiddleware.run( rootSaga );
 
 export {
     store,
+    //classState  
+    readClassState,
     //wallet
     setupAccounts,
     createRegularAccount,
     createSecureAccount,
     createSSS,
-    //payment
+    //payment   
     onSendAmountT1
-};
+};   

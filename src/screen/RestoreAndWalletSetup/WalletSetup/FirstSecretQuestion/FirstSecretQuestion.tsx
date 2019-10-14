@@ -18,7 +18,7 @@ import bip39 from 'react-native-bip39';
 
 //TODO: Redux
 import { connect } from 'react-redux';
-import { setupAccounts } from 'hexaRedux';
+import { setupAccounts, readClassState } from 'hexaRedux';
 
 
 
@@ -223,7 +223,9 @@ class FirstSecretQuestion extends React.Component<any, any> {
                         await bitcoinClassState.setRegularClassState( regularAccount );
                         //secure account     
                         await bitcoinClassState.setSecureClassState( secureAccount );
-                        await bitcoinClassState.setS3ServiceClassState( sss )
+                        await bitcoinClassState.setS3ServiceClassState( sss );
+                        this.props.readClassState();
+
                         //s3serverice
                         await comFunDBRead.readTblSSSDetails();
                         await comFunDBRead.readTblWallet();
@@ -404,6 +406,9 @@ const mapDispatchToProps = ( dispatch ) => {
     return {
         setupAccounts: () => {
             dispatch( setupAccounts() );
+        },
+        readClassState: () => {
+            dispatch( readClassState() );
         }
     }
 }
