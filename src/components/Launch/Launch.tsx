@@ -29,7 +29,7 @@ export default class Launch extends Component<Props, any> {
     super( props );
     this.state = ( {
       centerLogo: null,
-      centerLogoOpticy: new Animated.Value( 0 )
+      centerLogoOpacity: new Animated.Value( 0 )
     } )
   }
 
@@ -41,6 +41,12 @@ export default class Launch extends Component<Props, any> {
     let status = JSON.parse( value );
     const credentials = await Keychain.getGenericPassword();
     commonData.setPasscode( credentials.password );
+
+    setTimeout( () => {
+      this.setState( { centerLogo: images.LaunchScreen.hexaLogo } )
+    }, 10 );
+
+
     setTimeout( () => {
       if ( rootViewController == "PasscodeConfirm" ) {
         this.props.onCompleted( false, rootViewController );
@@ -51,25 +57,20 @@ export default class Launch extends Component<Props, any> {
       else {
         this.props.onCompleted( false, "OnBoardingNavigator" );
       }
-    }, 3000 );
+    }, 300 );
 
-    Animated.timing( this.state.centerLogoOpticy, {
+    Animated.timing( this.state.centerLogoOpacity, {
       toValue: 1,
-      duration: 100,
+      duration: 10,
       easing: Easing.bounce
     } ).start();
+    
 
-    setTimeout( () => {
-      this.setState( { centerLogo: images.LaunchScreen.hexaBaseCard } )
-    }, 1000 );
-    setTimeout( () => {
-      this.setState( { centerLogo: images.LaunchScreen.hexaLogo } )
-    }, 2000 );
   }
 
 
   render() {
-    const animatedOpcity = { opacity: this.state.centerLogoOpticy }
+    const animatedOpacity = { opacity: this.state.centerLogoOpacity }
     return (
       <View style={ styles.container }>
         <ImageBackground
@@ -81,10 +82,10 @@ export default class Launch extends Component<Props, any> {
         >
           <Animated.Image
             source={ this.state.centerLogo }
-            style={ [ animatedOpcity, { height: 400, width: 400 } ] }
+            style={ [ animatedOpacity, { height: 400, width: 400 } ] }
           />
         </ImageBackground>
-        <CustomStatusBar backgroundColor={ colors.white } hidden={ true } barStyle="dark-content" />
+        <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
       </View>
     );
   }
