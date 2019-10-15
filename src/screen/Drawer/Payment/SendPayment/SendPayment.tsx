@@ -14,6 +14,13 @@ import { SvgIcon } from "hexaComponent/Icons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Slider, CheckBox } from 'react-native-elements';
 
+//TODO: Base Component
+import { BaseComponent } from "hexaComponent/BaseComponent";
+
+
+//TODO: Custome Alert 
+import { AlertSimple } from "hexaComponent/Alert";;
+let alert = new AlertSimple();
 
 //TODO: Custome Pages
 import { StatusBar } from "hexaComponent/StatusBar";
@@ -37,16 +44,10 @@ var utils = require( "hexaUtils" );
 import { renderIf } from "hexaValidation";
 
 
-//TODO: Common Funciton
-var comFunDBRead = require( "hexaCommonDBReadData" );
 
-//TODO: Bitcoin Files
-var bitcoinClassState = require( "hexaClassState" );
-
-
-class SendPayment extends React.Component<any, any> {
+class SendPayment extends BaseComponent<any, any> {
     constructor ( props: any ) {
-        super( props )
+        super( props );
         this.state = ( {
             arr_AccountList: [],
             arr_SelectAccountDetails: [],
@@ -92,25 +93,13 @@ class SendPayment extends React.Component<any, any> {
                 this.setState( {
                     flag_Loading: false,
                     flag_DisableSentBtn: false,
-                    flag_SentBtnAnimation: false
-                } )
-                let msg = resTransferST.data != undefined ? resTransferST.err + "\n Total Fee = " + resTransferST.data.fee : resTransferST.err
-                setTimeout( () => {
-                    Alert.alert(
-                        'Oops',
-                        msg,
-                        [
-                            {
-                                text: 'Ok', onPress: () => {
+                    flag_SentBtnAnimation: false,
+                }, () => {
+                    setTimeout( () => {
+                        let msg = resTransferST.data != undefined ? resTransferST.err + "\n Total Fee = " + resTransferST.data.fee : resTransferST.err;
+                        alert.simpleOk( "Oops", msg );
+                    }, 100 );
 
-                                }
-                            },
-                        ],
-                        { cancelable: false },
-                    );
-                }, 100 );
-                this.setState( {
-                    flag_DisableSentBtn: true,
                 } )
             }
         }
