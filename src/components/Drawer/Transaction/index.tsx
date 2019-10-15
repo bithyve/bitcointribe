@@ -1,5 +1,3 @@
-import Transaction from "./Transaction";
+import Transaction from './Transaction';
 
-export {
-    Transaction
-}
+export { Transaction };

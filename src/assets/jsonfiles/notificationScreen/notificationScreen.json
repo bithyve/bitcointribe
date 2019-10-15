@@ -3,7 +3,7 @@
         {
             "id": 1,
             "icon": "https://facebook.github.io/react-native/docs/assets/favicon.png",
-            "title": "Programmable money on open blockchains is the future of finance. Helping companies/ individuals make #crypto & #bitcoin a part of their financial infrastructure",   
+            "title": "Programmable money on open blockchains is the future of finance. Helping companies/ individuals make #crypto & #bitcoin a part of their financial infrastructure",
             "desc": "Regular Account"
         },
         {
@@ -12,7 +12,7 @@
             "title": "Sent/Receive",
             "desc": "In Regualr Account"
         },
-        {    
+        {
             "id": 2,
             "icon": "user-circle",
             "title": "Account Settings",

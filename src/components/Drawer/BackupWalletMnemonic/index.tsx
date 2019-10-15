@@ -1,8 +1,4 @@
-import BackupWalletMnemonic from "./BackupWalletMnemonic";
-import BackupWalletMnemonicConfirmMnemonic from "./BackupWalletMnemonicConfirmMnemonic";
+import BackupWalletMnemonic from './BackupWalletMnemonic';
+import BackupWalletMnemonicConfirmMnemonic from './BackupWalletMnemonicConfirmMnemonic';
 
-
-export {
-    BackupWalletMnemonic,
-    BackupWalletMnemonicConfirmMnemonic
-}
+export { BackupWalletMnemonic, BackupWalletMnemonicConfirmMnemonic };

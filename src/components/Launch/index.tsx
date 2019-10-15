@@ -1,7 +1,4 @@
-import Launch from "./Launch";
-import OnBoarding from "./OnBoarding";
+import Launch from './Launch';
+import OnBoarding from './OnBoarding';
 
-export {
-    Launch,
-    OnBoarding
-}
+export { Launch, OnBoarding };

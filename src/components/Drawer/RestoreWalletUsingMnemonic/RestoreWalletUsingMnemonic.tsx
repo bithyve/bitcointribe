@@ -1,37 +1,30 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import {
     StyleSheet,
     View,
     ImageBackground,
     SafeAreaView,
     FlatList,
-    TextInput,
-} from "react-native";
+    TextInput
+} from 'react-native';
 import { Text } from 'native-base';
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-
-
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 //TODO: Custome Pages
-import { CustomStatusBar } from "hexaCustStatusBar";
-import { ModelLoader } from "hexaLoader";
+import { CustomStatusBar } from 'hexaCustStatusBar';
+import { ModelLoader } from 'hexaLoader';
 
 //TODO: Custome Object
-import {
-    colors,
-    images
-} from "hexaConstants";
-
-
+import { colors, images } from 'hexaConstants';
 
 export default class RestoreWalletUsingMnemonic extends Component {
-    constructor ( props: any ) {
-        super( props );
+    constructor(props: any) {
+        super(props);
         this.state = {
             arr_ModelWalletName: [],
             arr_ConfirmPassphrase: [],
             arr_ModelRestoreSucess: [],
-            wallerName: "",
+            wallerName: '',
             flag_Loading: false
         };
     }
@@ -117,51 +110,108 @@ export default class RestoreWalletUsingMnemonic extends Component {
     //     } );
     //     this.props.navigation.dispatch( resetAction );
     // }
-    _renderItem = ( { item, index } ) => (
-        <View style={ { flex: 1, backgroundColor: "white", alignItems: "center", justifyContent: "center", borderRadius: 10, margin: 5 } }>
+    _renderItem = ({ item, index }) => (
+        <View
+            style={{
+                flex: 1,
+                backgroundColor: 'white',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 10,
+                margin: 5
+            }}
+        >
             <TextInput
-                style={ { height: 30 } }
-                placeholder={ "Word " + ( index + 1 ) }
+                style={{ height: 30 }}
+                placeholder={'Word ' + (index + 1)}
             />
         </View>
     );
     render() {
         return (
-            <View style={ styles.container }>
-                <CustomStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
-                <SafeAreaView style={ styles.container }>
-                    <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
+            <View style={styles.container}>
+                <CustomStatusBar
+                    backgroundColor={colors.white}
+                    flagShowStatusBar={false}
+                    barStyle="dark-content"
+                />
+                <SafeAreaView style={styles.container}>
+                    <ImageBackground
+                        source={
+                            images.WalletSetupScreen.WalletScreen.backgoundImage
+                        }
+                        style={styles.container}
+                    >
                         <KeyboardAwareScrollView
                             enableAutomaticScroll
-                            automaticallyAdjustContentInsets={ true }
-                            keyboardOpeningTime={ 0 }
-                            enableOnAndroid={ true }
-                            contentContainerStyle={ { flexGrow: 1 } }
+                            automaticallyAdjustContentInsets={true}
+                            keyboardOpeningTime={0}
+                            enableOnAndroid={true}
+                            contentContainerStyle={{ flexGrow: 1 }}
                         >
                             <View>
-                                <View></View>
-                                <Text style={ { textAlign: "center", fontSize: 22, fontWeight: "600" } }>Enter the Mnemonic</Text>
+                                <View />
+                                <Text
+                                    style={{
+                                        textAlign: 'center',
+                                        fontSize: 22,
+                                        fontWeight: '600'
+                                    }}
+                                >
+                                    Enter the Mnemonic
+                                </Text>
                             </View>
-                            <Text style={ { textAlign: "center", padding: 10 } }>Enter the mnemonic in the order</Text>
+                            <Text style={{ textAlign: 'center', padding: 10 }}>
+                                Enter the mnemonic in the order
+                            </Text>
                             <FlatList
-                                style={ { flex: 1 } }
-                                data={ [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ] }
-                                renderItem={ this._renderItem }
-                                numColumns={ 3 }
+                                style={{ flex: 1 }}
+                                data={[
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    5,
+                                    6,
+                                    7,
+                                    8,
+                                    9,
+                                    10,
+                                    11,
+                                    12,
+                                    13,
+                                    14,
+                                    15,
+                                    16,
+                                    17,
+                                    18,
+                                    19,
+                                    20,
+                                    21,
+                                    22,
+                                    23,
+                                    24
+                                ]}
+                                renderItem={this._renderItem}
+                                numColumns={3}
                             />
-                            <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
+                            <ModelLoader
+                                loading={this.state.flag_Loading}
+                                color={colors.appColor}
+                                size={30}
+                            />
                         </KeyboardAwareScrollView>
                     </ImageBackground>
                 </SafeAreaView>
-            </View >
+            </View>
         );
     }
 }
 
-let styles = StyleSheet.create( {
+let styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "rgba(252,252,252,1)"
+        backgroundColor: 'rgba(252,252,252,1)'
     },
     viewSetupWallet: {
         flex: 4,
@@ -170,14 +220,13 @@ let styles = StyleSheet.create( {
     viewAppLogo: {
         marginTop: 20,
         flex: 1,
-        alignItems: "center",
+        alignItems: 'center'
     },
     imgAppLogo: {
         height: 70,
         width: 70
     },
     txtWhiteColor: {
-        color: "#ffffff"
+        color: '#ffffff'
     }
-
-} );
+});

@@ -1,5 +1,3 @@
-import AlertSimple from "./AlertSimple";
+import AlertSimple from './AlertSimple';
 
-export {
-    AlertSimple
-}
+export { AlertSimple };

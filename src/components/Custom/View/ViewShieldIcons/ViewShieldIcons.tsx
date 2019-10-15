@@ -1,40 +1,48 @@
-import React, { Component } from "react";
-import { StyleSheet, TouchableOpacity, Animated } from "react-native";
+import React, { Component } from 'react';
+import { StyleSheet, TouchableOpacity, Animated } from 'react-native';
 
-import {
-    images
-} from "hexaConstants";
+import { images } from 'hexaConstants';
 
 export default class ViewShieldIcons extends Component<any, any> {
-    constructor ( props: any ) {
-        super( props )
+    constructor(props: any) {
+        super(props);
     }
 
-    render = ( { children } = this.props ) => {
+    render = ({ children } = this.props) => {
         return (
-            <TouchableOpacity onPress={ () => this.props.click_Image()
-            }>
+            <TouchableOpacity onPress={() => this.props.click_Image()}>
                 <Animated.Image
-                    source={ images.walletScreen[ this.props.data.length != 0 ? this.props.data[ 0 ].image : images.walletScreen.shield ] }
-                    style={ [
+                    source={
+                        images.walletScreen[
+                            this.props.data.length != 0
+                                ? this.props.data[0].image
+                                : images.walletScreen.shield
+                        ]
+                    }
+                    style={[
                         {
-                            height: this.props.data.length != 0 ? this.props.data[ 0 ].imageHeight : 100,
-                            width: this.props.data.length != 0 ? this.props.data[ 0 ].imageWidth : 100,
+                            height:
+                                this.props.data.length != 0
+                                    ? this.props.data[0].imageHeight
+                                    : 100,
+                            width:
+                                this.props.data.length != 0
+                                    ? this.props.data[0].imageWidth
+                                    : 100
                         }
-                    ] }
+                    ]}
                 />
-
             </TouchableOpacity>
         );
     };
 }
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
     textWhite: {
-        color: "#FFFFFF",
+        color: '#FFFFFF',
         fontSize: 16,
-        alignSelf: "center",
-        fontWeight: "bold",
-        fontFamily: "Avenir"
+        alignSelf: 'center',
+        fontWeight: 'bold',
+        fontFamily: 'Avenir'
     }
-} );
+});

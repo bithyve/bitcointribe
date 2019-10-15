@@ -1,5 +1,3 @@
-import CustomStatusBar from "./CustomStatusBar";
+import CustomStatusBar from './CustomStatusBar';
 
-export {
-    CustomStatusBar
-}
+export { CustomStatusBar };

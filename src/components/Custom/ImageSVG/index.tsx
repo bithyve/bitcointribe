@@ -1,5 +1,3 @@
-import ImageSVG from "./ImageSVG";
+import ImageSVG from './ImageSVG';
 
-export {
-    ImageSVG
-}
+export { ImageSVG };

@@ -1,135 +1,155 @@
-import {
-    localDB
-} from "hexaConstants";
-var dbOpration = require( "hexaDBOpration" );
-var utils = require( "hexaUtils" );
-
-
+import { localDB } from 'hexaConstants';
+var dbOpration = require('hexaDBOpration');
+var utils = require('hexaUtils');
 
 //TODO: Bitcoin Files
-//import { HealthStatus } from "hexaBitcoin"  
-import HealthStatus from "HexaWallet/src/bitcoin/utilities/sss/HealthStatus"
-import { AlertSimple } from "hexaCustAlert";
+//import { HealthStatus } from "hexaBitcoin"
+import HealthStatus from 'HexaWallet/src/bitcoin/utilities/sss/HealthStatus';
+import { AlertSimple } from 'hexaCustAlert';
 let alert = new AlertSimple();
 
-
 //TODO: Common Funciton
-var comFunDBRead = require( "hexaCommonDBReadData" );
+var comFunDBRead = require('hexaCommonDBReadData');
 
 //TODO: Bitcoin Class
-var bitcoinClassState = require( "hexaClassState" );
+var bitcoinClassState = require('hexaClassState');
 
-
-
-//Setup Flow 
-const checkHealthSetupShare = async ( qatime: number ) => {
-    console.log( { qatime } );
+//Setup Flow
+const checkHealthSetupShare = async (qatime: number) => {
+    console.log({ qatime });
     const healthStatus = new HealthStatus();
     let arrShares = [
-        { shareId: "", updatedAt: 0 },
-        { shareId: "", updatedAt: 0 },
-        { shareId: "", updatedAt: 0 },
-        { shareId: "", updatedAt: 0 },
-        { shareId: "", updatedAt: 0 },
+        { shareId: '', updatedAt: 0 },
+        { shareId: '', updatedAt: 0 },
+        { shareId: '', updatedAt: 0 },
+        { shareId: '', updatedAt: 0 },
+        { shareId: '', updatedAt: 0 }
     ];
-    const res = await healthStatus.appHealthStatus( qatime, arrShares );
-    console.log( { res } );
-    await utils.setAppHealthStatus( res )
+    const res = await healthStatus.appHealthStatus(qatime, arrShares);
+    console.log({ res });
+    await utils.setAppHealthStatus(res);
     return res;
-}
+};
 
-
-const checkHealthAllShare = async ( share: any ) => {
+const checkHealthAllShare = async (share: any) => {
     //  console.log( { share } );
     let dateTime = Date.now();
-    let temp = [ share.trustedContShareId1, share.trustedContShareId2, share.selfshareShareId1 ];
-    console.log( { temp } );
+    let temp = [
+        share.trustedContShareId1,
+        share.trustedContShareId2,
+        share.selfshareShareId1
+    ];
+    console.log({ temp });
 
     const sss = await bitcoinClassState.getS3ServiceClassState();
-    var resCheckHealth = await sss.checkHealth( temp );
-    if ( resCheckHealth.status == 200 ) {
-        await bitcoinClassState.setS3ServiceClassState( sss );
+    var resCheckHealth = await sss.checkHealth(temp);
+    if (resCheckHealth.status == 200) {
+        await bitcoinClassState.setS3ServiceClassState(sss);
         resCheckHealth = resCheckHealth.data.lastUpdateds;
     } else {
-        alert.simpleOk( "Oops", resCheckHealth.err );
+        alert.simpleOk('Oops', resCheckHealth.err);
     }
 
-    console.log( { resCheckHealth } );
+    console.log({ resCheckHealth });
 
     let shares = [
-        { shareId: share.selfshareShareShareId2, updatedAt: share.selfshareShareDate2 },
-        { shareId: share.selfshareShareId3, updatedAt: share.selfshareShareDate3 },
+        {
+            shareId: share.selfshareShareShareId2,
+            updatedAt: share.selfshareShareDate2
+        },
+        {
+            shareId: share.selfshareShareId3,
+            updatedAt: share.selfshareShareDate3
+        }
     ];
-    resCheckHealth.push.apply( resCheckHealth, shares )
-    console.log( { resCheckHealth } );
+    resCheckHealth.push.apply(resCheckHealth, shares);
+    console.log({ resCheckHealth });
     const healthStatus = new HealthStatus();
-    const res = await healthStatus.appHealthStatus( share.qatime, resCheckHealth );
+    const res = await healthStatus.appHealthStatus(
+        share.qatime,
+        resCheckHealth
+    );
     let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
         localDB.tableName.tblWallet,
         res
     );
-    console.log( { res } );
-    if ( resupdateWalletDetials ) {
+    console.log({ res });
+    if (resupdateWalletDetials) {
         let temp = [];
-        for ( let i = 0; i < res.sharesInfo.length; i++ ) {
+        for (let i = 0; i < res.sharesInfo.length; i++) {
             let data = {};
-            data.shareId = res.sharesInfo[ i ].shareId;
-            data.shareStage = res.sharesInfo[ i ].shareStage;
-            data.acceptedDate = resCheckHealth[ i ] != null ? resCheckHealth[ i ].updatedAt : 0;
-            temp.push( data );
+            data.shareId = res.sharesInfo[i].shareId;
+            data.shareStage = res.sharesInfo[i].shareStage;
+            data.acceptedDate =
+                resCheckHealth[i] != null ? resCheckHealth[i].updatedAt : 0;
+            temp.push(data);
         }
         let resupdateSSSShareStage = await dbOpration.updateSSSShareStage(
             localDB.tableName.tblSSSDetails,
             temp,
             dateTime
         );
-        console.log( { resupdateSSSShareStage } );
+        console.log({ resupdateSSSShareStage });
         await comFunDBRead.readTblWallet();
         await comFunDBRead.readTblSSSDetails();
-        return res
+        return res;
     }
-}
+};
 
-
-const checkHealthWithServerAllShare = async ( share: any ) => {
+const checkHealthWithServerAllShare = async (share: any) => {
     //  console.log( { share } );
     let dateTime = Date.now();
     let resCheckHealth = [
-        { shareId: share.trustedContShareId1, updatedAt: share.trustedContDate1 },
-        { shareId: share.trustedContShareId2, updatedAt: share.trustedContDate2 },
+        {
+            shareId: share.trustedContShareId1,
+            updatedAt: share.trustedContDate1
+        },
+        {
+            shareId: share.trustedContShareId2,
+            updatedAt: share.trustedContDate2
+        },
         { shareId: share.selfshareShareId1, updatedAt: share.selfshareDate1 },
-        { shareId: share.selfshareShareShareId2, updatedAt: share.selfshareShareDate2 },
-        { shareId: share.selfshareShareId3, updatedAt: share.selfshareShareDate3 },
+        {
+            shareId: share.selfshareShareShareId2,
+            updatedAt: share.selfshareShareDate2
+        },
+        {
+            shareId: share.selfshareShareId3,
+            updatedAt: share.selfshareShareDate3
+        }
     ];
-    console.log( { resCheckHealth } );
+    console.log({ resCheckHealth });
     const healthStatus = new HealthStatus();
-    const res = await healthStatus.appHealthStatus( share.qatime, resCheckHealth );
+    const res = await healthStatus.appHealthStatus(
+        share.qatime,
+        resCheckHealth
+    );
     let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
         localDB.tableName.tblWallet,
         res
     );
-    console.log( { res } );
-    if ( resupdateWalletDetials ) {
+    console.log({ res });
+    if (resupdateWalletDetials) {
         let temp = [];
-        for ( let i = 0; i < res.sharesInfo.length; i++ ) {
+        for (let i = 0; i < res.sharesInfo.length; i++) {
             let data = {};
-            data.shareId = res.sharesInfo[ i ].shareId;
-            data.shareStage = res.sharesInfo[ i ].shareStage;
-            data.acceptedDate = resCheckHealth[ i ] != null ? resCheckHealth[ i ].updatedAt : 0;
-            temp.push( data );
+            data.shareId = res.sharesInfo[i].shareId;
+            data.shareStage = res.sharesInfo[i].shareStage;
+            data.acceptedDate =
+                resCheckHealth[i] != null ? resCheckHealth[i].updatedAt : 0;
+            temp.push(data);
         }
         let resupdateSSSShareStage = await dbOpration.updateSSSShareStage(
             localDB.tableName.tblSSSDetails,
             temp,
             dateTime
         );
-        console.log( { resupdateSSSShareStage } );
+        console.log({ resupdateSSSShareStage });
         await comFunDBRead.readTblWallet();
         await comFunDBRead.readTblSSSDetails();
-        return res
+        return res;
     }
-}
-
+};
 
 //TODO: func connection_AppHealthStatus (WalletScreen,TrustedContactScreen)
 // const connection_AppHealthStatus = async ( qatime: number, sharesId: any ) => {
@@ -279,18 +299,13 @@ const checkHealthWithServerAllShare = async ( share: any ) => {
 //             return resupdateWalletDetials;
 //         }
 
-
 //     }
 
 // }
 
-
 // const check_HealthRestoWalletUsingTrustedContact = async ( qatime: number, share: any ) => {
 //     console.log( { qatime, share } );
 // }
-
-
-
 
 // const connection_AppHealthStatusUpdateUsingRetoreWalletTrustedContact = async ( qatime: number, satime: number, encrShares: any, mnemonic: any, arr_RecordId: any ) => {
 //     //  console.log( { qatime, satime, encrShares, mnemonic } );
@@ -344,8 +359,6 @@ const checkHealthWithServerAllShare = async ( share: any ) => {
 
 // }
 
-
-
 // const check_AppHealthStausUsingMnemonic = async ( qatime: number, satime: number, shares: any, mnemonicTime: any ) => {
 //     const healthStatus = new HealthStatus();
 //     const res = await healthStatus.appHealthStatus( qatime, satime, shares, mnemonicTime, "mnemonic" );
@@ -357,7 +370,7 @@ const checkHealthWithServerAllShare = async ( share: any ) => {
 //     );
 //     if ( resupdateWalletDetials ) {
 //         return resupdateWalletDetials;
-//     }  
+//     }
 // }
 
 module.exports = {
