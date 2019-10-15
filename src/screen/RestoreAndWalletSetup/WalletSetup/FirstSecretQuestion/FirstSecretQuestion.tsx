@@ -18,7 +18,7 @@ import bip39 from 'react-native-bip39';
 
 //TODO: Redux
 import { connect } from 'react-redux';
-import { setupAccounts, readClassState } from 'hexaRedux';
+import { setupAccounts, writeAccountsState } from 'hexaRedux';
 
 
 
@@ -220,12 +220,12 @@ class FirstSecretQuestion extends React.Component<any, any> {
                         localDB.tableName.tblSSSDetails
                     );
                     if ( resInsertWallet && resInsertSecureCreateAcc && resInsertCreateAcc && resDeleteTableData ) {
-                        await bitcoinClassState.setRegularClassState( regularAccount );
-                        //secure account     
-                        await bitcoinClassState.setSecureClassState( secureAccount );
-                        await bitcoinClassState.setS3ServiceClassState( sss );
-                        this.props.readClassState();
-
+                        // await bitcoinClassState.setRegularClassState( regularAccount );
+                        // //secure account     
+                        // await bitcoinClassState.setSecureClassState( secureAccount );
+                        // await bitcoinClassState.setS3ServiceClassState( sss );
+                        // this.props.readClassState();               
+                        this.props.writeAccountsState( { regularAccount, secureAccount, sss } );
                         //s3serverice
                         await comFunDBRead.readTblSSSDetails();
                         await comFunDBRead.readTblWallet();
@@ -407,8 +407,8 @@ const mapDispatchToProps = ( dispatch ) => {
         setupAccounts: () => {
             dispatch( setupAccounts() );
         },
-        readClassState: () => {
-            dispatch( readClassState() );
+        writeAccountsState: ( args ) => {
+            dispatch( writeAccountsState( args ) );
         }
     }
 }

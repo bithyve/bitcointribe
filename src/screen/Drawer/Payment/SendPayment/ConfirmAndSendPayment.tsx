@@ -66,62 +66,58 @@ class ConfirmAndSendPayment extends BaseComponent<any, any> {
     }
 
 
+    componentWillReceiveProps( nextProps: any ) {
+        if ( nextProps.sendAmountDataT2 !== this.props.sendAmountDataT2 ) {
+            let { sendAmountDataT1, resTransferST } = nextProps.sendAmountDataT2;
+            if ( sendAmountDataT1.selectedAccount.accountName == "Regular Account" ) {
+                if ( resTransferST.status == 200 ) {
+                    this.setState( {
+                        flag_SentBtnAnimation: false,
+                        flag_DisableSentBtn: false,
+                        arrModelConfirmSendSuccess: [ {
+                            modalVisible: true,
+                            data: [ {
+                                amount: sendAmountDataT1.amount,
+                                tranFee: sendAmountDataT1.tranFee,
+                                accountName: sendAmountDataT1.accountName,
+                                txid: resTransferST.data.txid,
+                                date: utils.getUnixToDateFormat1()
+                            } ]
+                        } ]
+                    } )
+                } else {
+                    alert.simpleOk( "Oops", resTransferST.err );
+                }
+            } else {
+                if ( resTransferST.status == 200 ) {
+                    this.setState( {
+                        flag_SentBtnAnimation: false,
+                        flag_DisableSentBtn: false,
+                        arr_ModelConfirmSendSercureAccountOTP: [ {
+                            modalVisible: true,
+                            data: [ {
+                                sendAmountDataT1,
+                                resTransferST
+                            } ]
+                        } ]
+                    } )
+                } else {
+                    alert.simpleOk( "Oops", resTransferST.err );
+                }
+            }
+        }
+    }
+
+
     //TODO: Sent amount
     click_SentAmount = async () => {
-        //this.setState( { flag_Loading:true})
         this.setState( {
             flag_SentBtnAnimation: true,
             flag_DisableSentBtn: true,
         } );
-        let { data } = this.state;
-
-        let regularAccount = await bitcoinClassState.getRegularClassState();
-        let secureAccount = await bitcoinClassState.getSecureClassState();
-        var resTransferST;
-        if ( data.selectedAccount.accountName == "Regular Account" ) {
-            resTransferST = await regularAccount.transferST2( data.resTransferST.data.inputs, data.resTransferST.data.txb );
-            await bitcoinClassState.setRegularClassState( regularAccount );
-            // console.log( { resTransferST } );
-            if ( resTransferST.status == 200 ) {
-                this.setState( {
-                    flag_SentBtnAnimation: false,
-                    flag_DisableSentBtn: false,
-                    arrModelConfirmSendSuccess: [ {
-                        modalVisible: true,
-                        data: [ {
-                            amount: data.amount,
-                            tranFee: data.tranFee,
-                            accountName: data.accountName,
-                            txid: resTransferST.data.txid,
-                            date: utils.getUnixToDateFormat1()
-                        } ]
-                    } ]
-                } )
-            } else {
-                alert.simpleOk( "Oops", resTransferST.err );
-            }
-        } else {
-            resTransferST = await secureAccount.transferST2( data.resTransferST.data.inputs, data.resTransferST.data.txb );
-            await bitcoinClassState.setSecureClassState( secureAccount );
-            if ( resTransferST.status == 200 ) { //|| resTransferST.status == 400
-                this.setState( {
-                    flag_SentBtnAnimation: false,
-                    flag_DisableSentBtn: false,
-                    arr_ModelConfirmSendSercureAccountOTP: [ {
-                        modalVisible: true,
-                        data: [ {
-                            data,
-                            resTransferST
-                        } ]
-                    } ]
-                } )
-
-            } else {
-                alert.simpleOk( "Oops", resTransferST.err );
-            }
-        }
-
+        this.props.onSendAmountT2();
     }
+
 
     //TODO: Amount Sent Success
     click_GoToDailyAccount = async () => {
@@ -330,19 +326,23 @@ const styles = StyleSheet.create( {
     }
 } );
 
+
 const mapDispatchToProps = ( dispatch ) => {
     return {
-        onSendAmountT2: ( args ) => {
-            dispatch( onSendAmountT2( args ) );
+        onSendAmountT2: () => {
+            dispatch( onSendAmountT2() );
         }
     }
 }
 
+
 const mapStateToProps = state => {
     return {
-        sendAmountDataT1: state.paymentReducer.sendAmountDataT1
+        sendAmountDataT1: state.paymentReducer.sendAmountDataT1,
+        sendAmountDataT2: state.paymentReducer.sendAmountDataT2
     };
 };
+
 
 export default connect(
     mapStateToProps,

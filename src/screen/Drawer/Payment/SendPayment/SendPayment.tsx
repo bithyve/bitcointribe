@@ -105,8 +105,6 @@ class SendPayment extends BaseComponent<any, any> {
         }
     }
 
-
-
     componentWillUnmount() {
         utils.setFlagQRCodeScreen( true );
     }
