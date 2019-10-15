@@ -1,139 +1,169 @@
-import React from "react";
-import { StyleSheet, ImageBackground, SafeAreaView } from "react-native";
-import {
-    Container
-} from "native-base";
-
-
+import React from 'react';
+import { StyleSheet, ImageBackground, SafeAreaView } from 'react-native';
+import { Container } from 'native-base';
 
 //TODO: Custome Pages
-import { CustomStatusBar } from "hexaCustStatusBar";
-import { ModelLoader } from "hexaLoader";
+import { CustomStatusBar } from 'hexaCustStatusBar';
+import { ModelLoader } from 'hexaLoader';
 
 //TODO: Custome Model
-import { ModelPasscode, ModelBackupSecretQuestionsFirstQuestion, ModelMnemonicDisplay } from "hexaCustModel";
+import {
+    ModelPasscode,
+    ModelBackupSecretQuestionsFirstQuestion,
+    ModelMnemonicDisplay
+} from 'hexaCustModel';
 
-//TODO: Custome Object  
-import { colors, images } from "hexaConstants";
-var utils = require( "hexaUtils" );
+//TODO: Custome Object
+import { colors, images } from 'hexaConstants';
+var utils = require('hexaUtils');
 
 export default class MnemonicDisplay extends React.Component<any, any> {
-    constructor ( props: any ) {
-        super( props )
-        this.state = ( {
+    constructor(props: any) {
+        super(props);
+        this.state = {
             arrModelPasscode: [],
             arrModelBackupSecretQuestionsFirstQuestion: [],
             walletAnswerDetails: [],
             arrModelMnemonicDisplay: [],
-            mnemonic: ""
-        } )
+            mnemonic: ''
+        };
     }
 
     async componentWillMount() {
         let walletDetails = await utils.getWalletDetails();
-        this.setState( {
+        this.setState({
             arrModelPasscode: [
                 {
-                    modalVisible: true,
+                    modalVisible: true
                 }
             ],
-            walletAnswerDetails: JSON.parse( walletDetails.setUpWalletAnswerDetails ),
+            walletAnswerDetails: JSON.parse(
+                walletDetails.setUpWalletAnswerDetails
+            ),
             mnemonic: walletDetails.mnemonic
-        } );
-
+        });
     }
-
-
 
     render() {
         //array
-        let { arrModelPasscode, walletAnswerDetails, arrModelBackupSecretQuestionsFirstQuestion, arrModelMnemonicDisplay } = this.state;
+        let {
+            arrModelPasscode,
+            walletAnswerDetails,
+            arrModelBackupSecretQuestionsFirstQuestion,
+            arrModelMnemonicDisplay
+        } = this.state;
         //values
         let { mnemonic } = this.state;
         return (
             <Container>
-                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
+                <ImageBackground
+                    source={
+                        images.WalletSetupScreen.WalletScreen.backgoundImage
+                    }
+                    style={styles.container}
+                >
+                    <SafeAreaView
+                        style={[
+                            styles.container,
+                            { backgroundColor: 'transparent' }
+                        ]}
+                    >
                         <ModelPasscode
-                            data={ arrModelPasscode }
-                            closeModal={ () => this.props.navigation.pop() }
-                            click_Next={ () => {
-                                this.setState( {
-                                    arrModelPasscode: [ {
-                                        modalVisible: false
-                                    } ],
-                                    arrModelBackupSecretQuestionsFirstQuestion: [ {
-                                        modalVisible: true,
-                                        data: walletAnswerDetails
-                                    } ]
-                                } )
-                            } }
+                            data={arrModelPasscode}
+                            closeModal={() => this.props.navigation.pop()}
+                            click_Next={() => {
+                                this.setState({
+                                    arrModelPasscode: [
+                                        {
+                                            modalVisible: false
+                                        }
+                                    ],
+                                    arrModelBackupSecretQuestionsFirstQuestion: [
+                                        {
+                                            modalVisible: true,
+                                            data: walletAnswerDetails
+                                        }
+                                    ]
+                                });
+                            }}
                         />
                         <ModelBackupSecretQuestionsFirstQuestion
-                            data={ arrModelBackupSecretQuestionsFirstQuestion }
-                            click_Next={ () => {
-                                this.setState( {
+                            data={arrModelBackupSecretQuestionsFirstQuestion}
+                            click_Next={() => {
+                                this.setState({
                                     arrModelBackupSecretQuestionsFirstQuestion: [
                                         {
                                             modalVisible: false,
                                             data: walletAnswerDetails
                                         }
                                     ],
-                                    arrModelMnemonicDisplay: [ {
-                                        modalVisible: true,
-                                        data: mnemonic
-                                    } ]
-                                } );
-                            } }
-                            pop={ () => {
-                                this.setState( {
+                                    arrModelMnemonicDisplay: [
+                                        {
+                                            modalVisible: true,
+                                            data: mnemonic
+                                        }
+                                    ]
+                                });
+                            }}
+                            pop={() => {
+                                this.setState({
                                     arrModelBackupSecretQuestionsFirstQuestion: [
                                         {
                                             modalVisible: false,
                                             data: walletAnswerDetails
                                         }
                                     ]
-                                } );
-                                this.props.navigation.pop()
-                            } }
+                                });
+                                this.props.navigation.pop();
+                            }}
                         />
                         <ModelMnemonicDisplay
-                            data={ arrModelMnemonicDisplay }
-                            pop={ () => {
-                                this.setState( {
-                                    arrModelMnemonicDisplay: [ {
-                                        modalVisible: false,
-                                        data: mnemonic
-                                    } ]
-                                } )
-                                this.props.navigation.pop()
-                            } }
+                            data={arrModelMnemonicDisplay}
+                            pop={() => {
+                                this.setState({
+                                    arrModelMnemonicDisplay: [
+                                        {
+                                            modalVisible: false,
+                                            data: mnemonic
+                                        }
+                                    ]
+                                });
+                                this.props.navigation.pop();
+                            }}
                         />
                     </SafeAreaView>
                 </ImageBackground>
-                <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message="Loading" />
-                <CustomStatusBar backgroundColor={ colors.white } hidden={ true } barStyle="dark-content" />
-            </Container >
+                <ModelLoader
+                    loading={this.state.flag_Loading}
+                    color={colors.appColor}
+                    size={30}
+                    message="Loading"
+                />
+                <CustomStatusBar
+                    backgroundColor={colors.white}
+                    hidden={true}
+                    barStyle="dark-content"
+                />
+            </Container>
         );
     }
 }
 
-
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#F8F8F8",
+        backgroundColor: '#F8F8F8'
     },
     viewPagination: {
         flex: 2,
-        alignItems: "center",
-        justifyContent: "center",
+        alignItems: 'center',
+        justifyContent: 'center',
         marginLeft: 30,
         marginRight: 30
     },
     viewInputFiled: {
         flex: 3,
-        alignItems: "center",
+        alignItems: 'center',
         margin: 10
     },
     itemInputWalletName: {
@@ -143,17 +173,15 @@ const styles = StyleSheet.create( {
         shadowColor: 'gray',
         shadowOpacity: 0.3,
         backgroundColor: '#FFFFFF'
-
     },
     viewProcedBtn: {
         flex: 2,
-        justifyContent: "flex-end"
+        justifyContent: 'flex-end'
     },
     btnNext: {
-        position: "absolute",
+        position: 'absolute',
         bottom: 10,
-        width: "100%"
-
+        width: '100%'
     },
     //Grid View Selected
     gridSelectedList: {
@@ -166,4 +194,4 @@ const styles = StyleSheet.create( {
     modal4: {
         height: 180
     }
-} );
+});

@@ -1,5 +1,3 @@
-import AllTransaction from "./AllTransaction";
+import AllTransaction from './AllTransaction';
 
-export {
-    AllTransaction
-}
+export { AllTransaction };

@@ -1,8 +1,8 @@
-import AllContactList from "./AllContactList/AllContactList";
-import TrustedContact from "./TrustedContact/TrustedContact";
-import ShareSecretViaQR from "./ShareSecretViaQR/ShareSecretViaQR";
-import SelectContactListAssociatePerson from "./BackUpTrustedPartySecretStore/SelectContactListAssociatePerson";
-import TrustedContactAcceptOtp from "./BackUpTrustedPartySecretStore/TrustedContactAcceptOtp";
+import AllContactList from './AllContactList/AllContactList';
+import TrustedContact from './TrustedContact/TrustedContact';
+import ShareSecretViaQR from './ShareSecretViaQR/ShareSecretViaQR';
+import SelectContactListAssociatePerson from './BackUpTrustedPartySecretStore/SelectContactListAssociatePerson';
+import TrustedContactAcceptOtp from './BackUpTrustedPartySecretStore/TrustedContactAcceptOtp';
 
 export {
     AllContactList,
@@ -10,4 +10,4 @@ export {
     ShareSecretViaQR,
     SelectContactListAssociatePerson,
     TrustedContactAcceptOtp
-}
+};

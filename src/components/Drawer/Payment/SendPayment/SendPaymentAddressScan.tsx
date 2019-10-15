@@ -1,151 +1,156 @@
-import React from "react";
-import {
-    ImageBackground,
-    StyleSheet,
-    SafeAreaView
-} from "react-native";
-import {
-    Container,
-    Text
-} from "native-base";
+import React from 'react';
+import { ImageBackground, StyleSheet, SafeAreaView } from 'react-native';
+import { Container, Text } from 'native-base';
 //import BarcodeScanner from "react-native-barcode-scanners";
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
-
-
 //TODO: Custome object
-import {
-    colors,
-    images
-} from "hexaConstants";
+import { colors, images } from 'hexaConstants';
 
-
-//TODO: Custome Alert 
-import { AlertSimple } from "hexaCustAlert";
+//TODO: Custome Alert
+import { AlertSimple } from 'hexaCustAlert';
 let alert = new AlertSimple();
 
-
 //Custome Compontes
-import { CustomStatusBar } from "hexaCustStatusBar";
-import { HeaderTitle } from "hexaCustHeader";
+import { CustomStatusBar } from 'hexaCustStatusBar';
+import { HeaderTitle } from 'hexaCustHeader';
 
 //TODO: Common Funciton
-var bitcoinClassState = require( "hexaClassState" );
-
+var bitcoinClassState = require('hexaClassState');
 
 let flagGoback = true;
 
 export default class SendPaymentAddressScan extends React.Component {
-    constructor ( props: any ) {
-        super( props );
-
+    constructor(props: any) {
+        super(props);
     }
-
 
     componentWillMount() {
         flagGoback = true;
     }
 
     _renderTitleBar() {
-        return (
-            <Text></Text>
-        );
+        return <Text />;
     }
 
     _renderMenu() {
-        return (
-            <Text></Text>
-        )
+        return <Text />;
     }
 
     click_ResetFlag = async () => {
         flagGoback = true;
-    }
+    };
 
-
-    barcodeReceived = async ( e: any ) => {
+    barcodeReceived = async (e: any) => {
         try {
             var result = e.data;
             let regularAccount = await bitcoinClassState.getRegularClassState();
-            var resAddressDiff = await regularAccount.addressDiff( result );
+            var resAddressDiff = await regularAccount.addressDiff(result);
             //console.log( { resAddressDiff } );
-            if ( resAddressDiff.status == 200 ) {
+            if (resAddressDiff.status == 200) {
                 resAddressDiff = resAddressDiff.data;
             } else {
-                if ( flagGoback == true ) {
+                if (flagGoback == true) {
                     flagGoback = false;
-                    alert.simpleOkAction( "Oops", resAddressDiff.err, this.click_ResetFlag );
+                    alert.simpleOkAction(
+                        'Oops',
+                        resAddressDiff.err,
+                        this.click_ResetFlag
+                    );
                 }
             }
             let data = {};
-            if ( resAddressDiff.type == "paymentURI" ) {
-                var resDecPaymentURI = await regularAccount.decodePaymentURI( result );
-                if ( resDecPaymentURI.status == 200 ) {
-                    await bitcoinClassState.setRegularClassState( regularAccount );
+            if (resAddressDiff.type == 'paymentURI') {
+                var resDecPaymentURI = await regularAccount.decodePaymentURI(
+                    result
+                );
+                if (resDecPaymentURI.status == 200) {
+                    await bitcoinClassState.setRegularClassState(
+                        regularAccount
+                    );
                     resDecPaymentURI = resDecPaymentURI.data;
                 } else {
-                    if ( flagGoback == true ) {
+                    if (flagGoback == true) {
                         flagGoback = false;
-                        alert.simpleOkAction( "Oops", resDecPaymentURI.err, this.click_ResetFlag );
+                        alert.simpleOkAction(
+                            'Oops',
+                            resDecPaymentURI.err,
+                            this.click_ResetFlag
+                        );
                     }
                 }
                 data.address = resDecPaymentURI.address;
                 data.amount = resDecPaymentURI.options.amount;
-                data.type = "paymentURI";
+                data.type = 'paymentURI';
             } else {
                 data.address = result;
-                data.type = "address";
+                data.type = 'address';
             }
-            if ( flagGoback == true ) {
+            if (flagGoback == true) {
                 flagGoback = false;
                 const { navigation } = this.props;
                 navigation.goBack();
-                navigation.state.params.onSelect( { selected: true, data: data } );
+                navigation.state.params.onSelect({
+                    selected: true,
+                    data: data
+                });
             }
-        } catch ( error ) {
-            if ( flagGoback == true ) {
+        } catch (error) {
+            if (flagGoback == true) {
                 flagGoback = false;
-                alert.simpleOkAction( "Oops", error, this.click_ResetFlag );
+                alert.simpleOkAction('Oops', error, this.click_ResetFlag);
             }
         }
-    }
+    };
 
     //TODO: GoBack
     click_GoBack() {
         const { navigation } = this.props;
         navigation.goBack();
-        navigation.state.params.onSelect( { selected: true } );
+        navigation.state.params.onSelect({ selected: true });
     }
 
     render() {
         return (
             <Container>
-                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                    <HeaderTitle title="Scan Payment QRCode"
-                        pop={ () => this.click_GoBack() }
+                <ImageBackground
+                    source={
+                        images.WalletSetupScreen.WalletScreen.backgoundImage
+                    }
+                    style={styles.container}
+                >
+                    <HeaderTitle
+                        title="Scan Payment QRCode"
+                        pop={() => this.click_GoBack()}
                     />
-                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
+                    <SafeAreaView
+                        style={[
+                            styles.container,
+                            { backgroundColor: 'transparent' }
+                        ]}
+                    >
                         <QRCodeScanner
-                            onRead={ this.barcodeReceived }
-                            topContent={ this._renderTitleBar() }
-                            bottomContent={
-                                this._renderMenu()
-                            }
+                            onRead={this.barcodeReceived}
+                            topContent={this._renderTitleBar()}
+                            bottomContent={this._renderMenu()}
                             cameraType="back"
-                            showMarker={ true }
-                            vibrate={ true }
+                            showMarker={true}
+                            vibrate={true}
                         />
                     </SafeAreaView>
                 </ImageBackground>
-                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="light-content" />
-            </Container >
+                <CustomStatusBar
+                    backgroundColor={colors.white}
+                    hidden={false}
+                    barStyle="light-content"
+                />
+            </Container>
         );
     }
 }
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
     container: {
         flex: 1
-    },
-
-} );
+    }
+});

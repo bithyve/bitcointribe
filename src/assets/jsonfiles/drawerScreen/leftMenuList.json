@@ -1,25 +1,25 @@
 {
-  "menus": [
-    {
-      "id": 1,
-      "icon": "home",
-      "title": "Home",
-      "pageName": "Home",
-      "desc": "Regular Account"
-    },
-    {
-      "id": 2,
-      "icon": "cog",
-      "title": "Settings",
-      "pageName": "BackupPhraseScreen",
-      "desc": "IOS New Lang"
-    },
-    {
-      "id": 3,
-      "icon": "sign-out",
-      "title": "Logout",
-      "pageName": "LogoutScreen",
-      "desc": "IOS New Lang"
-    }
-  ]
+    "menus": [
+        {
+            "id": 1,
+            "icon": "home",
+            "title": "Home",
+            "pageName": "Home",
+            "desc": "Regular Account"
+        },
+        {
+            "id": 2,
+            "icon": "cog",
+            "title": "Settings",
+            "pageName": "BackupPhraseScreen",
+            "desc": "IOS New Lang"
+        },
+        {
+            "id": 3,
+            "icon": "sign-out",
+            "title": "Logout",
+            "pageName": "LogoutScreen",
+            "desc": "IOS New Lang"
+        }
+    ]
 }

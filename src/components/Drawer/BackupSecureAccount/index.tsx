@@ -1,5 +1,3 @@
-import BackupSecureAccount from "./BackupSecureAccount";
+import BackupSecureAccount from './BackupSecureAccount';
 
-export {
-    BackupSecureAccount
-}
+export { BackupSecureAccount };

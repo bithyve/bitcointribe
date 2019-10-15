@@ -17,27 +17,31 @@ import {
     watcherSSS
 } from './wallet';
 
-const reducers = combineReducers( { walletReducer } );
+const reducers = combineReducers({ walletReducer });
 
-const rootSaga = function* () {
-    yield all( [
-        fork( watcherSetupAccounts ),
-        fork( watcherRegularAccount ),
-        fork( watcherSecureAccount ),
-        fork( watcherSSS )
-    ] );
+const rootSaga = function*() {
+    yield all([
+        fork(watcherSetupAccounts),
+        fork(watcherRegularAccount),
+        fork(watcherSecureAccount),
+        fork(watcherSSS)
+    ]);
 };
 
 const middleWare = [];
 
 // Setup Redux-Saga
 const sagaMiddleware = createSagaMiddleware();
-middleWare.push( sagaMiddleware );
+middleWare.push(sagaMiddleware);
 
-const store = createStore( reducers, {}, composeWithDevTools( applyMiddleware( ...middleWare ) ) );
+const store = createStore(
+    reducers,
+    {},
+    composeWithDevTools(applyMiddleware(...middleWare))
+);
 
 // Initiate root saga.
-sagaMiddleware.run( rootSaga );
+sagaMiddleware.run(rootSaga);
 
 export {
     store,

@@ -1,8 +1,4 @@
-import ModelLoader from "./ModelLoader";
-import ModelLoaderPdfFileCreate from "./ModelLoaderPdfFileCreate";
+import ModelLoader from './ModelLoader';
+import ModelLoaderPdfFileCreate from './ModelLoaderPdfFileCreate';
 
-export {
-    ModelLoader,
-    ModelLoaderPdfFileCreate
-
-}
+export { ModelLoader, ModelLoaderPdfFileCreate };

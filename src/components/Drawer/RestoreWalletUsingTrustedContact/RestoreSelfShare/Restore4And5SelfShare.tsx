@@ -1,50 +1,48 @@
-import React from "react";
-import { StyleSheet, ImageBackground, View, SafeAreaView, Image } from "react-native";
+import React from 'react';
 import {
-    Container,
-    Text
-} from "native-base";
-
-
+    StyleSheet,
+    ImageBackground,
+    View,
+    SafeAreaView,
+    Image
+} from 'react-native';
+import { Container, Text } from 'native-base';
 
 //TODO: Custome Pages
-import { CustomStatusBar } from "hexaCustStatusBar";
-import { HeaderTitle } from "hexaCustHeader";
-import { ModelLoader } from "hexaLoader";
-import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
+import { CustomStatusBar } from 'hexaCustStatusBar';
+import { HeaderTitle } from 'hexaCustHeader';
+import { ModelLoader } from 'hexaLoader';
+import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-
-//TODO: Custome Alert 
-import { AlertSimple } from "hexaCustAlert";
+//TODO: Custome Alert
+import { AlertSimple } from 'hexaCustAlert';
 let alert = new AlertSimple();
 
-//TODO: Custome StyleSheet Files       
-import FontFamily from "hexaStyles";
+//TODO: Custome StyleSheet Files
+import FontFamily from 'hexaStyles';
 
 //TODO: Custome Object
-import { colors, images } from "hexaConstants";
-import { renderIf } from "hexaValidation";
-
+import { colors, images } from 'hexaConstants';
+import { renderIf } from 'hexaValidation';
 
 export default class Restore4And5SelfShare extends React.Component<any, any> {
-    constructor ( props: any ) {
-        super( props )
-        this.state = ( {
+    constructor(props: any) {
+        super(props);
+        this.state = {
             data: [],
-            title: "Share",
-            type: "",
+            title: 'Share',
+            type: '',
             arr_History: [],
             flag_ScanBtnDisable: true
-        } )
+        };
     }
 
-
     async componentWillMount() {
-        let data = this.props.navigation.getParam( "data" );
-        let title = this.props.navigation.getParam( "title" );
-        let type = this.props.navigation.getParam( "type" );
+        let data = this.props.navigation.getParam('data');
+        let title = this.props.navigation.getParam('title');
+        let type = this.props.navigation.getParam('type');
 
-        console.log( { data } );
+        console.log({ data });
         // let flag_History = utils.isJson( data.sssDetails.history );
         // var arr_History = [];
         // if ( flag_History ) {
@@ -57,21 +55,22 @@ export default class Restore4And5SelfShare extends React.Component<any, any> {
         // } else {
         //     flag_ScanBtnDisable = true;
         // }
-        console.log( { data } );
-        this.setState( {
+        console.log({ data });
+        this.setState({
             title,
             type,
             flag_ScanBtnDisable,
             data
-        } )
+        });
     }
 
-
-
-    //TODO: Sharing    
-    click_QRCode( data: any ) {
+    //TODO: Sharing
+    click_QRCode(data: any) {
         let { type } = this.state;
-        this.props.navigation.push( "Restore4And5SelfShareQRCodeScanner", { data: data, type: type } );
+        this.props.navigation.push('Restore4And5SelfShareQRCodeScanner', {
+            data: data,
+            type: type
+        });
         // let { title } = this.state;
         // let email4shareFilePath = data.sssDetails.encryptedMetaShare.split( '"' ).join( "" );
         // if ( title != "Email Share" ) {
@@ -120,12 +119,11 @@ export default class Restore4And5SelfShare extends React.Component<any, any> {
 
     //TODO: Re-Share Share
 
-    click_ReShare( data: any ) {
-        alert.simpleOk( "Oops", "coming soon" );
+    click_ReShare(data: any) {
+        alert.simpleOk('Oops', 'coming soon');
     }
 
-
-    onSelect = async ( returnValue: any ) => {
+    onSelect = async (returnValue: any) => {
         // if ( returnValue.data == returnValue.result ) {
         //     let { data } = this.state;
         //     let filePath = JSON.parse( data.sssDetails.encryptedMetaShare );
@@ -149,19 +147,15 @@ export default class Restore4And5SelfShare extends React.Component<any, any> {
         // } else {
         //     alert.simpleOk( "Oops", "Try again." );
         // }
-
-    }
-
-
+    };
 
     //TODO: Share or Reshare button on click
-    click_SentRequest( type: string, data: any ) {
-        console.log( { type, data } );
-
+    click_SentRequest(type: string, data: any) {
+        console.log({ type, data });
     }
 
     render() {
-        //array     
+        //array
         let { data, arr_History } = this.state;
         //Value
         let { title } = this.state;
@@ -169,45 +163,87 @@ export default class Restore4And5SelfShare extends React.Component<any, any> {
         let { flag_ScanBtnDisable } = this.state;
         return (
             <Container>
-                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                    <HeaderTitle title={ title }
-                        pop={ () => this.props.navigation.pop() }
+                <ImageBackground
+                    source={
+                        images.WalletSetupScreen.WalletScreen.backgoundImage
+                    }
+                    style={styles.container}
+                >
+                    <HeaderTitle
+                        title={title}
+                        pop={() => this.props.navigation.pop()}
                     />
-                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
-                        <View style={ { flex: 0.1, padding: 20 } }>
-                            <Text numberOfLines={ 2 } note style={ [ FontFamily.ffFiraSansMedium, { textAlign: "center" } ] }>Tab on Scan QRCode to scan 8 QR code  </Text>
+                    <SafeAreaView
+                        style={[
+                            styles.container,
+                            { backgroundColor: 'transparent' }
+                        ]}
+                    >
+                        <View style={{ flex: 0.1, padding: 20 }}>
+                            <Text
+                                numberOfLines={2}
+                                note
+                                style={[
+                                    FontFamily.ffFiraSansMedium,
+                                    { textAlign: 'center' }
+                                ]}
+                            >
+                                Tab on Scan QRCode to scan 8 QR code{' '}
+                            </Text>
                         </View>
-                        <View style={ { flex: 2, alignItems: "center", justifyContent: "center" } }>
-                            <Image style={ [ styles.imgAppLogo, { borderRadius: 10 } ] } source={ images.RestoreWalletUsingTrustedContact.share4and5SelfShareInfo } />
+                        <View
+                            style={{
+                                flex: 2,
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            <Image
+                                style={[
+                                    styles.imgAppLogo,
+                                    { borderRadius: 10 }
+                                ]}
+                                source={
+                                    images.RestoreWalletUsingTrustedContact
+                                        .share4and5SelfShareInfo
+                                }
+                            />
                         </View>
-                        { renderIf( flag_ScanBtnDisable == true )(
-                            <View style={ { flex: 0.3 } }>
+                        {renderIf(flag_ScanBtnDisable == true)(
+                            <View style={{ flex: 0.3 }}>
                                 <FullLinearGradientButton
-                                    click_Done={ () => {
-                                        this.click_QRCode( data )
-                                    } }
+                                    click_Done={() => {
+                                        this.click_QRCode(data);
+                                    }}
                                     title="Scan QRCode"
-                                    disabled={ false }
-                                    style={ [ { borderRadius: 10 } ] } />
+                                    disabled={false}
+                                    style={[{ borderRadius: 10 }]}
+                                />
                             </View>
-                        ) }
+                        )}
                     </SafeAreaView>
                 </ImageBackground>
-                <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
-                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
-            </Container >
+                <ModelLoader
+                    loading={this.state.flag_Loading}
+                    color={colors.appColor}
+                    size={30}
+                    message={this.state.msg_Loading}
+                />
+                <CustomStatusBar
+                    backgroundColor={colors.white}
+                    hidden={false}
+                    barStyle="dark-content"
+                />
+            </Container>
         );
     }
 }
 
-
-
-
 const primaryColor = colors.appColor;
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#F8F8F8",
+        backgroundColor: '#F8F8F8'
     },
     //botom model
     modal: {
@@ -218,8 +254,7 @@ const styles = StyleSheet.create( {
         height: 180
     },
     imgAppLogo: {
-        width: "90%",
-        height: "95%",
-
-    },
-} );
+        width: '90%',
+        height: '95%'
+    }
+});

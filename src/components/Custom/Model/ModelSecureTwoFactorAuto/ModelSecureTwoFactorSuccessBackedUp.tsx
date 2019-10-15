@@ -1,20 +1,14 @@
 import React, { Component } from 'react';
 import { Modal, View, StyleSheet, Image } from 'react-native';
-import { Text } from "native-base";
+import { Text } from 'native-base';
 
+import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
-
-
-
-//TODO: Custome StyleSheet Files       
-import FontFamily from "hexaStyles";
+//TODO: Custome StyleSheet Files
+import FontFamily from 'hexaStyles';
 
 //TODO: Custome Object
-import {
-    images
-} from "hexaConstants";
-
+import { images } from 'hexaConstants';
 
 interface Props {
     data: [];
@@ -22,10 +16,12 @@ interface Props {
     click_GoToWallet: Function;
 }
 
-export default class ModelSecureTwoFactorSuccessBackedUp extends Component<Props, any> {
-    constructor ( props: any ) {
-        super( props );
-
+export default class ModelSecureTwoFactorSuccessBackedUp extends Component<
+    Props,
+    any
+> {
+    constructor(props: any) {
+        super(props);
     }
 
     render() {
@@ -34,32 +30,62 @@ export default class ModelSecureTwoFactorSuccessBackedUp extends Component<Props
             <Modal
                 transparent
                 animationType="fade"
-                visible={ data.length != 0 ? data[ 0 ].modalVisible : false }
-                onRequestClose={ () =>
-                    this.props.closeModal()
-                }
+                visible={data.length != 0 ? data[0].modalVisible : false}
+                onRequestClose={() => this.props.closeModal()}
             >
-                <View style={ [
-                    styles.modalBackground,
-                    { backgroundColor: `rgba(0,0,0,0.4)` }
-                ] }>
-                    <View style={ styles.viewModelBody }>
-                        <View style={ { flexDirection: "row", flex: 0.6 } }>
-                            <Text style={ [ FontFamily.ffFiraSansMedium, {
-                                fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
-                                marginLeft: 20, marginRight: 20
-                            } ] }>2FA Secret Successfully Backed Up</Text>
+                <View
+                    style={[
+                        styles.modalBackground,
+                        { backgroundColor: `rgba(0,0,0,0.4)` }
+                    ]}
+                >
+                    <View style={styles.viewModelBody}>
+                        <View style={{ flexDirection: 'row', flex: 0.6 }}>
+                            <Text
+                                style={[
+                                    FontFamily.ffFiraSansMedium,
+                                    {
+                                        fontSize: 20,
+                                        color: '#2F2F2F',
+                                        flex: 6,
+                                        textAlign: 'center',
+                                        marginTop: 10,
+                                        marginLeft: 20,
+                                        marginRight: 20
+                                    }
+                                ]}
+                            >
+                                2FA Secret Successfully Backed Up
+                            </Text>
                         </View>
-                        <View style={ { flex: 2, alignItems: "center", justifyContent: "center" } }>
-                            <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingMnemonic.walletrestored } />
+                        <View
+                            style={{
+                                flex: 2,
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            <Image
+                                style={styles.imgAppLogo}
+                                source={
+                                    images.RestoreWalletUsingMnemonic
+                                        .walletrestored
+                                }
+                            />
                         </View>
-                        <View style={ { flex: 1, justifyContent: "flex-end" } }>
-                            <Text note style={ { margin: 20, textAlign: "center" } }>Hexa will remind you to backup your 2FA secret to keep your secure account safe and backed up.</Text>
+                        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+                            <Text
+                                note
+                                style={{ margin: 20, textAlign: 'center' }}
+                            >
+                                Hexa will remind you to backup your 2FA secret
+                                to keep your secure account safe and backed up.
+                            </Text>
                             <FullLinearGradientButton
-                                click_Done={ () => this.props.click_GoToWallet() }
+                                click_Done={() => this.props.click_GoToWallet()}
                                 title="Go To Wallet"
-                                disabled={ false }
-                                style={ [ { opacity: 1 }, { borderRadius: 10 } ] }
+                                disabled={false}
+                                style={[{ opacity: 1 }, { borderRadius: 10 }]}
                             />
                         </View>
                     </View>
@@ -69,13 +95,10 @@ export default class ModelSecureTwoFactorSuccessBackedUp extends Component<Props
     }
 }
 
-
-
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
     modalBackground: {
         flex: 1,
-        justifyContent: 'center',
-
+        justifyContent: 'center'
     },
     imgAppLogo: {
         width: 150,
@@ -89,6 +112,6 @@ const styles = StyleSheet.create( {
         margin: 20,
         padding: 10,
         borderRadius: 10,
-        backgroundColor: "#ffffff"
+        backgroundColor: '#ffffff'
     }
-} );
+});
