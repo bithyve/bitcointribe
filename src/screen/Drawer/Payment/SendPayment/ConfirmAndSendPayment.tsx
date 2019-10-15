@@ -8,6 +8,9 @@ import { SvgIcon } from "hexaComponent/Icons";
 import { RkCard } from "react-native-ui-kitten";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
+//TODO: Base Component
+import { BaseComponent } from "hexaComponent/BaseComponent";
+
 //TODO: redux
 import { connect } from 'react-redux';
 import { onSendAmountT2 } from 'hexaRedux'
@@ -41,8 +44,7 @@ var dbOpration = require( "hexaDBOpration" );
 //TODO: Bitcoin class
 var bitcoinClassState = require( "hexaClassState" );
 
-class ConfirmAndSendPayment extends React.Component<any, any> {
-
+class ConfirmAndSendPayment extends BaseComponent<any, any> {
     constructor ( props: any ) {
         super( props )
         this.state = ( {
