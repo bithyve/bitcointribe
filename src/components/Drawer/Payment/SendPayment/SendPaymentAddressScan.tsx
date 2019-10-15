@@ -26,7 +26,7 @@ let alert = new AlertSimple();
 
 
 //Custome Compontes
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { HeaderTitle } from "hexaCustHeader";
 
 //TODO: Common Funciton
@@ -137,7 +137,7 @@ export default class SendPaymentAddressScan extends React.Component {
                         />
                     </SafeAreaView>
                 </ImageBackground>
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="light-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="light-content" />
             </Container >
         );
     }

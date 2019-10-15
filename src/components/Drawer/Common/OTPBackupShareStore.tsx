@@ -18,7 +18,7 @@ let alert = new AlertSimple();
 
 //TODO: Custome Pages
 import { ModelLoader } from "hexaLoader";
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 import { HeaderTitle } from "hexaCustHeader";
 
@@ -237,7 +237,7 @@ export default class OTPBackupShareStore extends Component {
                     </SafeAreaView>
                 </ImageBackground>
                 <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </View>
         );
     }

@@ -127,7 +127,9 @@ export default class HexaWallet extends React.Component
             } );
         }
     }
-    onComplited ( status: boolean, pageName: string )
+
+
+    onCompleted ( status: boolean, pageName: string )
     {
         try
         {
@@ -158,8 +160,8 @@ export default class HexaWallet extends React.Component
             <Provider store={ store }>
                 { status ?
                     <Launch
-                        onComplited={ ( status: boolean, pageName: string ) =>
-                            this.onComplited( status, pageName )
+                        onCompleted={ ( status: boolean, pageName: string ) =>
+                            this.onCompleted( status, pageName )
                         }
                     />
                     :

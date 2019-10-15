@@ -10,7 +10,7 @@ var converter = require( 'number-to-words' );
 
 
 //TODO: Custome Compontes
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 
 import {
     ModelConfirmMnemonic1of3, ModelConfirmMnemonic2of3,
@@ -181,7 +181,7 @@ export default class BackupWalletMnemonicConfirmMnemonic extends Component {
                         </SafeAreaView>
                     </KeyboardAwareScrollView>
                 </ImageBackground>
-                <CustomeStatusBar backgroundColor={ colors.appColor } hidden={ false } barStyle="light-content" />
+                <CustomStatusBar backgroundColor={ colors.appColor } hidden={ false } barStyle="light-content" />
             </View >
         );
     }

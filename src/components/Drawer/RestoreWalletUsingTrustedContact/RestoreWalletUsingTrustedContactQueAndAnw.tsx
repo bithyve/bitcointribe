@@ -10,7 +10,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 
 //TODO: Custome Compontes
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 
 //TODO: Custome Models  
 import { ModelRestoreWalletFirstQuestion, ModelRestoreWalletSuccessfullyUsingTrustedContact } from "hexaCustModel";
@@ -129,7 +129,7 @@ export default class RestoreWalletUsingTrustedContactQueAndAnw extends Component
                         </KeyboardAwareScrollView>
                     </SafeAreaView>
                 </ImageBackground>
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </View >
         );
     }

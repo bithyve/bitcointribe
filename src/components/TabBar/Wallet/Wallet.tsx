@@ -33,7 +33,7 @@ import QRCode from 'react-native-qrcode-svg';
 import { FloatingAction } from "react-native-floating-action";
 
 //Custome Compontes   
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { ImageSVG } from "hexaCustImage";
 
 //TODO: Custome Models
@@ -2052,7 +2052,7 @@ class Wallet extends React.Component {
 
   reloadStatusBar() {
     return (
-      <CustomeStatusBar backgroundColor={ colors.appColor } hidden={ false } barStyle="dark-content" />
+      <CustomStatusBar backgroundColor={ colors.appColor } hidden={ false } barStyle="dark-content" />
     )
   }
 
@@ -2458,7 +2458,7 @@ class Wallet extends React.Component {
         />
         <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
         <ModelLoaderPdfFileCreate loading={ flag_LoadingPdfFile } color={ colors.appColor } size={ 30 } msg="Creating Wallet backup. This may take a while. Just stick around." />
-        <CustomeStatusBar backgroundColor={ colors.appColor } hidden={ false } barStyle="dark-content" />
+        <CustomStatusBar backgroundColor={ colors.appColor } hidden={ false } barStyle="dark-content" />
       </Container>
     );
   }

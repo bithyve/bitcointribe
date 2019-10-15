@@ -19,7 +19,7 @@ import * as Keychain from "react-native-keychain";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //TODO: Custome Pages
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 
 //TODO: Custome StyleSheet Files       
@@ -284,7 +284,7 @@ export default class Passcode extends Component {
             </KeyboardAwareScrollView>
           </SafeAreaView>
         </ImageBackground>
-        <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+        <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
       </View>
     );
   }

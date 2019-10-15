@@ -22,7 +22,7 @@ import Share from 'react-native-share';
 
 
 //TODO: Custome Pages
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { HeaderTitle } from "hexaCustHeader";
 import { ModelLoader } from "hexaLoader";
 import { FullLinearGradientIconWithLoadingButton } from "hexaCustomeLinearGradientButton";
@@ -313,7 +313,7 @@ export default class ReceivePayment extends React.Component<any, any> {
                     </SafeAreaView>
                 </ImageBackground>
                 <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container>
         );
     }

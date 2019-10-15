@@ -9,7 +9,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 
 //TODO: Custome Compontes
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { ModelBackupSecretQuestionsFirstQuestion, ModelQuestionsSuccessfullyBackedUp } from "hexaCustModel";
 
 //TODO: Custome Object
@@ -129,7 +129,7 @@ export default class BackupSecretQuestions extends Component {
                         </KeyboardAwareScrollView>
                     </ImageBackground>
                 </SafeAreaView>
-                <CustomeStatusBar backgroundColor={ colors.appColor } hidden={ false } barStyle="light-content" />
+                <CustomStatusBar backgroundColor={ colors.appColor } hidden={ false } barStyle="light-content" />
             </View >
         );
     }

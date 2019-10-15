@@ -11,7 +11,7 @@ import { Avatar } from 'react-native-elements';
 //TODO: Custome Pages    
 import { ImageSVG } from "hexaCustImage";
 
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { HeaderTitle } from "hexaCustHeader";
 import { ModelLoader } from "hexaLoader";
 import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
@@ -522,7 +522,7 @@ export default class RestoreSelectedContactsList extends React.Component<any, an
                     </SafeAreaView>
                 </ImageBackground>
                 <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

@@ -13,6 +13,18 @@ const UPDATE_SECURE_ACCOUNT = "UPDATE_SECURE_ACCOUNT";
 const CREATE_SSS = "CREATE_SSS";
 const UPDATE_SSS = "UPDATE_SSS";
 
+//types
+//regular balance
+//update regular balance
+
+//secure balance
+//update secure balance
+
+//regular address
+//update regular address
+//secure address
+//update secure address 
+
 const INITIAL_STATE = {
     mnemonic: undefined,
     regularAccount: undefined,

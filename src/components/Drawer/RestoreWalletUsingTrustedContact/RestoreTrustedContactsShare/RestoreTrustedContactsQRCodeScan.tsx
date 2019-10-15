@@ -19,7 +19,7 @@ import {
 var dbOpration = require( "hexaDBOpration" );
 
 //Custome Compontes
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { HeaderTitle } from "hexaCustHeader";
 
 //TODO: Custome Alert 
@@ -161,7 +161,7 @@ export default class RestoreTrustedContactsQRCodeScan extends React.Component {
                     </SafeAreaView>
                 </ImageBackground>
                 <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container>
         );
     }

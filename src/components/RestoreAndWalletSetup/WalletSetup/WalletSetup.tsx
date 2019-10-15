@@ -7,7 +7,7 @@ import { StackActions, NavigationActions } from "react-navigation";
 
 
 //TODO: Custome Comp   
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { WalletSetUpScrolling } from "hexaCustOnBoarding";
 import { HeaderTitle } from "hexaCustHeader";
 
@@ -59,7 +59,7 @@ export default class WalletSetup extends React.Component<any, any> {
                         </WalletSetUpScrolling>
                     </SafeAreaView>
                 </ImageBackground>
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }
