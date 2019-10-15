@@ -8,8 +8,8 @@ var utils = require( "hexaUtils" );
 const SEND_AMOUNT_T1 = "SEND_AMOUNT_T1";
 const UPDATE_DATA_T1 = "UPDATE_DATA_T1";
 
-const SEND_AMOUNT_T2 = "SEND_AMOUNT_T1";
-const UPDATE_DATA_T2 = "UPDATE_DATA_T1";
+const SEND_AMOUNT_T2 = "SEND_AMOUNT_T2";
+const UPDATE_DATA_T2 = "UPDATE_DATA_T2";
 
 const INITIAL_STATE = {
     sendAmountDataT1: {},
