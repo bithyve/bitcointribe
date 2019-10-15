@@ -18,7 +18,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 //TODO: Redux
 import { connect } from 'react-redux';
-import { readClassState } from 'hexaRedux';
+import { readAccountsState } from 'hexaRedux';
 
 
 //TODO: Custome Pages
@@ -137,8 +137,8 @@ class Passcode extends Component {
       await comFunDBRead.readTblWallet();
       await comFunDBRead.readTblSSSDetails();
 
-      //TODO:initial Values
-      this.props.readClassState();
+      //TODO:initial Values    
+      this.props.readAccountsState();
 
       let pageName = utils.getRootViewController();
       console.log( { pageName } );
@@ -317,8 +317,8 @@ let styles = StyleSheet.create( {
 
 const mapDispatchToProps = ( dispatch ) => {
   return {
-    readClassState: () => {
-      dispatch( readClassState() );
+    readAccountsState: () => {
+      dispatch( readAccountsState() );
     }
   }
 }

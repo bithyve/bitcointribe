@@ -4,7 +4,6 @@ import { sagaWatcherHelper } from "../utils";
 import { asyncStorageKeys } from "hexaConstants";
 
 
-
 //TODO: Bitcoin Files
 import { S3Service, RegularAccount, SecureAccount } from "hexaBitcoin";
 
@@ -12,8 +11,6 @@ import { S3Service, RegularAccount, SecureAccount } from "hexaBitcoin";
 const WRITE_ACCOUNTSSTATE = "WRITE_ACCOUNTSSTATE";
 const READ_ACCOUNTSSTATE = "READ_ACCOUNTSSTATE";
 const UPDATE_ACCOUNTSSTATE = "UPDATE_ACCOUNTSSTATE";
-
-
 
 const INITIAL_STATE = {
     regularAccount: undefined,
@@ -29,7 +26,7 @@ export const readAccountsState = () => {
     };
 };
 
-export const writeAccountState = ( args ) => {
+export const writeAccountsState = ( args ) => {
     return {
         type: WRITE_ACCOUNTSSTATE,
         ...args
@@ -38,7 +35,7 @@ export const writeAccountState = ( args ) => {
 
 // Reducers
 export const accountsStateReducer = ( state = INITIAL_STATE, action: any ) => {
-    console.log( { callsStateReducer: { state, action } } );
+    console.log( { accountsStates: { state, action } } );
     switch ( action.type ) {
         case UPDATE_ACCOUNTSSTATE:
             return { ...state, ...action.payload };
@@ -69,6 +66,10 @@ function* workerReadAccountsState() {
 function* workerWriteAccountsState( action ) {
     try {
         var { regularAccount, secureAccount, sss } = action;
+        yield put( {
+            type: UPDATE_ACCOUNTSSTATE,
+            payload: { regularAccount, secureAccount, sss }
+        } );
         regularAccount = JSON.stringify( regularAccount );
         yield AsyncStorage.setItem(
             asyncStorageKeys.regularClassObject,
@@ -84,10 +85,6 @@ function* workerWriteAccountsState( action ) {
             asyncStorageKeys.s3ServiceClassObject,
             sss
         );
-        yield put( {
-            type: UPDATE_ACCOUNTSSTATE,
-            payload: { regularAccount, secureAccount, sss }
-        } );
     } catch ( error ) {
         console.log( "error", error )
     }

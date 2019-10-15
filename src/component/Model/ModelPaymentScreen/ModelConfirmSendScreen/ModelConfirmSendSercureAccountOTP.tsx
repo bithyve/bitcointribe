@@ -8,6 +8,12 @@ import {
 import CodeInput from "react-native-confirmation-code-input";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
+//TODO: redux
+import { connect } from 'react-redux';
+import { onSendAmountT3 } from 'hexaRedux'
+
+
+
 import { FullLinearGradientLoadingButton } from "hexaComponent/LinearGradient/Buttons";
 
 
@@ -36,7 +42,7 @@ interface Props {
     click_Request: Function
 }
 
-export default class ModelConfirmSendSercureAccountOTP extends Component<Props, any> {
+class ModelConfirmSendSercureAccountOTP extends Component<Props, any> {
     constructor ( props: any ) {
         super( props )
         this.state = ( {
@@ -61,6 +67,7 @@ export default class ModelConfirmSendSercureAccountOTP extends Component<Props, 
 
 
     componentWillReceiveProps( nextProps: any ) {
+        console.log( { nextProps } );
         var data = nextProps.data[ 0 ];
         //console.log( { data } );
         if ( data != undefined ) {
@@ -72,6 +79,16 @@ export default class ModelConfirmSendSercureAccountOTP extends Component<Props, 
                 } )
             }
         }
+        if ( nextProps.sendAmountDataT3 !== this.props.sendAmountDataT3 ) {
+            let { resTransferST } = nextProps.sendAmountDataT3;
+            if ( resTransferST.status == 200 ) {
+                resTransferST = resTransferST.data;
+                this.click_StopLoader();
+                this.props.click_Next( resTransferST );
+            } else {
+                alert.simpleOkAction( "Oops", resTransferST.err, this.click_StopLoader );
+            }
+        }
 
     }
 
@@ -79,25 +96,10 @@ export default class ModelConfirmSendSercureAccountOTP extends Component<Props, 
 
     //TODO: Otp enter after
     _onFinishCheckingCode = async ( code: any ) => {
-
         this.setState( {
             token: code,
             flag_DisableBtnNext: false
         } );
-
-
-
-
-        // this.setState( {
-        //     passcodeStyle: [
-        //         {
-        //             activeColor: "red",
-        //             inactiveColor: "red",
-        //             cellBorderWidth: 1
-        //         }
-        //     ],
-        //     flag_DisableBtnNext: true
-        // } );
     }
 
     click_StopLoader = () => {
@@ -113,22 +115,13 @@ export default class ModelConfirmSendSercureAccountOTP extends Component<Props, 
             flag_NextBtnAnimation: true,
             flag_DisableBtnNext: true,
         } )
-        let { data, token, resTransferST } = this.state;
-        let secureAccount = await bitcoinClassState.getSecureClassState();
-        //console.log( { token, txHex: resTransferST.data.txHex } );
-        var resultTransferST = await secureAccount.transferST3( token, resTransferST.data.txHex, resTransferST.data.childIndexArray );
-        //console.log( { resultTransferST } );
-        if ( resultTransferST.status == 200 ) {
-            resultTransferST = resultTransferST.data;
-            this.click_StopLoader();
-            this.props.click_Next( resultTransferST );
-        } else {
-            alert.simpleOkAction( "Oops", resultTransferST.err, this.click_StopLoader );
-        }
+        let { token } = this.state;
+        let { onSendAmountT3 } = this.props;
+        await onSendAmountT3( { token } );
     }
 
     render() {
-        let { passcodeStyle, flag_DisableBtnNext, message, otp } = this.state;
+        let { passcodeStyle, flag_DisableBtnNext } = this.state;
         //flag
         let { flag_NextBtnAnimation } = this.state;
         return (
@@ -233,3 +226,23 @@ const styles = StyleSheet.create( {
 
     },
 } );
+
+
+const mapDispatchToProps = ( dispatch ) => {
+    return {
+        onSendAmountT3: ( args ) => {
+            dispatch( onSendAmountT3( args ) );
+        }
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        sendAmountDataT3: state.paymentReducer.sendAmountDataT3
+    };
+};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)( ModelConfirmSendSercureAccountOTP );
