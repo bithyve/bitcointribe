@@ -4,7 +4,7 @@ import {
 } from "react-native";
 
 
-export default class CustomeStatusBar extends Component<any, any> {
+export default class CustomStatusBar extends Component<any, any> {
     constructor ( props: any ) {
         super( props );
     }

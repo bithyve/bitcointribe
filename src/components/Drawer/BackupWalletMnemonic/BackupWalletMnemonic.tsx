@@ -6,7 +6,7 @@ import {
 
 
 //TODO: Custome Pages
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { ViewBackupWalletMnemonicScrolling } from "hexaCustView";
 import { HeaderTitle } from "hexaCustHeader";
 
@@ -88,7 +88,7 @@ export default class BackupWalletMnemonic extends React.Component<any, any> {
                         </ViewBackupWalletMnemonicScrolling>
                     </SafeAreaView>
                 </ImageBackground>
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

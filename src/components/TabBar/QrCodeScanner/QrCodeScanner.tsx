@@ -27,7 +27,7 @@ import {
 var utils = require( "hexaUtils" );
 
 //Custome Compontes
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 
 //TODO: Bitcoin Class
 var bitcoinClassState = require( "hexaClassState" );
@@ -181,7 +181,7 @@ export default class QrCodeScanner extends React.Component {
                         { this.cameraView }
                     </SafeAreaView>
                 </ImageBackground>
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

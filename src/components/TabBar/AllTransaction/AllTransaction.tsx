@@ -13,7 +13,7 @@ import { SvgIcon } from "@up-shared/components";
 
 import { ImageSVG } from "hexaCustImage";
 //TODO: Custome view
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 
 
 
@@ -294,7 +294,7 @@ export default class AllTransaction extends React.Component<any, any> {
           }
         />
         <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
-        <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+        <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
       </Container >
     );
   }

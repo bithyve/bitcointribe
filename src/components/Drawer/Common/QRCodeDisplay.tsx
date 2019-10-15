@@ -9,7 +9,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import QRCode from 'react-native-qrcode-svg';
 
 //TODO: Custome Pages
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { HeaderTitle } from "hexaCustHeader";
 
 
@@ -80,7 +80,7 @@ export default class QRCodeDisplay extends React.Component<any, any> {
                         </KeyboardAwareScrollView>
                     </SafeAreaView>
                 </ImageBackground>
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

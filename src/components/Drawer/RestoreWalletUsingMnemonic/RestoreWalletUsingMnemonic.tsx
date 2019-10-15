@@ -13,7 +13,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 
 //TODO: Custome Pages
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { ModelLoader } from "hexaLoader";
 
 //TODO: Custome Object
@@ -128,7 +128,7 @@ export default class RestoreWalletUsingMnemonic extends Component {
     render() {
         return (
             <View style={ styles.container }>
-                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <KeyboardAwareScrollView

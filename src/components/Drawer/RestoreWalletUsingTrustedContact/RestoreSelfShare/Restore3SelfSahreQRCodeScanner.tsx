@@ -27,7 +27,7 @@ import { AlertSimple } from "hexaCustAlert";
 let alert = new AlertSimple();
 
 //Custome Compontes
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { HeaderTitle } from "hexaCustHeader";
 import { ModelLoader } from "hexaLoader";
 
@@ -166,7 +166,7 @@ export default class Restore3SelfSahreQRCodeScanner extends React.Component {
                     </SafeAreaView>
                 </ImageBackground>
                 <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

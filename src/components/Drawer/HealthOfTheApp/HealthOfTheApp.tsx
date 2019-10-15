@@ -16,7 +16,7 @@ import { Avatar } from 'react-native-elements';
 
 //TODO: Custome Pages  
 import { ImageSVG } from "hexaCustImage";
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { HeaderTitle } from "hexaCustHeader";
 
 
@@ -928,7 +928,7 @@ export default class HealthOfTheApp extends React.Component<any, any> {
                 />
 
                 <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

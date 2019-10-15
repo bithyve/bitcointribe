@@ -15,7 +15,7 @@ import { Avatar } from 'react-native-elements';
 
 //TODO: Custome Pages
 import { ModelLoader } from "hexaLoader";
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { HeaderTitle } from "hexaCustHeader";
 
 
@@ -267,7 +267,7 @@ export default class SelectContactListAssociatePerson extends React.Component<an
                     </SafeAreaView>
                 </ImageBackground>
                 <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message="Loading" />
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

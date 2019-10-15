@@ -11,7 +11,7 @@ import QRCode from 'react-native-qrcode-svg';
 
 
 //TODO: Custome Pages
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { HeaderTitle } from "hexaCustHeader";
 
 
@@ -129,7 +129,7 @@ export default class SelfShareUsingWalletQRCode extends React.Component<any, any
                     </SafeAreaView>
                 </ImageBackground>
                 <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } message="Making QRCode" />
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

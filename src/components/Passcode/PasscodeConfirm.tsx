@@ -19,7 +19,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 //TODO: Custome Pages
 import { ModelLoader } from "hexaLoader";
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 
 
@@ -242,7 +242,7 @@ export default class PasscodeConfirm extends Component<any, any> {
           </SafeAreaView>
         </ImageBackground>
         <ModelLoader loading={ this.state.isLoading } color={ colors.appColor } size={ 30 } />
-        <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+        <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
       </View>
     );
   }

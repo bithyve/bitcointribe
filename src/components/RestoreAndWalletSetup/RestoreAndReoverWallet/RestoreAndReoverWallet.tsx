@@ -15,7 +15,7 @@ import { SvgIcon } from "@up-shared/components";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 //TODO: Custome Pages
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 
 
 
@@ -235,7 +235,7 @@ export default class RestoreAndReoverWallet extends Component<Props, any> {
                         </KeyboardAwareScrollView>
                     </SafeAreaView>
                 </ImageBackground>
-                <CustomeStatusBar backgroundColor={ colors.appColor } hidden={ false } barStyle="light-content" />
+                <CustomStatusBar backgroundColor={ colors.appColor } hidden={ false } barStyle="light-content" />
             </View >
         );
     }

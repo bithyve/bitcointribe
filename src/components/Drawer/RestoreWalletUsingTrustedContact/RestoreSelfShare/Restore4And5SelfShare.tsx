@@ -8,7 +8,7 @@ import {
 
 
 //TODO: Custome Pages
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { HeaderTitle } from "hexaCustHeader";
 import { ModelLoader } from "hexaLoader";
 import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
@@ -194,7 +194,7 @@ export default class Restore4And5SelfShare extends React.Component<any, any> {
                     </SafeAreaView>
                 </ImageBackground>
                 <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message={ this.state.msg_Loading } />
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }
