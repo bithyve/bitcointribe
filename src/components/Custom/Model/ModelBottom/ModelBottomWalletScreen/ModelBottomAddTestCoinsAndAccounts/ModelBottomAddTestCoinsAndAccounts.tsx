@@ -1,12 +1,7 @@
 import React, { Component } from 'react';
-import {
-    View, StyleSheet
-} from 'react-native';
-import { Text } from "native-base";
+import { View, StyleSheet } from 'react-native';
+import { Text } from 'native-base';
 import Modal from 'react-native-modalbox';
-
-
-
 
 interface Props {
     data: [];
@@ -15,44 +10,59 @@ interface Props {
     pop: Function;
 }
 
-
-
-export default class ModelBottomAddTestCoinsAndAccounts extends Component<Props, any> {
-
-    constructor ( props: any ) {
-        super( props );
-        this.state = ( {
+export default class ModelBottomAddTestCoinsAndAccounts extends Component<
+    Props,
+    any
+> {
+    constructor(props: any) {
+        super(props);
+        this.state = {
             data: []
-        } )
+        };
     }
 
-
-    componentWillReceiveProps = ( nextProps: any ) => {
+    componentWillReceiveProps = (nextProps: any) => {
         let data = nextProps.data;
         //console.log( { data } );
-        if ( data != undefined ) {
-            this.setState( {
-                data: data[ 0 ]
-            } )
+        if (data != undefined) {
+            this.setState({
+                data: data[0]
+            });
         }
-    }
-
+    };
 
     click_Clsoe = () => {
-        this.setState( {
+        this.setState({
             data: []
-        } )
-    }
-
+        });
+    };
 
     render() {
         let { data } = this.state;
         return (
-            <Modal style={ [ styles.modal, styles.modal4 ] } position={ "bottom" } isOpen={ data != undefined ? data.modalVisible : false } onClosed={ () => this.click_Clsoe() }>
+            <Modal
+                style={[styles.modal, styles.modal4]}
+                position={'bottom'}
+                isOpen={data != undefined ? data.modalVisible : false}
+                onClosed={() => this.click_Clsoe()}
+            >
                 <View>
-                    <View style={ { flexDirection: 'column', alignItems: "center", marginTop: 10, paddingBottom: 10, borderBottomColor: "#EFEFEF", borderBottomWidth: 1 } }>
-                        <Text style={ { fontSize: 16 } }>{ data != undefined ? data.title : "" }</Text>
-                        <Text note style={ { fontSize: 14 } }>{ data != undefined ? data.subTitle : "" }</Text>
+                    <View
+                        style={{
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            marginTop: 10,
+                            paddingBottom: 10,
+                            borderBottomColor: '#EFEFEF',
+                            borderBottomWidth: 1
+                        }}
+                    >
+                        <Text style={{ fontSize: 16 }}>
+                            {data != undefined ? data.title : ''}
+                        </Text>
+                        <Text note style={{ fontSize: 14 }}>
+                            {data != undefined ? data.subTitle : ''}
+                        </Text>
                     </View>
                     <View>
                         {/* <FlatList
@@ -110,12 +120,12 @@ export default class ModelBottomAddTestCoinsAndAccounts extends Component<Props,
                         /> */}
                     </View>
                 </View>
-            </Modal >
+            </Modal>
         );
     }
 }
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
     //botom model
     modal: {
         borderTopLeftRadius: 10,
@@ -124,4 +134,4 @@ const styles = StyleSheet.create( {
     modal4: {
         height: 180
     }
-} );  
+});

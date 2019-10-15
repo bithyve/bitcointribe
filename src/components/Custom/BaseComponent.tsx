@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { DeviceEventEmitter, Alert, View } from 'react-native';
 
-
 class BaseComponent extends Component {
     constructor(props) {
         super(props);
@@ -32,9 +31,9 @@ class BaseComponent extends Component {
     errorhandler = (e, onErrorOk) => {
         if (e && e.data && e.data.message) {
             const message = e.data.message;
-            Alert.alert("Oops", message, [
+            Alert.alert('Oops', message, [
                 {
-                    text: "Ok",
+                    text: 'Ok',
                     onPress: () => onErrorOk(e)
                 }
             ]);

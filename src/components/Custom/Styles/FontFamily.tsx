@@ -1,34 +1,34 @@
 import { StyleSheet } from 'react-native';
 
-export default StyleSheet.create( {
+export default StyleSheet.create({
     //TODO: fonts
     //FiraSans
     ffFiraSansRegular: {
-        fontFamily: "FiraSans-Regular"
+        fontFamily: 'FiraSans-Regular'
     },
     ffFiraSansMedium: {
-        fontFamily: "FiraSans-Medium"
+        fontFamily: 'FiraSans-Medium'
     },
     ffFiraSansBold: {
-        fontFamily: "FiraSans-Bold"
+        fontFamily: 'FiraSans-Bold'
     },
     ffFiraSansSemiBold: {
-        fontFamily: "FiraSans-SemiBold"
+        fontFamily: 'FiraSans-SemiBold'
     },
     ffFiraSansBookItalic: {
-        fontFamily: "FiraSans-BookItalic"
+        fontFamily: 'FiraSans-BookItalic'
     },
     ffFiraSansItalic: {
-        fontFamily: "FiraSans-Italic"
+        fontFamily: 'FiraSans-Italic'
     },
     //OpenSans
     ffOpenSansBold: {
-        fontFamily: "OpenSans-Bold"
+        fontFamily: 'OpenSans-Bold'
     },
     ffOpenSansRegular: {
-        fontFamily: "OpenSans-Regular"
+        fontFamily: 'OpenSans-Regular'
     },
     ffOpenSansExtraBold: {
-        fontFamily: "OpenSans-ExtraBold"
+        fontFamily: 'OpenSans-ExtraBold'
     }
-} );
+});

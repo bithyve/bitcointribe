@@ -1,20 +1,14 @@
 import React, { Component } from 'react';
 import { Modal, View, StyleSheet, Image } from 'react-native';
-import { Text } from "native-base";
+import { Text } from 'native-base';
 
+import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-
-import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
-
-
-//TODO: Custome StyleSheet Files       
-import FontFamily from "hexaStyles";
+//TODO: Custome StyleSheet Files
+import FontFamily from 'hexaStyles';
 
 //TODO: Custome Object
-import {
-    images
-} from "hexaConstants";
-
+import { images } from 'hexaConstants';
 
 interface Props {
     data: [];
@@ -22,26 +16,28 @@ interface Props {
     click_GoToWallet: Function;
 }
 
-export default class ModelQuestionsSuccessfullyBackedUp extends Component<Props, any> {
-
-    constructor ( props: any ) {
-        super( props );
-        this.state = ( {
+export default class ModelQuestionsSuccessfullyBackedUp extends Component<
+    Props,
+    any
+> {
+    constructor(props: any) {
+        super(props);
+        this.state = {
             walletName: null,
             flag_DisableBtnNext: true
-        } )
+        };
     }
 
     //TODO: Wallet Name
-    ckeckWalletName( val: string ) {
-        if ( val.length >= 3 ) {
-            this.setState( {
+    ckeckWalletName(val: string) {
+        if (val.length >= 3) {
+            this.setState({
                 flag_DisableBtnNext: false
-            } )
+            });
         } else {
-            this.setState( {
+            this.setState({
                 flag_DisableBtnNext: true
-            } )
+            });
         }
     }
 
@@ -51,34 +47,72 @@ export default class ModelQuestionsSuccessfullyBackedUp extends Component<Props,
             <Modal
                 transparent
                 animationType="fade"
-                visible={ data.length != 0 ? data[ 0 ].modalVisible : false }
-                onRequestClose={ () =>
-                    this.props.closeModal()
-                }
+                visible={data.length != 0 ? data[0].modalVisible : false}
+                onRequestClose={() => this.props.closeModal()}
             >
-                <View style={ [
-                    styles.modalBackground,
-                    { backgroundColor: `rgba(0,0,0,0.4)` }
-                ] }>
-                    <View style={ styles.viewModelBody }>
-                        <View style={ { flexDirection: "row", flex: 0.6 } }>
-                            <Text style={ [ FontFamily.ffFiraSansMedium, {
-                                fontSize: 20, color: "#2F2F2F", flex: 6, textAlign: "center", marginTop: 10,
-                                marginLeft: 20, marginRight: 20
-                            } ] }>Question Successfully Backed Up</Text>
+                <View
+                    style={[
+                        styles.modalBackground,
+                        { backgroundColor: `rgba(0,0,0,0.4)` }
+                    ]}
+                >
+                    <View style={styles.viewModelBody}>
+                        <View style={{ flexDirection: 'row', flex: 0.6 }}>
+                            <Text
+                                style={[
+                                    FontFamily.ffFiraSansMedium,
+                                    {
+                                        fontSize: 20,
+                                        color: '#2F2F2F',
+                                        flex: 6,
+                                        textAlign: 'center',
+                                        marginTop: 10,
+                                        marginLeft: 20,
+                                        marginRight: 20
+                                    }
+                                ]}
+                            >
+                                Question Successfully Backed Up
+                            </Text>
                         </View>
-                        <View style={ { flex: 2, alignItems: "center", justifyContent: "center" } }>
-                            <Image style={ styles.imgAppLogo } source={ images.RestoreWalletUsingMnemonic.walletrestored } />
+                        <View
+                            style={{
+                                flex: 2,
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            <Image
+                                style={styles.imgAppLogo}
+                                source={
+                                    images.RestoreWalletUsingMnemonic
+                                        .walletrestored
+                                }
+                            />
                         </View>
-                        <View style={ { flex: 1, alignItems: "center", justifyContent: "flex-end" } }>
-                            <Text note style={ [ styles.txtNotes, { textAlign: "center" } ] }>Hexa will remind you to help remember the answer</Text>
+                        <View
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'flex-end'
+                            }}
+                        >
+                            <Text
+                                note
+                                style={[
+                                    styles.txtNotes,
+                                    { textAlign: 'center' }
+                                ]}
+                            >
+                                Hexa will remind you to help remember the answer
+                            </Text>
                         </View>
-                        <View style={ { flex: 1, justifyContent: "flex-end" } }>
+                        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
                             <FullLinearGradientButton
-                                click_Done={ () => this.props.click_GoToWallet() }
+                                click_Done={() => this.props.click_GoToWallet()}
                                 title="Go to Wallet"
-                                disabled={ false }
-                                style={ [ { opacity: 1 }, { borderRadius: 10 } ] }
+                                disabled={false}
+                                style={[{ opacity: 1 }, { borderRadius: 10 }]}
                             />
                         </View>
                     </View>
@@ -88,10 +122,10 @@ export default class ModelQuestionsSuccessfullyBackedUp extends Component<Props,
     }
 }
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
     modalBackground: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'center'
     },
     imgAppLogo: {
         width: 150,
@@ -102,6 +136,6 @@ const styles = StyleSheet.create( {
         margin: 20,
         padding: 10,
         borderRadius: 10,
-        backgroundColor: "#ffffff"
+        backgroundColor: '#ffffff'
     }
-} );
+});

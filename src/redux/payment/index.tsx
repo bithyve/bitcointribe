@@ -1,9 +1,9 @@
-import { select, put } from "redux-saga/effects";
-import { sagaWatcherHelper } from "./controller";
+import { select, put } from 'redux-saga/effects';
+import { sagaWatcherHelper } from './controller';
 
 // Types
-const CREATE_SSS = "CREATE_SSS";
-const UPDATE_SSS = "UPDATE_SSS";
+const CREATE_SSS = 'CREATE_SSS';
+const UPDATE_SSS = 'UPDATE_SSS';
 
 const INITIAL_STATE = {
     sss: undefined
@@ -17,10 +17,9 @@ export const createSSS = () => {
     };
 };
 
-
 // Reducers
-export const walletReducer = ( state = INITIAL_STATE, action: any ) => {
-    switch ( action.type ) {
+export const walletReducer = (state = INITIAL_STATE, action: any) => {
+    switch (action.type) {
         case UPDATE_SSS:
             return { ...state, ...action.payload };
         default:
@@ -28,22 +27,20 @@ export const walletReducer = ( state = INITIAL_STATE, action: any ) => {
     }
 };
 
-
 // Sagas
 
 function* workerSSS() {
-    const { walletReducer } = yield select( state => state );
+    const { walletReducer } = yield select(state => state);
     try {
         const { mnemonic } = walletReducer;
-        const sss = new S3Service( mnemonic );
-        yield put( {
+        const sss = new S3Service(mnemonic);
+        yield put({
             type: UPDATE_SSS,
             payload: { sss }
-        } );
-    } catch ( e ) {
-        console.log( "error", e )
+        });
+    } catch (e) {
+        console.log('error', e);
     }
 }
 
-
-export const watcherSSS = sagaWatcherHelper( workerSSS, CREATE_SSS );
+export const watcherSSS = sagaWatcherHelper(workerSSS, CREATE_SSS);

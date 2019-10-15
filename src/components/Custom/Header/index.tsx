@@ -1,5 +1,3 @@
-import HeaderTitle from "./HeaderTitle/HeaderTitle";
+import HeaderTitle from './HeaderTitle/HeaderTitle';
 
-export {
-    HeaderTitle
-}
+export { HeaderTitle };

@@ -1,5 +1,14 @@
-import React from "react";
-import { StyleSheet, ImageBackground, View, Platform, SafeAreaView, FlatList, Dimensions, Alert } from "react-native";
+import React from 'react';
+import {
+    StyleSheet,
+    ImageBackground,
+    View,
+    Platform,
+    SafeAreaView,
+    FlatList,
+    Dimensions,
+    Alert
+} from 'react-native';
 import {
     Container,
     Input,
@@ -8,67 +17,69 @@ import {
     Body,
     Text,
     List,
-    ListItem,
-} from "native-base";
-import { SvgIcon } from "@up-shared/components";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+    ListItem
+} from 'native-base';
+import { SvgIcon } from '@up-shared/components';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Slider, CheckBox } from 'react-native-elements';
 
 //TODO: Custome Pages
-import { CustomStatusBar } from "hexaCustStatusBar";
-import { HeaderTitle } from "hexaCustHeader";
-import { ModelLoader } from "hexaLoader";
-import { FullLinearGradientLoadingButton } from "hexaCustomeLinearGradientButton";
+import { CustomStatusBar } from 'hexaCustStatusBar';
+import { HeaderTitle } from 'hexaCustHeader';
+import { ModelLoader } from 'hexaLoader';
+import { FullLinearGradientLoadingButton } from 'hexaCustomeLinearGradientButton';
 
 //TODO: Custome StyleSheet Files
-import FontFamily from "hexaStyles";
+import FontFamily from 'hexaStyles';
 
 //TODO: Custome Object
-import { colors, images } from "hexaConstants";
-import { renderIf } from "hexaValidation";
+import { colors, images } from 'hexaConstants';
+import { renderIf } from 'hexaValidation';
 
-import { getAccountDetails, onSendAmount } from "../../../../redux/payment/controller";
+import {
+    getAccountDetails,
+    onSendAmount
+} from '../../../../redux/payment/controller';
 
-var utils = require( "hexaUtils" );
+var utils = require('hexaUtils');
 //TODO: Common Funciton
-var comFunDBRead = require( "hexaCommonDBReadData" );
+var comFunDBRead = require('hexaCommonDBReadData');
 
 //TODO: Bitcoin Files
-var bitcoinClassState = require( "hexaClassState" );
-
+var bitcoinClassState = require('hexaClassState');
 
 export default class SendPayment extends React.Component<any, any> {
-    constructor ( props: any ) {
-        super( props )
-        this.state = ( {
+    constructor(props: any) {
+        super(props);
+        this.state = {
             arr_AccountList: [],
             arr_SelectAccountDetails: [],
-            address: "",
-            amount: "0",
-            memo: "",
+            address: '',
+            amount: '0',
+            memo: '',
             selectedAccountBal: 0,
-            memoMsg: "Add Memo",
+            memoMsg: 'Add Memo',
             tranPrio: 1,
             //flag
             flag_Memo: false,
             flag_DisableSentBtn: true,
             flag_SentBtnAnimation: false,
             flag_Loading: false
-        } )
+        };
     }
 
     componentWillMount = async () => {
         //class value reset
         const { navigation } = this.props;
-        let data = navigation.getParam( "data" );
-        let selectedAccount = navigation.getParam( "selectedAccount" );
+        let data = navigation.getParam('data');
+        let selectedAccount = navigation.getParam('selectedAccount');
 
         const details = await getAccountDetails({ data, selectedAccount });
         this.setState({ ...details });
 
         // console.log( { selectedAccount } );
         // console.log( { data } );
-        // //Singleton Flag value change    
+        // //Singleton Flag value change
         // let address = data != undefined ? data.address : "";
         // let amount = data != undefined ? data.amount.toString() : "0";
         // console.log( { amount, address } );
@@ -118,115 +129,132 @@ export default class SendPayment extends React.Component<any, any> {
         //     selectedAccountBal: accountbal,
         //     flag_DisableSentBtn
         // } )
-    }
+    };
 
     componentWillUnmount() {
-        utils.setFlagQRCodeScreen( true );
-
+        utils.setFlagQRCodeScreen(true);
     }
 
     setAmount() {
         let { amount, selectedAccountBal } = this.state;
-        let enterAmount = parseFloat( amount );
+        let enterAmount = parseFloat(amount);
         var flag_DisableSentBtn;
-        if ( enterAmount != 0 && enterAmount < parseFloat( selectedAccountBal ) ) {
+        if (enterAmount != 0 && enterAmount < parseFloat(selectedAccountBal)) {
             flag_DisableSentBtn = false;
-        } else if ( enterAmount >= parseFloat( selectedAccountBal ) ) {
+        } else if (enterAmount >= parseFloat(selectedAccountBal)) {
             flag_DisableSentBtn = true;
-        } else if ( amount == "" || enterAmount == 0 ) {
+        } else if (amount == '' || enterAmount == 0) {
             flag_DisableSentBtn = true;
         }
-        this.setState( {
+        this.setState({
             flag_DisableSentBtn
-        } )
+        });
     }
 
     //Change account details on account list
-    selectAccount( index: any ) {
-        let enterAmount = parseFloat( this.state.amount )
-        console.log( { enterAmount } );
-        var temp = [], arr_SelectAccountDetails = [], selectedAccountBal;
+    selectAccount(index: any) {
+        let enterAmount = parseFloat(this.state.amount);
+        console.log({ enterAmount });
+        var temp = [],
+            arr_SelectAccountDetails = [],
+            selectedAccountBal;
         let { arr_AccountList } = this.state;
-        console.log( { arr_AccountList } );
-        for ( let i = 0; i < arr_AccountList.length; i++ ) {
-            let item = arr_AccountList[ i ];
+        console.log({ arr_AccountList });
+        for (let i = 0; i < arr_AccountList.length; i++) {
+            let item = arr_AccountList[i];
             let data = {};
-            if ( i == index ) {
+            if (i == index) {
                 data.checked = true;
                 arr_SelectAccountDetails = item;
-                selectedAccountBal = parseFloat( item.balance );
+                selectedAccountBal = parseFloat(item.balance);
             } else {
                 data.checked = false;
             }
             data.balance = item.balance;
             data.accountName = item.accountName;
-            temp.push( data );
+            temp.push(data);
         }
-        console.log( { selectedAccountBal } );
+        console.log({ selectedAccountBal });
         var flag_DisableSentBtn;
-        if ( enterAmount != 0 && enterAmount < selectedAccountBal ) {
+        if (enterAmount != 0 && enterAmount < selectedAccountBal) {
             flag_DisableSentBtn = false;
-        } else if ( enterAmount >= selectedAccountBal ) {
+        } else if (enterAmount >= selectedAccountBal) {
             flag_DisableSentBtn = true;
-        } else if ( enterAmount == 0 ) {
+        } else if (enterAmount == 0) {
             flag_DisableSentBtn = true;
         }
-        console.log( { selectedAccountBal } );
-        this.setState( {
+        console.log({ selectedAccountBal });
+        this.setState({
             selectedAccountBal,
             arr_AccountList: temp,
             arr_SelectAccountDetails,
             flag_DisableSentBtn
-        } )
+        });
     }
 
-
-    //TODO: Send they amount 
+    //TODO: Send they amount
     click_SendAmount = async () => {
-        let { arr_SelectAccountDetails, address, amount, tranPrio, memo } = this.state;
-        this.setState( {
+        let {
+            arr_SelectAccountDetails,
+            address,
+            amount,
+            tranPrio,
+            memo
+        } = this.state;
+        this.setState({
             flag_Loading: true,
             flag_DisableSentBtn: true,
             flag_SentBtnAnimation: true
-        } )
-        const { resTransferST, data } = await onSendAmount({ arr_SelectAccountDetails, address, amount, tranPrio, memo })
+        });
+        const { resTransferST, data } = await onSendAmount({
+            arr_SelectAccountDetails,
+            address,
+            amount,
+            tranPrio,
+            memo
+        });
 
-        if ( resTransferST.status == 200 ) {
-            this.setState( {
+        if (resTransferST.status == 200) {
+            this.setState({
                 flag_Loading: false,
                 flag_DisableSentBtn: false,
                 flag_SentBtnAnimation: false
-            } );
-            this.props.navigation.push( "ConfirmAndSendPayment", { data: [ data ] } );
+            });
+            this.props.navigation.push('ConfirmAndSendPayment', {
+                data: [data]
+            });
         } else {
-            this.setState( {
+            this.setState({
                 flag_Loading: false,
                 flag_DisableSentBtn: false,
                 flag_SentBtnAnimation: false
-            } )
-            let msg = resTransferST.data != undefined ? resTransferST.err + "\n Total Fee = " + resTransferST.data.fee : resTransferST.err
-            setTimeout( () => {
+            });
+            let msg =
+                resTransferST.data != undefined
+                    ? resTransferST.err +
+                      '\n Total Fee = ' +
+                      resTransferST.data.fee
+                    : resTransferST.err;
+            setTimeout(() => {
                 Alert.alert(
                     'Oops',
                     msg,
                     [
                         {
-                            text: 'Ok', onPress: () => {
-
-                            }
-                        },
+                            text: 'Ok',
+                            onPress: () => {}
+                        }
                     ],
-                    { cancelable: false },
+                    { cancelable: false }
                 );
-            }, 100 );
-            this.setState( {
-                flag_DisableSentBtn: true,
-            } )
+            }, 100);
+            this.setState({
+                flag_DisableSentBtn: true
+            });
         }
-    }
+    };
 
-
-    // //buz bitcoin need small letter 
+    // //buz bitcoin need small letter
     // getPriority( no: any ) {
     //     if ( no == 0 ) {
     //         return "Low"
@@ -237,73 +265,103 @@ export default class SendPayment extends React.Component<any, any> {
     //     }
     // }
 
-    //TODO: When qrcode  scan 
-    getAddressWithBal = ( e: any ) => {
-        console.log( { e } );
+    //TODO: When qrcode  scan
+    getAddressWithBal = (e: any) => {
+        console.log({ e });
         let { amount } = this.state;
         let data = e.data;
-        console.log( { data } );
-        let address = data != undefined ? data.address : "";
-        console.log( { address } );
-        if ( address != "" ) {
-            if ( data.type != "address" ) {
-                this.setAmountAndAddress( address, data.amount != undefined ? data.amount.toString() : "0" );
+        console.log({ data });
+        let address = data != undefined ? data.address : '';
+        console.log({ address });
+        if (address != '') {
+            if (data.type != 'address') {
+                this.setAmountAndAddress(
+                    address,
+                    data.amount != undefined ? data.amount.toString() : '0'
+                );
             } else {
-                this.setAmountAndAddress( address, amount.toString() );
+                this.setAmountAndAddress(address, amount.toString());
             }
-
         }
-    }
+    };
 
-    setAmountAndAddress( address: string, amount: string ) {
+    setAmountAndAddress(address: string, amount: string) {
         let { selectedAccountBal, flag_DisableSentBtn } = this.state;
-        if ( amount != "0" && parseFloat( amount ) < parseFloat( selectedAccountBal ) && address != "" ) {
+        if (
+            amount != '0' &&
+            parseFloat(amount) < parseFloat(selectedAccountBal) &&
+            address != ''
+        ) {
             flag_DisableSentBtn = false;
         } else {
             flag_DisableSentBtn = true;
         }
-        console.log( { address, amount } );
-        this.setState( {
+        console.log({ address, amount });
+        this.setState({
             address,
             amount: amount,
             flag_DisableSentBtn
-        } )
+        });
     }
 
-
-    _renderItem( { item, index } ) {
+    _renderItem({ item, index }) {
         return (
-            <View key={ "card" + index }>
-                <View style={ { flex: 1, marginTop: -20 } }>
+            <View key={'card' + index}>
+                <View style={{ flex: 1, marginTop: -20 }}>
                     <List>
-                        <ListItem style={ { marginRight: 18 } }>
-                            <Left style={ { flex: 0.2 } }>
+                        <ListItem style={{ marginRight: 18 }}>
+                            <Left style={{ flex: 0.2 }}>
                                 <CheckBox
-                                    containerStyle={ { backgroundColor: "#ffffff", borderColor: "#ffffff", marginTop: 10 } }
-                                    checkedIcon='dot-circle-o'
-                                    uncheckedIcon='circle-o'
-                                    checkedColor={ colors.appColor }
+                                    containerStyle={{
+                                        backgroundColor: '#ffffff',
+                                        borderColor: '#ffffff',
+                                        marginTop: 10
+                                    }}
+                                    checkedIcon="dot-circle-o"
+                                    uncheckedIcon="circle-o"
+                                    checkedColor={colors.appColor}
                                     uncheckedColor="#7EBEE6"
-                                    checked={ item.checked }
-                                    onPress={ () => this.selectAccount( index ) }
+                                    checked={item.checked}
+                                    onPress={() => this.selectAccount(index)}
                                 />
                             </Left>
-                            <Body style={ { flex: 1 } }>
-                                <Text style={ [ FontFamily.ffFiraSansBold, { fontSize: 16 } ] }>{ item.accountName }</Text>
-                                <View style={ { flexDirection: "row", alignItems: "center" } }>
-                                    <Text note style={ [ { fontSize: 12 } ] }>Available balance</Text>
+                            <Body style={{ flex: 1 }}>
+                                <Text
+                                    style={[
+                                        FontFamily.ffFiraSansBold,
+                                        { fontSize: 16 }
+                                    ]}
+                                >
+                                    {item.accountName}
+                                </Text>
+                                <View
+                                    style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center'
+                                    }}
+                                >
+                                    <Text note style={[{ fontSize: 12 }]}>
+                                        Available balance
+                                    </Text>
                                     <SvgIcon
                                         name="icon_bitcoin"
                                         color="#D0D0D0"
-                                        size={ 15 }
+                                        size={15}
                                     />
-                                    <Text note style={ { fontSize: 12, marginLeft: -0.01 } }>{ item.balance }</Text>
+                                    <Text
+                                        note
+                                        style={{
+                                            fontSize: 12,
+                                            marginLeft: -0.01
+                                        }}
+                                    >
+                                        {item.balance}
+                                    </Text>
                                 </View>
                             </Body>
                         </ListItem>
                     </List>
                 </View>
-
             </View>
         );
     }
@@ -314,180 +372,276 @@ export default class SendPayment extends React.Component<any, any> {
         //values
         let { amount, tranPrio, memoMsg, memo, address } = this.state;
         //flag
-        let { flag_Memo, flag_DisableSentBtn, flag_Loading, flag_SentBtnAnimation } = this.state;
+        let {
+            flag_Memo,
+            flag_DisableSentBtn,
+            flag_Loading,
+            flag_SentBtnAnimation
+        } = this.state;
         return (
             <Container>
-                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                    <HeaderTitle title="Send"
-                        pop={ () => this.props.navigation.pop() }
+                <ImageBackground
+                    source={
+                        images.WalletSetupScreen.WalletScreen.backgoundImage
+                    }
+                    style={styles.container}
+                >
+                    <HeaderTitle
+                        title="Send"
+                        pop={() => this.props.navigation.pop()}
                     />
-                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
+                    <SafeAreaView
+                        style={[
+                            styles.container,
+                            { backgroundColor: 'transparent' }
+                        ]}
+                    >
                         <KeyboardAwareScrollView
                             enableAutomaticScroll
-                            automaticallyAdjustContentInsets={ true }
-                            keyboardOpeningTime={ 0 }
-                            enableOnAndroid={ true }
-                            contentContainerStyle={ { flexGrow: 1 } }
+                            automaticallyAdjustContentInsets={true}
+                            keyboardOpeningTime={0}
+                            enableOnAndroid={true}
+                            contentContainerStyle={{ flexGrow: 1 }}
                         >
-                            <View style={ { flex: 0.05, alignItems: "center" } }>
-                                <View style={ [ styles.itemQuestionPicker ] }>
-                                    <View style={ { flexDirection: "row", alignItems: "center" } }>
+                            <View style={{ flex: 0.05, alignItems: 'center' }}>
+                                <View style={[styles.itemQuestionPicker]}>
+                                    <View
+                                        style={{
+                                            flexDirection: 'row',
+                                            alignItems: 'center'
+                                        }}
+                                    >
                                         <SvgIcon
                                             name="icon_bitcoin"
                                             color="#D0D0D0"
-                                            size={ 23 }
-                                            style={ { flex: 0.2 } }
+                                            size={23}
+                                            style={{ flex: 0.2 }}
                                         />
                                         <Input
-                                            value={ amount }
+                                            value={amount}
                                             keyboardType="numeric"
                                             placeholder="Amount Sats"
                                             placeholderTextColor="#D0D0D0"
                                             returnKeyType="done"
-                                            onChangeText={ ( val ) => {
-                                                this.setState( {
+                                            onChangeText={val => {
+                                                this.setState({
                                                     amount: val
-                                                } )
-                                                setTimeout( () => {
-                                                    this.setAmount()
-                                                }, 100 );
-                                            } }
-                                            style={ [ FontFamily.ffOpenSansBold, { flex: 1, fontSize: 18 } ] }
+                                                });
+                                                setTimeout(() => {
+                                                    this.setAmount();
+                                                }, 100);
+                                            }}
+                                            style={[
+                                                FontFamily.ffOpenSansBold,
+                                                { flex: 1, fontSize: 18 }
+                                            ]}
                                         />
-                                        <Button transparent onPress={ () => {
-                                            this.setState( {
-                                                flag_Memo: !flag_Memo,
-                                            } )
-                                            setTimeout( () => {
-                                                if ( flag_Memo == true ) {
-                                                    this.setState( {
-                                                        memoMsg: "Add Memo",
-                                                        memo: ""
-                                                    } )
-                                                } else {
-                                                    this.setState( {
-                                                        memoMsg: "Remove  ",
-                                                        memo: ""
-                                                    } )
-                                                }
-                                            }, 100 );
-
-
-                                        } }>
-                                            <Text style={ { color: "#7EBEE6" } }>{ memoMsg }</Text>
+                                        <Button
+                                            transparent
+                                            onPress={() => {
+                                                this.setState({
+                                                    flag_Memo: !flag_Memo
+                                                });
+                                                setTimeout(() => {
+                                                    if (flag_Memo == true) {
+                                                        this.setState({
+                                                            memoMsg: 'Add Memo',
+                                                            memo: ''
+                                                        });
+                                                    } else {
+                                                        this.setState({
+                                                            memoMsg: 'Remove  ',
+                                                            memo: ''
+                                                        });
+                                                    }
+                                                }, 100);
+                                            }}
+                                        >
+                                            <Text style={{ color: '#7EBEE6' }}>
+                                                {memoMsg}
+                                            </Text>
                                         </Button>
                                     </View>
                                 </View>
-                                { renderIf( flag_Memo == true )(
-                                    <View style={ [ styles.itemQuestionPicker ] }>
+                                {renderIf(flag_Memo == true)(
+                                    <View style={[styles.itemQuestionPicker]}>
                                         <Input
-                                            value={ memo }
+                                            value={memo}
                                             keyboardType="default"
                                             placeholder="Add Memo"
                                             placeholderTextColor="#D0D0D0"
                                             returnKeyType="done"
-                                            onChangeText={ ( val ) => {
-                                                this.setState( {
+                                            onChangeText={val => {
+                                                this.setState({
                                                     memo: val
-                                                } )
-                                            } }
-                                            style={ [ FontFamily.ffOpenSansBold, { flex: 1, fontSize: 18 } ] }
+                                                });
+                                            }}
+                                            style={[
+                                                FontFamily.ffOpenSansBold,
+                                                { flex: 1, fontSize: 18 }
+                                            ]}
                                         />
                                     </View>
-                                ) }
-                                <View style={ [ styles.itemQuestionPicker ] }>
-                                    <View style={ { flexDirection: "row" } }>
+                                )}
+                                <View style={[styles.itemQuestionPicker]}>
+                                    <View style={{ flexDirection: 'row' }}>
                                         <Input
-                                            value={ address }
+                                            value={address}
                                             keyboardType="default"
                                             placeholder="Address"
                                             placeholderTextColor="#D0D0D0"
                                             returnKeyType="done"
-                                            onChangeText={ ( val ) => {
-                                                this.setState( {
+                                            onChangeText={val => {
+                                                this.setState({
                                                     address: val
-                                                } )
-                                            } }
-                                            style={ [ FontFamily.ffOpenSansBold, { flex: 1, fontSize: 18 } ] }
+                                                });
+                                            }}
+                                            style={[
+                                                FontFamily.ffOpenSansBold,
+                                                { flex: 1, fontSize: 18 }
+                                            ]}
                                         />
                                         <Button
                                             transparent
-                                            style={ { flex: 0.15 } }
-                                            onPress={ () => {
-                                                this.props.navigation.push( "SendPaymentAddressScan", { onSelect: this.getAddressWithBal.bind( this ) } )
-                                            } }>
-                                            <SvgIcon name="qr-codes" color="#000000" size={ 30 } />
+                                            style={{ flex: 0.15 }}
+                                            onPress={() => {
+                                                this.props.navigation.push(
+                                                    'SendPaymentAddressScan',
+                                                    {
+                                                        onSelect: this.getAddressWithBal.bind(
+                                                            this
+                                                        )
+                                                    }
+                                                );
+                                            }}
+                                        >
+                                            <SvgIcon
+                                                name="qr-codes"
+                                                color="#000000"
+                                                size={30}
+                                            />
                                         </Button>
                                     </View>
                                 </View>
                             </View>
-                            <View style={ { flex: 1 } } >
-                                <Text style={ { margin: 20 } }>Transaction Priority</Text>
-                                <View style={ { flex: 1, alignItems: "center" } }>
+                            <View style={{ flex: 1 }}>
+                                <Text style={{ margin: 20 }}>
+                                    Transaction Priority
+                                </Text>
+                                <View style={{ flex: 1, alignItems: 'center' }}>
                                     <Slider
-                                        style={ { width: Dimensions.get( 'screen' ).width - 50 } }
-                                        value={ tranPrio }
-                                        maximumValue={ 2 }
-                                        minimumValue={ 0 }
-                                        step={ 1 }
-                                        animateTransitions={ true }
-                                        thumbTintColor={ colors.appColor }
-                                        minimumTrackTintColor={ colors.appColor }
-                                        onValueChange={ value => {
-                                            this.setState( { tranPrio: value } )
-                                        } }
+                                        style={{
+                                            width:
+                                                Dimensions.get('screen').width -
+                                                50
+                                        }}
+                                        value={tranPrio}
+                                        maximumValue={2}
+                                        minimumValue={0}
+                                        step={1}
+                                        animateTransitions={true}
+                                        thumbTintColor={colors.appColor}
+                                        minimumTrackTintColor={colors.appColor}
+                                        onValueChange={value => {
+                                            this.setState({ tranPrio: value });
+                                        }}
                                     />
-                                    <View style={ { flexDirection: "row" } }>
-                                        <Text style={ { flex: 1, textAlign: "left", marginLeft: 20 } }>Low</Text>
-                                        <Text style={ { flex: 1, textAlign: "center" } }>Medium </Text>
-                                        <Text style={ { flex: 1, textAlign: "right", marginRight: 20 } }>High </Text>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <Text
+                                            style={{
+                                                flex: 1,
+                                                textAlign: 'left',
+                                                marginLeft: 20
+                                            }}
+                                        >
+                                            Low
+                                        </Text>
+                                        <Text
+                                            style={{
+                                                flex: 1,
+                                                textAlign: 'center'
+                                            }}
+                                        >
+                                            Medium{' '}
+                                        </Text>
+                                        <Text
+                                            style={{
+                                                flex: 1,
+                                                textAlign: 'right',
+                                                marginRight: 20
+                                            }}
+                                        >
+                                            High{' '}
+                                        </Text>
                                     </View>
                                 </View>
                             </View>
-                            <View style={ { flex: 1 } }>
-                                <Text style={ { margin: 20 } }>Choose any option to send</Text>
+                            <View style={{ flex: 1 }}>
+                                <Text style={{ margin: 20 }}>
+                                    Choose any option to send
+                                </Text>
                                 <FlatList
-                                    data={ arr_AccountList }
-                                    renderItem={ this._renderItem.bind( this ) }
-                                    keyExtractor={ ( item, index ) => index }
+                                    data={arr_AccountList}
+                                    renderItem={this._renderItem.bind(this)}
+                                    keyExtractor={(item, index) => index}
                                 />
                             </View>
-                            <View style={ { flex: 1 } }>
-                                <Text note style={ { textAlign: "center", margin: 10 } }>Transaction fee will be calculated in the next step according to the amount of money being sent.</Text>
+                            <View style={{ flex: 1 }}>
+                                <Text
+                                    note
+                                    style={{ textAlign: 'center', margin: 10 }}
+                                >
+                                    Transaction fee will be calculated in the
+                                    next step according to the amount of money
+                                    being sent.
+                                </Text>
                                 <FullLinearGradientLoadingButton
-                                    style={ [ flag_DisableSentBtn == true ? { opacity: 0.4 } : { opacity: 1 }, { borderRadius: 10, margin: 10 } ] }
-                                    disabled={ flag_DisableSentBtn }
-                                    animating={ flag_SentBtnAnimation }
+                                    style={[
+                                        flag_DisableSentBtn == true
+                                            ? { opacity: 0.4 }
+                                            : { opacity: 1 },
+                                        { borderRadius: 10, margin: 10 }
+                                    ]}
+                                    disabled={flag_DisableSentBtn}
+                                    animating={flag_SentBtnAnimation}
                                     title=" Send"
-                                    click_Done={ () => this.click_SendAmount() }
+                                    click_Done={() => this.click_SendAmount()}
                                 />
                             </View>
                         </KeyboardAwareScrollView>
                     </SafeAreaView>
                 </ImageBackground>
-                <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
-                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
-            </Container >
+                <ModelLoader
+                    loading={flag_Loading}
+                    color={colors.appColor}
+                    size={30}
+                />
+                <CustomStatusBar
+                    backgroundColor={colors.white}
+                    hidden={false}
+                    barStyle="dark-content"
+                />
+            </Container>
         );
     }
 }
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 1
     },
     itemQuestionPicker: {
         flex: 1,
-        width: Dimensions.get( 'screen' ).width / 1.07,
-        borderWidth: Platform.OS == "ios" ? 0 : 0.1,
+        width: Dimensions.get('screen').width / 1.07,
+        borderWidth: Platform.OS == 'ios' ? 0 : 0.1,
         borderRadius: 10,
         paddingLeft: 10,
         shadowOffset: { width: 2, height: 2 },
         shadowColor: 'black',
         shadowOpacity: 0.3,
-        justifyContent: "center",
+        justifyContent: 'center',
         backgroundColor: '#FFFFFF',
         marginBottom: 10,
         height: 60
-    },
-} );
+    }
+});

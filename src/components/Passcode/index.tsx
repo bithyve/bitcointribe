@@ -1,7 +1,4 @@
-import PasscodeConfirm from "./PasscodeConfirm"
-import Passcode from "./Passcode"
+import PasscodeConfirm from './PasscodeConfirm';
+import Passcode from './Passcode';
 
-export {
-    PasscodeConfirm,
-    Passcode
-}
+export { PasscodeConfirm, Passcode };

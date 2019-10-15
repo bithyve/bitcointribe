@@ -1,4 +1,2 @@
-import QrCodeScanner from "./QrCodeScanner";
-export {
-    QrCodeScanner
-}
+import QrCodeScanner from './QrCodeScanner';
+export { QrCodeScanner };

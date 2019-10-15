@@ -1,9 +1,5 @@
-import Settings from "./Settings";
-import AdvancedSettings from "./AdvancedSettings/AdvancedSettings";
-import MnemonicDisplay from "./AdvancedSettings/MnemonicDisplay/MnemonicDisplay";
+import Settings from './Settings';
+import AdvancedSettings from './AdvancedSettings/AdvancedSettings';
+import MnemonicDisplay from './AdvancedSettings/MnemonicDisplay/MnemonicDisplay';
 
-export {
-    Settings,
-    AdvancedSettings,
-    MnemonicDisplay
-}
+export { Settings, AdvancedSettings, MnemonicDisplay };

@@ -1,5 +1,15 @@
-import React from "react";
-import { StyleSheet, ImageBackground, View, Platform, SafeAreaView, FlatList, TouchableOpacity, Alert, Clipboard } from "react-native";
+import React from 'react';
+import {
+    StyleSheet,
+    ImageBackground,
+    View,
+    Platform,
+    SafeAreaView,
+    FlatList,
+    TouchableOpacity,
+    Alert,
+    Clipboard
+} from 'react-native';
 import {
     Container,
     Item,
@@ -10,142 +20,188 @@ import {
     Textarea,
     Left,
     Right,
-    List, ListItem,
-} from "native-base";
-import { SvgIcon } from "@up-shared/components";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { RkCard } from "react-native-ui-kitten";
+    List,
+    ListItem
+} from 'native-base';
+import { SvgIcon } from '@up-shared/components';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { RkCard } from 'react-native-ui-kitten';
 
 //TODO: Custome Pages
-import { CustomStatusBar } from "hexaCustStatusBar";
-import { HeaderTitle } from "hexaCustHeader";
-import { ModelLoader } from "hexaLoader";
+import { CustomStatusBar } from 'hexaCustStatusBar';
+import { HeaderTitle } from 'hexaCustHeader';
+import { ModelLoader } from 'hexaLoader';
 
-//TODO: Custome StyleSheet Files       
-import FontFamily from "hexaStyles";
+//TODO: Custome StyleSheet Files
+import FontFamily from 'hexaStyles';
 
 //TODO: Custome Object
-import { colors, images } from "hexaConstants";
+import { colors, images } from 'hexaConstants';
 
 //TODO: Common Funciton
-var comFunDBRead = require( "hexaCommonDBReadData" );
+var comFunDBRead = require('hexaCommonDBReadData');
 
 export default class AdvancedSettings extends React.Component<any, any> {
-    constructor ( props: any ) {
-        super( props )
-        this.state = ( {
+    constructor(props: any) {
+        super(props);
+        this.state = {
             walletDetails: [],
             arr_AccountDetails: [],
-            arr_ListItem: [ {
-                title: "Mnemonic"
-            }
+            arr_ListItem: [
+                {
+                    title: 'Mnemonic'
+                }
             ]
-        } )
+        };
     }
 
     async componentWillMount() {
         let walletDetails = await comFunDBRead.readTblWallet();
         let resAccountDetails = await comFunDBRead.readTblAccount();
-        console.log( { walletDetails, resAccountDetails } );
-        this.setState( {
+        console.log({ walletDetails, resAccountDetails });
+        this.setState({
             walletDetails,
-            arr_AccountDetails: resAccountDetails[ 0 ]
-        } );
+            arr_AccountDetails: resAccountDetails[0]
+        });
     }
 
     //TODO: list on click
-    click_MenuItem( item: any ) {
+    click_MenuItem(item: any) {
         let title = item.title;
-        if ( title == "Mnemonic" ) {
-            this.props.navigation.push( "MnemonicDisplay" );
+        if (title == 'Mnemonic') {
+            this.props.navigation.push('MnemonicDisplay');
         }
     }
 
     render() {
         return (
             <Container>
-                <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
-                    <HeaderTitle title="Advanced Settings"
-                        pop={ () => this.props.navigation.pop() }
+                <ImageBackground
+                    source={
+                        images.WalletSetupScreen.WalletScreen.backgoundImage
+                    }
+                    style={styles.container}
+                >
+                    <HeaderTitle
+                        title="Advanced Settings"
+                        pop={() => this.props.navigation.pop()}
                     />
-                    <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
+                    <SafeAreaView
+                        style={[
+                            styles.container,
+                            { backgroundColor: 'transparent' }
+                        ]}
+                    >
                         <KeyboardAwareScrollView
                             enableOnAndroid
-                            extraScrollHeight={ 40 }
-                            contentContainerStyle={ { flexGrow: 1, } }
+                            extraScrollHeight={40}
+                            contentContainerStyle={{ flexGrow: 1 }}
                         >
-                            <View style={ { flex: 0.2, borderRadius: 10, margin: 8 } }>
+                            <View
+                                style={{
+                                    flex: 0.2,
+                                    borderRadius: 10,
+                                    margin: 8
+                                }}
+                            >
                                 <FlatList
-                                    data={ this.state.arr_ListItem }
-                                    showsVerticalScrollIndicator={ false }
-                                    scrollEnabled={ false }
-                                    renderItem={ ( { item } ) => (
+                                    data={this.state.arr_ListItem}
+                                    showsVerticalScrollIndicator={false}
+                                    scrollEnabled={false}
+                                    renderItem={({ item }) => (
                                         <TouchableOpacity
-                                            onPress={ () => this.click_MenuItem( item ) }
+                                            onPress={() =>
+                                                this.click_MenuItem(item)
+                                            }
                                         >
                                             <RkCard
                                                 rkType="shadowed"
-                                                style={ {
+                                                style={{
                                                     flex: 1,
                                                     borderRadius: 8,
                                                     marginLeft: 8,
                                                     marginRight: 8,
-                                                    marginBottom: 4,
-                                                } }
+                                                    marginBottom: 4
+                                                }}
                                             >
                                                 <View
                                                     rkCardHeader
-                                                    style={ {
-                                                        flex: 1,
-                                                    } }
+                                                    style={{
+                                                        flex: 1
+                                                    }}
                                                 >
-                                                    <View style={ { flex: 1, flexDirection: "column" } }>
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                            flexDirection:
+                                                                'column'
+                                                        }}
+                                                    >
                                                         <Text
-                                                            style={ [ FontFamily.ffFiraSansMedium, { fontSize: 14 } ] }
+                                                            style={[
+                                                                FontFamily.ffFiraSansMedium,
+                                                                { fontSize: 14 }
+                                                            ]}
                                                         >
-                                                            { item.title }
+                                                            {item.title}
                                                         </Text>
-
                                                     </View>
-                                                    <View style={ { flex: 0.2, justifyContent: "center", alignItems: "flex-end" } }>
+                                                    <View
+                                                        style={{
+                                                            flex: 0.2,
+                                                            justifyContent:
+                                                                'center',
+                                                            alignItems:
+                                                                'flex-end'
+                                                        }}
+                                                    >
                                                         <SvgIcon
                                                             name="icon_forword"
                                                             color="#BABABA"
-                                                            size={ 20 }
+                                                            size={20}
                                                         />
                                                     </View>
                                                 </View>
                                             </RkCard>
                                         </TouchableOpacity>
-                                    ) }
-                                    keyExtractor={ ( item, index ) => index }
+                                    )}
+                                    keyExtractor={(item, index) => index}
                                 />
                             </View>
                         </KeyboardAwareScrollView>
                     </SafeAreaView>
                 </ImageBackground>
-                <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } message="Loading" />
-                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
-            </Container >
+                <ModelLoader
+                    loading={this.state.flag_Loading}
+                    color={colors.appColor}
+                    size={30}
+                    message="Loading"
+                />
+                <CustomStatusBar
+                    backgroundColor={colors.white}
+                    hidden={false}
+                    barStyle="dark-content"
+                />
+            </Container>
         );
     }
 }
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#F8F8F8",
+        backgroundColor: '#F8F8F8'
     },
     viewPagination: {
         flex: 2,
-        alignItems: "center",
-        justifyContent: "center",
+        alignItems: 'center',
+        justifyContent: 'center',
         marginLeft: 30,
         marginRight: 30
     },
     viewInputFiled: {
         flex: 3,
-        alignItems: "center",
+        alignItems: 'center',
         margin: 10
     },
     itemInputWalletName: {
@@ -155,17 +211,15 @@ const styles = StyleSheet.create( {
         shadowColor: 'gray',
         shadowOpacity: 0.3,
         backgroundColor: '#FFFFFF'
-
     },
     viewProcedBtn: {
         flex: 2,
-        justifyContent: "flex-end"
+        justifyContent: 'flex-end'
     },
     btnNext: {
-        position: "absolute",
+        position: 'absolute',
         bottom: 10,
-        width: "100%"
-
+        width: '100%'
     },
     //Grid View Selected
     gridSelectedList: {
@@ -178,4 +232,4 @@ const styles = StyleSheet.create( {
     modal4: {
         height: 180
     }
-} );
+});
