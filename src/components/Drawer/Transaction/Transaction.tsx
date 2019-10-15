@@ -31,7 +31,7 @@ var utils = require( "hexaUtils" );
 import FontFamily from "hexaStyles";
 
 //TODO: Custome Pages
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { ModelLoader } from "hexaLoader";
 
 
@@ -361,7 +361,7 @@ export default class Transaction extends React.Component<any, any> {
                     </SafeAreaView>
                 </ImageBackground>
                 <ModelLoader loading={ this.state.flag_Loading } color={ colors.appColor } size={ 30 } />
-                <CustomeStatusBar backgroundColor={ colors.appColor } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.appColor } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

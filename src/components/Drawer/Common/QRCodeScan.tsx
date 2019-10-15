@@ -23,7 +23,7 @@ var dbOpration = require( "hexaDBOpration" );
 var utils = require( "hexaUtils" );
 
 //Custome Compontes
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { HeaderTitle } from "hexaCustHeader";
 
 
@@ -173,7 +173,7 @@ export default class QRCodeScan extends React.Component {
                     this.click_UpdateMsg()
                 }
                 } />
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

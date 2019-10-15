@@ -12,7 +12,7 @@ import {
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
 
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { HeaderTitle } from "hexaCustHeader";
 
 //TODO: Custome object  
@@ -115,7 +115,7 @@ export default class ConfirmSelfShareQRScanner extends React.Component {
                         />
                     </SafeAreaView>
                 </ImageBackground>
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
             </Container >
         );
     }

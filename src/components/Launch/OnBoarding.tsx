@@ -8,7 +8,7 @@ import IconFontAwe from "react-native-vector-icons/FontAwesome";
 
 
 //Custome Compontes  
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { FullLinearGradientButton } from "hexaCustomeLinearGradientButton";
 
 //TODO: Custome StyleSheet Files       
@@ -111,7 +111,7 @@ export default class OnBoarding extends React.Component<any, any> {
           </View>
           <CreateTables />
         </SafeAreaView>
-        <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+        <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
       </View>
     );
   }

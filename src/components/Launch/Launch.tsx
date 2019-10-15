@@ -12,15 +12,15 @@ import { colors, images, asyncStorageKeys } from "hexaConstants";
 import Singleton from "HexaWallet/src/app/constants/Singleton";
 
 
-//TODO: Custome Object
-import { CustomeStatusBar } from "hexaCustStatusBar";
+//TODO: Custom Object
+import { CustomStatusBar } from "hexaCustStatusBar";
 
 
 
 import * as Keychain from "react-native-keychain";
 
 interface Props {
-  onComplited: Function;
+  onCompleted: Function;
 }
 
 
@@ -43,13 +43,13 @@ export default class Launch extends Component<Props, any> {
     commonData.setPasscode( credentials.password );
     setTimeout( () => {
       if ( rootViewController == "PasscodeConfirm" ) {
-        this.props.onComplited( false, rootViewController );
+        this.props.onCompleted( false, rootViewController );
       }
       else if ( status ) {
-        this.props.onComplited( false, "Passcode" );
+        this.props.onCompleted( false, "Passcode" );
       }
       else {
-        this.props.onComplited( false, "OnBoardingNavigator" );
+        this.props.onCompleted( false, "OnBoardingNavigator" );
       }
     }, 3000 );
 
@@ -84,7 +84,7 @@ export default class Launch extends Component<Props, any> {
             style={ [ animatedOpcity, { height: 400, width: 400 } ] }
           />
         </ImageBackground>
-        <CustomeStatusBar backgroundColor={ colors.white } hidden={ true } barStyle="dark-content" />
+        <CustomStatusBar backgroundColor={ colors.white } hidden={ true } barStyle="dark-content" />
       </View>
     );
   }

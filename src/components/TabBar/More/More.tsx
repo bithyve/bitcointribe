@@ -18,7 +18,7 @@ import { ImageSVG } from "hexaCustImage";
 
 
 //TODO: Custome Pages
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 
 
 
@@ -346,7 +346,7 @@ export default class Setting extends React.Component<any, any> {
             </KeyboardAwareScrollView>
           </SafeAreaView>
         </ImageBackground>
-        <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
+        <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="dark-content" />
       </Container >
     );
   }

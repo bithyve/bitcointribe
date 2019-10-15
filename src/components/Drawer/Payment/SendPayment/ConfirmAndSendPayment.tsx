@@ -11,7 +11,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { ImageSVG } from "hexaCustImage";
 
 //TODO: Custome Pages
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { HeaderTitle } from "hexaCustHeader";
 import { ModelLoader } from "hexaLoader";
 import { FullLinearGradientLoadingButton } from "hexaCustomeLinearGradientButton";
@@ -318,7 +318,7 @@ export default class ConfirmAndSendPayment extends React.Component<any, any> {
                     } }
                 />
                 <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
-                <CustomeStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="light-content" />
+                <CustomStatusBar backgroundColor={ colors.white } hidden={ false } barStyle="light-content" />
             </Container >
         );
     }

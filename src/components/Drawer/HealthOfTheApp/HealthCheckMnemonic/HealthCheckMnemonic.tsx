@@ -9,7 +9,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 
 //TODO: Custome Compontes
-import { CustomeStatusBar } from "hexaCustStatusBar";
+import { CustomStatusBar } from "hexaCustStatusBar";
 import { ModelHealthCheckMnemonicFirstWord, ModelHealthCheckMnemonicSecoundWord, ModelHealthCheckMnemonicThirdWord, ModelHeackCheckMnemonicSucessBackedUp } from "hexaCustModel";
 
 //TODO: Custome Object
@@ -50,7 +50,7 @@ export default class HealthCheckMnemonic extends Component {
         let { arr_ModelHealthCheckMnemonicFirstWord, arr_ModelHealthCheckMnemonicSecoundWord, arr_ModelHealthCheckMnemonicThirdWord, arr_ModelHeackCheckMnemonicSucessBackedUp, data } = this.state;
         return (
             <View style={ styles.container }>
-                <CustomeStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
+                <CustomStatusBar backgroundColor={ colors.white } flagShowStatusBar={ false } barStyle="dark-content" />
                 <SafeAreaView style={ styles.container }>
                     <ImageBackground source={ images.WalletSetupScreen.WalletScreen.backgoundImage } style={ styles.container }>
                         <KeyboardAwareScrollView
