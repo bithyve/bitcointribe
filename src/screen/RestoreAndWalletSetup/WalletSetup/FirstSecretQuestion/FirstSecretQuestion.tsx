@@ -418,10 +418,10 @@ const mapDispatchToProps = ( dispatch ) => {
 const mapStateToProps = state => {
     return {
         setUpAccounts: {
-            mnemonic: state.walletReducer.mnemonic,
-            regularAccount: state.walletReducer.regularAccount,
-            secureAccount: state.walletReducer.secureAccount,
-            sss: state.walletReducer.sss,
+            mnemonic: state.accountsSetupReducer.mnemonic,
+            regularAccount: state.accountsSetupReducer.regularAccount,
+            secureAccount: state.accountsSetupReducer.secureAccount,
+            sss: state.accountsSetupReducer.sss,
         }
     };
 };
