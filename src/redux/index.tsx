@@ -9,15 +9,21 @@ import { all, fork } from 'redux-saga/effects';
 import {
     readAccountsState,
     writeAccountsState,
+    writeRegularAccount,
+    writeSecureAccount,
+    writeSSSAccount,
     accountsStateReducer,
     watcherReadAccountsState,
-    watcherWriteAccountsState
+    watcherWriteAccountsState,
+    watcherWriteRegularAccountState,
+    watcherWriteSecureAccountState,
+    watcherWriteSSSAccountState
 } from "./accountsState";
 
 //TODO: Wallet (Account Create)
 import {
     setupAccounts,
-    walletReducer,
+    accountsSetupReducer,
     watcherSetupAccounts,
 } from './accountsSetup';
 
@@ -34,7 +40,7 @@ import {
 
 const reducers = combineReducers( {
     accountsStateReducer,
-    walletReducer,
+    accountsSetupReducer,
     paymentReducer
 } );
 
@@ -42,11 +48,18 @@ const reducers = combineReducers( {
 const rootSaga = function* () {
     yield all( [
         fork( watcherSetupAccounts ),
+
         fork( watcherOnSendAmountT1 ),
         fork( watcherOnSendAmountT2 ),
         fork( watcherOnSendAmountT3 ),
+
         fork( watcherReadAccountsState ),
         fork( watcherWriteAccountsState ),
+        fork( watcherWriteRegularAccountState ),
+        fork( watcherWriteSecureAccountState ),
+        fork( watcherWriteSSSAccountState ),
+
+
     ] );
 };
 
@@ -63,11 +76,17 @@ sagaMiddleware.run( rootSaga );
 
 export {
     store,
+
     //classState  
     readAccountsState,
     writeAccountsState,
-    //wallet   
+    writeRegularAccount,
+    writeSecureAccount,
+    writeSSSAccount,
+
+    //accountSetup   
     setupAccounts,
+
     //payment   
     onSendAmountT1,
     onSendAmountT2,

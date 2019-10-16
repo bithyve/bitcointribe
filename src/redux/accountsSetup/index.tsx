@@ -8,6 +8,8 @@ const SETUP_ACCOUNTS = "SETUP_ACCOUNTS";
 const SETUP_ACCOUNTS_SUCCESS = "SETUP_ACCOUNTS_SUCCESS";
 
 
+
+
 const INITIAL_STATE = {
     mnemonic: undefined,
     regularAccount: undefined,
@@ -23,8 +25,10 @@ export const setupAccounts = () => {
 };
 
 
+
+
 // Reducers
-export const walletReducer = ( state = INITIAL_STATE, action: any ) => {
+export const accountsSetupReducer = ( state = INITIAL_STATE, action: any ) => {
     switch ( action.type ) {
         case SETUP_ACCOUNTS_SUCCESS:
             return { ...state, ...action.payload };
