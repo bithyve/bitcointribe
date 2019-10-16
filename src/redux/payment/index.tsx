@@ -1,6 +1,6 @@
 import { select, put } from "redux-saga/effects";
 import { sagaWatcherHelper, getPriority } from "../utils";
-import { writeAccountsState } from 'hexaRedux';
+import { writeRegularAccount, writeSecureAccount } from 'hexaRedux';
 
 var utils = require( "hexaUtils" );
 
@@ -70,11 +70,11 @@ function* workerOnSendAmountT1( action ) {
         var resTransferST;
         if ( arr_SelectAccountDetails.accountName == "Regular Account" ) {
             resTransferST = yield regularAccount.transferST1( address, amountFloat, priority );
-            yield writeAccountsState( { regularAccount } );
+            yield writeRegularAccount( { regularAccount } );
             // yield bitcoinClassState.setRegularClassState( regularAccount );
         } else {
             resTransferST = yield secureAccount.transferST1( address, amountFloat, priority );
-            yield writeAccountsState( { secureAccount } );
+            yield writeSecureAccount( { secureAccount } );
             //yield bitcoinClassState.setSecureClassState( secureAccount );
         }
         yield put( {
@@ -108,11 +108,11 @@ function* workerOnSendAmountT2() {
         var resTransferST;
         if ( sendAmountDataT1.selectedAccount.accountName == "Regular Account" ) {
             resTransferST = yield regularAccount.transferST2( sendAmountDataT1.resTransferST.data.inputs, sendAmountDataT1.resTransferST.data.txb );
-            yield writeAccountsState( { regularAccount } );
+            yield writeRegularAccount( { regularAccount } );
             //  yield bitcoinClassState.setRegularClassState( regularAccount );
         } else {
             resTransferST = yield secureAccount.transferST2( sendAmountDataT1.resTransferST.data.inputs, sendAmountDataT1.resTransferST.data.txb );
-            yield writeAccountsState( { secureAccount } );
+            yield writeSecureAccount( { secureAccount } );
             //yield bitcoinClassState.setSecureClassState( secureAccount );
         }
         yield put( {
@@ -130,7 +130,6 @@ function* workerOnSendAmountT2() {
 }
 
 
-
 function* workerOnSendAmountT3( action ) {
     const { accountsStateReducer, paymentReducer } = yield select( state => state );
     try {
@@ -139,7 +138,7 @@ function* workerOnSendAmountT3( action ) {
         var { sendAmountDataT2 } = paymentReducer;
         sendAmountDataT2 = sendAmountDataT2.resTransferST;
         var resTransferST = yield secureAccount.transferST3( token, sendAmountDataT2.data.txHex, sendAmountDataT2.data.childIndexArray );
-        yield writeAccountsState( { secureAccount } );
+        yield writeSecureAccount( { secureAccount } );
         yield put( {
             type: UPDATE_DATA_T3,
             payload: {
