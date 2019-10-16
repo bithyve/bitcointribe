@@ -1,6 +1,6 @@
 import { select, put } from "redux-saga/effects";
 import { sagaWatcherHelper, getPriority } from "../utils";
-import { writeRegularAccount, writeSecureAccount } from 'hexaRedux';
+import { writeRegularAccount, writeSecureAccount } from "hexaRedux";
 
 var utils = require( "hexaUtils" );
 
@@ -57,7 +57,7 @@ export const paymentReducer = ( state = INITIAL_STATE, action: any ) => {
     }
 };
 
-
+//Worker
 function* workerOnSendAmountT1( action ) {
     const { accountsStateReducer } = yield select( state => state );
     try {
@@ -94,8 +94,8 @@ function* workerOnSendAmountT1( action ) {
                 }
             }
         } )
-    } catch ( e ) {
-        console.log( "error", e )
+    } catch ( error ) {
+        console.log( "error", error )
     }
 }
 
@@ -124,8 +124,8 @@ function* workerOnSendAmountT2() {
                 }
             }
         } )
-    } catch ( e ) {
-        console.log( "error", e )
+    } catch ( error ) {
+        console.log( "error", error )
     }
 }
 
@@ -147,13 +147,12 @@ function* workerOnSendAmountT3( action ) {
                 }
             }
         } )
-    } catch ( e ) {
-        console.log( "error", e )
+    } catch ( error ) {
+        console.log( "error", error )
     }
 }
 
+//Watcher
 export const watcherOnSendAmountT1 = sagaWatcherHelper( workerOnSendAmountT1, SEND_AMOUNT_T1 );
-
 export const watcherOnSendAmountT2 = sagaWatcherHelper( workerOnSendAmountT2, SEND_AMOUNT_T2 );
-
 export const watcherOnSendAmountT3 = sagaWatcherHelper( workerOnSendAmountT3, SEND_AMOUNT_T3 ); 

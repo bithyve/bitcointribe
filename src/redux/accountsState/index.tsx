@@ -1,7 +1,7 @@
 import { put } from "redux-saga/effects";
 import { sagaWatcherHelper } from "../utils";
 import { asyncStorageKeys } from "hexaConstants";
-import { getAsyncStorageValue, setAsyncStorageValue } from "hexaRedux/dbManager/asyncStorage";
+import { getAsyncStorageValue, setAsyncStorageValue } from 'DataManager';
 
 
 //TODO: Bitcoin Files
