@@ -126,6 +126,10 @@ class ConfirmAndSendPayment extends BaseComponent<any, any> {
         let orignalBal = data.bal;
         let sendBal = parseFloat( data.amount ) + parseFloat( data.tranFee );
         let totalBal = orignalBal - sendBal;
+
+
+
+
         let resUpdateAccountBalR = await dbOpration.updateAccountBalAccountTypeWise(
             localDB.tableName.tblAccount,
             accountType,
