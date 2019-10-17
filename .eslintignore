@@ -1,0 +1,21 @@
+/build/**
+/coverage/**
+/docs/**
+/jsdoc/**
+/templates/**
+/tests/bench/**
+/tests/fixtures/**
+/tests/performance/**
+/tmp/**
+/tools/internal-rules/node_modules/**
+/lib/rules/utils/unicode/is-combining-character.js
+
+**/dist/**
+**/node_modules/**
+**/server.js
+**/webpack.config*.js
+**/flow-typed/**
+# TODO: figure out a way to lint this using flow instead of typescript
+examples/todos-flow
+test.js
+!.eslintrc.js

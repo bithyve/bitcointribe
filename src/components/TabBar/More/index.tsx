@@ -4,8 +4,8 @@ import TrustedPartySelfShareQRCode from './ContactsSharedSecredYou/TrustedPartyS
 import TrsutedPartyQRCode from './ContactsSharedSecredYou/TrsutedPartyQRCode';
 
 export {
-    More,
-    ContactSharedSecretList,
-    TrustedPartySelfShareQRCode,
-    TrsutedPartyQRCode
+  More,
+  ContactSharedSecretList,
+  TrustedPartySelfShareQRCode,
+  TrsutedPartyQRCode,
 };

@@ -6,10 +6,10 @@ import FullLinearGradientShareButton from './FullLinearGradientShareButton';
 import FullLinearGradientTransactionScreenThreeOpt from './FullLinearGradientTransactionScreenThreeOpt';
 
 export {
-    FullLinearGradientButton,
-    FullLinearGradientIconButton,
-    FullLinearGradientIconWithLoadingButton,
-    FullLinearGradientLoadingButton,
-    FullLinearGradientShareButton,
-    FullLinearGradientTransactionScreenThreeOpt
+  FullLinearGradientButton,
+  FullLinearGradientIconButton,
+  FullLinearGradientIconWithLoadingButton,
+  FullLinearGradientLoadingButton,
+  FullLinearGradientShareButton,
+  FullLinearGradientTransactionScreenThreeOpt,
 };

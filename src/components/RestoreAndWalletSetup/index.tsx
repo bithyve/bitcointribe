@@ -6,9 +6,9 @@ import WalletName from './WalletSetup/WalletName/WalletName';
 import FirstSecretQuestion from './WalletSetup/FirstSecretQuestion/FirstSecretQuestion';
 
 export {
-    RestoreAndReoverWallet,
-    WalletSetup,
-    PermissionAndroid,
-    WalletName,
-    FirstSecretQuestion
+  RestoreAndReoverWallet,
+  WalletSetup,
+  PermissionAndroid,
+  WalletName,
+  FirstSecretQuestion,
 };
