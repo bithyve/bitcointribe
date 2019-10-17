@@ -1,11 +1,11 @@
 import { put } from "redux-saga/effects";
 import { sagaWatcherHelper } from "../utils";
 import { asyncStorageKeys } from "hexaConstants";
+import { S3Service, RegularAccount, SecureAccount } from "hexaBitcoin";
+
 
 var DataManager = require( "hexaDataManager" );
 
-//TODO: Bitcoin Files
-import { S3Service, RegularAccount, SecureAccount } from "hexaBitcoin";
 
 // Types
 const WRITE_ACCOUNTS_STATE = "WRITE_ACCOUNTS_STATE";
