@@ -3,12 +3,13 @@
 import { getAsyncStorageValue, setAsyncStorageValue } from "./AccountsState";
 
 //Accounts
-import { readTblAccounts } from "./Accounts";
+import { readTblAccounts, updateAccountBalance } from "./Accounts";
 
 export {
     getAsyncStorageValue,
     setAsyncStorageValue,
 
-    readTblAccounts
+    readTblAccounts,
+    updateAccountBalance
 }
 

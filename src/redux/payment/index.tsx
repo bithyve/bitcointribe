@@ -2,6 +2,7 @@ import { select, put } from "redux-saga/effects";
 import { sagaWatcherHelper, getPriority } from "../utils";
 import { writeRegularAccount, writeSecureAccount } from "hexaRedux";
 
+var DataManager = require( "hexaDataManager" );
 var utils = require( "hexaUtils" );
 
 // Types
@@ -14,10 +15,16 @@ const UPDATE_DATA_T2 = "UPDATE_DATA_T2";
 const SEND_AMOUNT_T3 = "SEND_AMOUNT_T3";
 const UPDATE_DATA_T3 = "UPDATE_DATA_T3";
 
+const SEND_AMOUNT_SUCCESS = "SEND_AMOUNT_SUCCESS";
+const UPDATE_AMOUNT_SUCCESS = "UPDATE_AMOUNT_SUCCESS";
+
+
 const INITIAL_STATE = {
     sendAmountDataT1: {},
     sendAmountDataT2: {},
-    sendAmountDataT3: {}
+    sendAmountDataT3: {},
+
+    sendAmountSuccess: {},
 };
 
 // Actions
@@ -42,6 +49,13 @@ export const onSendAmountT3 = ( args ) => {
     };
 }
 
+export const sendAmountSuccess = ( args ) => {
+    return {
+        type: SEND_AMOUNT_SUCCESS,
+        ...args
+    };
+}
+
 //Reducers
 export const paymentReducer = ( state = INITIAL_STATE, action: any ) => {
     console.log( action );
@@ -52,13 +66,15 @@ export const paymentReducer = ( state = INITIAL_STATE, action: any ) => {
             return { ...state, ...action.payload };
         case UPDATE_DATA_T3:
             return { ...state, ...action.payload };
+        case UPDATE_AMOUNT_SUCCESS:
+            return { ...state, ...action.payload };
         default:
             return state;
     }
 };
 
 //Worker
-function* workerOnSendAmountT1( action ) {
+function* workerOnSendAmountT1( action: any ) {
     const { accountsStateReducer } = yield select( state => state );
     try {
         const { arr_SelectAccountDetails, address, amount, tranPrio, memo } = action;
@@ -130,7 +146,7 @@ function* workerOnSendAmountT2() {
 }
 
 
-function* workerOnSendAmountT3( action ) {
+function* workerOnSendAmountT3( action: any ) {
     const { accountsStateReducer, paymentReducer } = yield select( state => state );
     try {
         const { token } = action;
@@ -152,7 +168,27 @@ function* workerOnSendAmountT3( action ) {
     }
 }
 
+function* workerSendAmountSuccess( action: any ) {
+    try {
+        const { tableName, accountType, totalBal } = action;
+        let res = yield DataManager.updateAccountBalance( tableName, accountType, totalBal );
+        yield put( {
+            type: UPDATE_AMOUNT_SUCCESS,
+            payload: {
+                sendAmountSuccess: {
+                    res
+                }
+            }
+        } )
+    } catch ( error ) {
+        console.log( { error } );
+
+    }
+}
+
 //Watcher
 export const watcherOnSendAmountT1 = sagaWatcherHelper( workerOnSendAmountT1, SEND_AMOUNT_T1 );
 export const watcherOnSendAmountT2 = sagaWatcherHelper( workerOnSendAmountT2, SEND_AMOUNT_T2 );
-export const watcherOnSendAmountT3 = sagaWatcherHelper( workerOnSendAmountT3, SEND_AMOUNT_T3 ); 
+export const watcherOnSendAmountT3 = sagaWatcherHelper( workerOnSendAmountT3, SEND_AMOUNT_T3 );
+
+export const watcherSendAmountSuccess = sagaWatcherHelper( workerSendAmountSuccess, SEND_AMOUNT_SUCCESS );
