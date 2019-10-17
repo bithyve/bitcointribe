@@ -20,7 +20,7 @@ export default class ViewErrorMessage extends Component<any, any> {
     };
   }
 
-  componentWillReceiveProps = (nextProps: any) => {
+  UNSAFE_componentWillReceiveProps = (nextProps: any) => {
     const { data } = nextProps;
     // console.log( { data } );
     if (data != undefined) {
@@ -94,12 +94,4 @@ export default class ViewErrorMessage extends Component<any, any> {
   };
 }
 
-const styles = StyleSheet.create({
-  textWhite: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    alignSelf: 'center',
-    fontWeight: 'bold',
-    fontFamily: 'Avenir',
-  },
-});
+const styles = StyleSheet.create({});

@@ -4,10 +4,6 @@ import { StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { images } from 'hexaConstants';
 
 export default class ViewShieldIcons extends Component<any, any> {
-  constructor(props: any) {
-    super(props);
-  }
-
   render = ({ children } = this.props) => {
     return (
       <TouchableOpacity onPress={() => this.props.click_Image()}>
@@ -37,12 +33,4 @@ export default class ViewShieldIcons extends Component<any, any> {
   };
 }
 
-const styles = StyleSheet.create({
-  textWhite: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    alignSelf: 'center',
-    fontWeight: 'bold',
-    fontFamily: 'Avenir',
-  },
-});
+const styles = StyleSheet.create({});

@@ -51,7 +51,7 @@ export default class ModelRestoreGAVerificationCode extends Component<
     };
   }
 
-  componentWillReceiveProps(nextProps: any) {
+  UNSAFE_componentWillReceiveProps(nextProps: any) {
     const { data } = nextProps;
     // console.log( { data } );
     if (data.length != 0) {

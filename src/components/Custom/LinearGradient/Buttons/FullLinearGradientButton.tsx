@@ -7,7 +7,7 @@ interface Props {
   title: string;
   style: any;
   disabled: Boolean;
-  click_Done: Function;
+  clickDone: Function;
 }
 
 export default class FullLinearGradientButton extends Component<Props, any> {
@@ -23,7 +23,7 @@ export default class FullLinearGradientButton extends Component<Props, any> {
           transparent
           full
           disabled={this.props.disabled}
-          onPress={() => this.props.click_Done()}
+          onPress={() => this.props.clickDone()}
         >
           <Text style={styles.textWhite}>{this.props.title}</Text>
         </Button>

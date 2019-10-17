@@ -1,3 +1,3 @@
 import SvgIcon from './icon/IconsComponent';
 
-export { SvgIcon };
+export default { SvgIcon };

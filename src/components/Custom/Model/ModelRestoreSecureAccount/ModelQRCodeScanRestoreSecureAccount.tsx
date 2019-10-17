@@ -29,10 +29,11 @@ export default class ModelQRCodeScanRestoreSecureAccount extends Component<
     this.state = {
       mnemonic: '',
       flag_NextBtnDisable: true,
+      flg: false,
     };
   }
 
-  componentWillReceiveProps = async (nextProps: any) => {
+  UNSAFE_componentWillReceiveProps = async (nextProps: any) => {
     const resultWallet = await comFunDBRead.readTblWallet();
     // console.log( { mnumanic: resultWallet } );
     this.setState({
@@ -41,16 +42,25 @@ export default class ModelQRCodeScanRestoreSecureAccount extends Component<
   };
 
   componentDidMount() {
+    this.setState({
+      flg: true,
+    });
     Permissions.request('camera').then((response: any) => {
       // console.log( { response } );
     });
   }
 
   _renderTitleBar() {
+    this.setState({
+      flg: true,
+    });
     return <Text />;
   }
 
   _renderMenu() {
+    this.setState({
+      flg: true,
+    });
     return <Text />;
   }
 

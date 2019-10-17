@@ -55,11 +55,12 @@ export default class ModelConfirmSendSercureAccountOTP extends Component<
     };
   }
 
-  componentWillReceiveProps(nextProps: any) {
+  UNSAFE_componentWillReceiveProps(nextProps: any) {
     let data = nextProps.data[0];
     // console.log( { data } );
     if (data != undefined) {
       if (Array.isArray(data.data)) {
+        // eslint-disable-next-line prefer-destructuring
         data = data.data[0];
         this.setState({
           data: data.data,

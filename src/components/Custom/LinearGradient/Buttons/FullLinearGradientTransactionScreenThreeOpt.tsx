@@ -105,12 +105,6 @@ export default class FullLinearGradientTransactionScreenThreeOpt extends Compone
 }
 
 const styles = StyleSheet.create({
-  textWhite: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontFamily: 'FiraSans-SemiBold',
-    alignSelf: 'center',
-  },
   btnDone: {
     margin: 5,
     height: 50,

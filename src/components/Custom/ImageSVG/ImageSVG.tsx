@@ -5,14 +5,10 @@ import SVG from 'react-native-remote-svg';
 import { renderIf } from 'hexaValidation';
 
 export default class ImageSVG extends Component<any, any> {
-  constructor(props: any) {
-    super(props);
-  }
-
   render() {
     return (
       <View>
-        {renderIf(Platform.OS == 'ios')(
+        {renderIf(Platform.OS === 'ios')(
           <SVG
             style={{
               width: this.props.size,
@@ -21,7 +17,7 @@ export default class ImageSVG extends Component<any, any> {
             source={this.props.source}
           />,
         )}
-        {renderIf(Platform.OS == 'android')(
+        {renderIf(Platform.OS === 'android')(
           <Image
             source={this.props.source}
             style={{

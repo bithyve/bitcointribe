@@ -20,10 +20,6 @@ export default class ModelHeackCheckMnemonicSucessBackedUp extends Component<
   Props,
   any
 > {
-  constructor(props: any) {
-    super(props);
-  }
-
   render() {
     const data = this.props.data.length != 0 ? this.props.data : [];
     return (
@@ -36,7 +32,7 @@ export default class ModelHeackCheckMnemonicSucessBackedUp extends Component<
         <View
           style={[
             styles.modalBackground,
-            { backgroundColor: `rgba(0,0,0,0.4)` },
+            { backgroundColor: 'rgba(0,0,0,0.4)' },
           ]}
         >
           <View style={styles.viewModelBody}>
@@ -97,9 +93,6 @@ const styles = StyleSheet.create({
   imgAppLogo: {
     width: 150,
     height: 170,
-  },
-  txtNotes: {
-    margin: 20,
   },
   viewModelBody: {
     flex: 0.7,

@@ -200,6 +200,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<
             const shareId = S3Service.getShareId(
               decryptedShareJson.encryptedShare,
             );
+            // eslint-disable-next-line no-await-in-loop
             await dbOpration.updateSSSShareId(
               localDB.tableName.tblSSSDetails,
               dateTime,
@@ -260,7 +261,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<
             resDecryptStaticNonPMDD =
               resDecryptStaticNonPMDD.data.decryptedStaticNonPMDD;
             secureAccount = new SecureAccount(resMnemonic.mnemonic);
-            var resImportSecureAccount = await secureAccount.importSecureAccount(
+            let resImportSecureAccount = await secureAccount.importSecureAccount(
               resDecryptStaticNonPMDD.secondaryXpub,
               resDecryptStaticNonPMDD.bhXpub,
             );
@@ -311,7 +312,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<
               }
             }
           } else {
-            alert.simpleOk('Oops', resImportSecureAccount.err);
+            alert.simpleOk('Oops', 'error');
           }
         }
       } else {
@@ -342,8 +343,10 @@ export default class ModelRestoreWalletFirstQuestion extends Component<
     const arr_QuestionList =
       this.state.arr_QuestionList != null
         ? this.state.arr_QuestionList
-        : dataQuestionList;
+        : // eslint-disable-next-line no-undef
+          dataQuestionList;
     const itemList = arr_QuestionList.map((item: any, index: number) => (
+      // eslint-disable-next-line react/jsx-key
       <Picker.Item label={item.item} value={item.item} style={{ width: 40 }} />
     ));
     return (
@@ -365,7 +368,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<
           <View
             style={[
               styles.modalBackground,
-              { backgroundColor: `rgba(0,0,0,0.4)` },
+              { backgroundColor: 'rgba(0,0,0,0.4)' },
             ]}
           >
             <View style={styles.viewModelBody}>
@@ -432,6 +435,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<
                               FontFamily.ffFiraSansMedium,
                               { color: '#000' },
                             ]}
+                            // eslint-disable-next-line react-native/no-raw-text
                           >
                             Select Question
                           </Title>

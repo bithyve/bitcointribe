@@ -24,7 +24,7 @@ export default class ModelBottomSingleButton extends Component<Props, any> {
     };
   }
 
-  componentWillReceiveProps = (nextProps: any) => {
+  UNSAFE_componentWillReceiveProps = (nextProps: any) => {
     const { data } = nextProps;
     // console.log( { data } );
     if (data != undefined) {

@@ -333,27 +333,4 @@ const styles = StyleSheet.create({
     borderColor: '#B9B9B9',
     borderWidth: 6,
   },
-
-  // Button text
-  textWhite: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    alignSelf: 'center',
-    fontWeight: 'bold',
-    fontFamily: 'Avenir',
-  },
-  // new styles
-  btnSkipNext: {
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  btnGetStarted: {
-    borderRadius: 5,
-    height: 50,
-  },
-  linearGradient: {
-    paddingLeft: 15,
-    paddingRight: 15,
-    borderRadius: 5,
-  },
 });

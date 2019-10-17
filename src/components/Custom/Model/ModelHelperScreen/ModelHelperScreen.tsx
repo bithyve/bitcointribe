@@ -28,11 +28,11 @@ export default class ModelHelperScreen extends Component<Props, any> {
     };
   }
 
-  componentWillReceiveProps = (receProps: any) => {
-    let data = receProps.data[0];
+  UNSAFE_componentWillReceiveProps = (receProps: any) => {
+    const data = receProps.data[0];
     console.log({ data });
-    if (data != undefined) {
-      data = data;
+    if (data !== undefined) {
+      // data = data;
       console.log({ newdata: data });
       this.setState({
         data: data.images,

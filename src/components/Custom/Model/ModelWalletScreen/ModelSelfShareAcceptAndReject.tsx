@@ -34,7 +34,7 @@ export default class ModelSelfShareAcceptAndReject extends Component<
         <View
           style={[
             styles.modalBackground,
-            { backgroundColor: `rgba(0,0,0,0.4)` },
+            { backgroundColor: 'rgba(0,0,0,0.4)' },
           ]}
         >
           <View style={styles.viewModelBody}>
@@ -97,8 +97,8 @@ export default class ModelSelfShareAcceptAndReject extends Component<
                   { textAlign: 'center', marginTop: 10 },
                 ]}
               >
-                This share will now be stored in More> Address book. Tap on it
-                to return share
+                This share will now be stored in More Address book. Tap on it to
+                return share
               </Text>
             </View>
             <View style={{ flex: 1, justifyContent: 'flex-end' }}>
