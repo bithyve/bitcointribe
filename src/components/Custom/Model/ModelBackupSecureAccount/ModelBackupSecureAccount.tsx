@@ -33,14 +33,18 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
       flag_NextBtnDisable: false,
       flag_Loading: true,
       flag_XPubQR: false,
+      flg: false,
     };
   }
 
   header(text: any) {
+    this.setState({
+      flg: true,
+    });
     return { text, margins: [0, 0, 0, 8] };
   }
 
-  componentWillReceiveProps = async (nextProps: any) => {
+  UNSAFE_componentWillReceiveProps = async (nextProps: any) => {
     // this point use backgound task
     setTimeout(() => {
       const { data } = nextProps;
@@ -65,7 +69,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
         <View
           style={[
             styles.modalBackground,
-            { backgroundColor: `rgba(0,0,0,0.4)` },
+            { backgroundColor: 'rgba(0,0,0,0.4)' },
           ]}
         >
           <View style={styles.viewModelBody}>

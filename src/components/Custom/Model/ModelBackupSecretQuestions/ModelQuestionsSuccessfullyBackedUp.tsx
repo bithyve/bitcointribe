@@ -53,7 +53,7 @@ export default class ModelQuestionsSuccessfullyBackedUp extends Component<
         <View
           style={[
             styles.modalBackground,
-            { backgroundColor: `rgba(0,0,0,0.4)` },
+            { backgroundColor: 'rgba(0,0,0,0.4)' },
           ]}
         >
           <View style={styles.viewModelBody}>

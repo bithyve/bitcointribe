@@ -2,10 +2,6 @@ import React, { Component } from 'react';
 import { StatusBar } from 'react-native';
 
 export default class CustomStatusBar extends Component<any, any> {
-  constructor(props: any) {
-    super(props);
-  }
-
   render() {
     return (
       <StatusBar

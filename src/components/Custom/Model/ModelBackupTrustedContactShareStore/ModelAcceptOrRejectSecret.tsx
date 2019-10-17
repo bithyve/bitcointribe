@@ -34,7 +34,7 @@ export default class ModelAcceptOrRejectSecret extends Component<Props, any> {
         <View
           style={[
             styles.modalBackground,
-            { backgroundColor: `rgba(0,0,0,0.4)` },
+            { backgroundColor: 'rgba(0,0,0,0.4)' },
           ]}
         >
           <View style={styles.viewModelBody}>
@@ -97,8 +97,8 @@ export default class ModelAcceptOrRejectSecret extends Component<Props, any> {
                   { textAlign: 'center', marginTop: 10 },
                 ]}
               >
-                This share will now be stored in More> Address book. Tap on it
-                to return share when requested by owner. An OTP will also be
+                This share will now be stored in More Address book. Tap on it to
+                return share when requested by owner. An OTP will also be
                 displayed post sharing.
               </Text>
             </View>

@@ -34,7 +34,7 @@ export default class ModelSecureAccountFailedBackup extends Component<
         <View
           style={[
             styles.modalBackground,
-            { backgroundColor: `rgba(0,0,0,0.4)` },
+            { backgroundColor: 'rgba(0,0,0,0.4)' },
           ]}
         >
           <View style={styles.viewModelBody}>
@@ -82,7 +82,7 @@ export default class ModelSecureAccountFailedBackup extends Component<
               }}
             >
               <Text note style={{ textAlign: 'center' }}>
-                We're sorry we were not able to Recover your wallet for some
+                We are sorry we were not able to Recover your wallet for some
                 reason.
               </Text>
               <Text note style={[styles.txtNotes, { textAlign: 'center' }]}>

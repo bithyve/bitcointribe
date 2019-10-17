@@ -82,7 +82,7 @@ export default class ModelSecureAccountSucessBackup extends Component<
               }}
             >
               <Text note style={{ textAlign: 'center' }}>
-                We're sorry we were not able to Recover your wallet for some
+                We are sorry we were not able to Recover your wallet for some
                 reason.
               </Text>
               <Text note style={[styles.txtNotes, { textAlign: 'center' }]}>

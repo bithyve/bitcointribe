@@ -38,11 +38,11 @@ export default class ModelPasscode extends Component<Props, any> {
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.componentWillReceiveProps(null);
   }
 
-  componentWillReceiveProps = async (nextProps: any) => {
+  UNSAFE_componentWillReceiveProps = async (nextProps: any) => {
     const credentials = await Keychain.getGenericPassword();
     // console.log( { credentials } );
     this.setState({

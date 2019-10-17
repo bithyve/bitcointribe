@@ -98,7 +98,7 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
     if (resIsActive.status == 200) {
       resIsActive = resIsActive.data.isActive;
       if (resIsActive) {
-        var address = await secureAccount.getAddress();
+        let address = await secureAccount.getAddress();
         if (address.status == 200) {
           await bitcoinClassState.setSecureClassState(secureAccount);
           address = address.data.address;
@@ -146,7 +146,7 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
         if (resValidateSecureAccountSetup.status == 200) {
           resValidateSecureAccountSetup = resValidateSecureAccountSetup.data;
           if (resValidateSecureAccountSetup.setupSuccessful) {
-            var address = await secureAccount.getAddress();
+            let address = await secureAccount.getAddress();
             if (address.status == 200) {
               await bitcoinClassState.setSecureClassState(secureAccount);
               address = address.data.address;

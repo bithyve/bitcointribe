@@ -76,7 +76,7 @@ export default class ModelBackupYourWallet extends Component<Props, any> {
                   { textAlign: 'center', margin: 15 },
                 ]}
               >
-                it's highly recommended to backup your wallet, to restore funds
+                it is highly recommended to backup your wallet, to restore funds
                 in case of device loss
               </Text>
               <Image

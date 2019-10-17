@@ -366,14 +366,6 @@ const styles = StyleSheet.create({
   },
   // Button wrapper
   // TODO:Button
-  button: {
-    borderRadius: 50, // Rounded border
-    borderWidth: 2, // 2 point border widht
-    borderColor: '#FFFFFF', // White colored border
-    paddingHorizontal: 50, // Horizontal padding
-    paddingVertical: 10, // Vertical padding
-    height: 40,
-  },
   // Button text
   textWhite: {
     color: '#FFFFFF',
@@ -390,10 +382,5 @@ const styles = StyleSheet.create({
   btnGetStarted: {
     borderRadius: 5,
     height: 50,
-  },
-  linearGradient: {
-    paddingLeft: 15,
-    paddingRight: 15,
-    borderRadius: 5,
   },
 });

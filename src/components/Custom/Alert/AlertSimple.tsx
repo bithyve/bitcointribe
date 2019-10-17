@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
 
 export default class AlertSimple {
-  public simpleOk(title: string, subtile: string) {
+  public static simpleOk(title: string, subtile: string) {
     Alert.alert(
       title,
       subtile,
@@ -14,8 +14,12 @@ export default class AlertSimple {
     );
   }
 
-  //TODO: Ok Action
-  public simpleOkAction(title: string, subtile: string, click_Ok: Function) {
+  // TODO: Ok Action
+  public static simpleOkAction(
+    title: string,
+    subtile: string,
+    clickOk: Function,
+  ) {
     Alert.alert(
       title,
       subtile,
@@ -23,7 +27,7 @@ export default class AlertSimple {
         {
           text: 'Ok',
           onPress: () => {
-            click_Ok();
+            clickOk();
           },
         },
       ],
@@ -31,25 +35,17 @@ export default class AlertSimple {
     );
   }
 
-  public simpleOkActionWithPara(
-    title: string,
-    subtile: string,
-    click_Ok: Function,
-  ) {
-    {
-      Alert.alert(
-        title,
-        subtile,
-        [
-          {
-            text: 'Ok',
-            onPress: () => {
-              function click_Ok(value: any) {}
-            },
-          },
-        ],
-        { cancelable: false },
-      );
-    }
+  public static simpleOkActionWithPara(title: string, subtile: string) {
+    Alert.alert(
+      title,
+      subtile,
+      [
+        {
+          text: 'Ok',
+          onPress: () => {},
+        },
+      ],
+      { cancelable: false },
+    );
   }
 }

@@ -21,10 +21,6 @@ interface Props {
 }
 
 export default class ModelContactPermission extends Component<Props, any> {
-  constructor(props: any) {
-    super(props);
-  }
-
   render() {
     const data = this.props.data.length != 0 ? this.props.data : [];
     return (
@@ -37,7 +33,7 @@ export default class ModelContactPermission extends Component<Props, any> {
         <View
           style={[
             styles.modalBackground,
-            { backgroundColor: `rgba(0,0,0,0.4)` },
+            { backgroundColor: 'rgba(0,0,0,0.4)' },
           ]}
         >
           <View style={styles.viewModelBody}>

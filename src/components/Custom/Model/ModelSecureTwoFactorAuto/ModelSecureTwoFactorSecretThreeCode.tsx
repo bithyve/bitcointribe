@@ -43,9 +43,10 @@ export default class ModelSecureTwoFactorSecretThreeCode extends Component<
     };
   }
 
-  componentWillReceiveProps(nextProps: any) {
+  UNSAFE_componentWillReceiveProps(nextProps: any) {
     const date = Date.now();
     let data = nextProps.data[0];
+    // eslint-disable-next-line prefer-destructuring
     data = data.data[0];
     if (data != null) {
       const { secret } = data;

@@ -31,7 +31,7 @@ export default class ModelMnemonicDisplay extends Component<Props, any> {
     };
   }
 
-  componentWillReceiveProps(nextProps: any) {
+  UNSAFE_componentWillReceiveProps(nextProps: any) {
     let data = nextProps.data[0];
     if (data != undefined) {
       data = data.data;
@@ -73,7 +73,7 @@ export default class ModelMnemonicDisplay extends Component<Props, any> {
         <View
           style={[
             styles.modalBackground,
-            { backgroundColor: `rgba(0,0,0,0.4)` },
+            { backgroundColor: 'rgba(0,0,0,0.4)' },
           ]}
         >
           <View style={styles.viewModelBody}>
@@ -134,17 +134,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     backgroundColor: '#ffffff',
-  },
-  itemInputWalletName: {
-    width: Dimensions.get('screen').width / 1.21,
-    borderWidth: 0,
-    borderRadius: 10,
-    shadowOffset: { width: 2, height: 2 },
-    shadowColor: 'black',
-    shadowOpacity: 0.3,
-    backgroundColor: '#FFFFFF',
-    marginBottom: 10,
-    height: 50,
   },
   itemQuestionPicker: {
     marginTop: 20,

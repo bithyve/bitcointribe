@@ -7,18 +7,15 @@ import { SvgIcon } from '@up-shared/components';
 import FontFamily from 'hexaStyles';
 
 export default class HeaderTitle extends Component<any, any> {
-  constructor(props: any) {
-    super(props);
-  }
-
   render() {
+    // eslint-disable-next-line no-return-assign
     return (
       <Header transparent>
         <Left style={{ flex: 0.8 }}>
           <Button transparent onPress={() => this.props.pop()}>
             <SvgIcon
               name="icon_back"
-              size={Platform.OS == 'ios' ? 22 : 20}
+              size={Platform.OS === 'ios' ? 22 : 20}
               color="#000000"
             />
           </Button>
