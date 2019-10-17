@@ -6,41 +6,38 @@ import { View, ViewPropTypes, StyleSheet, Text } from 'react-native';
 import variables from '../config/variables';
 
 SCLAlertSubtitle.propTypes = {
-    subtitle: PropTypes.string.isRequired,
-    subtitleContainerStyle: ViewPropTypes.style,
-    subtitleStyle: Text.propTypes.style
+  subtitle: PropTypes.string.isRequired,
+  subtitleContainerStyle: ViewPropTypes.style,
+  subtitleStyle: Text.propTypes.style,
 };
 
 SCLAlertSubtitle.defaultProps = {
-    subtitleContainerStyle: {},
-    subtitleStyle: {}
+  subtitleContainerStyle: {},
+  subtitleStyle: {},
 };
 
 const styles = StyleSheet.create({
-    container: {
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    subtitle: {
-        textAlign: 'center',
-        fontSize: variables.mediumFontSize,
-        color: variables.subtitleColor,
-        fontWeight: '300'
-    }
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  subtitle: {
+    textAlign: 'center',
+    fontSize: variables.mediumFontSize,
+    color: variables.subtitleColor,
+    fontWeight: '300',
+  },
 });
 
 function SCLAlertSubtitle(props) {
-    return (
-        <View style={[styles.container, props.subtitleContainerStyle]}>
-            <Text
-                numberOfLines={10}
-                style={[styles.subtitle, props.subtitleStyle]}
-            >
-                {' '}
-                {props.subtitle}{' '}
-            </Text>{' '}
-        </View>
-    );
+  return (
+    <View style={[styles.container, props.subtitleContainerStyle]}>
+      <Text numberOfLines={10} style={[styles.subtitle, props.subtitleStyle]}>
+        {' '}
+        {props.subtitle}{' '}
+      </Text>{' '}
+    </View>
+  );
 }
 
 export default SCLAlertSubtitle;

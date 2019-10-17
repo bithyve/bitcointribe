@@ -6,26 +6,26 @@ import { all, fork } from 'redux-saga/effects';
 // Import from ReduxDucks.
 
 import {
-    setupAccounts,
-    createRegularAccount,
-    createSecureAccount,
-    createSSS,
-    walletReducer,
-    watcherSetupAccounts,
-    watcherRegularAccount,
-    watcherSecureAccount,
-    watcherSSS
+  setupAccounts,
+  createRegularAccount,
+  createSecureAccount,
+  createSSS,
+  walletReducer,
+  watcherSetupAccounts,
+  watcherRegularAccount,
+  watcherSecureAccount,
+  watcherSSS,
 } from './wallet';
 
 const reducers = combineReducers({ walletReducer });
 
 const rootSaga = function*() {
-    yield all([
-        fork(watcherSetupAccounts),
-        fork(watcherRegularAccount),
-        fork(watcherSecureAccount),
-        fork(watcherSSS)
-    ]);
+  yield all([
+    fork(watcherSetupAccounts),
+    fork(watcherRegularAccount),
+    fork(watcherSecureAccount),
+    fork(watcherSSS),
+  ]);
 };
 
 const middleWare = [];
@@ -35,18 +35,18 @@ const sagaMiddleware = createSagaMiddleware();
 middleWare.push(sagaMiddleware);
 
 const store = createStore(
-    reducers,
-    {},
-    composeWithDevTools(applyMiddleware(...middleWare))
+  reducers,
+  {},
+  composeWithDevTools(applyMiddleware(...middleWare)),
 );
 
 // Initiate root saga.
 sagaMiddleware.run(rootSaga);
 
 export {
-    store,
-    setupAccounts,
-    createRegularAccount,
-    createSecureAccount,
-    createSSS
+  store,
+  setupAccounts,
+  createRegularAccount,
+  createSecureAccount,
+  createSSS,
 };

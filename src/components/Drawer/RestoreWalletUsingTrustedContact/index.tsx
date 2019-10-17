@@ -10,14 +10,14 @@ import Restore3SelfSahreQRCodeScanner from './RestoreSelfShare/Restore3SelfSahre
 import Restore4And5SelfShare from './RestoreSelfShare/Restore4And5SelfShare';
 import Restore4And5SelfShareQRCodeScanner from './RestoreSelfShare/Restore4And5SelfShareQRCodeScanner';
 export {
-    RestoreWalletUsingTrustedContact,
-    RestoreAllContactList,
-    RestoreSelectedContactsList,
-    RestoreWalletUsingTrustedContactQueAndAnw,
-    RestoreTrustedContactsShare,
-    RestoreTrustedContactsQRCodeScanScreen,
-    Restore3SelfShare,
-    Restore3SelfSahreQRCodeScanner,
-    Restore4And5SelfShare,
-    Restore4And5SelfShareQRCodeScanner
+  RestoreWalletUsingTrustedContact,
+  RestoreAllContactList,
+  RestoreSelectedContactsList,
+  RestoreWalletUsingTrustedContactQueAndAnw,
+  RestoreTrustedContactsShare,
+  RestoreTrustedContactsQRCodeScanScreen,
+  Restore3SelfShare,
+  Restore3SelfSahreQRCodeScanner,
+  Restore4And5SelfShare,
+  Restore4And5SelfShareQRCodeScanner,
 };

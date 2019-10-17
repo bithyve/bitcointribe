@@ -1,4 +1,4 @@
 {
-    "name": "hexaCommonDBReadData",
-    "main": "CommonDBReadData.tsx"
+  "name": "hexaCommonDBReadData",
+  "main": "CommonDBReadData.tsx"
 }

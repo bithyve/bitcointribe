@@ -7,11 +7,11 @@ import SelfShareSharing from './SelfShareSharing/SelfShareSharing';
 import ConfirmSelfShareQRScanner from './ConfirmSelfShareQRScanner/ConfirmSelfShareQRScanner';
 
 export {
-    HealthOfTheApp,
-    BackupSecretQuestions,
-    BackupSecureTwoFactorAuto,
-    HealthCheckMnemonic,
-    SelfShareUsingWalletQRCode,
-    SelfShareSharing,
-    ConfirmSelfShareQRScanner
+  HealthOfTheApp,
+  BackupSecretQuestions,
+  BackupSecureTwoFactorAuto,
+  HealthCheckMnemonic,
+  SelfShareUsingWalletQRCode,
+  SelfShareSharing,
+  ConfirmSelfShareQRScanner,
 };
