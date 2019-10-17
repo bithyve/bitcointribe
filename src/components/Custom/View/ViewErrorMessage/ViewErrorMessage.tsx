@@ -10,6 +10,7 @@ import {
 import IconFontAwe from 'react-native-vector-icons/FontAwesome';
 
 import { renderIf } from 'hexaValidation';
+
 export default class ViewErrorMessage extends Component<any, any> {
   constructor(props: any) {
     super(props);
@@ -20,8 +21,8 @@ export default class ViewErrorMessage extends Component<any, any> {
   }
 
   componentWillReceiveProps = (nextProps: any) => {
-    let data = nextProps.data;
-    //console.log( { data } );
+    const { data } = nextProps;
+    // console.log( { data } );
     if (data != undefined) {
       this.setState({
         data: data[0].data[0],
@@ -31,8 +32,8 @@ export default class ViewErrorMessage extends Component<any, any> {
   };
 
   render = () => {
-    //array
-    let { data, type } = this.state;
+    // array
+    const { data, type } = this.state;
     return (
       <View
         style={[

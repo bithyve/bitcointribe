@@ -6,11 +6,11 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 import { SvgIcon } from '@up-shared/components';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
-var utils = require('hexaUtils');
+// TODO: Custome Object
+const utils = require('hexaUtils');
 
 interface Props {
   data: [];
@@ -28,7 +28,7 @@ export default class ModelWalletName extends Component<Props, any> {
     };
   }
 
-  //TODO: Wallet Name
+  // TODO: Wallet Name
   ckeckWalletName(val: string) {
     if (val.length >= 3) {
       this.setState({
@@ -42,8 +42,8 @@ export default class ModelWalletName extends Component<Props, any> {
   }
 
   render() {
-    let data = this.props.data.length != 0 ? this.props.data : [];
-    let flag_DisableBtnNext = this.state.flag_DisableBtnNext;
+    const data = this.props.data.length != 0 ? this.props.data : [];
+    const { flag_DisableBtnNext } = this.state;
     return (
       <Modal
         transparent

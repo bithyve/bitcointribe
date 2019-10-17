@@ -1,3 +1,9 @@
+/* eslint-disable no-return-assign */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-continue */
+/* eslint-disable no-unused-vars */
 import { AxiosResponse } from 'axios';
 import bip32 from 'bip32';
 import bip39 from 'react-native-bip39';
@@ -11,18 +17,27 @@ const { BH_AXIOS } = config;
 
 export default class SecureHDWallet extends Bitcoin {
   private primaryMnemonic: string;
+
   private secondaryMnemonic: string;
+
   private walletID: string;
+
   private xpubs: {
     primary: string;
     secondary: string;
     bh: string;
   };
+
   private consumedAddresses: string[];
+
   private nextFreeChildIndex: number;
+
   private primaryXpriv: string;
+
   private multiSigCache;
+
   private signingEssentialsCache;
+
   private gapLimit: number;
 
   private cipherSpec: {
@@ -137,9 +152,8 @@ export default class SecureHDWallet extends Bitcoin {
     const secondaryXpub = decrypted;
     if (this.validateXpub(secondaryXpub)) {
       return { secondaryXpub };
-    } else {
-      throw new Error('Secondary Xpub is either tampered or is invalid');
     }
+    throw new Error('Secondary Xpub is either tampered or is invalid');
   };
 
   public checkHealth = async (
@@ -171,7 +185,7 @@ export default class SecureHDWallet extends Bitcoin {
   }> => {
     try {
       if (!(await this.isWalletEmpty())) {
-        console.log('Executing consumed binary search');
+        // console.log('Executing consumed binary search');
         this.nextFreeChildIndex = await this.binarySearchIterationForConsumedAddresses(
           config.BSI.INIT_INDEX,
         );
@@ -219,10 +233,7 @@ export default class SecureHDWallet extends Bitcoin {
       await this.fetchBalance();
     }
 
-    return await this.fetchTransactionsByAddresses(
-      this.consumedAddresses,
-      'Secure',
-    );
+    return this.fetchTransactionsByAddresses(this.consumedAddresses, 'Secure');
   };
 
   public getReceivingAddress = async (): Promise<{ address: string }> => {
@@ -250,9 +261,9 @@ export default class SecureHDWallet extends Bitcoin {
       if (!freeAddress) {
         // giving up as we could find a free address in the above cycle
 
-        console.log(
-          'Failed to find a free address in the above cycle, using the next address without checking',
-        );
+        // console.log(
+        //   'Failed to find a free address in the above cycle, using the next address without checking',
+        // );
         const multiSig = this.createSecureMultiSig(
           this.nextFreeChildIndex + itr,
         );
@@ -274,7 +285,7 @@ export default class SecureHDWallet extends Bitcoin {
   }> => {
     let res: AxiosResponse;
     try {
-      console.log({ walletID: this.walletID });
+      // console.log({ walletID: this.walletID });
       res = await BH_AXIOS.post('setupSecureAccount', {
         walletID: this.walletID,
       });
@@ -290,11 +301,8 @@ export default class SecureHDWallet extends Bitcoin {
       const { prepared } = this.prepareSecureAccount(setupData.bhXpub);
       if (prepared) {
         return { setupData };
-      } else {
-        throw new Error(
-          'Something went wrong; unable to prepare secure account',
-        );
       }
+      throw new Error('Something went wrong; unable to prepare secure account');
     }
   };
 
@@ -344,7 +352,7 @@ export default class SecureHDWallet extends Bitcoin {
       if (!output.address) {
         const { address } = await this.getReceivingAddress();
         output.address = address;
-        console.log(`adding the change address: ${output.address}`);
+        // console.log(`adding the change address: ${output.address}`);
       }
     }
 
@@ -357,7 +365,7 @@ export default class SecureHDWallet extends Bitcoin {
       }
       return 0;
     });
-    console.log({ sortedOutputs: outputs });
+    // console.log({ sortedOutputs: outputs });
 
     return outputs;
   };
@@ -388,9 +396,9 @@ export default class SecureHDWallet extends Bitcoin {
   > => {
     try {
       const inputUTXOs = await this.fetchUtxo();
-      console.log('Input UTXOs:', inputUTXOs);
+      // console.log('Input UTXOs:', inputUTXOs);
       const outputUTXOs = [{ address: recipientAddress, value: amount }];
-      console.log('Output UTXOs:', outputUTXOs);
+      // console.log('Output UTXOs:', outputUTXOs);
       const txnFee = await this.feeRatesPerByte(txnPriority);
       let balance: number = 0;
       inputUTXOs.forEach(utxo => {
@@ -401,10 +409,10 @@ export default class SecureHDWallet extends Bitcoin {
         outputUTXOs,
         txnFee,
       );
-      console.log('-------Transaction--------');
-      console.log('\tFee', fee);
-      console.log('\tInputs:', inputs);
-      console.log('\tOutputs:', outputs);
+      // console.log('-------Transaction--------');
+      // console.log('\tFee', fee);
+      // console.log('\tInputs:', inputs);
+      // console.log('\tOutputs:', outputs);
 
       if (!inputs) {
         // insufficient input utxos to compensate for output utxos + fee
@@ -418,7 +426,7 @@ export default class SecureHDWallet extends Bitcoin {
       inputs.forEach(input => txb.addInput(input.txId, input.vout, nSequence));
       const sortedOuts = await this.sortOutputs(outputs);
       sortedOuts.forEach(output => {
-        console.log('Adding Output:', output);
+        // console.log('Adding Output:', output);
         txb.addOutput(output.address, output.value);
       });
 
@@ -447,11 +455,11 @@ export default class SecureHDWallet extends Bitcoin {
     }>;
   } => {
     try {
-      console.log('------ Transaction Signing ----------');
+      // console.log('------ Transaction Signing ----------');
       let vin = 0;
       const childIndexArray = [];
       inputs.forEach(input => {
-        console.log('Signing Input:', input);
+        // console.log('Signing Input:', input);
         const { multiSig, primaryPriv, childIndex } = this.getSigningEssentials(
           input.address,
         );
@@ -502,12 +510,12 @@ export default class SecureHDWallet extends Bitcoin {
         throw new Error(err.response.data.err);
       }
 
-      console.log(
-        '---- Transaction Signed by BH Server (2nd sig for 2/3 MultiSig)----',
-      );
+      // console.log(
+      //   '---- Transaction Signed by BH Server (2nd sig for 2/3 MultiSig)----',
+      // );
 
-      console.log({ txHex: res.data.txHex });
-      console.log('------ Broadcasting Transaction --------');
+      // console.log({ txHex: res.data.txHex });
+      // console.log('------ Broadcasting Transaction --------');
 
       const { txid } = await this.broadcastTransaction(res.data.txHex);
       return { txid };
@@ -567,7 +575,7 @@ export default class SecureHDWallet extends Bitcoin {
       }
     }
 
-    throw new Error('Could not find WIF for ' + address);
+    throw new Error(`Could not find WIF for ${address}`);
   };
 
   private fetchUtxo = async (): Promise<
@@ -593,6 +601,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  // eslint-disable-next-line consistent-return
   private gapLimitCatchUp = async () => {
     // scanning future addressess in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
     let tryAgain = false;
@@ -624,9 +633,8 @@ export default class SecureHDWallet extends Bitcoin {
         emptyWallet = true;
       }
       return emptyWallet;
-    } else {
-      return false;
     }
+    return false;
   };
 
   private binarySearchIterationForConsumedAddresses = async (
@@ -635,7 +643,7 @@ export default class SecureHDWallet extends Bitcoin {
     minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
     depth: number = config.BSI.DEPTH.INIT,
   ) => {
-    console.log({ depth });
+    // console.log({ depth });
     if (depth >= config.BSI.DEPTH.LIMIT) {
       return maxUsedIndex + 1;
     } // fail
@@ -649,7 +657,7 @@ export default class SecureHDWallet extends Bitcoin {
     ]);
 
     if (txCounts[indexMultiSig.address] === 0) {
-      console.log({ index });
+      // console.log({ index });
       if (index === 0) {
         return 0;
       }
@@ -681,14 +689,13 @@ export default class SecureHDWallet extends Bitcoin {
     const root = bip32.fromSeed(seed, this.network);
     if (!priv) {
       const xpub = root
-        .derivePath('m/' + path)
+        .derivePath(`m/${path}`)
         .neutered()
         .toBase58();
       return xpub;
-    } else {
-      const xpriv = root.derivePath('m/' + path).toBase58();
-      return xpriv;
     }
+    const xpriv = root.derivePath(`m/${path}`).toBase58();
+    return xpriv;
   };
 
   private getPub = (extendedKey: string): string => {
@@ -738,7 +745,7 @@ export default class SecureHDWallet extends Bitcoin {
       return this.multiSigCache[childIndex];
     } // cache hit
 
-    console.log(`creating multiSig against index: ${childIndex}`);
+    // console.log(`creating multiSig against index: ${childIndex}`);
 
     const childPrimaryPub = this.getPub(
       this.deriveChildXKey(this.xpubs.primary, childIndex),

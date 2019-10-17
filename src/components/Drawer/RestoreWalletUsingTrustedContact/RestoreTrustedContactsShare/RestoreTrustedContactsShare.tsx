@@ -14,26 +14,27 @@ import { Avatar } from 'react-native-elements';
 import SendSMS from 'react-native-sms';
 import Modal from 'react-native-modalbox';
 
-//import Mailer from 'react-native-mail';
-var Mailer = require('NativeModules').RNMail;
-
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 import { ModelLoader } from 'hexaLoader';
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
 import { renderIf } from 'hexaValidation';
-var utils = require('hexaUtils');
+
+// import Mailer from 'react-native-mail';
+const Mailer = require('NativeModules').RNMail;
+
+const alert = new AlertSimple();
+const utils = require('hexaUtils');
 
 export default class RestoreTrustedContactsShare extends React.Component<
   any,
@@ -51,14 +52,16 @@ export default class RestoreTrustedContactsShare extends React.Component<
   }
 
   async componentWillMount() {
-    let data = this.props.navigation.getParam('data');
-    let title = this.props.navigation.getParam('title');
+    const data = this.props.navigation.getParam('data');
+    const title = this.props.navigation.getParam('title');
     console.log({ data });
-    let arr_History = JSON.parse(data.sssDetails.history);
-    let acceptedDate = data.sssDetails.acceptedDate;
-    let sharedDate = data.sssDetails.sharedDate;
+    const arr_History = JSON.parse(data.sssDetails.history);
+    const { acceptedDate } = data.sssDetails;
+    const { sharedDate } = data.sssDetails;
     console.log({ acceptedDate, sharedDate });
-    let flag_ShareBtnDisable, flag_ReShareBtnDisable, flag_ConfrimBtnDisable;
+    let flag_ShareBtnDisable;
+    let flag_ReShareBtnDisable;
+    let flag_ConfrimBtnDisable;
     if (sharedDate == '' && acceptedDate == '') {
       flag_ReShareBtnDisable = false;
       flag_ShareBtnDisable = true;
@@ -79,7 +82,7 @@ export default class RestoreTrustedContactsShare extends React.Component<
     });
   }
 
-  //TODO: Sharing
+  // TODO: Sharing
   click_Share(data: any) {
     this.refs.modal4.open();
 
@@ -129,7 +132,7 @@ export default class RestoreTrustedContactsShare extends React.Component<
     // }
   }
 
-  //TODO: Re-Share Share
+  // TODO: Re-Share Share
 
   click_ReShare(data: any) {
     alert.simpleOk('Oops', 'coming soon');
@@ -161,19 +164,19 @@ export default class RestoreTrustedContactsShare extends React.Component<
     // }
   };
 
-  //TODO: Share or Reshare button on click
+  // TODO: Share or Reshare button on click
   click_SentRequest(type: string, data: any) {
     console.log({ data });
-    let script = {};
+    const script = {};
     script.mg = 'Please select requested share to return back';
-    var encpScript = utils.encrypt(JSON.stringify(script), '122334');
+    let encpScript = utils.encrypt(JSON.stringify(script), '122334');
     encpScript = encpScript.split('/').join('_+_');
     if (type == 'SMS') {
-      let number =
+      const number =
         data.phoneNumbers.length != 0 ? data.phoneNumbers[0].number : '';
       SendSMS.send(
         {
-          body: 'https://prime-sign-230407.appspot.com/sss/req/' + encpScript,
+          body: `https://prime-sign-230407.appspot.com/sss/req/${encpScript}`,
           recipients: [number],
           successTypes: ['sent', 'queued'],
         },
@@ -204,21 +207,19 @@ export default class RestoreTrustedContactsShare extends React.Component<
         },
       );
     } else if (type == 'EMAIL') {
-      let email =
+      const email =
         data.emailAddresses.length != 0 ? data.emailAddresses[0].email : '';
       if (Platform.OS == 'android') {
         Mailer.mail(
           {
             subject: 'Hexa Wallet SSS Restore',
             recipients: [email],
-            body:
-              "Hexa wallet request you it's share back to restore wallet. Please tap on the link to return share <br> https://prime-sign-230407.appspot.com/sss/req/" +
-              encpScript,
+            body: `Hexa wallet request you it's share back to restore wallet. Please tap on the link to return share <br> https://prime-sign-230407.appspot.com/sss/req/${encpScript}`,
             isHTML: true,
           },
           (error, event) => {
             if (event == 'sent') {
-              //this.reloadList( "Email" );
+              // this.reloadList( "Email" );
             } else {
               alert.simpleOk('Oops', error);
             }
@@ -236,9 +237,7 @@ export default class RestoreTrustedContactsShare extends React.Component<
           {
             subject: 'Hexa Wallet SSS Restore',
             recipients: [email],
-            body:
-              "Hexa wallet request you it's share back to restore wallet. Please tap on the link to return share <br> https://prime-sign-230407.appspot.com/sss/req/" +
-              encpScript,
+            body: `Hexa wallet request you it's share back to restore wallet. Please tap on the link to return share <br> https://prime-sign-230407.appspot.com/sss/req/${encpScript}`,
             isHTML: true,
           },
           (error, event) => {
@@ -259,7 +258,7 @@ export default class RestoreTrustedContactsShare extends React.Component<
       }
     } else {
       this.props.navigation.push('RestoreTrustedContactsQRCodeScan', {
-        data: data,
+        data,
         onSelect: this.onSelect,
       });
     }
@@ -267,12 +266,12 @@ export default class RestoreTrustedContactsShare extends React.Component<
   }
 
   render() {
-    //array
-    let { data, arr_History } = this.state;
-    //Value
-    let { title } = this.state;
-    //flag
-    let { flag_ShareBtnDisable, flag_ReShareBtnDisable } = this.state;
+    // array
+    const { data, arr_History } = this.state;
+    // Value
+    const { title } = this.state;
+    // flag
+    const { flag_ShareBtnDisable, flag_ReShareBtnDisable } = this.state;
     return (
       <Container>
         <ImageBackground
@@ -439,7 +438,7 @@ export default class RestoreTrustedContactsShare extends React.Component<
                     />,
                   )}
                   <Text style={{ marginBottom: 10 }}>
-                    {data.givenName + ' ' + data.familyName}
+                    {`${data.givenName} ${data.familyName}`}
                   </Text>
                 </View>
                 <View style={{ alignItems: 'center' }}>
@@ -561,7 +560,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F8F8',
   },
-  //botom model
+  // botom model
   modal: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,

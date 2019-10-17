@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import { TransactionBuilder } from 'bitcoinjs-lib';
 import config from '../../Config';
 import SecureHDWallet from '../../utilities/accounts/SecureHDWallet';
@@ -111,16 +112,17 @@ export default class SecureAccount {
         data?: undefined;
       }
   > => {
+    let tempXpub: any = bhXpub;
     try {
-      if (!bhXpub) {
+      if (!tempXpub) {
         if (!token) {
           throw new Error('Neither a bhXpub nor a token is provided');
         }
         const res = await this.secureHDWallet.importBHXpub(token);
-        bhXpub = res.bhXpub;
+        tempXpub = res.bhXpub;
       }
       const { prepared } = this.secureHDWallet.prepareSecureAccount(
-        bhXpub,
+        tempXpub,
         secondaryXpub,
       );
 
@@ -477,9 +479,9 @@ export default class SecureAccount {
     try {
       if (this.secureHDWallet.isValidAddress(recipientAddress)) {
         // amount = Math.round(amount * 1e8); // converting into sats
-        amount = Math.round(amount);
+        const amt = Math.round(amount);
 
-        console.log('---- Creating Transaction ----');
+        // console.log('---- Creating Transaction ----');
         const {
           inputs,
           txb,
@@ -487,7 +489,7 @@ export default class SecureAccount {
           balance,
         } = await this.secureHDWallet.createHDTransaction(
           recipientAddress,
-          amount,
+          amt,
           priority.toLowerCase(),
         );
 
@@ -500,16 +502,15 @@ export default class SecureAccount {
           };
         }
         if (inputs && txb) {
-          console.log('---- Transaction Created ----');
+          // console.log('---- Transaction Created ----');
           return {
             status: config.STATUS.SUCCESS,
             data: { inputs, txb, fee },
           };
-        } else {
-          throw new Error(
-            'Unable to create transaction: inputs failed at coinselect',
-          );
         }
+        throw new Error(
+          'Unable to create transaction: inputs failed at coinselect',
+        );
       } else {
         throw new Error('Recipient address is wrong');
       }
@@ -555,9 +556,9 @@ export default class SecureAccount {
 
       const txHex = signedTxb.buildIncomplete().toHex();
 
-      console.log(
-        '---- Transaction signed by the user (1st sig for 2/3 MultiSig)----',
-      );
+      // console.log(
+      //   '---- Transaction signed by the user (1st sig for 2/3 MultiSig)----',
+      // );
 
       return {
         status: config.STATUS.SUCCESS,

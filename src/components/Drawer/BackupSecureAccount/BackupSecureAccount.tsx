@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-//TODO: Custome Compontes
+// TODO: Custome Compontes
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import {
   ModelBackupSecureAccount,
@@ -18,7 +18,7 @@ import {
   ModelSecureAccountFailedBackup,
 } from 'hexaCustModel';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
 
 export default class BackupSecureAccount extends Component {
@@ -34,8 +34,8 @@ export default class BackupSecureAccount extends Component {
   }
 
   async componentDidMount() {
-    let data = this.props.navigation.getParam('data');
-    //console.log( { data } );
+    const data = this.props.navigation.getParam('data');
+    // console.log( { data } );
     if (Platform.OS == 'android') {
       try {
         await PermissionsAndroid.request(
@@ -94,7 +94,7 @@ export default class BackupSecureAccount extends Component {
                     arr_ModelAuto6DigitCode: [
                       {
                         modalVisible: true,
-                        data: data,
+                        data,
                       },
                     ],
                   });

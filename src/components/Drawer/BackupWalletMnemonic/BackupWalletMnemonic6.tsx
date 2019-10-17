@@ -3,16 +3,16 @@ import { StyleSheet, View, FlatList } from 'react-native';
 import { Text, List, ListItem } from 'native-base';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-//NsNotification
+// NsNotification
 import BackboneEvents from 'backbone-events-standalone';
-// global event bus
-window.EventBus = BackboneEvents.mixin({});
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
+// global event bus
+window.EventBus = BackboneEvents.mixin({});
 
 export default class BackupWalletMnemonic6 extends React.Component<any, any> {
   constructor(props: any) {
@@ -20,13 +20,13 @@ export default class BackupWalletMnemonic6 extends React.Component<any, any> {
     this.state = {};
   }
 
-  //TODO: func click_Proceed
+  // TODO: func click_Proceed
   async click_Next() {
     window.EventBus.trigger('swipeNext', 'optional event info');
   }
 
   render() {
-    let data = this.props.data.length != 0 ? this.props.data : 'temp';
+    const data = this.props.data.length != 0 ? this.props.data : 'temp';
     return (
       <View style={styles.container}>
         <KeyboardAwareScrollView

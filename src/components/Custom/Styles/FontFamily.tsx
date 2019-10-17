@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-  //TODO: fonts
-  //FiraSans
+  // TODO: fonts
+  // FiraSans
   ffFiraSansRegular: {
     fontFamily: 'FiraSans-Regular',
   },
@@ -21,7 +21,7 @@ export default StyleSheet.create({
   ffFiraSansItalic: {
     fontFamily: 'FiraSans-Italic',
   },
-  //OpenSans
+  // OpenSans
   ffOpenSansBold: {
     fontFamily: 'OpenSans-Bold',
   },

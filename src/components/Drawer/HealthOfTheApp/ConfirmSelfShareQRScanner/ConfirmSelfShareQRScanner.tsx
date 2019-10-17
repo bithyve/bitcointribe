@@ -1,18 +1,19 @@
 import React from 'react';
 import { ImageBackground, StyleSheet, SafeAreaView } from 'react-native';
 import { Container, Text } from 'native-base';
-//import BarcodeScanner from "react-native-barcode-scanners";
+// import BarcodeScanner from "react-native-barcode-scanners";
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 
-//TODO: Custome object
+// TODO: Custome object
 import { colors, images } from 'hexaConstants';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
+
+const alert = new AlertSimple();
 
 let flag_ReadQRCode = true;
 
@@ -29,8 +30,8 @@ export default class ConfirmSelfShareQRScanner extends React.Component {
       'willFocus',
       () => {
         flag_ReadQRCode = true;
-        let data = this.props.navigation.getParam('data');
-        //console.log( { data } );
+        const data = this.props.navigation.getParam('data');
+        // console.log( { data } );
         this.setState({
           data,
         });
@@ -52,15 +53,15 @@ export default class ConfirmSelfShareQRScanner extends React.Component {
 
   barcodeReceived = async (e: any) => {
     try {
-      var result = e.data;
+      let result = e.data;
       result = result.split('Doublequote').join('"');
       result = result.split('Leftbrace').join('{');
       result = result.split('Rightbrace').join('}');
       result = result.split('Slash').join('/');
       result = result.split('Comma').join(',');
       result = result.split('Space').join(' ');
-      let { data } = this.state;
-      //console.log( { result, data } );
+      const { data } = this.state;
+      // console.log( { result, data } );
       if (result == data) {
         if (flag_ReadQRCode) {
           flag_ReadQRCode = false;
@@ -68,22 +69,20 @@ export default class ConfirmSelfShareQRScanner extends React.Component {
           navigation.goBack();
           navigation.state.params.onSelect({
             selected: true,
-            result: result,
-            data: data,
+            result,
+            data,
           });
         }
-      } else {
-        if (flag_ReadQRCode) {
-          flag_ReadQRCode = false;
-          alert.simpleOkAction(
-            'Oops',
-            'Invalid qrcode please scan first share qrcode.',
-            this.click_resetFlag,
-          );
-        }
+      } else if (flag_ReadQRCode) {
+        flag_ReadQRCode = false;
+        alert.simpleOkAction(
+          'Oops',
+          'Invalid qrcode please scan first share qrcode.',
+          this.click_resetFlag,
+        );
       }
     } catch (error) {
-      //console.log( error );
+      // console.log( error );
     }
   };
 

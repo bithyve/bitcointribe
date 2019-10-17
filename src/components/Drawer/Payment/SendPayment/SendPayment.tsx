@@ -23,16 +23,16 @@ import { SvgIcon } from '@up-shared/components';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Slider, CheckBox } from 'react-native-elements';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 import { ModelLoader } from 'hexaLoader';
 import { FullLinearGradientLoadingButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
 import { renderIf } from 'hexaValidation';
 
@@ -41,12 +41,12 @@ import {
   onSendAmount,
 } from '../../../../redux/payment/controller';
 
-var utils = require('hexaUtils');
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+const utils = require('hexaUtils');
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
 
-//TODO: Bitcoin Files
-var bitcoinClassState = require('hexaClassState');
+// TODO: Bitcoin Files
+const bitcoinClassState = require('hexaClassState');
 
 export default class SendPayment extends React.Component<any, any> {
   constructor(props: any) {
@@ -60,7 +60,7 @@ export default class SendPayment extends React.Component<any, any> {
       selectedAccountBal: 0,
       memoMsg: 'Add Memo',
       tranPrio: 1,
-      //flag
+      // flag
       flag_Memo: false,
       flag_DisableSentBtn: true,
       flag_SentBtnAnimation: false,
@@ -69,10 +69,10 @@ export default class SendPayment extends React.Component<any, any> {
   }
 
   componentWillMount = async () => {
-    //class value reset
+    // class value reset
     const { navigation } = this.props;
-    let data = navigation.getParam('data');
-    let selectedAccount = navigation.getParam('selectedAccount');
+    const data = navigation.getParam('data');
+    const selectedAccount = navigation.getParam('selectedAccount');
 
     const details = await getAccountDetails({ data, selectedAccount });
     this.setState({ ...details });
@@ -112,9 +112,9 @@ export default class SendPayment extends React.Component<any, any> {
     //     temp.push( jsonData );
     // }
 
-    //console.log( { amount, accountbal, address } );
+    // console.log( { amount, accountbal, address } );
 
-    //Sent button Enable and Disable
+    // Sent button Enable and Disable
     // if ( amount != "" && parseFloat( amount ) > parseFloat( accountbal ) && address != "" ) {
     //     flag_DisableSentBtn = false;
     // } else {
@@ -136,9 +136,9 @@ export default class SendPayment extends React.Component<any, any> {
   }
 
   setAmount() {
-    let { amount, selectedAccountBal } = this.state;
-    let enterAmount = parseFloat(amount);
-    var flag_DisableSentBtn;
+    const { amount, selectedAccountBal } = this.state;
+    const enterAmount = parseFloat(amount);
+    let flag_DisableSentBtn;
     if (enterAmount != 0 && enterAmount < parseFloat(selectedAccountBal)) {
       flag_DisableSentBtn = false;
     } else if (enterAmount >= parseFloat(selectedAccountBal)) {
@@ -151,18 +151,18 @@ export default class SendPayment extends React.Component<any, any> {
     });
   }
 
-  //Change account details on account list
+  // Change account details on account list
   selectAccount(index: any) {
-    let enterAmount = parseFloat(this.state.amount);
+    const enterAmount = parseFloat(this.state.amount);
     console.log({ enterAmount });
-    var temp = [],
-      arr_SelectAccountDetails = [],
-      selectedAccountBal;
-    let { arr_AccountList } = this.state;
+    const temp = [];
+    let arr_SelectAccountDetails = [];
+    let selectedAccountBal;
+    const { arr_AccountList } = this.state;
     console.log({ arr_AccountList });
     for (let i = 0; i < arr_AccountList.length; i++) {
-      let item = arr_AccountList[i];
-      let data = {};
+      const item = arr_AccountList[i];
+      const data = {};
       if (i == index) {
         data.checked = true;
         arr_SelectAccountDetails = item;
@@ -175,7 +175,7 @@ export default class SendPayment extends React.Component<any, any> {
       temp.push(data);
     }
     console.log({ selectedAccountBal });
-    var flag_DisableSentBtn;
+    let flag_DisableSentBtn;
     if (enterAmount != 0 && enterAmount < selectedAccountBal) {
       flag_DisableSentBtn = false;
     } else if (enterAmount >= selectedAccountBal) {
@@ -192,9 +192,9 @@ export default class SendPayment extends React.Component<any, any> {
     });
   }
 
-  //TODO: Send they amount
+  // TODO: Send they amount
   click_SendAmount = async () => {
-    let {
+    const {
       arr_SelectAccountDetails,
       address,
       amount,
@@ -229,9 +229,9 @@ export default class SendPayment extends React.Component<any, any> {
         flag_DisableSentBtn: false,
         flag_SentBtnAnimation: false,
       });
-      let msg =
+      const msg =
         resTransferST.data != undefined
-          ? resTransferST.err + '\n Total Fee = ' + resTransferST.data.fee
+          ? `${resTransferST.err}\n Total Fee = ${resTransferST.data.fee}`
           : resTransferST.err;
       setTimeout(() => {
         Alert.alert(
@@ -263,13 +263,13 @@ export default class SendPayment extends React.Component<any, any> {
   //     }
   // }
 
-  //TODO: When qrcode  scan
+  // TODO: When qrcode  scan
   getAddressWithBal = (e: any) => {
     console.log({ e });
-    let { amount } = this.state;
-    let data = e.data;
+    const { amount } = this.state;
+    const { data } = e;
     console.log({ data });
-    let address = data != undefined ? data.address : '';
+    const address = data != undefined ? data.address : '';
     console.log({ address });
     if (address != '') {
       if (data.type != 'address') {
@@ -297,14 +297,14 @@ export default class SendPayment extends React.Component<any, any> {
     console.log({ address, amount });
     this.setState({
       address,
-      amount: amount,
+      amount,
       flag_DisableSentBtn,
     });
   }
 
   _renderItem({ item, index }) {
     return (
-      <View key={'card' + index}>
+      <View key={`card${index}`}>
         <View style={{ flex: 1, marginTop: -20 }}>
           <List>
             <ListItem style={{ marginRight: 18 }}>
@@ -356,12 +356,12 @@ export default class SendPayment extends React.Component<any, any> {
   }
 
   render() {
-    //array
-    let { arr_AccountList } = this.state;
-    //values
-    let { amount, tranPrio, memoMsg, memo, address } = this.state;
-    //flag
-    let {
+    // array
+    const { arr_AccountList } = this.state;
+    // values
+    const { amount, tranPrio, memoMsg, memo, address } = this.state;
+    // flag
+    const {
       flag_Memo,
       flag_DisableSentBtn,
       flag_Loading,

@@ -8,6 +8,7 @@ export default class ImageSVG extends Component<any, any> {
   constructor(props: any) {
     super(props);
   }
+
   render() {
     return (
       <View>

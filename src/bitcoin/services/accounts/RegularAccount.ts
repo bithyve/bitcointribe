@@ -1,4 +1,5 @@
 import bip39 from 'react-native-bip39';
+// eslint-disable-next-line no-unused-vars
 import { TransactionBuilder } from 'bitcoinjs-lib';
 import config from '../../Config';
 import HDSegwitWallet from '../../utilities/accounts/HDSegwitWallet';
@@ -40,6 +41,7 @@ export default class RegularAccount {
       gapLimit,
     });
   };
+
   private hdWallet: HDSegwitWallet;
 
   constructor(
@@ -56,13 +58,13 @@ export default class RegularAccount {
       gapLimit: number;
     },
   ) {
-    console.log('====================================');
-    console.log({ mnemonic });
-    console.log(bip39.validateMnemonic);
+    // console.log('====================================');
+    // console.log({ mnemonic });
+    // console.log(bip39.validateMnemonic);
 
-    console.log('====================================');
+    // console.log('====================================');
     if (bip39.validateMnemonic(mnemonic)) {
-      console.log('Here');
+      // console.log('Here');
 
       this.hdWallet = new HDSegwitWallet(
         mnemonic,
@@ -401,7 +403,7 @@ export default class RegularAccount {
     try {
       if (this.hdWallet.isValidAddress(recipientAddress)) {
         // amount = Math.round(amount); // converting into sats
-        amount = Math.round(amount);
+        const amt = Math.round(amount);
 
         const {
           inputs,
@@ -410,7 +412,7 @@ export default class RegularAccount {
           balance,
         } = await this.hdWallet.createHDTransaction(
           recipientAddress,
-          amount,
+          amt,
           priority.toLowerCase(),
         );
 
@@ -424,16 +426,15 @@ export default class RegularAccount {
         }
 
         if (inputs && txb) {
-          console.log('---- Transaction Created ----');
+          // console.log('---- Transaction Created ----');
           return {
             status: config.STATUS.SUCCESS,
             data: { inputs, txb, fee },
           };
-        } else {
-          throw new Error(
-            'Unable to create transaction: inputs failed at coinselect',
-          );
         }
+        throw new Error(
+          'Unable to create transaction: inputs failed at coinselect',
+        );
       } else {
         throw new Error('Recipient address is wrong');
       }
@@ -466,12 +467,12 @@ export default class RegularAccount {
   > => {
     try {
       const signedTxb = this.hdWallet.signHDTransaction(inputs, txb);
-      console.log('---- Transaction Signed ----');
+      // console.log('---- Transaction Signed ----');
 
       const txHex = signedTxb.build().toHex();
-      console.log({ txHex });
+      // console.log({ txHex });
       const { txid } = await this.hdWallet.broadcastTransaction(txHex);
-      console.log('---- Transaction Broadcasted ----');
+      // console.log('---- Transaction Broadcasted ----');
 
       return { status: config.STATUS.SUCCESS, data: { txid } };
     } catch (err) {

@@ -11,14 +11,14 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 // import QRCode from "react-native-qrcode";
 import QRCode from 'react-native-qrcode-svg';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
 
 export default class QRCodeDisplay extends React.Component<any, any> {
@@ -32,15 +32,15 @@ export default class QRCodeDisplay extends React.Component<any, any> {
   }
 
   async componentWillMount() {
-    let data = this.props.navigation.getParam('data');
-    let walletName = this.props.navigation.getParam('walletName');
-    let mobileNo = this.props.navigation.getParam('mobileNo');
-    let qrCodeData = {};
+    const data = this.props.navigation.getParam('data');
+    const walletName = this.props.navigation.getParam('walletName');
+    const mobileNo = this.props.navigation.getParam('mobileNo');
+    const qrCodeData = {};
     qrCodeData.type = 'SSS Restore';
     qrCodeData.wn = walletName;
     // qrCodeData.mo = mobileNo;
     qrCodeData.data = data.toString();
-    //console.log( { qrCodeData } );
+    // console.log( { qrCodeData } );
     this.setState({
       data: JSON.stringify(qrCodeData).toString(),
     });

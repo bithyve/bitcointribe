@@ -9,6 +9,7 @@ import Restore3SelfShare from './RestoreSelfShare/Restore3SelfShare';
 import Restore3SelfSahreQRCodeScanner from './RestoreSelfShare/Restore3SelfSahreQRCodeScanner';
 import Restore4And5SelfShare from './RestoreSelfShare/Restore4And5SelfShare';
 import Restore4And5SelfShareQRCodeScanner from './RestoreSelfShare/Restore4And5SelfShareQRCodeScanner';
+
 export {
   RestoreWalletUsingTrustedContact,
   RestoreAllContactList,

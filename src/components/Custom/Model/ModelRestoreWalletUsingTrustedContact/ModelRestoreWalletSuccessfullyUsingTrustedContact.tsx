@@ -4,12 +4,13 @@ import { Text } from 'native-base';
 
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { images } from 'hexaConstants';
-var utils = require('hexaUtils');
+
+const utils = require('hexaUtils');
 
 interface Props {
   data: [];
@@ -31,7 +32,7 @@ export default class ModelRestoreWalletSuccessfullyUsingTrustedContact extends C
     };
   }
 
-  //TODO: Wallet Name
+  // TODO: Wallet Name
   ckeckWalletName(val: string) {
     if (val.length >= 3) {
       this.setState({
@@ -45,7 +46,7 @@ export default class ModelRestoreWalletSuccessfullyUsingTrustedContact extends C
   }
 
   render() {
-    let data = this.props.data.length != 0 ? this.props.data : [];
+    const data = this.props.data.length != 0 ? this.props.data : [];
     return (
       <Modal
         transparent

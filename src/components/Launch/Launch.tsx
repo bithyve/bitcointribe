@@ -11,7 +11,7 @@ import {
 import { colors, images, asyncStorageKeys } from 'hexaConstants';
 import Singleton from 'HexaWallet/src/app/constants/Singleton';
 
-//TODO: Custom Object
+// TODO: Custom Object
 import { CustomStatusBar } from 'hexaCustStatusBar';
 
 import * as Keychain from 'react-native-keychain';
@@ -30,15 +30,15 @@ export default class Launch extends Component<Props, any> {
   }
 
   async componentDidMount() {
-    let commonData = Singleton.getInstance();
-    let value = await AsyncStorage.getItem(
+    const commonData = Singleton.getInstance();
+    const value = await AsyncStorage.getItem(
       asyncStorageKeys.flag_PasscodeCreate,
     );
-    let rootViewController = await AsyncStorage.getItem(
+    const rootViewController = await AsyncStorage.getItem(
       asyncStorageKeys.rootViewController,
     );
     console.log({ value, rootViewController });
-    let status = JSON.parse(value);
+    const status = JSON.parse(value);
     const credentials = await Keychain.getGenericPassword();
     commonData.setPasscode(credentials.password);
 

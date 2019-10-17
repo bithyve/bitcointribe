@@ -1,8 +1,10 @@
+// eslint-disable-next-line no-unused-vars
 import bitcoinJS, { Transaction, TransactionBuilder } from 'bitcoinjs-lib';
 import Bitcoin from '../../utilities/accounts/Bitcoin';
 
 export default class JointAccount {
   public bitcoin: Bitcoin;
+
   constructor() {
     this.bitcoin = new Bitcoin();
   }
@@ -96,15 +98,15 @@ export default class JointAccount {
   }) => {
     if (this.bitcoin.isValidAddress(recipientAddress)) {
       const { balanceData } = await this.bitcoin.getBalance(senderAddress);
-      console.log({ balance: balanceData.final_balance });
+      // console.log({ balance: balanceData.final_balance });
 
-      console.log('---- Creating Transaction ----');
+      // console.log('---- Creating Transaction ----');
       const { inputs, txb, fee } = await this.bitcoin.createTransaction(
         senderAddress,
         recipientAddress,
         amount,
       );
-      console.log('---- Transaction Created ----');
+      // console.log('---- Transaction Created ----');
 
       if (parseInt(balanceData.final_balance, 10) + fee < amount) {
         throw new Error(
@@ -121,17 +123,16 @@ export default class JointAccount {
       );
 
       const txHex = signedTxb.buildIncomplete().toHex();
-      console.log({ txHex });
+      // console.log({ txHex });
       return {
         status: 200,
         data: txHex,
       };
-    } else {
-      return {
-        status: 400,
-        errorMessage: 'Supplied recipient address is wrong.',
-      };
     }
+    return {
+      status: 400,
+      errorMessage: 'Supplied recipient address is wrong.',
+    };
   };
 
   public recoverTxnDetails = async (txHex: string) => {
@@ -187,7 +188,7 @@ export default class JointAccount {
     );
 
     const reHex = regenSignTx.build().toHex();
-    console.log({ txHex: reHex });
+    // console.log({ txHex: reHex });
     const res = await this.bitcoin.broadcastTransaction(reHex);
     return res;
   };

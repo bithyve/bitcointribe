@@ -59,7 +59,9 @@ const decrypt = (data: any, password: string) => {
   let str = false;
   try {
     str = bytes.toString(CryptoJS.enc.Utf8);
-  } catch (e) {}
+  } catch (e) {
+    /**/
+  }
   return str;
 };
 
@@ -71,7 +73,8 @@ const sortFunction = (a: any, b: any) => {
 };
 
 // TODO: func two date diff days count
-const date_diff_indays = (date1: any, date2: any) => {
+// eslint-disable-next-line consistent-return
+const dateDiffInDays = (date1: any, date2: any) => {
   try {
     const dt1 = new Date(date1);
     const dt2 = new Date(date2);
@@ -81,33 +84,33 @@ const date_diff_indays = (date1: any, date2: any) => {
         (1000 * 60 * 60 * 24),
     );
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 };
 
 const getRandomBetweenNumber = (min: number, max: number) => {
-  const arr_Number = [];
+  const arrNumber = [];
   for (let i = 0; i < 3; i++) {
     const value = min + Math.floor(Math.random() * (max - min));
-    if (arr_Number.indexOf(value) !== -1) {
-      arr_Number.push(min + Math.floor(Math.random() * (max - min)));
+    if (arrNumber.indexOf(value) !== -1) {
+      arrNumber.push(min + Math.floor(Math.random() * (max - min)));
     } else {
-      arr_Number.push(value);
+      arrNumber.push(value);
     }
   }
-  return arr_Number;
+  return arrNumber;
 };
 
 const getDeviceModel = () => {
   const model = DeviceInfo.getModel();
   let modelName;
-  if (model == 'iPhone 6s' || model == 'iPhone 6') {
+  if (model === 'iPhone 6s' || model === 'iPhone 6') {
     modelName = 'Iphone6';
   } else if (
-    model == 'iPhone XS' ||
-    model == 'iPhone XS Max' ||
-    model == 'iPhone XR' ||
-    model == 'iPhone X'
+    model === 'iPhone XS' ||
+    model === 'iPhone XS Max' ||
+    model === 'iPhone XR' ||
+    model === 'iPhone X'
   ) {
     modelName = 'IphoneX';
   }
@@ -118,10 +121,10 @@ const getStatusBarHeight = () => {
   const model = DeviceInfo.getModel();
   let height;
   if (
-    model == 'iPhone XS' ||
-    model == 'iPhone XS Max' ||
-    model == 'iPhone XR' ||
-    model == 'iPhone X'
+    model === 'iPhone XS' ||
+    model === 'iPhone XS Max' ||
+    model === 'iPhone XR' ||
+    model === 'iPhone X'
   ) {
     height = 44;
   } else {
@@ -134,10 +137,10 @@ const getIphoneSize = () => {
   const model = DeviceInfo.getModel();
   let iphoneSeries = 'iphone X';
   if (
-    model == 'iPhone XS' ||
-    model == 'iPhone XS Max' ||
-    model == 'iPhone XR' ||
-    model == 'iPhone X'
+    model === 'iPhone XS' ||
+    model === 'iPhone XS Max' ||
+    model === 'iPhone XR' ||
+    model === 'iPhone X'
   ) {
     iphoneSeries = 'iphone X';
   } else {
@@ -295,8 +298,8 @@ const setFlagQRCodeScreen = (value: any) => {
 // AsyncStorage values get and set
 
 const getAsyncStorage = async (name: any) => {
-  console.log({ value: await AsyncStorage.getItem(asyncStorageKeys[name]) });
-  return await AsyncStorage.getItem(asyncStorageKeys[name]);
+  // console.log({ value: await AsyncStorage.getItem(asyncStorageKeys[name]) });
+  return AsyncStorage.getItem(asyncStorageKeys[name]);
 };
 
 const setAsyncStorage = (name: any, value: any) => {
@@ -315,7 +318,7 @@ module.exports = {
   encryptAgain,
   decrypt,
   sortFunction,
-  date_diff_indays,
+  dateDiffInDays,
   getRandomBetweenNumber,
   getDeviceModel,
   getStatusBarHeight,

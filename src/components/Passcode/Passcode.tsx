@@ -17,22 +17,23 @@ import * as Keychain from 'react-native-keychain';
 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, localDB, asyncStorageKeys } from 'hexaConstants';
 import utils from 'hexaUtils';
 import Singleton from 'hexaSingleton';
-var dbOpration = require('hexaDBOpration');
 import { renderIf } from 'hexaValidation';
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+const dbOpration = require('hexaDBOpration');
+
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
 
 export default class Passcode extends Component {
   constructor(props: any) {
@@ -53,7 +54,7 @@ export default class Passcode extends Component {
     };
   }
 
-  //TODO: Page Life Cycle
+  // TODO: Page Life Cycle
   componentWillMount() {
     try {
       this.retrieveData();
@@ -125,11 +126,11 @@ export default class Passcode extends Component {
         asyncStorageKeys.rootViewController,
       );
 
-      //Wallet Details Reading
+      // Wallet Details Reading
       await comFunDBRead.readTblWallet();
       await comFunDBRead.readTblSSSDetails();
 
-      let pageName = utils.getRootViewController();
+      const pageName = utils.getRootViewController();
       console.log({ pageName });
 
       if (
@@ -163,21 +164,21 @@ export default class Passcode extends Component {
     }
   };
 
-  //TODO: func urlDecription
+  // TODO: func urlDecription
   async urlDecription(code: any) {
     try {
-      let commonData = Singleton.getInstance();
-      let pageName = commonData.getRootViewController();
-      var script = commonData.getDeepLinkingUrl();
+      const commonData = Singleton.getInstance();
+      const pageName = commonData.getRootViewController();
+      let script = commonData.getDeepLinkingUrl();
       script = script.split('_+_').join('/');
-      let deepLinkingUrl = utils.decrypt(script, code.toString());
+      const deepLinkingUrl = utils.decrypt(script, code.toString());
       if (deepLinkingUrl) {
         const resultWallet = await dbOpration.readTablesData(
           localDB.tableName.tblWallet,
         );
         console.log({ resultWallet });
-        let publicKey = resultWallet.temp[0].publicKey;
-        let JsonDeepLinkingData = JSON.parse(deepLinkingUrl);
+        const { publicKey } = resultWallet.temp[0];
+        const JsonDeepLinkingData = JSON.parse(deepLinkingUrl);
         if (publicKey == JsonDeepLinkingData.cpk) {
           console.log('same public key');
           Keyboard.dismiss();
@@ -291,7 +292,7 @@ export default class Passcode extends Component {
                       : { opacity: 0.4 },
                     { borderRadius: 5 },
                   ]}
-                  disabled={this.state.status == true ? false : true}
+                  disabled={this.state.status != true}
                   title="PROCEED"
                   click_Done={() => this.onSuccess(this.state.pincode)}
                 />

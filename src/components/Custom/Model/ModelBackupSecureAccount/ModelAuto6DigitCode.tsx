@@ -6,17 +6,21 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 import { SvgIcon } from '@up-shared/components';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, localDB } from 'hexaConstants';
-var utils = require('hexaUtils');
-var dbOpration = require('hexaDBOpration');
+
+// TODO: Custome Pages
+import { ModelLoader } from 'hexaLoader';
+
+const alert = new AlertSimple();
+const utils = require('hexaUtils');
+const dbOpration = require('hexaDBOpration');
 
 interface Props {
   data: [];
@@ -25,11 +29,8 @@ interface Props {
   pop: Function;
 }
 
-//TODO: Custome Pages
-import { ModelLoader } from 'hexaLoader';
-
-//Bitcoin Files
-var bitcoinClassState = require('hexaClassState');
+// Bitcoin Files
+const bitcoinClassState = require('hexaClassState');
 
 export default class ModelAuto6DigitCode extends Component<Props, any> {
   constructor(props: any) {
@@ -41,7 +42,7 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
     };
   }
 
-  //TODO: Wallet Name
+  // TODO: Wallet Name
   ckeckWalletName(val: string) {
     if (val.length >= 6) {
       this.setState({
@@ -57,36 +58,37 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
       });
     }
   }
-  //TODO: Check code
+
+  // TODO: Check code
   click_Next = async () => {
     this.setState({
       flag_Loading: true,
     });
     const dateTime = Date.now();
-    let resultWallet = await utils.getWalletDetails();
-    //console.log( { resultWallet } );
-    let code = this.state.code;
-    let data = this.props.data.length != 0 ? this.props.data : [];
-    let secureAccountDetails = data[0].data;
-    //console.log( { data } );
-    let setupData = secureAccountDetails.setupData;
-    //console.log( { secureAccountDetails, setupData } );
+    const resultWallet = await utils.getWalletDetails();
+    // console.log( { resultWallet } );
+    const { code } = this.state;
+    const data = this.props.data.length != 0 ? this.props.data : [];
+    const secureAccountDetails = data[0].data;
+    // console.log( { data } );
+    const { setupData } = secureAccountDetails;
+    // console.log( { secureAccountDetails, setupData } );
     // const secureAccount = new SecureAccount( resultWallet.mnemonic );
-    let secureAccount = await bitcoinClassState.getSecureClassState();
-    let sss = await bitcoinClassState.getS3ServiceClassState();
-    //console.log( { secureAccount } );
-    let sssDetails = await utils.getSSSDetails();
+    const secureAccount = await bitcoinClassState.getSecureClassState();
+    const sss = await bitcoinClassState.getS3ServiceClassState();
+    // console.log( { secureAccount } );
+    const sssDetails = await utils.getSSSDetails();
     let encryptedStaticNonPMDD;
-    //console.log( { sssDetails } );
+    // console.log( { sssDetails } );
     for (let i = 0; i < sssDetails.length; i++) {
-      let data = sssDetails[i];
+      const data = sssDetails[i];
       if (data.decryptedShare != '') {
         if (
           data.type == 'Self Share 1' ||
           data.type == 'Self Share 2' ||
           data.type == 'Self Share 3'
         ) {
-          let decryptedShareJson = JSON.parse(data.decryptedShare);
+          const decryptedShareJson = JSON.parse(data.decryptedShare);
           encryptedStaticNonPMDD = decryptedShareJson.encryptedStaticNonPMDD;
           break;
         }
@@ -128,7 +130,7 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
           Alert.alert('Secure account db not update!');
         }
       } else {
-        var resDecryptStaticNonPMDD = await sss.decryptStaticNonPMDD(
+        let resDecryptStaticNonPMDD = await sss.decryptStaticNonPMDD(
           encryptedStaticNonPMDD,
         );
         if (resDecryptStaticNonPMDD.status == 200) {
@@ -136,7 +138,7 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
         } else {
           alert.simpleOk('Oops', resDecryptStaticNonPMDD.err);
         }
-        var resValidateSecureAccountSetup = await secureAccount.validateSecureAccountSetup(
+        let resValidateSecureAccountSetup = await secureAccount.validateSecureAccountSetup(
           code,
           resDecryptStaticNonPMDD.decryptedStaticNonPMDD.twoFASecret,
           resDecryptStaticNonPMDD.decryptedStaticNonPMDD.xIndex,
@@ -186,9 +188,9 @@ export default class ModelAuto6DigitCode extends Component<Props, any> {
   };
 
   render() {
-    let data = this.props.data.length != 0 ? this.props.data : [];
-    let flag_DisableBtnNext = this.state.flag_DisableBtnNext;
-    let flag_Loading = this.state.flag_Loading;
+    const data = this.props.data.length != 0 ? this.props.data : [];
+    const { flag_DisableBtnNext } = this.state;
+    const { flag_Loading } = this.state;
     return (
       <Modal
         transparent

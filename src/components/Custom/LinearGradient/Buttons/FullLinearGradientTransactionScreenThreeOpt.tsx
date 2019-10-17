@@ -4,7 +4,7 @@ import { Button } from 'native-base';
 import LinearGradient from 'react-native-linear-gradient';
 import { SvgIcon } from '@up-shared/components';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
 interface Props {

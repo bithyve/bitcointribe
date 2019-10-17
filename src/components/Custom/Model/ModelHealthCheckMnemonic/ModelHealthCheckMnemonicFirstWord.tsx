@@ -7,6 +7,13 @@ import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
 import { SvgIcon } from '@up-shared/components';
 
+// TODO: Custome StyleSheet Files
+import FontFamily from 'hexaStyles';
+
+// TODO: Custome Object
+import { images, colors } from 'hexaConstants';
+import { renderIf } from 'hexaValidation';
+
 interface Props {
   data: [];
   closeModal: Function;
@@ -14,13 +21,6 @@ interface Props {
   pop: Function;
   click_Request: Function;
 }
-
-//TODO: Custome StyleSheet Files
-import FontFamily from 'hexaStyles';
-
-//TODO: Custome Object
-import { images, colors } from 'hexaConstants';
-import { renderIf } from 'hexaValidation';
 
 export default class ModelHealthCheckMnemonicFirstWord extends Component<
   Props,
@@ -38,9 +38,9 @@ export default class ModelHealthCheckMnemonicFirstWord extends Component<
   }
 
   componentWillReceiveProps(nextProps: any) {
-    //console.log( { nextProps } );
-    var data = nextProps.data[0];
-    //console.log( { data } );
+    // console.log( { nextProps } );
+    const data = nextProps.data[0];
+    // console.log( { data } );
     if (data != null) {
       this.setState({
         number: data.number,
@@ -49,10 +49,10 @@ export default class ModelHealthCheckMnemonicFirstWord extends Component<
     }
   }
 
-  //TODO: func check_CorrectAnswer
+  // TODO: func check_CorrectAnswer
   check_CorrectWordLength() {
     setTimeout(() => {
-      let enterWord = this.state.enterWord;
+      const { enterWord } = this.state;
       if (enterWord.length >= 3) {
         this.setState({
           flag_DisableBtnNext: false,
@@ -67,7 +67,7 @@ export default class ModelHealthCheckMnemonicFirstWord extends Component<
   }
 
   click_Next() {
-    let { enterWord, word } = this.state;
+    const { enterWord, word } = this.state;
     if (enterWord == word) {
       this.props.click_Next();
     } else {
@@ -79,7 +79,7 @@ export default class ModelHealthCheckMnemonicFirstWord extends Component<
   }
 
   render() {
-    let {
+    const {
       number,
       enterWord,
       wordBorderColor,

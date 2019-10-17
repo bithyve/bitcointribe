@@ -1,5 +1,4 @@
 import React from 'react';
-import { colors } from '../constants/Constants';
 import {
   createStackNavigator,
   createBottomTabNavigator,
@@ -7,9 +6,9 @@ import {
 
 import { SvgIcon } from '@up-shared/components';
 // //localization
-//import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
+// import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
-//TODO: RestoreAndWalletSetupScreen
+// TODO: RestoreAndWalletSetupScreen
 import { OnBoarding } from 'hexaCompLanch';
 
 import { PasscodeConfirm, Passcode } from 'hexaCompPasscode';
@@ -48,8 +47,6 @@ import {
 
 // TODO: QrcodeScan
 import { QrCodeScanner } from 'hexaCompTabbarQrCodeScanner';
-
-TODO: Wallet;
 import { Wallet } from 'hexaCompTabbarWallet';
 
 //  TODO: All Transaction
@@ -105,8 +102,11 @@ import {
 
 // TODO: Account Transaction Screen
 import { Transaction } from 'hexaCompTransaction';
+import { colors } from '../constants/Constants';
 
-//TODO: StackNavigator:ONBoarding
+Wallet;
+
+// TODO: StackNavigator:ONBoarding
 const OnBoardingStackNavigator = createStackNavigator(
   {
     OnBoarding: {
@@ -274,7 +274,7 @@ const TrustedPartyShareSecretStackNavigator = createStackNavigator(
   },
 );
 
-//TODO: FirstTimeWalletSetupStackNavigatorRouter
+// TODO: FirstTimeWalletSetupStackNavigatorRouter
 const BackUpYourWalletStackNavigatorRouter = createStackNavigator(
   {
     AllContactList: {
@@ -343,7 +343,7 @@ const BackupTrustedPartrySecretStoreStackNavigator = createStackNavigator(
   },
 );
 
-//TODO: SettingsScreen
+// TODO: SettingsScreen
 const SettingsStackNavigator = createStackNavigator(
   {
     Settings: {
@@ -372,7 +372,7 @@ const SettingsStackNavigator = createStackNavigator(
   },
 );
 
-//TODO: HealthOfTheScreen Stack Navigator
+// TODO: HealthOfTheScreen Stack Navigator
 const HealthOfTheAppStackNavigator = createStackNavigator(
   {
     HealthOfTheApp: {
@@ -409,7 +409,7 @@ const HealthOfTheAppStackNavigator = createStackNavigator(
   },
 );
 
-//TODO: Backup Secure Account Stack Navigator
+// TODO: Backup Secure Account Stack Navigator
 
 const BackupSecureAccountWithPdfStackNavigator = createStackNavigator(
   {
@@ -423,8 +423,8 @@ const BackupSecureAccountWithPdfStackNavigator = createStackNavigator(
   },
 );
 
-//TODO: Payment Navigation
-//Receive Payment Stack Navigator
+// TODO: Payment Navigation
+// Receive Payment Stack Navigator
 const ReceivePaymentStackNavigator = createStackNavigator(
   {
     ReceivePayment: {
@@ -437,7 +437,7 @@ const ReceivePaymentStackNavigator = createStackNavigator(
   },
 );
 
-//Send Payment Stack Navigator
+// Send Payment Stack Navigator
 const SendPaymentStackNavigator = createStackNavigator(
   {
     SendPayment: {
@@ -458,7 +458,7 @@ const SendPaymentStackNavigator = createStackNavigator(
   },
 );
 
-//TODO: Account Transaction StackNavigator
+// TODO: Account Transaction StackNavigator
 const AccountTransactionStackNavigator = createStackNavigator(
   {
     Transaction: {
@@ -479,14 +479,14 @@ const AccountTransactionStackNavigator = createStackNavigator(
   },
 );
 
-//TODO: TabNavigator
-//TODO: TabNavigator:TabNavigator
+// TODO: TabNavigator
+// TODO: TabNavigator:TabNavigator
 const TabNavigator = createBottomTabNavigator(
   {
     Wallet: {
       screen: Wallet,
       navigationOptions: {
-        tabBarLabel: 'Wallet', //localization("TabBarItem.Payment"),
+        tabBarLabel: 'Wallet', // localization("TabBarItem.Payment"),
         drawerLockMode: 'locked-open',
         tabBarIcon: ({ tintColor }) => (
           <SvgIcon name="wallet" color={tintColor} size={22} />
@@ -496,7 +496,7 @@ const TabNavigator = createBottomTabNavigator(
     AllTransaction: {
       screen: AllTransaction,
       navigationOptions: {
-        tabBarLabel: 'Transaction', //localization("TabBarItem.Analytics"),
+        tabBarLabel: 'Transaction', // localization("TabBarItem.Analytics"),
         tabBarIcon: ({ tintColor }) => (
           <SvgIcon name="icon_transactions" color={tintColor} size={22} />
         ),
@@ -505,7 +505,7 @@ const TabNavigator = createBottomTabNavigator(
     QrCodeScanner: {
       screen: QrCodeScanner,
       navigationOptions: {
-        tabBarLabel: 'QR', //localization("TabBarItem.Accounts"),
+        tabBarLabel: 'QR', // localization("TabBarItem.Accounts"),
         tabBarIcon: ({ tintColor }) => (
           <SvgIcon name="qr-codes" color={tintColor} size={22} />
         ),
@@ -515,7 +515,7 @@ const TabNavigator = createBottomTabNavigator(
     More: {
       screen: More,
       navigationOptions: {
-        tabBarLabel: 'More', //localization("TabBarItem.More"),
+        tabBarLabel: 'More', // localization("TabBarItem.More"),
         tabBarIcon: ({ tintColor }) => (
           <SvgIcon name="more-icon" color={tintColor} size={22} />
         ),
@@ -526,7 +526,7 @@ const TabNavigator = createBottomTabNavigator(
     initialRouteName: 'Wallet',
     tabBarOptions: {
       showLabel: true,
-      //swipeEnabled: true,
+      // swipeEnabled: true,
       showIcon: true,
       activeTintColor: colors.appColor,
       labelStyle: {
@@ -541,8 +541,8 @@ const TabNavigator = createBottomTabNavigator(
   },
 );
 
-//TODO: RootNavigator
-//TODO: RootNavigator:createRootNavigator
+// TODO: RootNavigator
+// TODO: RootNavigator:createRootNavigator
 export const createRootNavigator = (
   signedIn = false,
   screenName = 'Passcode',
@@ -594,12 +594,12 @@ export const createRootNavigator = (
         screen: BackupTrustedPartrySecretStoreStackNavigator,
         navigationOptions: { header: null },
       },
-      //also use deepling url navigaton
+      // also use deepling url navigaton
       TrustedPartyShareSecretNavigator: {
         screen: TrustedPartyShareSecretStackNavigator,
         navigationOptions: { header: null },
       },
-      //TODO: Common Screens
+      // TODO: Common Screens
       OTPScreenNavigator: {
         screen: OTP,
         navigationOptions: { header: null },
@@ -608,12 +608,12 @@ export const createRootNavigator = (
         screen: OTPBackupShareStore,
         navigationOptions: { header: null },
       },
-      //TODO: Settings
+      // TODO: Settings
       SettingsNavigator: {
         screen: SettingsStackNavigator,
         navigationOptions: { header: null },
       },
-      //TODO: HealthOfTheApp
+      // TODO: HealthOfTheApp
       HealthOfTheAppNavigator: {
         screen: HealthOfTheAppStackNavigator,
         navigationOptions: { header: null },
@@ -622,32 +622,32 @@ export const createRootNavigator = (
         screen: TrustedContactStackNavigator,
         navigationOptions: { header: null },
       },
-      //TODO: Backup Secure Account
+      // TODO: Backup Secure Account
       BackupSecureAccountWithPdfNavigator: {
         screen: BackupSecureAccountWithPdfStackNavigator,
         navigationOptions: { header: null },
       },
 
-      //TODO: Payment Navigation
-      //ReceivePayment
+      // TODO: Payment Navigation
+      // ReceivePayment
       ReceivePaymentNavigator: {
         screen: ReceivePaymentStackNavigator,
         navigationOptions: { header: null },
       },
-      //SentPayment
+      // SentPayment
       SendPaymentNavigator: {
         screen: SendPaymentStackNavigator,
         navigationOptions: { header: null },
       },
-      //TODO: Transaction Navigation
+      // TODO: Transaction Navigation
       AccountTransactionNavigator: {
         screen: AccountTransactionStackNavigator,
         navigationOptions: { header: null },
       },
     },
     {
-      //initialRouteName: signedIn ? "OnBoardingNavigator" : PasscodeConfirm
-      initialRouteName: signedIn ? 'OnBoardingNavigator' : screenName, //"TabbarBottom" //
+      // initialRouteName: signedIn ? "OnBoardingNavigator" : PasscodeConfirm
+      initialRouteName: signedIn ? 'OnBoardingNavigator' : screenName, // "TabbarBottom" //
     },
   );
 };

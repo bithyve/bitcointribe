@@ -13,33 +13,34 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import { ImageSVG } from 'hexaCustImage';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 import { ModelLoader } from 'hexaLoader';
 import { FullLinearGradientLoadingButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome model
+// TODO: Custome model
 import {
   ModelConfirmSendSuccess,
   ModelConfirmSendSercureAccountOTP,
 } from 'hexaCustModel';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, localDB, svgIcon } from 'hexaConstants';
-var utils = require('hexaUtils');
 import { renderIf } from 'hexaValidation';
-var dbOpration = require('hexaDBOpration');
 
-//TODO: Bitcoin class
-var bitcoinClassState = require('hexaClassState');
+const alert = new AlertSimple();
+const utils = require('hexaUtils');
+const dbOpration = require('hexaDBOpration');
+
+// TODO: Bitcoin class
+const bitcoinClassState = require('hexaClassState');
 
 export default class ConfirmAndSendPayment extends React.Component<any, any> {
   constructor(props: any) {
@@ -55,31 +56,31 @@ export default class ConfirmAndSendPayment extends React.Component<any, any> {
   }
 
   async componentWillMount() {
-    var data = this.props.navigation.getParam('data');
-    //console.log( { selectedAccount: data } );
+    let data = this.props.navigation.getParam('data');
+    // console.log( { selectedAccount: data } );
     data = data[0];
-    //console.log( { selectedAccountFirstIndex: data } );
+    // console.log( { selectedAccountFirstIndex: data } );
     this.setState({
-      data: data,
+      data,
     });
   }
 
-  //TODO: Sent amount
+  // TODO: Sent amount
   click_SentAmount = async () => {
-    //this.setState( { flag_Loading:true})
+    // this.setState( { flag_Loading:true})
     this.setState({
       flag_SentBtnAnimation: true,
       flag_DisableSentBtn: true,
     });
-    let { data } = this.state;
-    //console.log( { selectedAccount: data } );
-    let date = Date.now();
-    let regularAccount = await bitcoinClassState.getRegularClassState();
-    let secureAccount = await bitcoinClassState.getSecureClassState();
-    let inputs = data.resTransferST.data.inputs;
-    let txb = data.resTransferST.data.txb;
-    //console.log( { inputs, txb } );
-    var resTransferST;
+    const { data } = this.state;
+    // console.log( { selectedAccount: data } );
+    const date = Date.now();
+    const regularAccount = await bitcoinClassState.getRegularClassState();
+    const secureAccount = await bitcoinClassState.getSecureClassState();
+    const { inputs } = data.resTransferST.data;
+    const { txb } = data.resTransferST.data;
+    // console.log( { inputs, txb } );
+    let resTransferST;
     if (data.selectedAccount.accountName == 'Regular Account') {
       resTransferST = await regularAccount.transferST2(
         data.resTransferST.data.inputs,
@@ -116,7 +117,7 @@ export default class ConfirmAndSendPayment extends React.Component<any, any> {
       );
       await bitcoinClassState.setSecureClassState(secureAccount);
       if (resTransferST.status == 200) {
-        //|| resTransferST.status == 400
+        // || resTransferST.status == 400
         this.setState({
           flag_SentBtnAnimation: false,
           flag_DisableSentBtn: false,
@@ -138,14 +139,14 @@ export default class ConfirmAndSendPayment extends React.Component<any, any> {
     }
   };
 
-  //TODO: Amount Sent Success
+  // TODO: Amount Sent Success
   click_GoToDailyAccount = async () => {
-    let { data } = this.state;
-    let accountType = data.selectedAccount.accountName;
-    let orignalBal = data.bal;
-    let sendBal = parseFloat(data.amount) + parseFloat(data.tranFee);
-    let totalBal = orignalBal - sendBal;
-    let resUpdateAccountBalR = await dbOpration.updateAccountBalAccountTypeWise(
+    const { data } = this.state;
+    const accountType = data.selectedAccount.accountName;
+    const orignalBal = data.bal;
+    const sendBal = parseFloat(data.amount) + parseFloat(data.tranFee);
+    const totalBal = orignalBal - sendBal;
+    const resUpdateAccountBalR = await dbOpration.updateAccountBalAccountTypeWise(
       localDB.tableName.tblAccount,
       accountType,
       totalBal,
@@ -164,14 +165,14 @@ export default class ConfirmAndSendPayment extends React.Component<any, any> {
   };
 
   render() {
-    //array
-    let {
+    // array
+    const {
       data,
       arrModelConfirmSendSuccess,
       arr_ModelConfirmSendSercureAccountOTP,
     } = this.state;
-    //flag
-    let {
+    // flag
+    const {
       flag_DisableSentBtn,
       flag_SentBtnAnimation,
       flag_Loading,
@@ -431,7 +432,7 @@ export default class ConfirmAndSendPayment extends React.Component<any, any> {
             this.props.navigation.pop();
           }}
           click_Next={(txId: any) => {
-            //console.log( { data, txId } );
+            // console.log( { data, txId } );
             this.setState({
               arr_ModelConfirmSendSercureAccountOTP: [
                 {

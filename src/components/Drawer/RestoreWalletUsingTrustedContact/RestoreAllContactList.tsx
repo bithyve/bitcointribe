@@ -16,27 +16,28 @@ import Contacts from 'react-native-contacts';
 import { Avatar } from 'react-native-elements';
 import GridView from 'react-native-super-grid';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 import { ModelLoader } from 'hexaLoader';
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, localDB } from 'hexaConstants';
 import { renderIf } from 'hexaValidation';
-var dbOpration = require('hexaDBOpration');
-var utils = require('hexaUtils');
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+const alert = new AlertSimple();
+const dbOpration = require('hexaDBOpration');
+const utils = require('hexaUtils');
+
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
 
 export default class RestoreAllContactList extends React.Component<any, any> {
   constructor(props: any) {
@@ -52,6 +53,7 @@ export default class RestoreAllContactList extends React.Component<any, any> {
       flag_MaxItemSeletedof3: true,
     };
   }
+
   componentWillMount() {
     Contacts.getAll((err, contacts) => {
       if (err) {
@@ -67,7 +69,7 @@ export default class RestoreAllContactList extends React.Component<any, any> {
   press = hey => {
     this.state.data.map((item, index) => {
       if (item.recordID === hey.recordID) {
-        //if ( this.state.SelectedFakeContactList.length <= 2 ) {
+        // if ( this.state.SelectedFakeContactList.length <= 2 ) {
         item.check = !item.check;
         if (item.check === true) {
           this.state.SelectedFakeContactList.push(item);
@@ -82,7 +84,7 @@ export default class RestoreAllContactList extends React.Component<any, any> {
         }
       }
     });
-    let seletedLength = this.state.SelectedFakeContactList.length;
+    const seletedLength = this.state.SelectedFakeContactList.length;
     // console.log( { seletedLength } );
     this.setState({ data: this.state.data });
     if (seletedLength <= 2) {
@@ -100,7 +102,7 @@ export default class RestoreAllContactList extends React.Component<any, any> {
     }
   };
 
-  //TODO: Searching Contact List
+  // TODO: Searching Contact List
   searchFilterFunction = (text: string) => {
     if (text.length > 0) {
       const newData = this.state.data.filter(item => {
@@ -119,11 +121,11 @@ export default class RestoreAllContactList extends React.Component<any, any> {
     }
   };
 
-  //TODO: Remove gird on click item
+  // TODO: Remove gird on click item
   click_RemoveGridItem(item: any) {
     // console.log( { item } );
-    let arr_SelectedItem = this.state.SelectedFakeContactList;
-    let arr_FullArrayList = this.state.data;
+    const arr_SelectedItem = this.state.SelectedFakeContactList;
+    const arr_FullArrayList = this.state.data;
     for (var i = 0; i < arr_SelectedItem.length; i++) {
       if (arr_SelectedItem[i].recordID === item.recordID) {
         arr_SelectedItem.splice(i, 1);
@@ -133,7 +135,7 @@ export default class RestoreAllContactList extends React.Component<any, any> {
     }
     for (var i = 0; i < arr_FullArrayList.length; i++) {
       if (arr_FullArrayList[i].recordID === item.recordID) {
-        let data = arr_FullArrayList[i];
+        const data = arr_FullArrayList[i];
         data.check = false;
         arr_FullArrayList[i] = data;
         break;
@@ -143,7 +145,7 @@ export default class RestoreAllContactList extends React.Component<any, any> {
       SelectedFakeContactList: arr_SelectedItem,
       data: arr_FullArrayList,
     });
-    let seletedLength = this.state.SelectedFakeContactList.length;
+    const seletedLength = this.state.SelectedFakeContactList.length;
     if (seletedLength <= 2 && seletedLength >= 1) {
       this.setState({
         flag_NextBtnDisable: false,
@@ -155,23 +157,23 @@ export default class RestoreAllContactList extends React.Component<any, any> {
     }
   }
 
-  //TODO: func click_Next
+  // TODO: func click_Next
   click_Next = async () => {
-    let arr_Account = await comFunDBRead.readTblSSSDetails();
+    const arr_Account = await comFunDBRead.readTblSSSDetails();
     this.setState({
       flag_NextBtnDisable1: true,
     });
-    let sssDetails = await utils.getSSSDetails();
+    const sssDetails = await utils.getSSSDetails();
     const dateTime = Date.now();
-    var selectedContactList = this.state.SelectedFakeContactList;
-    var arrTypes = [];
+    const selectedContactList = this.state.SelectedFakeContactList;
+    let arrTypes = [];
     console.log({ lenght: sssDetails.length });
     if (selectedContactList.length == 2) {
       arrTypes = [
         { type: 'Trusted Contacts 1' },
         { type: 'Trusted Contacts 2' },
       ];
-      let resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactKeepInfo(
+      const resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactKeepInfo(
         localDB.tableName.tblSSSDetails,
         dateTime,
         selectedContactList,
@@ -184,10 +186,10 @@ export default class RestoreAllContactList extends React.Component<any, any> {
         alert.simpleOk('Oops', 'Trusted Contact not insert databse.');
       }
     } else {
-      let data = this.props.navigation.getParam('data');
+      const data = this.props.navigation.getParam('data');
       console.log({ data });
       arrTypes = [{ type: data }];
-      let resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactKeepInfo(
+      const resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactKeepInfo(
         localDB.tableName.tblSSSDetails,
         dateTime,
         selectedContactList,
@@ -490,7 +492,7 @@ const styles = StyleSheet.create({
     bottom: 10,
     width: '100%',
   },
-  //Grid View Selected
+  // Grid View Selected
   gridSelectedList: {
     flex: 1,
   },

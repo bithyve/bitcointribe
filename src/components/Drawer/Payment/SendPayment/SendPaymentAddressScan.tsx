@@ -1,22 +1,23 @@
 import React from 'react';
 import { ImageBackground, StyleSheet, SafeAreaView } from 'react-native';
 import { Container, Text } from 'native-base';
-//import BarcodeScanner from "react-native-barcode-scanners";
+// import BarcodeScanner from "react-native-barcode-scanners";
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
-//TODO: Custome object
+// TODO: Custome object
 import { colors, images } from 'hexaConstants';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//Custome Compontes
+// Custome Compontes
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 
-//TODO: Common Funciton
-var bitcoinClassState = require('hexaClassState');
+const alert = new AlertSimple();
+
+// TODO: Common Funciton
+const bitcoinClassState = require('hexaClassState');
 
 let flagGoback = true;
 
@@ -43,37 +44,29 @@ export default class SendPaymentAddressScan extends React.Component {
 
   barcodeReceived = async (e: any) => {
     try {
-      var result = e.data;
-      let regularAccount = await bitcoinClassState.getRegularClassState();
-      var resAddressDiff = await regularAccount.addressDiff(result);
-      //console.log( { resAddressDiff } );
+      const result = e.data;
+      const regularAccount = await bitcoinClassState.getRegularClassState();
+      let resAddressDiff = await regularAccount.addressDiff(result);
+      // console.log( { resAddressDiff } );
       if (resAddressDiff.status == 200) {
         resAddressDiff = resAddressDiff.data;
-      } else {
-        if (flagGoback == true) {
-          flagGoback = false;
-          alert.simpleOkAction(
-            'Oops',
-            resAddressDiff.err,
-            this.click_ResetFlag,
-          );
-        }
+      } else if (flagGoback == true) {
+        flagGoback = false;
+        alert.simpleOkAction('Oops', resAddressDiff.err, this.click_ResetFlag);
       }
-      let data = {};
+      const data = {};
       if (resAddressDiff.type == 'paymentURI') {
-        var resDecPaymentURI = await regularAccount.decodePaymentURI(result);
+        let resDecPaymentURI = await regularAccount.decodePaymentURI(result);
         if (resDecPaymentURI.status == 200) {
           await bitcoinClassState.setRegularClassState(regularAccount);
           resDecPaymentURI = resDecPaymentURI.data;
-        } else {
-          if (flagGoback == true) {
-            flagGoback = false;
-            alert.simpleOkAction(
-              'Oops',
-              resDecPaymentURI.err,
-              this.click_ResetFlag,
-            );
-          }
+        } else if (flagGoback == true) {
+          flagGoback = false;
+          alert.simpleOkAction(
+            'Oops',
+            resDecPaymentURI.err,
+            this.click_ResetFlag,
+          );
         }
         data.address = resDecPaymentURI.address;
         data.amount = resDecPaymentURI.options.amount;
@@ -88,7 +81,7 @@ export default class SendPaymentAddressScan extends React.Component {
         navigation.goBack();
         navigation.state.params.onSelect({
           selected: true,
-          data: data,
+          data,
         });
       }
     } catch (error) {
@@ -99,7 +92,7 @@ export default class SendPaymentAddressScan extends React.Component {
     }
   };
 
-  //TODO: GoBack
+  // TODO: GoBack
   click_GoBack() {
     const { navigation } = this.props;
     navigation.goBack();

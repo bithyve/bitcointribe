@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import axios, { AxiosInstance } from 'axios';
 import Client from 'bitcoin-core';
 import bitcoinJS, { Network } from 'bitcoinjs-lib';
@@ -5,18 +6,28 @@ import config from 'react-native-config';
 
 class Config {
   public ENVIRONMENT: string;
+
   public NETWORK: Network;
+
   public BITCOIN_NODE: Client;
+
   public BH_AXIOS: AxiosInstance;
+
   public SECURE_WALLET_XPUB_PATH: string = config.BIT_SECURE_WALLET_XPUB_PATH;
+
   public SECURE_DERIVATION_BRANCH: string = config.BIT_SECURE_DERIVATION_BRANCH;
+
   public TOKEN: string = config.BIT_BLOCKCYPHER_API_URLS_TOKEN;
+
   public SSS_OTP_LENGTH: string = config.BIT_SSS_OTP_LENGTH;
+
   public GAP_LIMIT: number = parseInt(config.BIT_GAP_LIMIT, 10);
+
   public BH_SERVER = {
     DEV: config.BIT_API_URLS_BH_SERVER_DEV,
     PROD: config.BIT_API_URLS_BH_SERVER_PROD,
   };
+
   public BSI = {
     INIT_INDEX: parseInt(config.BIT_BSI_INIT_INDEX, 10),
     MAXUSEDINDEX: parseInt(config.BIT_BSI_MAXUSEDINDEX, 10),
@@ -26,22 +37,31 @@ class Config {
       LIMIT: parseInt(config.BIT_BSI_DEPTH_LIMIT, 10),
     },
   };
+
   public SSS_TOTAL: number = parseInt(config.BIT_SSS_TOTAL, 10);
+
   public SSS_THRESHOLD: number = parseInt(config.BIT_SSS_THRESHOLD, 10);
+
   public MSG_ID_LENGTH: number = parseInt(config.BIT_MSG_ID_LENGTH, 10);
+
   public SCHUNK_SIZE: number = parseInt(config.BIT_SCHUNK_SIZE, 10);
+
   public CHECKSUM_ITR: number = parseInt(config.BIT_CHECKSUM_ITR, 10);
+
   public HEXA_ID: string = config.BIT_HEXA_ID;
 
   public DPATH_PURPOSE: number = parseInt(config.BIT_DPATH_PURPOSE, 10);
+
   public SSS_METASHARE_SPLITS: number = parseInt(
     config.BIT_SSS_METASHARE_SPLITS,
     10,
   );
+
   public STATUS = {
     SUCCESS: parseInt(config.BIT_SUCCESS_STATUS_CODE, 10),
     ERROR: parseInt(config.BIT_ERROR_STATUS_CODE, 10),
   };
+
   public STANDARD = {
     BIP44: parseInt(config.BIT_STANDARD_BIP44, 10),
     BIP49: parseInt(config.BIT_STANDARD_BIP49, 10),
@@ -126,7 +146,7 @@ class Config {
   constructor(env: string) {
     this.ENVIRONMENT = env;
     this.setNetwork();
-    console.log({ id: this.HEXA_ID });
+    // console.log({ id: this.HEXA_ID });
 
     this.BITCOIN_NODE = new Client({
       network:

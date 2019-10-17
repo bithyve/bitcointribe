@@ -5,6 +5,7 @@ export default class CustomStatusBar extends Component<any, any> {
   constructor(props: any) {
     super(props);
   }
+
   render() {
     return (
       <StatusBar

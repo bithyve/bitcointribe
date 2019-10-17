@@ -6,10 +6,10 @@ import { SvgIcon } from '@up-shared/components';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { images, colors } from 'hexaConstants';
 import { renderIf } from 'hexaValidation';
 
@@ -44,14 +44,15 @@ export default class ModelSecureTwoFactorSecretThreeCode extends Component<
   }
 
   componentWillReceiveProps(nextProps: any) {
-    let date = Date.now();
-    var data = nextProps.data[0];
+    const date = Date.now();
+    let data = nextProps.data[0];
     data = data.data[0];
     if (data != null) {
-      let secret = data.secret;
-      let secretCount = secret.length;
-      let secretCode, message;
-      //console.log( { secret, secretCount } );
+      const { secret } = data;
+      const secretCount = secret.length;
+      let secretCode;
+      let message;
+      // console.log( { secret, secretCount } );
       if (date % 2 == 0) {
         secretCode = secret.substring(0, 3);
         message = 'First three letter your secure account secret for the PDF';
@@ -59,16 +60,16 @@ export default class ModelSecureTwoFactorSecretThreeCode extends Component<
         secretCode = secret.slice(-3);
         message = 'Last three letter your secure account secret for the PDF';
       }
-      //console.log( { secretCode } );
+      // console.log( { secretCode } );
       this.setState({
-        secret: secret,
+        secret,
         otp: secretCode,
         message,
       });
     }
   }
 
-  //TODO: Otp enter after
+  // TODO: Otp enter after
   _onFinishCheckingCode(isValid: boolean, code: any) {
     if (isValid) {
       this.setState({
@@ -100,7 +101,7 @@ export default class ModelSecureTwoFactorSecretThreeCode extends Component<
   }
 
   render() {
-    let { passcodeStyle, flag_DisableBtnNext, message, otp } = this.state;
+    const { passcodeStyle, flag_DisableBtnNext, message, otp } = this.state;
     return (
       <Modal
         transparent

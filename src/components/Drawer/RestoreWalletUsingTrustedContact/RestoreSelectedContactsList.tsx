@@ -13,7 +13,7 @@ import { RkCard } from 'react-native-ui-kitten';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Avatar } from 'react-native-elements';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { ImageSVG } from 'hexaCustImage';
 
 import { CustomStatusBar } from 'hexaCustStatusBar';
@@ -21,13 +21,14 @@ import { HeaderTitle } from 'hexaCustHeader';
 import { ModelLoader } from 'hexaLoader';
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, svgIcon } from 'hexaConstants';
-var utils = require('hexaUtils');
 import { renderIf } from 'hexaValidation';
+
+const utils = require('hexaUtils');
 
 let counterConfirm = 0;
 
@@ -80,7 +81,7 @@ export default class RestoreSelectedContactsList extends React.Component<
           statusMsg: 'Not confirmed',
         },
       ],
-      //flag
+      // flag
       flag_isTrustedContacts: true,
       flag_SelfShare: true,
       flag_SelfShareDisable: true,
@@ -105,9 +106,9 @@ export default class RestoreSelectedContactsList extends React.Component<
   }
 
   getTrustedContactInfo = async (sssDetails: any) => {
-    let keeperInfo = JSON.parse(sssDetails.keeperInfo);
+    const keeperInfo = JSON.parse(sssDetails.keeperInfo);
     console.log({ keeperInfo });
-    let data = {};
+    const data = {};
     data.emailAddresses = keeperInfo.emailAddresses;
     data.phoneNumbers = keeperInfo.phoneNumbers;
     data.history = JSON.parse(sssDetails.history);
@@ -116,7 +117,7 @@ export default class RestoreSelectedContactsList extends React.Component<
     data.givenName = keeperInfo.givenName;
     data.familyName = keeperInfo.familyName;
     data.sssDetails = sssDetails;
-    let sharedDate = sssDetails.sharedDate;
+    const { sharedDate } = sssDetails;
     if (sharedDate == '' && sssDetails.shareStage == '') {
       data.statusMsg = 'Not Confirmed';
       data.statusMsgColor = '#ff0000';
@@ -124,7 +125,7 @@ export default class RestoreSelectedContactsList extends React.Component<
       data.statusMsg = 'Shared';
       data.statusMsgColor = '#C07710';
     } else {
-      counterConfirm = counterConfirm + 1;
+      counterConfirm += 1;
       data.statusMsg = 'Confirmed';
       data.statusMsgColor = '#008000';
     }
@@ -138,52 +139,53 @@ export default class RestoreSelectedContactsList extends React.Component<
       flag_Loading: true,
     });
     let flag_Loading = true;
-    let dateTime = Date.now();
-    let walletDetails = await utils.getWalletDetails();
-    let sssDetails = await utils.getSSSDetails();
+    const dateTime = Date.now();
+    const walletDetails = await utils.getWalletDetails();
+    const sssDetails = await utils.getSSSDetails();
     console.log(sssDetails);
     console.log({ sssDetails });
     console.log({ walletDetails, sssDetails });
-    //flag
-    let flag_isSetupTrustedContact, flag_isSecretQuestions;
-    //array
-    let history = [];
-    let tempOpt = [];
-    let temp = [];
-    //Trusted Contacts
+    // flag
+    let flag_isSetupTrustedContact;
+    let flag_isSecretQuestions;
+    // array
+    const history = [];
+    const tempOpt = [];
+    const temp = [];
+    // Trusted Contacts
 
     if (sssDetails.length > 0) {
-      let { arr_TrustedContacts, arr_SelfShare } = this.state;
-      var len = sssDetails.length;
+      const { arr_TrustedContacts, arr_SelfShare } = this.state;
+      const len = sssDetails.length;
       for (let i = 0; i < len; i++) {
-        //Trusted Contacts
+        // Trusted Contacts
         if (
           sssDetails[i].type === 'Trusted Contacts 1' &&
           sssDetails[i].keeperInfo != ''
         ) {
-          let data = await this.getTrustedContactInfo(sssDetails[i]);
+          const data = await this.getTrustedContactInfo(sssDetails[i]);
           arr_TrustedContacts[0] = data[0];
         } else if (
           sssDetails[i].type === 'Trusted Contacts 2' &&
           sssDetails[i].keeperInfo != ''
         ) {
-          let data = await this.getTrustedContactInfo(sssDetails[i]);
+          const data = await this.getTrustedContactInfo(sssDetails[i]);
           arr_TrustedContacts[1] = data[0];
         }
 
-        //Self Share
+        // Self Share
         else if (
           sssDetails[i].type === 'Self Share 1' &&
           sssDetails[i].decryptedShare != ''
         ) {
-          let sharedDate = sssDetails[i].sharedDate;
-          let shareStage = sssDetails[i].shareStage;
-          let statusMsg = this.getMsgAndColor(sharedDate, shareStage)[0];
-          let statusColor = this.getMsgAndColor(sharedDate, shareStage)[1];
+          const { sharedDate } = sssDetails[i];
+          const { shareStage } = sssDetails[i];
+          const statusMsg = this.getMsgAndColor(sharedDate, shareStage)[0];
+          const statusColor = this.getMsgAndColor(sharedDate, shareStage)[1];
           if (statusMsg == 'Confirmed') {
-            counterConfirm = counterConfirm + 1;
+            counterConfirm += 1;
           }
-          let data = {};
+          const data = {};
           data.thumbnailPath = Platform.OS == 'ios' ? 'walletSVG' : 'walletPNG';
           data.givenName = 'Wallet';
           data.familyName = '';
@@ -195,14 +197,14 @@ export default class RestoreSelectedContactsList extends React.Component<
           sssDetails[i].type === 'Self Share 2' &&
           sssDetails[i].decryptedShare != ''
         ) {
-          let sharedDate = sssDetails[i].sharedDate;
-          let shareStage = sssDetails[i].shareStage;
-          let statusMsg = this.getMsgAndColor(sharedDate, shareStage)[0];
-          let statusColor = this.getMsgAndColor(sharedDate, shareStage)[1];
+          const { sharedDate } = sssDetails[i];
+          const { shareStage } = sssDetails[i];
+          const statusMsg = this.getMsgAndColor(sharedDate, shareStage)[0];
+          const statusColor = this.getMsgAndColor(sharedDate, shareStage)[1];
           if (statusMsg == 'Confirmed') {
-            counterConfirm = counterConfirm + 1;
+            counterConfirm += 1;
           }
-          let data = {};
+          const data = {};
           data.thumbnailPath = Platform.OS == 'ios' ? 'emailSVG' : 'emailPNG';
           data.givenName = 'Email';
           data.familyName = '';
@@ -211,14 +213,14 @@ export default class RestoreSelectedContactsList extends React.Component<
           data.sssDetails = sssDetails[i];
           arr_SelfShare[1] = data;
         } else {
-          let sharedDate = sssDetails[i].sharedDate;
-          let shareStage = sssDetails[i].shareStage;
-          let statusMsg = this.getMsgAndColor(sharedDate, shareStage)[0];
-          let statusColor = this.getMsgAndColor(sharedDate, shareStage)[1];
+          const { sharedDate } = sssDetails[i];
+          const { shareStage } = sssDetails[i];
+          const statusMsg = this.getMsgAndColor(sharedDate, shareStage)[0];
+          const statusColor = this.getMsgAndColor(sharedDate, shareStage)[1];
           if (statusMsg == 'Confirmed') {
-            counterConfirm = counterConfirm + 1;
+            counterConfirm += 1;
           }
-          let data = {};
+          const data = {};
           data.thumbnailPath =
             Platform.OS == 'ios' ? 'cloudstorageSVG' : 'cloudstoragePNG';
           data.givenName = 'iCloud';
@@ -229,7 +231,7 @@ export default class RestoreSelectedContactsList extends React.Component<
           arr_SelfShare[2] = data;
         }
         flag_Loading = false;
-        //Next Button Enable or Didable
+        // Next Button Enable or Didable
         console.log({ counterConfirm });
         let flag_DisableBtnNext = true;
         if (counterConfirm >= 3) {
@@ -254,14 +256,14 @@ export default class RestoreSelectedContactsList extends React.Component<
   getMsgAndColor(sharedDate: string, shareStage: string) {
     if (sharedDate == '' && shareStage != 'Good') {
       return ['Not Confirmed', '#ff0000'];
-    } else if (sharedDate != '' && shareStage != 'Good') {
-      return ['Shared', '#C07710'];
-    } else {
-      return ['Confirmed', '#008000'];
     }
+    if (sharedDate != '' && shareStage != 'Good') {
+      return ['Shared', '#C07710'];
+    }
+    return ['Confirmed', '#008000'];
   }
 
-  //TODO: func click_Item
+  // TODO: func click_Item
   click_AssociateContactItem = (item: any) => {
     if (
       item.givenName == 'Trusted Contacts 1' ||
@@ -273,22 +275,22 @@ export default class RestoreSelectedContactsList extends React.Component<
     } else {
       this.props.navigation.push('RestoreTrustedContactsShare', {
         data: item,
-        title: item.givenName + ' Share',
+        title: `${item.givenName} Share`,
       });
     }
   };
 
-  //TODO: func click_FirstMenuItem
+  // TODO: func click_FirstMenuItem
   click_SecretQuestion(item: any) {
-    let walletDetails = item.walletDetails;
-    let data = JSON.parse(walletDetails.setUpWalletAnswerDetails);
+    const { walletDetails } = item;
+    const data = JSON.parse(walletDetails.setUpWalletAnswerDetails);
     this.props.navigation.push('BackupSecretQuestions', {
-      data: data,
-      walletDetails: walletDetails,
+      data,
+      walletDetails,
     });
   }
 
-  //TODO: click_SetupTrustedContacts
+  // TODO: click_SetupTrustedContacts
   click_SetupTrustedContacts() {
     this.setState({
       arr_ModelBackupYourWallet: [
@@ -336,17 +338,17 @@ export default class RestoreSelectedContactsList extends React.Component<
     // }
   };
 
-  //TODO: Self share
+  // TODO: Self share
   click_SelfShare = async (item: any) => {
     if (item.givenName == 'Wallet') {
       this.props.navigation.push('Restore3SelfShare', {
         data: item,
-        title: item.givenName + ' Shares Scan',
+        title: `${item.givenName} Shares Scan`,
       });
     } else {
       this.props.navigation.push('Restore4And5SelfShare', {
         data: item,
-        title: item.givenName + ' Shares Scan',
+        title: `${item.givenName} Shares Scan`,
         type: item.givenName,
       });
     }
@@ -367,14 +369,14 @@ export default class RestoreSelectedContactsList extends React.Component<
     // }
   };
 
-  //TODO: click next button all or 3 share conrimed
+  // TODO: click next button all or 3 share conrimed
   click_Next() {
     this.props.navigation.push('RestoreWalletUsingTrustedContactQueAndAnw');
   }
 
   render() {
-    //flag
-    let {
+    // flag
+    const {
       flag_isTrustedContacts,
       flag_isSetupTrustedContact,
       flag_isMnemonic,
@@ -385,13 +387,17 @@ export default class RestoreSelectedContactsList extends React.Component<
       flag_SelfShareDisable,
       flag_DisableBtnNext,
     } = this.state;
-    //TouchableOpacity
-    let {
+    // TouchableOpacity
+    const {
       flag_DisableSecureTwoFactor,
       flag_DisableSecretQuestion,
     } = this.state;
-    //array
-    let { arr_TrustedContacts, arr_SelfShare, arr_SecretQuestion } = this.state;
+    // array
+    const {
+      arr_TrustedContacts,
+      arr_SelfShare,
+      arr_SecretQuestion,
+    } = this.state;
     return (
       <Container>
         <ImageBackground
@@ -847,7 +853,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     backgroundColor: '#FFFFFF',
   },
-  //botom model
+  // botom model
   modal: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,

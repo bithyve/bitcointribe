@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, View, ImageBackground, SafeAreaView } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-//TODO: Custome Compontes
+// TODO: Custome Compontes
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import {
   ModelHealthCheckMnemonicFirstWord,
@@ -11,7 +11,7 @@ import {
   ModelHeackCheckMnemonicSucessBackedUp,
 } from 'hexaCustModel';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
 
 export default class HealthCheckMnemonic extends Component {
@@ -27,7 +27,7 @@ export default class HealthCheckMnemonic extends Component {
   }
 
   componentWillMount() {
-    let data = this.props.navigation.getParam('data');
+    const data = this.props.navigation.getParam('data');
     setTimeout(() => {
       this.setState({
         data,
@@ -43,7 +43,7 @@ export default class HealthCheckMnemonic extends Component {
   }
 
   render() {
-    let {
+    const {
       arr_ModelHealthCheckMnemonicFirstWord,
       arr_ModelHealthCheckMnemonicSecoundWord,
       arr_ModelHealthCheckMnemonicThirdWord,

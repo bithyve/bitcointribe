@@ -14,17 +14,17 @@ import { StackActions, NavigationActions } from 'react-navigation';
 import CreateTables from 'HexaWallet/src/app/manage/database/CreateTables';
 import IconFontAwe from 'react-native-vector-icons/FontAwesome';
 
-//Custome Compontes
+// Custome Compontes
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome object
+// TODO: Custome object
 import { colors, images, asyncStorageKeys } from 'hexaConstants';
 
-//localization
+// localization
 import localization from 'hexaLocalization/i18n';
 
 export default class OnBoarding extends React.Component<any, any> {
@@ -37,7 +37,7 @@ export default class OnBoarding extends React.Component<any, any> {
 
   componentWillMount() {
     try {
-      //PrivacySnapshot.enabled( true );
+      // PrivacySnapshot.enabled( true );
       //   this.setState( {
       //     data: localization( "OnBoarding.onBoarding" )
       //   } );
@@ -46,7 +46,7 @@ export default class OnBoarding extends React.Component<any, any> {
     }
   }
 
-  //TODO: func click_Done
+  // TODO: func click_Done
   click_Done() {
     try {
       AsyncStorage.setItem(

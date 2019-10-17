@@ -11,7 +11,7 @@ import {
 import { Button } from 'native-base';
 import LinearGradient from 'react-native-linear-gradient';
 
-//TODO: Custome object
+// TODO: Custome object
 import { colors } from 'hexaConstants';
 // Detect screen width and height
 const { width, height } = Dimensions.get('window');
@@ -41,17 +41,19 @@ export default class OnBoarding extends Component<Props, any> {
     // Fisrt is screen is active
     index: 0,
   };
+
   state = this.initState(this.props);
+
   /**
    * Initialize the state
    */
   initState(props) {
     // Get the total number of slides passed as children
-    const total = props.children ? props.children.length || 1 : 0,
-      // Current index
-      index = total > 1 ? Math.min(props.index, total - 1) : 0,
-      // Current offset
-      offset = width * index;
+    const total = props.children ? props.children.length || 1 : 0;
+    // Current index
+    const index = total > 1 ? Math.min(props.index, total - 1) : 0;
+    // Current offset
+    const offset = width * index;
 
     const state = {
       total,
@@ -103,11 +105,11 @@ export default class OnBoarding extends Component<Props, any> {
    */
   onScrollEndDrag = e => {
     const {
-        contentOffset: { x: newOffset },
-      } = e.nativeEvent,
-      { children } = this.props,
-      { index } = this.state,
-      { offset } = this.internals;
+      contentOffset: { x: newOffset },
+    } = e.nativeEvent;
+    const { children } = this.props;
+    const { index } = this.state;
+    const { offset } = this.internals;
 
     // Update internal isScrolling state
     // if swiped right on the last slide
@@ -125,10 +127,10 @@ export default class OnBoarding extends Component<Props, any> {
    * @param {object} offset content offset
    */
   updateIndex = offset => {
-    const state = this.state,
-      diff = offset - this.internals.offset,
-      step = state.width;
-    let index = state.index;
+    const { state } = this;
+    const diff = offset - this.internals.offset;
+    const step = state.width;
+    let { index } = state;
 
     // Do nothing if offset didn't change
     if (!diff) {
@@ -155,10 +157,10 @@ export default class OnBoarding extends Component<Props, any> {
       return;
     }
 
-    const state = this.state,
-      diff = this.state.index + 1,
-      x = diff * state.width,
-      y = 0;
+    const { state } = this;
+    const diff = this.state.index + 1;
+    const x = diff * state.width;
+    const y = 0;
 
     // Call scrollTo on scrollView component to perform the swipe
     this.scrollView && this.scrollView.scrollTo({ x, y, animated: true });
@@ -212,10 +214,10 @@ export default class OnBoarding extends Component<Props, any> {
       return null;
     }
 
-    const ActiveDot = <View style={[styles.dot, styles.activeDot]} />,
-      Dot = <View style={styles.dot} />;
+    const ActiveDot = <View style={[styles.dot, styles.activeDot]} />;
+    const Dot = <View style={styles.dot} />;
 
-    let dots = [];
+    const dots = [];
 
     for (let key = 0; key < this.state.total; key++) {
       dots.push(
@@ -327,8 +329,8 @@ const styles = StyleSheet.create({
   // Set width and height to the screen size
   fullScreen: {
     flex: 1,
-    width: width,
-    height: height,
+    width,
+    height,
   },
   // Main container
   container: {
@@ -363,7 +365,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
   },
   // Button wrapper
-  //TODO:Button
+  // TODO:Button
   button: {
     borderRadius: 50, // Rounded border
     borderWidth: 2, // 2 point border widht
@@ -380,7 +382,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontFamily: 'Avenir',
   },
-  //new styles
+  // new styles
   btnSkipNext: {
     fontWeight: 'bold',
     fontSize: 14,
