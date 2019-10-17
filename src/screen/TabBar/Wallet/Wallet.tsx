@@ -1603,8 +1603,8 @@ class Wallet extends React.Component {
             .then( async ( path: any ) => {
               console.log( 'PDF created at: ' + path );
               if ( Platform.OS == "ios" ) {
-                var PdfPassword = NativeModules.PdfPassword;
-                PdfPassword.addEvent( "/" + pdfFileName, password );
+                // var PdfPassword = NativeModules.PdfPassword;
+                // PdfPassword.addEvent( "/" + pdfFileName, password );
               }
               resolve( path );
             } );
