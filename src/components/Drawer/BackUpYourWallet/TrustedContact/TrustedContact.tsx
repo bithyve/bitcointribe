@@ -19,40 +19,41 @@ import SendSMS from 'react-native-sms';
 import Permissions from 'react-native-permissions';
 import Modal from 'react-native-modalbox';
 
-//import Mailer from 'react-native-mail';
-var Mailer = require('NativeModules').RNMail;
-
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { ModelLoader } from 'hexaLoader';
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { FullLinearGradientShareButton } from 'hexaCustomeLinearGradientButton';
 import { HeaderTitle } from 'hexaCustHeader';
 
-//TODO: Custome  Model
+// TODO: Custome  Model
 import {
   ModelBottomSingleButton,
   ModelTrustedContactEmailAndPhoneShare,
 } from 'hexaCustModel';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, localDB, svgIcon, expaire } from 'hexaConstants';
 import { renderIf } from 'hexaValidation';
-var dbOpration = require('hexaDBOpration');
-var utils = require('hexaUtils');
-
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
-
-//TODO: Bitcoin Class
-var bitcoinClassState = require('hexaClassState');
 import { S3Service } from 'hexaBitcoin';
+
+// import Mailer from 'react-native-mail';
+const Mailer = require('NativeModules').RNMail;
+
+const alert = new AlertSimple();
+const dbOpration = require('hexaDBOpration');
+const utils = require('hexaUtils');
+
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
+
+// TODO: Bitcoin Class
+const bitcoinClassState = require('hexaClassState');
 
 export default class TrustedContact extends React.Component<any, any> {
   constructor(props: any) {
@@ -73,36 +74,33 @@ export default class TrustedContact extends React.Component<any, any> {
   }
 
   async componentWillMount() {
-    let data = this.props.navigation.getParam('data');
+    const data = this.props.navigation.getParam('data');
     console.log({ data });
-    //otp history
-    let arrHistory = data.history;
-    let eachHistoryLength = arrHistory.length;
-    var otp;
+    // otp history
+    const arrHistory = data.history;
+    const eachHistoryLength = arrHistory.length;
+    let otp;
     if (arrHistory[eachHistoryLength - 1] != undefined) {
       otp = arrHistory[eachHistoryLength - 1].otp;
     } else {
       otp = undefined;
     }
     if (otp != undefined) {
-      let dateTime = Date.now();
-      let sharedDate = parseInt(data.sssDetails.sharedDate);
-      var startDate = new Date(dateTime);
-      var endDate = new Date(sharedDate);
+      const dateTime = Date.now();
+      const sharedDate = parseInt(data.sssDetails.sharedDate);
+      const startDate = new Date(dateTime);
+      const endDate = new Date(sharedDate);
       console.warn(
-        'sart date =' +
-          startDate.toString() +
-          'end date = ' +
-          endDate.toString(),
+        `sart date =${startDate.toString()}end date = ${endDate.toString()}`,
       );
-      var diff = Math.abs(startDate.getTime() - endDate.getTime());
-      //console.warn( 'diff' + diff.toString() );
+      const diff = Math.abs(startDate.getTime() - endDate.getTime());
+      // console.warn( 'diff' + diff.toString() );
       const minutes: any = Math.floor(diff / 1000 / 60);
       const seconds: any = Math.floor((diff / 1000) % 60);
-      //console.log( { minutes, seconds } );
-      //console.warn( minutes.toString() )
+      // console.log( { minutes, seconds } );
+      // console.warn( minutes.toString() )
       const totalSec = parseInt(minutes * 60) + parseInt(seconds);
-      //console.log( { totalSec } );
+      // console.log( { totalSec } );
       if (
         (totalSec < parseInt(expaire.trustedContactScreen.expaire_otptime) &&
           data.sssDetails.shareStage == 'Ugly') ||
@@ -114,15 +112,15 @@ export default class TrustedContact extends React.Component<any, any> {
         });
       }
     }
-    //console.log( { otp } );
-    var resSSSDetails = await dbOpration.readSSSTableData(
+    // console.log( { otp } );
+    let resSSSDetails = await dbOpration.readSSSTableData(
       localDB.tableName.tblSSSDetails,
       data.recordID,
     );
     resSSSDetails = resSSSDetails.temp[0];
     await utils.setSSSDetailsRecordIDWise(resSSSDetails);
     this.setState({
-      data: data,
+      data,
       arr_History: data.history,
       arr_resSSSDetails: resSSSDetails,
     });
@@ -131,7 +129,7 @@ export default class TrustedContact extends React.Component<any, any> {
   componentDidMount() {
     if (Platform.OS == 'android') {
       Permissions.request('readSms').then((response: any) => {
-        //console.log( response );
+        // console.log( response );
       });
     }
   }
@@ -142,11 +140,11 @@ export default class TrustedContact extends React.Component<any, any> {
       msg_Loading: 'Key id genreating',
     });
     let flag_Loading = true;
-    let data = this.props.navigation.getParam('data');
-    //console.log( { data } );
-    let encryptedMetaShare = data.decryptedShare;
+    const data = this.props.navigation.getParam('data');
+    // console.log( { data } );
+    const encryptedMetaShare = data.decryptedShare;
     const sss = await bitcoinClassState.getS3ServiceClassState();
-    var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare(
+    let resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare(
       data.decryptedShare,
     );
     if (resGenerateEncryptedMetaShare.status == 200) {
@@ -162,7 +160,7 @@ export default class TrustedContact extends React.Component<any, any> {
         resGenerateEncryptedMetaShare.encryptedMetaShare,
         resGenerateEncryptedMetaShare.messageId,
       );
-      //console.log( { resUploadShare } );
+      // console.log( { resUploadShare } );
       if (resUploadShare.status == 200) {
         await bitcoinClassState.setS3ServiceClassState(sss);
         this.setState({
@@ -191,27 +189,27 @@ export default class TrustedContact extends React.Component<any, any> {
     });
   };
 
-  //TODO: click on model confirm button
+  // TODO: click on model confirm button
   click_SentURLSmsOrEmail(type: string, value: any) {
     // AsyncStorage.setItem( "flag_BackgoundApp", JSON.stringify( false ) );
-    var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-    let walletDetails = utils.getWalletDetails();
-    let script = {};
+    const reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+    const walletDetails = utils.getWalletDetails();
+    const script = {};
     script.wn = walletDetails.walletType;
     script.key = this.state.key;
-    var encpScript = utils.encrypt(JSON.stringify(script), '122334');
+    let encpScript = utils.encrypt(JSON.stringify(script), '122334');
     encpScript = encpScript.split('/').join('_+_');
-    //console.log( { encpScript } );
+    // console.log( { encpScript } );
     if (type == 'SMS') {
       SendSMS.send(
         {
-          body: 'https://prime-sign-230407.appspot.com/sss/bk/' + encpScript,
+          body: `https://prime-sign-230407.appspot.com/sss/bk/${encpScript}`,
           recipients: [value],
           successTypes: ['sent', 'queued'],
         },
         (completed, cancelled, error) => {
           if (completed) {
-            //console.log( 'SMS Sent Completed' );
+            // console.log( 'SMS Sent Completed' );
             setTimeout(() => {
               alert.simpleOkActionWithPara(
                 'Success',
@@ -223,9 +221,9 @@ export default class TrustedContact extends React.Component<any, any> {
               });
             }, 1000);
           } else if (cancelled) {
-            //console.log( 'SMS Sent Cancelled' );
+            // console.log( 'SMS Sent Cancelled' );
           } else if (error) {
-            //console.log( 'Some error occured' );
+            // console.log( 'Some error occured' );
           }
         },
       );
@@ -246,10 +244,9 @@ export default class TrustedContact extends React.Component<any, any> {
         {
           subject: 'Hexa Wallet SSS Recovery',
           recipients: [value],
-          body:
-            walletDetails.walletType +
-            " hexa wallet request you to store it's secret share, tap on the link to accept it  <br/> https://prime-sign-230407.appspot.com/sss/bk/" +
-            encpScript,
+          body: `${
+            walletDetails.walletType
+          } hexa wallet request you to store it's secret share, tap on the link to accept it  <br/> https://prime-sign-230407.appspot.com/sss/bk/${encpScript}`,
           isHTML: true,
         },
         (error, event) => {
@@ -284,27 +281,27 @@ export default class TrustedContact extends React.Component<any, any> {
     }
   }
 
-  //TODO: func backQrCodeScreen
+  // TODO: func backQrCodeScreen
   onSelect = (data: any) => {
     this.connection_UpdateSSSDetails('QR');
   };
 
-  //TODO: func SSS Details table update data
+  // TODO: func SSS Details table update data
   connection_UpdateSSSDetails = async (type: string) => {
     const dateTime = Date.now();
-    let history = this.state.arr_History;
-    let state_data = this.state.data;
+    const history = this.state.arr_History;
+    const state_data = this.state.data;
     state_data.statusMsgColor = '#C07710';
     state_data.statusMsg = 'Shared';
-    let temp = history;
-    let jsondata = {};
+    const temp = history;
+    const jsondata = {};
     if (type != 'QR') {
       jsondata.otp = this.state.otpCode;
     }
-    jsondata.title = 'Secret Share using ' + type.toLowerCase();
+    jsondata.title = `Secret Share using ${type.toLowerCase()}`;
     jsondata.date = utils.getUnixToDateFormat2();
     temp.push(jsondata);
-    let data = this.props.navigation.getParam('data');
+    const data = this.props.navigation.getParam('data');
     await dbOpration.updateSSSTransferMehtodDetails(
       localDB.tableName.tblSSSDetails,
       type,
@@ -325,7 +322,7 @@ export default class TrustedContact extends React.Component<any, any> {
     navigation.state.params.onSelect({ selected: true });
   }
 
-  //TODO: share option click
+  // TODO: share option click
   click_SentRequest(type: string, item: any) {
     if (type == 'SMS') {
       item = item.length != 0 ? item[0].number : '';
@@ -334,7 +331,7 @@ export default class TrustedContact extends React.Component<any, any> {
       item = item.length != 0 ? item[0].email : '';
       this.click_SentURLSmsOrEmail('EMAIL', item);
     } else {
-      let { arr_EncryptedMetaShare } = this.state;
+      const { arr_EncryptedMetaShare } = this.state;
       this.props.navigation.push('ShareSecretViaQR', {
         data: arr_EncryptedMetaShare,
         onSelect: this.onSelect,
@@ -343,8 +340,8 @@ export default class TrustedContact extends React.Component<any, any> {
     this.refs.modal4.close();
   }
 
-  //TODO: Close all model
-  //TODO: Close all model
+  // TODO: Close all model
+  // TODO: Close all model
   click_CloseModel() {
     this.setState({
       arr_ModelBottomSingleButton: [
@@ -356,8 +353,8 @@ export default class TrustedContact extends React.Component<any, any> {
   }
 
   render() {
-    //array
-    let { data, arr_ModelBottomSingleButton } = this.state;
+    // array
+    const { data, arr_ModelBottomSingleButton } = this.state;
     return (
       <Container>
         <ImageBackground
@@ -656,7 +653,7 @@ export default class TrustedContact extends React.Component<any, any> {
                   'flag_BackgoundApp',
                   JSON.stringify(false),
                 );
-                var messageId = this.state.key;
+                let messageId = this.state.key;
                 if (messageId != '') {
                   this.click_SentURLSmsOrEmail(val);
                 } else {
@@ -720,7 +717,7 @@ export default class TrustedContact extends React.Component<any, any> {
                     />,
                   )}
                   <Text style={{ marginBottom: 10 }}>
-                    {data.givenName + ' ' + data.familyName}
+                    {`${data.givenName} ${data.familyName}`}
                   </Text>
                 </View>
 
@@ -844,7 +841,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  //botom model
+  // botom model
   modal: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,

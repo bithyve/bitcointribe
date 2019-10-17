@@ -3,20 +3,21 @@ import { ImageBackground, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import { Container, Text } from 'native-base';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
-//TODO: Custome object
+// TODO: Custome object
 import { colors, images, localDB } from 'hexaConstants';
-var dbOpration = require('hexaDBOpration');
-var utils = require('hexaUtils');
 
-//Custome Compontes
+// Custome Compontes
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 
-//TODO: Custome Model
+// TODO: Custome Model
 import { ModelRestoreAssociateContactListForQRCodeScan } from 'hexaCustModel';
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+const dbOpration = require('hexaDBOpration');
+const utils = require('hexaUtils');
+
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
 
 export default class QRCodeScan extends React.Component {
   constructor(props: any) {
@@ -31,13 +32,13 @@ export default class QRCodeScan extends React.Component {
   }
 
   async componentDidMount() {
-    let resSSSDetails = await comFunDBRead.readTblSSSDetails();
-    let arr_KeeperInfo = [];
+    const resSSSDetails = await comFunDBRead.readTblSSSDetails();
+    const arr_KeeperInfo = [];
     for (let i = 0; i < resSSSDetails.length; i++) {
-      let data = {};
-      let fullInfo = resSSSDetails[i];
+      const data = {};
+      const fullInfo = resSSSDetails[i];
       if (fullInfo.acceptedDate == '') {
-        let keerInfo = JSON.parse(resSSSDetails[i].keeperInfo);
+        const keerInfo = JSON.parse(resSSSDetails[i].keeperInfo);
         data.thumbnailPath = keerInfo.thumbnailPath;
         data.givenName = keerInfo.givenName;
         data.familyName = keerInfo.familyName;
@@ -63,42 +64,42 @@ export default class QRCodeScan extends React.Component {
 
   barcodeReceived = async (e: any) => {
     try {
-      var result = e.data;
+      let result = e.data;
       result = JSON.parse(result);
       // console.log( { result } );
       if (result.type == 'SSS Restore') {
         utils.setDeepLinkingType('SSS Restore QR');
-        let item = this.state.item;
+        const { item } = this.state;
         this.setState({
           decryptedShare: result.data,
           arr_ModelRestoreAssociateContactList: [
             {
               modalVisible: true,
-              item: item,
+              item,
             },
           ],
         });
-        //console.log( { deepLinkPara } );
-        //utils.setDeepLinkingUrl( deepLinkPara );
-        //this.props.navigation.navigate( 'WalletScreen' );
+        // console.log( { deepLinkPara } );
+        // utils.setDeepLinkingUrl( deepLinkPara );
+        // this.props.navigation.navigate( 'WalletScreen' );
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  //TODO: GoBack
+  // TODO: GoBack
   click_GoBack() {
     const { navigation } = this.props;
     navigation.goBack();
     navigation.state.params.onSelect({ selected: true });
   }
 
-  //TODO: Popup select any contact
+  // TODO: Popup select any contact
   click_UpdateMsg = async () => {
     const dateTime = Date.now();
-    let recordId = this.state.recordId;
-    let decryptedShare = this.state.decryptedShare;
+    const { recordId } = this.state;
+    const { decryptedShare } = this.state;
     const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSSSRetoreDecryptedShare(
       localDB.tableName.tblSSSDetails,
       JSON.parse(decryptedShare),

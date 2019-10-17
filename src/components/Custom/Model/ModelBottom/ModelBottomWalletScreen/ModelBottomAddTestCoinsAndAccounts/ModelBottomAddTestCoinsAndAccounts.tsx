@@ -22,8 +22,8 @@ export default class ModelBottomAddTestCoinsAndAccounts extends Component<
   }
 
   componentWillReceiveProps = (nextProps: any) => {
-    let data = nextProps.data;
-    //console.log( { data } );
+    const { data } = nextProps;
+    // console.log( { data } );
     if (data != undefined) {
       this.setState({
         data: data[0],
@@ -38,7 +38,7 @@ export default class ModelBottomAddTestCoinsAndAccounts extends Component<
   };
 
   render() {
-    let { data } = this.state;
+    const { data } = this.state;
     return (
       <Modal
         style={[styles.modal, styles.modal4]}
@@ -126,7 +126,7 @@ export default class ModelBottomAddTestCoinsAndAccounts extends Component<
 }
 
 const styles = StyleSheet.create({
-  //botom model
+  // botom model
   modal: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,

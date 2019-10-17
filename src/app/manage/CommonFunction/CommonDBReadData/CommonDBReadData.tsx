@@ -1,9 +1,10 @@
 import { localDB } from 'hexaConstants';
-var dbOpration = require('hexaDBOpration');
-var utils = require('hexaUtils');
+
+const dbOpration = require('hexaDBOpration');
+const utils = require('hexaUtils');
 
 const readTblWallet = async () => {
-  var resultWallet = await dbOpration.readTablesData(
+  let resultWallet = await dbOpration.readTablesData(
     localDB.tableName.tblWallet,
   );
   resultWallet = resultWallet.temp[0];
@@ -12,7 +13,7 @@ const readTblWallet = async () => {
 };
 
 const readTblAccount = async () => {
-  var resAccount = await dbOpration.readTablesData(
+  let resAccount = await dbOpration.readTablesData(
     localDB.tableName.tblAccount,
   );
   resAccount = resAccount.temp;
@@ -20,24 +21,24 @@ const readTblAccount = async () => {
 };
 
 const readTblSSSDetails = async () => {
-  var resSSSDetails = await dbOpration.readTablesData(
+  let resSSSDetails = await dbOpration.readTablesData(
     localDB.tableName.tblSSSDetails,
   );
   resSSSDetails = resSSSDetails.temp;
-  //console.log( { resSSSDetails } );
+  // console.log( { resSSSDetails } );
   await utils.setSSSDetails(resSSSDetails);
   return resSSSDetails;
 };
 
 const readTblTransaction = async () => {
-  var resTranList = await dbOpration.readTablesData(
+  const resTranList = await dbOpration.readTablesData(
     localDB.tableName.tblTransaction,
   );
   return resTranList.temp;
 };
 
 const readTblTrustedPartySSSDetails = async () => {
-  var resSharedSecretList = await dbOpration.readTablesData(
+  let resSharedSecretList = await dbOpration.readTablesData(
     localDB.tableName.tblTrustedPartySSSDetails,
   );
   resSharedSecretList = resSharedSecretList.temp;

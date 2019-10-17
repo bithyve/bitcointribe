@@ -10,11 +10,11 @@ import {
 import { Text } from 'native-base';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { ModelLoader } from 'hexaLoader';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
 
 export default class RestoreWalletUsingMnemonic extends Component {
@@ -121,9 +121,10 @@ export default class RestoreWalletUsingMnemonic extends Component {
         margin: 5,
       }}
     >
-      <TextInput style={{ height: 30 }} placeholder={'Word ' + (index + 1)} />
+      <TextInput style={{ height: 30 }} placeholder={`Word ${index + 1}`} />
     </View>
   );
+
   render() {
     return (
       <View style={styles.container}>

@@ -26,15 +26,16 @@ import InAppBrowser from 'react-native-inappbrowser-reborn';
 
 import { ImageSVG } from 'hexaCustImage';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, svgIcon } from 'hexaConstants';
-var utils = require('hexaUtils');
+
+const utils = require('hexaUtils');
 
 export default class Setting extends React.Component<any, any> {
   constructor(props: any) {
@@ -45,7 +46,7 @@ export default class Setting extends React.Component<any, any> {
   }
 
   async componentWillMount() {
-    let walletDetails = await utils.getWalletDetails();
+    const walletDetails = await utils.getWalletDetails();
     let backupType;
     if (utils.isJson(walletDetails.appHealthStatus)) {
       backupType = JSON.parse(walletDetails.appHealthStatus);
@@ -102,9 +103,9 @@ export default class Setting extends React.Component<any, any> {
     });
   }
 
-  //TODO: func click_FirstMenuItem
+  // TODO: func click_FirstMenuItem
   click_MenuItem(item: any) {
-    let title = item.title;
+    const { title } = item;
     if (title == 'Health of the App') {
       this.props.navigation.push('HealthOfTheAppNavigator');
     } else if (title == 'Address Book') {
@@ -116,7 +117,7 @@ export default class Setting extends React.Component<any, any> {
     }
   }
 
-  //TODO: Open social site
+  // TODO: Open social site
   click_OpenSocialUrl = async (url: string) => {
     try {
       if (await InAppBrowser.isAvailable()) {
@@ -204,7 +205,7 @@ export default class Setting extends React.Component<any, any> {
   };
 
   render() {
-    let arr_FirstListItem = this.state.arr_FirstListItem;
+    const { arr_FirstListItem } = this.state;
     return (
       <Container>
         <ImageBackground

@@ -31,23 +31,24 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 // import QRCode from "react-native-qrcode";
 import QRCode from 'react-native-qrcode-svg';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 import { ModelLoader } from 'hexaLoader';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
 
-//TODO: Bitcoin class
-var bitcoinClassState = require('hexaClassState');
+const alert = new AlertSimple();
+
+// TODO: Bitcoin class
+const bitcoinClassState = require('hexaClassState');
 
 export default class TrustedPartySelfShareQRCode extends React.Component<
   any,
@@ -62,17 +63,17 @@ export default class TrustedPartySelfShareQRCode extends React.Component<
   }
 
   async componentWillMount() {
-    let data = this.props.navigation.getParam('data');
+    const data = this.props.navigation.getParam('data');
     console.log({ data });
-    let decryptedMetaShare = JSON.parse(data.resSharedSecretList.decrShare);
+    const decryptedMetaShare = JSON.parse(data.resSharedSecretList.decrShare);
     console.log({ decryptedMetaShare });
     const sss = await bitcoinClassState.getS3ServiceClassState();
-    var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare(
+    let resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare(
       decryptedMetaShare,
     );
     if (resGenerateEncryptedMetaShare.status == 200) {
       resGenerateEncryptedMetaShare = resGenerateEncryptedMetaShare.data;
-      let resUploadShare = await sss.uploadShare(
+      const resUploadShare = await sss.uploadShare(
         resGenerateEncryptedMetaShare.encryptedMetaShare,
         resGenerateEncryptedMetaShare.messageId,
       );
@@ -87,7 +88,7 @@ export default class TrustedPartySelfShareQRCode extends React.Component<
     } else {
       alert.simpleOk('Oops', resGenerateEncryptedMetaShare.err);
     }
-    let qrCodeData = {};
+    const qrCodeData = {};
     qrCodeData.type = 'SSS Restore Self Share';
     qrCodeData.wn = data.name;
     qrCodeData.data = resGenerateEncryptedMetaShare.key;
@@ -104,8 +105,8 @@ export default class TrustedPartySelfShareQRCode extends React.Component<
   }
 
   render() {
-    //flag
-    let { flag_Loading } = this.state;
+    // flag
+    const { flag_Loading } = this.state;
     return (
       <Container>
         <ImageBackground

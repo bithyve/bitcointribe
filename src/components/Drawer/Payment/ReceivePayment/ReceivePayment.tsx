@@ -27,31 +27,32 @@ import { SvgIcon } from '@up-shared/components';
 import IconFontAwe from 'react-native-vector-icons/FontAwesome';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import QRCode from 'react-native-qrcode-svg';
-//import QRCode from 'react-native-qrcode';
+// import QRCode from 'react-native-qrcode';
 import Share from 'react-native-share';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 import { ModelLoader } from 'hexaLoader';
 import { FullLinearGradientIconWithLoadingButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
-var utils = require('hexaUtils');
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+const alert = new AlertSimple();
+const utils = require('hexaUtils');
 
-//TODO: Bitcoin class
-var bitcoinClassState = require('hexaClassState');
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
+
+// TODO: Bitcoin class
+const bitcoinClassState = require('hexaClassState');
 
 export default class ReceivePayment extends React.Component<any, any> {
   constructor(props: any) {
@@ -69,20 +70,20 @@ export default class ReceivePayment extends React.Component<any, any> {
   }
 
   async componentWillMount() {
-    let selectedAccount = this.props.navigation.getParam('selectedAccount');
-    let walletDetails = await utils.getWalletDetails();
-    //console.log( { walletDetails } );
-    let arr_AccountList = await comFunDBRead.readTblAccount();
-    //console.log( { arr_AccountList } );
-    let regularAccount = await bitcoinClassState.getRegularClassState();
-    var address = await regularAccount.getAddress();
+    const selectedAccount = this.props.navigation.getParam('selectedAccount');
+    const walletDetails = await utils.getWalletDetails();
+    // console.log( { walletDetails } );
+    const arr_AccountList = await comFunDBRead.readTblAccount();
+    // console.log( { arr_AccountList } );
+    const regularAccount = await bitcoinClassState.getRegularClassState();
+    let address = await regularAccount.getAddress();
     if (address.status == 200) {
       address = address.data;
     } else {
       alert.simpleOk('Oops', address.err);
     }
     // var paymentQRCode = await this.getQrCode( address.address );
-    //console.log( { arr_AccountList } );
+    // console.log( { arr_AccountList } );
     this.setState({
       flag_Loading: false,
       arr_AccountList,
@@ -92,14 +93,14 @@ export default class ReceivePayment extends React.Component<any, any> {
     });
   }
 
-  //Dropdown select account name
+  // Dropdown select account name
   onValueChange = async (value: string) => {
     this.setState({
       flag_Loading: true,
     });
-    let regularAccount = await bitcoinClassState.getRegularClassState();
-    let secureAccount = await bitcoinClassState.getSecureClassState();
-    var address;
+    const regularAccount = await bitcoinClassState.getRegularClassState();
+    const secureAccount = await bitcoinClassState.getSecureClassState();
+    let address;
     if (value == 'Daily Wallet') {
       address = await regularAccount.getAddress();
       if (address.status == 200) {
@@ -124,10 +125,10 @@ export default class ReceivePayment extends React.Component<any, any> {
     });
   };
 
-  //get only address qrcode string
+  // get only address qrcode string
   getQrCode = async (address: any, option?: any) => {
-    let regularAccount = await bitcoinClassState.getRegularClassState();
-    //console.log( regularAccount );
+    const regularAccount = await bitcoinClassState.getRegularClassState();
+    // console.log( regularAccount );
     let resPaymentURI = await regularAccount.getPaymentURI(address, option);
     if (resPaymentURI.status == 200) {
       await bitcoinClassState.setRegularClassState(regularAccount);
@@ -138,15 +139,15 @@ export default class ReceivePayment extends React.Component<any, any> {
     return resPaymentURI;
   };
 
-  //amount change then get qrcode string
+  // amount change then get qrcode string
   getQrCodeWithAmount = async () => {
-    let address = this.state.accountAddress;
-    let amount = this.state.amount;
-    //console.log( { amount, address } );
-    let options = {
+    const address = this.state.accountAddress;
+    const { amount } = this.state;
+    // console.log( { amount, address } );
+    const options = {
       amount,
     };
-    var getQRCodeString;
+    let getQRCodeString;
     if (amount != '') {
       getQRCodeString = await this.getQrCode(address, options);
     } else {
@@ -163,9 +164,10 @@ export default class ReceivePayment extends React.Component<any, any> {
       base64string1,
     });
   };
-  //share qrcode image
+
+  // share qrcode image
   click_ShareAddress = async () => {
-    let { qrcodeAddresWithAmount } = this.state;
+    const { qrcodeAddresWithAmount } = this.state;
     // this.setState( {
     //     flag_LoadingShareBtn: true
     // } )
@@ -215,12 +217,12 @@ export default class ReceivePayment extends React.Component<any, any> {
   };
 
   render() {
-    //array
-    let { arr_AccountList } = this.state;
-    //values
-    let { accountName, qrcodeAddresWithAmount, amount } = this.state;
-    //flag
-    let { flag_Loading, flag_LoadingShareBtn } = this.state;
+    // array
+    const { arr_AccountList } = this.state;
+    // values
+    const { accountName, qrcodeAddresWithAmount, amount } = this.state;
+    // flag
+    const { flag_Loading, flag_LoadingShareBtn } = this.state;
     const itemList = arr_AccountList.map((item: any, index: number) => (
       <Picker.Item label={item.accountName} value={item.accountName} />
     ));
@@ -353,7 +355,7 @@ export default class ReceivePayment extends React.Component<any, any> {
                       marginLeft: 10,
                     }}
                   >
-                    {qrcodeAddresWithAmount + '  '}{' '}
+                    {`${qrcodeAddresWithAmount}  `}{' '}
                   </Text>
                   <TouchableOpacity
                     onPress={() => {

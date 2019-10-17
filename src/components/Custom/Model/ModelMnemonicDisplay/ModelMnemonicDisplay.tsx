@@ -12,6 +12,9 @@ import { Button, Text } from 'native-base';
 import { SvgIcon } from '@up-shared/components';
 import Share from 'react-native-share';
 
+// TODO: Custome StyleSheet Files
+import FontFamily from 'hexaStyles';
+
 interface Props {
   data: [];
   closeModal: Function;
@@ -19,9 +22,6 @@ interface Props {
   pop: Function;
   click_Request: Function;
 }
-
-//TODO: Custome StyleSheet Files
-import FontFamily from 'hexaStyles';
 
 export default class ModelMnemonicDisplay extends Component<Props, any> {
   constructor(props: any) {
@@ -32,19 +32,19 @@ export default class ModelMnemonicDisplay extends Component<Props, any> {
   }
 
   componentWillReceiveProps(nextProps: any) {
-    var data = nextProps.data[0];
+    let data = nextProps.data[0];
     if (data != undefined) {
       data = data.data;
-      //console.log( { data } );
+      // console.log( { data } );
       this.setState({
         mnemonic: data,
       });
     }
   }
 
-  //TODO: Next button on click
+  // TODO: Next button on click
   click_Share() {
-    let { mnemonic } = this.state;
+    const { mnemonic } = this.state;
     const shareOptions = {
       title: 'Mnemonic',
       message: mnemonic,
@@ -60,7 +60,7 @@ export default class ModelMnemonicDisplay extends Component<Props, any> {
   }
 
   render() {
-    let { mnemonic } = this.state;
+    const { mnemonic } = this.state;
     return (
       <Modal
         transparent

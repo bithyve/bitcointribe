@@ -31,16 +31,17 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 // import QRCode from "react-native-qrcode";
 import QRCode from 'react-native-qrcode-svg';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
-var utils = require('hexaUtils');
+
+const utils = require('hexaUtils');
 
 export default class TrsutedPartyQRCode extends React.Component<any, any> {
   constructor(props: any) {
@@ -53,10 +54,10 @@ export default class TrsutedPartyQRCode extends React.Component<any, any> {
   }
 
   async componentWillMount() {
-    let data = this.props.navigation.getParam('data');
+    const data = this.props.navigation.getParam('data');
     console.log({ data });
-    let walletDetails = utils.getWalletDetails();
-    let qrCodeData = {};
+    const walletDetails = utils.getWalletDetails();
+    const qrCodeData = {};
     qrCodeData.type = 'SSS Restore QR';
     qrCodeData.wn = walletDetails.walletType;
     qrCodeData.data = data.key;

@@ -15,15 +15,15 @@ import CodeInput from 'react-native-confirmation-code-input';
 import * as Keychain from 'react-native-keychain';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { ModelLoader } from 'hexaLoader';
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, asyncStorageKeys } from 'hexaConstants';
 import { renderIf } from 'hexaValidation';
 import Singleton from 'hexaSingleton';
@@ -97,8 +97,8 @@ export default class PasscodeConfirm extends Component<any, any> {
 
   saveData = async () => {
     try {
-      let code = this.state.pincode;
-      let commonData = Singleton.getInstance();
+      const code = this.state.pincode;
+      const commonData = Singleton.getInstance();
       commonData.setPasscode(code);
       const username = 'HexaWallet';
       const password = code;
@@ -252,7 +252,7 @@ export default class PasscodeConfirm extends Component<any, any> {
                       : { opacity: 0.4 },
                     { borderRadius: 5 },
                   ]}
-                  disabled={this.state.status == true ? false : true}
+                  disabled={this.state.status != true}
                   title="PROCEED"
                   click_Done={() => this.saveData()}
                 />

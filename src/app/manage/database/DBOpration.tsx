@@ -1,28 +1,32 @@
-//TODO: Custome Pages
-import { localDB } from '../../../app/constants/Constants';
-var utils = require('../../../app/constants/Utils');
+// TODO: Custome Pages
+import { localDB } from '../../constants/Constants';
 import Singleton from '../../constants/Singleton';
 import '../../../assets/static/js/sugar.js';
-
-const getPasscode = () => {
-  let commonData = Singleton.getInstance();
-  return commonData.getPasscode();
-};
 import SQLite from 'react-native-sqlite-storage';
 
+// TODO: Json Files
+import accountTypeData from '../../../assets/jsonfiles/tblAccountType/tblAccountType.json';
+
+const utils = require('../../../app/constants/Utils');
+
+const getPasscode = () => {
+  const commonData = Singleton.getInstance();
+  return commonData.getPasscode();
+};
+
 errorCB = err => {
-  //console.log( "SQL Error: " + err );
+  // console.log( "SQL Error: " + err );
 };
 
 successCB = () => {
-  //console.log( "SQL executed fine" );
+  // console.log( "SQL executed fine" );
 };
 
 openCB = () => {
-  //console.log( "Database OPENED" );
+  // console.log( "Database OPENED" );
 };
 
-var db = SQLite.openDatabase(
+const db = SQLite.openDatabase(
   localDB.dbName,
   '1.0',
   'HexaWallet Database',
@@ -30,20 +34,17 @@ var db = SQLite.openDatabase(
   this.openCB(),
   this.errorCB(),
 );
-
-//TODO: Json Files
-import accountTypeData from '../../../assets/jsonfiles/tblAccountType/tblAccountType.json';
-//TODO: Select All Table Data
+// TODO: Select All Table Data
 const readTablesData = (tableName: any) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
-    var temp = [];
+    const temp = [];
     db.transaction(tx => {
-      tx.executeSql('SELECT * FROM ' + tableName, [], (tx, results) => {
-        var len = results.rows.length;
+      tx.executeSql(`SELECT * FROM ${tableName}`, [], (tx, results) => {
+        const len = results.rows.length;
         if (len > 0) {
           for (let i = 0; i < len; i++) {
-            let data = results.rows.item(i);
+            const data = results.rows.item(i);
             if (tableName == 'tblWallet') {
               data.id = data.id;
               data.address = utils.decrypt(data.address, passcode);
@@ -154,16 +155,16 @@ const readTablesData = (tableName: any) => {
 };
 
 const readAccountTablesData = (tableName: string) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve: any, reject: any) => {
-    var temp = [];
+    const temp = [];
     db.transaction(tx => {
       let accountId: number;
-      tx.executeSql('SELECT * FROM ' + tableName, [], (tx, results) => {
-        var len = results.rows.length;
+      tx.executeSql(`SELECT * FROM ${tableName}`, [], (tx, results) => {
+        const len = results.rows.length;
         if (len > 0) {
           for (let i = 0; i < len; i++) {
-            let dbaccountType = utils.decrypt(
+            const dbaccountType = utils.decrypt(
               results.rows.item(i).accountType,
               passcode,
             );
@@ -174,17 +175,13 @@ const readAccountTablesData = (tableName: string) => {
           }
         }
         tx.executeSql(
-          'SELECT * from ' +
-            tableName +
-            ' ORDER BY (id= ' +
-            accountId +
-            ') ASC',
+          `SELECT * from ${tableName} ORDER BY (id= ${accountId}) ASC`,
           [],
           (tx, results) => {
-            var len = results.rows.length;
+            const len = results.rows.length;
             if (len > 0) {
               for (let i = 0; i < len; i++) {
-                let data = results.rows.item(i);
+                const data = results.rows.item(i);
                 data.id = data.id;
                 data.dateCreated = utils.decrypt(data.dateCreated, passcode);
                 data.lastUpdated = utils.decrypt(data.lastUpdated, passcode);
@@ -207,37 +204,37 @@ const readAccountTablesData = (tableName: string) => {
     });
   });
 };
-//TODO: Select tblAccountType
+// TODO: Select tblAccountType
 const readTableAcccountType = async (
   tableName1: string,
   tableName2: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve: any, reject: any) => {
-    var temp = [];
+    const temp = [];
     db.transaction(tx => {
-      tx.executeSql('select name  from ' + tableName1, [], (tx, results) => {
-        var len = results.rows.length;
+      tx.executeSql(`select name  from ${tableName1}`, [], (tx, results) => {
+        const len = results.rows.length;
         if (len > 0) {
           for (let i = 0; i < len; i++) {
-            var data = results.rows.item(i);
+            const data = results.rows.item(i);
             data.name = utils.decrypt(results.rows.item(i).name, passcode);
             temp.push(data);
           }
           temp.shift();
           temp.pop();
 
-          //for hide vault account and joint account
+          // for hide vault account and joint account
           temp.splice(1, 1);
           temp.splice(1, 1);
           tx.executeSql(
-            'select accountType  from ' + tableName2,
+            `select accountType  from ${tableName2}`,
             [],
             (tx2, results2) => {
-              var len2 = results2.rows.length;
+              const len2 = results2.rows.length;
               if (len2 > 0) {
                 for (let i2 = 0; i2 < len2; i2++) {
-                  var data2 = {};
+                  const data2 = {};
                   data2.name = utils.decrypt(
                     results2.rows.item(i2).accountType,
                     passcode,
@@ -272,21 +269,21 @@ const readTableAcccountType = async (
   });
 };
 
-//TODO: Select Recent Transaciton Address Wise
+// TODO: Select Recent Transaciton Address Wise
 const readRecentTransactionAddressWise = (
   tableName: string,
   address: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
-    var temp: any = [];
+    const temp: any = [];
     db.transaction(tx => {
       let accountId: number;
-      tx.executeSql('SELECT * FROM ' + tableName, [], (tx, results) => {
-        var len = results.rows.length;
+      tx.executeSql(`SELECT * FROM ${tableName}`, [], (tx, results) => {
+        const len = results.rows.length;
         if (len > 0) {
           for (let i = 0; i < len; i++) {
-            let dbdecryptAddress = utils.decrypt(
+            const dbdecryptAddress = utils.decrypt(
               results.rows.item(i).accountAddress,
               passcode,
             );
@@ -295,17 +292,13 @@ const readRecentTransactionAddressWise = (
             if (dbdecryptAddress == address) {
               accountId = parseInt(results.rows.item(i).id);
               tx.executeSql(
-                'SELECT * FROM ' +
-                  tableName +
-                  ' where id = ' +
-                  accountId +
-                  ' order by id asc',
+                `SELECT * FROM ${tableName} where id = ${accountId} order by id asc`,
                 [],
                 (tx, results) => {
-                  var len = results.rows.length;
+                  const len = results.rows.length;
                   if (len > 0) {
                     for (let i = 0; i < len; i++) {
-                      let data = {};
+                      const data = {};
                       data.id = results.rows.item(i).id;
                       data.accountAddress = utils.decrypt(
                         results.rows.item(i).accountAddress,
@@ -363,25 +356,25 @@ const readRecentTransactionAddressWise = (
   });
 };
 
-//TODO: Update
-//update:tblAmount
+// TODO: Update
+// update:tblAmount
 const updateTableData = (
   tblName: string,
   balance: string,
   address: string,
   lastUdateDate: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn) {
-        //select all data form tblAccount
+        // select all data form tblAccount
         let accountId;
-        txn.executeSql('SELECT * FROM ' + tblName, [], (tx, results) => {
-          var len = results.rows.length;
+        txn.executeSql(`SELECT * FROM ${tblName}`, [], (tx, results) => {
+          const len = results.rows.length;
           if (len > 0) {
             for (let i = 0; i < len; i++) {
-              let dbdecryptAddress = utils.decrypt(
+              const dbdecryptAddress = utils.decrypt(
                 results.rows.item(i).address,
                 passcode,
               );
@@ -389,9 +382,7 @@ const updateTableData = (
                 accountId = results.rows.item(i).id;
               }
               txn.executeSql(
-                'update ' +
-                  tblName +
-                  ' set balance = :amount,lastUpdated = :lastUpdated where id = :id',
+                `update ${tblName} set balance = :amount,lastUpdated = :lastUpdated where id = :id`,
                 [
                   utils.encrypt(balance.toString(), passcode),
                   lastUdateDate,
@@ -409,22 +400,20 @@ const updateTableData = (
   });
 };
 
-//TODO: Insert
+// TODO: Insert
 
-//TODO: insert Account Type
+// TODO: insert Account Type
 const insertAccountTypeData = (tblName, txtDate) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     db.transaction(function(txn) {
       if (accountTypeData) {
-        var len = accountTypeData.accountType.length;
+        const len = accountTypeData.accountType.length;
         if (len > 0) {
           for (let i = 0; i < len; i++) {
-            var data = accountTypeData.accountType[i];
+            const data = accountTypeData.accountType[i];
             txn.executeSql(
-              'INSERT INTO ' +
-                tblName +
-                ' (dateCreated,name,lastUpdated) VALUES (:dateCreated,:name,:lastUpdated)',
+              `INSERT INTO ${tblName} (dateCreated,name,lastUpdated) VALUES (:dateCreated,:name,:lastUpdated)`,
               [
                 utils.encrypt(txtDate.toString(), passcode),
                 utils.encrypt(data.name.toString(), passcode),
@@ -439,8 +428,8 @@ const insertAccountTypeData = (tblName, txtDate) => {
   });
 };
 
-//TODO: ========================================>  Wallet Details  <========================================
-//insert
+// TODO: ========================================>  Wallet Details  <========================================
+// insert
 const insertWallet = (
   tblName: string,
   fulldate: string,
@@ -453,14 +442,12 @@ const insertWallet = (
   setUpWalletAnswerDetails: any,
   appHealthStatus: any,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     db.transaction(function(txn) {
-      txn.executeSql('DELETE FROM ' + tblName);
+      txn.executeSql(`DELETE FROM ${tblName}`);
       txn.executeSql(
-        'INSERT INTO ' +
-          tblName +
-          ' (dateCreated,mnemonic,privateKey,address,publicKey,walletType,setUpWalletAnswerDetails,appHealthStatus,backupInfo,lastUpdated) VALUES (:dateCreated,:mnemonic,:privateKey,:address,:publicKey,:walletType,:setUpWalletAnswerDetails,:appHealthStatus,:backupInfo,:lastUpdated)',
+        `INSERT INTO ${tblName} (dateCreated,mnemonic,privateKey,address,publicKey,walletType,setUpWalletAnswerDetails,appHealthStatus,backupInfo,lastUpdated) VALUES (:dateCreated,:mnemonic,:privateKey,:address,:publicKey,:walletType,:setUpWalletAnswerDetails,:appHealthStatus,:backupInfo,:lastUpdated)`,
         [
           utils.encrypt(fulldate.toString(), passcode),
           utils.encrypt(mnemonicValue.toString(), passcode),
@@ -482,14 +469,14 @@ const insertWallet = (
   });
 };
 
-//update
+// update
 const updateWalletBackedUpSecretQue = (tblName: string, fulldate: string) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn) {
         txn.executeSql(
-          'update ' + tblName + ' set lastUpdated = :lastUpdated where id = 1',
+          `update ${tblName} set lastUpdated = :lastUpdated where id = 1`,
           [utils.encrypt(fulldate.toString(), passcode)],
         );
         resolve(true);
@@ -501,14 +488,12 @@ const updateWalletBackedUpSecretQue = (tblName: string, fulldate: string) => {
 };
 
 const updateWalletAppHealthStatus = (tblName: string, AppHealthStatus: any) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn: any) {
         txn.executeSql(
-          'update ' +
-            tblName +
-            ' set appHealthStatus = :appHealthStatus where id = 1',
+          `update ${tblName} set appHealthStatus = :appHealthStatus where id = 1`,
           [utils.encrypt(JSON.stringify(AppHealthStatus).toString(), passcode)],
         );
         resolve(true);
@@ -524,14 +509,12 @@ const updateWalletMnemonic = (
   mnemonic: string,
   fulldate: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn) {
         txn.executeSql(
-          'update ' +
-            tblName +
-            ' set mnemonic = :mnemonic,lastUpdated = :lastUpdated where id = 1',
+          `update ${tblName} set mnemonic = :mnemonic,lastUpdated = :lastUpdated where id = 1`,
           [
             utils.encrypt(mnemonic.toString(), passcode),
             utils.encrypt(fulldate.toString(), passcode),
@@ -551,14 +534,12 @@ const updateWalletMnemonicAndAnwserDetails = (
   QueAnwserDetails: any,
   fulldate: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn) {
         txn.executeSql(
-          'update ' +
-            tblName +
-            ' set mnemonic = :mnemonic,setUpWalletAnswerDetails = :setUpWalletAnswerDetails, lastUpdated = :lastUpdated where id = 1',
+          `update ${tblName} set mnemonic = :mnemonic,setUpWalletAnswerDetails = :setUpWalletAnswerDetails, lastUpdated = :lastUpdated where id = 1`,
           [
             utils.encrypt(mnemonic.toString(), passcode),
             utils.encrypt(
@@ -576,9 +557,9 @@ const updateWalletMnemonicAndAnwserDetails = (
   });
 };
 
-//TODO: ========================================>  Accounts  Details  <========================================
+// TODO: ========================================>  Accounts  Details  <========================================
 
-//TODO: insert tblAccount Only First Time
+// TODO: insert tblAccount Only First Time
 const insertCreateAccount = (
   tblName: string,
   date: string,
@@ -589,14 +570,12 @@ const insertCreateAccount = (
   accountType: string,
   additionalInfo: any,
 ) => {
-  let passcode = getPasscode();
-  let fullDate = utils.encrypt(date.toString(), passcode);
+  const passcode = getPasscode();
+  const fullDate = utils.encrypt(date.toString(), passcode);
   return new Promise((resolve, reject) => {
     db.transaction(function(txn) {
       txn.executeSql(
-        'INSERT INTO ' +
-          tblName +
-          '(dateCreated,address,balance,unit,accountName,accountType,additionalInfo,lastUpdated) VALUES (:dateCreated,:address,:balance,:unit,:accountName,:accountType,:additionalInfo,:lastUpdated)',
+        `INSERT INTO ${tblName}(dateCreated,address,balance,unit,accountName,accountType,additionalInfo,lastUpdated) VALUES (:dateCreated,:address,:balance,:unit,:accountName,:accountType,:additionalInfo,:lastUpdated)`,
         [
           fullDate,
           utils.encrypt(address.toString(), passcode),
@@ -613,7 +592,7 @@ const insertCreateAccount = (
   });
 };
 
-//TODO: insert Last Before Create Account
+// TODO: insert Last Before Create Account
 const insertLastBeforeCreateAccount = (
   tblName: string,
   fulldate: string,
@@ -623,15 +602,15 @@ const insertLastBeforeCreateAccount = (
   accountType: string,
   additionalInfo: any,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
-    let date = utils.encrypt(fulldate.toString(), passcode);
-    let add = utils.encrypt(address.toString(), passcode);
-    let amount = utils.encrypt('0', passcode);
-    let unitvalue = utils.encrypt(unit.toString(), passcode);
-    let accountNameValue = utils.encrypt(accountName.toString(), passcode);
-    let accountTypesValue = utils.encrypt(accountType.toString(), passcode);
-    let moreInfo = utils.encrypt(
+    const date = utils.encrypt(fulldate.toString(), passcode);
+    const add = utils.encrypt(address.toString(), passcode);
+    const amount = utils.encrypt('0', passcode);
+    const unitvalue = utils.encrypt(unit.toString(), passcode);
+    const accountNameValue = utils.encrypt(accountName.toString(), passcode);
+    const accountTypesValue = utils.encrypt(accountType.toString(), passcode);
+    const moreInfo = utils.encrypt(
       JSON.stringify(additionalInfo).toString(),
       passcode,
     );
@@ -655,7 +634,7 @@ const insertLastBeforeCreateAccount = (
   });
 };
 
-//update
+// update
 const updateSecureAccountAddressAndBal = (
   tblName: string,
   address: string,
@@ -663,21 +642,19 @@ const updateSecureAccountAddressAndBal = (
   id: string,
   isActive: number,
 ) => {
-  let passcode = getPasscode();
-  let date = Date.now();
+  const passcode = getPasscode();
+  const date = Date.now();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn) {
-        txn.executeSql('SELECT * FROM ' + tblName, [], (tx, results) => {
-          var len = results.rows.length;
+        txn.executeSql(`SELECT * FROM ${tblName}`, [], (tx, results) => {
+          const len = results.rows.length;
           if (len > 0) {
             for (let i = 0; i < len; i++) {
-              let dbId = results.rows.item(i).id;
+              const dbId = results.rows.item(i).id;
               if (dbId == id) {
                 txn.executeSql(
-                  'update ' +
-                    tblName +
-                    ' set address = :address,balance =:balance,lastUpdated =:lastUpdated,isActive =:isActive where id = :id',
+                  `update ${tblName} set address = :address,balance =:balance,lastUpdated =:lastUpdated,isActive =:isActive where id = :id`,
                   [
                     utils.encrypt(address.toString(), passcode),
                     utils.encrypt(bal.toString(), passcode),
@@ -703,24 +680,22 @@ const updateAccountBalAccountTypeWise = (
   accountType: string,
   bal: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn) {
-        txn.executeSql('SELECT * FROM ' + tblName, [], (tx, results) => {
-          var len = results.rows.length;
+        txn.executeSql(`SELECT * FROM ${tblName}`, [], (tx, results) => {
+          const len = results.rows.length;
           if (len > 0) {
             for (let i = 0; i < len; i++) {
-              let dbdecryptAccountType = utils.decrypt(
+              const dbdecryptAccountType = utils.decrypt(
                 results.rows.item(i).accountType,
                 passcode,
               );
-              let encpAccountType = results.rows.item(i).accountType;
+              const encpAccountType = results.rows.item(i).accountType;
               if (dbdecryptAccountType == accountType) {
                 txn.executeSql(
-                  'update ' +
-                    tblName +
-                    ' set balance =:balance where accountType = :accountType',
+                  `update ${tblName} set balance =:balance where accountType = :accountType`,
                   [utils.encrypt(bal.toString(), passcode), encpAccountType],
                 );
                 resolve(true);
@@ -741,25 +716,23 @@ const updateAccountBal = (
   bal: string,
   id: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn) {
-        txn.executeSql('SELECT * FROM ' + tblName, [], (tx, results) => {
-          var len = results.rows.length;
+        txn.executeSql(`SELECT * FROM ${tblName}`, [], (tx, results) => {
+          const len = results.rows.length;
           if (len > 0) {
             for (let i = 0; i < len; i++) {
-              let dbdecryptAddress = utils.decrypt(
+              const dbdecryptAddress = utils.decrypt(
                 results.rows.item(i).address,
                 passcode,
               );
-              let dbId = results.rows.item(i).id;
-              let dbAddress = results.rows.item(i).address;
+              const dbId = results.rows.item(i).id;
+              const dbAddress = results.rows.item(i).address;
               if (dbId == id && dbdecryptAddress == address) {
                 txn.executeSql(
-                  'update ' +
-                    tblName +
-                    ' set balance =:balance where id = :id and address = :address',
+                  `update ${tblName} set balance =:balance where id = :id and address = :address`,
                   [utils.encrypt(bal.toString(), passcode), dbId, dbAddress],
                 );
                 resolve(true);
@@ -780,14 +753,12 @@ const updateSecureAccountAddInfo = (
   addInfo: any,
   id: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn: any) {
         txn.executeSql(
-          'update ' +
-            tblName +
-            ' set lastUpdated =:lastUpdated,additionalInfo =:additionalInfo where id = :id',
+          `update ${tblName} set lastUpdated =:lastUpdated,additionalInfo =:additionalInfo where id = :id`,
           [
             utils.encrypt(date.toString(), passcode),
             utils.encrypt(JSON.stringify(addInfo).toString(), passcode),
@@ -802,25 +773,23 @@ const updateSecureAccountAddInfo = (
   });
 };
 
-//TODO: ========================================>  Transaction  Details  <========================================
-//TODO: insert Transaction
+// TODO: ========================================>  Transaction  Details  <========================================
+// TODO: insert Transaction
 const insertTblTransation = (
   tblName: string,
   transactionDetails: any,
   fulldate: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     db.transaction(function(txn: any) {
-      txn.executeSql('DELETE FROM ' + tblName);
+      txn.executeSql(`DELETE FROM ${tblName}`);
       for (let i = 0; i < transactionDetails.length; i++) {
-        //console.log( { trna: transactionDetails[ i ] } );
-        //console.log( { amount: parseInt( transactionDetails[ i ].amount ) } );
-        //console.log( { re: transactionDetails[ i ].senderAddresses != undefined ? JSON.stringify( transactionDetails[ i ].senderAddresses ) : "" } );
+        // console.log( { trna: transactionDetails[ i ] } );
+        // console.log( { amount: parseInt( transactionDetails[ i ].amount ) } );
+        // console.log( { re: transactionDetails[ i ].senderAddresses != undefined ? JSON.stringify( transactionDetails[ i ].senderAddresses ) : "" } );
         txn.executeSql(
-          'INSERT INTO ' +
-            tblName +
-            '(dateCreated,accountType,amount,confimation,tranDate,fees,receipientAddress,senderAddress,status,transactionType,txid,lastUpdated) VALUES (:dateCreated,:accountType,:amount,:confimation,:tranDate,:fees,:receipientAddress,:senderAddress,:status,:transactionType,:txid,:lastUpdated)',
+          `INSERT INTO ${tblName}(dateCreated,accountType,amount,confimation,tranDate,fees,receipientAddress,senderAddress,status,transactionType,txid,lastUpdated) VALUES (:dateCreated,:accountType,:amount,:confimation,:tranDate,:fees,:receipientAddress,:senderAddress,:status,:transactionType,:txid,:lastUpdated)`,
           [
             utils.encrypt(fulldate.toString(), passcode),
             utils.encrypt(
@@ -862,27 +831,27 @@ const insertTblTransation = (
   });
 };
 
-//TODO: ========================================>  SSS Details  <========================================
-//read
+// TODO: ========================================>  SSS Details  <========================================
+// read
 
 const readSSSTableData = (tableName: any, recordID: string) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
-    var temp = [];
+    const temp = [];
     db.transaction(tx => {
-      tx.executeSql('SELECT * FROM ' + tableName, [], (tx, results) => {
-        var len = results.rows.length;
+      tx.executeSql(`SELECT * FROM ${tableName}`, [], (tx, results) => {
+        const len = results.rows.length;
         if (len > 0) {
           for (let i = 0; i < len; i++) {
             // console.log( { results } );
             // console.log( results.rows.item( i ).recordId );
-            let dbdecryptrecordID = utils.decrypt(
+            const dbdecryptrecordID = utils.decrypt(
               results.rows.item(i).recordId,
               passcode,
             );
             // console.log( { dbdecryptrecordID } );
             if (dbdecryptrecordID == recordID) {
-              let data = results.rows.item(i);
+              const data = results.rows.item(i);
               data.id = data.id;
               data.share = utils.decrypt(data.share, passcode);
               data.shareId = utils.decrypt(data.shareId, passcode);
@@ -904,13 +873,13 @@ const readSSSTableData = (tableName: any, recordID: string) => {
   });
 };
 
-//insert
+// insert
 const insertSSSShareDetails = (tblName: string, temp: any) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     temp = temp[0];
-    let histroy = [];
-    let data = {};
+    const histroy = [];
+    const data = {};
     data.title = 'Secret Created.';
     data.date = utils.getUnixToDateFormat2();
     histroy.push(data);
@@ -918,21 +887,19 @@ const insertSSSShareDetails = (tblName: string, temp: any) => {
       for (let i = 0; i < temp.type.length; i++) {
         // console.log( { len: temp.share.length, i: i } );
         // console.log( { date: temp.date.toString(), share: temp.share[ i ].toString(), keerinfo: JSON.stringify( temp.keeperInfo[ i ].info ).toString(), history: JSON.stringify( histroy ).toString() } );
-        let share = temp.share != null ? temp.share[i].toString() : '';
-        let shareId =
+        const share = temp.share != null ? temp.share[i].toString() : '';
+        const shareId =
           temp.shareId != null ? temp.shareId[i].data.shareId.toString() : '';
-        let keeperInfo =
+        const keeperInfo =
           temp.keeperInfo[i].info != null
             ? JSON.stringify(temp.keeperInfo[i].info).toString()
             : '';
-        let metaShare =
+        const metaShare =
           temp.encryptedMetaShare[i].metaShare != null
             ? JSON.stringify(temp.encryptedMetaShare[i].metaShare).toString()
             : '';
         txn.executeSql(
-          'INSERT INTO ' +
-            tblName +
-            '(dateCreated,share,shareId,keeperInfo,history,decryptedShare,type,lastSuccessfulCheck) VALUES (:dateCreated,:share,:shareId,:keeperInfo,:history,:decryptedShare,:type,:lastSuccessfulCheck)',
+          `INSERT INTO ${tblName}(dateCreated,share,shareId,keeperInfo,history,decryptedShare,type,lastSuccessfulCheck) VALUES (:dateCreated,:share,:shareId,:keeperInfo,:history,:decryptedShare,:type,:lastSuccessfulCheck)`,
           [
             utils.encrypt(temp.date.toString(), passcode),
             utils.encrypt(share, passcode),
@@ -956,29 +923,27 @@ const updateRestoreUsingTrustedContactKeepInfo = (
   keepInfo: any,
   type: any,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
-    let temp = [];
-    let jsonData = {};
+    const temp = [];
+    const jsonData = {};
     jsonData.title = 'Secret Created.';
     jsonData.date = utils.getUnixToDateFormat2();
     temp.push(jsonData);
     db.transaction(function(txn) {
       for (let i = 0; i < keepInfo.length; i++) {
-        let data = keepInfo[i];
-        txn.executeSql('SELECT * FROM ' + tblName, [], (tx, results) => {
-          var len = results.rows.length;
+        const data = keepInfo[i];
+        txn.executeSql(`SELECT * FROM ${tblName}`, [], (tx, results) => {
+          const len = results.rows.length;
           for (let ii = 0; ii < len; ii++) {
-            let dbdecryptType = utils.decrypt(
+            const dbdecryptType = utils.decrypt(
               results.rows.item(ii).type,
               passcode,
             );
-            let encpType = results.rows.item(ii).type;
+            const encpType = results.rows.item(ii).type;
             if (dbdecryptType == type[i].type) {
               txn.executeSql(
-                'update ' +
-                  tblName +
-                  ' set keeperInfo = :keeperInfo,history =:history,recordId =:recordId,lastSuccessfulCheck =:lastSuccessfulCheck where type = :type',
+                `update ${tblName} set keeperInfo = :keeperInfo,history =:history,recordId =:recordId,lastSuccessfulCheck =:lastSuccessfulCheck where type = :type`,
                 [
                   utils.encrypt(JSON.stringify(data).toString(), passcode),
                   utils.encrypt(JSON.stringify(temp).toString(), passcode),
@@ -1003,27 +968,25 @@ const updateRestoreUsingTrustedContactSelfShare = (
   type: string,
   shareStage: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
-    let temp = [];
-    let jsonData = {};
+    const temp = [];
+    const jsonData = {};
     jsonData.title = 'Secret Created.';
     jsonData.date = utils.getUnixToDateFormat2();
     temp.push(jsonData);
     db.transaction(function(txn) {
-      txn.executeSql('SELECT * FROM ' + tblName, [], (tx, results) => {
-        var len = results.rows.length;
+      txn.executeSql(`SELECT * FROM ${tblName}`, [], (tx, results) => {
+        const len = results.rows.length;
         for (let ii = 0; ii < len; ii++) {
-          let dbdecryptType = utils.decrypt(
+          const dbdecryptType = utils.decrypt(
             results.rows.item(ii).type,
             passcode,
           );
-          let encpType = results.rows.item(ii).type;
+          const encpType = results.rows.item(ii).type;
           if (dbdecryptType == type) {
             txn.executeSql(
-              'update ' +
-                tblName +
-                ' set decryptedShare = :decryptedShare,history =:history,sharedDate =:sharedDate,acceptedDate=:acceptedDate,shareStage=:shareStage,lastSuccessfulCheck =:lastSuccessfulCheck where type = :type',
+              `update ${tblName} set decryptedShare = :decryptedShare,history =:history,sharedDate =:sharedDate,acceptedDate=:acceptedDate,shareStage=:shareStage,lastSuccessfulCheck =:lastSuccessfulCheck where type = :type`,
               [
                 utils.encrypt(JSON.stringify(shares).toString(), passcode),
                 utils.encrypt(JSON.stringify(temp).toString(), passcode),
@@ -1042,21 +1005,19 @@ const updateRestoreUsingTrustedContactSelfShare = (
   });
 };
 
-//update shareId shareStage
+// update shareId shareStage
 const updateSSSRetoreDecryptedShare = (
   tblName: string,
   decryptedMetaShare: any,
   fulldate: string,
   id: number,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn: any) {
         txn.executeSql(
-          'update ' +
-            tblName +
-            ' set decryptedShare = :decryptedShare,acceptedDate =:acceptedDate,lastSuccessfulCheck =:lastSuccessfulCheck,sharedDate =:sharedDate,shareStage =:shareStage where id = :id',
+          `update ${tblName} set decryptedShare = :decryptedShare,acceptedDate =:acceptedDate,lastSuccessfulCheck =:lastSuccessfulCheck,sharedDate =:sharedDate,shareStage =:shareStage where id = :id`,
           [
             utils.encrypt(
               JSON.stringify(decryptedMetaShare).toString(),
@@ -1077,7 +1038,7 @@ const updateSSSRetoreDecryptedShare = (
   });
 };
 
-//update trnasfer method and shared date
+// update trnasfer method and shared date
 const updateSSSTransferMehtodDetails = (
   tblName: string,
   type: string,
@@ -1085,26 +1046,24 @@ const updateSSSTransferMehtodDetails = (
   history: any,
   recoardId: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn) {
-        txn.executeSql('SELECT * FROM ' + tblName, [], (tx, results) => {
-          var len = results.rows.length;
+        txn.executeSql(`SELECT * FROM ${tblName}`, [], (tx, results) => {
+          const len = results.rows.length;
           if (len > 0) {
             for (let i = 0; i < len; i++) {
               //  console.log( results.rows.item( i ).recordId );
-              let dbdecryptrecordID = utils.decrypt(
+              const dbdecryptrecordID = utils.decrypt(
                 results.rows.item(i).recordId,
                 passcode,
               );
               console.log({ dbdecryptrecordID, recoardId });
-              let recordId = results.rows.item(i).recordId;
+              const { recordId } = results.rows.item(i);
               if (dbdecryptrecordID == recoardId) {
                 txn.executeSql(
-                  'update ' +
-                    tblName +
-                    ' set transferMethod = :transferMethod,sharedDate =:sharedDate,history =:history where recordId = :recordId',
+                  `update ${tblName} set transferMethod = :transferMethod,sharedDate =:sharedDate,history =:history where recordId = :recordId`,
                   [
                     utils.encrypt(type.toString(), passcode),
                     utils.encrypt(date.toString(), passcode),
@@ -1125,32 +1084,30 @@ const updateSSSTransferMehtodDetails = (
   });
 };
 
-//update shareId shareStage
+// update shareId shareStage
 const updateSSSShareId = (
   tblName: string,
   fulldate: string,
   shareId: string,
   type: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn) {
-        //console.log( { tblName, shareInfo, fulldate } );
-        txn.executeSql('SELECT * FROM ' + tblName, [], (tx, results) => {
-          var len = results.rows.length;
+        // console.log( { tblName, shareInfo, fulldate } );
+        txn.executeSql(`SELECT * FROM ${tblName}`, [], (tx, results) => {
+          const len = results.rows.length;
           if (len > 0) {
             for (let j = 0; j < len; j++) {
-              let decryptType = utils.decrypt(
+              const decryptType = utils.decrypt(
                 results.rows.item(j).type,
                 passcode,
               );
-              let encpType = results.rows.item(j).type;
+              const encpType = results.rows.item(j).type;
               if (decryptType == type) {
                 txn.executeSql(
-                  'update ' +
-                    tblName +
-                    ' set shareid = :shareid,lastSuccessfulCheck =:lastSuccessfulCheck where type = :type',
+                  `update ${tblName} set shareid = :shareid,lastSuccessfulCheck =:lastSuccessfulCheck where type = :type`,
                   [
                     utils.encrypt(shareId.toString(), passcode),
                     utils.encrypt(fulldate.toString(), passcode),
@@ -1170,32 +1127,30 @@ const updateSSSShareId = (
   });
 };
 
-//update shareId shareStage
+// update shareId shareStage
 const updateSSSShareStage = (
   tblName: string,
   shareInfo: any,
   fulldate: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn) {
-        //console.log( { tblName, shareInfo, fulldate } );
+        // console.log( { tblName, shareInfo, fulldate } );
         for (let i = 0; i < shareInfo.length; i++) {
-          txn.executeSql('SELECT * FROM ' + tblName, [], (tx, results) => {
-            var len = results.rows.length;
+          txn.executeSql(`SELECT * FROM ${tblName}`, [], (tx, results) => {
+            const len = results.rows.length;
             if (len > 0) {
               for (let j = 0; j < len; j++) {
-                let decryptShareId = utils.decrypt(
+                const decryptShareId = utils.decrypt(
                   results.rows.item(j).shareId,
                   passcode,
                 );
-                let shareId = results.rows.item(j).shareId;
+                const { shareId } = results.rows.item(j);
                 if (decryptShareId == shareInfo[i].shareId) {
                   txn.executeSql(
-                    'update ' +
-                      tblName +
-                      ' set acceptedDate= :acceptedDate ,shareStage = :shareStage,lastSuccessfulCheck =:lastSuccessfulCheck where shareid = :shareid',
+                    `update ${tblName} set acceptedDate= :acceptedDate ,shareStage = :shareStage,lastSuccessfulCheck =:lastSuccessfulCheck where shareid = :shareid`,
                     [
                       utils.encrypt(
                         shareInfo[i].acceptedDate.toString(),
@@ -1223,7 +1178,7 @@ const updateSSSShareStage = (
   });
 };
 
-//update shareId shareStage Id Wise
+// update shareId shareStage Id Wise
 const updateSSSShareStageIdWise = (
   tblName: string,
   resCheckHealth: any,
@@ -1231,16 +1186,14 @@ const updateSSSShareStageIdWise = (
   arrEachShareId: any,
   fulldate: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn) {
-        //console.log( { tblName, shareInfo, fulldate } );
+        // console.log( { tblName, shareInfo, fulldate } );
         for (let i = 0; i < arrEachShareId.length; i++) {
           txn.executeSql(
-            'update ' +
-              tblName +
-              ' set  shareid = :shareid,  shareStage = :shareStage,lastSuccessfulCheck =:lastSuccessfulCheck where id = :id',
+            `update ${tblName} set  shareid = :shareid,  shareStage = :shareStage,lastSuccessfulCheck =:lastSuccessfulCheck where id = :id`,
             [
               utils.encrypt(resCheckHealth[i].shareId.toString(), passcode),
               utils.encrypt(sharesInfo[i].shareStage.toString(), passcode),
@@ -1264,26 +1217,24 @@ const updateSSSShareStageWhereRecordId = (
   arr_RecordId: any,
   fulldate: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn) {
-        //console.log( { tblName, shareInfo, fulldate } );
+        // console.log( { tblName, shareInfo, fulldate } );
         for (let i = 0; i < shareInfo.length; i++) {
-          txn.executeSql('SELECT * FROM ' + tblName, [], (tx, results) => {
-            var len = results.rows.length;
+          txn.executeSql(`SELECT * FROM ${tblName}`, [], (tx, results) => {
+            const len = results.rows.length;
             if (len > 0) {
               for (let j = 0; j < len; j++) {
-                let decryptRecordId = utils.decrypt(
+                const decryptRecordId = utils.decrypt(
                   results.rows.item(j).recordId,
                   passcode,
                 );
-                let encpRecordId = results.rows.item(j).recordId;
+                const encpRecordId = results.rows.item(j).recordId;
                 if (decryptRecordId == arr_RecordId[i]) {
                   txn.executeSql(
-                    'update ' +
-                      tblName +
-                      ' set shareStage = :shareStage,lastSuccessfulCheck =:lastSuccessfulCheck where recordId = :recordId',
+                    `update ${tblName} set shareStage = :shareStage,lastSuccessfulCheck =:lastSuccessfulCheck where recordId = :recordId`,
                     [
                       utils.encrypt(
                         shareInfo[i].shareStage.toString(),
@@ -1313,21 +1264,19 @@ const updateHistroyAndSharedDate = (
   sharedDate: string,
   id: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn) {
         //  console.log( { tblName, history, sharedDate, id } );
-        txn.executeSql('SELECT * FROM ' + tblName, [], (tx, results) => {
-          var len = results.rows.length;
+        txn.executeSql(`SELECT * FROM ${tblName}`, [], (tx, results) => {
+          const len = results.rows.length;
           if (len > 0) {
             for (let j = 0; j < len; j++) {
-              let tableId = results.rows.item(j).id;
+              const tableId = results.rows.item(j).id;
               if (tableId == id) {
                 txn.executeSql(
-                  'update ' +
-                    tblName +
-                    ' set history = :history,sharedDate =:sharedDate where id = :id',
+                  `update ${tblName} set history = :history,sharedDate =:sharedDate where id = :id`,
                   [
                     utils.encrypt(JSON.stringify(history).toString(), passcode),
                     utils.encrypt(sharedDate.toString(), passcode),
@@ -1353,21 +1302,19 @@ const updateHistroyAndAcceptDate = (
   sharedDate: string,
   id: string,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
     try {
       db.transaction(function(txn) {
         //  console.log( { tblName, history, sharedDate, id } );
-        txn.executeSql('SELECT * FROM ' + tblName, [], (tx, results) => {
-          var len = results.rows.length;
+        txn.executeSql(`SELECT * FROM ${tblName}`, [], (tx, results) => {
+          const len = results.rows.length;
           if (len > 0) {
             for (let j = 0; j < len; j++) {
-              let tableId = results.rows.item(j).id;
+              const tableId = results.rows.item(j).id;
               if (tableId == id) {
                 txn.executeSql(
-                  'update ' +
-                    tblName +
-                    ' set history = :history,acceptedDate =:acceptedDate where id = :id',
+                  `update ${tblName} set history = :history,acceptedDate =:acceptedDate where id = :id`,
                   [
                     utils.encrypt(JSON.stringify(history).toString(), passcode),
                     utils.encrypt(sharedDate.toString(), passcode),
@@ -1387,8 +1334,8 @@ const updateHistroyAndAcceptDate = (
   });
 };
 
-//TODO: ========================================>  SSS Trusted Party Details   <========================================
-//insert
+// TODO: ========================================>  SSS Trusted Party Details   <========================================
+// insert
 const insertTrustedPartyDetails = (
   tblName: string,
   fulldate: string,
@@ -1398,18 +1345,16 @@ const insertTrustedPartyDetails = (
   metaData: any,
   nonPMDDData: any,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
-    let temp = [];
-    let jsonData = {};
+    const temp = [];
+    const jsonData = {};
     jsonData.title = 'Secret Stored.';
     jsonData.date = utils.getUnixToDateFormat(fulldate);
     temp.push(jsonData);
     db.transaction(function(txn) {
       txn.executeSql(
-        'INSERT INTO ' +
-          tblName +
-          '(dateCreated,keeperInfo,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)',
+        `INSERT INTO ${tblName}(dateCreated,keeperInfo,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:keeperInfo,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)`,
         [
           utils.encrypt(fulldate.toString(), passcode),
           utils.encrypt(JSON.stringify(keeperInfo).toString(), passcode),
@@ -1434,18 +1379,16 @@ const insertTrustedPartyDetailWithoutAssociate = (
   metaData: any,
   nonPMDDData: any,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
-    let temp = [];
-    let jsonData = {};
+    const temp = [];
+    const jsonData = {};
     jsonData.title = 'Secret Stored.';
     jsonData.date = utils.getUnixToDateFormat(fulldate);
     temp.push(jsonData);
     db.transaction(function(txn) {
       txn.executeSql(
-        'INSERT INTO ' +
-          tblName +
-          '(dateCreated,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)',
+        `INSERT INTO ${tblName}(dateCreated,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)`,
         [
           utils.encrypt(fulldate.toString(), passcode),
           utils.encrypt(JSON.stringify(urlScript).toString(), passcode),
@@ -1469,18 +1412,16 @@ const insertTrustedPartyDetailSelfShare = (
   metaData: any,
   nonPMDDData: any,
 ) => {
-  let passcode = getPasscode();
+  const passcode = getPasscode();
   return new Promise((resolve, reject) => {
-    let temp = [];
-    let jsonData = {};
+    const temp = [];
+    const jsonData = {};
     jsonData.title = 'Secret Stored.';
     jsonData.date = utils.getUnixToDateFormat(fulldate);
     temp.push(jsonData);
     db.transaction(function(txn) {
       txn.executeSql(
-        'INSERT INTO ' +
-          tblName +
-          '(dateCreated,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)',
+        `INSERT INTO ${tblName}(dateCreated,urlScript,decrShare,metaData,nonPMDDData,history,type) VALUES (:dateCreated,:urlScript,:decrShare,:metaData,:nonPMDDData,:history,:type)`,
         [
           utils.encrypt(fulldate.toString(), passcode),
           utils.encrypt(JSON.stringify(urlScript).toString(), passcode),
@@ -1496,11 +1437,11 @@ const insertTrustedPartyDetailSelfShare = (
   });
 };
 
-//TODO: ========================================>  For All Table   <========================================
+// TODO: ========================================>  For All Table   <========================================
 const deleteTableData = (tblName: string) => {
   return new Promise((resolve, reject) => {
     db.transaction(function(txn) {
-      txn.executeSql('delete from ' + tblName, [], (tx, results) => {
+      txn.executeSql(`delete from ${tblName}`, [], (tx, results) => {
         resolve(true);
       });
     });
@@ -1514,14 +1455,14 @@ module.exports = {
   readRecentTransactionAddressWise,
   insertAccountTypeData,
 
-  //Wallet Details
+  // Wallet Details
   insertWallet,
   updateWalletBackedUpSecretQue,
   updateWalletMnemonic,
   updateWalletAppHealthStatus,
   updateWalletMnemonicAndAnwserDetails,
 
-  //Account Details
+  // Account Details
   insertCreateAccount,
   insertLastBeforeCreateAccount,
   updateSecureAccountAddressAndBal,
@@ -1529,11 +1470,11 @@ module.exports = {
   updateAccountBalAccountTypeWise,
   updateSecureAccountAddInfo,
 
-  //Transation Details
+  // Transation Details
   insertTblTransation,
   updateTableData,
 
-  //SSS Details
+  // SSS Details
   readSSSTableData,
   insertSSSShareDetails,
   updateRestoreUsingTrustedContactKeepInfo,
@@ -1545,13 +1486,13 @@ module.exports = {
   updateSSSShareStageWhereRecordId,
   updateSSSRetoreDecryptedShare,
 
-  //SSS Trusted Party Details
+  // SSS Trusted Party Details
   insertTrustedPartyDetails,
   insertTrustedPartyDetailWithoutAssociate,
   updateHistroyAndSharedDate,
   updateHistroyAndAcceptDate,
   insertTrustedPartyDetailSelfShare,
 
-  //For All Table Operation
+  // For All Table Operation
   deleteTableData,
 };

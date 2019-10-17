@@ -14,7 +14,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { ImageSVG } from 'hexaCustImage';
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { svgIcon } from 'hexaConstants';
 
 interface Props {
@@ -24,7 +24,7 @@ interface Props {
 }
 
 export default class ModalAllTransactionDetails extends Component<Props, any> {
-  //details item view
+  // details item view
   _renderDetailsItem = ({ item, index }) => {
     return (
       <TouchableOpacity
@@ -58,6 +58,7 @@ export default class ModalAllTransactionDetails extends Component<Props, any> {
       </TouchableOpacity>
     );
   };
+
   render() {
     const {
       modalVisible,
@@ -111,8 +112,8 @@ export default class ModalAllTransactionDetails extends Component<Props, any> {
                     }}
                   >
                     {selectedTransaction.transactionType === 'Received'
-                      ? 'To ' + selectedTransaction.accountType + ' Account'
-                      : 'From ' + selectedTransaction.accountType + ' Account'}
+                      ? `To ${selectedTransaction.accountType} Account`
+                      : `From ${selectedTransaction.accountType} Account`}
                   </Text>
                   <Text
                     style={{

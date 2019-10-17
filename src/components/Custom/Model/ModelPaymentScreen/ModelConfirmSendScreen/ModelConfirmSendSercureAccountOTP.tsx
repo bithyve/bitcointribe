@@ -6,19 +6,20 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import { FullLinearGradientLoadingButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors } from 'hexaConstants';
 import { renderIf } from 'hexaValidation';
 
-//TODO: Bitcoin class
-var bitcoinClassState = require('hexaClassState');
+const alert = new AlertSimple();
+
+// TODO: Bitcoin class
+const bitcoinClassState = require('hexaClassState');
 
 interface Props {
   data: [];
@@ -55,8 +56,8 @@ export default class ModelConfirmSendSercureAccountOTP extends Component<
   }
 
   componentWillReceiveProps(nextProps: any) {
-    var data = nextProps.data[0];
-    //console.log( { data } );
+    let data = nextProps.data[0];
+    // console.log( { data } );
     if (data != undefined) {
       if (Array.isArray(data.data)) {
         data = data.data[0];
@@ -68,7 +69,7 @@ export default class ModelConfirmSendSercureAccountOTP extends Component<
     }
   }
 
-  //TODO: Otp enter after
+  // TODO: Otp enter after
   _onFinishCheckingCode = async (code: any) => {
     this.setState({
       token: code,
@@ -99,15 +100,15 @@ export default class ModelConfirmSendSercureAccountOTP extends Component<
       flag_NextBtnAnimation: true,
       flag_DisableBtnNext: true,
     });
-    let { data, token, resTransferST } = this.state;
-    let secureAccount = await bitcoinClassState.getSecureClassState();
-    //console.log( { token, txHex: resTransferST.data.txHex } );
-    var resultTransferST = await secureAccount.transferST3(
+    const { data, token, resTransferST } = this.state;
+    const secureAccount = await bitcoinClassState.getSecureClassState();
+    // console.log( { token, txHex: resTransferST.data.txHex } );
+    let resultTransferST = await secureAccount.transferST3(
       token,
       resTransferST.data.txHex,
       resTransferST.data.childIndexArray,
     );
-    //console.log( { resultTransferST } );
+    // console.log( { resultTransferST } );
     if (resultTransferST.status == 200) {
       resultTransferST = resultTransferST.data;
       this.click_StopLoader();
@@ -118,9 +119,9 @@ export default class ModelConfirmSendSercureAccountOTP extends Component<
   };
 
   render() {
-    let { passcodeStyle, flag_DisableBtnNext, message, otp } = this.state;
-    //flag
-    let { flag_NextBtnAnimation } = this.state;
+    const { passcodeStyle, flag_DisableBtnNext, message, otp } = this.state;
+    // flag
+    const { flag_NextBtnAnimation } = this.state;
     return (
       <Modal
         transparent

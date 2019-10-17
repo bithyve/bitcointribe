@@ -10,18 +10,18 @@ import {
 import { Container } from 'native-base';
 import { StackActions, NavigationActions } from 'react-navigation';
 
-//TODO: Custome Comp
+// TODO: Custome Comp
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { WalletSetUpScrolling } from 'hexaCustOnBoarding';
 import { HeaderTitle } from 'hexaCustHeader';
 
 import { WalletName, FirstSecretQuestion } from 'hexaCompRestoreAndWalletSetup';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, asyncStorageKeys } from 'hexaConstants';
 
 export default class WalletSetup extends React.Component<any, any> {
-  //TODO:click_GotoPermisionScrenn
+  // TODO:click_GotoPermisionScrenn
   goToWallet() {
     try {
       if (Platform.OS == 'android') {

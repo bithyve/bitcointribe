@@ -2,17 +2,17 @@ import React, { Component } from 'react';
 import { Modal, View, StyleSheet, Image } from 'react-native';
 import { Button, Text } from 'native-base';
 
-//TODO: Custome Compontes
+// TODO: Custome Compontes
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
 import { SvgIcon } from '@up-shared/components';
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
-//TODO: Custome Object
+// TODO: Custome Object
 import { images } from 'hexaConstants';
 
-//TODO: Common Funciton
-var utils = require('hexaUtils');
+// TODO: Common Funciton
+const utils = require('hexaUtils');
 
 interface Props {
   data: [];
@@ -23,6 +23,7 @@ interface Props {
 
 export default class ModelBackupSecureAccount extends Component<Props, any> {
   pdfObj = null;
+
   constructor(props: any) {
     super(props);
     this.state = {
@@ -36,14 +37,14 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
   }
 
   header(text: any) {
-    return { text: text, margins: [0, 0, 0, 8] };
+    return { text, margins: [0, 0, 0, 8] };
   }
 
   componentWillReceiveProps = async (nextProps: any) => {
-    //this point use backgound task
+    // this point use backgound task
     setTimeout(() => {
-      let data = nextProps.data;
-      //console.log( { data } );
+      const { data } = nextProps;
+      // console.log( { data } );
       if (data[0].modalVisible == true) {
         this.setState({
           data: data[0].secureAccountDetails,
@@ -53,7 +54,7 @@ export default class ModelBackupSecureAccount extends Component<Props, any> {
   };
 
   render() {
-    let data = this.props.data.length != 0 ? this.props.data : [];
+    const data = this.props.data.length != 0 ? this.props.data : [];
     return (
       <Modal
         transparent

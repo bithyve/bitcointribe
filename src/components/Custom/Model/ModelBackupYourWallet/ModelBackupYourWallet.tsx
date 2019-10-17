@@ -4,10 +4,10 @@ import { Button, Icon, Text } from 'native-base';
 
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { images } from 'hexaConstants';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
 interface Props {

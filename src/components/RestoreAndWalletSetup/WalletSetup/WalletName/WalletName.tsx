@@ -2,22 +2,22 @@ import React from 'react';
 import { StyleSheet, View, Alert } from 'react-native';
 import { Item, Input, Text } from 'native-base';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-//NsNotification
+// NsNotification
 import BackboneEvents from 'backbone-events-standalone';
+
+// TODO: Custome Pages
+import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
+
+// TODO: Custome Validation
+import { validationService } from 'hexaValidation';
+
+// TODO: Custome StyleSheet Files
+import FontFamily from 'hexaStyles';
 // global event bus
 window.EventBus = BackboneEvents.mixin({});
 
-//TODO: Custome Pages
-import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
-
-//TODO: Custome Validation
-import { validationService } from 'hexaValidation';
-
-//TODO: Custome StyleSheet Files
-import FontFamily from 'hexaStyles';
-
-//TODO: Custome Object
-var utils = require('hexaUtils');
+// TODO: Custome Object
+const utils = require('hexaUtils');
 
 export default class WalletName extends React.Component<any, any> {
   constructor(props: any) {
@@ -36,7 +36,7 @@ export default class WalletName extends React.Component<any, any> {
     this.getFormValidation = validationService.getFormValidation.bind(this);
   }
 
-  //TODO: Wallet Name
+  // TODO: Wallet Name
   ckeckWalletName(val: string) {
     try {
       if (val.length > 0) {
@@ -53,21 +53,21 @@ export default class WalletName extends React.Component<any, any> {
     }
   }
 
-  //TODO: func click_Proceed
+  // TODO: func click_Proceed
   click_Proceed = async () => {
     try {
       this.getFormValidation();
-      let walletName = this.state.walletName;
-      var hasWallet =
+      let { walletName } = this.state;
+      const hasWallet =
         walletName.includes('Wallet') || walletName.includes('wallet');
       if (!hasWallet) {
         if (walletName.includes("'s") || walletName.includes('’s')) {
-          walletName = walletName + ' Wallet';
+          walletName += ' Wallet';
         } else {
-          walletName = walletName + "'s Wallet";
+          walletName += "'s Wallet";
         }
       }
-      let SetUpDetails = {};
+      const SetUpDetails = {};
       SetUpDetails.walletName = walletName;
       await utils.setSetupWallet(SetUpDetails);
       window.EventBus.trigger('swipeScreen', 'optional event info');
@@ -89,8 +89,8 @@ export default class WalletName extends React.Component<any, any> {
   }
 
   render() {
-    //values
-    let { walletName } = this.state;
+    // values
+    const { walletName } = this.state;
     return (
       <View style={styles.container}>
         <KeyboardAwareScrollView

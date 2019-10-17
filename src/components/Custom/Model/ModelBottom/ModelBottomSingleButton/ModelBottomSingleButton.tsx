@@ -4,9 +4,9 @@ import { Button, Text } from 'native-base';
 import Modal from 'react-native-modalbox';
 
 import { ImageSVG } from 'hexaCustImage';
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, svgIcon } from 'hexaConstants';
 
 interface Props {
@@ -25,8 +25,8 @@ export default class ModelBottomSingleButton extends Component<Props, any> {
   }
 
   componentWillReceiveProps = (nextProps: any) => {
-    let data = nextProps.data;
-    //console.log( { data } );
+    const { data } = nextProps;
+    // console.log( { data } );
     if (data != undefined) {
       this.setState({
         data: data[0],
@@ -41,7 +41,7 @@ export default class ModelBottomSingleButton extends Component<Props, any> {
   };
 
   render() {
-    let { data } = this.state;
+    const { data } = this.state;
     return (
       <Modal
         style={[styles.modal, styles.modal4]}
@@ -124,7 +124,7 @@ export default class ModelBottomSingleButton extends Component<Props, any> {
 }
 
 const styles = StyleSheet.create({
-  //botom model
+  // botom model
   modal: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,

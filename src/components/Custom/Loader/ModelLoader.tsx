@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, Modal, Image } from 'react-native';
 import PropTypes from 'prop-types';
 
-//TODO: Custome object
+// TODO: Custome object
 import { images } from 'hexaConstants';
 
 const ModelLoader = ({

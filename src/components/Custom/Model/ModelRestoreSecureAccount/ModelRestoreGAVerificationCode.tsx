@@ -3,19 +3,20 @@ import { Modal, View, StyleSheet, Platform } from 'react-native';
 import { Button, Text } from 'native-base';
 import CodeInput from 'react-native-confirmation-code-input';
 
-//TODO: Custome Compontes
+// TODO: Custome Compontes
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 import { SvgIcon } from '@up-shared/components';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { ModelLoader } from 'hexaLoader';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, localDB } from 'hexaConstants';
-var dbOpration = require('hexaDBOpration');
-var utils = require('hexaUtils');
+
+const dbOpration = require('hexaDBOpration');
+const utils = require('hexaUtils');
 
 interface Props {
   data: [];
@@ -24,8 +25,8 @@ interface Props {
   click_Next: Function;
 }
 
-//Bitcoin Files
-var comFunDBRead = require('hexaCommonDBReadData');
+// Bitcoin Files
+const comFunDBRead = require('hexaCommonDBReadData');
 
 export default class ModelRestoreGAVerificationCode extends Component<
   Props,
@@ -51,8 +52,8 @@ export default class ModelRestoreGAVerificationCode extends Component<
   }
 
   componentWillReceiveProps(nextProps: any) {
-    let data = nextProps.data;
-    //console.log( { data } );
+    const { data } = nextProps;
+    // console.log( { data } );
     if (data.length != 0) {
       if (data[0].modalVisible == true) {
         this.setState({
@@ -64,9 +65,9 @@ export default class ModelRestoreGAVerificationCode extends Component<
     }
   }
 
-  //TODO: Otp enter after
+  // TODO: Otp enter after
   _onFinishCheckingCode(code: any) {
-    //console.log( { code } );
+    // console.log( { code } );
     if (code.length == 6) {
       this.setState({
         otp: code,
@@ -75,31 +76,31 @@ export default class ModelRestoreGAVerificationCode extends Component<
     }
   }
 
-  //TODO: Click on next button
+  // TODO: Click on next button
   click_Next = async () => {
     this.setState({
       flag_Loading: true,
     });
     const dateTime = Date.now();
-    let code = this.state.otp;
-    let xPub = this.state.xPub;
-    let prevScreenName = this.state.prevScreenName;
-    let prevData = this.state.prevData;
-    let resultWallet = await utils.getWalletDetails();
-    let secureAccount = await utils.getSecureAccountObject();
+    const code = this.state.otp;
+    const { xPub } = this.state;
+    const { prevScreenName } = this.state;
+    const { prevData } = this.state;
+    const resultWallet = await utils.getWalletDetails();
+    const secureAccount = await utils.getSecureAccountObject();
     // const secureAccount = new SecureAccount( resultWallet.mnemonic );
-    let resImportSecureAccount = await secureAccount.importSecureAccount(
+    const resImportSecureAccount = await secureAccount.importSecureAccount(
       code,
       xPub,
     );
     if (resImportSecureAccount.imported == true) {
       const address = await secureAccount.getAddress();
-      //console.log( { address } );
+      // console.log( { address } );
       const balance = await secureAccount.getBalance();
-      //console.log( { balance } );
-      //reading wallet details
+      // console.log( { balance } );
+      // reading wallet details
       await comFunDBRead.readTblWallet();
-      //Secure account insert
+      // Secure account insert
       let resUpdateSSSRetoreDecryptedShare;
       if (prevScreenName != 'Wallet') {
         resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSecureAccountAddressAndBal(
@@ -129,8 +130,8 @@ export default class ModelRestoreGAVerificationCode extends Component<
   };
 
   render() {
-    let flag_NextBtnDisable = this.state.flag_NextBtnDisable;
-    let flag_Loading = this.state.flag_Loading;
+    const { flag_NextBtnDisable } = this.state;
+    const { flag_Loading } = this.state;
     return (
       <Modal
         transparent

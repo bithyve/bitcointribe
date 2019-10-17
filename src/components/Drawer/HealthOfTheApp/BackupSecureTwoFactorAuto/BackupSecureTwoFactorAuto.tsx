@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import { StyleSheet, View, ImageBackground, SafeAreaView } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-//TODO: Custome Compontes
+// TODO: Custome Compontes
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import {
   ModelSecureTwoFactorSecretThreeCode,
   ModelSecureTwoFactorSuccessBackedUp,
 } from 'hexaCustModel';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
 
 export default class BackupSecureTwoFactorAuto extends Component {
@@ -22,7 +22,7 @@ export default class BackupSecureTwoFactorAuto extends Component {
   }
 
   componentWillMount() {
-    let data = this.props.navigation.getParam('data');
+    const data = this.props.navigation.getParam('data');
     setTimeout(() => {
       this.setState({
         arr_ModelSecureTwoFactorSecretThreeCode: [
@@ -36,7 +36,7 @@ export default class BackupSecureTwoFactorAuto extends Component {
   }
 
   render() {
-    let { arr_ModelSecureTwoFactorSuccessBackedUp } = this.state;
+    const { arr_ModelSecureTwoFactorSuccessBackedUp } = this.state;
     return (
       <View style={styles.container}>
         <CustomStatusBar

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import config from '../../Config';
 import {
   IBuddyStaticNonPMDD,
@@ -113,6 +114,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
+    return { status: config.STATUS.ERROR, err: 'not defined' };
   };
 
   public static decryptViaOTP = (
@@ -273,6 +275,7 @@ export default class S3Service {
   };
 
   private sss: SSS;
+
   constructor(mnemonic: string, encryptedShares?: string[]) {
     this.sss = new SSS(mnemonic, encryptedShares);
   }

@@ -4,12 +4,13 @@ import { Text } from 'native-base';
 
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { images } from 'hexaConstants';
-var utils = require('hexaUtils');
+
+const utils = require('hexaUtils');
 
 interface Props {
   data: [];
@@ -22,7 +23,7 @@ export default class ModelWalletSuccessfullyBackedUp extends Component<
   any
 > {
   render() {
-    let data = this.props.data.length != 0 ? this.props.data : [];
+    const data = this.props.data.length != 0 ? this.props.data : [];
     return (
       <Modal
         transparent

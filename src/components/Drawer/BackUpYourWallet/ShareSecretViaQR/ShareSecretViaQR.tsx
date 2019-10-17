@@ -11,16 +11,17 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 // import QRCode from "react-native-qrcode";
 import QRCode from 'react-native-qrcode-svg';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
-var utils = require('hexaUtils');
+
+const utils = require('hexaUtils');
 
 export default class ShareSecretViaQR extends React.Component<any, any> {
   constructor(props: any) {
@@ -33,19 +34,20 @@ export default class ShareSecretViaQR extends React.Component<any, any> {
   }
 
   async componentWillMount() {
-    let walletDetails = utils.getWalletDetails();
-    var data = this.props.navigation.getParam('data');
-    //console.log( { data } );
-    let qrCodeData = {};
+    const walletDetails = utils.getWalletDetails();
+    const data = this.props.navigation.getParam('data');
+    // console.log( { data } );
+    const qrCodeData = {};
     qrCodeData.type = 'SSS Recovery QR';
     qrCodeData.wn = walletDetails.walletType;
     qrCodeData.data = data.key;
-    //console.log( { qrCodeData } );
+    // console.log( { qrCodeData } );
     this.setState({
       data: JSON.stringify(qrCodeData).toString(),
     });
   }
-  //TODO: func click_Item
+
+  // TODO: func click_Item
   click_Item = (item: any) => {
     this.props.navigation.push('TrustedContact', {
       data: item,

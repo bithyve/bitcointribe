@@ -8,7 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { images } from 'hexaConstants';
 
 interface Props {
@@ -43,7 +43,7 @@ export default class ModelHelperScreen extends Component<Props, any> {
   };
 
   click_ChangeImage = () => {
-    let { data, index } = this.state;
+    const { data, index } = this.state;
     console.log({ len: data.length, index });
     if (data.length > index + 1) {
       this.setState({
@@ -56,9 +56,9 @@ export default class ModelHelperScreen extends Component<Props, any> {
   };
 
   render() {
-    let data = this.props.data.length != 0 ? this.props.data : [];
-    //values
-    let { helperImage } = this.state;
+    const data = this.props.data.length != 0 ? this.props.data : [];
+    // values
+    const { helperImage } = this.state;
     return (
       <Modal
         animationType={'fade'}

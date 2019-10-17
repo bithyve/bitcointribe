@@ -1,29 +1,30 @@
-//TODO: Bitcoin Class
-var bitcoinClassState = require('hexaClassState');
-
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
-
-//TODO: Custome Alert
+// TODO: Bitcoin Class
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome object
+// TODO: Custome object
 import { localDB } from 'hexaConstants';
-var dbOpration = require('hexaDBOpration');
+
+const bitcoinClassState = require('hexaClassState');
+
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
+
+const alert = new AlertSimple();
+const dbOpration = require('hexaDBOpration');
 
 const getAccountTransaction = async () => {
-  let dateTime = Date.now();
-  let regularAccount = await bitcoinClassState.getRegularClassState();
-  var regularAccountTransactions = await regularAccount.getTransactions();
+  const dateTime = Date.now();
+  const regularAccount = await bitcoinClassState.getRegularClassState();
+  let regularAccountTransactions = await regularAccount.getTransactions();
   if (regularAccountTransactions.status == 200) {
     await bitcoinClassState.setRegularClassState(regularAccount);
     regularAccountTransactions = regularAccountTransactions.data;
   } else {
     alert.simpleOk('Oops', regularAccountTransactions.err);
   }
-  let secureAccount = await bitcoinClassState.getSecureClassState();
-  var secureAccountTransactions = await secureAccount.getTransactions();
+  const secureAccount = await bitcoinClassState.getSecureClassState();
+  let secureAccountTransactions = await secureAccount.getTransactions();
   if (secureAccountTransactions.status == 200) {
     await bitcoinClassState.setSecureClassState(secureAccount);
     secureAccountTransactions = secureAccountTransactions.data;
@@ -37,8 +38,8 @@ const getAccountTransaction = async () => {
   results = results.sort((a, b) => {
     return a.confirmations - b.confirmations;
   });
-  //console.log( { results } );
-  let resStoreTrna = await dbOpration.insertTblTransation(
+  // console.log( { results } );
+  const resStoreTrna = await dbOpration.insertTblTransation(
     localDB.tableName.tblTransaction,
     results,
     dateTime,
@@ -47,8 +48,8 @@ const getAccountTransaction = async () => {
 };
 
 const getSecAccountTran = async (type: string) => {
-  let arrTransList = [];
-  var resTranList = await comFunDBRead.readTblTransaction();
+  const arrTransList = [];
+  const resTranList = await comFunDBRead.readTblTransaction();
   for (let i = 0; i < resTranList.length; i++) {
     if (resTranList[i].accountType == type) {
       arrTransList.push(resTranList[i]);

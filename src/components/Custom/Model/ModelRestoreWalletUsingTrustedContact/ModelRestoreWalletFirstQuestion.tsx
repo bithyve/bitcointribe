@@ -25,6 +25,23 @@ import {
 import { SvgIcon } from '@up-shared/components';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
+// TODO: Custome Pages
+import { ModelLoader } from 'hexaLoader';
+import { FullLinearGradientLoadingButton } from 'hexaCustomeLinearGradientButton';
+
+// TODO: Custome Alert
+import { AlertSimple } from 'hexaCustAlert';
+// TODO: Custome StyleSheet Files
+import FontFamily from 'hexaStyles';
+
+// TODO: Custome Object
+import { colors, localDB, asyncStorageKeys } from 'hexaConstants';
+import utils from 'hexaUtils';
+
+// TODO: Custome Validation
+import { validationService } from 'hexaValidation';
+import { S3Service, RegularAccount, SecureAccount } from 'hexaBitcoin';
+
 interface Props {
   data: [];
   closeModal: Function;
@@ -32,32 +49,15 @@ interface Props {
   pop: Function;
   click_Request: Function;
 }
+const alert = new AlertSimple();
+const dbOpration = require('hexaDBOpration');
 
-//TODO: Custome Pages
-import { ModelLoader } from 'hexaLoader';
-import { FullLinearGradientLoadingButton } from 'hexaCustomeLinearGradientButton';
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
+const comAppHealth = require('hexaCommonAppHealth');
 
-//TODO: Custome Alert
-import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
-//TODO: Custome StyleSheet Files
-import FontFamily from 'hexaStyles';
-
-//TODO: Custome Object
-import { colors, localDB, asyncStorageKeys } from 'hexaConstants';
-var dbOpration = require('hexaDBOpration');
-import utils from 'hexaUtils';
-
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
-var comAppHealth = require('hexaCommonAppHealth');
-
-//TODO: Custome Validation
-import { validationService } from 'hexaValidation';
-
-//TODO: Bitcoin Files
-var bitcoinClassState = require('hexaClassState');
-import { S3Service, RegularAccount, SecureAccount } from 'hexaBitcoin';
+// TODO: Bitcoin Files
+const bitcoinClassState = require('hexaClassState');
 
 export default class ModelRestoreWalletFirstQuestion extends Component<
   Props,
@@ -124,17 +124,17 @@ export default class ModelRestoreWalletFirstQuestion extends Component<
     this.getFormValidation = validationService.getFormValidation.bind(this);
   }
 
-  //TODO: Select Picker Question List change aciton
+  // TODO: Select Picker Question List change aciton
   onValueChange(value: string) {
     this.setState({
       firstQuestion: value,
     });
   }
 
-  //TODO: func check_CorrectAnswer
+  // TODO: func check_CorrectAnswer
   check_CorrectAnswer() {
     setTimeout(() => {
-      let firstAns = this.state.firstAnswer;
+      const firstAns = this.state.firstAnswer;
       if (firstAns.length >= 3) {
         this.setState({
           flag_DisableBtnNext: false,
@@ -147,7 +147,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<
     }, 100);
   }
 
-  //TODO: get bal and insert accound into local db
+  // TODO: get bal and insert accound into local db
   click_Next = async () => {
     try {
       this.getFormValidation();
@@ -156,47 +156,48 @@ export default class ModelRestoreWalletFirstQuestion extends Component<
         flag_DisableBtnNext: true,
         flag_NextBtnAnimation: true,
       });
-      let Question = this.state.firstQuestion;
-      let Answer = this.state.firstAnswer;
+      const Question = this.state.firstQuestion;
+      const Answer = this.state.firstAnswer;
       const dateTime = Date.now();
-      let walletDetail = await utils.getWalletDetails();
-      var sssDetails = await utils.getSSSDetails();
-      //console.log( { sssDetails } );
-      let decryptedShare = [];
-      let arr_TableId = [];
-      let walletName, encryptedStaticNonPMDD;
+      const walletDetail = await utils.getWalletDetails();
+      let sssDetails = await utils.getSSSDetails();
+      // console.log( { sssDetails } );
+      const decryptedShare = [];
+      const arr_TableId = [];
+      let walletName;
+      let encryptedStaticNonPMDD;
       for (let i = 0; i < sssDetails.length; i++) {
-        let data = sssDetails[i];
+        const data = sssDetails[i];
         if (data.decryptedShare != '') {
-          let decryptedShareJson = JSON.parse(data.decryptedShare);
-          //console.log( { decryptedShareJson } );
+          const decryptedShareJson = JSON.parse(data.decryptedShare);
+          // console.log( { decryptedShareJson } );
           decryptedShare.push(decryptedShareJson.encryptedShare);
           walletName = decryptedShareJson.meta.tag;
           encryptedStaticNonPMDD = decryptedShareJson.encryptedStaticNonPMDD;
         }
         arr_TableId.push(data.id);
       }
-      //console.log( { decryptedShare, Answer } );
-      //check wallet id and index number
-      var resMnemonic = await S3Service.recoverFromShares(
+      // console.log( { decryptedShare, Answer } );
+      // check wallet id and index number
+      let resMnemonic = await S3Service.recoverFromShares(
         decryptedShare,
         Answer,
       );
-      //console.log( { resMnemonic } );
+      // console.log( { resMnemonic } );
       if (resMnemonic.status == 200) {
         resMnemonic = resMnemonic.data;
         const regularAccount = new RegularAccount(resMnemonic.mnemonic);
-        var secureAccount;
+        let secureAccount;
         const sss = new S3Service(resMnemonic.mnemonic);
         await bitcoinClassState.setS3ServiceClassState(sss);
-        //console.log( { encryptedStaticNonPMDD } );
+        // console.log( { encryptedStaticNonPMDD } );
         const shareIds = [];
         const shareSelfShareIds = [];
         for (let i = 0; i < sssDetails.length; i++) {
-          let data = sssDetails[i];
+          const data = sssDetails[i];
           if (data.decryptedShare != '') {
-            let decryptedShareJson = JSON.parse(data.decryptedShare);
-            let shareId = S3Service.getShareId(
+            const decryptedShareJson = JSON.parse(data.decryptedShare);
+            const shareId = S3Service.getShareId(
               decryptedShareJson.encryptedShare,
             );
             await dbOpration.updateSSSShareId(
@@ -208,7 +209,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<
           }
         }
         sssDetails = await comFunDBRead.readTblSSSDetails();
-        let share = {};
+        const share = {};
         share.trustedContShareId1 =
           sssDetails[0].shareId != '' ? sssDetails[0].shareId : null;
         share.trustedContShareId2 =
@@ -225,17 +226,17 @@ export default class ModelRestoreWalletFirstQuestion extends Component<
         share.selfshareShareId3 =
           sssDetails[4].shareId != '' ? sssDetails[4].shareId : '';
         share.qatime = parseInt(dateTime);
-        let resCheckHealthAllShare = await comAppHealth.checkHealthAllShare(
+        const resCheckHealthAllShare = await comAppHealth.checkHealthAllShare(
           share,
         );
-        //console.log( { resCheckHealthAllShare } );
+        // console.log( { resCheckHealthAllShare } );
         if (resCheckHealthAllShare != '') {
-          let queTemp = [];
-          let questionData = {};
+          const queTemp = [];
+          const questionData = {};
           questionData.Question = Question;
           questionData.Answer = Answer;
           queTemp.push(questionData);
-          let arrBackupInfo = [
+          const arrBackupInfo = [
             { backupType: 'restore' },
             { backupMethod: 'share' },
           ];
@@ -251,10 +252,10 @@ export default class ModelRestoreWalletFirstQuestion extends Component<
             queTemp,
             resCheckHealthAllShare,
           );
-          var resDecryptStaticNonPMDD = await sss.decryptStaticNonPMDD(
+          let resDecryptStaticNonPMDD = await sss.decryptStaticNonPMDD(
             encryptedStaticNonPMDD,
           );
-          //console.log( { resDecryptStaticNonPMDD } );
+          // console.log( { resDecryptStaticNonPMDD } );
           if (resDecryptStaticNonPMDD.status == 200) {
             resDecryptStaticNonPMDD =
               resDecryptStaticNonPMDD.data.decryptedStaticNonPMDD;
@@ -263,10 +264,10 @@ export default class ModelRestoreWalletFirstQuestion extends Component<
               resDecryptStaticNonPMDD.secondaryXpub,
               resDecryptStaticNonPMDD.bhXpub,
             );
-            //console.log( { resImportSecureAccount } );
+            // console.log( { resImportSecureAccount } );
             if (resImportSecureAccount.status == 200) {
               resImportSecureAccount = resImportSecureAccount.data;
-              let resInsertDailyAccount = await dbOpration.insertCreateAccount(
+              const resInsertDailyAccount = await dbOpration.insertCreateAccount(
                 localDB.tableName.tblAccount,
                 dateTime,
                 '',
@@ -276,7 +277,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<
                 'Regular Account',
                 '',
               );
-              let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+              const resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
                 localDB.tableName.tblAccount,
                 dateTime,
                 '',
@@ -299,7 +300,7 @@ export default class ModelRestoreWalletFirstQuestion extends Component<
                   flag_NextBtnAnimation: false,
                 });
                 setTimeout(() => {
-                  let data = {};
+                  const data = {};
                   data.walletName = walletName;
                   this.props.click_Next(data);
                   AsyncStorage.setItem(
@@ -334,11 +335,11 @@ export default class ModelRestoreWalletFirstQuestion extends Component<
   }
 
   render() {
-    //flag
-    let { flag_Loading, flag_NextBtnAnimation } = this.state;
-    let flag_DisableBtnNext = this.state.flag_DisableBtnNext;
-    let firstQuestion = this.state.firstQuestion;
-    let arr_QuestionList =
+    // flag
+    const { flag_Loading, flag_NextBtnAnimation } = this.state;
+    const { flag_DisableBtnNext } = this.state;
+    const { firstQuestion } = this.state;
+    const arr_QuestionList =
       this.state.arr_QuestionList != null
         ? this.state.arr_QuestionList
         : dataQuestionList;

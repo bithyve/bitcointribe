@@ -16,37 +16,38 @@ import {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import bip39 from 'react-native-bip39';
 
-//TODO: Redux
+// TODO: Redux
 import { connect } from 'react-redux';
 import { setupAccounts } from 'HexaWallet/src/redux';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { ModelLoader } from 'hexaLoader';
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, localDB } from 'hexaConstants';
-var utils = require('hexaUtils');
-var dbOpration = require('hexaDBOpration');
 
-//TODO: Common Funciton
-var comAppHealth = require('hexaCommonAppHealth');
-var comFunDBRead = require('hexaCommonDBReadData');
-
-//TODO: Custome Validation
+// TODO: Custome Validation
 import { validationService } from 'hexaValidation';
 
-//TODO: Bitcoin Files
-var bitcoinClassState = require('hexaClassState');
-
 import { S3Service, RegularAccount, SecureAccount } from 'hexaBitcoin';
+
+const alert = new AlertSimple();
+const utils = require('hexaUtils');
+const dbOpration = require('hexaDBOpration');
+
+// TODO: Common Funciton
+const comAppHealth = require('hexaCommonAppHealth');
+const comFunDBRead = require('hexaCommonDBReadData');
+
+// TODO: Bitcoin Files
+const bitcoinClassState = require('hexaClassState');
 // import S3Service from "HexaWallet/src/bitcoin/services/sss/S3Service";
 // import RegularAccount from "HexaWallet/src/bitcoin/services/accounts/RegularAccount";
 // import SecureAccount from "HexaWallet/src/bitcoin/services/accounts/SecureAccount";
@@ -120,7 +121,7 @@ class FirstSecretQuestion extends React.Component<any, any> {
     this.props.setupAccounts();
   };
 
-  //TODO: Select Picker Question List change aciton
+  // TODO: Select Picker Question List change aciton
   onValueChange = (value: string) => {
     try {
       console.log({ value });
@@ -132,11 +133,11 @@ class FirstSecretQuestion extends React.Component<any, any> {
     }
   };
 
-  //TODO: func check_CorrectAnswer
+  // TODO: func check_CorrectAnswer
   check_CorrectAnswer = () => {
     try {
-      let firstAns = this.state.firstAnswer;
-      let secoundAns = this.state.secoundAnswer;
+      const firstAns = this.state.firstAnswer;
+      const secoundAns = this.state.secoundAnswer;
       console.log({ firstAns, secoundAns });
       if (firstAns == secoundAns && firstAns.length >= 3) {
         this.setState({
@@ -152,7 +153,7 @@ class FirstSecretQuestion extends React.Component<any, any> {
     }
   };
 
-  //TODO: func click_FirstQuestion
+  // TODO: func click_FirstQuestion
   click_FirstQuestion = async () => {
     const {
       mnemonic,
@@ -161,34 +162,34 @@ class FirstSecretQuestion extends React.Component<any, any> {
       sss,
     } = this.props.setUpAccounts;
     console.log({ mnemonic, regularAccount, secureAccount, sss });
-    if (!!mnemonic) {
+    if (mnemonic) {
       try {
         this.getFormValidation();
         this.setState({
           flag_Loading: true,
         });
-        let question = this.state.firstQuestion;
-        let answer = this.state.secoundAnswer;
-        let resWalletData = await utils.getSetupWallet();
+        const question = this.state.firstQuestion;
+        const answer = this.state.secoundAnswer;
+        const resWalletData = await utils.getSetupWallet();
         const dateTime = Date.now();
-        let walletName = resWalletData.walletName;
+        const { walletName } = resWalletData;
 
-        //setup Check Health
-        let updateShareIdStatus = await comAppHealth.checkHealthSetupShare(
+        // setup Check Health
+        const updateShareIdStatus = await comAppHealth.checkHealthSetupShare(
           dateTime,
         );
         if (updateShareIdStatus != '') {
           console.log({ updateShareIdStatus });
-          let arrQustionList = [];
-          let questionData = {};
+          const arrQustionList = [];
+          const questionData = {};
           questionData.Question = question;
           questionData.Answer = answer;
           arrQustionList.push(questionData);
-          let arrBackupInfo = [
+          const arrBackupInfo = [
             { backupType: 'new' },
             { backupMethod: 'share' },
           ];
-          let resInsertWallet = await dbOpration.insertWallet(
+          const resInsertWallet = await dbOpration.insertWallet(
             localDB.tableName.tblWallet,
             dateTime,
             mnemonic,
@@ -201,7 +202,7 @@ class FirstSecretQuestion extends React.Component<any, any> {
             updateShareIdStatus,
           );
           await comFunDBRead.readTblWallet();
-          let resInsertCreateAcc = await dbOpration.insertCreateAccount(
+          const resInsertCreateAcc = await dbOpration.insertCreateAccount(
             localDB.tableName.tblAccount,
             dateTime,
             '',
@@ -211,7 +212,7 @@ class FirstSecretQuestion extends React.Component<any, any> {
             'Regular Account',
             '',
           );
-          let resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
+          const resInsertSecureCreateAcc = await dbOpration.insertCreateAccount(
             localDB.tableName.tblAccount,
             dateTime,
             '',
@@ -221,7 +222,7 @@ class FirstSecretQuestion extends React.Component<any, any> {
             'Secure Account',
             '',
           );
-          let resDeleteTableData = await dbOpration.deleteTableData(
+          const resDeleteTableData = await dbOpration.deleteTableData(
             localDB.tableName.tblSSSDetails,
           );
           if (
@@ -231,10 +232,10 @@ class FirstSecretQuestion extends React.Component<any, any> {
             resDeleteTableData
           ) {
             await bitcoinClassState.setRegularClassState(regularAccount);
-            //secure account
+            // secure account
             await bitcoinClassState.setSecureClassState(secureAccount);
             await bitcoinClassState.setS3ServiceClassState(sss);
-            //s3serverice
+            // s3serverice
             await comFunDBRead.readTblSSSDetails();
             await comFunDBRead.readTblWallet();
             this.setState({
@@ -275,8 +276,8 @@ class FirstSecretQuestion extends React.Component<any, any> {
   }
 
   render() {
-    //flag
-    let { flag_Loading } = this.state;
+    // flag
+    const { flag_Loading } = this.state;
     const itemList = this.state.arr_QuestionList.map(
       (item: any, index: number) => (
         <Picker.Item label={item.item} value={item.item} />
@@ -357,7 +358,7 @@ class FirstSecretQuestion extends React.Component<any, any> {
                   keyboardType="default"
                   autoCapitalize="none"
                   autoCorrect={false}
-                  autoFocus={Platform.OS == 'ios' ? true : false}
+                  autoFocus={Platform.OS == 'ios'}
                   placeholder="Write your answer here"
                   style={[FontFamily.ffFiraSansMedium]}
                   placeholderTextColor="#B7B7B7"

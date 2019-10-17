@@ -30,7 +30,7 @@ class BaseComponent extends Component {
 
   errorhandler = (e, onErrorOk) => {
     if (e && e.data && e.data.message) {
-      const message = e.data.message;
+      const { message } = e.data;
       Alert.alert('Oops', message, [
         {
           text: 'Ok',
@@ -47,13 +47,13 @@ class BaseComponent extends Component {
   };
 
   showSpinner() {
-    if (!!this.spinnerRef.current) {
+    if (this.spinnerRef.current) {
       this.spinnerRef.current.show();
     }
   }
 
   hideSpinner() {
-    if (!!this.spinnerRef.current) {
+    if (this.spinnerRef.current) {
       this.spinnerRef.current.hide();
     }
   }

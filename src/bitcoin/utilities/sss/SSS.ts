@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { AxiosResponse } from 'axios';
 import bip39 from 'react-native-bip39';
 import crypto from 'crypto';
@@ -8,6 +9,7 @@ import {
   IMetaShare,
   ISocialStaticNonPMDD,
 } from './Interface';
+
 const { BH_AXIOS } = config;
 
 export default class SSS {
@@ -22,6 +24,7 @@ export default class SSS {
     keyLength: 24,
     iv: Buffer.alloc(16, 0),
   };
+
   public static recoverFromShares = (
     decryptedShares: string[],
   ): {
@@ -39,13 +42,12 @@ export default class SSS {
 
       const recoveredMnemonicHex = secrets.combine(shares);
       return { mnemonic: SSS.hexToString(recoveredMnemonicHex) };
-    } else {
-      throw new Error(
-        `supplied number of shares are less than the threshold (${
-          SSS.threshold
-        })`,
-      );
     }
+    throw new Error(
+      `supplied number of shares are less than the threshold (${
+        SSS.threshold
+      })`,
+    );
   };
 
   public static decryptShares = (
@@ -214,7 +216,7 @@ export default class SSS {
     recoveredQRData = '';
     for (let itr = 0; itr < config.SSS_METASHARE_SPLITS; itr++) {
       const res = qrData[itr].slice(3);
-      recoveredQRData = recoveredQRData + res;
+      recoveredQRData += res;
     }
     console.log({ recoveredQRData });
     const metaShare = JSON.parse(recoveredQRData);
@@ -307,6 +309,7 @@ export default class SSS {
       otp,
     };
   };
+
   public static generateOTP = (otpLength: number): string =>
     SSS.generateRandomString(otpLength);
 
@@ -320,6 +323,7 @@ export default class SSS {
     }
     return randomString;
   };
+
   private static threshold: number = config.SSS_THRESHOLD;
 
   private static hexToString = (hex: string): string => secrets.hex2str(hex);
@@ -354,7 +358,9 @@ export default class SSS {
 
     return temp.slice(0, 8);
   };
+
   private mnemonic: string;
+
   private encryptedShares: string[];
 
   constructor(mnemonic: string, encryptedShares?: string[]) {
@@ -363,7 +369,7 @@ export default class SSS {
     } else {
       throw new Error('Invalid Mnemonic');
     }
-    this.encryptedShares = encryptedShares ? encryptedShares : [];
+    this.encryptedShares = encryptedShares || [];
   }
 
   public stringToHex = (str: string): string => secrets.str2hex(str);
@@ -385,6 +391,7 @@ export default class SSS {
 
     for (let itr = 0; itr < shares.length; itr++) {
       const checksum = SSS.calculateChecksum(shares[itr]);
+      // eslint-disable-next-line operator-assignment
       shares[itr] = shares[itr] + checksum;
     }
 
@@ -421,6 +428,7 @@ export default class SSS {
     key?: string,
   ): { encryptedMetaShare: string; key: string; messageId: string } => {
     if (!key) {
+      // eslint-disable-next-line no-param-reassign
       key = SSS.makeKey(SSS.cipherSpec.keyLength);
     }
     const messageId: string = SSS.getMessageId(key, config.MSG_ID_LENGTH);
@@ -600,9 +608,8 @@ export default class SSS {
       return {
         updated,
       };
-    } else {
-      throw new Error('Unable to update the NonPMDD');
     }
+    throw new Error('Unable to update the NonPMDD');
   };
 
   public downloadDynamicNonPMDD = async (
@@ -624,9 +631,8 @@ export default class SSS {
       return {
         nonPMDD,
       };
-    } else {
-      throw new Error('Unable to fetch nonPMDD');
     }
+    throw new Error('Unable to fetch nonPMDD');
   };
 
   public encryptStaticNonPMDD = (
@@ -703,11 +709,11 @@ export default class SSS {
         qrData[itr] = metaString.slice(start);
       }
       start = end;
-      end = end + slice;
+      end += slice;
       if (index === 4) {
-        qrData[itr] = 'e0' + (itr + 1) + qrData[itr];
+        qrData[itr] = `e0${itr + 1}${qrData[itr]}`;
       } else if (index === 5) {
-        qrData[itr] = 'c0' + (itr + 1) + qrData[itr];
+        qrData[itr] = `c0${itr + 1}${qrData[itr]}`;
       }
     }
     console.log(qrData);

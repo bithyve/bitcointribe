@@ -8,22 +8,23 @@ import {
 } from 'react-native';
 import { Container, Text } from 'native-base';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 import { ModelLoader } from 'hexaLoader';
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
 import { renderIf } from 'hexaValidation';
+
+const alert = new AlertSimple();
 
 export default class Restore4And5SelfShare extends React.Component<any, any> {
   constructor(props: any) {
@@ -38,9 +39,9 @@ export default class Restore4And5SelfShare extends React.Component<any, any> {
   }
 
   async componentWillMount() {
-    let data = this.props.navigation.getParam('data');
-    let title = this.props.navigation.getParam('title');
-    let type = this.props.navigation.getParam('type');
+    const data = this.props.navigation.getParam('data');
+    const title = this.props.navigation.getParam('title');
+    const type = this.props.navigation.getParam('type');
 
     console.log({ data });
     // let flag_History = utils.isJson( data.sssDetails.history );
@@ -49,7 +50,7 @@ export default class Restore4And5SelfShare extends React.Component<any, any> {
     //     arr_History = JSON.parse( data.sssDetails.history );
     // }
     // let acceptedDate = data.sssDetails.acceptedDate;
-    let flag_ScanBtnDisable = true;
+    const flag_ScanBtnDisable = true;
     // if ( acceptedDate != "" ) {
     //     flag_ScanBtnDisable = false;
     // } else {
@@ -64,12 +65,12 @@ export default class Restore4And5SelfShare extends React.Component<any, any> {
     });
   }
 
-  //TODO: Sharing
+  // TODO: Sharing
   click_QRCode(data: any) {
-    let { type } = this.state;
+    const { type } = this.state;
     this.props.navigation.push('Restore4And5SelfShareQRCodeScanner', {
-      data: data,
-      type: type,
+      data,
+      type,
     });
     // let { title } = this.state;
     // let email4shareFilePath = data.sssDetails.encryptedMetaShare.split( '"' ).join( "" );
@@ -117,7 +118,7 @@ export default class Restore4And5SelfShare extends React.Component<any, any> {
     // }
   }
 
-  //TODO: Re-Share Share
+  // TODO: Re-Share Share
 
   click_ReShare(data: any) {
     alert.simpleOk('Oops', 'coming soon');
@@ -149,18 +150,18 @@ export default class Restore4And5SelfShare extends React.Component<any, any> {
     // }
   };
 
-  //TODO: Share or Reshare button on click
+  // TODO: Share or Reshare button on click
   click_SentRequest(type: string, data: any) {
     console.log({ type, data });
   }
 
   render() {
-    //array
-    let { data, arr_History } = this.state;
-    //Value
-    let { title } = this.state;
-    //flag
-    let { flag_ScanBtnDisable } = this.state;
+    // array
+    const { data, arr_History } = this.state;
+    // Value
+    const { title } = this.state;
+    // flag
+    const { flag_ScanBtnDisable } = this.state;
     return (
       <Container>
         <ImageBackground
@@ -231,7 +232,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F8F8',
   },
-  //botom model
+  // botom model
   modal: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,

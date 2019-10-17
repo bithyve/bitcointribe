@@ -1,3 +1,10 @@
+/* eslint-disable consistent-return */
+/* eslint-disable no-return-assign */
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-continue */
+/* eslint-disable no-unused-vars */
 import bip32 from 'bip32';
 import bip39 from 'react-native-bip39';
 import bitcoinJS, { TransactionBuilder } from 'bitcoinjs-lib';
@@ -8,16 +15,27 @@ import Bitcoin from './Bitcoin';
 
 export default class HDSegwitWallet extends Bitcoin {
   private mnemonic: string;
+
   private passphrase: string;
+
   private purpose: number;
+
   private derivationPath: string;
+
   private xpub: string;
+
   private usedAddresses: string[];
+
   private nextFreeAddressIndex: number;
+
   private nextFreeChangeAddressIndex: number;
+
   private internalAddresssesCache: {};
+
   private externalAddressesCache: {};
+
   private addressToWIFCache: {};
+
   private gapLimit: number;
 
   constructor(
@@ -37,7 +55,7 @@ export default class HDSegwitWallet extends Bitcoin {
     super();
     this.mnemonic = mnemonic;
     this.passphrase = passphrase;
-    this.purpose = dPathPurpose ? dPathPurpose : config.DPATH_PURPOSE;
+    this.purpose = dPathPurpose || config.DPATH_PURPOSE;
     this.derivationPath =
       config.NETWORK === bitcoinJS.networks.bitcoin
         ? `m/${this.purpose}'/0'/0'`
@@ -97,6 +115,7 @@ export default class HDSegwitWallet extends Bitcoin {
           this.nextFreeAddressIndex + itr,
         );
         this.externalAddressesCache[this.nextFreeAddressIndex + itr] = address;
+        // eslint-disable-next-line no-await-in-loop
         const txCounts = await this.getTxCounts([address]); // ensuring availability
         if (txCounts[address] === 0) {
           // free address found
@@ -304,16 +323,16 @@ export default class HDSegwitWallet extends Bitcoin {
   }> => {
     try {
       if (this.isValidAddress(recipientAddress)) {
-        amount = amount * 1e8; // converting into sats
+        const tempAmount = amount * 1e8; // converting into sats
         const { balance } = await this.fetchBalance();
 
         const { inputs, txb, fee } = await this.createHDTransaction(
           recipientAddress,
-          amount,
+          tempAmount,
         );
         console.log('---- Transaction Created ----');
 
-        if (balance < amount + fee) {
+        if (balance < tempAmount + fee) {
           throw new Error(
             'Insufficient balance to compensate for transfer amount and the txn fee',
           );
@@ -327,9 +346,8 @@ export default class HDSegwitWallet extends Bitcoin {
         console.log('---- Transaction Broadcasted ----');
 
         return { txid };
-      } else {
-        throw new Error('Recipient address is wrong');
       }
+      throw new Error('Recipient address is wrong');
     } catch (err) {
       throw new Error(`Unable to transfer: ${err.message}`);
     }
@@ -365,6 +383,7 @@ export default class HDSegwitWallet extends Bitcoin {
           this.nextFreeChangeAddressIndex + itr
         ] = address; // updating cache just for any case
 
+        // eslint-disable-next-line no-await-in-loop
         const txCounts = await this.getTxCounts([address]); // ensuring availability
 
         if (txCounts[address] === 0) {
@@ -521,9 +540,8 @@ export default class HDSegwitWallet extends Bitcoin {
       }
 
       return emptyWallet;
-    } else {
-      return false;
     }
+    return false;
   };
 
   private sortOutputs = async (
@@ -646,7 +664,7 @@ export default class HDSegwitWallet extends Bitcoin {
         return this.getExternalWIFByIndex(itr);
       }
     }
-    throw new Error('Could not find WIF for ' + address);
+    throw new Error(`Could not find WIF for ${address}`);
   };
 
   private getXpub = () => {

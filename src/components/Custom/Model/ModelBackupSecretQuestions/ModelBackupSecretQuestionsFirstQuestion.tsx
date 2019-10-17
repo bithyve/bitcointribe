@@ -16,8 +16,15 @@ import { SvgIcon } from '@up-shared/components';
 
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome Model
+// TODO: Custome Model
 import { ModelPasscode } from 'hexaCustModel';
+
+// TODO: Custome StyleSheet Files
+import FontFamily from 'hexaStyles';
+
+// TODO: Custome Object
+import { images } from 'hexaConstants';
+import { renderIf } from 'hexaValidation';
 
 interface Props {
   data: [];
@@ -26,13 +33,6 @@ interface Props {
   pop: Function;
   click_Request: Function;
 }
-
-//TODO: Custome StyleSheet Files
-import FontFamily from 'hexaStyles';
-
-//TODO: Custome Object
-import { images } from 'hexaConstants';
-import { renderIf } from 'hexaValidation';
 
 let wrongEnterAnswerCount = 0;
 
@@ -53,7 +53,7 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<
   }
 
   componentWillReceiveProps(nextProps: any) {
-    var data = nextProps.data[0];
+    let data = nextProps.data[0];
     if (data != undefined) {
       data = data.data[0];
       this.setState({
@@ -63,10 +63,10 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<
     }
   }
 
-  //TODO: func check_CorrectAnswer
+  // TODO: func check_CorrectAnswer
   check_CorrectAnswer() {
     setTimeout(() => {
-      let firstAns = this.state.firstAnswer;
+      const firstAns = this.state.firstAnswer;
       if (firstAns.length >= 3) {
         this.setState({
           flag_DisableBtnNext: false,
@@ -80,23 +80,23 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<
     }, 100);
   }
 
-  //TODO: Next button on click
+  // TODO: Next button on click
   click_Next() {
-    let answer = this.state.anwser;
-    let enterAnswer = this.state.firstAnswer;
+    const answer = this.state.anwser;
+    const enterAnswer = this.state.firstAnswer;
     if (answer != enterAnswer) {
       this.setState({
         answerBorderColor: '#E64545',
       });
-      wrongEnterAnswerCount = wrongEnterAnswerCount + 1;
-      //console.log( { wrongEnterAnswerCount } );
+      wrongEnterAnswerCount += 1;
+      // console.log( { wrongEnterAnswerCount } );
     } else {
       this.props.click_Next();
     }
   }
 
   render() {
-    let {
+    const {
       flag_DisableBtnNext,
       answerBorderColor,
       anwser,

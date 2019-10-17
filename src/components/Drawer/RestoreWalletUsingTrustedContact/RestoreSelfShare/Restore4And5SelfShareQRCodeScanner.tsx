@@ -1,24 +1,21 @@
 import React from 'react';
 import { StyleSheet, SafeAreaView } from 'react-native';
 import { Container, Tab, Tabs, TabHeading, Icon } from 'native-base';
-//NsNotification
+// NsNotification
 import BackboneEvents from 'backbone-events-standalone';
-// global event bus
-window.EventBus = BackboneEvents.mixin({});
 
-//TODO: Custome object
+// TODO: Custome object
 import { colors, localDB } from 'hexaConstants';
-var dbOpration = require('hexaDBOpration');
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//Custome Compontes
+// Custome Compontes
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 
-//Screens
+// Screens
+import { S3Service } from 'hexaBitcoin';
 import Restore4And5SelfShareQRCodeScreen1 from './Screens/Restore4And5SelfShareQRCodeScreen1';
 import Restore4And5SelfShareQRCodeScreen2 from './Screens/Restore4And5SelfShareQRCodeScreen2';
 import Restore4And5SelfShareQRCodeScreen3 from './Screens/Restore4And5SelfShareQRCodeScreen3';
@@ -28,11 +25,15 @@ import Restore4And5SelfShareQRCodeScreen6 from './Screens/Restore4And5SelfShareQ
 import Restore4And5SelfShareQRCodeScreen7 from './Screens/Restore4And5SelfShareQRCodeScreen7';
 import Restore4And5SelfShareQRCodeScreen8 from './Screens/Restore4And5SelfShareQRCodeScreen8';
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+// Bitcoin Files
+// global event bus
+window.EventBus = BackboneEvents.mixin({});
+const dbOpration = require('hexaDBOpration');
 
-//Bitcoin Files
-import { S3Service } from 'hexaBitcoin';
+const alert = new AlertSimple();
+
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
 
 export default class Restore4And5SelfShareQRCodeScanner extends React.Component {
   constructor(props: any) {
@@ -47,8 +48,8 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
   }
 
   componentWillMount() {
-    let data = this.props.navigation.getParam('data');
-    let type = this.props.navigation.getParam('type');
+    const data = this.props.navigation.getParam('data');
+    const type = this.props.navigation.getParam('type');
     console.log({ data, type });
 
     this.setState({
@@ -57,9 +58,9 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
     });
   }
 
-  //TODO: Click next qrcode click on
+  // TODO: Click next qrcode click on
   click_Next(index: number, data: any) {
-    let arr_Shares = this.state.arr_Shares;
+    const { arr_Shares } = this.state;
     arr_Shares.push.apply(arr_Shares, data);
     this.setState({
       selectedIndex: index,
@@ -69,16 +70,16 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
 
   click_Confirm = async (type: string, data: any) => {
     const dateTime = Date.now();
-    let arr_Shares = this.state.arr_Shares;
+    const { arr_Shares } = this.state;
     arr_Shares.push.apply(arr_Shares, data);
     console.log({ arr_Shares });
-    var resRecoverMetaShareFromQR = await S3Service.recoverMetaShareFromQR(
+    let resRecoverMetaShareFromQR = await S3Service.recoverMetaShareFromQR(
       arr_Shares,
     );
     if (resRecoverMetaShareFromQR.status == 200) {
       resRecoverMetaShareFromQR = resRecoverMetaShareFromQR.data;
       console.log({ resRecoverMetaShareFromQR });
-      let resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactSelfShare(
+      const resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactSelfShare(
         localDB.tableName.tblSSSDetails,
         dateTime,
         resRecoverMetaShareFromQR.metaShare,
@@ -96,8 +97,8 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
   };
 
   render() {
-    //values
-    let { selectedIndex, type } = this.state;
+    // values
+    const { selectedIndex, type } = this.state;
     return (
       <Container>
         <HeaderTitle

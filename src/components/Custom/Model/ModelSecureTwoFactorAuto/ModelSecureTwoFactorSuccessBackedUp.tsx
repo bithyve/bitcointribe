@@ -4,10 +4,10 @@ import { Text } from 'native-base';
 
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { images } from 'hexaConstants';
 
 interface Props {
@@ -25,7 +25,7 @@ export default class ModelSecureTwoFactorSuccessBackedUp extends Component<
   }
 
   render() {
-    let data = this.props.data.length != 0 ? this.props.data : [];
+    const data = this.props.data.length != 0 ? this.props.data : [];
     return (
       <Modal
         transparent

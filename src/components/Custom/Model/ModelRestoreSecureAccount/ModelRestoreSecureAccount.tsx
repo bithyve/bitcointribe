@@ -2,15 +2,16 @@ import React, { Component } from 'react';
 import { Modal, View, StyleSheet, Image, Platform } from 'react-native';
 import { Button, Text } from 'native-base';
 
-//TODO: Custome Compontes
+// TODO: Custome Compontes
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 import { SvgIcon } from '@up-shared/components';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
-//TODO: Custome Object
+// TODO: Custome Object
 import { images } from 'hexaConstants';
-var utils = require('hexaUtils');
+
+const utils = require('hexaUtils');
 
 interface Props {
   data: [];
@@ -28,7 +29,7 @@ export default class ModelRestoreSecureAccount extends Component<Props, any> {
   }
 
   render() {
-    let flag_NextBtnDisable = this.state.flag_NextBtnDisable;
+    const { flag_NextBtnDisable } = this.state;
     return (
       <Modal
         transparent

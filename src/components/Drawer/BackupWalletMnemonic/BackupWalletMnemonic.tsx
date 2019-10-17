@@ -2,21 +2,21 @@ import React from 'react';
 import { StyleSheet, ImageBackground, SafeAreaView } from 'react-native';
 import { Container } from 'native-base';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { ViewBackupWalletMnemonicScrolling } from 'hexaCustView';
 import { HeaderTitle } from 'hexaCustHeader';
 
+import { colors, images } from 'hexaConstants';
 import BackupWalletMnemonic6 from './BackupWalletMnemonic6';
 import BackupWalletMnemonic7to12 from './BackupWalletMnemonic7to12';
 import BackupWalletMnemonic13to18 from './BackupWalletMnemonic13to18';
 import BackupWalletMnemonic19to24 from './BackupWalletMnemonic19to24';
 
-//TODO: Custome Object
-import { colors, images } from 'hexaConstants';
+// TODO: Custome Object
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
 
 export default class BackupWalletMnemonic extends React.Component<any, any> {
   constructor(props: any) {
@@ -30,16 +30,16 @@ export default class BackupWalletMnemonic extends React.Component<any, any> {
   }
 
   async componentWillMount() {
-    var resultWallet = await comFunDBRead.readTblWallet();
-    let mnemonic = resultWallet.mnemonic;
-    let arrMnemonic = mnemonic.split(' ');
+    const resultWallet = await comFunDBRead.readTblWallet();
+    const { mnemonic } = resultWallet;
+    const arrMnemonic = mnemonic.split(' ');
     // let mnemonicLength = mnemonic.match( /\w+/g ).length;
-    let words1to6 = [];
-    let words7to12 = [];
-    let words13to18 = [];
-    let words19to24 = [];
+    const words1to6 = [];
+    const words7to12 = [];
+    const words13to18 = [];
+    const words19to24 = [];
     for (let i = 0; i < arrMnemonic.length; i++) {
-      let data = arrMnemonic[i];
+      const data = arrMnemonic[i];
       if (i < 6) {
         words1to6.push({ index: i + 1, title: data });
       } else if (i >= 6 && i < 12) {

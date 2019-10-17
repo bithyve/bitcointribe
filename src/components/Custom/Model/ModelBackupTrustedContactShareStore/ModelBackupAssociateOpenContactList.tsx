@@ -6,11 +6,11 @@ import { Avatar } from 'react-native-elements';
 
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
-var utils = require('hexaUtils');
+// TODO: Custome Object
+const utils = require('hexaUtils');
 
 interface Props {
   data: [];
@@ -23,7 +23,7 @@ export default class ModelBackupAssociateOpenContactList extends Component<
   any
 > {
   render() {
-    let walletName =
+    const walletName =
       this.props.data.length != 0
         ? this.props.data[0].walletName
         : 'Hexa Wallet';

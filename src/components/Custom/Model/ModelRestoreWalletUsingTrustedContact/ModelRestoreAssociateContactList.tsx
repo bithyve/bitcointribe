@@ -11,6 +11,11 @@ import { Text } from 'native-base';
 import { Avatar } from 'react-native-elements';
 import { RkCard } from 'react-native-ui-kitten';
 
+import { renderIf } from 'hexaValidation';
+
+// TODO: Custome StyleSheet Files
+import FontFamily from 'hexaStyles';
+
 interface Props {
   data: [];
   closeModal: Function;
@@ -18,20 +23,15 @@ interface Props {
   click_Request: Function;
 }
 
-import { renderIf } from 'hexaValidation';
-
-//TODO: Custome StyleSheet Files
-import FontFamily from 'hexaStyles';
-
 export default class ModelRestoreAssociateContactList extends Component<
   Props,
   any
 > {
-  //TODO: list item click any perosn
+  // TODO: list item click any perosn
   click_SelectContact(item: any) {
     Alert.alert(
       'Are you sure?',
-      'you want to associate' + item.givenName + ' ' + item.familyName + '?',
+      `you want to associate${item.givenName} ${item.familyName}?`,
       [
         {
           text: 'Cancel',
@@ -48,7 +48,7 @@ export default class ModelRestoreAssociateContactList extends Component<
   }
 
   render() {
-    let item = this.props.data.length != 0 ? this.props.data[0].item : 'temp';
+    const item = this.props.data.length != 0 ? this.props.data[0].item : 'temp';
 
     return (
       <Modal

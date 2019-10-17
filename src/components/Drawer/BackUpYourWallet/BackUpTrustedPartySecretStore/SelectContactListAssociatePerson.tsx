@@ -13,31 +13,32 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Contacts from 'react-native-contacts';
 import { Avatar } from 'react-native-elements';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { ModelLoader } from 'hexaLoader';
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, localDB } from 'hexaConstants';
 import { renderIf } from 'hexaValidation';
-var dbOpration = require('hexaDBOpration');
-var utils = require('hexaUtils');
-
-//TODO: Bitcoin Class
-var bitcoinClassState = require('hexaClassState');
 
 import { S3Service } from 'hexaBitcoin';
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+const alert = new AlertSimple();
+const dbOpration = require('hexaDBOpration');
+const utils = require('hexaUtils');
+
+// TODO: Bitcoin Class
+const bitcoinClassState = require('hexaClassState');
+
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
 
 export default class SelectContactListAssociatePerson extends React.Component<
   any,
@@ -57,12 +58,13 @@ export default class SelectContactListAssociatePerson extends React.Component<
       flag_MaxItemSeletedof3: true,
     };
   }
+
   componentWillMount() {
     Contacts.getAll((err, contacts) => {
       if (err) {
         throw err;
       }
-      //console.log( { contacts } );
+      // console.log( { contacts } );
       this.setState({
         data: contacts,
         arr_ContactList: contacts,
@@ -72,17 +74,17 @@ export default class SelectContactListAssociatePerson extends React.Component<
 
   press = (item: any) => {
     // console.log( { item } );
-    let givenName = item.givenName != '' ? item.givenName : '';
-    let familyName = item.familyName != '' ? item.familyName : '';
-    let name = givenName + ' ' + familyName;
-    //console.log( { name } );
+    const givenName = item.givenName != '' ? item.givenName : '';
+    const familyName = item.familyName != '' ? item.familyName : '';
+    const name = `${givenName} ${familyName}`;
+    // console.log( { name } );
     this.setState({
       arr_SelectedItem: item,
     });
-    let urlType = utils.getDeepLinkingType();
+    const urlType = utils.getDeepLinkingType();
     Alert.alert(
       'Are you sure?',
-      'you want to associate ' + name + '?',
+      `you want to associate ${name}?`,
       [
         {
           text: 'Cancel',
@@ -112,52 +114,54 @@ export default class SelectContactListAssociatePerson extends React.Component<
     this.props.navigation.navigate('TabbarBottom');
   };
 
-  //TODO: Qrcode Scan SSS Details Download Desc Sahre
+  // TODO: Qrcode Scan SSS Details Download Desc Sahre
   downloadDescShare = async () => {
     this.setState({
       flag_Loading: true,
     });
-    let keeperInfo = this.state.arr_SelectedItem;
+    const keeperInfo = this.state.arr_SelectedItem;
     let flag_Loading = true;
     const dateTime = Date.now();
-    let urlScriptDetails = utils.getDeepLinkingUrl();
-    //console.log( { urlScriptDetails } );
-    let urlScript = {};
+    const urlScriptDetails = utils.getDeepLinkingUrl();
+    // console.log( { urlScriptDetails } );
+    const urlScript = {};
     urlScript.walletName = urlScriptDetails.wn;
     urlScript.data = urlScriptDetails.data;
-    let walletDetails = utils.getWalletDetails();
+    const walletDetails = utils.getWalletDetails();
     const sss = await bitcoinClassState.getS3ServiceClassState();
-    let resDownlaodShare = await S3Service.downloadShare(urlScriptDetails.data);
-    //console.log( { resDownlaodShare } );
+    const resDownlaodShare = await S3Service.downloadShare(
+      urlScriptDetails.data,
+    );
+    // console.log( { resDownlaodShare } );
     if (resDownlaodShare.status == 200) {
-      let regularAccount = await bitcoinClassState.getRegularClassState();
-      var resGetWalletId = await regularAccount.getWalletId();
+      const regularAccount = await bitcoinClassState.getRegularClassState();
+      let resGetWalletId = await regularAccount.getWalletId();
       if (resGetWalletId.status == 200) {
         await bitcoinClassState.setRegularClassState(regularAccount);
         resGetWalletId = resGetWalletId.data;
       } else {
         alert.simpleOk('Oops', resGetWalletId.err);
       }
-      let resTrustedParty = await comFunDBRead.readTblTrustedPartySSSDetails();
-      let arr_DecrShare = [];
+      const resTrustedParty = await comFunDBRead.readTblTrustedPartySSSDetails();
+      const arr_DecrShare = [];
       for (let i = 0; i < resTrustedParty.length; i++) {
         arr_DecrShare.push(JSON.parse(resTrustedParty[i].decrShare));
       }
 
-      let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare(
+      const resDecryptEncMetaShare = await S3Service.decryptEncMetaShare(
         resDownlaodShare.data.encryptedMetaShare,
         urlScriptDetails.data,
         resGetWalletId.walletId,
         arr_DecrShare,
       );
       if (resDecryptEncMetaShare.status == 200) {
-        //console.log( { resDecryptEncMetaShare } );
+        // console.log( { resDecryptEncMetaShare } );
         arr_DecrShare.length != 0
           ? arr_DecrShare.push(resDecryptEncMetaShare.data.decryptedMetaShare)
           : arr_DecrShare.push(resDecryptEncMetaShare.data.decryptedMetaShare);
-        //console.log( { arr_DecrShare } );
+        // console.log( { arr_DecrShare } );
         const resUpdateHealth = await S3Service.updateHealth(arr_DecrShare);
-        //console.log( { resUpdateHealth } );
+        // console.log( { resUpdateHealth } );
         if (resUpdateHealth.status == 200) {
           await bitcoinClassState.setS3ServiceClassState(sss);
           const resTrustedParty = await dbOpration.insertTrustedPartyDetails(
@@ -198,7 +202,7 @@ export default class SelectContactListAssociatePerson extends React.Component<
     });
   };
 
-  //TODO: Searching Contact List
+  // TODO: Searching Contact List
   searchFilterFunction = (text: string) => {
     if (text.length > 0) {
       const newData = this.state.data.filter(item => {
@@ -396,7 +400,7 @@ const styles = StyleSheet.create({
     bottom: 10,
     width: '100%',
   },
-  //Grid View Selected
+  // Grid View Selected
   gridSelectedList: {
     flex: 1,
   },

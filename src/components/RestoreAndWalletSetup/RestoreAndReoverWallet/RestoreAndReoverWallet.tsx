@@ -14,19 +14,20 @@ import { Text } from 'native-base';
 import { SvgIcon } from '@up-shared/components';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, localDB } from 'hexaConstants';
 import utils from 'hexaUtils';
-var dbOpration = require('hexaDBOpration');
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+const dbOpration = require('hexaDBOpration');
+
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
 
 export default class RestoreAndReoverWallet extends Component<Props, any> {
   constructor(props: any) {
@@ -59,7 +60,7 @@ export default class RestoreAndReoverWallet extends Component<Props, any> {
 
   loadData = async () => {
     try {
-      var resSSSDetails = await dbOpration.readTablesData(
+      let resSSSDetails = await dbOpration.readTablesData(
         localDB.tableName.tblSSSDetails,
       );
       resSSSDetails = resSSSDetails.temp;
@@ -79,7 +80,7 @@ export default class RestoreAndReoverWallet extends Component<Props, any> {
     }
   };
 
-  //TODO: func click on list card item
+  // TODO: func click on list card item
   click_Card(item: any) {
     try {
       if (item == 'Set up as a New Wallet') {
@@ -99,43 +100,43 @@ export default class RestoreAndReoverWallet extends Component<Props, any> {
   createSSSDetailsTableStructure = async () => {
     try {
       const dateTime = Date.now();
-      let keeperInfo = [
+      const keeperInfo = [
         { info: null },
         { info: null },
         { info: null },
         { info: null },
         { info: null },
       ];
-      let encryptedMetaShare = [
+      const encryptedMetaShare = [
         { metaShare: null },
         { metaShare: null },
         { metaShare: null },
         { metaShare: null },
         { metaShare: null },
       ];
-      let arrTypes = [
+      const arrTypes = [
         { type: 'Trusted Contacts 1' },
         { type: 'Trusted Contacts 2' },
         { type: 'Self Share 1' },
         { type: 'Self Share 2' },
         { type: 'Self Share 3' },
       ];
-      let temp = [
+      const temp = [
         {
           date: dateTime,
           share: null,
           shareId: null,
-          keeperInfo: keeperInfo,
-          encryptedMetaShare: encryptedMetaShare,
+          keeperInfo,
+          encryptedMetaShare,
           type: arrTypes,
         },
       ];
       console.log({ temp });
-      let resDeleteTableData = await dbOpration.deleteTableData(
+      const resDeleteTableData = await dbOpration.deleteTableData(
         localDB.tableName.tblSSSDetails,
       );
       if (resDeleteTableData) {
-        let resInsertSSSShare = await dbOpration.insertSSSShareDetails(
+        const resInsertSSSShare = await dbOpration.insertSSSShareDetails(
           localDB.tableName.tblSSSDetails,
           temp,
         );

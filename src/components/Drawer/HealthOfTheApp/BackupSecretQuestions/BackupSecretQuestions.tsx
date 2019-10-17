@@ -2,16 +2,17 @@ import React, { Component } from 'react';
 import { StyleSheet, View, ImageBackground, SafeAreaView } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-//TODO: Custome Compontes
+// TODO: Custome Compontes
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import {
   ModelBackupSecretQuestionsFirstQuestion,
   ModelQuestionsSuccessfullyBackedUp,
 } from 'hexaCustModel';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, localDB } from 'hexaConstants';
-var dbOpration = require('hexaDBOpration');
+
+const dbOpration = require('hexaDBOpration');
 
 export default class BackupSecretQuestions extends Component {
   constructor(props: any) {
@@ -25,10 +26,10 @@ export default class BackupSecretQuestions extends Component {
   }
 
   componentWillMount() {
-    let data = this.props.navigation.getParam('data');
-    //console.log( { data } );
+    const data = this.props.navigation.getParam('data');
+    // console.log( { data } );
 
-    let walletDetails = this.props.navigation.getParam('walletDetails');
+    const walletDetails = this.props.navigation.getParam('walletDetails');
     setTimeout(() => {
       this.setState({
         data,
@@ -43,19 +44,19 @@ export default class BackupSecretQuestions extends Component {
     }, 100);
   }
 
-  //TODO: Click Sucess Popup click_GoToWallet
+  // TODO: Click Sucess Popup click_GoToWallet
 
   click_GoToWallet = async () => {
-    let { walletDetails } = this.state;
-    let arr_History = JSON.parse(walletDetails.setUpWalletAnswerDetails);
-    //console.log( { arr_History } );
+    const { walletDetails } = this.state;
+    const arr_History = JSON.parse(walletDetails.setUpWalletAnswerDetails);
+    // console.log( { arr_History } );
     const dateTime = Date.now();
-    let JsonData = {};
+    const JsonData = {};
     JsonData.Question = arr_History[0].Question;
     JsonData.Answer = arr_History[0].Answer;
-    let temp = [JsonData];
+    const temp = [JsonData];
     arr_History.push.apply(arr_History, temp);
-    let resUpdateWalletAns = await dbOpration.updateWalletBackedUpSecretQue(
+    const resUpdateWalletAns = await dbOpration.updateWalletBackedUpSecretQue(
       localDB.tableName.tblWallet,
       dateTime,
     );
@@ -65,8 +66,8 @@ export default class BackupSecretQuestions extends Component {
   };
 
   render() {
-    //array
-    let {
+    // array
+    const {
       data,
       arr_ModelBackupSecretQuestionsFirstQuestion,
       arr_ModelQuestionsSuccessfullyBackedUp,

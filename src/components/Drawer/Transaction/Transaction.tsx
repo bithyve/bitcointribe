@@ -20,29 +20,31 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { ImageSVG } from 'hexaCustImage';
 import { SvgIcon } from '@up-shared/components';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { images, colors, svgIcon } from 'hexaConstants';
-var utils = require('hexaUtils');
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { ModelLoader } from 'hexaLoader';
 
-//TODO: Custome Compontes
+// TODO: Custome Compontes
 
 import { FullLinearGradientTransactionScreenThreeOpt } from 'hexaCustomeLinearGradientButton';
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Common Funciton
-var comFunTran = require('hexaCommonTransaction');
+const utils = require('hexaUtils');
 
-//TODO: Bitcoin Class
-var bitcoinClassState = require('hexaClassState');
+const alert = new AlertSimple();
+
+// TODO: Common Funciton
+const comFunTran = require('hexaCommonTransaction');
+
+// TODO: Bitcoin Class
+const bitcoinClassState = require('hexaClassState');
 
 export default class Transaction extends React.Component<any, any> {
   constructor(props: any) {
@@ -57,9 +59,9 @@ export default class Transaction extends React.Component<any, any> {
   }
 
   componentWillMount() {
-    let data = this.props.navigation.getParam('data');
-    let walletDetails = this.props.navigation.getParam('walletDetails');
-    let appHealthInfo = JSON.parse(walletDetails.appHealthStatus);
+    const data = this.props.navigation.getParam('data');
+    const walletDetails = this.props.navigation.getParam('walletDetails');
+    const appHealthInfo = JSON.parse(walletDetails.appHealthStatus);
     console.log({ accoundDetappInfo: appHealthInfo });
     console.log({ data });
     this.setState(
@@ -79,16 +81,16 @@ export default class Transaction extends React.Component<any, any> {
   };
 
   async getRegularTransaction() {
-    let { arrSelectedAccount } = this.state;
+    const { arrSelectedAccount } = this.state;
     this.setState({ flag_Loading: true });
-    var resTransaction = [];
+    let resTransaction = [];
     if (arrSelectedAccount.accountType == 'Regular Account') {
       resTransaction = await comFunTran.getSecAccountTran('Regular');
       // resTransaction.length != 0 ? resTransaction : resTransaction = await this.getAccountTrans( "Regular" )
-      //console.log( { resTransaction } );
+      // console.log( { resTransaction } );
     } else {
       resTransaction = await comFunTran.getSecAccountTran('Secure');
-      /// resTransaction.length != 0 ? resTransaction : resTransaction = await this.getAccountTrans( "Secure" )
+      // / resTransaction.length != 0 ? resTransaction : resTransaction = await this.getAccountTrans( "Secure" )
     }
     this.setState({
       flag_Loading: false,
@@ -98,8 +100,8 @@ export default class Transaction extends React.Component<any, any> {
 
   getNewTrnasaction = async () => {
     this.setState({ flag_Loading: true });
-    var resTransaction = [];
-    let { arrSelectedAccount } = this.state;
+    let resTransaction = [];
+    const { arrSelectedAccount } = this.state;
     if (arrSelectedAccount.accountType == 'Regular Account') {
       resTransaction = await this.getAccountTrans('Regular');
     } else {
@@ -113,23 +115,21 @@ export default class Transaction extends React.Component<any, any> {
 
   getAccountTrans = async (type: string) => {
     await comFunTran.getAccountTransaction();
-    let regularAccount = await bitcoinClassState.getRegularClassState();
-    let secureAccount = await bitcoinClassState.getSecureClassState();
+    const regularAccount = await bitcoinClassState.getRegularClassState();
+    const secureAccount = await bitcoinClassState.getSecureClassState();
     let resTransaction = [];
     if (type == 'Regular') {
       resTransaction = await regularAccount.getTransactions();
       if (resTransaction.status == 200) {
         return resTransaction.data.transactions.transactionDetails;
-      } else {
-        alert.simpleOkAction('Oops', resTransaction.err, this.click_StopLoader);
       }
+      alert.simpleOkAction('Oops', resTransaction.err, this.click_StopLoader);
     } else {
       resTransaction = await secureAccount.getTransactions();
       if (resTransaction.status == 200) {
         return resTransaction.data.transactions.transactionDetails;
-      } else {
-        alert.simpleOkAction('Oops', resTransaction.err, this.click_StopLoader);
       }
+      alert.simpleOkAction('Oops', resTransaction.err, this.click_StopLoader);
     }
   };
 
@@ -163,8 +163,8 @@ export default class Transaction extends React.Component<any, any> {
               }}
             >
               {item.transactionType === 'Received'
-                ? 'To ' + item.accountType + ' Account'
-                : 'From ' + item.accountType + ' Account'}
+                ? `To ${item.accountType} Account`
+                : `From ${item.accountType} Account`}
             </Text>
             <Text
               style={{
@@ -246,10 +246,10 @@ export default class Transaction extends React.Component<any, any> {
   };
 
   render() {
-    //array
-    let { arrSelectedAccount, appHealthInfo, arrTransaction } = this.state;
-    //flag
-    let { flag_Loading } = this.state;
+    // array
+    const { arrSelectedAccount, appHealthInfo, arrTransaction } = this.state;
+    // flag
+    const { flag_Loading } = this.state;
     return (
       <Container>
         <SafeAreaView style={{ flex: 0, backgroundColor: colors.appColor }} />
@@ -307,10 +307,10 @@ export default class Transaction extends React.Component<any, any> {
                     source={
                       Platform.OS == 'ios'
                         ? svgIcon.transactionScreen[
-                            'SVG' + appHealthInfo.overallStatus
+                            `SVG${appHealthInfo.overallStatus}`
                           ]
                         : svgIcon.transactionScreen[
-                            'PNG' + appHealthInfo.overallStatus
+                            `PNG${appHealthInfo.overallStatus}`
                           ]
                     }
                   />

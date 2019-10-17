@@ -10,10 +10,10 @@ import { Button, Icon, Text } from 'native-base';
 import { Avatar } from 'react-native-elements';
 
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors } from 'hexaConstants';
 import { renderIf } from 'hexaValidation';
 
@@ -26,7 +26,7 @@ export default class ModelTrustedContactEmailAndPhoneShare extends Component {
     };
   }
 
-  //TODO: func list on click itme
+  // TODO: func list on click itme
 
   click_Item(item: any) {
     this.setState({
@@ -36,9 +36,9 @@ export default class ModelTrustedContactEmailAndPhoneShare extends Component {
   }
 
   render() {
-    let contactDetails =
+    const contactDetails =
       this.props.data.length != 0 ? this.props.data[0].contactDetails : '';
-    let arr_ConstactDetailsList =
+    const arr_ConstactDetailsList =
       this.props.data.length != 0
         ? this.props.data[0].arr_ConstactDetailsList
         : '';
@@ -50,7 +50,7 @@ export default class ModelTrustedContactEmailAndPhoneShare extends Component {
           this.props.data.length != 0 ? this.props.data[0].modalVisible : false
         }
         onRequestClose={() => {
-          //console.log( "call" );
+          // console.log( "call" );
           this.props.closeModal();
         }}
       >
