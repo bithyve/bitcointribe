@@ -56,6 +56,9 @@ export default class ModelEnterAndConfirmMnemonic extends Component<
   }
 
   WordCount(str: string) {
+    this.setState({
+      flg: true,
+    });
     return str.split(' ');
   }
 

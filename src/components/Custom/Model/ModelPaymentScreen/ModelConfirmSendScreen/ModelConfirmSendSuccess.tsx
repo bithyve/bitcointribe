@@ -27,7 +27,7 @@ export default class ModelConfirmSendSuccess extends Component<Props, any> {
     };
   }
 
-  componentWillReceiveProps = (nextProps: any) => {
+  UNSAFE_componentWillReceiveProps = (nextProps: any) => {
     const { data } = nextProps;
     if (data.length != 0) {
       this.setState({

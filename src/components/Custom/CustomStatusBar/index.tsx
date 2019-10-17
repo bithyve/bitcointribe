@@ -1,3 +1,3 @@
 import CustomStatusBar from './CustomStatusBar';
 
-export { CustomStatusBar };
+export default { CustomStatusBar };

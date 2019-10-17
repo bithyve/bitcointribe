@@ -35,7 +35,7 @@ export default class ModelHealthCheckMnemonicThirdWord extends Component<
     };
   }
 
-  componentWillReceiveProps(nextProps: any) {
+  UNSAFE_componentWillReceiveProps(nextProps: any) {
     // console.log( { nextProps } );
     const data = nextProps.data[0];
     // console.log( { data } );

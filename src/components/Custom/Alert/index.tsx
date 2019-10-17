@@ -1,3 +1,3 @@
 import AlertSimple from './AlertSimple';
 
-export { AlertSimple };
+export default { AlertSimple };

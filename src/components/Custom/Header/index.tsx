@@ -1,3 +1,3 @@
 import HeaderTitle from './HeaderTitle/HeaderTitle';
 
-export { HeaderTitle };
+export default { HeaderTitle };
