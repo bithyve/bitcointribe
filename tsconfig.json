@@ -1,27 +1,27 @@
 {
-    "compilerOptions": {
-        "allowJs": true,
-        "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
-        "isolatedModules": true,
-        "jsx": "react",
-        "lib": ["es6"],
-        "moduleResolution": "node",
-        "noEmit": true,
-        "strict": true,
-        "target": "esnext",
-        "baseUrl": "./",
-        "paths": {
-            "*": ["node_modules/*", "src/bitcoin/*"]
-        }
-    },
-    "exclude": [
-        "node_modules",
-        "babel.config.js",
-        "metro.config.js",
-        "jest.config.js",
-        "__tests__/**/*-test.ts",
-        "src/bitcoin"
-    ],
-    "include": ["node_modules/*", "src/**/*"]
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "jsx": "react",
+    "lib": ["es6"],
+    "moduleResolution": "node",
+    "noEmit": true,
+    "strict": true,
+    "target": "esnext",
+    "baseUrl": "./",
+    "paths": {
+      "*": ["node_modules/*", "src/bitcoin/*"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "babel.config.js",
+    "metro.config.js",
+    "jest.config.js",
+    "__tests__/**/*-test.ts",
+    "src/bitcoin"
+  ],
+  "include": ["node_modules/*", "src/**/*"]
 }

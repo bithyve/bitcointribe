@@ -5,9 +5,9 @@ import SelectContactListAssociatePerson from './BackUpTrustedPartySecretStore/Se
 import TrustedContactAcceptOtp from './BackUpTrustedPartySecretStore/TrustedContactAcceptOtp';
 
 export {
-    AllContactList,
-    TrustedContact,
-    ShareSecretViaQR,
-    SelectContactListAssociatePerson,
-    TrustedContactAcceptOtp
+  AllContactList,
+  TrustedContact,
+  ShareSecretViaQR,
+  SelectContactListAssociatePerson,
+  TrustedContactAcceptOtp,
 };

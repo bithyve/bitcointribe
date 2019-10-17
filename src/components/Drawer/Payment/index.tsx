@@ -4,8 +4,8 @@ import ConfirmAndSendPayment from './SendPayment/ConfirmAndSendPayment';
 import SendPaymentAddressScan from './SendPayment/SendPaymentAddressScan';
 
 export {
-    ReceivePayment,
-    SendPayment,
-    ConfirmAndSendPayment,
-    SendPaymentAddressScan
+  ReceivePayment,
+  SendPayment,
+  ConfirmAndSendPayment,
+  SendPaymentAddressScan,
 };

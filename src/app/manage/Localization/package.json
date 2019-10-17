@@ -1,4 +1,4 @@
 {
-    "name": "hexaLocalization",
-    "main": "i18n.tsx"
+  "name": "hexaLocalization",
+  "main": "i18n.tsx"
 }
