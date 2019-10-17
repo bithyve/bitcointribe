@@ -1,7 +1,6 @@
 import { select, put } from 'redux-saga/effects';
-import { createMnemonic, sagaWatcherHelper } from '../utils';
-
 import { S3Service, RegularAccount, SecureAccount } from 'hexaBitcoin';
+import { createMnemonic, sagaWatcherHelper } from '../utils';
 
 // Types
 const SETUP_ACCOUNTS = 'SETUP_ACCOUNTS';
@@ -13,17 +12,17 @@ const UPDATE_SECURE_ACCOUNT = 'UPDATE_SECURE_ACCOUNT';
 const CREATE_SSS = 'CREATE_SSS';
 const UPDATE_SSS = 'UPDATE_SSS';
 
-//types
-//regular balance
-//update regular balance
+// types
+// regular balance
+// update regular balance
 
-//secure balance
-//update secure balance
+// secure balance
+// update secure balance
 
-//regular address
-//update regular address
-//secure address
-//update secure address
+// regular address
+// update regular address
+// secure address
+// update secure address
 
 const INITIAL_STATE = {
   mnemonic: undefined,

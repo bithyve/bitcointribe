@@ -1,3 +1,4 @@
+/* eslint-disable */
 // ! moment.js
 
 (function(global, factory) {
@@ -574,7 +575,10 @@
   function getPrioritizedUnits(unitsObj) {
     const units = [];
     for (const u in unitsObj) {
-      units.push({ unit: u, priority: priorities[u] });
+      units.push({
+        unit: u,
+        priority: priorities[u],
+      });
     }
     units.sort((a, b) => a.priority - b.priority);
 
@@ -1012,6 +1016,7 @@
   const defaultLocaleMonths = 'January_February_March_April_May_June_July_August_September_October_November_December'.split(
     '_',
   );
+
   function localeMonths(m, format) {
     if (!m) {
       return isArray(this._months) ? this._months : this._months.standalone;
@@ -1029,6 +1034,7 @@
   const defaultLocaleMonthsShort = 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split(
     '_',
   );
+
   function localeMonthsShort(m, format) {
     if (!m) {
       return isArray(this._monthsShort)
@@ -1191,6 +1197,7 @@
   }
 
   const defaultMonthsShortRegex = matchWord;
+
   function monthsShortRegex(isStrict) {
     if (this._monthsParseExact) {
       if (!hasOwnProp(this, '_monthsRegex')) {
@@ -1212,6 +1219,7 @@
   }
 
   const defaultMonthsRegex = matchWord;
+
   function monthsRegex(isStrict) {
     if (this._monthsParseExact) {
       if (!hasOwnProp(this, '_monthsRegex')) {
@@ -1509,6 +1517,7 @@
   const defaultLocaleWeekdays = 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split(
     '_',
   );
+
   function localeWeekdays(m, format) {
     if (!m) {
       return isArray(this._weekdays)
@@ -1524,11 +1533,13 @@
   }
 
   const defaultLocaleWeekdaysShort = 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_');
+
   function localeWeekdaysShort(m) {
     return m ? this._weekdaysShort[m.day()] : this._weekdaysShort;
   }
 
   const defaultLocaleWeekdaysMin = 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_');
+
   function localeWeekdaysMin(m) {
     return m ? this._weekdaysMin[m.day()] : this._weekdaysMin;
   }
@@ -1724,6 +1735,7 @@
   }
 
   const defaultWeekdaysRegex = matchWord;
+
   function weekdaysRegex(isStrict) {
     if (this._weekdaysParseExact) {
       if (!hasOwnProp(this, '_weekdaysRegex')) {
@@ -1745,6 +1757,7 @@
   }
 
   const defaultWeekdaysShortRegex = matchWord;
+
   function weekdaysShortRegex(isStrict) {
     if (this._weekdaysParseExact) {
       if (!hasOwnProp(this, '_weekdaysRegex')) {
@@ -1766,6 +1779,7 @@
   }
 
   const defaultWeekdaysMinRegex = matchWord;
+
   function weekdaysMinRegex(isStrict) {
     if (this._weekdaysParseExact) {
       if (!hasOwnProp(this, '_weekdaysRegex')) {
@@ -1958,6 +1972,7 @@
   }
 
   const defaultLocaleMeridiemParse = /[ap]\.?m?\.?/i;
+
   function localeMeridiem(hours, minutes, isLower) {
     if (hours > 11) {
       return isLower ? 'pm' : 'PM';
@@ -2887,7 +2902,9 @@
     config._locale = config._locale || getLocale(config._l);
 
     if (input === null || (format === undefined && input === '')) {
-      return createInvalid({ nullInput: true });
+      return createInvalid({
+        nullInput: true,
+      });
     }
 
     if (typeof input === 'string') {
@@ -3450,7 +3467,10 @@
   }
 
   function positiveMomentsDifference(base, other) {
-    const res = { milliseconds: 0, months: 0 };
+    const res = {
+      milliseconds: 0,
+      months: 0,
+    };
 
     res.months =
       other.month() - base.month() + (other.year() - base.year()) * 12;
@@ -3471,7 +3491,10 @@
   function momentsDifference(base, other) {
     let res;
     if (!(base.isValid() && other.isValid())) {
-      return { milliseconds: 0, months: 0 };
+      return {
+        milliseconds: 0,
+        months: 0,
+      };
     }
 
     other = cloneWithOffset(other, base);
@@ -3813,7 +3836,10 @@
       this.isValid() &&
       ((isMoment(time) && time.isValid()) || createLocal(time).isValid())
     ) {
-      return createDuration({ to: this, from: time })
+      return createDuration({
+        to: this,
+        from: time,
+      })
         .locale(this.locale())
         .humanize(!withoutSuffix);
     }
@@ -3830,7 +3856,10 @@
       this.isValid() &&
       ((isMoment(time) && time.isValid()) || createLocal(time).isValid())
     ) {
-      return createDuration({ from: this, to: time })
+      return createDuration({
+        from: this,
+        to: time,
+      })
         .locale(this.locale())
         .humanize(!withoutSuffix);
     }

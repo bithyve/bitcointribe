@@ -14,34 +14,36 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SvgIcon } from '@up-shared/components';
 
-//TODO: Custome Image
+// TODO: Custome Image
 
 import { ImageSVG } from 'hexaCustImage';
-//TODO: Custome view
+// TODO: Custome view
 import { CustomStatusBar } from 'hexaCustStatusBar';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { localDB, images, colors, svgIcon } from 'hexaConstants';
-var dbOpration = require('hexaDBOpration');
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { ModelLoader } from 'hexaLoader';
 
-//TODO: ModalAllTransaction
+// TODO: ModalAllTransaction
 import { ModalAllTransactionDetails } from 'hexaCustModel';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+const dbOpration = require('hexaDBOpration');
 
-//TODO: Bitcoin Class
-var bitcoinClassState = require('hexaClassState');
+const alert = new AlertSimple();
+
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
+
+// TODO: Bitcoin Class
+const bitcoinClassState = require('hexaClassState');
 
 export default class AllTransaction extends React.Component<any, any> {
   constructor(props: any) {
@@ -74,7 +76,7 @@ export default class AllTransaction extends React.Component<any, any> {
   }
 
   getTransaction = async () => {
-    var resTranList = await comFunDBRead.readTblTransaction();
+    const resTranList = await comFunDBRead.readTblTransaction();
     this.dbDataShow(resTranList);
   };
 
@@ -91,8 +93,8 @@ export default class AllTransaction extends React.Component<any, any> {
   };
 
   async getAccountTransaction() {
-    let regularAccount = await bitcoinClassState.getRegularClassState();
-    var regularAccountTransactions = await regularAccount.getTransactions();
+    const regularAccount = await bitcoinClassState.getRegularClassState();
+    let regularAccountTransactions = await regularAccount.getTransactions();
     if (regularAccountTransactions.status == 200) {
       await bitcoinClassState.setRegularClassState(regularAccount);
       regularAccountTransactions = regularAccountTransactions.data;
@@ -107,8 +109,8 @@ export default class AllTransaction extends React.Component<any, any> {
         this.click_StopLoader,
       );
     }
-    let secureAccount = await bitcoinClassState.getSecureClassState();
-    var secureAccountTransactions = await secureAccount.getTransactions();
+    const secureAccount = await bitcoinClassState.getSecureClassState();
+    let secureAccountTransactions = await secureAccount.getTransactions();
     if (secureAccountTransactions.status == 200) {
       await bitcoinClassState.setSecureClassState(secureAccount);
       secureAccountTransactions = secureAccountTransactions.data;
@@ -126,7 +128,7 @@ export default class AllTransaction extends React.Component<any, any> {
   }
 
   filterTransaction = async () => {
-    let dateTime = Date.now();
+    const dateTime = Date.now();
     let results = [
       ...this.state.recentRegularTransactions,
       ...this.state.recentSecureTransactions,
@@ -134,7 +136,7 @@ export default class AllTransaction extends React.Component<any, any> {
     results = results.sort((a, b) => {
       return a.confirmations - b.confirmations;
     });
-    let resStoreTrna = await dbOpration.insertTblTransation(
+    const resStoreTrna = await dbOpration.insertTblTransation(
       localDB.tableName.tblTransaction,
       results,
       dateTime,
@@ -156,27 +158,27 @@ export default class AllTransaction extends React.Component<any, any> {
   }
 
   updateModalData(item: any) {
-    var detailsArray = [
+    const detailsArray = [
       {
         title: 'To',
         value:
           item.transactionType === 'Sent'
             ? item.recipientAddresses
-            : item.accountType + ' Account',
+            : `${item.accountType} Account`,
       },
       {
         title: 'From',
         value:
           item.transactionType === 'Received'
             ? item.senderAddresses
-            : item.accountType + ' Account',
+            : `${item.accountType} Account`,
       },
       { title: 'Amount', value: item.amount },
       { title: 'Fees', value: item.fee },
       { title: 'Transaction ID', value: item.txid },
       { title: 'Confirmations', value: item.confirmations },
     ];
-    var selectedTransaction = {
+    const selectedTransaction = {
       transactionType: item.transactionType,
       amount: item.amount,
       time: '-',
@@ -219,8 +221,8 @@ export default class AllTransaction extends React.Component<any, any> {
               }}
             >
               {item.transactionType === 'Received'
-                ? 'To ' + item.accountType + ' Account'
-                : 'From ' + item.accountType + ' Account'}
+                ? `To ${item.accountType} Account`
+                : `From ${item.accountType} Account`}
             </Text>
             <Text
               style={{

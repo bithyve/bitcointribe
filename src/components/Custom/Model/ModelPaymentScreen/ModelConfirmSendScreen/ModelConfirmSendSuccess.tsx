@@ -5,12 +5,13 @@ import { Text } from 'native-base';
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 import { SvgIcon } from '@up-shared/components';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { images } from 'hexaConstants';
-var utils = require('hexaUtils');
+
+const utils = require('hexaUtils');
 
 interface Props {
   data: [];
@@ -27,7 +28,7 @@ export default class ModelConfirmSendSuccess extends Component<Props, any> {
   }
 
   componentWillReceiveProps = (nextProps: any) => {
-    let data = nextProps.data;
+    const { data } = nextProps;
     if (data.length != 0) {
       this.setState({
         details: data[0].data[0],
@@ -36,9 +37,9 @@ export default class ModelConfirmSendSuccess extends Component<Props, any> {
   };
 
   render() {
-    let data = this.props.data.length != 0 ? this.props.data : [];
-    //array
-    let { details } = this.state;
+    const data = this.props.data.length != 0 ? this.props.data : [];
+    // array
+    const { details } = this.state;
     return (
       <Modal
         transparent

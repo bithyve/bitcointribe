@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Button } from 'native-base';
 import LinearGradient from 'react-native-linear-gradient';
 import { SvgIcon } from '@up-shared/components';
+
 interface Props {
   title: string;
   style: any;
@@ -30,7 +31,7 @@ export default class FullLinearGradientShareButton extends Component<
             disabled={this.props.disabled}
             onPress={() => this.props.click_Done(this.props.title)}
           >
-            <Text style={styles.textWhite}>{'  ' + this.props.title}</Text>
+            <Text style={styles.textWhite}>{`  ${this.props.title}`}</Text>
           </Button>
           <View style={{ flex: 0.2, flexDirection: 'row' }}>
             <View

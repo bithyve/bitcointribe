@@ -7,11 +7,11 @@ import { Avatar } from 'react-native-elements';
 import { RkCard } from 'react-native-ui-kitten';
 
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
-
-var utils = require('hexaUtils');
 import { renderIf } from 'hexaValidation';
+
+const utils = require('hexaUtils');
 
 interface Props {
   data: [];
@@ -31,8 +31,8 @@ export default class ModelSelectedContactsList extends Component<Props, any> {
   }
 
   render() {
-    let data = this.props.data.length != 0 ? this.props.data : [];
-    let flag_DisableBtnNext = this.state.flag_DisableBtnNext;
+    const data = this.props.data.length != 0 ? this.props.data : [];
+    const { flag_DisableBtnNext } = this.state;
     return (
       <Modal
         transparent

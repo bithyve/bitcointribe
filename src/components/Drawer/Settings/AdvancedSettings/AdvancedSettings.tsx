@@ -27,19 +27,19 @@ import { SvgIcon } from '@up-shared/components';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { RkCard } from 'react-native-ui-kitten';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 import { ModelLoader } from 'hexaLoader';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
 
 export default class AdvancedSettings extends React.Component<any, any> {
   constructor(props: any) {
@@ -56,8 +56,8 @@ export default class AdvancedSettings extends React.Component<any, any> {
   }
 
   async componentWillMount() {
-    let walletDetails = await comFunDBRead.readTblWallet();
-    let resAccountDetails = await comFunDBRead.readTblAccount();
+    const walletDetails = await comFunDBRead.readTblWallet();
+    const resAccountDetails = await comFunDBRead.readTblAccount();
     console.log({ walletDetails, resAccountDetails });
     this.setState({
       walletDetails,
@@ -65,9 +65,9 @@ export default class AdvancedSettings extends React.Component<any, any> {
     });
   }
 
-  //TODO: list on click
+  // TODO: list on click
   click_MenuItem(item: any) {
-    let title = item.title;
+    const { title } = item;
     if (title == 'Mnemonic') {
       this.props.navigation.push('MnemonicDisplay');
     }
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     bottom: 10,
     width: '100%',
   },
-  //Grid View Selected
+  // Grid View Selected
   gridSelectedList: {
     flex: 1,
   },

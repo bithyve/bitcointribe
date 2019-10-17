@@ -17,33 +17,35 @@ import { Avatar } from 'react-native-elements';
 import Modal from 'react-native-modalbox';
 import Permissions from 'react-native-permissions';
 import SendSMS from 'react-native-sms';
-var Mailer = require('NativeModules').RNMail;
 import TimerCountdown from 'react-native-timer-countdown';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 import { ModelLoader } from 'hexaLoader';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, localDB } from 'hexaConstants';
 import { renderIf } from 'hexaValidation';
-var dbOpration = require('hexaDBOpration');
-var utils = require('hexaUtils');
-
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
-
-//TODO: Bitcoin class
-var bitcoinClassState = require('hexaClassState');
 import { S3Service } from 'hexaBitcoin';
+
+const Mailer = require('NativeModules').RNMail;
+
+const alert = new AlertSimple();
+const dbOpration = require('hexaDBOpration');
+const utils = require('hexaUtils');
+
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
+
+// TODO: Bitcoin class
+const bitcoinClassState = require('hexaClassState');
 
 export default class ContactSharedSecretList extends React.Component<any, any> {
   constructor(props: any) {
@@ -68,10 +70,10 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
   }
 
   async componentWillMount(flagModelOpen: boolean) {
-    var resSharedSecretList = await comFunDBRead.readTblTrustedPartySSSDetails();
+    const resSharedSecretList = await comFunDBRead.readTblTrustedPartySSSDetails();
     console.log({ resSharedSecretList });
     const dateTime = Date.now();
-    let history = [];
+    const history = [];
     for (let i = 0; i < resSharedSecretList.length; i++) {
       if (resSharedSecretList[i].history != '') {
         history.push(JSON.parse(resSharedSecretList[i].history));
@@ -80,11 +82,11 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
       }
     }
     console.log({ history });
-    //for history get opt
-    let tempOpt = [];
+    // for history get opt
+    const tempOpt = [];
     for (let i = 0; i < history.length; i++) {
-      let eachHistory = history[i];
-      let eachHistoryLength = eachHistory.length;
+      const eachHistory = history[i];
+      const eachHistoryLength = eachHistory.length;
       console.log({ eachHistoryLength });
 
       let otp;
@@ -96,13 +98,13 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
       tempOpt.push(otp);
     }
     console.log({ tempOpt });
-    let temp = [];
+    const temp = [];
     for (let i = 0; i < resSharedSecretList.length; i++) {
-      let data = {};
-      var keeperInfo = {};
-      let decrShare = JSON.parse(resSharedSecretList[i].decrShare);
+      const data = {};
+      let keeperInfo = {};
+      const decrShare = JSON.parse(resSharedSecretList[i].decrShare);
       console.log({ decrShare });
-      let type = resSharedSecretList[i].type;
+      const { type } = resSharedSecretList[i];
       if (resSharedSecretList[i].keeperInfo != '') {
         keeperInfo = JSON.parse(resSharedSecretList[i].keeperInfo);
       } else {
@@ -113,14 +115,14 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         keeperInfo.emailAddresses = [];
       }
       // console.log( { keeperInfo } );
-      let urlScript = JSON.parse(resSharedSecretList[i].urlScript);
+      const urlScript = JSON.parse(resSharedSecretList[i].urlScript);
       console.log({ urlScript });
-      let sharedDate = parseInt(resSharedSecretList[i].sharedDate);
+      const sharedDate = parseInt(resSharedSecretList[i].sharedDate);
       //  console.warn( 'sharedDate date =' + sharedDate.toString() + "and full date =" + fulldate.toString() );
-      //console.log( 'sharedDate date =' + sharedDate.toString() + " and full date =" + fulldate.toString() );
-      var startDate = new Date(dateTime);
-      var endDate = new Date(sharedDate);
-      var diff = Math.abs(startDate.getTime() - endDate.getTime());
+      // console.log( 'sharedDate date =' + sharedDate.toString() + " and full date =" + fulldate.toString() );
+      const startDate = new Date(dateTime);
+      const endDate = new Date(sharedDate);
+      const diff = Math.abs(startDate.getTime() - endDate.getTime());
       const minutes: any = Math.floor(diff / 1000 / 60);
       const seconds: any = Math.floor((diff / 1000) % 60);
       const totalSec = parseInt(minutes * 60) + parseInt(seconds);
@@ -131,14 +133,14 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
       data.resSharedSecretList = resSharedSecretList[i];
       data.walletName =
         type == 'Self Share'
-          ? 'Self Share (' + urlScript.walletName + ')'
+          ? `Self Share (${urlScript.walletName})`
           : urlScript.walletName;
       data.type = type;
       data.keeperInfo = keeperInfo;
       data.name =
         keeperInfo.givenName != ''
           ? keeperInfo.givenName
-          : '' + ' ' + keeperInfo.familyName != ''
+          : `${'' + ' '}${keeperInfo.familyName}` != ''
           ? keeperInfo.familyName
           : '';
       let number;
@@ -160,11 +162,11 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
       arr_OrignalDetails: temp,
     });
 
-    //TODO: DeepLinking open person contact detail
-    let urlScript = utils.getDeepLinkingUrl();
-    let urlType = utils.getDeepLinkingType();
+    // TODO: DeepLinking open person contact detail
+    const urlScript = utils.getDeepLinkingUrl();
+    const urlType = utils.getDeepLinkingType();
     if (urlType == 'SSS Restore SMS/EMAIL') {
-      let message = urlScript.mg;
+      const message = urlScript.mg;
       alert.simpleOkAction(
         'Request',
         message,
@@ -193,7 +195,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
     });
     let flag_Loading = true;
     const sss = await bitcoinClassState.getS3ServiceClassState();
-    var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare(
+    let resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare(
       JSON.parse(data.resSharedSecretList.decrShare),
     );
     if (resGenerateEncryptedMetaShare.status == 200) {
@@ -240,7 +242,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
 
   press = (item: any) => {
     console.log({ item });
-    let type = item.resSharedSecretList.type;
+    const { type } = item.resSharedSecretList;
     if (type == 'Self Share') {
       this.props.navigation.push('TrustedPartySelfShareQRCode', {
         data: item,
@@ -255,7 +257,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
     }
   };
 
-  //TODO: Searching Contact List
+  // TODO: Searching Contact List
   searchFilterFunction = (text: string) => {
     if (text.length > 0) {
       const newData = this.state.data.filter(item => {
@@ -272,21 +274,21 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
     }
   };
 
-  //TODO: Deeplinking
+  // TODO: Deeplinking
   click_SentRequest(type: string, val: any) {
     console.log({ val });
-    let walletDetails = utils.getWalletDetails();
-    let { key, arr_EncryptedMetaShare } = this.state;
-    let script = {};
+    const walletDetails = utils.getWalletDetails();
+    const { key, arr_EncryptedMetaShare } = this.state;
+    const script = {};
     script.key = key;
-    var encpScript = utils.encrypt(JSON.stringify(script), '122334');
+    let encpScript = utils.encrypt(JSON.stringify(script), '122334');
     encpScript = encpScript.split('/').join('_+_');
     if (type == 'SMS') {
       val = val.length != 0 ? val[0].number : '';
       console.log({ val });
       SendSMS.send(
         {
-          body: 'https://prime-sign-230407.appspot.com/sss/res/' + encpScript,
+          body: `https://prime-sign-230407.appspot.com/sss/res/${encpScript}`,
           recipients: [val],
           successTypes: ['sent', 'queued'],
         },
@@ -333,10 +335,9 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         {
           subject: 'Hexa Wallet SSS Restore',
           recipients: [val],
-          body:
-            walletDetails.walletType +
-            ' hexa wallet returned your secret share. Tap on link to store your secret share back <br/> https://prime-sign-230407.appspot.com/sss/res/' +
-            encpScript,
+          body: `${
+            walletDetails.walletType
+          } hexa wallet returned your secret share. Tap on link to store your secret share back <br/> https://prime-sign-230407.appspot.com/sss/res/${encpScript}`,
           isHTML: true,
         },
         (error, event) => {
@@ -380,28 +381,28 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
     }
   }
 
-  //TODO: func backQrCodeScreen
+  // TODO: func backQrCodeScreen
   onSelect = (data: any) => {
     this.reloadList('QR');
   };
 
-  //TODO: Deep{ling sent then reload data
+  // TODO: Deep{ling sent then reload data
   reloadList = async (type: string) => {
     const dateTime = Date.now();
-    let selectedItem = this.state.arr_ItemSeleted;
+    const selectedItem = this.state.arr_ItemSeleted;
     console.log({ selectedItem });
-    var temp = [];
+    let temp = [];
     if (selectedItem.history != '') {
       temp = JSON.parse(selectedItem.history);
     }
-    let jsondata = {};
+    const jsondata = {};
     if (type != 'QR') {
       jsondata.otp = this.state.otp;
     }
-    jsondata.title = 'Secret Share using ' + type.toLowerCase();
+    jsondata.title = `Secret Share using ${type.toLowerCase()}`;
     jsondata.date = utils.getUnixToDateFormat(dateTime);
     temp.push(jsondata);
-    let resUpdateHistroyAndSharedDate = await dbOpration.updateHistroyAndSharedDate(
+    const resUpdateHistroyAndSharedDate = await dbOpration.updateHistroyAndSharedDate(
       localDB.tableName.tblTrustedPartySSSDetails,
       temp,
       dateTime,
@@ -413,8 +414,8 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
   };
 
   render() {
-    //array
-    let { data, arr_SelectedContact } = this.state;
+    // array
+    const { data, arr_SelectedContact } = this.state;
     let secretList;
     const list = (
       <FlatList
@@ -508,11 +509,11 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                           (remainingSec / 3600).toString(),
                           10,
                         );
-                        const s = seconds < 10 ? '0' + seconds : seconds;
-                        const m = minutes < 10 ? '0' + minutes : minutes;
-                        let h = hours < 10 ? '0' + hours : hours;
-                        h = h === '00' ? '' : h + ':';
-                        return h + m + ':' + s;
+                        const s = seconds < 10 ? `0${seconds}` : seconds;
+                        const m = minutes < 10 ? `0${minutes}` : minutes;
+                        let h = hours < 10 ? `0${hours}` : hours;
+                        h = h === '00' ? '' : `${h}:`;
+                        return `${h + m}:${s}`;
                       }}
                       allowFontScaling={true}
                       style={[
@@ -576,7 +577,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
         extraData={this.state}
       />
     );
-    let errorMsg = (
+    const errorMsg = (
       <View
         style={{
           flex: 1,
@@ -602,7 +603,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
           <HeaderTitle
             title="Contacts that have shared secrets"
             pop={() => {
-              let urlScript = utils.getDeepLinkingUrl();
+              const urlScript = utils.getDeepLinkingUrl();
               if (urlScript != '') {
                 utils.setDeepLinkingType('');
                 utils.setDeepLinkingUrl('');
@@ -694,9 +695,9 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
                     />,
                   )}
                   <Text style={{ marginBottom: 10 }}>
-                    {arr_SelectedContact.givenName +
-                      ' ' +
-                      arr_SelectedContact.familyName}
+                    {`${arr_SelectedContact.givenName} ${
+                      arr_SelectedContact.familyName
+                    }`}
                   </Text>
                 </View>
 
@@ -860,7 +861,7 @@ const styles = StyleSheet.create({
     bottom: 10,
     width: '100%',
   },
-  //Grid View Selected
+  // Grid View Selected
   gridSelectedList: {
     flex: 1,
   },

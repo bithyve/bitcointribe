@@ -5,13 +5,13 @@ import CodeInput from 'react-native-confirmation-code-input';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as Keychain from 'react-native-keychain';
 
-//TODO: Custome Compontes
+// TODO: Custome Compontes
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
 import { renderIf } from 'hexaValidation';
 
@@ -44,14 +44,14 @@ export default class ModelPasscode extends Component<Props, any> {
 
   componentWillReceiveProps = async (nextProps: any) => {
     const credentials = await Keychain.getGenericPassword();
-    //console.log( { credentials } );
+    // console.log( { credentials } );
     this.setState({
       pincode: credentials.password,
     });
   };
 
   onFinishCheckingCode = (isValid: boolean, code: string) => {
-    //console.log( { isValid, code } );
+    // console.log( { isValid, code } );
     if (isValid) {
       this.setState({
         status: true,
@@ -82,8 +82,8 @@ export default class ModelPasscode extends Component<Props, any> {
   };
 
   render() {
-    let data = this.props.data.length != 0 ? this.props.data : [];
-    let { pincode, passcodeStyle } = this.state;
+    const data = this.props.data.length != 0 ? this.props.data : [];
+    const { pincode, passcodeStyle } = this.state;
     return (
       <Modal
         transparent
@@ -152,7 +152,7 @@ export default class ModelPasscode extends Component<Props, any> {
                   height: Platform.OS == 'ios' ? 0 : 40,
                 }}
                 onFulfill={(isValid: any, code: any) => {
-                  //console.log( { isValid, code, pincode } );
+                  // console.log( { isValid, code, pincode } );
                   this.onFinishCheckingCode(isValid, code);
                 }}
                 type="withoutcharacters"
@@ -174,7 +174,7 @@ export default class ModelPasscode extends Component<Props, any> {
                   this.state.status == true ? { opacity: 1 } : { opacity: 0.4 },
                   { borderRadius: 5 },
                 ]}
-                disabled={this.state.status == true ? false : true}
+                disabled={this.state.status != true}
                 title="Next"
                 click_Done={() => this.onSuccess()}
               />

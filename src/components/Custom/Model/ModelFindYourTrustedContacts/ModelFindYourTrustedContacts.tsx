@@ -5,7 +5,7 @@ import { Button, Icon, Text } from 'native-base';
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 import { SvgIcon } from '@up-shared/components';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
 export default class ModelFindYourTrustedContacts extends Component {

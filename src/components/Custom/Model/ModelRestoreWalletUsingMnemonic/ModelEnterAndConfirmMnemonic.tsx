@@ -5,15 +5,16 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import { SvgIcon } from '@up-shared/components';
 
-//TODO: Custome Compontes
+// TODO: Custome Compontes
 import { FullLinearGradientLoadingButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { renderIf } from 'hexaValidation';
-var utils = require('hexaUtils');
+
+const utils = require('hexaUtils');
 
 interface Props {
   data: [];
@@ -39,8 +40,8 @@ export default class ModelEnterAndConfirmMnemonic extends Component<
   }
 
   mnemonicCheck(val: any) {
-    var words = val.trim();
-    let lengthString = this.WordCount(words);
+    const words = val.trim();
+    const lengthString = this.WordCount(words);
     if (lengthString.length >= 12 && lengthString.length <= 24) {
       this.setState({
         flag_DisableBtnConfirm: false,
@@ -58,7 +59,7 @@ export default class ModelEnterAndConfirmMnemonic extends Component<
     return str.split(' ');
   }
 
-  //TODO: Confirm Button  click
+  // TODO: Confirm Button  click
   click_Confirm = async () => {
     try {
       this.props.loadingFlag(true);
@@ -66,13 +67,13 @@ export default class ModelEnterAndConfirmMnemonic extends Component<
         flag_DisableBtnConfirm: true,
         flag_ConfirmBtnAnimating: true,
       });
-      let mnemonic = this.state.mnemonic;
-      let regularAccount = await utils.getRegularAccountObject();
+      const { mnemonic } = this.state;
+      const regularAccount = await utils.getRegularAccountObject();
       const getBal = await regularAccount.getBalance();
-      //console.log( { getBal } );
+      // console.log( { getBal } );
 
       if (getBal.status == 200) {
-        let bal = getBal.data.balance;
+        const bal = getBal.data.balance;
         this.props.click_Confirm(mnemonic, bal);
         this.props.loadingFlag(false);
         this.setState({
@@ -82,21 +83,21 @@ export default class ModelEnterAndConfirmMnemonic extends Component<
       } else {
         Alert.alert('GetBalance and mnemonic wrong.');
       }
-      //console.log( { getBal } );
+      // console.log( { getBal } );
     } catch (error) {
       this.setState({
         style_TextAreaBorderColor: 'red',
         flag_DisableBtnConfirm: false,
         flag_ConfirmBtnAnimating: false,
       });
-      //console.log( { error } );
+      // console.log( { error } );
     }
   };
 
   render() {
-    let data = this.props.data.length != 0 ? this.props.data : [];
-    let flag_DisableBtnConfirm = this.state.flag_DisableBtnConfirm;
-    let flag_ConfirmBtnAnimating = this.state.flag_ConfirmBtnAnimating;
+    const data = this.props.data.length != 0 ? this.props.data : [];
+    const { flag_DisableBtnConfirm } = this.state;
+    const { flag_ConfirmBtnAnimating } = this.state;
 
     return (
       <Modal

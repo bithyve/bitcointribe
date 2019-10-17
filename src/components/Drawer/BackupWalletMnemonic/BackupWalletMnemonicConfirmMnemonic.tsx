@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, ImageBackground, SafeAreaView } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-var converter = require('number-to-words');
 
-//TODO: Custome Compontes
+// TODO: Custome Compontes
 import { CustomStatusBar } from 'hexaCustStatusBar';
 
 import {
@@ -13,12 +12,14 @@ import {
   ModelWalletSuccessfullyBackedUp,
 } from 'hexaCustModel';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
 import utils from 'hexaUtils';
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+const converter = require('number-to-words');
+
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
 
 export default class BackupWalletMnemonicConfirmMnemonic extends Component {
   constructor(props: any) {
@@ -32,13 +33,14 @@ export default class BackupWalletMnemonicConfirmMnemonic extends Component {
       arr_ModelWalletSuccessfullyBackedUp: [],
     };
   }
+
   async componentDidMount() {
-    var resultWallet = await comFunDBRead.readTblWallet();
-    let mnemonic = resultWallet.mnemonic;
-    let arr_Mnemonic = mnemonic.split(' ');
-    let arr_randomNo = utils.getRandomBetweenNumber(1, arr_Mnemonic.length);
-    //console.log( { arr_Mnemonic, arr_randomNo } );
-    //console.log( arr_randomNo[ 0 ] - 1 );
+    const resultWallet = await comFunDBRead.readTblWallet();
+    const { mnemonic } = resultWallet;
+    const arr_Mnemonic = mnemonic.split(' ');
+    const arr_randomNo = utils.getRandomBetweenNumber(1, arr_Mnemonic.length);
+    // console.log( { arr_Mnemonic, arr_randomNo } );
+    // console.log( arr_randomNo[ 0 ] - 1 );
 
     this.setState({
       arr_randomNo,
@@ -54,8 +56,8 @@ export default class BackupWalletMnemonicConfirmMnemonic extends Component {
   }
 
   render() {
-    let arr_randomNo = this.state.arr_randomNo;
-    let arr_Mnemonic = this.state.arr_Mnemonic;
+    const { arr_randomNo } = this.state;
+    const { arr_Mnemonic } = this.state;
 
     return (
       <View style={styles.container}>

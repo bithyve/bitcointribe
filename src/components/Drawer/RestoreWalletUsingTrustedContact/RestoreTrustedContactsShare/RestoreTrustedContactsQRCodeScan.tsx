@@ -3,26 +3,28 @@ import { ImageBackground, StyleSheet, SafeAreaView } from 'react-native';
 import { Container, Text } from 'native-base';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
-//TODO: Custome object
+// TODO: Custome object
 import { colors, images, localDB } from 'hexaConstants';
-var dbOpration = require('hexaDBOpration');
 
-//Custome Compontes
+// Custome Compontes
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { ModelLoader } from 'hexaLoader';
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
-
-//TODO: Bitcoin files
+// TODO: Bitcoin files
 import { S3Service } from 'hexaBitcoin';
+
+const dbOpration = require('hexaDBOpration');
+
+const alert = new AlertSimple();
+
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
 
 let flag_ReadQRCode = true;
 
@@ -37,7 +39,7 @@ export default class RestoreTrustedContactsQRCodeScan extends React.Component {
   }
 
   componentWillMount() {
-    let data = this.props.navigation.getParam('data');
+    const data = this.props.navigation.getParam('data');
     this.setState({
       data,
     });
@@ -58,16 +60,16 @@ export default class RestoreTrustedContactsQRCodeScan extends React.Component {
 
   barcodeReceived = async (e: any) => {
     try {
-      var result = e.data;
+      let result = e.data;
       result = JSON.parse(result);
-      let { data } = this.state;
+      const { data } = this.state;
       console.log({ data, result });
       const dateTime = Date.now();
       if (result.type == 'SSS Restore QR') {
-        let resDownlaodShare = await S3Service.downloadShare(result.data);
+        const resDownlaodShare = await S3Service.downloadShare(result.data);
         console.log({ resDownlaodShare });
         if (resDownlaodShare.status == 200) {
-          let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare(
+          const resDecryptEncMetaShare = await S3Service.decryptEncMetaShare(
             resDownlaodShare.data.encryptedMetaShare,
             result.data,
           );
@@ -87,42 +89,36 @@ export default class RestoreTrustedContactsQRCodeScan extends React.Component {
                 this.props.navigation.pop(2);
               }
             }
-          } else {
-            if (flag_ReadQRCode == true) {
-              flag_ReadQRCode = false;
-              alert.simpleOkAction(
-                'Oops',
-                resDecryptEncMetaShare.err,
-                this.click_ResetFlagRead,
-              );
-            }
-          }
-        } else {
-          if (flag_ReadQRCode == true) {
+          } else if (flag_ReadQRCode == true) {
             flag_ReadQRCode = false;
             alert.simpleOkAction(
               'Oops',
-              resDownlaodShare.err,
+              resDecryptEncMetaShare.err,
               this.click_ResetFlagRead,
             );
           }
-        }
-      } else {
-        if (flag_ReadQRCode == true) {
+        } else if (flag_ReadQRCode == true) {
           flag_ReadQRCode = false;
           alert.simpleOkAction(
             'Oops',
-            'Please scan correct qrcode.',
+            resDownlaodShare.err,
             this.click_ResetFlagRead,
           );
         }
+      } else if (flag_ReadQRCode == true) {
+        flag_ReadQRCode = false;
+        alert.simpleOkAction(
+          'Oops',
+          'Please scan correct qrcode.',
+          this.click_ResetFlagRead,
+        );
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  //TODO: GoBack
+  // TODO: GoBack
   click_GoBack() {
     const { navigation } = this.props;
     navigation.goBack();
@@ -130,8 +126,8 @@ export default class RestoreTrustedContactsQRCodeScan extends React.Component {
   }
 
   render() {
-    //flag
-    let { flag_Loading } = this.state;
+    // flag
+    const { flag_Loading } = this.state;
     return (
       <Container>
         <ImageBackground

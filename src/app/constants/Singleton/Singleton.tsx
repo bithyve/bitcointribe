@@ -1,3 +1,4 @@
+/* eslint-disable */
 export default class Singleton {
   //In future use redux (singleton same redux but redux adv.)
   static myInstance = null;

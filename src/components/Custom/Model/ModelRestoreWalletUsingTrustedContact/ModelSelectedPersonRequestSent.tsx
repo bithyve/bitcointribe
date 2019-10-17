@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Modal, View, StyleSheet } from 'react-native';
 import { Button, Icon, Text } from 'native-base';
 
+// TODO: Custome StyleSheet Files
+import FontFamily from 'hexaStyles';
+
 interface Props {
   data: [];
   closeModal: Function;
@@ -10,15 +13,12 @@ interface Props {
   click_Request: Function;
 }
 
-//TODO: Custome StyleSheet Files
-import FontFamily from 'hexaStyles';
-
 export default class ModelSelectedPersonRequestSent extends Component<
   Props,
   any
 > {
   render() {
-    let item = this.props.data.length != 0 ? this.props.data[0].item : 'temp';
+    const item = this.props.data.length != 0 ? this.props.data[0].item : 'temp';
     return (
       <Modal
         transparent

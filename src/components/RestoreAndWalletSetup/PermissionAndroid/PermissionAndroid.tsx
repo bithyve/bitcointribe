@@ -14,14 +14,14 @@ import { StackActions, NavigationActions } from 'react-navigation';
 import IconFontAwe from 'react-native-vector-icons/FontAwesome';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, asyncStorageKeys } from 'hexaConstants';
 
 export default class PermissionAndroid extends Component {
@@ -61,7 +61,7 @@ export default class PermissionAndroid extends Component {
           PermissionsAndroid.PERMISSIONS.READ_SMS,
         ]);
         console.log({ grantedWrite });
-        let flat_Perm = this._isContains(grantedWrite, 'granted');
+        const flat_Perm = this._isContains(grantedWrite, 'granted');
         console.log({ flat_Perm });
         if (flat_Perm) {
           if (navigation.getParam('flow') == 'New Wallet') this.gotoWallet();
@@ -77,7 +77,7 @@ export default class PermissionAndroid extends Component {
     }
   };
 
-  //TODO: func goNextScreen
+  // TODO: func goNextScreen
   gotoWallet() {
     try {
       const resetAction = StackActions.reset({
@@ -91,6 +91,7 @@ export default class PermissionAndroid extends Component {
       console.log(error);
     }
   }
+
   render() {
     return (
       <View style={styles.container}>

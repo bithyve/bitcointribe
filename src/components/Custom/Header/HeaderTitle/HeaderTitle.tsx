@@ -3,13 +3,14 @@ import { Platform } from 'react-native';
 import { Header, Title, Button, Left, Right, Body } from 'native-base';
 import { SvgIcon } from '@up-shared/components';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
 export default class HeaderTitle extends Component<any, any> {
   constructor(props: any) {
     super(props);
   }
+
   render() {
     return (
       <Header transparent>

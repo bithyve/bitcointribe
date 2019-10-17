@@ -5,12 +5,13 @@ import { Button, Text } from 'native-base';
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 import { SvgIcon } from '@up-shared/components';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { images } from 'hexaConstants';
-var utils = require('hexaUtils');
+
+const utils = require('hexaUtils');
 
 interface Props {
   data: [];
@@ -25,7 +26,7 @@ export default class ModelContactPermission extends Component<Props, any> {
   }
 
   render() {
-    let data = this.props.data.length != 0 ? this.props.data : [];
+    const data = this.props.data.length != 0 ? this.props.data : [];
     return (
       <Modal
         transparent

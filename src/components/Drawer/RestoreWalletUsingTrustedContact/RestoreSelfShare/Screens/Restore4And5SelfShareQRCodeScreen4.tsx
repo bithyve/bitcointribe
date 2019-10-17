@@ -1,15 +1,16 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Container, Button, Text } from 'native-base';
-//import BarcodeScanner from "react-native-barcode-scanners";
+// import BarcodeScanner from "react-native-barcode-scanners";
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome object
+// TODO: Custome object
 import { renderIf } from 'hexaValidation';
+
+const alert = new AlertSimple();
 
 interface Props {
   click_Next: Function;
@@ -47,15 +48,15 @@ export default class Restore4And5SelfShareQRCodeScreen4 extends React.Component<
 
   barcodeReceived = async (e: any) => {
     try {
-      var result = e.data;
+      let result = e.data;
       result = result.split('Doublequote').join('"');
       result = result.split('Leftbrace').join('{');
       result = result.split('Rightbrace').join('}');
       result = result.split('Slash').join('/');
       result = result.split('Comma').join(',');
       result = result.split('Space').join(' ');
-      let type = this.props.type;
-      var firstChar = result.slice(0, 3);
+      const { type } = this.props;
+      const firstChar = result.slice(0, 3);
       if (type == 'iCloud') {
         if (firstChar == 'c04') {
           if (flag_ReadQRCode) {
@@ -63,32 +64,26 @@ export default class Restore4And5SelfShareQRCodeScreen4 extends React.Component<
             this.props.click_Next(4, [result]);
             flag_ReadQRCode = false;
           }
-        } else {
-          if (flag_ReadQRCode) {
-            alert.simpleOkAction(
-              'Oops',
-              'Please scan share 4 qrcode.',
-              this.click_resetFlag,
-            );
-            flag_ReadQRCode = false;
-          }
+        } else if (flag_ReadQRCode) {
+          alert.simpleOkAction(
+            'Oops',
+            'Please scan share 4 qrcode.',
+            this.click_resetFlag,
+          );
+          flag_ReadQRCode = false;
         }
-      } else {
-        if (firstChar == 'e04') {
-          if (flag_ReadQRCode) {
-            this.props.click_Next(4, [result]);
-            flag_ReadQRCode = false;
-          }
-        } else {
-          if (flag_ReadQRCode) {
-            alert.simpleOkAction(
-              'Oops',
-              'Please scan share 4 qrcode.',
-              this.click_resetFlag,
-            );
-            flag_ReadQRCode = false;
-          }
+      } else if (firstChar == 'e04') {
+        if (flag_ReadQRCode) {
+          this.props.click_Next(4, [result]);
+          flag_ReadQRCode = false;
         }
+      } else if (flag_ReadQRCode) {
+        alert.simpleOkAction(
+          'Oops',
+          'Please scan share 4 qrcode.',
+          this.click_resetFlag,
+        );
+        flag_ReadQRCode = false;
       }
     } catch (error) {
       console.log(error);
@@ -96,8 +91,8 @@ export default class Restore4And5SelfShareQRCodeScreen4 extends React.Component<
   };
 
   render() {
-    //flag
-    let { flag_qrcode } = this.state;
+    // flag
+    const { flag_qrcode } = this.state;
     return (
       <Container>
         <View style={styles.container}>

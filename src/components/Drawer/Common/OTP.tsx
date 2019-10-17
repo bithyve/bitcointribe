@@ -11,30 +11,32 @@ import CodeInput from 'react-native-confirmation-code-input';
 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { ModelLoader } from 'hexaLoader';
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 import { HeaderTitle } from 'hexaCustHeader';
 
-//TODO: Custome Model
+// TODO: Custome Model
 import { ModelRestoreAssociateContactList } from 'hexaCustModel';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, localDB } from 'hexaConstants';
 import utils from 'hexaUtils';
-var dbOpration = require('hexaDBOpration');
 import { renderIf } from 'hexaValidation';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Bitcoin Files
+// TODO: Bitcoin Files
 import { S3Service } from 'hexaBitcoin';
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+const dbOpration = require('hexaDBOpration');
+
+const alert = new AlertSimple();
+
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
 
 export default class OTP extends Component {
   constructor(props: any) {
@@ -60,21 +62,21 @@ export default class OTP extends Component {
   }
 
   async componentDidMount() {
-    let script = utils.getDeepLinkingUrl();
-    //console.log( { script } );
-    let resSSSDetails = await comFunDBRead.readTblSSSDetails();
-    //console.log( { resSSSDetails } );
-    let arr_KeeperInfo = [];
+    const script = utils.getDeepLinkingUrl();
+    // console.log( { script } );
+    const resSSSDetails = await comFunDBRead.readTblSSSDetails();
+    // console.log( { resSSSDetails } );
+    const arr_KeeperInfo = [];
     for (let i = 0; i < resSSSDetails.length; i++) {
-      let data = {};
-      let fullInfo = resSSSDetails[i];
-      //console.log( { fullInfo } );
+      const data = {};
+      const fullInfo = resSSSDetails[i];
+      // console.log( { fullInfo } );
       if (
         resSSSDetails[i].keeperInfo != '' &&
         (fullInfo.type == 'Trusted Contacts 1' ||
           fullInfo.type == 'Trusted Contacts 2')
       ) {
-        let keerInfo = JSON.parse(resSSSDetails[i].keeperInfo);
+        const keerInfo = JSON.parse(resSSSDetails[i].keeperInfo);
         data.id = resSSSDetails[i].id;
         data.thumbnailPath = keerInfo.thumbnailPath;
         data.givenName = keerInfo.givenName;
@@ -103,7 +105,7 @@ export default class OTP extends Component {
     }
   }
 
-  //TODO: if not sss trusted contact to going trusted contact screen for select perosn
+  // TODO: if not sss trusted contact to going trusted contact screen for select perosn
   click_GoTrusteContactScreen = () => {
     utils.setDeepLinkingType('');
     utils.setDeepLinkingUrl('');
@@ -111,7 +113,7 @@ export default class OTP extends Component {
   };
 
   _onFinishCheckingCode = async (code: string) => {
-    //console.log( { code } );
+    // console.log( { code } );
     if (code.length == 6) {
       this.setState({
         otp: code,
@@ -125,11 +127,11 @@ export default class OTP extends Component {
     this.setState({
       flag_Loading: true,
     });
-    let flag_Loading = true;
-    let enterOtp = this.state.otp;
-    let script = utils.getDeepLinkingUrl();
-    let tableId = this.state.tableId;
-    var resDecryptViaOTP = await S3Service.decryptViaOTP(script.key, enterOtp);
+    const flag_Loading = true;
+    const enterOtp = this.state.otp;
+    const script = utils.getDeepLinkingUrl();
+    const { tableId } = this.state;
+    let resDecryptViaOTP = await S3Service.decryptViaOTP(script.key, enterOtp);
     if (resDecryptViaOTP.status == 200) {
       resDecryptViaOTP = resDecryptViaOTP.data;
     } else {
@@ -142,8 +144,8 @@ export default class OTP extends Component {
         );
       }, 100);
     }
-    //console.log( { resDecryptViaOTP } );
-    var resDownShare = await S3Service.downloadShare(
+    // console.log( { resDecryptViaOTP } );
+    let resDownShare = await S3Service.downloadShare(
       resDecryptViaOTP.decryptedData,
     );
     if (resDownShare.status == 200) {
@@ -154,21 +156,21 @@ export default class OTP extends Component {
         alert.simpleOkAction('Oops', resDownShare.err, this.click_StopLoading);
       }, 100);
     }
-    //console.log( { resDownShare } );
-    let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare(
+    // console.log( { resDownShare } );
+    const resDecryptEncMetaShare = await S3Service.decryptEncMetaShare(
       resDownShare.encryptedMetaShare,
       resDecryptViaOTP.decryptedData,
     );
-    //console.log( { resDecryptEncMetaShare } );
+    // console.log( { resDecryptEncMetaShare } );
     if (resDecryptEncMetaShare.status == 200) {
-      //console.log( { resDecryptEncMetaShare } );
+      // console.log( { resDecryptEncMetaShare } );
       const resUpdateSSSRetoreDecryptedShare = await dbOpration.updateSSSRetoreDecryptedShare(
         localDB.tableName.tblSSSDetails,
         resDecryptEncMetaShare.data.decryptedMetaShare,
         dateTime,
         parseInt(tableId),
       );
-      //console.log( { resUpdateSSSRetoreDecryptedShare } );
+      // console.log( { resUpdateSSSRetoreDecryptedShare } );
       if (resUpdateSSSRetoreDecryptedShare) {
         this.setState({ flag_Loading: !flag_Loading });
         utils.setDeepLinkingType('');
@@ -197,8 +199,8 @@ export default class OTP extends Component {
   };
 
   render() {
-    //flag
-    let { flag_Loading } = this.state;
+    // flag
+    const { flag_Loading } = this.state;
     return (
       <View style={styles.container}>
         <ImageBackground

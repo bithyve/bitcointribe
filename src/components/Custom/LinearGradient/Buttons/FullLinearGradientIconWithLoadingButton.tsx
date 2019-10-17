@@ -44,7 +44,7 @@ export default class FullLinearGradientIconWithLoadingButton extends Component<
             color={this.props.iconColor}
             size={this.props.iconSize}
           />
-          <Text style={styles.textWhite}>{'  ' + this.props.title}</Text>
+          <Text style={styles.textWhite}>{`  ${this.props.title}`}</Text>
         </Button>
       </LinearGradient>
     );

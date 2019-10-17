@@ -11,30 +11,31 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 // import QRCode from "react-native-qrcode";
 import QRCode from 'react-native-qrcode-svg';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { HeaderTitle } from 'hexaCustHeader';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { ModelLoader } from 'hexaLoader';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, localDB } from 'hexaConstants';
-var utils = require('hexaUtils');
-var dbOpration = require('hexaDBOpration');
 
-//TODO: Bitcoin class
-var bitcoinClassState = require('hexaClassState');
+const alert = new AlertSimple();
+const utils = require('hexaUtils');
+const dbOpration = require('hexaDBOpration');
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+// TODO: Bitcoin class
+const bitcoinClassState = require('hexaClassState');
+
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
 
 export default class SelfShareUsingWalletQRCode extends React.Component<
   any,
@@ -50,15 +51,15 @@ export default class SelfShareUsingWalletQRCode extends React.Component<
   }
 
   async componentWillMount() {
-    let data = this.props.navigation.getParam('data');
-    //console.log( { data } );
+    const data = this.props.navigation.getParam('data');
+    // console.log( { data } );
 
-    let walletDetails = utils.getWalletDetails();
+    const walletDetails = utils.getWalletDetails();
     const sss = await bitcoinClassState.getS3ServiceClassState();
-    var resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare(
+    let resGenerateEncryptedMetaShare = await sss.generateEncryptedMetaShare(
       JSON.parse(data.decryptedShare),
     );
-    //console.log( { resGenerateEncryptedMetaShare } );
+    // console.log( { resGenerateEncryptedMetaShare } );
     if (resGenerateEncryptedMetaShare.status == 200) {
       resGenerateEncryptedMetaShare = resGenerateEncryptedMetaShare.data;
     } else {
@@ -71,7 +72,7 @@ export default class SelfShareUsingWalletQRCode extends React.Component<
     // console.log( { resUploadShare } );
     if (resUploadShare.status == 200) {
       await bitcoinClassState.setS3ServiceClassState(sss);
-      let qrCodeData = {};
+      const qrCodeData = {};
       qrCodeData.type = 'Self Share';
       qrCodeData.wn = walletDetails.walletType;
       qrCodeData.data = resGenerateEncryptedMetaShare.key;
@@ -91,7 +92,7 @@ export default class SelfShareUsingWalletQRCode extends React.Component<
   }
 
   updateSharedDate = async () => {
-    let { arrShareDetials } = this.state;
+    const { arrShareDetials } = this.state;
     const dateTime = Date.now();
     await dbOpration.updateHistroyAndSharedDate(
       localDB.tableName.tblSSSDetails,
@@ -109,8 +110,8 @@ export default class SelfShareUsingWalletQRCode extends React.Component<
   };
 
   render() {
-    //flag
-    let { flag_Loading } = this.state;
+    // flag
+    const { flag_Loading } = this.state;
     return (
       <Container>
         <ImageBackground

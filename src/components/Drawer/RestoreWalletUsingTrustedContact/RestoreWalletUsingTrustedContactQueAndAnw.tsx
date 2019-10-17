@@ -3,20 +3,20 @@ import { StyleSheet, View, ImageBackground, SafeAreaView } from 'react-native';
 import { StackActions, NavigationActions } from 'react-navigation';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-//TODO: Custome Compontes
+// TODO: Custome Compontes
 import { CustomStatusBar } from 'hexaCustStatusBar';
 
-//TODO: Custome Models
+// TODO: Custome Models
 import {
   ModelRestoreWalletFirstQuestion,
   ModelRestoreWalletSuccessfullyUsingTrustedContact,
 } from 'hexaCustModel';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
 
 export default class RestoreWalletUsingTrustedContactQueAndAnw extends Component {
   constructor(props: any) {
@@ -33,8 +33,8 @@ export default class RestoreWalletUsingTrustedContactQueAndAnw extends Component
   }
 
   async componentDidMount() {
-    let arr_WalletDetail = await comFunDBRead.readTblWallet();
-    let arr_SSSDetails = await comFunDBRead.readTblSSSDetails();
+    const arr_WalletDetail = await comFunDBRead.readTblWallet();
+    const arr_SSSDetails = await comFunDBRead.readTblSSSDetails();
     console.log({ arr_WalletDetail });
     this.setState({
       arr_WalletDetail,
@@ -47,7 +47,7 @@ export default class RestoreWalletUsingTrustedContactQueAndAnw extends Component
     });
   }
 
-  //TODO: Secound question click Next
+  // TODO: Secound question click Next
   click_Next = async (data: any) => {
     this.setState({
       arr_ModelRestoreWalletFirstQuestion: [
@@ -66,7 +66,7 @@ export default class RestoreWalletUsingTrustedContactQueAndAnw extends Component
     });
   };
 
-  //TODO: Success Wallet Setup then skip button on click
+  // TODO: Success Wallet Setup then skip button on click
   click_Skip() {
     const resetAction = StackActions.reset({
       index: 0, // <-- currect active route from actions array
@@ -77,10 +77,10 @@ export default class RestoreWalletUsingTrustedContactQueAndAnw extends Component
   }
 
   render() {
-    //flag
-    let { flag_Loading } = this.state;
-    //array
-    let {
+    // flag
+    const { flag_Loading } = this.state;
+    // array
+    const {
       arr_QuestionList,
       arr_ModelRestoreWalletFirstQuestion,
       arr_ModelRestoreWalletSuccessfullyUsingTrustedContact,

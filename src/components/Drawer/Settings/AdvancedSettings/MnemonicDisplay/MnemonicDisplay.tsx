@@ -2,20 +2,21 @@ import React from 'react';
 import { StyleSheet, ImageBackground, SafeAreaView } from 'react-native';
 import { Container } from 'native-base';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { ModelLoader } from 'hexaLoader';
 
-//TODO: Custome Model
+// TODO: Custome Model
 import {
   ModelPasscode,
   ModelBackupSecretQuestionsFirstQuestion,
   ModelMnemonicDisplay,
 } from 'hexaCustModel';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
-var utils = require('hexaUtils');
+
+const utils = require('hexaUtils');
 
 export default class MnemonicDisplay extends React.Component<any, any> {
   constructor(props: any) {
@@ -30,7 +31,7 @@ export default class MnemonicDisplay extends React.Component<any, any> {
   }
 
   async componentWillMount() {
-    let walletDetails = await utils.getWalletDetails();
+    const walletDetails = await utils.getWalletDetails();
     this.setState({
       arrModelPasscode: [
         {
@@ -43,15 +44,15 @@ export default class MnemonicDisplay extends React.Component<any, any> {
   }
 
   render() {
-    //array
-    let {
+    // array
+    const {
       arrModelPasscode,
       walletAnswerDetails,
       arrModelBackupSecretQuestionsFirstQuestion,
       arrModelMnemonicDisplay,
     } = this.state;
-    //values
-    let { mnemonic } = this.state;
+    // values
+    const { mnemonic } = this.state;
     return (
       <Container>
         <ImageBackground
@@ -176,7 +177,7 @@ const styles = StyleSheet.create({
     bottom: 10,
     width: '100%',
   },
-  //Grid View Selected
+  // Grid View Selected
   gridSelectedList: {
     flex: 1,
   },

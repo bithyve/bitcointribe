@@ -12,28 +12,30 @@ import CodeInput from 'react-native-confirmation-code-input';
 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { ModelLoader } from 'hexaLoader';
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { FullLinearGradientButton } from 'hexaCustomeLinearGradientButton';
 import { HeaderTitle } from 'hexaCustHeader';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, localDB } from 'hexaConstants';
 import utils from 'hexaUtils';
-var dbOpration = require('hexaDBOpration');
 import { renderIf } from 'hexaValidation';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
-
-//TODO: Bitcoin Class
-var bitcoinClassState = require('hexaClassState');
 import { S3Service } from 'hexaBitcoin';
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+const dbOpration = require('hexaDBOpration');
+
+const alert = new AlertSimple();
+
+// TODO: Bitcoin Class
+const bitcoinClassState = require('hexaClassState');
+
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
 
 export default class TrustedContactAcceptOtp extends Component {
   constructor(props: any) {
@@ -57,14 +59,14 @@ export default class TrustedContactAcceptOtp extends Component {
   }
 
   async componentDidMount() {
-    let keeperInfo = this.props.navigation.getParam('data');
+    const keeperInfo = this.props.navigation.getParam('data');
     this.setState({
       keeperInfo,
     });
   }
 
   _onFinishCheckingCode = async (code: string) => {
-    //console.log( { code } );
+    // console.log( { code } );
     if (code.length == 6) {
       this.setState({
         otp: code,
@@ -85,18 +87,18 @@ export default class TrustedContactAcceptOtp extends Component {
       flag_Loading: true,
     });
     let flag_Loading = true;
-    let { keeperInfo } = this.state;
-    let enterOtp = this.state.otp;
-    let script = utils.getDeepLinkingUrl();
+    const { keeperInfo } = this.state;
+    const enterOtp = this.state.otp;
+    const script = utils.getDeepLinkingUrl();
 
-    var resDecryptViaOTP = await S3Service.decryptViaOTP(script.key, enterOtp);
+    let resDecryptViaOTP = await S3Service.decryptViaOTP(script.key, enterOtp);
     if (resDecryptViaOTP.status == 200) {
       resDecryptViaOTP = resDecryptViaOTP.data;
     } else {
       alert.simpleOk('Oops', resDecryptViaOTP.err);
     }
-    //console.log( { resDecryptViaOTP } );
-    var resDownShare = await S3Service.downloadShare(
+    // console.log( { resDecryptViaOTP } );
+    let resDownShare = await S3Service.downloadShare(
       resDecryptViaOTP.decryptedData,
     );
     if (resDownShare.status == 200) {
@@ -104,31 +106,31 @@ export default class TrustedContactAcceptOtp extends Component {
     } else {
       alert.simpleOk('Oops', resDownShare.err);
     }
-    //console.log( { resDownShare } );
-    let walletDetails = utils.getWalletDetails();
+    // console.log( { resDownShare } );
+    const walletDetails = utils.getWalletDetails();
     const sss = await bitcoinClassState.getS3ServiceClassState();
-    let regularAccount = await bitcoinClassState.getRegularClassState();
-    var resGetWalletId = await regularAccount.getWalletId();
+    const regularAccount = await bitcoinClassState.getRegularClassState();
+    let resGetWalletId = await regularAccount.getWalletId();
     if (resGetWalletId.status == 200) {
       await bitcoinClassState.setRegularClassState(regularAccount);
       resGetWalletId = resGetWalletId.data;
     } else {
       alert.simpleOk('Oops', resGetWalletId.err);
     }
-    let resTrustedParty = await comFunDBRead.readTblTrustedPartySSSDetails();
-    let arr_DecrShare = [];
+    const resTrustedParty = await comFunDBRead.readTblTrustedPartySSSDetails();
+    const arr_DecrShare = [];
     for (let i = 0; i < resTrustedParty.length; i++) {
       arr_DecrShare.push(JSON.parse(resTrustedParty[i].decrShare));
     }
-    let resDecryptEncMetaShare = await S3Service.decryptEncMetaShare(
+    const resDecryptEncMetaShare = await S3Service.decryptEncMetaShare(
       resDownShare.encryptedMetaShare,
       resDecryptViaOTP.decryptedData,
       resGetWalletId.walletId,
       arr_DecrShare,
     );
-    //console.log( { resDecryptEncMetaShare } );
+    // console.log( { resDecryptEncMetaShare } );
     if (resDecryptEncMetaShare.status == 200) {
-      //console.log( { resDecryptEncMetaShare } );
+      // console.log( { resDecryptEncMetaShare } );
       arr_DecrShare.length != 0
         ? arr_DecrShare.push(resDecryptEncMetaShare.data.decryptedMetaShare)
         : arr_DecrShare.push(resDecryptEncMetaShare.data.decryptedMetaShare);

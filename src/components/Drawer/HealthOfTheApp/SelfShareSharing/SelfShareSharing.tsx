@@ -10,37 +10,38 @@ import {
 } from 'react-native';
 import { Container, Text } from 'native-base';
 import { SvgIcon } from '@up-shared/components';
-
-//import Mailer from 'react-native-mail';
-var Mailer = require('NativeModules').RNMail;
 import Share from 'react-native-share';
-var RNFS = require('react-native-fs');
 
-//TODO: Custome Pages
+// TODO: Custome Pages
 import { ModelLoader } from 'hexaLoader';
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { FullLinearGradientShareButton } from 'hexaCustomeLinearGradientButton';
 import { HeaderTitle } from 'hexaCustHeader';
 
-//TODO: Custome Model
+// TODO: Custome Model
 import { ModelBottomSingleButton, ModelBottomTwoButtons } from 'hexaCustModel';
 
-//TODO: Custome Alert
+// TODO: Custome Alert
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images, localDB } from 'hexaConstants';
 
-var dbOpration = require('hexaDBOpration');
-var utils = require('hexaUtils');
+// import Mailer from 'react-native-mail';
+const Mailer = require('NativeModules').RNMail;
+const RNFS = require('react-native-fs');
 
-//TODO: Common Funciton
+const alert = new AlertSimple();
 
-var comFunDBRead = require('hexaCommonDBReadData');
+const dbOpration = require('hexaDBOpration');
+const utils = require('hexaUtils');
+
+// TODO: Common Funciton
+
+const comFunDBRead = require('hexaCommonDBReadData');
 
 export default class SelfShareSharing extends React.Component<any, any> {
   constructor(props: any) {
@@ -51,21 +52,23 @@ export default class SelfShareSharing extends React.Component<any, any> {
       arr_History: [],
       arr_ModelBottomSingleButton: [],
       arr_ModelBottomTwoButtons: [],
-      //flag
+      // flag
       btnShareTitle: 'Share',
     };
   }
 
   async componentWillMount() {
-    let data = this.props.navigation.getParam('data');
-    let title = this.props.navigation.getParam('title');
-    //console.log( { data } );
+    const data = this.props.navigation.getParam('data');
+    const title = this.props.navigation.getParam('title');
+    // console.log( { data } );
     let { btnShareTitle } = this.state;
-    let arr_History = JSON.parse(data.sssDetails.history);
-    let shareStage = data.sssDetails.shareStage;
-    let sharedDate = data.sssDetails.sharedDate;
-    //console.log( { shareStage, sharedDate } );
-    let flag_ShareBtnDisable, flag_ReShareBtnDisable, flag_ConfrimBtnDisable;
+    const arr_History = JSON.parse(data.sssDetails.history);
+    const { shareStage } = data.sssDetails;
+    const { sharedDate } = data.sssDetails;
+    // console.log( { shareStage, sharedDate } );
+    let flag_ShareBtnDisable;
+    let flag_ReShareBtnDisable;
+    let flag_ConfrimBtnDisable;
     if (sharedDate == '' && shareStage != 'Good') {
       btnShareTitle = 'Share';
     } else if (shareStage != 'Good' && sharedDate != '') {
@@ -75,7 +78,7 @@ export default class SelfShareSharing extends React.Component<any, any> {
     } else {
       btnShareTitle = 'Share';
     }
-    //console.log( { data } );
+    // console.log( { data } );
     this.setState({
       title,
       btnShareTitle,
@@ -84,34 +87,34 @@ export default class SelfShareSharing extends React.Component<any, any> {
     });
   }
 
-  //TODO: Sharing PDF
+  // TODO: Sharing PDF
   click_ShareEmail = async (data: any) => {
-    let resultWallet = await utils.getWalletDetails();
-    let backupInfo = JSON.parse(resultWallet.backupInfo);
+    const resultWallet = await utils.getWalletDetails();
+    const backupInfo = JSON.parse(resultWallet.backupInfo);
     if (backupInfo[0].backupType == 'new') {
       // console.log( { data } );
-      let { title } = this.state;
-      var email4shareFilePath = data.sssDetails.decryptedShare
+      const { title } = this.state;
+      const email4shareFilePath = data.sssDetails.decryptedShare
         .split('"')
         .join('');
-      //console.log( { email4shareFilePath } );
-      //console.log( { email4shareFilePath } );
+      // console.log( { email4shareFilePath } );
+      // console.log( { email4shareFilePath } );
       if (title != 'Email Share') {
-        //console.log( { email4shareFilePath } );
-        let shareOptions = {
+        // console.log( { email4shareFilePath } );
+        const shareOptions = {
           title: '5th share',
           message:
             'Please find attached the 5th share pdf, it is password protected by the answer to the security question.',
           // urls: [ email4shareFilePath ],
           url:
             Platform.OS == 'android'
-              ? 'file://' + email4shareFilePath
+              ? `file://${email4shareFilePath}`
               : email4shareFilePath,
           type: 'application/pdf',
           showAppsToView: true,
           subject: '5th share pdf',
         };
-        //console.log( { shareOptions } );
+        // console.log( { shareOptions } );
         await Share.open(shareOptions).then((res: any) => {
           this.click_CloseModel();
           this.updateHistory(data, 'Shared.', '');
@@ -130,9 +133,9 @@ export default class SelfShareSharing extends React.Component<any, any> {
             attachment: {
               path: email4shareFilePath, // The absolute path of the file from which to read data.
               type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-              name:
-                resultWallet.walletType.split(' ')[0] +
-                ' Hexa wallet Share 4.pdf', // Optional: Custom filename for attachment
+              name: `${
+                resultWallet.walletType.split(' ')[0]
+              } Hexa wallet Share 4.pdf`, // Optional: Custom filename for attachment
             },
           },
           (error, event) => {
@@ -170,15 +173,15 @@ export default class SelfShareSharing extends React.Component<any, any> {
     }
   };
 
-  //TODO: Re-Share Share
+  // TODO: Re-Share Share
   click_ReShare(data: any) {
     alert.simpleOk('Oops', 'coming soon');
   }
 
-  //TODO:  Confirm
+  // TODO:  Confirm
   click_Confirm(data: any) {
     // console.log( { data } );
-    let value = JSON.parse(data.sssDetails.keeperInfo);
+    const value = JSON.parse(data.sssDetails.keeperInfo);
     this.props.navigation.push('ConfirmSelfShareQRScanner', {
       data: value,
       onSelect: this.onSelect,
@@ -188,15 +191,15 @@ export default class SelfShareSharing extends React.Component<any, any> {
   onSelect = async (returnValue: any) => {
     if (returnValue.data == returnValue.result) {
       this.click_CloseModel();
-      let { data } = this.state;
-      let filePath = JSON.parse(data.sssDetails.decryptedShare);
+      const { data } = this.state;
+      const filePath = JSON.parse(data.sssDetails.decryptedShare);
       // console.log( { filePath } );
       this.updateHistory(data, 'Confirmed.', filePath);
-      let walletDetails = await utils.getWalletDetails();
-      let sssDetails = await utils.getSSSDetails();
-      let encrShares = [];
+      const walletDetails = await utils.getWalletDetails();
+      const sssDetails = await utils.getSSSDetails();
+      const encrShares = [];
       for (let i = 0; i < sssDetails.length; i++) {
-        let data = {};
+        const data = {};
         data.shareId = sssDetails[i].shareId;
         data.updatedAt =
           sssDetails[i].sharedDate == ''
@@ -212,19 +215,19 @@ export default class SelfShareSharing extends React.Component<any, any> {
     }
   };
 
-  //TODO: update histroy
+  // TODO: update histroy
   updateHistory = async (data: any, title: string, filePath: any) => {
-    let { arr_History } = this.state;
+    const { arr_History } = this.state;
     const dateTime = Date.now();
-    let JsonData = {};
+    const JsonData = {};
     JsonData.title = title;
     JsonData.date = utils.getUnixToDateFormat2();
-    let temp = [JsonData];
+    const temp = [JsonData];
     arr_History.push.apply(arr_History, temp);
 
-    //console.log( { arr_History } );
+    // console.log( { arr_History } );
 
-    var resUpdateHistroyAndSharedDate;
+    let resUpdateHistroyAndSharedDate;
     if (title == 'Shared.') {
       resUpdateHistroyAndSharedDate = await dbOpration.updateHistroyAndSharedDate(
         localDB.tableName.tblSSSDetails,
@@ -240,7 +243,7 @@ export default class SelfShareSharing extends React.Component<any, any> {
         data.sssDetails.id,
       );
     }
-    //console.log( resUpdateHistroyAndSharedDate );
+    // console.log( resUpdateHistroyAndSharedDate );
     if (resUpdateHistroyAndSharedDate) {
       await comFunDBRead.readTblSSSDetails();
       this.setState({
@@ -251,7 +254,7 @@ export default class SelfShareSharing extends React.Component<any, any> {
     // console.log( { resUpdateHistroyAndSharedDate } );
   };
 
-  //TODO: Close all model
+  // TODO: Close all model
   click_CloseModel() {
     this.setState({
       arr_ModelBottomSingleButton: [
@@ -268,17 +271,17 @@ export default class SelfShareSharing extends React.Component<any, any> {
   }
 
   render() {
-    //array
-    let {
+    // array
+    const {
       data,
       arr_History,
       arr_ModelBottomSingleButton,
       arr_ModelBottomTwoButtons,
     } = this.state;
-    //Value
-    let { title } = this.state;
-    //flag
-    let { btnShareTitle } = this.state;
+    // Value
+    const { title } = this.state;
+    // flag
+    const { btnShareTitle } = this.state;
     return (
       <Container>
         <ImageBackground
@@ -493,7 +496,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F8F8',
   },
-  //botom model
+  // botom model
   modal: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,

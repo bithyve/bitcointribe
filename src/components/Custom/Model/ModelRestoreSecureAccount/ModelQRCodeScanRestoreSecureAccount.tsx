@@ -5,12 +5,13 @@ import IconFontAwe from 'react-native-vector-icons/FontAwesome';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import Permissions from 'react-native-permissions';
 
-//TODO: Custome StyleSheet Files
+// TODO: Custome StyleSheet Files
 import FontFamily from 'hexaStyles';
-var utils = require('hexaUtils');
 
-//TODO: Common Function
-var comFunDBRead = require('hexaCommonDBReadData');
+const utils = require('hexaUtils');
+
+// TODO: Common Function
+const comFunDBRead = require('hexaCommonDBReadData');
 
 interface Props {
   data: [];
@@ -32,8 +33,8 @@ export default class ModelQRCodeScanRestoreSecureAccount extends Component<
   }
 
   componentWillReceiveProps = async (nextProps: any) => {
-    let resultWallet = await comFunDBRead.readTblWallet();
-    //console.log( { mnumanic: resultWallet } );
+    const resultWallet = await comFunDBRead.readTblWallet();
+    // console.log( { mnumanic: resultWallet } );
     this.setState({
       mnemonic: resultWallet.mnemonic,
     });
@@ -41,7 +42,7 @@ export default class ModelQRCodeScanRestoreSecureAccount extends Component<
 
   componentDidMount() {
     Permissions.request('camera').then((response: any) => {
-      //console.log( { response } );
+      // console.log( { response } );
     });
   }
 
@@ -55,17 +56,17 @@ export default class ModelQRCodeScanRestoreSecureAccount extends Component<
 
   barcodeReceived = async (e: any) => {
     try {
-      var result = e.data;
-      let mnemonic = this.state.mnemonic;
+      const result = e.data;
+      const { mnemonic } = this.state;
       // console.log( { mnemonic } );
-      let secureAccount = await utils.getSecureAccountObject();
+      const secureAccount = await utils.getSecureAccountObject();
       // const secureAccount = new SecureAccount( mnemonic );
-      //console.log( { result } );
+      // console.log( { result } );
       if (result != '') {
-        let resDecryptSecondaryXpub = await secureAccount.decryptSecondaryXpub(
+        const resDecryptSecondaryXpub = await secureAccount.decryptSecondaryXpub(
           result,
         );
-        //console.log( { resDecryptSecondaryXpub } );
+        // console.log( { resDecryptSecondaryXpub } );
         this.props.click_Next(resDecryptSecondaryXpub.secondaryXpub);
       }
     } catch (error) {
@@ -74,7 +75,7 @@ export default class ModelQRCodeScanRestoreSecureAccount extends Component<
   };
 
   render() {
-    let data = this.props.data.length != 0 ? this.props.data : [];
+    const data = this.props.data.length != 0 ? this.props.data : [];
     return (
       <Modal
         transparent

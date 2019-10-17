@@ -1,24 +1,26 @@
 import { localDB } from 'hexaConstants';
-var dbOpration = require('hexaDBOpration');
-var utils = require('hexaUtils');
 
-//TODO: Bitcoin Files
-//import { HealthStatus } from "hexaBitcoin"
+// TODO: Bitcoin Files
+// import { HealthStatus } from "hexaBitcoin"
 import HealthStatus from 'HexaWallet/src/bitcoin/utilities/sss/HealthStatus';
 import { AlertSimple } from 'hexaCustAlert';
-let alert = new AlertSimple();
 
-//TODO: Common Funciton
-var comFunDBRead = require('hexaCommonDBReadData');
+const dbOpration = require('hexaDBOpration');
+const utils = require('hexaUtils');
 
-//TODO: Bitcoin Class
-var bitcoinClassState = require('hexaClassState');
+const alert = new AlertSimple();
 
-//Setup Flow
+// TODO: Common Funciton
+const comFunDBRead = require('hexaCommonDBReadData');
+
+// TODO: Bitcoin Class
+const bitcoinClassState = require('hexaClassState');
+
+// Setup Flow
 const checkHealthSetupShare = async (qatime: number) => {
   console.log({ qatime });
   const healthStatus = new HealthStatus();
-  let arrShares = [
+  const arrShares = [
     { shareId: '', updatedAt: 0 },
     { shareId: '', updatedAt: 0 },
     { shareId: '', updatedAt: 0 },
@@ -33,8 +35,8 @@ const checkHealthSetupShare = async (qatime: number) => {
 
 const checkHealthAllShare = async (share: any) => {
   //  console.log( { share } );
-  let dateTime = Date.now();
-  let temp = [
+  const dateTime = Date.now();
+  const temp = [
     share.trustedContShareId1,
     share.trustedContShareId2,
     share.selfshareShareId1,
@@ -42,7 +44,7 @@ const checkHealthAllShare = async (share: any) => {
   console.log({ temp });
 
   const sss = await bitcoinClassState.getS3ServiceClassState();
-  var resCheckHealth = await sss.checkHealth(temp);
+  let resCheckHealth = await sss.checkHealth(temp);
   if (resCheckHealth.status == 200) {
     await bitcoinClassState.setS3ServiceClassState(sss);
     resCheckHealth = resCheckHealth.data.lastUpdateds;
@@ -52,7 +54,7 @@ const checkHealthAllShare = async (share: any) => {
 
   console.log({ resCheckHealth });
 
-  let shares = [
+  const shares = [
     {
       shareId: share.selfshareShareShareId2,
       updatedAt: share.selfshareShareDate2,
@@ -66,22 +68,22 @@ const checkHealthAllShare = async (share: any) => {
   console.log({ resCheckHealth });
   const healthStatus = new HealthStatus();
   const res = await healthStatus.appHealthStatus(share.qatime, resCheckHealth);
-  let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
+  const resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
     localDB.tableName.tblWallet,
     res,
   );
   console.log({ res });
   if (resupdateWalletDetials) {
-    let temp = [];
+    const temp = [];
     for (let i = 0; i < res.sharesInfo.length; i++) {
-      let data = {};
+      const data = {};
       data.shareId = res.sharesInfo[i].shareId;
       data.shareStage = res.sharesInfo[i].shareStage;
       data.acceptedDate =
         resCheckHealth[i] != null ? resCheckHealth[i].updatedAt : 0;
       temp.push(data);
     }
-    let resupdateSSSShareStage = await dbOpration.updateSSSShareStage(
+    const resupdateSSSShareStage = await dbOpration.updateSSSShareStage(
       localDB.tableName.tblSSSDetails,
       temp,
       dateTime,
@@ -95,8 +97,8 @@ const checkHealthAllShare = async (share: any) => {
 
 const checkHealthWithServerAllShare = async (share: any) => {
   //  console.log( { share } );
-  let dateTime = Date.now();
-  let resCheckHealth = [
+  const dateTime = Date.now();
+  const resCheckHealth = [
     {
       shareId: share.trustedContShareId1,
       updatedAt: share.trustedContDate1,
@@ -118,22 +120,22 @@ const checkHealthWithServerAllShare = async (share: any) => {
   console.log({ resCheckHealth });
   const healthStatus = new HealthStatus();
   const res = await healthStatus.appHealthStatus(share.qatime, resCheckHealth);
-  let resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
+  const resupdateWalletDetials = await dbOpration.updateWalletAppHealthStatus(
     localDB.tableName.tblWallet,
     res,
   );
   console.log({ res });
   if (resupdateWalletDetials) {
-    let temp = [];
+    const temp = [];
     for (let i = 0; i < res.sharesInfo.length; i++) {
-      let data = {};
+      const data = {};
       data.shareId = res.sharesInfo[i].shareId;
       data.shareStage = res.sharesInfo[i].shareStage;
       data.acceptedDate =
         resCheckHealth[i] != null ? resCheckHealth[i].updatedAt : 0;
       temp.push(data);
     }
-    let resupdateSSSShareStage = await dbOpration.updateSSSShareStage(
+    const resupdateSSSShareStage = await dbOpration.updateSSSShareStage(
       localDB.tableName.tblSSSDetails,
       temp,
       dateTime,
@@ -145,7 +147,7 @@ const checkHealthWithServerAllShare = async (share: any) => {
   }
 };
 
-//TODO: func connection_AppHealthStatus (WalletScreen,TrustedContactScreen)
+// TODO: func connection_AppHealthStatus (WalletScreen,TrustedContactScreen)
 // const connection_AppHealthStatus = async ( qatime: number, sharesId: any ) => {
 //     console.log( { qatime, sharesId } );
 //     sharesId = sharesId.slice( 0, 3 );

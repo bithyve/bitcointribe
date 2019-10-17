@@ -3,6 +3,7 @@ import { StyleSheet, Text } from 'react-native';
 import { Button } from 'native-base';
 import LinearGradient from 'react-native-linear-gradient';
 import IconFontAwe from 'react-native-vector-icons/FontAwesome';
+
 interface Props {
   title: string;
   style: any;
@@ -33,7 +34,7 @@ export default class FullLinearGradientIconButton extends Component<
             color={this.props.iconColor}
             size={this.props.iconSize}
           />
-          <Text style={styles.textWhite}>{'  ' + this.props.title}</Text>
+          <Text style={styles.textWhite}>{`  ${this.props.title}`}</Text>
         </Button>
       </LinearGradient>
     );

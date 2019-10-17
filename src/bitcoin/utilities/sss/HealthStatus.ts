@@ -1,7 +1,8 @@
 import config from '../../Config';
-const HEXA_HEALTH = config.HEALTH_STATUS.HEXA_HEALTH;
-const ENTITY_HEALTH = config.HEALTH_STATUS.ENTITY_HEALTH;
-const TIME_SLOTS = config.HEALTH_STATUS.TIME_SLOTS;
+
+const { HEXA_HEALTH } = config.HEALTH_STATUS;
+const { ENTITY_HEALTH } = config.HEALTH_STATUS;
+const { TIME_SLOTS } = config.HEALTH_STATUS;
 
 export default class HealthStatus {
   private counter: {
@@ -35,10 +36,10 @@ export default class HealthStatus {
     let overallStatus: string = HEXA_HEALTH.STAGE1;
     const qaRes = this.qaHealthStatus(qaTimestamp);
     const qaStatus = qaRes.qaStage;
-    let sharesData: any;
-    let sharesInfo: any;
-    sharesData = this.shareHealthStatus(shares);
-    sharesInfo = sharesData.sharesInfo;
+    // let sharesData: any;
+    // let sharesInfo: any;
+    const sharesData = this.shareHealthStatus(shares);
+    const { sharesInfo } = sharesData;
     if (this.counter.ugly > 3 || this.counter.bad > 4) {
       overallStatus = HEXA_HEALTH.STAGE1;
     } else if (this.counter.ugly > 2 || this.counter.bad > 3) {
@@ -101,6 +102,7 @@ export default class HealthStatus {
       overallStatus,
     };
   };
+
   private mnemonicHealthStatus = (time: number): { mnemonicStage: string } => {
     let mnemonicStage = ENTITY_HEALTH.STAGE1;
     const delta = Math.abs(Date.now() - time);

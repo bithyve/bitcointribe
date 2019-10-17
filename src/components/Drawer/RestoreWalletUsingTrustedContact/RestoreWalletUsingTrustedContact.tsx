@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { StyleSheet, View, ImageBackground, SafeAreaView } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-//TODO: Custome Compontes
+// TODO: Custome Compontes
 import { CustomStatusBar } from 'hexaCustStatusBar';
 import { ModelWalletName, ModelContactPermission } from 'hexaCustModel';
 
-//TODO: Custome Object
+// TODO: Custome Object
 import { colors, images } from 'hexaConstants';
 
 export default class RestoreWalletUsingTrustedContact extends Component {
