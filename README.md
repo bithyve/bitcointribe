@@ -29,59 +29,11 @@ The various design considerations that Hexa chose to undertake are over at [the 
 git clone https://github.com/bithyve/hexa.git
 cd hexa
 sudo yarn install
-chmod +x pkgchanges/setup.sh
-./pkgchanges/setup.sh
 ```
-
 Make sure you have a `.env.dev` similar to `.env.example` in your project's root directory before running hexa. If this file is not present with the correct values the app will not run correctly.
-
-#### Running hexa android
-```
-npm run android-dev
-```
-     
-#### Running hexa ios    
-            
-```
-cd ios
-rm -rf Pods
-rm -rf build   
-rm Podfile.lock 
-rm -rf ~Library/{yourusername}/Xcode/DerivedData
-pod install      
-Double click on 
-HexaWallet.xcworkspace   
-open project xcode 
-
-Step 1:
-Delete this lib (react-native-config)
-```      
-<img src="/src/assets/issuesImages/issue1.png" height="400">   
-
-```   
-Step 2:
-Search react-native-config and remove the 6 pod files inside
-"${PODS_ROOT}/Headers/Public/react-native-config" and -l"react-native-config"
-```  
-<img src="/src/assets/issuesImages/issue2.png" height="400">   
-
-```     
-Step 3:
-Remove All Fonts in HexaWallet => Resources
-then drag and drop all fonts to your project as shown below: 
-```   
-<img src="/src/assets/issuesImages/issue3.png" height="400">  
- 
-```   
-Step 4:
-Click on (Add to target)
-```   
-<img src="/src/assets/issuesImages/issue4.png" height="400">   
-        
-            
 
 ### Contributing
 Please feel free to open a pull requests and issues with bugfixes and suggestions.
-  
+    
 ### License  
 [LICENSE](LICENSE)

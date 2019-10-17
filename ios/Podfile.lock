@@ -2,7 +2,7 @@ PODS:
   - boost-for-react-native (1.63.0)
   - BVLinearGradient (2.5.6):
     - React
-  - Crashlytics (3.13.4):
+  - Crashlytics (3.14.0):
     - Fabric (~> 1.10.2)
   - DoubleConversion (1.1.6)
   - Fabric (1.10.2)
@@ -63,17 +63,17 @@ PODS:
     - React-cxxreact (= 0.60.5)
     - React-jsi (= 0.60.5)
   - React-jsinspector (0.60.5)
-  - react-native-camera (3.3.2):
+  - react-native-camera (3.7.2):
     - React
-    - react-native-camera/RCT (= 3.3.2)
-    - react-native-camera/RN (= 3.3.2)
-  - react-native-camera/RCT (3.3.2):
+    - react-native-camera/RCT (= 3.7.2)
+    - react-native-camera/RN (= 3.7.2)
+  - react-native-camera/RCT (3.7.2):
     - React
-  - react-native-camera/RN (3.3.2):
+  - react-native-camera/RN (3.7.2):
     - React
   - react-native-config (0.11.7):
     - React
-  - react-native-contacts (5.0.2):
+  - react-native-contacts (5.0.4):
     - React
   - react-native-image-picker (1.1.0):
     - React
@@ -112,11 +112,11 @@ PODS:
     - React-Core (= 0.60.5)
   - React-RCTWebSocket (0.60.5):
     - React-Core (= 0.60.5)
-  - ReactNativePermissions (1.2.0):
+  - ReactNativePermissions (1.2.1):
     - React
-  - RNBackgroundFetch (2.7.0):
+  - RNBackgroundFetch (2.7.1):
     - React
-  - RNCAsyncStorage (1.6.1):
+  - RNCAsyncStorage (1.6.2):
     - React
   - RNDeviceInfo (2.3.2):
     - React
@@ -136,11 +136,12 @@ PODS:
     - React
   - RNSimpleShare (0.1.1):
     - React
-  - RNSVG (9.8.4):
+  - RNSVG (9.11.1):
     - React
   - RNVectorIcons (6.6.0):
     - React
-  - ShotBlocker (0.0.3)
+  - TcpSockets (3.3.2):
+    - React
   - yoga (0.60.5.React)
 
 DEPENDENCIES:
@@ -192,7 +193,7 @@ DEPENDENCIES:
   - RNSimpleShare (from `../node_modules/react-native-simple-share`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
-  - ShotBlocker
+  - TcpSockets (from `../node_modules/react-native-tcp`)
   - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -200,7 +201,6 @@ SPEC REPOS:
     - boost-for-react-native
     - Crashlytics
     - Fabric
-    - ShotBlocker
 
 EXTERNAL SOURCES:
   BVLinearGradient:
@@ -295,13 +295,15 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-svg"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
+  TcpSockets:
+    :path: "../node_modules/react-native-tcp"
   yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
   BVLinearGradient: e3aad03778a456d77928f594a649e96995f1c872
-  Crashlytics: 2dfd686bcb918dc10ee0e76f7f853fe42c7bd552
+  Crashlytics: 540b7e5f5da5a042647227a5e3ac51d85eed06df
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
   Fabric: 706c8b8098fff96c33c0db69cbf81f9c551d0d74
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
@@ -314,9 +316,9 @@ SPEC CHECKSUMS:
   React-jsi: 4d8c9efb6312a9725b18d6fc818ffc103f60fec2
   React-jsiexecutor: 90ad2f9db09513fc763bc757fdc3c4ff8bde2a30
   React-jsinspector: e08662d1bf5b129a3d556eb9ea343a3f40353ae4
-  react-native-camera: 3f7ba7242caaa4b0bcf963504407b3c857e79f34
+  react-native-camera: 92877108e4c4d1d5a3f1c6f8733f1877ab1e8c1a
   react-native-config: 55548054279d92e0e4566ea15a8b9b81028ec342
-  react-native-contacts: b08f96846ebd82f16c92c039b0da7a379067498a
+  react-native-contacts: 7d0b7ccd5f00df82ceca035935fc9d6e63af5aec
   react-native-image-picker: 7a85cf7b0a53845f03ae52fb4592a2748ded069b
   react-native-mail: 7e37dfbe93ff0d4c7df346b738854dbed533e86f
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
@@ -334,9 +336,9 @@ SPEC CHECKSUMS:
   React-RCTText: b074d89033583d4f2eb5faf7ea2db3a13c7553a2
   React-RCTVibration: 2105b2e0e2b66a6408fc69a46c8a7fb5b2fdade0
   React-RCTWebSocket: cd932a16b7214898b6b7f788c8bddb3637246ac4
-  ReactNativePermissions: f3beb8871251594a8ea2c6b19a3f8252d5c7379d
-  RNBackgroundFetch: c6dd741d7f86ad981f1f03279415c5151397559a
-  RNCAsyncStorage: 2e2e3feb9bdadc752a026703d8c4065ca912e75a
+  ReactNativePermissions: 7cfad56d13c8961cd2a1005b4955b1400c79ef3e
+  RNBackgroundFetch: 8d8d66b47eafcb9e772b2eb95057939038b3ef95
+  RNCAsyncStorage: 60a80e72d95bf02a01cace55d3697d9724f0d77f
   RNDeviceInfo: 17e34f6dd902f08d88cbe2c0b7a01be948d43641
   RNFS: a8fbe7060fa49157d819466404794ad9c58e58cf
   RNGestureHandler: 4cb47a93019c1a201df2644413a0a1569a51c8aa
@@ -346,11 +348,11 @@ SPEC CHECKSUMS:
   RNReactNativePdfLib: d56cdaa0801a4641d8a0c34aa7fe8ef37539d1bf
   RNShare: 8b171d4b43c1d886917fdd303bf7a4b87167b05c
   RNSimpleShare: 741246a2540a2f53d3b371d8f0e730dde2da5da5
-  RNSVG: a78b4c581e33a1bb72968997d167afabf72b05dc
+  RNSVG: be27aa7c58819f97399388ae53d7fa0572f32c7f
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
-  ShotBlocker: e05c2f5b411733dddafb807250e90e7b9931c73e
+  TcpSockets: 14306fb79f9750ea7d2ddd02d8bed182abb01797
   yoga: 312528f5bbbba37b4dcea5ef00e8b4033fdd9411
 
-PODFILE CHECKSUM: 88ac3b4aac412087d9bcee69c53ccc609846bc9f
+PODFILE CHECKSUM: b2e95b2a0bccc32032e22eb94a3a3b99bf6c4b23
 
 COCOAPODS: 1.6.0
