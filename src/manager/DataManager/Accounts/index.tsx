@@ -56,7 +56,48 @@ const readTblAccounts = async ( tableName: any ) => {
     } );
 }
 
+const updateAccountBalance = (
+    tblName: string,
+    accountType: string,
+    bal: string
+) => {
+    let passcode = getPasscode();
+    return new Promise( ( resolve, reject ) => {
+        try {
+            db.transaction( function ( txn ) {
+                txn.executeSql( "SELECT * FROM " + tblName, [], ( tx, results ) => {
+                    var len = results.rows.length;
+                    if ( len > 0 ) {
+                        for ( let i = 0; i < len; i++ ) {
+                            let dbdecryptAccountType = utils.decrypt(
+                                results.rows.item( i ).accountType,
+                                passcode
+                            );
+                            let encpAccountType = results.rows.item( i ).accountType;
+                            if ( dbdecryptAccountType == accountType ) {
+                                txn.executeSql(
+                                    "update " +
+                                    tblName +
+                                    " set balance =:balance where accountType = :accountType",
+                                    [
+                                        utils.encrypt( bal.toString(), passcode ),
+                                        encpAccountType
+                                    ]
+                                );
+                                resolve( true );
+                            }
+                        }
+                    }
+                } );
+            } );
+        } catch ( error ) {
+            console.log( error );
+        }
+    } );
+}
+
 
 export {
-    readTblAccounts
+    readTblAccounts,
+    updateAccountBalance
 }
