@@ -1,8 +1,8 @@
 import { put } from "redux-saga/effects";
 import { sagaWatcherHelper } from "../utils";
 import { asyncStorageKeys } from "hexaConstants";
-import { getAsyncStorageValue, setAsyncStorageValue } from 'DataManager';
 
+var DataManager = require( "hexaDataManager" );
 
 //TODO: Bitcoin Files
 import { S3Service, RegularAccount, SecureAccount } from "hexaBitcoin";
@@ -73,9 +73,9 @@ export const accountsStateReducer = ( state = INITIAL_STATE, action: any ) => {
 // Sagas
 function* workerReadAccountsState() {
     try {
-        let regularClassObject = yield getAsyncStorageValue( asyncStorageKeys.regularClassObject );
-        let secureClassObject = yield getAsyncStorageValue( asyncStorageKeys.secureClassObject );
-        let setS3ServiceObject = yield getAsyncStorageValue( asyncStorageKeys.s3ServiceClassObject );
+        let regularClassObject = yield DataManager.getAsyncStorageValue( asyncStorageKeys.regularClassObject );
+        let secureClassObject = yield DataManager.getAsyncStorageValue( asyncStorageKeys.secureClassObject );
+        let setS3ServiceObject = yield DataManager.getAsyncStorageValue( asyncStorageKeys.s3ServiceClassObject );
         const regularAccount = yield RegularAccount.fromJSON( regularClassObject );
         const secureAccount = yield SecureAccount.fromJSON( secureClassObject );
         const sss = yield S3Service.fromJSON( setS3ServiceObject );
@@ -99,19 +99,19 @@ function* workerWriteAccountsState( action ) {
         } );
 
         regularAccount = JSON.stringify( regularAccount );
-        yield setAsyncStorageValue(
+        yield DataManager.setAsyncStorageValue(
             asyncStorageKeys.regularClassObject,
             regularAccount
         );
 
         secureAccount = JSON.stringify( secureAccount );
-        yield setAsyncStorageValue(
+        yield DataManager.setAsyncStorageValue(
             asyncStorageKeys.secureClassObject,
             secureAccount
         );
 
         sss = JSON.stringify( sss );
-        yield setAsyncStorageValue(
+        yield DataManager.setAsyncStorageValue(
             asyncStorageKeys.s3ServiceClassObject,
             sss
         );
@@ -127,7 +127,7 @@ function* workerWriteRegularAccountState( action ) {
             type: UPDATE_ACCOUNTS_STATE,
             payload: { regularAccount }
         } );
-        yield setAsyncStorageValue(
+        yield DataManager.setAsyncStorageValue(
             asyncStorageKeys.regularClassObject,
             regularAccount
         );
@@ -143,7 +143,7 @@ function* workerWriteSecureAccountState( action ) {
             type: UPDATE_ACCOUNTS_STATE,
             payload: { secureAccount }
         } );
-        yield setAsyncStorageValue(
+        yield DataManager.setAsyncStorageValue(
             asyncStorageKeys.secureClassObject,
             secureAccount
         );
@@ -159,7 +159,7 @@ function* workerWriteSSSAccountState( action ) {
             type: UPDATE_ACCOUNTS_STATE,
             payload: { sss }
         } );
-        yield setAsyncStorageValue(
+        yield DataManager.setAsyncStorageValue(
             asyncStorageKeys.s3ServiceClassObject,
             sss
         );
