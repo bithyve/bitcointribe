@@ -1,9 +1,11 @@
-var comFunDBRead = require( "hexaCommonDBReadData" );
+import { localDB } from "hexaConstants";
+var DataManager = require( "hexaDataManager" );
 
 const getAccountDetails = async ( { selectedAccount = {} as any, data = undefined as any } ) => {
     let address = data != undefined ? data.address : "";
     let amount = data != undefined ? data.amount.toString() : "0";
-    let arr_AccountList = await comFunDBRead.readTblAccount();
+    var arr_AccountList = await DataManager.readTblAccounts( localDB.tableName.tblAccount );
+    arr_AccountList = arr_AccountList.temp;
     var temp = [], arr_SelectAccountDetails = [], accountbal;
     let flag_DisableSentBtn = true;
     for ( let i = 0; i < arr_AccountList.length; i++ ) {

@@ -8,6 +8,8 @@ const getPasscode = () => {
   let commonData = Singleton.getInstance();
   return commonData.getPasscode();
 };
+
+
 import SQLite from "react-native-sqlite-storage";
 
 
