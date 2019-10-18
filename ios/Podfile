@@ -28,7 +28,7 @@ target 'HexaWallet' do
   pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
-
+  
 
   pod 'Fabric'
   pod 'Crashlytics'
@@ -41,7 +41,7 @@ target 'HexaWallet' do
 
   pod 'react-native-contacts', :path => '../node_modules/react-native-contacts'
   
-    pod 'react-native-config', :path => '../node_modules/react-native-config'
+  pod 'react-native-config', :path => '../node_modules/react-native-config'
 
   pod 'react-native-webview', :path => '../node_modules/react-native-webview'
 
@@ -75,11 +75,11 @@ target 'HexaWallet' do
   
   pod 'react-native-sqlite-storage', :path => '../node_modules/react-native-sqlite-storage'
   
-  pod 'RNReactNativePdfLib', :path => '../node_modules/react-native-pdf-lib/ios'
+  pod 'RNReactNativePdfLib', :path => '../node_modules/react-native-pdf-lib/ios'  
   
   pod 'RNInAppBrowser', :path => '../node_modules/react-native-inappbrowser-reborn'
-  
-  
+      
+            
     
   post_install do |installer|
    installer.pods_project.targets.each do |target|
@@ -89,12 +89,12 @@ target 'HexaWallet' do
        " && RNC_ROOT=./node_modules/react-native-config/"\
        " && export SYMROOT=$RNC_ROOT/ios/ReactNativeConfig"\
        " && ruby $RNC_ROOT/ios/ReactNativeConfig/BuildDotenvConfig.ruby"
-       
+
        target.build_phases << phase
        target.build_phases.move(phase,0)
      end
-   end    
-  end    
+   end
+  end
        
      
 end  

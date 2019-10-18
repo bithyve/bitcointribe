@@ -135,6 +135,11 @@
     "react-test-renderer": "16.8.6",
     "typescript": "^3.5.3"
   },
+  "rnpm": {
+    "assets": [
+      "./assets/fonts"
+    ]
+  },
   "jest": {
     "preset": "react-native"
   },

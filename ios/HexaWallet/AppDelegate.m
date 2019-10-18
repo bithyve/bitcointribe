@@ -6,14 +6,14 @@
  */
 
 #import "AppDelegate.h"
-
+  
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 #import <React/RCTLinkingManager.h>
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
-
+  
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -78,7 +78,7 @@
     [UIView animateWithDuration:0.5 animations:^{
         colourView.alpha = 1;
     }];
-}
+}   
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     
