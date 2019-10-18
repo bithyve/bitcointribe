@@ -29,6 +29,8 @@ The various design considerations that Hexa chose to undertake are over at [the 
 git clone https://github.com/bithyve/hexa.git
 cd hexa
 sudo yarn install
+npm run android-dev
+npm run ios-dev
 ```
 Make sure you have a `.env.dev` similar to `.env.example` in your project's root directory before running hexa. If this file is not present with the correct values the app will not run correctly.
 

@@ -2,7 +2,11 @@ import { select, put } from "redux-saga/effects";
 import { sagaWatcherHelper, getPriority } from "../utils";
 import { writeRegularAccount, writeSecureAccount } from "hexaRedux";
 
+
+
+
 var DataManager = require( "hexaDataManager" );
+
 var utils = require( "hexaUtils" );
 
 // Types
@@ -23,7 +27,6 @@ const INITIAL_STATE = {
     sendAmountDataT1: {},
     sendAmountDataT2: {},
     sendAmountDataT3: {},
-
     sendAmountSuccess: {},
 };
 
@@ -34,7 +37,6 @@ export const onSendAmountT1 = ( args ) => {
         ...args
     };
 };
-
 
 export const onSendAmountT2 = () => {
     return {
@@ -182,7 +184,6 @@ function* workerSendAmountSuccess( action: any ) {
         } )
     } catch ( error ) {
         console.log( { error } );
-
     }
 }
 
