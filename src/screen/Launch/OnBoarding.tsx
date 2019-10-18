@@ -3,6 +3,7 @@ import { StyleSheet, View, SafeAreaView, Image, AsyncStorage, Dimensions, Alert 
 import { Text } from "native-base";
 import { StackActions, NavigationActions } from "react-navigation";
 
+
 import CreateTables from "HexaWallet/src/app/manage/database/CreateTables";
 
 import IconFontAwe from "react-native-vector-icons/FontAwesome";
@@ -40,6 +41,7 @@ export default class OnBoarding extends React.Component<any, any> {
       Alert.alert( error )
     }
   }
+
 
 
   //TODO: func click_Done  

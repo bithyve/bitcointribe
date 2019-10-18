@@ -862,7 +862,7 @@ class Wallet extends React.Component {
               create4thPdf = await this.genreatePdf( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, res4thShare6Create, res4thShare7Create, res4thShare8Create, resSecoundXpub4Share, res2FASecret4Share, walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 4.pdf", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 4", password );
             }
             resolve( create4thPdf );
-          }, delayTime.walletScreen.delay_qrcodeimage );
+          }, 4000 );
         } );
       } );
     } catch ( error ) {
@@ -941,7 +941,7 @@ class Wallet extends React.Component {
               create5thPdf = await this.genreatePdf( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, res5thShare6Create, res5thShare7Create, res5thShare8Create, resSecoundXpub5Share, res2FASecret5Share, walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 5.pdf", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 5", password );
             }
             resolve( create5thPdf );
-          }, delayTime.walletScreen.delay_qrcodeimage );
+          }, 4000 );
         } );
       } );
     } catch ( error ) {
@@ -1021,11 +1021,10 @@ class Wallet extends React.Component {
 
   genreatePdf = async ( data: any, pathShare1: string, pathShare2: string, pathShare3: string, pathShare4: string, pathShare5: string, pathShare6: string, pathShare7: string, pathShare8: string, pathSecoundXpub: string, path2FASecret: string, pdfFileName: string, forShare: string, password: string ) => {
     try {
-
-
       return new Promise( async ( resolve, reject ) => {
-        console.log( { data, pathShare1, pathShare8, pdfFileName, forShare } );
-        console.log( { password } );
+
+        console.log( { data, pathShare1, pathShare2, pathShare3, pathShare4, pathShare5, pathShare6, pathShare7, pathShare8, pathSecoundXpub, path2FASecret, pdfFileName, forShare, forShare, password } );
+        // console.log( { password } );  
         let arrQRCodeData = data.arrQRCodeData;
         let secret2FA = data.secret;
         let secondaryMnemonic = data.secondaryMnemonic;
@@ -1596,29 +1595,33 @@ class Wallet extends React.Component {
             fontSize: 10
           } )
         if ( Platform.OS == "ios" ) {
-          PDFDocument
-            .create( pdfPath )
-            .addPages( page1, page2, page3, page4, page5, page6 )
-            .write()
-            .then( async ( path: any ) => {
-              console.log( 'PDF created at: ' + path );
-              if ( Platform.OS == "ios" ) {
-                // var PdfPassword = NativeModules.PdfPassword;
-                // PdfPassword.addEvent( "/" + pdfFileName, password );
-              }
-              resolve( path );
-            } );
+          console.log( { pdfPath } );
+
+          resolve( pdfPath );
+          // PDFDocument
+          //   .create( pdfPath )
+          //   .addPages( page1, page2, page3, page4, page5, page6 )
+          //   .write()
+          //   .then( ( path: any ) => {
+          //     console.log( 'PDF created at: ' + path );
+          //     if ( Platform.OS == "ios" ) {
+          //       var PdfPassword = NativeModules.PdfPassword;
+          //       PdfPassword.addEvent( "/" + pdfFileName, password );
+          //     }
+          //     resolve( path );
+          //   } );
         } else {
-          PDFDocument
-            .create( pdfPath )
-            .addPages( page1, page2, page3, page4, page5, page6 )
-            .write()
-            .then( async ( path: any ) => {
-              console.log( 'PDF created at: ' + path );
-              console.log( { password } );
-              //this.setPdfAndroidPasswrod( path, password );
-              resolve( path );
-            } );
+          resolve( pdfPath );
+          // PDFDocument
+          //   .create( pdfPath )
+          //   .addPages( page1, page2, page3, page4, page5, page6 )
+          //   .write()
+          //   .then( ( path: any ) => {
+          //     console.log( 'PDF created at: ' + path );
+          //     console.log( { password } );
+          //     //this.setPdfAndroidPasswrod( path, password );
+          //     resolve( path );
+          //   } );
         }
       } );
     } catch ( error ) {
@@ -2453,6 +2456,7 @@ class Wallet extends React.Component {
                 images: [ "helper1" ]
               } ]
             }, () => this.asyncTask() )
+
           } }
         />
         <ModelLoader loading={ flag_Loading } color={ colors.appColor } size={ 30 } />
