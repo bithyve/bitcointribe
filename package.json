@@ -8,6 +8,7 @@
     "test": "jest",
     "lint": "eslint .",
     "android-dev": "ENVFILE=.env.dev react-native run-android",
+    "ios-dev": "ENVFILE=.env.dev react-native run-ios --simulator=\"iPhone 8\"",
     "build-android-dev": "export ENVFILE=.env.dev && cd android && ./gradlew assembleRelease && cd ..",
     "android-relase": "ENVFILE=.env.dev react-native run-android --variant=release"
   },
