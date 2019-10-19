@@ -32,32 +32,36 @@ import {
     onSendAmountT1,
     onSendAmountT2,
     onSendAmountT3,
+    onSendAmountSuccess,
     paymentReducer,
     watcherOnSendAmountT1,
     watcherOnSendAmountT2,
-    watcherOnSendAmountT3
+    watcherOnSendAmountT3,
+    watcherSendAmountSuccess
 } from './payment';
 
 const reducers = combineReducers( {
-    accountsStateReducer,
     accountsSetupReducer,
+    accountsStateReducer,
     paymentReducer
 } );
 
 
 const rootSaga = function* () {
     yield all( [
+        //accountSetup   
         fork( watcherSetupAccounts ),
-
-        fork( watcherOnSendAmountT1 ),
-        fork( watcherOnSendAmountT2 ),
-        fork( watcherOnSendAmountT3 ),
-
+        //classState  
         fork( watcherReadAccountsState ),
         fork( watcherWriteAccountsState ),
         fork( watcherWriteRegularAccountState ),
         fork( watcherWriteSecureAccountState ),
         fork( watcherWriteSSSAccountState ),
+        //payment   
+        fork( watcherOnSendAmountT1 ),
+        fork( watcherOnSendAmountT2 ),
+        fork( watcherOnSendAmountT3 ),
+        fork( watcherSendAmountSuccess ),
 
 
     ] );
@@ -76,19 +80,17 @@ sagaMiddleware.run( rootSaga );
 
 export {
     store,
-
+    //accountSetup   
+    setupAccounts,
     //classState  
     readAccountsState,
     writeAccountsState,
     writeRegularAccount,
     writeSecureAccount,
     writeSSSAccount,
-
-    //accountSetup   
-    setupAccounts,
-
     //payment   
     onSendAmountT1,
     onSendAmountT2,
-    onSendAmountT3
+    onSendAmountT3,
+    onSendAmountSuccess
 };      

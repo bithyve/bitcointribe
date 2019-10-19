@@ -13,7 +13,7 @@ import { BaseComponent } from "hexaComponent/BaseComponent";
 
 //TODO: redux
 import { connect } from 'react-redux';
-import { onSendAmountT2 } from 'hexaRedux'
+import { onSendAmountT2, onSendAmountSuccess } from 'hexaRedux'
 
 import { ImageSVG } from "hexaComponent/ImageSVG";
 
@@ -67,6 +67,7 @@ class ConfirmAndSendPayment extends BaseComponent<any, any> {
 
 
     componentWillReceiveProps( nextProps: any ) {
+        console.log( { nextProps } );
         if ( nextProps.sendAmountDataT2 !== this.props.sendAmountDataT2 ) {
             let { sendAmountDataT1, resTransferST } = nextProps.sendAmountDataT2;
             if ( sendAmountDataT1.selectedAccount.accountName == "Regular Account" ) {
@@ -106,6 +107,18 @@ class ConfirmAndSendPayment extends BaseComponent<any, any> {
                 }
             }
         }
+        else if ( nextProps.sendAmountSuccess !== this.props.sendAmountSuccess ) {
+            let { res } = nextProps.sendAmountSuccess;
+            if ( res ) {
+                this.setState( {
+                    arrModelConfirmSendSuccess: [ {
+                        modalVisible: false,
+                        data: []
+                    } ]
+                } );
+                this.props.navigation.navigate( "TabbarBottom" )
+            }
+        }
     }
 
 
@@ -121,29 +134,14 @@ class ConfirmAndSendPayment extends BaseComponent<any, any> {
 
     //TODO: Amount Sent Success
     click_GoToDailyAccount = async () => {
+
         let { data } = this.state;
         let accountType = data.selectedAccount.accountName;
         let orignalBal = data.bal;
         let sendBal = parseFloat( data.amount ) + parseFloat( data.tranFee );
         let totalBal = orignalBal - sendBal;
-
-
-
-
-        let resUpdateAccountBalR = await dbOpration.updateAccountBalAccountTypeWise(
-            localDB.tableName.tblAccount,
-            accountType,
-            totalBal
-        );
-        if ( resUpdateAccountBalR ) {
-            this.setState( {
-                arrModelConfirmSendSuccess: [ {
-                    modalVisible: false,
-                    data: []
-                } ]
-            } );
-            this.props.navigation.navigate( "TabbarBottom", { id: 1 } )
-        }
+        let { onSendAmountSuccess } = this.props;
+        await onSendAmountSuccess( { tableName: localDB.tableName.tblAccount, accountType, totalBal } )
     }
 
     render() {
@@ -335,6 +333,9 @@ const mapDispatchToProps = ( dispatch ) => {
     return {
         onSendAmountT2: () => {
             dispatch( onSendAmountT2() );
+        },
+        onSendAmountSuccess: ( args ) => {
+            dispatch( onSendAmountSuccess( args ) );
         }
     }
 }
@@ -343,7 +344,8 @@ const mapDispatchToProps = ( dispatch ) => {
 const mapStateToProps = state => {
     return {
         sendAmountDataT1: state.paymentReducer.sendAmountDataT1,
-        sendAmountDataT2: state.paymentReducer.sendAmountDataT2
+        sendAmountDataT2: state.paymentReducer.sendAmountDataT2,
+        sendAmountSuccess: state.paymentReducer.sendAmountSuccess,
     };
 };
 
