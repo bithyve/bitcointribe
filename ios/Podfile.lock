@@ -75,6 +75,8 @@ PODS:
     - React
   - react-native-contacts (5.0.4):
     - React
+  - react-native-html-to-pdf (0.8.0):
+    - React
   - react-native-image-picker (1.1.0):
     - React
   - react-native-mail (4.0.0):
@@ -162,6 +164,7 @@ DEPENDENCIES:
   - react-native-camera (from `../node_modules/react-native-camera`)
   - react-native-config (from `../node_modules/react-native-config`)
   - react-native-contacts (from `../node_modules/react-native-contacts`)
+  - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-mail (from `../node_modules/react-native-mail`)
   - react-native-randombytes (from `../node_modules/react-native-randombytes`)
@@ -233,6 +236,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-config"
   react-native-contacts:
     :path: "../node_modules/react-native-contacts"
+  react-native-html-to-pdf:
+    :path: "../node_modules/react-native-html-to-pdf"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
   react-native-mail:
@@ -319,6 +324,7 @@ SPEC CHECKSUMS:
   react-native-camera: 92877108e4c4d1d5a3f1c6f8733f1877ab1e8c1a
   react-native-config: 55548054279d92e0e4566ea15a8b9b81028ec342
   react-native-contacts: 7d0b7ccd5f00df82ceca035935fc9d6e63af5aec
+  react-native-html-to-pdf: 1d1199917f56a98377d431bce84c2f275e48eb71
   react-native-image-picker: 7a85cf7b0a53845f03ae52fb4592a2748ded069b
   react-native-mail: 7e37dfbe93ff0d4c7df346b738854dbed533e86f
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
