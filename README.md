@@ -29,10 +29,26 @@ The various design considerations that Hexa chose to undertake are over at [the 
 git clone https://github.com/bithyve/hexa.git
 cd hexa
 sudo yarn install
-npm run android-dev
-npm run ios-dev
 ```
 Make sure you have a `.env.dev` similar to `.env.example` in your project's root directory before running hexa. If this file is not present with the correct values the app will not run correctly.
+
+#### Run on android
+```
+npm run android-dev
+```
+
+#### Run on ios using terminal
+```
+npm run ios-dev
+```   
+#### Run on ios using xcodxe
+If font reference issue showing following this steps
+
+```
+In Xcode, go to File->Project/Workspace settings.
+Change the build system to Legacy Build system.
+```
+
 
 ### Contributing
 Please feel free to open a pull requests and issues with bugfixes and suggestions.
