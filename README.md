@@ -41,7 +41,7 @@ npm run android-dev
 ```
 npm run ios-dev
 ```   
-#### Run on ios using xcodxe
+#### Run on ios using xcodxe:
 If fonts reference issue showing following this steps
 
 ```
