@@ -42,7 +42,7 @@ npm run android-dev
 npm run ios-dev
 ```   
 #### Run on ios using xcodxe
-If font reference issue showing following this steps
+If fonts reference issue showing following this steps
 
 ```
 In Xcode, go to File->Project/Workspace settings.
