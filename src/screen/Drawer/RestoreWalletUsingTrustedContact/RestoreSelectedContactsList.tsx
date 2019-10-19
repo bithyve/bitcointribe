@@ -7,6 +7,7 @@ import {
 import { RkCard } from "react-native-ui-kitten";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Avatar } from 'react-native-elements';
+import IconFontAwe from "react-native-vector-icons/FontAwesome";
 
 //TODO: Custome Pages    
 import { ImageSVG } from "hexaComponent/ImageSVG";
