@@ -51,7 +51,7 @@ export const onSendAmountT3 = ( args ) => {
     };
 }
 
-export const sendAmountSuccess = ( args ) => {
+export const onSendAmountSuccess = ( args ) => {
     return {
         type: SEND_AMOUNT_SUCCESS,
         ...args

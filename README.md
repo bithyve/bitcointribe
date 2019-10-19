@@ -39,11 +39,11 @@ npm run android-dev
 
 #### Run on ios using terminal
 ```
-npm run ios-dev
+npm run ios-dev  
 ```   
-#### Run on ios using xcodxe:
+#### Run on ios using xcode:   
 If fonts reference issue showing following this steps
-
+   
 ```
 In Xcode, go to File->Project/Workspace settings.
 Change the build system to Legacy Build system.
