@@ -81,6 +81,8 @@ target 'HexaWallet' do
       
             
     
+  pod 'react-native-html-to-pdf', :path => '../node_modules/react-native-html-to-pdf'
+
   post_install do |installer|
    installer.pods_project.targets.each do |target|
      if target.name == 'react-native-config'

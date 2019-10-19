@@ -218,12 +218,12 @@ keyAlias "hexawallet"
     // }
 }       
    
-dependencies {                    
+dependencies {                       
     // animation image like gif
     compile 'com.facebook.fresco:animated-gif:1.+'
     compile 'com.facebook.fresco:animated-webp:1.+'
     compile 'com.facebook.fresco:webpsupport:1.+'
-       
+                 
     //pdf  
     implementation 'com.tom_roush:pdfbox-android:1.8.10.1'
     // pdf password   
@@ -234,7 +234,7 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
     transitive = true;
     }           
-    
+       
     implementation project(':react-native-html-to-pdf')   
     implementation project(':react-native-pdf-lib')
     implementation project(':react-native-sqlite-storage')
