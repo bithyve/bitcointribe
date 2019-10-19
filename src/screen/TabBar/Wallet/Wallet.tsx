@@ -25,9 +25,14 @@ import { RkCard } from "react-native-ui-kitten";
 import DropdownAlert from "react-native-dropdownalert";
 import { SvgIcon } from "hexaComponent/Icons";
 import Permissions from 'react-native-permissions';
+
+
 import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
+
 var RNFS = require( 'react-native-fs' );
 import QRCode from 'react-native-qrcode-svg';
+
 
 
 import { FloatingAction } from "react-native-floating-action";
@@ -92,6 +97,10 @@ import { S3Service } from "hexaBitcoin";
 
 //TODO: Common Funciton  
 var comAppHealth = require( "hexaCommonAppHealth" );
+
+
+
+
 
 class Wallet extends React.Component {
   constructor ( props: any ) {
@@ -158,6 +167,9 @@ class Wallet extends React.Component {
   }
 
 
+
+
+
   //TODO: Page Life Cycle
   componentWillMount() {
     try {
@@ -189,6 +201,9 @@ class Wallet extends React.Component {
       Alert.alert( error )
     }
   }
+
+
+
 
   changeAnimaiton() {
     try {
@@ -1071,558 +1086,16 @@ class Wallet extends React.Component {
         }
         const pdfPath = `${ docsDir }/${ pdfFileName }`;
         console.log( { pdfPath } );
-        const page1 = PDFPage
-          .create()
-          .drawText( forShare, {
-            x: 5,
-            y: 480,
-            fontSize: 18
-          } )
-          .drawText( 'Part 1', {
-            x: 5,
-            y: 470,
-            fontSize: 10
-          } )
-          .drawImage(
-            pathShare1,
-            'png',
-            {
-              x: 40,
-              y: 320,
-              width: 160,
-              height: 140,
-              //source: 'assets'
-            }
-          )
-          .drawText( arrShare1[ 0 ].toString(), {
-            x: 10,
-            y: 300,
-            fontSize: 10
-          } )
-          .drawText( arrShare1[ 1 ].toString(), {
-            x: 10,
-            y: 290,
-            fontSize: 10
-          } )
-          .drawText( arrShare1[ 2 ].toString(), {
-            x: 10,
-            y: 280,
-            fontSize: 10
-          } )
-          .drawText( arrShare1[ 3 ].toString(), {
-            x: 10,
-            y: 270,
-            fontSize: 10
-          } )
-          .drawText( arrShare1[ 4 ].toString(), {
-            x: 10,
-            y: 260,
-            fontSize: 10
-          } )
-          .drawText( arrShare1[ 5 ].toString(), {
-            x: 10,
-            y: 250,
-            fontSize: 10
-          } )
-          .drawText( arrShare1[ 6 ].toString(), {
-            x: 10,
-            y: 240,
-            fontSize: 10
-          } )
-          .drawText( 'Part 2', {
-            x: 5,
-            y: 230,
-            fontSize: 10
-          } )
-          .drawImage(
-            pathShare2,
-            'png',
-            {
-              x: 40,
-              y: 80,
-              width: 160,
-              height: 140,
-              // source: 'assets'
-            }
-          )
-          .drawText( arrShare2[ 0 ].toString(), {
-            x: 10,
-            y: 60,
-            fontSize: 10
-          } )
-          .drawText( arrShare2[ 1 ].toString(), {
-            x: 10,
-            y: 50,
-            fontSize: 10
-          } )
-          .drawText( arrShare2[ 2 ].toString(), {
-            x: 10,
-            y: 40,
-            fontSize: 10
-          } )
-          .drawText( arrShare2[ 3 ].toString(), {
-            x: 10,
-            y: 30,
-            fontSize: 10
-          } )
-          .drawText( arrShare2[ 4 ].toString(), {
-            x: 10,
-            y: 20,
-            fontSize: 10
-          } )
-          .drawText( arrShare2[ 5 ].toString(), {
-            x: 10,
-            y: 10,
-            fontSize: 10
-          } )
-          .drawText( arrShare2[ 6 ].toString(), {
-            x: 10,
-            y: 1,
-            fontSize: 10
-          } )
 
-        const page2 = PDFPage
-          .create()
-          .drawText( 'Part 3', {
-            x: 5,
-            y: 470,
-            fontSize: 10
-          } )
-          .drawImage(
-            pathShare3,
-            'png',
-            {
-              x: 40,
-              y: 320,
-              width: 160,
-              height: 140,
-              //source: 'assets'
-            }
-          )
-          .drawText( arrShare3[ 0 ].toString(), {
-            x: 10,
-            y: 300,
-            fontSize: 10
-          } )
-          .drawText( arrShare3[ 1 ].toString(), {
-            x: 10,
-            y: 290,
-            fontSize: 10
-          } )
-          .drawText( arrShare3[ 2 ].toString(), {
-            x: 10,
-            y: 280,
-            fontSize: 10
-          } )
-          .drawText( arrShare3[ 3 ].toString(), {
-            x: 10,
-            y: 270,
-            fontSize: 10
-          } )
-          .drawText( arrShare3[ 4 ].toString(), {
-            x: 10,
-            y: 260,
-            fontSize: 10
-          } )
-          .drawText( arrShare3[ 5 ].toString(), {
-            x: 10,
-            y: 250,
-            fontSize: 10
-          } )
-          .drawText( arrShare3[ 6 ].toString(), {
-            x: 10,
-            y: 240,
-            fontSize: 10
-          } )
-          .drawText( 'Part 4', {
-            x: 5,
-            y: 230,
-            fontSize: 10
-          } )
-          .drawImage(
-            pathShare4,
-            'png',
-            {
-              x: 40,
-              y: 80,
-              width: 160,
-              height: 140,
-              // source: 'assets'
-            }
-          )
-          .drawText( arrShare4[ 0 ].toString(), {
-            x: 10,
-            y: 60,
-            fontSize: 10
-          } )
-          .drawText( arrShare4[ 1 ].toString(), {
-            x: 10,
-            y: 50,
-            fontSize: 10
-          } )
-          .drawText( arrShare4[ 2 ].toString(), {
-            x: 10,
-            y: 40,
-            fontSize: 10
-          } )
-          .drawText( arrShare4[ 3 ].toString(), {
-            x: 10,
-            y: 30,
-            fontSize: 10
-          } )
-          .drawText( arrShare4[ 4 ].toString(), {
-            x: 10,
-            y: 20,
-            fontSize: 10
-          } )
-          .drawText( arrShare4[ 5 ].toString(), {
-            x: 10,
-            y: 10,
-            fontSize: 10
-          } )
-          .drawText( arrShare4[ 6 ].toString(), {
-            x: 10,
-            y: 1,
-            fontSize: 10
-          } )
-        const page3 = PDFPage
-          .create()
-          .drawText( 'Part 5', {
-            x: 5,
-            y: 470,
-            fontSize: 10
-          } )
-          .drawImage(
-            pathShare5,
-            'png',
-            {
-              x: 40,
-              y: 320,
-              width: 160,
-              height: 140,
-              //source: 'assets'
-            }
-          )
-          .drawText( arrShare5[ 0 ].toString(), {
-            x: 10,
-            y: 300,
-            fontSize: 10
-          } )
-          .drawText( arrShare5[ 1 ].toString(), {
-            x: 10,
-            y: 290,
-            fontSize: 10
-          } )
-          .drawText( arrShare5[ 2 ].toString(), {
-            x: 10,
-            y: 280,
-            fontSize: 10
-          } )
-          .drawText( arrShare5[ 3 ].toString(), {
-            x: 10,
-            y: 270,
-            fontSize: 10
-          } )
-          .drawText( arrShare5[ 4 ].toString(), {
-            x: 10,
-            y: 260,
-            fontSize: 10
-          } )
-          .drawText( arrShare5[ 5 ].toString(), {
-            x: 10,
-            y: 250,
-            fontSize: 10
-          } )
-          .drawText( arrShare5[ 6 ].toString(), {
-            x: 10,
-            y: 240,
-            fontSize: 10
-          } )
-          .drawText( 'Part 6', {
-            x: 5,
-            y: 230,
-            fontSize: 10
-          } )
-          .drawImage(
-            pathShare6,
-            'png',
-            {
-              x: 40,
-              y: 80,
-              width: 160,
-              height: 140,
-              // source: 'assets'
-            }
-          )
-          .drawText( arrShare6[ 0 ].toString(), {
-            x: 10,
-            y: 60,
-            fontSize: 10
-          } )
-          .drawText( arrShare6[ 1 ].toString(), {
-            x: 10,
-            y: 50,
-            fontSize: 10
-          } )
-          .drawText( arrShare6[ 2 ].toString(), {
-            x: 10,
-            y: 40,
-            fontSize: 10
-          } )
-          .drawText( arrShare6[ 3 ].toString(), {
-            x: 10,
-            y: 30,
-            fontSize: 10
-          } )
-          .drawText( arrShare6[ 4 ].toString(), {
-            x: 10,
-            y: 20,
-            fontSize: 10
-          } )
-          .drawText( arrShare6[ 5 ].toString(), {
-            x: 10,
-            y: 10,
-            fontSize: 10
-          } )
-          .drawText( arrShare6[ 6 ].toString(), {
-            x: 10,
-            y: 1,
-            fontSize: 10
-          } )
-        const page4 = PDFPage
-          .create()
-          .drawText( 'Part 7', {
-            x: 5,
-            y: 470,
-            fontSize: 10
-          } )
-          .drawImage(
-            pathShare7,
-            'png',
-            {
-              x: 40,
-              y: 320,
-              width: 160,
-              height: 140,
-              //source: 'assets'
-            }
-          )
-          .drawText( arrShare7[ 0 ].toString(), {
-            x: 10,
-            y: 300,
-            fontSize: 10
-          } )
-          .drawText( arrShare7[ 1 ].toString(), {
-            x: 10,
-            y: 290,
-            fontSize: 10
-          } )
-          .drawText( arrShare7[ 2 ].toString(), {
-            x: 10,
-            y: 280,
-            fontSize: 10
-          } )
-          .drawText( arrShare7[ 3 ].toString(), {
-            x: 10,
-            y: 270,
-            fontSize: 10
-          } )
-          .drawText( arrShare7[ 4 ].toString(), {
-            x: 10,
-            y: 260,
-            fontSize: 10
-          } )
-          .drawText( arrShare7[ 5 ].toString(), {
-            x: 10,
-            y: 250,
-            fontSize: 10
-          } )
-          .drawText( arrShare7[ 6 ].toString(), {
-            x: 10,
-            y: 240,
-            fontSize: 10
-          } )
-          .drawText( 'Part 8', {
-            x: 5,
-            y: 230,
-            fontSize: 10
-          } )
-          .drawImage(
-            pathShare8,
-            'png',
-            {
-              x: 40,
-              y: 80,
-              width: 160,
-              height: 140,
-              // source: 'assets'
-            }
-          )
-          .drawText( arrShare8[ 0 ].toString(), {
-            x: 10,
-            y: 60,
-            fontSize: 10
-          } )
-          .drawText( arrShare8[ 1 ].toString(), {
-            x: 10,
-            y: 50,
-            fontSize: 10
-          } )
-          .drawText( arrShare8[ 2 ].toString(), {
-            x: 10,
-            y: 40,
-            fontSize: 10
-          } )
-          .drawText( arrShare8[ 3 ].toString(), {
-            x: 10,
-            y: 30,
-            fontSize: 10
-          } )
-          .drawText( arrShare8[ 4 ].toString(), {
-            x: 10,
-            y: 20,
-            fontSize: 10
-          } )
-          .drawText( arrShare8[ 5 ].toString(), {
-            x: 10,
-            y: 10,
-            fontSize: 10
-          } )
-          .drawText( arrShare8[ 6 ].toString(), {
-            x: 10,
-            y: 1,
-            fontSize: 10
-          } )
-        const page5 = PDFPage
-          .create()
-          .drawText( 'Secondary Xpub (Encrypted):', {
-            x: 5,
-            y: 480,
-            fontSize: 18
-          } )
-          .drawImage(
-            pathSecoundXpub,
-            'png',
-            {
-              x: 25,
-              y: 300,
-              width: 160,
-              height: 140,
-              //source: 'assets'
-            }
-          )
-          .drawText( 'Scan the above QR Code using your HEXA', {
-            x: 30,
-            y: 250,
-            fontSize: 10
-          } )
-          .drawText( 'wallet in order to restore your Secure Account.', {
-            x: 30,
-            y: 240,
-            fontSize: 10
-          } )
-        const page6 = PDFPage
-          .create()
-          .drawText( '2FA Secret:', {
-            x: 5,
-            y: 480,
-            fontSize: 18
-          } )
-          .drawImage(
-            path2FASecret,
-            'png',
-            {
-              x: 25,
-              y: 300,
-              width: 160,
-              height: 140,
-              // source: 'assets'
-            }
-          )
-          .drawText( secret2FA, {
-            x: 25,
-            y: 250,
-            fontSize: 10
-          } )
-          .drawText( 'Following assets can be used to recover your funds using', {
-            x: 5,
-            y: 230,
-            fontSize: 10
-          } )
-          .drawText( 'the open - sourced ga - recovery tool.', {
-            x: 5,
-            y: 220,
-            fontSize: 10
-          } )
-          .drawText( 'Secondary Mnemonic:', {
-            x: 5,
-            y: 190,
-            fontSize: 18
-          } )
-          .drawText( firstArrSecondaryMnemonic, {
-            x: 5,
-            y: 170,
-            fontSize: 10
-          } )
-          .drawText( secoundArrSecondaryMnemonic, {
-            x: 5,
-            y: 160,
-            fontSize: 10
-          } )
-          .drawText( threeSecondaryMnemonic, {
-            x: 5,
-            y: 150,
-            fontSize: 10
-          } )
-          .drawText( 'BitHyve Xpub:', {
-            x: 5,
-            y: 120,
-            fontSize: 18
-          } )
-          .drawText( firstArrbhXpub, {
-            x: 5,
-            y: 100,
-            fontSize: 10
-          } )
-          .drawText( secoundArrbhXpub, {
-            x: 5,
-            y: 90,
-            fontSize: 10
-          } )
-          .drawText( threebhXpub, {
-            x: 5,
-            y: 80,
-            fontSize: 10
-          } )
-        if ( Platform.OS == "ios" ) {
-          console.log( { pdfPath } );
-
-          resolve( pdfPath );
-          // PDFDocument
-          //   .create( pdfPath )
-          //   .addPages( page1, page2, page3, page4, page5, page6 )
-          //   .write()
-          //   .then( ( path: any ) => {
-          //     console.log( 'PDF created at: ' + path );
-          //     if ( Platform.OS == "ios" ) {
-          //       var PdfPassword = NativeModules.PdfPassword;
-          //       PdfPassword.addEvent( "/" + pdfFileName, password );
-          //     }
-          //     resolve( path );
-          //   } );
-        } else {
-          resolve( pdfPath );
-          // PDFDocument
-          //   .create( pdfPath )
-          //   .addPages( page1, page2, page3, page4, page5, page6 )
-          //   .write()
-          //   .then( ( path: any ) => {
-          //     console.log( 'PDF created at: ' + path );
-          //     console.log( { password } );
-          //     //this.setPdfAndroidPasswrod( path, password );
-          //     resolve( path );
-          //   } );
-        }
+        let options = {
+          html: "<h1>Sagar Wallet Share 4</h1>" +
+            "<p>Part 1<p><br/>" +
+            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=HelloWorld&amp;size=100x100'/>",
+          fileName: 'test',
+          directory: 'Documents',
+        };
+        let file = await RNHTMLtoPDF.convert( options )
+        resolve( file );
       } );
     } catch ( error ) {
       Alert.alert( error )
@@ -2085,6 +1558,7 @@ class Wallet extends React.Component {
           scrollEnabled={ false }
           contentContainerStyle={ styles.container }
         >
+          <Image style={ { width: 100, height: 100 } } source={ { isStatic: true, uri: "file:///storage/emulated/0/qrcode5thSahre1.png" } } />
           <SafeAreaView style={ { flex: 0, backgroundColor: colors.appColor } } />
           <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
             {/* Top View Animation */ }
