@@ -52,7 +52,7 @@ export default class ModelBackupSecretQuestionsFirstQuestion extends Component<
     };
   }
 
-  componentWillReceiveProps(nextProps: any) {
+  UNSAFE_componentWillReceiveProps(nextProps: any) {
     let data = nextProps.data[0];
     if (data != undefined) {
       data = data.data[0];

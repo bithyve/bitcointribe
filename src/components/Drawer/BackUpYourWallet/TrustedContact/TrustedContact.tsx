@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-useless-escape */
 /* eslint-disable class-methods-use-this */
 import React from 'react';

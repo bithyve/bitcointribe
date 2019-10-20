@@ -1,8 +1,9 @@
 // TODO: Custome Pages
+import SQLite from 'react-native-sqlite-storage';
 import { localDB } from '../../constants/Constants';
 import Singleton from '../../constants/Singleton';
+// eslint-disable-next-line import/extensions
 import '../../../assets/static/js/sugar.js';
-import SQLite from 'react-native-sqlite-storage';
 
 // TODO: Json Files
 import accountTypeData from '../../../assets/jsonfiles/tblAccountType/tblAccountType.json';
@@ -14,25 +15,25 @@ const getPasscode = () => {
   return commonData.getPasscode();
 };
 
-errorCB = err => {
-  // console.log( "SQL Error: " + err );
-};
+// errorCB = err => {
+//   // console.log( "SQL Error: " + err );
+// };
 
-successCB = () => {
-  // console.log( "SQL executed fine" );
-};
+// successCB = () => {
+//   // console.log( "SQL executed fine" );
+// };
 
-openCB = () => {
-  // console.log( "Database OPENED" );
-};
+// openCB = () => {
+//   // console.log( "Database OPENED" );
+// };
 
 const db = SQLite.openDatabase(
   localDB.dbName,
   '1.0',
   'HexaWallet Database',
   200000,
-  this.openCB(),
-  this.errorCB(),
+  // this.openCB(),
+  // this.errorCB(),
 );
 // TODO: Select All Table Data
 const readTablesData = (tableName: any) => {
@@ -46,7 +47,7 @@ const readTablesData = (tableName: any) => {
           for (let i = 0; i < len; i++) {
             const data = results.rows.item(i);
             if (tableName == 'tblWallet') {
-              data.id = data.id;
+              // data.id = data.id;
               data.address = utils.decrypt(data.address, passcode);
               data.privateKey = utils.decrypt(data.privateKey, passcode);
               data.mnemonic = utils.decrypt(data.mnemonic, passcode);
@@ -65,7 +66,7 @@ const readTablesData = (tableName: any) => {
               );
               temp.push(data);
             } else if (tableName == 'tblAccount') {
-              data.id = data.id;
+              // data.id = data.id;
               data.dateCreated = utils.decrypt(data.dateCreated, passcode);
               data.address = utils.decrypt(data.address, passcode);
               data.balance = utils.decrypt(data.balance, passcode);
@@ -76,11 +77,11 @@ const readTablesData = (tableName: any) => {
                 data.additionalInfo,
                 passcode,
               );
-              data.isActive = data.isActive;
+              // data.isActive = data.isActive;
               data.lastUpdated = utils.decrypt(data.lastUpdated, passcode);
               temp.push(data);
             } else if (tableName == 'tblSSSDetails') {
-              data.id = data.id;
+              // data.id = data.id;
               data.dateCreated = utils.decrypt(data.dateCreated, passcode);
               data.share = utils.decrypt(data.share, passcode);
               data.shareId = utils.decrypt(data.shareId, passcode);
@@ -109,7 +110,7 @@ const readTablesData = (tableName: any) => {
               data.type = utils.decrypt(data.type, passcode);
               temp.push(data);
             } else if (tableName == 'tblTransaction') {
-              data.id = data.id;
+              // data.id = data.id;
               data.dateCreated = utils.decrypt(data.dateCreated, passcode);
               data.accountType = utils.decrypt(data.accountType, passcode);
               data.amount = utils.decrypt(data.amount, passcode);
@@ -130,7 +131,7 @@ const readTablesData = (tableName: any) => {
               data.lastUpdated = utils.decrypt(data.lastUpdated, passcode);
               temp.push(data);
             } else if (tableName == 'tblTrustedPartySSSDetails') {
-              data.id = data.id;
+              // data.id = data.id;
               data.dateCreated = utils.decrypt(data.dateCreated, passcode);
               data.keeperInfo = utils.decrypt(data.keeperInfo, passcode);
               data.urlScript = utils.decrypt(data.urlScript, passcode);
@@ -182,7 +183,7 @@ const readAccountTablesData = (tableName: string) => {
             if (len > 0) {
               for (let i = 0; i < len; i++) {
                 const data = results.rows.item(i);
-                data.id = data.id;
+                // data.id = data.id;
                 data.dateCreated = utils.decrypt(data.dateCreated, passcode);
                 data.lastUpdated = utils.decrypt(data.lastUpdated, passcode);
                 data.accountName = utils.decrypt(data.accountName, passcode);
@@ -240,23 +241,26 @@ const readTableAcccountType = async (
                     passcode,
                   );
                   if (data2.name == 'Secure') {
-                    for (var i = 0; i < temp.length; i++)
+                    for (let i = 0; i < temp.length; i++) {
                       if (temp[i].name === 'Secure') {
                         temp.splice(i, 1);
                         break;
                       }
+                    }
                   } else if (data2.name == 'Vault') {
-                    for (var i = 0; i < temp.length; i++)
+                    for (let i = 0; i < temp.length; i++) {
                       if (temp[i].name === 'Vault') {
                         temp.splice(i, 1);
                         break;
                       }
+                    }
                   } else if (data2.name == 'Joint') {
-                    for (var i = 0; i < temp.length; i++)
+                    for (let i = 0; i < temp.length; i++) {
                       if (temp[i].name === 'Joint') {
                         temp.splice(i, 1);
                         break;
                       }
+                    }
                   }
                 }
               }
@@ -852,7 +856,7 @@ const readSSSTableData = (tableName: any, recordID: string) => {
             // console.log( { dbdecryptrecordID } );
             if (dbdecryptrecordID == recordID) {
               const data = results.rows.item(i);
-              data.id = data.id;
+              // data.id = data.id;
               data.share = utils.decrypt(data.share, passcode);
               data.shareId = utils.decrypt(data.shareId, passcode);
               data.keeperInfo = utils.decrypt(data.keeperInfo, passcode);
@@ -877,6 +881,7 @@ const readSSSTableData = (tableName: any, recordID: string) => {
 const insertSSSShareDetails = (tblName: string, temp: any) => {
   const passcode = getPasscode();
   return new Promise((resolve, reject) => {
+    // eslint-disable-next-line no-param-reassign
     temp = temp[0];
     const histroy = [];
     const data = {};

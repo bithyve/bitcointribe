@@ -1,3 +1,4 @@
+/* eslint-disable */
 import config from '../../Config';
 import RegularAccount from '../../services/accounts/RegularAccount';
 
