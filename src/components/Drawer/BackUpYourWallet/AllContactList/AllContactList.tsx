@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import React from 'react';
 import {
   StyleSheet,
@@ -52,7 +53,7 @@ export default class AllContactList extends React.Component<any, any> {
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     Contacts.getAll((err, contacts) => {
       if (err) {
         throw err;
@@ -82,6 +83,7 @@ export default class AllContactList extends React.Component<any, any> {
           }
         }
       }
+      return this.state.SelectedFakeContactList.push(item);
     });
     const seletedLength = this.state.SelectedFakeContactList.length;
     // console.log( { seletedLength } );
@@ -165,14 +167,14 @@ export default class AllContactList extends React.Component<any, any> {
     // console.log( { item } );
     const arr_SelectedItem = this.state.SelectedFakeContactList;
     const arr_FullArrayList = this.state.data;
-    for (var i = 0; i < arr_SelectedItem.length; i++) {
+    for (let i = 0; i < arr_SelectedItem.length; i++) {
       if (arr_SelectedItem[i].recordID === item.recordID) {
         arr_SelectedItem.splice(i, 1);
         // console.log( arr_FullArrayList[ i ] );
         break;
       }
     }
-    for (var i = 0; i < arr_FullArrayList.length; i++) {
+    for (let i = 0; i < arr_FullArrayList.length; i++) {
       if (arr_FullArrayList[i].recordID === item.recordID) {
         const data = arr_FullArrayList[i];
         data.check = false;
@@ -449,30 +451,6 @@ const darkGrey = '#bdc3c7';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  viewPagination: {
-    flex: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 30,
-    marginRight: 30,
-  },
-  viewInputFiled: {
-    flex: 3,
-    alignItems: 'center',
-    margin: 10,
-  },
-  itemInputWalletName: {
-    borderWidth: 0,
-    borderRadius: 10,
-    shadowOffset: { width: 2, height: 2 },
-    shadowColor: 'gray',
-    shadowOpacity: 0.3,
-    backgroundColor: '#FFFFFF',
-  },
-  viewProcedBtn: {
-    flex: 2,
-    justifyContent: 'flex-end',
   },
   btnNext: {
     position: 'absolute',

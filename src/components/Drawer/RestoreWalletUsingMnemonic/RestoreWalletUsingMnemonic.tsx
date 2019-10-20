@@ -29,15 +29,15 @@ export default class RestoreWalletUsingMnemonic extends Component {
     };
   }
 
-  componentDidMount() {
-    // this.setState( {
-    //     arr_ModelWalletName: [
-    //         {
-    //             modalVisible: true
-    //         }
-    //     ]
-    // } )
-  }
+  // componentDidMount() {
+  //   // this.setState( {
+  //   //     arr_ModelWalletName: [
+  //   //         {
+  //   //             modalVisible: true
+  //   //         }
+  //   //     ]
+  //   // } )
+  // }
 
   // //TODO: func click_getWalletDetails
   // getWalletDetails = async ( mnemonic: string, bal: any ) => {
@@ -208,21 +208,5 @@ let styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'rgba(252,252,252,1)',
-  },
-  viewSetupWallet: {
-    flex: 4,
-    margin: 10,
-  },
-  viewAppLogo: {
-    marginTop: 20,
-    flex: 1,
-    alignItems: 'center',
-  },
-  imgAppLogo: {
-    height: 70,
-    width: 70,
-  },
-  txtWhiteColor: {
-    color: '#ffffff',
   },
 });

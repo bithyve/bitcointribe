@@ -1,3 +1,5 @@
+/* eslint-disable prefer-const */
+/* eslint-disable class-methods-use-this */
 import React from 'react';
 import {
   StyleSheet,
@@ -68,7 +70,7 @@ export default class SendPayment extends React.Component<any, any> {
     };
   }
 
-  componentWillMount = async () => {
+  UNSAFE_componentWillMount = async () => {
     // class value reset
     const { navigation } = this.props;
     const data = navigation.getParam('data');

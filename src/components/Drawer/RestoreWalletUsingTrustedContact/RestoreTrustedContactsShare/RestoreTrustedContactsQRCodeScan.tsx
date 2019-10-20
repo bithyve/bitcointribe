@@ -38,7 +38,7 @@ export default class RestoreTrustedContactsQRCodeScan extends React.Component {
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const data = this.props.navigation.getParam('data');
     this.setState({
       data,

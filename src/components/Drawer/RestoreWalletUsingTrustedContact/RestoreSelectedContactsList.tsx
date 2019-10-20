@@ -1,3 +1,5 @@
+/* eslint-disable prefer-destructuring */
+/* eslint-disable no-await-in-loop */
 import React from 'react';
 import {
   StyleSheet,
@@ -91,7 +93,7 @@ export default class RestoreSelectedContactsList extends React.Component<
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     this.willFocusSubscription = this.props.navigation.addListener(
       'willFocus',
       () => {
@@ -832,33 +834,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8F8F8',
-  },
-  viewTrustedContacts: {
-    flex: 1,
-  },
-  viewMnemonic: {
-    flex: 1,
-  },
-  viewSecretQuestion: {
-    flex: 1,
-  },
-  view2FactorAuto: {
-    flex: 1,
-  },
-  itemInputWalletName: {
-    borderWidth: 0,
-    borderRadius: 10,
-    shadowOffset: { width: 2, height: 2 },
-    shadowColor: 'gray',
-    shadowOpacity: 0.3,
-    backgroundColor: '#FFFFFF',
-  },
-  // botom model
-  modal: {
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-  },
-  modal4: {
-    height: 180,
   },
 });

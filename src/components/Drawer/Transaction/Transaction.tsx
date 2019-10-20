@@ -58,7 +58,7 @@ export default class Transaction extends React.Component<any, any> {
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const data = this.props.navigation.getParam('data');
     const walletDetails = this.props.navigation.getParam('walletDetails');
     const appHealthInfo = JSON.parse(walletDetails.appHealthStatus);
@@ -517,21 +517,5 @@ const styles = StyleSheet.create({
     shadowColor: '#000000',
     shadowOpacity: 0.1,
     shadowRadius: 20,
-  },
-  filterView: {
-    flexDirection: 'row',
-    padding: 5,
-    borderColor: '#D0D0D0',
-    borderWidth: 0.5,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  subTitleText: {
-    color: '#B7B7B7',
-    textAlign: 'center',
-    fontWeight: '600',
-    fontSize: 15,
-    paddingVertical: 10,
   },
 });

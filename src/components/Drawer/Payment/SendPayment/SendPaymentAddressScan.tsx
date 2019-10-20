@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import React from 'react';
 import { ImageBackground, StyleSheet, SafeAreaView } from 'react-native';
 import { Container, Text } from 'native-base';
@@ -22,11 +23,7 @@ const bitcoinClassState = require('hexaClassState');
 let flagGoback = true;
 
 export default class SendPaymentAddressScan extends React.Component {
-  constructor(props: any) {
-    super(props);
-  }
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     flagGoback = true;
   }
 

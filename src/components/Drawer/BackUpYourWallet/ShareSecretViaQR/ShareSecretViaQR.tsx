@@ -33,7 +33,7 @@ export default class ShareSecretViaQR extends React.Component<any, any> {
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     const walletDetails = utils.getWalletDetails();
     const data = this.props.navigation.getParam('data');
     // console.log( { data } );

@@ -22,6 +22,7 @@ export default class BackupWalletMnemonic6 extends React.Component<any, any> {
 
   // TODO: func click_Proceed
   async click_Next() {
+    const temp = this.props.data;
     window.EventBus.trigger('swipeNext', 'optional event info');
   }
 

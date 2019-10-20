@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 import React from 'react';
 import {
   StyleSheet,
@@ -55,7 +56,7 @@ export default class ConfirmAndSendPayment extends React.Component<any, any> {
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     let data = this.props.navigation.getParam('data');
     // console.log( { selectedAccount: data } );
     data = data[0];

@@ -93,6 +93,7 @@ module.exports = {
         peerDependencies: false,
       },
     ],
+    'class-methods-use-this': 1,
     'no-restricted-syntax': 1,
     'no-plusplus': 1,
     'react-native/no-unused-styles': 2,

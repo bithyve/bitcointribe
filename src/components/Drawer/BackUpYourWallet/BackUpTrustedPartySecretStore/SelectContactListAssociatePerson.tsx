@@ -59,7 +59,7 @@ export default class SelectContactListAssociatePerson extends React.Component<
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     Contacts.getAll((err, contacts) => {
       if (err) {
         throw err;
@@ -369,39 +369,6 @@ export default class SelectContactListAssociatePerson extends React.Component<
 const darkGrey = '#bdc3c7';
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  viewPagination: {
-    flex: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 30,
-    marginRight: 30,
-  },
-  viewInputFiled: {
-    flex: 3,
-    alignItems: 'center',
-    margin: 10,
-  },
-  itemInputWalletName: {
-    borderWidth: 0,
-    borderRadius: 10,
-    shadowOffset: { width: 2, height: 2 },
-    shadowColor: 'gray',
-    shadowOpacity: 0.3,
-    backgroundColor: '#FFFFFF',
-  },
-  viewProcedBtn: {
-    flex: 2,
-    justifyContent: 'flex-end',
-  },
-  btnNext: {
-    position: 'absolute',
-    bottom: 10,
-    width: '100%',
-  },
-  // Grid View Selected
-  gridSelectedList: {
     flex: 1,
   },
 });

@@ -1,3 +1,3 @@
 import RestoreWalletUsingMnemonic from './RestoreWalletUsingMnemonic';
 
-export { RestoreWalletUsingMnemonic };
+export default { RestoreWalletUsingMnemonic };

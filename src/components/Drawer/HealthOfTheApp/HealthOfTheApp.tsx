@@ -1,3 +1,6 @@
+/* eslint-disable class-methods-use-this */
+/* eslint-disable prefer-destructuring */
+/* eslint-disable no-await-in-loop */
 import React from 'react';
 import {
   StyleSheet,
@@ -140,7 +143,7 @@ export default class HealthOfTheApp extends React.Component<any, any> {
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     this.willFocusSubscription = this.props.navigation.addListener(
       'willFocus',
       () => {
@@ -280,6 +283,7 @@ export default class HealthOfTheApp extends React.Component<any, any> {
     }
   };
 
+  // eslint-disable-next-line class-methods-use-this
   getActionTrustedCont(backupType: string, decryptedShare: string) {
     if (backupType != 'new' && decryptedShare == '') {
       return true;
@@ -357,6 +361,7 @@ export default class HealthOfTheApp extends React.Component<any, any> {
     data.icon = 'timelockNew';
     data.title = 'Secret Question';
     data.subTitle = this.getQuestonHealth(appHealthStatus.qaStatus)[0];
+    // eslint-disable-next-line prefer-destructuring
     data.color = this.getQuestonHealth(appHealthStatus.qaStatus)[1];
     data.walletDetails = walletDetails;
     return [data];
@@ -378,6 +383,7 @@ export default class HealthOfTheApp extends React.Component<any, any> {
           sssDetails[i],
           backupType,
         );
+        // eslint-disable-next-line prefer-destructuring
         arr_TrustedContacts[0] = data[0];
       } else if (
         sssDetails[i].type === 'Trusted Contacts 2' &&
@@ -1540,26 +1546,7 @@ const styles = StyleSheet.create({
   viewMnemonic: {
     flex: 1,
   },
-  viewSecretQuestion: {
-    flex: 1,
-  },
   view2FactorAuto: {
     flex: 1,
-  },
-  itemInputWalletName: {
-    borderWidth: 0,
-    borderRadius: 10,
-    shadowOffset: { width: 2, height: 2 },
-    shadowColor: 'gray',
-    shadowOpacity: 0.3,
-    backgroundColor: '#FFFFFF',
-  },
-  // botom model
-  modal: {
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-  },
-  modal4: {
-    height: 180,
   },
 });

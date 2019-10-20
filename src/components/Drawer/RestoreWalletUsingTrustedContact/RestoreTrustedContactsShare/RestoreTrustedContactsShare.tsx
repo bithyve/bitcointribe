@@ -51,7 +51,7 @@ export default class RestoreTrustedContactsShare extends React.Component<
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     const data = this.props.navigation.getParam('data');
     const title = this.props.navigation.getParam('title');
     console.log({ data });

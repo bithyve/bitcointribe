@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import React from 'react';
 import { ImageBackground, StyleSheet, SafeAreaView } from 'react-native';
 import { Container, Text } from 'native-base';
@@ -25,7 +26,7 @@ export default class ConfirmSelfShareQRScanner extends React.Component {
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     this.willFocusSubscription = this.props.navigation.addListener(
       'willFocus',
       () => {
