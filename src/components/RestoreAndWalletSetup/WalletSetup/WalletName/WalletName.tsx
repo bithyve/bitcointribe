@@ -159,9 +159,9 @@ export default class WalletName extends React.Component<any, any> {
               ]}
               numberOfLines={3}
             >
-              We don't store this information. This is so that your contacts can
-              recognize the sender when they get a request or message from the
-              hexa app.
+              We do not store this information. This is so that your contacts
+              can recognize the sender when they get a request or message from
+              the hexa app.
             </Text>
             <FullLinearGradientButton
               title="Proceed"

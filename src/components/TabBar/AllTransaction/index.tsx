@@ -1,3 +1,3 @@
 import AllTransaction from './AllTransaction';
 
-export { AllTransaction };
+export default { AllTransaction };
