@@ -13,6 +13,7 @@ const styles = StyleSheet.create({
   },
 });
 
+// eslint-disable-next-line import/prefer-default-export
 export const validationService = {
   onInputChange,
   getInputValidationState,

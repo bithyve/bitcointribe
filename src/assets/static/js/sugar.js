@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 /*
  *  Sugar v2.0.4
  *
@@ -2170,6 +2172,7 @@
   function getRegExpFlags(reg, add) {
     let flags = '';
     add = add || '';
+
     function checkFlag(prop, flag) {
       if (prop || add.indexOf(flag) > -1) {
         flags += flag;
@@ -4087,7 +4090,11 @@
     options = getDateOptions(opt);
 
     function getDateOptions(opt) {
-      const options = isString(opt) ? { locale: opt } : opt || {};
+      const options = isString(opt)
+        ? {
+            locale: opt,
+          }
+        : opt || {};
       options.prefer =
         +!!getOwn(options, 'future') - +!!getOwn(options, 'past');
 
@@ -4315,7 +4322,13 @@
           setOrdinalWeekday(num);
           num = 1;
         } else {
-          updateDate(date, { weekday: set.weekday }, true);
+          updateDate(
+            date,
+            {
+              weekday: set.weekday,
+            },
+            true,
+          );
           delete set.weekday;
         }
       }
@@ -4619,7 +4632,9 @@
 
     if (isNumber(params) && advance) {
       // If param is a number and advancing, the number is in milliseconds.
-      params = { millisecond: params };
+      params = {
+        millisecond: params,
+      };
     } else if (isNumber(params)) {
       // Otherwise just set the timestamp and return.
       d.setTime(params);
@@ -6710,20 +6725,76 @@
     future: '{num} {unit} {sign}',
     duration: '{num} {unit}',
     modifiers: [
-      { name: 'half', src: 'half', value: 0.5 },
-      { name: 'midday', src: 'noon', value: 12 },
-      { name: 'midday', src: 'midnight', value: 24 },
-      { name: 'day', src: 'yesterday', value: -1 },
-      { name: 'day', src: 'today|tonight', value: 0 },
-      { name: 'day', src: 'tomorrow', value: 1 },
-      { name: 'sign', src: 'ago|before', value: -1 },
-      { name: 'sign', src: 'from now|after|from|in|later', value: 1 },
-      { name: 'edge', src: 'first day|first|beginning', value: -2 },
-      { name: 'edge', src: 'last day', value: 1 },
-      { name: 'edge', src: 'end|last', value: 2 },
-      { name: 'shift', src: 'last', value: -1 },
-      { name: 'shift', src: 'the|this', value: 0 },
-      { name: 'shift', src: 'next', value: 1 },
+      {
+        name: 'half',
+        src: 'half',
+        value: 0.5,
+      },
+      {
+        name: 'midday',
+        src: 'noon',
+        value: 12,
+      },
+      {
+        name: 'midday',
+        src: 'midnight',
+        value: 24,
+      },
+      {
+        name: 'day',
+        src: 'yesterday',
+        value: -1,
+      },
+      {
+        name: 'day',
+        src: 'today|tonight',
+        value: 0,
+      },
+      {
+        name: 'day',
+        src: 'tomorrow',
+        value: 1,
+      },
+      {
+        name: 'sign',
+        src: 'ago|before',
+        value: -1,
+      },
+      {
+        name: 'sign',
+        src: 'from now|after|from|in|later',
+        value: 1,
+      },
+      {
+        name: 'edge',
+        src: 'first day|first|beginning',
+        value: -2,
+      },
+      {
+        name: 'edge',
+        src: 'last day',
+        value: 1,
+      },
+      {
+        name: 'edge',
+        src: 'end|last',
+        value: 2,
+      },
+      {
+        name: 'shift',
+        src: 'last',
+        value: -1,
+      },
+      {
+        name: 'shift',
+        src: 'the|this',
+        value: 0,
+      },
+      {
+        name: 'shift',
+        src: 'next',
+        value: 1,
+      },
     ],
     parse: [
       '(?:just)? now',
@@ -10039,6 +10110,7 @@
       return subtract ? obj1 : {};
     }
     obj2 = coercePrimitiveToObject(obj2);
+
     function resolve(key, val, val1) {
       const exists = key in obj2 && isEqual(val1, obj2[key]);
       if (exists !== subtract) {
@@ -12965,6 +13037,7 @@
         execute();
       });
     };
+
     function lazy() {
       // If the execution has locked and it's immediate, then
       // allow 1 less in the queue as 1 call has already taken place.

@@ -543,6 +543,7 @@ const TabNavigator = createBottomTabNavigator(
 
 // TODO: RootNavigator
 // TODO: RootNavigator:createRootNavigator
+// eslint-disable-next-line import/prefer-default-export
 export const createRootNavigator = (
   signedIn = false,
   screenName = 'Passcode',

@@ -96,6 +96,8 @@ module.exports = {
     'class-methods-use-this': 1,
     'no-restricted-syntax': 1,
     'no-plusplus': 1,
+    'prefer-spread': 1,
+    'prefer-destructuring': 1,
     'react-native/no-unused-styles': 2,
     'react-native/split-platform-components': 2,
     'react-native/no-inline-styles': 1,
