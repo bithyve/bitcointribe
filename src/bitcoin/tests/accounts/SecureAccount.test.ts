@@ -1,10 +1,11 @@
-import bip39 from "bip39";
-import crypto from "crypto";
-import authenticator from "otplib/authenticator";
-import config from "../../Config";
-import SecureAccount from "../../services/accounts/SecureAccount";
+/* eslint-disable */
+import bip39 from 'bip39';
+import crypto from 'crypto';
+import authenticator from 'otplib/authenticator';
+import config from '../../Config';
+import SecureAccount from '../../services/accounts/SecureAccount';
 
-describe("Secure Account", () => {
+describe('Secure Account', () => {
   let secureAccount: SecureAccount;
 
   beforeAll(async () => {
@@ -14,7 +15,7 @@ describe("Secure Account", () => {
     authenticator.options = { crypto };
   });
 
-  test("generates the required assets and sets up the secure account", async () => {
+  test('generates the required assets and sets up the secure account', async () => {
     const res = await secureAccount.setupSecureAccount();
     expect(res.status).toBe(config.STATUS.SUCCESS);
 
@@ -23,10 +24,10 @@ describe("Secure Account", () => {
     expect(setupData.secret).toBeTruthy();
   });
 
-  test("checks the health of the secureAccount", async () => {
+  test('checks the health of the secureAccount', async () => {
     const dummyMnemonic =
-      "horn middle issue story near liar captain version where speed bubble goose obvious member ski first rebuild palace spy royal segment river defy travel";
-    const dummyTwoFASecret = "OZRDQOBUGBYEYMTIJQ3WINLBGM2XA5CG";
+      'horn middle issue story near liar captain version where speed bubble goose obvious member ski first rebuild palace spy royal segment river defy travel';
+    const dummyTwoFASecret = 'OZRDQOBUGBYEYMTIJQ3WINLBGM2XA5CG';
     let dummyChunk;
     const dummyPOS = 1;
 
@@ -45,12 +46,12 @@ describe("Secure Account", () => {
     expect(res.data.isValid).toBe(true);
   });
 
-  test("imports secure account", async () => {
+  test('imports secure account', async () => {
     const dummyMnemonic =
-      "horn middle issue story near liar captain version where speed bubble goose obvious member ski first rebuild palace spy royal segment river defy travel";
+      'horn middle issue story near liar captain version where speed bubble goose obvious member ski first rebuild palace spy royal segment river defy travel';
     const dummySecondaryXpub =
-      "tpubDDGFLSXWA8K2z1fmg37ivgFmQC5xBMcEycBD5pmYuzpM1GyeoeTeykZxFFcQpVVGvv6scShvtCfRkf59tzJzwoL44VMRR78RywTU46TvCrJ";
-    const dummyTwoFASecret = "OZRDQOBUGBYEYMTIJQ3WINLBGM2XA5CG";
+      'tpubDDGFLSXWA8K2z1fmg37ivgFmQC5xBMcEycBD5pmYuzpM1GyeoeTeykZxFFcQpVVGvv6scShvtCfRkf59tzJzwoL44VMRR78RywTU46TvCrJ';
+    const dummyTwoFASecret = 'OZRDQOBUGBYEYMTIJQ3WINLBGM2XA5CG';
 
     const secureHDAccount = new SecureAccount(dummyMnemonic);
     const dummyToken = authenticator.generate(dummyTwoFASecret);
@@ -68,9 +69,9 @@ describe("Secure Account", () => {
     expect(res.data.address).toBeTruthy();
   });
 
-  test("serialize and deserialize (stringification) secure account obj (state preservation test)", () => {
+  test('serialize and deserialize (stringification) secure account obj (state preservation test)', () => {
     const primaryMnemonic: string =
-      "horn middle issue story near liar captain version where speed bubble goose obvious member ski first rebuild palace spy royal segment river defy travel";
+      'horn middle issue story near liar captain version where speed bubble goose obvious member ski first rebuild palace spy royal segment river defy travel';
     const unserializedSecureAccount = new SecureAccount(primaryMnemonic);
     const initRes = unserializedSecureAccount.getRecoveryMnemonic();
     console.log({ mnemonic: initRes.data.secondaryMnemonic });
@@ -84,36 +85,36 @@ describe("Secure Account", () => {
     );
   });
 
-  test("checks whether the secure account has been activated (setup validation: completed)", async () => {
+  test('checks whether the secure account has been activated (setup validation: completed)', async () => {
     const dummyMnemonic =
-      "horn middle issue story near liar captain version where speed bubble goose obvious member ski first rebuild palace spy royal segment river defy travel";
+      'horn middle issue story near liar captain version where speed bubble goose obvious member ski first rebuild palace spy royal segment river defy travel';
     const secureHDAccount = new SecureAccount(dummyMnemonic);
     const { status, data } = await secureHDAccount.isActive();
     expect(status).toBe(config.STATUS.SUCCESS);
     expect(data.isActive).toBe(true);
   });
 
-  test("funds the wallet w/ random number of testcoins", async () => {
+  test('funds the wallet w/ random number of testcoins', async () => {
     const res = await secureAccount.getTestcoins();
     expect(res.status).toBe(config.STATUS.SUCCESS);
     expect(res.data.funded).toBe(true);
     expect(res.data.txid).toBeTruthy();
   });
 
-  test("transacts from a (pre-funded) secure account (multi-stage)", async () => {
+  test('transacts from a (pre-funded) secure account (multi-stage)', async () => {
     const dummyMnemonic =
-      "six sort kangaroo special couch fabric dream tuition process sail dutch quarter impact gauge era maple during section width young certain engage collect ahead";
-    const dummySecret = "GZFXQUJSKI4GMNSLMN3VIK3SKBSU64KV";
+      'six sort kangaroo special couch fabric dream tuition process sail dutch quarter impact gauge era maple during section width young certain engage collect ahead';
+    const dummySecret = 'GZFXQUJSKI4GMNSLMN3VIK3SKBSU64KV';
     const dummySecondaryXpub =
-      "tpubDDGFLSXWA8K2z1fmg37ivgFmQC5xBMcEycBD5pmYuzpM1GyeoeTeykZxFFcQpVVGvv6scShvtCfRkf59tzJzwoL44VMRR78RywTU46TvCrJ";
+      'tpubDDGFLSXWA8K2z1fmg37ivgFmQC5xBMcEycBD5pmYuzpM1GyeoeTeykZxFFcQpVVGvv6scShvtCfRkf59tzJzwoL44VMRR78RywTU46TvCrJ';
     // const dummyBHXpub =
     //   "tpubDHmUoBnFtKNcX4tD21HJXCKS1HPZTAZpYVuCvQtuPHzghwpWUwGQuLDURiWt77BsQnnhhRqXwDwJL3SiRQxudegC73FSLHRHXoCu2tAKoHG";
     const dummyToken = authenticator.generate(dummySecret);
 
     const transfer = {
-      recipientAddress: "2N1TSArdd2pt9RoqE3LXY55ixpRE9e5aot8",
+      recipientAddress: '2N1TSArdd2pt9RoqE3LXY55ixpRE9e5aot8',
       amount: 3500,
-      priority: "High",
+      priority: 'High',
     };
 
     const secureHDAccount = new SecureAccount(dummyMnemonic);
@@ -137,7 +138,7 @@ describe("Secure Account", () => {
     const { txHex, childIndexArray } = transferST2.data;
 
     const token = authenticator.generate(dummySecret);
-    console.log("Executing Transfer");
+    console.log('Executing Transfer');
     const transferST3 = await secureHDAccount.transferST3(
       token,
       txHex,

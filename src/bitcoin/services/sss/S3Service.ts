@@ -1,10 +1,11 @@
-import config from "../../Config";
+/* eslint-disable no-unused-vars */
+import config from '../../Config';
 import {
   IBuddyStaticNonPMDD,
   IMetaShare,
   ISocialStaticNonPMDD,
-} from "../../utilities/sss/Interface";
-import SSS from "../../utilities/sss/SSS";
+} from '../../utilities/sss/Interface';
+import SSS from '../../utilities/sss/SSS';
 
 export default class S3Service {
   public static fromJSON = (json: string) => {
@@ -18,7 +19,7 @@ export default class S3Service {
     } = sss;
 
     return new S3Service(mnemonic, encryptedShares);
-  }
+  };
 
   public static recoverFromShares = (
     encryptedShares: string[],
@@ -43,7 +44,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public static downloadShare = async (
     key: string,
@@ -69,7 +70,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public static decryptEncMetaShare = async (
     encryptedMetaShare: string,
@@ -102,7 +103,7 @@ export default class S3Service {
         const messageId = SSS.getMessageId(key, config.MSG_ID_LENGTH);
         const { deleted } = await SSS.affirmDecryption(messageId);
         if (!deleted) {
-          throw new Error("Unable to remove the share from the server");
+          throw new Error('Unable to remove the share from the server');
         } else {
           return {
             status: config.STATUS.SUCCESS,
@@ -113,7 +114,8 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+    return { status: config.STATUS.ERROR, err: 'not defined' };
+  };
 
   public static decryptViaOTP = (
     otpEncryptedData: string,
@@ -139,7 +141,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public static recoverMetaShareFromQR = (
     qrData: string[],
@@ -164,7 +166,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public static updateHealth = async (
     metaShares: IMetaShare[],
@@ -196,7 +198,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public static getShareId = (
     encryptedShare: string,
@@ -221,7 +223,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public static generateKey = ():
     | {
@@ -244,7 +246,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public static encryptViaOTP = (
     key: string,
@@ -270,9 +272,10 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   private sss: SSS;
+
   constructor(mnemonic: string, encryptedShares?: string[]) {
     this.sss = new SSS(mnemonic, encryptedShares);
   }
@@ -299,7 +302,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public encryptStaticNonPMDD = (
     staticNonPMDD: ISocialStaticNonPMDD | IBuddyStaticNonPMDD,
@@ -327,7 +330,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public getWalletId = ():
     | {
@@ -343,11 +346,14 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-      return { status: config.STATUS.SUCCESS, data: this.sss.getWalletId() };
+      return {
+        status: config.STATUS.SUCCESS,
+        data: this.sss.getWalletId(),
+      };
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public initializeHealthcheck = async (
     encryptedShares: string[],
@@ -371,7 +377,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public checkHealth = async (
     shareIDs: string[],
@@ -400,7 +406,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public updateDynamicNonPMDD = async (
     dynamicNonPMDD: IMetaShare[],
@@ -430,7 +436,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public downloadDynamicNonPMDD = async (
     walletId: string,
@@ -456,7 +462,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public decryptDynamicNonPMDD = async (
     encryptedDynamicNonPMDD: string,
@@ -482,7 +488,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public decryptStaticNonPMDD = async (
     encryptedNonPMDD: string,
@@ -508,7 +514,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public createMetaShare = (
     index: number,
@@ -541,7 +547,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public createQR = async (
     metashare: IMetaShare,
@@ -566,7 +572,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public generateEncryptedMetaShare = (
     metaShare: IMetaShare,
@@ -594,7 +600,7 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 
   public uploadShare = async (
     encryptedMetaShare: string,
@@ -621,5 +627,5 @@ export default class S3Service {
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }
-  }
+  };
 }

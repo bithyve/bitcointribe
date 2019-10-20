@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="58" height="58" viewBox="0 0 58 58">
+  <defs>
+    <filter id="Ellipse_10" x="0" y="0" width="58" height="58" filterUnits="userSpaceOnUse">
+      <feOffset input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="icon_shieldred_mark" transform="translate(-306 -49.074)">
+    <g id="Group_7143" data-name="Group 7143" transform="translate(0 -26)">
+      <g transform="matrix(1, 0, 0, 1, 306, 75.07)" filter="url(#Ellipse_10)">
+        <circle id="Ellipse_10-2" data-name="Ellipse 10" cx="20" cy="20" r="20" transform="translate(9 9)" fill="#fff"/>
+      </g>
+    </g>
+    <g id="Group_7295" data-name="Group 7295" transform="translate(-2.171 4.337)">
+      <path id="icon_sheild_background" d="M55,5.021A4.187,4.187,0,0,1,50.863.828.82.82,0,0,0,50.035,0H36.793a.82.82,0,0,0-.828.828,4.187,4.187,0,0,1-4.138,4.193A.82.82,0,0,0,31,5.849v6.157C31,22.782,40.8,28.25,43.414,28.25c3.029,0,12.414-5.849,12.414-16.244V5.849A.82.82,0,0,0,55,5.021Z" transform="translate(293.501 60.014)" fill="#f36e59"/>
+      <path id="Path_5640" data-name="Path 5640" d="M268.414,5.849v6.157c0,10.4-9.385,16.244-12.414,16.244V0h6.621a.82.82,0,0,1,.828.828,4.187,4.187,0,0,0,4.138,4.193A.82.82,0,0,1,268.414,5.849Z" transform="translate(81.031 60.014)" fill="#d35a4f"/>
+      <g id="Group_9969" data-name="Group 9969" transform="translate(387.923 -227.482)">
+        <path id="Path_7294" data-name="Path 7294" d="M-51.03,296a.978.978,0,0,0-.969.976v4.444a.978.978,0,0,0,.972.972.98.98,0,0,0,.973-.976v-4.443A.98.98,0,0,0-51.03,296Z" transform="translate(0 1)" fill="#fff"/>
+        <path id="Path_7295" data-name="Path 7295" d="M-52,311.825a.978.978,0,0,0,.972.971.981.981,0,0,0,.973-.974.981.981,0,0,0-.975-.971A.979.979,0,0,0-52,311.825Z" transform="translate(0 -6.047)" fill="#fff"/>
+      </g>
+    </g>
+  </g>
+</svg>
