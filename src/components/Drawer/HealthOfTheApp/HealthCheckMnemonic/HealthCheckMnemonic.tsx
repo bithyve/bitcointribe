@@ -26,7 +26,7 @@ export default class HealthCheckMnemonic extends Component {
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const data = this.props.navigation.getParam('data');
     setTimeout(() => {
       this.setState({
@@ -179,21 +179,5 @@ let styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1F8BCD',
-  },
-  viewSetupWallet: {
-    flex: 4,
-    margin: 10,
-  },
-  viewAppLogo: {
-    marginTop: 20,
-    flex: 1,
-    alignItems: 'center',
-  },
-  imgAppLogo: {
-    height: 70,
-    width: 70,
-  },
-  txtWhiteColor: {
-    color: '#ffffff',
   },
 });

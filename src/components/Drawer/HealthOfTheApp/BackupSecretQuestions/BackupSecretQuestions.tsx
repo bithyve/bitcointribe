@@ -25,7 +25,7 @@ export default class BackupSecretQuestions extends Component {
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const data = this.props.navigation.getParam('data');
     // console.log( { data } );
 
@@ -55,6 +55,7 @@ export default class BackupSecretQuestions extends Component {
     JsonData.Question = arr_History[0].Question;
     JsonData.Answer = arr_History[0].Answer;
     const temp = [JsonData];
+    // eslint-disable-next-line prefer-spread
     arr_History.push.apply(arr_History, temp);
     const resUpdateWalletAns = await dbOpration.updateWalletBackedUpSecretQue(
       localDB.tableName.tblWallet,
@@ -145,21 +146,5 @@ let styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1F8BCD',
-  },
-  viewSetupWallet: {
-    flex: 4,
-    margin: 10,
-  },
-  viewAppLogo: {
-    marginTop: 20,
-    flex: 1,
-    alignItems: 'center',
-  },
-  imgAppLogo: {
-    height: 70,
-    width: 70,
-  },
-  txtWhiteColor: {
-    color: '#ffffff',
   },
 });

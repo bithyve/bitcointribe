@@ -1,3 +1,3 @@
 import Transaction from './Transaction';
 
-export { Transaction };
+export default { Transaction };

@@ -31,7 +31,7 @@ export default class QRCodeDisplay extends React.Component<any, any> {
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     const data = this.props.navigation.getParam('data');
     const walletName = this.props.navigation.getParam('walletName');
     const mobileNo = this.props.navigation.getParam('mobileNo');

@@ -285,22 +285,6 @@ let styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  viewPagination: {
-    flex: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 30,
-    marginRight: 30,
-  },
-  viewAppLogo: {
-    flex: 1,
-    alignItems: 'center',
-    marginTop: 50,
-  },
-  imgAppLogo: {
-    height: 150,
-    width: 150,
-  },
   viewPasscode: {
     flex: 1,
     alignItems: 'center',

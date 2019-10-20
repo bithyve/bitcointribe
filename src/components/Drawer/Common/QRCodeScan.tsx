@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import React from 'react';
 import { ImageBackground, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import { Container, Text } from 'native-base';

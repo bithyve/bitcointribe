@@ -1,4 +1,6 @@
+/* eslint-disable react-native/split-platform-components */
 import React, { Component } from 'react';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   StyleSheet,
   View,
@@ -176,21 +178,5 @@ let styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1F8BCD',
-  },
-  viewSetupWallet: {
-    flex: 4,
-    margin: 10,
-  },
-  viewAppLogo: {
-    marginTop: 20,
-    flex: 1,
-    alignItems: 'center',
-  },
-  imgAppLogo: {
-    height: 70,
-    width: 70,
-  },
-  txtWhiteColor: {
-    color: '#ffffff',
   },
 });

@@ -38,7 +38,7 @@ export default class Restore4And5SelfShare extends React.Component<any, any> {
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     const data = this.props.navigation.getParam('data');
     const title = this.props.navigation.getParam('title');
     const type = this.props.navigation.getParam('type');
@@ -231,14 +231,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8F8F8',
-  },
-  // botom model
-  modal: {
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-  },
-  modal4: {
-    height: 180,
   },
   imgAppLogo: {
     width: '90%',

@@ -1,3 +1,5 @@
+/* eslint-disable no-useless-escape */
+/* eslint-disable class-methods-use-this */
 import React from 'react';
 import {
   StyleSheet,
@@ -73,7 +75,7 @@ export default class TrustedContact extends React.Component<any, any> {
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     const data = this.props.navigation.getParam('data');
     console.log({ data });
     // otp history
@@ -117,6 +119,7 @@ export default class TrustedContact extends React.Component<any, any> {
       localDB.tableName.tblSSSDetails,
       data.recordID,
     );
+    // eslint-disable-next-line prefer-destructuring
     resSSSDetails = resSSSDetails.temp[0];
     await utils.setSSSDetailsRecordIDWise(resSSSDetails);
     this.setState({

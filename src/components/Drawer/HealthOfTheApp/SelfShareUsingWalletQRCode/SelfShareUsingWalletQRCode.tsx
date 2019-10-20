@@ -50,7 +50,7 @@ export default class SelfShareUsingWalletQRCode extends React.Component<
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     const data = this.props.navigation.getParam('data');
     // console.log( { data } );
 

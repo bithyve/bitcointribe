@@ -174,7 +174,7 @@ export default class Bitcoin {
           `${MAINNET.BALANCE_CHECK}${address}/balance?token=${config.TOKEN}`,
         );
       } catch (err) {
-        //console.log('Error:', err.response.data);
+        // console.log('Error:', err.response.data);
         return {
           status: err.response.status,
           errorMessage: err.response.data,

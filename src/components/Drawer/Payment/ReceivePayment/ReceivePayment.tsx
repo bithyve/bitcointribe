@@ -69,7 +69,7 @@ export default class ReceivePayment extends React.Component<any, any> {
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     const selectedAccount = this.props.navigation.getParam('selectedAccount');
     const walletDetails = await utils.getWalletDetails();
     // console.log( { walletDetails } );
@@ -224,6 +224,8 @@ export default class ReceivePayment extends React.Component<any, any> {
     // flag
     const { flag_Loading, flag_LoadingShareBtn } = this.state;
     const itemList = arr_AccountList.map((item: any, index: number) => (
+      // eslint-disable-next-line react/jsx-filename-extension
+      // eslint-disable-next-line react/jsx-key
       <Picker.Item label={item.accountName} value={item.accountName} />
     ));
     return (
@@ -277,6 +279,7 @@ export default class ReceivePayment extends React.Component<any, any> {
                               FontFamily.ffFiraSansMedium,
                               { color: '#000' },
                             ]}
+                            // eslint-disable-next-line react-native/no-raw-text
                           >
                             Select Account
                           </Title>

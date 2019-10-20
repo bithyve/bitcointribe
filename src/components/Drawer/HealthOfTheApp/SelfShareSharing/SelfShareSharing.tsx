@@ -57,7 +57,7 @@ export default class SelfShareSharing extends React.Component<any, any> {
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     const data = this.props.navigation.getParam('data');
     const title = this.props.navigation.getParam('title');
     // console.log( { data } );
@@ -174,6 +174,7 @@ export default class SelfShareSharing extends React.Component<any, any> {
   };
 
   // TODO: Re-Share Share
+  // eslint-disable-next-line class-methods-use-this
   click_ReShare(data: any) {
     alert.simpleOk('Oops', 'coming soon');
   }
@@ -223,6 +224,7 @@ export default class SelfShareSharing extends React.Component<any, any> {
     JsonData.title = title;
     JsonData.date = utils.getUnixToDateFormat2();
     const temp = [JsonData];
+    // eslint-disable-next-line prefer-spread
     arr_History.push.apply(arr_History, temp);
 
     // console.log( { arr_History } );
@@ -495,13 +497,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8F8F8',
-  },
-  // botom model
-  modal: {
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-  },
-  modal4: {
-    height: 180,
   },
 });

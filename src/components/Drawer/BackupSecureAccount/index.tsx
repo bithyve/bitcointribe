@@ -1,3 +1,3 @@
 import BackupSecureAccount from './BackupSecureAccount';
 
-export { BackupSecureAccount };
+export default { BackupSecureAccount };
