@@ -41,8 +41,7 @@
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
 }
-  
-     
+
   - (BOOL)application:(UIApplication *)application continueUserActivity:(nonnull NSUserActivity *)userActivity
    restorationHandler:(nonnull void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler
   {
@@ -51,7 +50,6 @@
                        restorationHandler:restorationHandler];
   }
     
-  
 -(BOOL)application:(UIApplication *)application
            openURL:(NSURL *)url
            options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
@@ -65,5 +63,36 @@
     return [RCTLinkingManager application:application openURL:url
                         sourceApplication:sourceApplication annotation:annotation];
   }
+  
+//TODO: remove screen short
+- (void)applicationWillResignActive:(UIApplication *)application {
+    // fill screen with our own colour
+    UIView *colourView = [[UIView alloc]initWithFrame:self.window.frame];
+    colourView.backgroundColor = [UIColor whiteColor];
+    colourView.tag = 1234;
+    colourView.alpha = 0;
+    [self.window addSubview:colourView];
+    [self.window bringSubviewToFront:colourView];
+
+    // fade in the view
+    [UIView animateWithDuration:0.5 animations:^{
+        colourView.alpha = 1;
+    }];
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    
+    // grab a reference to our coloured view
+    UIView *colourView = [self.window viewWithTag:1234];
+
+    // fade away colour view from main view
+    [UIView animateWithDuration:0.5 animations:^{
+        colourView.alpha = 0;
+    } completion:^(BOOL finished) {
+        // remove when finished fading
+        [colourView removeFromSuperview];
+    }];
+}
+
 
 @end

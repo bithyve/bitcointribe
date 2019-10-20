@@ -9,7 +9,19 @@
     "moduleResolution": "node",
     "noEmit": true,
     "strict": true,
-    "target": "esnext"
+    "target": "esnext",
+    "baseUrl": "./",
+    "paths": {
+      "*": ["node_modules/*", "src/bitcoin/*"]
+    }
   },
-  "exclude": ["node_modules", "babel.config.js", "metro.config.js", "jest.config.js"]
+  "exclude": [
+    "node_modules",
+    "babel.config.js",
+    "metro.config.js",
+    "jest.config.js",
+    "__tests__/**/*-test.ts",
+    "src/bitcoin"
+  ],
+  "include": ["node_modules/*", "src/**/*"]
 }
