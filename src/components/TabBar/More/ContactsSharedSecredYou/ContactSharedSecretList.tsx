@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-useless-concat */
 import React from 'react';
 import {
   StyleSheet,
@@ -69,7 +71,7 @@ export default class ContactSharedSecretList extends React.Component<any, any> {
     };
   }
 
-  async componentWillMount(flagModelOpen: boolean) {
+  async UNSAFE_componentWillMount(flagModelOpen: boolean) {
     const resSharedSecretList = await comFunDBRead.readTblTrustedPartySSSDetails();
     console.log({ resSharedSecretList });
     const dateTime = Date.now();
@@ -831,39 +833,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8F8F8',
-  },
-  viewPagination: {
-    flex: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 30,
-    marginRight: 30,
-  },
-  viewInputFiled: {
-    flex: 3,
-    alignItems: 'center',
-    margin: 10,
-  },
-  itemInputWalletName: {
-    borderWidth: 0,
-    borderRadius: 10,
-    shadowOffset: { width: 2, height: 2 },
-    shadowColor: 'gray',
-    shadowOpacity: 0.3,
-    backgroundColor: '#FFFFFF',
-  },
-  viewProcedBtn: {
-    flex: 2,
-    justifyContent: 'flex-end',
-  },
-  btnNext: {
-    position: 'absolute',
-    bottom: 10,
-    width: '100%',
-  },
-  // Grid View Selected
-  gridSelectedList: {
-    flex: 1,
   },
   modal: {
     borderTopLeftRadius: 10,

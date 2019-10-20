@@ -1,3 +1,5 @@
+/* eslint-disable react-native/no-raw-text */
+/* eslint-disable react/jsx-key */
 import React from 'react';
 import { StyleSheet, View, Platform, Dimensions, Alert } from 'react-native';
 import {
@@ -418,7 +420,7 @@ class FirstSecretQuestion extends React.Component<any, any> {
               ]}
               numberOfLines={2}
             >
-              The answer is never stored anywhere and even your contacts don't
+              The answer is never stored anywhere and even your contacts do not
               know this answer{' '}
             </Text>
             <FullLinearGradientButton

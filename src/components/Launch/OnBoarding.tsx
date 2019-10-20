@@ -35,16 +35,16 @@ export default class OnBoarding extends React.Component<any, any> {
     };
   }
 
-  componentWillMount() {
-    try {
-      // PrivacySnapshot.enabled( true );
-      //   this.setState( {
-      //     data: localization( "OnBoarding.onBoarding" )
-      //   } );
-    } catch (error) {
-      Alert.alert(error);
-    }
-  }
+  // componentWillMount() {
+  //   try {
+  //     // PrivacySnapshot.enabled( true );
+  //     //   this.setState( {
+  //     //     data: localization( "OnBoarding.onBoarding" )
+  //     //   } );
+  //   } catch (error) {
+  //     Alert.alert(error);
+  //   }
+  // }
 
   // TODO: func click_Done
   click_Done() {
@@ -153,25 +153,5 @@ export default class OnBoarding extends React.Component<any, any> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  slide: {
-    flex: 1, // Take up all screen
-    justifyContent: 'center', // Center vertically
-    alignItems: 'center', // Center horizontally
-  },
-  // Header styles
-  header: {
-    color: '#000000',
-    fontSize: 30,
-    marginVertical: 15,
-    margin: 20,
-    textAlign: 'center',
-  },
-  // Text below header
-  text: {
-    fontFamily: 'Avenir',
-    fontSize: 18,
-    marginHorizontal: 40,
-    textAlign: 'center',
   },
 });

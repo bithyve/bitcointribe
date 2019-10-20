@@ -62,7 +62,7 @@ export default class TrustedPartySelfShareQRCode extends React.Component<
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     const data = this.props.navigation.getParam('data');
     console.log({ data });
     const decryptedMetaShare = JSON.parse(data.resSharedSecretList.decrShare);

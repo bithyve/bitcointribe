@@ -1,3 +1,7 @@
+/* eslint-disable prefer-destructuring */
+/* eslint-disable no-async-promise-executor */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-undef */
 import React from 'react';
 import {
   View,
@@ -148,11 +152,11 @@ class Wallet extends React.Component {
       flag_Fabactive: false,
       flag_focusedStatusBar: true,
     };
-    isNetwork = utils.getNetwork();
+    const isNetwork = utils.getNetwork();
   }
 
   // TODO: Page Life Cycle
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     try {
       this.willFocusSubscription = this.props.navigation.addListener(
         'willFocus',
@@ -315,12 +319,13 @@ class Wallet extends React.Component {
         data.unit = dataAccount.unit;
         data.indicator = false;
         data.setupData = setupData;
-        if (data.accountType == 'Regular Account')
+        if (data.accountType == 'Regular Account') {
           data.svgIcon =
             Platform.OS == 'ios' ? 'dailyAccountSVG' : 'dailyAccountPNG';
-        else
+        } else {
           data.svgIcon =
             Platform.OS == 'ios' ? 'secureAccountSVG' : 'secureAccountPNG';
+        }
         temp.push(data);
       }
       this.setState({
@@ -669,7 +674,7 @@ class Wallet extends React.Component {
             bhXpub: resSetupSecureAccount.setupData.bhXpub,
           };
           console.log({ socialStaticNonPMDD });
-          var resEncryptSocialStaticNonPMDD = await sss.encryptStaticNonPMDD(
+          let resEncryptSocialStaticNonPMDD = await sss.encryptStaticNonPMDD(
             socialStaticNonPMDD,
           );
           console.log({ shareIds, resEncryptSocialStaticNonPMDD });
@@ -734,7 +739,7 @@ class Wallet extends React.Component {
               );
               console.log({ rescreateMetaShare3 });
               if (rescreateMetaShare3.status == 200) {
-                var qrcode4share = await sss.createQR(
+                let qrcode4share = await sss.createQR(
                   rescreateMetaShare3.data.metaShare,
                   4,
                 );
@@ -1432,8 +1437,9 @@ class Wallet extends React.Component {
       const chunkLength = Math.max(arr.length / n, 1);
       const chunks = [];
       for (let i = 0; i < n; i++) {
-        if (chunkLength * (i + 1) <= arr.length)
+        if (chunkLength * (i + 1) <= arr.length) {
           chunks.push(arr.slice(chunkLength * i, chunkLength * (i + 1)));
+        }
       }
 
       return chunks;
@@ -3025,18 +3031,6 @@ class Wallet extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-  },
-  plusButtonBottom: {
-    position: 'absolute',
-    zIndex: 1,
-  },
-  svgImage: {
-    width: '100%',
-    height: '100%',
   },
 });
 
