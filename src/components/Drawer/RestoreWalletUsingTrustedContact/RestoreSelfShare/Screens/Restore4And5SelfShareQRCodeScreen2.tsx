@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Container, Button, Text } from 'native-base';

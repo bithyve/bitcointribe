@@ -1,3 +1,4 @@
+/* eslint-disable prefer-spread */
 import React from 'react';
 import { StyleSheet, SafeAreaView } from 'react-native';
 import { Container, Tab, Tabs, TabHeading, Icon } from 'native-base';
@@ -47,7 +48,7 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const data = this.props.navigation.getParam('data');
     const type = this.props.navigation.getParam('type');
     console.log({ data, type });
@@ -69,7 +70,6 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
   }
 
   click_Confirm = async (type: string, data: any) => {
-    const dateTime = Date.now();
     const { arr_Shares } = this.state;
     arr_Shares.push.apply(arr_Shares, data);
     console.log({ arr_Shares });
@@ -81,6 +81,7 @@ export default class Restore4And5SelfShareQRCodeScanner extends React.Component 
       console.log({ resRecoverMetaShareFromQR });
       const resInsertContactList = await dbOpration.updateRestoreUsingTrustedContactSelfShare(
         localDB.tableName.tblSSSDetails,
+        // eslint-disable-next-line no-undef
         dateTime,
         resRecoverMetaShareFromQR.metaShare,
         type,

@@ -30,7 +30,7 @@ export default class MnemonicDisplay extends React.Component<any, any> {
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     const walletDetails = await utils.getWalletDetails();
     this.setState({
       arrModelPasscode: [
@@ -147,45 +147,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8F8F8',
-  },
-  viewPagination: {
-    flex: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 30,
-    marginRight: 30,
-  },
-  viewInputFiled: {
-    flex: 3,
-    alignItems: 'center',
-    margin: 10,
-  },
-  itemInputWalletName: {
-    borderWidth: 0,
-    borderRadius: 10,
-    shadowOffset: { width: 2, height: 2 },
-    shadowColor: 'gray',
-    shadowOpacity: 0.3,
-    backgroundColor: '#FFFFFF',
-  },
-  viewProcedBtn: {
-    flex: 2,
-    justifyContent: 'flex-end',
-  },
-  btnNext: {
-    position: 'absolute',
-    bottom: 10,
-    width: '100%',
-  },
-  // Grid View Selected
-  gridSelectedList: {
-    flex: 1,
-  },
-  modal: {
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-  },
-  modal4: {
-    height: 180,
   },
 });
