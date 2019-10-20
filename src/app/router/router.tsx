@@ -1,295 +1,254 @@
-import React from "react";
-import { colors } from "../constants/Constants";
+import React from 'react';
 import {
   createStackNavigator,
-  createBottomTabNavigator
-} from "react-navigation";
-import { SvgIcon } from "@up-shared/components";
+  createBottomTabNavigator,
+} from 'react-navigation';
 
-//localization
-import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
+import { SvgIcon } from '@up-shared/components';
+// //localization
+// import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
-//TODO: RestoreAndWalletSetupScreen
-import OnBoardingScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/OnBoardingScreen/OnBoardingScreen";
-import PasscodeScreen from "HexaWallet/src/screens/PasscodeScreen/PasscodeScreen";
-import PasscodeConfirmScreen from "HexaWallet/src/screens/PasscodeScreen/PasscodeConfirmScreen";
-import RestoreAndReoverWalletScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/RestoreAndReoverWalletScreen/RestoreAndReoverWalletScreen";
+// TODO: RestoreAndWalletSetupScreen
+import { OnBoarding } from 'hexaCompLanch';
 
-import RestoreWalletUsingMnemonicScrren from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingMnemonicScreen/RestoreWalletUsingMnemonicScrren";
+import { PasscodeConfirm, Passcode } from 'hexaCompPasscode';
 
-// Restore Wallet using Trusted Contact
-import RestoreWalletUsingTrustedContactScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreWalletUsingTrustedContactScreen";
-import RestoreAllContactListScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreAllContactListScreen";
-import RestoreSelectedContactsListScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreSelectedContactsListScreen";
-import RestoreWalletUsingTrustedContactQueAndAnwScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreWalletUsingTrustedContactQueAndAnwScreen";
+//  Restore And Wallet Setup
+import {
+  RestoreAndReoverWallet,
+  WalletSetup,
+  PermissionAndroid,
+} from 'hexaCompRestoreAndWalletSetup';
 
-import RestoreTrustedContactsShareScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreTrustedContactsShareScreen/RestoreTrustedContactsShareScreen";
-import RestoreTrustedContactsQRCodeScanScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreTrustedContactsShareScreen/RestoreTrustedContactsQRCodeScanScreen";
+//  Restore Wallet using Mnemonic
+import { RestoreWalletUsingMnemonic } from 'hexaCompRestoreWalletUsingMnemonic';
 
-import Restore3SelfShareScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreSelfShareScreen/Restore3SelfShareScreen";
-import Restore3SelfSahreQRCodeScannerScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreSelfShareScreen/Restore3SelfSahreQRCodeScannerScreen";
-import Restore4And5SelfShareScreen from "HexaWallet/src/screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreSelfShareScreen/Restore4And5SelfShareScreen";
-import Restore4And5SelfShareQRCodeScanner from "../../screens/DrawerScreen/RestoreWalletUsingTrustedContactScreen/RestoreSelfShareScreen/Restore4And5SelfShareQRCodeScanner";
+//  Restore Wallet using Trusted Contact
+import {
+  RestoreWalletUsingTrustedContact,
+  RestoreAllContactList,
+  RestoreSelectedContactsList,
+  RestoreWalletUsingTrustedContactQueAndAnw,
+  RestoreTrustedContactsShare,
+  RestoreTrustedContactsQRCodeScanScreen,
+  Restore3SelfShare,
+  Restore3SelfSahreQRCodeScanner,
+  Restore4And5SelfShare,
+  Restore4And5SelfShareQRCodeScanner,
+} from 'hexaCompRestoreWalletUsingTrustedContact';
 
-import WalletSetupScreens from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/WalletSetupScreens/WalletSetupScreens";
-import PermissionAndroidScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/PermissionAndroidScreen/PermissionAndroidScreen";
-import SecretQuestionAndAnswerScreen from "HexaWallet/src/screens/RestoreAndWalletSetupScreen/WalletSetupScreens/SecretQuestionAndAnswerScreen/SecretQuestionAndAnswerScreen";
+//  More
+import {
+  More,
+  ContactSharedSecretList,
+  TrustedPartySelfShareQRCode,
+  TrsutedPartyQRCode,
+} from 'hexaCompTabbarMore';
 
+// TODO: QrcodeScan
+import { QrCodeScanner } from 'hexaCompTabbarQrCodeScanner';
+import { Wallet } from 'hexaCompTabbarWallet';
 
-import MoreScreen from "HexaWallet/src/screens/TabBarScreen/MoreScreen/MoreScreen";
-import ContactSharedSecretList from "HexaWallet/src/screens/TabBarScreen/MoreScreen/ContactsSharedSecredYouScreen/ContactSharedSecretList";
-import TrustedPartySelfShareQRCode from "HexaWallet/src/screens/TabBarScreen/MoreScreen/ContactsSharedSecredYouScreen/TrustedPartySelfShareQRCode";
-import TrsutedPartyQRCodeScreen from "HexaWallet/src/screens/TabBarScreen/MoreScreen/ContactsSharedSecredYouScreen/TrsutedPartyQRCodeScreen";
+//  TODO: All Transaction
+import { AllTransaction } from 'hexaCompTabbarAllTransaction';
 
-//Tabbar screen
-import QrCodeScannerScreen from "HexaWallet/src/screens/TabBarScreen/QrCodeScannerScreen/QrCodeScannerScreen";
+// TODO: Backup your Wallet
+import {
+  AllContactList,
+  TrustedContact,
+  ShareSecretViaQR,
+  SelectContactListAssociatePerson,
+  TrustedContactAcceptOtp,
+} from 'hexaCompBackUpYourWallet';
 
-//TODO: New Screen Hexa Wallet
-import WalletScreen from "HexaWallet/src/screens/TabBarScreen/WalletScreen/WalletScreen";
+// TODO: Settings
+import { Settings, AdvancedSettings, MnemonicDisplay } from 'hexaCompSettings';
 
-//TODO: All Transaction Screen
-import AllTransactionScreen from "HexaWallet/src/screens/TabBarScreen/AllTransactionScreen/AllTransactionScreen";
+// TODO: Backup Wallet Mnemonic Screen
+import {
+  BackupWalletMnemonic,
+  BackupWalletMnemonicConfirmMnemonic,
+} from 'hexaCompBackupWalletMnemonic';
 
-//TODO: Backup your Walleet Screen
-import AllContactListScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/AllContactListScreen/AllContactListScreen";
-import SecretSharingScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/SecretSharingScreen/SecretSharingScreen";
-import TrustedContactScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/TrustedContactScreen/TrustedContactScreen";
-import ShareSecretViaQRScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/ShareSecretViaQRScreen/ShareSecretViaQRScreen";
+// TODO: Common Screen
+import {
+  QRCodeDisplay,
+  OTP,
+  QRCodeScan,
+  OTPBackupShareStore,
+} from 'hexaCompCommon';
 
-import SelectContactListAssociatePerson from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/BackUpTrustedPartySecretStoreScreen/SelectContactListAssociatePerson";
-import TrustedContactAcceptOtpScreen from "HexaWallet/src/screens/DrawerScreen/BackUpYourWalletScreen/BackUpTrustedPartySecretStoreScreen/TrustedContactAcceptOtpScreen";
+// TODO: Backup Secure Account
+import { BackupSecureAccount } from 'hexaCompBackupSecureAccount';
 
-//TODO: Settings  
-import SettingsScreen from "HexaWallet/src/screens/DrawerScreen/SettingsScreen/SettingsScreen";
+// TODO: Health of the App
+import {
+  HealthOfTheApp,
+  BackupSecretQuestions,
+  BackupSecureTwoFactorAuto,
+  HealthCheckMnemonic,
+  SelfShareUsingWalletQRCode,
+  SelfShareSharing,
+  ConfirmSelfShareQRScanner,
+} from 'hexaCompHealthOfTheApp';
 
-//TODO: Backup Wallet Mnemonic Screen
-import BackupWalletMnemonicScreen from "HexaWallet/src/screens/DrawerScreen/BackupWalletMnemonicScreen/BackupWalletMnemonicScreen";
-import BackupWalletMnemonicConfirmMnemonicScreen from "HexaWallet/src/screens/DrawerScreen/BackupWalletMnemonicScreen/BackupWalletMnemonicConfirmMnemonicScreen";
+// TODO: Payment Screen
+import {
+  ReceivePayment,
+  SendPayment,
+  ConfirmAndSendPayment,
+  SendPaymentAddressScan,
+} from 'hexaCompPayment';
 
-//TODO: Advanced Settings
-import AdvancedSettingsScreen from "HexaWallet/src/screens/DrawerScreen/SettingsScreen/AdvancedSettingsScreen/AdvancedSettingsScreen";
-import MnemonicDisplayScreen from "HexaWallet/src/screens/DrawerScreen/SettingsScreen/AdvancedSettingsScreen/MnemonicDisplayScreen/MnemonicDisplayScreen";
+// TODO: Account Transaction Screen
+import { Transaction } from 'hexaCompTransaction';
+import { colors } from '../constants/Constants';
 
+Wallet;
 
-//TODO: Common Screen
-import QRCodeScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/QRCodeScreen";
-import OTPScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/OTPScreen";
-import QRCodeScanScreen from "HexaWallet/src/screens/DrawerScreen/CommonScreens/QRCodeScanScreen";
-import OTPBackupShareStore from "HexaWallet/src/screens/DrawerScreen/CommonScreens/OTPBackupShareStore";
-
-//TODO: Backup Secure Account
-import BackupSecureAccountScreen from "HexaWallet/src/screens/DrawerScreen/BackupSecureAccountScreen/BackupSecureAccountScreen";
-
-//TODO: Restore Secure Account
-import RestoreSecureAccountScreen from "HexaWallet/src/screens/DrawerScreen/RestoreSecureAccountScreen/RestoreSecureAccountScreen";
-
-//TODO: Health of the App
-import HealthOfTheAppScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/HealthOfTheAppScreen";
-import BackupSecretQuestionsScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/BackupSecretQuestionsScreen/BackupSecretQuestionsScreen";
-import BackupSecureTwoFactorAutoScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/BackupSecureTwoFactorAutoScreen/BackupSecureTwoFactorAutoScreen";
-import HealthCheckMnemonicScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/HealthCheckMnemonicScreen/HealthCheckMnemonicScreen";
-import SelfShareUsingWalletQRCode from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/SelfShareUsingWalletQRCode/SelfShareUsingWalletQRCode";
-import SelfShareSharingScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/SelfShareSharingScreen/SelfShareSharingScreen";
-import ConfirmSelfShareQRScannerScreen from "HexaWallet/src/screens/DrawerScreen/HealthOfTheAppScreen/ConfirmSelfShareQRScannerScreen/ConfirmSelfShareQRScannerScreen";
-
-//TODO: Payment Screen
-import ReceivePaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/ReceivePaymentScreen/ReceivePaymentScreen";
-import SendPaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/SendPaymentScreen/SendPaymentScreen";
-import ConfirmAndSendPaymentScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/SendPaymentScreen/ConfirmAndSendPaymentScreen";
-import SendPaymentAddressScanScreen from "HexaWallet/src/screens/DrawerScreen/PaymentScreen/SendPaymentScreen/SendPaymentAddressScanScreen";
-
-//TODO: Account Transaction Screen
-import TransactionScreen from "HexaWallet/src/screens/DrawerScreen/TransactionScreen/TransactionScreen";
-
-// Static Screens
-import AccountSS1 from "HexaWallet/src/screens/TabBarScreen/StaticScreen/Account/AccountSS1";
-import AccountSS2 from "HexaWallet/src/screens/TabBarScreen/StaticScreen/Account/AccountSS2";
-import ContactSS1 from "HexaWallet/src/screens/TabBarScreen/StaticScreen/Contact/ContactSS1";
-import ContactSS2 from "HexaWallet/src/screens/TabBarScreen/StaticScreen/Contact/ContactSS2";
-import ContactSS3 from "HexaWallet/src/screens/TabBarScreen/StaticScreen/Contact/ContactSS3";
-
-
-//TODO: StackNavigator
-const AccountSSNavigator = createStackNavigator(
-  {
-    AccountSS1: {
-      screen: AccountSS1,
-      navigationOptions: { header: null }
-    },
-    AccountSS2: {
-      screen: AccountSS2,
-      navigationOptions: { header: null }
-    }
-  },
-  {
-    initialRouteName: "AccountSS1"
-  }
-);
-
-const ContactSSNavigator = createStackNavigator(
-  {
-    ContactSS1: {
-      screen: ContactSS1,
-      navigationOptions: { header: null }
-    },
-    ContactSS2: {
-      screen: ContactSS2,
-      navigationOptions: { header: null }
-    },
-    ContactSS3: {
-      screen: ContactSS3,
-      navigationOptions: { header: null }
-    }
-  },
-  { initialRouteName: "ContactSS1" }
-);
-
-
-//TODO: StackNavigator:ONBoarding
+// TODO: StackNavigator:ONBoarding
 const OnBoardingStackNavigator = createStackNavigator(
   {
     OnBoarding: {
-      screen: OnBoardingScreen,
-      navigationOptions: { header: null }
-    }
+      screen: OnBoarding,
+      navigationOptions: { header: null },
+    },
   },
   {
-    initialRouteName: "OnBoarding"
-  }
+    initialRouteName: 'OnBoarding',
+  },
+);
+
+const RestoreAndWalletSetupStackNavigator = createStackNavigator(
+  {
+    RestoreAndReoverWallet: {
+      screen: RestoreAndReoverWallet,
+      navigationOptions: { header: null },
+    },
+    WalletSetup: {
+      screen: WalletSetup,
+      navigationOptions: { header: null },
+    },
+    PermissionAndroid: {
+      screen: PermissionAndroid,
+      navigationOptions: { header: null },
+    },
+  },
+  {
+    initialRouteName: 'RestoreAndReoverWallet',
+  },
 );
 
 const RestoreWalletUsingMnemonicStackNavigator = createStackNavigator(
   {
-    RestoreWalletUsingMnemonicScrren: {
-      screen: RestoreWalletUsingMnemonicScrren,
-      navigationOptions: { header: null }
-    }
+    RestoreWalletUsingMnemonic: {
+      screen: RestoreWalletUsingMnemonic,
+      navigationOptions: { header: null },
+    },
   },
   {
-    initialRouteName: "RestoreWalletUsingMnemonicScrren"
-  }
+    initialRouteName: 'RestoreWalletUsingMnemonic',
+  },
 );
 
 const RestoreWalletUsingTrustedContactStackNavigator = createStackNavigator(
   {
-    RestoreWalletUsingTrustedContactScreen: {
-      screen: RestoreWalletUsingTrustedContactScreen,
-      navigationOptions: { header: null }
+    RestoreWalletUsingTrustedContact: {
+      screen: RestoreWalletUsingTrustedContact,
+      navigationOptions: { header: null },
     },
-    RestoreSelectedContactsListScreen: {
-      screen: RestoreSelectedContactsListScreen,
-      navigationOptions: { header: null }
+    RestoreSelectedContactsList: {
+      screen: RestoreSelectedContactsList,
+      navigationOptions: { header: null },
     },
-    RestoreAllContactListScreen: {
-      screen: RestoreAllContactListScreen,
-      navigationOptions: { header: null }
+    RestoreAllContactList: {
+      screen: RestoreAllContactList,
+      navigationOptions: { header: null },
     },
-    RestoreTrustedContactsShareScreen: {
-      screen: RestoreTrustedContactsShareScreen,
-      navigationOptions: { header: null }
+    RestoreTrustedContactsShare: {
+      screen: RestoreTrustedContactsShare,
+      navigationOptions: { header: null },
     },
-    RestoreTrustedContactsQRCodeScanScreen: {
+    RestoreTrustedContactsQRCodeScan: {
       screen: RestoreTrustedContactsQRCodeScanScreen,
-      navigationOptions: { header: null }
+      navigationOptions: { header: null },
     },
-    Restore3SelfShareScreen: {
-      screen: Restore3SelfShareScreen,
-      navigationOptions: { header: null }
+    Restore3SelfShare: {
+      screen: Restore3SelfShare,
+      navigationOptions: { header: null },
     },
-    Restore3SelfSahreQRCodeScannerScreen: {
-      screen: Restore3SelfSahreQRCodeScannerScreen,
-      navigationOptions: { header: null }
+    Restore3SelfSahreQRCodeScanner: {
+      screen: Restore3SelfSahreQRCodeScanner,
+      navigationOptions: { header: null },
     },
-    Restore4And5SelfShareScreen: {
-      screen: Restore4And5SelfShareScreen,
-      navigationOptions: { header: null }
+    Restore4And5SelfShare: {
+      screen: Restore4And5SelfShare,
+      navigationOptions: { header: null },
     },
     Restore4And5SelfShareQRCodeScanner: {
       screen: Restore4And5SelfShareQRCodeScanner,
-      navigationOptions: { header: null }
+      navigationOptions: { header: null },
     },
-    RestoreWalletUsingTrustedContactQueAndAnwScreen: {
-      screen: RestoreWalletUsingTrustedContactQueAndAnwScreen,
-      navigationOptions: { header: null }
-    }
+    RestoreWalletUsingTrustedContactQueAndAnw: {
+      screen: RestoreWalletUsingTrustedContactQueAndAnw,
+      navigationOptions: { header: null },
+    },
   },
   {
-    initialRouteName: "RestoreSelectedContactsListScreen"
-  }
+    initialRouteName: 'RestoreSelectedContactsList',
+  },
 );
-
 
 const RestoreWalletUsingTrustedContactAndroidStackNavigator = createStackNavigator(
   {
-    PermissionAndroidScreen: {
-      screen: PermissionAndroidScreen,
-      navigationOptions: { header: null }
+    PermissionAndroid: {
+      screen: PermissionAndroid,
+      navigationOptions: { header: null },
     },
-    RestoreWalletUsingTrustedContactScreen: {
-      screen: RestoreWalletUsingTrustedContactScreen,
-      navigationOptions: { header: null }
+    RestoreWalletUsingTrustedContact: {
+      screen: RestoreWalletUsingTrustedContact,
+      navigationOptions: { header: null },
     },
-    RestoreSelectedContactsListScreen: {
-      screen: RestoreSelectedContactsListScreen,
-      navigationOptions: { header: null }
+    RestoreSelectedContactsList: {
+      screen: RestoreSelectedContactsList,
+      navigationOptions: { header: null },
     },
-    RestoreAllContactListScreen: {
-      screen: RestoreAllContactListScreen,
-      navigationOptions: { header: null }
+    RestoreAllContactList: {
+      screen: RestoreAllContactList,
+      navigationOptions: { header: null },
     },
-    RestoreTrustedContactsShareScreen: {
-      screen: RestoreTrustedContactsShareScreen,
-      navigationOptions: { header: null }
+    RestoreTrustedContactsShare: {
+      screen: RestoreTrustedContactsShare,
+      navigationOptions: { header: null },
     },
-    RestoreTrustedContactsQRCodeScanScreen: {
+    RestoreTrustedContactsQRCodeScan: {
       screen: RestoreTrustedContactsQRCodeScanScreen,
-      navigationOptions: { header: null }
+      navigationOptions: { header: null },
     },
-    Restore3SelfShareScreen: {
-      screen: Restore3SelfShareScreen,
-      navigationOptions: { header: null }
+    Restore3SelfShare: {
+      screen: Restore3SelfShare,
+      navigationOptions: { header: null },
     },
-    Restore3SelfSahreQRCodeScannerScreen: {
-      screen: Restore3SelfSahreQRCodeScannerScreen,
-      navigationOptions: { header: null }
+    Restore3SelfSahreQRCodeScanner: {
+      screen: Restore3SelfSahreQRCodeScanner,
+      navigationOptions: { header: null },
     },
-    Restore4And5SelfShareScreen: {
-      screen: Restore4And5SelfShareScreen,
-      navigationOptions: { header: null }
+    Restore4And5SelfShare: {
+      screen: Restore4And5SelfShare,
+      navigationOptions: { header: null },
     },
     Restore4And5SelfShareQRCodeScanner: {
       screen: Restore4And5SelfShareQRCodeScanner,
-      navigationOptions: { header: null }
+      navigationOptions: { header: null },
     },
-    RestoreWalletUsingTrustedContactQueAndAnwScreen: {
-      screen: RestoreWalletUsingTrustedContactQueAndAnwScreen,
-      navigationOptions: { header: null }
-    }
+    RestoreWalletUsingTrustedContactQueAndAnw: {
+      screen: RestoreWalletUsingTrustedContactQueAndAnw,
+      navigationOptions: { header: null },
+    },
   },
   {
-    initialRouteName: "PermissionAndroidScreen"
-  }
-);
-
-
-const RestoreAndWalletSetupStackNavigator = createStackNavigator(
-  {
-    RestoreAndReoverWalletScreen: {
-      screen: RestoreAndReoverWalletScreen,
-      navigationOptions: { header: null }
-    },
-    WalletSetupScreens: {
-      screen: WalletSetupScreens,
-      navigationOptions: { header: null }
-    },
-    PermissionAndroidScreen: {
-      screen: PermissionAndroidScreen,
-      navigationOptions: { header: null }
-    }
+    initialRouteName: 'PermissionAndroid',
   },
-  {
-    initialRouteName: "RestoreAndReoverWalletScreen"
-  }
 );
 
 const TrustedPartyShareSecretStackNavigator = createStackNavigator(
@@ -298,504 +257,398 @@ const TrustedPartyShareSecretStackNavigator = createStackNavigator(
       screen: ContactSharedSecretList,
       navigationOptions: {
         header: null,
-        tabBarVisible: false
-      }
+        tabBarVisible: false,
+      },
     },
     TrustedPartySelfShareQRCode: {
       screen: TrustedPartySelfShareQRCode,
-      navigationOptions: { header: null }
+      navigationOptions: { header: null },
     },
-    TrsutedPartyQRCodeScreen: {
-      screen: TrsutedPartyQRCodeScreen,
-      navigationOptions: { header: null }
-    }
+    TrsutedPartyQRCode: {
+      screen: TrsutedPartyQRCode,
+      navigationOptions: { header: null },
+    },
   },
   {
-    initialRouteName: "ContactSharedSecretList"
-  }
+    initialRouteName: 'ContactSharedSecretList',
+  },
 );
 
-//TODO: FirstTimeWalletSetupStackNavigatorRouter
+// TODO: FirstTimeWalletSetupStackNavigatorRouter
 const BackUpYourWalletStackNavigatorRouter = createStackNavigator(
   {
-    AllContactListScreen: {
-      screen: AllContactListScreen,
-      navigationOptions: { header: null }
+    AllContactList: {
+      screen: AllContactList,
+      navigationOptions: { header: null },
     },
-    SecretSharingScreen: {
-      screen: SecretSharingScreen,
-      navigationOptions: { header: null }
+    TrustedContact: {
+      screen: TrustedContact,
+      navigationOptions: { header: null },
     },
-    TrustedContactScreen: {
-      screen: TrustedContactScreen,
-      navigationOptions: { header: null }
+    ShareSecretViaQR: {
+      screen: ShareSecretViaQR,
+      navigationOptions: { header: null },
     },
-    ShareSecretViaQRScreen: {
-      screen: ShareSecretViaQRScreen,
-      navigationOptions: { header: null }
-    }
   },
   {
-    initialRouteName: "AllContactListScreen"
-  }
+    initialRouteName: 'AllContactList',
+  },
 );
 
 const BackUpYourWalletSecoundTimeStackNavigatorRouter = createStackNavigator(
   {
-    SecretSharingScreen: {
-      screen: SecretSharingScreen,
-      navigationOptions: { header: null }
+    TrustedContact: {
+      screen: TrustedContact,
+      navigationOptions: { header: null },
     },
-    TrustedContactScreen: {
-      screen: TrustedContactScreen,
-      navigationOptions: { header: null }
+    ShareSecretViaQR: {
+      screen: ShareSecretViaQR,
+      navigationOptions: { header: null },
     },
-    ShareSecretViaQRScreen: {
-      screen: ShareSecretViaQRScreen,
-      navigationOptions: { header: null }
-    }
   },
   {
-    initialRouteName: "SecretSharingScreen"
-  }
+    initialRouteName: 'TrustedContact',
+  },
 );
 
 const TrustedContactStackNavigator = createStackNavigator(
   {
-    TrustedContactScreen: {
-      screen: TrustedContactScreen,
-      navigationOptions: { header: null }
+    TrustedContact: {
+      screen: TrustedContact,
+      navigationOptions: { header: null },
     },
-    ShareSecretViaQRScreen: {
-      screen: ShareSecretViaQRScreen,
-      navigationOptions: { header: null }
-    }
+    ShareSecretViaQR: {
+      screen: ShareSecretViaQR,
+      navigationOptions: { header: null },
+    },
   },
   {
-    initialRouteName: "TrustedContactScreen"
-  }
+    initialRouteName: 'TrustedContact',
+  },
 );
 
 const BackupTrustedPartrySecretStoreStackNavigator = createStackNavigator(
   {
     SelectContactListAssociatePerson: {
       screen: SelectContactListAssociatePerson,
-      navigationOptions: { header: null }
+      navigationOptions: { header: null },
     },
-    TrustedContactAcceptOtpScreen: {
-      screen: TrustedContactAcceptOtpScreen,
-      navigationOptions: { header: null }
-    }
+    TrustedContactAcceptOtp: {
+      screen: TrustedContactAcceptOtp,
+      navigationOptions: { header: null },
+    },
   },
   {
-    initialRouteName: "SelectContactListAssociatePerson"
-  }
+    initialRouteName: 'SelectContactListAssociatePerson',
+  },
 );
 
-//TODO: SettingsScreen
+// TODO: SettingsScreen
 const SettingsStackNavigator = createStackNavigator(
   {
-    SettingsScreen: {
-      screen: SettingsScreen,
-      navigationOptions: { header: null }
+    Settings: {
+      screen: Settings,
+      navigationOptions: { header: null },
     },
-    BackupWalletMnemonicScreen: {
-      screen: BackupWalletMnemonicScreen,
-      navigationOptions: { header: null }
+    BackupWalletMnemonic: {
+      screen: BackupWalletMnemonic,
+      navigationOptions: { header: null },
     },
-    BackupWalletMnemonicConfirmMnemonicScreen: {
-      screen: BackupWalletMnemonicConfirmMnemonicScreen,
-      navigationOptions: { header: null }
+    BackupWalletMnemonicConfirmMnemonic: {
+      screen: BackupWalletMnemonicConfirmMnemonic,
+      navigationOptions: { header: null },
     },
-    AdvancedSettingsScreen: {
-      screen: AdvancedSettingsScreen,
-      navigationOptions: { header: null }
+    AdvancedSettings: {
+      screen: AdvancedSettings,
+      navigationOptions: { header: null },
     },
-    MnemonicDisplayScreen: {
-      screen: MnemonicDisplayScreen,
-      navigationOptions: { header: null }
-    }
+    MnemonicDisplay: {
+      screen: MnemonicDisplay,
+      navigationOptions: { header: null },
+    },
   },
   {
-    initialRouteName: "AdvancedSettingsScreen"
-  }
+    initialRouteName: 'AdvancedSettings',
+  },
 );
 
-//TODO: HealthOfTheScreen Stack Navigator
+// TODO: HealthOfTheScreen Stack Navigator
 const HealthOfTheAppStackNavigator = createStackNavigator(
   {
-    HealthOfTheAppScreen: {
-      screen: HealthOfTheAppScreen,
-      navigationOptions: { header: null }
+    HealthOfTheApp: {
+      screen: HealthOfTheApp,
+      navigationOptions: { header: null },
     },
-    BackupSecretQuestionsScreen: {
-      screen: BackupSecretQuestionsScreen,
-      navigationOptions: { header: null }
+    BackupSecretQuestions: {
+      screen: BackupSecretQuestions,
+      navigationOptions: { header: null },
     },
-    BackupSecureTwoFactorAutoScreen: {
-      screen: BackupSecureTwoFactorAutoScreen,
-      navigationOptions: { header: null }
+    BackupSecureTwoFactorAuto: {
+      screen: BackupSecureTwoFactorAuto,
+      navigationOptions: { header: null },
     },
-    HealthCheckMnemonicScreen: {
-      screen: HealthCheckMnemonicScreen,
-      navigationOptions: { header: null }
+    HealthCheckMnemonic: {
+      screen: HealthCheckMnemonic,
+      navigationOptions: { header: null },
     },
     SelfShareUsingWalletQRCode: {
       screen: SelfShareUsingWalletQRCode,
-      navigationOptions: { header: null }
+      navigationOptions: { header: null },
     },
-    SelfShareSharingScreen: {
-      screen: SelfShareSharingScreen,
-      navigationOptions: { header: null }
+    SelfShareSharing: {
+      screen: SelfShareSharing,
+      navigationOptions: { header: null },
     },
-    ConfirmSelfShareQRScannerScreen: {
-      screen: ConfirmSelfShareQRScannerScreen,
-      navigationOptions: { header: null }
-    }
+    ConfirmSelfShareQRScanner: {
+      screen: ConfirmSelfShareQRScanner,
+      navigationOptions: { header: null },
+    },
   },
   {
-    initialRouteName: "HealthOfTheAppScreen"
-  }
+    initialRouteName: 'HealthOfTheApp',
+  },
 );
 
-//TODO: Backup Secure Account Stack Navigator
+// TODO: Backup Secure Account Stack Navigator
 
 const BackupSecureAccountWithPdfStackNavigator = createStackNavigator(
   {
-    BackupSecureAccountScreen: {
-      screen: BackupSecureAccountScreen,
-      navigationOptions: { header: null }
-    }
+    BackupSecureAccount: {
+      screen: BackupSecureAccount,
+      navigationOptions: { header: null },
+    },
   },
   {
-    initialRouteName: "BackupSecureAccountScreen"
-  }
-);
-
-//TODO: Restore Secure Account Stack Navigator
-const ResotreSecureAccountStackNavigator = createStackNavigator(
-  {
-    RestoreSecureAccountScreen: {
-      screen: RestoreSecureAccountScreen,
-      navigationOptions: { header: null }
-    }
+    initialRouteName: 'BackupSecureAccount',
   },
-  {
-    initialRouteName: "RestoreSecureAccountScreen"
-  }
 );
 
-//TODO: Payment Navigation
-//Receive Payment Stack Navigator
+// TODO: Payment Navigation
+// Receive Payment Stack Navigator
 const ReceivePaymentStackNavigator = createStackNavigator(
   {
-    ReceivePaymentScreen: {
-      screen: ReceivePaymentScreen,
-      navigationOptions: { header: null }
-    }
+    ReceivePayment: {
+      screen: ReceivePayment,
+      navigationOptions: { header: null },
+    },
   },
   {
-    initialRouteName: "ReceivePaymentScreen"
-  }
+    initialRouteName: 'ReceivePayment',
+  },
 );
 
-//Send Payment Stack Navigator
+// Send Payment Stack Navigator
 const SendPaymentStackNavigator = createStackNavigator(
   {
-    SendPaymentScreen: {
-      screen: SendPaymentScreen,
-      navigationOptions: { header: null }
+    SendPayment: {
+      screen: SendPayment,
+      navigationOptions: { header: null },
     },
-    ConfirmAndSendPaymentScreen: {
-      screen: ConfirmAndSendPaymentScreen,
-      navigationOptions: { header: null }
+    ConfirmAndSendPayment: {
+      screen: ConfirmAndSendPayment,
+      navigationOptions: { header: null },
     },
-    SendPaymentAddressScanScreen: {
-      screen: SendPaymentAddressScanScreen,
-      navigationOptions: { header: null }
-    }
+    SendPaymentAddressScan: {
+      screen: SendPaymentAddressScan,
+      navigationOptions: { header: null },
+    },
   },
   {
-    initialRouteName: "SendPaymentScreen"
-  }
+    initialRouteName: 'SendPayment',
+  },
 );
 
-//TODO: Account Transaction StackNavigator
+// TODO: Account Transaction StackNavigator
 const AccountTransactionStackNavigator = createStackNavigator(
   {
-    TransactionScreen: {
-      screen: TransactionScreen,
-      navigationOptions: { header: null }
+    Transaction: {
+      screen: Transaction,
+      navigationOptions: { header: null },
     },
     RecieveNavigation: {
       screen: ReceivePaymentStackNavigator,
-      navigationOptions: { header: null }
+      navigationOptions: { header: null },
     },
     SendPaymentNavigation: {
       screen: SendPaymentStackNavigator,
-      navigationOptions: { header: null }
-    }
+      navigationOptions: { header: null },
+    },
   },
   {
-    initialRouteName: "TransactionScreen"
-  }
+    initialRouteName: 'Transaction',
+  },
 );
 
-//TODO: TabNavigator
-//TODO: TabNavigator:TabNavigator
+// TODO: TabNavigator
+// TODO: TabNavigator:TabNavigator
 const TabNavigator = createBottomTabNavigator(
   {
-    WalletScreen: {
-      screen: WalletScreen, //PaymentScreen,
+    Wallet: {
+      screen: Wallet,
       navigationOptions: {
-        tabBarLabel: "Wallet", //localization("TabBarItem.Payment"),
-        drawerLockMode: "locked-open",
-        tabBarIcon: ( { tintColor } ) => (
-          <SvgIcon name="wallet" color={ tintColor } size={ 22 } />
-        )
-      }
+        tabBarLabel: 'Wallet', // localization("TabBarItem.Payment"),
+        drawerLockMode: 'locked-open',
+        tabBarIcon: ({ tintColor }) => (
+          <SvgIcon name="wallet" color={tintColor} size={22} />
+        ),
+      },
     },
-    AllTransactionScreen: {
-      screen: AllTransactionScreen,
+    AllTransaction: {
+      screen: AllTransaction,
       navigationOptions: {
-        tabBarLabel: "Transaction", //localization("TabBarItem.Analytics"),
-        tabBarIcon: ( { tintColor } ) => (
-          <SvgIcon name="icon_transactions" color={ tintColor } size={ 22 } />
-        )
-      }
+        tabBarLabel: 'Transaction', // localization("TabBarItem.Analytics"),
+        tabBarIcon: ({ tintColor }) => (
+          <SvgIcon name="icon_transactions" color={tintColor} size={22} />
+        ),
+      },
     },
-    QrCodeScannerScreen: {
-      screen: QrCodeScannerScreen,
+    QrCodeScanner: {
+      screen: QrCodeScanner,
       navigationOptions: {
-        tabBarLabel: "QR", //localization("TabBarItem.Accounts"),
-        tabBarIcon: ( { tintColor } ) => (
-          <SvgIcon name="qr-codes" color={ tintColor } size={ 22 } />
-        )
-      }
+        tabBarLabel: 'QR', // localization("TabBarItem.Accounts"),
+        tabBarIcon: ({ tintColor }) => (
+          <SvgIcon name="qr-codes" color={tintColor} size={22} />
+        ),
+      },
     },
 
     More: {
-      screen: MoreScreen,
+      screen: More,
       navigationOptions: {
-        tabBarLabel: "More", //localization("TabBarItem.More"),
-        tabBarIcon: ( { tintColor } ) => (
-          <SvgIcon name="more-icon" color={ tintColor } size={ 22 } />
-        )
-      }
-    }
+        tabBarLabel: 'More', // localization("TabBarItem.More"),
+        tabBarIcon: ({ tintColor }) => (
+          <SvgIcon name="more-icon" color={tintColor} size={22} />
+        ),
+      },
+    },
   },
   {
-    initialRouteName: "WalletScreen",
+    initialRouteName: 'Wallet',
     tabBarOptions: {
       showLabel: true,
-      //swipeEnabled: true,
+      // swipeEnabled: true,
       showIcon: true,
       activeTintColor: colors.appColor,
       labelStyle: {
         fontSize: 11,
-        fontFamily: "FiraSans-Medium"
+        fontFamily: 'FiraSans-Medium',
       },
       style: {
-        backgroundColor: "#ffffff"
+        backgroundColor: '#ffffff',
       },
-      tabStyle: {}
-    }
-  }
+      tabStyle: {},
+    },
+  },
 );
 
-//TODO: RootNavigator
-//TODO: RootNavigator:createRootNavigator
+// TODO: RootNavigator
+// TODO: RootNavigator:createRootNavigator
+// eslint-disable-next-line import/prefer-default-export
 export const createRootNavigator = (
   signedIn = false,
-  screenName = "PasscodeScreen"
+  screenName = 'Passcode',
 ) => {
   return createStackNavigator(
     {
-      PasscodeScreen: {
-        screen: PasscodeScreen,
-        navigationOptions: { header: null }
-      },
-      AccountSSNavigator: {
-        screen: AccountSSNavigator,
-        navigationOptions: { header: null }
-      },
-      ContactSSNavigator: {
-        screen: ContactSSNavigator,
-        navigationOptions: { header: null }
-      },
       OnBoardingNavigator: {
         screen: OnBoardingStackNavigator,
-        navigationOptions: { header: null }
+        navigationOptions: { header: null },
       },
-      PasscodeConfirmScreen: {
-        screen: PasscodeConfirmScreen,
-        navigationOptions: { header: null }
+      PasscodeConfirm: {
+        screen: PasscodeConfirm,
+        navigationOptions: { header: null },
+      },
+      Passcode: {
+        screen: Passcode,
+        navigationOptions: { header: null },
       },
       RestoreAndWalletSetupNavigator: {
         screen: RestoreAndWalletSetupStackNavigator,
-        navigationOptions: { header: null }
-      },
-      RestoreWalletUsingMnemonicNavigator: {
-        screen: RestoreWalletUsingMnemonicStackNavigator,
-        navigationOptions: { header: null }
-      },
-      RestoreWalletUsingTrustedContactNavigator: {
-        screen: RestoreWalletUsingTrustedContactStackNavigator,
-        navigationOptions: { header: null }
-      },
-      RestoreWalletUsingTrustedContactAndroidNavigator: {
-        screen: RestoreWalletUsingTrustedContactAndroidStackNavigator,
-        navigationOptions: { header: null }
+        navigationOptions: { header: null },
       },
       TabbarBottom: {
         screen: TabNavigator,
-        navigationOptions: { header: null }
+        navigationOptions: { header: null },
       },
+      RestoreWalletUsingMnemonicNavigator: {
+        screen: RestoreWalletUsingMnemonicStackNavigator,
+        navigationOptions: { header: null },
+      },
+      RestoreWalletUsingTrustedContactNavigator: {
+        screen: RestoreWalletUsingTrustedContactStackNavigator,
+        navigationOptions: { header: null },
+      },
+      RestoreWalletUsingTrustedContactAndroidNavigator: {
+        screen: RestoreWalletUsingTrustedContactAndroidStackNavigator,
+        navigationOptions: { header: null },
+      },
+
       BackUpYourWalletNavigator: {
         screen: BackUpYourWalletStackNavigatorRouter,
-        navigationOptions: { header: null }
+        navigationOptions: { header: null },
       },
       BackUpYourWalletSecoundTimeNavigator: {
         screen: BackUpYourWalletSecoundTimeStackNavigatorRouter,
-        navigationOptions: { header: null }
+        navigationOptions: { header: null },
       },
       BackupTrustedPartrySecretNavigator: {
         screen: BackupTrustedPartrySecretStoreStackNavigator,
-        navigationOptions: { header: null }
+        navigationOptions: { header: null },
       },
-      //also use deepling url navigaton
+      // also use deepling url navigaton
       TrustedPartyShareSecretNavigator: {
         screen: TrustedPartyShareSecretStackNavigator,
-        navigationOptions: { header: null }
+        navigationOptions: { header: null },
       },
-      //TODO: Common Screens
+      // TODO: Common Screens
       OTPScreenNavigator: {
-        screen: OTPScreen,
-        navigationOptions: { header: null }
+        screen: OTP,
+        navigationOptions: { header: null },
       },
       OTPBackupShareStoreNavigator: {
         screen: OTPBackupShareStore,
-        navigationOptions: { header: null }
+        navigationOptions: { header: null },
       },
-      //TODO: Settings
+      // TODO: Settings
       SettingsNavigator: {
         screen: SettingsStackNavigator,
-        navigationOptions: { header: null }
+        navigationOptions: { header: null },
       },
-      //TODO: HealthOfTheApp
+      // TODO: HealthOfTheApp
       HealthOfTheAppNavigator: {
         screen: HealthOfTheAppStackNavigator,
-        navigationOptions: { header: null }
+        navigationOptions: { header: null },
       },
       TrustedContactNavigator: {
         screen: TrustedContactStackNavigator,
-        navigationOptions: { header: null }
+        navigationOptions: { header: null },
       },
-      //TODO: Backup Secure Account
+      // TODO: Backup Secure Account
       BackupSecureAccountWithPdfNavigator: {
         screen: BackupSecureAccountWithPdfStackNavigator,
-        navigationOptions: { header: null }
+        navigationOptions: { header: null },
       },
-      //TODO: Restore Secure Account
-      ResotreSecureAccountNavigator: {
-        screen: ResotreSecureAccountStackNavigator,
-        navigationOptions: { header: null }
-      },
-      //TODO: Payment Navigation
-      //ReceivePayment
+
+      // TODO: Payment Navigation
+      // ReceivePayment
       ReceivePaymentNavigator: {
         screen: ReceivePaymentStackNavigator,
-        navigationOptions: { header: null }
+        navigationOptions: { header: null },
       },
-      //SentPayment
+      // SentPayment
       SendPaymentNavigator: {
         screen: SendPaymentStackNavigator,
-        navigationOptions: { header: null }
+        navigationOptions: { header: null },
       },
-      //TODO: Transaction Navigation
+      // TODO: Transaction Navigation
       AccountTransactionNavigator: {
         screen: AccountTransactionStackNavigator,
-        navigationOptions: { header: null }
-      }
-      //Drwaer Navigation
-      // SecurityScreen: {
-      //   screen: SecurityScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // HelpScreen: {
-      //   screen: HelpScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // InviteScreen: {
-      //   screen: InviteScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // BankAccountScreen: {
-      //   screen: BankAccountScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // LogoutScreen: {
-      //   screen: LogoutScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // NotificationScreen: {
-      //   screen: NotificationScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // //SentMoney And Receive Money
-      // SentAndReceiveeScreen: {
-      //   screen: SentAndReceiveeScreen,
-      //   navigationOptions: {
-      //     header: null
-      //   }
-      // },
-      // SentMoneyScreen: {
-      //   screen: SentMoneyScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // ReceiveMoneyScreen: {
-      //   screen: ReceiveMoneyScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // QrcodeScannerScreen: {
-      //   screen: QrcodeScannerScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // //Backup Phrase
-      // BackupPhraseScreen: {
-      //   screen: BackupPhraseScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // VerifyBackupPhraseScreen: {
-      //   screen: VerifyBackupPhraseScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // //AccountDetailsScrenn
-      // AccountsDetailsScreen: {
-      //   screen: AccountsDetailsScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // //AccountDetailsOnboardingRouter
-      // AccountDetailsOnboardingRouter: {
-      //   screen: AccountDetailsOnboardingRouter,
-      //   navigationOptions: { header: null }
-      // },
-      // //For DeepLinking
-      // MergeConfirmJointAccountScreen: {
-      //   screen: MergeConfirmJointAccountScreen,
-      //   navigationOptions: { header: null }
-      // },
-      // CreateJointAccountScreen: {
-      //   screen: CreateJointAccountScreen,
-      //   navigationOptions: { header: null }
-      // }
+        navigationOptions: { header: null },
+      },
     },
     {
-      //initialRouteName: signedIn ? "OnBoardingNavigator" : PasscodeConfirmScreen
-      initialRouteName: signedIn ? "OnBoardingNavigator" : screenName //"TabbarBottom" //
-      // initialRouteName: signedIn ? "OnBoardingNavigator" : "PermissionNavigator" //"TabbarBottom" //
-      // initialRouteName: signedIn ? "OnBoardingNavigator" : "OnBoardingNavigator"
-      // initialRouteName: signedIn ? "TabbarBottom" : "TabbarBottom"
-    }
+      // initialRouteName: signedIn ? "OnBoardingNavigator" : PasscodeConfirm
+      initialRouteName: signedIn ? 'OnBoardingNavigator' : screenName, // "TabbarBottom" //
+    },
   );
 };

@@ -1,0 +1,134 @@
+/* eslint-disable class-methods-use-this */
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Container, Button, Text } from 'native-base';
+// import BarcodeScanner from "react-native-barcode-scanners";
+import QRCodeScanner from 'react-native-qrcode-scanner';
+
+// TODO: Custome Alert
+import { AlertSimple } from 'hexaCustAlert';
+
+// TODO: Custome object
+import { renderIf } from 'hexaValidation';
+
+const alert = new AlertSimple();
+
+interface Props {
+  click_Next: Function;
+}
+
+let flag_ReadQRCode = true;
+
+export default class Restore4And5SelfShareQRCodeScreen2 extends React.Component<
+  Props,
+  any
+> {
+  constructor(props: any) {
+    super(props);
+
+    this.state = {
+      flag_qrcode: false,
+    };
+  }
+
+  componentWillUnmount() {
+    flag_ReadQRCode = true;
+  }
+
+  _renderTitleBar() {
+    return <Text />;
+  }
+
+  _renderMenu() {
+    return <Text />;
+  }
+
+  click_resetFlag = () => {
+    flag_ReadQRCode = true;
+  };
+
+  barcodeReceived = async (e: any) => {
+    try {
+      let result = e.data;
+      result = result.split('Doublequote').join('"');
+      result = result.split('Leftbrace').join('{');
+      result = result.split('Rightbrace').join('}');
+      result = result.split('Slash').join('/');
+      result = result.split('Comma').join(',');
+      result = result.split('Space').join(' ');
+      const { type } = this.props;
+      const firstChar = result.slice(0, 3);
+      if (type == 'iCloud') {
+        if (firstChar == 'c02') {
+          if (flag_ReadQRCode) {
+            console.log({ result });
+            this.props.click_Next(2, [result]);
+            flag_ReadQRCode = false;
+          }
+        } else if (flag_ReadQRCode) {
+          alert.simpleOkAction(
+            'Oops',
+            'Please scan share 2 qrcode.',
+            this.click_resetFlag,
+          );
+          flag_ReadQRCode = false;
+        }
+      } else if (firstChar == 'e02') {
+        if (flag_ReadQRCode) {
+          this.props.click_Next(2, [result]);
+          flag_ReadQRCode = false;
+        }
+      } else if (flag_ReadQRCode) {
+        alert.simpleOkAction(
+          'Oops',
+          'Please scan share 2 qrcode.',
+          this.click_resetFlag,
+        );
+        flag_ReadQRCode = false;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  render() {
+    // flag
+    const { flag_qrcode } = this.state;
+    return (
+      <Container>
+        <View style={styles.container}>
+          {renderIf(flag_qrcode == false)(
+            <Button
+              full
+              style={{
+                flex: 1,
+                margin: 20,
+                borderRadius: 10,
+                backgroundColor: 'gray',
+              }}
+              onPress={() => this.setState({ flag_qrcode: !flag_qrcode })}
+            >
+              <Text style={{ color: '#000000' }}>Tab To Scan share 2</Text>
+            </Button>,
+          )}
+          {renderIf(flag_qrcode == true)(
+            <QRCodeScanner
+              onRead={this.barcodeReceived}
+              topContent={this._renderTitleBar()}
+              bottomContent={this._renderMenu()}
+              cameraType="back"
+              showMarker={true}
+              vibrate={true}
+            />,
+          )}
+        </View>
+      </Container>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

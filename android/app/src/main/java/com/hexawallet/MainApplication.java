@@ -7,6 +7,7 @@ import com.facebook.react.PackageList;
 import com.facebook.hermes.reactexecutor.HermesExecutorFactory;
 import com.facebook.react.bridge.JavaScriptExecutorFactory;
 import com.facebook.react.ReactApplication;
+import com.christopherdro.htmltopdf.RNHTMLtoPDFPackage;
 import com.proyecto26.inappbrowser.RNInAppBrowserPackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.hopding.pdflib.PDFLibPackage;
@@ -38,6 +39,7 @@ import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
 
 import com.hexawallet.PdfPasswordPackage;
+import com.hexawallet.UtilsPackage;
 
 import java.util.List;
 
@@ -61,6 +63,7 @@ public class MainApplication extends Application implements ShareApplication, Re
       // Packages that cannot be autolinked yet can be added manually here, for
       // example:
       packages.add(new PdfPasswordPackage());
+      packages.add(new UtilsPackage());
       return packages;
     }
 

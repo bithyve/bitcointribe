@@ -1,6 +1,7 @@
-import JointAccount from "../../services/accounts/JointAccount";
+/* eslint-disable */
+import JointAccount from '../../services/accounts/JointAccount';
 
-describe.skip("Joint Account", () => {
+describe.skip('Joint Account', () => {
   let jointAccount: JointAccount;
   let initDetails: string;
   let mergeDetails: string;
@@ -17,9 +18,9 @@ describe.skip("Joint Account", () => {
     jest.setTimeout(50000);
     jointAccount = new JointAccount();
     creatorMnemonic =
-      "image shell scatter purchase health bridge verify mirror abstract rhythm list bid";
+      'image shell scatter purchase health bridge verify mirror abstract rhythm list bid';
     mergerMnemonic =
-      "physical shallow pave space climb reason refuse burst city suspect buyer swing";
+      'physical shallow pave space climb reason refuse burst city suspect buyer swing';
 
     const cRes = await jointAccount.bitcoin.generateHDWallet(creatorMnemonic);
     creatorPriv = cRes.privateKey;
@@ -30,8 +31,8 @@ describe.skip("Joint Account", () => {
 
   test("inititates the creation of joint account (cretor's end)", async () => {
     const details = {
-      creator: "Matt",
-      walletName: "ST. Funding",
+      creator: 'Matt',
+      walletName: 'ST. Funding',
     };
 
     initDetails = jointAccount.initiateJointAccount(creatorMnemonic, details);
@@ -39,7 +40,7 @@ describe.skip("Joint Account", () => {
     const initiationDetails = JSON.parse(initDetails);
     const { cpk, typ, wn, cn } = initiationDetails;
     expect(cpk).toBeDefined();
-    expect(typ).toEqual("conf");
+    expect(typ).toEqual('conf');
     expect(wn).toEqual(details.walletName);
     expect(cn).toEqual(details.creator);
   });
@@ -47,7 +48,7 @@ describe.skip("Joint Account", () => {
   test("merges an initiated joint account (merger's end)", async () => {
     const details = {
       jointDetails: initDetails,
-      merger: "Ken",
+      merger: 'Ken',
     };
 
     const { multiSig, mergeJSON } = jointAccount.mergeJointAccount(
@@ -61,15 +62,15 @@ describe.skip("Joint Account", () => {
     expect(address).toBeDefined();
     const { typ, mpk, mn } = JSON.parse(mergeDetails);
     expect(mpk).toBeDefined();
-    expect(typ).toEqual("imp");
+    expect(typ).toEqual('imp');
     expect(mn).toEqual(details.merger);
   });
 
-  test("provide details for acknowledgement", () => {
+  test('provide details for acknowledgement', () => {
     ackDetails = jointAccount.ackDetails(mergeDetails);
     const acknowledgementDetails = JSON.parse(ackDetails);
     expect(acknowledgementDetails.cpk).toBeUndefined();
-    expect(acknowledgementDetails.typ).toEqual("ack");
+    expect(acknowledgementDetails.typ).toEqual('ack');
     const { mpk, mn, cn } = JSON.parse(mergeDetails);
     expect(acknowledgementDetails.mpk).toEqual(mpk);
     expect(acknowledgementDetails.mn).toEqual(mn);
@@ -92,15 +93,15 @@ describe.skip("Joint Account", () => {
     const { add, typ, cpk } = JSON.parse(creationDetails);
     const initiationDetails = JSON.parse(initDetails);
     expect(add).toEqual(jointMultiSig.address);
-    expect(typ).toEqual("imp");
+    expect(typ).toEqual('imp');
     expect(cpk).toEqual(initiationDetails.cpk);
     console.log({ address: jointMultiSig.address });
   });
 
-  test("inititates a transaction from a (pre-funded) joint account (txn construction and signing)", async () => {
+  test('inititates a transaction from a (pre-funded) joint account (txn construction and signing)', async () => {
     const res = await jointAccount.initJointTxn({
       senderAddress: jointMultiSig.address,
-      recipientAddress: "2N4qBb5f1KyfbpHxtLM86QgbZ7qcxsFf9AL",
+      recipientAddress: '2N4qBb5f1KyfbpHxtLM86QgbZ7qcxsFf9AL',
       amount: 4500,
       privateKey: creatorPriv,
       scripts: jointMultiSig.scripts,
@@ -110,11 +111,11 @@ describe.skip("Joint Account", () => {
       txHex = res.data;
       expect(txHex).toBeDefined();
     } else {
-      throw new Error("joint transaction initiation failed");
+      throw new Error('joint transaction initiation failed');
     }
   });
 
-  test("finalizes an initiated transaction from the joint account (2nd signature provisioning and broadcasting)", async () => {
+  test('finalizes an initiated transaction from the joint account (2nd signature provisioning and broadcasting)', async () => {
     const { txid } = await jointAccount.authorizeJointTxn(txHex, mergerPriv);
     expect(txid).toBeDefined();
   });
