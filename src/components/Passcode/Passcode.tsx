@@ -55,7 +55,7 @@ export default class Passcode extends Component {
   }
 
   // TODO: Page Life Cycle
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     try {
       this.retrieveData();
     } catch (error) {
@@ -254,6 +254,7 @@ export default class Passcode extends Component {
                   inactiveColor={this.state.passcodeStyle[0].inactiveColor}
                   className="border-box"
                   cellBorderWidth={this.state.passcodeStyle[0].cellBorderWidth}
+                  // eslint-disable-next-line react/jsx-no-duplicate-props
                   compareWithCode={this.state.pincode}
                   autoFocus={true}
                   inputPosition="center"

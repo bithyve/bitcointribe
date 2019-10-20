@@ -53,7 +53,7 @@ export default class TrsutedPartyQRCode extends React.Component<any, any> {
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     const data = this.props.navigation.getParam('data');
     console.log({ data });
     const walletDetails = utils.getWalletDetails();

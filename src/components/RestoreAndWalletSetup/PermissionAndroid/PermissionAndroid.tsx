@@ -1,3 +1,5 @@
+/* eslint-disable react-native/split-platform-components */
+/* eslint-disable import/no-extraneous-dependencies */
 import React, { Component } from 'react';
 import {
   StyleSheet,

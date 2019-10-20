@@ -37,7 +37,7 @@ export default class RestoreAndReoverWallet extends Component<Props, any> {
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     try {
       this.willFocusSubscription = this.props.navigation.addListener(
         'willFocus',
@@ -342,10 +342,6 @@ let styles = StyleSheet.create({
     marginTop: 20,
     flex: 1,
     alignItems: 'center',
-  },
-  imgAppLogo: {
-    height: 70,
-    width: 70,
   },
   txtWhiteColor: {
     color: '#ffffff',

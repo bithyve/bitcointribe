@@ -71,7 +71,7 @@ export default class AllTransaction extends React.Component<any, any> {
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getTransaction();
   }
 
