@@ -1,3 +1,4 @@
+/* eslint-disable */
 import bip39 from 'bip39';
 import crypto from 'crypto';
 import config from '../../Config';

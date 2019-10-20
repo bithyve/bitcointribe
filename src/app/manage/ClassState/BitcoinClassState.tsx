@@ -7,8 +7,8 @@ import { S3Service, RegularAccount, SecureAccount } from 'hexaBitcoin';
 const utils = require('HexaWallet/src/app/constants/Utils');
 
 const setRegularClassState = async (value: any) => {
-  value = JSON.stringify(value);
-  AsyncStorage.setItem(asyncStorageKeys.regularClassObject, value);
+  const tvalue = JSON.stringify(value);
+  AsyncStorage.setItem(asyncStorageKeys.regularClassObject, tvalue);
 };
 
 const getRegularClassState = async () => {
@@ -24,8 +24,8 @@ const getRegularClassState = async () => {
 };
 
 const setSecureClassState = async (value: any) => {
-  value = JSON.stringify(value);
-  AsyncStorage.setItem(asyncStorageKeys.secureClassObject, value);
+  const tvalue = JSON.stringify(value);
+  AsyncStorage.setItem(asyncStorageKeys.secureClassObject, tvalue);
 };
 
 const getSecureClassState = async () => {
@@ -41,8 +41,8 @@ const getSecureClassState = async () => {
 };
 
 const setS3ServiceClassState = async (value: any) => {
-  value = JSON.stringify(value);
-  AsyncStorage.setItem(asyncStorageKeys.s3ServiceClassObject, value);
+  const tvalue = JSON.stringify(value);
+  AsyncStorage.setItem(asyncStorageKeys.s3ServiceClassObject, tvalue);
 };
 
 const getS3ServiceClassState = async () => {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import JointAccount from '../../services/accounts/JointAccount';
 
 describe.skip('Joint Account', () => {

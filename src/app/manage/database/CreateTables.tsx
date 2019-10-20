@@ -3,10 +3,6 @@ import SQLite from 'react-native-sqlite-storage';
 import { localDB } from '../../constants/Constants';
 
 export default class CreateTables extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   componentDidMount() {
     const db = SQLite.openDatabase(
       { name: localDB.dbName, readOnly: true },

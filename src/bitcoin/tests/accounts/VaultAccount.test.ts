@@ -1,3 +1,4 @@
+/* eslint-disable */
 import bip65 from 'bip65';
 import { ECPair } from 'bitcoinjs-lib';
 import VaultAccount from '../../services/accounts/VaultAccount';
