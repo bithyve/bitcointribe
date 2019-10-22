@@ -38,7 +38,6 @@ export default class BackupSecretQuestions extends Component {
     componentWillMount() {
         let data = this.props.navigation.getParam( "data" );
         //console.log( { data } );
-
         let walletDetails = this.props.navigation.getParam( "walletDetails" );
         setTimeout( () => {
             this.setState( {
