@@ -132,28 +132,6 @@ class Wallet extends React.Component {
       flag_refreshing: false,
       flag_Loading: false,
       flag_LoadingPdfFile: false,
-      //pdf
-      qrcodeImageString1: "hexa",
-      qrcodeImageString2: "hexa",
-      qrcodeImageString3: "hexa",
-      qrcodeImageString4: "hexa",
-      qrcodeImageString5: "hexa",
-      qrcodeImageString6: "hexa",
-      qrcodeImageString7: "hexa",
-      qrcodeImageString8: "hexa",
-      qrcodeImageString9: "hexa",
-      qrcodeImageString10: "hexa",
-      base64string1: "",
-      base64string2: "",
-      base64string3: "",
-      base64string4: "",
-      base64string5: "",
-      base64string6: "",
-      base64string7: "",
-      base64string8: "",
-      base64string9: "",
-      base64string10: "",
-      flag_QrcodeDisaply: false,
       //Loading Flags
       flag_Offline: false,
       flag_GetBal: false,
@@ -187,6 +165,7 @@ class Wallet extends React.Component {
       Alert.alert( error )
     }
   }
+
 
   componentDidMount() {
     try {
@@ -547,21 +526,9 @@ class Wallet extends React.Component {
   //async task    
   generateSSSDetails = async () => {
     try {
-      // this.setState( {
-      //   flag_PdfFileCreate: true,
-      //   arrErrorMessage: [ {
-      //     type: "asyncTask",
-      //     data: [ {
-      //       message: "Creating your wallet backup",
-      //       bgColor: "#262A2E",
-      //       color: "#ffffff",
-      //     } ]
-      //   } ]  
-      // } );
       const dateTime = Date.now();
       let walletDetails = await utils.getWalletDetails();
       let setUpWalletAnswerDetails = JSON.parse( walletDetails.setUpWalletAnswerDetails );
-      console.log( { setUpWalletAnswerDetails } );
       let secureAccount = await bitcoinClassState.getSecureClassState();
       let sss = await bitcoinClassState.getS3ServiceClassState();
       var resSetupSecureAccount = await secureAccount.setupSecureAccount();
@@ -570,14 +537,12 @@ class Wallet extends React.Component {
       } else {
         alert.simpleOkAction( "Oops", resSetupSecureAccount.err, this.click_StopLoader );
       }
-      console.log( { resSetupSecureAccount } );
       var secondaryXpub = await secureAccount.getSecondaryXpub();
       if ( secondaryXpub.status == 200 ) {
         secondaryXpub = secondaryXpub.data.secondaryXpub;
       } else {
         alert.simpleOkAction( "Oops", secondaryXpub.err, this.click_StopLoader );
       }
-      console.log( { secondaryXpub } );
       var getSecoundMnemonic = await secureAccount.getRecoveryMnemonic();
       if ( getSecoundMnemonic.status == 200 ) {
         await bitcoinClassState.setSecureClassState( secureAccount );
@@ -585,16 +550,16 @@ class Wallet extends React.Component {
       } else {
         alert.simpleOkAction( "Oops", getSecoundMnemonic.err, this.click_StopLoader );
       }
-      console.log( { getSecoundMnemonic } );
+
       //Get Shares                 
       const generateShareRes = await sss.generateShares( setUpWalletAnswerDetails[ 0 ].Answer );
-      console.log( { generateShareRes } );
+
       if ( generateShareRes.status == 200 ) {
         const { encryptedShares } = generateShareRes.data;
         const autoHealthShares = encryptedShares.slice( 0, 3 );
-        console.log( { autoHealthShares } );
+
         const resInitializeHealthcheck = await sss.initializeHealthcheck( autoHealthShares );
-        console.log( { resInitializeHealthcheck } );
+
         if ( resInitializeHealthcheck.status == 200 || resInitializeHealthcheck.status == 400 ) {
           const shareIds = [];
           // console.log( { autoHealthShares } );
@@ -602,58 +567,47 @@ class Wallet extends React.Component {
             shareIds.push( S3Service.getShareId( share ) )
           }
           const socialStaticNonPMDD = { secondaryXpub, bhXpub: resSetupSecureAccount.setupData.bhXpub }
-          console.log( { socialStaticNonPMDD } );
+
           var resEncryptSocialStaticNonPMDD = await sss.encryptStaticNonPMDD( socialStaticNonPMDD );
-          console.log( { shareIds, resEncryptSocialStaticNonPMDD } );
+
           if ( resEncryptSocialStaticNonPMDD.status == 200 ) {
             resEncryptSocialStaticNonPMDD = resEncryptSocialStaticNonPMDD.data.encryptedStaticNonPMDD;
             const buddyStaticNonPMDD = { getSecoundMnemonic, twoFASecret: resSetupSecureAccount.setupData.secret, secondaryXpub, bhXpub: resSetupSecureAccount.setupData.bhXpub };
-            console.log( { buddyStaticNonPMDD } );
+
             let resEncryptBuddyStaticNonPMDD = await sss.encryptStaticNonPMDD( buddyStaticNonPMDD );
             if ( resEncryptBuddyStaticNonPMDD.status == 200 ) {
               resEncryptBuddyStaticNonPMDD = resEncryptBuddyStaticNonPMDD.data.encryptedStaticNonPMDD;
               let rescreateMetaShare = await sss.createMetaShare( 1, encryptedShares[ 0 ], resEncryptSocialStaticNonPMDD, walletDetails.walletType );
-              console.log( { encpShare: encryptedShares[ 1 ], rescreateMetaShare } );
               let resGenerateEncryptedMetaShare1 = await sss.generateEncryptedMetaShare( rescreateMetaShare.data.metaShare );
               let rescreateMetaShare1 = await sss.createMetaShare( 2, encryptedShares[ 1 ], resEncryptSocialStaticNonPMDD, walletDetails.walletType );
-              console.log( { encpShare: encryptedShares[ 2 ], rescreateMetaShare1 } );
               let resGenerateEncryptedMetaShare2 = await sss.generateEncryptedMetaShare( rescreateMetaShare1.data.metaShare );
               let rescreateMetaShare2 = await sss.createMetaShare( 3, encryptedShares[ 2 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
               let resGenerateEncryptedMetaShare3 = await sss.generateEncryptedMetaShare( rescreateMetaShare2.data.metaShare );
-              console.log( { rescreateMetaShare2 } );
               //for pdf                      
               let rescreateMetaShare3 = await sss.createMetaShare( 4, encryptedShares[ 3 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
-              console.log( { rescreateMetaShare3 } );
+
               if ( rescreateMetaShare3.status == 200 ) {
                 var qrcode4share = await sss.createQR( rescreateMetaShare3.data.metaShare, 4 );
-                console.log( { qrcode4share } );
                 if ( qrcode4share.status == 200 ) {
                   qrcode4share = qrcode4share.data.qrData
                   // console.log( { qrcode4share } );
                   //creating 4th share pdf   
                   let temp = [];
                   temp.push( { arrQRCodeData: qrcode4share, secondaryXpub: secondaryXpub, qrData: resSetupSecureAccount.setupData.qrData, secret: resSetupSecureAccount.setupData.secret, secondaryMnemonic: getSecoundMnemonic, bhXpub: resSetupSecureAccount.setupData.bhXpub } )
-                  let resGenerate4thsharepdf = await this.generate4thShare( temp, setUpWalletAnswerDetails[ 0 ].Answer, walletDetails );
-                  console.log( { resGenerate4thsharepdf } );
+                  let resGenerate4thsharepdf = await this.genreatePdf( temp, walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 4", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 4", setUpWalletAnswerDetails[ 0 ].Answer );
                   if ( resGenerate4thsharepdf != "" ) {
                     let rescreateMetaShare4 = await sss.createMetaShare( 5, encryptedShares[ 4 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
-                    console.log( { rescreateMetaShare4 } );
                     if ( rescreateMetaShare4.status == 200 ) {
                       var qrcode5share = await sss.createQR( rescreateMetaShare4.data.metaShare, 5 );
-                      console.log( { qrcode5share } );
                       if ( qrcode5share.status == 200 ) {
                         qrcode5share = qrcode5share.data.qrData
                         let temp = [];
                         temp.push( { arrQRCodeData: qrcode5share, secondaryXpub: secondaryXpub, qrData: resSetupSecureAccount.setupData.qrData, secret: resSetupSecureAccount.setupData.secret, secondaryMnemonic: getSecoundMnemonic, bhXpub: resSetupSecureAccount.setupData.bhXpub } )
-                        console.log( { temp } );
-                        let resGenerate5thsharepdf = await this.generate5thShare( temp, setUpWalletAnswerDetails[ 0 ].Answer, walletDetails );
-                        console.log( { resGenerate5thsharepdf } );
-                        if ( resGenerate5thsharepdf != "" ) {
+                        let resGenerate5thsharepdf = await this.genreatePdf( temp, walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 5", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 5", setUpWalletAnswerDetails[ 0 ].Answer ); if ( resGenerate5thsharepdf != "" ) {
                           let keeperInfo = [ { info: null }, { info: null }, { info: rescreateMetaShare2.data }, { info: qrcode4share[ 0 ] }, { info: qrcode5share[ 0 ] } ];
                           let encryptedMetaShare = [ { metaShare: rescreateMetaShare.data.metaShare }, { metaShare: rescreateMetaShare1.data.metaShare }, { metaShare: rescreateMetaShare2.data.metaShare }, { metaShare: resGenerate4thsharepdf }, { metaShare: resGenerate5thsharepdf } ]
                           let arrTypes = [ { type: "Trusted Contacts 1" }, { type: "Trusted Contacts 2" }, { type: "Self Share 1" }, { type: "Self Share 2" }, { type: "Self Share 3" } ];
                           let temp = [ { date: dateTime, share: encryptedShares, shareId: shareIds, keeperInfo: keeperInfo, encryptedMetaShare: encryptedMetaShare, type: arrTypes } ]
-                          console.log( { temp } );
                           let resInsertSSSShare = await dbOpration.insertSSSShareDetails(
                             localDB.tableName.tblSSSDetails,
                             temp
@@ -665,7 +619,6 @@ class Wallet extends React.Component {
                               flag_LoadingPdfFile: false,
                             } )
                           }
-                          console.log( { resInsertSSSShare } );
                         }
                       }
                     } else {
@@ -694,102 +647,6 @@ class Wallet extends React.Component {
     }
   }
 
-  base64string1 = async ( base64string1: any ) => {
-    try {
-      this.setState( {
-        base64string1
-      } );
-    } catch ( error ) {
-      Alert.alert( error )
-    }
-  }
-  base64string2 = async ( base64string2: any ) => {
-    try {
-      this.setState( {
-        base64string2
-      } );
-    } catch ( error ) {
-      Alert.alert( error )
-    }
-  }
-  base64string3 = async ( base64string3: any ) => {
-    try {
-      this.setState( {
-        base64string3
-      } );
-    } catch ( error ) {
-      Alert.alert( error )
-    }
-  }
-  base64string4 = async ( base64string4: any ) => {
-    try {
-      this.setState( {
-        base64string4
-      } );
-    } catch ( error ) {
-      Alert.alert( error )
-    }
-  }
-  base64string5 = async ( base64string5: any ) => {
-    try {
-      this.setState( {
-        base64string5
-      } );
-    } catch ( error ) {
-      Alert.alert( error )
-    }
-  }
-  base64string6 = async ( base64string6: any ) => {
-    try {
-      this.setState( {
-        base64string6
-      } );
-    } catch ( error ) {
-      Alert.alert( error )
-    }
-  }
-
-  base64string7 = async ( base64string7: any ) => {
-    try {
-      this.setState( {
-        base64string7
-      } );
-    } catch ( error ) {
-      Alert.alert( error )
-    }
-  }
-
-  base64string8 = async ( base64string8: any ) => {
-    try {
-      this.setState( {
-        base64string8
-      } );
-    } catch ( error ) {
-      Alert.alert( error )
-    }
-  }
-
-  base64string9 = async ( base64string9: any ) => {
-    try {
-      this.setState( {
-        base64string9
-      } );
-    } catch ( error ) {
-      Alert.alert( error )
-    }
-  }
-
-
-
-  base64string10 = async ( base64string10: any ) => {
-    try {
-      this.setState( {
-        base64string10
-      } );
-    } catch ( error ) {
-      Alert.alert( error )
-    }
-  }
 
   //qrstring modify
   getCorrectFormatStirng( share1: string ) {
@@ -801,219 +658,6 @@ class Wallet extends React.Component {
       share1 = share1.split( ',' ).join( "Comma" );
       share1 = share1.split( ' ' ).join( "Space" );
       return share1;
-    } catch ( error ) {
-      Alert.alert( error )
-    }
-  }
-
-
-  //For 4th Share
-  generate4thShare = async ( data: any, password: string, walletDetails: any ) => {
-    try {
-      console.log( { password, walletDetails } );
-      return new Promise( async ( resolve, reject ) => {
-        data = data[ 0 ];
-        let arrQRCodeData = data.arrQRCodeData;
-        let secondaryXpub = data.secondaryXpub;
-        let qrData = data.qrData;
-        //set state value for qrcode   
-        this.setState( {
-          qrcodeImageString1: await this.getCorrectFormatStirng( arrQRCodeData[ 0 ] ),
-          qrcodeImageString2: await this.getCorrectFormatStirng( arrQRCodeData[ 1 ] ),
-          qrcodeImageString3: await this.getCorrectFormatStirng( arrQRCodeData[ 2 ] ),
-          qrcodeImageString4: await this.getCorrectFormatStirng( arrQRCodeData[ 3 ] ),
-          qrcodeImageString5: await this.getCorrectFormatStirng( arrQRCodeData[ 4 ] ),
-          qrcodeImageString6: await this.getCorrectFormatStirng( arrQRCodeData[ 5 ] ),
-          qrcodeImageString7: await this.getCorrectFormatStirng( arrQRCodeData[ 6 ] ),
-          qrcodeImageString8: await this.getCorrectFormatStirng( arrQRCodeData[ 7 ] ),
-          qrcodeImageString9: secondaryXpub,
-          qrcodeImageString10: qrData,
-        }, async () => {
-          await this.svg1.toDataURL( this.base64string1 );
-          await this.svg2.toDataURL( this.base64string2 );
-          await this.svg3.toDataURL( this.base64string3 );
-          await this.svg4.toDataURL( this.base64string4 );
-          await this.svg5.toDataURL( this.base64string5 );
-          await this.svg6.toDataURL( this.base64string6 );
-          await this.svg7.toDataURL( this.base64string7 );
-          await this.svg8.toDataURL( this.base64string8 );
-          await this.svg9.toDataURL( this.base64string9 );
-          await this.svg10.toDataURL( this.base64string10 );
-          setTimeout( async () => {
-            let base64string1 = this.state.base64string1;
-            let base64string2 = this.state.base64string2;
-            let base64string3 = this.state.base64string3;
-            let base64string4 = this.state.base64string4;
-            let base64string5 = this.state.base64string5;
-            let base64string6 = this.state.base64string6;
-            let base64string7 = this.state.base64string7;
-            let base64string8 = this.state.base64string8;
-            let base64string9 = this.state.base64string9;
-            let base64string10 = this.state.base64string10;
-            let res4thShare1Create = await this.generateSahreQRCode( base64string1, "qrcode4thSahre1.png" );
-            // console.log( { res4thShare1Create } );     
-            let res4thShare2Create = await this.generateSahreQRCode( base64string2, "qrcode4thSahre2.png" );
-            //    console.log( { res4thShare2Create } );
-            let res4thShare3Create = await this.generateSahreQRCode( base64string3, "qrcode4thSahre3.png" );
-            //  console.log( { res4thShare3Create } );
-            let res4thShare4Create = await this.generateSahreQRCode( base64string4, "qrcode4thSahre4.png" );
-            //console.log( { res4thShare4Create } );
-            let res4thShare5Create = await this.generateSahreQRCode( base64string5, "qrcode4thSahre5.png" );
-            //console.log( { res4thShare5Create } );
-            let res4thShare6Create = await this.generateSahreQRCode( base64string6, "qrcode4thSahre6.png" );
-            //console.log( { res4thShare6Create } );
-            let res4thShare7Create = await this.generateSahreQRCode( base64string7, "qrcode4thSahre7.png" );
-            //console.log( { res4thShare7Create } );   
-            let res4thShare8Create = await this.generateSahreQRCode( base64string8, "qrcode4thSahre8.png" );
-            //console.log( { res4thShare8Create } );
-            let resSecoundXpub4Share = await this.generateXpubAnd2FAQRCode( base64string9, "secoundryXpub4Share.png" );
-            // console.log( { resSecoundXpub4Share } );  
-            let res2FASecret4Share = await this.generateXpubAnd2FAQRCode( base64string10, "googleAuto2FASecret4Share.png" );
-            // console.log( { res2FASecret4Share } );
-            var create4thPdf;
-            if ( Platform.OS == "android" ) {
-              create4thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode4thSahre1.png", "/storage/emulated/0/qrcode4thSahre2.png", "/storage/emulated/0/qrcode4thSahre3.png", "/storage/emulated/0/qrcode4thSahre4.png", "/storage/emulated/0/qrcode4thSahre5.png", "/storage/emulated/0/qrcode4thSahre6.png", "/storage/emulated/0/qrcode4thSahre7.png", "/storage/emulated/0/qrcode4thSahre8.png", "/storage/emulated/0/secoundryXpub4Share.png", "/storage/emulated/0/googleAuto2FASecret4Share.png", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 4.pdf", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 4", password );
-            } else {
-              create4thPdf = await this.genreatePdf( data, res4thShare1Create, res4thShare2Create, res4thShare3Create, res4thShare4Create, res4thShare5Create, res4thShare6Create, res4thShare7Create, res4thShare8Create, resSecoundXpub4Share, res2FASecret4Share, walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 4.pdf", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 4", password );
-            }
-            resolve( create4thPdf );
-          }, 4000 );
-        } );
-      } );
-    } catch ( error ) {
-      Alert.alert( error )
-    }
-  }
-
-  //for 5th share
-  generate5thShare = async ( data: any, password: string, walletDetails: any ) => {
-    try {
-      return new Promise( async ( resolve, reject ) => {
-        data = data[ 0 ];
-        let arrQRCodeData = data.arrQRCodeData;
-        let secondaryXpub = data.secondaryXpub;
-        let qrData = data.qrData;
-        console.log( { arrQRCodeData, secondaryXpub, qrData } );
-        console.log( { password } );
-        //set state value for qrcode
-        this.setState( {
-          qrcodeImageString1: await this.getCorrectFormatStirng( arrQRCodeData[ 0 ] ),
-          qrcodeImageString2: await this.getCorrectFormatStirng( arrQRCodeData[ 1 ] ),
-          qrcodeImageString3: await this.getCorrectFormatStirng( arrQRCodeData[ 2 ] ),
-          qrcodeImageString4: await this.getCorrectFormatStirng( arrQRCodeData[ 3 ] ),
-          qrcodeImageString5: await this.getCorrectFormatStirng( arrQRCodeData[ 4 ] ),
-          qrcodeImageString6: await this.getCorrectFormatStirng( arrQRCodeData[ 5 ] ),
-          qrcodeImageString7: await this.getCorrectFormatStirng( arrQRCodeData[ 6 ] ),
-          qrcodeImageString8: await this.getCorrectFormatStirng( arrQRCodeData[ 7 ] ),
-          qrcodeImageString9: secondaryXpub,
-          qrcodeImageString10: qrData,
-        }, async () => {
-          await this.svg1.toDataURL( this.base64string1 );
-          await this.svg2.toDataURL( this.base64string2 );
-          await this.svg3.toDataURL( this.base64string3 );
-          await this.svg4.toDataURL( this.base64string4 );
-          await this.svg5.toDataURL( this.base64string5 );
-          await this.svg6.toDataURL( this.base64string6 );
-          await this.svg7.toDataURL( this.base64string7 );
-          await this.svg8.toDataURL( this.base64string8 );
-          await this.svg9.toDataURL( this.base64string9 );
-          await this.svg10.toDataURL( this.base64string10 );
-          setTimeout( async () => {
-            let base64string1 = this.state.base64string1;
-            let base64string2 = this.state.base64string2;
-            let base64string3 = this.state.base64string3;
-            let base64string4 = this.state.base64string4;
-            let base64string5 = this.state.base64string5;
-            let base64string6 = this.state.base64string6;
-            let base64string7 = this.state.base64string7;
-            let base64string8 = this.state.base64string8;
-            let base64string9 = this.state.base64string9;
-            let base64string10 = this.state.base64string10;
-            let res5thShare1Create = await this.generateSahreQRCode( base64string1, "qrcode5thSahre1.png" );
-            console.log( { res5thShare1Create } );
-            let res5thShare2Create = await this.generateSahreQRCode( base64string2, "qrcode5thSahre2.png" );
-            //    console.log( { res4thShare2Create } );
-            let res5thShare3Create = await this.generateSahreQRCode( base64string3, "qrcode5thSahre3.png" );
-            //  console.log( { res4thShare3Create } );
-            let res5thShare4Create = await this.generateSahreQRCode( base64string4, "qrcode5thSahre4.png" );
-            //console.log( { res4thShare4Create } );
-            let res5thShare5Create = await this.generateSahreQRCode( base64string5, "qrcode5thSahre5.png" );
-            //console.log( { res4thShare5Create } );
-            let res5thShare6Create = await this.generateSahreQRCode( base64string6, "qrcode5thSahre6.png" );
-            //console.log( { res5thShare6Create } );
-            let res5thShare7Create = await this.generateSahreQRCode( base64string7, "qrcode5thSahre7.png" );
-            //console.log( { res5thShare7Create } );
-            let res5thShare8Create = await this.generateSahreQRCode( base64string8, "qrcode5thSahre8.png" );
-            //console.log( { res5thShare8Create } );   
-            let resSecoundXpub5Share = await this.generateXpubAnd2FAQRCode( base64string9, "secoundryXpub5Share.png" );
-            // console.log( { resSecoundXpub4Share } );
-            let res2FASecret5Share = await this.generateXpubAnd2FAQRCode( base64string10, "googleAuto2FASecret5Share.png" );
-            // console.log( { res2FASecret4Share } );  
-            var create5thPdf;
-            if ( Platform.OS == "android" ) {
-              create5thPdf = await this.genreatePdf( data, "/storage/emulated/0/qrcode5thSahre1.png", "/storage/emulated/0/qrcode5thSahre2.png", "/storage/emulated/0/qrcode5thSahre3.png", "/storage/emulated/0/qrcode5thSahre4.png", "/storage/emulated/0/qrcode5thSahre5.png", "/storage/emulated/0/qrcode5thSahre6.png", "/storage/emulated/0/qrcode5thSahre7.png", "/storage/emulated/0/qrcode5thSahre8.png", "/storage/emulated/0/secoundryXpub5Share.png", "/storage/emulated/0/googleAuto2FASecret5Share.png", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 5.pdf", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 5", password );
-            } else {
-              create5thPdf = await this.genreatePdf( data, res5thShare1Create, res5thShare2Create, res5thShare3Create, res5thShare4Create, res5thShare5Create, res5thShare6Create, res5thShare7Create, res5thShare8Create, resSecoundXpub5Share, res2FASecret5Share, walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 5.pdf", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 5", password );
-            }
-            resolve( create5thPdf );
-          }, 4000 );
-        } );
-      } );
-    } catch ( error ) {
-      Alert.alert( error )
-    }
-  }
-
-  generateSahreQRCode = async ( share1: any, fileName: string ) => {
-    try {
-      return new Promise( async ( resolve, reject ) => {
-        console.log( { share1, fileName } );
-        var docsDir;
-        if ( Platform.OS == "android" ) {
-          docsDir = await RNFS.ExternalStorageDirectoryPath + "/pdfFiles/"; // RNFS.DocumentDirectoryPath; 
-        } else {
-          docsDir = await PDFLib.getDocumentsDirectory();
-        }
-        docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
-        console.log( { docsDir } );
-        var path = `${ docsDir }/${ fileName }`;
-        RNFS.writeFile( path, share1, "base64" )
-          .then( ( success: any ) => {
-            console.log( { path } );
-            resolve( path );
-          } )
-          .catch( ( err: any ) => {
-            alert.simpleOk( "Oops", err );
-          } )
-      } );
-    } catch ( error ) {
-      Alert.alert( error )
-    }
-  }
-
-  generateXpubAnd2FAQRCode = async ( share1: string, fileName: string ) => {
-    try {
-      return new Promise( async ( resolve, reject ) => {
-        console.log( { xpuband2fa: share1, fileName } );
-        var docsDir;
-        if ( Platform.OS == "android" ) {
-          docsDir = await RNFS.ExternalStorageDirectoryPath + "/pdfFiles/"; // RNFS.DocumentDirectoryPath; //
-        } else {
-          docsDir = await PDFLib.getDocumentsDirectory();
-        }
-        docsDir = Platform.OS === 'android' ? `file://${ docsDir }` : docsDir;
-        console.log( { dir: docsDir } );
-
-        var path = `${ docsDir }/${ fileName }`;
-        RNFS.writeFile( path, share1, "base64" )
-          .then( ( success: any ) => {
-            console.log( { path } );
-            resolve( path );
-          } )
-          .catch( ( err: any ) => {
-            alert.simpleOk( "Oops", err );
-          } )
-      } );
     } catch ( error ) {
       Alert.alert( error )
     }
@@ -1034,68 +678,124 @@ class Wallet extends React.Component {
   }
 
 
-  genreatePdf = async ( data: any, pathShare1: string, pathShare2: string, pathShare3: string, pathShare4: string, pathShare5: string, pathShare6: string, pathShare7: string, pathShare8: string, pathSecoundXpub: string, path2FASecret: string, pdfFileName: string, forShare: string, password: string ) => {
+  genreatePdf = async ( data: any, pdfFileName: string, forShare: string, password: string ) => {
     try {
       return new Promise( async ( resolve, reject ) => {
-
-        console.log( { data, pathShare1, pathShare2, pathShare3, pathShare4, pathShare5, pathShare6, pathShare7, pathShare8, pathSecoundXpub, path2FASecret, pdfFileName, forShare, forShare, password } );
-        // console.log( { password } );  
+        data = data[ 0 ];
         let arrQRCodeData = data.arrQRCodeData;
+        let secondaryXpub = data.secondaryXpub;
+        let qrData = data.qrData;
         let secret2FA = data.secret;
         let secondaryMnemonic = data.secondaryMnemonic;
         let bhXpub = data.bhXpub;
-        //Share 1 
-        // let arrShare1 = .split();   
+        //qrcode string   
+        let qrCode1 = await this.getCorrectFormatStirng( arrQRCodeData[ 0 ] );
+        let qrCode2 = await this.getCorrectFormatStirng( arrQRCodeData[ 1 ] );
+        let qrCode3 = await this.getCorrectFormatStirng( arrQRCodeData[ 2 ] );
+        let qrCode4 = await this.getCorrectFormatStirng( arrQRCodeData[ 3 ] );
+        let qrCode5 = await this.getCorrectFormatStirng( arrQRCodeData[ 4 ] );
+        let qrCode6 = await this.getCorrectFormatStirng( arrQRCodeData[ 5 ] );
+        let qrCode7 = await this.getCorrectFormatStirng( arrQRCodeData[ 6 ] );
+        let qrCode8 = await this.getCorrectFormatStirng( arrQRCodeData[ 7 ] );
+        //Share 1                         
         // console.log( { arrShare1 } );       
-        let arrShare1 = this.chunkArray( arrQRCodeData[ 0 ], 7 );
-        let arrShare2 = this.chunkArray( arrQRCodeData[ 1 ], 7 );
-        let arrShare3 = this.chunkArray( arrQRCodeData[ 2 ], 7 );
-        let arrShare4 = this.chunkArray( arrQRCodeData[ 3 ], 7 );
-        let arrShare5 = this.chunkArray( arrQRCodeData[ 4 ], 7 );
-        let arrShare6 = this.chunkArray( arrQRCodeData[ 5 ], 7 );
-        let arrShare7 = this.chunkArray( arrQRCodeData[ 6 ], 7 );
-        let arrShare8 = this.chunkArray( arrQRCodeData[ 7 ], 7 );
-        //Secound Mnemonic
+        let arrShare1 = this.chunkArray( arrQRCodeData[ 0 ], 4 );
+        let arrShare2 = this.chunkArray( arrQRCodeData[ 1 ], 4 );
+        let arrShare3 = this.chunkArray( arrQRCodeData[ 2 ], 4 );
+        let arrShare4 = this.chunkArray( arrQRCodeData[ 3 ], 4 );
+        let arrShare5 = this.chunkArray( arrQRCodeData[ 4 ], 4 );
+        let arrShare6 = this.chunkArray( arrQRCodeData[ 5 ], 4 );
+        let arrShare7 = this.chunkArray( arrQRCodeData[ 6 ], 4 );
+        let arrShare8 = this.chunkArray( arrQRCodeData[ 7 ], 4 );
+
+        // //Secound Mnemonic
         let arrSecondaryMnemonic = secondaryMnemonic.split( ' ' );
         var firstArrSecondaryMnemonic, secoundArrSecondaryMnemonic, threeSecondaryMnemonic;
-        let arrSepArray = this.chunkArray( arrSecondaryMnemonic, 3 );
+        let arrSepArray = this.chunkArray( arrSecondaryMnemonic, 2 );
         firstArrSecondaryMnemonic = arrSepArray[ 0 ].toString();
         firstArrSecondaryMnemonic = firstArrSecondaryMnemonic.split( ',' ).join( ' ' );
         secoundArrSecondaryMnemonic = arrSepArray[ 1 ].toString();
         secoundArrSecondaryMnemonic = secoundArrSecondaryMnemonic.split( ',' ).join( ' ' );
-        threeSecondaryMnemonic = arrSepArray[ 2 ].toString();
-        threeSecondaryMnemonic = threeSecondaryMnemonic.split( ',' ).join( ' ' );
+
         //bhXpub
-        // console.log( { bhXpub } );
-        var firstArrbhXpub, secoundArrbhXpub, threebhXpub;
-        let arrSepArraybhXpub = bhXpub.match( /.{1,40}/g );
-        // console.log( arrSepArraybhXpub );
-        firstArrbhXpub = arrSepArraybhXpub[ 0 ].toString();
-        firstArrbhXpub = firstArrbhXpub.split( ',' ).join( ' ' );
-        secoundArrbhXpub = arrSepArraybhXpub[ 1 ].toString();
-        secoundArrbhXpub = secoundArrbhXpub.split( ',' ).join( ' ' );
-        threebhXpub = arrSepArraybhXpub[ 2 ].toString();
-        threebhXpub = threebhXpub.split( ',' ).join( ' ' );
-
-        //console.log( { secondaryMnemonic, bhXpub } );
-        var docsDir;
-        if ( Platform.OS == "android" ) {
-          docsDir = await RNFS.ExternalStorageDirectoryPath;
-        } else {
-          docsDir = await PDFLib.getDocumentsDirectory();
-        }
-        const pdfPath = `${ docsDir }/${ pdfFileName }`;
-        console.log( { pdfPath } );
-
+        let arrBhXpub = this.chunkArray( bhXpub, 2 );
         let options = {
-          html: "<h1>Sagar Wallet Share 4</h1>" +
-            "<p>Part 1<p><br/>" +
-            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=HelloWorld&amp;size=100x100'/>",
-          fileName: 'test',
+          padding: 0,
+          height: 842,
+          width: 595,
+          html: "<h1>" + forShare + "</h1>" +
+            "<h3 style='text-decoration: underline;'>Part 1<h3>" +
+            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode1 + "&amp' style='margin-left:35%'/><br/>" +
+            "<p align='center'>" + arrShare1[ 0 ] + "</p>" +
+            "<p align='center'>" + arrShare1[ 1 ] + "</p>" +
+            "<p align='center'>" + arrShare1[ 2 ] + "</p>" +
+            "<p align='center'>" + arrShare1[ 3 ] + "</p>" +
+            "<h3 style='text-decoration: underline;'>Part 2<h3>" +
+            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode2 + "&amp' style='margin-left:35%'/><br/>" +
+            "<p align='center'>" + arrShare2[ 0 ] + "</p>" +
+            "<p align='center'>" + arrShare2[ 1 ] + "</p>" +
+            "<p align='center'>" + arrShare2[ 2 ] + "</p>" +
+            "<p align='center'>" + arrShare2[ 3 ] + "</p>" +
+            "<h3 style='text-decoration: underline;'>Part 3<h3>" +
+            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode3 + "&amp' style='margin-left:35%'/><br/>" +
+            "<p align='center'>" + arrShare3[ 0 ] + "</p>" +
+            "<p align='center'>" + arrShare3[ 1 ] + "</p>" +
+            "<p align='center'>" + arrShare3[ 2 ] + "</p>" +
+            "<p align='center'>" + arrShare3[ 3 ] + "</p>" +
+            "<h3 style='text-decoration: underline;'>Part 4<h3>" +
+            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode4 + "&amp' style='margin-left:35%'/><br/>" +
+            "<p align='center'>" + arrShare4[ 0 ] + "</p>" +
+            "<p align='center'>" + arrShare4[ 1 ] + "</p>" +
+            "<p align='center'>" + arrShare4[ 2 ] + "</p>" +
+            "<p align='center'>" + arrShare4[ 3 ] + "</p>" +
+            "<h3 style='text-decoration: underline;'>Part 5<h3>" +
+            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode5 + "&amp' style='margin-left:35%'/><br/>" +
+            "<p align='center'>" + arrShare5[ 0 ] + "</p>" +
+            "<p align='center'>" + arrShare5[ 1 ] + "</p>" +
+            "<p align='center'>" + arrShare5[ 2 ] + "</p>" +
+            "<p align='center'>" + arrShare5[ 3 ] + "</p>" +
+            "<h3 style='text-decoration: underline;'>Part 6<h3>" +
+            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode6 + "&amp' style='margin-left:35%'/><br/>" +
+            "<p align='center'>" + arrShare6[ 0 ] + "</p>" +
+            "<p align='center'>" + arrShare6[ 1 ] + "</p>" +
+            "<p align='center'>" + arrShare6[ 2 ] + "</p>" +
+            "<p align='center'>" + arrShare6[ 3 ] + "</p>" +
+            "<h3 style='text-decoration: underline;'>Part 7<h3>" +
+            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode7 + "&amp' style='margin-left:35%'/><br/>" +
+            "<p align='center'>" + arrShare7[ 0 ] + "</p>" +
+            "<p align='center'>" + arrShare7[ 1 ] + "</p>" +
+            "<p align='center'>" + arrShare7[ 2 ] + "</p>" +
+            "<p align='center'>" + arrShare7[ 3 ] + "</p>" +
+            "<h3 style='text-decoration: underline;'>Part 8<h3>" +
+            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode8 + "&amp' style='margin-left:35%'/><br/>" +
+            "<p align='center'>" + arrShare8[ 0 ] + "</p>" +
+            "<p align='center'>" + arrShare8[ 1 ] + "</p>" +
+            "<p align='center'>" + arrShare8[ 2 ] + "</p>" +
+            "<p align='center'>" + arrShare8[ 3 ] + "</p>" +
+            "<h3 style='text-decoration: underline;'>Secondary Xpub (Encrypted):<h3>" +
+            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + secondaryXpub + "&amp' style='margin-left:35%'/>" +
+            "<p align='center'>Scan the above QR Code using your HEXA wallet in order to restore your Secure Account.</p>" +
+            "<p>2FA Secret:<p><br/>" +
+            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrData + "&amp' style='margin-left:35%'/>" +
+            "<p align='center'>" + secret2FA + "</p>" +
+            "<p>Following assets can be used to recover your funds using the open - sourced ga - recovery tool.</p><br/><br/>" +
+            "<p>Secondary Mnemonic:<p>" +
+            "<p align='center'>" + firstArrSecondaryMnemonic + "</p>" +
+            "<p align='center'>" + secoundArrSecondaryMnemonic + "</p><br/>" +
+            "<p>BitHyve Xpub:<p>" +
+            "<p align='center'>" + arrBhXpub[ 0 ] + "</p>" +
+            "<p align='center'>" + arrBhXpub[ 1 ] + "</p>",
+          fileName: pdfFileName,
           directory: 'Documents',
         };
         let file = await RNHTMLtoPDF.convert( options )
-        resolve( file );
+        if ( Platform.OS == "ios" ) {
+          var PdfPassword = NativeModules.PdfPassword;
+          PdfPassword.addEvent( "/" + pdfFileName + ".pdf", password );
+        } else {
+          this.setPdfAndroidPasswrod( file.filePath, password );
+        }
+        resolve( file.filePath );
       } );
     } catch ( error ) {
       Alert.alert( error )
@@ -1106,8 +806,9 @@ class Wallet extends React.Component {
   // async function to call the Java native method
   async setPdfAndroidPasswrod( pdfPath: string, pdffilePassword: string ) {
     try {
-      var PdfPassword = NativeModules.PdfPassword;
-      PdfPassword.setPdfPasswrod( pdfPath, pdffilePassword, ( err: any ) => { console.log( err ) }, ( msg: any ) => { console.log( msg ) } );
+      console.log( { pdfPath } );
+      // var PdfPassword = NativeModules.PdfPassword;
+      // PdfPassword.setPdfPasswrod( pdfPath, pdffilePassword, ( err: any ) => { console.log( err ) }, ( msg: any ) => { console.log( msg ) } );
     } catch ( error ) {
       Alert.alert( error )
     }
@@ -1538,8 +1239,7 @@ class Wallet extends React.Component {
     let { arr_ModelAcceptOrRejectSecret, arr_ModelBackupShareAssociateContact, arr_ModelBackupAssociateOpenContactList, arr_ModelBackupYourWallet, arr_ModelSelfShareAcceptAndReject, arrModelHelperScreen } = this.state;
     //flag
     let { flag_Loading, flag_refreshing, flag_Offline, flag_GetBal, flag_PdfFileCreate, flag_ReloadAccounts, flag_LoadingPdfFile } = this.state;
-    //qrcode string values
-    let { qrcodeImageString1, qrcodeImageString2, qrcodeImageString3, qrcodeImageString4, qrcodeImageString5, qrcodeImageString6, qrcodeImageString7, qrcodeImageString8, qrcodeImageString9, qrcodeImageString10 } = this.state;
+
 
     const actions = [
       {
@@ -1558,7 +1258,6 @@ class Wallet extends React.Component {
           scrollEnabled={ false }
           contentContainerStyle={ styles.container }
         >
-          <Image style={ { width: 100, height: 100 } } source={ { isStatic: true, uri: "file:///storage/emulated/0/qrcode5thSahre1.png" } } />
           <SafeAreaView style={ { flex: 0, backgroundColor: colors.appColor } } />
           <SafeAreaView style={ [ styles.container, { backgroundColor: 'transparent' } ] }>
             {/* Top View Animation */ }
@@ -1678,67 +1377,6 @@ class Wallet extends React.Component {
 
               </ScrollView>
             </Animated.View>
-            <View style={ { flexDirection: "row", marginLeft: 500, height: 10 } }>
-              <QRCode
-                value={ qrcodeImageString1 }
-                getRef={ ( c ) => ( this.svg1 = c ) }
-                size={ 200 }
-
-              />
-              <QRCode
-                value={ qrcodeImageString2 }
-                getRef={ ( c ) => ( this.svg2 = c ) }
-                style={ { height: 0, width: 0 } }
-                size={ 200 }
-
-              />
-              <QRCode
-                value={ qrcodeImageString3 }
-                getRef={ ( c ) => ( this.svg3 = c ) }
-                size={ 200 }
-
-              />
-              <QRCode
-                value={ qrcodeImageString4 }
-                getRef={ ( c ) => ( this.svg4 = c ) }
-                size={ 200 }
-
-              />
-              <QRCode
-                value={ qrcodeImageString5 }
-                getRef={ ( c ) => ( this.svg5 = c ) }
-                size={ 200 }
-
-              />
-              <QRCode
-                value={ qrcodeImageString6 }
-                getRef={ ( c ) => ( this.svg6 = c ) }
-                size={ 200 }
-
-              />
-              <QRCode
-                value={ qrcodeImageString7 }
-                getRef={ ( c ) => ( this.svg7 = c ) }
-                size={ 200 }
-              />
-              <QRCode
-                value={ qrcodeImageString8 }
-                getRef={ ( c ) => ( this.svg8 = c ) }
-                size={ 200 }
-
-              />
-              <QRCode
-                value={ qrcodeImageString9 }
-                getRef={ ( c ) => ( this.svg9 = c ) }
-                size={ 200 }
-
-              />
-              <QRCode
-                value={ qrcodeImageString10 }
-                getRef={ ( c ) => ( this.svg10 = c ) }
-                size={ 200 }
-              />
-            </View>
           </SafeAreaView>
         </Content>
         <DropdownAlert ref={ ref => ( this.dropdown = ref ) } />
