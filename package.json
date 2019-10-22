@@ -37,6 +37,7 @@
     "number-to-words": "^1.2.4",
     "path-browserify": "0.0.0",
     "punycode": "^1.4.1",
+    "qrcode-svg": "^1.0.0",
     "querystring-es3": "^0.2.1",
     "react": "16.8.6",
     "react-native": "0.60.5",

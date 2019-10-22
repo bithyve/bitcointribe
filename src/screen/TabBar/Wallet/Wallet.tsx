@@ -25,13 +25,12 @@ import { RkCard } from "react-native-ui-kitten";
 import DropdownAlert from "react-native-dropdownalert";
 import { SvgIcon } from "hexaComponent/Icons";
 import Permissions from 'react-native-permissions';
+var QRCode = require( "qrcode-svg" );
 
-
-import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 
 var RNFS = require( 'react-native-fs' );
-import QRCode from 'react-native-qrcode-svg';
+
 
 
 
@@ -688,6 +687,7 @@ class Wallet extends React.Component {
         let secret2FA = data.secret;
         let secondaryMnemonic = data.secondaryMnemonic;
         let bhXpub = data.bhXpub;
+
         //qrcode string   
         let qrCode1 = await this.getCorrectFormatStirng( arrQRCodeData[ 0 ] );
         let qrCode2 = await this.getCorrectFormatStirng( arrQRCodeData[ 1 ] );
@@ -697,6 +697,7 @@ class Wallet extends React.Component {
         let qrCode6 = await this.getCorrectFormatStirng( arrQRCodeData[ 5 ] );
         let qrCode7 = await this.getCorrectFormatStirng( arrQRCodeData[ 6 ] );
         let qrCode8 = await this.getCorrectFormatStirng( arrQRCodeData[ 7 ] );
+
         //Share 1                         
         // console.log( { arrShare1 } );       
         let arrShare1 = this.chunkArray( arrQRCodeData[ 0 ], 4 );
@@ -725,58 +726,59 @@ class Wallet extends React.Component {
           width: 595,
           html: "<h1>" + forShare + "</h1>" +
             "<h3 style='text-decoration: underline;'>Part 1<h3>" +
-            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode1 + "&amp' style='margin-left:35%'/><br/>" +
+            //"<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode1 + "&amp' style='margin-left:35%'/><br/>" +
+            new QRCode( qrCode1 ).svg() +
             "<p align='center'>" + arrShare1[ 0 ] + "</p>" +
             "<p align='center'>" + arrShare1[ 1 ] + "</p>" +
             "<p align='center'>" + arrShare1[ 2 ] + "</p>" +
             "<p align='center'>" + arrShare1[ 3 ] + "</p>" +
             "<h3 style='text-decoration: underline;'>Part 2<h3>" +
-            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode2 + "&amp' style='margin-left:35%'/><br/>" +
+            new QRCode( qrCode2 ).svg() +
             "<p align='center'>" + arrShare2[ 0 ] + "</p>" +
             "<p align='center'>" + arrShare2[ 1 ] + "</p>" +
             "<p align='center'>" + arrShare2[ 2 ] + "</p>" +
             "<p align='center'>" + arrShare2[ 3 ] + "</p>" +
             "<h3 style='text-decoration: underline;'>Part 3<h3>" +
-            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode3 + "&amp' style='margin-left:35%'/><br/>" +
+            new QRCode( qrCode3 ).svg() +
             "<p align='center'>" + arrShare3[ 0 ] + "</p>" +
             "<p align='center'>" + arrShare3[ 1 ] + "</p>" +
             "<p align='center'>" + arrShare3[ 2 ] + "</p>" +
             "<p align='center'>" + arrShare3[ 3 ] + "</p>" +
             "<h3 style='text-decoration: underline;'>Part 4<h3>" +
-            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode4 + "&amp' style='margin-left:35%'/><br/>" +
+            new QRCode( qrCode4 ).svg() +
             "<p align='center'>" + arrShare4[ 0 ] + "</p>" +
             "<p align='center'>" + arrShare4[ 1 ] + "</p>" +
             "<p align='center'>" + arrShare4[ 2 ] + "</p>" +
             "<p align='center'>" + arrShare4[ 3 ] + "</p>" +
             "<h3 style='text-decoration: underline;'>Part 5<h3>" +
-            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode5 + "&amp' style='margin-left:35%'/><br/>" +
+            new QRCode( qrCode5 ).svg() +
             "<p align='center'>" + arrShare5[ 0 ] + "</p>" +
             "<p align='center'>" + arrShare5[ 1 ] + "</p>" +
             "<p align='center'>" + arrShare5[ 2 ] + "</p>" +
             "<p align='center'>" + arrShare5[ 3 ] + "</p>" +
             "<h3 style='text-decoration: underline;'>Part 6<h3>" +
-            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode6 + "&amp' style='margin-left:35%'/><br/>" +
+            new QRCode( qrCode6 ).svg() +
             "<p align='center'>" + arrShare6[ 0 ] + "</p>" +
             "<p align='center'>" + arrShare6[ 1 ] + "</p>" +
             "<p align='center'>" + arrShare6[ 2 ] + "</p>" +
             "<p align='center'>" + arrShare6[ 3 ] + "</p>" +
             "<h3 style='text-decoration: underline;'>Part 7<h3>" +
-            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode7 + "&amp' style='margin-left:35%'/><br/>" +
+            new QRCode( qrCode7 ).svg() +
             "<p align='center'>" + arrShare7[ 0 ] + "</p>" +
             "<p align='center'>" + arrShare7[ 1 ] + "</p>" +
             "<p align='center'>" + arrShare7[ 2 ] + "</p>" +
             "<p align='center'>" + arrShare7[ 3 ] + "</p>" +
             "<h3 style='text-decoration: underline;'>Part 8<h3>" +
-            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode8 + "&amp' style='margin-left:35%'/><br/>" +
+            new QRCode( qrCode8 ).svg() +
             "<p align='center'>" + arrShare8[ 0 ] + "</p>" +
             "<p align='center'>" + arrShare8[ 1 ] + "</p>" +
             "<p align='center'>" + arrShare8[ 2 ] + "</p>" +
             "<p align='center'>" + arrShare8[ 3 ] + "</p>" +
             "<h3 style='text-decoration: underline;'>Secondary Xpub (Encrypted):<h3>" +
-            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + secondaryXpub + "&amp' style='margin-left:35%'/>" +
+            new QRCode( secondaryXpub ).svg() +
             "<p align='center'>Scan the above QR Code using your HEXA wallet in order to restore your Secure Account.</p>" +
             "<p>2FA Secret:<p><br/>" +
-            "<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrData + "&amp' style='margin-left:35%'/>" +
+            new QRCode( qrData ).svg() +
             "<p align='center'>" + secret2FA + "</p>" +
             "<p>Following assets can be used to recover your funds using the open - sourced ga - recovery tool.</p><br/><br/>" +
             "<p>Secondary Mnemonic:<p>" +
