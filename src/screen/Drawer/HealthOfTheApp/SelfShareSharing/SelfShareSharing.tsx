@@ -88,6 +88,7 @@ export default class SelfShareSharing extends React.Component<any, any> {
 
     //TODO: Sharing PDF
     click_ShareEmail = async ( data: any ) => {
+        console.log( { pdfpath: data } );
         let resultWallet = await utils.getWalletDetails();
         let backupInfo = JSON.parse( resultWallet.backupInfo );
         if ( backupInfo[ 0 ].backupType == "new" ) {
