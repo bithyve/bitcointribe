@@ -6896,6 +6896,11 @@ qr.js@0.0.0:
   resolved "https://registry.yarnpkg.com/qr.js/-/qr.js-0.0.0.tgz#cace86386f59a0db8050fa90d9b6b0e88a1e364f"
   integrity sha1-ys6GOG9ZoNuAUPqQ2baw6IoeNk8=
 
+qrcode-svg@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/qrcode-svg/-/qrcode-svg-1.0.0.tgz#25bddf0c06c7e546622f4b595a3553efa2647bce"
+  integrity sha1-Jb3fDAbH5UZiL0tZWjVT76Jke84=
+
 qrcode@^1.2.0:
   version "1.4.2"
   resolved "https://registry.yarnpkg.com/qrcode/-/qrcode-1.4.2.tgz#e7c82a60140916d666541043bd2b0b72ee4e38a6"
