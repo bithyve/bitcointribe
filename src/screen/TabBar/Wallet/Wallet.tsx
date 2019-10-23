@@ -561,19 +561,17 @@ class Wallet extends React.Component {
 
         if ( resInitializeHealthcheck.status == 200 || resInitializeHealthcheck.status == 400 ) {
           const shareIds = [];
-          // console.log( { autoHealthShares } );
+          console.log( { autoHealthShares } );
           for ( const share of encryptedShares ) {
             shareIds.push( S3Service.getShareId( share ) )
           }
           const socialStaticNonPMDD = { secondaryXpub, bhXpub: resSetupSecureAccount.setupData.bhXpub }
-
           var resEncryptSocialStaticNonPMDD = await sss.encryptStaticNonPMDD( socialStaticNonPMDD );
-
           if ( resEncryptSocialStaticNonPMDD.status == 200 ) {
             resEncryptSocialStaticNonPMDD = resEncryptSocialStaticNonPMDD.data.encryptedStaticNonPMDD;
             const buddyStaticNonPMDD = { getSecoundMnemonic, twoFASecret: resSetupSecureAccount.setupData.secret, secondaryXpub, bhXpub: resSetupSecureAccount.setupData.bhXpub };
-
             let resEncryptBuddyStaticNonPMDD = await sss.encryptStaticNonPMDD( buddyStaticNonPMDD );
+            console.log( { resEncryptBuddyStaticNonPMDD } );
             if ( resEncryptBuddyStaticNonPMDD.status == 200 ) {
               resEncryptBuddyStaticNonPMDD = resEncryptBuddyStaticNonPMDD.data.encryptedStaticNonPMDD;
               let rescreateMetaShare = await sss.createMetaShare( 1, encryptedShares[ 0 ], resEncryptSocialStaticNonPMDD, walletDetails.walletType );
@@ -582,18 +580,19 @@ class Wallet extends React.Component {
               let resGenerateEncryptedMetaShare2 = await sss.generateEncryptedMetaShare( rescreateMetaShare1.data.metaShare );
               let rescreateMetaShare2 = await sss.createMetaShare( 3, encryptedShares[ 2 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
               let resGenerateEncryptedMetaShare3 = await sss.generateEncryptedMetaShare( rescreateMetaShare2.data.metaShare );
-              //for pdf                      
+              //for pdf                        
               let rescreateMetaShare3 = await sss.createMetaShare( 4, encryptedShares[ 3 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
-
               if ( rescreateMetaShare3.status == 200 ) {
                 var qrcode4share = await sss.createQR( rescreateMetaShare3.data.metaShare, 4 );
                 if ( qrcode4share.status == 200 ) {
                   qrcode4share = qrcode4share.data.qrData
-                  // console.log( { qrcode4share } );
-                  //creating 4th share pdf   
+                  console.log( { qrcode4share } );
+                  //creating 4th share pdf        
                   let temp = [];
-                  temp.push( { arrQRCodeData: qrcode4share, secondaryXpub: secondaryXpub, qrData: resSetupSecureAccount.setupData.qrData, secret: resSetupSecureAccount.setupData.secret, secondaryMnemonic: getSecoundMnemonic, bhXpub: resSetupSecureAccount.setupData.bhXpub } )
+                  temp.push( { arrQRCodeData: qrcode4share, secondaryXpub: secondaryXpub, qrData: resSetupSecureAccount.setupData.qrData, secret: resSetupSecureAccount.setupData.secret, secondaryMnemonic: getSecoundMnemonic, bhXpub: resSetupSecureAccount.setupData.bhXpub } );
+                  console.log( { temp } );
                   let resGenerate4thsharepdf = await this.genreatePdf( temp, walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 4", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 4", setUpWalletAnswerDetails[ 0 ].Answer );
+                  console.log( { resGenerate4thsharepdf } );
                   if ( resGenerate4thsharepdf != "" ) {
                     let rescreateMetaShare4 = await sss.createMetaShare( 5, encryptedShares[ 4 ], resEncryptBuddyStaticNonPMDD, walletDetails.walletType );
                     if ( rescreateMetaShare4.status == 200 ) {
@@ -602,7 +601,9 @@ class Wallet extends React.Component {
                         qrcode5share = qrcode5share.data.qrData
                         let temp = [];
                         temp.push( { arrQRCodeData: qrcode5share, secondaryXpub: secondaryXpub, qrData: resSetupSecureAccount.setupData.qrData, secret: resSetupSecureAccount.setupData.secret, secondaryMnemonic: getSecoundMnemonic, bhXpub: resSetupSecureAccount.setupData.bhXpub } )
-                        let resGenerate5thsharepdf = await this.genreatePdf( temp, walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 5", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 5", setUpWalletAnswerDetails[ 0 ].Answer ); if ( resGenerate5thsharepdf != "" ) {
+                        let resGenerate5thsharepdf = await this.genreatePdf( temp, walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 5", walletDetails.walletType.split( " " )[ 0 ] + " Hexa Wallet Share 5", setUpWalletAnswerDetails[ 0 ].Answer );
+                        console.log( { resGenerate5thsharepdf } );
+                        if ( resGenerate5thsharepdf != "" ) {
                           let keeperInfo = [ { info: null }, { info: null }, { info: rescreateMetaShare2.data }, { info: qrcode4share[ 0 ] }, { info: qrcode5share[ 0 ] } ];
                           let encryptedMetaShare = [ { metaShare: rescreateMetaShare.data.metaShare }, { metaShare: rescreateMetaShare1.data.metaShare }, { metaShare: rescreateMetaShare2.data.metaShare }, { metaShare: resGenerate4thsharepdf }, { metaShare: resGenerate5thsharepdf } ]
                           let arrTypes = [ { type: "Trusted Contacts 1" }, { type: "Trusted Contacts 2" }, { type: "Self Share 1" }, { type: "Self Share 2" }, { type: "Self Share 3" } ];
@@ -681,6 +682,8 @@ class Wallet extends React.Component {
     try {
       return new Promise( async ( resolve, reject ) => {
         data = data[ 0 ];
+        console.log( { data } );
+
         let arrQRCodeData = data.arrQRCodeData;
         let secondaryXpub = data.secondaryXpub;
         let qrData = data.qrData;
@@ -724,73 +727,75 @@ class Wallet extends React.Component {
           padding: 0,
           height: 842,
           width: 595,
-          html: "<h1>" + forShare + "</h1>" +
+          html: "<h1>" + forShare.toString() + "</h1>" +
             "<h3 style='text-decoration: underline;'>Part 1<h3>" +
             //"<img src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode1 + "&amp' style='margin-left:35%'/><br/>" +
             new QRCode( qrCode1 ).svg() +
-            "<p align='center'>" + arrShare1[ 0 ] + "</p>" +
-            "<p align='center'>" + arrShare1[ 1 ] + "</p>" +
-            "<p align='center'>" + arrShare1[ 2 ] + "</p>" +
-            "<p align='center'>" + arrShare1[ 3 ] + "</p>" +
+            "<p align='center'>" + arrShare1[ 0 ].toString() + "</p>" +
+            "<p align='center'>" + arrShare1[ 1 ].toString() + "</p>" +
+            "<p align='center'>" + arrShare1[ 2 ].toString() + "</p>" +
+            "<p align='center'>" + arrShare1[ 3 ].toString() + "</p>" +
             "<h3 style='text-decoration: underline;'>Part 2<h3>" +
             new QRCode( qrCode2 ).svg() +
-            "<p align='center'>" + arrShare2[ 0 ] + "</p>" +
-            "<p align='center'>" + arrShare2[ 1 ] + "</p>" +
-            "<p align='center'>" + arrShare2[ 2 ] + "</p>" +
-            "<p align='center'>" + arrShare2[ 3 ] + "</p>" +
+            "<p align='center'>" + arrShare2[ 0 ].toString() + "</p>" +
+            "<p align='center'>" + arrShare2[ 1 ].toString() + "</p>" +
+            "<p align='center'>" + arrShare2[ 2 ].toString() + "</p>" +
+            "<p align='center'>" + arrShare2[ 3 ].toString() + "</p>" +
             "<h3 style='text-decoration: underline;'>Part 3<h3>" +
             new QRCode( qrCode3 ).svg() +
-            "<p align='center'>" + arrShare3[ 0 ] + "</p>" +
-            "<p align='center'>" + arrShare3[ 1 ] + "</p>" +
-            "<p align='center'>" + arrShare3[ 2 ] + "</p>" +
-            "<p align='center'>" + arrShare3[ 3 ] + "</p>" +
+            "<p align='center'>" + arrShare3[ 0 ].toString() + "</p>" +
+            "<p align='center'>" + arrShare3[ 1 ].toString() + "</p>" +
+            "<p align='center'>" + arrShare3[ 2 ].toString() + "</p>" +
+            "<p align='center'>" + arrShare3[ 3 ].toString() + "</p>" +
             "<h3 style='text-decoration: underline;'>Part 4<h3>" +
             new QRCode( qrCode4 ).svg() +
-            "<p align='center'>" + arrShare4[ 0 ] + "</p>" +
-            "<p align='center'>" + arrShare4[ 1 ] + "</p>" +
-            "<p align='center'>" + arrShare4[ 2 ] + "</p>" +
-            "<p align='center'>" + arrShare4[ 3 ] + "</p>" +
-            "<h3 style='text-decoration: underline;'>Part 5<h3>" +
-            new QRCode( qrCode5 ).svg() +
-            "<p align='center'>" + arrShare5[ 0 ] + "</p>" +
-            "<p align='center'>" + arrShare5[ 1 ] + "</p>" +
-            "<p align='center'>" + arrShare5[ 2 ] + "</p>" +
-            "<p align='center'>" + arrShare5[ 3 ] + "</p>" +
-            "<h3 style='text-decoration: underline;'>Part 6<h3>" +
-            new QRCode( qrCode6 ).svg() +
-            "<p align='center'>" + arrShare6[ 0 ] + "</p>" +
-            "<p align='center'>" + arrShare6[ 1 ] + "</p>" +
-            "<p align='center'>" + arrShare6[ 2 ] + "</p>" +
-            "<p align='center'>" + arrShare6[ 3 ] + "</p>" +
-            "<h3 style='text-decoration: underline;'>Part 7<h3>" +
-            new QRCode( qrCode7 ).svg() +
-            "<p align='center'>" + arrShare7[ 0 ] + "</p>" +
-            "<p align='center'>" + arrShare7[ 1 ] + "</p>" +
-            "<p align='center'>" + arrShare7[ 2 ] + "</p>" +
-            "<p align='center'>" + arrShare7[ 3 ] + "</p>" +
-            "<h3 style='text-decoration: underline;'>Part 8<h3>" +
-            new QRCode( qrCode8 ).svg() +
-            "<p align='center'>" + arrShare8[ 0 ] + "</p>" +
-            "<p align='center'>" + arrShare8[ 1 ] + "</p>" +
-            "<p align='center'>" + arrShare8[ 2 ] + "</p>" +
-            "<p align='center'>" + arrShare8[ 3 ] + "</p>" +
-            "<h3 style='text-decoration: underline;'>Secondary Xpub (Encrypted):<h3>" +
-            new QRCode( secondaryXpub ).svg() +
-            "<p align='center'>Scan the above QR Code using your HEXA wallet in order to restore your Secure Account.</p>" +
-            "<p>2FA Secret:<p><br/>" +
-            new QRCode( qrData ).svg() +
-            "<p align='center'>" + secret2FA + "</p>" +
-            "<p>Following assets can be used to recover your funds using the open - sourced ga - recovery tool.</p><br/><br/>" +
-            "<p>Secondary Mnemonic:<p>" +
-            "<p align='center'>" + firstArrSecondaryMnemonic + "</p>" +
-            "<p align='center'>" + secoundArrSecondaryMnemonic + "</p><br/>" +
-            "<p>BitHyve Xpub:<p>" +
-            "<p align='center'>" + arrBhXpub[ 0 ] + "</p>" +
-            "<p align='center'>" + arrBhXpub[ 1 ] + "</p>",
+            "<p align='center'>" + arrShare4[ 0 ].toString() + "</p>" +
+            "<p align='center'>" + arrShare4[ 1 ].toString() + "</p>" +
+            "<p align='center'>" + arrShare4[ 2 ].toString() + "</p>" +
+            "<p align='center'>" + arrShare4[ 3 ].toString() + "</p>" +
+            "<h3 style='text-decoration: underline;'>Part 5<h3>",
+          // new QRCode( qrCode5 ).svg() +
+          // "<p align='center'>" + arrShare5[ 0 ].toString() + "</p>" +
+          // "<p align='center'>" + arrShare5[ 1 ].toString() + "</p>" +
+          // "<p align='center'>" + arrShare5[ 2 ].toString() + "</p>" +
+          // "<p align='center'>" + arrShare5[ 3 ].toString() + "</p>" +
+          // "<h3 style='text-decoration: underline;'>Part 6<h3>" +
+          // new QRCode( qrCode6 ).svg() +
+          // "<p align='center'>" + arrShare6[ 0 ].toString() + "</p>" +
+          // "<p align='center'>" + arrShare6[ 1 ].toString() + "</p>" +
+          // "<p align='center'>" + arrShare6[ 2 ].toString() + "</p>" +
+          // "<p align='center'>" + arrShare6[ 3 ].toString() + "</p>" +
+          // "<h3 style='text-decoration: underline;'>Part 7<h3>" +
+          // new QRCode( qrCode7 ).svg() +
+          // "<p align='center'>" + arrShare7[ 0 ].toString() + "</p>" +
+          // "<p align='center'>" + arrShare7[ 1 ].toString() + "</p>" +
+          // "<p align='center'>" + arrShare7[ 2 ].toString() + "</p>" +
+          // "<p align='center'>" + arrShare7[ 3 ].toString() + "</p>" +
+          // "<h3 style='text-decoration: underline;'>Part 8<h3>" +
+          // new QRCode( qrCode8 ).svg() +
+          // "<p align='center'>" + arrShare8[ 0 ].toString() + "</p>" +
+          // "<p align='center'>" + arrShare8[ 1 ].toString() + "</p>" +
+          // "<p align='center'>" + arrShare8[ 2 ].toString() + "</p>" +
+          // "<p align='center'>" + arrShare8[ 3 ].toString() + "</p>"+
+          // "<h3 style='text-decoration: underline;'>Secondary Xpub (Encrypted):<h3>" +
+          // new QRCode( secondaryXpub.toString() ).svg() +
+          // "<p align='center'>Scan the above QR Code using your HEXA wallet in order to restore your Secure Account.</p>" +
+          // "<p>2FA Secret:<p><br/>" +
+          // new QRCode( qrData ).svg() +
+          // "<p align='center'>" + secret2FA + "</p>" +
+          // "<p>Following assets can be used to recover your funds using the open - sourced ga - recovery tool.</p><br/><br/>" +
+          // "<p>Secondary Mnemonic:<p>" +
+          // "<p align='center'>" + firstArrSecondaryMnemonic + "</p>" +
+          // "<p align='center'>" + secoundArrSecondaryMnemonic + "</p><br/>" +
+          // "<p>BitHyve Xpub:<p>" +
+          // "<p align='center'>" + arrBhXpub[ 0 ].toString() + "</p>" +
+          // "<p align='center'>" + arrBhXpub[ 1 ].toString() + "</p>",
           fileName: pdfFileName,
           directory: 'Documents',
         };
-        let file = await RNHTMLtoPDF.convert( options )
+        let file = await RNHTMLtoPDF.convert( options );
+        console.log( { file } );
+
         if ( Platform.OS == "ios" ) {
           var PdfPassword = NativeModules.PdfPassword;
           PdfPassword.addEvent( "/" + pdfFileName + ".pdf", password );
