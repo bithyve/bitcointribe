@@ -1,332 +1,316 @@
-import moment from "moment";
-//import ConnectivityTracker from "react-native-connectivity-tracker";
-let CryptoJS = require( "crypto-js" );
-import DeviceInfo from "react-native-device-info";
-import bip39 from "bip39";
-import {
-  AsyncStorage
-} from "react-native";
+import moment from 'moment';
+// import ConnectivityTracker from "react-native-connectivity-tracker";
+let CryptoJS = require('crypto-js');
+import DeviceInfo from 'react-native-device-info';
+import bip39 from 'bip39';
+import { AsyncStorage } from 'react-native';
 
-import {
-  asyncStorageKeys
-} from "hexaConstants";
+import { asyncStorageKeys } from 'hexaConstants';
 
-import Singleton from "hexaSingleton";
-//TODO: Date Format
+import Singleton from 'hexaSingleton';
+// TODO: Date Format
 
 const getUnixTimeDate = date => {
-  const dateTime = new Date( date ).getTime();
-  const lastUpdateDate = Math.floor( dateTime / 1000 );
+  const dateTime = new Date(date).getTime();
+  const lastUpdateDate = Math.floor(dateTime / 1000);
   return lastUpdateDate;
 };
 
 const getUnixToDateFormat = unixDate => {
-  return moment.unix( unixDate ).format( "DD-MM-YYYY HH:mm:ss" );
+  return moment.unix(unixDate).format('DD-MM-YYYY HH:mm:ss');
 };
 const getUnixToNormaDateFormat = unixDate => {
-  return moment.unix( unixDate ).format( "DD-MM-YYYY" );
-
+  return moment.unix(unixDate).format('DD-MM-YYYY');
 };
 
 const getUnixToDateFormat1 = () => {
-  return moment().format( 'hh:mm a , DD MMM YYYY' );
-}
+  return moment().format('hh:mm a , DD MMM YYYY');
+};
 
 const getUnixToDateFormat2 = () => {
-  return moment().format( 'DD MMM YYYY , hh:mm a' );
-}
+  return moment().format('DD MMM YYYY , hh:mm a');
+};
 
-// //TODO: Network check
-// let isNetwork: boolean;
-// const onConnectivityChange = ( isConnected: any, timestamp: any, connectionInfo: any ) => {
-//   console.log( "connection state change" );
-//   isNetwork = isConnected;
-// };
+//  // TODO: Network check
+//  let isNetwork: boolean;
+//  const onConnectivityChange = ( isConnected: any, timestamp: any, connectionInfo: any ) => {
+//    console.log( "connection state change" );
+//    isNetwork = isConnected;
+//  };
 
-// ConnectivityTracker.init( {
-//   onConnectivityChange,
-//   attachConnectionInfo: false,
-//   onError: ( msg: any ) => console.log( msg )
-//   // verifyServersAreUp: () => store.dispatch(checkOurServersAreUp()),
-// } );
+//  ConnectivityTracker.init( {
+//    onConnectivityChange,
+//    attachConnectionInfo: false,
+//    onError: ( msg: any ) => console.log( msg )
+//    //  verifyServersAreUp: () => store.dispatch(checkOurServersAreUp()),
+//  } );
 
 const getNetwork = () => {
-  return true //isNetwork;  
+  return true; // isNetwork;
 };
 
-const encrypt = ( data: any, password: string ) => {
-  let ciphertext = CryptoJS.AES.encrypt( data, password );
+const encrypt = (data: any, password: string) => {
+  let ciphertext = CryptoJS.AES.encrypt(data, password);
   return ciphertext.toString();
 };
 
-const encryptAgain = ( data: any, password: string ) => {
-  let ciphertext = CryptoJS.AES.encrypt( data, password, {
-    mode: CryptoJS.mode.ECB
-  } );
+const encryptAgain = (data: any, password: string) => {
+  let ciphertext = CryptoJS.AES.encrypt(data, password, {
+    mode: CryptoJS.mode.ECB,
+  });
 
   return ciphertext.toString();
 };
 
-const decrypt = ( data: any, password: string ) => {
-  let bytes = CryptoJS.AES.decrypt( data, password );
+const decrypt = (data: any, password: string) => {
+  let bytes = CryptoJS.AES.decrypt(data, password);
   let str = false;
   try {
-    str = bytes.toString( CryptoJS.enc.Utf8 );
-  } catch ( e ) { }
+    str = bytes.toString(CryptoJS.enc.Utf8);
+  } catch (e) {}
   return str;
 };
 
-//TODO: for sorting date wise transaction data
-const sortFunction = ( a: any, b: any ) => {
-  var dateA = new Date( a.received ).getTime();
-  var dateB = new Date( b.received ).getTime();
+// TODO: for sorting date wise transaction data
+const sortFunction = (a: any, b: any) => {
+  var dateA = new Date(a.received).getTime();
+  var dateB = new Date(b.received).getTime();
   return dateA < dateB ? 1 : -1;
 };
 
-//TODO: func two date diff days count
-const date_diff_indays = ( date1: any, date2: any ) => {
+// TODO: func two date diff days count
+const date_diff_indays = (date1: any, date2: any) => {
   try {
-    let dt1 = new Date( date1 );
-    let dt2 = new Date( date2 );
+    let dt1 = new Date(date1);
+    let dt2 = new Date(date2);
     return Math.floor(
-      ( Date.UTC( dt2.getFullYear(), dt2.getMonth(), dt2.getDate() ) -
-        Date.UTC( dt1.getFullYear(), dt1.getMonth(), dt1.getDate() ) ) /
-      ( 1000 * 60 * 60 * 24 )
+      (Date.UTC(dt2.getFullYear(), dt2.getMonth(), dt2.getDate()) -
+        Date.UTC(dt1.getFullYear(), dt1.getMonth(), dt1.getDate())) /
+        (1000 * 60 * 60 * 24),
     );
-  } catch ( error ) {
-    console.log( error );
+  } catch (error) {
+    console.log(error);
   }
 };
 
-const getRandomBetweenNumber = ( min: number, max: number ) => {
+const getRandomBetweenNumber = (min: number, max: number) => {
   let arr_Number = [];
-  for ( let i = 0; i < 3; i++ ) {
-    let value = min + Math.floor( Math.random() * ( max - min ) )
-    if ( arr_Number.indexOf( value ) !== -1 ) {
-      arr_Number.push( min + Math.floor( Math.random() * ( max - min ) ) );
+  for (let i = 0; i < 3; i++) {
+    let value = min + Math.floor(Math.random() * (max - min));
+    if (arr_Number.indexOf(value) !== -1) {
+      arr_Number.push(min + Math.floor(Math.random() * (max - min)));
     } else {
-      arr_Number.push( value )
+      arr_Number.push(value);
     }
   }
   return arr_Number;
-}
+};
 
 const getDeviceModel = () => {
   let model = DeviceInfo.getModel();
   let modelName;
-  if ( model == "iPhone 6s" || model == "iPhone 6" ) {
-    modelName = "Iphone6";
+  if (model == 'iPhone 6s' || model == 'iPhone 6') {
+    modelName = 'Iphone6';
   } else if (
-    model == "iPhone XS" ||
-    model == "iPhone XS Max" ||
-    model == "iPhone XR" ||
-    model == "iPhone X"
+    model == 'iPhone XS' ||
+    model == 'iPhone XS Max' ||
+    model == 'iPhone XR' ||
+    model == 'iPhone X'
   ) {
-    modelName = "IphoneX";
+    modelName = 'IphoneX';
   }
   return modelName;
 };
-
 
 const getStatusBarHeight = () => {
   let model = DeviceInfo.getModel();
   let height;
   if (
-    model == "iPhone XS" ||
-    model == "iPhone XS Max" ||
-    model == "iPhone XR" ||
-    model == "iPhone X"
+    model == 'iPhone XS' ||
+    model == 'iPhone XS Max' ||
+    model == 'iPhone XR' ||
+    model == 'iPhone X'
   ) {
     height = 44;
-  }
-  else {
+  } else {
     height = 20;
   }
   return height;
-}
-
+};
 
 const getIphoneSize = () => {
   let model = DeviceInfo.getModel();
-  var iphoneSeries = "iphone X";
+  var iphoneSeries = 'iphone X';
   if (
-    model == "iPhone XS" ||
-    model == "iPhone XS Max" ||
-    model == "iPhone XR" ||
-    model == "iPhone X"
+    model == 'iPhone XS' ||
+    model == 'iPhone XS Max' ||
+    model == 'iPhone XR' ||
+    model == 'iPhone X'
   ) {
-    iphoneSeries = "iphone X";
-  }
-  else {
-    iphoneSeries = "!iphone X"
+    iphoneSeries = 'iphone X';
+  } else {
+    iphoneSeries = '!iphone X';
   }
   return iphoneSeries;
-}
-
+};
 
 const getMnemonic = () => {
   let mnemonic = bip39.generateMnemonic();
-  return mnemonic.split( " " );
-}
+  return mnemonic.split(' ');
+};
 
-const isJson = ( str: string ) => {
+const isJson = (str: string) => {
   try {
-    JSON.parse( str );
-  } catch ( e ) {
+    JSON.parse(str);
+  } catch (e) {
     return false;
   }
   return true;
-}
+};
 
-//Get and Set WalletDetails
+// Get and Set WalletDetails
 const getWalletDetails = () => {
   let commonData = Singleton.getInstance();
   return commonData.getWalletDetails();
-}
-const setWalletDetails = ( value: any ) => {
+};
+const setWalletDetails = (value: any) => {
   let commonData = Singleton.getInstance();
-  commonData.setWalletDetails( value );
+  commonData.setWalletDetails(value);
   return true;
-}
-//Get and Set SetupWallet
+};
+// Get and Set SetupWallet
 const getSetupWallet = () => {
   let commonData = Singleton.getInstance();
   return commonData.getSetupWallet();
-}
+};
 
-
-const setSetupWallet = ( value: any ) => {
+const setSetupWallet = (value: any) => {
   let commonData = Singleton.getInstance();
-  commonData.setSetupWallet( value );
+  commonData.setSetupWallet(value);
   return true;
-}
+};
 
-//TODO: Singleton  Set and Get RootViewController
+// TODO: Singleton  Set and Get RootViewController
 const getRootViewController = () => {
   let commonData = Singleton.getInstance();
   return commonData.getRootViewController();
-}
-const setRootViewController = ( value: any ) => {
+};
+const setRootViewController = (value: any) => {
   let commonData = Singleton.getInstance();
-  commonData.setRootViewController( value );
+  commonData.setRootViewController(value);
   return true;
-}
+};
 
-//TODO: Singleton Set and Get DeepLinkingUrl
+// TODO: Singleton Set and Get DeepLinkingUrl
 const getDeepLinkingUrl = () => {
   let commonData = Singleton.getInstance();
   return commonData.getDeepLinkingUrl();
-}
-const setDeepLinkingUrl = ( value: any ) => {
+};
+const setDeepLinkingUrl = (value: any) => {
   let commonData = Singleton.getInstance();
-  commonData.setDeepLinkingUrl( value );
+  commonData.setDeepLinkingUrl(value);
   return true;
-}
+};
 
-//TODO: Singleton Set and Get DeepLinkingType
+// TODO: Singleton Set and Get DeepLinkingType
 const getDeepLinkingType = () => {
   let commonData = Singleton.getInstance();
   return commonData.getDeepLinkingType();
-}
-const setDeepLinkingType = ( value: any ) => {
+};
+const setDeepLinkingType = (value: any) => {
   let commonData = Singleton.getInstance();
-  commonData.setDeepLinkingType( value );
+  commonData.setDeepLinkingType(value);
   return true;
-}
+};
 
-//TODO: Singleton SSS Details Get and Set Values
+// TODO: Singleton SSS Details Get and Set Values
 const getSSSDetails = () => {
   let commonData = Singleton.getInstance();
   return commonData.getSSSDetails();
-}
-const setSSSDetails = ( value: any ) => {
+};
+const setSSSDetails = (value: any) => {
   let commonData = Singleton.getInstance();
-  commonData.setSSSDetails( value );
+  commonData.setSSSDetails(value);
   return true;
-}
-//TODO: Singleton SSS Details RecordIDWise Get and Set Values
+};
+// TODO: Singleton SSS Details RecordIDWise Get and Set Values
 const getSSSDetailsRecordIDWise = () => {
   let commonData = Singleton.getInstance();
   return commonData.getSSSDetailsRecordIDWise();
-}
-const setSSSDetailsRecordIDWise = ( value: any ) => {
+};
+const setSSSDetailsRecordIDWise = (value: any) => {
   let commonData = Singleton.getInstance();
-  commonData.setSSSDetailsRecordIDWise( value );
+  commonData.setSSSDetailsRecordIDWise(value);
   return true;
-}
+};
 
-//TODO: Singleton App Health Status
+// TODO: Singleton App Health Status
 const getAppHealthStatus = () => {
   let commonData = Singleton.getInstance();
   return commonData.getAppHealthStatus();
-}
-const setAppHealthStatus = ( value: any ) => {
+};
+const setAppHealthStatus = (value: any) => {
   let commonData = Singleton.getInstance();
-  commonData.setAppHealthStatus( value );
+  commonData.setAppHealthStatus(value);
   return true;
-}
+};
 
-//TODO: Singleton Bitcoin Class
-
+// TODO: Singleton Bitcoin Class
 
 const getRegularAccountObject = () => {
   let commonData = Singleton.getInstance();
   return commonData.getRegularAccountObject();
-}
+};
 
-const setRegularAccountObject = ( value: any ) => {
+const setRegularAccountObject = (value: any) => {
   let commonData = Singleton.getInstance();
-  commonData.setRegularAccountObject( value );
+  commonData.setRegularAccountObject(value);
   return true;
-}
+};
 
 const getSecureAccountObject = () => {
   let commonData = Singleton.getInstance();
   return commonData.getSecureAccountObject();
-}
-const setSecureAccountObject = ( value: any ) => {
+};
+const setSecureAccountObject = (value: any) => {
   let commonData = Singleton.getInstance();
-  commonData.setSecureAccountObject( value );
+  commonData.setSecureAccountObject(value);
   return true;
-}
+};
 
 const getS3ServiceObject = () => {
   let commonData = Singleton.getInstance();
   return commonData.getS3ServiceObject();
-}
-const setS3ServiceObject = ( value: any ) => {
+};
+const setS3ServiceObject = (value: any) => {
   let commonData = Singleton.getInstance();
-  commonData.setS3ServiceObject( value );
+  commonData.setS3ServiceObject(value);
   return true;
-}
+};
 
-
-//Singleton Flag
+// Singleton Flag
 
 const getFlagQRCodeScreen = () => {
   let commonData = Singleton.getInstance();
   return commonData.getFlagQRCodeScreen();
-}
-const setFlagQRCodeScreen = ( value: any ) => {
+};
+const setFlagQRCodeScreen = (value: any) => {
   let commonData = Singleton.getInstance();
-  commonData.setFlagQRCodeScreen( value );
+  commonData.setFlagQRCodeScreen(value);
   return true;
-}
+};
 
-// AsyncStorage values get and set
+//  AsyncStorage values get and set
 
-const getAsyncStorage = async ( name: any ) => {
-  console.log( { value: await AsyncStorage.getItem( asyncStorageKeys[ name ] ) } );
-  return await AsyncStorage.getItem( asyncStorageKeys[ name ] );
-}
+const getAsyncStorage = async (name: any) => {
+  console.log({ value: await AsyncStorage.getItem(asyncStorageKeys[name]) });
+  return await AsyncStorage.getItem(asyncStorageKeys[name]);
+};
 
-const setAsyncStorage = ( name: any, value: any ) => {
-  AsyncStorage.setItem(
-    asyncStorageKeys[ name ],
-    value
-  );
+const setAsyncStorage = (name: any, value: any) => {
+  AsyncStorage.setItem(asyncStorageKeys[name], value);
   return true;
-}
+};
 
 module.exports = {
   getUnixTimeDate,
@@ -346,7 +330,7 @@ module.exports = {
   getIphoneSize,
   isJson,
 
-  //Singleton          
+  // Singleton
   getMnemonic,
   getWalletDetails,
   setWalletDetails,
@@ -359,17 +343,17 @@ module.exports = {
   getDeepLinkingType,
   setDeepLinkingType,
 
-  //Singleton SSS Details
+  // Singleton SSS Details
   getSSSDetails,
   setSSSDetails,
   getSSSDetailsRecordIDWise,
   setSSSDetailsRecordIDWise,
 
-  //Singleton App Health Status
+  // Singleton App Health Status
   getAppHealthStatus,
   setAppHealthStatus,
 
-  //Singleton Bitcoin Class
+  // Singleton Bitcoin Class
   getRegularAccountObject,
   setRegularAccountObject,
   getSecureAccountObject,
@@ -377,11 +361,11 @@ module.exports = {
   getS3ServiceObject,
   setS3ServiceObject,
 
-  //Singleton Flags
+  // Singleton Flags
   getFlagQRCodeScreen,
   setFlagQRCodeScreen,
 
-  //AsyncStorage
+  // AsyncStorage
   getAsyncStorage,
-  setAsyncStorage
-};   
+  setAsyncStorage,
+};

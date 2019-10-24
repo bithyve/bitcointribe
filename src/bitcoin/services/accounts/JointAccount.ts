@@ -1,8 +1,10 @@
-import bitcoinJS, { Transaction, TransactionBuilder } from "bitcoinjs-lib";
-import Bitcoin from "../../utilities/accounts/Bitcoin";
+// eslint-disable-next-line no-unused-vars
+import bitcoinJS, { Transaction, TransactionBuilder } from 'bitcoinjs-lib';
+import Bitcoin from '../../utilities/accounts/Bitcoin';
 
 export default class JointAccount {
   public bitcoin: Bitcoin;
+
   constructor() {
     this.bitcoin = new Bitcoin();
   }
@@ -12,24 +14,24 @@ export default class JointAccount {
     details: { creator: string; walletName: string },
   ) => {
     const { keyPair } = this.bitcoin.generateHDWallet(mnemonic);
-    const publicKey = keyPair.publicKey.toString("hex");
+    const publicKey = keyPair.publicKey.toString('hex');
 
     const jointDetails = {
       cn: details.creator, // creator's name
       wn: details.walletName, // wallet's name
       cpk: publicKey, // creator's public key
-      typ: "conf",
+      typ: 'conf',
     };
 
     return JSON.stringify(jointDetails);
-  }
+  };
 
   public mergeJointAccount = (
     mnemonic: string,
     details: { jointDetails: string; merger: string },
   ) => {
     const { keyPair } = this.bitcoin.generateHDWallet(mnemonic);
-    const publicKey = keyPair.publicKey.toString("hex");
+    const publicKey = keyPair.publicKey.toString('hex');
     const jointDetails = JSON.parse(details.jointDetails);
 
     jointDetails.mpk = publicKey; // merger's public key
@@ -40,29 +42,29 @@ export default class JointAccount {
 
     const multiSig = {
       scripts: {
-        redeem: initMultiSig.p2sh.redeem.output.toString("hex"),
-        witness: initMultiSig.p2wsh.redeem.output.toString("hex"),
+        redeem: initMultiSig.p2sh.redeem.output.toString('hex'),
+        witness: initMultiSig.p2wsh.redeem.output.toString('hex'),
       },
       address: initMultiSig.address,
     };
 
-    jointDetails.typ = "imp";
+    jointDetails.typ = 'imp';
     return { multiSig, mergeJSON: JSON.stringify(jointDetails) };
-  }
+  };
 
   public ackDetails = (jointDetails: string) => {
     const details = JSON.parse(jointDetails);
     delete details.cpk;
-    details.typ = "ack";
+    details.typ = 'ack';
     return JSON.stringify(details);
-  }
+  };
 
   public createInitiatedJointAccount = (
     mnemonic: string,
     details: { jointDetails: string },
   ) => {
     const { keyPair } = this.bitcoin.generateHDWallet(mnemonic);
-    const publicKey = keyPair.publicKey.toString("hex");
+    const publicKey = keyPair.publicKey.toString('hex');
 
     const jointDetails = JSON.parse(details.jointDetails);
     jointDetails.cpk = publicKey;
@@ -71,15 +73,15 @@ export default class JointAccount {
 
     const multiSig = {
       scripts: {
-        redeem: initMultiSig.p2sh.redeem.output.toString("hex"),
-        witness: initMultiSig.p2wsh.redeem.output.toString("hex"),
+        redeem: initMultiSig.p2sh.redeem.output.toString('hex'),
+        witness: initMultiSig.p2wsh.redeem.output.toString('hex'),
       },
       address: initMultiSig.address,
     };
     jointDetails.add = multiSig.address;
-    jointDetails.typ = "imp";
+    jointDetails.typ = 'imp';
     return { multiSig, creationJSON: JSON.stringify(jointDetails) };
-  }
+  };
 
   public initJointTxn = async ({
     senderAddress,
@@ -96,19 +98,19 @@ export default class JointAccount {
   }) => {
     if (this.bitcoin.isValidAddress(recipientAddress)) {
       const { balanceData } = await this.bitcoin.getBalance(senderAddress);
-      console.log({ balance: balanceData.final_balance });
+      // console.log({ balance: balanceData.final_balance });
 
-      console.log("---- Creating Transaction ----");
+      // console.log('---- Creating Transaction ----');
       const { inputs, txb, fee } = await this.bitcoin.createTransaction(
         senderAddress,
         recipientAddress,
         amount,
       );
-      console.log("---- Transaction Created ----");
+      // console.log('---- Transaction Created ----');
 
       if (parseInt(balanceData.final_balance, 10) + fee < amount) {
         throw new Error(
-          "Insufficient balance to compensate for transfer amount and the txn fee",
+          'Insufficient balance to compensate for transfer amount and the txn fee',
         );
       }
 
@@ -116,23 +118,22 @@ export default class JointAccount {
         inputs,
         txb,
         [this.bitcoin.getKeyPair(privateKey)],
-        Buffer.from(scripts.redeem, "hex"),
-        Buffer.from(scripts.witness, "hex"),
+        Buffer.from(scripts.redeem, 'hex'),
+        Buffer.from(scripts.witness, 'hex'),
       );
 
       const txHex = signedTxb.buildIncomplete().toHex();
-      console.log({ txHex });
+      // console.log({ txHex });
       return {
         status: 200,
         data: txHex,
       };
-    } else {
-      return {
-        status: 400,
-        errorMessage: "Supplied recipient address is wrong.",
-      };
     }
-  }
+    return {
+      status: 400,
+      errorMessage: 'Supplied recipient address is wrong.',
+    };
+  };
 
   public recoverTxnDetails = async (txHex: string) => {
     const regenTx: Transaction = bitcoinJS.Transaction.fromHex(txHex);
@@ -145,12 +146,12 @@ export default class JointAccount {
 
     const recoveredInputs = await this.bitcoin.recoverInputsFromTxHex(txHex);
     let valueIn: number = 0;
-    recoveredInputs.forEach((input) => {
+    recoveredInputs.forEach(input => {
       valueIn += input.value;
     });
 
     let valueOut: number = 0;
-    regenTx.outs.forEach((output) => {
+    regenTx.outs.forEach(output => {
       valueOut += output.value;
     });
     const txnFee = valueIn - valueOut;
@@ -161,7 +162,7 @@ export default class JointAccount {
       amount: amount / 1e8,
       txnFee: txnFee / 1e8,
     };
-  }
+  };
 
   public authorizeJointTxn = async (txHex: string, privateKey: string) => {
     const regenTx: Transaction = bitcoinJS.Transaction.fromHex(txHex);
@@ -187,8 +188,8 @@ export default class JointAccount {
     );
 
     const reHex = regenSignTx.build().toHex();
-    console.log({ txHex: reHex });
+    // console.log({ txHex: reHex });
     const res = await this.bitcoin.broadcastTransaction(reHex);
     return res;
-  }
+  };
 }

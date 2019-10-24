@@ -1,61 +1,71 @@
 import React, { Component } from 'react';
-import {
-    View, StyleSheet
-} from 'react-native';
-import { Text } from "native-base";
+import { View, StyleSheet } from 'react-native';
+import { Text } from 'native-base';
 import Modal from 'react-native-modalbox';
 
-
-
-
 interface Props {
-    data: [];
-    closeModal: Function;
-    click_Done: Function;
-    pop: Function;
+  data: [];
+  closeModal: Function;
+  click_Done: Function;
+  pop: Function;
 }
 
+export default class ModelBottomAddTestCoinsAndAccounts extends Component<
+  Props,
+  any
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      data: [],
+    };
+  }
 
-
-export default class ModelBottomAddTestCoinsAndAccounts extends Component<Props, any> {
-
-    constructor ( props: any ) {
-        super( props );
-        this.state = ( {
-            data: []
-        } )
+  componentWillReceiveProps = (nextProps: any) => {
+    let data = nextProps.data;
+    // console.log( { data } );
+    if (data != undefined) {
+      this.setState({
+        data: data[0],
+      });
     }
+  };
 
+  click_Clsoe = () => {
+    this.setState({
+      data: [],
+    });
+  };
 
-    componentWillReceiveProps = ( nextProps: any ) => {
-        let data = nextProps.data;
-        //console.log( { data } );
-        if ( data != undefined ) {
-            this.setState( {
-                data: data[ 0 ]
-            } )
-        }
-    }
-
-
-    click_Clsoe = () => {
-        this.setState( {
-            data: []
-        } )
-    }
-
-
-    render() {
-        let { data } = this.state;
-        return (
-            <Modal style={ [ styles.modal, styles.modal4 ] } position={ "bottom" } isOpen={ data != undefined ? data.modalVisible : false } onClosed={ () => this.click_Clsoe() }>
-                <View>
-                    <View style={ { flexDirection: 'column', alignItems: "center", marginTop: 10, paddingBottom: 10, borderBottomColor: "#EFEFEF", borderBottomWidth: 1 } }>
-                        <Text style={ { fontSize: 16 } }>{ data != undefined ? data.title : "" }</Text>
-                        <Text note style={ { fontSize: 14 } }>{ data != undefined ? data.subTitle : "" }</Text>
-                    </View>
-                    <View>
-                        {/* <FlatList
+  render() {
+    let { data } = this.state;
+    return (
+      <Modal
+        style={[styles.modal, styles.modal4]}
+        position={'bottom'}
+        isOpen={data != undefined ? data.modalVisible : false}
+        onClosed={() => this.click_Clsoe()}
+      >
+        <View>
+          <View
+            style={{
+              flexDirection: 'column',
+              alignItems: 'center',
+              marginTop: 10,
+              paddingBottom: 10,
+              borderBottomColor: '#EFEFEF',
+              borderBottomWidth: 1,
+            }}
+          >
+            <Text style={{ fontSize: 16 }}>
+              {data != undefined ? data.title : ''}
+            </Text>
+            <Text note style={{ fontSize: 14 }}>
+              {data != undefined ? data.subTitle : ''}
+            </Text>
+          </View>
+          <View>
+            {/* <FlatList
                             data={ arr_FirstListItem }
                             showsVerticalScrollIndicator={ false }
                             scrollEnabled={ false }
@@ -108,20 +118,20 @@ export default class ModelBottomAddTestCoinsAndAccounts extends Component<Props,
                             ) }
                             keyExtractor={ ( item, index ) => index.toString() }
                         /> */}
-                    </View>
-                </View>
-            </Modal >
-        );
-    }
+          </View>
+        </View>
+      </Modal>
+    );
+  }
 }
 
-const styles = StyleSheet.create( {
-    //botom model
-    modal: {
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10
-    },
-    modal4: {
-        height: 180
-    }
-} );  
+const styles = StyleSheet.create({
+  // botom model
+  modal: {
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  modal4: {
+    height: 180,
+  },
+});
