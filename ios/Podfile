@@ -5,6 +5,10 @@ target 'HexaWallet' do
   # Pods for HexaWallet
   use_native_modules!
   pod 'React', :path => '../node_modules/react-native/'
+  
+  # new lib
+  pod 'React-RCTImage', :path => '../node_modules/react-native/Libraries/Image'
+  
   pod 'React-Core', :path => '../node_modules/react-native/React'
   pod 'React-DevSupport', :path => '../node_modules/react-native/React'
   pod 'React-RCTActionSheet', :path => '../node_modules/react-native/Libraries/ActionSheetIOS'

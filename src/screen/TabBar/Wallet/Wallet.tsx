@@ -940,9 +940,10 @@ class Wallet extends React.Component {
         secoundArrSecondaryMnemonic = secoundArrSecondaryMnemonic
           .split(',')
           .join(' ');
-
+        let arrBhXpub = this.chunkArray( bhXpub, 2 );
+          if(Platform.OS == "ios"){
         // bhXpub
-        let arrBhXpub = this.chunkArray(bhXpub, 2);
+
         let options = {
           padding: 0,
           height: 842,
@@ -1008,12 +1009,7 @@ class Wallet extends React.Component {
               arrShare4[3].toString() +
               '</p>' +
               "<h3 style='text-decoration: underline;'>Part 5<h3>" +
-              Platform.OS ==
-            'ios'
-              ? new QRCode(qrCode5).svg()
-              : "<img src='https:// api.qrserver.com/v1/create-qr-code/?data=" +
-                  qrCode5 +
-                  "&amp'/>" +
+             new QRCode(qrCode5).svg() +
                   "<p align='center'>" +
                   arrShare5[0].toString() +
                   '</p>' +
@@ -1027,12 +1023,7 @@ class Wallet extends React.Component {
                   arrShare5[3].toString() +
                   '</p>' +
                   "<h3 style='text-decoration: underline;'>Part 6<h3>" +
-                  Platform.OS ==
-                'ios'
-              ? new QRCode(qrCode6).svg()
-              : "<img src='https:// api.qrserver.com/v1/create-qr-code/?data=" +
-                  qrCode6 +
-                  "&amp'/>" +
+                 new QRCode(qrCode6).svg() +
                   "<p align='center'>" +
                   arrShare6[0].toString() +
                   '</p>' +
@@ -1046,12 +1037,7 @@ class Wallet extends React.Component {
                   arrShare6[3].toString() +
                   '</p>' +
                   "<h3 style='text-decoration: underline;'>Part 7<h3>" +
-                  Platform.OS ==
-                'ios'
-              ? new QRCode(qrCode7).svg()
-              : "<img src='https:// api.qrserver.com/v1/create-qr-code/?data=" +
-                  qrCode7 +
-                  "&amp'/>" +
+                  new QRCode(qrCode7).svg() +
                   "<p align='center'>" +
                   arrShare7[0].toString() +
                   '</p>' +
@@ -1065,12 +1051,7 @@ class Wallet extends React.Component {
                   arrShare7[3].toString() +
                   '</p>' +
                   "<h3 style='text-decoration: underline;'>Part 8<h3>" +
-                  Platform.OS ==
-                'ios'
-              ? new QRCode(qrCode8).svg()
-              : "<img src='https:// api.qrserver.com/v1/create-qr-code/?data=" +
-                qrCode8 +
-                "&amp'/>" +
+                   new QRCode(qrCode8).svg()+
                 "<p align='center'>" +
                 arrShare8[0].toString() +
                 '</p>' +
@@ -1093,9 +1074,9 @@ class Wallet extends React.Component {
                 '</p>' +
                 '<p>Following assets can be used to recover your funds using the open - sourced ga - recovery tool.</p><br/><br/>' +
                 '<p>Secondary Mnemonic:<p>' +
-                "<p align='center'>" +
-                firstArrSecondaryMnemonic +
-                '</p>' +
+                "<p align='center'>" +  
+                firstArrSecondaryMnemonic +   
+                '</p>' +   
                 "<p align='center'>" +
                 secoundArrSecondaryMnemonic +
                 '</p><br/>' +
@@ -1105,14 +1086,164 @@ class Wallet extends React.Component {
                 '</p>' +
                 "<p align='center'>" +
                 arrBhXpub[1].toString() +
-                '</p>',
+                '</p>',    
           fileName: pdfFileName,
-          directory: 'Documents',
+          directory: 'Documents',  
         };
         let file = await RNHTMLtoPDF.convert(options);
         console.log({ file });
-
-        resolve(file.filePath);
+        // pdf passwod     
+        var PdfPassword = NativeModules.PdfPassword;      
+            PdfPassword.addEvent( "/" + pdfFileName + ".pdf", password );
+        resolve(file.filePath);    
+          } else {
+            let options = {  
+              html:
+                '<h1>' +
+                forShare.toString() +
+                '</h1>' +
+                "<h3 style='text-decoration: underline;'>Part 1<h3>" +
+                "<img  src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode1+"&amp;'/>"+
+                "<p align='center'>" +
+                arrShare1[ 0 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare1[ 1 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare1[ 2 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare1[ 3 ].toString() +
+                '</p>' +
+                "<h3 style='text-decoration: underline;'>Part 2<h3>" +
+                "<img  src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode2 + "&amp;'/>" +
+                "<p align='center'>" +
+                arrShare2[ 0 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare2[ 1 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare2[ 2 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare2[ 3 ].toString() +
+                '</p>' +
+                "<h3 style='text-decoration: underline;'>Part 3<h3>" +
+                "<img  src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode3 + "&amp;'/>" +
+                "<p align='center'>" +
+                arrShare3[ 0 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare3[ 1 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare3[ 2 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare3[ 3 ].toString() +
+                '</p>' +
+                "<h3 style='text-decoration: underline;'>Part 4<h3>" +
+                "<img  src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode4 + "&amp;'/>" +
+                "<p align='center'>" +
+                arrShare4[ 0 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare4[ 1 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare4[ 2 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare4[ 3 ].toString() +
+                '</p>' +
+                "<h3 style='text-decoration: underline;'>Part 5<h3>" +
+                "<img  src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode5 + "&amp;'/>" +
+                "<p align='center'>" +
+                arrShare5[ 0 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare5[ 1 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare5[ 2 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare5[ 3 ].toString() +
+                '</p>' +
+                "<h3 style='text-decoration: underline;'>Part 6<h3>" +
+                "<img  src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode6 + "&amp;'/>" +
+                "<p align='center'>" +
+                arrShare6[ 0 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare6[ 1 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare6[ 2 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare6[ 3 ].toString() +
+                '</p>' +
+                "<h3 style='text-decoration: underline;'>Part 7<h3>" +
+                "<img  src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode7 + "&amp;'/>" +
+                "<p align='center'>" +
+                arrShare7[ 0 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare7[ 1 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare7[ 2 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrShare7[ 3 ].toString() +
+                '</p>' +
+                "<h3 style='text-decoration: underline;'>Part 8<h3>" +
+                "<img  src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrCode8 + "&amp;'/>" +
+                "<p align='center'>" +
+                arrShare8[ 0 ].toString() +  
+                '</p>' +    
+                "<p align='center'>" +  
+                arrShare8[ 1 ].toString() +    
+                '</p>' +
+                "<p align='center'>" +    
+                arrShare8[ 2 ].toString() +      
+                '</p>' +
+                "<p align='center'>" +
+                arrShare8[ 3 ].toString() +
+                '</p>' +
+                "<h3 style='text-decoration: underline;'>Secondary Xpub (Encrypted):<h3>" +
+                "<img  src='https://api.qrserver.com/v1/create-qr-code/?data=" + secondaryXpub + "&amp;'/>" +
+                "<p align='center'>Scan the above QR Code using your HEXA wallet in order to restore your Secure Account.</p>" +
+                '<p>2FA Secret:<p><br/>' +
+                "<img  src='https://api.qrserver.com/v1/create-qr-code/?data=" + qrData + "&amp;'/>" +
+                "<p align='center'>" +
+                secret2FA +
+                '</p>' +
+                '<p>Following assets can be used to recover your funds using the open - sourced ga - recovery tool.</p><br/><br/>' +
+                '<p>Secondary Mnemonic:<p>' +
+                "<p align='center'>" +
+                firstArrSecondaryMnemonic +
+                '</p>' +
+                "<p align='center'>" +
+                secoundArrSecondaryMnemonic +
+                '</p><br/>' +
+                '<p>BitHyve Xpub:<p>' +
+                "<p align='center'>" +
+                arrBhXpub[ 0 ].toString() +
+                '</p>' +
+                "<p align='center'>" +
+                arrBhXpub[ 1 ].toString() +
+                '</p>',
+              fileName: pdfFileName,
+              directory: 'Documents',
+            };
+            let file = await RNHTMLtoPDF.convert( options );
+            console.log( { file } );
+            resolve( file.filePath );
+          }
       });
     } catch (error) {
       Alert.alert(error);
