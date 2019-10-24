@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 const colors = {
   appColor: '#2595D6',
   tabbarActiveColor: '#2D71B6',
-  black: '#000000',
+  black: '#000000',    
   white: '#FFFFFF',
   Saving: '#E6A620',
   Secure: '#30A2F3',
@@ -147,7 +147,7 @@ const svgIcon = {
     //  png
     histroy_HexaPNG: require(assetsSVG + 'common/image_hexa.png'),
     //  svg
-    //  histroy_HexaSVG: require( assetsSVG + "common/image_hexa.svg" ),
+     histroy_HexaSVG: require( assetsSVG + "common/image_hexa.svg" ),
   },
   healthoftheapp: {
     //  png
@@ -162,14 +162,14 @@ const svgIcon = {
       'healthoftheapp/secretquestions.png'),
     questionPNG: require(assetsSVG + 'healthoftheapp/question.png'),
     //  svg
-    //  trustedcontactsSVG: require( assetsSVG + "healthoftheapp/trustedcontacts.svg" ),
-    //  selectcontactsSVG: require( assetsSVG + "healthoftheapp/selectcontacts.svg" ),
-    //  selfshareSVG: require( assetsSVG + "healthoftheapp/selfshare.svg" ),
-    //  walletSVG: require( assetsSVG + "healthoftheapp/wallet.svg" ),
-    //  emailSVG: require( assetsSVG + "healthoftheapp/email.svg" ),
-    //  cloudstorageSVG: require( assetsSVG + "healthoftheapp/cloudstorage.svg" ),
-    //  secretquestionsSVG: require( assetsSVG + "healthoftheapp/secretquestions.svg" ),
-    //  questionSVG: require( assetsSVG + "healthoftheapp/question.svg" ),
+     trustedcontactsSVG: require( assetsSVG + "healthoftheapp/trustedcontacts.svg" ),
+     selectcontactsSVG: require( assetsSVG + "healthoftheapp/selectcontacts.svg" ),
+     selfshareSVG: require( assetsSVG + "healthoftheapp/selfshare.svg" ),
+     walletSVG: require( assetsSVG + "healthoftheapp/wallet.svg" ),
+     emailSVG: require( assetsSVG + "healthoftheapp/email.svg" ),
+     cloudstorageSVG: require( assetsSVG + "healthoftheapp/cloudstorage.svg" ),
+     secretquestionsSVG: require( assetsSVG + "healthoftheapp/secretquestions.svg" ),
+     questionSVG: require( assetsSVG + "healthoftheapp/question.svg" ),
   },
   walletScreen: {
     //  png
@@ -179,11 +179,11 @@ const svgIcon = {
     testCoinsPNG: require(assetsSVG + 'walletscreen/coins.png'),
     secureAccount2FAPNG: require(assetsSVG + 'walletscreen/2FA.png'),
     //  svg
-    //  dailyAccountSVG: require( assetsSVG + "walletscreen/dailywallet.svg" ),
-    //  secureAccountSVG: require( assetsSVG + "walletscreen/icon_securewallet.svg" ),
-    //  addAccountsSVG: require( assetsSVG + "walletscreen/icon_add.svg" ),
-    //  testCoinsSVG: require( assetsSVG + "walletscreen/coins.svg" ),
-    //  secureAccount2FASVG: require( assetsSVG + "walletscreen/2FA.svg" ),
+     dailyAccountSVG: require( assetsSVG + "walletscreen/dailywallet.svg" ),
+     secureAccountSVG: require( assetsSVG + "walletscreen/icon_securewallet.svg" ),
+     addAccountsSVG: require( assetsSVG + "walletscreen/icon_add.svg" ),
+     testCoinsSVG: require( assetsSVG + "walletscreen/coins.svg" ),
+     secureAccount2FASVG: require( assetsSVG + "walletscreen/2FA.svg" ),
   },
   transactionScreen: {
     //  png
@@ -193,11 +193,11 @@ const svgIcon = {
     PNG4: require(assetsSVG + 'transactionScreen/icon_shieldgreen.png'),
     PNG5: require(assetsSVG + 'transactionScreen/icon_shieldgreen_tick.png'),
     //  svg
-    //  SVG1: require( assetsSVG + "transactionScreen/icon_shieldred_mark.svg" ),
-    //  SVG2: require( assetsSVG + "transactionScreen/icon_shieldred.svg" ),
-    //  SVG3: require( assetsSVG + "transactionScreen/icon_shieldyellow.svg" ),
-    //  SVG4: require( assetsSVG + "transactionScreen/icon_shieldgreen.svg" ),
-    //  SVG5: require( assetsSVG + "transactionScreen/icon_shieldgreen_tick.svg" ),
+     SVG1: require( assetsSVG + "transactionScreen/icon_shieldred_mark.svg" ),
+     SVG2: require( assetsSVG + "transactionScreen/icon_shieldred.svg" ),
+     SVG3: require( assetsSVG + "transactionScreen/icon_shieldyellow.svg" ),
+     SVG4: require( assetsSVG + "transactionScreen/icon_shieldgreen.svg" ),
+     SVG5: require( assetsSVG + "transactionScreen/icon_shieldgreen_tick.svg" ),
   },
   moreScreen: {
     //  png
@@ -206,19 +206,19 @@ const svgIcon = {
     addressBookPNG: require(assetsSVG + 'moreScreen/icon_contacts.png'),
     settingsPNG: require(assetsSVG + 'moreScreen/icon_settings.png'),
     //  svg
-    //  healthSVG: require( assetsSVG + "moreScreen/icon_health.svg" ),
-    //  backupMethodSVG: require( assetsSVG + "moreScreen/secretcontacts.svg" ),
-    //  addressBookSVG: require( assetsSVG + "moreScreen/icon_contacts.svg" ),
-    //  settingsSVG: require( assetsSVG + "moreScreen/icon_settings.svg" ),
+     healthSVG: require( assetsSVG + "moreScreen/icon_health.svg" ),
+     backupMethodSVG: require( assetsSVG + "moreScreen/secretcontacts.svg" ),
+     addressBookSVG: require( assetsSVG + "moreScreen/icon_contacts.svg" ),
+     settingsSVG: require( assetsSVG + "moreScreen/icon_settings.svg" ),
   },
   bottomModel: {
-    //  png
+    //  png 
     recreatePNG: require(assetsSVG + 'bottomModel/recreate.png'),
     resharePNG: require(assetsSVG + 'bottomModel/reshare.png'),
-    //  svg
-    //  recreateSVG: require( assetsSVG + "bottomModel/recreate.svg" ),
-    //  reshareSVG: require( assetsSVG + "bottomModel/reshare.svg" ),
-  },
+    //  svg   
+     recreateSVG: require( assetsSVG + "bottomModel/recreate.svg" ),
+     reshareSVG: require( assetsSVG + "bottomModel/reshare.svg" ),
+  },  
 };
 
 //  Local Database

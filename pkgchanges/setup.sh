@@ -5,9 +5,9 @@ cp -Rf pkgchanges/react-native-confirmation-code-input/ node_modules/react-nativ
 
 rn-nodeify --install --hack
 
-# #for only ios side
-# rm -rf ios/Pods
-# rm -rf ios/build
-# rm ios/Podfile.lock
-# cd ios && pod install
-# # for only android side
+#for only ios side
+rm -rf ios/Pods
+rm -rf ios/build
+rm ios/Podfile.lock
+cd ios && pod install
+# for only android side
