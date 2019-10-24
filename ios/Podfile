@@ -29,7 +29,7 @@ target 'HexaWallet' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
   
-
+  
   pod 'Fabric'
   pod 'Crashlytics'
 
@@ -78,9 +78,7 @@ target 'HexaWallet' do
   pod 'RNReactNativePdfLib', :path => '../node_modules/react-native-pdf-lib/ios'  
   
   pod 'RNInAppBrowser', :path => '../node_modules/react-native-inappbrowser-reborn'
-      
-            
-    
+ 
   pod 'react-native-html-to-pdf', :path => '../node_modules/react-native-html-to-pdf'
 
   post_install do |installer|

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="58" height="58" viewBox="0 0 58 58">
+  <defs>
+    <filter id="Ellipse_10" x="0" y="0" width="58" height="58" filterUnits="userSpaceOnUse">
+      <feOffset input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <linearGradient id="linear-gradient" x1="0.5" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#51b48a"/>
+      <stop offset="1" stop-color="#00a55f"/>
+    </linearGradient>
+  </defs>
+  <g id="icon_shieldgreen_tick" transform="translate(-306 -49.074)">
+    <g id="Group_7143" data-name="Group 7143" transform="translate(0 -26)">
+      <g transform="matrix(1, 0, 0, 1, 306, 75.07)" filter="url(#Ellipse_10)">
+        <circle id="Ellipse_10-2" data-name="Ellipse 10" cx="20" cy="20" r="20" transform="translate(9 9)" fill="#fff"/>
+      </g>
+    </g>
+    <g id="Group_7295" data-name="Group 7295" transform="translate(-2.171 4.337)">
+      <path id="icon_sheild_background" d="M55,5.021A4.187,4.187,0,0,1,50.863.828.82.82,0,0,0,50.035,0H36.793a.82.82,0,0,0-.828.828,4.187,4.187,0,0,1-4.138,4.193A.82.82,0,0,0,31,5.849v6.157C31,22.782,40.8,28.25,43.414,28.25c3.029,0,12.414-5.849,12.414-16.244V5.849A.82.82,0,0,0,55,5.021Z" transform="translate(293.501 60.014)" fill="url(#linear-gradient)"/>
+      <path id="Path_5640" data-name="Path 5640" d="M268.414,5.849v6.157c0,10.4-9.385,16.244-12.414,16.244V0h6.621a.82.82,0,0,1,.828.828,4.187,4.187,0,0,0,4.138,4.193A.82.82,0,0,1,268.414,5.849Z" transform="translate(81.031 60.014)" fill="#379b70"/>
+      <g id="Group_9970" data-name="Group 9970" transform="translate(86.323 -178.218)">
+        <path id="Path_7298" data-name="Path 7298" d="M253.6,249.2l-4.724,4.724-1.509-1.509a.67.67,0,0,0-.477-.2h0a.675.675,0,0,0-.477,1.152l1.986,1.988a.677.677,0,0,0,.956,0l5.2-5.2a.675.675,0,0,0-.955-.956Z" transform="translate(0 0)" fill="#fff"/>
+      </g>
+    </g>
+  </g>
+</svg>
