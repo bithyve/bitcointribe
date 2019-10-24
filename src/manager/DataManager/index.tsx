@@ -1,14 +1,12 @@
-//TODO: AccountsState
-import { getAsyncStorageValue, setAsyncStorageValue } from "./AccountsState";
+// TODO: AccountsState
+import { getAsyncStorageValue, setAsyncStorageValue } from './AccountsState';
 
-//Accounts        
-import { readTblAccounts, updateAccountBalance } from "./Accounts";
+// Accounts
+import { readTblAccounts, updateAccountBalance } from './Accounts';
 
 export {
-    getAsyncStorageValue,
-    setAsyncStorageValue,
-
-    readTblAccounts,
-    updateAccountBalance
-}
-
+  getAsyncStorageValue,
+  setAsyncStorageValue,
+  readTblAccounts,
+  updateAccountBalance,
+};

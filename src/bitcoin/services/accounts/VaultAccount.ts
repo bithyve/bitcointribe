@@ -1,11 +1,12 @@
-import bip32 from "bip32";
-import bip39 from "bip39";
-import bip65 from "bip65";
-import bitcoinJS from "bitcoinjs-lib";
-import Bitcoin from "../../utilities/accounts/Bitcoin";
+import bip32 from 'bip32';
+import bip39 from 'bip39';
+import bip65 from 'bip65';
+import bitcoinJS from 'bitcoinjs-lib';
+import Bitcoin from '../../utilities/accounts/Bitcoin';
 
 export default class VaultAccount {
   public bitcoin: Bitcoin;
+
   constructor() {
     this.bitcoin = new Bitcoin();
   }
@@ -18,7 +19,7 @@ export default class VaultAccount {
       publicKey,
       bitcoinJS.opcodes.OP_CHECKSIG,
     ]);
-  }
+  };
 
   public createTLC = async (
     mnemonic: string,
@@ -40,7 +41,7 @@ export default class VaultAccount {
       const chainInfo = await this.bitcoin.fetchChainInfo();
       lockTime = bip65.encode({ blocks: chainInfo.height + blockHeight });
     } else {
-      throw new Error("Please specify time or block height");
+      throw new Error('Please specify time or block height');
     }
 
     const seed = bip39.mnemonicToSeed(mnemonic);
@@ -61,9 +62,9 @@ export default class VaultAccount {
       address: p2sh.address,
       lockTime,
       privateKey: keyPair.toWIF(),
-      redeemScript: redeemScript.toString("hex"),
+      redeemScript: redeemScript.toString('hex'),
     };
-  }
+  };
 
   public transfer = async (
     senderAddress: string,
@@ -83,13 +84,13 @@ export default class VaultAccount {
   > => {
     if (this.bitcoin.isValidAddress(recipientAddress)) {
       const { balanceData } = await this.bitcoin.getBalance(senderAddress);
-      console.log({ balance: balanceData.final_balance });
+      // console.log({ balance: balanceData.final_balance });
 
       const { utc } = bip65.decode(lockTime);
       if (utc) {
         // non functional in time; transaction broadcast failing with 64: non-final
         const { mediantime } = await this.bitcoin.client.getBlockchainInfo();
-        console.log({ mediantime, lockTime });
+        // console.log({ mediantime, lockTime });
         if (mediantime < lockTime) {
           const errorMessage = `${lockTime -
             mediantime} second(s) remaining for the UTXO to be spendable (approximately)`;
@@ -100,7 +101,7 @@ export default class VaultAccount {
         }
       } else {
         const { height } = await this.bitcoin.fetchChainInfo();
-        console.log({ height, lockTime });
+        // console.log({ height, lockTime });
         if (height < lockTime) {
           const errorMessage = `${lockTime -
             height} block(s) remaining for the UTXO to be spendable`;
@@ -117,10 +118,10 @@ export default class VaultAccount {
         amount,
         0xfffffffe,
       );
-      console.log("---- Transaction Created ----");
+      // console.log('---- Transaction Created ----');
       if (parseInt(balanceData.final_balance, 10) + fee <= amount) {
         throw new Error(
-          "Insufficient balance to compensate for transfer amount and the txn fee",
+          'Insufficient balance to compensate for transfer amount and the txn fee',
         );
       }
 
@@ -130,12 +131,15 @@ export default class VaultAccount {
       const tx = txb.buildIncomplete();
       const redeemScript = this.bitcoin.cltvCheckSigOutput(keyPair, lockTime);
 
-      console.log({ redeemScript: redeemScript.toString("hex") });
+      // console.log({ redeemScript: redeemScript.toString('hex') });
       const hashType = bitcoinJS.Transaction.SIGHASH_ALL;
       const signatureHash = tx.hashForSignature(0, redeemScript, hashType);
 
       const unlockingScript = bitcoinJS.script.compile([
-        bitcoinJS.script.signature.encode(keyPair.sign(signatureHash), hashType),
+        bitcoinJS.script.signature.encode(
+          keyPair.sign(signatureHash),
+          hashType,
+        ),
       ]);
 
       const redeemScriptSig = bitcoinJS.payments.p2sh({
@@ -147,46 +151,47 @@ export default class VaultAccount {
         network: this.bitcoin.network,
       }).input;
       tx.setInputScript(0, redeemScriptSig);
-      console.log("---- Transaction Signed ----");
+      // console.log('---- Transaction Signed ----');
 
       const txHex = tx.toHex();
-      console.log({ txHex });
+      // console.log({ txHex });
       const res = await this.bitcoin.broadcastTransaction(txHex);
-      console.log("---- Transaction Broadcasted ----");
+      // console.log('---- Transaction Broadcasted ----');
       return res;
-    } else {
-      return {
-        status: 400,
-        errorMessage: "Supplied recipient address is wrong.",
-      };
     }
-  }
+    return {
+      status: 400,
+      errorMessage: 'Supplied recipient address is wrong.',
+    };
+  };
 
   public recoverVault = async (redeemScriptHex: string) => {
     const decodedScript = await this.bitcoin.client.decodeScript(
       redeemScriptHex,
     );
     const { asm } = decodedScript;
-    const splits = asm.split(" ");
+    const splits = asm.split(' ');
     const lockTime = parseInt(splits[0], 10);
-    const pubKey = Buffer.from(splits[3], "hex");
+    const pubKey = Buffer.from(splits[3], 'hex');
     const redeemScript = this.cltvCheckSigOutput(pubKey, lockTime);
-    if (redeemScript.toString("hex") === redeemScriptHex) {
-      const address = bitcoinJS.payments.p2sh({
+    if (redeemScript.toString('hex') === redeemScriptHex) {
+      const { address } = bitcoinJS.payments.p2sh({
         redeem: bitcoinJS.payments.p2wsh({
-          redeem: { output: redeemScript, network: this.bitcoin.network },
+          redeem: {
+            output: redeemScript,
+            network: this.bitcoin.network,
+          },
           network: this.bitcoin.network,
         }),
         network: this.bitcoin.network,
-      }).address;
+      });
 
       return {
         address,
         lockTime,
-        publicKey: pubKey.toString("hex"),
+        publicKey: pubKey.toString('hex'),
       };
-    } else {
-      throw new Error("Vault recovery failed");
     }
-  }
+    throw new Error('Vault recovery failed');
+  };
 }
