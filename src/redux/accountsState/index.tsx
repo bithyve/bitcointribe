@@ -1,177 +1,190 @@
-import { put } from "redux-saga/effects";
-import { sagaWatcherHelper } from "../utils";
-import { asyncStorageKeys } from "hexaConstants";
-import { S3Service, RegularAccount, SecureAccount } from "hexaBitcoin";
+import { put } from 'redux-saga/effects';
+import { sagaWatcherHelper } from '../utils';
+import { asyncStorageKeys } from 'hexaConstants';
+import { S3Service, RegularAccount, SecureAccount } from 'hexaBitcoin';
 
+var DataManager = require('hexaDataManager');
 
-var DataManager = require( "hexaDataManager" );
-
-
-// Types
-const WRITE_ACCOUNTS_STATE = "WRITE_ACCOUNTS_STATE";
-const WRITE_REGUALR_ACCOUNT_STATE = "WRITE_REGUALR_ACCOUNT_STATE";
-const WRITE_SECURE_ACCOUNT_STATE = "WRITE_SECURE_ACCOUNT_STATE";
-const WRITE_SSS_ACCOUNT_STATE = "WRITE_SSS_ACCOUNT_STATE";
-const READ_ACCOUNTS_STATE = "READ_ACCOUNTS_STATE";
-const UPDATE_ACCOUNTS_STATE = "UPDATE_ACCOUNTS_STATE";
-
+//  Types
+const WRITE_ACCOUNTS_STATE = 'WRITE_ACCOUNTS_STATE';
+const WRITE_REGUALR_ACCOUNT_STATE = 'WRITE_REGUALR_ACCOUNT_STATE';
+const WRITE_SECURE_ACCOUNT_STATE = 'WRITE_SECURE_ACCOUNT_STATE';
+const WRITE_SSS_ACCOUNT_STATE = 'WRITE_SSS_ACCOUNT_STATE';
+const READ_ACCOUNTS_STATE = 'READ_ACCOUNTS_STATE';
+const UPDATE_ACCOUNTS_STATE = 'UPDATE_ACCOUNTS_STATE';
 
 const INITIAL_STATE = {
-    regularAccount: undefined,
-    secureAccount: undefined,
-    sss: undefined
+  regularAccount: undefined,
+  secureAccount: undefined,
+  sss: undefined,
 };
 
-// Actions
+//  Actions
 export const readAccountsState = () => {
-    return {
-        type: READ_ACCOUNTS_STATE,
-    };
+  return {
+    type: READ_ACCOUNTS_STATE,
+  };
 };
 
-export const writeAccountsState = ( args ) => {
-    return {
-        type: WRITE_ACCOUNTS_STATE,
-        ...args
-    }
-}
-
-
-export const writeRegularAccount = ( args ) => {
-    return {
-        type: WRITE_REGUALR_ACCOUNT_STATE,
-        ...args
-    }
-}
-
-export const writeSecureAccount = ( args ) => {
-    return {
-        type: WRITE_SECURE_ACCOUNT_STATE,
-        ...args
-    }
-}
-
-export const writeSSSAccount = ( args ) => {
-    return {
-        type: WRITE_SSS_ACCOUNT_STATE,
-        ...args
-    }
-}
-
-
-// Reducers
-export const accountsStateReducer = ( state = INITIAL_STATE, action: any ) => {
-    console.log( { accountsStates: { state, action } } );
-    switch ( action.type ) {
-        case UPDATE_ACCOUNTS_STATE:
-            return { ...state, ...action.payload };
-        default:
-            return state;
-    }
+export const writeAccountsState = args => {
+  return {
+    type: WRITE_ACCOUNTS_STATE,
+    ...args,
+  };
 };
 
-// Sagas
+export const writeRegularAccount = args => {
+  return {
+    type: WRITE_REGUALR_ACCOUNT_STATE,
+    ...args,
+  };
+};
+
+export const writeSecureAccount = args => {
+  return {
+    type: WRITE_SECURE_ACCOUNT_STATE,
+    ...args,
+  };
+};
+
+export const writeSSSAccount = args => {
+  return {
+    type: WRITE_SSS_ACCOUNT_STATE,
+    ...args,
+  };
+};
+
+//  Reducers
+export const accountsStateReducer = (state = INITIAL_STATE, action: any) => {
+  console.log({ accountsStates: { state, action } });
+  switch (action.type) {
+    case UPDATE_ACCOUNTS_STATE:
+      return { ...state, ...action.payload };
+    default:
+      return state;
+  }
+};
+
+//  Sagas
 function* workerReadAccountsState() {
-    try {
-        let regularClassObject = yield DataManager.getAsyncStorageValue( asyncStorageKeys.regularClassObject );
-        let secureClassObject = yield DataManager.getAsyncStorageValue( asyncStorageKeys.secureClassObject );
-        let setS3ServiceObject = yield DataManager.getAsyncStorageValue( asyncStorageKeys.s3ServiceClassObject );
-        const regularAccount = yield RegularAccount.fromJSON( regularClassObject );
-        const secureAccount = yield SecureAccount.fromJSON( secureClassObject );
-        const sss = yield S3Service.fromJSON( setS3ServiceObject );
-        yield put( {
-            type: UPDATE_ACCOUNTS_STATE,
-            payload: { regularAccount, secureAccount, sss }
-        } );
-
-    } catch ( e ) {
-        console.log( "error", e )
-    }
+  try {
+    let regularClassObject = yield DataManager.getAsyncStorageValue(
+      asyncStorageKeys.regularClassObject,
+    );
+    let secureClassObject = yield DataManager.getAsyncStorageValue(
+      asyncStorageKeys.secureClassObject,
+    );
+    let setS3ServiceObject = yield DataManager.getAsyncStorageValue(
+      asyncStorageKeys.s3ServiceClassObject,
+    );
+    const regularAccount = yield RegularAccount.fromJSON(regularClassObject);
+    const secureAccount = yield SecureAccount.fromJSON(secureClassObject);
+    const sss = yield S3Service.fromJSON(setS3ServiceObject);
+    yield put({
+      type: UPDATE_ACCOUNTS_STATE,
+      payload: { regularAccount, secureAccount, sss },
+    });
+  } catch (e) {
+    console.log('error', e);
+  }
 }
 
-function* workerWriteAccountsState( action ) {
-    try {
+function* workerWriteAccountsState(action) {
+  try {
+    var { regularAccount, secureAccount, sss } = action;
+    yield put({
+      type: UPDATE_ACCOUNTS_STATE,
+      payload: { regularAccount, secureAccount, sss },
+    });
 
-        var { regularAccount, secureAccount, sss } = action;
-        yield put( {
-            type: UPDATE_ACCOUNTS_STATE,
-            payload: { regularAccount, secureAccount, sss }
-        } );
+    regularAccount = JSON.stringify(regularAccount);
+    yield DataManager.setAsyncStorageValue(
+      asyncStorageKeys.regularClassObject,
+      regularAccount,
+    );
 
-        regularAccount = JSON.stringify( regularAccount );
-        yield DataManager.setAsyncStorageValue(
-            asyncStorageKeys.regularClassObject,
-            regularAccount
-        );
+    secureAccount = JSON.stringify(secureAccount);
+    yield DataManager.setAsyncStorageValue(
+      asyncStorageKeys.secureClassObject,
+      secureAccount,
+    );
 
-        secureAccount = JSON.stringify( secureAccount );
-        yield DataManager.setAsyncStorageValue(
-            asyncStorageKeys.secureClassObject,
-            secureAccount
-        );
-
-        sss = JSON.stringify( sss );
-        yield DataManager.setAsyncStorageValue(
-            asyncStorageKeys.s3ServiceClassObject,
-            sss
-        );
-    } catch ( error ) {
-        console.log( "error", error )
-    }
+    sss = JSON.stringify(sss);
+    yield DataManager.setAsyncStorageValue(
+      asyncStorageKeys.s3ServiceClassObject,
+      sss,
+    );
+  } catch (error) {
+    console.log('error', error);
+  }
 }
 
-function* workerWriteRegularAccountState( action ) {
-    try {
-        var { regularAccount } = action;
-        yield put( {
-            type: UPDATE_ACCOUNTS_STATE,
-            payload: { regularAccount }
-        } );
-        yield DataManager.setAsyncStorageValue(
-            asyncStorageKeys.regularClassObject,
-            regularAccount
-        );
-    } catch ( error ) {
-        console.log( "error", error )
-    }
+function* workerWriteRegularAccountState(action) {
+  try {
+    var { regularAccount } = action;
+    yield put({
+      type: UPDATE_ACCOUNTS_STATE,
+      payload: { regularAccount },
+    });
+    yield DataManager.setAsyncStorageValue(
+      asyncStorageKeys.regularClassObject,
+      regularAccount,
+    );
+  } catch (error) {
+    console.log('error', error);
+  }
 }
 
-function* workerWriteSecureAccountState( action ) {
-    try {
-        var { secureAccount } = action;
-        yield put( {
-            type: UPDATE_ACCOUNTS_STATE,
-            payload: { secureAccount }
-        } );
-        yield DataManager.setAsyncStorageValue(
-            asyncStorageKeys.secureClassObject,
-            secureAccount
-        );
-    } catch ( error ) {
-        console.log( "error", error )
-    }
+function* workerWriteSecureAccountState(action) {
+  try {
+    var { secureAccount } = action;
+    yield put({
+      type: UPDATE_ACCOUNTS_STATE,
+      payload: { secureAccount },
+    });
+    yield DataManager.setAsyncStorageValue(
+      asyncStorageKeys.secureClassObject,
+      secureAccount,
+    );
+  } catch (error) {
+    console.log('error', error);
+  }
 }
 
-function* workerWriteSSSAccountState( action ) {
-    try {
-        var { sss } = action;
-        yield put( {
-            type: UPDATE_ACCOUNTS_STATE,
-            payload: { sss }
-        } );
-        yield DataManager.setAsyncStorageValue(
-            asyncStorageKeys.s3ServiceClassObject,
-            sss
-        );
-    } catch ( error ) {
-        console.log( "error", error )
-    }
+function* workerWriteSSSAccountState(action) {
+  try {
+    var { sss } = action;
+    yield put({
+      type: UPDATE_ACCOUNTS_STATE,
+      payload: { sss },
+    });
+    yield DataManager.setAsyncStorageValue(
+      asyncStorageKeys.s3ServiceClassObject,
+      sss,
+    );
+  } catch (error) {
+    console.log('error', error);
+  }
 }
 
-export const watcherReadAccountsState = sagaWatcherHelper( workerReadAccountsState, READ_ACCOUNTS_STATE );
-export const watcherWriteAccountsState = sagaWatcherHelper( workerWriteAccountsState, WRITE_ACCOUNTS_STATE );
+export const watcherReadAccountsState = sagaWatcherHelper(
+  workerReadAccountsState,
+  READ_ACCOUNTS_STATE,
+);
+export const watcherWriteAccountsState = sagaWatcherHelper(
+  workerWriteAccountsState,
+  WRITE_ACCOUNTS_STATE,
+);
 
-
-export const watcherWriteRegularAccountState = sagaWatcherHelper( workerWriteRegularAccountState, WRITE_REGUALR_ACCOUNT_STATE );
-export const watcherWriteSecureAccountState = sagaWatcherHelper( workerWriteSecureAccountState, WRITE_SECURE_ACCOUNT_STATE );
-export const watcherWriteSSSAccountState = sagaWatcherHelper( workerWriteSSSAccountState, WRITE_SSS_ACCOUNT_STATE );   
+export const watcherWriteRegularAccountState = sagaWatcherHelper(
+  workerWriteRegularAccountState,
+  WRITE_REGUALR_ACCOUNT_STATE,
+);
+export const watcherWriteSecureAccountState = sagaWatcherHelper(
+  workerWriteSecureAccountState,
+  WRITE_SECURE_ACCOUNT_STATE,
+);
+export const watcherWriteSSSAccountState = sagaWatcherHelper(
+  workerWriteSSSAccountState,
+  WRITE_SSS_ACCOUNT_STATE,
+);
