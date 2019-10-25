@@ -63,13 +63,13 @@ PODS:
     - React-cxxreact (= 0.60.5)
     - React-jsi (= 0.60.5)
   - React-jsinspector (0.60.5)
-  - react-native-camera (3.7.0):
+  - react-native-camera (3.8.0):
     - React
-    - react-native-camera/RCT (= 3.7.0)
-    - react-native-camera/RN (= 3.7.0)
-  - react-native-camera/RCT (3.7.0):
+    - react-native-camera/RCT (= 3.8.0)
+    - react-native-camera/RN (= 3.8.0)
+  - react-native-camera/RCT (3.8.0):
     - React
-  - react-native-camera/RN (3.7.0):
+  - react-native-camera/RN (3.8.0):
     - React
   - react-native-config (0.11.7):
     - React
@@ -122,7 +122,7 @@ PODS:
     - React
   - RNDeviceInfo (2.3.2):
     - React
-  - RNFS (2.14.1):
+  - RNFS (2.16.1):
     - React
   - RNGestureHandler (1.4.1):
     - React
@@ -138,11 +138,10 @@ PODS:
     - React
   - RNSimpleShare (0.1.1):
     - React
-  - RNSVG (9.11.1):
+  - RNSVG (9.12.0):
     - React
   - RNVectorIcons (6.6.0):
     - React
-  - ShotBlocker (0.0.3)
   - TcpSockets (3.3.2):
     - React
   - yoga (0.60.5.React)
@@ -197,7 +196,6 @@ DEPENDENCIES:
   - RNSimpleShare (from `../node_modules/react-native-simple-share`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
-  - ShotBlocker
   - TcpSockets (from `../node_modules/react-native-tcp`)
   - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -206,7 +204,6 @@ SPEC REPOS:
     - boost-for-react-native
     - Crashlytics
     - Fabric
-    - ShotBlocker
 
 EXTERNAL SOURCES:
   BVLinearGradient:
@@ -324,7 +321,7 @@ SPEC CHECKSUMS:
   React-jsi: 4d8c9efb6312a9725b18d6fc818ffc103f60fec2
   React-jsiexecutor: 90ad2f9db09513fc763bc757fdc3c4ff8bde2a30
   React-jsinspector: e08662d1bf5b129a3d556eb9ea343a3f40353ae4
-  react-native-camera: 85bbc026d9e62697b6d842d528854cd3d938fad6
+  react-native-camera: 21cf4ed26cf432ceb1fae959aa6924943fd6f714
   react-native-config: 55548054279d92e0e4566ea15a8b9b81028ec342
   react-native-contacts: 7d0b7ccd5f00df82ceca035935fc9d6e63af5aec
   react-native-html-to-pdf: 1d1199917f56a98377d431bce84c2f275e48eb71
@@ -349,7 +346,7 @@ SPEC CHECKSUMS:
   RNBackgroundFetch: 8d8d66b47eafcb9e772b2eb95057939038b3ef95
   RNCAsyncStorage: 60a80e72d95bf02a01cace55d3697d9724f0d77f
   RNDeviceInfo: 17e34f6dd902f08d88cbe2c0b7a01be948d43641
-  RNFS: a8fbe7060fa49157d819466404794ad9c58e58cf
+  RNFS: 795866388a01de4e470f3b1041a99cf20a343844
   RNGestureHandler: 4cb47a93019c1a201df2644413a0a1569a51c8aa
   RNI18n: e2f7e76389fcc6e84f2c8733ea89b92502351fd8
   RNInAppBrowser: 9d1ffb9db0d0cbdf03f528f1f0624b2c533b93fd
@@ -357,12 +354,11 @@ SPEC CHECKSUMS:
   RNReactNativePdfLib: d56cdaa0801a4641d8a0c34aa7fe8ef37539d1bf
   RNShare: 8b171d4b43c1d886917fdd303bf7a4b87167b05c
   RNSimpleShare: 741246a2540a2f53d3b371d8f0e730dde2da5da5
-  RNSVG: be27aa7c58819f97399388ae53d7fa0572f32c7f
+  RNSVG: 75670614bca635d3dd64bc267bc199e539cb4fa9
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
-  ShotBlocker: e05c2f5b411733dddafb807250e90e7b9931c73e
   TcpSockets: 14306fb79f9750ea7d2ddd02d8bed182abb01797
   yoga: 312528f5bbbba37b4dcea5ef00e8b4033fdd9411
 
-PODFILE CHECKSUM: d0c2441742076136318e07d45c34e6abecd16a0d
+PODFILE CHECKSUM: 7952daf6857187775624d19ea58608ee2c5e23ef
 
-COCOAPODS: 1.7.5
+COCOAPODS: 1.6.0

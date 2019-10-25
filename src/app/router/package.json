@@ -1,4 +1,4 @@
 {
-  "name": "hexaRouter",
-  "main": "router.tsx"
+    "name": "hexaRouter",
+    "main": "router.tsx"
 }

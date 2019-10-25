@@ -275,7 +275,6 @@ export default class S3Service {
   };
 
   private sss: SSS;
-
   constructor(mnemonic: string, encryptedShares?: string[]) {
     this.sss = new SSS(mnemonic, encryptedShares);
   }
@@ -346,10 +345,7 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.sss.getWalletId(),
-      };
+      return { status: config.STATUS.SUCCESS, data: this.sss.getWalletId() };
     } catch (err) {
       return { status: config.STATUS.ERROR, err: err.message };
     }

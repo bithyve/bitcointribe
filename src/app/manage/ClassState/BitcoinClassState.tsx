@@ -1,22 +1,21 @@
 import { AsyncStorage } from 'react-native';
-import { asyncStorageKeys } from 'HexaWallet/src/app/constants/Constants';
+import { asyncStorageKeys } from 'hexaConstants';
+var utils = require('hexaUtils');
 
 // TODO: Bitcoin Files
 import { S3Service, RegularAccount, SecureAccount } from 'hexaBitcoin';
 
-const utils = require('HexaWallet/src/app/constants/Utils');
-
 const setRegularClassState = async (value: any) => {
-  const tvalue = JSON.stringify(value);
-  AsyncStorage.setItem(asyncStorageKeys.regularClassObject, tvalue);
+  value = JSON.stringify(value);
+  AsyncStorage.setItem(asyncStorageKeys.regularClassObject, value);
 };
 
 const getRegularClassState = async () => {
-  const regularClassObject = await AsyncStorage.getItem(
+  let regularClassObject = await AsyncStorage.getItem(
     asyncStorageKeys.regularClassObject,
   );
   if (regularClassObject != null) {
-    const regularAccount = RegularAccount.fromJSON(regularClassObject);
+    let regularAccount = RegularAccount.fromJSON(regularClassObject);
     await utils.setRegularAccountObject(regularAccount);
     return regularAccount;
   }
@@ -24,16 +23,16 @@ const getRegularClassState = async () => {
 };
 
 const setSecureClassState = async (value: any) => {
-  const tvalue = JSON.stringify(value);
-  AsyncStorage.setItem(asyncStorageKeys.secureClassObject, tvalue);
+  value = JSON.stringify(value);
+  AsyncStorage.setItem(asyncStorageKeys.secureClassObject, value);
 };
 
 const getSecureClassState = async () => {
-  const secureClassObject = await AsyncStorage.getItem(
+  let secureClassObject = await AsyncStorage.getItem(
     asyncStorageKeys.secureClassObject,
   );
   if (secureClassObject != null) {
-    const secureAccount = SecureAccount.fromJSON(secureClassObject);
+    let secureAccount = SecureAccount.fromJSON(secureClassObject);
     await utils.setSecureAccountObject(secureAccount);
     return secureAccount;
   }
@@ -41,16 +40,16 @@ const getSecureClassState = async () => {
 };
 
 const setS3ServiceClassState = async (value: any) => {
-  const tvalue = JSON.stringify(value);
-  AsyncStorage.setItem(asyncStorageKeys.s3ServiceClassObject, tvalue);
+  value = JSON.stringify(value);
+  AsyncStorage.setItem(asyncStorageKeys.s3ServiceClassObject, value);
 };
 
 const getS3ServiceClassState = async () => {
-  const setS3ServiceObject = await AsyncStorage.getItem(
+  let setS3ServiceObject = await AsyncStorage.getItem(
     asyncStorageKeys.s3ServiceClassObject,
   );
   if (setS3ServiceObject != null) {
-    const s3Service = S3Service.fromJSON(setS3ServiceObject);
+    let s3Service = S3Service.fromJSON(setS3ServiceObject);
     await utils.setS3ServiceObject(s3Service);
     return s3Service;
   }
