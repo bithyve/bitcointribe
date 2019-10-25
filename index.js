@@ -2,27 +2,36 @@
 /** @format */
 import React from 'react';
 import { createAppContainer } from 'react-navigation';
-import { AppRegistry, Linking, StatusBar, Alert } from 'react-native';
+import {
+  AsyncStorage,
+  AppState,
+  AppRegistry,
+  Linking,
+  StatusBar,
+  Alert,
+  SafeAreaView,
+  StyleSheet,
+} from 'react-native';
 import DeepLinking from 'react-native-deep-linking';
 import 'HexaWallet/shim';
 import { name as appName } from 'HexaWallet/app.json';
 
 import { createRootNavigator } from 'hexaRouter';
-import { Launch } from 'hexaCompLanch';
+import { Launch } from 'hexaScreen/Launch';
 
-// TODO: Redux
+//TODO: Redux
 import { Provider } from 'react-redux';
 import { store } from './src/redux';
 
-// TODO: Custome Object
-const utils = require('HexaWallet/src/app/constants/Utils');
-
+//TODO: Custome Object
+var utils = require('hexaUtils');
 export default class HexaWallet extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       status: true,
       isStartPage: 'OnBoardingNavigator',
+      appState: AppState.currentState,
     };
     StatusBar.setBarStyle('light-content', true);
   }
@@ -38,66 +47,49 @@ export default class HexaWallet extends React.Component {
         .catch(e => {});
       // This listener handles the case where the app is woken up from the Universal or Deep Linking
       Linking.addEventListener('url', this.appWokeUp);
-      // TODO: Deep Linking
+      //TODO: Deep Linking
       DeepLinking.addScheme('https://');
       DeepLinking.addRoute(
         '/prime-sign-230407.appspot.com/sss/:pageName/:script',
-        response => {
-          // console.log({
-          //     response
-          // });
-          let pageName;
-          let type;
-          // console.log({ response });
+        (response: any) => {
+          console.log({
+            response,
+          });
+          var pageName;
+          var type;
+          console.log({ response });
           if (response.pageName === 'bk') {
             pageName = 'TabbarBottom';
             type = 'SSS Recovery SMS/EMAIL';
-          } else if (response.pageName === 'req') {
+          } else if (response.pageName == 'req') {
             pageName = 'TrustedPartyShareSecretNavigator';
             type = 'SSS Restore SMS/EMAIL';
-          } else if (response.pageName === 'res') {
+          } else if (response.pageName == 'res') {
             pageName = 'OTPScreenNavigator';
             type = 'SSS Restore SMS/EMAIL';
           } else {
             Alert.alert('Working');
           }
           utils.setRootViewController(pageName);
-          let { script } = response;
+          var script = response.script;
           script = script.split('_+_').join('/');
-          // console.log({ script });
-          let decpScript = utils.decrypt(script, '122334');
+          console.log({ script });
+          var decpScript = utils.decrypt(script, '122334');
           decpScript = JSON.parse(decpScript);
-          // console.log({ decpScript });
+          console.log({ decpScript });
           utils.setDeepLinkingUrl(decpScript);
           utils.setDeepLinkingType(type);
         },
       );
     } catch (error) {
-      // console.log({ error });
-    }
-  }
-
-  componentWillUnmount() {
-    try {
-      Linking.removeEventListener('url', this.appWokeUp);
-    } catch (e) {
-      // console.log({ e });
-    }
-  }
-
-  onCompleted(status, pageName) {
-    try {
-      this.setState({
-        status,
-        isStartPage: pageName,
+      console.log({
+        error,
       });
-    } catch (e) {
-      // console.log({ e });
     }
   }
 
-  appWokeUp = event => {
-    // console.log({ url: event.url });
+  appWokeUp = (event: any) => {
+    console.log({ url: event.url });
     this.setState({
       status: true,
     });
@@ -106,32 +98,53 @@ export default class HexaWallet extends React.Component {
     this.resetStackToProperRoute(event.url);
   };
 
-  resetStackToProperRoute = url => {
-    // console.log({ resetStackToProperRoute: url });
+  resetStackToProperRoute = (url: any) => {
+    console.log({ resetStackToProperRoute: url });
     DeepLinking.evaluateUrl(url);
   };
 
+  componentWillUnmount() {
+    try {
+      Linking.removeEventListener('url', this.appWokeUp);
+    } catch (e) {
+      console.log({
+        e,
+      });
+    }
+  }
+  onComplited(status: boolean, pageName: string) {
+    try {
+      this.setState({
+        status: status,
+        isStartPage: pageName,
+      });
+    } catch (e) {
+      console.log({
+        e,
+      });
+    }
+  }
+
   render() {
-    const { status, isStartPage } = this.state;
+    let { status, isStartPage } = this.state;
     const Layout = createRootNavigator(status, isStartPage);
-    // console.log(`first = ${  status}`, isStartPage);
+    console.log('first = ' + status, isStartPage);
     const AppContainer = createAppContainer(Layout);
     return (
       <Provider store={store}>
-        {' '}
         {status ? (
           <Launch
-            onCompleted={(status, pageName) =>
-              this.onCompleted(status, pageName)
+            onComplited={(status: boolean, pageName: string) =>
+              this.onComplited(status, pageName)
             }
           />
         ) : (
           <AppContainer />
-        )}{' '}
+        )}
       </Provider>
     );
   }
 }
 
-// console.disableYellowBox = true;
+console.disableYellowBox = true;
 AppRegistry.registerComponent(appName, () => HexaWallet);

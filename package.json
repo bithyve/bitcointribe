@@ -9,11 +9,13 @@
   },
   "scripts": {
     "start": "react-native start",
-    "test": "jest",
+    "prepare": "chmod +x pkgchanges/setup.sh && ./pkgchanges/setup.sh",
     "prettier:write": "npx prettier --write **/*.{js,jsx,ts,tsx,json} && npx prettier --write *.{js,jsx,ts,tsx,json}",
     "lint": "./node_modules/.bin/eslint -c .eslintrc.js --ext .js,.jsx,.ts,.tsx ./src",
     "lint:fix": "./node_modules/.bin/eslint /src/ --fix",
+    "test": "jest",
     "android-dev": "ENVFILE=.env.dev react-native run-android",
+    "ios-dev": "ENVFILE=.env.dev react-native run-ios --simulator=\"iPhone 8\"",
     "build-android-dev": "export ENVFILE=.env.dev && cd android && ./gradlew assembleRelease && cd ..",
     "android-relase": "ENVFILE=.env.dev react-native run-android --variant=release"
   },
@@ -42,6 +44,7 @@
     "number-to-words": "^1.2.4",
     "path-browserify": "0.0.0",
     "punycode": "^1.4.1",
+    "qrcode-svg": "^1.0.0",
     "querystring-es3": "^0.2.1",
     "react": "16.8.6",
     "react-native": "0.60.5",
@@ -157,6 +160,11 @@
     "pretty-quick": "^2.0.0",
     "react-test-renderer": "16.8.6",
     "typescript": "^3.5.3"
+  },
+  "rnpm": {
+    "assets": [
+      "./assets/fonts"
+    ]
   },
   "jest": {
     "preset": "react-native"

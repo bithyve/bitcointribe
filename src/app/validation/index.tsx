@@ -1,4 +1,8 @@
-import renderIf from './renderIf';
-import { validationService } from './service';
+import renderIf from "./renderIf";
+import { validationService } from "./service";
 
-export { renderIf, validationService };
+
+export {
+    renderIf,
+    validationService
+}

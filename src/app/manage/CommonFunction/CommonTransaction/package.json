@@ -1,4 +1,4 @@
 {
-  "name": "hexaCommonTransaction",
-  "main": "CommonTransaction.tsx"
+    "name": "hexaCommonTransaction",
+    "main": "CommonTransaction.tsx"
 }

@@ -2,7 +2,7 @@ import { select, put } from 'redux-saga/effects';
 import { S3Service, RegularAccount, SecureAccount } from 'hexaBitcoin';
 import { createMnemonic, sagaWatcherHelper } from '../utils';
 
-// Types
+//  Types
 const SETUP_ACCOUNTS = 'SETUP_ACCOUNTS';
 const SETUP_ACCOUNTS_SUCCESS = 'SETUP_ACCOUNTS_SUCCESS';
 const CREATE_REGULAR_ACCOUNT = 'CREATE_REGULAR_ACCOUNT';
@@ -12,17 +12,17 @@ const UPDATE_SECURE_ACCOUNT = 'UPDATE_SECURE_ACCOUNT';
 const CREATE_SSS = 'CREATE_SSS';
 const UPDATE_SSS = 'UPDATE_SSS';
 
-// types
-// regular balance
-// update regular balance
+//  types
+//  regular balance
+//  update regular balance
 
-// secure balance
-// update secure balance
+//  secure balance
+//  update secure balance
 
-// regular address
-// update regular address
-// secure address
-// update secure address
+//  regular address
+//  update regular address
+//  secure address
+//  update secure address
 
 const INITIAL_STATE = {
   mnemonic: undefined,
@@ -31,7 +31,7 @@ const INITIAL_STATE = {
   sss: undefined,
 };
 
-// Actions
+//  Actions
 export const setupAccounts = () => {
   return {
     type: SETUP_ACCOUNTS,
@@ -56,7 +56,7 @@ export const createSSS = () => {
   };
 };
 
-// Reducers
+//  Reducers
 export const walletReducer = (state = INITIAL_STATE, action: any) => {
   switch (action.type) {
     case SETUP_ACCOUNTS_SUCCESS:
@@ -69,7 +69,7 @@ export const walletReducer = (state = INITIAL_STATE, action: any) => {
   }
 };
 
-// Sagas
+//  Sagas
 
 function* workerSetupAccounts() {
   try {
