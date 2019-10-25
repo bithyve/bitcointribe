@@ -1,31 +1,30 @@
-/* eslint-disable */
 export default class Singleton {
-  //In future use redux (singleton same redux but redux adv.)
+  // In future use redux (singleton same redux but redux adv.)
   static myInstance = null;
   public passcode: string = '';
   public rootViewController: string = 'TabbarBottom';
   public deepLinkingUrl: string = '';
   public deepLinkingType: string = '';
 
-  //Bitcoin Class
+  // Bitcoin Class
   public regularAccountObject: any;
   public secureAccountObject: any;
   public s3Service: any;
 
-  //Tabbar Screen Flag
+  // Tabbar Screen Flag
   public flagScanQRCode: boolean = true;
 
-  //Wallet Details
+  // Wallet Details
   public walletJsonDetails: any;
 
-  //Setup your wallet screen
+  // Setup your wallet screen
   public setupWallet = {};
 
-  //SSS Details
+  // SSS Details
   public sssJsonDetails: any;
   public sssDetailsRecordIDWise: any;
 
-  //App Health Status
+  // App Health Status
   public appHealthStatus: any;
 
   /**
@@ -38,21 +37,21 @@ export default class Singleton {
     return this.myInstance;
   }
 
-  //TODO: passcode
+  // TODO: passcode
   getPasscode() {
     return this.passcode;
   }
   setPasscode(code: string) {
     this.passcode = code;
   }
-  //TODO: rootViewController
+  // TODO: rootViewController
   getRootViewController() {
     return this.rootViewController;
   }
   setRootViewController(controller: string) {
     this.rootViewController = controller;
   }
-  //TODO: deepLinkingUrl
+  // TODO: deepLinkingUrl
   getDeepLinkingUrl() {
     return this.deepLinkingUrl;
   }
@@ -60,7 +59,7 @@ export default class Singleton {
     this.deepLinkingUrl = url;
   }
 
-  //TODO: deepLinkingType
+  // TODO: deepLinkingType
   getDeepLinkingType() {
     return this.deepLinkingType;
   }
@@ -68,7 +67,7 @@ export default class Singleton {
     this.deepLinkingType = type;
   }
 
-  //Wallet Details
+  // Wallet Details
   getWalletDetails() {
     return this.walletJsonDetails;
   }
@@ -77,7 +76,7 @@ export default class Singleton {
     this.walletJsonDetails = url;
   }
 
-  //Setup your wallet
+  // Setup your wallet
   getSetupWallet() {
     return this.setupWallet;
   }
@@ -85,7 +84,7 @@ export default class Singleton {
     this.setupWallet = url;
   }
 
-  //sss details
+  // sss details
   getSSSDetails() {
     return this.sssJsonDetails;
   }
@@ -99,7 +98,7 @@ export default class Singleton {
     this.sssDetailsRecordIDWise = value;
   }
 
-  //App Health Status
+  // App Health Status
 
   getAppHealthStatus() {
     return this.appHealthStatus;
@@ -108,7 +107,7 @@ export default class Singleton {
     this.appHealthStatus = value;
   }
 
-  //Bitcoin class
+  // Bitcoin class
   getRegularAccountObject() {
     return this.regularAccountObject;
   }
@@ -128,7 +127,7 @@ export default class Singleton {
     this.s3Service = value;
   }
 
-  //Flags
+  // Flags
   getFlagQRCodeScreen() {
     return this.flagScanQRCode;
   }

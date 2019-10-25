@@ -1,10 +1,14 @@
 platform :ios, '9.0'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
-
+   
 target 'HexaWallet' do
   # Pods for HexaWallet
   use_native_modules!
- pod 'React', :path => '../node_modules/react-native/'
+  pod 'React', :path => '../node_modules/react-native/'
+  
+  # new lib
+  pod 'React-RCTImage', :path => '../node_modules/react-native/Libraries/Image'
+  
   pod 'React-Core', :path => '../node_modules/react-native/React'
   pod 'React-DevSupport', :path => '../node_modules/react-native/React'
   pod 'React-RCTActionSheet', :path => '../node_modules/react-native/Libraries/ActionSheetIOS'
@@ -17,7 +21,7 @@ target 'HexaWallet' do
   pod 'React-RCTText', :path => '../node_modules/react-native/Libraries/Text'
   pod 'React-RCTVibration', :path => '../node_modules/react-native/Libraries/Vibration'
   pod 'React-RCTWebSocket', :path => '../node_modules/react-native/Libraries/WebSocket'
-
+  
   pod 'React-cxxreact', :path => '../node_modules/react-native/ReactCommon/cxxreact'
   pod 'React-jsi', :path => '../node_modules/react-native/ReactCommon/jsi'
   pod 'React-jsiexecutor', :path => '../node_modules/react-native/ReactCommon/jsiexecutor'
@@ -28,11 +32,10 @@ target 'HexaWallet' do
   pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
-
-
-   pod 'Fabric'
+  
+  
+  pod 'Fabric'
   pod 'Crashlytics'
-  pod 'ShotBlocker'
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
@@ -41,6 +44,8 @@ target 'HexaWallet' do
   pod 'react-native-camera', :path => '../node_modules/react-native-camera'
 
   pod 'react-native-contacts', :path => '../node_modules/react-native-contacts'
+  
+  pod 'react-native-config', :path => '../node_modules/react-native-config'
 
   pod 'react-native-webview', :path => '../node_modules/react-native-webview'
 
@@ -74,12 +79,28 @@ target 'HexaWallet' do
   
   pod 'react-native-sqlite-storage', :path => '../node_modules/react-native-sqlite-storage'
   
-  pod 'RNReactNativePdfLib', :path => '../node_modules/react-native-pdf-lib/ios'
+  pod 'RNReactNativePdfLib', :path => '../node_modules/react-native-pdf-lib/ios'  
   
   pod 'RNInAppBrowser', :path => '../node_modules/react-native-inappbrowser-reborn'
-  
+ 
   pod 'react-native-html-to-pdf', :path => '../node_modules/react-native-html-to-pdf'
 
+  post_install do |installer|
+   installer.pods_project.targets.each do |target|
+     if target.name == 'react-native-config'
+       phase = target.project.new(Xcodeproj::Project::Object::PBXShellScriptBuildPhase)
+       phase.shell_script = "cd ../../"\
+       " && RNC_ROOT=./node_modules/react-native-config/"\
+       " && export SYMROOT=$RNC_ROOT/ios/ReactNativeConfig"\
+       " && ruby $RNC_ROOT/ios/ReactNativeConfig/BuildDotenvConfig.ruby"
+
+       target.build_phases << phase
+       target.build_phases.move(phase,0)
+     end
+   end
+  end
+       
+     
 end  
 
 

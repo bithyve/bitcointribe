@@ -1,29 +1,30 @@
 import React from 'react';
+import { colors } from '../constants/Constants';
 import {
   createStackNavigator,
   createBottomTabNavigator,
 } from 'react-navigation';
 
-import { SvgIcon } from '@up-shared/components';
-// //localization
+import { SvgIcon } from 'hexaComponent/Icons';
+//  // localization
 // import { localization } from "HexaWallet/src/app/manage/Localization/i18n";
 
 // TODO: RestoreAndWalletSetupScreen
-import { OnBoarding } from 'hexaCompLanch';
+import { OnBoarding } from 'hexaScreen/Launch';
 
-import { PasscodeConfirm, Passcode } from 'hexaCompPasscode';
+import { PasscodeConfirm, Passcode } from 'hexaScreen/Passcode';
 
-//  Restore And Wallet Setup
+//   Restore And Wallet Setup
 import {
   RestoreAndReoverWallet,
   WalletSetup,
   PermissionAndroid,
-} from 'hexaCompRestoreAndWalletSetup';
+} from 'hexaScreen/RestoreAndWalletSetup';
 
-//  Restore Wallet using Mnemonic
-import { RestoreWalletUsingMnemonic } from 'hexaCompRestoreWalletUsingMnemonic';
+//   Restore Wallet using Mnemonic
+import { RestoreWalletUsingMnemonic } from 'hexaScreen/Drawer/RestoreWalletUsingMnemonic';
 
-//  Restore Wallet using Trusted Contact
+//   Restore Wallet using Trusted Contact
 import {
   RestoreWalletUsingTrustedContact,
   RestoreAllContactList,
@@ -35,53 +36,59 @@ import {
   Restore3SelfSahreQRCodeScanner,
   Restore4And5SelfShare,
   Restore4And5SelfShareQRCodeScanner,
-} from 'hexaCompRestoreWalletUsingTrustedContact';
+} from 'hexaScreen/Drawer/RestoreWalletUsingTrustedContact';
 
-//  More
+//   More
 import {
   More,
   ContactSharedSecretList,
   TrustedPartySelfShareQRCode,
   TrsutedPartyQRCode,
-} from 'hexaCompTabbarMore';
+} from 'hexaScreen/TabBar/More';
 
-// TODO: QrcodeScan
-import { QrCodeScanner } from 'hexaCompTabbarQrCodeScanner';
-import { Wallet } from 'hexaCompTabbarWallet';
+//  TODO: QrcodeScan
+import { QrCodeScanner } from 'hexaScreen/TabBar/QrCodeScanner';
 
-//  TODO: All Transaction
-import { AllTransaction } from 'hexaCompTabbarAllTransaction';
+TODO: Wallet;
+import { Wallet } from 'hexaScreen/TabBar/Wallet';
 
-// TODO: Backup your Wallet
+//   TODO: All Transaction
+import { AllTransaction } from 'hexaScreen/TabBar/AllTransaction';
+
+//  TODO: Backup your Wallet
 import {
   AllContactList,
   TrustedContact,
   ShareSecretViaQR,
   SelectContactListAssociatePerson,
   TrustedContactAcceptOtp,
-} from 'hexaCompBackUpYourWallet';
+} from 'hexaScreen/Drawer/BackUpYourWallet';
 
-// TODO: Settings
-import { Settings, AdvancedSettings, MnemonicDisplay } from 'hexaCompSettings';
+//  TODO: Settings
+import {
+  Settings,
+  AdvancedSettings,
+  MnemonicDisplay,
+} from 'hexaScreen/Drawer/Settings';
 
-// TODO: Backup Wallet Mnemonic Screen
+//  TODO: Backup Wallet Mnemonic Screen
 import {
   BackupWalletMnemonic,
   BackupWalletMnemonicConfirmMnemonic,
-} from 'hexaCompBackupWalletMnemonic';
+} from 'hexaScreen/Drawer/BackupWalletMnemonic';
 
-// TODO: Common Screen
+//  TODO: Common Screen
 import {
   QRCodeDisplay,
   OTP,
   QRCodeScan,
   OTPBackupShareStore,
-} from 'hexaCompCommon';
+} from 'hexaScreen/Drawer/Common';
 
-// TODO: Backup Secure Account
-import { BackupSecureAccount } from 'hexaCompBackupSecureAccount';
+//  TODO: Backup Secure Account
+import { BackupSecureAccount } from 'hexaScreen/Drawer/BackupSecureAccount';
 
-// TODO: Health of the App
+//  TODO: Health of the App
 import {
   HealthOfTheApp,
   BackupSecretQuestions,
@@ -90,21 +97,18 @@ import {
   SelfShareUsingWalletQRCode,
   SelfShareSharing,
   ConfirmSelfShareQRScanner,
-} from 'hexaCompHealthOfTheApp';
+} from 'hexaScreen/Drawer/HealthOfTheApp';
 
-// TODO: Payment Screen
+//  TODO: Payment Screen
 import {
   ReceivePayment,
   SendPayment,
   ConfirmAndSendPayment,
   SendPaymentAddressScan,
-} from 'hexaCompPayment';
+} from 'hexaScreen/Drawer/Payment';
 
-// TODO: Account Transaction Screen
-import { Transaction } from 'hexaCompTransaction';
-import { colors } from '../constants/Constants';
-
-Wallet;
+//  TODO: Account Transaction Screen
+import { Transaction } from 'hexaScreen/Drawer/Transaction';
 
 // TODO: StackNavigator:ONBoarding
 const OnBoardingStackNavigator = createStackNavigator(
@@ -543,7 +547,6 @@ const TabNavigator = createBottomTabNavigator(
 
 // TODO: RootNavigator
 // TODO: RootNavigator:createRootNavigator
-// eslint-disable-next-line import/prefer-default-export
 export const createRootNavigator = (
   signedIn = false,
   screenName = 'Passcode',

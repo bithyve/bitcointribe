@@ -82,7 +82,7 @@ module.exports = {
     'react/jsx-filename-extension': [
       1,
       {
-        extensions: ['.js', '.jsx'],
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
     ],
     'import/no-extraneous-dependencies': [
@@ -265,7 +265,7 @@ module.exports = {
     'max-params': 0, // limits the number of parameters that can be used in the function declaration. (off by default)
     'max-statements': 0, // specify the maximum number of statement allowed in a function (off by default)
     'no-bitwise': 1, // disallow use of bitwise operators (off by default)
-    'no-plusplus': 0, // disallow use of unary operators, ++ and -- (off by default)
+    // 'no-plusplus': 0, // disallow use of unary operators, ++ and -- (off by default)
 
     'react/display-name': 0,
     'react/jsx-boolean-value': 0,

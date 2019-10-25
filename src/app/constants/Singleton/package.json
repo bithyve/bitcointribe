@@ -1,4 +1,4 @@
 {
-  "name": "hexaSingleton",
-  "main": "Singleton.tsx"
+    "name": "hexaSingleton",
+    "main": "Singleton.tsx"
 }
