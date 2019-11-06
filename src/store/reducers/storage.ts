@@ -10,12 +10,7 @@ const initialState = {
   insertedIntoDB: false,
   key: '',
   database: {
-    // develop an evolutionary schema for the database
-    wallet_name: null,
-    security_ans: null,
-    regular_acc: null,
-    secure_acc: null,
-    S3_service: null,
+    // develop an evolutionary schema and type-def for the database
   },
 };
 

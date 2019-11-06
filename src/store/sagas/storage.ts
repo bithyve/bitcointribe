@@ -52,7 +52,7 @@ function* insertDBWorker({ payload }) {
     }
     const updatedDB = {
       ...database,
-      titles: database.titles.concat([payload.data]),
+      ...payload.data,
     };
     const encryptedDB = encrypt(updatedDB, key);
 
