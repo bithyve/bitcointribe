@@ -13,15 +13,20 @@ function* initSetupWorker({ payload }) {
     // yield call(); Create Regular, Secure and S3Instance
     const mnemonic = yield call(createMnemonic);
 
+    // initiate the accounts
     const regularAcc = new RegularAccount(mnemonic);
     const secureAcc = new SecureAccount(mnemonic);
+
+    // share generation
     const s3Service = new S3Service(mnemonic);
+    const { data } = yield call(s3Service.generateShares, payload.securityAns);
 
     const instances = {
       regularAcc: regularAcc.toString(),
       secureAcc: secureAcc.toString(),
       s3Service: s3Service.toString(),
-    }; // stringified
+      shares: data.encryptedShares,
+    };
 
     const databaseSnap = {
       ...payload,
