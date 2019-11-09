@@ -33,6 +33,6 @@ export const dbFetched = database => {
   return { type: DB_FETCHED, payload: { database } };
 };
 
-export const dbInserted = inserted => {
-  return { type: DB_INSERTED, payload: { inserted } };
+export const dbInserted = updatedDatabase => {
+  return { type: DB_INSERTED, payload: { updatedDatabase } };
 };

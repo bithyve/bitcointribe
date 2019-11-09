@@ -11,16 +11,19 @@ const fetch = async key => {
     }
     const encryptedDatabase = data.rows._array[0].encData;
     const database = decrypt(encryptedDatabase, key);
+
     return database;
   } catch (err) {
     console.log(err);
   }
 };
 
-const insert = async (databaseSnap, key, inserted = true) => {
-  const encryptedDB = encrypt(databaseSnap, key);
+const insert = async (database, key, inserted = true) => {
+  const encryptedDatabase = encrypt(database, key);
   try {
-    inserted ? await db.update(encryptedDB) : await db.insert(encryptedDB);
+    inserted
+      ? await db.update(encryptedDatabase)
+      : await db.insert(encryptedDatabase);
   } catch (err) {
     console.log(err);
     return false;

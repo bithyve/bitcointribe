@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 
 import * as SecureStore from "../storage/secure-store";
-import * as Cipher from "../storage/encryption";
+import * as Cipher from "../common/encryption";
 
 const SecureScreen = props => {
   const [pin, setPin] = useState("");
