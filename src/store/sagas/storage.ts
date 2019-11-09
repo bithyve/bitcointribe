@@ -10,7 +10,7 @@ import {
   dbInserted
 } from "../actions/storage";
 import dataManager from "../../storage/database-manager";
-import { encrypt, decrypt } from "../../storage/encryption";
+import { encrypt, decrypt } from "../../common/encryption";
 
 function* initDBWorker() {
   try {
