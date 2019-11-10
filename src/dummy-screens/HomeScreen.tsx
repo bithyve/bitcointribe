@@ -13,7 +13,6 @@ import * as SecureStore from "../storage/secure-store";
 import AsyncStorage from "@react-native-community/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { initializeDB, keyFetched } from "../store/actions/storage";
-import RegularAccount from "../bitcoin/services/accounts/RegularAccount";
 
 const HomeScreen = props => {
   // const initialize = useCallback(async () => {
