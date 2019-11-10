@@ -222,8 +222,6 @@ class Config {
     if (this.ENVIRONMENT === "MAIN") {
       this.NETWORK = bitcoinJS.networks.bitcoin;
     } else if (this.ENVIRONMENT === "TEST") {
-      console.log("HERE");
-      console.log({ bitcoinJS });
       this.NETWORK = bitcoinJS.networks.testnet;
     } else {
       throw new Error("Please specify an apt environment(MAIN||TEST)");
