@@ -8,7 +8,7 @@ import {
   TextInput,
   Alert
 } from "react-native";
-import * as Cipher from "../storage/encryption";
+import * as Cipher from "../common/encryption";
 import * as SecureStore from "../storage/secure-store";
 import AsyncStorage from "@react-native-community/async-storage";
 import { useDispatch, useSelector } from "react-redux";

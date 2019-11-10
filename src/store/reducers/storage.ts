@@ -33,7 +33,8 @@ export default (state = initialState, action) => {
       newState.insertedIntoDB = true;
       break;
     case DB_INSERTED:
-      newState.insertedIntoDB = action.payload.inserted;
+      newState.database = action.payload.updatedDatabase;
+      newState.insertedIntoDB = true;
       break;
     case KEY_FETCHED:
       newState.key = action.payload.key;

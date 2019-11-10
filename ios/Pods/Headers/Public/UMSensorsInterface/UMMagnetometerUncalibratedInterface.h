@@ -1,0 +1,1 @@
+../../../../../node_modules/expo/node_modules/unimodules-sensors-interface/ios/UMSensorsInterface/UMMagnetometerUncalibratedInterface.h

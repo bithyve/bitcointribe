@@ -50,8 +50,17 @@ function* insertDBWorker({ payload }) {
       titles: database.titles.concat([payload.data])
     };
 
-    yield call(dataManager.insert, updatedDB, key, insertedIntoDB);
-    yield put(fetchFromDB());
+    const inserted = yield call(
+      dataManager.insert,
+      updatedDB,
+      key,
+      insertedIntoDB
+    );
+    if (!inserted) {
+      // dispatch failure
+    }
+
+    yield put(dbInserted(updatedDB));
   } catch (err) {
     console.log(err);
   }
