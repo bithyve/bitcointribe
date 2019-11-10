@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import bip39 from "bip39";
+import * as bip39 from "bip39";
 import crypto from "crypto";
 import secrets from "secrets.js-grempe";
 import config from "../../Config";

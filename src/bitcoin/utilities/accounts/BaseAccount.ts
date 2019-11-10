@@ -1,4 +1,4 @@
-import bip39 from "bip39";
+import * as bip39 from "bip39";
 import { Network, TransactionBuilder } from "bitcoinjs-lib";
 import config from "../../Config";
 import { ErrMap } from "../ErrMap";

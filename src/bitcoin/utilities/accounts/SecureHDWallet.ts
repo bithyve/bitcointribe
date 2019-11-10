@@ -1,7 +1,7 @@
 import { AxiosResponse } from "axios";
 import bip32 from "bip32";
-import bip39 from "bip39";
-import bitcoinJS, { Network, TransactionBuilder } from "bitcoinjs-lib";
+import * as bip39 from "bip39";
+import * as bitcoinJS from "bitcoinjs-lib";
 import coinselect from "coinselect";
 import crypto from "crypto";
 import config from "../../Config";
@@ -48,7 +48,7 @@ export default class SecureHDWallet extends Bitcoin {
       };
       gapLimit: number;
     },
-    network?: Network
+    network?: bitcoinJS.Network
   ) {
     super(network);
     this.primaryMnemonic = primaryMnemonic;
@@ -411,7 +411,7 @@ export default class SecureHDWallet extends Bitcoin {
         return { fee, balance };
       }
 
-      const txb: TransactionBuilder = new bitcoinJS.TransactionBuilder(
+      const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
         this.network
       );
 
@@ -435,9 +435,9 @@ export default class SecureHDWallet extends Bitcoin {
 
   public signHDTransaction = (
     inputs: any,
-    txb: TransactionBuilder
+    txb: bitcoinJS.TransactionBuilder
   ): {
-    signedTxb: TransactionBuilder;
+    signedTxb: bitcoinJS.TransactionBuilder;
     childIndexArray: Array<{
       childIndex: number;
       inputIdentifier: {

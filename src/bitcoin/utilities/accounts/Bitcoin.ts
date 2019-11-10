@@ -1,16 +1,10 @@
 import axios, { AxiosResponse } from "axios";
 import bip21 from "bip21";
 import bip32, { BIP32Interface } from "bip32";
-import bip39 from "bip39";
+import * as bip39 from "bip39";
 import bip65 from "bip65";
 import Client from "bitcoin-core";
-import bitcoinJS, {
-  ECPairInterface,
-  Network,
-  Transaction,
-  TransactionBuilder,
-  Payment
-} from "bitcoinjs-lib";
+import * as bitcoinJS from "bitcoinjs-lib";
 import coinselect from "coinselect";
 import config from "../../Config";
 
@@ -18,14 +12,14 @@ const { BH_AXIOS } = config;
 const { TESTNET, MAINNET } = config.API_URLS;
 
 export default class Bitcoin {
-  public network: Network;
+  public network: bitcoinJS.Network;
   public client: Client;
-  constructor(network?: Network) {
+  constructor(network?: bitcoinJS.Network) {
     this.network = network ? network : config.NETWORK;
     this.client = config.BITCOIN_NODE;
   }
 
-  public getKeyPair = (privateKey: string): ECPairInterface =>
+  public getKeyPair = (privateKey: string): bitcoinJS.ECPairInterface =>
     bitcoinJS.ECPair.fromWIF(privateKey, this.network);
 
   public utcNow = (): number => Math.floor(Date.now() / 1000);
@@ -105,7 +99,7 @@ export default class Bitcoin {
     return this.generateHDWallet(mnemonic, passphrase);
   };
 
-  public getP2SH = (keyPair: ECPairInterface): Payment =>
+  public getP2SH = (keyPair: bitcoinJS.ECPairInterface): bitcoinJS.Payment =>
     bitcoinJS.payments.p2sh({
       redeem: bitcoinJS.payments.p2wpkh({
         pubkey: keyPair.publicKey,
@@ -552,8 +546,8 @@ export default class Bitcoin {
     required: number,
     pubKeys: any[]
   ): {
-    p2wsh: Payment;
-    p2sh: Payment;
+    p2wsh: bitcoinJS.Payment;
+    p2sh: bitcoinJS.Payment;
     address: string;
   } => {
     // generic multiSig address generator
@@ -847,7 +841,11 @@ export default class Bitcoin {
     amount: number,
     nSequence?: number,
     txnPriority?: string
-  ): Promise<{ inputs: object[]; txb: TransactionBuilder; fee: number }> => {
+  ): Promise<{
+    inputs: object[];
+    txb: bitcoinJS.TransactionBuilder;
+    fee: number;
+  }> => {
     console.log({ senderAddress });
     const res = await this.multiFetchUnspentOutputs([senderAddress]);
     const inputUTXOs = res.UTXOs;
@@ -866,7 +864,7 @@ export default class Bitcoin {
     console.log("\tInputs:", inputs);
     console.log("\tOutputs:", outputs);
 
-    const txb: TransactionBuilder = new bitcoinJS.TransactionBuilder(
+    const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
       this.network
     );
 
@@ -888,11 +886,11 @@ export default class Bitcoin {
 
   public signTransaction = (
     inputs: any,
-    txb: TransactionBuilder,
-    keyPairs: ECPairInterface[],
+    txb: bitcoinJS.TransactionBuilder,
+    keyPairs: bitcoinJS.ECPairInterface[],
     redeemScript: any,
     witnessScript?: any
-  ): TransactionBuilder => {
+  ): bitcoinJS.TransactionBuilder => {
     console.log("------ Transaction Signing ----------");
     let vin = 0;
     inputs.forEach(input => {
@@ -915,11 +913,11 @@ export default class Bitcoin {
 
   public signPartialTxn = (
     inputs: any,
-    txb: TransactionBuilder,
-    keyPairs: ECPairInterface[],
+    txb: bitcoinJS.TransactionBuilder,
+    keyPairs: bitcoinJS.ECPairInterface[],
     redeemScript: any,
     witnessScript?: any
-  ): Transaction => {
+  ): bitcoinJS.Transaction => {
     let vin = 0;
     inputs.forEach(input => {
       keyPairs.forEach(keyPair => {
@@ -1011,7 +1009,7 @@ export default class Bitcoin {
   public recoverInputsFromTxHex = async (
     txHex: string
   ): Promise<Array<{ txId: string; vout: number; value: number }>> => {
-    const regenTx: Transaction = bitcoinJS.Transaction.fromHex(txHex);
+    const regenTx: bitcoinJS.Transaction = bitcoinJS.Transaction.fromHex(txHex);
     const recoveredInputs = [];
     await Promise.all(
       regenTx.ins.map(async inp => {
@@ -1034,7 +1032,7 @@ export default class Bitcoin {
   };
 
   public cltvCheckSigOutput = (
-    keyPair: ECPairInterface,
+    keyPair: bitcoinJS.ECPairInterface,
     lockTime: number
   ): Buffer => {
     return bitcoinJS.script.compile([
@@ -1047,7 +1045,7 @@ export default class Bitcoin {
   };
 
   public createTLC = async (
-    keyPair: ECPairInterface,
+    keyPair: bitcoinJS.ECPairInterface,
     time: number,
     blockHeight: number
   ): Promise<{
