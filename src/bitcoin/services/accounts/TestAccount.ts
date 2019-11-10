@@ -1,4 +1,4 @@
-import bitcoinJS, { Network } from "bitcoinjs-lib";
+import * as bitcoinJS from "bitcoinjs-lib";
 import BaseAccount from "../../utilities/accounts/BaseAccount";
 
 export default class TestAccount extends BaseAccount {
@@ -53,7 +53,7 @@ export default class TestAccount extends BaseAccount {
       gapLimit: number;
     }
   ) {
-    const network: Network = bitcoinJS.networks.testnet;
+    const network: bitcoinJS.Network = bitcoinJS.networks.testnet;
     super(mnemonic, passphrase, dPathPurpose, stateVars, network);
   }
 }

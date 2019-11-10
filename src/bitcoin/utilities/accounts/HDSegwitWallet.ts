@@ -1,6 +1,6 @@
 import bip32 from "bip32";
-import bip39 from "bip39";
-import bitcoinJS, { Network, TransactionBuilder } from "bitcoinjs-lib";
+import * as bip39 from "bip39";
+import * as bitcoinJS from "bitcoinjs-lib";
 import coinselect from "coinselect";
 import crypto from "crypto";
 import config from "../../Config";
@@ -33,7 +33,7 @@ export default class HDSegwitWallet extends Bitcoin {
       addressToWIFCache: {};
       gapLimit: number;
     },
-    network?: Network
+    network?: bitcoinJS.Network
   ) {
     super(network);
     this.mnemonic = mnemonic ? mnemonic : bip39.generateMnemonic(256);
@@ -246,7 +246,7 @@ export default class HDSegwitWallet extends Bitcoin {
         return { fee, balance };
       }
 
-      const txb: TransactionBuilder = new bitcoinJS.TransactionBuilder(
+      const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
         this.network
       );
 
@@ -270,9 +270,9 @@ export default class HDSegwitWallet extends Bitcoin {
 
   public signHDTransaction = (
     inputs: any,
-    txb: TransactionBuilder,
+    txb: bitcoinJS.TransactionBuilder,
     witnessScript?: any
-  ): TransactionBuilder => {
+  ): bitcoinJS.TransactionBuilder => {
     try {
       console.log("------ Transaction Signing ----------");
       let vin = 0;
