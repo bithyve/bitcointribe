@@ -331,6 +331,8 @@ export default class S3Service {
     }
   };
 
+  public getEncryptedShares = () => this.sss.getShares();
+
   public encryptStaticNonPMDD = (
     staticNonPMDD: ISocialStaticNonPMDD | IBuddyStaticNonPMDD
   ):

@@ -13,7 +13,7 @@ export const fetchFromDB = () => {
 };
 
 export const insertIntoDB = data => {
-  return { type: INSERT_INTO_DB, payload: { data } };
+  return { type: INSERT_INTO_DB, payload: { ...data } };
 };
 
 export const keyFetched = key => {
