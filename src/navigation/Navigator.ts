@@ -1,15 +1,24 @@
-import { createAppContainer } from "react-navigation";
+import { createAppContainer, createSwitchNavigator } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
-import HomeScreen from "../dummy-screens/HomeScreen";
-import SecureScreen from "../dummy-screens/SecureScreen";
-import StoreScreen from "../dummy-screens/StoreScreen";
-import WalletSetupScreen from "../dummy-screens/WalletSetupScreen";
 
-const Navigator = createStackNavigator({
-  Home: HomeScreen,
-  Secure: SecureScreen,
-  Store: StoreScreen,
-  WSetup: WalletSetupScreen
+import StartupScreen from "../dummy-screens/StartupScreen";
+import HomeScreen from "../dummy-screens/HomeScreen";
+import WalletNameScreen from "../dummy-screens/wallet-setup/WalletNameScreen";
+import SecurityQuesScreen from "../dummy-screens/wallet-setup/SecurityQuesScreen";
+
+const WalletSetupNavigator = createStackNavigator({
+  WalletName: WalletNameScreen,
+  SecurityQues: SecurityQuesScreen
+});
+
+const HomeNavigator = createStackNavigator({
+  Home: HomeScreen
+});
+
+const Navigator = createSwitchNavigator({
+  Startup: StartupScreen,
+  WalletSetup: WalletSetupNavigator,
+  HomeNav: HomeNavigator
 });
 
 export default createAppContainer(Navigator);
