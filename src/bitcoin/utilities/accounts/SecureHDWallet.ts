@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import bip32 from "bip32";
+import * as bip32 from "bip32";
 import * as bip39 from "bip39";
 import * as bitcoinJS from "bitcoinjs-lib";
 import coinselect from "coinselect";

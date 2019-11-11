@@ -6,7 +6,6 @@ import {
   FETCH_FROM_DB,
   dbFetched,
   INSERT_INTO_DB,
-  fetchFromDB,
   dbInserted
 } from "../actions/storage";
 import dataManager from "../../storage/database-manager";
