@@ -4,14 +4,39 @@ import {
   DB_INSERTED,
   KEY_FETCHED
 } from "../actions/storage";
+import { Database, Services } from "../../common/interfaces/Interfaces";
+import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
+import TestAccount from "../../bitcoin/services/accounts/TestAccount";
+import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
+import S3Service from "../../bitcoin/services/sss/S3Service";
 
-const initialState = {
+const setServices = newState => {
+  const { database, services } = newState;
+  if (database.accounts) {
+    services.regularAccount = RegularAccount.fromJSON(
+      database.accounts.regularAccount
+    );
+    services.testAccount = TestAccount.fromJSON(database.accounts.testAccount);
+    services.secureAccount = SecureAccount.fromJSON(
+      database.accounts.secureAccount
+    );
+    services.s3Service = S3Service.fromJSON(database.accounts.s3Service);
+    newState.services = services;
+  }
+};
+
+const initialState: {
+  databaseInitialized: Boolean;
+  insertedIntoDB: Boolean;
+  key: String;
+  database: Database;
+  services: Services;
+} = {
   databaseInitialized: false,
   insertedIntoDB: false,
   key: "",
-  database: {
-    // develop an evolutionary schema for the database
-  }
+  database: {},
+  services: {}
 };
 
 export default (state = initialState, action) => {
@@ -23,10 +48,12 @@ export default (state = initialState, action) => {
     case DB_FETCHED:
       newState.database = action.payload.database;
       newState.insertedIntoDB = true;
+      setServices(newState);
       break;
     case DB_INSERTED:
       newState.database = action.payload.updatedDatabase;
       newState.insertedIntoDB = true;
+      setServices(newState);
       break;
     case KEY_FETCHED:
       newState.key = action.payload.key;
