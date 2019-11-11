@@ -2,10 +2,6 @@
 #
 .DS_Store
 
-# Folders
-ios/
-android/
-
 # Xcode
 #
 build/
@@ -58,3 +54,12 @@ buck-out/
 
 # Bundle artifact
 *.jsbundle
+
+# ios/android folders
+#
+ios/
+android/
+
+# environment variables
+#
+.env
