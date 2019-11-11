@@ -5,15 +5,19 @@ import { fetchAddress } from "../../store/actions/accounts";
 import { REGULAR_ACCOUNT } from "../../common/constants/accountTypes";
 
 const RegularAccountScreen = props => {
+  console.log("PAINTED");
   const dispatch = useDispatch();
-
+  const address = useSelector(state => state.accounts.REGULAR_ACCOUNT.address);
   return (
     <View style={styles.screen}>
       <Text>RegularAccount Here!</Text>
       <Button
         title="Fetch Addr"
-        onPress={() => dispatch(fetchAddress(REGULAR_ACCOUNT))}
+        onPress={() => {
+          dispatch(fetchAddress(REGULAR_ACCOUNT));
+        }}
       />
+      {address ? <Text>{address}</Text> : null}
     </View>
   );
 };
