@@ -47,7 +47,7 @@ function* insertDBWorker({ payload }) {
     }
     const updatedDB = {
       ...database,
-      titles: database.titles.concat([payload.data])
+      ...payload
     };
 
     const inserted = yield call(
