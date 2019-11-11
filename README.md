@@ -1,4 +1,12 @@
-## Installing HEXA
+## Building HEXA
+
+### Prerequisites:
+
+- [Node](https://nodejs.org/en/)
+- [Yarn](https://yarnpkg.com/lang/en/)
+- [CocoaPods](https://cocoapods.org/)
+- [Xcode](https://developer.apple.com/xcode/)
+- [Android Studio](https://developer.android.com/studio)
 
 ```
 git clone https://github.com/bithyve/_HEXA.git
@@ -14,16 +22,16 @@ Make sure you have a `.env` similar to `.env.example` in your project's root dir
 yarn ios
 ```
 
-#### Run on Android
+### Run on Android
 
 ```
 yarn android
 ```
 
-### Contributing
+## Contributing
 
 Please feel free to open a pull requests, issues with bugfixes and suggestions.
 
-### License
+## License
 
 [LICENSE](LICENSE)
