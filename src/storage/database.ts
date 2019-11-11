@@ -1,6 +1,6 @@
 import * as SQLite from "expo-sqlite";
 
-const db = SQLite.openDatabase("hexaenc6.db");
+const db = SQLite.openDatabase("hexa.db");
 
 export const init = () => {
   return new Promise((resolve, reject) => {
