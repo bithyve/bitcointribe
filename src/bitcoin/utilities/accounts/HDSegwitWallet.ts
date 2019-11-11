@@ -1,4 +1,4 @@
-import bip32 from "bip32";
+import * as bip32 from "bip32";
 import * as bip39 from "bip39";
 import * as bitcoinJS from "bitcoinjs-lib";
 import coinselect from "coinselect";
@@ -583,7 +583,7 @@ export default class HDSegwitWallet extends Bitcoin {
     if (this.externalAddressesCache[index]) {
       return this.externalAddressesCache[index];
     } // cache hit
-
+    console.log({ bip32 });
     const node = bip32.fromBase58(this.getXpub(), this.network);
     const keyPair = node.derive(0).derive(index);
 

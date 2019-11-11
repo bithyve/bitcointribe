@@ -1,5 +1,11 @@
 import React from "react";
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  Button
+} from "react-native";
 import { useSelector } from "react-redux";
 
 const HomeScreen = props => {
@@ -8,7 +14,15 @@ const HomeScreen = props => {
   return (
     <View style={styles.screen}>
       {walletName ? (
-        <Text>Welcome to {`${walletName}'s`} HEXA!</Text>
+        <View>
+          <Text>Welcome to {`${walletName}'s`} HEXA!</Text>
+          <Button
+            title="Regular"
+            onPress={() => {
+              props.navigation.navigate("Regular");
+            }}
+          />
+        </View>
       ) : (
         <ActivityIndicator size="large" />
       )}

@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import bip21 from "bip21";
-import bip32, { BIP32Interface } from "bip32";
+import * as bip32 from "bip32";
 import * as bip39 from "bip39";
 import bip65 from "bip65";
 import Client from "bitcoin-core";
@@ -24,7 +24,10 @@ export default class Bitcoin {
 
   public utcNow = (): number => Math.floor(Date.now() / 1000);
 
-  public getAddress = (keyPair: BIP32Interface, standard: number): string => {
+  public getAddress = (
+    keyPair: bip32.BIP32Interface,
+    standard: number
+  ): string => {
     if (standard === config.STANDARD.BIP44) {
       return bitcoinJS.payments.p2pkh({
         pubkey: keyPair.publicKey,
@@ -54,7 +57,7 @@ export default class Bitcoin {
     passphrase?: string
   ): {
     mnemonic: string;
-    keyPair: BIP32Interface;
+    keyPair: bip32.BIP32Interface;
     address: string;
     privateKey: string;
   } => {
@@ -89,7 +92,7 @@ export default class Bitcoin {
     passphrase?: string
   ): {
     mnemonic: string;
-    keyPair: BIP32Interface;
+    keyPair: bip32.BIP32Interface;
     address: string;
     privateKey: string;
   } => {
