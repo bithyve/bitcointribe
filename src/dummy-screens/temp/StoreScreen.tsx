@@ -8,7 +8,7 @@ import {
   Button
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchFromDB, insertIntoDB } from "../store/actions/storage";
+import { fetchFromDB, insertIntoDB } from "../../store/actions/storage";
 
 const StoreScreen = props => {
   const dispatch = useDispatch();
