@@ -1,4 +1,4 @@
-// types and action creators (pure): dispatched from components
+// types and action creators: dispatched by components and sagas
 export const INIT_DB = "INIT_DB";
 export const FETCH_FROM_DB = "FETCH_FROM_DB";
 export const INSERT_INTO_DB = "INSERT_INTO_DB";
@@ -20,7 +20,7 @@ export const keyFetched = key => {
   return { type: KEY_FETCHED, payload: { key } };
 };
 
-// types and action creators (saga): dispatched from saga workers
+// types and action creators (saga): dispatched by saga workers
 export const DB_INITIALIZED = "DB_INITIALIZED";
 export const DB_FETCHED = "DB_FETCHED";
 export const DB_INSERTED = "DB_INSERTED";

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Button, TextInput } from "react-native";
 import { useDispatch } from "react-redux";
-import { initializeSetup } from "../../store/actions/setup";
+import { initializeSetup } from "../../store/actions/wallet-setup";
 import AsyncStorage from "@react-native-community/async-storage";
 
 const SecurityQuesScreen = props => {
