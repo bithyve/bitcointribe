@@ -7,16 +7,16 @@ export interface Database {
   walletName?: String;
   securityAns?: String;
   accounts?: {
-    regularAccount: string;
-    testAccount: string;
-    secureAccount: string;
-    s3Service: string;
+    REGULAR_ACCOUNT: string;
+    TEST_ACCOUNT: string;
+    SECURE_ACCOUNT: string;
+    S3_SERVICE: string;
   };
 }
 
 export interface Services {
-  regularAccount?: RegularAccount;
-  testAccount?: TestAccount;
-  secureAccount?: SecureAccount;
-  s3Service?: S3Service;
+  REGULAR_ACCOUNT?: RegularAccount;
+  TEST_ACCOUNT?: TestAccount;
+  SECURE_ACCOUNT?: SecureAccount;
+  S3_SERVICE?: S3Service;
 }
