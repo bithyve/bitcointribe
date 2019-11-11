@@ -214,7 +214,7 @@ class Config {
     });
     this.BH_AXIOS = axios.create({
       baseURL: this.SERVER,
-      data: { hexa_id: this.HEXA_ID }
+      headers: { hexa_id: this.HEXA_ID }
     });
   }
 

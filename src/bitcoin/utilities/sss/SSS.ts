@@ -377,7 +377,7 @@ export default class SSS {
 
   public stringToHex = (str: string): string => secrets.str2hex(str);
 
-  public getShares = (): string[] => this.encryptedShares;
+  public getShares = () => (this.encryptedShares ? this.encryptShares : null);
 
   public generateMessageID = (): string =>
     SSS.generateRandomString(config.MSG_ID_LENGTH);
