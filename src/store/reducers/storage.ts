@@ -23,7 +23,7 @@ const setServices = newState => {
       database.accounts.SECURE_ACCOUNT
     );
     services.S3_SERVICE = S3Service.fromJSON(database.accounts.S3_SERVICE);
-    newState.services = services;
+    return services;
   }
 };
 
@@ -42,24 +42,40 @@ const initialState: {
 };
 
 export default (state = initialState, action) => {
-  const newState = { ...state };
   switch (action.type) {
     case DB_INITIALIZED:
-      newState.databaseInitialized = action.payload.initialized;
-      break;
+      return {
+        ...state,
+        databaseInitialized: action.payload.initialized
+      };
+
     case DB_FETCHED:
-      newState.database = action.payload.database;
-      newState.insertedIntoDB = true;
-      setServices(newState);
-      break;
+      const newState = {
+        ...state,
+        database: action.payload.database,
+        insertedIntoDB: true
+      };
+      return {
+        ...newState,
+        services: setServices(newState)
+      };
+
     case DB_INSERTED:
-      newState.database = action.payload.updatedDatabase;
-      newState.insertedIntoDB = true;
-      setServices(newState);
-      break;
+      const updatedState = {
+        ...state,
+        database: action.payload.updatedDatabase,
+        insertedIntoDB: true
+      };
+      return {
+        ...updatedState,
+        services: setServices(updatedState)
+      };
+
     case KEY_FETCHED:
-      newState.key = action.payload.key;
-      break;
+      return {
+        ...state,
+        key: action.payload.key
+      };
   }
-  return newState;
+  return state;
 };
