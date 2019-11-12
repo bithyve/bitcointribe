@@ -6,11 +6,13 @@ import {
   FETCH_BALANCE,
   balanceFetched,
   FETCH_TRANSACTIONS,
-  transactionsFetched
+  transactionsFetched,
+  activateLoader
 } from "../actions/accounts";
 import { Services } from "../../common/interfaces/Interfaces";
 
 function* fetchAddrWorker({ payload }) {
+  yield put(activateLoader(payload.accountType, "address"));
   const services: Services = yield select(state => state.storage.services);
   const res = yield call(services[payload.accountType].getAddress);
   res.status === 200
@@ -21,6 +23,7 @@ function* fetchAddrWorker({ payload }) {
 export const fetchAddrWatcher = createWatcher(fetchAddrWorker, FETCH_ADDR);
 
 function* fetchBalanceWorker({ payload }) {
+  yield put(activateLoader(payload.accountType, "balances"));
   const services: Services = yield select(state => state.storage.services);
   const res = yield call(services[payload.accountType].getBalance);
   res.status === 200
@@ -34,6 +37,7 @@ export const fetchBalanceWatcher = createWatcher(
 );
 
 function* fetchTransactionsWorker({ payload }) {
+  yield put(activateLoader(payload.accountType, "transactions"));
   const services: Services = yield select(state => state.storage.services);
   const res = yield call(services[payload.accountType].getTransactions);
   res.status === 200
