@@ -12,7 +12,7 @@ import {
 import { initSetupWatcher } from "./sagas/wallet-setup";
 import storageReducer from "./reducers/storage";
 import accountsReducer from "./reducers/accounts";
-import { fetchAddrWatcher } from "./sagas/accounts";
+import { fetchAddrWatcher, fetchBalanceWatcher } from "./sagas/accounts";
 
 const rootSaga = function*() {
   yield all([
@@ -25,7 +25,8 @@ const rootSaga = function*() {
     fork(initSetupWatcher),
 
     // accounts watchers
-    fork(fetchAddrWatcher)
+    fork(fetchAddrWatcher),
+    fork(fetchBalanceWatcher)
   ]);
 };
 

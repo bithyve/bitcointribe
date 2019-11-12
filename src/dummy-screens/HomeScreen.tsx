@@ -7,6 +7,10 @@ import {
   Button
 } from "react-native";
 import { useSelector } from "react-redux";
+import {
+  REGULAR_ACCOUNT,
+  TEST_ACCOUNT
+} from "../common/constants/accountTypes";
 
 const HomeScreen = props => {
   const database = useSelector(state => state.storage.database);
@@ -17,9 +21,19 @@ const HomeScreen = props => {
         <View>
           <Text>Welcome to {`${walletName}'s`} HEXA!</Text>
           <Button
-            title="Regular"
+            title="Regular Account"
             onPress={() => {
-              props.navigation.navigate("Regular");
+              props.navigation.navigate("Account", {
+                accountType: REGULAR_ACCOUNT
+              });
+            }}
+          />
+          <Button
+            title="Test Account"
+            onPress={() => {
+              props.navigation.navigate("Account", {
+                accountType: TEST_ACCOUNT
+              });
             }}
           />
         </View>
