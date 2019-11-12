@@ -1,11 +1,23 @@
-import { ADDR_FETCHED, BALANCE_FETCHED } from "../actions/accounts";
+import {
+  ADDR_FETCHED,
+  BALANCE_FETCHED,
+  TRANSACTIONS_FETCHED
+} from "../actions/accounts";
 
-const ACCOUNT_VARS = {
+const ACCOUNT_VARS: {
+  address: String;
+  balances: {
+    balance: Number;
+    unconfirmedBalance: Number;
+  };
+  transactions: any;
+} = {
   address: "",
   balances: {
     balance: 0,
     unconfirmedBalance: 0
-  }
+  },
+  transactions: {}
 };
 
 const initialState = {
@@ -25,12 +37,22 @@ export default (state = initialState, action) => {
           address: action.payload.address
         }
       };
+
     case BALANCE_FETCHED:
       return {
         ...state,
         [account]: {
           ...state[account],
           balances: action.payload.balances
+        }
+      };
+
+    case TRANSACTIONS_FETCHED:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          transactions: action.payload.transactions
         }
       };
   }

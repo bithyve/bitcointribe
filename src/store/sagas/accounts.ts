@@ -4,7 +4,9 @@ import {
   FETCH_ADDR,
   addressFetched,
   FETCH_BALANCE,
-  balanceFetched
+  balanceFetched,
+  FETCH_TRANSACTIONS,
+  transactionsFetched
 } from "../actions/accounts";
 import { Services } from "../../common/interfaces/Interfaces";
 
@@ -29,4 +31,17 @@ function* fetchBalanceWorker({ payload }) {
 export const fetchBalanceWatcher = createWatcher(
   fetchBalanceWorker,
   FETCH_BALANCE
+);
+
+function* fetchTransactionsWorker({ payload }) {
+  const services: Services = yield select(state => state.storage.services);
+  const res = yield call(services[payload.accountType].getTransactions);
+  res.status === 200
+    ? yield put(transactionsFetched(payload.accountType, res.data.transactions))
+    : null;
+}
+
+export const fetchTransactionsWatcher = createWatcher(
+  fetchTransactionsWorker,
+  FETCH_TRANSACTIONS
 );
