@@ -1,5 +1,11 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  ActivityIndicator
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchAddress,
@@ -10,11 +16,9 @@ import {
 const AccountScreen = props => {
   const accountType = props.navigation.getParam("accountType");
   const dispatch = useDispatch();
-  const { address, balances, transactions } = useSelector(
+  const { address, balances, transactions, loading } = useSelector(
     state => state.accounts[accountType]
   );
-  console.log({ transactions });
-
   const netBalance = balances
     ? balances.balance + balances.unconfirmedBalance
     : 0;
@@ -40,26 +44,41 @@ const AccountScreen = props => {
           await dispatch(fetchTransactions(accountType));
         }}
       />
-      <Text style={{ marginVertical: 20 }}>
-        Account balance: {netBalance ? <Text>{netBalance}</Text> : 0} sats.
-      </Text>
-      {address ? (
-        <Text style={{ marginVertical: 20 }}>Receiving address: {address}</Text>
-      ) : null}
+      <View style={{ marginVertical: 20, flexDirection: "row" }}>
+        <Text>Account balance: </Text>
+        {loading.balances ? (
+          <ActivityIndicator size="small" />
+        ) : (
+          <Text>{netBalance} sats</Text>
+        )}
+      </View>
 
-      {transactions.totalTransactions ? (
-        <View style={{ margin: 40 }}>
-          <Text>Total Transactions: {transactions.totalTransactions}</Text>
-          <View style={{ margin: 10, padding: 10 }}>
-            {transactions.transactionDetails.map(tx => (
-              <View key={tx.txid}>
-                <Text style={{ marginVertical: 5 }}>Txn ID: {tx.txid}</Text>
-                <Text style={{ marginVertical: 5 }}>Amount: {tx.amount}</Text>
-              </View>
-            ))}
+      <View style={{ marginVertical: 20 }}>
+        <Text style={{ marginBottom: 10 }}>Receiving address:</Text>
+        {loading.address ? (
+          <ActivityIndicator size="small" />
+        ) : (
+          <Text>{address}</Text>
+        )}
+      </View>
+
+      <View style={{ margin: 40 }}>
+        {loading.transactions ? (
+          <ActivityIndicator size="large" />
+        ) : transactions.totalTransactions ? (
+          <View>
+            <Text>Total Transactions: {transactions.totalTransactions}</Text>
+            <View style={{ margin: 10, padding: 10 }}>
+              {transactions.transactionDetails.map(tx => (
+                <View key={tx.txid}>
+                  <Text style={{ marginVertical: 5 }}>Txn ID: {tx.txid}</Text>
+                  <Text style={{ marginVertical: 5 }}>Amount: {tx.amount}</Text>
+                </View>
+              ))}
+            </View>
           </View>
-        </View>
-      ) : null}
+        ) : null}
+      </View>
     </View>
   );
 };
