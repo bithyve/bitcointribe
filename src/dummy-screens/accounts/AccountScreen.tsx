@@ -1,27 +1,33 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  ActivityIndicator,
+  ScrollView
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchAddress,
   fetchBalance,
-  fetchTransactions
+  fetchTransactions,
+  clearTransfer
 } from "../../store/actions/accounts";
 
 const AccountScreen = props => {
   const accountType = props.navigation.getParam("accountType");
   const dispatch = useDispatch();
-  const { address, balances, transactions } = useSelector(
+  const { address, balances, transactions, loading } = useSelector(
     state => state.accounts[accountType]
   );
-  console.log({ transactions });
-
   const netBalance = balances
     ? balances.balance + balances.unconfirmedBalance
     : 0;
 
   return (
-    <View style={styles.screen}>
-      <Text>{accountType} Here!</Text>
+    <ScrollView contentContainerStyle={styles.screen}>
+      <Text>{accountType}</Text>
       <Button
         title="Fetch Addr"
         onPress={() => {
@@ -31,37 +37,67 @@ const AccountScreen = props => {
       <Button
         title="Fetch Balance"
         onPress={async () => {
-          await dispatch(fetchBalance(accountType));
+          dispatch(fetchBalance(accountType));
         }}
       />
       <Button
         title="Fetch Transactions"
         onPress={async () => {
-          await dispatch(fetchTransactions(accountType));
+          dispatch(fetchTransactions(accountType));
         }}
       />
-      <Text style={{ marginVertical: 20 }}>
-        Account balance: {netBalance ? <Text>{netBalance}</Text> : 0} sats.
-      </Text>
-      {address ? (
-        <Text style={{ marginVertical: 20 }}>Receiving address: {address}</Text>
-      ) : null}
+      <Button
+        title="Transfer"
+        onPress={() => {
+          dispatch(clearTransfer(accountType));
+          props.navigation.navigate("Transfer", {
+            accountType
+          });
+        }}
+      />
+      <View style={{ marginVertical: 20, flexDirection: "row" }}>
+        <Text>Account balance: </Text>
+        {loading.balances ? (
+          <ActivityIndicator size="small" />
+        ) : (
+          <Text>{netBalance} sats</Text>
+        )}
+      </View>
 
-      {transactions.totalTransactions ? (
-        <View style={{ margin: 40 }}>
-          <Text>Total Transactions: {transactions.totalTransactions}</Text>
-          <View style={{ margin: 10, padding: 10 }}>
-            {transactions.transactionDetails.map(tx => (
-              <View key={tx.txid}>
-                <Text style={{ marginVertical: 5 }}>Txn ID: {tx.txid}</Text>
-                <Text style={{ marginVertical: 5 }}>Amount: {tx.amount}</Text>
-              </View>
-            ))}
+      <View style={{ marginVertical: 20 }}>
+        <Text style={{ marginBottom: 10 }}>Receiving address:</Text>
+        {loading.address ? (
+          <ActivityIndicator size="small" />
+        ) : (
+          <Text>{address}</Text>
+        )}
+      </View>
+
+      <View style={{ margin: 40 }}>
+        {loading.transactions ? (
+          <ActivityIndicator size="large" />
+        ) : transactions.totalTransactions ? (
+          <View>
+            <Text>Total Transactions: {transactions.totalTransactions}</Text>
+            <View style={{ margin: 10, padding: 10 }}>
+              {transactions.transactionDetails.map(tx => (
+                <View key={tx.txid}>
+                  <Text style={{ marginVertical: 5 }}>Txn ID: {tx.txid}</Text>
+                  <Text style={{ marginVertical: 5 }}>Amount: {tx.amount}</Text>
+                </View>
+              ))}
+            </View>
           </View>
-        </View>
-      ) : null}
-    </View>
+        ) : null}
+      </View>
+    </ScrollView>
   );
+};
+
+AccountScreen.navigationOptions = navData => {
+  return {
+    headerTitle: navData.navigation.getParam("accountType")
+  };
 };
 
 const styles = StyleSheet.create({
