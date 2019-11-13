@@ -16,7 +16,8 @@ import {
   fetchAddrWatcher,
   fetchBalanceWatcher,
   fetchTransactionsWatcher,
-  transferST1Watcher
+  transferST1Watcher,
+  transferST2Watcher
 } from "./sagas/accounts";
 
 // const rootSaga = function*() {
@@ -50,7 +51,8 @@ const rootSaga = function*() {
     fetchAddrWatcher,
     fetchBalanceWatcher,
     fetchTransactionsWatcher,
-    transferST1Watcher
+    transferST1Watcher,
+    transferST2Watcher
   ];
 
   yield all(

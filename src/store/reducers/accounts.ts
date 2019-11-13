@@ -3,7 +3,9 @@ import {
   BALANCE_FETCHED,
   TRANSACTIONS_FETCHED,
   LOADING,
-  TRANSFER_ST1_EXECUTED
+  TRANSFER_ST1_EXECUTED,
+  TRANSFER_ST2_EXECUTED,
+  CLEAR_TRANSFER
 } from "../actions/accounts";
 
 const ACCOUNT_VARS: {
@@ -13,7 +15,11 @@ const ACCOUNT_VARS: {
     unconfirmedBalance: Number;
   };
   transactions: any;
-  transfer: any;
+  transfer: {
+    executing: Boolean;
+    stage1: any;
+    txid: String;
+  };
   loading: {
     address: Boolean;
     balances: Boolean;
@@ -27,7 +33,11 @@ const ACCOUNT_VARS: {
     unconfirmedBalance: 0
   },
   transactions: {},
-  transfer: null,
+  transfer: {
+    executing: false,
+    stage1: {},
+    txid: ""
+  },
   loading: {
     address: false,
     balances: false,
@@ -90,8 +100,39 @@ export default (state = initialState, action) => {
         [account]: {
           ...state[account],
           transfer: {
-            ...state[account].transfer,
-            stage1: action.payload.dataST1
+            ...action.payload.stage1,
+            executing: true
+          },
+          loading: {
+            ...state[account].loading,
+            transfer: false
+          }
+        }
+      };
+
+    case CLEAR_TRANSFER:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          transfer: {
+            ...initialState[account].transfer
+          }
+        }
+      };
+
+    case TRANSFER_ST2_EXECUTED:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          transfer: {
+            txid: action.payload.txid,
+            executing: false
+          },
+          loading: {
+            ...state[account].loading,
+            transfer: false
           }
         }
       };
@@ -103,7 +144,9 @@ export default (state = initialState, action) => {
           ...state[account],
           loading: {
             ...state[account].loading,
-            [action.payload.beingLoaded]: true
+            [action.payload.beingLoaded]: !state[account].loading[
+              action.payload.beingLoaded
+            ]
           }
         }
       };
