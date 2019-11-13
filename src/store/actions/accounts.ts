@@ -6,8 +6,8 @@ export const FETCH_BALANCE = "FETCH_BALANCE";
 export const FETCH_TRANSACTIONS = "FETCH_TRANSACTIONS";
 export const TRANSFER_ST1 = "TRANSFER_ST1";
 export const TRANSFER_ST2 = "TRANSFER_ST2";
+export const GET_TESTCOINS = "GET_TESTCOINS";
 export const CLEAR_TRANSFER = "CLEAR_TRANSFER";
-
 export const LOADING = "LOADING";
 
 export const fetchAddress = accountType => {
@@ -42,6 +42,11 @@ export const transferST2 = (
   }
 ) => {
   return { type: TRANSFER_ST2, payload: { accountType, transferInfo } };
+};
+
+export const getTestcoins = accountType => {
+  // Test Account specific
+  return { type: GET_TESTCOINS, payload: { accountType } };
 };
 
 export const clearTransfer = accountType => {

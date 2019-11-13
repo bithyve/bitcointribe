@@ -1,8 +1,11 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { View, Text, StyleSheet, Button, TextInput } from "react-native";
+import { updateWalletName } from "../../store/actions/wallet-setup";
 
 const WalletNameScreen = props => {
   const [walletName, setWalletName] = useState("");
+  const dispatch = useDispatch();
 
   return (
     <View style={styles.screen}>
@@ -22,7 +25,8 @@ const WalletNameScreen = props => {
       <Button
         title="Next"
         onPress={() => {
-          props.navigation.navigate("SecurityQues", { walletName });
+          dispatch(updateWalletName(walletName));
+          props.navigation.navigate("SecurityQues");
         }}
       />
     </View>
