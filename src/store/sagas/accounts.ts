@@ -11,7 +11,9 @@ import {
   TRANSFER_ST1,
   TRANSFER_ST2,
   executedST1,
-  executedST2
+  executedST2,
+  GET_TESTCOINS,
+  fetchBalance
 } from "../actions/accounts";
 import { Services } from "../../common/interfaces/Interfaces";
 
@@ -92,3 +94,12 @@ export const transferST2Watcher = createWatcher(
   transferST2Worker,
   TRANSFER_ST2
 );
+
+function* testcoinsWorker({ payload }) {
+  const services: Services = yield select(state => state.storage.services);
+  const res = yield call(services[payload.accountType].getTestcoins);
+  console.log({ res });
+  res.status === 200 ? yield put(fetchBalance(payload.accountType)) : null;
+}
+
+export const testcoinsWatcher = createWatcher(testcoinsWorker, GET_TESTCOINS);

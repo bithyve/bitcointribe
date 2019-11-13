@@ -12,8 +12,10 @@ import {
   fetchAddress,
   fetchBalance,
   fetchTransactions,
-  clearTransfer
+  clearTransfer,
+  getTestcoins
 } from "../../store/actions/accounts";
+import { TEST_ACCOUNT } from "../../common/constants/accountTypes";
 
 const AccountScreen = props => {
   const accountType = props.navigation.getParam("accountType");
@@ -39,6 +41,14 @@ const AccountScreen = props => {
           dispatch(fetchBalance(accountType));
         }}
       />
+      {accountType === TEST_ACCOUNT ? (
+        <Button
+          title="Get Testcoins"
+          onPress={async () => {
+            dispatch(getTestcoins(accountType));
+          }}
+        />
+      ) : null}
       <Button
         title="Fetch Transactions"
         onPress={async () => {

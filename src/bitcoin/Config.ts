@@ -169,7 +169,7 @@ class Config {
     }
   };
 
-  public SERVER: string = this.BH_SERVER.DEV;
+  public SERVER: string = this.BH_SERVER.PROD;
 
   public API_URLS = {
     TESTNET: {
