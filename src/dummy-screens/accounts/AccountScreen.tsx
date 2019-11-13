@@ -27,7 +27,6 @@ const AccountScreen = props => {
 
   return (
     <ScrollView contentContainerStyle={styles.screen}>
-      <Text>{accountType}</Text>
       <Button
         title="Fetch Addr"
         onPress={() => {
@@ -78,7 +77,7 @@ const AccountScreen = props => {
           <ActivityIndicator size="large" />
         ) : transactions.totalTransactions ? (
           <View>
-            <Text>Total Transactions: {transactions.totalTransactions}</Text>
+            <Text>Transactions:</Text>
             <View style={{ margin: 10, padding: 10 }}>
               {transactions.transactionDetails.map(tx => (
                 <View key={tx.txid}>
