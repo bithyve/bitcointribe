@@ -1,7 +1,7 @@
 import {
   ADDR_FETCHED,
   BALANCE_FETCHED,
-  TRANSACTIONS_FETCHED
+  TRANSACTIONS_FETCHED,
 } from "../actions/accounts";
 
 const ACCOUNT_VARS: {

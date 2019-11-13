@@ -15,10 +15,12 @@ export const fetchTransactions = accountType => {
   return { type: FETCH_TRANSACTIONS, payload: { accountType } };
 };
 
+
 // types and action creators (saga): dispatched by saga workers
 export const ADDR_FETCHED = "ADDR_FETCHED";
 export const BALANCE_FETCHED = "BALANCE_FETCHED";
 export const TRANSACTIONS_FETCHED = "TRANSACTIONS_FETCHED";
+
 
 export const addressFetched = (accountType, address) => {
   return { type: ADDR_FETCHED, payload: { accountType, address } };
@@ -31,3 +33,5 @@ export const balanceFetched = (accountType, balances) => {
 export const transactionsFetched = (accountType, transactions) => {
   return { type: TRANSACTIONS_FETCHED, payload: { accountType, transactions } };
 };
+
+
