@@ -12,8 +12,10 @@ import {
   fetchAddress,
   fetchBalance,
   fetchTransactions,
-  clearTransfer
+  clearTransfer,
+  getTestcoins
 } from "../../store/actions/accounts";
+import { TEST_ACCOUNT } from "../../common/constants/accountTypes";
 
 const AccountScreen = props => {
   const accountType = props.navigation.getParam("accountType");
@@ -27,7 +29,6 @@ const AccountScreen = props => {
 
   return (
     <ScrollView contentContainerStyle={styles.screen}>
-      <Text>{accountType}</Text>
       <Button
         title="Fetch Addr"
         onPress={() => {
@@ -40,6 +41,14 @@ const AccountScreen = props => {
           dispatch(fetchBalance(accountType));
         }}
       />
+      {accountType === TEST_ACCOUNT ? (
+        <Button
+          title="Get Testcoins"
+          onPress={async () => {
+            dispatch(getTestcoins(accountType));
+          }}
+        />
+      ) : null}
       <Button
         title="Fetch Transactions"
         onPress={async () => {
@@ -78,7 +87,7 @@ const AccountScreen = props => {
           <ActivityIndicator size="large" />
         ) : transactions.totalTransactions ? (
           <View>
-            <Text>Total Transactions: {transactions.totalTransactions}</Text>
+            <Text>Transactions:</Text>
             <View style={{ margin: 10, padding: 10 }}>
               {transactions.transactionDetails.map(tx => (
                 <View key={tx.txid}>
