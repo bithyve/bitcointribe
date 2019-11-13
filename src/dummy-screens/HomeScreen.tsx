@@ -9,7 +9,8 @@ import {
 import { useSelector } from "react-redux";
 import {
   REGULAR_ACCOUNT,
-  TEST_ACCOUNT
+  TEST_ACCOUNT,
+  SECURE_ACCOUNT
 } from "../common/constants/accountTypes";
 
 const HomeScreen = props => {
@@ -33,6 +34,14 @@ const HomeScreen = props => {
             onPress={() => {
               props.navigation.navigate("Account", {
                 accountType: TEST_ACCOUNT
+              });
+            }}
+          />
+          <Button
+            title="Setup secure Account"
+            onPress={() => {
+              props.navigation.navigate("SecureAccount", {
+                accountType: SECURE_ACCOUNT
               });
             }}
           />
