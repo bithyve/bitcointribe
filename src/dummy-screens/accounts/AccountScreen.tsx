@@ -25,7 +25,7 @@ const AccountScreen = props => {
 
   return (
     <View style={styles.screen}>
-      <Text>{accountType} Here!</Text>
+      <Text>{accountType}</Text>
       <Button
         title="Fetch Addr"
         onPress={() => {
@@ -43,6 +43,14 @@ const AccountScreen = props => {
         onPress={async () => {
           await dispatch(fetchTransactions(accountType));
         }}
+      />
+      <Button
+        title="Transfer"
+        onPress={() =>
+          props.navigation.navigate("Transfer", {
+            accountType
+          })
+        }
       />
       <View style={{ marginVertical: 20, flexDirection: "row" }}>
         <Text>Account balance: </Text>
