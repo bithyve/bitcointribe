@@ -4,13 +4,15 @@ import {
   Text,
   StyleSheet,
   Button,
-  ActivityIndicator
+  ActivityIndicator,
+  ScrollView
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchAddress,
   fetchBalance,
-  fetchTransactions
+  fetchTransactions,
+  clearTransfer
 } from "../../store/actions/accounts";
 
 const AccountScreen = props => {
@@ -24,7 +26,7 @@ const AccountScreen = props => {
     : 0;
 
   return (
-    <View style={styles.screen}>
+    <ScrollView contentContainerStyle={styles.screen}>
       <Text>{accountType}</Text>
       <Button
         title="Fetch Addr"
@@ -35,22 +37,23 @@ const AccountScreen = props => {
       <Button
         title="Fetch Balance"
         onPress={async () => {
-          await dispatch(fetchBalance(accountType));
+          dispatch(fetchBalance(accountType));
         }}
       />
       <Button
         title="Fetch Transactions"
         onPress={async () => {
-          await dispatch(fetchTransactions(accountType));
+          dispatch(fetchTransactions(accountType));
         }}
       />
       <Button
         title="Transfer"
-        onPress={() =>
+        onPress={() => {
+          dispatch(clearTransfer(accountType));
           props.navigation.navigate("Transfer", {
             accountType
-          })
-        }
+          });
+        }}
       />
       <View style={{ marginVertical: 20, flexDirection: "row" }}>
         <Text>Account balance: </Text>
@@ -87,8 +90,14 @@ const AccountScreen = props => {
           </View>
         ) : null}
       </View>
-    </View>
+    </ScrollView>
   );
+};
+
+AccountScreen.navigationOptions = navData => {
+  return {
+    headerTitle: navData.navigation.getParam("accountType")
+  };
 };
 
 const styles = StyleSheet.create({

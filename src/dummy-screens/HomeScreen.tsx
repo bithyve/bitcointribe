@@ -19,7 +19,9 @@ const HomeScreen = props => {
     <View style={styles.screen}>
       {walletName ? (
         <View>
-          <Text>Welcome to {`${walletName}'s`} HEXA!</Text>
+          <Text style={{ marginVertical: 10 }}>
+            Welcome to {`${walletName}'s`} wallet!
+          </Text>
           <Button
             title="Regular Account"
             onPress={() => {
@@ -42,6 +44,10 @@ const HomeScreen = props => {
       )}
     </View>
   );
+};
+
+HomeScreen.navigationOptions = {
+  headerTitle: "Home"
 };
 
 const styles = StyleSheet.create({
