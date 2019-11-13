@@ -2,7 +2,8 @@ import {
   ADDR_FETCHED,
   BALANCE_FETCHED,
   TRANSACTIONS_FETCHED,
-  LOADING
+  LOADING,
+  TRANSFER_ST1_EXECUTED
 } from "../actions/accounts";
 
 const ACCOUNT_VARS: {
@@ -12,10 +13,12 @@ const ACCOUNT_VARS: {
     unconfirmedBalance: Number;
   };
   transactions: any;
+  transfer: any;
   loading: {
     address: Boolean;
     balances: Boolean;
     transactions: Boolean;
+    transfer: Boolean;
   };
 } = {
   address: "",
@@ -24,10 +27,12 @@ const ACCOUNT_VARS: {
     unconfirmedBalance: 0
   },
   transactions: {},
+  transfer: null,
   loading: {
     address: false,
     balances: false,
-    transactions: false
+    transactions: false,
+    transfer: false
   }
 };
 
@@ -75,6 +80,18 @@ export default (state = initialState, action) => {
           loading: {
             ...state[account].loading,
             transactions: false
+          }
+        }
+      };
+
+    case TRANSFER_ST1_EXECUTED:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          transfer: {
+            ...state[account].transfer,
+            stage1: action.payload.dataST1
           }
         }
       };

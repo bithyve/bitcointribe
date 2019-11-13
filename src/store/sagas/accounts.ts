@@ -7,7 +7,10 @@ import {
   balanceFetched,
   FETCH_TRANSACTIONS,
   transactionsFetched,
-  activateLoader
+  activateLoader,
+  TRANSFER_ST1,
+  TRANSFER_ST2,
+  executedST1
 } from "../actions/accounts";
 import { Services } from "../../common/interfaces/Interfaces";
 
@@ -48,4 +51,23 @@ function* fetchTransactionsWorker({ payload }) {
 export const fetchTransactionsWatcher = createWatcher(
   fetchTransactionsWorker,
   FETCH_TRANSACTIONS
+);
+
+function* transferST1Worker({ payload }) {
+  const { recipientAddress, amount, priority } = payload.transferInfo;
+  const services: Services = yield select(state => state.storage.services);
+  const res = yield call(
+    services[payload.accountType].transferST1,
+    recipientAddress,
+    amount,
+    priority
+  );
+  res.status === 200
+    ? yield put(executedST1(payload.accountType, res.data))
+    : null;
+}
+
+export const transferST1Watcher = createWatcher(
+  transferST1Worker,
+  TRANSFER_ST1
 );
