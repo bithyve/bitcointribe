@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Button, TextInput } from "react-native";
 import { useDispatch } from "react-redux";
-import { initializeSetup } from "../../store/actions/wallet-setup";
+import {
+  initializeSetup,
+  updateSecurityAns
+} from "../../store/actions/wallet-setup";
 import AsyncStorage from "@react-native-community/async-storage";
 
 const SecurityQuesScreen = props => {
   const [securityAns, setSecurityAns] = useState("");
   const dispatch = useDispatch();
-  const walletName = props.navigation.getParam("walletName");
 
   return (
     <View style={styles.screen}>
@@ -27,7 +29,8 @@ const SecurityQuesScreen = props => {
       <Button
         title="Submit"
         onPress={async () => {
-          dispatch(initializeSetup(walletName, securityAns));
+          dispatch(updateSecurityAns(securityAns));
+          dispatch(initializeSetup());
           await AsyncStorage.setItem("walletExists", "true");
           props.navigation.navigate("HomeNav");
         }}
