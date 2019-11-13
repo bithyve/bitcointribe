@@ -28,10 +28,10 @@ function* initSetupWorker({ payload }) {
     yield call(s3Service.generateShares, payload.securityAns);
 
     const accounts = {
-      regularAccount: JSON.stringify(regularAcc),
-      testAccount: JSON.stringify(testAcc),
-      secureAccount: JSON.stringify(secureAcc),
-      s3Service: JSON.stringify(s3Service)
+      REGULAR_ACCOUNT: JSON.stringify(regularAcc),
+      TEST_ACCOUNT: JSON.stringify(testAcc),
+      SECURE_ACCOUNT: JSON.stringify(secureAcc),
+      S3_SERVICE: JSON.stringify(s3Service)
     };
 
     const toBeInserted = {

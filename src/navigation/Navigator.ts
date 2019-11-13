@@ -5,7 +5,8 @@ import StartupScreen from "../dummy-screens/StartupScreen";
 import HomeScreen from "../dummy-screens/HomeScreen";
 import WalletNameScreen from "../dummy-screens/wallet-setup/WalletNameScreen";
 import SecurityQuesScreen from "../dummy-screens/wallet-setup/SecurityQuesScreen";
-import RegularAccountScreen from "../dummy-screens/accounts/RegularAccountScreen";
+import AccountScreen from "../dummy-screens/accounts/AccountScreen";
+import TransferScreen from "../dummy-screens/accounts/TransferScreen";
 
 const WalletSetupNavigator = createStackNavigator({
   WalletName: WalletNameScreen,
@@ -14,7 +15,8 @@ const WalletSetupNavigator = createStackNavigator({
 
 const HomeNavigator = createStackNavigator({
   Home: HomeScreen,
-  Regular: RegularAccountScreen
+  Account: AccountScreen,
+  Transfer: TransferScreen
 });
 
 const Navigator = createSwitchNavigator({
