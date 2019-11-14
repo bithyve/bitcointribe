@@ -1,16 +1,16 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-const Screen = props => {
+const S3UserScreen = props => {
   return (
     <View style={styles.screen}>
-      <Text>Screen Here!</Text>
+      <Text>UserScreen Here!</Text>
     </View>
   );
 };
 
-Screen.navigationOptions = {
-  headerTitle: "Screen"
+S3UserScreen.navigationOptions = {
+  headerTitle: "User"
 };
 
 const styles = StyleSheet.create({
@@ -21,4 +21,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Screen;
+export default S3UserScreen;

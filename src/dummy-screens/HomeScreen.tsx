@@ -25,7 +25,7 @@ const HomeScreen = props => {
           <Button
             title="Regular Account"
             onPress={() => {
-              props.navigation.navigate("Account", {
+              props.navigation.navigate("AccountNav", {
                 accountType: REGULAR_ACCOUNT
               });
             }}
@@ -33,9 +33,15 @@ const HomeScreen = props => {
           <Button
             title="Test Account"
             onPress={() => {
-              props.navigation.navigate("Account", {
+              props.navigation.navigate("AccountNav", {
                 accountType: TEST_ACCOUNT
               });
+            }}
+          />
+          <Button
+            title="SSS"
+            onPress={() => {
+              props.navigation.navigate("SSS", {});
             }}
           />
         </View>
