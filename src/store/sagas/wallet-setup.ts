@@ -8,15 +8,11 @@ import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import TestAccount from "../../bitcoin/services/accounts/TestAccount";
 
-function* initSetupWorker() {
+function* initSetupWorker({ payload }) {
   try {
-    const { walletName, securityAns } = yield select(
-      state => state.walletSetup
-    );
-    if (!walletName || !securityAns) return;
+    const { walletName, securityAns } = payload;
 
     // initiate the accounts
-
     // Regular account
     const regularAcc = new RegularAccount();
     const res = yield call(regularAcc.getMnemonic);
