@@ -23,8 +23,20 @@ const AccountScreen = props => {
   const { address, balances, transactions, loading } = useSelector(
     state => state.accounts[serviceType]
   );
-  const netBalance = balances
-    ? balances.balance + balances.unconfirmedBalance
+  const service = useSelector(state => state.storage.services[serviceType]);
+  console.log({
+    balance:
+      service.hdWallet.balances.balance +
+      service.hdWallet.balances.unconfirmedBalance
+  });
+
+  // const netBalance = balances
+  //   ? balances.balance + balances.unconfirmedBalance
+  //   : 0;
+
+  const netBalance = service
+    ? service.hdWallet.balances.balance +
+      service.hdWallet.balances.unconfirmedBalance
     : 0;
 
   return (

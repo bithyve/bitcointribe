@@ -16,6 +16,7 @@ import {
   fetchBalance
 } from "../actions/accounts";
 import { Services } from "../../common/interfaces/Interfaces";
+import { insertIntoDB } from "../actions/storage";
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, "address"));
@@ -32,9 +33,16 @@ function* fetchBalanceWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, "balances"));
   const services: Services = yield select(state => state.storage.services);
   const res = yield call(services[payload.serviceType].getBalance);
-  res.status === 200
-    ? yield put(balanceFetched(payload.serviceType, res.data))
-    : yield put(switchLoader(payload.serviceType, "balances"));
+  if (res.status === 200) {
+    yield put(balanceFetched(payload.serviceType, res.data));
+    yield put(
+      insertIntoDB({
+        [payload.serviceType]: JSON.stringify(services[payload.serviceType])
+      })
+    );
+  } else {
+    yield put(switchLoader(payload.serviceType, "balances"));
+  }
 }
 
 export const fetchBalanceWatcher = createWatcher(

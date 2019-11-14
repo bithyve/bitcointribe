@@ -19,6 +19,7 @@ export default class BaseAccount {
       externalAddressesCache: {};
       addressToWIFCache: {};
       gapLimit: number;
+      balances: { balance: number; unconfirmedBalance: number };
     },
     network?: Network
   ) {

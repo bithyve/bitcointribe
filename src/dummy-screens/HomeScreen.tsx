@@ -14,7 +14,10 @@ import {
 
 const HomeScreen = props => {
   const database = useSelector(state => state.storage.database);
-  const { walletName } = database;
+  let walletName;
+  if (database) {
+    walletName = database.WALLET_SETUP.walletName;
+  }
   return (
     <View style={styles.screen}>
       {walletName ? (
