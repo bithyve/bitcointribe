@@ -6,20 +6,22 @@ import {
   healthCheckInitialized
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
+import { S3_SERVICE } from "../../common/constants/serviceTypes";
 
 function* initHCWorker() {
-  const initialized = yield select(state => state.sss.hcInit);
-
-  if (initialized) return;
+  const s3Service: S3Service = yield select(
+    state => state.storage.services[S3_SERVICE]
+  );
+  const initialized = s3Service.sss.healthCheckInitialized;
+  if (initialized) {
+    return;
+  }
 
   yield put(switchS3Loader("initHC"));
-  const s3Service: S3Service = yield select(
-    state => state.storage.services.S3_SERVICE
-  );
-
   const res = yield call(s3Service.initializeHealthcheck);
+  console.log({ res });
   res.status === 200
-    ? yield put(healthCheckInitialized(res.data.success))
+    ? yield put(healthCheckInitialized())
     : yield put(switchS3Loader("initHC"));
 }
 

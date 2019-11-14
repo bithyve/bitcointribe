@@ -14,6 +14,6 @@ export const switchS3Loader = beingLoaded => {
 // types and action creators (saga): dispatched by saga workers
 export const HEALTH_CHECK_INITIALIZED = "HEALTH_CHECK_INITIALIZED";
 
-export const healthCheckInitialized = initialized => {
-  return { type: HEALTH_CHECK_INITIALIZED, payload: { initialized } };
+export const healthCheckInitialized = () => {
+  return { type: HEALTH_CHECK_INITIALIZED };
 };
