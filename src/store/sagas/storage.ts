@@ -59,7 +59,7 @@ function* insertDBWorker({ payload }) {
       // dispatch failure
     }
 
-    yield put(dbInserted(updatedDB));
+    yield put(dbInserted(payload));
   } catch (err) {
     console.log(err);
   }
