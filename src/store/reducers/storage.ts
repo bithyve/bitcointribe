@@ -12,17 +12,13 @@ import S3Service from "../../bitcoin/services/sss/S3Service";
 
 const setServices = newState => {
   const { database, services } = newState;
-  if (database.accounts) {
+  if (database) {
     services.REGULAR_ACCOUNT = RegularAccount.fromJSON(
-      database.accounts.REGULAR_ACCOUNT
+      database.REGULAR_ACCOUNT
     );
-    services.TEST_ACCOUNT = TestAccount.fromJSON(
-      database.accounts.TEST_ACCOUNT
-    );
-    services.SECURE_ACCOUNT = SecureAccount.fromJSON(
-      database.accounts.SECURE_ACCOUNT
-    );
-    services.S3_SERVICE = S3Service.fromJSON(database.accounts.S3_SERVICE);
+    services.TEST_ACCOUNT = TestAccount.fromJSON(database.TEST_ACCOUNT);
+    services.SECURE_ACCOUNT = SecureAccount.fromJSON(database.SECURE_ACCOUNT);
+    services.S3_SERVICE = S3Service.fromJSON(database.S3_SERVICE);
     return services;
   }
 };
@@ -37,7 +33,7 @@ const initialState: {
   databaseInitialized: false,
   insertedIntoDB: false,
   key: "",
-  database: {},
+  database: null,
   services: {}
 };
 
