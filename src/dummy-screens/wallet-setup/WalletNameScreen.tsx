@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { View, Text, StyleSheet, Button, TextInput } from "react-native";
 
 const WalletNameScreen = props => {
   const [walletName, setWalletName] = useState("");
+  const dispatch = useDispatch();
 
   return (
     <View style={styles.screen}>
