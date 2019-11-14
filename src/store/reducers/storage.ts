@@ -59,7 +59,10 @@ export default (state = initialState, action) => {
     case DB_INSERTED:
       const updatedState = {
         ...state,
-        database: action.payload.updatedDatabase,
+        database: {
+          ...state.database,
+          ...action.payload.updatedEntity
+        },
         insertedIntoDB: true
       };
       return {
