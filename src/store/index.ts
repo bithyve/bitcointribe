@@ -12,7 +12,6 @@ import {
 import { initSetupWatcher } from "./sagas/wallet-setup";
 import storageReducer from "./reducers/storage";
 import accountsReducer from "./reducers/accounts";
-import walletSetupReducer from "./reducers/wallet-setup";
 import {
   fetchAddrWatcher,
   fetchBalanceWatcher,
@@ -76,7 +75,6 @@ const rootSaga = function*() {
 
 const rootReducer = combineReducers({
   storage: storageReducer,
-  walletSetup: walletSetupReducer,
   accounts: accountsReducer
 });
 

@@ -92,7 +92,16 @@ const AccountScreen = props => {
               {transactions.transactionDetails.map(tx => (
                 <View key={tx.txid}>
                   <Text style={{ marginVertical: 5 }}>Txn ID: {tx.txid}</Text>
-                  <Text style={{ marginVertical: 5 }}>Amount: {tx.amount}</Text>
+                  <View
+                    style={{
+                      marginVertical: 5,
+                      flexDirection: "row",
+                      justifyContent: "space-between"
+                    }}
+                  >
+                    <Text>Amount: {tx.amount}</Text>
+                    <Text>{tx.transactionType}</Text>
+                  </View>
                 </View>
               ))}
             </View>
