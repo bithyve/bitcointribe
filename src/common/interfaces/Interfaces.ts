@@ -12,6 +12,11 @@ export interface Database {
     SECURE_ACCOUNT: string;
     S3_SERVICE: string;
   };
+  secureAccSetupData?:{
+    bhXpub:string;
+    qrData: string;
+    secret: string;
+  };
 }
 
 export interface Services {
