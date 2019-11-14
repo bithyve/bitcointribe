@@ -20,6 +20,11 @@ export default class HDSegwitWallet extends Bitcoin {
   private externalAddressesCache: {};
   private addressToWIFCache: {};
 
+  public balances: { balance: number; unconfirmedBalance: number } = {
+    balance: 0,
+    unconfirmedBalance: 0
+  };
+
   constructor(
     mnemonic?: string,
     passphrase?: string,
@@ -32,6 +37,7 @@ export default class HDSegwitWallet extends Bitcoin {
       externalAddressesCache: {};
       addressToWIFCache: {};
       gapLimit: number;
+      balances: { balance: number; unconfirmedBalance: number };
     },
     network?: bitcoinJS.Network
   ) {
@@ -57,6 +63,7 @@ export default class HDSegwitWallet extends Bitcoin {
       : {}; // index => address
     this.addressToWIFCache = stateVars ? stateVars.addressToWIFCache : {};
     this.gapLimit = stateVars ? stateVars.gapLimit : config.GAP_LIMIT;
+    this.balances = stateVars ? stateVars.balances : this.balances;
   }
 
   public getMnemonic = (): { mnemonic: string } => {
@@ -162,7 +169,7 @@ export default class HDSegwitWallet extends Bitcoin {
       const { balance, unconfirmedBalance } = await this.getBalanceByAddresses(
         this.usedAddresses
       );
-      return { balance, unconfirmedBalance };
+      return (this.balances = { balance, unconfirmedBalance });
     } catch (err) {
       throw new Error(`Unable to get balance: ${err.message}`);
     }

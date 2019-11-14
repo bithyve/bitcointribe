@@ -363,21 +363,32 @@ export default class SSS {
 
     return temp.slice(0, 8);
   };
+
   private mnemonic: string;
   private encryptedShares: string[];
+  public healthCheckInitialized: Boolean;
 
-  constructor(mnemonic: string, encryptedShares?: string[]) {
+  constructor(
+    mnemonic: string,
+    stateVars?: {
+      encryptedShares;
+      healthCheckInitialized;
+    }
+  ) {
     if (bip39.validateMnemonic(mnemonic)) {
       this.mnemonic = mnemonic;
     } else {
       throw new Error("Invalid Mnemonic");
     }
-    this.encryptedShares = encryptedShares ? encryptedShares : [];
+    this.encryptedShares = stateVars ? stateVars.encryptedShares : [];
+    this.healthCheckInitialized = stateVars
+      ? stateVars.healthCheckInitialized
+      : false;
   }
 
   public stringToHex = (str: string): string => secrets.str2hex(str);
 
-  public getShares = () => (this.encryptedShares ? this.encryptShares : null);
+  public getShares = () => this.encryptedShares;
 
   public generateMessageID = (): string =>
     SSS.generateRandomString(config.MSG_ID_LENGTH);
@@ -450,13 +461,15 @@ export default class SSS {
     };
   };
 
-  public initializeHealthcheck = async (
-    encryptedShares: string[]
-  ): Promise<{
+  public initializeHealthcheck = async (): Promise<{
     success: boolean;
   }> => {
+    if (this.healthCheckInitialized) {
+      throw new Error("Health Check is already initialized.");
+    }
+
     const shareIDs: string[] = [];
-    for (const encryptedShare of encryptedShares) {
+    for (const encryptedShare of this.encryptedShares) {
       const { shareId } = SSS.getShareId(encryptedShare);
       shareIDs.push(shareId);
     }
@@ -470,6 +483,9 @@ export default class SSS {
       });
     } catch (err) {
       throw new Error(err.response.data.err);
+    }
+    if (res.data.initSuccessful) {
+      this.healthCheckInitialized = true;
     }
     return {
       success: res.data.initSuccessful
