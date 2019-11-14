@@ -12,7 +12,7 @@ import {
 import { initSetupWatcher } from "./sagas/wallet-setup";
 import storageReducer from "./reducers/storage";
 import accountsReducer from "./reducers/accounts";
-import secureAccountReducer from "./reducers/secureAccount-setup"
+import secureAccountReducer from "./reducers/secureAccount-setup";
 import {
   fetchAddrWatcher,
   fetchBalanceWatcher,
@@ -21,7 +21,7 @@ import {
   transferST2Watcher,
   testcoinsWatcher
 } from "./sagas/accounts";
-import {setupSecureAccountWatcher}from "./sagas/secureAccount-setup"
+import {setupSecureAccountWatcher, checkHealthtWatcher}from "./sagas/secureAccount-setup";
 
 // const rootSaga = function*() {
 //   yield all([
@@ -58,6 +58,7 @@ const rootSaga = function*() {
     transferST2Watcher,
     //secure account setup watcher
     setupSecureAccountWatcher,
+    checkHealthtWatcher,
     testcoinsWatcher
   ];
 
