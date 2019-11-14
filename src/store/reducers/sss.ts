@@ -1,12 +1,11 @@
 import { HEALTH_CHECK_INITIALIZED, S3_LOADING } from "../actions/sss";
+import S3Service from "../../bitcoin/services/sss/S3Service";
 
 const initialState: {
-  hcInit: Boolean;
   loading: {
     hcInit: Boolean;
   };
 } = {
-  hcInit: false,
   loading: {
     hcInit: false
   }
@@ -17,7 +16,6 @@ export default (state = initialState, action) => {
     case HEALTH_CHECK_INITIALIZED:
       return {
         ...state,
-        hcInit: action.payload.initialized,
         loading: {
           ...state.loading,
           hcInit: false
