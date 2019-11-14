@@ -450,13 +450,11 @@ export default class SSS {
     };
   };
 
-  public initializeHealthcheck = async (
-    encryptedShares: string[]
-  ): Promise<{
+  public initializeHealthcheck = async (): Promise<{
     success: boolean;
   }> => {
     const shareIDs: string[] = [];
-    for (const encryptedShare of encryptedShares) {
+    for (const encryptedShare of this.encryptedShares) {
       const { shareId } = SSS.getShareId(encryptedShare);
       shareIDs.push(shareId);
     }

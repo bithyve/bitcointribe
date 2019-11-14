@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT
-} from "../common/constants/accountTypes";
+} from "../common/constants/serviceTypes";
 
 const HomeScreen = props => {
   const database = useSelector(state => state.storage.database);
@@ -25,23 +25,23 @@ const HomeScreen = props => {
           <Button
             title="Regular Account"
             onPress={() => {
-              props.navigation.navigate("AccountNav", {
-                accountType: REGULAR_ACCOUNT
+              props.navigation.navigate("Account", {
+                serviceType: REGULAR_ACCOUNT
               });
             }}
           />
           <Button
             title="Test Account"
             onPress={() => {
-              props.navigation.navigate("AccountNav", {
-                accountType: TEST_ACCOUNT
+              props.navigation.navigate("Account", {
+                serviceType: TEST_ACCOUNT
               });
             }}
           />
           <Button
             title="SSS"
             onPress={() => {
-              props.navigation.navigate("SSS", {});
+              props.navigation.navigate("SSS");
             }}
           />
         </View>

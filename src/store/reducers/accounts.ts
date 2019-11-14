@@ -53,7 +53,7 @@ const initialState = {
 };
 
 export default (state = initialState, action) => {
-  const account = action.payload ? action.payload.accountType : null;
+  const account = action.payload ? action.payload.serviceType : null;
   switch (action.type) {
     case ADDR_FETCHED:
       return {

@@ -385,9 +385,7 @@ export default class S3Service {
     }
   };
 
-  public initializeHealthcheck = async (
-    encryptedShares: string[]
-  ): Promise<
+  public initializeHealthcheck = async (): Promise<
     | {
         status: number;
         data: {
@@ -406,7 +404,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.initializeHealthcheck(encryptedShares)
+        data: await this.sss.initializeHealthcheck()
       };
     } catch (err) {
       return { status: 513, err: err.message, message: ErrMap[513] };
