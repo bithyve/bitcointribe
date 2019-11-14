@@ -533,7 +533,6 @@ export default class Bitcoin {
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("/testnetFaucet", {
-        hexa_id: config.HEXA_ID,
         recipientAddress,
         amount
       });
