@@ -19,10 +19,7 @@ const WalletSetupNavigator = createStackNavigator({
 const HomeNavigator = createStackNavigator({
   Home: HomeScreen,
   Account: AccountScreen,
-  Transfer: TransferScreen
-});
-const SecureAccountNavigator = createStackNavigator({
-  Home: HomeScreen,
+  Transfer: TransferScreen,
   SecureAccount: SecureAccountScreen
 });
 
