@@ -22,8 +22,6 @@ export const fetchTransactions = accountType => {
   return { type: FETCH_TRANSACTIONS, payload: { accountType } };
 };
 
-<<<<<<< HEAD
-=======
 export const transferST1 = (
   accountType,
   transferInfo: { recipientAddress: String; amount: Number; priority?: String }
@@ -53,7 +51,6 @@ export const clearTransfer = accountType => {
 export const switchLoader = (accountType, beingLoaded) => {
   return { type: LOADING, payload: { accountType, beingLoaded } };
 };
->>>>>>> e8a6b4fbbfe36d31ae55c8b9a648163d86402923
 
 // types and action creators (saga): dispatched by saga workers
 export const ADDR_FETCHED = "ADDR_FETCHED";
@@ -75,9 +72,7 @@ export const transactionsFetched = (accountType, transactions) => {
   return { type: TRANSACTIONS_FETCHED, payload: { accountType, transactions } };
 };
 
-<<<<<<< HEAD
 
-=======
 export const executedST1 = (accountType, stage1) => {
   return { type: TRANSFER_ST1_EXECUTED, payload: { accountType, stage1 } };
 };
@@ -85,4 +80,3 @@ export const executedST1 = (accountType, stage1) => {
 export const executedST2 = (accountType, txid) => {
   return { type: TRANSFER_ST2_EXECUTED, payload: { accountType, txid } };
 };
->>>>>>> e8a6b4fbbfe36d31ae55c8b9a648163d86402923

@@ -12,6 +12,8 @@ import {
     res.status === 200
       ? yield put(secureAccountSetup(res.setupData))
       : null;
-  }
+      const ress = setupSecureAccountWorker( {payload });
+    }
+   
   
-  export const fetchAddrWatcher = createWatcher(setupSecureAccountWorker, SETUP_SECUREACCOUNT);
+  export const setupSecureAccountWatcher = createWatcher(setupSecureAccountWorker, SETUP_SECUREACCOUNT);

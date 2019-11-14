@@ -4,18 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import {
     setupSecureAccount
 } from "../../store/actions/secureAccount-setup";
-
+import {
+  SECURE_ACCOUNT
+} from "../../common/constants/accountTypes";
 const SecureAccountScreen = props => {
   const accountType = props.navigation.getParam("accountType");
   const dispatch = useDispatch();
-  const { address, balances, transactions } = useSelector(
-    state => state.accounts[accountType]
-  );
-  console.log({ transactions });
-
-  const netBalance = balances
-    ? balances.balance + balances.unconfirmedBalance
-    : 0;
 
   return (
     <View style={styles.screen}>
@@ -23,10 +17,19 @@ const SecureAccountScreen = props => {
       <Button
         title="Setup Secure Account"
         onPress={() => {
-          dispatch(setupSecureAccount());
+          dispatch(setupSecureAccount(accountType));
         }}
-      />    
+      />  
+      <Button
+        title="Secure Account"
+        onPress={() => {
+        props.navigation.navigate("Account", {
+        accountType: SECURE_ACCOUNT
+        });
+        }}
+       />
     </View>
+    
   );
 };
 
