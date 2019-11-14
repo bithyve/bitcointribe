@@ -14,7 +14,8 @@ export default class TestAccount extends BaseAccount {
       internalAddresssesCache,
       externalAddressesCache,
       addressToWIFCache,
-      gapLimit
+      gapLimit,
+      balances
     }: {
       mnemonic: string;
       passphrase: string;
@@ -26,6 +27,7 @@ export default class TestAccount extends BaseAccount {
       externalAddressesCache: {};
       addressToWIFCache: {};
       gapLimit: number;
+      balances: { balance: number; unconfirmedBalance: number };
     } = hdWallet;
 
     return new TestAccount(mnemonic, passphrase, purpose, {
@@ -35,7 +37,8 @@ export default class TestAccount extends BaseAccount {
       internalAddresssesCache,
       externalAddressesCache,
       addressToWIFCache,
-      gapLimit
+      gapLimit,
+      balances
     });
   };
 
@@ -51,6 +54,7 @@ export default class TestAccount extends BaseAccount {
       externalAddressesCache: {};
       addressToWIFCache: {};
       gapLimit: number;
+      balances: { balance: number; unconfirmedBalance: number };
     }
   ) {
     const network: bitcoinJS.Network = bitcoinJS.networks.testnet;

@@ -7,6 +7,7 @@ import {
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { S3_SERVICE } from "../../common/constants/serviceTypes";
+import { insertIntoDB } from "../actions/storage";
 
 function* initHCWorker() {
   const s3Service: S3Service = yield select(
@@ -19,10 +20,13 @@ function* initHCWorker() {
 
   yield put(switchS3Loader("initHC"));
   const res = yield call(s3Service.initializeHealthcheck);
-  console.log({ res });
-  res.status === 200
-    ? yield put(healthCheckInitialized())
-    : yield put(switchS3Loader("initHC"));
+
+  if (res.status === 200) {
+    yield put(healthCheckInitialized());
+    yield put(insertIntoDB({ S3_SERVICE: JSON.stringify(s3Service) }));
+  } else {
+    yield put(switchS3Loader("initHC"));
+  }
 }
 
 export const initHCWatcher = createWatcher(initHCWorker, INIT_HEALTH_CHECK);

@@ -13,7 +13,8 @@ export default class RegularAccount extends BaseAccount {
       internalAddresssesCache,
       externalAddressesCache,
       addressToWIFCache,
-      gapLimit
+      gapLimit,
+      balances
     }: {
       mnemonic: string;
       passphrase: string;
@@ -25,6 +26,7 @@ export default class RegularAccount extends BaseAccount {
       externalAddressesCache: {};
       addressToWIFCache: {};
       gapLimit: number;
+      balances: { balance: number; unconfirmedBalance: number };
     } = hdWallet;
 
     return new RegularAccount(mnemonic, passphrase, purpose, {
@@ -34,7 +36,8 @@ export default class RegularAccount extends BaseAccount {
       internalAddresssesCache,
       externalAddressesCache,
       addressToWIFCache,
-      gapLimit
+      gapLimit,
+      balances
     });
   };
 
@@ -50,6 +53,7 @@ export default class RegularAccount extends BaseAccount {
       externalAddressesCache: {};
       addressToWIFCache: {};
       gapLimit: number;
+      balances: { balance: number; unconfirmedBalance: number };
     }
   ) {
     super(mnemonic, passphrase, dPathPurpose, stateVars);
