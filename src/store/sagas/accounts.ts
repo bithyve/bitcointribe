@@ -22,10 +22,20 @@ function* fetchAddrWorker({ payload }) {
   const service = yield select(
     state => state.accounts[payload.serviceType].service
   );
+
+  const preFetchAddress = service.hdWallet.receivingAddress;
   const res = yield call(service.getAddress);
-  res.status === 200
-    ? yield put(addressFetched(payload.serviceType, res.data.address))
-    : yield put(switchLoader(payload.serviceType, "receivingAddress"));
+  const postFetchAddress =
+    res.status === 200 ? res.data.address : preFetchAddress;
+
+  if (
+    res.status === 200 &&
+    JSON.stringify(preFetchAddress) !== JSON.stringify(postFetchAddress)
+  ) {
+    yield put(addressFetched(payload.serviceType, postFetchAddress));
+  } else {
+    yield put(switchLoader(payload.serviceType, "receivingAddress"));
+  }
 }
 
 export const fetchAddrWatcher = createWatcher(fetchAddrWorker, FETCH_ADDR);
@@ -35,9 +45,16 @@ function* fetchBalanceWorker({ payload }) {
   const service = yield select(
     state => state.accounts[payload.serviceType].service
   );
+
+  const preFetchBalances = service.hdWallet.balances;
   const res = yield call(service.getBalance);
-  if (res.status === 200) {
-    yield put(balanceFetched(payload.serviceType, res.data));
+  const postFetchBalances = res.status === 200 ? res.data : preFetchBalances;
+
+  if (
+    res.status === 200 &&
+    JSON.stringify(preFetchBalances) !== JSON.stringify(postFetchBalances)
+  ) {
+    yield put(balanceFetched(payload.serviceType, postFetchBalances));
     yield put(
       insertIntoDB({
         [payload.serviceType]: JSON.stringify(service)
@@ -58,10 +75,19 @@ function* fetchTransactionsWorker({ payload }) {
   const service = yield select(
     state => state.accounts[payload.serviceType].service
   );
-  const res = yield call(service.getTransactions);
 
-  if (res.status === 200) {
-    yield put(transactionsFetched(payload.serviceType, res.data.transactions));
+  const preFetchTransactions = service.hdWallet.transactions;
+  const res = yield call(service.getTransactions);
+  const postFetchTransactions =
+    res.status === 200 ? res.data.transactions : preFetchTransactions;
+  console.log({ preFetchTransactions, postFetchTransactions });
+
+  if (
+    res.status === 200 &&
+    JSON.stringify(preFetchTransactions) !==
+      JSON.stringify(postFetchTransactions)
+  ) {
+    yield put(transactionsFetched(payload.serviceType, postFetchTransactions));
     yield put(
       insertIntoDB({
         [payload.serviceType]: JSON.stringify(service)

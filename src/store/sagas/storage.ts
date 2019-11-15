@@ -68,6 +68,7 @@ function* insertDBWorker({ payload }) {
     }
 
     yield put(dbInserted(payload));
+    !insertedIntoDB ? yield put(enrichServices(updatedDB)) : null; // enriching services post initial insertion
   } catch (err) {
     console.log(err);
   }
