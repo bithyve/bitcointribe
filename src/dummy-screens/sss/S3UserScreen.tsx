@@ -14,9 +14,7 @@ import S3Service from "../../bitcoin/services/sss/S3Service";
 const S3UserScreen = props => {
   const dispatch = useDispatch();
   const { loading } = useSelector(state => state.sss);
-  const s3Service: S3Service = useSelector(
-    state => state.storage.services[S3_SERVICE]
-  );
+  const s3Service: S3Service = useSelector(state => state.sss.service);
 
   const { healthCheckInitialized } = s3Service.sss;
   return (

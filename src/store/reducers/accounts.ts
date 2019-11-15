@@ -7,8 +7,18 @@ import {
   TRANSFER_ST2_EXECUTED,
   CLEAR_TRANSFER
 } from "../actions/accounts";
+import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
+import TestAccount from "../../bitcoin/services/accounts/TestAccount";
+import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
+import { SERVICES_ENRICHED } from "../actions/storage";
+import {
+  REGULAR_ACCOUNT,
+  TEST_ACCOUNT,
+  SECURE_ACCOUNT
+} from "../../common/constants/serviceTypes";
 
 const ACCOUNT_VARS: {
+  service: RegularAccount | TestAccount | SecureAccount;
   address: String;
   balances: {
     balance: Number;
@@ -27,6 +37,7 @@ const ACCOUNT_VARS: {
     transfer: Boolean;
   };
 } = {
+  service: null,
   address: "",
   balances: {
     balance: 0,
@@ -134,6 +145,23 @@ export default (state = initialState, action) => {
             ...state[account].loading,
             transfer: false
           }
+        }
+      };
+
+    case SERVICES_ENRICHED:
+      return {
+        ...state,
+        [REGULAR_ACCOUNT]: {
+          ...state[REGULAR_ACCOUNT],
+          service: action.payload.services[REGULAR_ACCOUNT]
+        },
+        [TEST_ACCOUNT]: {
+          ...state[TEST_ACCOUNT],
+          service: action.payload.services[TEST_ACCOUNT]
+        },
+        [SECURE_ACCOUNT]: {
+          ...state[SECURE_ACCOUNT],
+          service: action.payload.services[SECURE_ACCOUNT]
         }
       };
 

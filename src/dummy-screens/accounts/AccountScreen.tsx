@@ -23,7 +23,7 @@ const AccountScreen = props => {
   const { address, balances, transactions, loading } = useSelector(
     state => state.accounts[serviceType]
   );
-  const service = useSelector(state => state.storage.services[serviceType]);
+  const service = useSelector(state => state.accounts[serviceType].service);
   console.log({
     balance:
       service.hdWallet.balances.balance +
