@@ -13,20 +13,19 @@ import {
   executedST1,
   executedST2,
   GET_TESTCOINS,
-  fetchBalance,
-  fetchAddress
+  fetchBalance
 } from "../actions/accounts";
 import { insertIntoDB } from "../actions/storage";
 
 function* fetchAddrWorker({ payload }) {
-  yield put(switchLoader(payload.serviceType, "address"));
+  yield put(switchLoader(payload.serviceType, "receivingAddress"));
   const service = yield select(
     state => state.accounts[payload.serviceType].service
   );
   const res = yield call(service.getAddress);
   res.status === 200
     ? yield put(addressFetched(payload.serviceType, res.data.address))
-    : yield put(switchLoader(payload.serviceType, "address"));
+    : yield put(switchLoader(payload.serviceType, "receivingAddress"));
 }
 
 export const fetchAddrWatcher = createWatcher(fetchAddrWorker, FETCH_ADDR);
@@ -39,7 +38,6 @@ function* fetchBalanceWorker({ payload }) {
   const res = yield call(service.getBalance);
   if (res.status === 200) {
     yield put(balanceFetched(payload.serviceType, res.data));
-    yield put(fetchAddress(payload.serviceType));
     yield put(
       insertIntoDB({
         [payload.serviceType]: JSON.stringify(service)
@@ -61,9 +59,17 @@ function* fetchTransactionsWorker({ payload }) {
     state => state.accounts[payload.serviceType].service
   );
   const res = yield call(service.getTransactions);
-  res.status === 200
-    ? yield put(transactionsFetched(payload.serviceType, res.data.transactions))
-    : yield put(switchLoader(payload.serviceType, "transactions"));
+
+  if (res.status === 200) {
+    yield put(transactionsFetched(payload.serviceType, res.data.transactions));
+    yield put(
+      insertIntoDB({
+        [payload.serviceType]: JSON.stringify(service)
+      })
+    );
+  } else {
+    yield put(switchLoader(payload.serviceType, "transactions"));
+  }
 }
 
 export const fetchTransactionsWatcher = createWatcher(
@@ -103,7 +109,6 @@ function* transferST2Worker({ payload }) {
   const res = yield call(service.transferST2, inputs, txb);
   if (res.status === 200) {
     yield put(executedST2(payload.serviceType, res.data.txid));
-    yield put(fetchBalance(payload.serviceType));
   } else {
     yield put(switchLoader(payload.serviceType, "transfer"));
   }

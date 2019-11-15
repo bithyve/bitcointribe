@@ -1,3 +1,21 @@
+export interface Transactions {
+  totalTransactions: number;
+  confirmedTransactions: number;
+  unconfirmedTransactions: number;
+  transactionDetails: Array<{
+    txid: string;
+    status: string;
+    confirmations: number;
+    fee: string;
+    date: string;
+    transactionType: string;
+    amount: number;
+    accountType: string;
+    recipientAddresses?: string[];
+    senderAddresses?: string[];
+  }>;
+}
+
 export interface IMetaShare {
   encryptedShare: string;
   meta: {

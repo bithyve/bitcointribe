@@ -19,7 +19,7 @@ import {
 
 const ACCOUNT_VARS: {
   service: RegularAccount | TestAccount | SecureAccount;
-  address: String;
+  receivingAddress: String;
   balances: {
     balance: Number;
     unconfirmedBalance: Number;
@@ -31,14 +31,14 @@ const ACCOUNT_VARS: {
     txid: String;
   };
   loading: {
-    address: Boolean;
+    receivingAddress: Boolean;
     balances: Boolean;
     transactions: Boolean;
     transfer: Boolean;
   };
 } = {
   service: null,
-  address: "",
+  receivingAddress: "",
   balances: {
     balance: 0,
     unconfirmedBalance: 0
@@ -50,7 +50,7 @@ const ACCOUNT_VARS: {
     txid: ""
   },
   loading: {
-    address: false,
+    receivingAddress: false,
     balances: false,
     transactions: false,
     transfer: false
@@ -71,10 +71,10 @@ export default (state = initialState, action) => {
         ...state,
         [account]: {
           ...state[account],
-          address: action.payload.address,
+          receivingAddress: action.payload.address,
           loading: {
             ...state[account].loading,
-            address: false
+            receivingAddress: false
           }
         }
       };
