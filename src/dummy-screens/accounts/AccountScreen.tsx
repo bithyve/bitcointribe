@@ -86,7 +86,7 @@ const AccountScreen = props => {
       <View style={{ margin: 40 }}>
         {loading.transactions ? (
           <ActivityIndicator size="large" />
-        ) : transactions ? (
+        ) : transactions.totalTransactions ? (
           <View>
             <Text>Transactions:</Text>
             <View style={{ margin: 10, padding: 10 }}>
