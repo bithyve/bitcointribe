@@ -236,7 +236,7 @@ export default class SecureHDWallet extends Bitcoin {
           continue;
         }
         const { address } = this.createSecureMultiSig(
-          this.nextFreeChildIndex + itr
+          this.nextFreeChildIndex + itr,
         );
 
         const txCounts = await this.getTxCounts([address]);
@@ -738,14 +738,15 @@ export default class SecureHDWallet extends Bitcoin {
       return this.multiSigCache[childIndex];
     } // cache hit
 
-    console.log(`creating multiSig against index: ${childIndex}`);
-
+    // console.log(`creating multiSig against index: ${childIndex}`);
+     console.log(childIndex);
+     console.log("..." + this.xpubs.primary);
     const childPrimaryPub = this.getPub(
       this.deriveChildXKey(this.xpubs.primary, childIndex)
     );
     const childRecoveryPub = this.getPub(
       this.deriveChildXKey(this.xpubs.secondary, childIndex)
-    );
+    );  
     const childBHPub = this.getPub(
       this.deriveChildXKey(this.xpubs.bh, childIndex)
     );
@@ -755,7 +756,7 @@ export default class SecureHDWallet extends Bitcoin {
     const pubs = [childBHPub, childPrimaryPub, childRecoveryPub];
     // console.log({ pubs });
     const multiSig = this.generateMultiSig(2, pubs);
-
+  
     return (this.multiSigCache[childIndex] = {
       scripts: {
         redeem: multiSig.p2sh.redeem.output.toString("hex"),

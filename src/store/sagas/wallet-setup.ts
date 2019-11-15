@@ -23,6 +23,8 @@ function* initSetupWorker({ payload }) {
 
     // Secure account
     const secureAcc = new SecureAccount(primaryMnemonic);
+  
+    // yield call(secureAcc.getSecondaryMnemonic);
 
     // share generation
     const s3Service = new S3Service(primaryMnemonic);

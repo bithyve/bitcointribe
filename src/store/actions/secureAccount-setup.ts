@@ -9,9 +9,17 @@ export const CHECK_HEALTH = "CHECK_HEALTH";
 export const checkHealth = (accountType)=> {
     return {type: CHECK_HEALTH, payload: {accountType}};
 };
+
+
+export const IS_ACTIVE = "IS_ACTIVE";
+export const isActive = (accountType) => {
+return {type:IS_ACTIVE, payload: {accountType} };
+};
+
+
+
 // types and action creators (saga): dispatched by saga workers
 export const SECUREACCOUNT_SETUP = "SECUREACCOUNT_SETUP";
-
 export const secureAccountSetup = (
   accountType,
   setupData:
@@ -23,7 +31,17 @@ export const secureAccountSetup = (
   };
 
 export const HEALTH_CHECK = "HEALTH_CHECK";
-
-export const healthCheck = (accountType,data:{isValid: boolean}) => {
+export const healthCheck = (
+  accountType,
+  data:{isValid: boolean}
+  ) => {
         return {type : HEALTH_CHECK, payload: {accountType,data}};
   };
+export const ACTIVATED = "ACTIVATED";
+export const activated =(
+  accountType, 
+  saStatus:{isActive: boolean}
+  )=>{
+  return {type: ACTIVATED, payload:{accountType,saStatus}};
+};
+

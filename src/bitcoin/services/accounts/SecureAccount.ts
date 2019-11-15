@@ -341,6 +341,7 @@ export default class SecureAccount {
       }
   > => {
     try {
+      
       return {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.getReceivingAddress()

@@ -17,6 +17,8 @@ export interface Database {
     qrData: string;
     secret: string;
   };
+  secureAccIsActive?:boolean;
+  
 }
 
 export interface Services {
