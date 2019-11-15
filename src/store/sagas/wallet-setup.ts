@@ -1,4 +1,4 @@
-import { call, put } from "redux-saga/effects";
+import { call, put, select } from "redux-saga/effects";
 import { createWatcher } from "../utils/watcher-creator";
 import { INIT_SETUP } from "../actions/wallet-setup";
 import { insertIntoDB } from "../actions/storage";
@@ -10,8 +10,9 @@ import TestAccount from "../../bitcoin/services/accounts/TestAccount";
 
 function* initSetupWorker({ payload }) {
   try {
-    // initiate the accounts
+    const { walletName, securityAns } = payload;
 
+    // initiate the accounts
     // Regular account
     const regularAcc = new RegularAccount();
     const res = yield call(regularAcc.getMnemonic);
@@ -25,7 +26,7 @@ function* initSetupWorker({ payload }) {
 
     // share generation
     const s3Service = new S3Service(primaryMnemonic);
-    yield call(s3Service.generateShares, payload.securityAns);
+    yield call(s3Service.generateShares, securityAns);
 
     const accounts = {
       REGULAR_ACCOUNT: JSON.stringify(regularAcc),
@@ -35,8 +36,8 @@ function* initSetupWorker({ payload }) {
     };
 
     const toBeInserted = {
-      ...payload,
-      accounts
+      WALLET_SETUP: { walletName, securityAns },
+      ...accounts
     };
 
     yield put(insertIntoDB(toBeInserted));

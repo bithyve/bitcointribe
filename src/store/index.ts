@@ -4,21 +4,25 @@ import createSagaMiddleware from "redux-saga";
 import { call, all, spawn } from "redux-saga/effects";
 import { composeWithDevTools } from "redux-devtools-extension";
 
+import storageReducer from "./reducers/storage";
+import accountsReducer from "./reducers/accounts";
+import sssReducer from "./reducers/sss";
 import {
   initDBWatcher,
   fetchDBWatcher,
-  insertDBWatcher
+  insertDBWatcher,
+  servicesEnricherWatcher
 } from "./sagas/storage";
 import { initSetupWatcher } from "./sagas/wallet-setup";
-import storageReducer from "./reducers/storage";
-import accountsReducer from "./reducers/accounts";
 import {
   fetchAddrWatcher,
   fetchBalanceWatcher,
   fetchTransactionsWatcher,
   transferST1Watcher,
-  transferST2Watcher
+  transferST2Watcher,
+  testcoinsWatcher
 } from "./sagas/accounts";
+import { initHCWatcher } from "./sagas/sss";
 
 // const rootSaga = function*() {
 //   yield all([
@@ -43,6 +47,7 @@ const rootSaga = function*() {
     initDBWatcher,
     fetchDBWatcher,
     insertDBWatcher,
+    servicesEnricherWatcher,
 
     // wallet setup watcher
     initSetupWatcher,
@@ -52,7 +57,11 @@ const rootSaga = function*() {
     fetchBalanceWatcher,
     fetchTransactionsWatcher,
     transferST1Watcher,
-    transferST2Watcher
+    transferST2Watcher,
+    testcoinsWatcher,
+
+    // sss watchers
+    initHCWatcher
   ];
 
   yield all(
@@ -73,7 +82,8 @@ const rootSaga = function*() {
 
 const rootReducer = combineReducers({
   storage: storageReducer,
-  accounts: accountsReducer
+  accounts: accountsReducer,
+  sss: sssReducer
 });
 
 const sagaMiddleware = createSagaMiddleware();

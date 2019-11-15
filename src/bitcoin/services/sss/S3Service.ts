@@ -13,13 +13,15 @@ export default class S3Service {
     const { sss } = JSON.parse(json);
     const {
       mnemonic,
-      encryptedShares
+      encryptedShares,
+      healthCheckInitialized
     }: {
       mnemonic: string;
       encryptedShares: string[];
+      healthCheckInitialized: Boolean;
     } = sss;
 
-    return new S3Service(mnemonic, encryptedShares);
+    return new S3Service(mnemonic, { encryptedShares, healthCheckInitialized });
   };
 
   public static recoverFromShares = (
@@ -300,9 +302,9 @@ export default class S3Service {
     }
   };
 
-  private sss: SSS;
-  constructor(mnemonic: string, encryptedShares?: string[]) {
-    this.sss = new SSS(mnemonic, encryptedShares);
+  public sss: SSS;
+  constructor(mnemonic: string, stateVars?) {
+    this.sss = new SSS(mnemonic, stateVars);
   }
 
   public generateShares = (
@@ -385,9 +387,7 @@ export default class S3Service {
     }
   };
 
-  public initializeHealthcheck = async (
-    encryptedShares: string[]
-  ): Promise<
+  public initializeHealthcheck = async (): Promise<
     | {
         status: number;
         data: {
@@ -406,7 +406,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.initializeHealthcheck(encryptedShares)
+        data: await this.sss.initializeHealthcheck()
       };
     } catch (err) {
       return { status: 513, err: err.message, message: ErrMap[513] };

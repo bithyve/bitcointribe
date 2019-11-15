@@ -7,6 +7,7 @@ import Client from "bitcoin-core";
 import * as bitcoinJS from "bitcoinjs-lib";
 import coinselect from "coinselect";
 import config from "../../Config";
+import { Transactions } from "../Interface";
 
 const { BH_AXIOS } = config;
 const { TESTNET, MAINNET } = config.API_URLS;
@@ -288,41 +289,9 @@ export default class Bitcoin {
     addresses: string[],
     accountType: string
   ): Promise<{
-    transactions: {
-      totalTransactions: number;
-      confirmedTransactions: number;
-      unconfirmedTransactions: number;
-      transactionDetails: Array<{
-        txid: string;
-        status: string;
-        confirmations: number;
-        fee: string;
-        date: string;
-        transactionType: string;
-        amount: number;
-        accountType: string;
-        recipientAddresses?: string[];
-        senderAddresses?: string[];
-      }>;
-    };
+    transactions: Transactions;
   }> => {
-    const transactions: {
-      totalTransactions: number;
-      confirmedTransactions: number;
-      unconfirmedTransactions: number;
-      transactionDetails: Array<{
-        txid: string;
-        status: string;
-        confirmations: number;
-        fee: string;
-        date: string;
-        transactionType: string;
-        amount: number;
-        accountType: string;
-        recipientAddresses?: string[];
-        senderAddresses?: string[];
-      }>;
-    } = {
+    const transactions: Transactions = {
       totalTransactions: 0,
       confirmedTransactions: 0,
       unconfirmedTransactions: 0,
@@ -530,7 +499,6 @@ export default class Bitcoin {
     funded: any;
   }> => {
     const amount = Math.trunc(Math.random() * 1e5) / 1e8;
-    console.log({ amount });
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("/testnetFaucet", {

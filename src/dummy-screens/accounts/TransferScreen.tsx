@@ -15,12 +15,12 @@ import {
 } from "../../store/actions/accounts";
 
 const TransferScreen = props => {
-  const accountType = props.navigation.getParam("accountType");
+  const serviceType = props.navigation.getParam("serviceType");
   const [recipientAddress, setRecipientAddress] = useState("");
   const [amount, setAmount] = useState();
 
   const { transfer, loading } = useSelector(
-    state => state.accounts[accountType]
+    state => state.accounts[serviceType]
   );
 
   const stage1 = useCallback(
@@ -60,7 +60,7 @@ const TransferScreen = props => {
             title="Confirm"
             onPress={() => {
               dispatch(
-                transferST1(accountType, {
+                transferST1(serviceType, {
                   recipientAddress,
                   amount: parseInt(amount)
                 })
@@ -91,7 +91,7 @@ const TransferScreen = props => {
               title="Send"
               onPress={() => {
                 dispatch(
-                  transferST2(accountType, {
+                  transferST2(serviceType, {
                     inputs: transfer.inputs,
                     txb: transfer.txb
                   })
@@ -101,7 +101,7 @@ const TransferScreen = props => {
             <Button
               title="Cancel"
               onPress={() => {
-                dispatch(clearTransfer(accountType));
+                dispatch(clearTransfer(serviceType));
               }}
             />
           </View>
@@ -129,7 +129,7 @@ const TransferScreen = props => {
 
 TransferScreen.navigationOptions = navData => {
   return {
-    headerTitle: navData.navigation.getParam("accountType")
+    headerTitle: navData.navigation.getParam("serviceType")
   };
 };
 

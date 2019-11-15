@@ -10,11 +10,14 @@ import { useSelector } from "react-redux";
 import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT
-} from "../common/constants/accountTypes";
+} from "../common/constants/serviceTypes";
 
 const HomeScreen = props => {
   const database = useSelector(state => state.storage.database);
-  const { walletName } = database;
+  let walletName;
+  if (database) {
+    walletName = database.WALLET_SETUP.walletName;
+  }
   return (
     <View style={styles.screen}>
       {walletName ? (
@@ -26,7 +29,7 @@ const HomeScreen = props => {
             title="Regular Account"
             onPress={() => {
               props.navigation.navigate("Account", {
-                accountType: REGULAR_ACCOUNT
+                serviceType: REGULAR_ACCOUNT
               });
             }}
           />
@@ -34,8 +37,14 @@ const HomeScreen = props => {
             title="Test Account"
             onPress={() => {
               props.navigation.navigate("Account", {
-                accountType: TEST_ACCOUNT
+                serviceType: TEST_ACCOUNT
               });
+            }}
+          />
+          <Button
+            title="SSS"
+            onPress={() => {
+              props.navigation.navigate("SSS");
             }}
           />
         </View>

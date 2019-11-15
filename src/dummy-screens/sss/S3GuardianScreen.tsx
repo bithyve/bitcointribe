@@ -1,16 +1,16 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-const Screen = props => {
+const S3GuardianScreen = props => {
   return (
     <View style={styles.screen}>
-      <Text>Screen Here!</Text>
+      <Text>GuardianScreen Here!</Text>
     </View>
   );
 };
 
-Screen.navigationOptions = {
-  headerTitle: "Screen"
+S3GuardianScreen.navigationOptions = {
+  headerTitle: "Guardian"
 };
 
 const styles = StyleSheet.create({
@@ -21,4 +21,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Screen;
+export default S3GuardianScreen;

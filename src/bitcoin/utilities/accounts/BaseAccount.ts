@@ -3,6 +3,7 @@ import { Network, TransactionBuilder } from "bitcoinjs-lib";
 import config from "../../Config";
 import { ErrMap } from "../ErrMap";
 import HDSegwitWallet from "./HDSegwitWallet";
+import { Transactions } from "../Interface";
 
 export default class BaseAccount {
   private hdWallet: HDSegwitWallet;
@@ -19,6 +20,9 @@ export default class BaseAccount {
       externalAddressesCache: {};
       addressToWIFCache: {};
       gapLimit: number;
+      balances: { balance: number; unconfirmedBalance: number };
+      receivingAddress: string;
+      transactions: Transactions;
     },
     network?: Network
   ) {
