@@ -5,6 +5,7 @@ import coinselect from "coinselect";
 import crypto from "crypto";
 import config from "../../Config";
 import Bitcoin from "./Bitcoin";
+import { Transactions } from "../Interface";
 
 export default class HDSegwitWallet extends Bitcoin {
   private mnemonic: string;
@@ -25,6 +26,7 @@ export default class HDSegwitWallet extends Bitcoin {
     unconfirmedBalance: 0
   };
   public receivingAddress: string = "";
+  public transactions: Transactions = null;
 
   constructor(
     mnemonic?: string,
@@ -40,6 +42,7 @@ export default class HDSegwitWallet extends Bitcoin {
       gapLimit: number;
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
+      transactions: Transactions;
     },
     network?: bitcoinJS.Network
   ) {
@@ -69,6 +72,7 @@ export default class HDSegwitWallet extends Bitcoin {
     this.receivingAddress = stateVars
       ? stateVars.receivingAddress
       : this.receivingAddress;
+    this.transactions = stateVars ? stateVars.transactions : this.transactions;
   }
 
   public getMnemonic = (): { mnemonic: string } => {
@@ -183,30 +187,19 @@ export default class HDSegwitWallet extends Bitcoin {
   };
 
   public fetchTransactions = async (): Promise<{
-    transactions: {
-      totalTransactions: number;
-      confirmedTransactions: number;
-      unconfirmedTransactions: number;
-      transactionDetails: Array<{
-        txid: string;
-        status: string;
-        confirmations: number;
-        fee: string;
-        date: string;
-        transactionType: string;
-        amount: number;
-        accountType: string;
-        recipientAddresses?: string[];
-        senderAddresses?: string[];
-      }>;
-    };
+    transactions: Transactions;
   }> => {
     if (this.usedAddresses.length === 0) {
       // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
       await this.fetchBalance();
     }
 
-    return this.fetchTransactionsByAddresses(this.usedAddresses, "Regular");
+    const { transactions } = await this.fetchTransactionsByAddresses(
+      this.usedAddresses,
+      "Regular"
+    );
+    this.transactions = transactions;
+    return { transactions };
   };
 
   public createHDTransaction = async (

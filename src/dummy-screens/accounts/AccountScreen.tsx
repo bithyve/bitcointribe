@@ -20,13 +20,14 @@ import { TEST_ACCOUNT } from "../../common/constants/serviceTypes";
 const AccountScreen = props => {
   const serviceType = props.navigation.getParam("serviceType");
   const dispatch = useDispatch();
-  const { address, balances, transactions, loading, service } = useSelector(
+  const { loading, service } = useSelector(
     state => state.accounts[serviceType]
   );
 
+  const { balances, receivingAddress, transactions } = service.hdWallet;
+
   const netBalance = service
-    ? service.hdWallet.balances.balance +
-      service.hdWallet.balances.unconfirmedBalance
+    ? balances.balance + balances.unconfirmedBalance
     : 0;
 
   return (
@@ -74,20 +75,18 @@ const AccountScreen = props => {
           <Text>{netBalance} sats</Text>
         )}
       </View>
-
       <View style={{ marginVertical: 20 }}>
         <Text style={{ marginBottom: 10 }}>Receiving address:</Text>
-        {loading.address ? (
+        {loading.receivingAddress ? (
           <ActivityIndicator size="small" />
         ) : (
-          <Text>{service.hdWallet.receivingAddress}</Text>
+          <Text>{receivingAddress}</Text>
         )}
       </View>
-
       <View style={{ margin: 40 }}>
         {loading.transactions ? (
           <ActivityIndicator size="large" />
-        ) : transactions.totalTransactions ? (
+        ) : transactions ? (
           <View>
             <Text>Transactions:</Text>
             <View style={{ margin: 10, padding: 10 }}>
