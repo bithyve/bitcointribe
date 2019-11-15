@@ -5,6 +5,7 @@ import coinselect from "coinselect";
 import crypto from "crypto";
 import config from "../../Config";
 import Bitcoin from "./Bitcoin";
+import { Transactions } from "../Interface";
 
 export default class HDSegwitWallet extends Bitcoin {
   private mnemonic: string;
@@ -24,6 +25,8 @@ export default class HDSegwitWallet extends Bitcoin {
     balance: 0,
     unconfirmedBalance: 0
   };
+  public receivingAddress: string = "";
+  public transactions: Transactions = null;
 
   constructor(
     mnemonic?: string,
@@ -38,6 +41,8 @@ export default class HDSegwitWallet extends Bitcoin {
       addressToWIFCache: {};
       gapLimit: number;
       balances: { balance: number; unconfirmedBalance: number };
+      receivingAddress: string;
+      transactions: Transactions;
     },
     network?: bitcoinJS.Network
   ) {
@@ -64,6 +69,10 @@ export default class HDSegwitWallet extends Bitcoin {
     this.addressToWIFCache = stateVars ? stateVars.addressToWIFCache : {};
     this.gapLimit = stateVars ? stateVars.gapLimit : config.GAP_LIMIT;
     this.balances = stateVars ? stateVars.balances : this.balances;
+    this.receivingAddress = stateVars
+      ? stateVars.receivingAddress
+      : this.receivingAddress;
+    this.transactions = stateVars ? stateVars.transactions : this.transactions;
   }
 
   public getMnemonic = (): { mnemonic: string } => {
@@ -125,6 +134,8 @@ export default class HDSegwitWallet extends Bitcoin {
         ); // not checking this one, it might be free
         this.nextFreeAddressIndex += itr + 1;
       }
+
+      this.receivingAddress = freeAddress;
       return { address: freeAddress };
     } catch (err) {
       throw new Error(`Unable to generate receiving address: ${err.message}`);
@@ -176,30 +187,19 @@ export default class HDSegwitWallet extends Bitcoin {
   };
 
   public fetchTransactions = async (): Promise<{
-    transactions: {
-      totalTransactions: number;
-      confirmedTransactions: number;
-      unconfirmedTransactions: number;
-      transactionDetails: Array<{
-        txid: string;
-        status: string;
-        confirmations: number;
-        fee: string;
-        date: string;
-        transactionType: string;
-        amount: number;
-        accountType: string;
-        recipientAddresses?: string[];
-        senderAddresses?: string[];
-      }>;
-    };
+    transactions: Transactions;
   }> => {
     if (this.usedAddresses.length === 0) {
       // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
       await this.fetchBalance();
     }
 
-    return this.fetchTransactionsByAddresses(this.usedAddresses, "Regular");
+    const { transactions } = await this.fetchTransactionsByAddresses(
+      this.usedAddresses,
+      "Regular"
+    );
+    this.transactions = transactions;
+    return { transactions };
   };
 
   public createHDTransaction = async (
