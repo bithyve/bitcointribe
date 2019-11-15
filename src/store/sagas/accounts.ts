@@ -13,7 +13,8 @@ import {
   executedST1,
   executedST2,
   GET_TESTCOINS,
-  fetchBalance
+  fetchBalance,
+  fetchAddress
 } from "../actions/accounts";
 import { insertIntoDB } from "../actions/storage";
 
@@ -38,6 +39,7 @@ function* fetchBalanceWorker({ payload }) {
   const res = yield call(service.getBalance);
   if (res.status === 200) {
     yield put(balanceFetched(payload.serviceType, res.data));
+    yield put(fetchAddress(payload.serviceType));
     yield put(
       insertIntoDB({
         [payload.serviceType]: JSON.stringify(service)
@@ -99,9 +101,12 @@ function* transferST2Worker({ payload }) {
   );
 
   const res = yield call(service.transferST2, inputs, txb);
-  res.status === 200
-    ? yield put(executedST2(payload.serviceType, res.data.txid))
-    : yield put(switchLoader(payload.serviceType, "transfer"));
+  if (res.status === 200) {
+    yield put(executedST2(payload.serviceType, res.data.txid));
+    yield put(fetchBalance(payload.serviceType));
+  } else {
+    yield put(switchLoader(payload.serviceType, "transfer"));
+  }
 }
 
 export const transferST2Watcher = createWatcher(

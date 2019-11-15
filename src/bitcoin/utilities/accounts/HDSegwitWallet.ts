@@ -24,6 +24,7 @@ export default class HDSegwitWallet extends Bitcoin {
     balance: 0,
     unconfirmedBalance: 0
   };
+  public receivingAddress: string = "";
 
   constructor(
     mnemonic?: string,
@@ -38,6 +39,7 @@ export default class HDSegwitWallet extends Bitcoin {
       addressToWIFCache: {};
       gapLimit: number;
       balances: { balance: number; unconfirmedBalance: number };
+      receivingAddress: string;
     },
     network?: bitcoinJS.Network
   ) {
@@ -64,6 +66,9 @@ export default class HDSegwitWallet extends Bitcoin {
     this.addressToWIFCache = stateVars ? stateVars.addressToWIFCache : {};
     this.gapLimit = stateVars ? stateVars.gapLimit : config.GAP_LIMIT;
     this.balances = stateVars ? stateVars.balances : this.balances;
+    this.receivingAddress = stateVars
+      ? stateVars.receivingAddress
+      : this.receivingAddress;
   }
 
   public getMnemonic = (): { mnemonic: string } => {
@@ -125,6 +130,8 @@ export default class HDSegwitWallet extends Bitcoin {
         ); // not checking this one, it might be free
         this.nextFreeAddressIndex += itr + 1;
       }
+
+      this.receivingAddress = freeAddress;
       return { address: freeAddress };
     } catch (err) {
       throw new Error(`Unable to generate receiving address: ${err.message}`);
