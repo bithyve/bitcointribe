@@ -4,14 +4,11 @@ import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 
 export interface Database {
-  walletName?: String;
-  securityAns?: String;
-  accounts?: {
-    REGULAR_ACCOUNT: string;
-    TEST_ACCOUNT: string;
-    SECURE_ACCOUNT: string;
-    S3_SERVICE: string;
-  };
+  WALLET_SETUP: { walletName: String; securityAns: String };
+  REGULAR_ACCOUNT: string;
+  TEST_ACCOUNT: string;
+  SECURE_ACCOUNT: string;
+  S3_SERVICE: string;
 }
 
 export interface Services {

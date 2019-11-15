@@ -7,9 +7,19 @@ import {
   TRANSFER_ST2_EXECUTED,
   CLEAR_TRANSFER
 } from "../actions/accounts";
+import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
+import TestAccount from "../../bitcoin/services/accounts/TestAccount";
+import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
+import { SERVICES_ENRICHED } from "../actions/storage";
+import {
+  REGULAR_ACCOUNT,
+  TEST_ACCOUNT,
+  SECURE_ACCOUNT
+} from "../../common/constants/serviceTypes";
 
 const ACCOUNT_VARS: {
-  address: String;
+  service: RegularAccount | TestAccount | SecureAccount;
+  receivingAddress: String;
   balances: {
     balance: Number;
     unconfirmedBalance: Number;
@@ -21,13 +31,14 @@ const ACCOUNT_VARS: {
     txid: String;
   };
   loading: {
-    address: Boolean;
+    receivingAddress: Boolean;
     balances: Boolean;
     transactions: Boolean;
     transfer: Boolean;
   };
 } = {
-  address: "",
+  service: null,
+  receivingAddress: "",
   balances: {
     balance: 0,
     unconfirmedBalance: 0
@@ -39,7 +50,7 @@ const ACCOUNT_VARS: {
     txid: ""
   },
   loading: {
-    address: false,
+    receivingAddress: false,
     balances: false,
     transactions: false,
     transfer: false
@@ -53,17 +64,17 @@ const initialState = {
 };
 
 export default (state = initialState, action) => {
-  const account = action.payload ? action.payload.accountType : null;
+  const account = action.payload ? action.payload.serviceType : null;
   switch (action.type) {
     case ADDR_FETCHED:
       return {
         ...state,
         [account]: {
           ...state[account],
-          address: action.payload.address,
+          receivingAddress: action.payload.address,
           loading: {
             ...state[account].loading,
-            address: false
+            receivingAddress: false
           }
         }
       };
@@ -134,6 +145,23 @@ export default (state = initialState, action) => {
             ...state[account].loading,
             transfer: false
           }
+        }
+      };
+
+    case SERVICES_ENRICHED:
+      return {
+        ...state,
+        [REGULAR_ACCOUNT]: {
+          ...state[REGULAR_ACCOUNT],
+          service: action.payload.services[REGULAR_ACCOUNT]
+        },
+        [TEST_ACCOUNT]: {
+          ...state[TEST_ACCOUNT],
+          service: action.payload.services[TEST_ACCOUNT]
+        },
+        [SECURE_ACCOUNT]: {
+          ...state[SECURE_ACCOUNT],
+          service: action.payload.services[SECURE_ACCOUNT]
         }
       };
 

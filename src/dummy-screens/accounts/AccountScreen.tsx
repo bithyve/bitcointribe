@@ -12,46 +12,58 @@ import {
   fetchAddress,
   fetchBalance,
   fetchTransactions,
-  clearTransfer
+  clearTransfer,
+  getTestcoins
 } from "../../store/actions/accounts";
+import { TEST_ACCOUNT } from "../../common/constants/serviceTypes";
 
 const AccountScreen = props => {
-  const accountType = props.navigation.getParam("accountType");
+  const serviceType = props.navigation.getParam("serviceType");
   const dispatch = useDispatch();
-  const { address, balances, transactions, loading } = useSelector(
-    state => state.accounts[accountType]
+  const { loading, service } = useSelector(
+    state => state.accounts[serviceType]
   );
-  const netBalance = balances
+
+  const { balances, receivingAddress, transactions } = service.hdWallet;
+
+  const netBalance = service
     ? balances.balance + balances.unconfirmedBalance
     : 0;
 
   return (
     <ScrollView contentContainerStyle={styles.screen}>
-      <Text>{accountType}</Text>
       <Button
         title="Fetch Addr"
         onPress={() => {
-          dispatch(fetchAddress(accountType));
+          dispatch(fetchAddress(serviceType));
         }}
       />
       <Button
         title="Fetch Balance"
         onPress={async () => {
-          dispatch(fetchBalance(accountType));
+          dispatch(fetchBalance(serviceType));
         }}
       />
+      {serviceType === TEST_ACCOUNT ? (
+        <Button
+          title="Get Testcoins"
+          onPress={async () => {
+            dispatch(getTestcoins(serviceType));
+          }}
+        />
+      ) : null}
       <Button
         title="Fetch Transactions"
         onPress={async () => {
-          dispatch(fetchTransactions(accountType));
+          dispatch(fetchTransactions(serviceType));
         }}
       />
       <Button
         title="Transfer"
         onPress={() => {
-          dispatch(clearTransfer(accountType));
+          dispatch(clearTransfer(serviceType));
           props.navigation.navigate("Transfer", {
-            accountType
+            serviceType
           });
         }}
       />
@@ -63,27 +75,34 @@ const AccountScreen = props => {
           <Text>{netBalance} sats</Text>
         )}
       </View>
-
       <View style={{ marginVertical: 20 }}>
         <Text style={{ marginBottom: 10 }}>Receiving address:</Text>
-        {loading.address ? (
+        {loading.receivingAddress ? (
           <ActivityIndicator size="small" />
         ) : (
-          <Text>{address}</Text>
+          <Text>{receivingAddress}</Text>
         )}
       </View>
-
       <View style={{ margin: 40 }}>
         {loading.transactions ? (
           <ActivityIndicator size="large" />
         ) : transactions.totalTransactions ? (
           <View>
-            <Text>Total Transactions: {transactions.totalTransactions}</Text>
+            <Text>Transactions:</Text>
             <View style={{ margin: 10, padding: 10 }}>
               {transactions.transactionDetails.map(tx => (
                 <View key={tx.txid}>
                   <Text style={{ marginVertical: 5 }}>Txn ID: {tx.txid}</Text>
-                  <Text style={{ marginVertical: 5 }}>Amount: {tx.amount}</Text>
+                  <View
+                    style={{
+                      marginVertical: 5,
+                      flexDirection: "row",
+                      justifyContent: "space-between"
+                    }}
+                  >
+                    <Text>Amount: {tx.amount}</Text>
+                    <Text>{tx.transactionType}</Text>
+                  </View>
                 </View>
               ))}
             </View>
@@ -96,7 +115,7 @@ const AccountScreen = props => {
 
 AccountScreen.navigationOptions = navData => {
   return {
-    headerTitle: navData.navigation.getParam("accountType")
+    headerTitle: navData.navigation.getParam("serviceType")
   };
 };
 
