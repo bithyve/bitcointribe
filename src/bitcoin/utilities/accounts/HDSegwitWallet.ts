@@ -26,7 +26,12 @@ export default class HDSegwitWallet extends Bitcoin {
     unconfirmedBalance: 0
   };
   public receivingAddress: string = "";
-  public transactions: Transactions = null;
+  public transactions: Transactions = {
+    totalTransactions: 0,
+    confirmedTransactions: 0,
+    unconfirmedTransactions: 0,
+    transactionDetails: []
+  };
 
   constructor(
     mnemonic?: string,
