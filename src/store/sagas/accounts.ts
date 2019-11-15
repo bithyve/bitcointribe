@@ -19,8 +19,10 @@ import { Services } from "../../common/interfaces/Interfaces";
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.accountType, "address"));
+  console.log(payload.accountType);
   const services: Services = yield select(state => state.storage.services);
   const res = yield call(services[payload.accountType].getAddress);
+  console.log(res);
   res.status === 200
     ? yield put(addressFetched(payload.accountType, res.data.address))
     : yield put(switchLoader(payload.accountType, "address"));

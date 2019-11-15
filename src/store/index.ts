@@ -21,7 +21,7 @@ import {
   transferST2Watcher,
   testcoinsWatcher
 } from "./sagas/accounts";
-import {setupSecureAccountWatcher, checkHealthtWatcher}from "./sagas/secureAccount-setup";
+import {setupSecureAccountWatcher, checkHealthtWatcher,isActiveWatcher}from "./sagas/secureAccount-setup";
 
 // const rootSaga = function*() {
 //   yield all([
@@ -56,9 +56,11 @@ const rootSaga = function*() {
     fetchTransactionsWatcher,
     transferST1Watcher,
     transferST2Watcher,
-    //secure account setup watcher
+    //secure account watcher
     setupSecureAccountWatcher,
     checkHealthtWatcher,
+    isActiveWatcher,
+    //test 
     testcoinsWatcher
   ];
 

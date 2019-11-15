@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, Button } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
     setupSecureAccount,
-    checkHealth
+    checkHealth,
+    isActive,
 } from "../../store/actions/secureAccount-setup";
 import {
   SECURE_ACCOUNT
@@ -22,6 +23,12 @@ const SecureAccountScreen = props => {
         }}
       />
       <Button
+        title="SecureAcc isActive "
+        onPress={() => {
+       dispatch(isActive(accountType));
+        }}
+      />
+      <Button
         title="Check Health"
         onPress={() => {
        dispatch(checkHealth(accountType));
@@ -34,8 +41,7 @@ const SecureAccountScreen = props => {
                 accountType: SECURE_ACCOUNT
               });
             }}
-      />
-      
+      />   
     </View>
     
   );

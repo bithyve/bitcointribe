@@ -6,20 +6,20 @@ import {
     secureAccountSetup,
     CHECK_HEALTH,
     healthCheck,
+    IS_ACTIVE,
+    activated,
   } from "../actions/secureAccount-setup";
 import { Services, Database } from "../../common/interfaces/Interfaces";
-import { insertIntoDB,fetchFromDB } from "../actions/storage";
-import { useSelector } from "react-redux";
-
+import { insertIntoDB } from "../actions/storage";
   function* setupSecureAccountWorker({ payload }) {
     try {
     const services: Services = yield select(state => state.storage.services);
     const res = yield call(services[payload.accountType].setupSecureAccount);
- 
+    console.log(res);
     res.status === 200
       ? yield put(secureAccountSetup( payload.accountType,res.data.setupData))
       : null;
-      
+    console.log(res.data.setupData); 
     const secureAccSetupData = res.data.setupData;
     const toBeInserted = {
       secureAccSetupData
@@ -35,13 +35,14 @@ import { useSelector } from "react-redux";
 
   
   function* checkHealthWorker({ payload }) {
+    try {
     let chunk;
     const POS = 1;
     const database: Database = yield select(state => state.storage.database);
     let {secureAccSetupData} = database;
     console.log(database);
     const secret = secureAccSetupData.secret;
-    // const secret= yield call(dataManager.fetch, key);
+   
     if (POS === 1) {
       chunk = secret.slice(0, config.SCHUNK_SIZE);
     } else if (POS === -1) {
@@ -55,7 +56,31 @@ import { useSelector } from "react-redux";
     res.status === 200
       ? yield put(healthCheck(payload.accountType,res.data))
       : null;
+    }catch (err) {
+      console.log(err);
+    }
     }
    
   
   export const checkHealthtWatcher = createWatcher(checkHealthWorker, CHECK_HEALTH);
+
+  function* isActiveWorker ({ payload }) {
+    try {
+    const services: Services = yield select(state => state.storage.services);
+    const res = yield call(services[payload.accountType].isActive);
+    res.status === 200
+      ? yield put(activated(payload.accountType,res.data))
+      : null;
+      const secureAccIsActive = res.data.isActive;
+      const toBeInserted = {
+        secureAccIsActive
+        };
+        yield put(insertIntoDB(toBeInserted));
+        console.log(res.data.isActive);
+    }catch (err) {
+      console.log(err);
+    } 
+  }
+  export const isActiveWatcher = createWatcher(isActiveWorker, IS_ACTIVE);
+
+  

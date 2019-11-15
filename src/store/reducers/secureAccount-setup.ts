@@ -1,6 +1,7 @@
 import {
     SECUREACCOUNT_SETUP,
     HEALTH_CHECK,
+    ACTIVATED,
   } from "../actions/secureAccount-setup";
   const SECUREACCOUNT_VARS: {
     setupData: {
@@ -10,17 +11,23 @@ import {
     };
     data: {
       isValid: boolean;
-  };
+    };
+    saStatus:{
+      isActive: boolean;
+    };
+    address: String;
   } = {
     setupData: {
         qrData: "",
         secret: "",
         bhXpub:""
-
     },
     data: {
       isValid: false
-  }
+    },
+    saStatus:{isActive: false
+    },
+    address:""
   };
   
   const initialState = {
@@ -40,6 +47,12 @@ import {
           ...state, 
           data: action.payload.data,
         };
+      case ACTIVATED:
+        return {
+          ...state,
+          saStatus:action.payload.saStatus,
+        };
+      
     }
     return state;
   };
