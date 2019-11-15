@@ -1,5 +1,6 @@
 import * as bitcoinJS from "bitcoinjs-lib";
 import BaseAccount from "../../utilities/accounts/BaseAccount";
+import { Transactions } from "../../utilities/Interface";
 
 export default class TestAccount extends BaseAccount {
   public static fromJSON = (json: string) => {
@@ -15,7 +16,9 @@ export default class TestAccount extends BaseAccount {
       externalAddressesCache,
       addressToWIFCache,
       gapLimit,
-      balances
+      balances,
+      receivingAddress,
+      transactions
     }: {
       mnemonic: string;
       passphrase: string;
@@ -28,6 +31,8 @@ export default class TestAccount extends BaseAccount {
       addressToWIFCache: {};
       gapLimit: number;
       balances: { balance: number; unconfirmedBalance: number };
+      receivingAddress: string;
+      transactions: Transactions;
     } = hdWallet;
 
     return new TestAccount(mnemonic, passphrase, purpose, {
@@ -38,7 +43,9 @@ export default class TestAccount extends BaseAccount {
       externalAddressesCache,
       addressToWIFCache,
       gapLimit,
-      balances
+      balances,
+      receivingAddress,
+      transactions
     });
   };
 
@@ -55,6 +62,8 @@ export default class TestAccount extends BaseAccount {
       addressToWIFCache: {};
       gapLimit: number;
       balances: { balance: number; unconfirmedBalance: number };
+      receivingAddress: string;
+      transactions: Transactions;
     }
   ) {
     const network: bitcoinJS.Network = bitcoinJS.networks.testnet;

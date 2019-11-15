@@ -4,37 +4,18 @@ import {
   DB_INSERTED,
   KEY_FETCHED
 } from "../actions/storage";
-import { Database, Services } from "../../common/interfaces/Interfaces";
-import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
-import TestAccount from "../../bitcoin/services/accounts/TestAccount";
-import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
-import S3Service from "../../bitcoin/services/sss/S3Service";
-
-const setServices = newState => {
-  const { database, services } = newState;
-  if (database) {
-    services.REGULAR_ACCOUNT = RegularAccount.fromJSON(
-      database.REGULAR_ACCOUNT
-    );
-    services.TEST_ACCOUNT = TestAccount.fromJSON(database.TEST_ACCOUNT);
-    services.SECURE_ACCOUNT = SecureAccount.fromJSON(database.SECURE_ACCOUNT);
-    services.S3_SERVICE = S3Service.fromJSON(database.S3_SERVICE);
-    return services;
-  }
-};
+import { Database } from "../../common/interfaces/Interfaces";
 
 const initialState: {
   databaseInitialized: Boolean;
   insertedIntoDB: Boolean;
   key: String;
   database: Database;
-  services: Services;
 } = {
   databaseInitialized: false,
   insertedIntoDB: false,
   key: "",
-  database: null,
-  services: {}
+  database: null
 };
 
 export default (state = initialState, action) => {
@@ -52,19 +33,20 @@ export default (state = initialState, action) => {
         insertedIntoDB: true
       };
       return {
-        ...newState,
-        services: setServices(newState)
+        ...newState
       };
 
     case DB_INSERTED:
       const updatedState = {
         ...state,
-        database: action.payload.updatedDatabase,
+        database: {
+          ...state.database,
+          ...action.payload.updatedEntity
+        },
         insertedIntoDB: true
       };
       return {
-        ...updatedState,
-        services: setServices(updatedState)
+        ...updatedState
       };
 
     case KEY_FETCHED:
