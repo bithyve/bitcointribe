@@ -8,7 +8,7 @@ import {
   IDynamicNonPMDD,
   IMetaShare,
   ISocialStaticNonPMDD
-} from "./Interface";
+} from "../Interface";
 const { BH_AXIOS } = config;
 
 export default class SSS {

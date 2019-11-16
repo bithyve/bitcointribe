@@ -5,7 +5,7 @@ import {
   IDynamicNonPMDD,
   IMetaShare,
   ISocialStaticNonPMDD
-} from "../../utilities/sss/Interface";
+} from "../../utilities/Interface";
 import SSS from "../../utilities/sss/SSS";
 
 export default class S3Service {
