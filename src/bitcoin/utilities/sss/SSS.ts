@@ -421,13 +421,20 @@ export default class SSS {
   };
 
   public uploadShare = async (
-    encryptedMetaShare: string,
-    messageId: string,
+    shareIndex: 0 | 1 | 2,
     dynamicNonPMDD?: IDynamicNonPMDD
   ): Promise<{
-    success: boolean;
+    otp: string;
+    encryptedKey: string;
   }> => {
+    if (!this.metaShares.length)
+      throw new Error("Generate MetaShares prior uploading");
+
     let res: AxiosResponse;
+    const metaShare: IMetaShare = this.metaShares[shareIndex];
+    const { encryptedMetaShare, key, messageId } = this.encryptMetaShare(
+      metaShare
+    );
 
     try {
       res = await BH_AXIOS.post("uploadShare", {
@@ -440,11 +447,11 @@ export default class SSS {
     }
 
     const { success } = res.data;
-
     if (!success) {
       throw new Error("Unable to upload share");
     }
-    return { success };
+    const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
+    return { otp, encryptedKey: otpEncryptedData };
   };
 
   public encryptMetaShare = (
@@ -455,14 +462,19 @@ export default class SSS {
       key = SSS.makeKey(SSS.cipherSpec.keyLength);
     }
     const messageId: string = SSS.getMessageId(key, config.MSG_ID_LENGTH);
+    console.log({ messageId });
     const cipher = crypto.createCipheriv(
       SSS.cipherSpec.algorithm,
       key,
       SSS.cipherSpec.iv
     );
+    console.log("HERE");
+    console.log({ metaShare });
     let encrypted = cipher.update(JSON.stringify(metaShare), "utf8", "hex");
+    console.log({ encrypted });
     encrypted += cipher.final("hex");
     const encryptedMetaShare = encrypted;
+    console.log({ encryptedMetaShare });
     return {
       encryptedMetaShare,
       key,
@@ -809,6 +821,7 @@ export default class SSS {
       }
 
       this.metaShares.push(metaShare);
+      index++;
     }
     if (this.metaShares.length !== 5) {
       this.metaShares = [];
