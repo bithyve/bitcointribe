@@ -7,7 +7,7 @@ import {
   ActivityIndicator
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { initHealthCheck } from "../../store/actions/sss";
+import { initHealthCheck, prepareMShares } from "../../store/actions/sss";
 import { S3_SERVICE } from "../../common/constants/serviceTypes";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 
@@ -27,6 +27,10 @@ const S3UserScreen = props => {
           <Text style={{ marginTop: 12 }}>HC Initialized!</Text>
         ) : null}
       </View>
+      <Button
+        title="Prepare MShares"
+        onPress={() => dispatch(prepareMShares())}
+      />
     </View>
   );
 };

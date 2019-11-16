@@ -5,7 +5,7 @@ import {
   IDynamicNonPMDD,
   IMetaShare,
   ISocialStaticNonPMDD
-} from "../../utilities/sss/Interface";
+} from "../../utilities/Interface";
 import SSS from "../../utilities/sss/SSS";
 
 export default class S3Service {
@@ -14,14 +14,23 @@ export default class S3Service {
     const {
       mnemonic,
       encryptedShares,
-      healthCheckInitialized
+      healthCheckInitialized,
+      walletId,
+      metaShares
     }: {
       mnemonic: string;
       encryptedShares: string[];
-      healthCheckInitialized: Boolean;
+      metaShares: IMetaShare[];
+      healthCheckInitialized: boolean;
+      walletId: string;
     } = sss;
 
-    return new S3Service(mnemonic, { encryptedShares, healthCheckInitialized });
+    return new S3Service(mnemonic, {
+      encryptedShares,
+      metaShares,
+      healthCheckInitialized,
+      walletId
+    });
   };
 
   public static recoverFromShares = (
@@ -303,7 +312,15 @@ export default class S3Service {
   };
 
   public sss: SSS;
-  constructor(mnemonic: string, stateVars?) {
+  constructor(
+    mnemonic: string,
+    stateVars?: {
+      encryptedShares: string[];
+      metaShares: IMetaShare[];
+      healthCheckInitialized: boolean;
+      walletId: string;
+    }
+  ) {
     this.sss = new SSS(mnemonic, stateVars);
   }
 
@@ -332,8 +349,6 @@ export default class S3Service {
       return { status: 510, err: err.message, message: ErrMap[510] };
     }
   };
-
-  public getEncryptedShares = () => this.sss.getShares();
 
   public encryptStaticNonPMDD = (
     staticNonPMDD: ISocialStaticNonPMDD | IBuddyStaticNonPMDD
@@ -381,7 +396,10 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-      return { status: config.STATUS.SUCCESS, data: this.sss.getWalletId() };
+      return {
+        status: config.STATUS.SUCCESS,
+        data: { walletId: this.sss.walletId }
+      };
     } catch (err) {
       return { status: 512, err: err.message, message: ErrMap[512] };
     }
@@ -590,17 +608,20 @@ export default class S3Service {
     }
   };
 
-  public createMetaShare = (
-    index: number,
-    encryptedShare: string,
-    encryptedStaticNonPMDD: string,
+  public createMetaShares = (
+    secureAssets: {
+      secondaryMnemonic: string;
+      twoFASecret: string;
+      secondaryXpub: string;
+      bhXpub: string;
+    },
     tag: string,
     version?: number
   ):
     | {
         status: number;
         data: {
-          metaShare: IMetaShare;
+          metaShares: IMetaShare[];
         };
         err?: undefined;
         message?: undefined;
@@ -614,13 +635,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.sss.addMeta(
-          index,
-          encryptedShare,
-          encryptedStaticNonPMDD,
-          tag,
-          version
-        )
+        data: this.sss.createMetaShares(secureAssets, tag, version)
       };
     } catch (err) {
       return { status: 520, err: err.message, message: ErrMap[520] };
