@@ -368,6 +368,11 @@ export default class SSS {
   public walletId: string;
   public encryptedShares: string[];
   public metaShares: IMetaShare[];
+  public metaShareTransferAssets: Array<{
+    otp: string;
+    encryptedKey: string;
+    encryptedMetaShare: string;
+  }>;
   public healthCheckInitialized: boolean;
 
   constructor(
@@ -377,6 +382,11 @@ export default class SSS {
       metaShares: IMetaShare[];
       healthCheckInitialized: boolean;
       walletId: string;
+      metaShareTransferAssets: Array<{
+        otp: string;
+        encryptedKey: string;
+        encryptedMetaShare: string;
+      }>;
     }
   ) {
     if (bip39.validateMnemonic(mnemonic)) {
@@ -395,6 +405,9 @@ export default class SSS {
     this.healthCheckInitialized = stateVars
       ? stateVars.healthCheckInitialized
       : false;
+    this.metaShareTransferAssets = stateVars
+      ? stateVars.metaShareTransferAssets
+      : [];
   }
 
   public stringToHex = (str: string): string => secrets.str2hex(str);
@@ -421,13 +434,20 @@ export default class SSS {
   };
 
   public uploadShare = async (
-    encryptedMetaShare: string,
-    messageId: string,
+    shareIndex: 0 | 1 | 2,
     dynamicNonPMDD?: IDynamicNonPMDD
   ): Promise<{
-    success: boolean;
+    otp: string;
+    encryptedKey: string;
   }> => {
+    if (!this.metaShares.length)
+      throw new Error("Generate MetaShares prior uploading");
+
     let res: AxiosResponse;
+    const metaShare: IMetaShare = this.metaShares[shareIndex];
+    const { encryptedMetaShare, key, messageId } = this.encryptMetaShare(
+      metaShare
+    );
 
     try {
       res = await BH_AXIOS.post("uploadShare", {
@@ -440,11 +460,16 @@ export default class SSS {
     }
 
     const { success } = res.data;
-
     if (!success) {
       throw new Error("Unable to upload share");
     }
-    return { success };
+    const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
+    this.metaShareTransferAssets[shareIndex] = {
+      otp,
+      encryptedKey: otpEncryptedData,
+      encryptedMetaShare
+    };
+    return { otp, encryptedKey: otpEncryptedData };
   };
 
   public encryptMetaShare = (
@@ -809,6 +834,7 @@ export default class SSS {
       }
 
       this.metaShares.push(metaShare);
+      index++;
     }
     if (this.metaShares.length !== 5) {
       this.metaShares = [];

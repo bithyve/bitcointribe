@@ -4,16 +4,13 @@ import {
   INIT_HEALTH_CHECK,
   switchS3Loader,
   healthCheckInitialized,
-  PREPARE_MSHARES
+  PREPARE_MSHARES,
+  UPLOAD_ENC_MSHARES
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
 import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
 import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
-import {
-  ISocialStaticNonPMDD,
-  IBuddyStaticNonPMDD
-} from "../../bitcoin/utilities/Interface";
 
 function* initHCWorker() {
   const s3Service: S3Service = yield select(state => state.sss.service);
@@ -70,4 +67,26 @@ function* generateMetaSharesWorker() {
 export const generateMetaSharesWatcher = createWatcher(
   generateMetaSharesWorker,
   PREPARE_MSHARES
+);
+
+function* uploadEncMetaShareWorker({ payload }) {
+  yield put(switchS3Loader("uploadMetaShare"));
+
+  const s3Service: S3Service = yield select(state => state.sss.service);
+  if (!s3Service.sss.metaShares.length) yield call(generateMetaSharesWorker);
+
+  // const transferAsset =
+  //   s3Service.sss.metaShareTransferAssets[payload.shareIndex];
+  // if (transferAsset) return; // TODO: 10 min removal strategy
+
+  const res = yield call(s3Service.uploadShare, payload.shareIndex);
+  if (res.status === 200) {
+    yield put(insertIntoDB({ S3_SERVICE: JSON.stringify(s3Service) }));
+  }
+  yield put(switchS3Loader("uploadMetaShare"));
+}
+
+export const uploadEncMetaShareWatcher = createWatcher(
+  uploadEncMetaShareWorker,
+  UPLOAD_ENC_MSHARES
 );
