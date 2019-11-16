@@ -14,22 +14,29 @@ export default class S3Service {
     const {
       mnemonic,
       encryptedShares,
+      metaShares,
       healthCheckInitialized,
       walletId,
-      metaShares
+      metaShareTransferAssets
     }: {
       mnemonic: string;
       encryptedShares: string[];
       metaShares: IMetaShare[];
       healthCheckInitialized: boolean;
       walletId: string;
+      metaShareTransferAssets: Array<{
+        otp: string;
+        encryptedKey: string;
+        encryptedMetaShare: string;
+      }>;
     } = sss;
 
     return new S3Service(mnemonic, {
       encryptedShares,
       metaShares,
       healthCheckInitialized,
-      walletId
+      walletId,
+      metaShareTransferAssets
     });
   };
 
@@ -319,6 +326,11 @@ export default class S3Service {
       metaShares: IMetaShare[];
       healthCheckInitialized: boolean;
       walletId: string;
+      metaShareTransferAssets: Array<{
+        otp: string;
+        encryptedKey: string;
+        encryptedMetaShare: string;
+      }>;
     }
   ) {
     this.sss = new SSS(mnemonic, stateVars);
@@ -700,14 +712,14 @@ export default class S3Service {
   };
 
   public uploadShare = async (
-    encryptedMetaShare: string,
-    messageId: string,
+    shareIndex: 0 | 1 | 2,
     dynamicNonPMDD?: IDynamicNonPMDD
   ): Promise<
     | {
         status: number;
         data: {
-          success: boolean;
+          otp: string;
+          encryptedKey: string;
         };
         err?: undefined;
         message?: undefined;
@@ -722,11 +734,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.uploadShare(
-          encryptedMetaShare,
-          messageId,
-          dynamicNonPMDD
-        )
+        data: await this.sss.uploadShare(shareIndex, dynamicNonPMDD)
       };
     } catch (err) {
       return { status: 523, err: err.message, message: ErrMap[523] };

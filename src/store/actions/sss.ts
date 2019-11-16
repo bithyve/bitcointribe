@@ -2,6 +2,7 @@
 
 export const INIT_HEALTH_CHECK = "INIT_HEALTH_CHECK";
 export const PREPARE_MSHARES = "PREPARE_MSHARES";
+export const UPLOAD_ENC_MSHARES = "UPLOAD_ENC_MSHARES";
 export const S3_LOADING = "S3_LOADING";
 
 export const initHealthCheck = () => {
@@ -10,6 +11,10 @@ export const initHealthCheck = () => {
 
 export const prepareMShares = () => {
   return { type: PREPARE_MSHARES };
+};
+
+export const uploadEncMShares = (shareIndex: 0 | 1 | 2) => {
+  return { type: UPLOAD_ENC_MSHARES, payload: { shareIndex } };
 };
 
 export const switchS3Loader = beingLoaded => {
