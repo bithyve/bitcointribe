@@ -8,7 +8,7 @@ import {
   IDynamicNonPMDD,
   IMetaShare,
   ISocialStaticNonPMDD
-} from "./Interface";
+} from "../Interface";
 const { BH_AXIOS } = config;
 
 export default class SSS {
@@ -365,14 +365,28 @@ export default class SSS {
   };
 
   private mnemonic: string;
-  private encryptedShares: string[];
-  public healthCheckInitialized: Boolean;
+  public walletId: string;
+  public encryptedShares: string[];
+  public metaShares: IMetaShare[];
+  public metaShareTransferAssets: Array<{
+    otp: string;
+    encryptedKey: string;
+    encryptedMetaShare: string;
+  }>;
+  public healthCheckInitialized: boolean;
 
   constructor(
     mnemonic: string,
     stateVars?: {
-      encryptedShares;
-      healthCheckInitialized;
+      encryptedShares: string[];
+      metaShares: IMetaShare[];
+      healthCheckInitialized: boolean;
+      walletId: string;
+      metaShareTransferAssets: Array<{
+        otp: string;
+        encryptedKey: string;
+        encryptedMetaShare: string;
+      }>;
     }
   ) {
     if (bip39.validateMnemonic(mnemonic)) {
@@ -380,15 +394,23 @@ export default class SSS {
     } else {
       throw new Error("Invalid Mnemonic");
     }
+    this.walletId = stateVars
+      ? stateVars.walletId
+      : crypto
+          .createHash("sha256")
+          .update(bip39.mnemonicToSeedSync(this.mnemonic))
+          .digest("hex");
     this.encryptedShares = stateVars ? stateVars.encryptedShares : [];
+    this.metaShares = stateVars ? stateVars.metaShares : [];
     this.healthCheckInitialized = stateVars
       ? stateVars.healthCheckInitialized
       : false;
+    this.metaShareTransferAssets = stateVars
+      ? stateVars.metaShareTransferAssets
+      : [];
   }
 
   public stringToHex = (str: string): string => secrets.str2hex(str);
-
-  public getShares = () => this.encryptedShares;
 
   public generateMessageID = (): string =>
     SSS.generateRandomString(config.MSG_ID_LENGTH);
@@ -412,13 +434,20 @@ export default class SSS {
   };
 
   public uploadShare = async (
-    encryptedMetaShare: string,
-    messageId: string,
+    shareIndex: 0 | 1 | 2,
     dynamicNonPMDD?: IDynamicNonPMDD
   ): Promise<{
-    success: boolean;
+    otp: string;
+    encryptedKey: string;
   }> => {
+    if (!this.metaShares.length)
+      throw new Error("Generate MetaShares prior uploading");
+
     let res: AxiosResponse;
+    const metaShare: IMetaShare = this.metaShares[shareIndex];
+    const { encryptedMetaShare, key, messageId } = this.encryptMetaShare(
+      metaShare
+    );
 
     try {
       res = await BH_AXIOS.post("uploadShare", {
@@ -431,11 +460,16 @@ export default class SSS {
     }
 
     const { success } = res.data;
-
     if (!success) {
       throw new Error("Unable to upload share");
     }
-    return { success };
+    const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
+    this.metaShareTransferAssets[shareIndex] = {
+      otp,
+      encryptedKey: otpEncryptedData,
+      encryptedMetaShare
+    };
+    return { otp, encryptedKey: otpEncryptedData };
   };
 
   public encryptMetaShare = (
@@ -474,11 +508,10 @@ export default class SSS {
       shareIDs.push(shareId);
     }
 
-    const { walletId } = this.getWalletId();
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("sharesHealthCheckInit", {
-        walletID: walletId,
+        walletID: this.walletId,
         shareIDs
       });
     } catch (err) {
@@ -493,12 +526,10 @@ export default class SSS {
   };
 
   public checkHealth = async (shareIDs: string[]) => {
-    const { walletId } = this.getWalletId();
-
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("checkSharesHealth", {
-        walletID: walletId,
+        walletID: this.walletId,
         shareIDs: shareIDs.filter(shareId => shareId !== null)
       });
     } catch (err) {
@@ -526,9 +557,44 @@ export default class SSS {
     };
   };
 
-  public encryptDynamicNonPMDD = (
-    dynamicNonPMDD: IMetaShare[]
-  ): { encryptedDynamicNonPMDD: string } => {
+  public generateStaticNonPMDD = (secureAccAssets: {
+    secondaryMnemonic: string;
+    twoFASecret: string;
+    secondaryXpub: string;
+    bhXpub: string;
+  }) => {
+    const {
+      secondaryMnemonic,
+      twoFASecret,
+      secondaryXpub,
+      bhXpub
+    } = secureAccAssets;
+
+    const socialStaticNonPMDD: ISocialStaticNonPMDD = {
+      secondaryXpub,
+      bhXpub
+    };
+    const buddyStaticNonPMDD: IBuddyStaticNonPMDD = {
+      secondaryMnemonic,
+      twoFASecret,
+      secondaryXpub,
+      bhXpub
+    };
+
+    return {
+      encryptedSocialStaticNonPMDD: this.encryptStaticNonPMDD(
+        socialStaticNonPMDD
+      ).encryptedStaticNonPMDD,
+      encryptedBuddyStaticNonPMDD: this.encryptStaticNonPMDD(buddyStaticNonPMDD)
+        .encryptedStaticNonPMDD
+    };
+  };
+
+  public encryptStaticNonPMDD = (
+    staticNonPMDD: ISocialStaticNonPMDD | IBuddyStaticNonPMDD
+  ): {
+    encryptedStaticNonPMDD: string;
+  } => {
     const key = SSS.generateKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString("hex")
     );
@@ -537,20 +603,15 @@ export default class SSS {
     //   SSS.cipherSpec.salt,
     //   SSS.cipherSpec.keyLength,
     // );
-
     const cipher = crypto.createCipheriv(
       SSS.cipherSpec.algorithm,
       key,
       SSS.cipherSpec.iv
     );
-    let encrypted = cipher.update(
-      JSON.stringify(dynamicNonPMDD),
-      "utf8",
-      "hex"
-    );
-    encrypted += cipher.final("hex");
 
-    return { encryptedDynamicNonPMDD: encrypted };
+    let encrypted = cipher.update(JSON.stringify(staticNonPMDD), "utf8", "hex");
+    encrypted += cipher.final("hex");
+    return { encryptedStaticNonPMDD: encrypted };
   };
 
   public decryptStaticNonPMDD = (
@@ -577,6 +638,33 @@ export default class SSS {
 
     const decryptedStaticNonPMDD = JSON.parse(decrypted);
     return { decryptedStaticNonPMDD };
+  };
+
+  public encryptDynamicNonPMDD = (
+    dynamicNonPMDD: IMetaShare[]
+  ): { encryptedDynamicNonPMDD: string } => {
+    const key = SSS.generateKey(
+      bip39.mnemonicToSeedSync(this.mnemonic).toString("hex")
+    );
+    // const key = crypto.scryptSync(
+    //   intermediateKey,
+    //   SSS.cipherSpec.salt,
+    //   SSS.cipherSpec.keyLength,
+    // );
+
+    const cipher = crypto.createCipheriv(
+      SSS.cipherSpec.algorithm,
+      key,
+      SSS.cipherSpec.iv
+    );
+    let encrypted = cipher.update(
+      JSON.stringify(dynamicNonPMDD),
+      "utf8",
+      "hex"
+    );
+    encrypted += cipher.final("hex");
+
+    return { encryptedDynamicNonPMDD: encrypted };
   };
 
   public decryptDynamicNonPMDD = (
@@ -636,7 +724,6 @@ export default class SSS {
   ): Promise<{
     updated: boolean;
   }> => {
-    const { walletId } = this.getWalletId();
     const dynamicNonPMDD: IDynamicNonPMDD = {
       updatedAt: Date.now(),
       encryptedDynamicNonPMDD
@@ -645,7 +732,7 @@ export default class SSS {
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("updateDynamicNonPMDD", {
-        walletID: walletId,
+        walletID: this.walletId,
         dynamicNonPMDD
       });
     } catch (err) {
@@ -686,40 +773,27 @@ export default class SSS {
     }
   };
 
-  public encryptStaticNonPMDD = (
-    staticNonPMDD: ISocialStaticNonPMDD | IBuddyStaticNonPMDD
-  ): {
-    encryptedStaticNonPMDD: string;
-  } => {
-    const key = SSS.generateKey(
-      bip39.mnemonicToSeedSync(this.mnemonic).toString("hex")
-    );
-    // const key = crypto.scryptSync(
-    //   intermediateKey,
-    //   SSS.cipherSpec.salt,
-    //   SSS.cipherSpec.keyLength,
-    // );
-    const cipher = crypto.createCipheriv(
-      SSS.cipherSpec.algorithm,
-      key,
-      SSS.cipherSpec.iv
-    );
-
-    let encrypted = cipher.update(JSON.stringify(staticNonPMDD), "utf8", "hex");
-    encrypted += cipher.final("hex");
-    return { encryptedStaticNonPMDD: encrypted };
-  };
-
-  public addMeta = (
-    index: number,
-    encryptedShare: string,
-    encryptedStaticNonPMDD: string,
+  public createMetaShares = (
+    secureAssets: {
+      secondaryMnemonic: string;
+      twoFASecret: string;
+      secondaryXpub: string;
+      bhXpub: string;
+    },
     tag: string,
-    version: number
+    version?: number
   ): {
-    metaShare: IMetaShare;
+    metaShares: IMetaShare[];
   } => {
-    const { walletId } = this.getWalletId();
+    if (!this.encryptedShares.length) {
+      throw new Error("Can not create MetaShares; missing encryptedShares");
+    }
+
+    const {
+      encryptedSocialStaticNonPMDD,
+      encryptedBuddyStaticNonPMDD
+    } = this.generateStaticNonPMDD(secureAssets);
+
     const timestamp = new Date().toLocaleString(undefined, {
       day: "numeric",
       month: "numeric",
@@ -728,20 +802,46 @@ export default class SSS {
       minute: "2-digit"
     });
 
-    const metaShare: IMetaShare = {
-      encryptedShare,
-      meta: {
-        version: version ? version : 0,
-        validator: "HEXA",
-        index,
-        walletId,
-        tag,
-        timestamp
-      },
-      encryptedStaticNonPMDD
-    };
+    let index = 0;
+    let metaShare: IMetaShare;
+    for (const encryptedShare of this.encryptedShares) {
+      if (index !== 2) {
+        metaShare = {
+          encryptedShare,
+          meta: {
+            version: version ? version : 0,
+            validator: "HEXA",
+            index,
+            walletId: this.walletId,
+            tag,
+            timestamp
+          },
+          encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD
+        };
+      } else {
+        metaShare = {
+          encryptedShare,
+          meta: {
+            version: version ? version : 0,
+            validator: "HEXA",
+            index,
+            walletId: this.walletId,
+            tag,
+            timestamp
+          },
+          encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD
+        };
+      }
 
-    return { metaShare };
+      this.metaShares.push(metaShare);
+      index++;
+    }
+    if (this.metaShares.length !== 5) {
+      this.metaShares = [];
+      throw new Error("Something went wrong while generating metaShares");
+    }
+
+    return { metaShares: this.metaShares };
   };
 
   public createQR = async (
@@ -797,14 +897,5 @@ export default class SSS {
       this.encryptedShares.push(encrypted);
     }
     return { encryptedShares: this.encryptedShares };
-  };
-
-  public getWalletId = (): { walletId: string } => {
-    return {
-      walletId: crypto
-        .createHash("sha256")
-        .update(bip39.mnemonicToSeedSync(this.mnemonic))
-        .digest("hex")
-    };
   };
 }
