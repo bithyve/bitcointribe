@@ -7,11 +7,13 @@ const initialState: {
   service: S3Service;
   loading: {
     hcInit: Boolean;
+    uploadMetaShare: Boolean;
   };
 } = {
   service: null,
   loading: {
-    hcInit: false
+    hcInit: false,
+    uploadMetaShare: false
   }
 };
 
@@ -37,7 +39,9 @@ export default (state = initialState, action) => {
         ...state,
         loading: {
           ...state.loading,
-          hcInit: !state.loading.hcInit
+          [action.payload.beingLoaded]: !state.loading[
+            action.payload.beingLoaded
+          ]
         }
       };
   }
