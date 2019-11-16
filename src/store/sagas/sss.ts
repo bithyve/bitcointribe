@@ -70,15 +70,20 @@ export const generateMetaSharesWatcher = createWatcher(
 );
 
 function* uploadEncMetaShareWorker({ payload }) {
+  yield put(switchS3Loader("uploadMetaShare"));
+
   const s3Service: S3Service = yield select(state => state.sss.service);
   if (!s3Service.sss.metaShares.length) yield call(generateMetaSharesWorker);
 
-  const res = yield call(s3Service.uploadShare, payload.shareIndex);
-  console.log(res);
+  // const transferAsset =
+  //   s3Service.sss.metaShareTransferAssets[payload.shareIndex];
+  // if (transferAsset) return; // TODO: 10 min removal strategy
 
-  // if (res.status === 200) {
-  //   yield put(insertIntoDB({ S3_SERVICE: JSON.stringify(s3Service) }));
-  // }
+  const res = yield call(s3Service.uploadShare, payload.shareIndex);
+  if (res.status === 200) {
+    yield put(insertIntoDB({ S3_SERVICE: JSON.stringify(s3Service) }));
+  }
+  yield put(switchS3Loader("uploadMetaShare"));
 }
 
 export const uploadEncMetaShareWatcher = createWatcher(

@@ -368,6 +368,11 @@ export default class SSS {
   public walletId: string;
   public encryptedShares: string[];
   public metaShares: IMetaShare[];
+  public metaShareTransferAssets: Array<{
+    otp: string;
+    encryptedKey: string;
+    encryptedMetaShare: string;
+  }>;
   public healthCheckInitialized: boolean;
 
   constructor(
@@ -377,6 +382,11 @@ export default class SSS {
       metaShares: IMetaShare[];
       healthCheckInitialized: boolean;
       walletId: string;
+      metaShareTransferAssets: Array<{
+        otp: string;
+        encryptedKey: string;
+        encryptedMetaShare: string;
+      }>;
     }
   ) {
     if (bip39.validateMnemonic(mnemonic)) {
@@ -395,6 +405,9 @@ export default class SSS {
     this.healthCheckInitialized = stateVars
       ? stateVars.healthCheckInitialized
       : false;
+    this.metaShareTransferAssets = stateVars
+      ? stateVars.metaShareTransferAssets
+      : [];
   }
 
   public stringToHex = (str: string): string => secrets.str2hex(str);
@@ -451,6 +464,11 @@ export default class SSS {
       throw new Error("Unable to upload share");
     }
     const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
+    this.metaShareTransferAssets[shareIndex] = {
+      otp,
+      encryptedKey: otpEncryptedData,
+      encryptedMetaShare
+    };
     return { otp, encryptedKey: otpEncryptedData };
   };
 
@@ -462,19 +480,14 @@ export default class SSS {
       key = SSS.makeKey(SSS.cipherSpec.keyLength);
     }
     const messageId: string = SSS.getMessageId(key, config.MSG_ID_LENGTH);
-    console.log({ messageId });
     const cipher = crypto.createCipheriv(
       SSS.cipherSpec.algorithm,
       key,
       SSS.cipherSpec.iv
     );
-    console.log("HERE");
-    console.log({ metaShare });
     let encrypted = cipher.update(JSON.stringify(metaShare), "utf8", "hex");
-    console.log({ encrypted });
     encrypted += cipher.final("hex");
     const encryptedMetaShare = encrypted;
-    console.log({ encryptedMetaShare });
     return {
       encryptedMetaShare,
       key,
