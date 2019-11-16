@@ -700,14 +700,14 @@ export default class S3Service {
   };
 
   public uploadShare = async (
-    encryptedMetaShare: string,
-    messageId: string,
+    shareIndex: 0 | 1 | 2,
     dynamicNonPMDD?: IDynamicNonPMDD
   ): Promise<
     | {
         status: number;
         data: {
-          success: boolean;
+          otp: string;
+          encryptedKey: string;
         };
         err?: undefined;
         message?: undefined;
@@ -722,11 +722,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.uploadShare(
-          encryptedMetaShare,
-          messageId,
-          dynamicNonPMDD
-        )
+        data: await this.sss.uploadShare(shareIndex, dynamicNonPMDD)
       };
     } catch (err) {
       return { status: 523, err: err.message, message: ErrMap[523] };

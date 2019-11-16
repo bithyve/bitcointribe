@@ -22,7 +22,11 @@ import {
   transferST2Watcher,
   testcoinsWatcher
 } from "./sagas/accounts";
-import { initHCWatcher, generateMetaSharesWatcher } from "./sagas/sss";
+import {
+  initHCWatcher,
+  generateMetaSharesWatcher,
+  uploadEncMetaShareWatcher
+} from "./sagas/sss";
 
 // const rootSaga = function*() {
 //   yield all([
@@ -62,7 +66,8 @@ const rootSaga = function*() {
 
     // sss watchers
     initHCWatcher,
-    generateMetaSharesWatcher
+    generateMetaSharesWatcher,
+    uploadEncMetaShareWatcher
   ];
 
   yield all(
