@@ -68,19 +68,18 @@ export default class S3Service {
   };
 
   public static downloadShare = async (
-    key: string
+    encryptedKey: string,
+    otp: string
   ): Promise<
     | {
         status: number;
         data:
           | {
-              encryptedMetaShare: string;
-              messageId: string;
+              metaShare: IMetaShare;
               dynamicNonPMDD: IDynamicNonPMDD;
             }
           | {
-              encryptedMetaShare: string;
-              messageId: string;
+              metaShare: IMetaShare;
               dynamicNonPMDD?: undefined;
             };
         err?: undefined;
@@ -96,7 +95,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await SSS.downloadShare(key)
+        data: await SSS.downloadShare(encryptedKey, otp)
       };
     } catch (err) {
       return { status: 502, err: err.message, message: ErrMap[502] };

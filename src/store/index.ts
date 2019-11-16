@@ -25,7 +25,8 @@ import {
 import {
   initHCWatcher,
   generateMetaSharesWatcher,
-  uploadEncMetaShareWatcher
+  uploadEncMetaShareWatcher,
+  downloadMetaShareWatcher
 } from "./sagas/sss";
 
 // const rootSaga = function*() {
@@ -67,7 +68,8 @@ const rootSaga = function*() {
     // sss watchers
     initHCWatcher,
     generateMetaSharesWatcher,
-    uploadEncMetaShareWatcher
+    uploadEncMetaShareWatcher,
+    downloadMetaShareWatcher
   ];
 
   yield all(

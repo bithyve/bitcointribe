@@ -71,19 +71,19 @@ export default class SSS {
   };
 
   public static downloadShare = async (
-    key: string
+    encryptedKey: string,
+    otp: string
   ): Promise<
     | {
-        encryptedMetaShare: string;
-        messageId: string;
+        metaShare: IMetaShare;
         dynamicNonPMDD: IDynamicNonPMDD;
       }
     | {
-        encryptedMetaShare: string;
-        messageId: string;
+        metaShare: IMetaShare;
         dynamicNonPMDD?: undefined;
       }
   > => {
+    const key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
     const messageId: string = SSS.getMessageId(key, config.MSG_ID_LENGTH);
     let res: AxiosResponse;
     try {
@@ -95,10 +95,11 @@ export default class SSS {
     }
 
     const { share, dynamicNonPMDD } = res.data;
+    const metaShare = SSS.decryptMetaShare(share, key).decryptedMetaShare;
     if (dynamicNonPMDD) {
-      return { encryptedMetaShare: share, messageId, dynamicNonPMDD };
+      return { metaShare, dynamicNonPMDD };
     }
-    return { encryptedMetaShare: share, messageId };
+    return { metaShare };
   };
 
   public static validateDecryption = (
