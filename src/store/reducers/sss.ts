@@ -9,13 +9,15 @@ const initialState: {
     hcInit: Boolean;
     uploadMetaShare: Boolean;
     downloadMetaShare: Boolean;
+    updateMSharesHealth: Boolean;
   };
 } = {
   service: null,
   loading: {
     hcInit: false,
     uploadMetaShare: false,
-    downloadMetaShare: false
+    downloadMetaShare: false,
+    updateMSharesHealth: false
   }
 };
 
