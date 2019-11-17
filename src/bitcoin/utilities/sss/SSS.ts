@@ -387,11 +387,6 @@ export default class SSS {
   public walletId: string;
   public encryptedShares: string[];
   public metaShares: IMetaShare[];
-  public metaShareTransferAssets: Array<{
-    otp: string;
-    encryptedKey: string;
-    encryptedMetaShare: string;
-  }>;
   public healthCheckInitialized: boolean;
   public healthCheckStatus: {};
 
@@ -402,11 +397,6 @@ export default class SSS {
       metaShares: IMetaShare[];
       healthCheckInitialized: boolean;
       walletId: string;
-      metaShareTransferAssets: Array<{
-        otp: string;
-        encryptedKey: string;
-        encryptedMetaShare: string;
-      }>;
       healthCheckStatus: {};
     }
   ) {
@@ -426,9 +416,6 @@ export default class SSS {
     this.healthCheckInitialized = stateVars
       ? stateVars.healthCheckInitialized
       : false;
-    this.metaShareTransferAssets = stateVars
-      ? stateVars.metaShareTransferAssets
-      : [];
     this.healthCheckStatus = stateVars ? stateVars.healthCheckStatus : {};
   }
 
@@ -486,11 +473,6 @@ export default class SSS {
       throw new Error("Unable to upload share");
     }
     const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
-    this.metaShareTransferAssets[shareIndex] = {
-      otp,
-      encryptedKey: otpEncryptedData,
-      encryptedMetaShare
-    };
     return { otp, encryptedKey: otpEncryptedData };
   };
 
