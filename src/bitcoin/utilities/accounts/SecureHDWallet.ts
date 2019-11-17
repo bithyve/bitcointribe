@@ -523,11 +523,11 @@ export default class SecureHDWallet extends Bitcoin {
     try {
       const path = this.derivePath(bhXpub);
       const primaryXpub = this.getRecoverableXKey(this.primaryMnemonic, path);
-
+       console.log(primaryXpub);
       if (!secondaryXpub) {
         secondaryXpub = this.getRecoverableXKey(this.secondaryMnemonic, path);
       }
-
+      console.log(secondaryXpub);
       this.primaryXpriv = this.getRecoverableXKey(
         this.primaryMnemonic,
         path,
@@ -539,7 +539,7 @@ export default class SecureHDWallet extends Bitcoin {
         secondary: secondaryXpub,
         bh: bhXpub
       };
-
+      console.log(this.xpubs);
       return {
         prepared: true
       };
@@ -740,7 +740,12 @@ export default class SecureHDWallet extends Bitcoin {
 
     // console.log(`creating multiSig against index: ${childIndex}`);
      console.log(childIndex);
+    //  const x = this.getSecondaryXpub();
+    console.log("this from secureHDaccount");
+     console.log(this);
+     console.log("secondary mnemo: "+ this.secondaryMnemonic);
      console.log("..." + this.xpubs.primary);
+
     const childPrimaryPub = this.getPub(
       this.deriveChildXKey(this.xpubs.primary, childIndex)
     );
