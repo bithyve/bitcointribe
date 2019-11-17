@@ -15,15 +15,18 @@ import {
   clearTransfer,
   getTestcoins
 } from "../../store/actions/accounts";
-import { TEST_ACCOUNT } from "../../common/constants/accountTypes";
+import { TEST_ACCOUNT } from "../../common/constants/serviceTypes";
 
 const AccountScreen = props => {
-  const accountType = props.navigation.getParam("accountType");
+  const serviceType = props.navigation.getParam("serviceType");
   const dispatch = useDispatch();
-  const { address, balances, transactions, loading } = useSelector(
-    state => state.accounts[accountType]
+  const { loading, service } = useSelector(
+    state => state.accounts[serviceType]
   );
-  const netBalance = balances
+
+  const { balances, receivingAddress, transactions } = service.hdWallet;
+
+  const netBalance = service
     ? balances.balance + balances.unconfirmedBalance
     : 0;
 
@@ -32,35 +35,35 @@ const AccountScreen = props => {
       <Button
         title="Fetch Addr"
         onPress={() => {
-          dispatch(fetchAddress(accountType));
+          dispatch(fetchAddress(serviceType));
         }}
       />
       <Button
         title="Fetch Balance"
         onPress={async () => {
-          dispatch(fetchBalance(accountType));
+          dispatch(fetchBalance(serviceType));
         }}
       />
-      {accountType === TEST_ACCOUNT ? (
+      {serviceType === TEST_ACCOUNT ? (
         <Button
           title="Get Testcoins"
           onPress={async () => {
-            dispatch(getTestcoins(accountType));
+            dispatch(getTestcoins(serviceType));
           }}
         />
       ) : null}
       <Button
         title="Fetch Transactions"
         onPress={async () => {
-          dispatch(fetchTransactions(accountType));
+          dispatch(fetchTransactions(serviceType));
         }}
       />
       <Button
         title="Transfer"
         onPress={() => {
-          dispatch(clearTransfer(accountType));
+          dispatch(clearTransfer(serviceType));
           props.navigation.navigate("Transfer", {
-            accountType
+            serviceType
           });
         }}
       />
@@ -72,16 +75,14 @@ const AccountScreen = props => {
           <Text>{netBalance} sats</Text>
         )}
       </View>
-
       <View style={{ marginVertical: 20 }}>
         <Text style={{ marginBottom: 10 }}>Receiving address:</Text>
-        {loading.address ? (
+        {loading.receivingAddress ? (
           <ActivityIndicator size="small" />
         ) : (
-          <Text>{address}</Text>
+          <Text>{receivingAddress}</Text>
         )}
       </View>
-
       <View style={{ margin: 40 }}>
         {loading.transactions ? (
           <ActivityIndicator size="large" />
@@ -114,7 +115,7 @@ const AccountScreen = props => {
 
 AccountScreen.navigationOptions = navData => {
   return {
-    headerTitle: navData.navigation.getParam("accountType")
+    headerTitle: navData.navigation.getParam("serviceType")
   };
 };
 

@@ -1,15 +1,18 @@
 import { createAppContainer, createSwitchNavigator } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 
-import StartupScreen from "../dummy-screens/StartupScreen";
-import HomeScreen from "../dummy-screens/HomeScreen";
-import WalletNameScreen from "../dummy-screens/wallet-setup/WalletNameScreen";
-import SecurityQuesScreen from "../dummy-screens/wallet-setup/SecurityQuesScreen";
-import AccountScreen from "../dummy-screens/accounts/AccountScreen";
-import SecureAccountScreen from "../dummy-screens/accounts/SecureAccountScreen";
-
-import TransferScreen from "../dummy-screens/accounts/TransferScreen";
-
+import {
+  StartupScreen,
+  HomeScreen,
+  WalletNameScreen,
+  SecurityQuesScreen,
+  AccountScreen,
+  TransferScreen,
+  S3Screen,
+  S3UserScreen,
+  S3GuardianScreen,
+  SecureAccountScreen
+} from "../dummy-screens";
 
 const WalletSetupNavigator = createStackNavigator({
   WalletName: WalletNameScreen,
@@ -20,7 +23,10 @@ const HomeNavigator = createStackNavigator({
   Home: HomeScreen,
   Account: AccountScreen,
   Transfer: TransferScreen,
-  SecureAccount: SecureAccountScreen
+  SecureAccount: SecureAccountScreen,
+  SSS: S3Screen,
+  S3User: S3UserScreen,
+  S3Guardian: S3GuardianScreen
 });
 
 const Navigator = createSwitchNavigator({

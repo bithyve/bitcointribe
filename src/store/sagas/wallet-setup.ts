@@ -40,9 +40,12 @@ function* initSetupWorker({ payload }) {
     };
 
     const toBeInserted = {
-      walletName,
-      securityAns,
-      accounts
+      WALLET_SETUP: { walletName, securityAns },
+      DECENTRALIZED_BACKUP: {
+        SHARES_TRANSFER_DETAILS: {},
+        SHARES_UNDER_CUSTODY: {}
+      },
+      ...accounts
     };
 
     yield put(insertIntoDB(toBeInserted));

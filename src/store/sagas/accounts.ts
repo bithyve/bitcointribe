@@ -15,28 +15,54 @@ import {
   GET_TESTCOINS,
   fetchBalance
 } from "../actions/accounts";
-import { Services } from "../../common/interfaces/Interfaces";
+import { insertIntoDB } from "../actions/storage";
 
 function* fetchAddrWorker({ payload }) {
-  yield put(switchLoader(payload.accountType, "address"));
-  console.log(payload.accountType);
-  const services: Services = yield select(state => state.storage.services);
-  const res = yield call(services[payload.accountType].getAddress);
-  console.log(res);
-  res.status === 200
-    ? yield put(addressFetched(payload.accountType, res.data.address))
-    : yield put(switchLoader(payload.accountType, "address"));
+  yield put(switchLoader(payload.serviceType, "receivingAddress"));
+  const service = yield select(
+    state => state.accounts[payload.serviceType].service
+  );
+
+  const preFetchAddress = service.hdWallet.receivingAddress;
+  const res = yield call(service.getAddress);
+  const postFetchAddress =
+    res.status === 200 ? res.data.address : preFetchAddress;
+
+  if (
+    res.status === 200 &&
+    JSON.stringify(preFetchAddress) !== JSON.stringify(postFetchAddress)
+  ) {
+    yield put(addressFetched(payload.serviceType, postFetchAddress));
+  } else {
+    yield put(switchLoader(payload.serviceType, "receivingAddress"));
+  }
 }
 
 export const fetchAddrWatcher = createWatcher(fetchAddrWorker, FETCH_ADDR);
 
 function* fetchBalanceWorker({ payload }) {
-  yield put(switchLoader(payload.accountType, "balances"));
-  const services: Services = yield select(state => state.storage.services);
-  const res = yield call(services[payload.accountType].getBalance);
-  res.status === 200
-    ? yield put(balanceFetched(payload.accountType, res.data))
-    : yield put(switchLoader(payload.accountType, "balances"));
+  yield put(switchLoader(payload.serviceType, "balances"));
+  const service = yield select(
+    state => state.accounts[payload.serviceType].service
+  );
+
+  const preFetchBalances = service.hdWallet.balances;
+  const res = yield call(service.getBalance);
+  const postFetchBalances = res.status === 200 ? res.data : preFetchBalances;
+
+  if (
+    res.status === 200 &&
+    JSON.stringify(preFetchBalances) !== JSON.stringify(postFetchBalances)
+  ) {
+    yield put(balanceFetched(payload.serviceType, postFetchBalances));
+    yield put(
+      insertIntoDB({
+        [payload.serviceType]: JSON.stringify(service)
+      })
+    );
+  } else {
+    yield put(switchLoader(payload.serviceType, "balances"));
+  }
 }
 
 export const fetchBalanceWatcher = createWatcher(
@@ -45,12 +71,31 @@ export const fetchBalanceWatcher = createWatcher(
 );
 
 function* fetchTransactionsWorker({ payload }) {
-  yield put(switchLoader(payload.accountType, "transactions"));
-  const services: Services = yield select(state => state.storage.services);
-  const res = yield call(services[payload.accountType].getTransactions);
-  res.status === 200
-    ? yield put(transactionsFetched(payload.accountType, res.data.transactions))
-    : yield put(switchLoader(payload.accountType, "transactions"));
+  yield put(switchLoader(payload.serviceType, "transactions"));
+  const service = yield select(
+    state => state.accounts[payload.serviceType].service
+  );
+
+  const preFetchTransactions = service.hdWallet.transactions;
+  const res = yield call(service.getTransactions);
+  const postFetchTransactions =
+    res.status === 200 ? res.data.transactions : preFetchTransactions;
+  console.log({ preFetchTransactions, postFetchTransactions });
+
+  if (
+    res.status === 200 &&
+    JSON.stringify(preFetchTransactions) !==
+      JSON.stringify(postFetchTransactions)
+  ) {
+    yield put(transactionsFetched(payload.serviceType, postFetchTransactions));
+    yield put(
+      insertIntoDB({
+        [payload.serviceType]: JSON.stringify(service)
+      })
+    );
+  } else {
+    yield put(switchLoader(payload.serviceType, "transactions"));
+  }
 }
 
 export const fetchTransactionsWatcher = createWatcher(
@@ -59,18 +104,20 @@ export const fetchTransactionsWatcher = createWatcher(
 );
 
 function* transferST1Worker({ payload }) {
-  yield put(switchLoader(payload.accountType, "transfer"));
+  yield put(switchLoader(payload.serviceType, "transfer"));
   const { recipientAddress, amount, priority } = payload.transferInfo;
-  const services: Services = yield select(state => state.storage.services);
+  const service = yield select(
+    state => state.accounts[payload.serviceType].service
+  );
   const res = yield call(
-    services[payload.accountType].transferST1,
+    service.transferST1,
     recipientAddress,
     amount,
     priority
   );
   res.status === 200
-    ? yield put(executedST1(payload.accountType, res.data))
-    : yield put(switchLoader(payload.accountType, "transfer"));
+    ? yield put(executedST1(payload.serviceType, res.data))
+    : yield put(switchLoader(payload.serviceType, "transfer"));
 }
 
 export const transferST1Watcher = createWatcher(
@@ -79,17 +126,18 @@ export const transferST1Watcher = createWatcher(
 );
 
 function* transferST2Worker({ payload }) {
-  yield put(switchLoader(payload.accountType, "transfer"));
+  yield put(switchLoader(payload.serviceType, "transfer"));
   const { inputs, txb } = payload.transferInfo;
-  const services: Services = yield select(state => state.storage.services);
-  const res = yield call(
-    services[payload.accountType].transferST2,
-    inputs,
-    txb
+  const service = yield select(
+    state => state.accounts[payload.serviceType].service
   );
-  res.status === 200
-    ? yield put(executedST2(payload.accountType, res.data.txid))
-    : yield put(switchLoader(payload.accountType, "transfer"));
+
+  const res = yield call(service.transferST2, inputs, txb);
+  if (res.status === 200) {
+    yield put(executedST2(payload.serviceType, res.data.txid));
+  } else {
+    yield put(switchLoader(payload.serviceType, "transfer"));
+  }
 }
 
 export const transferST2Watcher = createWatcher(
@@ -98,10 +146,11 @@ export const transferST2Watcher = createWatcher(
 );
 
 function* testcoinsWorker({ payload }) {
-  const services: Services = yield select(state => state.storage.services);
-  const res = yield call(services[payload.accountType].getTestcoins);
-  console.log({ res });
-  res.status === 200 ? yield put(fetchBalance(payload.accountType)) : null;
+  const service = yield select(
+    state => state.accounts[payload.serviceType].service
+  );
+  const res = yield call(service.getTestcoins);
+  res.status === 200 ? yield put(fetchBalance(payload.serviceType)) : null;
 }
 
 export const testcoinsWatcher = createWatcher(testcoinsWorker, GET_TESTCOINS);
