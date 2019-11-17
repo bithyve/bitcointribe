@@ -17,7 +17,6 @@ export default class S3Service {
       metaShares,
       healthCheckInitialized,
       walletId,
-      metaShareTransferAssets,
       healthCheckStatus
     }: {
       mnemonic: string;
@@ -25,11 +24,6 @@ export default class S3Service {
       metaShares: IMetaShare[];
       healthCheckInitialized: boolean;
       walletId: string;
-      metaShareTransferAssets: Array<{
-        otp: string;
-        encryptedKey: string;
-        encryptedMetaShare: string;
-      }>;
       healthCheckStatus: {};
     } = sss;
 
@@ -38,7 +32,6 @@ export default class S3Service {
       metaShares,
       healthCheckInitialized,
       walletId,
-      metaShareTransferAssets,
       healthCheckStatus
     });
   };
@@ -320,11 +313,6 @@ export default class S3Service {
       metaShares: IMetaShare[];
       healthCheckInitialized: boolean;
       walletId: string;
-      metaShareTransferAssets: Array<{
-        otp: string;
-        encryptedKey: string;
-        encryptedMetaShare: string;
-      }>;
       healthCheckStatus: {};
     }
   ) {

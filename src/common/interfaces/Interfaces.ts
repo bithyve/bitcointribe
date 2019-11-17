@@ -5,11 +5,14 @@ import S3Service from "../../bitcoin/services/sss/S3Service";
 
 export interface Database {
   WALLET_SETUP: { walletName: String; securityAns: String };
+  DECENTRALIZED_BACKUP: {
+    SHARES_TRANSFER_DETAILS: {};
+    SHARES_UNDER_CUSTODY: {};
+  };
   REGULAR_ACCOUNT: string;
   TEST_ACCOUNT: string;
   SECURE_ACCOUNT: string;
   S3_SERVICE: string;
-  UNDER_CUSTODY: {};
 }
 
 export interface Services {
