@@ -261,6 +261,7 @@ export default class SSS {
       walletId: string;
       shareId: string;
       updated: boolean;
+      updatedAt?: number;
       dynamicNonPMDD?: IDynamicNonPMDD;
       err?: string;
     }>;

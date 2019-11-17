@@ -6,7 +6,8 @@ import {
   healthCheckInitialized,
   PREPARE_MSHARES,
   UPLOAD_ENC_MSHARES,
-  DOWNLOAD_MSHARE
+  DOWNLOAD_MSHARE,
+  UPDATE_MSHARES_HEALTH
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
@@ -126,4 +127,35 @@ function* downloadMetaShareWorker({ payload }) {
 export const downloadMetaShareWatcher = createWatcher(
   downloadMetaShareWorker,
   DOWNLOAD_MSHARE
+);
+
+function* updateMSharesHealthWorker() {
+  // set a timelapse for auto update and enable instantaneous manual update
+  yield put(switchS3Loader("updateMSharesHealth"));
+
+  const { UNDER_CUSTODY } = yield select(state => state.storage.database);
+  const metaShares = Object.keys(UNDER_CUSTODY).map(
+    tag => UNDER_CUSTODY[tag].metaShare
+  );
+
+  const res = yield call(S3Service.updateHealth, metaShares);
+  if (res.status === 200) {
+    const { updationInfo } = res.data;
+    Object.keys(UNDER_CUSTODY).forEach(tag => {
+      for (let info of updationInfo) {
+        if (info.updated) {
+          if (info.walletId === UNDER_CUSTODY[tag].metaShare.meta.walletId) {
+            UNDER_CUSTODY[tag].lastHealthUpdate = info.updatedAt;
+          }
+        }
+      }
+    });
+    yield put(insertIntoDB({ UNDER_CUSTODY }));
+  }
+  yield put(switchS3Loader("updateMSharesHealth"));
+}
+
+export const updateMSharesHealthWatcher = createWatcher(
+  updateMSharesHealthWorker,
+  UPDATE_MSHARES_HEALTH
 );
