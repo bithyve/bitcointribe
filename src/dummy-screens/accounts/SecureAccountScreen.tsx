@@ -18,25 +18,25 @@ const SecureAccountScreen = props => {
       <Text>{accountType} Here!</Text>
       <Button
         title="Setup Secure Account"
-        onPress={() => {
+        onPress={async() => {
        dispatch(setupSecureAccount(accountType));
         }}
       />
       <Button
         title="SecureAcc isActive "
-        onPress={() => {
+        onPress={async() => {
        dispatch(isActive(accountType));
         }}
       />
       <Button
         title="Check Health"
-        onPress={() => {
+        onPress={async() => {
        dispatch(checkHealth(accountType));
         }}
       /> 
      <Button
             title="Secure Account"
-            onPress={() => {
+            onPress={async() => {
               props.navigation.navigate("Account", {
                 accountType: SECURE_ACCOUNT
               });

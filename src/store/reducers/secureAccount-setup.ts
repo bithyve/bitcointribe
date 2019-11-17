@@ -3,6 +3,7 @@ import {
     HEALTH_CHECK,
     ACTIVATED,
   } from "../actions/secureAccount-setup";
+  
   const SECUREACCOUNT_VARS: {
     setupData: {
         qrData: string;
@@ -15,7 +16,6 @@ import {
     saStatus:{
       isActive: boolean;
     };
-    address: String;
   } = {
     setupData: {
         qrData: "",
@@ -27,7 +27,6 @@ import {
     },
     saStatus:{isActive: false
     },
-    address:""
   };
   
   const initialState = {

@@ -23,13 +23,15 @@ function* initSetupWorker({ payload }) {
 
     // Secure account
     const secureAcc = new SecureAccount(primaryMnemonic);
+    console.log("wallet-setup");
+    console.log(secureAcc);
   
-    // yield call(secureAcc.getSecondaryMnemonic);
-
     // share generation
     const s3Service = new S3Service(primaryMnemonic);
     yield call(s3Service.generateShares, securityAns);
-
+    console.log("see diff: ");
+    console.log(JSON.stringify(secureAcc));
+    console.log(secureAcc);
     const accounts = {
       REGULAR_ACCOUNT: JSON.stringify(regularAcc),
       TEST_ACCOUNT: JSON.stringify(testAcc),

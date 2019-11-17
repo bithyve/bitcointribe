@@ -15,16 +15,25 @@ import { insertIntoDB } from "../actions/storage";
     try {
     const services: Services = yield select(state => state.storage.services);
     const res = yield call(services[payload.accountType].setupSecureAccount);
-    console.log(res);
+    console.log("secureAcc setup 1");
+    console.log(services[payload.accountType]);
     res.status === 200
-      ? yield put(secureAccountSetup( payload.accountType,res.data.setupData))
+      ? yield put(secureAccountSetup( payload.accountType,res))
       : null;
+    console.log("here->");
     console.log(res.data.setupData); 
+
     const secureAccSetupData = res.data.setupData;
+    const accounts = {
+      SECURE_ACCOUNT: res,
+    }
     const toBeInserted = {
-      secureAccSetupData
+      secureAccSetupData,
+      accounts
       };
       yield put(insertIntoDB(toBeInserted));
+      console.log("secureAcc setup 2");
+      console.log(services[payload.accountType]);
      
     }catch (err) {
       console.log(err);

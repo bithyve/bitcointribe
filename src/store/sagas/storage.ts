@@ -6,7 +6,7 @@ import {
   FETCH_FROM_DB,
   dbFetched,
   INSERT_INTO_DB,
-  dbInserted
+  dbInserted,
 } from "../actions/storage";
 import dataManager from "../../storage/database-manager";
 
@@ -66,3 +66,4 @@ function* insertDBWorker({ payload }) {
 }
 
 export const insertDBWatcher = createWatcher(insertDBWorker, INSERT_INTO_DB);
+

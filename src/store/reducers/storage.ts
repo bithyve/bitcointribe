@@ -2,7 +2,7 @@ import {
   DB_INITIALIZED,
   DB_FETCHED,
   DB_INSERTED,
-  KEY_FETCHED
+  KEY_FETCHED,
 } from "../actions/storage";
 import { Database, Services } from "../../common/interfaces/Interfaces";
 import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
@@ -70,6 +70,7 @@ export default (state = initialState, action) => {
         ...updatedState,
         services: setServices(updatedState)
       };
+    
 
     case KEY_FETCHED:
       return {
