@@ -71,19 +71,21 @@ export default class SSS {
   };
 
   public static downloadShare = async (
-    key: string
+    encryptedKey: string,
+    otp: string
   ): Promise<
     | {
-        encryptedMetaShare: string;
-        messageId: string;
+        metaShare: IMetaShare;
         dynamicNonPMDD: IDynamicNonPMDD;
+        messageId: string;
       }
     | {
-        encryptedMetaShare: string;
+        metaShare: IMetaShare;
         messageId: string;
         dynamicNonPMDD?: undefined;
       }
   > => {
+    const key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
     const messageId: string = SSS.getMessageId(key, config.MSG_ID_LENGTH);
     let res: AxiosResponse;
     try {
@@ -95,10 +97,11 @@ export default class SSS {
     }
 
     const { share, dynamicNonPMDD } = res.data;
+    const metaShare = SSS.decryptMetaShare(share, key).decryptedMetaShare;
     if (dynamicNonPMDD) {
-      return { encryptedMetaShare: share, messageId, dynamicNonPMDD };
+      return { metaShare, dynamicNonPMDD, messageId };
     }
-    return { encryptedMetaShare: share, messageId };
+    return { metaShare, messageId };
   };
 
   public static validateDecryption = (
@@ -141,6 +144,26 @@ export default class SSS {
     }
 
     return { deleted: res.data.deleted };
+  };
+
+  public static downloadAndValidateShare = async (
+    encryptedKey: string,
+    otp: string,
+    existingShares?: IMetaShare[],
+    walletId?: string
+  ) => {
+    const { metaShare, messageId, dynamicNonPMDD } = await SSS.downloadShare(
+      encryptedKey,
+      otp
+    );
+
+    if (SSS.validateDecryption(metaShare, existingShares, walletId)) {
+      const { deleted } = await SSS.affirmDecryption(messageId);
+      if (!deleted) {
+        console.log("Unable to remove the share from the server");
+      }
+      return { metaShare, dynamicNonPMDD };
+    }
   };
 
   public static decryptViaOTP = (
