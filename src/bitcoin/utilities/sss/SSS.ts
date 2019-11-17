@@ -4,10 +4,10 @@ import crypto from "crypto";
 import secrets from "secrets.js-grempe";
 import config from "../../Config";
 import {
-  IBuddyStaticNonPMDD,
-  IDynamicNonPMDD,
-  IMetaShare,
-  ISocialStaticNonPMDD
+  BuddyStaticNonPMDD,
+  DynamicNonPMDD,
+  MetaShare,
+  SocialStaticNonPMDD
 } from "../Interface";
 const { BH_AXIOS } = config;
 
@@ -20,21 +20,21 @@ export default class SSS {
   } = config.CIPHER_SPEC;
 
   public static recoverFromShares = (
-    decryptedShares: string[]
+    decryptedSecrets: string[]
   ): {
     mnemonic: string;
   } => {
-    if (decryptedShares.length >= SSS.threshold) {
-      const shares = [];
-      for (const share of decryptedShares) {
-        if (SSS.validShare(share)) {
-          shares.push(share.slice(0, share.length - 8));
+    if (decryptedSecrets.length >= SSS.threshold) {
+      const secretsArray = [];
+      for (const secret of decryptedSecrets) {
+        if (SSS.validShare(secret)) {
+          secretsArray.push(secret.slice(0, secret.length - 8));
         } else {
-          throw new Error(`Invalid checksum, share: ${share} is corrupt`);
+          throw new Error(`Invalid checksum, share: ${secret} is corrupt`);
         }
       }
 
-      const recoveredMnemonicHex = secrets.combine(shares);
+      const recoveredMnemonicHex = secrets.combine(secretsArray);
       return { mnemonic: SSS.hexToString(recoveredMnemonicHex) };
     } else {
       throw new Error(
@@ -43,31 +43,26 @@ export default class SSS {
     }
   };
 
-  public static decryptShares = (
-    shares: string[],
+  public static decryptSecrets = (
+    secretsArray: string[],
     answer: string
   ): {
-    decryptedShares: string[];
+    decryptedSecrets: string[];
   } => {
     const key = SSS.generateKey(answer);
-    // const key = crypto.scryptSync(
-    //   intermediateKey,
-    //   this.cipherSpec.salt,
-    //   this.cipherSpec.keyLength,
-    // );
 
-    const decryptedShares: string[] = [];
-    for (const share of shares) {
+    const decryptedSecrets: string[] = [];
+    for (const secret of secretsArray) {
       const decipher = crypto.createDecipheriv(
         SSS.cipherSpec.algorithm,
         key,
         SSS.cipherSpec.iv
       );
-      let decrypted = decipher.update(share, "hex", "utf8");
+      let decrypted = decipher.update(secret, "hex", "utf8");
       decrypted += decipher.final("utf8");
-      decryptedShares.push(decrypted);
+      decryptedSecrets.push(decrypted);
     }
-    return { decryptedShares };
+    return { decryptedSecrets };
   };
 
   public static downloadShare = async (
@@ -75,12 +70,12 @@ export default class SSS {
     otp: string
   ): Promise<
     | {
-        metaShare: IMetaShare;
-        dynamicNonPMDD: IDynamicNonPMDD;
+        metaShare: MetaShare;
+        dynamicNonPMDD: DynamicNonPMDD;
         messageId: string;
       }
     | {
-        metaShare: IMetaShare;
+        metaShare: MetaShare;
         messageId: string;
         dynamicNonPMDD?: undefined;
       }
@@ -105,8 +100,8 @@ export default class SSS {
   };
 
   public static validateDecryption = (
-    decryptedMetaShare: IMetaShare,
-    existingShares: IMetaShare[],
+    decryptedMetaShare: MetaShare,
+    existingShares: MetaShare[],
     walletId?: string
   ): boolean => {
     if (walletId && decryptedMetaShare.meta.walletId === walletId) {
@@ -149,7 +144,7 @@ export default class SSS {
   public static downloadAndValidateShare = async (
     encryptedKey: string,
     otp: string,
-    existingShares?: IMetaShare[],
+    existingShares?: MetaShare[],
     walletId?: string
   ) => {
     const { metaShare, messageId, dynamicNonPMDD } = await SSS.downloadShare(
@@ -200,7 +195,7 @@ export default class SSS {
     encryptedMetaShare: string,
     key: any
   ): {
-    decryptedMetaShare: IMetaShare;
+    decryptedMetaShare: MetaShare;
   } => {
     // const key = crypto.scryptSync(
     //   intermediateKey,
@@ -239,7 +234,7 @@ export default class SSS {
 
   public static recoverMetaShareFromQR = (
     qrData: string[]
-  ): { metaShare: IMetaShare } => {
+  ): { metaShare: MetaShare } => {
     console.log({ qrData });
     qrData.sort();
     let recoveredQRData: string;
@@ -255,14 +250,14 @@ export default class SSS {
   };
 
   public static updateHealth = async (
-    metaShares: IMetaShare[]
+    metaShares: MetaShare[]
   ): Promise<{
     updationInfo: Array<{
       walletId: string;
       shareId: string;
       updated: boolean;
       updatedAt?: number;
-      dynamicNonPMDD?: IDynamicNonPMDD;
+      dynamicNonPMDD?: DynamicNonPMDD;
       err?: string;
     }>;
   }> => {
@@ -383,30 +378,20 @@ export default class SSS {
     return temp.slice(0, 8);
   };
 
-  private mnemonic: string;
   public walletId: string;
-  public encryptedShares: string[];
-  public metaShares: IMetaShare[];
-  public metaShareTransferAssets: Array<{
-    otp: string;
-    encryptedKey: string;
-    encryptedMetaShare: string;
-  }>;
+  public encryptedSecrets: string[];
+  public metaShares: MetaShare[];
   public healthCheckInitialized: boolean;
   public healthCheckStatus: {};
+  private mnemonic: string;
 
   constructor(
     mnemonic: string,
     stateVars?: {
-      encryptedShares: string[];
-      metaShares: IMetaShare[];
+      encryptedSecrets: string[];
+      metaShares: MetaShare[];
       healthCheckInitialized: boolean;
       walletId: string;
-      metaShareTransferAssets: Array<{
-        otp: string;
-        encryptedKey: string;
-        encryptedMetaShare: string;
-      }>;
       healthCheckStatus: {};
     }
   ) {
@@ -421,14 +406,11 @@ export default class SSS {
           .createHash("sha256")
           .update(bip39.mnemonicToSeedSync(this.mnemonic))
           .digest("hex");
-    this.encryptedShares = stateVars ? stateVars.encryptedShares : [];
+    this.encryptedSecrets = stateVars ? stateVars.encryptedSecrets : [];
     this.metaShares = stateVars ? stateVars.metaShares : [];
     this.healthCheckInitialized = stateVars
       ? stateVars.healthCheckInitialized
       : false;
-    this.metaShareTransferAssets = stateVars
-      ? stateVars.metaShareTransferAssets
-      : [];
     this.healthCheckStatus = stateVars ? stateVars.healthCheckStatus : {};
   }
 
@@ -456,17 +438,18 @@ export default class SSS {
   };
 
   public uploadShare = async (
-    shareIndex: 0 | 1 | 2,
-    dynamicNonPMDD?: IDynamicNonPMDD
+    shareIndex: number,
+    dynamicNonPMDD?: DynamicNonPMDD
   ): Promise<{
     otp: string;
     encryptedKey: string;
   }> => {
-    if (!this.metaShares.length)
+    if (!this.metaShares.length) {
       throw new Error("Generate MetaShares prior uploading");
+    }
 
     let res: AxiosResponse;
-    const metaShare: IMetaShare = this.metaShares[shareIndex];
+    const metaShare: MetaShare = this.metaShares[shareIndex];
     const { encryptedMetaShare, key, messageId } = this.encryptMetaShare(
       metaShare
     );
@@ -486,16 +469,11 @@ export default class SSS {
       throw new Error("Unable to upload share");
     }
     const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
-    this.metaShareTransferAssets[shareIndex] = {
-      otp,
-      encryptedKey: otpEncryptedData,
-      encryptedMetaShare
-    };
     return { otp, encryptedKey: otpEncryptedData };
   };
 
   public encryptMetaShare = (
-    metaShare: IMetaShare,
+    metaShare: MetaShare,
     key?: string
   ): { encryptedMetaShare: string; key: string; messageId: string } => {
     if (!key) {
@@ -593,11 +571,11 @@ export default class SSS {
       bhXpub
     } = secureAccAssets;
 
-    const socialStaticNonPMDD: ISocialStaticNonPMDD = {
+    const socialStaticNonPMDD: SocialStaticNonPMDD = {
       secondaryXpub,
       bhXpub
     };
-    const buddyStaticNonPMDD: IBuddyStaticNonPMDD = {
+    const buddyStaticNonPMDD: BuddyStaticNonPMDD = {
       secondaryMnemonic,
       twoFASecret,
       secondaryXpub,
@@ -614,7 +592,7 @@ export default class SSS {
   };
 
   public encryptStaticNonPMDD = (
-    staticNonPMDD: ISocialStaticNonPMDD | IBuddyStaticNonPMDD
+    staticNonPMDD: SocialStaticNonPMDD | BuddyStaticNonPMDD
   ): {
     encryptedStaticNonPMDD: string;
   } => {
@@ -640,7 +618,7 @@ export default class SSS {
   public decryptStaticNonPMDD = (
     encryptStaticNonPMDD: string
   ): {
-    decryptedStaticNonPMDD: ISocialStaticNonPMDD | IBuddyStaticNonPMDD;
+    decryptedStaticNonPMDD: SocialStaticNonPMDD | BuddyStaticNonPMDD;
   } => {
     const key = SSS.generateKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString("hex")
@@ -664,7 +642,7 @@ export default class SSS {
   };
 
   public encryptDynamicNonPMDD = (
-    dynamicNonPMDD: IMetaShare[]
+    dynamicNonPMDD: MetaShare[]
   ): { encryptedDynamicNonPMDD: string } => {
     const key = SSS.generateKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString("hex")
@@ -693,7 +671,7 @@ export default class SSS {
   public decryptDynamicNonPMDD = (
     encryptedDynamicNonPMDD: string
   ): {
-    decryptedDynamicNonPMDD: IMetaShare[];
+    decryptedDynamicNonPMDD: MetaShare[];
   } => {
     const key = SSS.generateKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString("hex")
@@ -718,9 +696,9 @@ export default class SSS {
   };
 
   public restoreDynamicNonPMDD = (
-    dynamicNonPMDDs: IDynamicNonPMDD[]
+    dynamicNonPMDDs: DynamicNonPMDD[]
   ): {
-    decryptedDynamicNonPMDD: IMetaShare[];
+    decryptedDynamicNonPMDD: MetaShare[];
   } => {
     if (dynamicNonPMDDs.length === 0) {
       throw new Error("No dynamicNonPMDDs supplied");
@@ -747,7 +725,7 @@ export default class SSS {
   ): Promise<{
     updated: boolean;
   }> => {
-    const dynamicNonPMDD: IDynamicNonPMDD = {
+    const dynamicNonPMDD: DynamicNonPMDD = {
       updatedAt: Date.now(),
       encryptedDynamicNonPMDD
     };
@@ -775,7 +753,7 @@ export default class SSS {
   public downloadDynamicNonPMDD = async (
     walletID: string
   ): Promise<{
-    dynamicNonPMDD: IDynamicNonPMDD;
+    dynamicNonPMDD: DynamicNonPMDD;
   }> => {
     let res: AxiosResponse;
     try {
@@ -806,10 +784,10 @@ export default class SSS {
     tag: string,
     version?: number
   ): {
-    metaShares: IMetaShare[];
+    metaShares: MetaShare[];
   } => {
-    if (!this.encryptedShares.length) {
-      throw new Error("Can not create MetaShares; missing encryptedShares");
+    if (!this.encryptedSecrets.length) {
+      throw new Error("Can not create MetaShares; missing encryptedSecrets");
     }
 
     const {
@@ -826,12 +804,12 @@ export default class SSS {
     });
 
     let index = 0;
-    let metaShare: IMetaShare;
-    for (const encryptedShare of this.encryptedShares) {
+    let metaShare: MetaShare;
+    for (const encryptedSecret of this.encryptedSecrets) {
       if (index !== 2) {
         metaShare = {
-          encryptedShare,
-          shareId: SSS.getShareId(encryptedShare),
+          encryptedSecret,
+          shareId: SSS.getShareId(encryptedSecret),
           meta: {
             version: version ? version : 0,
             validator: "HEXA",
@@ -844,8 +822,8 @@ export default class SSS {
         };
       } else {
         metaShare = {
-          encryptedShare,
-          shareId: SSS.getShareId(encryptedShare),
+          encryptedSecret,
+          shareId: SSS.getShareId(encryptedSecret),
           meta: {
             version: version ? version : 0,
             validator: "HEXA",
@@ -870,7 +848,7 @@ export default class SSS {
   };
 
   public createQR = async (
-    metashare: IMetaShare,
+    metashare: MetaShare,
     index: number
   ): Promise<{ qrData: string[] }> => {
     const splits: number = config.SSS_METASHARE_SPLITS;
@@ -898,29 +876,24 @@ export default class SSS {
     return { qrData };
   };
 
-  public encryptShares = (
-    shares: string[],
+  public encryptSecrets = (
+    secretsToEncrypt: string[],
     answer: string
   ): {
-    encryptedShares: string[];
+    encryptedSecrets: string[];
   } => {
     const key = SSS.generateKey(answer);
-    // const key = crypto.scryptSync(
-    //   intermediateKey,
-    //   this.cipherSpec.salt,
-    //   this.cipherSpec.keyLength,
-    // );
 
-    for (const share of shares) {
+    for (const secret of secretsToEncrypt) {
       const cipher = crypto.createCipheriv(
         SSS.cipherSpec.algorithm,
         key,
         SSS.cipherSpec.iv
       );
-      let encrypted = cipher.update(share, "utf8", "hex");
+      let encrypted = cipher.update(secret, "utf8", "hex");
       encrypted += cipher.final("hex");
-      this.encryptedShares.push(encrypted);
+      this.encryptedSecrets.push(encrypted);
     }
-    return { encryptedShares: this.encryptedShares };
+    return { encryptedSecrets: this.encryptedSecrets };
   };
 }

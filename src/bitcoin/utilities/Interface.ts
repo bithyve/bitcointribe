@@ -16,8 +16,8 @@ export interface Transactions {
   }>;
 }
 
-export interface IMetaShare {
-  encryptedShare: string;
+export interface MetaShare {
+  encryptedSecret: string;
   shareId: string;
   meta: {
     version: number;
@@ -30,17 +30,17 @@ export interface IMetaShare {
   encryptedStaticNonPMDD: string;
 }
 
-export interface IDynamicNonPMDD {
+export interface DynamicNonPMDD {
   updatedAt: number;
   encryptedDynamicNonPMDD: string;
 }
 
-export interface ISocialStaticNonPMDD {
+export interface SocialStaticNonPMDD {
   secondaryXpub: string;
   bhXpub: string;
 }
 
-export interface IBuddyStaticNonPMDD {
+export interface BuddyStaticNonPMDD {
   secondaryMnemonic: string;
   twoFASecret: string;
   secondaryXpub: string;

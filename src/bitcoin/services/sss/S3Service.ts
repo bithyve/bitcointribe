@@ -1,10 +1,10 @@
 import config from "../../Config";
 import { ErrMap } from "../../utilities/ErrMap";
 import {
-  IBuddyStaticNonPMDD,
-  IDynamicNonPMDD,
-  IMetaShare,
-  ISocialStaticNonPMDD
+  BuddyStaticNonPMDD,
+  DynamicNonPMDD,
+  MetaShare,
+  SocialStaticNonPMDD
 } from "../../utilities/Interface";
 import SSS from "../../utilities/sss/SSS";
 
@@ -13,32 +13,25 @@ export default class S3Service {
     const { sss } = JSON.parse(json);
     const {
       mnemonic,
-      encryptedShares,
+      encryptedSecrets,
       metaShares,
       healthCheckInitialized,
       walletId,
-      metaShareTransferAssets,
       healthCheckStatus
     }: {
       mnemonic: string;
-      encryptedShares: string[];
-      metaShares: IMetaShare[];
+      encryptedSecrets: string[];
+      metaShares: MetaShare[];
       healthCheckInitialized: boolean;
       walletId: string;
-      metaShareTransferAssets: Array<{
-        otp: string;
-        encryptedKey: string;
-        encryptedMetaShare: string;
-      }>;
       healthCheckStatus: {};
     } = sss;
 
     return new S3Service(mnemonic, {
-      encryptedShares,
+      encryptedSecrets,
       metaShares,
       healthCheckInitialized,
       walletId,
-      metaShareTransferAssets,
       healthCheckStatus
     });
   };
@@ -62,8 +55,8 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-      const { decryptedShares } = SSS.decryptShares(encryptedShares, answer);
-      const { mnemonic } = SSS.recoverFromShares(decryptedShares);
+      const { decryptedSecrets } = SSS.decryptSecrets(encryptedShares, answer);
+      const { mnemonic } = SSS.recoverFromShares(decryptedSecrets);
       return { status: config.STATUS.SUCCESS, data: { mnemonic } };
     } catch (err) {
       return { status: 501, err: err.message, message: ErrMap[501] };
@@ -78,11 +71,11 @@ export default class S3Service {
         status: number;
         data:
           | {
-              metaShare: IMetaShare;
-              dynamicNonPMDD: IDynamicNonPMDD;
+              metaShare: MetaShare;
+              dynamicNonPMDD: DynamicNonPMDD;
             }
           | {
-              metaShare: IMetaShare;
+              metaShare: MetaShare;
               dynamicNonPMDD?: undefined;
             };
         err?: undefined;
@@ -108,14 +101,14 @@ export default class S3Service {
   public static downloadAndValidateShare = async (
     encryptedKey: string,
     otp: string,
-    existingShares: IMetaShare[] = [],
+    existingShares: MetaShare[] = [],
     walletId?: string
   ): Promise<
     | {
         status: number;
         data: {
-          metaShare: IMetaShare;
-          dynamicNonPMDD: IDynamicNonPMDD;
+          metaShare: MetaShare;
+          dynamicNonPMDD: DynamicNonPMDD;
         };
         err?: undefined;
         message?: undefined;
@@ -176,7 +169,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          metaShare: IMetaShare;
+          metaShare: MetaShare;
         };
         err?: undefined;
         message?: undefined;
@@ -198,7 +191,7 @@ export default class S3Service {
   };
 
   public static updateHealth = async (
-    metaShares: IMetaShare[]
+    metaShares: MetaShare[]
   ): Promise<
     | {
         status: number;
@@ -208,7 +201,7 @@ export default class S3Service {
             shareId: string;
             updated: boolean;
             updatedAt?: number;
-            dynamicNonPMDD?: IDynamicNonPMDD;
+            dynamicNonPMDD?: DynamicNonPMDD;
             err?: string;
           }>;
         };
@@ -316,15 +309,10 @@ export default class S3Service {
   constructor(
     mnemonic: string,
     stateVars?: {
-      encryptedShares: string[];
-      metaShares: IMetaShare[];
+      encryptedSecrets: string[];
+      metaShares: MetaShare[];
       healthCheckInitialized: boolean;
       walletId: string;
-      metaShareTransferAssets: Array<{
-        otp: string;
-        encryptedKey: string;
-        encryptedMetaShare: string;
-      }>;
       healthCheckStatus: {};
     }
   ) {
@@ -337,7 +325,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          encryptedShares: string[];
+          encryptedSecrets: string[];
         };
         err?: undefined;
         message?: undefined;
@@ -350,15 +338,15 @@ export default class S3Service {
       } => {
     try {
       const { shares } = this.sss.generateShares();
-      const { encryptedShares } = this.sss.encryptShares(shares, answer);
-      return { status: config.STATUS.SUCCESS, data: { encryptedShares } };
+      const { encryptedSecrets } = this.sss.encryptSecrets(shares, answer);
+      return { status: config.STATUS.SUCCESS, data: { encryptedSecrets } };
     } catch (err) {
       return { status: 510, err: err.message, message: ErrMap[510] };
     }
   };
 
   public encryptStaticNonPMDD = (
-    staticNonPMDD: ISocialStaticNonPMDD | IBuddyStaticNonPMDD
+    staticNonPMDD: SocialStaticNonPMDD | BuddyStaticNonPMDD
   ):
     | {
         status: number;
@@ -465,7 +453,7 @@ export default class S3Service {
   };
 
   public updateDynamicNonPMDD = async (
-    dynamicNonPMDD: IMetaShare[]
+    dynamicNonPMDD: MetaShare[]
   ): Promise<
     | {
         status: number;
@@ -502,7 +490,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          dynamicNonPMDD: IDynamicNonPMDD;
+          dynamicNonPMDD: DynamicNonPMDD;
         };
         err?: undefined;
         message?: undefined;
@@ -530,7 +518,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          decryptedDynamicNonPMDD: IMetaShare[];
+          decryptedDynamicNonPMDD: MetaShare[];
         };
         err?: undefined;
         message?: undefined;
@@ -552,12 +540,12 @@ export default class S3Service {
   };
 
   public restoreDynamicNonPMDD = (
-    dynamicNonPMDDs: IDynamicNonPMDD[]
+    dynamicNonPMDDs: DynamicNonPMDD[]
   ):
     | {
         status: number;
         data: {
-          latestDynamicNonPMDD: IMetaShare[];
+          latestDynamicNonPMDD: MetaShare[];
         };
         err?: undefined;
         message?: undefined;
@@ -589,7 +577,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          decryptedStaticNonPMDD: ISocialStaticNonPMDD | IBuddyStaticNonPMDD;
+          decryptedStaticNonPMDD: SocialStaticNonPMDD | BuddyStaticNonPMDD;
         };
         err?: undefined;
         message?: undefined;
@@ -623,7 +611,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          metaShares: IMetaShare[];
+          metaShares: MetaShare[];
         };
         err?: undefined;
         message?: undefined;
@@ -645,7 +633,7 @@ export default class S3Service {
   };
 
   public createQR = async (
-    metashare: IMetaShare,
+    metashare: MetaShare,
     index: number
   ): Promise<
     | {
@@ -672,7 +660,7 @@ export default class S3Service {
   };
 
   public generateEncryptedMetaShare = (
-    metaShare: IMetaShare,
+    metaShare: MetaShare,
     key?: string
   ):
     | {
@@ -702,8 +690,8 @@ export default class S3Service {
   };
 
   public uploadShare = async (
-    shareIndex: 0 | 1 | 2,
-    dynamicNonPMDD?: IDynamicNonPMDD
+    shareIndex: number,
+    dynamicNonPMDD?: DynamicNonPMDD
   ): Promise<
     | {
         status: number;
