@@ -7,7 +7,8 @@ import {
   PREPARE_MSHARES,
   UPLOAD_ENC_MSHARES,
   DOWNLOAD_MSHARE,
-  UPDATE_MSHARES_HEALTH
+  UPDATE_MSHARES_HEALTH,
+  CHECK_MSHARES_HEALTH
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
@@ -17,13 +18,11 @@ import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
 function* initHCWorker() {
   const s3Service: S3Service = yield select(state => state.sss.service);
   const initialized = s3Service.sss.healthCheckInitialized;
-  if (initialized) {
-    return;
-  }
+
+  if (initialized || !s3Service.sss.metaShares.length) return;
 
   yield put(switchS3Loader("initHC"));
   const res = yield call(s3Service.initializeHealthcheck);
-
   if (res.status === 200) {
     yield put(healthCheckInitialized());
     yield put(insertIntoDB({ S3_SERVICE: JSON.stringify(s3Service) }));
@@ -75,7 +74,7 @@ function* uploadEncMetaShareWorker({ payload }) {
   yield put(switchS3Loader("uploadMetaShare"));
 
   const s3Service: S3Service = yield select(state => state.sss.service);
-  if (!s3Service.sss.metaShares.length) yield call(generateMetaSharesWorker);
+  if (!s3Service.sss.metaShares.length) return;
 
   // const transferAsset =
   //   s3Service.sss.metaShareTransferAssets[payload.shareIndex];
@@ -99,9 +98,14 @@ function* downloadMetaShareWorker({ payload }) {
 
   const { otp, encryptedKey } = payload;
   const { UNDER_CUSTODY } = yield select(state => state.storage.database);
-  const existingShares = Object.keys(UNDER_CUSTODY).map(
-    tag => UNDER_CUSTODY[tag].metaShare
-  );
+
+  let existingShares = [];
+  if (Object.keys(UNDER_CUSTODY).length) {
+    existingShares = Object.keys(UNDER_CUSTODY).map(
+      tag => UNDER_CUSTODY[tag].metaShare
+    );
+  }
+
   const res = yield call(
     S3Service.downloadAndValidateShare,
     encryptedKey,
@@ -158,4 +162,20 @@ function* updateMSharesHealthWorker() {
 export const updateMSharesHealthWatcher = createWatcher(
   updateMSharesHealthWorker,
   UPDATE_MSHARES_HEALTH
+);
+
+function* checkMSharesHealthWorker() {
+  yield put(switchS3Loader("checkMSharesHealth"));
+  const s3Service: S3Service = yield select(state => state.sss.service);
+
+  const res = yield call(s3Service.checkHealth);
+  if (res.status === 200) {
+  }
+
+  yield put(switchS3Loader("checkMSharesHealth"));
+}
+
+export const checkMSharesHealthWatcher = createWatcher(
+  checkMSharesHealthWorker,
+  CHECK_MSHARES_HEALTH
 );
