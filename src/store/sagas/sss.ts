@@ -12,8 +12,6 @@ import {
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
-import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
-import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
 
 function* initHCWorker() {
   const s3Service: S3Service = yield select(state => state.sss.service);
@@ -27,6 +25,7 @@ function* initHCWorker() {
     yield put(healthCheckInitialized());
     yield put(insertIntoDB({ S3_SERVICE: JSON.stringify(s3Service) }));
   } else {
+    console.log({ err: res.err });
     yield put(switchS3Loader("initHC"));
   }
 }
@@ -62,6 +61,8 @@ function* generateMetaSharesWorker() {
   const res = yield call(s3Service.createMetaShares, secureAssets, walletName);
   if (res.status === 200) {
     yield put(insertIntoDB({ S3_SERVICE: JSON.stringify(s3Service) }));
+  } else {
+    console.log({ err: res.err });
   }
 }
 
@@ -71,19 +72,35 @@ export const generateMetaSharesWatcher = createWatcher(
 );
 
 function* uploadEncMetaShareWorker({ payload }) {
-  yield put(switchS3Loader("uploadMetaShare"));
-
   const s3Service: S3Service = yield select(state => state.sss.service);
   if (!s3Service.sss.metaShares.length) return;
 
-  // const transferAsset =
-  //   s3Service.sss.metaShareTransferAssets[payload.shareIndex];
-  // if (transferAsset) return; // TODO: 10 min removal strategy
+  const { DECENTRALIZED_BACKUP } = yield select(
+    state => state.storage.database
+  );
+  const { shareId } = s3Service.sss.metaShares[payload.shareIndex];
+
+  // preventing re-uploads till expiry
+  if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[shareId]) return;
+
+  // TODO: 10 min removal strategy
+  yield put(switchS3Loader("uploadMetaShare"));
 
   const res = yield call(s3Service.uploadShare, payload.shareIndex);
   console.log({ otp: res.data.otp, encryptedKey: res.data.encryptedKey });
   if (res.status === 200) {
-    yield put(insertIntoDB({ S3_SERVICE: JSON.stringify(s3Service) }));
+    const { otp, encryptedKey } = res.data;
+
+    const updatedBackup = {
+      ...DECENTRALIZED_BACKUP,
+      SHARES_TRANSFER_DETAILS: {
+        ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
+        [shareId]: { otp, encryptedKey }
+      }
+    };
+    yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+  } else {
+    console.log({ err: res.err });
   }
   yield put(switchS3Loader("uploadMetaShare"));
 }
@@ -97,12 +114,15 @@ function* downloadMetaShareWorker({ payload }) {
   yield put(switchS3Loader("downloadMetaShare"));
 
   const { otp, encryptedKey } = payload;
-  const { UNDER_CUSTODY } = yield select(state => state.storage.database);
+  const { DECENTRALIZED_BACKUP } = yield select(
+    state => state.storage.database
+  );
 
+  const { SHARES_UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
   let existingShares = [];
-  if (Object.keys(UNDER_CUSTODY).length) {
-    existingShares = Object.keys(UNDER_CUSTODY).map(
-      tag => UNDER_CUSTODY[tag].metaShare
+  if (Object.keys(SHARES_UNDER_CUSTODY).length) {
+    existingShares = Object.keys(SHARES_UNDER_CUSTODY).map(
+      tag => SHARES_UNDER_CUSTODY[tag].metaShare
     );
   }
 
@@ -114,16 +134,18 @@ function* downloadMetaShareWorker({ payload }) {
   );
   if (res.status === 200) {
     const { metaShare, dynamicNonPMDD } = res.data;
-    const updatedCustodyAssets = {
-      ...UNDER_CUSTODY,
-      [metaShare.meta.tag]: {
-        metaShare,
-        dynamicNonPMDD
+
+    const updatedBackup = {
+      ...DECENTRALIZED_BACKUP,
+      SHARES_UNDER_CUSTODY: {
+        ...DECENTRALIZED_BACKUP.SHARES_UNDER_CUSTODY,
+        [metaShare.meta.tag]: { metaShare, dynamicNonPMDD }
       }
     };
 
-    if (JSON.stringify(UNDER_CUSTODY) !== JSON.stringify(updatedCustodyAssets))
-      yield put(insertIntoDB({ UNDER_CUSTODY: updatedCustodyAssets }));
+    yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+  } else {
+    console.log({ err: res.err });
   }
   yield put(switchS3Loader("downloadMetaShare"));
 }
@@ -137,24 +159,36 @@ function* updateMSharesHealthWorker() {
   // set a timelapse for auto update and enable instantaneous manual update
   yield put(switchS3Loader("updateMSharesHealth"));
 
-  const { UNDER_CUSTODY } = yield select(state => state.storage.database);
-  const metaShares = Object.keys(UNDER_CUSTODY).map(
-    tag => UNDER_CUSTODY[tag].metaShare
+  const { DECENTRALIZED_BACKUP } = yield select(
+    state => state.storage.database
+  );
+  const { SHARES_UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
+  const metaShares = Object.keys(SHARES_UNDER_CUSTODY).map(
+    tag => SHARES_UNDER_CUSTODY[tag].metaShare
   );
 
   const res = yield call(S3Service.updateHealth, metaShares);
   if (res.status === 200) {
     const { updationInfo } = res.data;
-    Object.keys(UNDER_CUSTODY).forEach(tag => {
+    Object.keys(SHARES_UNDER_CUSTODY).forEach(tag => {
       for (let info of updationInfo) {
         if (info.updated) {
-          if (info.walletId === UNDER_CUSTODY[tag].metaShare.meta.walletId) {
-            UNDER_CUSTODY[tag].lastHealthUpdate = info.updatedAt;
+          if (
+            info.walletId === SHARES_UNDER_CUSTODY[tag].metaShare.meta.walletId
+          ) {
+            SHARES_UNDER_CUSTODY[tag].lastHealthUpdate = info.updatedAt;
           }
         }
       }
     });
-    yield put(insertIntoDB({ UNDER_CUSTODY }));
+
+    const updatedBackup = {
+      ...DECENTRALIZED_BACKUP,
+      SHARES_UNDER_CUSTODY
+    };
+    yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+  } else {
+    console.log({ err: res.err });
   }
   yield put(switchS3Loader("updateMSharesHealth"));
 }
@@ -168,8 +202,15 @@ function* checkMSharesHealthWorker() {
   yield put(switchS3Loader("checkMSharesHealth"));
   const s3Service: S3Service = yield select(state => state.sss.service);
 
+  const preInstance = JSON.stringify(s3Service);
   const res = yield call(s3Service.checkHealth);
+  const postInstance = JSON.stringify(s3Service);
+
   if (res.status === 200) {
+    if (preInstance !== postInstance)
+      yield put(insertIntoDB({ S3_SERVICE: JSON.stringify(s3Service) }));
+  } else {
+    console.log({ err: res.err });
   }
 
   yield put(switchS3Loader("checkMSharesHealth"));

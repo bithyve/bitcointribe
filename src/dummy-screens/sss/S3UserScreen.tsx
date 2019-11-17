@@ -17,12 +17,14 @@ import S3Service from "../../bitcoin/services/sss/S3Service";
 
 const S3UserScreen = props => {
   const dispatch = useDispatch();
-  const { loading } = useSelector(state => state.sss);
-  const s3Service: S3Service = useSelector(state => state.sss.service);
+  const { SHARES_TRANSFER_DETAILS } = useSelector(
+    state => state.storage.database.DECENTRALIZED_BACKUP
+  );
+  const { loading, service } = useSelector(state => state.sss);
+  const s3Service: S3Service = service;
 
   const {
     healthCheckInitialized,
-    metaShareTransferAssets,
     healthCheckStatus,
     metaShares
   } = s3Service.sss;
@@ -49,13 +51,14 @@ const S3UserScreen = props => {
         />
         {loading.uploadMetaShare ? (
           <ActivityIndicator size="small" style={{ marginHorizontal: 5 }} />
-        ) : metaShareTransferAssets[0] ? (
+        ) : metaShares.length && Object.keys(SHARES_TRANSFER_DETAILS).length ? (
           <View style={{ marginHorizontal: 40 }}>
             <Text style={{ marginTop: 12 }}>
-              OTP: {metaShareTransferAssets[0].otp}
+              OTP: {SHARES_TRANSFER_DETAILS[metaShares[0].shareId].otp}
             </Text>
             <Text style={{ marginTop: 12 }}>
-              EncKey: {metaShareTransferAssets[0].encryptedKey}
+              EncKey:
+              {SHARES_TRANSFER_DETAILS[metaShares[0].shareId].encryptedKey}
             </Text>
           </View>
         ) : null}
@@ -67,7 +70,8 @@ const S3UserScreen = props => {
         />
         {loading.checkMSharesHealth ? (
           <ActivityIndicator size="small" style={{ marginHorizontal: 5 }} />
-        ) : Object.keys(healthCheckStatus).length ? (
+        ) : Object.keys(healthCheckStatus).length &&
+          healthCheckStatus[metaShares[0].shareId] ? (
           (Date.now() - healthCheckStatus[metaShares[0].shareId]) / 1000 >
           15 ? (
             <Text style={{ marginTop: 12 }}>Bad</Text>
