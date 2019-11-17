@@ -9,6 +9,7 @@ export interface Database {
   TEST_ACCOUNT: string;
   SECURE_ACCOUNT: string;
   S3_SERVICE: string;
+  UNDER_CUSTODY: {};
 }
 
 export interface Services {

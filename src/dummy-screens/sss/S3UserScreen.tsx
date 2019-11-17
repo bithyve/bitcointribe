@@ -35,7 +35,6 @@ const S3UserScreen = props => {
         title="Prepare MShares"
         onPress={() => dispatch(prepareMShares())}
       />
-
       <View>
         <Button
           title="Upload Enc MShares(1)"

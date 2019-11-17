@@ -68,19 +68,18 @@ export default class S3Service {
   };
 
   public static downloadShare = async (
-    key: string
+    encryptedKey: string,
+    otp: string
   ): Promise<
     | {
         status: number;
         data:
           | {
-              encryptedMetaShare: string;
-              messageId: string;
+              metaShare: IMetaShare;
               dynamicNonPMDD: IDynamicNonPMDD;
             }
           | {
-              encryptedMetaShare: string;
-              messageId: string;
+              metaShare: IMetaShare;
               dynamicNonPMDD?: undefined;
             };
         err?: undefined;
@@ -96,23 +95,24 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await SSS.downloadShare(key)
+        data: await SSS.downloadShare(encryptedKey, otp)
       };
     } catch (err) {
       return { status: 502, err: err.message, message: ErrMap[502] };
     }
   };
 
-  public static decryptEncMetaShare = async (
-    encryptedMetaShare: string,
-    key: string,
+  public static downloadAndValidateShare = async (
+    encryptedKey: string,
+    otp: string,
     existingShares: IMetaShare[] = [],
     walletId?: string
   ): Promise<
     | {
         status: number;
         data: {
-          decryptedMetaShare: IMetaShare;
+          metaShare: IMetaShare;
+          dynamicNonPMDD: IDynamicNonPMDD;
         };
         err?: undefined;
         message?: undefined;
@@ -125,25 +125,15 @@ export default class S3Service {
       }
   > => {
     try {
-      const { decryptedMetaShare } = SSS.decryptMetaShare(
-        encryptedMetaShare,
-        key
-      );
-
-      if (
-        SSS.validateDecryption(decryptedMetaShare, existingShares, walletId)
-      ) {
-        const messageId = SSS.getMessageId(key, config.MSG_ID_LENGTH);
-        const { deleted } = await SSS.affirmDecryption(messageId);
-        if (!deleted) {
-          throw new Error("Unable to remove the share from the server");
-        } else {
-          return {
-            status: config.STATUS.SUCCESS,
-            data: { decryptedMetaShare }
-          };
-        }
-      }
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await SSS.downloadAndValidateShare(
+          encryptedKey,
+          otp,
+          existingShares,
+          walletId
+        )
+      };
     } catch (err) {
       return { status: 503, err: err.message, message: ErrMap[503] };
     }
