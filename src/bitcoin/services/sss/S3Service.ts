@@ -204,6 +204,7 @@ export default class S3Service {
             walletId: string;
             shareId: string;
             updated: boolean;
+            updatedAt?: number;
             dynamicNonPMDD?: IDynamicNonPMDD;
             err?: string;
           }>;

@@ -8,7 +8,7 @@ import {
   TextInput,
   ActivityIndicator
 } from "react-native";
-import { downloadMetaShare } from "../../store/actions/sss";
+import { downloadMShare, updateMSharesHealth } from "../../store/actions/sss";
 
 const S3GuardianScreen = props => {
   const dispatch = useDispatch();
@@ -54,9 +54,18 @@ const S3GuardianScreen = props => {
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Button
           title="Download MShare"
-          onPress={() => dispatch(downloadMetaShare(otp, encryptedKey))}
+          onPress={() => dispatch(downloadMShare(otp, encryptedKey))}
         />
         {loading.downloadMetaShare ? (
+          <ActivityIndicator size="small" style={{ marginHorizontal: 5 }} />
+        ) : null}
+      </View>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Button
+          title="Update Health"
+          onPress={() => dispatch(updateMSharesHealth())}
+        />
+        {loading.updateMSharesHealth ? (
           <ActivityIndicator size="small" style={{ marginHorizontal: 5 }} />
         ) : null}
       </View>
