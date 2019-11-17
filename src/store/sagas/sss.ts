@@ -12,8 +12,6 @@ import {
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
-import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
-import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
 
 function* initHCWorker() {
   const s3Service: S3Service = yield select(state => state.sss.service);
@@ -74,8 +72,6 @@ export const generateMetaSharesWatcher = createWatcher(
 );
 
 function* uploadEncMetaShareWorker({ payload }) {
-  yield put(switchS3Loader("uploadMetaShare"));
-
   const s3Service: S3Service = yield select(state => state.sss.service);
   if (!s3Service.sss.metaShares.length) return;
 
@@ -88,6 +84,7 @@ function* uploadEncMetaShareWorker({ payload }) {
   if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[shareId]) return;
 
   // TODO: 10 min removal strategy
+  yield put(switchS3Loader("uploadMetaShare"));
 
   const res = yield call(s3Service.uploadShare, payload.shareIndex);
   console.log({ otp: res.data.otp, encryptedKey: res.data.encryptedKey });
