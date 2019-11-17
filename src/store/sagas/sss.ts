@@ -95,13 +95,31 @@ export const uploadEncMetaShareWatcher = createWatcher(
 
 function* downloadMetaShareWorker({ payload }) {
   yield put(switchS3Loader("downloadMetaShare"));
-  const { otp, encryptedKey } = payload;
 
-  const res = yield call(S3Service.downloadShare, encryptedKey, otp);
-  console.log({ res });
-  // if (res.status === 200) {
-  //   yield put(insertIntoDB({ S3_SERVICE: JSON.stringify(s3Service) }));
-  // }
+  const { otp, encryptedKey } = payload;
+  const { UNDER_CUSTODY } = yield select(state => state.storage.database);
+  const existingShares = Object.keys(UNDER_CUSTODY).map(
+    tag => UNDER_CUSTODY[tag].metaShare
+  );
+  const res = yield call(
+    S3Service.downloadAndValidateShare,
+    encryptedKey,
+    otp,
+    existingShares
+  );
+  if (res.status === 200) {
+    const { metaShare, dynamicNonPMDD } = res.data;
+    const updatedCustodyAssets = {
+      ...UNDER_CUSTODY,
+      [metaShare.meta.tag]: {
+        metaShare,
+        dynamicNonPMDD
+      }
+    };
+
+    if (JSON.stringify(UNDER_CUSTODY) !== JSON.stringify(updatedCustodyAssets))
+      yield put(insertIntoDB({ UNDER_CUSTODY: updatedCustodyAssets }));
+  }
   yield put(switchS3Loader("downloadMetaShare"));
 }
 

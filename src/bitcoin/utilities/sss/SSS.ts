@@ -77,9 +77,11 @@ export default class SSS {
     | {
         metaShare: IMetaShare;
         dynamicNonPMDD: IDynamicNonPMDD;
+        messageId: string;
       }
     | {
         metaShare: IMetaShare;
+        messageId: string;
         dynamicNonPMDD?: undefined;
       }
   > => {
@@ -97,9 +99,9 @@ export default class SSS {
     const { share, dynamicNonPMDD } = res.data;
     const metaShare = SSS.decryptMetaShare(share, key).decryptedMetaShare;
     if (dynamicNonPMDD) {
-      return { metaShare, dynamicNonPMDD };
+      return { metaShare, dynamicNonPMDD, messageId };
     }
-    return { metaShare };
+    return { metaShare, messageId };
   };
 
   public static validateDecryption = (
@@ -142,6 +144,26 @@ export default class SSS {
     }
 
     return { deleted: res.data.deleted };
+  };
+
+  public static downloadAndValidateShare = async (
+    encryptedKey: string,
+    otp: string,
+    existingShares?: IMetaShare[],
+    walletId?: string
+  ) => {
+    const { metaShare, messageId, dynamicNonPMDD } = await SSS.downloadShare(
+      encryptedKey,
+      otp
+    );
+
+    if (SSS.validateDecryption(metaShare, existingShares, walletId)) {
+      const { deleted } = await SSS.affirmDecryption(messageId);
+      if (!deleted) {
+        console.log("Unable to remove the share from the server");
+      }
+      return { metaShare, dynamicNonPMDD };
+    }
   };
 
   public static decryptViaOTP = (
