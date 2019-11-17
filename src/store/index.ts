@@ -4,15 +4,17 @@ import createSagaMiddleware from "redux-saga";
 import { call, all, spawn } from "redux-saga/effects";
 import { composeWithDevTools } from "redux-devtools-extension";
 
+import storageReducer from "./reducers/storage";
+import accountsReducer from "./reducers/accounts";
+import sssReducer from "./reducers/sss";
+import secureAccountReducer from "./reducers/secureAccount-setup";
 import {
   initDBWatcher,
   fetchDBWatcher,
-  insertDBWatcher
+  insertDBWatcher,
+  servicesEnricherWatcher
 } from "./sagas/storage";
 import { initSetupWatcher } from "./sagas/wallet-setup";
-import storageReducer from "./reducers/storage";
-import accountsReducer from "./reducers/accounts";
-import secureAccountReducer from "./reducers/secureAccount-setup";
 import {
   fetchAddrWatcher,
   fetchBalanceWatcher,
@@ -22,6 +24,14 @@ import {
   testcoinsWatcher
 } from "./sagas/accounts";
 import {setupSecureAccountWatcher, checkHealthtWatcher,isActiveWatcher}from "./sagas/secureAccount-setup";
+import {
+  initHCWatcher,
+  generateMetaSharesWatcher,
+  uploadEncMetaShareWatcher,
+  downloadMetaShareWatcher,
+  updateMSharesHealthWatcher,
+  checkMSharesHealthWatcher
+} from "./sagas/sss";
 
 // const rootSaga = function*() {
 //   yield all([
@@ -46,6 +56,7 @@ const rootSaga = function*() {
     initDBWatcher,
     fetchDBWatcher,
     insertDBWatcher,
+    servicesEnricherWatcher,
 
     // wallet setup watcher
     initSetupWatcher,
@@ -56,12 +67,20 @@ const rootSaga = function*() {
     fetchTransactionsWatcher,
     transferST1Watcher,
     transferST2Watcher,
+    testcoinsWatcher,
+
+    // sss watchers
+    initHCWatcher,
+    generateMetaSharesWatcher,
+    uploadEncMetaShareWatcher,
+    downloadMetaShareWatcher,
+    updateMSharesHealthWatcher,
+    checkMSharesHealthWatcher,
+
     //secure account watcher
     setupSecureAccountWatcher,
     checkHealthtWatcher,
     isActiveWatcher,
-    //test 
-    testcoinsWatcher
   ];
 
   yield all(
@@ -83,7 +102,8 @@ const rootSaga = function*() {
 const rootReducer = combineReducers({
   storage: storageReducer,
   accounts: accountsReducer,
-  secureAccount: secureAccountReducer
+  secureAccount: secureAccountReducer,
+  sss: sssReducer
 });
 
 const sagaMiddleware = createSagaMiddleware();

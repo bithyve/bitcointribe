@@ -9,6 +9,10 @@ const Screen = props => {
   );
 };
 
+Screen.navigationOptions = {
+  headerTitle: "Screen"
+};
+
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
