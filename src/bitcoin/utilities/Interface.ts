@@ -18,6 +18,7 @@ export interface Transactions {
 
 export interface IMetaShare {
   encryptedShare: string;
+  shareId: string;
   meta: {
     version: number;
     validator: string;

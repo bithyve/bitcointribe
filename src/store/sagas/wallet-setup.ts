@@ -37,7 +37,8 @@ function* initSetupWorker({ payload }) {
 
     const toBeInserted = {
       WALLET_SETUP: { walletName, securityAns },
-      ...accounts
+      ...accounts,
+      UNDER_CUSTODY: {}
     };
 
     yield put(insertIntoDB(toBeInserted));

@@ -5,6 +5,7 @@ export const PREPARE_MSHARES = "PREPARE_MSHARES";
 export const UPLOAD_ENC_MSHARES = "UPLOAD_ENC_MSHARES";
 export const DOWNLOAD_MSHARE = "DOWNLOAD_MSHARE";
 export const UPDATE_MSHARES_HEALTH = "UPDATE_MSHARES_HEALTH";
+export const CHECK_MSHARES_HEALTH = "CHECK_MSHARES_HEALTH";
 export const S3_LOADING = "S3_LOADING";
 
 export const initHealthCheck = () => {
@@ -25,6 +26,10 @@ export const downloadMShare = (otp, encryptedKey) => {
 
 export const updateMSharesHealth = () => {
   return { type: UPDATE_MSHARES_HEALTH };
+};
+
+export const checkMSharesHealth = () => {
+  return { type: CHECK_MSHARES_HEALTH };
 };
 
 export const switchS3Loader = beingLoaded => {

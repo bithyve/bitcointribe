@@ -272,8 +272,10 @@ export default class SSS {
 
     const toUpdate: Array<{ walletId: string; shareId: string }> = [];
     for (const metaShare of metaShares) {
-      const { shareId } = SSS.getShareId(metaShare.encryptedShare);
-      toUpdate.push({ walletId: metaShare.meta.walletId, shareId });
+      toUpdate.push({
+        walletId: metaShare.meta.walletId,
+        shareId: metaShare.shareId
+      });
     }
 
     let res: AxiosResponse;
@@ -289,18 +291,11 @@ export default class SSS {
     return { updationInfo };
   };
 
-  public static getShareId = (
-    encryptedShare: string
-  ): {
-    shareId: string;
-  } => {
-    return {
-      shareId: crypto
-        .createHash("sha256")
-        .update(encryptedShare)
-        .digest("hex")
-    };
-  };
+  public static getShareId = (encryptedSecret: string): string =>
+    crypto
+      .createHash("sha256")
+      .update(JSON.stringify(encryptedSecret))
+      .digest("hex");
 
   public static makeKey = (length: number): string => {
     let result = "";
@@ -398,6 +393,7 @@ export default class SSS {
     encryptedMetaShare: string;
   }>;
   public healthCheckInitialized: boolean;
+  public healthCheckStatus: {};
 
   constructor(
     mnemonic: string,
@@ -411,6 +407,7 @@ export default class SSS {
         encryptedKey: string;
         encryptedMetaShare: string;
       }>;
+      healthCheckStatus: {};
     }
   ) {
     if (bip39.validateMnemonic(mnemonic)) {
@@ -432,6 +429,7 @@ export default class SSS {
     this.metaShareTransferAssets = stateVars
       ? stateVars.metaShareTransferAssets
       : [];
+    this.healthCheckStatus = stateVars ? stateVars.healthCheckStatus : {};
   }
 
   public stringToHex = (str: string): string => secrets.str2hex(str);
@@ -522,15 +520,15 @@ export default class SSS {
   public initializeHealthcheck = async (): Promise<{
     success: boolean;
   }> => {
-    if (this.healthCheckInitialized) {
+    if (this.healthCheckInitialized)
       throw new Error("Health Check is already initialized.");
-    }
 
-    const shareIDs: string[] = [];
-    for (const encryptedShare of this.encryptedShares) {
-      const { shareId } = SSS.getShareId(encryptedShare);
-      shareIDs.push(shareId);
-    }
+    if (!this.metaShares.length)
+      throw new Error("Can not initialize health check; missing MetaShares");
+
+    const shareIDs = this.metaShares
+      .slice(0, 3)
+      .map(metaShare => metaShare.shareId);
 
     let res: AxiosResponse;
     try {
@@ -549,12 +547,22 @@ export default class SSS {
     };
   };
 
-  public checkHealth = async (shareIDs: string[]) => {
+  public checkHealth = async (): Promise<{
+    healthCheckStatus: {};
+  }> => {
     let res: AxiosResponse;
+
+    if (!this.metaShares.length)
+      throw new Error("Can not initialize health check; missing MetaShares");
+
+    const shareIDs = this.metaShares
+      .slice(0, 3)
+      .map(metaShare => metaShare.shareId);
+
     try {
       res = await BH_AXIOS.post("checkSharesHealth", {
         walletID: this.walletId,
-        shareIDs: shareIDs.filter(shareId => shareId !== null)
+        shareIDs
       });
     } catch (err) {
       throw new Error(err.response.data.err);
@@ -563,21 +571,12 @@ export default class SSS {
     const updates: Array<{ shareId: string; updatedAt: number }> =
       res.data.lastUpdateds;
 
-    const lastUpdateds = [];
-    for (let itr = 0; itr <= shareIDs.length; itr++) {
-      if (shareIDs[itr] === null) {
-        lastUpdateds[itr] = null;
-      } else {
-        for (const update of updates) {
-          if (update.shareId === shareIDs[itr]) {
-            lastUpdateds[itr] = update;
-          }
-        }
-      }
+    for (const { shareId, updatedAt } of updates) {
+      this.healthCheckStatus[shareId] = updatedAt;
     }
 
     return {
-      lastUpdateds
+      healthCheckStatus: this.healthCheckStatus
     };
   };
 
@@ -832,6 +831,7 @@ export default class SSS {
       if (index !== 2) {
         metaShare = {
           encryptedShare,
+          shareId: SSS.getShareId(encryptedShare),
           meta: {
             version: version ? version : 0,
             validator: "HEXA",
@@ -845,6 +845,7 @@ export default class SSS {
       } else {
         metaShare = {
           encryptedShare,
+          shareId: SSS.getShareId(encryptedShare),
           meta: {
             version: version ? version : 0,
             validator: "HEXA",
