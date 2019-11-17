@@ -17,7 +17,8 @@ export default class S3Service {
       metaShares,
       healthCheckInitialized,
       walletId,
-      metaShareTransferAssets
+      metaShareTransferAssets,
+      healthCheckStatus
     }: {
       mnemonic: string;
       encryptedShares: string[];
@@ -29,6 +30,7 @@ export default class S3Service {
         encryptedKey: string;
         encryptedMetaShare: string;
       }>;
+      healthCheckStatus: {};
     } = sss;
 
     return new S3Service(mnemonic, {
@@ -36,7 +38,8 @@ export default class S3Service {
       metaShares,
       healthCheckInitialized,
       walletId,
-      metaShareTransferAssets
+      metaShareTransferAssets,
+      healthCheckStatus
     });
   };
 
@@ -249,7 +252,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: SSS.getShareId(encryptedShare)
+        data: { shareId: SSS.getShareId(encryptedShare) }
       };
     } catch (err) {
       return { status: 507, err: err.message, message: ErrMap[507] };
@@ -322,6 +325,7 @@ export default class S3Service {
         encryptedKey: string;
         encryptedMetaShare: string;
       }>;
+      healthCheckStatus: {};
     }
   ) {
     this.sss = new SSS(mnemonic, stateVars);
@@ -434,16 +438,11 @@ export default class S3Service {
     }
   };
 
-  public checkHealth = async (
-    shareIDs: string[]
-  ): Promise<
+  public checkHealth = async (): Promise<
     | {
         status: number;
         data: {
-          lastUpdateds: Array<{
-            shareId: string;
-            updatedAt: number;
-          }>;
+          healthCheckStatus: {};
         };
         err?: undefined;
         message?: undefined;
@@ -458,7 +457,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.checkHealth(shareIDs)
+        data: await this.sss.checkHealth()
       };
     } catch (err) {
       return { status: 514, err: err.message, message: ErrMap[514] };
