@@ -20,8 +20,11 @@ export const uploadEncMShares = (shareIndex: 0 | 1 | 2) => {
   return { type: UPLOAD_ENC_MSHARES, payload: { shareIndex } };
 };
 
-export const downloadMShare = (otp, encryptedKey) => {
-  return { type: DOWNLOAD_MSHARE, payload: { otp, encryptedKey } };
+export const downloadMShare = (otp, encryptedKey, downloadType?) => {
+  return {
+    type: DOWNLOAD_MSHARE,
+    payload: { otp, encryptedKey, downloadType }
+  };
 };
 
 export const updateMSharesHealth = () => {
