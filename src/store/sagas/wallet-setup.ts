@@ -37,6 +37,10 @@ function* initSetupWorker({ payload }) {
 
     const toBeInserted = {
       WALLET_SETUP: { walletName, securityAns },
+      DECENTRALIZED_BACKUP: {
+        SHARES_TRANSFER_DETAILS: {},
+        SHARES_UNDER_CUSTODY: {}
+      },
       ...accounts
     };
 

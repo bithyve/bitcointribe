@@ -10,19 +10,31 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   initHealthCheck,
   prepareMShares,
-  uploadEncMShares
+  uploadEncMShares,
+  checkMSharesHealth
 } from "../../store/actions/sss";
-import { S3_SERVICE } from "../../common/constants/serviceTypes";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 
 const S3UserScreen = props => {
   const dispatch = useDispatch();
-  const { loading } = useSelector(state => state.sss);
-  const s3Service: S3Service = useSelector(state => state.sss.service);
+  const { SHARES_TRANSFER_DETAILS } = useSelector(
+    state => state.storage.database.DECENTRALIZED_BACKUP
+  );
+  const { loading, service } = useSelector(state => state.sss);
+  const s3Service: S3Service = service;
 
-  const { healthCheckInitialized, metaShareTransferAssets } = s3Service.sss;
+  const {
+    healthCheckInitialized,
+    healthCheckStatus,
+    metaShares
+  } = s3Service.sss;
   return (
     <View style={styles.screen}>
+      <Button
+        title="Prepare MShares"
+        onPress={() => dispatch(prepareMShares())}
+      />
+
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Button title="Init HC" onPress={() => dispatch(initHealthCheck())} />
         {loading.hcInit ? (
@@ -31,10 +43,6 @@ const S3UserScreen = props => {
           <Text style={{ marginTop: 12 }}>HC Initialized!</Text>
         ) : null}
       </View>
-      <Button
-        title="Prepare MShares"
-        onPress={() => dispatch(prepareMShares())}
-      />
 
       <View>
         <Button
@@ -43,16 +51,36 @@ const S3UserScreen = props => {
         />
         {loading.uploadMetaShare ? (
           <ActivityIndicator size="small" style={{ marginHorizontal: 5 }} />
-        ) : metaShareTransferAssets[0] ? (
+        ) : metaShares.length && Object.keys(SHARES_TRANSFER_DETAILS).length ? (
           <View style={{ marginHorizontal: 40 }}>
             <Text style={{ marginTop: 12 }}>
-              OTP: {metaShareTransferAssets[0].otp}
+              OTP: {SHARES_TRANSFER_DETAILS[metaShares[0].shareId].otp}
             </Text>
             <Text style={{ marginTop: 12 }}>
-              EncKey: {metaShareTransferAssets[0].encryptedKey}
+              EncKey:
+              {SHARES_TRANSFER_DETAILS[metaShares[0].shareId].encryptedKey}
             </Text>
           </View>
         ) : null}
+      </View>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Button
+          title="Check Health"
+          onPress={() => dispatch(checkMSharesHealth())}
+        />
+        {loading.checkMSharesHealth ? (
+          <ActivityIndicator size="small" style={{ marginHorizontal: 5 }} />
+        ) : Object.keys(healthCheckStatus).length &&
+          healthCheckStatus[metaShares[0].shareId] ? (
+          (Date.now() - healthCheckStatus[metaShares[0].shareId]) / 1000 >
+          15 ? (
+            <Text style={{ marginTop: 12 }}>Bad</Text>
+          ) : (
+            <Text style={{ marginTop: 12 }}>Great</Text>
+          )
+        ) : (
+          <Text style={{ marginTop: 12 }}>No updates</Text>
+        )}
       </View>
     </View>
   );
