@@ -29,7 +29,8 @@ import {
   downloadMetaShareWatcher,
   updateMSharesHealthWatcher,
   checkMSharesHealthWatcher,
-  uploadRequestedShareWatcher
+  uploadRequestedShareWatcher,
+  requestShareWatcher
 } from "./sagas/sss";
 
 // const rootSaga = function*() {
@@ -75,7 +76,8 @@ const rootSaga = function*() {
     downloadMetaShareWatcher,
     updateMSharesHealthWatcher,
     checkMSharesHealthWatcher,
-    uploadRequestedShareWatcher
+    uploadRequestedShareWatcher,
+    requestShareWatcher
   ];
 
   yield all(

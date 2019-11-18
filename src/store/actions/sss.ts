@@ -7,6 +7,7 @@ export const UPLOAD_REQUESTED_SHARE = "UPLOAD_REQUESTED_SHARE";
 export const DOWNLOAD_MSHARE = "DOWNLOAD_MSHARE";
 export const UPDATE_MSHARES_HEALTH = "UPDATE_MSHARES_HEALTH";
 export const CHECK_MSHARES_HEALTH = "CHECK_MSHARES_HEALTH";
+export const REQUEST_SHARE = "REQUEST_SHARE";
 export const S3_LOADING = "S3_LOADING";
 
 export const initHealthCheck = () => {
@@ -38,6 +39,10 @@ export const updateMSharesHealth = () => {
 
 export const checkMSharesHealth = () => {
   return { type: CHECK_MSHARES_HEALTH };
+};
+
+export const requestShare = () => {
+  return { type: REQUEST_SHARE };
 };
 
 export const switchS3Loader = beingLoaded => {
