@@ -236,7 +236,7 @@ export default class SecureHDWallet extends Bitcoin {
           continue;
         }
         const { address } = this.createSecureMultiSig(
-          this.nextFreeChildIndex + itr,
+          this.nextFreeChildIndex + itr
         );
 
         const txCounts = await this.getTxCounts([address]);
@@ -523,11 +523,11 @@ export default class SecureHDWallet extends Bitcoin {
     try {
       const path = this.derivePath(bhXpub);
       const primaryXpub = this.getRecoverableXKey(this.primaryMnemonic, path);
-       console.log(primaryXpub);
+
       if (!secondaryXpub) {
         secondaryXpub = this.getRecoverableXKey(this.secondaryMnemonic, path);
       }
-      console.log(secondaryXpub);
+
       this.primaryXpriv = this.getRecoverableXKey(
         this.primaryMnemonic,
         path,
@@ -539,7 +539,7 @@ export default class SecureHDWallet extends Bitcoin {
         secondary: secondaryXpub,
         bh: bhXpub
       };
-      console.log(this.xpubs);
+
       return {
         prepared: true
       };
@@ -738,20 +738,14 @@ export default class SecureHDWallet extends Bitcoin {
       return this.multiSigCache[childIndex];
     } // cache hit
 
-    // console.log(`creating multiSig against index: ${childIndex}`);
-     console.log(childIndex);
-    //  const x = this.getSecondaryXpub();
-    console.log("this from secureHDaccount");
-     console.log(this);
-     console.log("secondary mnemo: "+ this.secondaryMnemonic);
-     console.log("..." + this.xpubs.primary);
+    console.log(`creating multiSig against index: ${childIndex}`);
 
     const childPrimaryPub = this.getPub(
       this.deriveChildXKey(this.xpubs.primary, childIndex)
     );
     const childRecoveryPub = this.getPub(
       this.deriveChildXKey(this.xpubs.secondary, childIndex)
-    );  
+    );
     const childBHPub = this.getPub(
       this.deriveChildXKey(this.xpubs.bh, childIndex)
     );
@@ -761,7 +755,7 @@ export default class SecureHDWallet extends Bitcoin {
     const pubs = [childBHPub, childPrimaryPub, childRecoveryPub];
     // console.log({ pubs });
     const multiSig = this.generateMultiSig(2, pubs);
-  
+
     return (this.multiSigCache[childIndex] = {
       scripts: {
         redeem: multiSig.p2sh.redeem.output.toString("hex"),

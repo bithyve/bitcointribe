@@ -341,8 +341,6 @@ export default class SecureAccount {
       }
   > => {
     try {
-      console.log("getmnemonic from Sa");
-      console.log(this);
       return {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.getReceivingAddress()

@@ -7,7 +7,7 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import storageReducer from "./reducers/storage";
 import accountsReducer from "./reducers/accounts";
 import sssReducer from "./reducers/sss";
-import secureAccountReducer from "./reducers/secureAccount-setup";
+import secureAccountReducer from "./reducers/secureAccount";
 import {
   initDBWatcher,
   fetchDBWatcher,
@@ -23,7 +23,13 @@ import {
   transferST2Watcher,
   testcoinsWatcher
 } from "./sagas/accounts";
-import {setupSecureAccountWatcher, checkHealthtWatcher,isActiveWatcher}from "./sagas/secureAccount-setup";
+import {
+  setupSecureAccountWatcher, 
+  checkHealthtWatcher,
+  isActiveWatcher,
+  secureFetchAddrWatcher,
+  secureFetchBalanceWatcher,
+  secureFetchTransactionsWatcher}from "./sagas/secureAccount";
 import {
   initHCWatcher,
   generateMetaSharesWatcher,
@@ -81,6 +87,9 @@ const rootSaga = function*() {
     setupSecureAccountWatcher,
     checkHealthtWatcher,
     isActiveWatcher,
+    secureFetchAddrWatcher,
+    secureFetchBalanceWatcher,
+    secureFetchTransactionsWatcher
   ];
 
   yield all(

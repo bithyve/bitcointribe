@@ -1,44 +1,67 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, Text, StyleSheet, Button } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
     setupSecureAccount,
     checkHealth,
     isActive,
-} from "../../store/actions/secureAccount-setup";
+    secureFetchAddress,
+    secureFetchBalance,
+    secureFetchTransactions
+} from "../../store/actions/secureAccount";
 import {
   SECURE_ACCOUNT
-} from "../../common/constants/accountTypes";
+} from "../../common/constants/serviceTypes";
 const SecureAccountScreen = props => {
-  const accountType = props.navigation.getParam("accountType");
+  const serviceType = props.navigation.getParam("serviceType");
   const dispatch = useDispatch();
-
+  // const {service } = useSelector(
+  //   state => state.secureAccount[serviceType]
+  // );
   return (
     <View style={styles.screen}>
-      <Text>{accountType} Here!</Text>
+      <Text>{serviceType} Here!</Text>
       <Button
         title="Setup Secure Account"
         onPress={async() => {
-       dispatch(setupSecureAccount(accountType));
+       dispatch(setupSecureAccount(serviceType));
         }}
       />
       <Button
         title="SecureAcc isActive "
         onPress={async() => {
-       dispatch(isActive(accountType));
+       dispatch(isActive(serviceType));
         }}
       />
       <Button
         title="Check Health"
         onPress={async() => {
-       dispatch(checkHealth(accountType));
+       dispatch(checkHealth(serviceType));
         }}
       /> 
+      <Button
+        title="Fetch Addr"
+        onPress={() => {
+          dispatch(secureFetchAddress(serviceType));
+        }}
+      />
+      <Button
+        title="Fetch Balance"
+        onPress={async () => {
+          dispatch(secureFetchBalance(serviceType));
+        }}
+      />
+      <Button
+        title="Fetch Transactions"
+        onPress={async () => {
+          dispatch(secureFetchTransactions(serviceType));
+        }}
+      />
      <Button
-            title="Secure Account"
-            onPress={async() => {
+            title="Transfer"
+            onPress={() => {
               props.navigation.navigate("Account", {
-                accountType: SECURE_ACCOUNT
+                serviceType: SECURE_ACCOUNT
               });
             }}
       />   
@@ -46,7 +69,11 @@ const SecureAccountScreen = props => {
     
   );
 };
-
+SecureAccountScreen.navigationOptions = navData => {
+  return {
+    headerTitle: navData.navigation.getParam("serviceType")
+  };
+};
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
