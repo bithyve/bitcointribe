@@ -8,7 +8,8 @@ import {
   UPLOAD_ENC_MSHARES,
   DOWNLOAD_MSHARE,
   UPDATE_MSHARES_HEALTH,
-  CHECK_MSHARES_HEALTH
+  CHECK_MSHARES_HEALTH,
+  UPLOAD_REQUESTED_SHARE
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
@@ -73,6 +74,7 @@ export const generateMetaSharesWatcher = createWatcher(
 );
 
 function* uploadEncMetaShareWorker({ payload }) {
+  // Transfer: User >>> Guardian
   const s3Service: S3Service = yield select(state => state.sss.service);
   if (!s3Service.sss.metaShares.length) return;
 
@@ -111,6 +113,38 @@ export const uploadEncMetaShareWatcher = createWatcher(
   UPLOAD_ENC_MSHARES
 );
 
+function* uploadRequestedShareWorker({ payload }) {
+  // Transfer: Guardian >>> User
+  const { tag, encryptedKey, otp } = payload;
+  const { SHARES_UNDER_CUSTODY } = yield select(
+    state => state.storage.database.DECENTRALIZED_BACKUP.SHARES_UNDER_CUSTODY
+  );
+
+  const { metaShare, dynamicNonPMDD } = SHARES_UNDER_CUSTODY[tag];
+  // TODO: 10 min removal strategy
+  yield put(switchS3Loader("uploadRequestedShare"));
+
+  const res = yield call(
+    S3Service.uploadRequestedShare,
+    encryptedKey,
+    otp,
+    metaShare,
+    dynamicNonPMDD
+  );
+
+  if (res.status === 200 && res.data.success === true) {
+    return; // yield success
+  } else {
+    console.log({ res });
+  }
+  yield put(switchS3Loader("uploadRequestedShare"));
+}
+
+export const uploadRequestedShareWatcher = createWatcher(
+  uploadRequestedShareWorker,
+  UPLOAD_REQUESTED_SHARE
+);
+
 function* downloadMetaShareWorker({ payload }) {
   yield put(switchS3Loader("downloadMetaShare"));
 
@@ -119,7 +153,7 @@ function* downloadMetaShareWorker({ payload }) {
     state => state.storage.database
   );
 
-  const { SHARES_UNDER_CUSTODY, RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
+  const { SHARES_UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
 
   let res;
   if (payload.downloadType !== "recovery") {

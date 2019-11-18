@@ -3,6 +3,7 @@
 export const INIT_HEALTH_CHECK = "INIT_HEALTH_CHECK";
 export const PREPARE_MSHARES = "PREPARE_MSHARES";
 export const UPLOAD_ENC_MSHARES = "UPLOAD_ENC_MSHARES";
+export const UPLOAD_REQUESTED_SHARE = "UPLOAD_REQUESTED_SHARE";
 export const DOWNLOAD_MSHARE = "DOWNLOAD_MSHARE";
 export const UPDATE_MSHARES_HEALTH = "UPDATE_MSHARES_HEALTH";
 export const CHECK_MSHARES_HEALTH = "CHECK_MSHARES_HEALTH";
@@ -18,6 +19,10 @@ export const prepareMShares = () => {
 
 export const uploadEncMShares = (shareIndex: 0 | 1 | 2) => {
   return { type: UPLOAD_ENC_MSHARES, payload: { shareIndex } };
+};
+
+export const uploadRequestedShare = (tag, encryptedKey, otp) => {
+  return { type: UPLOAD_REQUESTED_SHARE, payload: { tag, encryptedKey, otp } };
 };
 
 export const downloadMShare = (otp, encryptedKey, downloadType?) => {

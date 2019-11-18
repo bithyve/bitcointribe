@@ -141,6 +141,59 @@ export default class SSS {
     return { deleted: res.data.deleted };
   };
 
+  public static encryptMetaShare = (
+    metaShare: MetaShare,
+    key?: string
+  ): { encryptedMetaShare: string; key: string; messageId: string } => {
+    if (!key) {
+      key = SSS.makeKey(SSS.cipherSpec.keyLength);
+    }
+    const messageId: string = SSS.getMessageId(key, config.MSG_ID_LENGTH);
+    const cipher = crypto.createCipheriv(
+      SSS.cipherSpec.algorithm,
+      key,
+      SSS.cipherSpec.iv
+    );
+    let encrypted = cipher.update(JSON.stringify(metaShare), "utf8", "hex");
+    encrypted += cipher.final("hex");
+    const encryptedMetaShare = encrypted;
+    return {
+      encryptedMetaShare,
+      key,
+      messageId
+    };
+  };
+
+  public static uploadRequestedShare = async (
+    encryptedKey: string,
+    otp: string,
+    metaShare: MetaShare,
+    dynamicNonPMDD?: DynamicNonPMDD
+  ): Promise<{ success: boolean }> => {
+    const key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
+    const { encryptedMetaShare, messageId } = SSS.encryptMetaShare(
+      metaShare,
+      key
+    );
+
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post("uploadShare", {
+        share: encryptedMetaShare,
+        messageId,
+        dynamicNonPMDD
+      });
+    } catch (err) {
+      throw new Error(err.response.data.err);
+    }
+
+    const { success } = res.data;
+    if (!success) {
+      throw new Error("Unable to upload share");
+    }
+    return { success };
+  };
+
   public static downloadAndValidateShare = async (
     encryptedKey: string,
     otp: string,
@@ -459,7 +512,7 @@ export default class SSS {
 
     let res: AxiosResponse;
     const metaShare: MetaShare = this.metaShares[shareIndex];
-    const { encryptedMetaShare, key, messageId } = this.encryptMetaShare(
+    const { encryptedMetaShare, key, messageId } = SSS.encryptMetaShare(
       metaShare
     );
 
@@ -479,29 +532,6 @@ export default class SSS {
     }
     const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
     return { otp, encryptedKey: otpEncryptedData };
-  };
-
-  public encryptMetaShare = (
-    metaShare: MetaShare,
-    key?: string
-  ): { encryptedMetaShare: string; key: string; messageId: string } => {
-    if (!key) {
-      key = SSS.makeKey(SSS.cipherSpec.keyLength);
-    }
-    const messageId: string = SSS.getMessageId(key, config.MSG_ID_LENGTH);
-    const cipher = crypto.createCipheriv(
-      SSS.cipherSpec.algorithm,
-      key,
-      SSS.cipherSpec.iv
-    );
-    let encrypted = cipher.update(JSON.stringify(metaShare), "utf8", "hex");
-    encrypted += cipher.final("hex");
-    const encryptedMetaShare = encrypted;
-    return {
-      encryptedMetaShare,
-      key,
-      messageId
-    };
   };
 
   public initializeHealthcheck = async (): Promise<{
