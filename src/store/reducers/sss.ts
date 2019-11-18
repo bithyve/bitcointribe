@@ -11,6 +11,7 @@ const initialState: {
     downloadMetaShare: Boolean;
     updateMSharesHealth: Boolean;
     checkMSharesHealth: Boolean;
+    uploadRequestedShare: Boolean;
   };
 } = {
   service: null,
@@ -19,7 +20,8 @@ const initialState: {
     uploadMetaShare: false,
     downloadMetaShare: false,
     updateMSharesHealth: false,
-    checkMSharesHealth: false
+    checkMSharesHealth: false,
+    uploadRequestedShare: false
   }
 };
 
