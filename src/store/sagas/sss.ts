@@ -10,11 +10,14 @@ import {
   UPDATE_MSHARES_HEALTH,
   CHECK_MSHARES_HEALTH,
   UPLOAD_REQUESTED_SHARE,
-  REQUEST_SHARE
+  REQUEST_SHARE,
+  RECOVER_MNEMONIC,
+  mnemonicRecovered
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
 import { AxiosResponse } from "axios";
+import { MetaShare } from "../../bitcoin/utilities/Interface";
 
 function* initHCWorker() {
   const s3Service: S3Service = yield select(state => state.sss.service);
@@ -137,6 +140,7 @@ function* requestShareWorker() {
       { REQUEST_DETAILS: { tag: walletName, otp, encryptedKey } }
     ]
   };
+  console.log(updatedBackup.RECOVERY_SHARES);
 
   yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
 }
@@ -316,4 +320,31 @@ function* checkMSharesHealthWorker() {
 export const checkMSharesHealthWatcher = createWatcher(
   checkMSharesHealthWorker,
   CHECK_MSHARES_HEALTH
+);
+
+function* recoverMnemonicWorker({ payload }) {
+  const { securityAns, metaShares } = payload;
+  if (metaShares.length !== 3) return;
+
+  const encryptedSecrets: string[] = metaShares.map(
+    metaShare => metaShare.encryptedSecret
+  );
+
+  const res = yield call(
+    S3Service.recoverFromSecrets,
+    encryptedSecrets,
+    securityAns
+  );
+
+  if (res.status === 200) {
+    // TODO: recreate accounts and write to database
+    yield put(mnemonicRecovered(res.data.mnemonic)); // storing in redux state (for demo)
+  } else {
+    console.log({ err: res.err });
+  }
+}
+
+export const recoverMnemonicWatcer = createWatcher(
+  recoverMnemonicWorker,
+  RECOVER_MNEMONIC
 );

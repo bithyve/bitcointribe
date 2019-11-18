@@ -15,7 +15,10 @@ import {
   clearTransfer,
   getTestcoins
 } from "../../store/actions/accounts";
-import { TEST_ACCOUNT } from "../../common/constants/serviceTypes";
+import {
+  TEST_ACCOUNT,
+  REGULAR_ACCOUNT
+} from "../../common/constants/serviceTypes";
 
 const AccountScreen = props => {
   const serviceType = props.navigation.getParam("serviceType");
@@ -23,6 +26,9 @@ const AccountScreen = props => {
   const { loading, service } = useSelector(
     state => state.accounts[serviceType]
   );
+
+  const { mnemonic } = service.getMnemonic().data;
+  console.log({ mnemonic });
 
   const { balances, receivingAddress, transactions } = service.hdWallet;
 
