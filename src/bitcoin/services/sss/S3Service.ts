@@ -36,8 +36,8 @@ export default class S3Service {
     });
   };
 
-  public static recoverFromShares = (
-    encryptedShares: string[],
+  public static recoverFromSecrets = (
+    encryptedSecrets: string[],
     answer: string
   ):
     | {
@@ -55,8 +55,8 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-      const { decryptedSecrets } = SSS.decryptSecrets(encryptedShares, answer);
-      const { mnemonic } = SSS.recoverFromShares(decryptedSecrets);
+      const { decryptedSecrets } = SSS.decryptSecrets(encryptedSecrets, answer);
+      const { mnemonic } = SSS.recoverFromSecrets(decryptedSecrets);
       return { status: config.STATUS.SUCCESS, data: { mnemonic } };
     } catch (err) {
       return { status: 501, err: err.message, message: ErrMap[501] };
