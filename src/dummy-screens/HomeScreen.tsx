@@ -49,10 +49,10 @@ const HomeScreen = props => {
             }}
           />
           <Button
-            title="Setup Secure Account"
+            title="Secure Account"
             onPress={() => {
               props.navigation.navigate("SecureAccount", {
-                accountType: SECURE_ACCOUNT
+                serviceType: SECURE_ACCOUNT
               });
             }}
           />

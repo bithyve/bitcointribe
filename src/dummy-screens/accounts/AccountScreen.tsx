@@ -15,7 +15,7 @@ import {
   clearTransfer,
   getTestcoins
 } from "../../store/actions/accounts";
-import { TEST_ACCOUNT } from "../../common/constants/serviceTypes";
+import { TEST_ACCOUNT,SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
 
 const AccountScreen = props => {
   const serviceType = props.navigation.getParam("serviceType");
@@ -23,12 +23,16 @@ const AccountScreen = props => {
   const { loading, service } = useSelector(
     state => state.accounts[serviceType]
   );
+  // let wallet;
+  // if(service===SECURE_ACCOUNT) 
+  // { wallet = service.secureHDWallet;}
+  // else 
+  // { wallet = service.hdWallet;}
 
-  const { balances, receivingAddress, transactions } = service.hdWallet;
-
-  const netBalance = service
-    ? balances.balance + balances.unconfirmedBalance
-    : 0;
+  const {balances, receivingAddress, transactions} = service.hdWallet;
+  const  netBalance = service
+  ? balances.balance + balances.unconfirmedBalance
+  : 0;
 
   return (
     <ScrollView contentContainerStyle={styles.screen}>
@@ -72,7 +76,7 @@ const AccountScreen = props => {
         {loading.balances ? (
           <ActivityIndicator size="small" />
         ) : (
-          <Text>{netBalance} sats</Text>
+           <Text>{netBalance} sats</Text>
         )}
       </View>
       <View style={{ marginVertical: 20 }}>
@@ -83,7 +87,7 @@ const AccountScreen = props => {
           <Text>{receivingAddress}</Text>
         )}
       </View>
-      <View style={{ margin: 40 }}>
+      { <View style={{ margin: 40 }}>
         {loading.transactions ? (
           <ActivityIndicator size="large" />
         ) : transactions.totalTransactions ? (
@@ -108,7 +112,7 @@ const AccountScreen = props => {
             </View>
           </View>
         ) : null}
-      </View>
+      </View> }
     </ScrollView>
   );
 };

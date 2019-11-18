@@ -37,7 +37,6 @@ function* fetchAddrWorker({ payload }) {
     yield put(switchLoader(payload.serviceType, "receivingAddress"));
   }
 }
-
 export const fetchAddrWatcher = createWatcher(fetchAddrWorker, FETCH_ADDR);
 
 function* fetchBalanceWorker({ payload }) {

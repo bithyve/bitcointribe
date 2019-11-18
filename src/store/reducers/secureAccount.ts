@@ -2,8 +2,12 @@ import {
     SECUREACCOUNT_SETUP,
     HEALTH_CHECK,
     ACTIVATED,
-  } from "../actions/secureAccount-setup";
-  
+    SECURE_ADDR_FETCHED,
+    SECURE_BALANCE_FETCHED,
+    SECURE_TRANSACTIONS_FETCHED,
+  } from "../actions/secureAccount";
+  import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
+
   const SECUREACCOUNT_VARS: {
     setupData: {
         qrData: string;
@@ -16,6 +20,13 @@ import {
     saStatus:{
       isActive: boolean;
     };
+    service: SecureAccount;
+    receivingAddress: String;
+    balances: {
+    balance: Number;
+    unconfirmedBalance: Number;
+  };
+  transactions: any;
   } = {
     setupData: {
         qrData: "",
@@ -27,6 +38,13 @@ import {
     },
     saStatus:{isActive: false
     },
+    service: null,
+    receivingAddress: "",
+    balances: {
+    balance: 0,
+    unconfirmedBalance: 0
+  },
+  transactions: {},
   };
   
   const initialState = {
@@ -51,7 +69,23 @@ import {
           ...state,
           saStatus:action.payload.saStatus,
         };
-      
-    }
+      case SECURE_ADDR_FETCHED:
+          return {         
+            ...state,
+            receivingAddress: action.payload.address,
+          };
+    
+      case SECURE_BALANCE_FETCHED:
+          return {
+            ...state,
+            balances: action.payload.balances,
+          };
+    
+      case SECURE_TRANSACTIONS_FETCHED:
+          return {
+            ...state,
+            transactions: action.payload.transactions,      
+          };
+        };
     return state;
   };
