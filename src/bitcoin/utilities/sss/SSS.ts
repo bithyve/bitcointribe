@@ -99,7 +99,7 @@ export default class SSS {
     return { metaShare, messageId };
   };
 
-  public static validateDecryption = (
+  public static validateStorage = (
     decryptedMetaShare: MetaShare,
     existingShares: MetaShare[],
     walletId?: string
@@ -152,7 +152,7 @@ export default class SSS {
       otp
     );
 
-    if (SSS.validateDecryption(metaShare, existingShares, walletId)) {
+    if (SSS.validateStorage(metaShare, existingShares, walletId)) {
       const { deleted } = await SSS.affirmDecryption(messageId);
       if (!deleted) {
         console.log("Unable to remove the share from the server");
@@ -211,8 +211,17 @@ export default class SSS {
     try {
       let decrypted = decipher.update(encryptedMetaShare, "hex", "utf8");
       decrypted += decipher.final("utf8");
-      const decryptedMetaShare = JSON.parse(decrypted);
-      if (decryptedMetaShare.meta.validator !== "HEXA") {
+      const decryptedMetaShare: MetaShare = JSON.parse(decrypted);
+      const { shareId, encryptedSecret } = decryptedMetaShare;
+      const generatedShareId = crypto
+        .createHash("sha256")
+        .update(JSON.stringify(encryptedSecret))
+        .digest("hex");
+
+      if (
+        shareId !== generatedShareId &&
+        decryptedMetaShare.meta.validator !== "HEXA"
+      ) {
         throw new Error();
       }
 

@@ -39,7 +39,8 @@ function* initSetupWorker({ payload }) {
       WALLET_SETUP: { walletName, securityAns },
       DECENTRALIZED_BACKUP: {
         SHARES_TRANSFER_DETAILS: {},
-        SHARES_UNDER_CUSTODY: {}
+        SHARES_UNDER_CUSTODY: {},
+        RECOVERY_SHARES: []
       },
       ...accounts
     };

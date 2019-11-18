@@ -12,6 +12,7 @@ import {
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
+import { AxiosResponse } from "axios";
 
 function* initHCWorker() {
   const s3Service: S3Service = yield select(state => state.sss.service);
@@ -118,30 +119,48 @@ function* downloadMetaShareWorker({ payload }) {
     state => state.storage.database
   );
 
-  const { SHARES_UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
-  let existingShares = [];
-  if (Object.keys(SHARES_UNDER_CUSTODY).length) {
-    existingShares = Object.keys(SHARES_UNDER_CUSTODY).map(
-      tag => SHARES_UNDER_CUSTODY[tag].metaShare
+  const { SHARES_UNDER_CUSTODY, RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
+
+  let res;
+  if (payload.downloadType !== "recovery") {
+    let existingShares = [];
+    if (Object.keys(SHARES_UNDER_CUSTODY).length) {
+      existingShares = Object.keys(SHARES_UNDER_CUSTODY).map(
+        tag => SHARES_UNDER_CUSTODY[tag].metaShare
+      );
+    }
+
+    res = yield call(
+      S3Service.downloadAndValidateShare,
+      encryptedKey,
+      otp,
+      existingShares
     );
+  } else {
+    res = yield call(S3Service.downloadAndValidateShare, encryptedKey, otp);
   }
 
-  const res = yield call(
-    S3Service.downloadAndValidateShare,
-    encryptedKey,
-    otp,
-    existingShares
-  );
   if (res.status === 200) {
     const { metaShare, dynamicNonPMDD } = res.data;
 
-    const updatedBackup = {
-      ...DECENTRALIZED_BACKUP,
-      SHARES_UNDER_CUSTODY: {
-        ...DECENTRALIZED_BACKUP.SHARES_UNDER_CUSTODY,
-        [metaShare.meta.tag]: { metaShare, dynamicNonPMDD }
-      }
-    };
+    let updatedBackup;
+    if (payload.downloadType !== "recovery") {
+      updatedBackup = {
+        ...DECENTRALIZED_BACKUP,
+        SHARES_UNDER_CUSTODY: {
+          ...DECENTRALIZED_BACKUP.SHARES_UNDER_CUSTODY,
+          [metaShare.meta.tag]: { metaShare, dynamicNonPMDD }
+        }
+      };
+    } else {
+      updatedBackup = {
+        ...DECENTRALIZED_BACKUP,
+        RECOVERY_SHARES: [
+          ...DECENTRALIZED_BACKUP.RECOVERY_SHARES,
+          { metaShare, dynamicNonPMDD }
+        ]
+      };
+    }
 
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
   } else {
