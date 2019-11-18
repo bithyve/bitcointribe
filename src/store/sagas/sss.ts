@@ -9,7 +9,8 @@ import {
   DOWNLOAD_MSHARE,
   UPDATE_MSHARES_HEALTH,
   CHECK_MSHARES_HEALTH,
-  UPLOAD_REQUESTED_SHARE
+  UPLOAD_REQUESTED_SHARE,
+  REQUEST_SHARE
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
@@ -272,4 +273,32 @@ function* checkMSharesHealthWorker() {
 export const checkMSharesHealthWatcher = createWatcher(
   checkMSharesHealthWorker,
   CHECK_MSHARES_HEALTH
+);
+
+function* requestShareWorker() {
+  const { WALLET_SETUP, DECENTRALIZED_BACKUP } = yield select(
+    state => state.storage.database
+  );
+
+  if (DECENTRALIZED_BACKUP.RECOVERY_SHARES.length >= 3) return; // capping to 3 shares reception
+
+  const { walletName } = WALLET_SETUP;
+  const { otp, encryptedKey } = yield call(S3Service.generateRequestCreds);
+
+  const updatedBackup = {
+    ...DECENTRALIZED_BACKUP,
+    RECOVERY_SHARES: [
+      ...DECENTRALIZED_BACKUP.RECOVERY_SHARES,
+      { tag: walletName, otp, encryptedKey }
+    ]
+  };
+
+  console.log(updatedBackup.RECOVERY_SHARES);
+
+  yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+}
+
+export const requestShareWatcher = createWatcher(
+  requestShareWorker,
+  REQUEST_SHARE
 );
