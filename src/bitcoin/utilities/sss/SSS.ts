@@ -245,7 +245,7 @@ export default class SSS {
       return { decryptedData };
     } catch (err) {
       throw new Error(
-        "An error occured while decrypting the share: Invalid OTP/Tampered Share"
+        "An error occured while decrypting the data: Invalid OTP/Tampered data"
       );
     }
   };
@@ -303,7 +303,6 @@ export default class SSS {
   public static recoverMetaShareFromQR = (
     qrData: string[]
   ): { metaShare: MetaShare } => {
-    console.log({ qrData });
     qrData.sort();
     let recoveredQRData: string;
     recoveredQRData = "";
@@ -311,9 +310,7 @@ export default class SSS {
       const res = qrData[itr].slice(3);
       recoveredQRData = recoveredQRData + res;
     }
-    console.log({ recoveredQRData });
     const metaShare = JSON.parse(recoveredQRData);
-    console.log({ metaShare });
     return { metaShare };
   };
 
@@ -398,6 +395,7 @@ export default class SSS {
       otp
     };
   };
+
   public static generateOTP = (otpLength: number): string =>
     SSS.generateRandomString(otpLength);
 
@@ -721,7 +719,6 @@ export default class SSS {
     const key = SSS.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString("hex")
     );
-    console.log({ key });
     // const key = crypto.scryptSync(
     //   intermediateKey,
     //   SSS.cipherSpec.salt,
@@ -917,7 +914,6 @@ export default class SSS {
         qrData[itr] = "c0" + (itr + 1) + qrData[itr];
       }
     }
-    console.log(qrData);
     return { qrData };
   };
 
