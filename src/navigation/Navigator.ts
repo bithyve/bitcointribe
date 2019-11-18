@@ -10,7 +10,8 @@ import {
   TransferScreen,
   S3Screen,
   S3UserScreen,
-  S3GuardianScreen
+  S3GuardianScreen,
+  RecoveryScreen
 } from "../dummy-screens";
 
 const WalletSetupNavigator = createStackNavigator({
@@ -24,7 +25,8 @@ const HomeNavigator = createStackNavigator({
   Transfer: TransferScreen,
   SSS: S3Screen,
   S3User: S3UserScreen,
-  S3Guardian: S3GuardianScreen
+  S3Guardian: S3GuardianScreen,
+  Recovery: RecoveryScreen
 });
 
 const Navigator = createSwitchNavigator({

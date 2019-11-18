@@ -98,6 +98,77 @@ export default class S3Service {
     }
   };
 
+  public static generateEncryptedMetaShare = (
+    metaShare: MetaShare,
+    key?: string
+  ):
+    | {
+        status: number;
+        data: {
+          encryptedMetaShare: string;
+          key: string;
+          messageId: string;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: SSS.encryptMetaShare(metaShare, key)
+      };
+    } catch (err) {
+      return { status: 522, err: err.message, message: ErrMap[522] };
+    }
+  };
+
+  public static generateRequestCreds = (): {
+    otp: string;
+    encryptedKey: string;
+  } => SSS.generateRequestCreds();
+
+  public static uploadRequestedShare = async (
+    encryptedKey: string,
+    otp: string,
+    metaShare: MetaShare,
+    dynamicNonPMDD?: DynamicNonPMDD
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          success: boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await SSS.uploadRequestedShare(
+          encryptedKey,
+          otp,
+          metaShare,
+          dynamicNonPMDD
+        )
+      };
+    } catch (err) {
+      return { status: 503, err: err.message, message: ErrMap[503] };
+    }
+  };
+
   public static downloadAndValidateShare = async (
     encryptedKey: string,
     otp: string,
@@ -270,7 +341,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: { key: SSS.makeKey(SSS.cipherSpec.keyLength) }
+        data: { key: SSS.generateKey(SSS.cipherSpec.keyLength) }
       };
     } catch (err) {
       return { status: 508, err: err.message, message: ErrMap[508] };
@@ -656,36 +727,6 @@ export default class S3Service {
       };
     } catch (err) {
       return { status: 521, err: err.message, message: ErrMap[521] };
-    }
-  };
-
-  public generateEncryptedMetaShare = (
-    metaShare: MetaShare,
-    key?: string
-  ):
-    | {
-        status: number;
-        data: {
-          encryptedMetaShare: string;
-          key: string;
-          messageId: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.sss.encryptMetaShare(metaShare, key)
-      };
-    } catch (err) {
-      return { status: 522, err: err.message, message: ErrMap[522] };
     }
   };
 
