@@ -74,7 +74,7 @@ const S3GuardianScreen = props => {
           <ActivityIndicator size="small" style={{ marginHorizontal: 5 }} />
         ) : null}
       </View>
-      <View style={{ flexDirection: "row" }}>
+      <View style={{ flexDirection: "row", marginTop: 15 }}>
         <Text>Tag: </Text>
         <TextInput
           value={tag}
@@ -86,10 +86,16 @@ const S3GuardianScreen = props => {
           }}
         />
       </View>
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginTop: 5
+        }}
+      >
         <Button
           title="Upload Requested Share"
-          onPress={() => dispatch(uploadRequestedShare(tag, otp, encryptedKey))}
+          onPress={() => dispatch(uploadRequestedShare(tag, encryptedKey, otp))}
         />
         {loading.uploadRequestedShare ? (
           <ActivityIndicator size="small" style={{ marginHorizontal: 5 }} />
