@@ -28,7 +28,10 @@ import {
   uploadEncMetaShareWatcher,
   downloadMetaShareWatcher,
   updateMSharesHealthWatcher,
-  checkMSharesHealthWatcher
+  checkMSharesHealthWatcher,
+  uploadRequestedShareWatcher,
+  requestShareWatcher,
+  recoverMnemonicWatcer
 } from "./sagas/sss";
 
 // const rootSaga = function*() {
@@ -73,7 +76,10 @@ const rootSaga = function*() {
     uploadEncMetaShareWatcher,
     downloadMetaShareWatcher,
     updateMSharesHealthWatcher,
-    checkMSharesHealthWatcher
+    checkMSharesHealthWatcher,
+    uploadRequestedShareWatcher,
+    requestShareWatcher,
+    recoverMnemonicWatcer
   ];
 
   yield all(

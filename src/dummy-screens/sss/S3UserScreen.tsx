@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   Button,
-  ActivityIndicator
+  ActivityIndicator,
+  TextInput
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -22,6 +23,7 @@ const S3UserScreen = props => {
   );
   const { loading, service } = useSelector(state => state.sss);
   const s3Service: S3Service = service;
+  const [metaShareIndex, setMetaShareIndex] = useState("0");
 
   const {
     healthCheckInitialized,
@@ -45,21 +47,52 @@ const S3UserScreen = props => {
       </View>
 
       <View>
-        <Button
-          title="Upload Enc MShares(1)"
-          onPress={() => dispatch(uploadEncMShares(0))}
-        />
+        <View
+          style={{
+            flexDirection: "row",
+            marginHorizontal: 50,
+            justifyContent: "space-around"
+          }}
+        >
+          <Button
+            title="Upload MShares"
+            onPress={() => dispatch(uploadEncMShares(parseInt(metaShareIndex)))}
+          />
+          <TextInput
+            value={metaShareIndex}
+            onChangeText={setMetaShareIndex}
+            style={{
+              borderBottomWidth: 0.5,
+              width: 50,
+              textAlign: "center"
+            }}
+            keyboardType="numeric"
+          />
+        </View>
         {loading.uploadMetaShare ? (
           <ActivityIndicator size="small" style={{ marginHorizontal: 5 }} />
-        ) : metaShares.length && Object.keys(SHARES_TRANSFER_DETAILS).length ? (
+        ) : (metaShareIndex == "0" || metaShareIndex) &&
+          metaShares.length &&
+          Object.keys(SHARES_TRANSFER_DETAILS).length ? (
           <View style={{ marginHorizontal: 40 }}>
-            <Text style={{ marginTop: 12 }}>
-              OTP: {SHARES_TRANSFER_DETAILS[metaShares[0].shareId].otp}
-            </Text>
-            <Text style={{ marginTop: 12 }}>
-              EncKey:
-              {SHARES_TRANSFER_DETAILS[metaShares[0].shareId].encryptedKey}
-            </Text>
+            {SHARES_TRANSFER_DETAILS[metaShares[metaShareIndex].shareId] ? (
+              <View>
+                <Text style={{ marginTop: 12 }}>
+                  OTP:
+                  {
+                    SHARES_TRANSFER_DETAILS[metaShares[metaShareIndex].shareId]
+                      .otp
+                  }
+                </Text>
+                <Text style={{ marginTop: 12 }}>
+                  EncKey:
+                  {
+                    SHARES_TRANSFER_DETAILS[metaShares[metaShareIndex].shareId]
+                      .encryptedKey
+                  }
+                </Text>
+              </View>
+            ) : null}
           </View>
         ) : null}
       </View>
@@ -70,9 +103,11 @@ const S3UserScreen = props => {
         />
         {loading.checkMSharesHealth ? (
           <ActivityIndicator size="small" style={{ marginHorizontal: 5 }} />
-        ) : Object.keys(healthCheckStatus).length &&
-          healthCheckStatus[metaShares[0].shareId] ? (
-          (Date.now() - healthCheckStatus[metaShares[0].shareId]) / 1000 >
+        ) : (metaShareIndex == "0" || metaShareIndex) &&
+          Object.keys(healthCheckStatus).length &&
+          healthCheckStatus[metaShares[metaShareIndex].shareId] ? (
+          (Date.now() - healthCheckStatus[metaShares[metaShareIndex].shareId]) /
+            1000 >
           15 ? (
             <Text style={{ marginTop: 12 }}>Bad</Text>
           ) : (
@@ -82,6 +117,10 @@ const S3UserScreen = props => {
           <Text style={{ marginTop: 12 }}>No updates</Text>
         )}
       </View>
+      <Button
+        title="Recovery"
+        onPress={() => props.navigation.navigate("Recovery")}
+      />
     </View>
   );
 };
