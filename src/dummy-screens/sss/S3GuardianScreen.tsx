@@ -8,13 +8,18 @@ import {
   TextInput,
   ActivityIndicator
 } from "react-native";
-import { downloadMShare, updateMSharesHealth } from "../../store/actions/sss";
+import {
+  downloadMShare,
+  updateMSharesHealth,
+  uploadRequestedShare
+} from "../../store/actions/sss";
 
 const S3GuardianScreen = props => {
   const dispatch = useDispatch();
   const { loading } = useSelector(state => state.sss);
   const [encryptedKey, setEncryptedKey] = useState("");
   const [otp, setOTP] = useState("");
+  const [tag, setTag] = useState("");
 
   return (
     <View style={styles.screen}>
@@ -66,6 +71,27 @@ const S3GuardianScreen = props => {
           onPress={() => dispatch(updateMSharesHealth())}
         />
         {loading.updateMSharesHealth ? (
+          <ActivityIndicator size="small" style={{ marginHorizontal: 5 }} />
+        ) : null}
+      </View>
+      <View style={{ flexDirection: "row" }}>
+        <Text>Tag: </Text>
+        <TextInput
+          value={tag}
+          onChangeText={setTag}
+          style={{
+            borderBottomWidth: 0.5,
+            width: 100,
+            textAlign: "center"
+          }}
+        />
+      </View>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Button
+          title="Upload Requested Share"
+          onPress={() => dispatch(uploadRequestedShare(tag, otp, encryptedKey))}
+        />
+        {loading.uploadRequestedShare ? (
           <ActivityIndicator size="small" style={{ marginHorizontal: 5 }} />
         ) : null}
       </View>

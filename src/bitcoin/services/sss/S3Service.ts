@@ -128,6 +128,11 @@ export default class S3Service {
     }
   };
 
+  public static generateRequestCreds = (): {
+    otp: string;
+    encryptedKey: string;
+  } => SSS.generateRequestCreds();
+
   public static uploadRequestedShare = async (
     encryptedKey: string,
     otp: string,
@@ -336,7 +341,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: { key: SSS.makeKey(SSS.cipherSpec.keyLength) }
+        data: { key: SSS.generateKey(SSS.cipherSpec.keyLength) }
       };
     } catch (err) {
       return { status: 508, err: err.message, message: ErrMap[508] };
