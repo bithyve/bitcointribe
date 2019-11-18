@@ -7,6 +7,7 @@ import TransferScreen from "./accounts/TransferScreen";
 import S3Screen from "./sss/S3Screen";
 import S3UserScreen from "./sss/S3UserScreen";
 import S3GuardianScreen from "./sss/S3GuardianScreen";
+import RecoveryScreen from "./sss/RecoveryScreen";
 
 export {
   StartupScreen,
@@ -17,5 +18,6 @@ export {
   TransferScreen,
   S3Screen,
   S3UserScreen,
-  S3GuardianScreen
+  S3GuardianScreen,
+  RecoveryScreen
 };

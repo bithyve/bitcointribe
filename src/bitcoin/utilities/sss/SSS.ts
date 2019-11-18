@@ -49,7 +49,7 @@ export default class SSS {
   ): {
     decryptedSecrets: string[];
   } => {
-    const key = SSS.generateKey(answer);
+    const key = SSS.getDerivedKey(answer);
 
     const decryptedSecrets: string[] = [];
     for (const secret of secretsArray) {
@@ -146,7 +146,7 @@ export default class SSS {
     key?: string
   ): { encryptedMetaShare: string; key: string; messageId: string } => {
     if (!key) {
-      key = SSS.makeKey(SSS.cipherSpec.keyLength);
+      key = SSS.generateKey(SSS.cipherSpec.keyLength);
     }
     const messageId: string = SSS.getMessageId(key, config.MSG_ID_LENGTH);
     const cipher = crypto.createCipheriv(
@@ -162,6 +162,12 @@ export default class SSS {
       key,
       messageId
     };
+  };
+
+  public static generateRequestCreds = () => {
+    const key = SSS.generateKey(SSS.cipherSpec.keyLength);
+    const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
+    return { otp, encryptedKey: otpEncryptedData };
   };
 
   public static uploadRequestedShare = async (
@@ -220,7 +226,7 @@ export default class SSS {
   ): {
     decryptedData: any;
   } => {
-    const key = SSS.generateKey(otp);
+    const key = SSS.getDerivedKey(otp);
     // const key = crypto.scryptSync(
     //   intermediateKey,
     //   this.cipherSpec.salt,
@@ -354,7 +360,7 @@ export default class SSS {
       .update(JSON.stringify(encryptedSecret))
       .digest("hex");
 
-  public static makeKey = (length: number): string => {
+  public static generateKey = (length: number): string => {
     let result = "";
     const characters =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -372,7 +378,7 @@ export default class SSS {
     otp: string;
   } => {
     const otp: string = SSS.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
-    const key = SSS.generateKey(otp);
+    const key = SSS.getDerivedKey(otp);
     // const key = crypto.scryptSync(
     //   intermediateKey,
     //   this.cipherSpec.salt,
@@ -409,8 +415,8 @@ export default class SSS {
 
   private static hexToString = (hex: string): string => secrets.hex2str(hex);
 
-  private static generateKey = (psuedoKey: string): string => {
-    const hashRounds = 5048;
+  private static getDerivedKey = (psuedoKey: string): string => {
+    const hashRounds = 1048;
     let key = psuedoKey;
     for (let itr = 0; itr < hashRounds; itr++) {
       const hash = crypto.createHash("sha512");
@@ -635,7 +641,7 @@ export default class SSS {
   ): {
     encryptedStaticNonPMDD: string;
   } => {
-    const key = SSS.generateKey(
+    const key = SSS.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString("hex")
     );
     // const key = crypto.scryptSync(
@@ -659,7 +665,7 @@ export default class SSS {
   ): {
     decryptedStaticNonPMDD: SocialStaticNonPMDD | BuddyStaticNonPMDD;
   } => {
-    const key = SSS.generateKey(
+    const key = SSS.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString("hex")
     );
     // const key = crypto.scryptSync(
@@ -683,7 +689,7 @@ export default class SSS {
   public encryptDynamicNonPMDD = (
     dynamicNonPMDD: MetaShare[]
   ): { encryptedDynamicNonPMDD: string } => {
-    const key = SSS.generateKey(
+    const key = SSS.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString("hex")
     );
     // const key = crypto.scryptSync(
@@ -712,7 +718,7 @@ export default class SSS {
   ): {
     decryptedDynamicNonPMDD: MetaShare[];
   } => {
-    const key = SSS.generateKey(
+    const key = SSS.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString("hex")
     );
     console.log({ key });
@@ -921,7 +927,7 @@ export default class SSS {
   ): {
     encryptedSecrets: string[];
   } => {
-    const key = SSS.generateKey(answer);
+    const key = SSS.getDerivedKey(answer);
 
     for (const secret of secretsToEncrypt) {
       const cipher = crypto.createCipheriv(

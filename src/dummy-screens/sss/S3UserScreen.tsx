@@ -82,6 +82,10 @@ const S3UserScreen = props => {
           <Text style={{ marginTop: 12 }}>No updates</Text>
         )}
       </View>
+      <Button
+        title="Recovery"
+        onPress={() => props.navigation.navigate("Recovery")}
+      />
     </View>
   );
 };
