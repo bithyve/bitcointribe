@@ -19,7 +19,7 @@ export default class SSS {
     keyLength: number;
   } = config.CIPHER_SPEC;
 
-  public static recoverFromShares = (
+  public static recoverFromSecrets = (
     decryptedSecrets: string[]
   ): {
     mnemonic: string;

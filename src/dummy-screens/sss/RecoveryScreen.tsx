@@ -1,16 +1,27 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, Button } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { requestShare, downloadMShare } from "../../store/actions/sss";
+import {
+  requestShare,
+  downloadMShare,
+  recoverMmnemonic
+} from "../../store/actions/sss";
 
 const RecoveryScreen = props => {
+  const { securityAns } = useSelector(
+    state => state.storage.database.WALLET_SETUP
+  );
+  const { mnemonic } = useSelector(state => state.sss);
   const dispatch = useDispatch();
-  const [otp, setOTP] = useState("");
-  const [encryptedKey, setEncryptedKey] = useState("");
 
   const { RECOVERY_SHARES } = useSelector(
     state => state.storage.database.DECENTRALIZED_BACKUP
   );
+
+  const metaShares = [];
+  RECOVERY_SHARES.forEach(({ META_SHARE }) => {
+    if (META_SHARE) metaShares.push(META_SHARE);
+  });
 
   return (
     <View style={styles.screen}>
@@ -36,6 +47,15 @@ const RecoveryScreen = props => {
           </View>
         );
       })}
+      {metaShares.length == 3 ? (
+        <View style={{ marginTop: 15 }}>
+          <Button
+            title="Recover Mnemonic"
+            onPress={() => dispatch(recoverMmnemonic(metaShares, securityAns))}
+          />
+          {mnemonic ? <Text style={{ marginTop: 10 }}>{mnemonic}</Text> : null}
+        </View>
+      ) : null}
     </View>
   );
 };
