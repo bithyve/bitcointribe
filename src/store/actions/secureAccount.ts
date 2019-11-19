@@ -1,3 +1,4 @@
+import { TransactionBuilder } from "bitcoinjs-lib";
 // types and action creators: dispatched by components and sagas
 export const SETUP_SECUREACCOUNT =  "SETUP_SECUREACCOUNT";
 export const CHECK_HEALTH = "CHECK_HEALTH";
@@ -5,6 +6,9 @@ export const IS_ACTIVE = "IS_ACTIVE";
 export const SECURE_FETCH_ADDR = "FETCHSECURE_FETCH_ADDR_ADDR";
 export const SECURE_FETCH_BALANCE = "SECURE_FETCH_BALANCE";
 export const SECURE_FETCH_TRANSACTIONS = "SECURE_FETCH_TRANSACTIONS";
+export const SECURE_TRANSFER_ST1 = "SECURE_TRANSFER_ST1";
+export const SECURE_TRANSFER_ST2 = "SECURE_TRANSFER_ST2";
+export const SECURE_TRANSFER_ST3 = "SECURE_TRANSFER_ST3";
 
 export const setupSecureAccount = (serviceType) => {
     return { type: SETUP_SECUREACCOUNT, payload: {serviceType} };
@@ -30,6 +34,28 @@ export const secureFetchTransactions = serviceType => {
   return { type: SECURE_FETCH_TRANSACTIONS, payload: { serviceType } };
 };
 
+export const secureTransferST1 = (
+  serviceType,
+  transferInfo: { recipientAddress: String; amount: Number; priority?: String }
+) => {
+  return { type: SECURE_TRANSFER_ST1, payload: { serviceType, transferInfo } };
+};
+
+export const secureTransferST2 = (
+  serviceType,
+  transferInfo: {
+    inputs: Array<{
+      txId: string;
+      vout: number;
+      value: number;
+      address: string;
+    }>;
+    txb: TransactionBuilder;
+  }
+) => {
+  return { type: SECURE_TRANSFER_ST2, payload: { serviceType, transferInfo } };
+};
+
 // types and action creators (saga): dispatched by saga workers
 export const SECUREACCOUNT_SETUP = "SECUREACCOUNT_SETUP";
 export const HEALTH_CHECK = "HEALTH_CHECK";
@@ -37,6 +63,8 @@ export const ACTIVATED = "ACTIVATED";
 export const SECURE_ADDR_FETCHED = "SECURE_ADDR_FETCHED";
 export const SECURE_BALANCE_FETCHED = "SECURE_BALANCE_FETCHED";
 export const SECURE_TRANSACTIONS_FETCHED = "SECURE_TRANSACTIONS_FETCHED";
+export const SECURE_TRANSFER_ST1_EXECUTED = "SECURE_TRANSFER_ST1_EXECUTED";
+export const SECURE_TRANSFER_ST2_EXECUTED = "SECURE_TRANSFER_ST2_EXECUTED";
 
 export const secureAccountSetup = (
   serviceType,
@@ -72,4 +100,12 @@ export const secureBalanceFetched = (serviceType, balances) => {
 
 export const secureTransactionsFetched = (serviceType, transactions) => {
   return { type: SECURE_TRANSACTIONS_FETCHED, payload: { serviceType, transactions } };
+};
+
+export const secureExecutedST1 = (serviceType, stage1) => {
+  return { type: SECURE_TRANSFER_ST1_EXECUTED, payload: { serviceType, stage1 } };
+};
+
+export const secureExecutedST2 = (serviceType, txid) => {
+  return { type: SECURE_TRANSFER_ST2_EXECUTED, payload: { serviceType, txid } };
 };
