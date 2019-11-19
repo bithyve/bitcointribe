@@ -5,6 +5,8 @@ import {
     SECURE_ADDR_FETCHED,
     SECURE_BALANCE_FETCHED,
     SECURE_TRANSACTIONS_FETCHED,
+    SECURE_TRANSFER_ST1_EXECUTED,
+    SECURE_TRANSFER_ST2_EXECUTED,
   } from "../actions/secureAccount";
   import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
 
@@ -27,6 +29,11 @@ import {
     unconfirmedBalance: Number;
   };
   transactions: any;
+  transfer: {
+    executing: Boolean;
+    stage1: any;
+    txid: String;
+  };
   } = {
     setupData: {
         qrData: "",
@@ -45,6 +52,11 @@ import {
     unconfirmedBalance: 0
   },
   transactions: {},
+  transfer: {
+    executing: false,
+    stage1: {},
+    txid: ""
+  },
   };
   
   const initialState = {
