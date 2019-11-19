@@ -36,7 +36,10 @@ import {
   uploadEncMetaShareWatcher,
   downloadMetaShareWatcher,
   updateMSharesHealthWatcher,
-  checkMSharesHealthWatcher
+  checkMSharesHealthWatcher,
+  uploadRequestedShareWatcher,
+  requestShareWatcher,
+  recoverMnemonicWatcer
 } from "./sagas/sss";
 
 // const rootSaga = function*() {
@@ -82,7 +85,9 @@ const rootSaga = function*() {
     downloadMetaShareWatcher,
     updateMSharesHealthWatcher,
     checkMSharesHealthWatcher,
-
+    uploadRequestedShareWatcher,
+    requestShareWatcher,
+    recoverMnemonicWatcer,
     //secure account watcher
     setupSecureAccountWatcher,
     checkHealthtWatcher,

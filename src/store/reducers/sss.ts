@@ -1,7 +1,12 @@
-import { HEALTH_CHECK_INITIALIZED, S3_LOADING } from "../actions/sss";
+import {
+  HEALTH_CHECK_INITIALIZED,
+  S3_LOADING,
+  MNEMONIC_RECOVERED
+} from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { SERVICES_ENRICHED } from "../actions/storage";
 import { S3_SERVICE } from "../../common/constants/serviceTypes";
+import { statement } from "@babel/template";
 
 const initialState: {
   service: S3Service;
@@ -11,7 +16,9 @@ const initialState: {
     downloadMetaShare: Boolean;
     updateMSharesHealth: Boolean;
     checkMSharesHealth: Boolean;
+    uploadRequestedShare: Boolean;
   };
+  mnemonic: String;
 } = {
   service: null,
   loading: {
@@ -19,8 +26,10 @@ const initialState: {
     uploadMetaShare: false,
     downloadMetaShare: false,
     updateMSharesHealth: false,
-    checkMSharesHealth: false
-  }
+    checkMSharesHealth: false,
+    uploadRequestedShare: false
+  },
+  mnemonic: ""
 };
 
 export default (state = initialState, action) => {
@@ -32,6 +41,12 @@ export default (state = initialState, action) => {
           ...state.loading,
           hcInit: false
         }
+      };
+
+    case MNEMONIC_RECOVERED:
+      return {
+        ...state,
+        mnemonic: action.payload.mnemonic
       };
 
     case SERVICES_ENRICHED:
