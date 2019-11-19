@@ -2,6 +2,7 @@ import { call, put, select } from "redux-saga/effects";
 import { createWatcher } from "../utils/watcher-creator";
 import { INIT_SETUP } from "../actions/wallet-setup";
 import { insertIntoDB } from "../actions/storage";
+import { Database } from "../../common/interfaces/Interfaces";
 
 import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
 import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
@@ -37,16 +38,17 @@ function* initSetupWorker({ payload }) {
       S3_SERVICE: JSON.stringify(s3Service)
     };
 
-    const toBeInserted = {
+    const initialDatabase: Database = {
       WALLET_SETUP: { walletName, securityAns },
       DECENTRALIZED_BACKUP: {
+        RECOVERY_SHARES: [],
         SHARES_TRANSFER_DETAILS: {},
         SHARES_UNDER_CUSTODY: {}
       },
       ...accounts
     };
 
-    yield put(insertIntoDB(toBeInserted));
+    yield put(insertIntoDB(initialDatabase));
   } catch (err) {
     console.log(err);
   }

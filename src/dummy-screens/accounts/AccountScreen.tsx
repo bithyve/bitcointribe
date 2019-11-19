@@ -15,7 +15,10 @@ import {
   clearTransfer,
   getTestcoins
 } from "../../store/actions/accounts";
-import { TEST_ACCOUNT,SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
+import {
+  TEST_ACCOUNT,
+  REGULAR_ACCOUNT
+} from "../../common/constants/serviceTypes";
 
 const AccountScreen = props => {
   const serviceType = props.navigation.getParam("serviceType");
@@ -29,10 +32,14 @@ const AccountScreen = props => {
   // else 
   // { wallet = service.hdWallet;}
 
-  const {balances, receivingAddress, transactions} = service.hdWallet;
-  const  netBalance = service
-  ? balances.balance + balances.unconfirmedBalance
-  : 0;
+  const { mnemonic } = service.getMnemonic().data;
+  console.log({ mnemonic });
+
+  const { balances, receivingAddress, transactions } = service.hdWallet;
+
+  const netBalance = service
+    ? balances.balance + balances.unconfirmedBalance
+    : 0;
 
   return (
     <ScrollView contentContainerStyle={styles.screen}>
