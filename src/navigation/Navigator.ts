@@ -1,38 +1,34 @@
-import { createAppContainer, createSwitchNavigator } from "react-navigation";
+import { createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
+import Launch from "../pages/Launch";
+import PasscodeConfirm from "../pages/PasscodeConfirm";
+import RestoreAndReoverWallet from "../pages/RestoreAndReoverWallet";
+import RestoreSelectedContactsList from "../pages/RestoreSelectedContactsList";
+import Home from "../pages/Home";
+import NewWalletName from "../pages/NewWalletName";
+import NewWalletQuestion from "../pages/NewWalletQuestion";
+import RestoreWalletBySecondaryDevice from "../pages/RestoreWalletBySecondaryDevice";
+import RestoreWalletUsingDocuments from "../pages/RestoreWalletUsingDocuments";
 
-import {
-  StartupScreen,
-  HomeScreen,
-  WalletNameScreen,
-  SecurityQuesScreen,
-  AccountScreen,
-  TransferScreen,
-  S3Screen,
-  S3UserScreen,
-  S3GuardianScreen,
-  RecoveryScreen
-} from "../dummy-screens";
-
-const WalletSetupNavigator = createStackNavigator({
-  WalletName: WalletNameScreen,
-  SecurityQues: SecurityQuesScreen
-});
-
-const HomeNavigator = createStackNavigator({
-  Home: HomeScreen,
-  Account: AccountScreen,
-  Transfer: TransferScreen,
-  SSS: S3Screen,
-  S3User: S3UserScreen,
-  S3Guardian: S3GuardianScreen,
-  Recovery: RecoveryScreen
-});
-
-const Navigator = createSwitchNavigator({
-  Startup: StartupScreen,
-  WalletSetup: WalletSetupNavigator,
-  HomeNav: HomeNavigator
-});
+const Navigator = createStackNavigator(
+  {
+    Launch,
+    PasscodeConfirm,
+    RestoreAndReoverWallet,
+    RestoreSelectedContactsList,
+    Home,
+    NewWalletName,
+    NewWalletQuestion,
+    RestoreWalletBySecondaryDevice,
+    RestoreWalletUsingDocuments
+  },
+  {
+    initialRouteName: "Launch",
+    headerLayoutPreset: "center",
+    defaultNavigationOptions: ({ navigation }) => ({
+      header: null
+    })
+  }
+);
 
 export default createAppContainer(Navigator);
