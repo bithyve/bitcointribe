@@ -24,8 +24,6 @@ function* initSetupWorker({ payload }) {
 
     // Secure account
     const secureAcc = new SecureAccount(primaryMnemonic);
-    console.log("wallet-setup");
-    console.log(secureAcc);
   
     // share generation
     const s3Service = new S3Service(primaryMnemonic);

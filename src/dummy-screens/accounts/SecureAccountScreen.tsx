@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
+import React,{useState} from "react";
+import { View, Text, StyleSheet, Button,TextInput } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
     setupSecureAccount,
@@ -15,9 +15,8 @@ import {
 const SecureAccountScreen = props => {
   const serviceType = props.navigation.getParam("serviceType");
   const dispatch = useDispatch();
-  // const {service } = useSelector(
-  //   state => state.secureAccount[serviceType]
-  // );
+  const [chunk, setChunk] = useState("");
+  const [POS, setPOS] = useState();
   return (
     <View style={styles.screen}>
       <Text>{serviceType} Here!</Text>
@@ -33,10 +32,39 @@ const SecureAccountScreen = props => {
        dispatch(isActive(serviceType));
         }}
       />
+      <View style={{ flexDirection: "row", marginVertical: 5 }}>
+          <Text>chunk: </Text>
+          <TextInput
+            value={chunk}
+            onChangeText={setChunk}
+            style={{
+              borderBottomWidth: 0.5,
+              width: 200,
+              textAlign: "center"
+            }}
+          />
+        </View>
+        <View
+          style={{ flexDirection: "row", marginVertical: 5, marginBottom: 10 }}
+        >
+          <Text>POS: </Text>
+          <TextInput
+            value={POS}
+            onChangeText={setPOS}
+            style={{
+              borderBottomWidth: 0.5,
+              width: 200,
+              textAlign: "center"
+            }}
+            keyboardType="numeric"
+          />
+        </View>
+
       <Button
         title="Check Health"
         onPress={async() => {
-       dispatch(checkHealth(serviceType));
+       dispatch(checkHealth(serviceType,{chunk,POS: parseInt(POS)})
+       );
         }}
       /> 
       <Button

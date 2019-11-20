@@ -49,22 +49,11 @@ function* setupSecureAccountWorker({ payload }) {
 
   
   function* checkHealthWorker({ payload }) {
-    try {
-    let chunk;
-    const POS = 1;
+    try { 
     const service = yield select(
-      state => state.accounts[payload.serviceType].service
-    );
-    const {secret,qrData} = yield select(state => state.storage.database.secureAccSetupData); 
-    console.log("qrData");
-    console.log(qrData);  
-    if (POS === 1) {
-      chunk = secret.slice(0, config.SCHUNK_SIZE);
-    } else if (POS === -1) {
-      chunk = secret.slice(
-        secret.length - config.SCHUNK_SIZE,
+        state => state.accounts[payload.serviceType].service
       );
-    }
+    const { chunk, POS } = payload.transferInfo;
     const res = yield call(service.checkHealth,chunk, POS);
     console.log(res);
     res.status === 200
