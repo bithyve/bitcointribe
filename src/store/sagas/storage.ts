@@ -33,7 +33,7 @@ function* fetchDBWorker() {
   try {
     const key = yield select(state => state.storage.key);
     const database = yield call(dataManager.fetch, key);
-    if (database) {
+    if (key && database) {
       yield put(dbFetched(database));
       yield put(enrichServices(database));
     }
