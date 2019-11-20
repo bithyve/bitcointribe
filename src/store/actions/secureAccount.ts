@@ -15,8 +15,10 @@ export const setupSecureAccount = (serviceType) => {
     return { type: SETUP_SECUREACCOUNT, payload: {serviceType} };
   };
 
-export const checkHealth = (serviceType)=> {
-    return {type: CHECK_HEALTH, payload: {serviceType}};
+export const checkHealth = (
+  serviceType,
+  transferInfo:{chunk:string; POS:Number} )=> {
+    return {type: CHECK_HEALTH, payload: {serviceType, transferInfo}};
 };
 
 export const isActive = (serviceType) => {
