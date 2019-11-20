@@ -60,7 +60,7 @@ const SecureAccountScreen = props => {
      <Button
             title="Transfer"
             onPress={() => {
-              props.navigation.navigate("Account", {
+              props.navigation.navigate("GAToken", {
                 serviceType: SECURE_ACCOUNT
               });
             }}
