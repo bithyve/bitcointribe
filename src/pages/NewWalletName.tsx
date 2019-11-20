@@ -76,7 +76,11 @@ export default function NewWalletName(props) {
           {walletName.trim() != "" ? (
             <View style={styles.bottomButtonView}>
               <TouchableOpacity
-                onPress={() => props.navigation.navigate("NewWalletQuestion")}
+                onPress={() => {
+                  props.navigation.navigate("NewWalletQuestion", {
+                    walletName
+                  });
+                }}
                 style={styles.buttonView}
               >
                 <Text style={styles.buttonText}>Continue</Text>

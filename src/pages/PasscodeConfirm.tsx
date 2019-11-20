@@ -60,11 +60,7 @@ export default function PasscodeConfirm(props) {
 
 	const dispatch = useDispatch();
 	const { hasCreds } = useSelector(state => state.walletSetup);
-	if(hasCreds) props.navigation.replace('RestoreAndReoverWallet');
-
-	const setCreds = useCallback(()=>{
-		dispatch(storeCreds(passcode));
-	}, [dispatch])
+	if(hasCreds) props.navigation.replace('RestoreAndReoverWallet');;
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
@@ -116,7 +112,7 @@ export default function PasscodeConfirm(props) {
 							</TouchableWithoutFeedback>
 							<TouchableOpacity
 								disabled={passcode == confirmPasscode ? false : true}
-								onPress={setCreds}
+								onPress={()=> dispatch(storeCreds(passcode))}
 								style={{ ...styles.proceedButtonView, backgroundColor: passcode == confirmPasscode ? Colors.blue : Colors.lightBlue, }}
 							>
 								<Text style={styles.proceedButtonText}>Proceed</Text>

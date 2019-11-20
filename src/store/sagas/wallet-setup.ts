@@ -56,6 +56,7 @@ function* initSetupWorker({ payload }) {
     };
 
     yield put(insertIntoDB(initialDatabase));
+    yield call(AsyncStorage.setItem, "walletExists", "true");
   } catch (err) {
     console.log(err);
   }
@@ -73,9 +74,12 @@ function* credentialsStorageWorker({ payload }) {
 
   //store the AES key against the hash
   if (!(yield call(SecureStore.store, hash, encryptedKey))) {
-    yield call(AsyncStorage.setItem, "hasPasscode", "false");
+    yield call(AsyncStorage.setItem, "hasCreds", "false");
+    return;
   }
-  yield call(AsyncStorage.setItem, "hasPasscode", "true");
+
+  yield put(keyFetched(AES_KEY));
+  yield call(AsyncStorage.setItem, "hasCreds", "true");
   yield put(credsStored());
 }
 
@@ -86,6 +90,7 @@ export const credentialStorageWatcher = createWatcher(
 
 function* credentialsAuthWorker({ payload }) {
   // hash the pin and fetch AES from secure store
+
   const hash = yield call(Cipher.hash, payload.passcode);
   const encryptedKey = yield call(SecureStore.fetch, hash);
   const key = yield call(Cipher.decrypt, encryptedKey, hash);

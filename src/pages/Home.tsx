@@ -23,6 +23,8 @@ import DeviceInfo from 'react-native-device-info';
 import ToggleSwitch from "../components/ToggleSwitch";
 import Entypo from "react-native-vector-icons/Entypo";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import { useSelector } from "react-redux";
+import { Database } from '../common/interfaces/Interfaces';
 
 export default function Home() {
 	const [switchOn, setSwitchOn] = useState(true);
@@ -242,6 +244,9 @@ export default function Home() {
 		setSelected(tabTitle);
 	}
 
+	const database:Database = useSelector(state => state.storage.database);
+	const walletName = database?  database.WALLET_SETUP.walletName: ""
+
 	return (
 		<ImageBackground
 			source={require('./../assets/images/home-bg.png')}
@@ -253,7 +258,7 @@ export default function Home() {
 				<View style={{ marginTop: hp('3%'), marginLeft: 20, marginRight: 20 }}>
 					<View style={{ flexDirection: 'row' }}>
 						<View style={{ flex: 7, marginBottom: hp('3%'), justifyContent: 'center' }}>
-							<Text style={{ color: Colors.white, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(25, 812), display: 'flex', marginBottom: hp('0.8%') }}>Murtuza’s Wallet</Text>
+							<Text style={{ color: Colors.white, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(25, 812), display: 'flex', marginBottom: hp('0.8%') }}>{ walletName? `${walletName}’s Wallet`: 'Hexa Wallet'}</Text>
 							<View style={{ flexDirection: "row", alignItems: 'flex-end' }}>
 								<Image
 									style={{ width: wp('2.5%'), height: wp('2.5%'), marginRight: 5, marginBottom: 7 }}
