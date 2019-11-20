@@ -1,10 +1,15 @@
-import { call, put, select } from "redux-saga/effects";
+import { call, put } from "redux-saga/effects";
 import { createWatcher } from "../utils/watcher-creator";
 import AsyncStorage from "@react-native-community/async-storage";
 
 import * as Cipher from "../../common/encryption";
 import * as SecureStore from "../../storage/secure-store";
-import { INIT_SETUP, SETUP_CREDS, CREDS_AUTH } from "../actions/wallet-setup";
+import {
+  INIT_SETUP,
+  CREDS_AUTH,
+  STORE_CREDS,
+  credsStored
+} from "../actions/wallet-setup";
 import { insertIntoDB, keyFetched, fetchFromDB } from "../actions/storage";
 import { Database } from "../../common/interfaces/Interfaces";
 
@@ -58,7 +63,7 @@ function* initSetupWorker({ payload }) {
 
 export const initSetupWatcher = createWatcher(initSetupWorker, INIT_SETUP);
 
-function* credentialsSetupWorker({ payload }) {
+function* credentialsStorageWorker({ payload }) {
   //hash the pin
   const hash = yield call(Cipher.hash, payload.passcode);
 
@@ -71,11 +76,12 @@ function* credentialsSetupWorker({ payload }) {
     yield call(AsyncStorage.setItem, "hasPasscode", "false");
   }
   yield call(AsyncStorage.setItem, "hasPasscode", "true");
+  yield put(credsStored());
 }
 
-export const credentialSetupWatcher = createWatcher(
-  credentialsSetupWorker,
-  SETUP_CREDS
+export const credentialStorageWatcher = createWatcher(
+  credentialsStorageWorker,
+  STORE_CREDS
 );
 
 function* credentialsAuthWorker({ payload }) {
