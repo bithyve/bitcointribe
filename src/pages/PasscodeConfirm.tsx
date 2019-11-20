@@ -13,15 +13,14 @@ import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { RFValue } from "react-native-responsive-fontsize";
-import {useDispatch} from "react-redux";
-import { setupCreds } from '../store/actions/wallet-setup';
+import {useDispatch, useSelector} from "react-redux";
+import { storeCreds } from '../store/actions/wallet-setup';
 
 export default function PasscodeConfirm(props) {
 	const [passcode, setPasscode] = useState('');
 	const [confirmPasscode, setConfirmPasscode] = useState('');
 	const [passcodeFlag, setPasscodeFlag] = useState(true);
 	const [confirmPasscodeFlag, setConfirmPasscodeFlag] = useState(0);
-	const dispatch = useDispatch();
 
 	const onPressNumber = (text) => {
 		let tmpPasscode = passcode;
@@ -59,9 +58,12 @@ export default function PasscodeConfirm(props) {
 		}
 	}
 
+	const dispatch = useDispatch();
+	const { hasCreds } = useSelector(state => state.walletSetup);
+	if(hasCreds) props.navigation.replace('RestoreAndReoverWallet');
+
 	const setCreds = useCallback(()=>{
-		dispatch(setupCreds(passcode));
-		props.navigation.replace('RestoreAndReoverWallet')	
+		dispatch(storeCreds(passcode));
 	}, [dispatch])
 
 	return (

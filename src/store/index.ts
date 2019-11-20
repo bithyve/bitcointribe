@@ -5,6 +5,7 @@ import { call, all, spawn } from "redux-saga/effects";
 import { composeWithDevTools } from "redux-devtools-extension";
 
 import storageReducer from "./reducers/storage";
+import walletSetupReducer from "./reducers/wallet-setup";
 import accountsReducer from "./reducers/accounts";
 import sssReducer from "./reducers/sss";
 import {
@@ -15,7 +16,7 @@ import {
 } from "./sagas/storage";
 import {
   initSetupWatcher,
-  credentialSetupWatcher,
+  credentialStorageWatcher,
   credentialsAuthWatcher
 } from "./sagas/wallet-setup";
 import {
@@ -65,7 +66,7 @@ const rootSaga = function*() {
 
     // wallet setup watcher
     initSetupWatcher,
-    credentialSetupWatcher,
+    credentialStorageWatcher,
     credentialsAuthWatcher,
 
     // accounts watchers
@@ -106,6 +107,7 @@ const rootSaga = function*() {
 
 const rootReducer = combineReducers({
   storage: storageReducer,
+  walletSetup: walletSetupReducer,
   accounts: accountsReducer,
   sss: sssReducer
 });
