@@ -151,6 +151,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-cardview')
     implementation project(':react-native-video')
     implementation project(':react-native-device-info')
     implementation project(':react-native-randombytes')
