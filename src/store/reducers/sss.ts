@@ -6,7 +6,6 @@ import {
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { SERVICES_ENRICHED } from "../actions/storage";
 import { S3_SERVICE } from "../../common/constants/serviceTypes";
-import { statement } from "@babel/template";
 
 const initialState: {
   service: S3Service;
