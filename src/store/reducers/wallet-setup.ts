@@ -1,9 +1,11 @@
-import { CREDS_STORED } from "../actions/wallet-setup";
+import { CREDS_STORED, CREDS_AUTHENTICATED } from "../actions/wallet-setup";
 
 const initialState: {
   hasCreds: Boolean;
+  isAuthenticated: Boolean;
 } = {
-  hasCreds: false
+  hasCreds: false,
+  isAuthenticated: false
 };
 
 export default (state = initialState, action) => {
@@ -13,6 +15,12 @@ export default (state = initialState, action) => {
         ...state,
         hasCreds: true
       };
+    case CREDS_AUTHENTICATED:
+      return {
+        ...state,
+        isAuthenticated: action.payload.isAuthenticated
+      };
   }
+
   return state;
 };

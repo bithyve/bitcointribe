@@ -8,7 +8,8 @@ import {
   INIT_SETUP,
   CREDS_AUTH,
   STORE_CREDS,
-  credsStored
+  credsStored,
+  credsAuthenticated
 } from "../actions/wallet-setup";
 import { insertIntoDB, keyFetched, fetchFromDB } from "../actions/storage";
 import { Database } from "../../common/interfaces/Interfaces";
@@ -96,10 +97,12 @@ function* credentialsAuthWorker({ payload }) {
   const key = yield call(Cipher.decrypt, encryptedKey, hash);
 
   if (!key) {
-    // dispatch failure
+    yield put(credsAuthenticated(false));
+    return;
   }
   yield put(keyFetched(key));
   yield put(fetchFromDB());
+  yield put(credsAuthenticated(true));
 }
 
 export const credentialsAuthWatcher = createWatcher(
