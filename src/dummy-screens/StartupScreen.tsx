@@ -53,11 +53,12 @@ const StartupScreen = props => {
   }, []);
 
   useEffect(() => {
-    pinExists();
-    if (isAuthenticated)
-      walletExists
-        ? props.navigation.navigate("HomeNav")
-        : props.navigation.navigate("WalletSetup");
+    pinExists().then(() => {
+      if (isAuthenticated)
+        walletExists
+          ? props.navigation.navigate("HomeNav")
+          : props.navigation.navigate("WalletSetup");
+    });
   }, [isAuthenticated]);
 
   return (
