@@ -62,17 +62,16 @@ function* insertDBWorker({ payload }) {
       ...payload
     };
 
-    console.log({ insertedIntoDB });
     const inserted = yield call(
       dataManager.insert,
       updatedDB,
       key,
       insertedIntoDB
     );
-    console.log({ inserted });
     if (!inserted) {
       // dispatch failure
       console.log("Failed to insert into DB");
+      return;
     }
 
     yield put(dbInserted(payload));

@@ -13,7 +13,7 @@ export default function Launch(props) {
     //TODO: move to login and post authentication to the RestoreAndRecover (if wallet setup isn't in place already)
     if (await AsyncStorage.getItem("hasCreds")) {
       if (await AsyncStorage.getItem("walletExists")) {
-        dispatch(credsAuth("1111")); //mocking passcode entered@Login
+        dispatch(credsAuth("1111")); //mocking passcode entered@Login (check for authentication update as well)
         props.navigation.replace("Home");
       } else props.navigation.replace("RestoreAndReoverWallet");
     } else props.navigation.replace("PasscodeConfirm");
