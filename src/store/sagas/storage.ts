@@ -33,9 +33,13 @@ function* fetchDBWorker() {
   try {
     const key = yield select(state => state.storage.key);
     const database = yield call(dataManager.fetch, key);
-    if (database) {
+    if (key && database) {
       yield put(dbFetched(database));
       yield put(enrichServices(database));
+    } else {
+      console.log(
+        "Failed to fetch the database; either key is missing or database is empty"
+      );
     }
   } catch (err) {
     console.log(err);
@@ -50,6 +54,7 @@ function* insertDBWorker({ payload }) {
     const { database, insertedIntoDB, key } = storage;
     if (!key) {
       // dispatch failure
+      console.log("Key missing");
       return;
     }
     const updatedDB = {
@@ -57,14 +62,17 @@ function* insertDBWorker({ payload }) {
       ...payload
     };
 
+    console.log({ insertedIntoDB });
     const inserted = yield call(
       dataManager.insert,
       updatedDB,
       key,
       insertedIntoDB
     );
+    console.log({ inserted });
     if (!inserted) {
       // dispatch failure
+      console.log("Failed to insert into DB");
     }
 
     yield put(dbInserted(payload));
