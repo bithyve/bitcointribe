@@ -13,7 +13,11 @@ import {
   insertDBWatcher,
   servicesEnricherWatcher
 } from "./sagas/storage";
-import { initSetupWatcher } from "./sagas/wallet-setup";
+import {
+  initSetupWatcher,
+  credentialSetupWatcher,
+  credentialsAuthWatcher
+} from "./sagas/wallet-setup";
 import {
   fetchAddrWatcher,
   fetchBalanceWatcher,
@@ -61,6 +65,8 @@ const rootSaga = function*() {
 
     // wallet setup watcher
     initSetupWatcher,
+    credentialSetupWatcher,
+    credentialsAuthWatcher,
 
     // accounts watchers
     fetchAddrWatcher,

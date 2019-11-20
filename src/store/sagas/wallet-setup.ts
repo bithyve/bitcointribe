@@ -1,7 +1,11 @@
 import { call, put, select } from "redux-saga/effects";
 import { createWatcher } from "../utils/watcher-creator";
-import { INIT_SETUP } from "../actions/wallet-setup";
-import { insertIntoDB } from "../actions/storage";
+import AsyncStorage from "@react-native-community/async-storage";
+
+import * as Cipher from "../../common/encryption";
+import * as SecureStore from "../../storage/secure-store";
+import { INIT_SETUP, SETUP_CREDS, CREDS_AUTH } from "../actions/wallet-setup";
+import { insertIntoDB, keyFetched, fetchFromDB } from "../actions/storage";
 import { Database } from "../../common/interfaces/Interfaces";
 
 import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
@@ -53,3 +57,41 @@ function* initSetupWorker({ payload }) {
 }
 
 export const initSetupWatcher = createWatcher(initSetupWorker, INIT_SETUP);
+
+function* credentialsSetupWorker({ payload }) {
+  //hash the pin
+  const hash = yield call(Cipher.hash, payload.passcode);
+
+  //generate an AES key and ecnrypt it with
+  const AES_KEY = yield call(Cipher.generateKey);
+  const encryptedKey = yield call(Cipher.encrypt, AES_KEY, hash);
+
+  //store the AES key against the hash
+  if (!(yield call(SecureStore.store, hash, encryptedKey))) {
+    yield call(AsyncStorage.setItem, "hasPasscode", "false");
+  }
+  yield call(AsyncStorage.setItem, "hasPasscode", "true");
+}
+
+export const credentialSetupWatcher = createWatcher(
+  credentialsSetupWorker,
+  SETUP_CREDS
+);
+
+function* credentialsAuthWorker({ payload }) {
+  // hash the pin and fetch AES from secure store
+  const hash = yield call(Cipher.hash, payload.passcode);
+  const encryptedKey = yield call(SecureStore.fetch, hash);
+  const key = yield call(Cipher.decrypt, encryptedKey, hash);
+
+  if (!key) {
+    // dispatch failure
+  }
+  yield put(keyFetched(key));
+  yield put(fetchFromDB());
+}
+
+export const credentialsAuthWatcher = createWatcher(
+  credentialsAuthWorker,
+  CREDS_AUTH
+);

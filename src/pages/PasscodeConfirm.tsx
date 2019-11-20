@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
 	StyleSheet,
 	Text,
@@ -7,21 +7,23 @@ import {
 	TouchableWithoutFeedback,
 	TouchableOpacity,
 	StatusBar,
-	ScrollView
 } from 'react-native';
 import Ionicons from "react-native-vector-icons/Ionicons"
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import { RFValue } from "react-native-responsive-fontsize";
+import {useDispatch} from "react-redux";
+import { setupCreds } from '../store/actions/wallet-setup';
 
 export default function PasscodeConfirm(props) {
 	const [passcode, setPasscode] = useState('');
 	const [confirmPasscode, setConfirmPasscode] = useState('');
 	const [passcodeFlag, setPasscodeFlag] = useState(true);
 	const [confirmPasscodeFlag, setConfirmPasscodeFlag] = useState(0);
+	const dispatch = useDispatch();
 
-	function onPressNumber(text) {
+	const onPressNumber = (text) => {
 		let tmpPasscode = passcode;
 		let tmpConfirmPasscode = confirmPasscode;
 		if (passcodeFlag) {
@@ -56,6 +58,11 @@ export default function PasscodeConfirm(props) {
 			}
 		}
 	}
+
+	const setCreds = useCallback(()=>{
+		dispatch(setupCreds(passcode));
+		props.navigation.replace('RestoreAndReoverWallet')	
+	}, [dispatch])
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
@@ -107,7 +114,7 @@ export default function PasscodeConfirm(props) {
 							</TouchableWithoutFeedback>
 							<TouchableOpacity
 								disabled={passcode == confirmPasscode ? false : true}
-								onPress={() => props.navigation.replace('RestoreAndReoverWallet')}
+								onPress={setCreds}
 								style={{ ...styles.proceedButtonView, backgroundColor: passcode == confirmPasscode ? Colors.blue : Colors.lightBlue, }}
 							>
 								<Text style={styles.proceedButtonText}>Proceed</Text>
