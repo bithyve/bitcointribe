@@ -7,6 +7,8 @@ import {
     SECURE_TRANSACTIONS_FETCHED,
     SECURE_TRANSFER_ST1_EXECUTED,
     SECURE_TRANSFER_ST2_EXECUTED,
+    SECURE_TRANSFER_ST3_EXECUTED,
+    
   } from "../actions/secureAccount";
   import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
 
@@ -30,10 +32,13 @@ import {
   };
   transactions: any;
   transfer: {
-    executing: Boolean;
+    executing1: Boolean;
+    executing2: Boolean;
     stage1: any;
+    stage2:any;
     txid: String;
   };
+  
   } = {
     setupData: {
         qrData: "",
@@ -53,8 +58,10 @@ import {
   },
   transactions: {},
   transfer: {
-    executing: false,
+    executing1: false,
+    executing2:false,
     stage1: {},
+    stage2:{},
     txid: ""
   },
   };
@@ -64,7 +71,7 @@ import {
   };
 
   export default (state = initialState, action) => {
-
+    const account = action.payload ? action.payload.serviceType : null;
     switch (action.type) {
       case SECUREACCOUNT_SETUP:
         return {
@@ -98,6 +105,37 @@ import {
             ...state,
             transactions: action.payload.transactions,      
           };
-        };
+      case SECURE_TRANSFER_ST1_EXECUTED:
+            return {
+              ...state,
+              transfer: {
+                  ...action.payload.stage1,
+                  executing1: true, 
+                },
+                
+            };
+      case SECURE_TRANSFER_ST2_EXECUTED:
+              return {
+                ...state,
+                transfer: {
+                    ...action.payload.stage2,
+                    executing2: true,
+                  },
+                  
+              }; 
+      case SECURE_TRANSFER_ST3_EXECUTED:
+                return {
+                  ...state,
+                  transfer: {
+                    txid: action.payload.txid,
+                    executing1: false,
+                    executing2: false,
+                    }, 
+                    
+                };       
+    };
+      
+
+
     return state;
   };

@@ -29,7 +29,10 @@ import {
   isActiveWatcher,
   secureFetchAddrWatcher,
   secureFetchBalanceWatcher,
-  secureFetchTransactionsWatcher}from "./sagas/secureAccount";
+  secureFetchTransactionsWatcher,
+  secureTransferST1Watcher,
+  secureTransferST2Watcher,
+  secureTransferST3Watcher}from "./sagas/secureAccount";
 import {
   initHCWatcher,
   generateMetaSharesWatcher,
@@ -88,6 +91,9 @@ const rootSaga = function*() {
     uploadRequestedShareWatcher,
     requestShareWatcher,
     recoverMnemonicWatcer,
+    secureTransferST1Watcher,
+    secureTransferST2Watcher,
+    secureTransferST3Watcher,
     //secure account watcher
     setupSecureAccountWatcher,
     checkHealthtWatcher,

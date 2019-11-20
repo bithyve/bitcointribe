@@ -1,4 +1,4 @@
-import { call, put, select } from "redux-saga/effects";
+import { call, put, select, fork } from "redux-saga/effects";
 import { createWatcher } from "../utils/watcher-creator";
 import config from '../../bitcoin/Config';
 import {
@@ -14,8 +14,17 @@ import {
     secureBalanceFetched,
     SECURE_FETCH_TRANSACTIONS,
     secureTransactionsFetched,
+    SECURE_TRANSFER_ST1,
+    secureExecutedST1,
+    SECURE_TRANSFER_ST2,
+    secureExecutedST2,
+    SECURE_TRANSFER_ST3,
+    secureExecutedST3,
+    GA_TOKEN,
+    
   } from "../actions/secureAccount";
 import { insertIntoDB } from "../actions/storage";
+import { payments } from "bitcoinjs-lib";
 function* setupSecureAccountWorker({ payload }) {
     try {
       const service = yield select(
@@ -46,7 +55,9 @@ function* setupSecureAccountWorker({ payload }) {
     const service = yield select(
       state => state.accounts[payload.serviceType].service
     );
-    const {secret} = yield select(state => state.storage.database.secureAccSetupData);   
+    const {secret,qrData} = yield select(state => state.storage.database.secureAccSetupData); 
+    console.log("qrData");
+    console.log(qrData);  
     if (POS === 1) {
       chunk = secret.slice(0, config.SCHUNK_SIZE);
     } else if (POS === -1) {
@@ -88,12 +99,10 @@ function* setupSecureAccountWorker({ payload }) {
 
   function* secureFetchAddrWorker({ payload }) {
     try{
-    // yield put(switchLoader(payload.serviceType, "receivingAddress"));
+     //yield put(switchLoader(payload.serviceType, "receivingAddress"));
     const service = yield select(
       state => state.accounts[payload.serviceType].service
     );
-    console.log("address");
-    console.log(service);
     const preFetchAddress = service.secureHDWallet.receivingAddress;
     const res = yield call(service.getAddress);
     const postFetchAddress =
@@ -105,7 +114,7 @@ function* setupSecureAccountWorker({ payload }) {
     ) {
       yield put(secureAddressFetched(payload.serviceType, postFetchAddress));
     } else {
-      // yield put(switchLoader(payload.serviceType, "receivingAddress"));
+      //  yield put(switchLoader(payload.serviceType, "receivingAddress"));
     }
     console.log(res.data.address);
   }catch(err){
@@ -116,13 +125,14 @@ export const secureFetchAddrWatcher = createWatcher(secureFetchAddrWorker, SECUR
 
 function* secureFetchBalanceWorker({ payload }) {
   try{
-  // yield put(switchLoader(payload.serviceType, "balances"));
+  //  yield put(switchLoader(payload.serviceType, "balances"));
   const service = yield select(
     state => state.accounts[payload.serviceType].service
   );
 
   const preFetchBalances = service.secureHDWallet.balances;
   const res = yield call(service.getBalance);
+  console.log(res.data.balance);
   const postFetchBalances = res.status === 200 ? res.data : preFetchBalances;
 
   if (
@@ -136,9 +146,9 @@ function* secureFetchBalanceWorker({ payload }) {
       })
     );
   } else {
-    // yield put(switchLoader(payload.serviceType, "balances"));
+    //  yield put(switchLoader(payload.serviceType, "balances"));
   }
-  console.log(res.data);
+  //console.log(res.data.balance);
 }catch(err){
   console.log(err);
 }
@@ -151,7 +161,7 @@ export const secureFetchBalanceWatcher = createWatcher(
 
 function* secureFetchTransactionsWorker({ payload }) {
   try{
-  // yield put(switchLoader(payload.serviceType, "transactions"));
+  //  yield put(switchLoader(payload.serviceType, "transactions"));
   const service = yield select(
     state => state.accounts[payload.serviceType].service
   );
@@ -174,7 +184,7 @@ function* secureFetchTransactionsWorker({ payload }) {
       })
     );
   } else {
-    // yield put(switchLoader(payload.serviceType, "transactions"));
+    //  yield put(switchLoader(payload.serviceType, "transactions"));
   }
   console.log(res.data.transactions);
 }catch(err){
@@ -186,3 +196,82 @@ export const secureFetchTransactionsWatcher = createWatcher(
   secureFetchTransactionsWorker,
   SECURE_FETCH_TRANSACTIONS
 );
+
+function* secureTransferST1Worker({ payload }) {
+   //yield put(switchLoader(payload.serviceType, "transfer"));
+  const { recipientAddress, amount, priority } = payload.transferInfo;
+  const service = yield select(
+    state => state.accounts[payload.serviceType].service
+  );
+  const res = yield call(
+    service.transferST1,
+    recipientAddress,
+    amount,
+    priority
+  );
+  res.status === 200
+    ? yield put(secureExecutedST1(payload.serviceType, res.data))
+    : null 
+    //yield put(switchLoader(payload.serviceType, "transfer"));
+   console.log("......1st.......")
+    console.log(res.data);
+}
+
+export const secureTransferST1Watcher = createWatcher(
+  secureTransferST1Worker,
+  SECURE_TRANSFER_ST1
+);
+
+function* secureTransferST2Worker({ payload }) {
+   //yield put(switchLoader(payload.serviceType, "transfer"));
+  const { inputs, txb } = payload.transferInfo;
+  const service = yield select(
+    state => state.accounts[payload.serviceType].service
+  );
+
+  const res = yield call(service.transferST2, inputs, txb);
+  if (res.status === 200) {
+    yield put(secureExecutedST2(payload.serviceType, res.data));
+  } else {
+   //  yield put(switchLoader(payload.serviceType, "transfer"));
+  }
+  console.log(".....2nd.......");
+  console.log(res.data);
+  //yield fork(secureTransferST3Worker ,res.data)
+}
+
+export const secureTransferST2Watcher = createWatcher(
+  secureTransferST2Worker,
+  SECURE_TRANSFER_ST2
+);
+
+function* secureTransferST3Worker({ payload }) {
+  // yield put(switchLoader(payload.serviceType, "transfer"));
+  const { token,childIndexArray, txHex } = payload.transferInfo;
+  console.log("........TOKEN.........");
+  console.log(token);
+  const service = yield select(
+    state => state.accounts[payload.serviceType].service
+  );
+  const res = yield call(service.transferST3, token, txHex, childIndexArray);
+  console.log(res);
+  if (res.status === 200) {
+    yield put(secureExecutedST3(payload.serviceType, res.data.txid));
+  } else {
+   //  yield put(switchLoader(payload.serviceType, "transfer"));
+         }
+  console.log(".......txid........");
+  console.log(res.data);
+  
+}
+export const secureTransferST3Watcher = createWatcher(
+  secureTransferST3Worker,
+  SECURE_TRANSFER_ST3
+);
+
+function* getTokenWorker({payload}){
+    const token = payload.token; 
+
+    //  yield fork(secureTransferST3Worker ,{token})
+}
+export const getTokenWatcher = createWatcher(getTokenWorker,GA_TOKEN);
