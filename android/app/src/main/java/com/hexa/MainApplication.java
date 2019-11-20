@@ -3,6 +3,7 @@ package com.hexa;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.kishanjvaghela.cardview.RNCardViewPackage;
 import com.brentvatne.react.ReactVideoPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.bitgo.randombytes.RandomBytesPackage;
@@ -44,6 +45,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNCardViewPackage(),
             new ReactVideoPackage(),
             new RNDeviceInfo(),
             new RandomBytesPackage(),

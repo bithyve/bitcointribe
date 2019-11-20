@@ -18,7 +18,11 @@ export const initializeSetup = (walletName, securityAns) => {
 // types and action creators (saga): dispatched by saga workers
 
 export const CREDS_STORED = "CREDS_STORED";
-
+export const CREDS_AUTHENTICATED = "CREDS_AUTHENTICATED";
 export const credsStored = () => {
   return { type: CREDS_STORED };
+};
+
+export const credsAuthenticated = isAuthenticated => {
+  return { type: CREDS_AUTHENTICATED, payload: { isAuthenticated } };
 };
