@@ -12,7 +12,7 @@ import {
 import AsyncStorage from "@react-native-community/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { initializeDB } from "../store/actions/storage";
-import { credsAuth, storeCreds } from "../store/actions/wallet-setup";
+import { credsAuth, storeCreds } from "../store/actions/setupAndAuth";
 
 const StartupScreen = props => {
   // const initialize = useCallback(async () => {
@@ -37,7 +37,7 @@ const StartupScreen = props => {
   const [walletExists, setWalletExists] = useState(false);
   const [pin, setPin] = useState();
 
-  const { isAuthenticated } = useSelector(state => state.walletSetup);
+  const { isAuthenticated } = useSelector(state => state.setupAndAuth);
 
   const pinExists = async () => {
     if (await AsyncStorage.getItem("hasCreds")) {
