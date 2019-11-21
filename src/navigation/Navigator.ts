@@ -10,45 +10,25 @@ import NewWalletQuestion from "../pages/NewWalletQuestion";
 import RestoreWalletBySecondaryDevice from "../pages/RestoreWalletBySecondaryDevice";
 import RestoreWalletUsingDocuments from "../pages/RestoreWalletUsingDocuments";
 
-import {
-  StartupScreen,
-  HomeScreen,
-  WalletNameScreen,
-  SecurityQuesScreen,
-  AccountScreen,
-  TransferScreen,
-  S3Screen,
-  S3UserScreen,
-  S3GuardianScreen,
-  SecureAccountScreen,
-  RecoveryScreen,
-  GAScreen,
-  SecureTransferScreen
-} from "../dummy-screens";
-
-const WalletSetupNavigator = createStackNavigator({
-  WalletName: WalletNameScreen,
-  SecurityQues: SecurityQuesScreen
-});
-
-const HomeNavigator = createStackNavigator({
-  Home: HomeScreen,
-  Account: AccountScreen,
-  Transfer: TransferScreen,
-  SecureAccount: SecureAccountScreen,
-  SSS: S3Screen,
-  S3User: S3UserScreen,
-  S3Guardian: S3GuardianScreen,
-  Recovery: RecoveryScreen,
-  GAToken:GAScreen,
-  SecureTransfer:SecureTransferScreen
-});
-
-const Navigator = createSwitchNavigator({
-  Startup: StartupScreen,
-  WalletSetup: WalletSetupNavigator,
-  HomeNav: HomeNavigator
-});
-
+const Navigator = createStackNavigator(
+  {
+    Launch,
+    PasscodeConfirm,
+    RestoreAndReoverWallet,
+    RestoreSelectedContactsList,
+    Home,
+    NewWalletName,
+    NewWalletQuestion,
+    RestoreWalletBySecondaryDevice,
+    RestoreWalletUsingDocuments
+  },
+  {
+    initialRouteName: "Launch",
+    headerLayoutPreset: "center",
+    defaultNavigationOptions: ({ navigation }) => ({
+      header: null
+    })
+  }
+);
 
 export default createAppContainer(Navigator);
