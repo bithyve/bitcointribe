@@ -34,11 +34,11 @@ function* initSetupWorker({ payload }) {
 
     // Secure account
     const secureAcc = new SecureAccount(primaryMnemonic);
-
+  
     // share generation
     const s3Service = new S3Service(primaryMnemonic);
     yield call(s3Service.generateShares, securityAns);
-
+    
     const accounts = {
       REGULAR_ACCOUNT: JSON.stringify(regularAcc),
       TEST_ACCOUNT: JSON.stringify(testAcc),
