@@ -17,6 +17,7 @@ export const insertIntoDB = data => {
   return { type: INSERT_INTO_DB, payload: { ...data } };
 };
 
+
 export const keyFetched = key => {
   return { type: KEY_FETCHED, payload: { key } };
 };
@@ -46,3 +47,5 @@ export const dbInserted = updatedEntity => {
 export const servicesEnriched = services => {
   return { type: SERVICES_ENRICHED, payload: { services } };
 };
+
+

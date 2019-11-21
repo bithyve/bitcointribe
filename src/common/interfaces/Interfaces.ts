@@ -15,6 +15,13 @@ export interface Database {
     SHARES_TRANSFER_DETAILS: {};
     SHARES_UNDER_CUSTODY: {};
   };
+  secureAccSetupData?:{
+    bhXpub:string;
+    qrData: string;
+    secret: string;
+  };
+  secureAccIsActive?:boolean;
+  
   REGULAR_ACCOUNT: string;
   TEST_ACCOUNT: string;
   SECURE_ACCOUNT: string;
