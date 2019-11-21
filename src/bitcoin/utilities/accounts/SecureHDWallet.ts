@@ -24,7 +24,10 @@ export default class SecureHDWallet extends Bitcoin {
   private multiSigCache;
   private signingEssentialsCache;
   private gapLimit: number;
-
+  private twoFASetup: {
+    qrData: string;
+    secret: string;
+  };
   private cipherSpec: {
     algorithm: string;
     salt: string;
@@ -47,6 +50,10 @@ export default class SecureHDWallet extends Bitcoin {
         bh: string;
       };
       gapLimit: number;
+      twoFASetup: {
+        qrData: string;
+        secret: string;
+      };
     },
     network?: bitcoinJS.Network
   ) {
@@ -73,6 +80,7 @@ export default class SecureHDWallet extends Bitcoin {
       keyLength: 24,
       iv: Buffer.alloc(16, 0)
     };
+    this.twoFASetup = stateVars ? stateVars.twoFASetup : undefined;
   }
 
   public importBHXpub = async (
@@ -289,6 +297,7 @@ export default class SecureHDWallet extends Bitcoin {
     } else {
       const { prepared } = this.prepareSecureAccount(setupData.bhXpub);
       if (prepared) {
+        this.twoFASetup = setupData;
         return { setupData };
       } else {
         throw new Error(
