@@ -40,6 +40,11 @@ PODS:
     - React/Core (= 0.59.10)
   - react-native-randombytes (3.5.3):
     - React
+  - react-native-video (4.4.4):
+    - React
+    - react-native-video/Video (= 4.4.4)
+  - react-native-video/Video (4.4.4):
+    - React
   - React/Core (0.59.10):
     - yoga (= 0.59.10.React)
   - React/CxxBridge (0.59.10):
@@ -95,6 +100,8 @@ PODS:
     - React/RCTBlob
   - RNCAsyncStorage (1.6.2):
     - React
+  - RNDeviceInfo (5.3.0):
+    - React
   - RNGestureHandler (1.3.0):
     - React
   - RNReanimated (1.2.0):
@@ -135,6 +142,7 @@ DEPENDENCIES:
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - react-native-randombytes (from `../node_modules/react-native-randombytes`)
+  - react-native-video (from `../node_modules/react-native-video`)
   - React/Core (from `../node_modules/react-native`)
   - React/CxxBridge (from `../node_modules/react-native`)
   - React/DevSupport (from `../node_modules/react-native`)
@@ -150,6 +158,7 @@ DEPENDENCIES:
   - React/RCTVibration (from `../node_modules/react-native`)
   - React/RCTWebSocket (from `../node_modules/react-native`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
+  - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler/RNGestureHandler.podspec`)
   - RNReanimated (from `../node_modules/react-native-reanimated/RNReanimated.podspec`)
   - RNScreens (from `../node_modules/react-native-screens`)
@@ -218,8 +227,12 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native"
   react-native-randombytes:
     :path: "../node_modules/react-native-randombytes"
+  react-native-video:
+    :path: "../node_modules/react-native-video"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-community/async-storage"
+  RNDeviceInfo:
+    :path: "../node_modules/react-native-device-info"
   RNGestureHandler:
     :podspec: "../node_modules/react-native-gesture-handler/RNGestureHandler.podspec"
   RNReanimated:
@@ -284,7 +297,9 @@ SPEC CHECKSUMS:
   glog: aefd1eb5dda2ab95ba0938556f34b98e2da3a60d
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
+  react-native-video: 8c49eca5a6087de968a05b340933b10e3b58169a
   RNCAsyncStorage: 60a80e72d95bf02a01cace55d3697d9724f0d77f
+  RNDeviceInfo: f245326b5b61b80db7e9cbc9de6c75688572a4e0
   RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
   RNReanimated: 1b52415c4302f198cb581282a0166690bad62c43
   RNScreens: f28b48b8345f2f5f39ed6195518291515032a788
@@ -302,6 +317,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 1e70fe58b872355f0ecb44fb81bb1a16484047f0
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: 63b33b45354767c79c12fdbb57be430df04714df
+PODFILE CHECKSUM: beb7d63cf6b7d4f8c41a08e52e4e7f5c7d7de514
 
 COCOAPODS: 1.7.5
