@@ -2,6 +2,7 @@ import { TransactionBuilder } from "bitcoinjs-lib";
 import config from "../../Config";
 import SecureHDWallet from "../../utilities/accounts/SecureHDWallet";
 import { ErrMap } from "../../utilities/ErrMap";
+import { Transactions } from "../../utilities/Interface";
 
 export default class SecureAccount {
   public static fromJSON = (json: string) => {
@@ -16,6 +17,9 @@ export default class SecureAccount {
       primaryXpriv,
       xpubs,
       gapLimit,
+      balances,
+      receivingAddress,
+      transactions,
       twoFASetup
     }: {
       primaryMnemonic: string;
@@ -31,6 +35,9 @@ export default class SecureAccount {
         bh: string;
       };
       gapLimit: number;
+      balances: { balance: number; unconfirmedBalance: number };
+      receivingAddress: string;
+      transactions: Transactions;
       twoFASetup: {
         qrData: string;
         secret: string;
@@ -46,11 +53,14 @@ export default class SecureAccount {
       primaryXpriv,
       xpubs,
       gapLimit,
+      balances,
+      receivingAddress,
+      transactions,
       twoFASetup
     });
   };
 
-  private secureHDWallet: SecureHDWallet;
+  public secureHDWallet: SecureHDWallet;
 
   constructor(
     primaryMnemonic: string,
@@ -67,6 +77,9 @@ export default class SecureAccount {
         bh: string;
       };
       gapLimit: number;
+      balances: { balance: number; unconfirmedBalance: number };
+      receivingAddress: string;
+      transactions: Transactions;
       twoFASetup: {
         qrData: string;
         secret: string;

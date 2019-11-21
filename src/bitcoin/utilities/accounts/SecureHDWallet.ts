@@ -6,6 +6,7 @@ import coinselect from "coinselect";
 import crypto from "crypto";
 import config from "../../Config";
 import Bitcoin from "./Bitcoin";
+import { Transactions } from "../Interface";
 
 const { BH_AXIOS } = config;
 
@@ -35,6 +36,18 @@ export default class SecureHDWallet extends Bitcoin {
     keyLength: number;
   };
 
+  public balances: { balance: number; unconfirmedBalance: number } = {
+    balance: 0,
+    unconfirmedBalance: 0
+  };
+  public receivingAddress: string = "";
+  public transactions: Transactions = {
+    totalTransactions: 0,
+    confirmedTransactions: 0,
+    unconfirmedTransactions: 0,
+    transactionDetails: []
+  };
+
   constructor(
     primaryMnemonic: string,
     stateVars?: {
@@ -50,6 +63,9 @@ export default class SecureHDWallet extends Bitcoin {
         bh: string;
       };
       gapLimit: number;
+      balances: { balance: number; unconfirmedBalance: number };
+      receivingAddress: string;
+      transactions: Transactions;
       twoFASetup: {
         qrData: string;
         secret: string;
@@ -80,6 +96,11 @@ export default class SecureHDWallet extends Bitcoin {
       keyLength: 24,
       iv: Buffer.alloc(16, 0)
     };
+    this.balances = stateVars ? stateVars.balances : this.balances;
+    this.receivingAddress = stateVars
+      ? stateVars.receivingAddress
+      : this.receivingAddress;
+    this.transactions = stateVars ? stateVars.transactions : this.transactions;
     this.twoFASetup = stateVars ? stateVars.twoFASetup : undefined;
   }
 
@@ -198,7 +219,8 @@ export default class SecureHDWallet extends Bitcoin {
       const { balance, unconfirmedBalance } = await this.getBalanceByAddresses(
         this.consumedAddresses
       );
-      return { balance, unconfirmedBalance };
+
+      return (this.balances = { balance, unconfirmedBalance });
     } catch (err) {
       throw new Error(`Unable to get balance: ${err.message}`);
     }
@@ -228,10 +250,12 @@ export default class SecureHDWallet extends Bitcoin {
       await this.fetchBalance();
     }
 
-    return await this.fetchTransactionsByAddresses(
+    const { transactions } = await this.fetchTransactionsByAddresses(
       this.consumedAddresses,
       "Secure"
     );
+    this.transactions = transactions;
+    return { transactions };
   };
 
   public getReceivingAddress = async (): Promise<{ address: string }> => {
@@ -268,6 +292,8 @@ export default class SecureHDWallet extends Bitcoin {
         freeAddress = multiSig.address; // not checking this one, it might be free
         this.nextFreeChildIndex += itr + 1;
       }
+
+      this.receivingAddress = freeAddress;
       return { address: freeAddress };
     } catch (err) {
       throw new Error(`Unable to generate receiving address: ${err.message}`);
