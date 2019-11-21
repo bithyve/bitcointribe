@@ -17,7 +17,8 @@ import {
 } from "../../store/actions/accounts";
 import {
   TEST_ACCOUNT,
-  REGULAR_ACCOUNT
+  REGULAR_ACCOUNT,
+  SECURE_ACCOUNT
 } from "../../common/constants/serviceTypes";
 
 const AccountScreen = props => {
@@ -38,6 +39,14 @@ const AccountScreen = props => {
 
   return (
     <ScrollView contentContainerStyle={styles.screen}>
+      {serviceType === SECURE_ACCOUNT ? (
+        <Button
+          title="Get Testcoins"
+          onPress={async () => {
+            dispatch(getTestcoins(serviceType));
+          }}
+        />
+      ) : null}
       <Button
         title="Fetch Addr"
         onPress={() => {

@@ -15,7 +15,8 @@ export default class SecureAccount {
       signingEssentialsCache,
       primaryXpriv,
       xpubs,
-      gapLimit
+      gapLimit,
+      twoFASetup
     }: {
       primaryMnemonic: string;
       secondaryMnemonic: string;
@@ -30,6 +31,10 @@ export default class SecureAccount {
         bh: string;
       };
       gapLimit: number;
+      twoFASetup: {
+        qrData: string;
+        secret: string;
+      };
     } = secureHDWallet;
 
     return new SecureAccount(primaryMnemonic, {
@@ -40,7 +45,8 @@ export default class SecureAccount {
       signingEssentialsCache,
       primaryXpriv,
       xpubs,
-      gapLimit
+      gapLimit,
+      twoFASetup
     });
   };
 
@@ -61,6 +67,10 @@ export default class SecureAccount {
         bh: string;
       };
       gapLimit: number;
+      twoFASetup: {
+        qrData: string;
+        secret: string;
+      };
     }
   ) {
     this.secureHDWallet = new SecureHDWallet(primaryMnemonic, stateVars);
