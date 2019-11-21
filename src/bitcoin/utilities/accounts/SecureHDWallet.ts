@@ -12,23 +12,13 @@ const { BH_AXIOS } = config;
 
 export default class SecureHDWallet extends Bitcoin {
   private primaryMnemonic: string;
-  private secondaryMnemonic: string;
   private walletID: string;
-  private xpubs: {
-    primary: string;
-    secondary: string;
-    bh: string;
-  };
   private consumedAddresses: string[];
   private nextFreeChildIndex: number;
   private primaryXpriv: string;
   private multiSigCache;
   private signingEssentialsCache;
   private gapLimit: number;
-  private twoFASetup: {
-    qrData: string;
-    secret: string;
-  };
   private cipherSpec: {
     algorithm: string;
     salt: string;
@@ -36,6 +26,16 @@ export default class SecureHDWallet extends Bitcoin {
     keyLength: number;
   };
 
+  public twoFASetup: {
+    qrData: string;
+    secret: string;
+  };
+  public secondaryMnemonic: string;
+  public xpubs: {
+    primary: string;
+    secondary: string;
+    bh: string;
+  };
   public balances: { balance: number; unconfirmedBalance: number } = {
     balance: 0,
     unconfirmedBalance: 0
