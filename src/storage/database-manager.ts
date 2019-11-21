@@ -20,6 +20,7 @@ const fetch = async key => {
 
 const insert = async (database, key, inserted = true) => {
   const encryptedDatabase = encrypt(database, key);
+
   try {
     inserted
       ? await db.update(encryptedDatabase)

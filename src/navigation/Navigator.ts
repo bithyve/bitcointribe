@@ -1,37 +1,50 @@
 import { createAppContainer, createSwitchNavigator } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 
-import {
-  StartupScreen,
-  HomeScreen,
-  WalletNameScreen,
-  SecurityQuesScreen,
-  AccountScreen,
-  TransferScreen,
-  S3Screen,
-  S3UserScreen,
-  S3GuardianScreen,
-  RecoveryScreen
-} from "../dummy-screens";
+import Launch from "../pages/Launch";
+import PasscodeConfirm from "../pages/PasscodeConfirm";
+import RestoreAndReoverWallet from "../pages/RestoreAndReoverWallet";
+import RestoreSelectedContactsList from "../pages/RestoreSelectedContactsList";
+import Home from "../pages/Home";
+import NewWalletName from "../pages/NewWalletName";
+import NewWalletQuestion from "../pages/NewWalletQuestion";
+import RestoreWalletBySecondaryDevice from "../pages/RestoreWalletBySecondaryDevice";
+import RestoreWalletUsingDocuments from "../pages/RestoreWalletUsingDocuments";
 
-const WalletSetupNavigator = createStackNavigator({
-  WalletName: WalletNameScreen,
-  SecurityQues: SecurityQuesScreen
-});
+const HomeNavigator = createStackNavigator(
+  {
+    Home
+  },
+  {
+    headerLayoutPreset: "center",
+    defaultNavigationOptions: ({ navigation }) => ({
+      header: null
+    })
+  }
+);
 
-const HomeNavigator = createStackNavigator({
-  Home: HomeScreen,
-  Account: AccountScreen,
-  Transfer: TransferScreen,
-  SSS: S3Screen,
-  S3User: S3UserScreen,
-  S3Guardian: S3GuardianScreen,
-  Recovery: RecoveryScreen
-});
+const SetupNavigator = createStackNavigator(
+  {
+    Launch,
+    PasscodeConfirm,
+    RestoreAndReoverWallet,
+    RestoreSelectedContactsList,
+    NewWalletName,
+    NewWalletQuestion,
+    RestoreWalletBySecondaryDevice,
+    RestoreWalletUsingDocuments
+  },
+  {
+    initialRouteName: "Launch",
+    headerLayoutPreset: "center",
+    defaultNavigationOptions: ({ navigation }) => ({
+      header: null
+    })
+  }
+);
 
 const Navigator = createSwitchNavigator({
-  Startup: StartupScreen,
-  WalletSetup: WalletSetupNavigator,
+  SetupNav: SetupNavigator,
   HomeNav: HomeNavigator
 });
 
