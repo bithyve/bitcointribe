@@ -18,6 +18,8 @@ import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
 import { AxiosResponse } from "axios";
 import { MetaShare } from "../../bitcoin/utilities/Interface";
+import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
+import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
 
 function* initHCWorker() {
   const s3Service: S3Service = yield select(state => state.sss.service);
@@ -43,24 +45,19 @@ function* generateMetaSharesWorker() {
   const { walletName } = yield select(
     state => state.storage.database.WALLET_SETUP
   );
-  // const secureAccount: SecureAccount = yield select(
-  //   state => state.accounts[SECURE_ACCOUNT].service
-  // );
+  const secureAccount: SecureAccount = yield select(
+    state => state.accounts[SECURE_ACCOUNT].service
+  );
 
-  // mocking till the availability of secure account
-  const secondaryMnemonic =
-    "unique issue slogan party van unfair assault warfare then rubber satisfy snack";
-  const twoFASecret = "some_secret";
-  const bhXpub =
-    "tpubDDGFLSXWA8K2z1fmg37ivgFmQC5xBMcEycBD5pmYuzpM1GyeoeTeykZxFFcQpVVGvv6scShvtCfRkf59tzJzwoL44VMRR78RywTU46TvCrJ";
-  const secondaryXpub =
-    "tpubDDGFLSXWA8K2z1fmg37ivgFmQC5xBMcEycBD5pmYuzpM1GyeoeTeykZxFFcQpVVGvv6scShvtCfRkf59tzJzwoL44VMRR78RywTU46TvCrJ";
+  const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
+  const twoFASecret = secureAccount.secureHDWallet.twoFASetup.secret;
+  const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
 
   const secureAssets = {
     secondaryMnemonic,
     twoFASecret,
-    secondaryXpub,
-    bhXpub
+    secondaryXpub: secondary,
+    bhXpub: bh
   };
 
   if (s3Service.sss.metaShares.length) return;
