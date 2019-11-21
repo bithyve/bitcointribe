@@ -16,6 +16,7 @@ import {
   fetchBalance
 } from "../actions/accounts";
 import { insertIntoDB } from "../actions/storage";
+import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, "receivingAddress"));
@@ -23,7 +24,11 @@ function* fetchAddrWorker({ payload }) {
     state => state.accounts[payload.serviceType].service
   );
 
-  const preFetchAddress = service.hdWallet.receivingAddress;
+  const preFetchAddress =
+    payload.serviceType === SECURE_ACCOUNT
+      ? service.secureHDWallet.receivingAddress
+      : service.hdWallet.receivingAddress;
+
   const res = yield call(service.getAddress);
   const postFetchAddress =
     res.status === 200 ? res.data.address : preFetchAddress;
@@ -46,7 +51,10 @@ function* fetchBalanceWorker({ payload }) {
     state => state.accounts[payload.serviceType].service
   );
 
-  const preFetchBalances = service.hdWallet.balances;
+  const preFetchBalances =
+    payload.serviceType === SECURE_ACCOUNT
+      ? service.secureHDWallet.balances
+      : service.hdWallet.balances;
   const res = yield call(service.getBalance);
   const postFetchBalances = res.status === 200 ? res.data : preFetchBalances;
 
@@ -76,11 +84,13 @@ function* fetchTransactionsWorker({ payload }) {
     state => state.accounts[payload.serviceType].service
   );
 
-  const preFetchTransactions = service.hdWallet.transactions;
+  const preFetchTransactions =
+    payload.serviceType === SECURE_ACCOUNT
+      ? service.secureHDWallet.transactions
+      : service.hdWallet.transactions;
   const res = yield call(service.getTransactions);
   const postFetchTransactions =
     res.status === 200 ? res.data.transactions : preFetchTransactions;
-  console.log({ preFetchTransactions, postFetchTransactions });
 
   if (
     res.status === 200 &&
