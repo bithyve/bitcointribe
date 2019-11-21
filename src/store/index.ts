@@ -5,6 +5,7 @@ import { call, all, spawn } from "redux-saga/effects";
 import { composeWithDevTools } from "redux-devtools-extension";
 
 import storageReducer from "./reducers/storage";
+import walletSetupReducer from "./reducers/wallet-setup";
 import accountsReducer from "./reducers/accounts";
 import sssReducer from "./reducers/sss";
 import secureAccountReducer from "./reducers/secureAccount";
@@ -14,7 +15,11 @@ import {
   insertDBWatcher,
   servicesEnricherWatcher
 } from "./sagas/storage";
-import { initSetupWatcher } from "./sagas/wallet-setup";
+import {
+  initSetupWatcher,
+  credentialStorageWatcher,
+  credentialsAuthWatcher
+} from "./sagas/wallet-setup";
 import {
   fetchAddrWatcher,
   fetchBalanceWatcher,
@@ -72,6 +77,8 @@ const rootSaga = function*() {
 
     // wallet setup watcher
     initSetupWatcher,
+    credentialStorageWatcher,
+    credentialsAuthWatcher,
 
     // accounts watchers
     fetchAddrWatcher,
@@ -121,6 +128,7 @@ const rootSaga = function*() {
 
 const rootReducer = combineReducers({
   storage: storageReducer,
+  walletSetup: walletSetupReducer,
   accounts: accountsReducer,
   secureAccount: secureAccountReducer,
   sss: sssReducer
