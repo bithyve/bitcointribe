@@ -9,8 +9,7 @@ import {
 import { useSelector } from "react-redux";
 import {
   REGULAR_ACCOUNT,
-  TEST_ACCOUNT,
-  SECURE_ACCOUNT
+  TEST_ACCOUNT
 } from "../common/constants/serviceTypes";
 
 const HomeScreen = props => {
@@ -46,14 +45,6 @@ const HomeScreen = props => {
             title="SSS"
             onPress={() => {
               props.navigation.navigate("SSS");
-            }}
-          />
-          <Button
-            title="Secure Account"
-            onPress={() => {
-              props.navigation.navigate("SecureAccount", {
-                serviceType: SECURE_ACCOUNT
-              });
             }}
           />
         </View>

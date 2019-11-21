@@ -2,7 +2,7 @@ import {
   DB_INITIALIZED,
   DB_FETCHED,
   DB_INSERTED,
-  KEY_FETCHED,
+  KEY_FETCHED
 } from "../actions/storage";
 import { Database } from "../../common/interfaces/Interfaces";
 
@@ -48,7 +48,6 @@ export default (state = initialState, action) => {
       return {
         ...updatedState
       };
-    
 
     case KEY_FETCHED:
       return {

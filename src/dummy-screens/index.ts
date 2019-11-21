@@ -7,10 +7,7 @@ import TransferScreen from "./accounts/TransferScreen";
 import S3Screen from "./sss/S3Screen";
 import S3UserScreen from "./sss/S3UserScreen";
 import S3GuardianScreen from "./sss/S3GuardianScreen";
-import SecureAccountScreen from "./accounts/SecureAccountScreen";
 import RecoveryScreen from "./sss/RecoveryScreen";
-import GAScreen from "./accounts/GAScreen";
-import SecureTransferScreen from "./accounts/SecureTransferScreen";
 
 export {
   StartupScreen,
@@ -22,8 +19,5 @@ export {
   S3Screen,
   S3UserScreen,
   S3GuardianScreen,
-  SecureAccountScreen,
-  RecoveryScreen,
-  GAScreen,
-  SecureTransferScreen
+  RecoveryScreen
 };
