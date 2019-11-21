@@ -9,6 +9,7 @@ import {
 } from "../actions/accounts";
 import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
 import TestAccount from "../../bitcoin/services/accounts/TestAccount";
+import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
 import { SERVICES_ENRICHED } from "../actions/storage";
 import {
   REGULAR_ACCOUNT,
@@ -17,7 +18,7 @@ import {
 } from "../../common/constants/serviceTypes";
 
 const ACCOUNT_VARS: {
-  service: RegularAccount | TestAccount;
+  service: RegularAccount | TestAccount | SecureAccount;
   receivingAddress: String;
   balances: {
     balance: Number;

@@ -8,7 +8,6 @@ import storageReducer from "./reducers/storage";
 import walletSetupReducer from "./reducers/wallet-setup";
 import accountsReducer from "./reducers/accounts";
 import sssReducer from "./reducers/sss";
-import secureAccountReducer from "./reducers/secureAccount";
 import {
   initDBWatcher,
   fetchDBWatcher,
@@ -28,16 +27,6 @@ import {
   transferST2Watcher,
   testcoinsWatcher
 } from "./sagas/accounts";
-import {
-  setupSecureAccountWatcher, 
-  checkHealthtWatcher,
-  isActiveWatcher,
-  secureFetchAddrWatcher,
-  secureFetchBalanceWatcher,
-  secureFetchTransactionsWatcher,
-  secureTransferST1Watcher,
-  secureTransferST2Watcher,
-  secureTransferST3Watcher}from "./sagas/secureAccount";
 import {
   initHCWatcher,
   generateMetaSharesWatcher,
@@ -97,17 +86,7 @@ const rootSaga = function*() {
     checkMSharesHealthWatcher,
     uploadRequestedShareWatcher,
     requestShareWatcher,
-    recoverMnemonicWatcer,
-    secureTransferST1Watcher,
-    secureTransferST2Watcher,
-    secureTransferST3Watcher,
-    //secure account watcher
-    setupSecureAccountWatcher,
-    checkHealthtWatcher,
-    isActiveWatcher,
-    secureFetchAddrWatcher,
-    secureFetchBalanceWatcher,
-    secureFetchTransactionsWatcher
+    recoverMnemonicWatcer
   ];
 
   yield all(
@@ -130,7 +109,6 @@ const rootReducer = combineReducers({
   storage: storageReducer,
   walletSetup: walletSetupReducer,
   accounts: accountsReducer,
-  secureAccount: secureAccountReducer,
   sss: sssReducer
 });
 
