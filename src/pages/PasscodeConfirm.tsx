@@ -14,7 +14,7 @@ import Fonts from '../common/Fonts';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { RFValue } from "react-native-responsive-fontsize";
 import {useDispatch, useSelector} from "react-redux";
-import { storeCreds } from '../store/actions/wallet-setup';
+import { storeCreds } from '../store/actions/setupAndAuth';
 
 export default function PasscodeConfirm(props) {
 	const [passcode, setPasscode] = useState('');
@@ -59,7 +59,7 @@ export default function PasscodeConfirm(props) {
 	}
 
 	const dispatch = useDispatch();
-	const { hasCreds } = useSelector(state => state.walletSetup);
+	const { hasCreds } = useSelector(state => state.setupAndAuth);
 	if(hasCreds) props.navigation.replace('RestoreAndReoverWallet');;
 
 	return (

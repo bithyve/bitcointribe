@@ -1,5 +1,6 @@
-import { createAppContainer } from "react-navigation";
+import { createAppContainer, createSwitchNavigator } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
+
 import Launch from "../pages/Launch";
 import PasscodeConfirm from "../pages/PasscodeConfirm";
 import RestoreAndReoverWallet from "../pages/RestoreAndReoverWallet";
@@ -10,13 +11,24 @@ import NewWalletQuestion from "../pages/NewWalletQuestion";
 import RestoreWalletBySecondaryDevice from "../pages/RestoreWalletBySecondaryDevice";
 import RestoreWalletUsingDocuments from "../pages/RestoreWalletUsingDocuments";
 
-const Navigator = createStackNavigator(
+const HomeNavigator = createStackNavigator(
+  {
+    Home
+  },
+  {
+    headerLayoutPreset: "center",
+    defaultNavigationOptions: ({ navigation }) => ({
+      header: null
+    })
+  }
+);
+
+const SetupNavigator = createStackNavigator(
   {
     Launch,
     PasscodeConfirm,
     RestoreAndReoverWallet,
     RestoreSelectedContactsList,
-    Home,
     NewWalletName,
     NewWalletQuestion,
     RestoreWalletBySecondaryDevice,
@@ -30,5 +42,10 @@ const Navigator = createStackNavigator(
     })
   }
 );
+
+const Navigator = createSwitchNavigator({
+  SetupNav: SetupNavigator,
+  HomeNav: HomeNavigator
+});
 
 export default createAppContainer(Navigator);
