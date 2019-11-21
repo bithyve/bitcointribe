@@ -28,7 +28,7 @@ function* initSetupWorker({ payload }) {
     // Regular account
     const regularAcc = new RegularAccount();
     let res = yield call(regularAcc.getMnemonic);
-    if (res !== 200) throw new Error("Regular account gen failed");
+    if (res.status !== 200) throw new Error("Regular account gen failed");
     const primaryMnemonic = res.data.mnemonic;
 
     // Test account
@@ -37,12 +37,12 @@ function* initSetupWorker({ payload }) {
     // Secure account
     const secureAcc = new SecureAccount(primaryMnemonic);
     res = yield call(secureAcc.setupSecureAccount);
-    if (res !== 200) throw new Error("Secure account setup failed");
+    if (res.status !== 200) throw new Error("Secure account setup failed");
 
     // share generation
     const s3Service = new S3Service(primaryMnemonic);
     yield call(s3Service.generateShares, securityAns);
-    if (res !== 200) throw new Error("Share generation failed");
+    if (res.status !== 200) throw new Error("Share generation failed");
 
     const accounts = {
       REGULAR_ACCOUNT: JSON.stringify(regularAcc),

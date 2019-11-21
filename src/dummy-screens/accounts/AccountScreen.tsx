@@ -17,7 +17,6 @@ import {
 } from "../../store/actions/accounts";
 import {
   TEST_ACCOUNT,
-  REGULAR_ACCOUNT,
   SECURE_ACCOUNT
 } from "../../common/constants/serviceTypes";
 
@@ -28,25 +27,19 @@ const AccountScreen = props => {
     state => state.accounts[serviceType]
   );
 
-  const { mnemonic } = service.getMnemonic().data;
-  console.log({ mnemonic });
+  if (serviceType !== SECURE_ACCOUNT) {
+    const { mnemonic } = service.getMnemonic().data;
+    console.log({ mnemonic });
+  }
 
-  const { balances, receivingAddress, transactions } = service.hdWallet;
-
+  const { balances, receivingAddress, transactions } =
+    serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
   const netBalance = service
     ? balances.balance + balances.unconfirmedBalance
     : 0;
 
   return (
     <ScrollView contentContainerStyle={styles.screen}>
-      {serviceType === SECURE_ACCOUNT ? (
-        <Button
-          title="Get Testcoins"
-          onPress={async () => {
-            dispatch(getTestcoins(serviceType));
-          }}
-        />
-      ) : null}
       <Button
         title="Fetch Addr"
         onPress={() => {
