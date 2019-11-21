@@ -9,8 +9,9 @@ import {
   CREDS_AUTH,
   STORE_CREDS,
   credsStored,
-  credsAuthenticated
-} from "../actions/wallet-setup";
+  credsAuthenticated,
+  setupInitialized
+} from "../actions/setupAndAuth";
 import { insertIntoDB, keyFetched, fetchFromDB } from "../actions/storage";
 import { Database } from "../../common/interfaces/Interfaces";
 
@@ -58,6 +59,7 @@ function* initSetupWorker({ payload }) {
 
     yield put(insertIntoDB(initialDatabase));
     yield call(AsyncStorage.setItem, "walletExists", "true");
+    yield put(setupInitialized());
   } catch (err) {
     console.log(err);
   }

@@ -7,13 +7,12 @@ import {
   ScrollView,
   StatusBar,
   Text,
-  Image,
   KeyboardAvoidingView,
   Platform,
   Keyboard,
   TouchableWithoutFeedback
 } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Fonts from "../common/Fonts";
@@ -26,7 +25,7 @@ import {
 } from "react-native-responsive-screen";
 import Feather from "react-native-vector-icons/Feather";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import { initializeSetup } from "../store/actions/wallet-setup";
+import { initializeSetup } from "../store/actions/setupAndAuth";
 
 export default function NewWalletQuestion(props) {
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
@@ -54,6 +53,11 @@ export default function NewWalletQuestion(props) {
 
   const dispatch = useDispatch();
   const walletName = props.navigation.getParam("walletName");
+  const { isInitialized } = useSelector(state => state.setupAndAuth);
+
+  if (isInitialized) {
+    props.navigation.navigate("HomeNav");
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -284,10 +288,7 @@ export default function NewWalletQuestion(props) {
               confirmAnswer.trim() &&
               answer.trim() ? (
                 <TouchableOpacity
-                  onPress={() => {
-                    dispatch(initializeSetup(walletName, answer));
-                    props.navigation.replace("Home");
-                  }}
+                  onPress={() => dispatch(initializeSetup(walletName, answer))}
                   style={styles.buttonView}
                 >
                   <Text style={styles.buttonText}>Done</Text>
