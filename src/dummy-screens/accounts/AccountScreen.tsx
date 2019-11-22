@@ -27,10 +27,10 @@ const AccountScreen = props => {
     state => state.accounts[serviceType]
   );
 
-  if (serviceType !== SECURE_ACCOUNT) {
-    const { mnemonic } = service.getMnemonic().data;
-    console.log({ mnemonic });
-  }
+  // if (serviceType !== SECURE_ACCOUNT) {
+  //   const { mnemonic } = service.getMnemonic().data;
+  //   console.log({ mnemonic });
+  // }
 
   const { balances, receivingAddress, transactions } =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
