@@ -144,7 +144,9 @@ function* transferST2Worker({ payload }) {
 
   const res = yield call(service.transferST2, inputs, txb);
   if (res.status === 200) {
-    yield put(executedST2(payload.serviceType, res.data.txid));
+    if (payload.serviceType === SECURE_ACCOUNT)
+      yield put(executedST2(payload.serviceType, res.data));
+    else yield put(executedST2(payload.serviceType, res.data.txid));
   } else {
     yield put(switchLoader(payload.serviceType, "transfer"));
   }

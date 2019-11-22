@@ -5,7 +5,8 @@ import {
   LOADING,
   TRANSFER_ST1_EXECUTED,
   TRANSFER_ST2_EXECUTED,
-  CLEAR_TRANSFER
+  CLEAR_TRANSFER,
+  TRANSFER_ST3_EXECUTED
 } from "../actions/accounts";
 import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
 import TestAccount from "../../bitcoin/services/accounts/TestAccount";
@@ -28,6 +29,7 @@ const ACCOUNT_VARS: {
   transfer: {
     executing: Boolean;
     stage1: any;
+    stage2: any;
     txid: String;
   };
   loading: {
@@ -47,6 +49,7 @@ const ACCOUNT_VARS: {
   transfer: {
     executing: false,
     stage1: {},
+    stage2: {},
     txid: ""
   },
   loading: {
@@ -111,7 +114,7 @@ export default (state = initialState, action) => {
         [account]: {
           ...state[account],
           transfer: {
-            ...action.payload.stage1,
+            stage1: { ...action.payload.stage1 },
             executing: true
           },
           loading: {
@@ -133,6 +136,40 @@ export default (state = initialState, action) => {
       };
 
     case TRANSFER_ST2_EXECUTED:
+      switch (action.payload.serviceType) {
+        case REGULAR_ACCOUNT || TEST_ACCOUNT:
+          return {
+            ...state,
+            [account]: {
+              ...state[account],
+              transfer: {
+                txid: action.payload.txid,
+                executing: false
+              },
+              loading: {
+                ...state[account].loading,
+                transfer: false
+              }
+            }
+          };
+        case SECURE_ACCOUNT:
+          return {
+            ...state,
+            [account]: {
+              ...state[account],
+              transfer: {
+                stage2: { ...action.payload.stage2 },
+                executing: true
+              },
+              loading: {
+                ...state[account].loading,
+                transfer: false
+              }
+            }
+          };
+      }
+
+    case TRANSFER_ST3_EXECUTED:
       return {
         ...state,
         [account]: {
