@@ -25,7 +25,8 @@ import {
   fetchTransactionsWatcher,
   transferST1Watcher,
   transferST2Watcher,
-  testcoinsWatcher
+  testcoinsWatcher,
+  transferST3Watcher
 } from "./sagas/accounts";
 import {
   initHCWatcher,
@@ -75,6 +76,7 @@ const rootSaga = function*() {
     fetchTransactionsWatcher,
     transferST1Watcher,
     transferST2Watcher,
+    transferST3Watcher,
     testcoinsWatcher,
 
     // sss watchers
