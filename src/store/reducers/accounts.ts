@@ -27,7 +27,7 @@ const ACCOUNT_VARS: {
   };
   transactions: any;
   transfer: {
-    executing: Boolean;
+    executed: string;
     stage1: any;
     stage2: any;
     txid: String;
@@ -47,7 +47,7 @@ const ACCOUNT_VARS: {
   },
   transactions: {},
   transfer: {
-    executing: false,
+    executed: "",
     stage1: {},
     stage2: {},
     txid: ""
@@ -114,8 +114,9 @@ export default (state = initialState, action) => {
         [account]: {
           ...state[account],
           transfer: {
-            stage1: { ...action.payload.stage1 },
-            executing: true
+            ...state[account].transfer,
+            stage1: { ...action.payload.result },
+            executed: "ST1"
           },
           loading: {
             ...state[account].loading,
@@ -143,8 +144,9 @@ export default (state = initialState, action) => {
             [account]: {
               ...state[account],
               transfer: {
-                txid: action.payload.txid,
-                executing: false
+                ...state[account].transfer,
+                txid: action.payload.result,
+                executed: "ST2"
               },
               loading: {
                 ...state[account].loading,
@@ -158,8 +160,9 @@ export default (state = initialState, action) => {
             [account]: {
               ...state[account],
               transfer: {
-                stage2: { ...action.payload.stage2 },
-                executing: true
+                ...state[account].transfer,
+                stage2: { ...action.payload.result },
+                executed: "ST2"
               },
               loading: {
                 ...state[account].loading,
@@ -175,7 +178,8 @@ export default (state = initialState, action) => {
         [account]: {
           ...state[account],
           transfer: {
-            txid: action.payload.txid,
+            ...state[account].transfer,
+            txid: action.payload.result,
             executing: false
           },
           loading: {
