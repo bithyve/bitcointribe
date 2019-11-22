@@ -110,7 +110,7 @@ function* uploadEncMetaShareWorker({ payload }) {
       ...DECENTRALIZED_BACKUP,
       SHARES_TRANSFER_DETAILS: {
         ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
-        [shareId]: { otp, encryptedKey }
+        [shareId]: { OTP: otp, ENCRYPTED_KEY: encryptedKey }
       }
     };
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
@@ -158,10 +158,10 @@ export const requestShareWatcher = createWatcher(
 function* uploadRequestedShareWorker({ payload }) {
   // Transfer: Guardian >>> User
   const { tag, encryptedKey, otp } = payload;
-  const { SHARES_UNDER_CUSTODY } = yield select(
+  const { UNDER_CUSTODY } = yield select(
     state => state.storage.database.DECENTRALIZED_BACKUP
   );
-  const { metaShare, dynamicNonPMDD } = SHARES_UNDER_CUSTODY[tag];
+  const { META_SHARE, DYNAMIC_NONPMDD } = UNDER_CUSTODY[tag];
 
   // TODO: 10 min removal strategy
   yield put(switchS3Loader("uploadRequestedShare"));
@@ -170,8 +170,8 @@ function* uploadRequestedShareWorker({ payload }) {
     S3Service.uploadRequestedShare,
     encryptedKey,
     otp,
-    metaShare,
-    dynamicNonPMDD
+    META_SHARE,
+    DYNAMIC_NONPMDD
   );
 
   if (res.status === 200 && res.data.success === true) {
@@ -196,14 +196,14 @@ function* downloadMetaShareWorker({ payload }) {
     state => state.storage.database
   );
 
-  const { SHARES_UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
+  const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
 
   let res;
   if (payload.downloadType !== "recovery") {
     let existingShares = [];
-    if (Object.keys(SHARES_UNDER_CUSTODY).length) {
-      existingShares = Object.keys(SHARES_UNDER_CUSTODY).map(
-        tag => SHARES_UNDER_CUSTODY[tag].metaShare
+    if (Object.keys(UNDER_CUSTODY).length) {
+      existingShares = Object.keys(UNDER_CUSTODY).map(
+        tag => UNDER_CUSTODY[tag].META_SHARE
       );
     }
 
@@ -224,9 +224,12 @@ function* downloadMetaShareWorker({ payload }) {
     if (payload.downloadType !== "recovery") {
       updatedBackup = {
         ...DECENTRALIZED_BACKUP,
-        SHARES_UNDER_CUSTODY: {
-          ...DECENTRALIZED_BACKUP.SHARES_UNDER_CUSTODY,
-          [metaShare.meta.tag]: { metaShare, dynamicNonPMDD }
+        UNDER_CUSTODY: {
+          ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
+          [metaShare.meta.tag]: {
+            META_SHARE: metaShare,
+            DYNAMIC_NONPMDD: dynamicNonPMDD
+          }
         }
       };
     } else {
@@ -268,31 +271,29 @@ function* updateMSharesHealthWorker() {
   const { DECENTRALIZED_BACKUP } = yield select(
     state => state.storage.database
   );
-  const { SHARES_UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
-  const metaShares = Object.keys(SHARES_UNDER_CUSTODY).map(
-    tag => SHARES_UNDER_CUSTODY[tag].metaShare
+  const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
+  const metaShares = Object.keys(UNDER_CUSTODY).map(
+    tag => UNDER_CUSTODY[tag].META_SHARE
   );
 
   const res = yield call(S3Service.updateHealth, metaShares);
   if (res.status === 200) {
-    const { updationInfo } = res.data;
-    Object.keys(SHARES_UNDER_CUSTODY).forEach(tag => {
-      for (let info of updationInfo) {
-        if (info.updated) {
-          if (
-            info.walletId === SHARES_UNDER_CUSTODY[tag].metaShare.meta.walletId
-          ) {
-            SHARES_UNDER_CUSTODY[tag].lastHealthUpdate = info.updatedAt;
-          }
-        }
-      }
-    });
-
-    const updatedBackup = {
-      ...DECENTRALIZED_BACKUP,
-      SHARES_UNDER_CUSTODY
-    };
-    yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+    // TODO: Use during selective updation
+    // const { updationInfo } = res.data;
+    // Object.keys(UNDER_CUSTODY).forEach(tag => {
+    //   for (let info of updationInfo) {
+    //     if (info.updated) {
+    //       if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
+    //         UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
+    //       }
+    //     }
+    //   }
+    // });
+    // const updatedBackup = {
+    //   ...DECENTRALIZED_BACKUP,
+    //   UNDER_CUSTODY
+    // };
+    // yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
   } else {
     console.log({ err: res.err });
   }

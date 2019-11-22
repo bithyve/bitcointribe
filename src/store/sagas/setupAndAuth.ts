@@ -49,7 +49,7 @@ function* initSetupWorker({ payload }) {
       DECENTRALIZED_BACKUP: {
         RECOVERY_SHARES: [],
         SHARES_TRANSFER_DETAILS: {},
-        SHARES_UNDER_CUSTODY: {}
+        UNDER_CUSTODY: {}
       },
       SERVICES: {
         REGULAR_ACCOUNT: JSON.stringify(regularAcc),

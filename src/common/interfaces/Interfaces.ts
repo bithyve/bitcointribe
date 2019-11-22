@@ -5,15 +5,22 @@ import S3Service from "../../bitcoin/services/sss/S3Service";
 import { MetaShare, DynamicNonPMDD } from "../../bitcoin/utilities/Interface";
 
 export interface Database {
-  WALLET_SETUP: { walletName: String; securityAns: String };
+  WALLET_SETUP: { walletName: string; securityAns: string };
   DECENTRALIZED_BACKUP: {
     RECOVERY_SHARES: {
       REQUEST_DETAILS: { tag: string; otp: string; encryptedKey: string };
       META_SHARE?: MetaShare;
       DYNAMIC_NONPMDD?: DynamicNonPMDD;
     }[];
-    SHARES_TRANSFER_DETAILS: {};
-    SHARES_UNDER_CUSTODY: {};
+    SHARES_TRANSFER_DETAILS: {
+      [SHARE_ID: string]: { OTP: string; ENCRYPTED_KEY: string };
+    };
+    UNDER_CUSTODY: {
+      [TAG: string]: {
+        META_SHARE: MetaShare;
+        DYNAMIC_NONPMDD: DynamicNonPMDD;
+      };
+    };
   };
   SERVICES: {
     REGULAR_ACCOUNT: string;
