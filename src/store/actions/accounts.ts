@@ -27,13 +27,13 @@ export const transferST1 = (serviceType, transferInfo) => {
   return { type: TRANSFER_ST1, payload: { serviceType, transferInfo } };
 };
 
-export const transferST2 = (serviceType, transferInfo) => {
-  return { type: TRANSFER_ST2, payload: { serviceType, transferInfo } };
+export const transferST2 = serviceType => {
+  return { type: TRANSFER_ST2, payload: { serviceType } };
 };
 
-export const transferST3 = (serviceType, transferInfo) => {
+export const transferST3 = (serviceType, token) => {
   //Secure account specific
-  return { type: TRANSFER_ST3, payload: { serviceType, transferInfo } };
+  return { type: TRANSFER_ST3, payload: { serviceType, token } };
 };
 
 export const getTestcoins = serviceType => {
@@ -69,15 +69,15 @@ export const transactionsFetched = (serviceType, transactions) => {
   return { type: TRANSACTIONS_FETCHED, payload: { serviceType, transactions } };
 };
 
-export const executedST1 = (serviceType, stage1) => {
-  return { type: TRANSFER_ST1_EXECUTED, payload: { serviceType, stage1 } };
+export const executedST1 = (serviceType, result) => {
+  return { type: TRANSFER_ST1_EXECUTED, payload: { serviceType, result } };
 };
 
-export const executedST2 = (serviceType, txid) => {
-  return { type: TRANSFER_ST2_EXECUTED, payload: { serviceType, txid } };
+export const executedST2 = (serviceType, result) => {
+  return { type: TRANSFER_ST2_EXECUTED, payload: { serviceType, result } };
 };
 
-export const executedST3 = (serviceType, txid) => {
+export const executedST3 = (serviceType, result) => {
   // Secure account specific
-  return { type: TRANSFER_ST3_EXECUTED, payload: { serviceType, txid } };
+  return { type: TRANSFER_ST3_EXECUTED, payload: { serviceType, result } };
 };

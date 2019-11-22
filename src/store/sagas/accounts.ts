@@ -13,7 +13,9 @@ import {
   executedST1,
   executedST2,
   GET_TESTCOINS,
-  fetchBalance
+  fetchBalance,
+  TRANSFER_ST3,
+  executedST3
 } from "../actions/accounts";
 import { insertIntoDB } from "../actions/storage";
 import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
@@ -137,16 +139,21 @@ export const transferST1Watcher = createWatcher(
 
 function* transferST2Worker({ payload }) {
   yield put(switchLoader(payload.serviceType, "transfer"));
-  const { inputs, txb } = payload.transferInfo;
-  const service = yield select(
-    state => state.accounts[payload.serviceType].service
+  const { service, transfer } = yield select(
+    state => state.accounts[payload.serviceType]
   );
 
+  const { inputs, txb } = transfer.stage1;
+  if (!inputs && !txb) {
+    console.log("Transaction object missing");
+    return;
+  }
   const res = yield call(service.transferST2, inputs, txb);
   if (res.status === 200) {
-    if (payload.serviceType === SECURE_ACCOUNT)
+    if (payload.serviceType === SECURE_ACCOUNT) {
+      console.log({ res });
       yield put(executedST2(payload.serviceType, res.data));
-    else yield put(executedST2(payload.serviceType, res.data.txid));
+    } else yield put(executedST2(payload.serviceType, res.data.txid));
   } else {
     yield put(switchLoader(payload.serviceType, "transfer"));
   }
@@ -155,6 +162,33 @@ function* transferST2Worker({ payload }) {
 export const transferST2Watcher = createWatcher(
   transferST2Worker,
   TRANSFER_ST2
+);
+
+function* transferST3Worker({ payload }) {
+  if (payload.serviceType !== SECURE_ACCOUNT) return;
+
+  yield put(switchLoader(payload.serviceType, "transfer"));
+  const { token } = payload;
+  const { service, transfer } = yield select(
+    state => state.accounts[payload.serviceType]
+  );
+
+  const { txHex, childIndexArray } = transfer.stage2;
+  if (!txHex && !childIndexArray) {
+    console.log("TxHex and childindex array missing");
+  }
+
+  const res = yield call(service.transferST3, token, txHex, childIndexArray);
+  if (res.status === 200) {
+    yield put(executedST3(payload.serviceType, res.data.txid));
+  } else {
+    yield put(switchLoader(payload.serviceType, "transfer"));
+  }
+}
+
+export const transferST3Watcher = createWatcher(
+  transferST3Worker,
+  TRANSFER_ST3
 );
 
 function* testcoinsWorker({ payload }) {
