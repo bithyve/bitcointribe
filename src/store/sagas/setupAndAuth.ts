@@ -44,21 +44,19 @@ function* initSetupWorker({ payload }) {
     yield call(s3Service.generateShares, securityAns);
     if (res.status !== 200) throw new Error("Share generation failed");
 
-    const accounts = {
-      REGULAR_ACCOUNT: JSON.stringify(regularAcc),
-      TEST_ACCOUNT: JSON.stringify(testAcc),
-      SECURE_ACCOUNT: JSON.stringify(secureAcc),
-      S3_SERVICE: JSON.stringify(s3Service)
-    };
-
     const initialDatabase: Database = {
       WALLET_SETUP: { walletName, securityAns },
       DECENTRALIZED_BACKUP: {
         RECOVERY_SHARES: [],
         SHARES_TRANSFER_DETAILS: {},
-        SHARES_UNDER_CUSTODY: {}
+        UNDER_CUSTODY: {}
       },
-      ...accounts
+      SERVICES: {
+        REGULAR_ACCOUNT: JSON.stringify(regularAcc),
+        TEST_ACCOUNT: JSON.stringify(testAcc),
+        SECURE_ACCOUNT: JSON.stringify(secureAcc),
+        S3_SERVICE: JSON.stringify(s3Service)
+      }
     };
 
     yield put(insertIntoDB(initialDatabase));

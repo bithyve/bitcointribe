@@ -81,14 +81,14 @@ const S3UserScreen = props => {
                   OTP:
                   {
                     SHARES_TRANSFER_DETAILS[metaShares[metaShareIndex].shareId]
-                      .otp
+                      .OTP
                   }
                 </Text>
                 <Text style={{ marginTop: 12 }}>
                   EncKey:
                   {
                     SHARES_TRANSFER_DETAILS[metaShares[metaShareIndex].shareId]
-                      .encryptedKey
+                      .ENCRYPTED_KEY
                   }
                 </Text>
               </View>
