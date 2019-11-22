@@ -87,14 +87,22 @@ function* servicesEnricherWorker() {
   try {
     const { database } = yield select(state => state.storage);
     if (!database) {
+      console.log("Database missing; services encrichment failed");
       return;
     }
 
+    const {
+      REGULAR_ACCOUNT,
+      TEST_ACCOUNT,
+      SECURE_ACCOUNT,
+      S3_SERVICE
+    } = database.SERVICES;
+
     const services = {
-      REGULAR_ACCOUNT: RegularAccount.fromJSON(database.REGULAR_ACCOUNT),
-      TEST_ACCOUNT: TestAccount.fromJSON(database.TEST_ACCOUNT),
-      SECURE_ACCOUNT: SecureAccount.fromJSON(database.SECURE_ACCOUNT),
-      S3_SERVICE: S3Service.fromJSON(database.S3_SERVICE)
+      REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
+      TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
+      SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
+      S3_SERVICE: S3Service.fromJSON(S3_SERVICE)
     };
 
     yield put(servicesEnriched(services));

@@ -16,8 +16,6 @@ import {
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
-import { AxiosResponse } from "axios";
-import { MetaShare } from "../../bitcoin/utilities/Interface";
 import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
 import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
 
@@ -31,7 +29,12 @@ function* initHCWorker() {
   const res = yield call(s3Service.initializeHealthcheck);
   if (res.status === 200) {
     yield put(healthCheckInitialized());
-    yield put(insertIntoDB({ S3_SERVICE: JSON.stringify(s3Service) }));
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      S3_SERVICE: JSON.stringify(s3Service)
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {
     console.log({ err: res.err });
     yield put(switchS3Loader("initHC"));
@@ -63,7 +66,12 @@ function* generateMetaSharesWorker() {
   if (s3Service.sss.metaShares.length) return;
   const res = yield call(s3Service.createMetaShares, secureAssets, walletName);
   if (res.status === 200) {
-    yield put(insertIntoDB({ S3_SERVICE: JSON.stringify(s3Service) }));
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      S3_SERVICE: JSON.stringify(s3Service)
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {
     console.log({ err: res.err });
   }
@@ -305,8 +313,14 @@ function* checkMSharesHealthWorker() {
   const postInstance = JSON.stringify(s3Service);
 
   if (res.status === 200) {
-    if (preInstance !== postInstance)
-      yield put(insertIntoDB({ S3_SERVICE: JSON.stringify(s3Service) }));
+    if (preInstance !== postInstance) {
+      const { SERVICES } = yield select(state => state.storage.database);
+      const updatedSERVICES = {
+        ...SERVICES,
+        S3_SERVICE: JSON.stringify(s3Service)
+      };
+      yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    }
   } else {
     console.log({ err: res.err });
   }

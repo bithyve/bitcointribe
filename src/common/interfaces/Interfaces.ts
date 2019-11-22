@@ -15,10 +15,12 @@ export interface Database {
     SHARES_TRANSFER_DETAILS: {};
     SHARES_UNDER_CUSTODY: {};
   };
-  REGULAR_ACCOUNT: string;
-  TEST_ACCOUNT: string;
-  SECURE_ACCOUNT: string;
-  S3_SERVICE: string;
+  SERVICES: {
+    REGULAR_ACCOUNT: string;
+    TEST_ACCOUNT: string;
+    SECURE_ACCOUNT: string;
+    S3_SERVICE: string;
+  };
 }
 
 export interface Services {
