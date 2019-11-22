@@ -92,8 +92,8 @@ const TransferScreen = props => {
               onPress={() => {
                 dispatch(
                   transferST2(serviceType, {
-                    inputs: transfer.inputs,
-                    txb: transfer.txb
+                    inputs: transfer.stage1.inputs,
+                    txb: transfer.stage1.txb
                   })
                 );
               }}
