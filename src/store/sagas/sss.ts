@@ -1,5 +1,5 @@
 import { call, put, select } from "redux-saga/effects";
-import { createWatcher } from "../utils/watcher-creator";
+import { createWatcher } from "../utils/utilities";
 import {
   INIT_HEALTH_CHECK,
   switchS3Loader,
@@ -14,7 +14,8 @@ import {
   RECOVER_MNEMONIC,
   mnemonicRecovered,
   UPDATE_DYNAMINC_NONPMDD,
-  DOWNLOAD_DYNAMIC_NONPMDD
+  DOWNLOAD_DYNAMIC_NONPMDD,
+  RECOVER_WALLET
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
@@ -232,6 +233,10 @@ function* downloadMetaShareWorker({ payload }) {
             META_SHARE: metaShare,
             ENC_DYNAMIC_NONPMDD: dynamicNonPMDD
           }
+        },
+        DYNAMIC_NONPMDD: {
+          ...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD,
+          META_SHARES: [...DECENTRALIZED_BACKUP.META_SHARES, metaShare]
         }
       };
     } else {
@@ -281,21 +286,23 @@ function* updateMSharesHealthWorker() {
   const res = yield call(S3Service.updateHealth, metaShares);
   if (res.status === 200) {
     // TODO: Use during selective updation
-    // const { updationInfo } = res.data;
-    // Object.keys(UNDER_CUSTODY).forEach(tag => {
-    //   for (let info of updationInfo) {
-    //     if (info.updated) {
-    //       if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
-    //         UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
-    //       }
-    //     }
-    //   }
-    // });
-    // const updatedBackup = {
-    //   ...DECENTRALIZED_BACKUP,
-    //   UNDER_CUSTODY
-    // };
-    // yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+    const { updationInfo } = res.data;
+    Object.keys(UNDER_CUSTODY).forEach(tag => {
+      for (let info of updationInfo) {
+        if (info.updated) {
+          if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
+            UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
+            if (info.dynamicNonPMDD)
+              UNDER_CUSTODY[tag].DYNAMIC_NONPMDD = info.dynamicNonPMDD;
+          }
+        }
+      }
+    });
+    const updatedBackup = {
+      ...DECENTRALIZED_BACKUP,
+      UNDER_CUSTODY
+    };
+    yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
   } else {
     console.log({ err: res.err });
   }
@@ -339,43 +346,18 @@ export const checkMSharesHealthWatcher = createWatcher(
 function* updateDynamicNonPMDDWorker() {
   yield put(switchS3Loader("updateDynamicNonPMDD"));
 
-  const { DECENTRALIZED_BACKUP } = yield select(
-    state => state.storage.database
+  const { DYNAMIC_NONPMDD } = yield select(
+    state => state.storage.database.DECENTRALIZED_BACKUP
   );
 
-  const { UNDER_CUSTODY, DYNAMIC_NONPMDD } = DECENTRALIZED_BACKUP;
-  // prepare dynamicNonPMDD
-  const metaShares = Object.keys(UNDER_CUSTODY).map(
-    tag => UNDER_CUSTODY[tag].META_SHARE
-  );
+  if (!Object.keys(DYNAMIC_NONPMDD).length) return; // Nothing in DNP
 
-  let updatedDNP: DynamicNonPMDD = { ...DYNAMIC_NONPMDD };
-  if (metaShares.length) {
-    updatedDNP = {
-      ...DYNAMIC_NONPMDD,
-      META_SHARES: metaShares
-    };
-  }
+  const s3Service: S3Service = yield select(state => state.sss.service);
+  const res = yield call(s3Service.updateDynamicNonPMDD, DYNAMIC_NONPMDD);
 
-  if (!Object.keys(updatedDNP).length) return; // Nothing in DNP
-
-  if (JSON.stringify(updatedDNP) !== JSON.stringify(DYNAMIC_NONPMDD)) {
-    const s3Service: S3Service = yield select(state => state.sss.service);
-    const res = yield call(s3Service.updateDynamicNonPMDD, updatedDNP);
-
-    if (res.status === 200) {
-      const updatedBackup = {
-        ...DECENTRALIZED_BACKUP,
-        DYNAMIC_NONPMDD: updatedDNP
-      };
-
-      yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
-    } else {
-      console.log({ err: res.err });
-    } // yield failure/success based on status
-  } else {
-    console.log("Nothing new to upload @DNP");
-  }
+  if (res.status === 200) {
+  } // yield success
+  else console.log({ err: res.err }); // yield failure
 
   yield put(switchS3Loader("updateDynamicNonPMDD"));
 }
