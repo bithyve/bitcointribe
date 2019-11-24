@@ -13,7 +13,8 @@ import {
   REQUEST_SHARE,
   RECOVER_MNEMONIC,
   mnemonicRecovered,
-  UPDATE_DYNAMINC_NONPMDD
+  UPDATE_DYNAMINC_NONPMDD,
+  DOWNLOAD_DYNAMIC_NONPMDD
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
@@ -335,12 +336,6 @@ export const checkMSharesHealthWatcher = createWatcher(
   CHECK_MSHARES_HEALTH
 );
 
-function* prepareDynamicNonPMDDWorker() {
-  const { DYNAMIC_NONPMDD } = yield select(
-    state => state.storage.database.DECENTRALIZED_BACKUP
-  );
-}
-
 function* updateDynamicNonPMDDWorker() {
   yield put(switchS3Loader("updateDynamicNonPMDD"));
 
@@ -388,6 +383,20 @@ function* updateDynamicNonPMDDWorker() {
 export const updateDynamicNonPMDDWatcher = createWatcher(
   updateDynamicNonPMDDWorker,
   UPDATE_DYNAMINC_NONPMDD
+);
+
+function* downloadDynamicNonPMDDWorker({ payload }) {
+  yield put(switchS3Loader("downloadDynamicNonPMDD"));
+  const res = yield call(S3Service.downloadDynamicNonPMDD, payload.walletId);
+  if (res.status === 200) {
+    // TODO: add functionality as per the requirements
+  } else console.log({ err: res.err });
+  yield put(switchS3Loader("downloadDynamicNonPMDD"));
+}
+
+export const downloadDynamicNonPMDDWatcher = createWatcher(
+  downloadDynamicNonPMDDWorker,
+  DOWNLOAD_DYNAMIC_NONPMDD
 );
 
 function* recoverMnemonicWorker({ payload }) {
