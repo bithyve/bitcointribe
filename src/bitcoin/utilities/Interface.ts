@@ -30,7 +30,7 @@ export interface MetaShare {
   encryptedStaticNonPMDD: string;
 }
 
-export interface DynamicNonPMDD {
+export interface EncDynamicNonPMDD {
   updatedAt: number;
   encryptedDynamicNonPMDD: string;
 }

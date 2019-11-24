@@ -1,5 +1,5 @@
 import { call, put } from "redux-saga/effects";
-import { createWatcher } from "../utils/watcher-creator";
+import { createWatcher, serviceGenerator } from "../utils/utilities";
 import AsyncStorage from "@react-native-community/async-storage";
 
 import * as Cipher from "../../common/encryption";
@@ -15,50 +15,28 @@ import {
 import { insertIntoDB, keyFetched, fetchFromDB } from "../actions/storage";
 import { Database } from "../../common/interfaces/Interfaces";
 
-import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
-import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
-import S3Service from "../../bitcoin/services/sss/S3Service";
-import TestAccount from "../../bitcoin/services/accounts/TestAccount";
-
 function* initSetupWorker({ payload }) {
   try {
     const { walletName, securityAns } = payload;
-
-    // initiate the accounts
-    // Regular account
-    const regularAcc = new RegularAccount();
-    let res = yield call(regularAcc.getMnemonic);
-    if (res.status !== 200) throw new Error("Regular account gen failed");
-    const primaryMnemonic = res.data.mnemonic;
-
-    // Test account
-    const testAcc = new TestAccount();
-
-    // Secure account
-    const secureAcc = new SecureAccount(primaryMnemonic);
-    res = yield call(secureAcc.setupSecureAccount);
-    if (res.status !== 200) throw new Error("Secure account setup failed");
-
-    // share generation
-    const s3Service = new S3Service(primaryMnemonic);
-    yield call(s3Service.generateShares, securityAns);
-    if (res.status !== 200) throw new Error("Share generation failed");
-
-    const accounts = {
-      REGULAR_ACCOUNT: JSON.stringify(regularAcc),
-      TEST_ACCOUNT: JSON.stringify(testAcc),
-      SECURE_ACCOUNT: JSON.stringify(secureAcc),
-      S3_SERVICE: JSON.stringify(s3Service)
-    };
+    const { regularAcc, testAcc, secureAcc, s3Service } = yield call(
+      serviceGenerator,
+      securityAns
+    );
 
     const initialDatabase: Database = {
       WALLET_SETUP: { walletName, securityAns },
       DECENTRALIZED_BACKUP: {
         RECOVERY_SHARES: [],
         SHARES_TRANSFER_DETAILS: {},
-        SHARES_UNDER_CUSTODY: {}
+        UNDER_CUSTODY: {},
+        DYNAMIC_NONPMDD: {}
       },
-      ...accounts
+      SERVICES: {
+        REGULAR_ACCOUNT: JSON.stringify(regularAcc),
+        TEST_ACCOUNT: JSON.stringify(testAcc),
+        SECURE_ACCOUNT: JSON.stringify(secureAcc),
+        S3_SERVICE: JSON.stringify(s3Service)
+      }
     };
 
     yield put(insertIntoDB(initialDatabase));
