@@ -1,5 +1,5 @@
 import { call, put, select } from "redux-saga/effects";
-import { createWatcher } from "../utils/watcher-creator";
+import { createWatcher } from "../utils/utilities";
 import {
   FETCH_ADDR,
   addressFetched,
@@ -65,11 +65,12 @@ function* fetchBalanceWorker({ payload }) {
     JSON.stringify(preFetchBalances) !== JSON.stringify(postFetchBalances)
   ) {
     yield put(balanceFetched(payload.serviceType, postFetchBalances));
-    yield put(
-      insertIntoDB({
-        [payload.serviceType]: JSON.stringify(service)
-      })
-    );
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [payload.serviceType]: JSON.stringify(service)
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {
     yield put(switchLoader(payload.serviceType, "balances"));
   }
@@ -100,11 +101,12 @@ function* fetchTransactionsWorker({ payload }) {
       JSON.stringify(postFetchTransactions)
   ) {
     yield put(transactionsFetched(payload.serviceType, postFetchTransactions));
-    yield put(
-      insertIntoDB({
-        [payload.serviceType]: JSON.stringify(service)
-      })
-    );
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [payload.serviceType]: JSON.stringify(service)
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {
     yield put(switchLoader(payload.serviceType, "transactions"));
   }

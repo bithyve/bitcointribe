@@ -37,7 +37,11 @@ import {
   checkMSharesHealthWatcher,
   uploadRequestedShareWatcher,
   requestShareWatcher,
-  recoverMnemonicWatcer
+  updateDynamicNonPMDDWatcher,
+  downloadDynamicNonPMDDWatcher,
+  recoverMnemonicWatcher,
+  recoverWalletWatcher,
+  restoreDynamicNonPMDDWatcher
 } from "./sagas/sss";
 
 // const rootSaga = function*() {
@@ -88,7 +92,11 @@ const rootSaga = function*() {
     checkMSharesHealthWatcher,
     uploadRequestedShareWatcher,
     requestShareWatcher,
-    recoverMnemonicWatcer
+    updateDynamicNonPMDDWatcher,
+    downloadDynamicNonPMDDWatcher,
+    restoreDynamicNonPMDDWatcher,
+    recoverMnemonicWatcher,
+    recoverWalletWatcher
   ];
 
   yield all(
