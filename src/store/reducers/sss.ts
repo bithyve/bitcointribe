@@ -16,6 +16,8 @@ const initialState: {
     updateMSharesHealth: Boolean;
     checkMSharesHealth: Boolean;
     uploadRequestedShare: Boolean;
+    updateDynamicNonPMDD: Boolean;
+    downloadDynamicNonPMDD: Boolean;
   };
   mnemonic: String;
 } = {
@@ -26,7 +28,9 @@ const initialState: {
     downloadMetaShare: false,
     updateMSharesHealth: false,
     checkMSharesHealth: false,
-    uploadRequestedShare: false
+    uploadRequestedShare: false,
+    updateDynamicNonPMDD: false,
+    downloadDynamicNonPMDD: false
   },
   mnemonic: ""
 };
