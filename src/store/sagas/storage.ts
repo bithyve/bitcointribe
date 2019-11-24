@@ -1,5 +1,5 @@
 import { call, put, select } from "redux-saga/effects";
-import { createWatcher } from "../utils/watcher-creator";
+import { createWatcher } from "../utils/utilities";
 import {
   INIT_DB,
   dbInitialized,
