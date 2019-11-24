@@ -30,11 +30,6 @@ export interface MetaShare {
   encryptedStaticNonPMDD: string;
 }
 
-export interface DynamicNonPMDD {
-  updatedAt: number;
-  encryptedDynamicNonPMDD: string;
-}
-
 export interface SocialStaticNonPMDD {
   secondaryXpub: string;
   bhXpub: string;

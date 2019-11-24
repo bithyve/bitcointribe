@@ -9,6 +9,7 @@ export const UPDATE_MSHARES_HEALTH = "UPDATE_MSHARES_HEALTH";
 export const CHECK_MSHARES_HEALTH = "CHECK_MSHARES_HEALTH";
 export const REQUEST_SHARE = "REQUEST_SHARE";
 export const RECOVER_MNEMONIC = "RECOVER_MNEMONIC";
+export const UPDATE_DYNAMINC_NONPMDD = "UPDATE_DYNAMINC_NONPMDD";
 export const S3_LOADING = "S3_LOADING";
 
 export const initHealthCheck = () => {
@@ -48,6 +49,10 @@ export const requestShare = () => {
 
 export const recoverMmnemonic = (metaShares, securityAns) => {
   return { type: RECOVER_MNEMONIC, payload: { metaShares, securityAns } };
+};
+
+export const updateDynamicNonPMDD = () => {
+  return { type: UPDATE_DYNAMINC_NONPMDD };
 };
 
 export const switchS3Loader = beingLoaded => {

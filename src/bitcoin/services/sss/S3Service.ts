@@ -524,7 +524,7 @@ export default class S3Service {
   };
 
   public updateDynamicNonPMDD = async (
-    dynamicNonPMDD: MetaShare[]
+    dynamicNonPMDD: any
   ): Promise<
     | {
         status: number;
