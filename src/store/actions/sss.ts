@@ -10,8 +10,9 @@ export const CHECK_MSHARES_HEALTH = "CHECK_MSHARES_HEALTH";
 export const REQUEST_SHARE = "REQUEST_SHARE";
 export const UPDATE_DYNAMINC_NONPMDD = "UPDATE_DYNAMINC_NONPMDD";
 export const DOWNLOAD_DYNAMIC_NONPMDD = "DOWNLOAD_DYNAMIC_NONPMDD";
+export const RESTORE_DYNAMIC_NONPMDD = "RESTORE_DYNAMIC_NONPMDD";
 export const RECOVER_MNEMONIC = "RECOVER_MNEMONIC";
-
+export const RECOVER_WALLET = "RECOVER_WALLET";
 export const S3_LOADING = "S3_LOADING";
 
 export const initHealthCheck = () => {
@@ -56,8 +57,17 @@ export const updateDynamicNonPMDD = () => {
 export const downloadDynamicNonPMDD = walletId => {
   return { type: DOWNLOAD_DYNAMIC_NONPMDD, payload: { walletId } };
 };
+
+export const restoreDynamicNonPMDD = () => {
+  return { type: RESTORE_DYNAMIC_NONPMDD };
+};
+
 export const recoverMmnemonic = (metaShares, securityAns) => {
   return { type: RECOVER_MNEMONIC, payload: { metaShares, securityAns } };
+};
+
+export const recoverWallet = () => {
+  return { type: RECOVER_WALLET };
 };
 
 export const switchS3Loader = beingLoaded => {
