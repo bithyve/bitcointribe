@@ -19,6 +19,7 @@ import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
 import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
 import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
+import { DynamicNonPMDD } from "../../common/interfaces/Interfaces";
 
 function* initHCWorker() {
   const s3Service: S3Service = yield select(state => state.sss.service);
@@ -146,7 +147,6 @@ function* requestShareWorker() {
       { REQUEST_DETAILS: { tag: walletName, otp, encryptedKey } }
     ]
   };
-  console.log(updatedBackup.RECOVERY_SHARES);
 
   yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
 }
@@ -335,22 +335,53 @@ export const checkMSharesHealthWatcher = createWatcher(
   CHECK_MSHARES_HEALTH
 );
 
-function* updateDynamicNonPMDDWorker() {
+function* prepareDynamicNonPMDDWorker() {
   const { DYNAMIC_NONPMDD } = yield select(
     state => state.storage.database.DECENTRALIZED_BACKUP
   );
+}
 
-  // const metaShares = Object.keys(UNDER_CUSTODY).map(
-  //   tag => UNDER_CUSTODY[tag].META_SHARE
-  // );
-
-  if (!Object.keys(DYNAMIC_NONPMDD).length) return; // Nothing in DNP
-
+function* updateDynamicNonPMDDWorker() {
   yield put(switchS3Loader("updateDynamicNonPMDD"));
-  const s3Service: S3Service = yield select(state => state.sss.service);
-  const res = yield call(s3Service.updateDynamicNonPMDD, DYNAMIC_NONPMDD);
 
-  if (res.status !== 200) console.log({ err: res.err }); // yield failure/success based on status
+  const { DECENTRALIZED_BACKUP } = yield select(
+    state => state.storage.database
+  );
+
+  const { UNDER_CUSTODY, DYNAMIC_NONPMDD } = DECENTRALIZED_BACKUP;
+  // prepare dynamicNonPMDD
+  const metaShares = Object.keys(UNDER_CUSTODY).map(
+    tag => UNDER_CUSTODY[tag].META_SHARE
+  );
+
+  let updatedDNP: DynamicNonPMDD = { ...DYNAMIC_NONPMDD };
+  if (metaShares.length) {
+    updatedDNP = {
+      ...DYNAMIC_NONPMDD,
+      META_SHARES: metaShares
+    };
+  }
+
+  if (!Object.keys(updatedDNP).length) return; // Nothing in DNP
+
+  if (JSON.stringify(updatedDNP) !== JSON.stringify(DYNAMIC_NONPMDD)) {
+    const s3Service: S3Service = yield select(state => state.sss.service);
+    const res = yield call(s3Service.updateDynamicNonPMDD, updatedDNP);
+
+    if (res.status === 200) {
+      const updatedBackup = {
+        ...DECENTRALIZED_BACKUP,
+        DYNAMIC_NONPMDD: updatedDNP
+      };
+
+      yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+    } else {
+      console.log({ err: res.err });
+    } // yield failure/success based on status
+  } else {
+    console.log("Nothing new to upload @DNP");
+  }
+
   yield put(switchS3Loader("updateDynamicNonPMDD"));
 }
 

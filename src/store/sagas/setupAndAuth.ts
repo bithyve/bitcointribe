@@ -50,9 +50,7 @@ function* initSetupWorker({ payload }) {
         RECOVERY_SHARES: [],
         SHARES_TRANSFER_DETAILS: {},
         UNDER_CUSTODY: {},
-        DYNAMIC_NONPMDD: {
-          META_SHARES: []
-        }
+        DYNAMIC_NONPMDD: {}
       },
       SERVICES: {
         REGULAR_ACCOUNT: JSON.stringify(regularAcc),
