@@ -2,7 +2,7 @@ import config from "../../Config";
 import { ErrMap } from "../../utilities/ErrMap";
 import {
   BuddyStaticNonPMDD,
-  DynamicNonPMDD,
+  EncDynamicNonPMDD,
   MetaShare,
   SocialStaticNonPMDD
 } from "../../utilities/Interface";
@@ -72,7 +72,7 @@ export default class S3Service {
         data:
           | {
               metaShare: MetaShare;
-              dynamicNonPMDD: DynamicNonPMDD;
+              dynamicNonPMDD: EncDynamicNonPMDD;
             }
           | {
               metaShare: MetaShare;
@@ -95,6 +95,34 @@ export default class S3Service {
       };
     } catch (err) {
       return { status: 502, err: err.message, message: ErrMap[502] };
+    }
+  };
+
+  public static downloadDynamicNonPMDD = async (
+    walletId: string
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          dynamicNonPMDD: EncDynamicNonPMDD;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await SSS.downloadDynamicNonPMDD(walletId)
+      };
+    } catch (err) {
+      return { status: 516, err: err.message, message: ErrMap[516] };
     }
   };
 
@@ -137,7 +165,7 @@ export default class S3Service {
     encryptedKey: string,
     otp: string,
     metaShare: MetaShare,
-    dynamicNonPMDD?: DynamicNonPMDD
+    dynamicNonPMDD?: EncDynamicNonPMDD
   ): Promise<
     | {
         status: number;
@@ -179,7 +207,7 @@ export default class S3Service {
         status: number;
         data: {
           metaShare: MetaShare;
-          dynamicNonPMDD: DynamicNonPMDD;
+          dynamicNonPMDD: EncDynamicNonPMDD;
         };
         err?: undefined;
         message?: undefined;
@@ -272,7 +300,7 @@ export default class S3Service {
             shareId: string;
             updated: boolean;
             updatedAt?: number;
-            dynamicNonPMDD?: DynamicNonPMDD;
+            dynamicNonPMDD?: EncDynamicNonPMDD;
             err?: string;
           }>;
         };
@@ -555,34 +583,6 @@ export default class S3Service {
     }
   };
 
-  public downloadDynamicNonPMDD = async (
-    walletId: string
-  ): Promise<
-    | {
-        status: number;
-        data: {
-          dynamicNonPMDD: DynamicNonPMDD;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.sss.downloadDynamicNonPMDD(walletId)
-      };
-    } catch (err) {
-      return { status: 516, err: err.message, message: ErrMap[516] };
-    }
-  };
-
   public decryptDynamicNonPMDD = (
     encryptedDynamicNonPMDD: string
   ):
@@ -611,7 +611,7 @@ export default class S3Service {
   };
 
   public restoreDynamicNonPMDD = (
-    dynamicNonPMDDs: DynamicNonPMDD[]
+    dynamicNonPMDDs: EncDynamicNonPMDD[]
   ):
     | {
         status: number;
@@ -732,7 +732,7 @@ export default class S3Service {
 
   public uploadShare = async (
     shareIndex: number,
-    dynamicNonPMDD?: DynamicNonPMDD
+    dynamicNonPMDD?: EncDynamicNonPMDD
   ): Promise<
     | {
         status: number;
