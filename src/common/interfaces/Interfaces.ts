@@ -2,7 +2,10 @@ import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
 import TestAccount from "../../bitcoin/services/accounts/TestAccount";
 import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
 import S3Service from "../../bitcoin/services/sss/S3Service";
-import { MetaShare } from "../../bitcoin/utilities/Interface";
+import {
+  MetaShare,
+  EncDynamicNonPMDD
+} from "../../bitcoin/utilities/Interface";
 
 export interface Database {
   WALLET_SETUP: { walletName: string; securityAns: string };
@@ -10,7 +13,7 @@ export interface Database {
     RECOVERY_SHARES: {
       REQUEST_DETAILS: { tag: string; otp: string; encryptedKey: string };
       META_SHARE?: MetaShare;
-      ENC_DYNAMIC_NONPMDD?: string;
+      ENC_DYNAMIC_NONPMDD?: EncDynamicNonPMDD;
     }[];
     SHARES_TRANSFER_DETAILS: {
       [SHARE_ID: string]: { OTP: string; ENCRYPTED_KEY: string };
@@ -18,7 +21,7 @@ export interface Database {
     UNDER_CUSTODY: {
       [TAG: string]: {
         META_SHARE: MetaShare;
-        ENC_DYNAMIC_NONPMDD: string;
+        ENC_DYNAMIC_NONPMDD: EncDynamicNonPMDD;
       };
     };
     DYNAMIC_NONPMDD: DynamicNonPMDD;

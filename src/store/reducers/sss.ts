@@ -18,6 +18,8 @@ const initialState: {
     uploadRequestedShare: Boolean;
     updateDynamicNonPMDD: Boolean;
     downloadDynamicNonPMDD: Boolean;
+    restoreDynamicNonPMDD: Boolean;
+    restoreWallet: Boolean;
   };
   mnemonic: String;
 } = {
@@ -30,7 +32,9 @@ const initialState: {
     checkMSharesHealth: false,
     uploadRequestedShare: false,
     updateDynamicNonPMDD: false,
-    downloadDynamicNonPMDD: false
+    downloadDynamicNonPMDD: false,
+    restoreDynamicNonPMDD: false,
+    restoreWallet: false
   },
   mnemonic: ""
 };
