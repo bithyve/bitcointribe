@@ -12,12 +12,15 @@ import {
   UPLOAD_REQUESTED_SHARE,
   REQUEST_SHARE,
   RECOVER_MNEMONIC,
-  mnemonicRecovered
+  mnemonicRecovered,
+  UPDATE_DYNAMINC_NONPMDD,
+  DOWNLOAD_DYNAMIC_NONPMDD
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
 import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
 import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
+import { DynamicNonPMDD } from "../../common/interfaces/Interfaces";
 
 function* initHCWorker() {
   const s3Service: S3Service = yield select(state => state.sss.service);
@@ -145,7 +148,6 @@ function* requestShareWorker() {
       { REQUEST_DETAILS: { tag: walletName, otp, encryptedKey } }
     ]
   };
-  console.log(updatedBackup.RECOVERY_SHARES);
 
   yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
 }
@@ -161,7 +163,7 @@ function* uploadRequestedShareWorker({ payload }) {
   const { UNDER_CUSTODY } = yield select(
     state => state.storage.database.DECENTRALIZED_BACKUP
   );
-  const { META_SHARE, DYNAMIC_NONPMDD } = UNDER_CUSTODY[tag];
+  const { META_SHARE, ENC_DYNAMIC_NONPMDD } = UNDER_CUSTODY[tag];
 
   // TODO: 10 min removal strategy
   yield put(switchS3Loader("uploadRequestedShare"));
@@ -171,7 +173,7 @@ function* uploadRequestedShareWorker({ payload }) {
     encryptedKey,
     otp,
     META_SHARE,
-    DYNAMIC_NONPMDD
+    ENC_DYNAMIC_NONPMDD
   );
 
   if (res.status === 200 && res.data.success === true) {
@@ -228,7 +230,7 @@ function* downloadMetaShareWorker({ payload }) {
           ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
           [metaShare.meta.tag]: {
             META_SHARE: metaShare,
-            DYNAMIC_NONPMDD: dynamicNonPMDD
+            ENC_DYNAMIC_NONPMDD: dynamicNonPMDD
           }
         }
       };
@@ -239,7 +241,7 @@ function* downloadMetaShareWorker({ payload }) {
             return {
               REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
               META_SHARE: metaShare,
-              DYNAMIC_NONPMDD: dynamicNonPMDD
+              ENC_DYNAMIC_NONPMDD: dynamicNonPMDD
             };
           }
           return recoveryShare;
@@ -332,6 +334,69 @@ function* checkMSharesHealthWorker() {
 export const checkMSharesHealthWatcher = createWatcher(
   checkMSharesHealthWorker,
   CHECK_MSHARES_HEALTH
+);
+
+function* updateDynamicNonPMDDWorker() {
+  yield put(switchS3Loader("updateDynamicNonPMDD"));
+
+  const { DECENTRALIZED_BACKUP } = yield select(
+    state => state.storage.database
+  );
+
+  const { UNDER_CUSTODY, DYNAMIC_NONPMDD } = DECENTRALIZED_BACKUP;
+  // prepare dynamicNonPMDD
+  const metaShares = Object.keys(UNDER_CUSTODY).map(
+    tag => UNDER_CUSTODY[tag].META_SHARE
+  );
+
+  let updatedDNP: DynamicNonPMDD = { ...DYNAMIC_NONPMDD };
+  if (metaShares.length) {
+    updatedDNP = {
+      ...DYNAMIC_NONPMDD,
+      META_SHARES: metaShares
+    };
+  }
+
+  if (!Object.keys(updatedDNP).length) return; // Nothing in DNP
+
+  if (JSON.stringify(updatedDNP) !== JSON.stringify(DYNAMIC_NONPMDD)) {
+    const s3Service: S3Service = yield select(state => state.sss.service);
+    const res = yield call(s3Service.updateDynamicNonPMDD, updatedDNP);
+
+    if (res.status === 200) {
+      const updatedBackup = {
+        ...DECENTRALIZED_BACKUP,
+        DYNAMIC_NONPMDD: updatedDNP
+      };
+
+      yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+    } else {
+      console.log({ err: res.err });
+    } // yield failure/success based on status
+  } else {
+    console.log("Nothing new to upload @DNP");
+  }
+
+  yield put(switchS3Loader("updateDynamicNonPMDD"));
+}
+
+export const updateDynamicNonPMDDWatcher = createWatcher(
+  updateDynamicNonPMDDWorker,
+  UPDATE_DYNAMINC_NONPMDD
+);
+
+function* downloadDynamicNonPMDDWorker({ payload }) {
+  yield put(switchS3Loader("downloadDynamicNonPMDD"));
+  const res = yield call(S3Service.downloadDynamicNonPMDD, payload.walletId);
+  if (res.status === 200) {
+    // TODO: add functionality as per the requirements
+  } else console.log({ err: res.err });
+  yield put(switchS3Loader("downloadDynamicNonPMDD"));
+}
+
+export const downloadDynamicNonPMDDWatcher = createWatcher(
+  downloadDynamicNonPMDDWorker,
+  DOWNLOAD_DYNAMIC_NONPMDD
 );
 
 function* recoverMnemonicWorker({ payload }) {

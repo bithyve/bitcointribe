@@ -5,7 +5,7 @@ import secrets from "secrets.js-grempe";
 import config from "../../Config";
 import {
   BuddyStaticNonPMDD,
-  DynamicNonPMDD,
+  EncDynamicNonPMDD,
   MetaShare,
   SocialStaticNonPMDD
 } from "../Interface";
@@ -71,7 +71,7 @@ export default class SSS {
   ): Promise<
     | {
         metaShare: MetaShare;
-        dynamicNonPMDD: DynamicNonPMDD;
+        dynamicNonPMDD: EncDynamicNonPMDD;
         messageId: string;
       }
     | {
@@ -97,6 +97,30 @@ export default class SSS {
       return { metaShare, dynamicNonPMDD, messageId };
     }
     return { metaShare, messageId };
+  };
+
+  public static downloadDynamicNonPMDD = async (
+    walletID: string
+  ): Promise<{
+    dynamicNonPMDD: EncDynamicNonPMDD;
+  }> => {
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post("downloadDynamicNonPMDD", {
+        walletID
+      });
+    } catch (err) {
+      throw new Error(err.response.data.err);
+    }
+
+    const { dynamicNonPMDD } = res.data;
+    if (dynamicNonPMDD) {
+      return {
+        dynamicNonPMDD
+      };
+    } else {
+      throw new Error("Unable to download EncDynamicNonPMDD");
+    }
   };
 
   public static validateStorage = (
@@ -174,7 +198,7 @@ export default class SSS {
     encryptedKey: string,
     otp: string,
     metaShare: MetaShare,
-    dynamicNonPMDD?: DynamicNonPMDD
+    dynamicNonPMDD?: EncDynamicNonPMDD
   ): Promise<{ success: boolean }> => {
     const key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
     const { encryptedMetaShare, messageId } = SSS.encryptMetaShare(
@@ -322,7 +346,7 @@ export default class SSS {
       shareId: string;
       updated: boolean;
       updatedAt?: number;
-      dynamicNonPMDD?: DynamicNonPMDD;
+      dynamicNonPMDD?: EncDynamicNonPMDD;
       err?: string;
     }>;
   }> => {
@@ -505,7 +529,7 @@ export default class SSS {
 
   public uploadShare = async (
     shareIndex: number,
-    dynamicNonPMDD?: DynamicNonPMDD
+    dynamicNonPMDD?: EncDynamicNonPMDD
   ): Promise<{
     otp: string;
     encryptedKey: string;
@@ -738,7 +762,7 @@ export default class SSS {
   };
 
   public restoreDynamicNonPMDD = (
-    dynamicNonPMDDs: DynamicNonPMDD[]
+    dynamicNonPMDDs: EncDynamicNonPMDD[]
   ): {
     decryptedDynamicNonPMDD: MetaShare[];
   } => {
@@ -767,7 +791,7 @@ export default class SSS {
   ): Promise<{
     updated: boolean;
   }> => {
-    const dynamicNonPMDD: DynamicNonPMDD = {
+    const dynamicNonPMDD: EncDynamicNonPMDD = {
       updatedAt: Date.now(),
       encryptedDynamicNonPMDD
     };
@@ -789,30 +813,6 @@ export default class SSS {
       };
     } else {
       throw new Error("Unable to update the NonPMDD");
-    }
-  };
-
-  public downloadDynamicNonPMDD = async (
-    walletID: string
-  ): Promise<{
-    dynamicNonPMDD: DynamicNonPMDD;
-  }> => {
-    let res: AxiosResponse;
-    try {
-      res = await BH_AXIOS.post("downloadDynamicNonPMDD", {
-        walletID
-      });
-    } catch (err) {
-      throw new Error(err.response.data.err);
-    }
-
-    const { dynamicNonPMDD } = res.data;
-    if (dynamicNonPMDD) {
-      return {
-        dynamicNonPMDD
-      };
-    } else {
-      throw new Error("Unable to download DynamicNonPMDD");
     }
   };
 
