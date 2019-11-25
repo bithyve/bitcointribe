@@ -38,6 +38,8 @@ PODS:
   - glog (0.3.5)
   - React (0.59.10):
     - React/Core (= 0.59.10)
+  - react-native-html-to-pdf (0.8.0):
+    - React
   - react-native-randombytes (3.5.3):
     - React
   - react-native-video (4.4.4):
@@ -141,6 +143,7 @@ DEPENDENCIES:
   - EXWebBrowser (from `../node_modules/expo-web-browser/ios`)
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
+  - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
   - react-native-randombytes (from `../node_modules/react-native-randombytes`)
   - react-native-video (from `../node_modules/react-native-video`)
   - React/Core (from `../node_modules/react-native`)
@@ -225,6 +228,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   React:
     :path: "../node_modules/react-native"
+  react-native-html-to-pdf:
+    :path: "../node_modules/react-native-html-to-pdf"
   react-native-randombytes:
     :path: "../node_modules/react-native-randombytes"
   react-native-video:
@@ -296,6 +301,7 @@ SPEC CHECKSUMS:
   Folly: de497beb10f102453a1afa9edbf8cf8a251890de
   glog: aefd1eb5dda2ab95ba0938556f34b98e2da3a60d
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
+  react-native-html-to-pdf: 1d1199917f56a98377d431bce84c2f275e48eb71
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
   react-native-video: 8c49eca5a6087de968a05b340933b10e3b58169a
   RNCAsyncStorage: 60a80e72d95bf02a01cace55d3697d9724f0d77f
@@ -317,6 +323,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 1e70fe58b872355f0ecb44fb81bb1a16484047f0
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: beb7d63cf6b7d4f8c41a08e52e4e7f5c7d7de514
+PODFILE CHECKSUM: b1a91952415fdbc3f04b785f33312e8fffdd8077
 
 COCOAPODS: 1.8.3
