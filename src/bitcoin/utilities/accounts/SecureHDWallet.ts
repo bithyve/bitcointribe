@@ -309,7 +309,6 @@ export default class SecureHDWallet extends Bitcoin {
   }> => {
     let res: AxiosResponse;
     try {
-      console.log({ walletID: this.walletID });
       res = await BH_AXIOS.post("setupSecureAccount", {
         walletID: this.walletID
       });

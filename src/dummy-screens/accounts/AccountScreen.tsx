@@ -53,12 +53,15 @@ const AccountScreen = props => {
         }}
       />
       {serviceType === TEST_ACCOUNT ? (
-        <Button
-          title="Get Testcoins"
-          onPress={async () => {
-            dispatch(getTestcoins(serviceType));
-          }}
-        />
+        <View style={{ flexDirection: "row" }}>
+          <Button
+            title="Get Testcoins"
+            onPress={async () => {
+              dispatch(getTestcoins(serviceType));
+            }}
+          />
+          {loading.testcoins ? <ActivityIndicator size="small" /> : null}
+        </View>
       ) : null}
       <Button
         title="Fetch Transactions"

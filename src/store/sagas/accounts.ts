@@ -194,11 +194,16 @@ export const transferST3Watcher = createWatcher(
 );
 
 function* testcoinsWorker({ payload }) {
+  yield put(switchLoader(payload.serviceType, "testcoins"));
+
   const service = yield select(
     state => state.accounts[payload.serviceType].service
   );
   const res = yield call(service.getTestcoins);
-  res.status === 200 ? yield put(fetchBalance(payload.serviceType)) : null;
+  res.status === 200
+    ? console.log("testcoins received")
+    : console.log("Failed to get testcoins");
+  yield put(switchLoader(payload.serviceType, "testcoins"));
 }
 
 export const testcoinsWatcher = createWatcher(testcoinsWorker, GET_TESTCOINS);
