@@ -16,17 +16,18 @@ import {
   UPDATE_DYNAMINC_NONPMDD,
   DOWNLOAD_DYNAMIC_NONPMDD,
   RECOVER_WALLET,
-  RESTORE_DYNAMIC_NONPMDD
+  RESTORE_DYNAMIC_NONPMDD,
+  GENERATE_PDF
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
 import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
 import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
-import { DynamicNonPMDD } from "../../common/interfaces/Interfaces";
 import {
   EncDynamicNonPMDD,
   MetaShare
 } from "../../bitcoin/utilities/Interface";
+import generatePDF from "../utils/generatePDF";
 
 function* initHCWorker() {
   const s3Service: S3Service = yield select(state => state.sss.service);
@@ -275,6 +276,50 @@ function* downloadMetaShareWorker({ payload }) {
 export const downloadMetaShareWatcher = createWatcher(
   downloadMetaShareWorker,
   DOWNLOAD_MSHARE
+);
+
+function* generatePDFWorker({ payload }) {
+  const s3Service: S3Service = yield select(state => state.sss.service);
+  const res = yield call(s3Service.createQR, payload.shareIndex);
+  if (res.status !== 200) return;
+
+  const secureAccount: SecureAccount = yield select(
+    state => state.accounts[SECURE_ACCOUNT].service
+  );
+  const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
+  const { qrData, secret } = secureAccount.secureHDWallet.twoFASetup;
+  const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
+
+  const secureAssets = {
+    secondaryMnemonic,
+    twoFASecret: secret,
+    twoFAQR: qrData,
+    secondaryXpub: secondary,
+    bhXpub: bh
+  };
+
+  const pdfData = {
+    qrData: res.data.qrData,
+    ...secureAssets
+  };
+
+  const { securityAns } = yield select(
+    state => state.storage.database.WALLET_SETUP
+  );
+
+  const generatedPDF = yield call(
+    generatePDF,
+    pdfData,
+    `HexaShare${payload.shareIndex}`,
+    `Hexa Share ${payload.shareIndex}`,
+    securityAns
+  );
+  console.log({ generatedPDF });
+}
+
+export const generatePDFWatcher = createWatcher(
+  generatePDFWorker,
+  GENERATE_PDF
 );
 
 function* updateMSharesHealthWorker() {
