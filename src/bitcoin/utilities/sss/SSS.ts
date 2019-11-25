@@ -889,12 +889,9 @@ export default class SSS {
     return { metaShares: this.metaShares };
   };
 
-  public createQR = async (
-    metashare: MetaShare,
-    index: number
-  ): Promise<{ qrData: string[] }> => {
+  public createQR = async (index: number): Promise<{ qrData: string[] }> => {
     const splits: number = config.SSS_METASHARE_SPLITS;
-    const metaString = JSON.stringify(metashare);
+    const metaString = JSON.stringify(this.metaShares[index]);
     const slice = Math.trunc(metaString.length / splits);
     const qrData: string[] = [];
 

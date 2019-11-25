@@ -13,6 +13,7 @@ const initialState: {
     hcInit: Boolean;
     uploadMetaShare: Boolean;
     downloadMetaShare: Boolean;
+    generatePDF: Boolean;
     updateMSharesHealth: Boolean;
     checkMSharesHealth: Boolean;
     uploadRequestedShare: Boolean;
@@ -28,6 +29,7 @@ const initialState: {
     hcInit: false,
     uploadMetaShare: false,
     downloadMetaShare: false,
+    generatePDF: false,
     updateMSharesHealth: false,
     checkMSharesHealth: false,
     uploadRequestedShare: false,
