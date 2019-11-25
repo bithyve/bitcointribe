@@ -37,6 +37,7 @@ const ACCOUNT_VARS: {
     balances: Boolean;
     transactions: Boolean;
     transfer: Boolean;
+    testcoins: Boolean;
   };
 } = {
   service: null,
@@ -56,7 +57,8 @@ const ACCOUNT_VARS: {
     receivingAddress: false,
     balances: false,
     transactions: false,
-    transfer: false
+    transfer: false,
+    testcoins: false
   }
 };
 

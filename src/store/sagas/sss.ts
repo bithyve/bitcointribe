@@ -218,8 +218,8 @@ function* downloadMetaShareWorker({ payload }) {
     res = yield call(
       S3Service.downloadAndValidateShare,
       encryptedKey,
-      otp,
-      existingShares
+      otp
+      // existingShares
     );
   } else {
     res = yield call(S3Service.downloadAndValidateShare, encryptedKey, otp);
@@ -227,7 +227,6 @@ function* downloadMetaShareWorker({ payload }) {
 
   if (res.status === 200) {
     const { metaShare, dynamicNonPMDD } = res.data;
-
     let updatedBackup;
     if (payload.downloadType !== "recovery") {
       updatedBackup = {
@@ -241,7 +240,9 @@ function* downloadMetaShareWorker({ payload }) {
         },
         DYNAMIC_NONPMDD: {
           ...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD,
-          META_SHARES: [...DECENTRALIZED_BACKUP.META_SHARES, metaShare]
+          META_SHARES: DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES
+            ? [...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES, metaShare]
+            : [metaShare]
         }
       };
     } else {
