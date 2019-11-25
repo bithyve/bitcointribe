@@ -25,108 +25,107 @@ const chunkArray = (arr: any, n: any) => {
 };
 
 export default async (pdfData, fileName, title, password) => {
-  try {
-    const {
-      qrData,
-      secondaryMnemonic,
-      twoFASecret,
-      twoFAQR,
-      secondaryXpub,
-      bhXpub
-    } = pdfData;
+  const {
+    qrData,
+    secondaryMnemonic,
+    twoFASecret,
+    twoFAQR,
+    secondaryXpub,
+    bhXpub
+  } = pdfData;
 
-    let qrCodes: string[];
-    let chunkedQR: string[][];
-    qrData.forEach(qrString => {
-      qrCodes.push(getFormattedString(qrString));
-      chunkedQR.push(chunkArray(qrString, 4));
-    });
+  const qrCodes: string[] = [];
+  const chunkedQR: string[][] = [];
+  qrData.forEach(qrString => {
+    qrCodes.push(getFormattedString(qrString));
+    chunkedQR.push(chunkArray(qrString, 4));
+  });
 
-    let chunkedSecondaryMnemonic = chunkArray(secondaryMnemonic.split(" "), 2);
-    chunkedSecondaryMnemonic = chunkedSecondaryMnemonic.map(chunk =>
-      chunk
-        .toString()
-        .split(",")
-        .join(" ")
-    );
-    let chunkedBHXpub = chunkArray(bhXpub, 2);
+  let chunkedSecondaryMnemonic = chunkArray(secondaryMnemonic.split(" "), 2);
+  chunkedSecondaryMnemonic = chunkedSecondaryMnemonic.map(chunk =>
+    chunk
+      .toString()
+      .split(",")
+      .join(" ")
+  );
+  let chunkedBHXpub = chunkArray(bhXpub, 2);
 
-    const shareParts: string[] = [];
-    for (let index = 0; index < 8; index++) {
-      const part =
-        `<h3 style='text-decoration: underline;'>Part ${index + 1}<h3>` +
-        new QRCode(qrCodes[index]).svg() +
-        "<p align='center'>" +
-        chunkedQR[index][0].toString() +
-        "</p>" +
-        "<p align='center'>" +
-        chunkedQR[index][1].toString() +
-        "</p>" +
-        "<p align='center'>" +
-        chunkedQR[index][2].toString() +
-        "</p>" +
-        "<p align='center'>" +
-        chunkedQR[index][3].toString() +
-        "</p>";
-      shareParts.push(part);
-    }
-
-    const html =
-      "<h1>" +
-      title.toString() +
-      "</h1>" +
-      shareParts.join("") +
-      "<h3 style='text-decoration: underline;'>Secondary Xpub (Encrypted):<h3>" +
-      new QRCode(secondaryXpub).svg() +
-      "<p align='center'>Scan the above QR Code using your HEXA wallet in order to restore your Secure Account.</p>" +
-      "<p>2FA Secret:<p><br/>" +
-      new QRCode(twoFAQR).svg() +
+  const shareParts: string[] = [];
+  for (let index = 0; index < 8; index++) {
+    const part =
+      `<h3 style='text-decoration: underline;'>Part ${index + 1}<h3>` +
+      new QRCode(qrCodes[index]).svg() +
       "<p align='center'>" +
-      twoFASecret +
-      "</p>" +
-      "<p>Following assets can be used to recover your funds using the open - sourced ga - recovery tool.</p><br/><br/>" +
-      "<p>Secondary Mnemonic:<p>" +
-      "<p align='center'>" +
-      chunkedSecondaryMnemonic[0] +
+      chunkedQR[index][0].toString() +
       "</p>" +
       "<p align='center'>" +
-      chunkedSecondaryMnemonic[1] +
-      "</p><br/>" +
-      "<p>BitHyve Xpub:<p>" +
-      "<p align='center'>" +
-      chunkedBHXpub[0].toString() +
+      chunkedQR[index][1].toString() +
       "</p>" +
       "<p align='center'>" +
-      chunkedBHXpub[1].toString() +
+      chunkedQR[index][2].toString() +
+      "</p>" +
+      "<p align='center'>" +
+      chunkedQR[index][3].toString() +
       "</p>";
+    shareParts.push(part);
+  }
 
-    if (Platform.OS == "ios") {
-      let options = {
-        padding: 0,
-        height: 842,
-        width: 595,
-        html,
-        fileName: fileName,
-        directory: "Documents"
-      };
+  const html =
+    "<h1>" +
+    title.toString() +
+    "</h1>" +
+    shareParts.join("") +
+    "<h3 style='text-decoration: underline;'>Secondary Xpub (Encrypted):<h3>" +
+    new QRCode(secondaryXpub).svg() +
+    "<p align='center'>Scan the above QR Code using your HEXA wallet in order to restore your Secure Account.</p>" +
+    "<p>2FA Secret:<p><br/>" +
+    new QRCode(twoFAQR).svg() +
+    "<p align='center'>" +
+    twoFASecret +
+    "</p>" +
+    "<p>Following assets can be used to recover your funds using the open - sourced ga - recovery tool.</p><br/><br/>" +
+    "<p>Secondary Mnemonic:<p>" +
+    "<p align='center'>" +
+    chunkedSecondaryMnemonic[0] +
+    "</p>" +
+    "<p align='center'>" +
+    chunkedSecondaryMnemonic[1] +
+    "</p><br/>" +
+    "<p>BitHyve Xpub:<p>" +
+    "<p align='center'>" +
+    chunkedBHXpub[0].toString() +
+    "</p>" +
+    "<p align='center'>" +
+    chunkedBHXpub[1].toString() +
+    "</p>";
 
-      const file = await RNHTMLtoPDF.convert(options);
-      const PdfPassword = NativeModules.PdfPassword;
-      PdfPassword.addEvent("/" + fileName + ".pdf", password);
-      console.log({ filePath: file.filePath });
-      return file.filePath;
-    } else {
-      // TODO: PDF creation @Android
-      // let options = {
-      //   html,
-      //   fileName: fileName,
-      //   directory: "Documents"
-      // };
-      // let file = await RNHTMLtoPDF.convert(options);
-      // console.log({ file });
-      // setPdfAndroidPasswrod(file.filePath, password);
-    }
-  } catch (error) {
-    console.log({ error });
+  if (Platform.OS == "ios") {
+    let options = {
+      padding: 0,
+      height: 842,
+      width: 595,
+      html,
+      fileName: fileName,
+      directory: "Documents"
+    };
+
+    const file = await RNHTMLtoPDF.convert(options);
+    // console.log({ file });
+    // console.log({ NativeModules });
+    // const PdfPassword = NativeModules.PdfPassword;
+    // console.log({ PdfPassword });
+    // PdfPassword.addEvent("/" + fileName + ".pdf", password);
+    // console.log({ filePath: file.filePath });
+    return file.filePath;
+  } else {
+    // TODO: PDF creation @Android
+    // let options = {
+    //   html,
+    //   fileName: fileName,
+    //   directory: "Documents"
+    // };
+    // let file = await RNHTMLtoPDF.convert(options);
+    // console.log({ file });
+    // setPdfAndroidPasswrod(file.filePath, password);
   }
 };

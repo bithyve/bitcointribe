@@ -279,6 +279,7 @@ export const downloadMetaShareWatcher = createWatcher(
 );
 
 function* generatePDFWorker({ payload }) {
+  yield put(switchS3Loader("generatePDF"));
   const s3Service: S3Service = yield select(state => state.sss.service);
   const res = yield call(s3Service.createQR, payload.shareIndex);
   if (res.status !== 200) return;
@@ -307,14 +308,20 @@ function* generatePDFWorker({ payload }) {
     state => state.storage.database.WALLET_SETUP
   );
 
-  const generatedPDF = yield call(
-    generatePDF,
-    pdfData,
-    `HexaShare${payload.shareIndex}`,
-    `Hexa Share ${payload.shareIndex}`,
-    securityAns
-  );
-  console.log({ generatedPDF });
+  try {
+    const generatedPDFPath = yield call(
+      generatePDF,
+      pdfData,
+      `HexaShare${payload.shareIndex}`,
+      `Hexa Share ${payload.shareIndex}`,
+      securityAns
+    );
+    console.log({ generatedPDFPath });
+  } catch (err) {
+    console.log({ err });
+  }
+
+  yield put(switchS3Loader("generatePDF"));
 }
 
 export const generatePDFWatcher = createWatcher(
