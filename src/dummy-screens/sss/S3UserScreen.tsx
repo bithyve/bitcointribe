@@ -12,7 +12,8 @@ import {
   initHealthCheck,
   prepareMShares,
   uploadEncMShares,
-  checkMSharesHealth
+  checkMSharesHealth,
+  generatePDF
 } from "../../store/actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 
@@ -116,6 +117,15 @@ const S3UserScreen = props => {
         ) : (
           <Text style={{ marginTop: 12 }}>No updates</Text>
         )}
+      </View>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Button
+          title="Generate PDF(4)"
+          onPress={() => dispatch(generatePDF(4))}
+        />
+        {loading.generatePDF ? (
+          <ActivityIndicator size="small" style={{ marginHorizontal: 5 }} />
+        ) : null}
       </View>
       <Button
         title="Recovery"
