@@ -41,7 +41,8 @@ import {
   downloadDynamicNonPMDDWatcher,
   recoverMnemonicWatcher,
   recoverWalletWatcher,
-  restoreDynamicNonPMDDWatcher
+  restoreDynamicNonPMDDWatcher,
+  generatePDFWatcher
 } from "./sagas/sss";
 
 // const rootSaga = function*() {
@@ -88,6 +89,7 @@ const rootSaga = function*() {
     generateMetaSharesWatcher,
     uploadEncMetaShareWatcher,
     downloadMetaShareWatcher,
+    generatePDFWatcher,
     updateMSharesHealthWatcher,
     checkMSharesHealthWatcher,
     uploadRequestedShareWatcher,

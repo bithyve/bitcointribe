@@ -12,7 +12,8 @@ import {
   initHealthCheck,
   prepareMShares,
   uploadEncMShares,
-  checkMSharesHealth
+  checkMSharesHealth,
+  generatePDF
 } from "../../store/actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 
@@ -24,6 +25,7 @@ const S3UserScreen = props => {
   const { loading, service } = useSelector(state => state.sss);
   const s3Service: S3Service = service;
   const [metaShareIndex, setMetaShareIndex] = useState("0");
+  const [shareIndex, setShareIndex] = useState("4");
 
   const {
     healthCheckInitialized,
@@ -116,6 +118,22 @@ const S3UserScreen = props => {
         ) : (
           <Text style={{ marginTop: 12 }}>No updates</Text>
         )}
+      </View>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Button
+          title="Generate PDF"
+          onPress={() => dispatch(generatePDF(parseInt(shareIndex)))}
+        />
+        <TextInput
+          value={shareIndex}
+          onChangeText={setShareIndex}
+          style={{
+            borderBottomWidth: 0.5,
+            width: 50,
+            textAlign: "center"
+          }}
+          keyboardType="numeric"
+        />
       </View>
       <Button
         title="Recovery"

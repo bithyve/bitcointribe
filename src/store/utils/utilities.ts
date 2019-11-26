@@ -27,7 +27,6 @@ export const serviceGenerator = async (
   // Secure account
   const secureAcc = new SecureAccount(primaryMnemonic);
   res = await secureAcc.setupSecureAccount();
-  console.log({ res });
   if (res.status !== 200) throw new Error("Secure account setup failed");
 
   // share generation
