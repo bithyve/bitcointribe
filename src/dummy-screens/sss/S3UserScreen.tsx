@@ -25,6 +25,7 @@ const S3UserScreen = props => {
   const { loading, service } = useSelector(state => state.sss);
   const s3Service: S3Service = service;
   const [metaShareIndex, setMetaShareIndex] = useState("0");
+  const [shareIndex, setShareIndex] = useState("4");
 
   const {
     healthCheckInitialized,
@@ -120,12 +121,19 @@ const S3UserScreen = props => {
       </View>
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Button
-          title="Generate PDF(4)"
-          onPress={() => dispatch(generatePDF(4))}
+          title="Generate PDF"
+          onPress={() => dispatch(generatePDF(parseInt(shareIndex)))}
         />
-        {loading.generatePDF ? (
-          <ActivityIndicator size="small" style={{ marginHorizontal: 5 }} />
-        ) : null}
+        <TextInput
+          value={shareIndex}
+          onChangeText={setShareIndex}
+          style={{
+            borderBottomWidth: 0.5,
+            width: 50,
+            textAlign: "center"
+          }}
+          keyboardType="numeric"
+        />
       </View>
       <Button
         title="Recovery"
