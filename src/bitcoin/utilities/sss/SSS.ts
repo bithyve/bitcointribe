@@ -889,7 +889,10 @@ export default class SSS {
     return { metaShares: this.metaShares };
   };
 
-  public createQR = async (index: number): Promise<{ qrData: string[] }> => {
+  public createQR = (index: number): { qrData: string[] } => {
+    if (index < 3 || index > 5)
+      throw new Error("QR creation failed; index out of bounds");
+
     const splits: number = config.SSS_METASHARE_SPLITS;
     const metaString = JSON.stringify(this.metaShares[index]);
     const slice = Math.trunc(metaString.length / splits);
@@ -905,9 +908,9 @@ export default class SSS {
       }
       start = end;
       end = end + slice;
-      if (index === 4) {
+      if (index === 3) {
         qrData[itr] = "e0" + (itr + 1) + qrData[itr];
-      } else if (index === 5) {
+      } else if (index === 4) {
         qrData[itr] = "c0" + (itr + 1) + qrData[itr];
       }
     }
