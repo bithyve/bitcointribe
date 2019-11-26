@@ -6,7 +6,7 @@ export const init = () => {
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
       tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS wsetup (id INTEGER PRIMARY KEY NOT NULL, encData TEXT NOT NULL);",
+        "CREATE TABLE IF NOT EXISTS base (id INTEGER PRIMARY KEY NOT NULL, encData TEXT NOT NULL);",
         [],
         () => {
           resolve();
@@ -24,7 +24,7 @@ export const fetch = () => {
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
       tx.executeSql(
-        "SELECT * FROM wsetup;",
+        "SELECT * FROM base;",
         [],
         (_, result) => {
           resolve(result);
@@ -42,7 +42,7 @@ export const insert = encData => {
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
       tx.executeSql(
-        "INSERT INTO wsetup (encData) VALUES (?);",
+        "INSERT INTO base (encData) VALUES (?);",
         [encData],
         (_, result) => {
           resolve(result);
@@ -60,7 +60,7 @@ export const update = encData => {
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
       tx.executeSql(
-        `UPDATE wsetup SET encData=? WHERE id=1`,
+        `UPDATE base SET encData=? WHERE id=1`,
         [encData],
         (_, result) => {
           resolve(result);
