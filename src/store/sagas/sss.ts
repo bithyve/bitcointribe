@@ -281,8 +281,11 @@ export const downloadMetaShareWatcher = createWatcher(
 function* generatePDFWorker({ payload }) {
   yield put(switchS3Loader("generatePDF"));
   const s3Service: S3Service = yield select(state => state.sss.service);
-  const res = yield call(s3Service.createQR, payload.shareIndex);
-  if (res.status !== 200) return;
+  const res = yield call(s3Service.createQR, payload.shareIndex - 1);
+  if (res.status !== 200) {
+    console.log({ err: res.err });
+    return;
+  }
 
   const secureAccount: SecureAccount = yield select(
     state => state.accounts[SECURE_ACCOUNT].service
