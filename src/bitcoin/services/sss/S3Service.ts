@@ -703,10 +703,9 @@ export default class S3Service {
     }
   };
 
-  public createQR = async (
-    metashare: MetaShare,
+  public createQR = (
     index: number
-  ): Promise<
+  ):
     | {
         status: number;
         data: { qrData: string[] };
@@ -718,12 +717,11 @@ export default class S3Service {
         err: string;
         message: string;
         data?: undefined;
-      }
-  > => {
+      } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.createQR(metashare, index)
+        data: this.sss.createQR(index)
       };
     } catch (err) {
       return { status: 521, err: err.message, message: ErrMap[521] };
