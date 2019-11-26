@@ -110,12 +110,8 @@ export default async (pdfData, fileName, title, password) => {
     };
 
     const file = await RNHTMLtoPDF.convert(options);
-    // console.log({ file });
-    // console.log({ NativeModules });
-    // const PdfPassword = NativeModules.PdfPassword;
-    // console.log({ PdfPassword });
-    // PdfPassword.addEvent("/" + fileName + ".pdf", password);
-    // console.log({ filePath: file.filePath });
+    const PdfPassword = NativeModules.PdfPassword;
+    PdfPassword.addEvent("/" + fileName + ".pdf", password);
     return file.filePath;
   } else {
     // TODO: PDF creation @Android
