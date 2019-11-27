@@ -33,7 +33,6 @@ export const serviceGenerator = async (
   const s3Service = new S3Service(primaryMnemonic);
   res = s3Service.generateShares(securityAns);
   if (res.status !== 200) throw new Error("Share generation failed");
-
   return {
     regularAcc,
     testAcc,

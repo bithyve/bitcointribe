@@ -1,6 +1,25 @@
 import RNHTMLtoPDF from "react-native-html-to-pdf";
-import { Platform, NativeModules } from "react-native";
+import { Platform, NativeModules, Alert } from "react-native";
 import QRCode from "qrcode-svg";
+import { PermissionsAndroid } from "react-native";
+
+async function requestStoragePermission() {
+  try {
+    await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      {
+        title: "Hexa Storage Permission",
+        message: "Storage permission is required to store the PDF",
+        buttonNeutral: "Ask Me Later",
+        buttonNegative: "Cancel",
+        buttonPositive: "OK"
+      }
+    );
+    return PermissionsAndroid.RESULTS.GRANTED;
+  } catch (err) {
+    console.warn(err);
+  }
+}
 
 const getFormattedString = (qrString: string) => {
   qrString = qrString.split('"').join("Dquote");
@@ -112,16 +131,27 @@ export default async (pdfData, fileName, title, password) => {
     const file = await RNHTMLtoPDF.convert(options);
     const PdfPassword = NativeModules.PdfPassword;
     PdfPassword.addEvent("/" + fileName + ".pdf", password);
+    Alert.alert("PDF saved", file.filePath, [
+      { text: "Okay", style: "destructive" }
+    ]);
     return file.filePath;
-  } else {
-    // TODO: PDF creation @Android
-    // let options = {
-    //   html,
-    //   fileName: fileName,
-    //   directory: "Documents"
-    // };
-    // let file = await RNHTMLtoPDF.convert(options);
-    // console.log({ file });
+  } else if (Platform.OS == "android") {
+    // TODO: PDF password protection @Android
+    let options = {
+      html,
+      height: 842,
+      width: 595,
+      fileName: fileName,
+      directory: "docs"
+    };
+    if (!(await requestStoragePermission())) {
+      throw new Error("Storage Permission Denied");
+    }
+    let file = await RNHTMLtoPDF.convert(options);
+    Alert.alert("PDF saved", file.filePath, [
+      { text: "Okay", style: "destructive" }
+    ]);
+    return file.filePath;
     // setPdfAndroidPasswrod(file.filePath, password);
   }
 };

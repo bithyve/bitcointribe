@@ -169,7 +169,7 @@ class Config {
     }
   };
 
-  public SERVER: string = this.BH_SERVER.DEV;
+  public SERVER: string = this.BH_SERVER.PROD;
 
   public API_URLS = {
     TESTNET: {
@@ -213,8 +213,7 @@ class Config {
       host: BIT_HOST_IP
     });
     this.BH_AXIOS = axios.create({
-      baseURL: this.SERVER,
-      headers: { hexa_id: this.HEXA_ID }
+      baseURL: this.SERVER
     });
   }
 
