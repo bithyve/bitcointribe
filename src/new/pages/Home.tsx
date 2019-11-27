@@ -25,8 +25,6 @@ import ToggleSwitch from "../components/ToggleSwitch";
 import Entypo from "react-native-vector-icons/Entypo";
 import { RFValue } from "react-native-responsive-fontsize";
 import CommonStyles from "../common/Styles";
-import { useSelector } from "react-redux";
-import { Database } from '../common/interfaces/Interfaces';
 
 export default function Home(props) {
 	const [switchOn, setSwitchOn] = useState(true);
@@ -280,9 +278,6 @@ export default function Home(props) {
 		setSelected(tabTitle);
 	}
 
-	const database:Database = useSelector(state => state.storage.database);
-	const walletName = database?  database.WALLET_SETUP.walletName: ""
-
 	return (
 		<ImageBackground
 			source={require('./../assets/images/home-bg.png')}
@@ -294,7 +289,7 @@ export default function Home(props) {
 				<View style={styles.headerViewContainer}>
 					<View style={{ flexDirection: 'row' }}>
 						<View style={styles.headerTitleViewContainer}>
-							<Text style={styles.headerTitleText}>{`${walletName}'s Wallet`}</Text>
+							<Text style={styles.headerTitleText}>Murtuza’s Wallet</Text>
 							<View style={{ flexDirection: "row", alignItems: 'flex-end' }}>
 								<Image
 									style={CommonStyles.homepageAmountImage}
