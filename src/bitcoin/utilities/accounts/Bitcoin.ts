@@ -9,7 +9,7 @@ import coinselect from "coinselect";
 import config from "../../Config";
 import { Transactions } from "../Interface";
 
-const { BH_AXIOS } = config;
+const { BH_AXIOS, HEXA_ID } = config;
 const { TESTNET, MAINNET } = config.API_URLS;
 
 export default class Bitcoin {
@@ -502,6 +502,7 @@ export default class Bitcoin {
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("/testnetFaucet", {
+        HEXA_ID,
         recipientAddress,
         amount
       });
