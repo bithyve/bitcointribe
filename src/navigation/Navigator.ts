@@ -15,7 +15,8 @@ import ManageBackup from "../pages/ManageBackup";
 
 const HomeNavigator = createStackNavigator(
   {
-    Home
+    Home,
+    ManageBackup
   },
   {
     headerLayoutPreset: "center",
@@ -31,8 +32,6 @@ const SetupNavigator = createStackNavigator(
     PasscodeConfirm,
     NewWalletName,
     NewWalletQuestion,
-    Home,
-    ManageBackup,
     RestoreAndReoverWallet,
     RestoreSelectedContactsList,
     RestoreWalletBySecondaryDevice,

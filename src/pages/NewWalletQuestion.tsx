@@ -12,7 +12,8 @@ import {
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
-  TextInput
+  TextInput,
+  ActivityIndicator
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -57,8 +58,7 @@ export default function NewWalletQuestion(props) {
 
   const dispatch = useDispatch();
   const walletName = props.navigation.getParam("walletName");
-  const { isInitialized } = useSelector(state => state.setupAndAuth);
-
+  const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   if (isInitialized) {
     props.navigation.navigate("HomeNav");
   }
@@ -288,7 +288,11 @@ export default function NewWalletQuestion(props) {
                   onPress={() => dispatch(initializeSetup(walletName, answer))}
                   style={styles.buttonView}
                 >
-                  <Text style={styles.buttonText}>Confirm & Proceed</Text>
+                  {!loading.initializing ? (
+                    <Text style={styles.buttonText}>Confirm & Proceed</Text>
+                  ) : (
+                    <ActivityIndicator size="small" />
+                  )}
                 </TouchableOpacity>
               ) : (
                 <View

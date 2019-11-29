@@ -2,11 +2,11 @@ import {
   ADDR_FETCHED,
   BALANCE_FETCHED,
   TRANSACTIONS_FETCHED,
-  LOADING,
   TRANSFER_ST1_EXECUTED,
   TRANSFER_ST2_EXECUTED,
   CLEAR_TRANSFER,
-  TRANSFER_ST3_EXECUTED
+  TRANSFER_ST3_EXECUTED,
+  ACCOUNTS_LOADING
 } from "../actions/accounts";
 import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
 import TestAccount from "../../bitcoin/services/accounts/TestAccount";
@@ -208,7 +208,7 @@ export default (state = initialState, action) => {
         }
       };
 
-    case LOADING:
+    case ACCOUNTS_LOADING:
       return {
         ...state,
         [account]: {
