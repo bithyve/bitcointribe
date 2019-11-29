@@ -10,41 +10,40 @@ import {
   STORE_CREDS,
   credsStored,
   credsAuthenticated,
-  setupInitialized
+  setupInitialized,
+  switchSetupLoader
 } from "../actions/setupAndAuth";
 import { insertIntoDB, keyFetched, fetchFromDB } from "../actions/storage";
 import { Database } from "../../common/interfaces/Interfaces";
 
 function* initSetupWorker({ payload }) {
-  try {
-    const { walletName, securityAns } = payload;
-    const { regularAcc, testAcc, secureAcc, s3Service } = yield call(
-      serviceGenerator,
-      securityAns
-    );
+  yield put(switchSetupLoader("initializing"));
 
-    const initialDatabase: Database = {
-      WALLET_SETUP: { walletName, securityAns },
-      DECENTRALIZED_BACKUP: {
-        RECOVERY_SHARES: [],
-        SHARES_TRANSFER_DETAILS: {},
-        UNDER_CUSTODY: {},
-        DYNAMIC_NONPMDD: {}
-      },
-      SERVICES: {
-        REGULAR_ACCOUNT: JSON.stringify(regularAcc),
-        TEST_ACCOUNT: JSON.stringify(testAcc),
-        SECURE_ACCOUNT: JSON.stringify(secureAcc),
-        S3_SERVICE: JSON.stringify(s3Service)
-      }
-    };
+  const { walletName, securityAns } = payload;
+  const { regularAcc, testAcc, secureAcc, s3Service } = yield call(
+    serviceGenerator,
+    securityAns
+  );
 
-    yield put(insertIntoDB(initialDatabase));
-    yield call(AsyncStorage.setItem, "walletExists", "true");
-    yield put(setupInitialized());
-  } catch (err) {
-    console.log(err);
-  }
+  const initialDatabase: Database = {
+    WALLET_SETUP: { walletName, securityAns },
+    DECENTRALIZED_BACKUP: {
+      RECOVERY_SHARES: [],
+      SHARES_TRANSFER_DETAILS: {},
+      UNDER_CUSTODY: {},
+      DYNAMIC_NONPMDD: {}
+    },
+    SERVICES: {
+      REGULAR_ACCOUNT: JSON.stringify(regularAcc),
+      TEST_ACCOUNT: JSON.stringify(testAcc),
+      SECURE_ACCOUNT: JSON.stringify(secureAcc),
+      S3_SERVICE: JSON.stringify(s3Service)
+    }
+  };
+
+  yield put(insertIntoDB(initialDatabase));
+  yield call(AsyncStorage.setItem, "walletExists", "true");
+  yield put(setupInitialized());
 }
 
 export const initSetupWatcher = createWatcher(initSetupWorker, INIT_SETUP);

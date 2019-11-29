@@ -280,6 +280,7 @@ export default function Home(props) {
 		setSelected(tabTitle);
 	}
 
+	
 	const database:Database = useSelector(state => state.storage.database);
 	const walletName = database?  database.WALLET_SETUP.walletName: ""
 

@@ -14,7 +14,6 @@ export const DOWNLOAD_DYNAMIC_NONPMDD = "DOWNLOAD_DYNAMIC_NONPMDD";
 export const RESTORE_DYNAMIC_NONPMDD = "RESTORE_DYNAMIC_NONPMDD";
 export const RECOVER_MNEMONIC = "RECOVER_MNEMONIC";
 export const RECOVER_WALLET = "RECOVER_WALLET";
-export const S3_LOADING = "S3_LOADING";
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -78,13 +77,10 @@ export const recoverWallet = () => {
   return { type: RECOVER_WALLET };
 };
 
-export const switchS3Loader = beingLoaded => {
-  return { type: S3_LOADING, payload: { beingLoaded } };
-};
-
 // types and action creators (saga): dispatched by saga workers
 export const HEALTH_CHECK_INITIALIZED = "HEALTH_CHECK_INITIALIZED";
 export const MNEMONIC_RECOVERED = "MNEMONIC_RECOVERED";
+export const S3_LOADING = "S3_LOADING";
 
 export const healthCheckInitialized = () => {
   return { type: HEALTH_CHECK_INITIALIZED };
@@ -92,4 +88,8 @@ export const healthCheckInitialized = () => {
 
 export const mnemonicRecovered = mnemonic => {
   return { type: MNEMONIC_RECOVERED, payload: { mnemonic } };
+};
+
+export const switchS3Loader = beingLoaded => {
+  return { type: S3_LOADING, payload: { beingLoaded } };
 };
