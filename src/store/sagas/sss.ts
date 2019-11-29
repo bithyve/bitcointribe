@@ -29,30 +29,6 @@ import {
 } from "../../bitcoin/utilities/Interface";
 import generatePDF from "../utils/generatePDF";
 
-function* initHCWorker() {
-  const s3Service: S3Service = yield select(state => state.sss.service);
-  const initialized = s3Service.sss.healthCheckInitialized;
-
-  if (initialized || !s3Service.sss.metaShares.length) return;
-
-  yield put(switchS3Loader("initHC"));
-  const res = yield call(s3Service.initializeHealthcheck);
-  if (res.status === 200) {
-    yield put(healthCheckInitialized());
-    const { SERVICES } = yield select(state => state.storage.database);
-    const updatedSERVICES = {
-      ...SERVICES,
-      S3_SERVICE: JSON.stringify(s3Service)
-    };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-  } else {
-    console.log({ err: res.err });
-    yield put(switchS3Loader("initHC"));
-  }
-}
-
-export const initHCWatcher = createWatcher(initHCWorker, INIT_HEALTH_CHECK);
-
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select(state => state.sss.service);
   const { walletName } = yield select(
@@ -76,6 +52,38 @@ function* generateMetaSharesWorker() {
   if (s3Service.sss.metaShares.length) return;
   const res = yield call(s3Service.createMetaShares, secureAssets, walletName);
   if (res.status === 200) {
+    return s3Service;
+    // const { SERVICES } = yield select(state => state.storage.database);
+    // const updatedSERVICES = {
+    //   ...SERVICES,
+    //   S3_SERVICE: JSON.stringify(s3Service)
+    // };
+    // yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+  } else {
+    throw new Error(res.err);
+  }
+}
+
+export const generateMetaSharesWatcher = createWatcher(
+  generateMetaSharesWorker,
+  PREPARE_MSHARES
+);
+
+function* initHCWorker() {
+  yield put(switchS3Loader("initHC"));
+  let s3Service: S3Service = yield select(state => state.sss.service);
+  const initialized = s3Service.sss.healthCheckInitialized;
+  if (initialized) {
+    yield put(switchS3Loader("initHC"));
+    return;
+  }
+  if (!s3Service.sss.metaShares.length) {
+    s3Service = yield call(generateMetaSharesWorker);
+  }
+
+  const res = yield call(s3Service.initializeHealthcheck);
+  if (res.status === 200) {
+    yield put(healthCheckInitialized());
     const { SERVICES } = yield select(state => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
@@ -84,13 +92,11 @@ function* generateMetaSharesWorker() {
     yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {
     console.log({ err: res.err });
+    yield put(switchS3Loader("initHC"));
   }
 }
 
-export const generateMetaSharesWatcher = createWatcher(
-  generateMetaSharesWorker,
-  PREPARE_MSHARES
-);
+export const initHCWatcher = createWatcher(initHCWorker, INIT_HEALTH_CHECK);
 
 function* uploadEncMetaShareWorker({ payload }) {
   // Transfer: User >>> Guardian
