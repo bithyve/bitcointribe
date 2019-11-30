@@ -28,9 +28,10 @@ import BottomInfoBox from "../components/BottomInfoBox";
 import CopyThisText from "../components/CopyThisText";
 import ContactList from "../components/ContactList";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import QRCode from "react-native-qrcode-svg";
 
 import { useDispatch, useSelector } from "react-redux";
-import { prepareMShares, initHealthCheck } from "../store/actions/sss";
+import { initHealthCheck, uploadEncMShare } from "../store/actions/sss";
 import S3Service from "../bitcoin/services/sss/S3Service";
 
 export default function ManageBackup(props) {
@@ -192,15 +193,8 @@ export default function ManageBackup(props) {
         </View>
         {selectedType == "secondaryDevice" ? (
           <View style={styles.modalContentView}>
-            <Image
-              style={{
-                width: hp("27%"),
-                height: hp("27%"),
-                alignSelf: "center"
-              }}
-              source={require("../assets/images/qrcode.png")}
-            />
-            <CopyThisText text="lk2j3429-85213-5134=50t-934285623877wer78er7" />
+            <QRCode value={secondaryQR} size={hp("27%")} />
+            <CopyThisText text={secondaryQR} />
           </View>
         ) : selectedType == "cloud" ? (
           <View style={{ flex: 1 }}>
@@ -306,11 +300,33 @@ export default function ManageBackup(props) {
     );
   }
 
-  const dispatch = useDispatch();
   const s3Service: S3Service = useSelector(state => state.sss.service);
   useEffect(() => {
     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
   }, []);
+
+  const dispatch = useDispatch();
+  const [secondaryQR, setSecondaryQR] = useState("");
+  const { SHARES_TRANSFER_DETAILS } = useSelector(
+    state => state.storage.database.DECENTRALIZED_BACKUP
+  );
+  SHARES_TRANSFER_DETAILS[0] && !secondaryQR
+    ? setSecondaryQR(
+        JSON.stringify({
+          ...SHARES_TRANSFER_DETAILS[0],
+          type: "secondaryDeviceQR"
+        })
+      )
+    : null;
+
+  useEffect(() => {
+    if (selectedType === "secondaryDevice") {
+      if (!secondaryQR) {
+        dispatch(uploadEncMShare(0));
+      }
+      console.log(secondaryQR);
+    }
+  }, [selectedType]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
