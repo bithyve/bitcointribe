@@ -2,7 +2,7 @@
 
 export const INIT_HEALTH_CHECK = "INIT_HEALTH_CHECK";
 export const PREPARE_MSHARES = "PREPARE_MSHARES";
-export const UPLOAD_ENC_MSHARES = "UPLOAD_ENC_MSHARES";
+export const UPLOAD_ENC_MSHARE = "UPLOAD_ENC_MSHARES";
 export const UPLOAD_REQUESTED_SHARE = "UPLOAD_REQUESTED_SHARE";
 export const DOWNLOAD_MSHARE = "DOWNLOAD_MSHARE";
 export const GENERATE_PDF = "GENERATE_PDF";
@@ -23,8 +23,8 @@ export const prepareMShares = () => {
   return { type: PREPARE_MSHARES };
 };
 
-export const uploadEncMShares = (shareIndex: number) => {
-  return { type: UPLOAD_ENC_MSHARES, payload: { shareIndex } };
+export const uploadEncMShare = (shareIndex: number) => {
+  return { type: UPLOAD_ENC_MSHARE, payload: { shareIndex } };
 };
 
 export const uploadRequestedShare = (tag, encryptedKey, otp) => {
