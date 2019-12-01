@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { View, StyleSheet, StatusBar } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import Video from "react-native-video";
+import Colors from "../common/Colors";
+
 import { initializeDB } from "../store/actions/storage";
 import AsyncStorage from "@react-native-community/async-storage";
 import { credsAuth } from "../store/actions/setupAndAuth";
@@ -31,7 +33,7 @@ export default function Launch(props) {
   return (
     <View style={styles.container}>
       <Video
-        source={require("../assets/video/splash_animation.mp4")}
+        source={require("./../assets/video/splash_animation.mp4")}
         style={{
           flex: 1
         }}
@@ -53,6 +55,6 @@ export default function Launch(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff"
+    backgroundColor: Colors.white
   }
 });

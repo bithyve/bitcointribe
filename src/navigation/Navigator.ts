@@ -10,10 +10,13 @@ import NewWalletName from "../pages/NewWalletName";
 import NewWalletQuestion from "../pages/NewWalletQuestion";
 import RestoreWalletBySecondaryDevice from "../pages/RestoreWalletBySecondaryDevice";
 import RestoreWalletUsingDocuments from "../pages/RestoreWalletUsingDocuments";
+import RestoreWalletByContacts from "../pages/RestoreWalletByContacts";
+import ManageBackup from "../pages/ManageBackup";
 
 const HomeNavigator = createStackNavigator(
   {
-    Home
+    Home,
+    ManageBackup
   },
   {
     headerLayoutPreset: "center",
@@ -27,12 +30,13 @@ const SetupNavigator = createStackNavigator(
   {
     Launch,
     PasscodeConfirm,
-    RestoreAndReoverWallet,
-    RestoreSelectedContactsList,
     NewWalletName,
     NewWalletQuestion,
+    RestoreAndReoverWallet,
+    RestoreSelectedContactsList,
     RestoreWalletBySecondaryDevice,
-    RestoreWalletUsingDocuments
+    RestoreWalletUsingDocuments,
+    RestoreWalletByContacts
   },
   {
     initialRouteName: "Launch",

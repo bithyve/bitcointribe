@@ -3,6 +3,7 @@ package com.hexa;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.horcrux.svg.SvgPackage;
 import com.christopherdro.htmltopdf.RNHTMLtoPDFPackage;
 import com.kishanjvaghela.cardview.RNCardViewPackage;
 import com.brentvatne.react.ReactVideoPackage;
@@ -46,6 +47,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new SvgPackage(),
             new RNHTMLtoPDFPackage(),
             new RNCardViewPackage(),
             new ReactVideoPackage(),

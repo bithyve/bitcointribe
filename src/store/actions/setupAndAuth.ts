@@ -20,6 +20,7 @@ export const initializeSetup = (walletName, securityAns) => {
 export const CREDS_STORED = "CREDS_STORED";
 export const CREDS_AUTHENTICATED = "CREDS_AUTHENTICATED";
 export const SETUP_INITIALIZED = "SETUP_INITIALIZED";
+export const SETUP_LOADING = "SETUP_LOADING";
 
 export const credsStored = () => {
   return { type: CREDS_STORED };
@@ -31,4 +32,8 @@ export const credsAuthenticated = isAuthenticated => {
 
 export const setupInitialized = () => {
   return { type: SETUP_INITIALIZED };
+};
+
+export const switchSetupLoader = beingLoaded => {
+  return { type: SETUP_LOADING, payload: { beingLoaded } };
 };
