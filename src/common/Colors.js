@@ -7,7 +7,9 @@ export default {
   lightBlue: "#77B9EB",
   blue: "#006CB4",
   green: '#70C1B3',
+  darkGreen:"#33956B",
   white: '#ffffff',
   red: '#FF7761',
-  homepageButtonColor: "#2C85C1"
+  homepageButtonColor: "#2C85C1",
+  yellow:"#E9BB35"
 };

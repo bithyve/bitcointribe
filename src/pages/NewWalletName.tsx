@@ -9,19 +9,22 @@ import {
   Text,
   Image,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  TextInput
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Fonts from "../common/Fonts";
 import Colors from "../common/Colors";
 import CommonStyles from "../common/Styles";
-import { TextInput } from "react-native-gesture-handler";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import { RFValue } from "react-native-responsive-fontsize";
+import DeviceInfo from "react-native-device-info";
+import HeaderTitle from "../components/HeaderTitle";
+import BottomInfoBox from "../components/BottomInfoBox";
 
 export default function NewWalletName(props) {
   const [walletName, setWalletName] = useState("");
@@ -48,20 +51,19 @@ export default function NewWalletName(props) {
         </View>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS == "ios" ? "padding" : null}
+          behavior={Platform.OS == "ios" ? "padding" : ""}
           enabled
         >
           <ScrollView>
-            <Text style={styles.pageTitle}>New Hexa Wallet</Text>
-            <Text style={styles.labelStyle}>
-              Please name your{" "}
-              <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
-                wallet
-              </Text>
-            </Text>
+            <HeaderTitle
+              firstLineTitle={"New Hexa Wallet"}
+              secondLineTitle={""}
+              infoTextNormal={"Please name your "}
+              infoTextBold={"wallet"}
+            />
             <TextInput
               style={inputStyle}
-              placeholder={"Pam’s Wallet"}
+              placeholder={"Enter a name for your wallet"}
               placeholderTextColor={Colors.borderColor}
               value={walletName}
               onChangeText={text => setWalletName(text)}
@@ -73,8 +75,9 @@ export default function NewWalletName(props) {
               }}
             />
           </ScrollView>
-          {walletName.trim() != "" ? (
-            <View style={styles.bottomButtonView}>
+
+          <View style={styles.bottomButtonView}>
+            {walletName.trim() != "" ? (
               <TouchableOpacity
                 onPress={() => {
                   props.navigation.navigate("NewWalletQuestion", {
@@ -85,32 +88,18 @@ export default function NewWalletName(props) {
               >
                 <Text style={styles.buttonText}>Continue</Text>
               </TouchableOpacity>
-              <View style={styles.statusIndicatorView}>
-                <View style={styles.statusIndicatorActiveView} />
-                <View style={styles.statusIndicatorInactiveView} />
-                <View style={styles.statusIndicatorInactiveView} />
-              </View>
+            ) : null}
+            <View style={styles.statusIndicatorView}>
+              <View style={styles.statusIndicatorActiveView} />
+              <View style={styles.statusIndicatorInactiveView} />
             </View>
-          ) : (
-            <View
-              style={{
-                marginBottom: 25,
-                padding: 20,
-                backgroundColor: Colors.backgroundColor,
-                marginLeft: 15,
-                marginRight: 15,
-                borderRadius: 10,
-                justifyContent: "center"
-              }}
-            >
-              <Text style={styles.bottomNoteText}>
-                We do not store this anywhere.
-              </Text>
-              <Text style={styles.bottomNoteInfoText}>
-                Your contacts will see this to identify you
-              </Text>
-            </View>
-          )}
+          </View>
+          {walletName.trim() == "" ? (
+            <BottomInfoBox
+              title={"We do not store this anywhere."}
+              infoText={"Your contacts will see this to identify you"}
+            />
+          ) : null}
         </KeyboardAvoidingView>
       </View>
     </SafeAreaView>
@@ -121,7 +110,7 @@ const styles = StyleSheet.create({
   pageTitle: {
     color: Colors.blue,
     fontSize: RFValue(25, 812),
-    marginLeft: 15,
+    marginLeft: 20,
     marginBottom: 5,
     fontFamily: Fonts.FiraSansRegular
   },
@@ -137,8 +126,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: hp("5%"),
     height: 50,
-    marginLeft: 15,
-    marginRight: 15,
+    marginLeft: 20,
+    marginRight: 20,
     paddingLeft: 15,
     fontSize: RFValue(13, 812),
     color: Colors.textColorGrey,
@@ -151,12 +140,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: hp("5%"),
     height: 50,
-    marginLeft: 15,
-    marginRight: 15,
+    marginLeft: 20,
+    marginRight: 20,
     paddingLeft: 15,
     fontSize: RFValue(13, 812),
     color: Colors.textColorGrey,
-    elevation: 2,
+    elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: { width: 2, height: 2 },
@@ -196,7 +185,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingLeft: 30,
     paddingRight: 30,
-    paddingBottom: 40,
+    paddingBottom: DeviceInfo.hasNotch() ? 70 : 40,
     paddingTop: 30,
     alignItems: "center"
   },

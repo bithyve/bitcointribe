@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   initHealthCheck,
   prepareMShares,
-  uploadEncMShares,
+  uploadEncMShare,
   checkMSharesHealth,
   generatePDF
 } from "../../store/actions/sss";
@@ -58,7 +58,7 @@ const S3UserScreen = props => {
         >
           <Button
             title="Upload MShares"
-            onPress={() => dispatch(uploadEncMShares(parseInt(metaShareIndex)))}
+            onPress={() => dispatch(uploadEncMShare(parseInt(metaShareIndex)))}
           />
           <TextInput
             value={metaShareIndex}
@@ -77,21 +77,15 @@ const S3UserScreen = props => {
           metaShares.length &&
           Object.keys(SHARES_TRANSFER_DETAILS).length ? (
           <View style={{ marginHorizontal: 40 }}>
-            {SHARES_TRANSFER_DETAILS[metaShares[metaShareIndex].shareId] ? (
+            {SHARES_TRANSFER_DETAILS[metaShareIndex] ? (
               <View>
                 <Text style={{ marginTop: 12 }}>
                   OTP:
-                  {
-                    SHARES_TRANSFER_DETAILS[metaShares[metaShareIndex].shareId]
-                      .OTP
-                  }
+                  {SHARES_TRANSFER_DETAILS[metaShareIndex].OTP}
                 </Text>
                 <Text style={{ marginTop: 12 }}>
                   EncKey:
-                  {
-                    SHARES_TRANSFER_DETAILS[metaShares[metaShareIndex].shareId]
-                      .ENCRYPTED_KEY
-                  }
+                  {SHARES_TRANSFER_DETAILS[metaShareIndex].ENCRYPTED_KEY}
                 </Text>
               </View>
             ) : null}

@@ -5,7 +5,7 @@ import {
   switchS3Loader,
   healthCheckInitialized,
   PREPARE_MSHARES,
-  UPLOAD_ENC_MSHARES,
+  UPLOAD_ENC_MSHARE,
   DOWNLOAD_MSHARE,
   UPDATE_MSHARES_HEALTH,
   CHECK_MSHARES_HEALTH,
@@ -28,30 +28,6 @@ import {
   MetaShare
 } from "../../bitcoin/utilities/Interface";
 import generatePDF from "../utils/generatePDF";
-
-function* initHCWorker() {
-  const s3Service: S3Service = yield select(state => state.sss.service);
-  const initialized = s3Service.sss.healthCheckInitialized;
-
-  if (initialized || !s3Service.sss.metaShares.length) return;
-
-  yield put(switchS3Loader("initHC"));
-  const res = yield call(s3Service.initializeHealthcheck);
-  if (res.status === 200) {
-    yield put(healthCheckInitialized());
-    const { SERVICES } = yield select(state => state.storage.database);
-    const updatedSERVICES = {
-      ...SERVICES,
-      S3_SERVICE: JSON.stringify(s3Service)
-    };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-  } else {
-    console.log({ err: res.err });
-    yield put(switchS3Loader("initHC"));
-  }
-}
-
-export const initHCWatcher = createWatcher(initHCWorker, INIT_HEALTH_CHECK);
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select(state => state.sss.service);
@@ -76,6 +52,36 @@ function* generateMetaSharesWorker() {
   if (s3Service.sss.metaShares.length) return;
   const res = yield call(s3Service.createMetaShares, secureAssets, walletName);
   if (res.status === 200) {
+    return s3Service;
+    // const { SERVICES } = yield select(state => state.storage.database);
+    // const updatedSERVICES = {
+    //   ...SERVICES,
+    //   S3_SERVICE: JSON.stringify(s3Service)
+    // };
+    // yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+  } else {
+    throw new Error(res.err);
+  }
+}
+
+export const generateMetaSharesWatcher = createWatcher(
+  generateMetaSharesWorker,
+  PREPARE_MSHARES
+);
+
+function* initHCWorker() {
+  let s3Service: S3Service = yield select(state => state.sss.service);
+  const initialized = s3Service.sss.healthCheckInitialized;
+  if (initialized) return;
+
+  yield put(switchS3Loader("initHC"));
+  if (!s3Service.sss.metaShares.length) {
+    s3Service = yield call(generateMetaSharesWorker);
+  }
+
+  const res = yield call(s3Service.initializeHealthcheck);
+  if (res.status === 200) {
+    yield put(healthCheckInitialized());
     const { SERVICES } = yield select(state => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
@@ -84,13 +90,11 @@ function* generateMetaSharesWorker() {
     yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {
     console.log({ err: res.err });
+    yield put(switchS3Loader("initHC"));
   }
 }
 
-export const generateMetaSharesWatcher = createWatcher(
-  generateMetaSharesWorker,
-  PREPARE_MSHARES
-);
+export const initHCWatcher = createWatcher(initHCWorker, INIT_HEALTH_CHECK);
 
 function* uploadEncMetaShareWorker({ payload }) {
   // Transfer: User >>> Guardian
@@ -100,11 +104,12 @@ function* uploadEncMetaShareWorker({ payload }) {
   const { DECENTRALIZED_BACKUP } = yield select(
     state => state.storage.database
   );
-  const { shareId } = s3Service.sss.metaShares[payload.shareIndex];
 
   // preventing re-uploads till expiry
-  if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[shareId]) {
-    console.log(DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[shareId]);
+  if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]) {
+    console.log(
+      DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
+    );
     return;
   }
 
@@ -120,7 +125,7 @@ function* uploadEncMetaShareWorker({ payload }) {
       ...DECENTRALIZED_BACKUP,
       SHARES_TRANSFER_DETAILS: {
         ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
-        [shareId]: { OTP: otp, ENCRYPTED_KEY: encryptedKey }
+        [payload.shareIndex]: { OTP: otp, ENCRYPTED_KEY: encryptedKey }
       }
     };
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
@@ -132,7 +137,7 @@ function* uploadEncMetaShareWorker({ payload }) {
 
 export const uploadEncMetaShareWatcher = createWatcher(
   uploadEncMetaShareWorker,
-  UPLOAD_ENC_MSHARES
+  UPLOAD_ENC_MSHARE
 );
 
 function* requestShareWorker() {
