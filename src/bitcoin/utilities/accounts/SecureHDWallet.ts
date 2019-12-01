@@ -5,27 +5,12 @@ import * as bitcoinJS from "bitcoinjs-lib";
 import coinselect from "coinselect";
 import crypto from "crypto";
 import config from "../../Config";
-import Bitcoin from "./Bitcoin";
 import { Transactions } from "../Interface";
+import Bitcoin from "./Bitcoin";
 
-const { BH_AXIOS } = config;
+const { BH_AXIOS, HEXA_ID } = config;
 
 export default class SecureHDWallet extends Bitcoin {
-  private primaryMnemonic: string;
-  private walletID: string;
-  private consumedAddresses: string[];
-  private nextFreeChildIndex: number;
-  private primaryXpriv: string;
-  private multiSigCache;
-  private signingEssentialsCache;
-  private gapLimit: number;
-  private cipherSpec: {
-    algorithm: string;
-    salt: string;
-    iv: Buffer;
-    keyLength: number;
-  };
-
   public twoFASetup: {
     qrData: string;
     secret: string;
@@ -46,6 +31,21 @@ export default class SecureHDWallet extends Bitcoin {
     confirmedTransactions: 0,
     unconfirmedTransactions: 0,
     transactionDetails: []
+  };
+
+  private primaryMnemonic: string;
+  private walletID: string;
+  private consumedAddresses: string[];
+  private nextFreeChildIndex: number;
+  private primaryXpriv: string;
+  private multiSigCache;
+  private signingEssentialsCache;
+  private gapLimit: number;
+  private cipherSpec: {
+    algorithm: string;
+    salt: string;
+    iv: Buffer;
+    keyLength: number;
   };
 
   constructor(
@@ -114,6 +114,7 @@ export default class SecureHDWallet extends Bitcoin {
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("importBHXpub", {
+        HEXA_ID,
         token,
         walletID: walletId
       });
@@ -184,6 +185,7 @@ export default class SecureHDWallet extends Bitcoin {
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("checkSecureHealth", {
+        HEXA_ID,
         chunk,
         pos,
         walletID: walletId
@@ -310,12 +312,12 @@ export default class SecureHDWallet extends Bitcoin {
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("setupSecureAccount", {
+        HEXA_ID,
         walletID: this.walletID
       });
     } catch (err) {
       throw new Error(err.response.data.err);
     }
-
     const { setupSuccessful, setupData } = res.data;
     if (!setupSuccessful) {
       throw new Error("Secure account setup failed");
@@ -341,6 +343,7 @@ export default class SecureHDWallet extends Bitcoin {
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("resetTwoFA", {
+        HEXA_ID,
         walletID: this.walletID,
         token
       });
@@ -355,6 +358,7 @@ export default class SecureHDWallet extends Bitcoin {
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("isSecureActive", {
+        HEXA_ID,
         walletID: this.walletID
       });
     } catch (err) {
@@ -527,6 +531,7 @@ export default class SecureHDWallet extends Bitcoin {
       let res: AxiosResponse;
       try {
         res = await BH_AXIOS.post("secureHDTransaction", {
+          HEXA_ID,
           walletID: this.walletID,
           token,
           txHex,

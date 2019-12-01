@@ -9,7 +9,7 @@ import {
   MetaShare,
   SocialStaticNonPMDD
 } from "../Interface";
-const { BH_AXIOS } = config;
+const { BH_AXIOS, HEXA_ID } = config;
 
 export default class SSS {
   public static cipherSpec: {
@@ -85,6 +85,7 @@ export default class SSS {
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("downloadShare", {
+        HEXA_ID,
         messageId
       });
     } catch (err) {
@@ -107,6 +108,7 @@ export default class SSS {
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("downloadDynamicNonPMDD", {
+        HEXA_ID,
         walletID
       });
     } catch (err) {
@@ -156,6 +158,7 @@ export default class SSS {
 
     try {
       res = await BH_AXIOS.post("affirmDecryption", {
+        HEXA_ID,
         messageId
       });
     } catch (err) {
@@ -209,6 +212,7 @@ export default class SSS {
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("uploadShare", {
+        HEXA_ID,
         share: encryptedMetaShare,
         messageId,
         dynamicNonPMDD
@@ -365,6 +369,7 @@ export default class SSS {
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("updateSharesHealth", {
+        HEXA_ID,
         toUpdate
       });
     } catch (err) {
@@ -546,6 +551,7 @@ export default class SSS {
 
     try {
       res = await BH_AXIOS.post("uploadShare", {
+        HEXA_ID,
         share: encryptedMetaShare,
         messageId,
         dynamicNonPMDD
@@ -578,6 +584,7 @@ export default class SSS {
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("sharesHealthCheckInit", {
+        HEXA_ID,
         walletID: this.walletId,
         shareIDs
       });
@@ -606,6 +613,7 @@ export default class SSS {
 
     try {
       res = await BH_AXIOS.post("checkSharesHealth", {
+        HEXA_ID,
         walletID: this.walletId,
         shareIDs
       });
@@ -799,6 +807,7 @@ export default class SSS {
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post("updateDynamicNonPMDD", {
+        HEXA_ID,
         walletID: this.walletId,
         dynamicNonPMDD
       });
@@ -848,7 +857,7 @@ export default class SSS {
     let index = 0;
     let metaShare: MetaShare;
     for (const encryptedSecret of this.encryptedSecrets) {
-      if (index !== 2) {
+      if (index === 0) {
         metaShare = {
           encryptedSecret,
           shareId: SSS.getShareId(encryptedSecret),
@@ -860,7 +869,7 @@ export default class SSS {
             tag,
             timestamp
           },
-          encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD
+          encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD
         };
       } else {
         metaShare = {
@@ -874,7 +883,7 @@ export default class SSS {
             tag,
             timestamp
           },
-          encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD
+          encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD
         };
       }
 
@@ -890,9 +899,6 @@ export default class SSS {
   };
 
   public createQR = (index: number): { qrData: string[] } => {
-    if (index < 3 || index > 5)
-      throw new Error("QR creation failed; index out of bounds");
-
     const splits: number = config.SSS_METASHARE_SPLITS;
     const metaString = JSON.stringify(this.metaShares[index]);
     const slice = Math.trunc(metaString.length / splits);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -7,24 +7,29 @@ import {
   ScrollView,
   StatusBar,
   Text,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Keyboard,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  TextInput,
+  ActivityIndicator
 } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Fonts from "../common/Fonts";
 import Colors from "../common/Colors";
 import CommonStyles from "../common/Styles";
-import { TextInput } from "react-native-gesture-handler";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import Feather from "react-native-vector-icons/Feather";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import { RFValue } from "react-native-responsive-fontsize";
+import HeaderTitle from "../components/HeaderTitle";
+import BottomInfoBox from "../components/BottomInfoBox";
+
+import { useDispatch, useSelector } from "react-redux";
 import { initializeSetup } from "../store/actions/setupAndAuth";
 
 export default function NewWalletQuestion(props) {
@@ -53,12 +58,10 @@ export default function NewWalletQuestion(props) {
 
   const dispatch = useDispatch();
   const walletName = props.navigation.getParam("walletName");
-  const { isInitialized } = useSelector(state => state.setupAndAuth);
-
+  const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   if (isInitialized) {
     props.navigation.navigate("HomeNav");
   }
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -79,27 +82,27 @@ export default function NewWalletQuestion(props) {
             </View>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          activeOpacity={10}
+
+        <KeyboardAvoidingView
           style={{ flex: 1 }}
-          onPress={() => {
-            setDropdownBoxOpenClose(false);
-            Keyboard.dismiss();
-          }}
+          behavior={Platform.OS == "ios" ? "padding" : ""}
+          enabled
         >
-          <KeyboardAvoidingView
+          <TouchableOpacity
+            activeOpacity={10}
             style={{ flex: 1 }}
-            behavior={Platform.OS == "ios" ? "padding" : null}
-            enabled
+            onPress={() => {
+              setDropdownBoxOpenClose(false);
+              Keyboard.dismiss();
+            }}
           >
             <ScrollView>
-              <Text style={styles.pageTitle}>New Hexa Wallet</Text>
-              <Text style={styles.labelStyle}>
-                Select{" "}
-                <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
-                  secret question
-                </Text>
-              </Text>
+              <HeaderTitle
+                firstLineTitle={"New Hexa Wallet"}
+                secondLineTitle={""}
+                infoTextNormal={"Setup "}
+                infoTextBold={"secret question and answer"}
+              />
               <TouchableOpacity
                 activeOpacity={10}
                 style={
@@ -111,13 +114,7 @@ export default function NewWalletQuestion(props) {
                   setDropdownBoxOpenClose(!dropdownBoxOpenClose);
                 }}
               >
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(13, 812)
-                  }}
-                >
+                <Text style={styles.dropdownBoxText}>
                   {dropdownBoxValue.question
                     ? dropdownBoxValue.question
                     : "Select Question"}
@@ -132,18 +129,7 @@ export default function NewWalletQuestion(props) {
                 />
               </TouchableOpacity>
               {dropdownBoxOpenClose ? (
-                <View
-                  style={{
-                    borderRadius: 10,
-                    margin: 15,
-                    height: "auto",
-                    elevation: 10,
-                    shadowColor: Colors.shadowBlue,
-                    shadowOpacity: 10,
-                    shadowOffset: { width: 0, height: 10 },
-                    backgroundColor: Colors.white
-                  }}
-                >
+                <View style={styles.dropdownBoxModal}>
                   {dropdownBoxList.map((value, index) => (
                     <TouchableOpacity
                       onPress={() => {
@@ -151,16 +137,13 @@ export default function NewWalletQuestion(props) {
                         setDropdownBoxOpenClose(false);
                       }}
                       style={{
+                        ...styles.dropdownBoxModalElementView,
                         borderTopLeftRadius: index == 0 ? 10 : 0,
                         borderTopRightRadius: index == 0 ? 10 : 0,
                         borderBottomLeftRadius:
                           index == dropdownBoxList.length - 1 ? 10 : 0,
                         borderBottomRightRadius:
                           index == dropdownBoxList.length - 1 ? 10 : 0,
-                        height: 55,
-                        justifyContent: "center",
-                        paddingLeft: 15,
-                        paddingRight: 15,
                         paddingTop: index == 0 ? 5 : 0,
                         backgroundColor:
                           dropdownBoxValue.id == value.id
@@ -191,18 +174,15 @@ export default function NewWalletQuestion(props) {
                       ...answerInputStyle,
                       flexDirection: "row",
                       alignItems: "center",
-                      paddingRight: 15
+                      paddingRight: 15,
+                      borderColor:
+                        confirmAnswer && answer && confirmAnswer != answer
+                          ? Colors.red
+                          : Colors.borderColor
                     }}
                   >
                     <TextInput
-                      style={{
-                        flex: 1,
-                        height: 50,
-                        fontSize: RFValue(13, 812),
-                        color: Colors.textColorGrey,
-                        fontFamily: Fonts.FiraSansRegular,
-                        paddingLeft: 15
-                      }}
+                      style={styles.modalInputBox}
                       secureTextEntry={hideShowAnswer}
                       placeholder={"Enter your answer"}
                       placeholderTextColor={Colors.borderColor}
@@ -223,7 +203,7 @@ export default function NewWalletQuestion(props) {
                       }}
                     >
                       <Feather
-                        style={{ marginLeft: "auto" }}
+                        style={{ marginLeft: "auto", padding: 10 }}
                         size={15}
                         color={Colors.blue}
                         name={hideShowAnswer ? "eye-off" : "eye"}
@@ -237,18 +217,15 @@ export default function NewWalletQuestion(props) {
                       flexDirection: "row",
                       alignItems: "center",
                       paddingRight: 15,
-                      marginTop: 15
+                      marginTop: 15,
+                      borderColor:
+                        confirmAnswer && answer && confirmAnswer != answer
+                          ? Colors.red
+                          : Colors.borderColor
                     }}
                   >
                     <TextInput
-                      style={{
-                        flex: 1,
-                        height: 50,
-                        fontSize: RFValue(13, 812),
-                        color: Colors.textColorGrey,
-                        fontFamily: Fonts.FiraSansRegular,
-                        paddingLeft: 15
-                      }}
+                      style={styles.modalInputBox}
                       secureTextEntry={hideShowConfirmAnswer}
                       placeholder={"Confirm your answer"}
                       placeholderTextColor={Colors.borderColor}
@@ -270,7 +247,7 @@ export default function NewWalletQuestion(props) {
                       }}
                     >
                       <Feather
-                        style={{ marginLeft: "auto" }}
+                        style={{ marginLeft: "auto", padding: 10 }}
                         size={15}
                         color={Colors.blue}
                         name={hideShowConfirmAnswer ? "eye-off" : "eye"}
@@ -281,6 +258,26 @@ export default function NewWalletQuestion(props) {
               ) : (
                 <View style={{ marginTop: 15 }} />
               )}
+              {confirmAnswer && answer && confirmAnswer != answer ? (
+                <View
+                  style={{
+                    marginLeft: 20,
+                    marginRight: 20,
+                    flexDirection: "row"
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: Colors.red,
+                      fontFamily: Fonts.FiraSansMediumItalic,
+                      fontSize: RFValue(10, 812),
+                      marginLeft: "auto"
+                    }}
+                  >
+                    Answers do not match
+                  </Text>
+                </View>
+              ) : null}
             </ScrollView>
 
             <View style={styles.bottomButtonView}>
@@ -291,7 +288,11 @@ export default function NewWalletQuestion(props) {
                   onPress={() => dispatch(initializeSetup(walletName, answer))}
                   style={styles.buttonView}
                 >
-                  <Text style={styles.buttonText}>Done</Text>
+                  {!loading.initializing ? (
+                    <Text style={styles.buttonText}>Confirm & Proceed</Text>
+                  ) : (
+                    <ActivityIndicator size="small" />
+                  )}
                 </TouchableOpacity>
               ) : (
                 <View
@@ -304,50 +305,22 @@ export default function NewWalletQuestion(props) {
               <View style={styles.statusIndicatorView}>
                 <View style={styles.statusIndicatorInactiveView} />
                 <View style={styles.statusIndicatorActiveView} />
-                <View style={styles.statusIndicatorInactiveView} />
               </View>
             </View>
-            {confirmAnswer.trim() == "" && answer.trim() == "" ? (
-              <View
-                style={{
-                  marginBottom: 25,
-                  padding: 20,
-                  backgroundColor: Colors.backgroundColor,
-                  marginLeft: 15,
-                  marginRight: 15,
-                  borderRadius: 10,
-                  justifyContent: "center"
-                }}
-              >
-                <Text style={styles.bottomNoteText}>
-                  This question will serve as a hint
-                </Text>
-                <Text style={styles.bottomNoteInfoText}>
-                  For you to remember what the answer was
-                </Text>
-              </View>
+            {dropdownBoxValue.id.trim() == "" ? (
+              <BottomInfoBox
+                title={"This question will serve as a hint"}
+                infoText={"For you to remember what the answer was"}
+              />
             ) : null}
-          </KeyboardAvoidingView>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  pageTitle: {
-    color: Colors.blue,
-    fontSize: RFValue(25, 812),
-    marginLeft: 15,
-    marginBottom: 5,
-    fontFamily: Fonts.FiraSansRegular
-  },
-  labelStyle: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(12, 812),
-    marginLeft: 15,
-    fontFamily: Fonts.FiraSansRegular
-  },
   dropdownBox: {
     flexDirection: "row",
     borderColor: Colors.borderColor,
@@ -355,8 +328,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 30,
     height: 50,
-    marginLeft: 15,
-    marginRight: 15,
+    marginLeft: 20,
+    marginRight: 20,
     paddingLeft: 15,
     paddingRight: 15,
     alignItems: "center"
@@ -368,8 +341,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 30,
     height: 50,
-    marginLeft: 15,
-    marginRight: 15,
+    marginLeft: 20,
+    marginRight: 20,
     paddingLeft: 15,
     paddingRight: 15,
     elevation: 10,
@@ -379,20 +352,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     alignItems: "center"
   },
-  bottomNoteText: {
-    color: Colors.blue,
-    fontSize: RFValue(13, 812),
-    marginBottom: 2,
-    fontFamily: Fonts.FiraSansRegular
-  },
-  bottomNoteInfoText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(12, 812),
-    fontFamily: Fonts.FiraSansRegular
-  },
   buttonView: {
     height: wp("13%"),
-    width: wp("30%"),
+    width: wp("35%"),
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 8,
@@ -433,22 +395,49 @@ const styles = StyleSheet.create({
     marginLeft: 5
   },
   inputBox: {
-    borderColor: Colors.borderColor,
     borderWidth: 0.5,
     borderRadius: 10,
-    marginLeft: 15,
-    marginRight: 15
+    marginLeft: 20,
+    marginRight: 20
   },
   inputBoxFocused: {
-    borderColor: Colors.borderColor,
     borderWidth: 0.5,
     borderRadius: 10,
-    marginLeft: 15,
-    marginRight: 15,
+    marginLeft: 20,
+    marginRight: 20,
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: { width: 2, height: 2 },
     backgroundColor: Colors.white
+  },
+  modalInputBox: {
+    flex: 1,
+    height: 50,
+    fontSize: RFValue(13, 812),
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    paddingLeft: 15
+  },
+  dropdownBoxText: {
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(13, 812)
+  },
+  dropdownBoxModal: {
+    borderRadius: 10,
+    margin: 15,
+    height: "auto",
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 10,
+    shadowOffset: { width: 0, height: 10 },
+    backgroundColor: Colors.white
+  },
+  dropdownBoxModalElementView: {
+    height: 55,
+    justifyContent: "center",
+    paddingLeft: 15,
+    paddingRight: 15
   }
 });
