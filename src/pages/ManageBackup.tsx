@@ -29,6 +29,7 @@ import CopyThisText from "../components/CopyThisText";
 import ContactList from "../components/ContactList";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import QRCode from "react-native-qrcode-svg";
+import SecondaryQR from "../components/SecondaryQR";
 
 import { useDispatch, useSelector } from "react-redux";
 import { initHealthCheck, uploadEncMShare } from "../store/actions/sss";
@@ -192,10 +193,7 @@ export default function ManageBackup(props) {
           />
         </View>
         {selectedType == "secondaryDevice" ? (
-          <View style={styles.modalContentView}>
-            <QRCode value={secondaryQR} size={hp("27%")} />
-            <CopyThisText text={secondaryQR} />
-          </View>
+          <SecondaryQR style={styles.modalContentView} />
         ) : selectedType == "cloud" ? (
           <View style={{ flex: 1 }}>
             <Text
@@ -300,33 +298,11 @@ export default function ManageBackup(props) {
     );
   }
 
+  const dispatch = useDispatch();
   const s3Service: S3Service = useSelector(state => state.sss.service);
   useEffect(() => {
     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
   }, []);
-
-  const dispatch = useDispatch();
-  const [secondaryQR, setSecondaryQR] = useState("");
-  const { SHARES_TRANSFER_DETAILS } = useSelector(
-    state => state.storage.database.DECENTRALIZED_BACKUP
-  );
-  SHARES_TRANSFER_DETAILS[0] && !secondaryQR
-    ? setSecondaryQR(
-        JSON.stringify({
-          ...SHARES_TRANSFER_DETAILS[0],
-          type: "secondaryDeviceQR"
-        })
-      )
-    : null;
-
-  useEffect(() => {
-    if (selectedType === "secondaryDevice") {
-      if (!secondaryQR) {
-        dispatch(uploadEncMShare(0));
-      }
-      console.log(secondaryQR);
-    }
-  }, [selectedType]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
