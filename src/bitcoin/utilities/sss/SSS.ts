@@ -857,7 +857,7 @@ export default class SSS {
     let index = 0;
     let metaShare: MetaShare;
     for (const encryptedSecret of this.encryptedSecrets) {
-      if (index !== 2) {
+      if (index === 0) {
         metaShare = {
           encryptedSecret,
           shareId: SSS.getShareId(encryptedSecret),
@@ -869,7 +869,7 @@ export default class SSS {
             tag,
             timestamp
           },
-          encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD
+          encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD
         };
       } else {
         metaShare = {
@@ -883,7 +883,7 @@ export default class SSS {
             tag,
             timestamp
           },
-          encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD
+          encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD
         };
       }
 
