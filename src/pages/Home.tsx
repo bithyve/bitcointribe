@@ -123,7 +123,7 @@ export default function Home(props) {
 		}
 	])
 	const [modaldata, setModaldata] = useState(transactionData);
-	const [openmodal, setOpenmodal] = useState('close')
+	const [openmodal, setOpenmodal] = useState('closed')
 
 
 	function getIconByAccountType(type) {
@@ -164,13 +164,19 @@ export default function Home(props) {
 									<Text style={styles.transactionModalTitleText}>{item.title} </Text>
 									<Text style={styles.transactionModalDateText}>{item.date} <Entypo size={10} name={'dot-single'} color={Colors.textColorGrey} />{item.time}</Text>
 								</View>
-							</View >
+							</View>
 							<View style={styles.transactionModalAmountView}>
 								<Image source={require('../assets/images/icons/icon_bitcoin_gray.png')} style={{ width: 12, height: 12, resizeMode: 'contain' }} />
 								<Text style={{ ...styles.transactionModalAmountText, color: item.transactionStatus == 'receive' ? Colors.green : Colors.red, }}>{item.price}</Text>
 								<Text style={styles.transactionModalAmountUnitText}>6+</Text>
+								<Ionicons
+								name="ios-arrow-forward"
+								color={Colors.textColorGrey}
+								size={12}
+								style={{ marginLeft:20,  alignSelf: 'center' }}
+							/>
 							</View>
-						</View >
+						</View>
 					}
 				/>
 			</View>

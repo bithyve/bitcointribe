@@ -20,9 +20,7 @@ import {
 } from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
 import BottomSheet from "reanimated-bottom-sheet";
-import BottomInfoBox from "../components/BottomInfoBox";
-import ContactList from "../components/ContactList";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import KnowMoreButton from "../components/KnowMoreButton";
 
 import { useDispatch, useSelector } from "react-redux";
 import { initHealthCheck } from "../store/actions/sss";
@@ -30,6 +28,31 @@ import S3Service from "../bitcoin/services/sss/S3Service";
 import SecondaryDevice from "../components/containers/backups/SecondaryDevice";
 import Contacts from "../components/containers/backups/Contacts";
 import Cloud from "../components/containers/backups/Cloud";
+
+function getImageByType(type) {
+  if (type == "secondaryDevice") {
+    return require("../assets/images/icons/icon_secondarydevice.png");
+  } else if (type == "contact") {
+    return require("../assets/images/icons/icon_user.png");
+  } else if (type == "cloud") {
+    return require("../assets/images/icons/icon_cloud.png");
+  }
+  if (type == "print") {
+    return require("../assets/images/icons/print.png");
+  } else if (type == "security") {
+    return require("../assets/images/icons/icon_securityquestion.png");
+  }
+}
+
+function getIconByStatus(status) {
+  if (status == "error") {
+    return require("../assets/images/icons/icon_error_red.png");
+  } else if (status == "warning") {
+    return require("../assets/images/icons/icon_error_yellow.png");
+  } else if (status == "success") {
+    return require("../assets/images/icons/icon_check.png");
+  }
+}
 
 export default function ManageBackup(props) {
   const [bottomSheet, setBottomSheet] = useState(React.createRef());
@@ -123,31 +146,6 @@ export default function ManageBackup(props) {
     bottomSheet.current.snapTo(1);
   }
 
-  function getImageByType(type) {
-    if (type == "secondaryDevice") {
-      return require("../assets/images/icons/icon_secondarydevice.png");
-    } else if (type == "contact") {
-      return require("../assets/images/icons/icon_user.png");
-    } else if (type == "cloud") {
-      return require("../assets/images/icons/icon_cloud.png");
-    }
-    if (type == "print") {
-      return require("../assets/images/icons/print.png");
-    } else if (type == "security") {
-      return require("../assets/images/icons/icon_securityquestion.png");
-    }
-  }
-
-  function getIconByStatus(status) {
-    if (status == "error") {
-      return require("../assets/images/icons/icon_error_red.png");
-    } else if (status == "warning") {
-      return require("../assets/images/icons/icon_error_yellow.png");
-    } else if (status == "success") {
-      return require("../assets/images/icons/icon_check.png");
-    }
-  }
-
   //   function onCloseEnd() {
   //     if (selectedType == "secondaryDevice") {
   //       setSelectedType("contact");
@@ -225,9 +223,11 @@ export default function ManageBackup(props) {
                 The wallet backup is not secured. Please complete the setup to
                 safeguard against loss of funds
               </Text>
-              <TouchableOpacity style={styles.knowMoreButton}>
-                <Text style={styles.knowMoreButtonText}>Know More</Text>
-              </TouchableOpacity>
+              <KnowMoreButton
+                onpress={() => {}}
+                containerStyle={{ marginTop: 10, marginLeft: 25 }}
+                textStyle={{}}
+              />
             </View>
             <View style={{ flex: 1 }}>
               <Image
@@ -285,7 +285,8 @@ export default function ManageBackup(props) {
                       <Text
                         style={{
                           fontFamily: Fonts.FiraSansMediumItalic,
-                          fontWeight: "bold"
+                          fontWeight: "bold",
+                          fontStyle: "italic"
                         }}
                       >
                         {item.time}
