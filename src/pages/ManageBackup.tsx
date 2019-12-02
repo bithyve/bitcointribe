@@ -28,6 +28,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { initHealthCheck } from "../store/actions/sss";
 import S3Service from "../bitcoin/services/sss/S3Service";
 import SecondaryDevice from "../components/containers/backups/SecondaryDevice";
+import Contacts from "../components/containers/backups/Contacts";
+import Cloud from "../components/containers/backups/Cloud";
 
 export default function ManageBackup(props) {
   const [bottomSheet, setBottomSheet] = useState(React.createRef());
@@ -109,7 +111,7 @@ export default function ManageBackup(props) {
   }
 
   function continueNProceed() {
-    // bottomSheet.current.snapTo(0);
+    bottomSheet.current.snapTo(0);
     // setTimeout(() => {
     //   setSelectedType("cloud");
     //   setSelectedStatus("success");
@@ -154,128 +156,21 @@ export default function ManageBackup(props) {
   //   }
 
   function renderContent() {
-    return selectedType == "secondaryDevice" ? (
-      <SecondaryDevice getIconByStatus={getIconByStatus} />
-    ) : (
-      <View style={styles.modalContainer}>
-        <View style={styles.modalHeaderTitleView}>
-          <View style={{ marginTop: hp("2%") }}>
-            <Text style={styles.modalHeaderTitleText}>
-              {selectedType == "contact"
-                ? "Trusted Contact"
-                : selectedType == "cloud"
-                ? "Cloud"
-                : "Secondary Device"}
-            </Text>
-            {selectedType == "contact" || selectedType == "cloud" ? (
-              <Text style={styles.modalHeaderInfoText}>Never backed up</Text>
-            ) : (
-              <Text style={styles.modalHeaderInfoText}>
-                Last backup{" "}
-                <Text
-                  style={{
-                    fontFamily: Fonts.FiraSansMediumItalic,
-                    fontWeight: "bold"
-                  }}
-                >
-                  {"3 months ago"}
-                </Text>
-              </Text>
-            )}
-          </View>
-          <Image
-            style={styles.cardIconImage}
-            source={getIconByStatus(selectedStatus)}
+    switch (selectedType) {
+      case "secondaryDevice":
+        return <SecondaryDevice getIconByStatus={getIconByStatus} />;
+      case "contact":
+        return (
+          <Contacts
+            getIconByStatus={getIconByStatus}
+            continueNProceed={continueNProceed}
           />
-        </View>
-        {selectedType == "secondaryDevice" ? null : selectedType == "cloud" ? (
-          <View style={{ flex: 1 }}>
-            <Text
-              style={{
-                marginLeft: 30,
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12, 812),
-                marginTop: 5,
-                marginBottom: 5
-              }}
-            >
-              Select cloud drive to{" "}
-              <Text
-                style={{
-                  fontFamily: Fonts.FiraSansMediumItalic,
-                  fontWeight: "bold"
-                }}
-              >
-                store recovery secret
-              </Text>
-            </Text>
-            <View style={{ flex: 1 }}>
-              <FlatList
-                data={cloudData}
-                renderItem={({ item, index }) => (
-                  <View style={styles.listElements}>
-                    <Image
-                      style={styles.listElementsIconImage}
-                      source={item.imageIcon}
-                    />
-                    <View style={{ justifyContent: "space-between", flex: 1 }}>
-                      <Text style={styles.listElementsTitle}>{item.title}</Text>
-                      <Text style={styles.listElementsInfo} numberOfLines={1}>
-                        {item.info}
-                      </Text>
-                    </View>
-                    <View style={styles.listElementIcon}>
-                      <Ionicons
-                        name="ios-arrow-forward"
-                        color={Colors.textColorGrey}
-                        size={15}
-                        style={{ alignSelf: "center" }}
-                      />
-                    </View>
-                  </View>
-                )}
-              />
-            </View>
-          </View>
-        ) : selectedType == "contact" ? (
-          <View style={{ flex: 1 }}>
-            <Text
-              style={{
-                marginLeft: 30,
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12, 812),
-                marginTop: 5
-              }}
-            >
-              Select contact to{" "}
-              <Text
-                style={{
-                  fontFamily: Fonts.FiraSansMediumItalic,
-                  fontWeight: "bold"
-                }}
-              >
-                send recovery secret
-              </Text>
-            </Text>
-            <ContactList
-              style={{}}
-              onPressContinue={() => continueNProceed()}
-              onSelectContact={list => selectedContactsList(list)}
-            />
-          </View>
-        ) : null}
-        {selectedType == "secondaryDevice" ? (
-          <BottomInfoBox
-            title={"Note"}
-            infoText={
-              "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna"
-            }
-          />
-        ) : null}
-      </View>
-    );
+        );
+      case "cloud":
+        return <Cloud getIconByStatus={getIconByStatus} />;
+      default:
+        return <View></View>;
+    }
   }
 
   function renderHeader() {
@@ -516,85 +411,5 @@ const styles = StyleSheet.create({
     height: 14,
     resizeMode: "contain",
     marginLeft: "auto"
-  },
-  modalContainer: {
-    height: "100%",
-    backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderTopWidth: 1,
-    borderColor: Colors.borderColor,
-    alignSelf: "center",
-    width: "100%"
-  },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingBottom: 15,
-    paddingTop: 10,
-    marginLeft: 20,
-    marginTop: 20,
-    marginRight: 20,
-    marginBottom: 15
-  },
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18, 812),
-    fontFamily: Fonts.FiraSansMedium
-  },
-  modalHeaderInfoText: {
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12, 812),
-    marginTop: 5
-  },
-  modalContentView: {
-    flex: 1,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  listElements: {
-    flexDirection: "row",
-    marginLeft: 20,
-    marginRight: 20,
-    borderBottomWidth: 0.5,
-    borderColor: Colors.borderColor,
-    paddingTop: 25,
-    paddingBottom: 25,
-    paddingLeft: 10,
-    alignItems: "center"
-  },
-  listElementsTitle: {
-    color: Colors.blue,
-    fontSize: RFValue(13, 812),
-    marginLeft: 13,
-    fontFamily: Fonts.FiraSansRegular
-  },
-  listElementsInfo: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(11, 812),
-    marginLeft: 13,
-    marginTop: 5,
-    fontFamily: Fonts.FiraSansRegular
-  },
-  listElementIcon: {
-    paddingRight: 5,
-    marginLeft: 25,
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  listElementsIconImage: {
-    resizeMode: "contain",
-    width: 25,
-    height: 25,
-    alignSelf: "center"
   }
 });
