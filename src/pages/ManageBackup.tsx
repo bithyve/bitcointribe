@@ -8,12 +8,9 @@ import {
   StatusBar,
   Text,
   Image,
-  FlatList,
-  AsyncStorage,
-  Platform
+  FlatList
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import AntDesign from "react-native-vector-icons/AntDesign";
 import Fonts from "../common/Fonts";
 import Colors from "../common/Colors";
 import CommonStyles from "../common/Styles";
@@ -23,23 +20,19 @@ import {
 } from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
 import BottomSheet from "reanimated-bottom-sheet";
-import DeviceInfo from "react-native-device-info";
 import BottomInfoBox from "../components/BottomInfoBox";
-import CopyThisText from "../components/CopyThisText";
 import ContactList from "../components/ContactList";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import QRCode from "react-native-qrcode-svg";
-import SecondaryQR from "../components/SecondaryQR";
 
 import { useDispatch, useSelector } from "react-redux";
-import { initHealthCheck, uploadEncMShare } from "../store/actions/sss";
+import { initHealthCheck } from "../store/actions/sss";
 import S3Service from "../bitcoin/services/sss/S3Service";
+import SecondaryDevice from "../components/containers/backups/SecondaryDevice";
 
 export default function ManageBackup(props) {
   const [bottomSheet, setBottomSheet] = useState(React.createRef());
   const [selectedType, setSelectedType] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("error");
-  const [temp, setTemp] = useState(true);
   const [contacts, setContacts] = useState([]);
   const [cloudData, setCloudData] = useState([
     {
@@ -102,28 +95,29 @@ export default function ManageBackup(props) {
     }
   ]);
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (!selectedType) {
-        setSelectedType("secondaryDevice");
-        setSelectedStatus("error");
-      }
-    }, 3000);
-  });
+  //   useEffect(() => { // selectedType is populated based on the degradation of health
+  //     setTimeout(() => {
+  //       if (!selectedType) {
+  //         setSelectedType("secondaryDevice");
+  //         setSelectedStatus("error");
+  //       }
+  //     }, 3000);
+  //   });
 
   function selectedContactsList(list) {
     setContacts(list);
   }
 
   function continueNProceed() {
-    bottomSheet.current.snapTo(0);
-    setTimeout(() => {
-      setSelectedType("cloud");
-      setSelectedStatus("success");
-    }, 1000);
+    // bottomSheet.current.snapTo(0);
+    // setTimeout(() => {
+    //   setSelectedType("cloud");
+    //   setSelectedStatus("success");
+    // }, 1000);
   }
 
   function openModal(type) {
+    setSelectedType(type);
     bottomSheet.current.snapTo(1);
   }
 
@@ -152,15 +146,17 @@ export default function ManageBackup(props) {
     }
   }
 
-  function onCloseEnd() {
-    if (selectedType == "secondaryDevice") {
-      setSelectedType("contact");
-      setSelectedStatus("warning");
-    }
-  }
+  //   function onCloseEnd() {
+  //     if (selectedType == "secondaryDevice") {
+  //       setSelectedType("contact");
+  //       setSelectedStatus("warning");
+  //     }
+  //   }
 
   function renderContent() {
-    return (
+    return selectedType == "secondaryDevice" ? (
+      <SecondaryDevice getIconByStatus={getIconByStatus} />
+    ) : (
       <View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
           <View style={{ marginTop: hp("2%") }}>
@@ -192,9 +188,7 @@ export default function ManageBackup(props) {
             source={getIconByStatus(selectedStatus)}
           />
         </View>
-        {selectedType == "secondaryDevice" ? (
-          <SecondaryQR style={styles.modalContentView} />
-        ) : selectedType == "cloud" ? (
+        {selectedType == "secondaryDevice" ? null : selectedType == "cloud" ? (
           <View style={{ flex: 1 }}>
             <Text
               style={{
@@ -352,12 +346,12 @@ export default function ManageBackup(props) {
             extraData={selectedType}
             renderItem={({ item, index }) => (
               <View
-                style={{
-                  opacity: !selectedType || item.type == selectedType ? 1 : 0.5
-                }}
+              // style={{
+              //   opacity: !selectedType || item.type == selectedType ? 1 : 0.5
+              // }}
               >
                 <TouchableOpacity
-                  disabled={item.type == selectedType ? false : true}
+                  //   disabled={item.type == selectedType ? false : true}
                   onPress={() => openModal(item.type)}
                   style={{
                     ...styles.manageBackupCard,
@@ -413,7 +407,7 @@ export default function ManageBackup(props) {
           />
         </ScrollView>
         <BottomSheet
-          onCloseEnd={() => onCloseEnd()}
+          //   onCloseEnd={() => onCloseEnd()}
           enabledInnerScrolling={true}
           ref={bottomSheet}
           snapPoints={[-30, hp("90%")]}
