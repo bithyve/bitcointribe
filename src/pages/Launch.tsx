@@ -21,8 +21,7 @@ export default function Launch(props) {
     } else props.navigation.replace("PasscodeConfirm");
   };
 
-  // setTimeout(postVideoNav, 5000);
-  postVideoNav();
+  setTimeout(postVideoNav, 5000);
 
   useEffect(() => {
     dispatch(initializeDB());
