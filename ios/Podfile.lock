@@ -5,6 +5,10 @@ PODS:
   - EXConstants (7.0.1):
     - UMConstantsInterface
     - UMCore
+  - EXContacts (7.0.0):
+    - UMCore
+    - UMFileSystemInterface
+    - UMPermissionsInterface
   - EXFileSystem (7.0.0):
     - UMCore
     - UMFileSystemInterface
@@ -133,6 +137,7 @@ DEPENDENCIES:
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - EXAppLoaderProvider (from `../node_modules/expo/node_modules/expo-app-loader-provider/ios`)
   - EXConstants (from `../node_modules/expo/node_modules/expo-constants/ios`)
+  - EXContacts (from `../node_modules/expo-contacts/ios`)
   - EXFileSystem (from `../node_modules/expo/node_modules/expo-file-system/ios`)
   - EXFont (from `../node_modules/expo-font/ios`)
   - EXKeepAwake (from `../node_modules/expo-keep-awake/ios`)
@@ -195,6 +200,9 @@ EXTERNAL SOURCES:
   EXConstants:
     :path: !ruby/object:Pathname
     path: "../node_modules/expo/node_modules/expo-constants/ios"
+  EXContacts:
+    :path: !ruby/object:Pathname
+    path: "../node_modules/expo-contacts/ios"
   EXFileSystem:
     :path: !ruby/object:Pathname
     path: "../node_modules/expo/node_modules/expo-file-system/ios"
@@ -293,6 +301,7 @@ SPEC CHECKSUMS:
   DoubleConversion: bb338842f62ab1d708ceb63ec3d999f0f3d98ecd
   EXAppLoaderProvider: 5d348813a9cf09b03bbe5b8b55437bc1bfbddbd1
   EXConstants: 857aa7b1c84e2878f8402d712061860bca16a697
+  EXContacts: 5ec0cb83ea2ea68694eac97ddf2a5cfefb8e2286
   EXFileSystem: 7e53a2c30a2eb6987ba6d5158ab908f947523228
   EXFont: 71d07dc5d2153db7d1a23f1e0cc1b6341d55c432
   EXKeepAwake: d4caf9a1a7691126ade4ca0b76592e93250a8f29
