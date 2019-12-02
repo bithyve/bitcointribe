@@ -20,6 +20,7 @@ import {
 } from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
 import BottomSheet from "reanimated-bottom-sheet";
+import KnowMoreButton from "../components/KnowMoreButton";
 
 import { useDispatch, useSelector } from "react-redux";
 import { initHealthCheck } from "../store/actions/sss";
@@ -222,9 +223,11 @@ export default function ManageBackup(props) {
                 The wallet backup is not secured. Please complete the setup to
                 safeguard against loss of funds
               </Text>
-              <TouchableOpacity style={styles.knowMoreButton}>
-                <Text style={styles.knowMoreButtonText}>Know More</Text>
-              </TouchableOpacity>
+              <KnowMoreButton
+                onpress={() => {}}
+                containerStyle={{ marginTop: 10, marginLeft: 25 }}
+                textStyle={{}}
+              />
             </View>
             <View style={{ flex: 1 }}>
               <Image
@@ -282,7 +285,8 @@ export default function ManageBackup(props) {
                       <Text
                         style={{
                           fontFamily: Fonts.FiraSansMediumItalic,
-                          fontWeight: "bold"
+                          fontWeight: "bold",
+                          fontStyle: "italic"
                         }}
                       >
                         {item.time}

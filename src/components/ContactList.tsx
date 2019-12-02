@@ -6,12 +6,14 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Alert,
+  AsyncStorage,
+  PermissionsAndroid,
   Platform,
-  PermissionsAndroid
+  Alert
 } from "react-native";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
+import CommonStyles from "../common/Styles";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
@@ -44,6 +46,85 @@ export default function ContactList(props) {
   const [scrollViewRef, setScrollViewRef] = useState(React.createRef());
   const [radioOnOff, setRadioOnOff] = useState(false);
   const [contactData, setContactData] = useState([]);
+  // const [contactData, setContactData] = useState([
+  //   {
+  //     name: "Shivani Altekar",
+  //     checked: false,
+  //     id: 1,
+  //     communicationMode: [],
+  //     status: ""
+  //   },
+  //   {
+  //     name: "Uma AmravatiKr",
+  //     checked: false,
+  //     id: 2,
+  //     communicationMode: [],
+  //     status: ""
+  //   },
+  //   {
+  //     name: "Adison Alter",
+  //     checked: false,
+  //     id: 3,
+  //     communicationMode: [],
+  //     status: ""
+  //   },
+  //   {
+  //     name: "Add Add",
+  //     checked: false,
+  //     id: 4,
+  //     communicationMode: [],
+  //     status: ""
+  //   },
+  //   {
+  //     name: "Raj Boke",
+  //     checked: false,
+  //     id: 5,
+  //     communicationMode: [],
+  //     status: ""
+  //   },
+  //   {
+  //     name: "Samantha Bhujange",
+  //     checked: false,
+  //     id: 6,
+  //     communicationMode: [],
+  //     status: ""
+  //   },
+  //   {
+  //     name: "Kaweri Balwihari",
+  //     checked: false,
+  //     id: 7,
+  //     communicationMode: [],
+  //     status: ""
+  //   },
+  //   {
+  //     name: "Radhesham Bichkule",
+  //     checked: false,
+  //     id: 8,
+  //     communicationMode: [],
+  //     status: ""
+  //   },
+  //   {
+  //     name: "Rameswar Bihari",
+  //     checked: false,
+  //     id: 9,
+  //     communicationMode: [],
+  //     status: ""
+  //   },
+  //   {
+  //     name: "Shahaji Buchade",
+  //     checked: false,
+  //     id: 10,
+  //     communicationMode: [],
+  //     status: ""
+  //   },
+  //   {
+  //     name: "Shabnam Chitale",
+  //     checked: false,
+  //     id: 11,
+  //     communicationMode: [],
+  //     status: ""
+  //   }
+  // ]);
   const [alphabetsList] = useState([
     "A",
     "B",
@@ -92,16 +173,18 @@ export default function ContactList(props) {
 
   function onContactSelect(index) {
     let contacts = contactData;
-    if (
-      selectedContacts.findIndex(value => value.id == contacts[index].id) == 0
-    ) {
-      selectedContacts.shift();
+    if (contacts[index].checked) {
+      selectedContacts.splice(
+        selectedContacts.findIndex(temp => temp.id == contacts[index].id),
+        1
+      );
     } else {
-      if (selectedContacts.length == 2) {
+      if (selectedContacts.length === 2) {
         selectedContacts.pop();
       }
       selectedContacts.push(contacts[index]);
     }
+
     setSelectedContacts(selectedContacts);
     for (let i = 0; i < contacts.length; i++) {
       if (
@@ -113,8 +196,6 @@ export default function ContactList(props) {
       }
     }
     setContactData(contacts);
-
-    console.log("select", selectedContacts);
     setRadioOnOff(!radioOnOff);
     props.onSelectContact(selectedContacts);
   }
@@ -125,13 +206,11 @@ export default function ContactList(props) {
         contactData.findIndex(tmp => tmp.id == value.id)
       ].checked = false;
     }
-    if (selectedContacts.findIndex(value => value.id == value.id) == 0) {
-      selectedContacts.shift();
-    } else if (selectedContacts.findIndex(value => value.id == value.id) == 1) {
-      selectedContacts.pop();
-    }
+    selectedContacts.splice(
+      selectedContacts.findIndex(temp => temp.id == value.id),
+      1
+    );
     setSelectedContacts(selectedContacts);
-    console.log("cancel", selectedContacts);
     setRadioOnOff(!radioOnOff);
     props.onSelectContact(selectedContacts);
   }
@@ -156,26 +235,34 @@ export default function ContactList(props) {
       <View style={{ flex: 1, flexDirection: "row" }}>
         <View style={{ flex: 11 }}>
           <ScrollView showsVerticalScrollIndicator={false} ref={scrollViewRef}>
-            {contactData.map((value, index) => (
-              <TouchableOpacity
-                onPress={() => onContactSelect(index)}
-                style={styles.contactView}
-              >
-                <RadioButton
-                  size={15}
-                  color={Colors.lightBlue}
-                  borderColor={Colors.borderColor}
-                  isChecked={value.checked}
-                  onpress={() => onContactSelect(index)}
-                />
-                <Text style={styles.contactText}>
-                  {value.name.split(" ")[0]}{" "}
-                  <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                    {value.name.split(" ")[1]}
+            {contactData.map((value, index) => {
+              let selected = false;
+              if (
+                selectedContacts.findIndex(temp => temp.id == value.id) > -1
+              ) {
+                selected = true;
+              }
+              return (
+                <TouchableOpacity
+                  onPress={() => onContactSelect(index)}
+                  style={styles.contactView}
+                >
+                  <RadioButton
+                    size={15}
+                    color={Colors.lightBlue}
+                    borderColor={Colors.borderColor}
+                    isChecked={selected}
+                    onpress={() => onContactSelect(index)}
+                  />
+                  <Text style={styles.contactText}>
+                    {value.name.split(" ")[0]}{" "}
+                    <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                      {value.name.split(" ")[1]}
+                    </Text>
                   </Text>
-                </Text>
-              </TouchableOpacity>
-            ))}
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
         </View>
         <View style={styles.contactIndexView}>
