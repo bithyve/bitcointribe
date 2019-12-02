@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Image, FlatList } from "react-native";
 import Fonts from "../../../common/Fonts";
 import Colors from "../../../common/Colors";
+import BackupStyles from "./Styles";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -32,14 +33,14 @@ const Cloud = props => {
   ]);
 
   return (
-    <View style={styles.modalContainer}>
-      <View style={styles.modalHeaderTitleView}>
+    <View style={BackupStyles.modalContainer}>
+      <View style={BackupStyles.modalHeaderTitleView}>
         <View style={{ marginTop: hp("2%") }}>
-          <Text style={styles.modalHeaderTitleText}>Cloud</Text>
-          <Text style={styles.modalHeaderInfoText}>Never backed up</Text>
+          <Text style={BackupStyles.modalHeaderTitleText}>Cloud</Text>
+          <Text style={BackupStyles.modalHeaderInfoText}>Never backed up</Text>
         </View>
         <Image
-          style={styles.cardIconImage}
+          style={BackupStyles.cardIconImage}
           source={props.getIconByStatus(selectedStatus)}
         />
       </View>
@@ -98,56 +99,6 @@ const Cloud = props => {
 };
 
 const styles = StyleSheet.create({
-  cardIconImage: {
-    width: 12,
-    height: 14,
-    resizeMode: "contain",
-    marginLeft: "auto"
-  },
-  modalContainer: {
-    height: "100%",
-    backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderTopWidth: 1,
-    borderColor: Colors.borderColor,
-    alignSelf: "center",
-    width: "100%"
-  },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingBottom: 15,
-    paddingTop: 10,
-    marginLeft: 20,
-    marginTop: 20,
-    marginRight: 20,
-    marginBottom: 15
-  },
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18, 812),
-    fontFamily: Fonts.FiraSansMedium
-  },
-  modalHeaderInfoText: {
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12, 812),
-    marginTop: 5
-  },
-  modalContentView: {
-    flex: 1,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center"
-  },
   listElements: {
     flexDirection: "row",
     marginLeft: 20,

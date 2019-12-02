@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ActivityIndicator, Image } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Image } from "react-native";
 import Fonts from "../../../common/Fonts";
+import BackupStyles from "./Styles";
 import Colors from "../../../common/Colors";
 import {
   widthPercentageToDP as wp,
@@ -17,23 +18,15 @@ const Contacts = props => {
     setContacts(list);
   }
 
-  function continueNProceed() {
-    // bottomSheet.current.snapTo(0);
-    // setTimeout(() => {
-    //   setSelectedType("cloud");
-    //   setSelectedStatus("success");
-    // }, 1000);
-  }
-
   return (
-    <View style={styles.modalContainer}>
-      <View style={styles.modalHeaderTitleView}>
+    <View style={BackupStyles.modalContainer}>
+      <View style={BackupStyles.modalHeaderTitleView}>
         <View style={{ marginTop: hp("2%") }}>
-          <Text style={styles.modalHeaderTitleText}>Trusted Contact</Text>
-          <Text style={styles.modalHeaderInfoText}>Never backed up</Text>
+          <Text style={BackupStyles.modalHeaderTitleText}>Trusted Contact</Text>
+          <Text style={BackupStyles.modalHeaderInfoText}>Never backed up</Text>
         </View>
         <Image
-          style={styles.cardIconImage}
+          style={BackupStyles.cardIconImage}
           source={props.getIconByStatus(selectedStatus)}
         />
       </View>
@@ -59,7 +52,7 @@ const Contacts = props => {
         </Text>
         <ContactList
           style={{}}
-          onPressContinue={() => continueNProceed()}
+          onPressContinue={() => props.continueNProceed()}
           onSelectContact={list => selectedContactsList(list)}
         />
       </View>
@@ -67,58 +60,6 @@ const Contacts = props => {
   );
 };
 
-const styles = StyleSheet.create({
-  cardIconImage: {
-    width: 12,
-    height: 14,
-    resizeMode: "contain",
-    marginLeft: "auto"
-  },
-  modalContainer: {
-    height: "100%",
-    backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderTopWidth: 1,
-    borderColor: Colors.borderColor,
-    alignSelf: "center",
-    width: "100%"
-  },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingBottom: 15,
-    paddingTop: 10,
-    marginLeft: 20,
-    marginTop: 20,
-    marginRight: 20,
-    marginBottom: 15
-  },
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18, 812),
-    fontFamily: Fonts.FiraSansMedium
-  },
-  modalHeaderInfoText: {
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12, 812),
-    marginTop: 5
-  },
-  modalContentView: {
-    flex: 1,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  loader: { height: hp("27%"), justifyContent: "center" }
-});
+const styles = StyleSheet.create({});
 
 export default Contacts;
