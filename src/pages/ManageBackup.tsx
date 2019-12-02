@@ -28,6 +28,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { initHealthCheck } from "../store/actions/sss";
 import S3Service from "../bitcoin/services/sss/S3Service";
 import SecondaryDevice from "../components/containers/backups/SecondaryDevice";
+import Contacts from "../components/containers/backups/Contacts";
 
 export default function ManageBackup(props) {
   const [bottomSheet, setBottomSheet] = useState(React.createRef());
@@ -154,6 +155,12 @@ export default function ManageBackup(props) {
   //   }
 
   function renderContent() {
+    switch (selectedType) {
+      case "secondaryDevice":
+        return <SecondaryDevice getIconByStatus={getIconByStatus} />;
+      case "contact":
+        return <Contacts getIconByStatus={getIconByStatus} />;
+    }
     return selectedType == "secondaryDevice" ? (
       <SecondaryDevice getIconByStatus={getIconByStatus} />
     ) : (
