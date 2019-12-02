@@ -3,6 +3,7 @@
     "prepare": "chmod +x setup.sh && ./setup.sh",
     "postinstall": "jetify",
     "android": "react-native run-android",
+    "android-release": "cd android && ./gradlew app:assembleRelease",
     "ios": "react-native run-ios",
     "web": "expo start --web",
     "start": "react-native start",
