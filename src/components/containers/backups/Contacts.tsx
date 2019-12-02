@@ -7,74 +7,62 @@ import {
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
-import BottomInfoBox from "../../BottomInfoBox";
-import QRCode from "react-native-qrcode-svg";
-import CopyThisText from "../../CopyThisText";
-import { useDispatch, useSelector } from "react-redux";
-import { uploadEncMShare } from "../../../store/actions/sss";
+import ContactList from "../../ContactList";
 
-const SecondaryDevice = props => {
+const Contacts = props => {
   const [selectedStatus, setSelectedStatus] = useState("error"); // for preserving health of this entity
-  const [secondaryQR, setSecondaryQR] = useState("");
-  const { SHARES_TRANSFER_DETAILS } = useSelector(
-    state => state.storage.database.DECENTRALIZED_BACKUP
-  );
-  const { loading } = useSelector(state => state.sss);
+  const [contacts, setContacts] = useState([]);
 
-  SHARES_TRANSFER_DETAILS[0] && !secondaryQR
-    ? setSecondaryQR(
-        JSON.stringify({
-          ...SHARES_TRANSFER_DETAILS[0],
-          type: "secondaryDeviceQR"
-        })
-      )
-    : null;
-  const dispatch = useDispatch();
+  function selectedContactsList(list) {
+    setContacts(list);
+  }
 
-  useEffect(() => {
-    if (!secondaryQR) {
-      dispatch(uploadEncMShare(0));
-    }
-  }, []);
+  function continueNProceed() {
+    // bottomSheet.current.snapTo(0);
+    // setTimeout(() => {
+    //   setSelectedType("cloud");
+    //   setSelectedStatus("success");
+    // }, 1000);
+  }
 
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
         <View style={{ marginTop: hp("2%") }}>
-          <Text style={styles.modalHeaderTitleText}>Secondary Device</Text>
-          <Text style={styles.modalHeaderInfoText}>
-            Last backup{" "}
-            <Text
-              style={{
-                fontFamily: Fonts.FiraSansMediumItalic,
-                fontWeight: "bold"
-              }}
-            >
-              {"3 months ago"}
-            </Text>
-          </Text>
+          <Text style={styles.modalHeaderTitleText}>Trusted Contact</Text>
+          <Text style={styles.modalHeaderInfoText}>Never backed up</Text>
         </View>
         <Image
           style={styles.cardIconImage}
           source={props.getIconByStatus(selectedStatus)}
         />
       </View>
-      <View style={styles.modalContentView}>
-        {loading.uploadMetaShare || !secondaryQR ? (
-          <View style={styles.loader}>
-            <ActivityIndicator size="large" />
-          </View>
-        ) : (
-          <QRCode value={secondaryQR} size={hp("27%")} />
-        )}
-        {secondaryQR ? <CopyThisText text={secondaryQR} /> : null}
+      <View style={{ flex: 1 }}>
+        <Text
+          style={{
+            marginLeft: 30,
+            color: Colors.textColorGrey,
+            fontFamily: Fonts.FiraSansRegular,
+            fontSize: RFValue(12, 812),
+            marginTop: 5
+          }}
+        >
+          Select contact to{" "}
+          <Text
+            style={{
+              fontFamily: Fonts.FiraSansMediumItalic,
+              fontWeight: "bold"
+            }}
+          >
+            send recovery secret
+          </Text>
+        </Text>
+        <ContactList
+          style={{}}
+          onPressContinue={() => continueNProceed()}
+          onSelectContact={list => selectedContactsList(list)}
+        />
       </View>
-      <BottomInfoBox
-        title={"Note"}
-        infoText={
-          "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna"
-        }
-      />
     </View>
   );
 };
@@ -133,4 +121,4 @@ const styles = StyleSheet.create({
   loader: { height: hp("27%"), justifyContent: "center" }
 });
 
-export default SecondaryDevice;
+export default Contacts;
