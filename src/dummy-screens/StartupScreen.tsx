@@ -6,6 +6,8 @@ import {
   Button,
   ActivityIndicator,
   TextInput,
+  Platform,
+  Linking,
   Alert
 } from "react-native";
 
@@ -47,6 +49,24 @@ const StartupScreen = props => {
       setHasPin(true);
     }
   };
+
+  const handleDeepLink = event => {
+    Alert.alert("DeepLink Detected", event.url);
+  };
+
+  useEffect(() => {
+    Linking.getInitialURL()
+      .then(url => {
+        if (url) {
+          Alert.alert("Initializer URL", url);
+        }
+      })
+      .catch(err => Alert.alert("An err occured", err));
+
+    console.log("Adding event listener");
+    Linking.addEventListener("url", handleDeepLink);
+    // return Linking.removeEventListener("url", handleDeepLink);
+  }, []);
 
   useEffect(() => {
     dispatch(initializeDB());
