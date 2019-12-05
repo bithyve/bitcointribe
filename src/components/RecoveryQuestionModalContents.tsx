@@ -30,7 +30,7 @@ export default function RecoveryQuestionModalContents(props) {
     ]);
     
     return (<View style={{ ...styles.modalContentContainer, height: '100%' }}>
-        <View style={{ height: '100%' }}>
+        <View >
             <View style={{ flexDirection: 'row', padding: wp('7%') }}>
                 <View style={{ flex: 3, justifyContent: 'center' }}>
                     <Text style={styles.modalTitleText}>Enter Security Question{"\n"}and Answer</Text>
