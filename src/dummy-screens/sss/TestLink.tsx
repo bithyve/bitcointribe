@@ -5,12 +5,13 @@ import {
   PermissionsAndroid,
   Platform,
   Alert,
-  Share,
   Button,
   View
 } from "react-native";
 import * as ExpoContacts from "expo-contacts";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
+import Share from "react-native-share";
+import { text, email } from "react-native-communications";
 
 async function requestContactsPermission() {
   try {
@@ -43,13 +44,34 @@ const TestLink = props => {
     }
     ExpoContacts.getContactsAsync().then(({ data }) => {
       if (!data.length) Alert.alert("No contacts found!");
-      setContactData([data[0]]); // shred for testing
+      setContactData([data[0]]);
     });
   };
 
   useEffect(() => {
     getContactsAsync();
   }, []);
+
+  const onShare = async mode => {
+    if (mode === "text") {
+      selectedContact.phoneNumbers
+        ? text(
+            selectedContact.phoneNumbers[0].number,
+            "This is deep/universal link!"
+          )
+        : Alert.alert("Following contact has no associated number");
+    } else if (mode === "email") {
+      selectedContact.emails
+        ? email(
+            selectedContact.emails[0].email,
+            null,
+            null,
+            "Guardian request",
+            "This is deep/universal link!"
+          )
+        : Alert.alert("Following contact has no associated email");
+    }
+  };
 
   return (
     <ScrollView
@@ -67,7 +89,8 @@ const TestLink = props => {
       })}
       {selectedContact ? (
         <View style={{ marginTop: 10 }}>
-          <Button title="Share DL" onPress={() => {}} />
+          <Button title="Share via Text" onPress={() => onShare("text")} />
+          <Button title="Share via Email" onPress={() => onShare("email")} />
         </View>
       ) : null}
     </ScrollView>
