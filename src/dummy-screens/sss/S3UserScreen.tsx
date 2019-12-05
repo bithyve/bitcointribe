@@ -130,6 +130,10 @@ const S3UserScreen = props => {
         />
       </View>
       <Button
+        title="Send link"
+        onPress={() => props.navigation.navigate("TestLink")}
+      />
+      <Button
         title="Recovery"
         onPress={() => props.navigation.navigate("Recovery")}
       />
