@@ -63,7 +63,6 @@ const StartupScreen = props => {
       })
       .catch(err => Alert.alert("An err occured", err));
 
-    console.log("Adding event listener");
     Linking.addEventListener("url", handleDeepLink);
     // return Linking.removeEventListener("url", handleDeepLink);
   }, []);
