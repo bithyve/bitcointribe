@@ -41,7 +41,7 @@ export default function Login(props) {
   }
 
   const dispatch = useDispatch();
-  const { isAuthenticated, authenticationFailed, loading } = useSelector(
+  const { isAuthenticated, authenticationFailed } = useSelector(
     state => state.setupAndAuth
   );
 

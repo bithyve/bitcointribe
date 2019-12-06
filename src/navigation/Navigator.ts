@@ -14,19 +14,6 @@ import RestoreWalletUsingDocuments from "../pages/RestoreWalletUsingDocuments";
 import RestoreWalletByContacts from "../pages/RestoreWalletByContacts";
 import ManageBackup from "../pages/ManageBackup";
 
-const HomeNavigator = createStackNavigator(
-  {
-    Home,
-    ManageBackup
-  },
-  {
-    headerLayoutPreset: "center",
-    defaultNavigationOptions: ({ navigation }) => ({
-      header: null
-    })
-  }
-);
-
 const SetupNavigator = createStackNavigator(
   {
     Launch,
@@ -42,6 +29,19 @@ const SetupNavigator = createStackNavigator(
   },
   {
     initialRouteName: "Launch",
+    headerLayoutPreset: "center",
+    defaultNavigationOptions: ({ navigation }) => ({
+      header: null
+    })
+  }
+);
+
+const HomeNavigator = createStackNavigator(
+  {
+    Home,
+    ManageBackup
+  },
+  {
     headerLayoutPreset: "center",
     defaultNavigationOptions: ({ navigation }) => ({
       header: null
