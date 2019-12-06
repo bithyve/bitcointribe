@@ -39,6 +39,8 @@ import SmallHeaderModal from "../components/SmallHeaderModal";
 import AddressBookContents from "../components/AddressBookContents";
 import CustodianRequestAcceptModalContents from "../components/CustodianRequestAcceptModalContents";
 import HomePageShield from "../components/HomePageShield";
+import { AppState } from "react-native";
+import AsyncStorage from "@react-native-community/async-storage";
 
 export default function Home(props) {
   const [tabBarZIndex, setTabBarZIndex] = useState(999);
@@ -761,8 +763,16 @@ export default function Home(props) {
     );
   };
 
-  const database: Database = useSelector(state => state.storage.database);
+  const database = useSelector(state => state.storage.database);
   const walletName = database ? database.WALLET_SETUP.walletName : "";
+
+  const handleAppStateChange = nextAppState => {
+    if (nextAppState === "active") props.navigation.navigate("ReLogin");
+  };
+
+  useEffect(() => {
+    AppState.addEventListener("change", handleAppStateChange);
+  }, []);
 
   return (
     <ImageBackground

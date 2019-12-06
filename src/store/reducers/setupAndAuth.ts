@@ -2,7 +2,8 @@ import {
   CREDS_STORED,
   CREDS_AUTHENTICATED,
   SETUP_INITIALIZED,
-  SETUP_LOADING
+  SETUP_LOADING,
+  RE_LOGIN
 } from "../actions/setupAndAuth";
 
 const initialState: {
@@ -10,6 +11,7 @@ const initialState: {
   hasCreds: Boolean;
   isAuthenticated: Boolean;
   authenticationFailed: Boolean;
+  reLogin: Boolean;
   loading: {
     initializing: Boolean;
     storingCreds: Boolean;
@@ -20,6 +22,7 @@ const initialState: {
   hasCreds: false,
   isAuthenticated: false,
   authenticationFailed: false,
+  reLogin: false,
   loading: {
     initializing: false,
     storingCreds: false,
@@ -73,6 +76,19 @@ export default (state = initialState, action) => {
           [action.payload.beingLoaded]: !state.loading[
             action.payload.beingLoaded
           ]
+        }
+      };
+
+    case RE_LOGIN:
+      return {
+        ...state,
+        reLogin: action.payload.loggedIn,
+        authenticationFailed: action.payload.reset
+          ? false
+          : !action.payload.loggedIn,
+        loading: {
+          ...state.loading,
+          authenticating: false
         }
       };
   }
