@@ -6837,6 +6837,11 @@ react-native-os@^1.0.1:
   resolved "https://registry.yarnpkg.com/react-native-os/-/react-native-os-1.2.5.tgz#4b10b010b8734bb300e8c0017f01bc67cad98e7a"
   integrity sha512-cueg5nhzqA9vGwRXzX5/f/95JdhWjy7pNf9r5XW9YEfVf0C36CHzz5LNLrZQqJukmCWoeOEBDmtvllfpXVIpcA==
 
+react-native-progress-circle@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-progress-circle/-/react-native-progress-circle-2.1.0.tgz#62bdf31c76962d10c5c14446b61ff7d05cf0d0ec"
+  integrity sha512-VP0s92bgbTMQy4hQzPU4LlGyFj3z5u7i1HYFG8/yzXXfGkX1cxKS4xOlE+OTaObWC99w7Bodi3h8R7En2nQPYw==
+
 react-native-qrcode-svg@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/react-native-qrcode-svg/-/react-native-qrcode-svg-6.0.1.tgz#e5609069532d5f0c22a673a74c0eda2d04ce46ec"
