@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
-import { View, StyleSheet, StatusBar } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { View, StyleSheet, StatusBar, AppState } from "react-native";
+import { useDispatch } from "react-redux";
 import Video from "react-native-video";
 import Colors from "../common/Colors";
 
 import { initializeDB } from "../store/actions/storage";
 import AsyncStorage from "@react-native-community/async-storage";
+import Login from "./Login";
 
 export default function Launch(props) {
   const dispatch = useDispatch();
