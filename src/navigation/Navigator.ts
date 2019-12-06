@@ -40,7 +40,12 @@ const SetupNavigator = createStackNavigator(
 const HomeNavigator = createStackNavigator(
   {
     Home,
-    ReLogin,
+    ReLogin: {
+      screen: ReLogin,
+      navigationOptions: {
+        gesturesEnabled: false
+      }
+    },
     ManageBackup
   },
   {
