@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { View, StyleSheet, StatusBar } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { View, StyleSheet, StatusBar, AppState } from "react-native";
+import { useDispatch } from "react-redux";
 import Video from "react-native-video";
 import Colors from "../common/Colors";
 
@@ -10,6 +10,10 @@ import AsyncStorage from "@react-native-community/async-storage";
 export default function Launch(props) {
   const dispatch = useDispatch();
 
+  const handleAppStateChange = nextAppState => {
+    console.log({ nextAppState });
+  };
+
   useEffect(() => {
     dispatch(initializeDB());
     setTimeout(async () => {
@@ -17,6 +21,8 @@ export default function Launch(props) {
         props.navigation.replace("Login");
       else props.navigation.replace("PasscodeConfirm");
     }, 5000);
+
+    AppState.addEventListener("change", handleAppStateChange);
   }, []);
 
   return (
