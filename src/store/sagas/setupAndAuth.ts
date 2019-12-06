@@ -49,6 +49,8 @@ function* initSetupWorker({ payload }) {
 export const initSetupWatcher = createWatcher(initSetupWorker, INIT_SETUP);
 
 function* credentialsStorageWorker({ payload }) {
+  yield put(switchSetupLoader("storingCreds"));
+
   //hash the pin
   const hash = yield call(Cipher.hash, payload.passcode);
 
@@ -73,16 +75,20 @@ export const credentialStorageWatcher = createWatcher(
 );
 
 function* credentialsAuthWorker({ payload }) {
-  // hash the pin and fetch AES from secure store
+  yield put(switchSetupLoader("authenticating"));
 
-  const hash = yield call(Cipher.hash, payload.passcode);
-  const encryptedKey = yield call(SecureStore.fetch, hash);
-  const key = yield call(Cipher.decrypt, encryptedKey, hash);
-
-  if (!key) {
+  let key;
+  try {
+    const hash = yield call(Cipher.hash, payload.passcode);
+    const encryptedKey = yield call(SecureStore.fetch, hash);
+    key = yield call(Cipher.decrypt, encryptedKey, hash);
+  } catch (err) {
+    console.log({ err });
     yield put(credsAuthenticated(false));
     return;
   }
+
+  if (!key) throw new Error("Key missing");
   yield put(keyFetched(key));
   yield put(fetchFromDB());
   yield put(credsAuthenticated(true));
