@@ -40,7 +40,7 @@ import AddressBookContents from "../components/AddressBookContents";
 import CustodianRequestAcceptModalContents from "../components/CustodianRequestAcceptModalContents";
 import HomePageShield from "../components/HomePageShield";
 import { AppState } from "react-native";
-import AsyncStorage from "@react-native-community/async-storage";
+import NetInfo from "@react-native-community/netinfo";
 
 export default function Home(props) {
   const [tabBarZIndex, setTabBarZIndex] = useState(999);
@@ -267,12 +267,11 @@ export default function Home(props) {
   }
 
   useEffect(function() {
-    NoInternetBottomSheet.current.snapTo(0);
-    setTimeout(() => {
-      setTabBarZIndex(0);
-    }, 10);
-    CustodianRequestBottomSheet.current.snapTo(1);
-    bottomSheet.current.snapTo(1);
+    // setTimeout(() => {
+    //   setTabBarZIndex(0);
+    // }, 10);
+    // CustodianRequestBottomSheet.current.snapTo(1);
+    // bottomSheet.current.snapTo(1);
   }, []);
 
   function renderContent() {
@@ -772,6 +771,11 @@ export default function Home(props) {
 
   useEffect(() => {
     AppState.addEventListener("change", handleAppStateChange);
+
+    NetInfo.addEventListener(state => {
+      console.log("Connection type", state.type);
+      if (!state.isConnected) NoInternetBottomSheet.current.snapTo(1);
+    });
   }, []);
 
   return (
