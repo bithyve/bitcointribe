@@ -6,26 +6,14 @@ import Login from "../pages/Login";
 import PasscodeConfirm from "../pages/PasscodeConfirm";
 import RestoreAndReoverWallet from "../pages/RestoreAndReoverWallet";
 import RestoreSelectedContactsList from "../pages/RestoreSelectedContactsList";
-import Home from "../pages/Home";
 import NewWalletName from "../pages/NewWalletName";
 import NewWalletQuestion from "../pages/NewWalletQuestion";
 import RestoreWalletBySecondaryDevice from "../pages/RestoreWalletBySecondaryDevice";
 import RestoreWalletUsingDocuments from "../pages/RestoreWalletUsingDocuments";
 import RestoreWalletByContacts from "../pages/RestoreWalletByContacts";
+import Home from "../pages/Home";
+import ReLogin from "../pages/ReLogin";
 import ManageBackup from "../pages/ManageBackup";
-
-const HomeNavigator = createStackNavigator(
-  {
-    Home,
-    ManageBackup
-  },
-  {
-    headerLayoutPreset: "center",
-    defaultNavigationOptions: ({ navigation }) => ({
-      header: null
-    })
-  }
-);
 
 const SetupNavigator = createStackNavigator(
   {
@@ -42,6 +30,20 @@ const SetupNavigator = createStackNavigator(
   },
   {
     initialRouteName: "Launch",
+    headerLayoutPreset: "center",
+    defaultNavigationOptions: ({ navigation }) => ({
+      header: null
+    })
+  }
+);
+
+const HomeNavigator = createStackNavigator(
+  {
+    Home,
+    ReLogin,
+    ManageBackup
+  },
+  {
     headerLayoutPreset: "center",
     defaultNavigationOptions: ({ navigation }) => ({
       header: null

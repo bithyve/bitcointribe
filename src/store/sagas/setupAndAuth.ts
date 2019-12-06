@@ -11,7 +11,8 @@ import {
   credsStored,
   credsAuthenticated,
   setupInitialized,
-  switchSetupLoader
+  switchSetupLoader,
+  switchReLogin
 } from "../actions/setupAndAuth";
 import { insertIntoDB, keyFetched, fetchFromDB } from "../actions/storage";
 import { Database } from "../../common/interfaces/Interfaces";
@@ -75,6 +76,7 @@ export const credentialStorageWatcher = createWatcher(
 );
 
 function* credentialsAuthWorker({ payload }) {
+  console.log({ payload });
   yield put(switchSetupLoader("authenticating"));
 
   let key;
@@ -84,14 +86,19 @@ function* credentialsAuthWorker({ payload }) {
     key = yield call(Cipher.decrypt, encryptedKey, hash);
   } catch (err) {
     console.log({ err });
-    yield put(credsAuthenticated(false));
+    if (payload.reLogin) yield put(switchReLogin(false));
+    else yield put(credsAuthenticated(false));
     return;
   }
-
   if (!key) throw new Error("Key missing");
-  yield put(keyFetched(key));
-  yield put(fetchFromDB());
-  yield put(credsAuthenticated(true));
+
+  if (payload.reLogin) {
+    yield put(switchReLogin(true));
+  } else {
+    yield put(keyFetched(key));
+    yield put(fetchFromDB());
+    yield put(credsAuthenticated(true));
+  }
 }
 
 export const credentialsAuthWatcher = createWatcher(

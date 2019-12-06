@@ -10,7 +10,6 @@ import {
   ActivityIndicator,
   Alert
 } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
@@ -20,8 +19,8 @@ import {
 } from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { credsAuth } from "../store/actions/setupAndAuth";
-import AsyncStorage from "@react-native-community/async-storage";
+import { useDispatch, useSelector } from "react-redux";
+import { credsAuth, switchReLogin } from "../store/actions/setupAndAuth";
 
 export default function Login(props) {
   const [passcode, setPasscode] = useState("");
@@ -41,15 +40,14 @@ export default function Login(props) {
   }
 
   const dispatch = useDispatch();
-  const { isAuthenticated, authenticationFailed } = useSelector(
+  const { reLogin, authenticationFailed } = useSelector(
     state => state.setupAndAuth
   );
 
-  if (isAuthenticated)
-    AsyncStorage.getItem("walletExists").then(exists => {
-      if (exists) props.navigation.navigate("HomeNav");
-      else props.navigation.replace("RestoreAndReoverWallet");
-    });
+  if (reLogin) {
+    props.navigation.pop();
+    dispatch(switchReLogin(false, true));
+  }
 
   useEffect(() => {
     authenticationFailed
@@ -199,9 +197,7 @@ export default function Login(props) {
             <View>
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
-                onPress={() => {
-                  dispatch(credsAuth(passcode));
-                }}
+                onPress={() => dispatch(credsAuth(passcode, true))}
                 style={{
                   ...styles.proceedButtonView,
                   backgroundColor:
