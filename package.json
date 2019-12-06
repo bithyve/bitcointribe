@@ -54,6 +54,7 @@
     "react-native-html-to-pdf": "^0.8.0",
     "react-native-level-fs": "^3.0.0",
     "react-native-os": "^1.0.1",
+    "react-native-progress-circle": "^2.1.0",
     "react-native-qrcode-svg": "^6.0.1",
     "react-native-randombytes": "^3.0.0",
     "react-native-reanimated": "~1.2.0",

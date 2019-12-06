@@ -6,8 +6,11 @@ import {
   SafeAreaView,
   TouchableWithoutFeedback,
   TouchableOpacity,
-  StatusBar
+  StatusBar,
+  ActivityIndicator,
+  Alert
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
@@ -17,73 +20,53 @@ import {
 } from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { useDispatch, useSelector } from "react-redux";
-import { storeCreds } from "../store/actions/setupAndAuth";
+import { credsAuth } from "../store/actions/setupAndAuth";
+import AsyncStorage from "@react-native-community/async-storage";
 
-export default function PasscodeConfirm(props) {
+export default function Login(props) {
   const [passcode, setPasscode] = useState("");
-  const [confirmPasscode, setConfirmPasscode] = useState("");
   const [passcodeFlag, setPasscodeFlag] = useState(true);
-  const [confirmPasscodeFlag, setConfirmPasscodeFlag] = useState(0);
 
   function onPressNumber(text) {
     let tmpPasscode = passcode;
-    let tmpConfirmPasscode = confirmPasscode;
-    if (passcodeFlag) {
-      if (passcode.length < 4) {
-        if (text != "x") {
-          tmpPasscode += text;
-          setPasscode(tmpPasscode);
-        }
+    if (passcode.length < 4) {
+      if (text != "x") {
+        tmpPasscode += text;
+        setPasscode(tmpPasscode);
       }
-      if (passcode && text == "x") {
-        setPasscode(passcode.slice(0, -1));
-      }
-    } else if (confirmPasscodeFlag) {
-      if (confirmPasscode.length < 4) {
-        if (text != "x") {
-          tmpConfirmPasscode += text;
-          setConfirmPasscode(tmpConfirmPasscode);
-        }
-      }
-      if (confirmPasscode && text == "x") {
-        setConfirmPasscode(confirmPasscode.slice(0, -1));
-      }
+    }
+    if (passcode && text == "x") {
+      setPasscode(passcode.slice(0, -1));
     }
   }
 
-  useEffect(() => {
-    if (confirmPasscode.length == 4 && passcode.length == 4) {
-      setPasscodeFlag(false);
-      setConfirmPasscodeFlag(2);
-    } else if (passcode.length == 4 && confirmPasscodeFlag != 2) {
-      setPasscodeFlag(false);
-      setConfirmPasscodeFlag(1);
-    } else if (
-      !confirmPasscode &&
-      passcode.length == 4 &&
-      confirmPasscodeFlag == 2
-    ) {
-      setPasscodeFlag(true);
-      setConfirmPasscodeFlag(0);
-    }
-  }, [passcode, confirmPasscode]);
-
   const dispatch = useDispatch();
-  const { hasCreds } = useSelector(state => state.setupAndAuth);
-  if (hasCreds) props.navigation.replace("RestoreAndReoverWallet");
+  const { isAuthenticated, authenticationFailed, loading } = useSelector(
+    state => state.setupAndAuth
+  );
+
+  if (isAuthenticated)
+    AsyncStorage.getItem("walletExists").then(exists => {
+      if (exists) props.navigation.navigate("HomeNav");
+      else props.navigation.replace("RestoreAndReoverWallet");
+    });
+
+  useEffect(() => {
+    authenticationFailed
+      ? Alert.alert("Incorrect passcode", "Please try again!")
+      : null;
+  }, [authenticationFailed]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar />
       <View style={{ flex: 1 }}>
         <View style={{}}>
-          <Text style={styles.headerTitleText}>Hello!</Text>
+          <Text style={styles.headerTitleText}>Welcome Back!</Text>
           <View>
             <Text style={styles.headerInfoText}>
               Please enter a <Text style={styles.boldItalicText}>passcode</Text>
             </Text>
-
             <View>
               <View style={styles.passcodeTextInputView}>
                 <View
@@ -214,196 +197,15 @@ export default function PasscodeConfirm(props) {
           </View>
           {passcode.length == 4 ? (
             <View>
-              <Text style={styles.headerInfoText}>
-                Re-enter the <Text style={styles.boldItalicText}>passcode</Text>{" "}
-                to <Text style={styles.boldItalicText}>verify and login.</Text>
-              </Text>
-              <View>
-                <View style={{ flexDirection: "row", marginTop: hp("1.5%") }}>
-                  <View
-                    style={[
-                      confirmPasscode.length == 0
-                        ? styles.textBoxActive
-                        : {
-                            ...styles.textBoxStyles,
-                            borderColor:
-                              passcode != confirmPasscode &&
-                              confirmPasscode.length == 4
-                                ? Colors.red
-                                : Colors.borderColor
-                          }
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        confirmPasscode.length == 0 && confirmPasscodeFlag == 1
-                          ? { ...styles.textFocused }
-                          : styles.textStyles
-                      ]}
-                    >
-                      {confirmPasscode.length >= 1 ? (
-                        <Text style={{ fontSize: RFValue(10, 812) }}>
-                          <FontAwesome
-                            size={8}
-                            name={"circle"}
-                            color={Colors.black}
-                          />
-                        </Text>
-                      ) : confirmPasscode.length == 0 &&
-                        confirmPasscodeFlag == 1 ? (
-                        <Text style={styles.passcodeTextInputText}>{"|"}</Text>
-                      ) : (
-                        ""
-                      )}
-                    </Text>
-                  </View>
-                  <View
-                    style={[
-                      confirmPasscode.length == 1
-                        ? styles.textBoxActive
-                        : {
-                            ...styles.textBoxStyles,
-                            borderColor:
-                              passcode != confirmPasscode &&
-                              confirmPasscode.length == 4
-                                ? Colors.red
-                                : Colors.borderColor
-                          }
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        confirmPasscode.length == 1
-                          ? {
-                              ...styles.textFocused,
-                              borderColor: Colors.borderColor
-                            }
-                          : styles.textStyles,
-                        {
-                          borderColor:
-                            passcode != confirmPasscode &&
-                            confirmPasscode.length == 4
-                              ? Colors.red
-                              : Colors.borderColor
-                        }
-                      ]}
-                    >
-                      {confirmPasscode.length >= 2 ? (
-                        <Text style={{ fontSize: RFValue(10, 812) }}>
-                          <FontAwesome
-                            size={8}
-                            name={"circle"}
-                            color={Colors.black}
-                          />
-                        </Text>
-                      ) : confirmPasscode.length == 1 ? (
-                        <Text style={styles.passcodeTextInputText}>{"|"}</Text>
-                      ) : (
-                        ""
-                      )}
-                    </Text>
-                  </View>
-                  <View
-                    style={[
-                      confirmPasscode.length == 2
-                        ? styles.textBoxActive
-                        : {
-                            ...styles.textBoxStyles,
-                            borderColor:
-                              passcode != confirmPasscode &&
-                              confirmPasscode.length == 4
-                                ? Colors.red
-                                : Colors.borderColor
-                          }
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        confirmPasscode.length == 2
-                          ? {
-                              ...styles.textFocused,
-                              borderColor: Colors.borderColor
-                            }
-                          : styles.textStyles,
-                        {
-                          borderColor:
-                            passcode != confirmPasscode &&
-                            confirmPasscode.length == 4
-                              ? Colors.red
-                              : Colors.borderColor
-                        }
-                      ]}
-                    >
-                      {confirmPasscode.length >= 3 ? (
-                        <Text style={{ fontSize: RFValue(10, 812) }}>
-                          <FontAwesome
-                            size={8}
-                            name={"circle"}
-                            color={Colors.black}
-                          />
-                        </Text>
-                      ) : confirmPasscode.length == 2 ? (
-                        <Text style={styles.passcodeTextInputText}>{"|"}</Text>
-                      ) : (
-                        ""
-                      )}
-                    </Text>
-                  </View>
-                  <View
-                    style={[
-                      confirmPasscode.length == 3
-                        ? styles.textBoxActive
-                        : {
-                            ...styles.textBoxStyles,
-                            borderColor:
-                              passcode != confirmPasscode &&
-                              confirmPasscode.length == 4
-                                ? Colors.red
-                                : Colors.borderColor
-                          }
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        confirmPasscode.length == 3
-                          ? {
-                              ...styles.textFocused,
-                              borderColor: Colors.borderColor
-                            }
-                          : styles.textStyles,
-                        {
-                          borderColor:
-                            passcode != confirmPasscode &&
-                            confirmPasscode.length == 4
-                              ? Colors.red
-                              : Colors.borderColor
-                        }
-                      ]}
-                    >
-                      {confirmPasscode.length >= 4 ? (
-                        <Text style={{ fontSize: RFValue(10, 812) }}>
-                          <FontAwesome
-                            size={8}
-                            name={"circle"}
-                            color={Colors.black}
-                          />
-                        </Text>
-                      ) : confirmPasscode.length == 3 ? (
-                        <Text style={styles.passcodeTextInputText}>{"|"}</Text>
-                      ) : (
-                        ""
-                      )}
-                    </Text>
-                  </View>
-                </View>
-              </View>
               <TouchableOpacity
-                disabled={passcode == confirmPasscode ? false : true}
-                onPress={() => dispatch(storeCreds(passcode))}
+                disabled={passcode.length == 4 ? false : true}
+                onPress={() => {
+                  dispatch(credsAuth(passcode));
+                }}
                 style={{
                   ...styles.proceedButtonView,
                   backgroundColor:
-                    passcode == confirmPasscode ? Colors.blue : Colors.lightBlue
+                    passcode.length == 4 ? Colors.blue : Colors.lightBlue
                 }}
               >
                 <Text style={styles.proceedButtonText}>Proceed</Text>
@@ -411,6 +213,7 @@ export default function PasscodeConfirm(props) {
             </View>
           ) : null}
         </View>
+
         <View style={{ marginTop: "auto" }}>
           <View style={styles.keyPadRow}>
             <TouchableOpacity
