@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   StatusBar,
   ActivityIndicator,
-  Alert
+  Alert,
+  BackHandler
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Colors from "../common/Colors";
@@ -54,6 +55,17 @@ export default function Login(props) {
       ? Alert.alert("Incorrect passcode", "Please try again!")
       : null;
   }, [authenticationFailed]);
+
+  const hardwareBackHandler = () => {
+    return true;
+  }; // returning true disables the hardware back button
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", hardwareBackHandler);
+
+    return () =>
+      BackHandler.removeEventListener("hardwareBackPress", hardwareBackHandler);
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
