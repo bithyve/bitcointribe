@@ -766,15 +766,15 @@ export default function Home(props) {
   const walletName = database ? database.WALLET_SETUP.walletName : "";
 
   const handleAppStateChange = nextAppState => {
-    if (nextAppState === "active") props.navigation.navigate("ReLogin");
+    if (nextAppState === "background") props.navigation.navigate("ReLogin");
   };
 
   useEffect(() => {
     AppState.addEventListener("change", handleAppStateChange);
 
     NetInfo.addEventListener(state => {
-      console.log("Connection type", state.type);
       if (!state.isConnected) NoInternetBottomSheet.current.snapTo(1);
+      else if (state.isConnected) NoInternetBottomSheet.current.snapTo(0);
     });
   }, []);
 
