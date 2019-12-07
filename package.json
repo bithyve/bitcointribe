@@ -12,6 +12,7 @@
   "dependencies": {
     "@react-native-community/async-storage": "^1.6.2",
     "@react-native-community/blur": "^3.3.1",
+    "@react-native-community/netinfo": "3.2.1",
     "@tradle/react-native-http": "^2.0.0",
     "assert": "^1.1.1",
     "asyncstorage-down": "^4.2.0",
@@ -45,6 +46,7 @@
     "react-dom": "16.8.3",
     "react-native": "0.59.10",
     "react-native-cardview": "^2.0.5",
+    "react-native-communications": "^2.2.1",
     "react-native-config": "^0.11.7",
     "react-native-crypto": "^2.1.0",
     "react-native-device-info": "^5.3.0",
@@ -53,6 +55,7 @@
     "react-native-html-to-pdf": "^0.8.0",
     "react-native-level-fs": "^3.0.0",
     "react-native-os": "^1.0.1",
+    "react-native-progress-circle": "^2.1.0",
     "react-native-qrcode-svg": "^6.0.1",
     "react-native-randombytes": "^3.0.0",
     "react-native-reanimated": "~1.2.0",
