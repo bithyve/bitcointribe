@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Image, Platform } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Platform,
+  TouchableOpacity
+} from "react-native";
 import Fonts from "../../../common/Fonts";
 import BackupStyles from "./Styles";
 import Colors from "../../../common/Colors";
@@ -14,8 +21,7 @@ import { useDispatch, useSelector } from "react-redux";
 import CommunicationModeModalContents from "../../CommunicationModeModalContents";
 import DeviceInfo from "react-native-device-info";
 import BottomSheet from "reanimated-bottom-sheet";
-import AsyncStorage from "@react-native-community/async-storage";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { textWithoutEncoding, email } from "react-native-communications";
 
 const Contacts = props => {
   const [selectedStatus, setSelectedStatus] = useState("error"); // for preserving health of this entity
@@ -30,6 +36,26 @@ const Contacts = props => {
 
   const continueNProceed = async () => {
     communicationModeBottomSheet.current.snapTo(1);
+  };
+
+  const communicate = async selectedContactMode => {
+    const deepLink = "https://prime-sign-230407.appspot.com/something";
+    switch (selectedContactMode.type) {
+      case "number":
+        textWithoutEncoding(selectedContactMode.info, deepLink);
+        break;
+
+      case "email":
+        console.log({ selectedContactMode });
+        email(
+          [selectedContactMode.info],
+          null,
+          null,
+          "Guardian request",
+          deepLink
+        );
+        break;
+    }
   };
 
   function requestHeader() {
@@ -52,9 +78,7 @@ const Contacts = props => {
   function renderCommunicationModeContent() {
     return (
       <CommunicationModeModalContents
-        onPressProceed={selectedContactMode => {
-          console.log(selectedContactMode);
-        }}
+        onPressProceed={communicate}
         contact={contacts[0]}
       />
     );
