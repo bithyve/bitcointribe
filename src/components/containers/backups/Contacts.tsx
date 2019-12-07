@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, Platform } from "react-native";
 import Fonts from "../../../common/Fonts";
 import BackupStyles from "./Styles";
 import Colors from "../../../common/Colors";
@@ -9,13 +9,61 @@ import {
 } from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
 import ContactList from "../../ContactList";
+import { uploadEncMShare } from "../../../store/actions/sss";
+import { useDispatch, useSelector } from "react-redux";
+import CommunicationModeModalContents from "../../CommunicationModeModalContents";
+import DeviceInfo from "react-native-device-info";
+import BottomSheet from "reanimated-bottom-sheet";
+import AsyncStorage from "@react-native-community/async-storage";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const Contacts = props => {
   const [selectedStatus, setSelectedStatus] = useState("error"); // for preserving health of this entity
   const [contacts, setContacts] = useState([]);
+  const [communicationModeBottomSheet, setCommunicationMode] = useState(
+    React.createRef()
+  );
 
   function selectedContactsList(list) {
     setContacts(list);
+  }
+
+  const continueNProceed = async () => {
+    communicationModeBottomSheet.current.snapTo(1);
+  };
+
+  function requestHeader() {
+    return (
+      <TouchableOpacity
+        activeOpacity={10}
+        onPress={() => closeModal()}
+        style={{ ...styles.modalHeaderContainer }}
+      >
+        <View style={styles.modalHeaderHandle} />
+      </TouchableOpacity>
+    );
+  }
+
+  function closeModal() {
+    communicationModeBottomSheet.current.snapTo(0);
+    return;
+  }
+
+  function renderCommunicationModeContent() {
+    return <CommunicationModeModalContents onPressProceed={() => {}} />;
+  }
+  const dispatch = useDispatch();
+
+  const { SHARES_TRANSFER_DETAILS } = useSelector(
+    state => state.storage.database.DECENTRALIZED_BACKUP
+  );
+  const { loading } = useSelector(state => state.sss);
+  loading.uploadMetaShare ? console.log("Uploading metaShare") : null;
+
+  function contactHandler() {
+    console.log({ contacts });
+    if (contacts[0] && !SHARES_TRANSFER_DETAILS[1])
+      dispatch(uploadEncMShare(1));
   }
 
   return (
@@ -52,14 +100,36 @@ const Contacts = props => {
         </Text>
         <ContactList
           style={{}}
-          onPressContinue={() => props.continueNProceed()}
-          onSelectContact={list => selectedContactsList(list)}
+          onPressContinue={continueNProceed}
+          onSelectContact={list => setContacts(list)}
         />
       </View>
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={communicationModeBottomSheet}
+        snapPoints={[
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? 0 : 0,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("65%") : hp("75%")
+        ]}
+        renderContent={renderCommunicationModeContent}
+        renderHeader={requestHeader}
+      />
     </View>
   );
 };
 
-const styles = StyleSheet.create({});
-
+const styles = StyleSheet.create({
+  modalHeaderContainer: {
+    paddingTop: 20
+  },
+  modalHeaderHandle: {
+    width: 30,
+    height: 5,
+    backgroundColor: Colors.borderColor,
+    borderRadius: 10,
+    alignSelf: "center",
+    marginTop: 7,
+    marginBottom: 7
+  }
+});
 export default Contacts;
