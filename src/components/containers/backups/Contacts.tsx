@@ -25,7 +25,7 @@ const Contacts = props => {
   );
 
   function selectedContactsList(list) {
-    setContacts(list);
+    if (list.length > 0) setContacts([...list]);
   }
 
   const continueNProceed = async () => {
@@ -50,20 +50,14 @@ const Contacts = props => {
   }
 
   function renderCommunicationModeContent() {
-    return <CommunicationModeModalContents onPressProceed={() => {}} />;
-  }
-  const dispatch = useDispatch();
-
-  const { SHARES_TRANSFER_DETAILS } = useSelector(
-    state => state.storage.database.DECENTRALIZED_BACKUP
-  );
-  const { loading } = useSelector(state => state.sss);
-  loading.uploadMetaShare ? console.log("Uploading metaShare") : null;
-
-  function contactHandler() {
-    console.log({ contacts });
-    if (contacts[0] && !SHARES_TRANSFER_DETAILS[1])
-      dispatch(uploadEncMShare(1));
+    return (
+      <CommunicationModeModalContents
+        onPressProceed={selectedContactMode => {
+          console.log(selectedContactMode);
+        }}
+        contact={contacts[0]}
+      />
+    );
   }
 
   return (
@@ -101,7 +95,7 @@ const Contacts = props => {
         <ContactList
           style={{}}
           onPressContinue={continueNProceed}
-          onSelectContact={list => setContacts(list)}
+          onSelectContact={selectedContactsList}
         />
       </View>
       <BottomSheet
