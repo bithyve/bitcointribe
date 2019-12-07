@@ -30,7 +30,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -55,7 +55,7 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow HEXA to access your microphone</string>
 	<key>NSMotionUsageDescription</key>
-	<string>Allow HEXA to access your device&apos;s accelerometer</string>
+	<string>Allow HEXA to access your device's accelerometer</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Give HEXA permission to save photos</string>
 	<key>NSPhotoLibraryUsageDescription</key>

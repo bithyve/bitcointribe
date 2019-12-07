@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import * as ExpoContacts from "expo-contacts";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
-import Share from "react-native-share";
 import { text, email } from "react-native-communications";
 
 async function requestContactsPermission() {
