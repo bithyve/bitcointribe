@@ -267,11 +267,11 @@ export default function Home(props) {
   }
 
   useEffect(function() {
-    // setTimeout(() => {
-    //   setTabBarZIndex(0);
-    // }, 10);
-    // CustodianRequestBottomSheet.current.snapTo(1);
-    // bottomSheet.current.snapTo(1);
+    setTimeout(() => {
+      setTabBarZIndex(0);
+    }, 10);
+    CustodianRequestBottomSheet.current.snapTo(1);
+    bottomSheet.current.snapTo(1);
   }, []);
 
   function renderContent() {
