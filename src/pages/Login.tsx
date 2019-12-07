@@ -4,10 +4,8 @@ import {
   Text,
   View,
   SafeAreaView,
-  TouchableWithoutFeedback,
   TouchableOpacity,
   StatusBar,
-  ActivityIndicator,
   Alert
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";

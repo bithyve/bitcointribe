@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  Image,
-  TouchableOpacity,
   Text,
   StyleSheet,
   ScrollView,
-  AsyncStorage,
+  TouchableOpacity,
   PermissionsAndroid,
   Platform,
   Alert
@@ -246,6 +244,7 @@ export default function ContactList(props) {
                 <TouchableOpacity
                   onPress={() => onContactSelect(index)}
                   style={styles.contactView}
+                  key={index}
                 >
                   <RadioButton
                     size={15}
