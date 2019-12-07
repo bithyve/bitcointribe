@@ -6,7 +6,8 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TextInput
+  TextInput,
+  ActivityIndicator
 } from "react-native";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
@@ -16,6 +17,7 @@ import {
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import RadioButton from "../components/RadioButton";
+import { useSelector } from "react-redux";
 
 export default function CommunicationModeModalContents(props) {
   const { contact } = props;
@@ -58,6 +60,8 @@ export default function CommunicationModeModalContents(props) {
       setSelectedContactMode(null);
     }
   };
+
+  const { loading } = useSelector(state => state.sss);
 
   return (
     <View style={{ ...styles.modalContentContainer, height: "100%" }}>
@@ -103,12 +107,17 @@ export default function CommunicationModeModalContents(props) {
         {selectedContactMode ? (
           <TouchableOpacity
             onPress={() => props.onPressProceed(selectedContactMode)}
+            disabled={loading.uploadMetaShare}
             style={{
               ...styles.proceedButtonView,
               backgroundColor: Colors.blue
             }}
           >
-            <Text style={styles.proceedButtonText}>Proceed</Text>
+            {loading.uploadMetaShare ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <Text style={styles.proceedButtonText}>Proceed</Text>
+            )}
           </TouchableOpacity>
         ) : null}
       </View>

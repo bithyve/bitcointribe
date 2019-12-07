@@ -5,7 +5,8 @@ import {
   StyleSheet,
   Image,
   Platform,
-  TouchableOpacity
+  TouchableOpacity,
+  Alert
 } from "react-native";
 import Fonts from "../../../common/Fonts";
 import BackupStyles from "./Styles";
@@ -34,12 +35,26 @@ const Contacts = props => {
     if (list.length > 0) setContacts([...list]);
   }
 
+  const dispatch = useDispatch();
+  const { SHARES_TRANSFER_DETAILS } = useSelector(
+    state => state.storage.database.DECENTRALIZED_BACKUP
+  );
+
   const continueNProceed = async () => {
+    if (!SHARES_TRANSFER_DETAILS[props.index])
+      dispatch(uploadEncMShare(props.index));
     communicationModeBottomSheet.current.snapTo(1);
   };
 
   const communicate = async selectedContactMode => {
-    const deepLink = "https://prime-sign-230407.appspot.com/something";
+    if (!SHARES_TRANSFER_DETAILS[props.index]) {
+      Alert.alert("Failed to share");
+      return;
+    }
+    const deepLink =
+      "https://prime-sign-230407.appspot.com/sss/ek/" +
+      SHARES_TRANSFER_DETAILS[props.index].ENCRYPTED_KEY;
+
     switch (selectedContactMode.type) {
       case "number":
         textWithoutEncoding(selectedContactMode.info, deepLink);
