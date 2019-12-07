@@ -47,15 +47,15 @@
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
-        <!-- Accepts URIs that begin with "https://hexawallet.io/-->
+        <!-- Accepts URIs that begin with "https://prime-sign-230407.appspot.com/-->
         <data android:scheme="https"
-              android:host="hexawallet.io"/>
+              android:host="prime-sign-230407.appspot.com"/>
         </intent-filter>
         <intent-filter android:label="Hexa">
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
-        <!-- Accepts URIs that begin with "hexa://dl -->
+        <!-- Accepts URIs that begin with "hexa" -->
         <data android:scheme="hexa"/>
         </intent-filter> 
       </activity>
