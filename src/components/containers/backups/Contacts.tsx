@@ -36,9 +36,10 @@ const Contacts = props => {
   }
 
   const dispatch = useDispatch();
-  const { SHARES_TRANSFER_DETAILS } = useSelector(
-    state => state.storage.database.DECENTRALIZED_BACKUP
+  const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
+    state => state.storage.database
   );
+  const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
 
   const continueNProceed = async () => {
     if (!SHARES_TRANSFER_DETAILS[props.index])
@@ -52,7 +53,7 @@ const Contacts = props => {
       return;
     }
     const deepLink =
-      "https://prime-sign-230407.appspot.com/sss/ek/" +
+      `https://prime-sign-230407.appspot.com/${WALLET_SETUP.walletName}/sss/ek/` +
       SHARES_TRANSFER_DETAILS[props.index].ENCRYPTED_KEY;
 
     switch (selectedContactMode.type) {

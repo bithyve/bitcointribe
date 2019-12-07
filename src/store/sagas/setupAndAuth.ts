@@ -76,7 +76,6 @@ export const credentialStorageWatcher = createWatcher(
 );
 
 function* credentialsAuthWorker({ payload }) {
-  console.log({ payload });
   yield put(switchSetupLoader("authenticating"));
 
   let key;
