@@ -16,7 +16,7 @@ export default function Launch(props) {
       if (await AsyncStorage.getItem("hasCreds"))
         props.navigation.replace("Login");
       else props.navigation.replace("PasscodeConfirm");
-    }, 0);
+    }, 5000);
   }, []);
 
   useEffect(() => {
