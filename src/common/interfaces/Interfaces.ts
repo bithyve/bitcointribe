@@ -16,7 +16,7 @@ export interface Database {
       ENC_DYNAMIC_NONPMDD?: EncDynamicNonPMDD;
     }[];
     SHARES_TRANSFER_DETAILS: {
-      [SHARE_ID: string]: { OTP: string; ENCRYPTED_KEY: string }; // change SHARE_ID to shareIndex
+      [SHARE_INDEX: string]: { OTP: string; ENCRYPTED_KEY: string };
     };
     UNDER_CUSTODY: {
       [TAG: string]: {

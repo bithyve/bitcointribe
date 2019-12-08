@@ -11,7 +11,9 @@ import {
   ImageBackground,
   Platform,
   ScrollView,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  Linking,
+  Alert
 } from "react-native";
 import { useSelector } from "react-redux";
 import CardView from "react-native-cardview";
@@ -265,14 +267,6 @@ export default function Home(props) {
       return require("../assets/images/icons/icon_test.png");
     }
   }
-
-  useEffect(function() {
-    // setTimeout(() => {
-    //   setTabBarZIndex(0);
-    // }, 10);
-    // CustodianRequestBottomSheet.current.snapTo(1);
-    // bottomSheet.current.snapTo(1);
-  }, []);
 
   function renderContent() {
     if (selected == "Transactions") {
@@ -574,9 +568,10 @@ export default function Home(props) {
   };
 
   const renderCustodianRequestModalContent = () => {
+    if (!custodyRequest) return <View></View>;
     return (
       <CustodianRequestModalContents
-        userName={"Arpan Jain"}
+        userName={custodyRequest.requester}
         onPressAcceptSecret={() => {
           setTimeout(() => {
             setTabBarZIndex(0);
@@ -596,21 +591,22 @@ export default function Home(props) {
   };
 
   const renderCustodianRequestOtpModalContent = () => {
+    if (!custodyRequest) return <View></View>;
     return (
       <CustodianRequestOtpModalContents
+        custodyRequest={custodyRequest}
         modalRef={CustodianRequestOtpBottomSheet}
-        onPressConfirm={() => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 10);
+        downloadStatus={success => {
+          setTabBarZIndex(0);
           CustodianRequestOtpBottomSheet.current.snapTo(0);
-          CustodianRequestAcceptBottomSheet.current.snapTo(1);
+          if (success) CustodianRequestAcceptBottomSheet.current.snapTo(1);
         }}
       />
     );
   };
 
   const renderCustodianRequestRejectedModalContent = () => {
+    if (!custodyRequest) return <View></View>;
     return (
       <CustodianRequestRejectedModalContents
         onPressViewThrustedContacts={() => {
@@ -619,15 +615,16 @@ export default function Home(props) {
           }, 10);
           CustodianRequestRejectedBottomSheet.current.snapTo(0);
         }}
-        userName={"Arpan Jain"}
+        userName={custodyRequest.requester}
       />
     );
   };
 
   const renderCustodianRequestAcceptModalContent = () => {
+    if (!custodyRequest) return <View></View>;
     return (
       <CustodianRequestAcceptModalContents
-        userName={"Arpan Jain"}
+        userName={custodyRequest.requester}
         onPressAssociateContacts={() => {}}
         onPressSkip={() => {
           setTimeout(() => {
@@ -766,7 +763,11 @@ export default function Home(props) {
   const walletName = database ? database.WALLET_SETUP.walletName : "";
 
   const handleAppStateChange = nextAppState => {
-    if (nextAppState === "background") props.navigation.navigate("ReLogin");
+    setTimeout(
+      () =>
+        nextAppState === "active" ? props.navigation.navigate("ReLogin") : null,
+      2
+    ); // producing a subtle delay to let deep link event listener make the first move
   };
 
   useEffect(() => {
@@ -777,6 +778,32 @@ export default function Home(props) {
       else if (state.isConnected) NoInternetBottomSheet.current.snapTo(0);
     });
   }, []);
+
+  const handleDeepLink = event => {
+    const splits = event.url.split("/");
+    const requester = splits[3];
+    if (splits[4] === "sss" && splits[5] === "ek") {
+      const custodyRequest = { requester, ek: splits[6] };
+      props.navigation.navigate("Home", { custodyRequest });
+    }
+  };
+
+  useEffect(() => {
+    Linking.addEventListener("url", handleDeepLink);
+
+    // return () => Linking.removeEventListener("url", handleDeepLink);
+  }, []);
+
+  const custodyRequest = props.navigation.getParam("custodyRequest");
+  useEffect(() => {
+    if (custodyRequest) {
+      setTimeout(() => {
+        setTabBarZIndex(0);
+      }, 10);
+      CustodianRequestBottomSheet.current.snapTo(1);
+      bottomSheet.current.snapTo(1);
+    }
+  }, [custodyRequest]);
 
   return (
     <ImageBackground

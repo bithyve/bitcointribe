@@ -6,7 +6,8 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TextInput
+  TextInput,
+  ActivityIndicator
 } from "react-native";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
@@ -16,22 +17,27 @@ import {
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import RadioButton from "../components/RadioButton";
+import { useSelector } from "react-redux";
 
 export default function CommunicationModeModalContents(props) {
   const { contact } = props;
   if (!contact) return <View></View>;
 
-  const communicationInfo = [...contact.phoneNumbers, ...contact.emails];
+  const communicationInfo = [];
+  if (contact.phoneNumbers) communicationInfo.push(...contact.phoneNumbers);
+  if (contact.emails) communicationInfo.push(...contact.emails);
 
   const [selectedContactMode, setSelectedContactMode] = useState();
   const [contactInfo, setContactInfo] = useState(
     communicationInfo.map(({ number, email }, index) => {
-      return {
-        id: index,
-        info: number || email,
-        isSelected: false,
-        type: number ? "number" : "email"
-      };
+      if (number || email) {
+        return {
+          id: index,
+          info: number || email,
+          isSelected: false,
+          type: number ? "number" : "email"
+        };
+      }
     })
   );
 
@@ -58,6 +64,8 @@ export default function CommunicationModeModalContents(props) {
       setSelectedContactMode(null);
     }
   };
+
+  const { loading } = useSelector(state => state.sss);
 
   return (
     <View style={{ ...styles.modalContentContainer, height: "100%" }}>
@@ -103,12 +111,17 @@ export default function CommunicationModeModalContents(props) {
         {selectedContactMode ? (
           <TouchableOpacity
             onPress={() => props.onPressProceed(selectedContactMode)}
+            disabled={loading.uploadMetaShare}
             style={{
               ...styles.proceedButtonView,
               backgroundColor: Colors.blue
             }}
           >
-            <Text style={styles.proceedButtonText}>Proceed</Text>
+            {loading.uploadMetaShare ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <Text style={styles.proceedButtonText}>Proceed</Text>
+            )}
           </TouchableOpacity>
         ) : null}
       </View>
