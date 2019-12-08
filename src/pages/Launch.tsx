@@ -19,10 +19,6 @@ export default function Launch(props) {
     }, 0);
   }, []);
 
-  const handleDeepLink = event => {
-    Alert.alert("DeepLink Detected", event.url);
-  };
-
   useEffect(() => {
     Linking.getInitialURL()
       .then(url => {
@@ -31,9 +27,6 @@ export default function Launch(props) {
         }
       })
       .catch(err => Alert.alert("An err occured", err));
-
-    Linking.addEventListener("url", handleDeepLink);
-    // return Linking.removeEventListener("url", handleDeepLink);
   }, []);
 
   return (
