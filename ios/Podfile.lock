@@ -108,7 +108,7 @@ PODS:
     - React/RCTBlob
   - RNCAsyncStorage (1.6.2):
     - React
-  - RNDeviceInfo (5.3.0):
+  - RNDeviceInfo (5.3.1):
     - React
   - RNGestureHandler (1.3.0):
     - React
@@ -325,7 +325,7 @@ SPEC CHECKSUMS:
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
   react-native-video: 8c49eca5a6087de968a05b340933b10e3b58169a
   RNCAsyncStorage: 60a80e72d95bf02a01cace55d3697d9724f0d77f
-  RNDeviceInfo: f245326b5b61b80db7e9cbc9de6c75688572a4e0
+  RNDeviceInfo: 6f20764111df002b4484f90cbe0a861be29bcc6c
   RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
   RNReanimated: 1b52415c4302f198cb581282a0166690bad62c43
   RNScreens: f28b48b8345f2f5f39ed6195518291515032a788

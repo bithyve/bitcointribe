@@ -7,7 +7,8 @@ import {
   StyleSheet,
   ScrollView,
   TextInput,
-  ActivityIndicator
+  ActivityIndicator,
+  Platform
 } from "react-native";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
@@ -18,10 +19,15 @@ import {
 } from "react-native-responsive-screen";
 import RadioButton from "../components/RadioButton";
 import { useSelector } from "react-redux";
+import { TouchableNativeFeedback } from "react-native-gesture-handler";
 
 export default function CommunicationModeModalContents(props) {
   const { contact } = props;
   if (!contact) return <View></View>;
+
+  let TouchableElement;
+  TouchableElement =
+    Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity;
 
   const communicationInfo = [];
   if (contact.phoneNumbers) communicationInfo.push(...contact.phoneNumbers);
@@ -91,7 +97,7 @@ export default function CommunicationModeModalContents(props) {
           <ScrollView>
             {contactInfo.map((item, index) => {
               return (
-                <TouchableOpacity
+                <TouchableElement
                   onPress={() => onContactSelect(index)}
                   style={styles.contactInfo}
                 >
@@ -103,13 +109,13 @@ export default function CommunicationModeModalContents(props) {
                     onpress={() => onContactSelect(index)}
                   />
                   <Text style={styles.contactInfoText}>{item.info}</Text>
-                </TouchableOpacity>
+                </TouchableElement>
               );
             })}
           </ScrollView>
         </View>
         {selectedContactMode ? (
-          <TouchableOpacity
+          <TouchableElement
             onPress={() => props.onPressProceed(selectedContactMode)}
             disabled={loading.uploadMetaShare}
             style={{
@@ -122,7 +128,7 @@ export default function CommunicationModeModalContents(props) {
             ) : (
               <Text style={styles.proceedButtonText}>Proceed</Text>
             )}
-          </TouchableOpacity>
+          </TouchableElement>
         ) : null}
       </View>
     </View>

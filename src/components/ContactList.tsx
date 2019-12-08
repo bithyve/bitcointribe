@@ -20,6 +20,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import RadioButton from "../components/RadioButton";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import * as ExpoContacts from "expo-contacts";
+import { TouchableNativeFeedback } from "react-native-gesture-handler";
 
 async function requestContactsPermission() {
   try {
@@ -40,6 +41,10 @@ async function requestContactsPermission() {
 }
 
 export default function ContactList(props) {
+  let TouchableElement;
+  TouchableElement =
+    Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity;
+
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [scrollViewRef, setScrollViewRef] = useState(React.createRef());
   const [radioOnOff, setRadioOnOff] = useState(false);
@@ -112,6 +117,20 @@ export default function ContactList(props) {
   //     name: "Shahaji Buchade",
   //     checked: false,
   //     id: 10,
+  //     communicationMode: [],
+  //     status: ""
+  //   },
+  //   {
+  //     name: "Shabnam Chitale",
+  //     checked: false,
+  //     id: 11,
+  //     communicationMode: [],
+  //     status: ""
+  //   },
+  //   {
+  //     name: "Shabnam Chitale",
+  //     checked: false,
+  //     id: 11,
   //     communicationMode: [],
   //     status: ""
   //   },
@@ -224,9 +243,9 @@ export default function ContactList(props) {
                 {value.name.split(" ")[1]}
               </Text>
             </Text>
-            <TouchableOpacity onPress={() => onCancel(value)}>
+            <TouchableElement onPress={() => onCancel(value)}>
               <AntDesign name="close" size={17} color={Colors.white} />
-            </TouchableOpacity>
+            </TouchableElement>
           </View>
         ))}
       </View>
@@ -241,7 +260,7 @@ export default function ContactList(props) {
                 selected = true;
               }
               return (
-                <TouchableOpacity
+                <TouchableElement
                   onPress={() => onContactSelect(index)}
                   style={styles.contactView}
                   key={index}
@@ -259,21 +278,21 @@ export default function ContactList(props) {
                       {value.name.split(" ")[1]}
                     </Text>
                   </Text>
-                </TouchableOpacity>
+                </TouchableElement>
               );
             })}
           </ScrollView>
         </View>
         <View style={styles.contactIndexView}>
-          <TouchableOpacity
+          <TouchableElement
             onPress={() => {
               scrollViewRef.current.scrollTo({ x: 60, y: 60, animated: true });
             }}
           >
             <Text style={styles.contactIndexText}>#</Text>
-          </TouchableOpacity>
+          </TouchableElement>
           {alphabetsList.map(value => (
-            <TouchableOpacity
+            <TouchableElement
               onPress={() => {
                 scrollViewRef.current.scrollTo({
                   x: 60,
@@ -283,17 +302,17 @@ export default function ContactList(props) {
               }}
             >
               <Text style={styles.contactIndexText}>{value}</Text>
-            </TouchableOpacity>
+            </TouchableElement>
           ))}
         </View>
       </View>
       {selectedContacts.length >= 1 && (
-        <TouchableOpacity
+        <TouchableElement
           onPress={() => props.onPressContinue()}
           style={styles.bottomButtonView}
         >
           <Text style={styles.buttonText}>Confirm & Proceed</Text>
-        </TouchableOpacity>
+        </TouchableElement>
       )}
     </View>
   );
