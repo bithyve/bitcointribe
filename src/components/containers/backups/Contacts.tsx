@@ -62,7 +62,6 @@ const Contacts = props => {
         break;
 
       case "email":
-        console.log({ selectedContactMode });
         email(
           [selectedContactMode.info],
           null,

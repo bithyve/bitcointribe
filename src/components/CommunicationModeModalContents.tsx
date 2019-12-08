@@ -6,7 +6,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TextInput,
   ActivityIndicator
 } from "react-native";
 import Colors from "../common/Colors";

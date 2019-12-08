@@ -766,7 +766,7 @@ export default function Home(props) {
     setTimeout(
       () =>
         nextAppState === "active" ? props.navigation.navigate("ReLogin") : null,
-      2
+      50
     ); // producing a subtle delay to let deep link event listener make the first move
   };
 
@@ -797,9 +797,7 @@ export default function Home(props) {
   const custodyRequest = props.navigation.getParam("custodyRequest");
   useEffect(() => {
     if (custodyRequest) {
-      setTimeout(() => {
-        setTabBarZIndex(0);
-      }, 10);
+      setTabBarZIndex(0);
       CustodianRequestBottomSheet.current.snapTo(1);
       bottomSheet.current.snapTo(1);
     }
@@ -891,7 +889,7 @@ export default function Home(props) {
                     return (
                       <TouchableOpacity
                         onPress={() => {
-                          alert("test");
+                          props.navigation.navigate("Accounts");
                         }}
                       >
                         <CardView cornerRadius={10} style={styles.card}>
