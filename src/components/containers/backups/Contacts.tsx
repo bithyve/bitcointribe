@@ -53,7 +53,7 @@ const Contacts = props => {
       return;
     }
     const deepLink =
-      `https://prime-sign-230407.appspot.com/${WALLET_SETUP.walletName}/sss/ek/` +
+      `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
       SHARES_TRANSFER_DETAILS[props.index].ENCRYPTED_KEY;
 
     switch (selectedContactMode.type) {
