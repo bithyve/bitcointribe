@@ -268,32 +268,6 @@ export default function Home(props) {
     }
   }
 
-  const handleDeepLink = event => {
-    const splits = event.url.split("/");
-    const requester = splits[3];
-    if (splits[4] === "sss" && splits[5] === "ek") {
-      const custodyRequest = { requester, ek: splits[6] };
-      props.navigation.navigate("Home", { custodyRequest });
-    }
-  };
-
-  useEffect(() => {
-    Linking.addEventListener("url", handleDeepLink);
-
-    // return () => Linking.removeEventListener("url", handleDeepLink);
-  }, []);
-
-  const custodyRequest = props.navigation.getParam("custodyRequest");
-  useEffect(() => {
-    if (custodyRequest) {
-      setTimeout(() => {
-        setTabBarZIndex(0);
-      }, 10);
-      CustodianRequestBottomSheet.current.snapTo(1);
-      bottomSheet.current.snapTo(1);
-    }
-  }, [custodyRequest]);
-
   function renderContent() {
     if (selected == "Transactions") {
       return (
@@ -623,18 +597,16 @@ export default function Home(props) {
         custodyRequest={custodyRequest}
         modalRef={CustodianRequestOtpBottomSheet}
         downloadStatus={success => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 10);
+          setTabBarZIndex(0);
           CustodianRequestOtpBottomSheet.current.snapTo(0);
           if (success) CustodianRequestAcceptBottomSheet.current.snapTo(1);
-          else CustodianRequestRejectedBottomSheet.current.snapTo(1);
         }}
       />
     );
   };
 
   const renderCustodianRequestRejectedModalContent = () => {
+    if (!custodyRequest) return <View></View>;
     return (
       <CustodianRequestRejectedModalContents
         onPressViewThrustedContacts={() => {
@@ -643,7 +615,7 @@ export default function Home(props) {
           }, 10);
           CustodianRequestRejectedBottomSheet.current.snapTo(0);
         }}
-        userName={"Arpan Jain"}
+        userName={custodyRequest.requester}
       />
     );
   };
@@ -791,17 +763,47 @@ export default function Home(props) {
   const walletName = database ? database.WALLET_SETUP.walletName : "";
 
   const handleAppStateChange = nextAppState => {
-    if (nextAppState === "background") props.navigation.navigate("ReLogin");
+    setTimeout(
+      () =>
+        nextAppState === "active" ? props.navigation.navigate("ReLogin") : null,
+      2
+    ); // producing a subtle delay to let deep link event listener make the first move
   };
 
-  // useEffect(() => {
-  //   AppState.addEventListener("change", handleAppStateChange);
+  useEffect(() => {
+    AppState.addEventListener("change", handleAppStateChange);
 
-  //   NetInfo.addEventListener(state => {
-  //     if (!state.isConnected) NoInternetBottomSheet.current.snapTo(1);
-  //     else if (state.isConnected) NoInternetBottomSheet.current.snapTo(0);
-  //   });
-  // }, []);
+    NetInfo.addEventListener(state => {
+      if (!state.isConnected) NoInternetBottomSheet.current.snapTo(1);
+      else if (state.isConnected) NoInternetBottomSheet.current.snapTo(0);
+    });
+  }, []);
+
+  const handleDeepLink = event => {
+    const splits = event.url.split("/");
+    const requester = splits[3];
+    if (splits[4] === "sss" && splits[5] === "ek") {
+      const custodyRequest = { requester, ek: splits[6] };
+      props.navigation.navigate("Home", { custodyRequest });
+    }
+  };
+
+  useEffect(() => {
+    Linking.addEventListener("url", handleDeepLink);
+
+    // return () => Linking.removeEventListener("url", handleDeepLink);
+  }, []);
+
+  const custodyRequest = props.navigation.getParam("custodyRequest");
+  useEffect(() => {
+    if (custodyRequest) {
+      setTimeout(() => {
+        setTabBarZIndex(0);
+      }, 10);
+      CustodianRequestBottomSheet.current.snapTo(1);
+      bottomSheet.current.snapTo(1);
+    }
+  }, [custodyRequest]);
 
   return (
     <ImageBackground

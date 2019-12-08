@@ -71,9 +71,9 @@ export default function CustodianRequestOtpModalContents(props) {
           <View style={styles.passcodeTextInputView}>
             <TextInput
               maxLength={1}
-              returnKeyType="done"
-              returnKeyLabel="Done"
-              keyboardType="number-pad"
+              //   returnKeyType="done"
+              //   returnKeyLabel="Done"
+              //   keyboardType="number-pad"
               ref={input => {
                 this.textInput = input;
               }}
@@ -105,9 +105,9 @@ export default function CustodianRequestOtpModalContents(props) {
 
             <TextInput
               maxLength={1}
-              returnKeyType="done"
-              returnKeyLabel="Done"
-              keyboardType="number-pad"
+              //   returnKeyType="done"
+              //   returnKeyLabel="Done"
+              //   keyboardType="number-pad"
               ref={input => {
                 this.textInput2 = input;
               }}
@@ -132,9 +132,9 @@ export default function CustodianRequestOtpModalContents(props) {
 
             <TextInput
               maxLength={1}
-              returnKeyType="done"
-              returnKeyLabel="Done"
-              keyboardType="number-pad"
+              //   returnKeyType="done"
+              //   returnKeyLabel="Done"
+              //   keyboardType="number-pad"
               ref={input => {
                 this.textInput3 = input;
               }}
@@ -159,9 +159,9 @@ export default function CustodianRequestOtpModalContents(props) {
 
             <TextInput
               maxLength={1}
-              returnKeyType="done"
-              returnKeyLabel="Done"
-              keyboardType="number-pad"
+              //   returnKeyType="done"
+              //   returnKeyLabel="Done"
+              //   keyboardType="number-pad"
               ref={input => {
                 this.textInput4 = input;
               }}
@@ -186,9 +186,9 @@ export default function CustodianRequestOtpModalContents(props) {
 
             <TextInput
               maxLength={1}
-              returnKeyType="done"
-              returnKeyLabel="Done"
-              keyboardType="number-pad"
+              //   returnKeyType="done"
+              //   returnKeyLabel="Done"
+              //   keyboardType="number-pad"
               ref={input => {
                 this.textInput5 = input;
               }}
@@ -212,9 +212,9 @@ export default function CustodianRequestOtpModalContents(props) {
             />
             <TextInput
               maxLength={1}
-              returnKeyType="done"
-              returnKeyLabel="Done"
-              keyboardType="number-pad"
+              //   returnKeyType="done"
+              //   returnKeyLabel="Done"
+              //   keyboardType="number-pad"
               ref={input => {
                 this.textInput6 = input;
               }}
