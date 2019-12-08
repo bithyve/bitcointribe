@@ -8,7 +8,6 @@ export default StyleSheet.create({
     headerContainer: {
         flexDirection: 'row',
         marginTop: 10,
-        justifyContent: 'center',
         alignItems: 'center',
         height: 54,
         backgroundColor: Colors.white,
@@ -16,9 +15,6 @@ export default StyleSheet.create({
         borderBottomWidth: 0.5,
     },
     headerLeftIconContainer: { 
-        position: 'absolute', 
-        left: 0, 
-        top: 0, 
         height: 54 
     },
     headerLeftIconInnerContainer:{

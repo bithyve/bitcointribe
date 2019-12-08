@@ -5,8 +5,7 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  FlatList,
-  Platform
+  FlatList
 } from "react-native";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
@@ -15,13 +14,8 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
-import { TouchableNativeFeedback } from "react-native-gesture-handler";
 
 export default function MoreHomePageTabContents(props) {
-  let TouchableElement;
-  TouchableElement =
-    Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity;
-
   const [addData, setAddData] = useState([
     {
       title: "Health of the App",
@@ -67,7 +61,7 @@ export default function MoreHomePageTabContents(props) {
               </View>
             )}
             renderItem={({ item }) => (
-              <TouchableElement
+              <TouchableOpacity
                 onPress={() => props.onPressElements(item)}
                 style={styles.addModalView}
               >
@@ -83,7 +77,7 @@ export default function MoreHomePageTabContents(props) {
                     <Text style={styles.addModalInfoText}>{item.info}</Text>
                   </View>
                 </View>
-              </TouchableElement>
+              </TouchableOpacity>
             )}
           />
         </View>

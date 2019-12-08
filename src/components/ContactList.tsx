@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
-import CommonStyles from "../common/Styles";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
@@ -20,7 +19,6 @@ import { RFValue } from "react-native-responsive-fontsize";
 import RadioButton from "../components/RadioButton";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import * as ExpoContacts from "expo-contacts";
-import { TouchableNativeFeedback } from "react-native-gesture-handler";
 
 async function requestContactsPermission() {
   try {
@@ -41,10 +39,6 @@ async function requestContactsPermission() {
 }
 
 export default function ContactList(props) {
-  let TouchableElement;
-  TouchableElement =
-    Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity;
-
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [scrollViewRef, setScrollViewRef] = useState(React.createRef());
   const [radioOnOff, setRadioOnOff] = useState(false);
@@ -243,9 +237,9 @@ export default function ContactList(props) {
                 {value.name.split(" ")[1]}
               </Text>
             </Text>
-            <TouchableElement onPress={() => onCancel(value)}>
+            <TouchableOpacity onPress={() => onCancel(value)}>
               <AntDesign name="close" size={17} color={Colors.white} />
-            </TouchableElement>
+            </TouchableOpacity>
           </View>
         ))}
       </View>
@@ -260,7 +254,7 @@ export default function ContactList(props) {
                 selected = true;
               }
               return (
-                <TouchableElement
+                <TouchableOpacity
                   onPress={() => onContactSelect(index)}
                   style={styles.contactView}
                   key={index}
@@ -278,21 +272,21 @@ export default function ContactList(props) {
                       {value.name.split(" ")[1]}
                     </Text>
                   </Text>
-                </TouchableElement>
+                </TouchableOpacity>
               );
             })}
           </ScrollView>
         </View>
         <View style={styles.contactIndexView}>
-          <TouchableElement
+          <TouchableOpacity
             onPress={() => {
               scrollViewRef.current.scrollTo({ x: 60, y: 60, animated: true });
             }}
           >
             <Text style={styles.contactIndexText}>#</Text>
-          </TouchableElement>
+          </TouchableOpacity>
           {alphabetsList.map(value => (
-            <TouchableElement
+            <TouchableOpacity
               onPress={() => {
                 scrollViewRef.current.scrollTo({
                   x: 60,
@@ -302,17 +296,17 @@ export default function ContactList(props) {
               }}
             >
               <Text style={styles.contactIndexText}>{value}</Text>
-            </TouchableElement>
+            </TouchableOpacity>
           ))}
         </View>
       </View>
       {selectedContacts.length >= 1 && (
-        <TouchableElement
+        <TouchableOpacity
           onPress={() => props.onPressContinue()}
           style={styles.bottomButtonView}
         >
           <Text style={styles.buttonText}>Confirm & Proceed</Text>
-        </TouchableElement>
+        </TouchableOpacity>
       )}
     </View>
   );
