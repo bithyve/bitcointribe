@@ -89,13 +89,13 @@ export default function ManageBackup(props) {
       type: "secondaryDevice"
     },
     {
-      title: "Pam Shelby",
+      title: "Trusted Contact 1",
       time: "1 month ago",
       status: "error",
       type: "contact"
     },
     {
-      title: "Grace Shelby",
+      title: "Trusted Contact 2",
       time: "12 days ago",
       status: "warning",
       type: "contact"
@@ -141,8 +141,13 @@ export default function ManageBackup(props) {
     // }, 1000);
   }
 
-  function openModal(type) {
+  const [contactIndex, setContactIndex] = useState();
+  function openModal(type, title?) {
+    // title as dummy identifier for Trusted Contact index
     setSelectedType(type);
+    if (title)
+      title === "Trusted Contact 1" ? setContactIndex(1) : setContactIndex(2);
+
     bottomSheet.current.snapTo(1);
   }
 
@@ -162,6 +167,7 @@ export default function ManageBackup(props) {
           <Contacts
             getIconByStatus={getIconByStatus}
             continueNProceed={continueNProceed}
+            index={contactIndex}
           />
         );
       case "cloud":
@@ -247,7 +253,7 @@ export default function ManageBackup(props) {
               >
                 <TouchableOpacity
                   //   disabled={item.type == selectedType ? false : true}
-                  onPress={() => openModal(item.type)}
+                  onPress={() => openModal(item.type, item.title)}
                   style={{
                     ...styles.manageBackupCard,
                     borderColor:
