@@ -797,9 +797,7 @@ export default function Home(props) {
   const custodyRequest = props.navigation.getParam("custodyRequest");
   useEffect(() => {
     if (custodyRequest) {
-      setTimeout(() => {
-        setTabBarZIndex(0);
-      }, 10);
+      setTabBarZIndex(0);
       CustodianRequestBottomSheet.current.snapTo(1);
       bottomSheet.current.snapTo(1);
     }
