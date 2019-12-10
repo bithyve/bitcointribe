@@ -4,10 +4,8 @@ import {
   Text,
   View,
   SafeAreaView,
-  TouchableWithoutFeedback,
   TouchableOpacity,
   StatusBar,
-  ActivityIndicator,
   Alert,
   BackHandler
 } from "react-native";

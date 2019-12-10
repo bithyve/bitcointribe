@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
-import CommonStyles from "../common/Styles";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
@@ -112,6 +111,20 @@ export default function ContactList(props) {
   //     name: "Shahaji Buchade",
   //     checked: false,
   //     id: 10,
+  //     communicationMode: [],
+  //     status: ""
+  //   },
+  //   {
+  //     name: "Shabnam Chitale",
+  //     checked: false,
+  //     id: 11,
+  //     communicationMode: [],
+  //     status: ""
+  //   },
+  //   {
+  //     name: "Shabnam Chitale",
+  //     checked: false,
+  //     id: 11,
   //     communicationMode: [],
   //     status: ""
   //   },

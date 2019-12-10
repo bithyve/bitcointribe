@@ -1,12 +1,11 @@
 import React, { useEffect } from "react";
-import { View, StyleSheet, StatusBar, AppState } from "react-native";
+import { View, StyleSheet, StatusBar, Linking, Alert } from "react-native";
 import { useDispatch } from "react-redux";
 import Video from "react-native-video";
 import Colors from "../common/Colors";
 
 import { initializeDB } from "../store/actions/storage";
 import AsyncStorage from "@react-native-community/async-storage";
-import Login from "./Login";
 
 export default function Launch(props) {
   const dispatch = useDispatch();
@@ -18,6 +17,16 @@ export default function Launch(props) {
         props.navigation.replace("Login");
       else props.navigation.replace("PasscodeConfirm");
     }, 5000);
+  }, []);
+
+  useEffect(() => {
+    Linking.getInitialURL()
+      .then(url => {
+        if (url) {
+          Alert.alert("Initializer URL", url);
+        }
+      })
+      .catch(err => Alert.alert("An err occured", err));
   }, []);
 
   return (
