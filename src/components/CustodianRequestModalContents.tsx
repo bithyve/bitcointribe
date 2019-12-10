@@ -82,7 +82,6 @@ export default function CustodianRequestModalContents(props) {
         >
           <TouchableElement
             onPress={() => {
-              console.log("Pressed");
               props.onPressAcceptSecret();
             }}
             style={{ ...styles.successModalButtonView }}
