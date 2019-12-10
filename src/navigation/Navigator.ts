@@ -13,6 +13,7 @@ import RestoreWalletUsingDocuments from "../pages/RestoreWalletUsingDocuments";
 import RestoreWalletByContacts from "../pages/RestoreWalletByContacts";
 import Home from "../pages/Home";
 import ReLogin from "../pages/ReLogin";
+import Accounts from "../pages/Accounts";
 import ManageBackup from "../pages/ManageBackup";
 
 const SetupNavigator = createStackNavigator(
@@ -46,6 +47,7 @@ const HomeNavigator = createStackNavigator(
         gesturesEnabled: false
       }
     },
+    Accounts,
     ManageBackup
   },
   {
