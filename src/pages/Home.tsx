@@ -590,20 +590,20 @@ export default function Home(props) {
     );
   };
 
-  const renderCustodianRequestOtpModalContent = () => {
-    if (!custodyRequest) return <View></View>;
-    return (
-      <CustodianRequestOtpModalContents
-        custodyRequest={custodyRequest}
-        modalRef={CustodianRequestOtpBottomSheet}
-        downloadStatus={success => {
-          setTabBarZIndex(0);
-          CustodianRequestOtpBottomSheet.current.snapTo(0);
-          if (success) CustodianRequestAcceptBottomSheet.current.snapTo(1);
-        }}
-      />
-    );
-  };
+  // const renderCustodianRequestOtpModalContent = () => {
+  //   if (!custodyRequest) return <View></View>;
+  //   return (
+  //     <CustodianRequestOtpModalContents
+  //       custodyRequest={custodyRequest}
+  //       modalRef={CustodianRequestOtpBottomSheet}
+  //       downloadStatus={success => {
+  //         setTabBarZIndex(0);
+  //         CustodianRequestOtpBottomSheet.current.snapTo(0);
+  //         if (success) CustodianRequestAcceptBottomSheet.current.snapTo(1);
+  //       }}
+  //     />
+  //   );
+  // };
 
   const renderCustodianRequestRejectedModalContent = () => {
     if (!custodyRequest) return <View></View>;
@@ -999,7 +999,7 @@ export default function Home(props) {
         renderHeader={renderCustodianRequestModalHeader}
       />
 
-      <BottomSheet
+      {/* <BottomSheet
         enabledInnerScrolling={true}
         ref={CustodianRequestOtpBottomSheet}
         snapPoints={[
@@ -1009,7 +1009,7 @@ export default function Home(props) {
         ]}
         renderContent={renderCustodianRequestOtpModalContent}
         renderHeader={renderCustodianRequestOtpModalHeader}
-      />
+      /> */}
       <BottomSheet
         enabledInnerScrolling={true}
         ref={CustodianRequestRejectedBottomSheet}
