@@ -577,7 +577,7 @@ export default function Home(props) {
             setTabBarZIndex(0);
           }, 10);
           CustodianRequestBottomSheet.current.snapTo(0);
-          CustodianRequestOtpBottomSheet.current.snapTo(1);
+          props.navigation.navigate("CustodianRequestOtp", { custodyRequest });
         }}
         onPressRejectSecret={() => {
           setTimeout(() => {

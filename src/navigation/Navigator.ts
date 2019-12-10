@@ -15,6 +15,7 @@ import Home from "../pages/Home";
 import ReLogin from "../pages/ReLogin";
 import Accounts from "../pages/Accounts";
 import ManageBackup from "../pages/ManageBackup";
+import CustodianRequestOtp from "../pages/CustodianRequest/CustodianRequestOtp";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -48,7 +49,8 @@ const HomeNavigator = createStackNavigator(
       }
     },
     Accounts,
-    ManageBackup
+    ManageBackup,
+    CustodianRequestOtp
   },
   {
     headerLayoutPreset: "center",
