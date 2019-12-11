@@ -11,46 +11,36 @@ import {
   FlatList
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Fonts from "../common/Fonts";
-import Colors from "../common/Colors";
-import CommonStyles from "../common/Styles";
+import Fonts from "../../common/Fonts";
+import Colors from "../../common/Colors";
+import CommonStyles from "../../common/Styles";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
 import BottomSheet from "reanimated-bottom-sheet";
-import KnowMoreButton from "../components/KnowMoreButton";
+import KnowMoreButton from "../../components/KnowMoreButton";
 
 import { useDispatch, useSelector } from "react-redux";
-import { initHealthCheck } from "../store/actions/sss";
-import S3Service from "../bitcoin/services/sss/S3Service";
-import SecondaryDevice from "../components/containers/backups/SecondaryDevice";
-import Contacts from "../components/containers/backups/Contacts";
-import Cloud from "../components/containers/backups/Cloud";
+import { initHealthCheck } from "../../store/actions/sss";
+import S3Service from "../../bitcoin/services/sss/S3Service";
+import SecondaryDevice from "../../components/containers/backups/SecondaryDevice";
+import Contacts from "../../components/containers/backups/Contacts";
+import Cloud from "../../components/containers/backups/Cloud";
 
 function getImageByType(type) {
   if (type == "secondaryDevice") {
-    return require("../assets/images/icons/icon_secondarydevice.png");
+    return require("../../assets/images/icons/icon_secondarydevice.png");
   } else if (type == "contact") {
-    return require("../assets/images/icons/icon_user.png");
+    return require("../../assets/images/icons/icon_user.png");
   } else if (type == "cloud") {
-    return require("../assets/images/icons/icon_cloud.png");
+    return require("../../assets/images/icons/icon_cloud.png");
   }
   if (type == "print") {
-    return require("../assets/images/icons/print.png");
+    return require("../../assets/images/icons/print.png");
   } else if (type == "security") {
-    return require("../assets/images/icons/icon_securityquestion.png");
-  }
-}
-
-function getIconByStatus(status) {
-  if (status == "error") {
-    return require("../assets/images/icons/icon_error_red.png");
-  } else if (status == "warning") {
-    return require("../assets/images/icons/icon_error_yellow.png");
-  } else if (status == "success") {
-    return require("../assets/images/icons/icon_check.png");
+    return require("../../assets/images/icons/icon_securityquestion.png");
   }
 }
 
@@ -63,22 +53,22 @@ export default function ManageBackup(props) {
     {
       title: "iCloud Drive",
       info: "Store backup in iCloud Drive",
-      imageIcon: require("../assets/images/icons/logo_brand_brands_logos_icloud.png")
+      imageIcon: require("../../assets/images/icons/logo_brand_brands_logos_icloud.png")
     },
     {
       title: "Google Drive",
       info: "Store backup in Google Drive",
-      imageIcon: require("../assets/images/icons/logo_brand_brands_logos_icloud.png")
+      imageIcon: require("../../assets/images/icons/logo_brand_brands_logos_icloud.png")
     },
     {
       title: "One Drive",
       info: "Store backup in One Drive",
-      imageIcon: require("../assets/images/icons/logo_brand_brands_logos_icloud.png")
+      imageIcon: require("../../assets/images/icons/logo_brand_brands_logos_icloud.png")
     },
     {
       title: "DropBox Storage",
       info: "Store backup in Dropbox Storage",
-      imageIcon: require("../assets/images/icons/logo_brand_brands_logos_icloud.png")
+      imageIcon: require("../../assets/images/icons/logo_brand_brands_logos_icloud.png")
     }
   ]);
   const [pageData, setPageData] = useState([
@@ -158,22 +148,27 @@ export default function ManageBackup(props) {
   //     }
   //   }
 
+  const getIconByStatus = status => {
+    if (status == "error") {
+      return require("../../assets/images/icons/icon_error_red.png");
+    } else if (status == "warning") {
+      return require("../../assets/images/icons/icon_error_yellow.png");
+    } else if (status == "success") {
+      return require("../../assets/images/icons/icon_check.png");
+    }
+  };
+
   function renderContent() {
     switch (selectedType) {
       case "secondaryDevice":
-        return <SecondaryDevice getIconByStatus={getIconByStatus} />;
+        props.navigation.navigate("SecondaryDevice");
+        break;
       case "contact":
-        return (
-          <Contacts
-            getIconByStatus={getIconByStatus}
-            continueNProceed={continueNProceed}
-            index={contactIndex}
-          />
-        );
+        props.navigation.navigate("TrustedContacts", { index: contactIndex });
+        break;
       case "cloud":
-        return <Cloud getIconByStatus={getIconByStatus} />;
-      default:
-        return <View></View>;
+        props.navigation.navigate("Cloud");
+        break;
     }
   }
 
@@ -237,7 +232,7 @@ export default function ManageBackup(props) {
             </View>
             <View style={{ flex: 1 }}>
               <Image
-                source={require("../assets/images/icons/sheild_error.png")}
+                source={require("../../assets/images/icons/sheild_error.png")}
                 style={styles.shieldImage}
               />
             </View>
