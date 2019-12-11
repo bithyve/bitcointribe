@@ -1,5 +1,8 @@
 import { createAppContainer, createSwitchNavigator } from "react-navigation";
-import { createStackNavigator } from "react-navigation-stack";
+import {
+  createStackNavigator,
+  StackViewTransitionConfigs
+} from "react-navigation-stack";
 
 import Launch from "../pages/Launch";
 import Login from "../pages/Login";
@@ -15,6 +18,7 @@ import Home from "../pages/Home";
 import ReLogin from "../pages/ReLogin";
 import Accounts from "../pages/Accounts";
 import ManageBackup from "../pages/ManageBackup";
+import CustodianRequestOtp from "../pages/CustodianRequest/CustodianRequestOtp";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -48,13 +52,31 @@ const HomeNavigator = createStackNavigator(
       }
     },
     Accounts,
-    ManageBackup
+    ManageBackup,
+    CustodianRequestOtp
   },
+
   {
     headerLayoutPreset: "center",
     defaultNavigationOptions: ({ navigation }) => ({
       header: null
-    })
+    }),
+    transitionConfig: (transitionProps, prevTransitionProps) => {
+      if (
+        transitionProps.scene.route.routeName === "CustodianRequestOtp" ||
+        (prevTransitionProps &&
+          "CustodianRequestOtp" === prevTransitionProps.scene.route.routeName)
+      )
+        return StackViewTransitionConfigs.defaultTransitionConfig(
+          transitionProps,
+          prevTransitionProps,
+          true
+        );
+      return StackViewTransitionConfigs.defaultTransitionConfig(
+        transitionProps,
+        prevTransitionProps
+      );
+    }
   }
 );
 
