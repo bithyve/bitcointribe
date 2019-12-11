@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  View,
-  Image,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  Platform
-} from "react-native";
+import { View, Image, TouchableOpacity, Text, StyleSheet } from "react-native";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -14,12 +7,11 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
-import { TouchableNativeFeedback } from "react-native-gesture-handler";
 
-export default function CustodianRequestAcceptModalContents(props) {
-  let TouchableElement;
-  TouchableElement =
-    Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity;
+export default function CustodianRequestAccepted(props) {
+  const requester = props.navigation.getParam("requester");
+
+  const onPressAssociateContacts = () => {};
 
   return (
     <View style={{ ...styles.modalContentContainer, height: "100%" }}>
@@ -42,11 +34,9 @@ export default function CustodianRequestAcceptModalContents(props) {
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Image
               style={styles.successModalAmountImage}
-              source={require("./../assets/images/icons/icon_wallet.png")}
+              source={require("../../assets/images/icons/icon_wallet.png")}
             />
-            <Text style={styles.successModalWalletNameText}>
-              {props.userName}
-            </Text>
+            <Text style={styles.successModalWalletNameText}>{requester}</Text>
           </View>
         </View>
         <View>
@@ -69,14 +59,14 @@ export default function CustodianRequestAcceptModalContents(props) {
             alignItems: "center"
           }}
         >
-          <TouchableElement
-            onPress={() => props.onPressAssociateContacts()}
+          <TouchableOpacity
+            onPress={() => onPressAssociateContacts()}
             style={{ ...styles.successModalButtonView }}
           >
             <Text style={styles.proceedButtonText}>Associate Contact</Text>
-          </TouchableElement>
-          <TouchableElement
-            onPress={() => props.onPressSkip()}
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => props.navigation.replace("Home")}
             style={{
               height: wp("13%"),
               width: wp("35%"),
@@ -87,9 +77,9 @@ export default function CustodianRequestAcceptModalContents(props) {
             <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
               Skip
             </Text>
-          </TouchableElement>
+          </TouchableOpacity>
           <Image
-            source={require("../assets/images/icons/accept.png")}
+            source={require("../../assets/images/icons/accept.png")}
             style={styles.successModalImage}
           />
         </View>
