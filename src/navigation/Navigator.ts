@@ -20,6 +20,9 @@ import Accounts from "../pages/Accounts";
 import ManageBackup from "../pages/ManageBackup";
 import CustodianRequestOTP from "../pages/CustodianRequest/CustodianRequestOTP";
 import CustodianRequestAccepted from "../pages/CustodianRequest/CustodianRequestAccepted";
+import SecondaryDevice from "../pages/ManageBackup/SecondaryDevice";
+import TrustedContacts from "../pages/ManageBackup/TrustedContacts";
+import Cloud from "../pages/ManageBackup/Cloud";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -54,10 +57,12 @@ const HomeNavigator = createStackNavigator(
     },
     Accounts,
     ManageBackup,
+    SecondaryDevice,
+    TrustedContacts,
+    Cloud,
     CustodianRequestOTP,
     CustodianRequestAccepted
   },
-
   {
     headerLayoutPreset: "center",
     defaultNavigationOptions: ({ navigation }) => ({
@@ -65,9 +70,9 @@ const HomeNavigator = createStackNavigator(
     }),
     transitionConfig: (transitionProps, prevTransitionProps) => {
       if (
-        transitionProps.scene.route.routeName === "CustodianRequestOtp" ||
+        transitionProps.scene.route.routeName === "CustodianRequestOTP" ||
         (prevTransitionProps &&
-          "CustodianRequestOtp" === prevTransitionProps.scene.route.routeName)
+          "CustodianRequestOTP" === prevTransitionProps.scene.route.routeName)
       )
         return StackViewTransitionConfigs.defaultTransitionConfig(
           transitionProps,
