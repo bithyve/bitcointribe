@@ -7,7 +7,8 @@ import {
   TextInput,
   StyleSheet,
   ActivityIndicator,
-  Platform
+  Platform,
+  Alert
 } from "react-native";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
@@ -24,7 +25,7 @@ import CustodianRequestAcceptModalContents from "../../components/CustodianReque
 import TransparentHeaderModal from "../../components/TransparentHeaderModal";
 import CustodianRequestRejectedModalContents from "../../components/CustodianRequestRejectedModalContents";
 
-export default function CustodianRequestOtpModalContents(props) {
+export default function CustodianRequestOTP(props) {
   let TouchableElement;
   TouchableElement =
     Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity;
@@ -54,7 +55,6 @@ export default function CustodianRequestOtpModalContents(props) {
   const { loading } = useSelector(state => state.sss);
 
   const onOTPSubmit = () => {
-    console.log({ ek });
     if (passcode.length !== 6 || !ek) return;
     dispatch(downloadMShare(passcode, ek));
   };
@@ -64,8 +64,14 @@ export default function CustodianRequestOtpModalContents(props) {
   );
 
   useEffect(() => {
-    if (UNDER_CUSTODY[requester])
-      CustodianRequestAcceptBottomSheet.current.snapTo(1);
+    if (UNDER_CUSTODY[requester]) {
+      passcode.length === 6
+        ? props.navigation.navigate("CustodianRequestAccepted", { requester })
+        : Alert.alert(
+            "Failed to store",
+            "You cannot custody multiple shares of the same user."
+          );
+    }
   }, [UNDER_CUSTODY]);
 
   const renderCustodianRequestAcceptModalHeader = () => {
