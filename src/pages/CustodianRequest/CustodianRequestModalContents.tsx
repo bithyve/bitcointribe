@@ -7,8 +7,8 @@ import {
   StyleSheet,
   Platform
 } from "react-native";
-import Colors from "../common/Colors";
-import Fonts from "../common/Fonts";
+import Colors from "../../common/Colors";
+import Fonts from "../../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
 import {
   widthPercentageToDP as wp,

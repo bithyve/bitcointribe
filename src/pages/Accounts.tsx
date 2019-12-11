@@ -140,7 +140,7 @@ export default function Accounts(props) {
   const [carousel, setCarousel] = useState(React.createRef());
 
   const renderSendContents = () => {
-    return <SendModalContents />;
+    return <SendModalContents onPressBack={() => {}} />;
   };
 
   const renderItem = ({ item, index }) => {
@@ -552,7 +552,9 @@ export default function Accounts(props) {
             style={{ flexDirection: "row", marginLeft: 10, marginRight: 10 }}
           >
             <TouchableOpacity
-              // onPress={()=>{SendBottomSheet.current.snapTo(1)}}
+              onPress={() => {
+                SendBottomSheet.current.snapTo(1);
+              }}
               style={styles.bottomCardView}
             >
               <Image

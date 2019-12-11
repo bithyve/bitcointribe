@@ -1,5 +1,8 @@
 import { createAppContainer, createSwitchNavigator } from "react-navigation";
-import { createStackNavigator } from "react-navigation-stack";
+import {
+  createStackNavigator,
+  StackViewTransitionConfigs
+} from "react-navigation-stack";
 
 import Launch from "../pages/Launch";
 import Login from "../pages/Login";
@@ -15,6 +18,11 @@ import Home from "../pages/Home";
 import ReLogin from "../pages/ReLogin";
 import Accounts from "../pages/Accounts";
 import ManageBackup from "../pages/ManageBackup";
+import CustodianRequestOTP from "../pages/CustodianRequest/CustodianRequestOTP";
+import CustodianRequestAccepted from "../pages/CustodianRequest/CustodianRequestAccepted";
+import SecondaryDevice from "../pages/ManageBackup/SecondaryDevice";
+import TrustedContacts from "../pages/ManageBackup/TrustedContacts";
+import Cloud from "../pages/ManageBackup/Cloud";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -48,13 +56,34 @@ const HomeNavigator = createStackNavigator(
       }
     },
     Accounts,
-    ManageBackup
+    ManageBackup,
+    SecondaryDevice,
+    TrustedContacts,
+    Cloud,
+    CustodianRequestOTP,
+    CustodianRequestAccepted
   },
   {
     headerLayoutPreset: "center",
     defaultNavigationOptions: ({ navigation }) => ({
       header: null
-    })
+    }),
+    transitionConfig: (transitionProps, prevTransitionProps) => {
+      if (
+        transitionProps.scene.route.routeName === "CustodianRequestOTP" ||
+        (prevTransitionProps &&
+          "CustodianRequestOTP" === prevTransitionProps.scene.route.routeName)
+      )
+        return StackViewTransitionConfigs.defaultTransitionConfig(
+          transitionProps,
+          prevTransitionProps,
+          true
+        );
+      return StackViewTransitionConfigs.defaultTransitionConfig(
+        transitionProps,
+        prevTransitionProps
+      );
+    }
   }
 );
 
