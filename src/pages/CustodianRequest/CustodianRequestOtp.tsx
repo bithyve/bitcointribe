@@ -19,18 +19,28 @@ import {
 import { downloadMShare } from "../../store/actions/sss";
 import { useDispatch, useSelector } from "react-redux";
 import { TouchableNativeFeedback } from "react-native-gesture-handler";
+import BottomSheet from "reanimated-bottom-sheet";
+import CustodianRequestAcceptModalContents from "../../components/CustodianRequestAcceptModalContents";
+import TransparentHeaderModal from "../../components/TransparentHeaderModal";
+import CustodianRequestRejectedModalContents from "../../components/CustodianRequestRejectedModalContents";
 
 export default function CustodianRequestOtpModalContents(props) {
-  const custodyRequest = props.navigation.getParam("custodyRequest");
-  if (!custodyRequest) return <View></View>;
-
   let TouchableElement;
   TouchableElement =
     Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity;
 
+  const custodyRequest = props.navigation.getParam("custodyRequest");
   const { requester, ek } = custodyRequest;
   const [passcode, setPasscode] = useState("");
   const inputRef = useRef(null);
+  const [
+    CustodianRequestRejectedBottomSheet,
+    setCustodianRequestRejectedBottomSheet
+  ] = useState(React.createRef());
+  const [
+    CustodianRequestAcceptBottomSheet,
+    setCustodianRequestAcceptBottomSheet
+  ] = useState(React.createRef());
 
   function onPressNumber(text) {
     let tmpPasscode = passcode;
@@ -44,6 +54,7 @@ export default function CustodianRequestOtpModalContents(props) {
   const { loading } = useSelector(state => state.sss);
 
   const onOTPSubmit = () => {
+    console.log({ ek });
     if (passcode.length !== 6 || !ek) return;
     dispatch(downloadMShare(passcode, ek));
   };
@@ -53,8 +64,52 @@ export default function CustodianRequestOtpModalContents(props) {
   );
 
   useEffect(() => {
-    if (UNDER_CUSTODY[requester]) props.downloadStatus(true);
+    if (UNDER_CUSTODY[requester])
+      CustodianRequestAcceptBottomSheet.current.snapTo(1);
   }, [UNDER_CUSTODY]);
+
+  const renderCustodianRequestAcceptModalHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          CustodianRequestAcceptBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderCustodianRequestRejectedModalContent = () => {
+    return (
+      <CustodianRequestRejectedModalContents
+        onPressViewThrustedContacts={() => {
+          CustodianRequestRejectedBottomSheet.current.snapTo(0);
+        }}
+        userName={custodyRequest.requester}
+      />
+    );
+  };
+
+  const renderCustodianRequestRejectedModalHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          CustodianRequestRejectedBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderCustodianRequestAcceptModalContent = () => {
+    return (
+      <CustodianRequestAcceptModalContents
+        userName={custodyRequest.requester}
+        onPressAssociateContacts={() => {}}
+        onPressSkip={() => {
+          CustodianRequestAcceptBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
 
   return (
     <View style={{ ...styles.modalContentContainer, height: "100%" }}>
@@ -273,6 +328,16 @@ export default function CustodianRequestOtpModalContents(props) {
           </TouchableElement>
         </View>
       </View>
+
+      {UNDER_CUSTODY[requester] ? (
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={CustodianRequestAcceptBottomSheet}
+          snapPoints={[-50, hp("60%")]}
+          renderContent={renderCustodianRequestAcceptModalContent}
+          renderHeader={renderCustodianRequestAcceptModalHeader}
+        />
+      ) : null}
     </View>
   );
 }
