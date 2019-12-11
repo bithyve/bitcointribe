@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Image,
@@ -7,8 +7,8 @@ import {
   StyleSheet,
   Platform
 } from "react-native";
-import Colors from "../common/Colors";
-import Fonts from "../common/Fonts";
+import Colors from "../../common/Colors";
+import Fonts from "../../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
 import {
   widthPercentageToDP as wp,
@@ -16,14 +16,14 @@ import {
 } from "react-native-responsive-screen";
 import { TouchableNativeFeedback } from "react-native-gesture-handler";
 
-export default function CustodianRequestModalContents(props) {
+export default function CustodianRequestRejectedModalContents(props) {
   let TouchableElement;
   TouchableElement =
     Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity;
 
   return (
     <View style={{ ...styles.modalContentContainer, height: "100%" }}>
-      <View>
+      <View style={{ height: "100%" }}>
         <View
           style={{
             ...styles.successModalHeaderView,
@@ -32,20 +32,14 @@ export default function CustodianRequestModalContents(props) {
           }}
         >
           <Text style={styles.modalTitleText}>
-            You have been selected as a{"\n"}guardian for Hexa Wallet
+            Secret Rejected{"\n"}Successfully
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: wp("1.5%") }}>
-            Please contact the sender to get{"\n"}the OTP and accept the secret
+            You have rejected the request to be a{"\n"}guardian for
           </Text>
         </View>
         <View style={styles.box}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: hp("2%")
-            }}
-          >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Image
               style={styles.successModalAmountImage}
               source={require("./../assets/images/icons/icon_wallet.png")}
@@ -54,22 +48,17 @@ export default function CustodianRequestModalContents(props) {
               {props.userName}
             </Text>
           </View>
-          <View style={styles.separator} />
+        </View>
+        <View>
           <View
             style={{
-              marginTop: hp("2%"),
-              marginLeft: wp("2%"),
-              marginRight: wp("2%")
+              marginLeft: wp("8%"),
+              marginRight: wp("8%")
             }}
           >
-            <Text
-              style={{ ...styles.modalTitleText, fontSize: RFValue(11, 812) }}
-            >
-              Message from the Sender
-            </Text>
             <Text style={{ ...styles.modalInfoText }}>
-              Please accept my secret, this will help me recover{"\n"}my wallet
-              later
+              The sender will be notified that you have rejected the{"\n"}
+              request to be a guardian
             </Text>
           </View>
         </View>
@@ -81,26 +70,15 @@ export default function CustodianRequestModalContents(props) {
           }}
         >
           <TouchableElement
-            onPress={() => {
-              props.onPressAcceptSecret();
-            }}
+            onPress={() => props.onPressViewThrustedContacts()}
             style={{ ...styles.successModalButtonView }}
           >
-            <Text style={styles.proceedButtonText}>Accept Secret</Text>
+            <Text style={styles.proceedButtonText}>Trusted Contacts</Text>
           </TouchableElement>
-          <TouchableElement
-            onPress={() => props.onPressRejectSecret()}
-            style={{
-              height: wp("13%"),
-              width: wp("35%"),
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
-              Reject Secret
-            </Text>
-          </TouchableElement>
+          <Image
+            source={require("../assets/images/icons/reject.png")}
+            style={styles.successModalImage}
+          />
         </View>
       </View>
     </View>
@@ -158,8 +136,7 @@ const styles = StyleSheet.create({
     width: wp("15%"),
     height: wp("15%"),
     marginRight: 15,
-    marginLeft: 10,
-    marginBottom: wp("1%"),
+    marginLeft: 15,
     resizeMode: "contain"
   },
   successModalAmountText: {
@@ -197,10 +174,10 @@ const styles = StyleSheet.create({
     fontSize: RFValue(13, 812),
     fontFamily: Fonts.FiraSansMedium
   },
-  separator: {
-    height: 2,
-    marginLeft: wp("2%"),
-    marginRight: wp("2%"),
-    backgroundColor: Colors.borderColor
+  successModalImage: {
+    width: wp("25%"),
+    height: hp("20%"),
+    marginLeft: "auto",
+    resizeMode: "cover"
   }
 });

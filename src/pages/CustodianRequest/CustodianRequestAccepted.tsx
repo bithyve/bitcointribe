@@ -1,29 +1,21 @@
 import React from "react";
-import {
-  View,
-  Image,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  Platform
-} from "react-native";
-import Colors from "../common/Colors";
-import Fonts from "../common/Fonts";
+import { View, Image, TouchableOpacity, Text, StyleSheet } from "react-native";
+import Colors from "../../common/Colors";
+import Fonts from "../../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
-import { TouchableNativeFeedback } from "react-native-gesture-handler";
 
-export default function CustodianRequestModalContents(props) {
-  let TouchableElement;
-  TouchableElement =
-    Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity;
+export default function CustodianRequestAccepted(props) {
+  const requester = props.navigation.getParam("requester");
+
+  const onPressAssociateContacts = () => {};
 
   return (
     <View style={{ ...styles.modalContentContainer, height: "100%" }}>
-      <View>
+      <View style={{ height: "100%" }}>
         <View
           style={{
             ...styles.successModalHeaderView,
@@ -32,44 +24,31 @@ export default function CustodianRequestModalContents(props) {
           }}
         >
           <Text style={styles.modalTitleText}>
-            You have been selected as a{"\n"}guardian for Hexa Wallet
+            Secret Accepted{"\n"}Successfully
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: wp("1.5%") }}>
-            Please contact the sender to get{"\n"}the OTP and accept the secret
+            Secret Successfully Accepted{"\n"}You are now a guardian for
           </Text>
         </View>
         <View style={styles.box}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: hp("2%")
-            }}
-          >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Image
               style={styles.successModalAmountImage}
-              source={require("./../assets/images/icons/icon_wallet.png")}
+              source={require("../../assets/images/icons/icon_wallet.png")}
             />
-            <Text style={styles.successModalWalletNameText}>
-              {props.userName}
-            </Text>
+            <Text style={styles.successModalWalletNameText}>{requester}</Text>
           </View>
-          <View style={styles.separator} />
+        </View>
+        <View>
           <View
             style={{
-              marginTop: hp("2%"),
-              marginLeft: wp("2%"),
-              marginRight: wp("2%")
+              marginLeft: wp("8%"),
+              marginRight: wp("8%")
             }}
           >
-            <Text
-              style={{ ...styles.modalTitleText, fontSize: RFValue(11, 812) }}
-            >
-              Message from the Sender
-            </Text>
             <Text style={{ ...styles.modalInfoText }}>
-              Please accept my secret, this will help me recover{"\n"}my wallet
-              later
+              Associate the secret with a contact to better manage the{"\n"}
+              secrets you are guardian for
             </Text>
           </View>
         </View>
@@ -80,16 +59,14 @@ export default function CustodianRequestModalContents(props) {
             alignItems: "center"
           }}
         >
-          <TouchableElement
-            onPress={() => {
-              props.onPressAcceptSecret();
-            }}
+          <TouchableOpacity
+            onPress={() => onPressAssociateContacts()}
             style={{ ...styles.successModalButtonView }}
           >
-            <Text style={styles.proceedButtonText}>Accept Secret</Text>
-          </TouchableElement>
-          <TouchableElement
-            onPress={() => props.onPressRejectSecret()}
+            <Text style={styles.proceedButtonText}>Associate Contact</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => props.navigation.replace("Home")}
             style={{
               height: wp("13%"),
               width: wp("35%"),
@@ -98,9 +75,13 @@ export default function CustodianRequestModalContents(props) {
             }}
           >
             <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
-              Reject Secret
+              Skip
             </Text>
-          </TouchableElement>
+          </TouchableOpacity>
+          <Image
+            source={require("../../assets/images/icons/accept.png")}
+            style={styles.successModalImage}
+          />
         </View>
       </View>
     </View>
@@ -158,8 +139,7 @@ const styles = StyleSheet.create({
     width: wp("15%"),
     height: wp("15%"),
     marginRight: 15,
-    marginLeft: 10,
-    marginBottom: wp("1%"),
+    marginLeft: 15,
     resizeMode: "contain"
   },
   successModalAmountText: {
@@ -197,10 +177,10 @@ const styles = StyleSheet.create({
     fontSize: RFValue(13, 812),
     fontFamily: Fonts.FiraSansMedium
   },
-  separator: {
-    height: 2,
-    marginLeft: wp("2%"),
-    marginRight: wp("2%"),
-    backgroundColor: Colors.borderColor
+  successModalImage: {
+    width: wp("25%"),
+    height: hp("20%"),
+    marginLeft: "auto",
+    resizeMode: "cover"
   }
 });
