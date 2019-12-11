@@ -46,6 +46,13 @@ const SetupNavigator = createStackNavigator(
   }
 );
 
+const MODAL_ROUTES = [
+  "SecondaryDevice",
+  "TrustedContacts",
+  "Cloud",
+  "CustodianRequestOTP",
+  "CustodianRequestAccepted"
+];
 const HomeNavigator = createStackNavigator(
   {
     Home,
@@ -69,19 +76,17 @@ const HomeNavigator = createStackNavigator(
       header: null
     }),
     transitionConfig: (transitionProps, prevTransitionProps) => {
-      if (
-        transitionProps.scene.route.routeName === "CustodianRequestOTP" ||
-        (prevTransitionProps &&
-          "CustodianRequestOTP" === prevTransitionProps.scene.route.routeName)
-      )
-        return StackViewTransitionConfigs.defaultTransitionConfig(
-          transitionProps,
-          prevTransitionProps,
-          true
-        );
+      const isModal = MODAL_ROUTES.some(
+        screenName =>
+          screenName === transitionProps.scene.route.routeName ||
+          (prevTransitionProps &&
+            screenName === prevTransitionProps.scene.route.routeName)
+      );
+
       return StackViewTransitionConfigs.defaultTransitionConfig(
         transitionProps,
-        prevTransitionProps
+        prevTransitionProps,
+        isModal
       );
     }
   }
