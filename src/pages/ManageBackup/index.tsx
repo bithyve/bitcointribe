@@ -154,33 +154,33 @@ export default function ManageBackup(props) {
     }
   };
 
-  function renderContent() {
-    switch (selectedType) {
-      case "secondaryDevice":
-        props.navigation.navigate("SecondaryDevice");
-        break;
-      case "contact":
-        props.navigation.navigate("TrustedContacts", { index: contactIndex });
-        break;
-      case "cloud":
-        props.navigation.navigate("Cloud");
-        break;
-    }
-  }
+  // function renderContent() {
+  //   switch (selectedType) {
+  //     case "secondaryDevice":
+  //       props.navigation.navigate("SecondaryDevice");
+  //       break;
+  //     case "contact":
+  //       props.navigation.navigate("TrustedContacts", { index: contactIndex });
+  //       break;
+  //     case "cloud":
+  //       props.navigation.navigate("Cloud");
+  //       break;
+  //   }
+  // }
 
-  function renderHeader() {
-    return (
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => {
-          bottomSheet.current.snapTo(0);
-        }}
-        style={styles.modalHeader}
-      >
-        <View style={styles.modalHeaderHandle} />
-      </TouchableOpacity>
-    );
-  }
+  // function renderHeader() {
+  //   return (
+  //     <TouchableOpacity
+  //       activeOpacity={10}
+  //       onPress={() => {
+  //         bottomSheet.current.snapTo(0);
+  //       }}
+  //       style={styles.modalHeader}
+  //     >
+  //       <View style={styles.modalHeaderHandle} />
+  //     </TouchableOpacity>
+  //   );
+  // }
 
   const dispatch = useDispatch();
   const s3Service: S3Service = useSelector(state => state.sss.service);
@@ -243,8 +243,16 @@ export default function ManageBackup(props) {
               // }}
               >
                 <TouchableOpacity
-                  //   disabled={item.type == selectedType ? false : true}
-                  onPress={() => props.navigation.navigate(item.route)}
+                  onPress={() =>
+                    props.navigation.navigate(item.route, {
+                      index:
+                        item.title === "Trusted Contact 1"
+                          ? 1
+                          : item.title === "Trusted Contact 2"
+                          ? 2
+                          : undefined
+                    })
+                  }
                   style={{
                     ...styles.manageBackupCard,
                     borderColor:
