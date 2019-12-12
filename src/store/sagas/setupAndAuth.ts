@@ -29,7 +29,7 @@ function* initSetupWorker({ payload }) {
   const initialDatabase: Database = {
     WALLET_SETUP: { walletName, securityAns },
     DECENTRALIZED_BACKUP: {
-      RECOVERY_SHARES: [],
+      RECOVERY_SHARES: {},
       SHARES_TRANSFER_DETAILS: {},
       UNDER_CUSTODY: {},
       DYNAMIC_NONPMDD: {}

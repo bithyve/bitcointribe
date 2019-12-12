@@ -11,10 +11,12 @@ export interface Database {
   WALLET_SETUP: { walletName: string; securityAns: string };
   DECENTRALIZED_BACKUP: {
     RECOVERY_SHARES: {
-      REQUEST_DETAILS: { tag: string; otp: string; encryptedKey: string };
-      META_SHARE?: MetaShare;
-      ENC_DYNAMIC_NONPMDD?: EncDynamicNonPMDD;
-    }[];
+      [SHARE_INDEX: string]: {
+        REQUEST_DETAILS: { tag: string; otp: string; encryptedKey: string };
+        META_SHARE?: MetaShare;
+        ENC_DYNAMIC_NONPMDD?: EncDynamicNonPMDD;
+      };
+    };
     SHARES_TRANSFER_DETAILS: {
       [SHARE_INDEX: string]: { OTP: string; ENCRYPTED_KEY: string };
     };
