@@ -24,6 +24,8 @@ import SecondaryDevice from "../pages/ManageBackup/SecondaryDevice";
 import CommunicationMode from "../pages/ManageBackup/CommunicationMode";
 import TrustedContacts from "../pages/ManageBackup/TrustedContacts";
 import Cloud from "../pages/ManageBackup/Cloud";
+import WalletNameRecovery from "../pages/Recovery/WalletNameRecovery";
+import QuestionRecovery from "../pages/Recovery/QuestionRecovery";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -33,6 +35,8 @@ const SetupNavigator = createStackNavigator(
     NewWalletName,
     NewWalletQuestion,
     RestoreAndRecoverWallet,
+    WalletNameRecovery,
+    QuestionRecovery,
     RestoreSelectedContactsList,
     RestoreWalletBySecondaryDevice,
     RestoreWalletUsingDocuments,
