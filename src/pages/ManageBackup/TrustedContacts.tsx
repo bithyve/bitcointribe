@@ -42,6 +42,7 @@ const TrustedContacts = props => {
 
   const continueNProceed = async () => {
     if (!SHARES_TRANSFER_DETAILS[index]) dispatch(uploadEncMShare(index));
+    else console.log(SHARES_TRANSFER_DETAILS[index]);
     // communicationModeBottomSheet.current.snapTo(1);
     props.navigation.navigate("CommunicationMode", {
       contact: contacts[0],

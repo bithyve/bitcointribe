@@ -7,7 +7,7 @@ import {
 import Launch from "../pages/Launch";
 import Login from "../pages/Login";
 import PasscodeConfirm from "../pages/PasscodeConfirm";
-import RestoreAndReoverWallet from "../pages/RestoreAndReoverWallet";
+import RestoreAndRecoverWallet from "../pages/RestoreAndRecoverWallet";
 import RestoreSelectedContactsList from "../pages/RestoreSelectedContactsList";
 import NewWalletName from "../pages/NewWalletName";
 import NewWalletQuestion from "../pages/NewWalletQuestion";
@@ -32,7 +32,7 @@ const SetupNavigator = createStackNavigator(
     PasscodeConfirm,
     NewWalletName,
     NewWalletQuestion,
-    RestoreAndReoverWallet,
+    RestoreAndRecoverWallet,
     RestoreSelectedContactsList,
     RestoreWalletBySecondaryDevice,
     RestoreWalletUsingDocuments,
