@@ -37,7 +37,7 @@ export default function NewWalletName(props) {
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.navigate("RestoreAndReoverWallet");
+              props.navigation.navigate("RestoreAndRecoverWallet");
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>

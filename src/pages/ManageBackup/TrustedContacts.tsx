@@ -21,8 +21,6 @@ import { uploadEncMShare } from "../../store/actions/sss";
 import { useDispatch, useSelector } from "react-redux";
 import CommunicationModeModalContents from "../../components/CommunicationModeModalContents";
 import DeviceInfo from "react-native-device-info";
-import BottomSheet from "reanimated-bottom-sheet";
-import { textWithoutEncoding, email } from "react-native-communications";
 import { getIconByStatus } from "./utils";
 
 const TrustedContacts = props => {
@@ -39,67 +37,44 @@ const TrustedContacts = props => {
   }
 
   const dispatch = useDispatch();
-  const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
-    state => state.storage.database
-  );
+  const { DECENTRALIZED_BACKUP } = useSelector(state => state.storage.database);
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
 
   const continueNProceed = async () => {
     if (!SHARES_TRANSFER_DETAILS[index]) dispatch(uploadEncMShare(index));
-    communicationModeBottomSheet.current.snapTo(1);
+    else console.log(SHARES_TRANSFER_DETAILS[index]);
+    // communicationModeBottomSheet.current.snapTo(1);
+    props.navigation.navigate("CommunicationMode", {
+      contact: contacts[0],
+      index
+    });
   };
 
-  const communicate = async selectedContactMode => {
-    if (!SHARES_TRANSFER_DETAILS[index]) {
-      Alert.alert("Failed to share");
-      return;
-    }
-    const deepLink =
-      `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
-      SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY;
+  // function requestHeader() {
+  //   return (
+  //     <TouchableOpacity
+  //       activeOpacity={10}
+  //       onPress={() => closeModal()}
+  //       style={{ ...styles.modalHeaderContainer }}
+  //     >
+  //       <View style={styles.modalHeaderHandle} />
+  //     </TouchableOpacity>
+  //   );
+  // }
 
-    switch (selectedContactMode.type) {
-      case "number":
-        textWithoutEncoding(selectedContactMode.info, deepLink);
-        break;
+  // function closeModal() {
+  //   communicationModeBottomSheet.current.snapTo(0);
+  //   return;
+  // }
 
-      case "email":
-        email(
-          [selectedContactMode.info],
-          null,
-          null,
-          "Guardian request",
-          deepLink
-        );
-        break;
-    }
-  };
-
-  function requestHeader() {
-    return (
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => closeModal()}
-        style={{ ...styles.modalHeaderContainer }}
-      >
-        <View style={styles.modalHeaderHandle} />
-      </TouchableOpacity>
-    );
-  }
-
-  function closeModal() {
-    communicationModeBottomSheet.current.snapTo(0);
-    return;
-  }
-
-  function renderCommunicationModeContent() {
-    return (
-      <CommunicationModeModalContents
-        onPressProceed={communicate}
-        contact={contacts[0]}
-      />
-    );
-  }
+  // function renderCommunicationModeContent() {
+  //   return (
+  //     <CommunicationModeModalContents
+  //       onPressProceed={communicate}
+  //       contact={contacts[0]}
+  //     />
+  //   );
+  // }
 
   return (
     <View style={BackupStyles.modalContainer}>
@@ -139,7 +114,7 @@ const TrustedContacts = props => {
           onSelectContact={selectedContactsList}
         />
       </View>
-      <BottomSheet
+      {/* <BottomSheet
         enabledInnerScrolling={true}
         ref={communicationModeBottomSheet}
         snapPoints={[
@@ -148,7 +123,7 @@ const TrustedContacts = props => {
         ]}
         renderContent={renderCommunicationModeContent}
         renderHeader={requestHeader}
-      />
+      /> */}
     </View>
   );
 };
