@@ -18,7 +18,7 @@ import {
 import BottomInfoBox from "../../components/BottomInfoBox";
 import DeviceInfo from "react-native-device-info";
 
-export default function RecoveryWalletName(props) {
+export default function WalletNameRecovery(props) {
   const [inputStyle, setInputStyle] = useState(styles.inputBox);
   const [walletName, setWalletName] = useState("");
 
@@ -92,7 +92,9 @@ export default function RecoveryWalletName(props) {
         >
           {walletName ? (
             <TouchableOpacity
-              onPress={() => props.navigation.navigate("")}
+              onPress={() =>
+                props.navigation.navigate("QuestionRecovery", { walletName })
+              }
               style={{ ...styles.proceedButtonView }}
             >
               <Text style={styles.proceedButtonText}>Proceed</Text>
