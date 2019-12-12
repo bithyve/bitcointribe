@@ -53,8 +53,8 @@ export const checkMSharesHealth = () => {
   return { type: CHECK_MSHARES_HEALTH };
 };
 
-export const requestShare = () => {
-  return { type: REQUEST_SHARE };
+export const requestShare = (walletName, shareIndex) => {
+  return { type: REQUEST_SHARE, payload: { walletName, shareIndex } };
 };
 
 export const updateDynamicNonPMDD = () => {
