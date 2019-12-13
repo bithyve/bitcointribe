@@ -12,7 +12,8 @@ import {
   credsAuthenticated,
   setupInitialized,
   switchSetupLoader,
-  switchReLogin
+  switchReLogin,
+  INIT_RECOVERY
 } from "../actions/setupAndAuth";
 import { insertIntoDB, keyFetched, fetchFromDB } from "../actions/storage";
 import { Database } from "../../common/interfaces/Interfaces";
@@ -29,7 +30,7 @@ function* initSetupWorker({ payload }) {
   const initialDatabase: Database = {
     WALLET_SETUP: { walletName, securityAns },
     DECENTRALIZED_BACKUP: {
-      RECOVERY_SHARES: [],
+      RECOVERY_SHARES: {},
       SHARES_TRANSFER_DETAILS: {},
       UNDER_CUSTODY: {},
       DYNAMIC_NONPMDD: {}
@@ -48,6 +49,29 @@ function* initSetupWorker({ payload }) {
 }
 
 export const initSetupWatcher = createWatcher(initSetupWorker, INIT_SETUP);
+
+function* initRecoveryWorker({ payload }) {
+  const { walletName, securityAns } = payload;
+
+  const initialDatabase: Database = {
+    WALLET_SETUP: { walletName, securityAns },
+    DECENTRALIZED_BACKUP: {
+      RECOVERY_SHARES: {},
+      SHARES_TRANSFER_DETAILS: {},
+      UNDER_CUSTODY: {},
+      DYNAMIC_NONPMDD: {}
+    }
+  };
+
+  yield put(insertIntoDB(initialDatabase));
+  // yield call(AsyncStorage.setItem, "walletExists", "true");
+  // yield put(setupInitialized());
+}
+
+export const initRecoveryWatcher = createWatcher(
+  initRecoveryWorker,
+  INIT_RECOVERY
+);
 
 function* credentialsStorageWorker({ payload }) {
   yield put(switchSetupLoader("storingCreds"));
