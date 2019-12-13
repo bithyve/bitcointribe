@@ -140,25 +140,26 @@ export const uploadEncMetaShareWatcher = createWatcher(
   UPLOAD_ENC_MSHARE
 );
 
-function* requestShareWorker() {
-  const { WALLET_SETUP, DECENTRALIZED_BACKUP } = yield select(
+function* requestShareWorker({ payload }) {
+  const { DECENTRALIZED_BACKUP, WALLET_SETUP } = yield select(
     state => state.storage.database
   );
 
-  if (DECENTRALIZED_BACKUP.RECOVERY_SHARES.length >= 3) {
+  if (Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).length >= 3) {
     console.log(DECENTRALIZED_BACKUP.RECOVERY_SHARES);
     return;
   } // capping to 3 shares reception
 
-  const { walletName } = WALLET_SETUP;
   const { otp, encryptedKey } = yield call(S3Service.generateRequestCreds);
 
   const updatedBackup = {
     ...DECENTRALIZED_BACKUP,
-    RECOVERY_SHARES: [
+    RECOVERY_SHARES: {
       ...DECENTRALIZED_BACKUP.RECOVERY_SHARES,
-      { REQUEST_DETAILS: { tag: walletName, otp, encryptedKey } }
-    ]
+      [payload.shareIndex]: {
+        REQUEST_DETAILS: { tag: WALLET_SETUP.walletName, otp, encryptedKey }
+      }
+    }
   };
 
   yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
@@ -252,18 +253,19 @@ function* downloadMetaShareWorker({ payload }) {
         }
       };
     } else {
-      const updatedRecoveryShares = DECENTRALIZED_BACKUP.RECOVERY_SHARES.map(
-        recoveryShare => {
-          if (recoveryShare.REQUEST_DETAILS.otp === otp) {
-            return {
-              REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
-              META_SHARE: metaShare,
-              ENC_DYNAMIC_NONPMDD: dynamicNonPMDD
-            };
-          }
-          return recoveryShare;
+      const updatedRecoveryShares = Object.keys(
+        DECENTRALIZED_BACKUP.RECOVERY_SHARES
+      ).map(key => {
+        const recoveryShare = DECENTRALIZED_BACKUP.RECOVERY_SHARES[key];
+        if (recoveryShare.REQUEST_DETAILS.otp === otp) {
+          return {
+            REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
+            META_SHARE: metaShare,
+            ENC_DYNAMIC_NONPMDD: dynamicNonPMDD
+          };
         }
-      );
+        return recoveryShare;
+      });
 
       updatedBackup = {
         ...DECENTRALIZED_BACKUP,
@@ -455,8 +457,8 @@ function* restoreDynamicNonPMDDWorker() {
   );
 
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
-  const dyanmicNonPMDDs: EncDynamicNonPMDD[] = RECOVERY_SHARES.map(
-    ({ ENC_DYNAMIC_NONPMDD }) => ENC_DYNAMIC_NONPMDD
+  const dyanmicNonPMDDs: EncDynamicNonPMDD[] = Object.keys(RECOVERY_SHARES).map(
+    key => RECOVERY_SHARES[key].ENC_DYNAMIC_NONPMDD
   );
 
   if (!dyanmicNonPMDDs.length) {
@@ -525,7 +527,8 @@ function* recoverWalletWorker({ payload }) {
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
 
   const metaShares = [];
-  RECOVERY_SHARES.forEach(({ META_SHARE }) => {
+  Object.keys(RECOVERY_SHARES).forEach(key => {
+    const { META_SHARE } = RECOVERY_SHARES[key];
     if (META_SHARE) metaShares.push(META_SHARE);
   });
   if (metaShares.length !== 3) {

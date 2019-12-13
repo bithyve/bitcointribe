@@ -30,7 +30,7 @@ const RestoreAndRecoverWallet = props => {
             right away
           </Text>
           <TouchableOpacity
-            onPress={() => this.props.navigation.navigate("NewWalletName")}
+            onPress={() => props.navigation.navigate("NewWalletName")}
             style={styles.NewWalletTouchableView}
           >
             <Image
