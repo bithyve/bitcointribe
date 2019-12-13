@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Image,
@@ -17,8 +17,12 @@ import {
 } from "react-native-responsive-screen";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import KnowMoreButton from "../../components/KnowMoreButton";
+import { useDispatch, useSelector } from "react-redux";
+import { initializeRecovery } from "../../store/actions/setupAndAuth";
 
 export default function RecoveryQuestionModalContents(props) {
+  const walletName = props.navigation.getParam("walletName");
+  const dispatch = useDispatch();
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
     id: "",
@@ -34,6 +38,12 @@ export default function RecoveryQuestionModalContents(props) {
     { id: "6", question: "Name of your favourite teacher?" },
     { id: "7", question: "Name of your favourite teacher?" }
   ]);
+
+  const { insertedIntoDB } = useSelector(state => state.storage);
+  useEffect(() => {
+    if (insertedIntoDB)
+      props.navigation.navigate("RestoreSelectedContactsList");
+  }, [insertedIntoDB]);
 
   return (
     <View style={{ ...styles.modalContentContainer, height: "100%" }}>
@@ -156,9 +166,9 @@ export default function RecoveryQuestionModalContents(props) {
           </View>
           <TouchableOpacity
             disabled={dropdownBoxValue.id && answer ? false : true}
-            onPress={() =>
-              props.navigation.navigate("RestoreSelectedContactsList")
-            }
+            onPress={() => {
+              dispatch(initializeRecovery(walletName, answer));
+            }}
             style={styles.questionConfirmButton}
           >
             <Text style={styles.proceedButtonText}>Confirm</Text>

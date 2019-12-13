@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput, Button } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet, Button } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
   requestShare,
@@ -14,19 +14,32 @@ const RecoveryScreen = props => {
   const { mnemonic } = useSelector(state => state.sss);
   const dispatch = useDispatch();
 
+  const { WALLET_SETUP } = useSelector(state => state.storage.database);
   const { RECOVERY_SHARES } = useSelector(
     state => state.storage.database.DECENTRALIZED_BACKUP
   );
 
   const metaShares = [];
-  RECOVERY_SHARES.forEach(({ META_SHARE }) => {
+  Object.keys(RECOVERY_SHARES).forEach(key => {
+    const { META_SHARE } = RECOVERY_SHARES[key];
     if (META_SHARE) metaShares.push(META_SHARE);
   });
 
   return (
     <View style={styles.screen}>
-      <Button title="Request Share" onPress={() => dispatch(requestShare())} />
-      {RECOVERY_SHARES.map(({ REQUEST_DETAILS, META_SHARE }) => {
+      <Button
+        title="Request Share"
+        onPress={() => {
+          dispatch(
+            requestShare(
+              WALLET_SETUP.walletName,
+              Object.keys(RECOVERY_SHARES).length
+            )
+          );
+        }}
+      />
+      {Object.keys(RECOVERY_SHARES).map(key => {
+        const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[key];
         if (META_SHARE) return;
         const { otp, encryptedKey } = REQUEST_DETAILS;
 
