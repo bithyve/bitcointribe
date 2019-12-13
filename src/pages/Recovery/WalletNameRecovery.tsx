@@ -8,17 +8,17 @@ import {
   KeyboardAvoidingView,
   Platform
 } from "react-native";
-import Colors from "../common/Colors";
-import Fonts from "../common/Fonts";
+import Colors from "../../common/Colors";
+import Fonts from "../../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
-import BottomInfoBox from "./BottomInfoBox";
+import BottomInfoBox from "../../components/BottomInfoBox";
 import DeviceInfo from "react-native-device-info";
 
-export default function WalletNameRecoveryModalContents(props) {
+export default function WalletNameRecovery(props) {
   const [inputStyle, setInputStyle] = useState(styles.inputBox);
   const [walletName, setWalletName] = useState("");
 
@@ -74,15 +74,12 @@ export default function WalletNameRecoveryModalContents(props) {
             value={walletName}
             onChangeText={text => {
               setWalletName(text);
-              props.onTextChange(text);
             }}
             onFocus={() => {
               setInputStyle(styles.inputBoxFocused);
-              props.onPressTextBoxFocus();
             }}
             onBlur={() => {
               setInputStyle(styles.inputBox);
-              props.onPressTextBoxBlur();
             }}
           />
         </View>
@@ -95,7 +92,9 @@ export default function WalletNameRecoveryModalContents(props) {
         >
           {walletName ? (
             <TouchableOpacity
-              onPress={() => props.onPressProceed()}
+              onPress={() =>
+                props.navigation.navigate("QuestionRecovery", { walletName })
+              }
               style={{ ...styles.proceedButtonView }}
             >
               <Text style={styles.proceedButtonText}>Proceed</Text>
