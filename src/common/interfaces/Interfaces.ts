@@ -28,7 +28,7 @@ export interface Database {
     };
     DYNAMIC_NONPMDD: DynamicNonPMDD;
   };
-  SERVICES: {
+  SERVICES?: {
     REGULAR_ACCOUNT: string;
     TEST_ACCOUNT: string;
     SECURE_ACCOUNT: string;
