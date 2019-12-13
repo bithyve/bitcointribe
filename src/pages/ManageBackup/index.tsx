@@ -21,7 +21,6 @@ import {
 import { RFValue } from "react-native-responsive-fontsize";
 import BottomSheet from "reanimated-bottom-sheet";
 import KnowMoreButton from "../../components/KnowMoreButton";
-
 import { useDispatch, useSelector } from "react-redux";
 import { initHealthCheck } from "../../store/actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
@@ -76,70 +75,67 @@ export default function ManageBackup(props) {
       title: "Secondary Device",
       time: "3 months ago",
       status: "error",
-      type: "secondaryDevice"
+      type: "secondaryDevice",
+      route: "SecondaryDevice"
     },
     {
       title: "Trusted Contact 1",
       time: "1 month ago",
       status: "error",
-      type: "contact"
+      type: "contact",
+      route: "TrustedContacts"
     },
     {
       title: "Trusted Contact 2",
       time: "12 days ago",
       status: "warning",
-      type: "contact"
+      type: "contact",
+      route: "TrustedContacts"
     },
     {
       title: "Cloud",
       time: "2 days ago",
       status: "success",
-      type: "cloud"
+      type: "cloud",
+      route: "Cloud"
     },
     {
       title: "Print",
       time: "3 days ago",
       status: "success",
-      type: "print"
+      type: "print",
+      route: "Cloud"
     },
     {
       title: "Security Questions",
       time: "1 day ago",
       status: "success",
-      type: "security"
+      type: "security",
+      route: "Cloud"
     }
   ]);
 
-  //   useEffect(() => { // selectedType is populated based on the degradation of health
-  //     setTimeout(() => {
-  //       if (!selectedType) {
-  //         setSelectedType("secondaryDevice");
-  //         setSelectedStatus("error");
-  //       }
-  //     }, 3000);
-  //   });
+  // function selectedContactsList(list) {
+  //   setContacts(list);
+  // }
 
-  function selectedContactsList(list) {
-    setContacts(list);
-  }
+  // function continueNProceed() {
+  //   bottomSheet.current.snapTo(0);
+  // setTimeout(() => {
+  //   setSelectedType("cloud");
+  //   setSelectedStatus("success");
+  // }, 1000);
+  //}
 
-  function continueNProceed() {
-    bottomSheet.current.snapTo(0);
-    // setTimeout(() => {
-    //   setSelectedType("cloud");
-    //   setSelectedStatus("success");
-    // }, 1000);
-  }
+  // const [contactIndex, setContactIndex] = useState();
+  // function openModal(type, title?) {
+  //   // title as dummy identifier for Trusted Contact index
+  //   setSelectedType(type);
+  //   if (title)
+  //     title === "Trusted Contact 1" ? setContactIndex(1) : setContactIndex(2);
 
-  const [contactIndex, setContactIndex] = useState();
-  function openModal(type, title?) {
-    // title as dummy identifier for Trusted Contact index
-    setSelectedType(type);
-    if (title)
-      title === "Trusted Contact 1" ? setContactIndex(1) : setContactIndex(2);
-
-    bottomSheet.current.snapTo(1);
-  }
+  //   bottomSheet.current.snapTo(1);
+  // }
 
   //   function onCloseEnd() {
   //     if (selectedType == "secondaryDevice") {
@@ -158,33 +154,33 @@ export default function ManageBackup(props) {
     }
   };
 
-  function renderContent() {
-    switch (selectedType) {
-      case "secondaryDevice":
-        props.navigation.navigate("SecondaryDevice");
-        break;
-      case "contact":
-        props.navigation.navigate("TrustedContacts", { index: contactIndex });
-        break;
-      case "cloud":
-        props.navigation.navigate("Cloud");
-        break;
-    }
-  }
+  // function renderContent() {
+  //   switch (selectedType) {
+  //     case "secondaryDevice":
+  //       props.navigation.navigate("SecondaryDevice");
+  //       break;
+  //     case "contact":
+  //       props.navigation.navigate("TrustedContacts", { index: contactIndex });
+  //       break;
+  //     case "cloud":
+  //       props.navigation.navigate("Cloud");
+  //       break;
+  //   }
+  // }
 
-  function renderHeader() {
-    return (
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => {
-          bottomSheet.current.snapTo(0);
-        }}
-        style={styles.modalHeader}
-      >
-        <View style={styles.modalHeaderHandle} />
-      </TouchableOpacity>
-    );
-  }
+  // function renderHeader() {
+  //   return (
+  //     <TouchableOpacity
+  //       activeOpacity={10}
+  //       onPress={() => {
+  //         bottomSheet.current.snapTo(0);
+  //       }}
+  //       style={styles.modalHeader}
+  //     >
+  //       <View style={styles.modalHeaderHandle} />
+  //     </TouchableOpacity>
+  //   );
+  // }
 
   const dispatch = useDispatch();
   const s3Service: S3Service = useSelector(state => state.sss.service);
@@ -247,8 +243,16 @@ export default function ManageBackup(props) {
               // }}
               >
                 <TouchableOpacity
-                  //   disabled={item.type == selectedType ? false : true}
-                  onPress={() => openModal(item.type, item.title)}
+                  onPress={() =>
+                    props.navigation.navigate(item.route, {
+                      index:
+                        item.title === "Trusted Contact 1"
+                          ? 1
+                          : item.title === "Trusted Contact 2"
+                          ? 2
+                          : undefined
+                    })
+                  }
                   style={{
                     ...styles.manageBackupCard,
                     borderColor:
@@ -303,14 +307,14 @@ export default function ManageBackup(props) {
             )}
           />
         </ScrollView>
-        <BottomSheet
+        {/* <BottomSheet
           //   onCloseEnd={() => onCloseEnd()}
           enabledInnerScrolling={true}
           ref={bottomSheet}
           snapPoints={[-30, hp("90%")]}
           renderContent={renderContent}
           renderHeader={renderHeader}
-        />
+        /> */}
       </View>
     </SafeAreaView>
   );

@@ -7,7 +7,7 @@ import {
 import Launch from "../pages/Launch";
 import Login from "../pages/Login";
 import PasscodeConfirm from "../pages/PasscodeConfirm";
-import RestoreAndReoverWallet from "../pages/RestoreAndReoverWallet";
+import RestoreAndRecoverWallet from "../pages/RestoreAndRecoverWallet";
 import RestoreSelectedContactsList from "../pages/RestoreSelectedContactsList";
 import NewWalletName from "../pages/NewWalletName";
 import NewWalletQuestion from "../pages/NewWalletQuestion";
@@ -21,8 +21,11 @@ import ManageBackup from "../pages/ManageBackup";
 import CustodianRequestOTP from "../pages/CustodianRequest/CustodianRequestOTP";
 import CustodianRequestAccepted from "../pages/CustodianRequest/CustodianRequestAccepted";
 import SecondaryDevice from "../pages/ManageBackup/SecondaryDevice";
+import CommunicationMode from "../pages/ManageBackup/CommunicationMode";
 import TrustedContacts from "../pages/ManageBackup/TrustedContacts";
 import Cloud from "../pages/ManageBackup/Cloud";
+import WalletNameRecovery from "../pages/Recovery/WalletNameRecovery";
+import QuestionRecovery from "../pages/Recovery/QuestionRecovery";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -31,7 +34,9 @@ const SetupNavigator = createStackNavigator(
     PasscodeConfirm,
     NewWalletName,
     NewWalletQuestion,
-    RestoreAndReoverWallet,
+    RestoreAndRecoverWallet,
+    WalletNameRecovery,
+    QuestionRecovery,
     RestoreSelectedContactsList,
     RestoreWalletBySecondaryDevice,
     RestoreWalletUsingDocuments,
@@ -46,6 +51,14 @@ const SetupNavigator = createStackNavigator(
   }
 );
 
+const MODAL_ROUTES = [
+  "SecondaryDevice",
+  "CommunicationMode",
+  "TrustedContacts",
+  "Cloud",
+  "CustodianRequestOTP",
+  "CustodianRequestAccepted"
+];
 const HomeNavigator = createStackNavigator(
   {
     Home,
@@ -58,6 +71,7 @@ const HomeNavigator = createStackNavigator(
     Accounts,
     ManageBackup,
     SecondaryDevice,
+    CommunicationMode,
     TrustedContacts,
     Cloud,
     CustodianRequestOTP,
@@ -69,19 +83,17 @@ const HomeNavigator = createStackNavigator(
       header: null
     }),
     transitionConfig: (transitionProps, prevTransitionProps) => {
-      if (
-        transitionProps.scene.route.routeName === "CustodianRequestOTP" ||
-        (prevTransitionProps &&
-          "CustodianRequestOTP" === prevTransitionProps.scene.route.routeName)
-      )
-        return StackViewTransitionConfigs.defaultTransitionConfig(
-          transitionProps,
-          prevTransitionProps,
-          true
-        );
+      const isModal = MODAL_ROUTES.some(
+        screenName =>
+          screenName === transitionProps.scene.route.routeName ||
+          (prevTransitionProps &&
+            screenName === prevTransitionProps.scene.route.routeName)
+      );
+
       return StackViewTransitionConfigs.defaultTransitionConfig(
         transitionProps,
-        prevTransitionProps
+        prevTransitionProps,
+        isModal
       );
     }
   }
