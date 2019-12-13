@@ -2,6 +2,7 @@
 export const STORE_CREDS = "STORE_CREDS";
 export const CREDS_AUTH = "CREDS_AUTH";
 export const INIT_SETUP = "INIT_SETUP";
+export const INIT_RECOVERY = "INIT_RECOVERY";
 export const RE_LOGIN = "RE_LOGIN";
 
 export const storeCreds = passcode => {
@@ -14,6 +15,10 @@ export const credsAuth = (passcode, reLogin?) => {
 
 export const initializeSetup = (walletName, securityAns) => {
   return { type: INIT_SETUP, payload: { walletName, securityAns } };
+};
+
+export const initializeRecovery = (walletName, securityAns) => {
+  return { type: INIT_RECOVERY, payload: { walletName, securityAns } };
 };
 
 export const switchReLogin = (loggedIn, reset?) => {
