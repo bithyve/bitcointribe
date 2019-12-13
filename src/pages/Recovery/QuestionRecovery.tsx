@@ -17,10 +17,12 @@ import {
 } from "react-native-responsive-screen";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import KnowMoreButton from "../../components/KnowMoreButton";
+import { useDispatch } from "react-redux";
+import { initializeRecovery } from "../../store/actions/setupAndAuth";
 
 export default function RecoveryQuestionModalContents(props) {
   const walletName = props.navigation.getParam("walletName");
-
+  const dispatch = useDispatch();
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
     id: "",
@@ -159,13 +161,8 @@ export default function RecoveryQuestionModalContents(props) {
           <TouchableOpacity
             disabled={dropdownBoxValue.id && answer ? false : true}
             onPress={() => {
-              let walletDetails = {
-                walletName,
-                securityAns: answer
-              };
-              props.navigation.navigate("RestoreSelectedContactsList", {
-                walletDetails
-              });
+              dispatch(initializeRecovery(walletName, answer));
+              props.navigation.navigate("RestoreSelectedContactsList");
             }}
             style={styles.questionConfirmButton}
           >
