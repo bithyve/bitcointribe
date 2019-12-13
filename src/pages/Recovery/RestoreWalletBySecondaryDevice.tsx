@@ -33,7 +33,6 @@ import QRCode from "react-native-qrcode-svg";
 export default function RestoreWalletBySecondaryDevice(props) {
   const [secondaryQR, setSecondaryQR] = useState("");
 
-  const walletName = props.navigation.getParam("walletName");
   const { RECOVERY_SHARES } = useSelector(
     state => state.storage.database.DECENTRALIZED_BACKUP
   );
@@ -53,7 +52,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
 
   const dispatch = useDispatch();
   useEffect(() => {
-    if (!REQUEST_DETAILS) dispatch(requestShare(walletName, 0));
+    if (!REQUEST_DETAILS) dispatch(requestShare(0));
   }, []);
 
   return (

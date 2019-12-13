@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Image,
@@ -17,7 +17,7 @@ import {
 } from "react-native-responsive-screen";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import KnowMoreButton from "../../components/KnowMoreButton";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { initializeRecovery } from "../../store/actions/setupAndAuth";
 
 export default function RecoveryQuestionModalContents(props) {
@@ -38,6 +38,12 @@ export default function RecoveryQuestionModalContents(props) {
     { id: "6", question: "Name of your favourite teacher?" },
     { id: "7", question: "Name of your favourite teacher?" }
   ]);
+
+  const { insertedIntoDB } = useSelector(state => state.storage);
+  useEffect(() => {
+    if (insertedIntoDB)
+      props.navigation.navigate("RestoreSelectedContactsList");
+  }, [insertedIntoDB]);
 
   return (
     <View style={{ ...styles.modalContentContainer, height: "100%" }}>
@@ -162,7 +168,6 @@ export default function RecoveryQuestionModalContents(props) {
             disabled={dropdownBoxValue.id && answer ? false : true}
             onPress={() => {
               dispatch(initializeRecovery(walletName, answer));
-              props.navigation.navigate("RestoreSelectedContactsList");
             }}
             style={styles.questionConfirmButton}
           >
