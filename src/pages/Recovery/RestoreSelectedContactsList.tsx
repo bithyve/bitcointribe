@@ -37,8 +37,6 @@ import RecoverySuccessModalContents from "../../components/RecoverySuccessModalC
 import RecoveryWalletNameModalContents from "../../components/RecoveryWalletNameModalContents";
 
 export default function RestoreSelectedContactsList(props) {
-  const walletDetails = props.navigation.getParam("walletDetails");
-
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [walletNameBottomSheet, setWalletNameBottomSheet] = useState(
     React.createRef()
@@ -240,9 +238,7 @@ export default function RestoreSelectedContactsList(props) {
         <TouchableOpacity
           style={{ ...styles.listElements, marginTop: 60 }}
           onPress={() =>
-            props.navigation.navigate("RestoreWalletBySecondaryDevice", {
-              walletName: walletDetails.walletName
-            })
+            props.navigation.navigate("RestoreWalletBySecondaryDevice")
           }
         >
           <Image

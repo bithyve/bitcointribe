@@ -141,7 +141,7 @@ export const uploadEncMetaShareWatcher = createWatcher(
 );
 
 function* requestShareWorker({ payload }) {
-  const { DECENTRALIZED_BACKUP } = yield select(
+  const { DECENTRALIZED_BACKUP, WALLET_SETUP } = yield select(
     state => state.storage.database
   );
 
@@ -157,7 +157,7 @@ function* requestShareWorker({ payload }) {
     RECOVERY_SHARES: {
       ...DECENTRALIZED_BACKUP.RECOVERY_SHARES,
       [payload.shareIndex]: {
-        REQUEST_DETAILS: { tag: payload.walletName, otp, encryptedKey }
+        REQUEST_DETAILS: { tag: WALLET_SETUP.walletName, otp, encryptedKey }
       }
     }
   };
