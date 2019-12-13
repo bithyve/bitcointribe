@@ -19,6 +19,8 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import KnowMoreButton from "../../components/KnowMoreButton";
 
 export default function RecoveryQuestionModalContents(props) {
+  const walletName = props.navigation.getParam("walletName");
+
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
     id: "",
@@ -156,9 +158,15 @@ export default function RecoveryQuestionModalContents(props) {
           </View>
           <TouchableOpacity
             disabled={dropdownBoxValue.id && answer ? false : true}
-            onPress={() =>
-              props.navigation.navigate("RestoreSelectedContactsList")
-            }
+            onPress={() => {
+              let walletDetails = {
+                walletName,
+                securityAns: answer
+              };
+              props.navigation.navigate("RestoreSelectedContactsList", {
+                walletDetails
+              });
+            }}
             style={styles.questionConfirmButton}
           >
             <Text style={styles.proceedButtonText}>Confirm</Text>

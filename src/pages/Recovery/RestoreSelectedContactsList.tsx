@@ -15,9 +15,9 @@ import {
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import Fonts from "../common/Fonts";
-import Colors from "../common/Colors";
-import CommonStyles from "../common/Styles";
+import Fonts from "../../common/Fonts";
+import Colors from "../../common/Colors";
+import CommonStyles from "../../common/Styles";
 import { RFValue } from "react-native-responsive-fontsize";
 import BottomSheet from "reanimated-bottom-sheet";
 import DeviceInfo from "react-native-device-info";
@@ -26,17 +26,19 @@ import {
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import Feather from "react-native-vector-icons/Feather";
-import HeaderTitle from "../components/HeaderTitle";
-import BottomInfoBox from "../components/BottomInfoBox";
-import KnowMoreButton from "../components/KnowMoreButton";
-import RequestModalContents from "../components/RequestModalContents";
-import TransparentHeaderModal from "../components/TransparentHeaderModal";
+import HeaderTitle from "../../components/HeaderTitle";
+import BottomInfoBox from "../../components/BottomInfoBox";
+import KnowMoreButton from "../../components/KnowMoreButton";
+import RequestModalContents from "../../components/RequestModalContents";
+import TransparentHeaderModal from "../../components/TransparentHeaderModal";
 import Entypo from "react-native-vector-icons/Entypo";
-import RecoveryQuestionModalContents from "../components/RecoveryQuestionModalContents";
-import RecoverySuccessModalContents from "../components/RecoverySuccessModalContents";
-import RecoveryWalletNameModalContents from "../components/RecoveryWalletNameModalContents";
+import RecoveryQuestionModalContents from "../../components/RecoveryQuestionModalContents";
+import RecoverySuccessModalContents from "../../components/RecoverySuccessModalContents";
+import RecoveryWalletNameModalContents from "../../components/RecoveryWalletNameModalContents";
 
 export default function RestoreSelectedContactsList(props) {
+  const walletDetails = props.navigation.getParam("walletDetails");
+
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [walletNameBottomSheet, setWalletNameBottomSheet] = useState(
     React.createRef()
@@ -52,7 +54,7 @@ export default function RestoreSelectedContactsList(props) {
     React.createRef()
   );
   const [walletNameOpenModal, setWalletNameOpenModal] = useState("close");
-  const [walletName, setWalletName] = useState("");
+  // const [walletName, setWalletName] = useState("");
   const [isContactSelected, setIsContactSelected] = useState(true);
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
     id: "",
@@ -60,24 +62,24 @@ export default function RestoreSelectedContactsList(props) {
   });
   const [answer, setAnswer] = useState("");
 
-  function openCloseModal() {
-    if (!walletName) {
-      walletNameBottomSheet.current.snapTo(0);
-      return;
-    }
-    if (walletNameOpenModal == "closed") {
-      setWalletNameOpenModal("half");
-      return;
-    }
-    if (walletNameOpenModal == "half") {
-      setWalletNameOpenModal("full");
-      return;
-    }
-    if (walletNameOpenModal == "full") {
-      setWalletNameOpenModal("closed");
-      return;
-    }
-  }
+  // function openCloseModal() {
+  //   if (!walletName) {
+  //     walletNameBottomSheet.current.snapTo(0);
+  //     return;
+  //   }
+  //   if (walletNameOpenModal == "closed") {
+  //     setWalletNameOpenModal("half");
+  //     return;
+  //   }
+  //   if (walletNameOpenModal == "half") {
+  //     setWalletNameOpenModal("full");
+  //     return;
+  //   }
+  //   if (walletNameOpenModal == "full") {
+  //     setWalletNameOpenModal("closed");
+  //     return;
+  //   }
+  // }
 
   const getSelectedContactList = async () => {
     let contactList = await AsyncStorage.getItem("selectedContacts");
@@ -238,12 +240,14 @@ export default function RestoreSelectedContactsList(props) {
         <TouchableOpacity
           style={{ ...styles.listElements, marginTop: 60 }}
           onPress={() =>
-            props.navigation.navigate("RestoreWalletBySecondaryDevice")
+            props.navigation.navigate("RestoreWalletBySecondaryDevice", {
+              walletName: walletDetails.walletName
+            })
           }
         >
           <Image
             style={styles.iconImage}
-            source={require("../assets/images/icons/icon_secondarydevice.png")}
+            source={require("../../assets/images/icons/icon_secondarydevice.png")}
           />
           <View style={styles.textInfoView}>
             <Text style={styles.listElementsTitle}>Secondary Device (One)</Text>
@@ -272,7 +276,7 @@ export default function RestoreSelectedContactsList(props) {
           >
             <Image
               style={styles.iconImage}
-              source={require("../assets/images/icons/icon_contact.png")}
+              source={require("../../assets/images/icons/icon_contact.png")}
             />
             <View style={styles.textInfoView}>
               <Text style={styles.listElementsTitle}>
@@ -447,7 +451,7 @@ export default function RestoreSelectedContactsList(props) {
         >
           <Image
             style={styles.iconImage}
-            source={require("../assets/images/icons/files-and-folders-2.png")}
+            source={require("../../assets/images/icons/files-and-folders-2.png")}
           />
           <View style={styles.textInfoView}>
             <Text style={styles.listElementsTitle}>Personal Copies (Two)</Text>
