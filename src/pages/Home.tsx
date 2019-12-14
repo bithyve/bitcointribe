@@ -782,9 +782,15 @@ export default function Home(props) {
   const handleDeepLink = event => {
     const splits = event.url.split("/");
     const requester = splits[3];
-    if (splits[4] === "sss" && splits[5] === "ek") {
-      const custodyRequest = { requester, ek: splits[6] };
-      props.navigation.navigate("Home", { custodyRequest });
+
+    if (splits[4] === "sss") {
+      if (splits[5] === "ek") {
+        const custodyRequest = { requester, ek: splits[6] };
+        props.navigation.navigate("Home", { custodyRequest });
+      } else if (splits[5] === "rk") {
+        const recoveryRequest = { requester, rk: splits[6] };
+        props.navigation.replace("Home", { recoveryRequest });
+      }
     }
   };
 
@@ -795,6 +801,8 @@ export default function Home(props) {
   }, []);
 
   const custodyRequest = props.navigation.getParam("custodyRequest");
+  const recoveryRequest = props.navigation.getParam("recoveryRequest");
+
   useEffect(() => {
     if (custodyRequest) {
       setTimeout(() => {
@@ -804,6 +812,12 @@ export default function Home(props) {
       bottomSheet.current.snapTo(1);
     }
   }, [custodyRequest]);
+
+  useEffect(() => {
+    if (recoveryRequest) {
+      Alert.alert(JSON.stringify(recoveryRequest));
+    }
+  }, [recoveryRequest]);
 
   return (
     <ImageBackground
