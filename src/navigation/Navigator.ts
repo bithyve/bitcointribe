@@ -26,6 +26,7 @@ import TrustedContacts from "../pages/ManageBackup/TrustedContacts";
 import Cloud from "../pages/ManageBackup/Cloud";
 import WalletNameRecovery from "../pages/Recovery/WalletNameRecovery";
 import QuestionRecovery from "../pages/Recovery/QuestionRecovery";
+import RecoveryCommunication from "../pages/Recovery/RecoveryCommunication";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -40,7 +41,8 @@ const SetupNavigator = createStackNavigator(
     RestoreSelectedContactsList,
     RestoreWalletBySecondaryDevice,
     RestoreWalletUsingDocuments,
-    RestoreWalletByContacts
+    RestoreWalletByContacts,
+    RecoveryCommunication
   },
   {
     initialRouteName: "Launch",
