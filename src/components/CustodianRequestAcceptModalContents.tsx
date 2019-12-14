@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  View,
-  Image,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  Platform
-} from "react-native";
+import { View, Image, TouchableOpacity, Text, StyleSheet } from "react-native";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -14,13 +7,8 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
-import { TouchableNativeFeedback } from "react-native-gesture-handler";
 
 export default function CustodianRequestAcceptModalContents(props) {
-  let TouchableElement;
-  TouchableElement =
-    Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity;
-
   return (
     <View style={{ ...styles.modalContentContainer, height: "100%" }}>
       <View style={{ height: "100%" }}>
@@ -69,13 +57,13 @@ export default function CustodianRequestAcceptModalContents(props) {
             alignItems: "center"
           }}
         >
-          <TouchableElement
+          <TouchableOpacity
             onPress={() => props.onPressAssociateContacts()}
             style={{ ...styles.successModalButtonView }}
           >
             <Text style={styles.proceedButtonText}>Associate Contact</Text>
-          </TouchableElement>
-          <TouchableElement
+          </TouchableOpacity>
+          <TouchableOpacity
             onPress={() => props.onPressSkip()}
             style={{
               height: wp("13%"),
@@ -87,7 +75,7 @@ export default function CustodianRequestAcceptModalContents(props) {
             <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
               Skip
             </Text>
-          </TouchableElement>
+          </TouchableOpacity>
           <Image
             source={require("../assets/images/icons/accept.png")}
             style={styles.successModalImage}
@@ -188,9 +176,9 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansMedium
   },
   successModalImage: {
-    width: wp("25%"),
-    height: hp("20%"),
+    width: wp("30%"),
+    height: wp("35%"),
     marginLeft: "auto",
-    resizeMode: "cover"
+    resizeMode: "contain"
   }
 });

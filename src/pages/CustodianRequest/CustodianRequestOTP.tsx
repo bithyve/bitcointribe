@@ -7,7 +7,6 @@ import {
   TextInput,
   StyleSheet,
   ActivityIndicator,
-  Platform,
   Alert
 } from "react-native";
 import Colors from "../../common/Colors";
@@ -19,13 +18,8 @@ import {
 } from "react-native-responsive-screen";
 import { downloadMShare } from "../../store/actions/sss";
 import { useDispatch, useSelector } from "react-redux";
-import { TouchableNativeFeedback } from "react-native-gesture-handler";
 
 export default function CustodianRequestOTP(props) {
-  let TouchableElement;
-  TouchableElement =
-    Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity;
-
   const custodyRequest = props.navigation.getParam("custodyRequest");
   const { requester, ek } = custodyRequest;
   const [passcode, setPasscode] = useState("");
@@ -275,7 +269,7 @@ export default function CustodianRequestOTP(props) {
           </Text>
         </View>
         <View style={{ flexDirection: "row", marginTop: "auto" }}>
-          <TouchableElement
+          <TouchableOpacity
             onPress={onOTPSubmit}
             style={{ ...styles.confirmModalButtonView }}
           >
@@ -284,7 +278,7 @@ export default function CustodianRequestOTP(props) {
             ) : (
               <Text style={styles.confirmButtonText}>Confirm</Text>
             )}
-          </TouchableElement>
+          </TouchableOpacity>
         </View>
       </View>
     </View>

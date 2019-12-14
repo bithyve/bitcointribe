@@ -15,7 +15,7 @@ import ProgressCircle from 'react-native-progress-circle'
 
 export default function HomePageShield(props) {
 
-    return (<ImageBackground source={require("../assets/images/icons/protector.png")} style={{
+    return (<ImageBackground source={props.shieldImage ? props.shieldImage : require("../assets/images/icons/protector.png")} style={{
         width: wp('17%'),
         height: wp('25%'),
         justifyContent: 'center',
@@ -28,7 +28,7 @@ export default function HomePageShield(props) {
             radius={wp('4%')}
             borderWidth={2}
             color={Colors.white}
-            shadowColor={"#006CB4"}
+            shadowColor={props.circleShadowColor ? props.circleShadowColor :"#006CB4"}
             bgColor={props.shieldStatus == 0 ? Colors.red : props.shieldStatus > 0 && props.shieldStatus <= 50 ? Colors.yellow : props.shieldStatus > 50 && props.shieldStatus <= 100 ? Colors.green : Colors.red}
         >
         <View style={{
