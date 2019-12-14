@@ -41,12 +41,106 @@ import SmallHeaderModal from "../components/SmallHeaderModal";
 import AddressBookContents from "../components/AddressBookContents";
 import CustodianRequestAcceptModalContents from "../components/CustodianRequestAcceptModalContents";
 import HomePageShield from "../components/HomePageShield";
+import ErrorModalContents from "../components/ErrorModalContents";
+import TransactionDetailsContents from "../components/TransactionDetailsContents";
+import TransactionListModalContents from "../components/TransactionListModalContents";
+import AddModalContents from "../components/AddModalContents";
+import QrCodeModalContents from "../components/QrCodeModalContents";
+import FastBitcoinModalContents from "../components/FastBitcoinModalContents";
+import FastBitcoinCalculationModalContents from "../components/FastBitcoinCalculationModalContents";
+import GetBittrModalContents from "../components/GetBittrModalContents";
+import AddContactsModalContents from "../components/AddContactsModalContents";
+import FamilyandFriendsAddressBookModalContents from "../components/FamilyandFriendsAddressBookModalContents";
+import SelectedContactFromAddressBook from "../components/SelectedContactFromAddressBook";
+import SelectedContactFromAddressBookQrCode from "../components/SelectedContactFromAddressBookQrCode";
+import HealthCheckSecurityQuestionModalContents from "../components/HealthCheckSecurityQuestionModalContents";
+import HealthCheckGoogleAuthModalContents from "../components/HealthCheckGoogleAuthModalContents";
 import { AppState } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 
+// Note: For health check modal open we have added touchable to shield of homepage and correct question is "Name of your favourite food?" second option from dropdown, correct answer is "Sweets".
+
 export default function Home(props) {
+  const [dropdownBoxValue, setDropdownBoxValue] = useState({
+    id: "",
+    question: ""
+  });
+  const [answer, setAnswer] = useState("");
+  const [selectToAdd, setSelectToAdd] = useState("");
+  const [openmodal, setOpenmodal] = useState("closed");
   const [tabBarZIndex, setTabBarZIndex] = useState(999);
+  const [tabSelected, setTabSelected] = useState("sell");
   const [switchOn, setSwitchOn] = useState(true);
+  const [selected, setSelected] = useState("Transactions");
+  const [
+    HealthCheckSuccessBottomSheet,
+    setHealthCheckSuccessBottomSheet
+  ] = useState(React.createRef());
+  const [
+    HealthCheckGoogleAuthBottomSheet,
+    setHealthCheckGoogleAuthBottomSheet
+  ] = useState(React.createRef());
+  const [
+    HealthCheckSecurityQuestionBottomSheet,
+    setHealthCheckSecurityQuestionBottomSheet
+  ] = useState(React.createRef());
+  const [
+    ContactSelectedFromAddressBookQrCodeBottomSheet,
+    setContactSelectedFromAddressBookQrCodeBottomSheet
+  ] = useState(React.createRef());
+  const [
+    ContactSelectedFromAddressBookBottomSheet,
+    setContactSelectedFromAddressBookBottomSheet
+  ] = useState(React.createRef());
+  const [
+    FamilyAndFriendAddressBookBottomSheet,
+    setFamilyAndFriendAddressBookBottomSheet
+  ] = useState(React.createRef());
+  const [AddBottomSheet, setAddBottomSheet] = useState(React.createRef());
+  const [
+    fastBitcoinSellCalculationBottomSheet,
+    setFastBitcoinSellCalculationBottomSheet
+  ] = useState(React.createRef());
+  const [
+    fastBitcoinRedeemCalculationBottomSheet,
+    setFastBitcoinRedeemCalculationBottomSheet
+  ] = useState(React.createRef());
+
+  const [addressBookBottomSheet, setAddressBookBottomSheet] = useState(
+    React.createRef()
+  );
+  const [MoreTabBottomSheet, setMoreTabBottomSheet] = useState(
+    React.createRef()
+  );
+  const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
+    React.createRef()
+  );
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [
+    PinChangeSuccessBottomSheet,
+    setPinChangeSuccessBottomSheet
+  ] = useState(React.createRef());
+  const [
+    CustodianRequestBottomSheet,
+    setCustodianRequestBottomSheet
+  ] = useState(React.createRef());
+  const [
+    CustodianRequestOtpBottomSheet,
+    setCustodianRequestOtpBottomSheet
+  ] = useState(React.createRef());
+  const [
+    CustodianRequestRejectedBottomSheet,
+    setCustodianRequestRejectedBottomSheet
+  ] = useState(React.createRef());
+  const [
+    CustodianRequestAcceptBottomSheet,
+    setCustodianRequestAcceptBottomSheet
+  ] = useState(React.createRef());
+  const [
+    transactionDetailsBottomSheet,
+    setTransactionDetailsBottomSheet
+  ] = useState(React.createRef());
+  const [bottomSheet, setBottomSheet] = useState(React.createRef());
   const [data, setData] = useState([
     [
       {
@@ -95,33 +189,6 @@ export default function Home(props) {
       }
     ]
   ]);
-  const [selected, setSelected] = useState("Transactions");
-  const [addressBookBottomSheet, setAddressBookBottomSheet] = useState(
-    React.createRef()
-  );
-  const [MoreTabBottomSheet, setMoreTabBottomSheet] = useState(
-    React.createRef()
-  );
-  const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
-    React.createRef()
-  );
-  const [
-    CustodianRequestBottomSheet,
-    setCustodianRequestBottomSheet
-  ] = useState(React.createRef());
-  const [
-    CustodianRequestOtpBottomSheet,
-    setCustodianRequestOtpBottomSheet
-  ] = useState(React.createRef());
-  const [
-    CustodianRequestRejectedBottomSheet,
-    setCustodianRequestRejectedBottomSheet
-  ] = useState(React.createRef());
-  const [
-    CustodianRequestAcceptBottomSheet,
-    setCustodianRequestAcceptBottomSheet
-  ] = useState(React.createRef());
-  const [bottomSheet, setBottomSheet] = useState(React.createRef());
   const [transactionData, setTransactionData] = useState([
     {
       title: "Spending accounts",
@@ -194,65 +261,7 @@ export default function Home(props) {
       transactionStatus: "send"
     }
   ]);
-  const [addData, setAddData] = useState([
-    {
-      title: "Getbittr",
-      image: require("../assets/images/icons/icon_getbitter.png"),
-      info: "GetBittr gives you an easy way to stack sats"
-    },
-    {
-      title: "Fastbitcoins",
-      image: require("../assets/images/icons/icon_fastbicoin.png"),
-      info: "The quickest way to buy bitcoins, from your local store"
-    },
-    {
-      title: "Add Account",
-      image: require("../assets/images/icons/icon_addaccount.png"),
-      info: "Add an account to your wallet, Select from options"
-    },
-    {
-      title: "Add Contact",
-      image: require("../assets/images/icons/icon_addcontact.png"),
-      info: "Add contacts from your address book"
-    },
-    {
-      title: "Import Wallet",
-      image: require("../assets/images/icons/icon_importwallet.png"),
-      info: "Import a non-Hexa wallet as an account"
-    },
-    {
-      title: "Add Account",
-      image: require("../assets/images/icons/icon_addaccount.png"),
-      info: "Add an account to your wallet, Select from options"
-    },
-    {
-      title: "Add Contact",
-      image: require("../assets/images/icons/icon_addcontact.png"),
-      info: "Add contacts from your address book"
-    },
-    {
-      title: "Import Wallet",
-      image: require("../assets/images/icons/icon_importwallet.png"),
-      info: "Import a non-Hexa wallet as an account"
-    },
-    {
-      title: "Add Account",
-      image: require("../assets/images/icons/icon_addaccount.png"),
-      info: "Add an account to your wallet, Select from options"
-    },
-    {
-      title: "Add Contact",
-      image: require("../assets/images/icons/icon_addcontact.png"),
-      info: "Add contacts from your address book"
-    },
-    {
-      title: "Import Wallet",
-      image: require("../assets/images/icons/icon_importwallet.png"),
-      info: "Import a non-Hexa wallet as an account"
-    }
-  ]);
   const [modaldata, setModaldata] = useState(transactionData);
-  const [openmodal, setOpenmodal] = useState("closed");
 
   function getIconByAccountType(type) {
     if (type == "saving") {
@@ -268,211 +277,51 @@ export default function Home(props) {
     }
   }
 
+  useEffect(function() {
+    PinChangeSuccessBottomSheet.current.snapTo(1);
+    ErrorBottomSheet.current.snapTo(1);
+    NoInternetBottomSheet.current.snapTo(0);
+    setTimeout(() => {
+      setTabBarZIndex(0);
+    }, 10);
+    CustodianRequestBottomSheet.current.snapTo(1);
+    bottomSheet.current.snapTo(1);
+  }, []);
+
   function renderContent() {
     if (selected == "Transactions") {
       return (
-        <View style={styles.modalContentContainer}>
-          <FlatList
-            data={modaldata}
-            ItemSeparatorComponent={() => (
-              <View style={{ backgroundColor: Colors.white }}>
-                <View style={styles.separatorView} />
-              </View>
-            )}
-            renderItem={({ item }) => (
-              <View style={styles.transactionModalElementView}>
-                <View style={styles.modalElementInfoView}>
-                  <View style={{ justifyContent: "center" }}>
-                    <FontAwesome
-                      name={
-                        item.transactionStatus == "receive"
-                          ? "long-arrow-down"
-                          : "long-arrow-up"
-                      }
-                      size={15}
-                      color={
-                        item.transactionStatus == "receive"
-                          ? Colors.green
-                          : Colors.red
-                      }
-                    />
-                  </View>
-                  <View style={{ justifyContent: "center", marginLeft: 10 }}>
-                    <Text style={styles.transactionModalTitleText}>
-                      {item.title}{" "}
-                    </Text>
-                    <Text style={styles.transactionModalDateText}>
-                      {item.date}{" "}
-                      <Entypo
-                        size={10}
-                        name={"dot-single"}
-                        color={Colors.textColorGrey}
-                      />
-                      {item.time}
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.transactionModalAmountView}>
-                  <Image
-                    source={require("../assets/images/icons/icon_bitcoin_gray.png")}
-                    style={{ width: 12, height: 12, resizeMode: "contain" }}
-                  />
-                  <Text
-                    style={{
-                      ...styles.transactionModalAmountText,
-                      color:
-                        item.transactionStatus == "receive"
-                          ? Colors.green
-                          : Colors.red
-                    }}
-                  >
-                    {item.price}
-                  </Text>
-                  <Text style={styles.transactionModalAmountUnitText}>6+</Text>
-                  <Ionicons
-                    name="ios-arrow-forward"
-                    color={Colors.textColorGrey}
-                    size={12}
-                    style={{ marginLeft: 20, alignSelf: "center" }}
-                  />
-                </View>
-              </View>
-            )}
-          />
-        </View>
+        <TransactionListModalContents
+          onPressTransaction={() => {
+            setTimeout(() => {
+              setTabBarZIndex(0);
+            }, 10);
+            transactionDetailsBottomSheet.current.snapTo(1);
+          }}
+          transactionData={modaldata}
+        />
       );
     } else if (selected == "Add") {
       return (
-        <View style={styles.modalContentContainer}>
-          <FlatList
-            data={modaldata}
-            ItemSeparatorComponent={() => (
-              <View style={{ backgroundColor: Colors.white }}>
-                <View style={styles.separatorView} />
-              </View>
-            )}
-            renderItem={({ item }) => (
-              <View style={styles.addModalView}>
-                <View style={styles.modalElementInfoView}>
-                  <View style={{ justifyContent: "center" }}>
-                    <Image
-                      source={item.image}
-                      style={{ width: 25, height: 25 }}
-                    />
-                  </View>
-                  <View style={{ justifyContent: "center", marginLeft: 10 }}>
-                    <Text style={styles.addModalTitleText}>{item.title} </Text>
-                    <Text style={styles.addModalInfoText}>{item.info}</Text>
-                  </View>
-                </View>
-              </View>
-            )}
-          />
-        </View>
+        <AddModalContents
+          onPressElements={type => {
+            if (
+              type == "Fastbitcoins" ||
+              type == "Getbittr" ||
+              type == "Add Contact"
+            ) {
+              setTimeout(() => {
+                setTabBarZIndex(0);
+                setSelectToAdd(type);
+              }, 10);
+              AddBottomSheet.current.snapTo(1);
+            }
+          }}
+          addData={modaldata}
+        />
       );
     } else if (selected == "QR") {
-      return (
-        <View style={styles.modalContentContainer}>
-          <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS == "ios" ? "padding" : ""}
-            enabled
-          >
-            <ScrollView style={styles.qrModalScrollView}>
-              <View style={styles.qrModalImageNTextInputView}>
-                <ImageBackground
-                  source={require("../assets/images/icons/iPhone-QR.png")}
-                  style={styles.qrModalImage}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      paddingTop: 10,
-                      paddingRight: 5,
-                      paddingLeft: 10,
-                      width: "100%"
-                    }}
-                  >
-                    <View
-                      style={{
-                        borderLeftWidth: 1,
-                        borderTopColor: "white",
-                        borderLeftColor: "white",
-                        height: hp("5%"),
-                        width: hp("5%"),
-                        borderTopWidth: 1
-                      }}
-                    />
-                    <View
-                      style={{
-                        borderTopWidth: 1,
-                        borderRightWidth: 1,
-                        borderRightColor: "white",
-                        borderTopColor: "white",
-                        height: hp("5%"),
-                        width: hp("5%"),
-                        marginLeft: "auto"
-                      }}
-                    />
-                  </View>
-                  <View
-                    style={{
-                      marginTop: "auto",
-                      flexDirection: "row",
-                      paddingBottom: 5,
-                      paddingRight: 5,
-                      paddingLeft: 10,
-                      width: "100%"
-                    }}
-                  >
-                    <View
-                      style={{
-                        borderLeftWidth: 1,
-                        borderBottomColor: "white",
-                        borderLeftColor: "white",
-                        height: hp("5%"),
-                        width: hp("5%"),
-                        borderBottomWidth: 1
-                      }}
-                    />
-                    <View
-                      style={{
-                        borderBottomWidth: 1,
-                        borderRightWidth: 1,
-                        borderRightColor: "white",
-                        borderBottomColor: "white",
-                        height: hp("5%"),
-                        width: hp("5%"),
-                        marginLeft: "auto"
-                      }}
-                    />
-                  </View>
-                </ImageBackground>
-                <TextInput
-                  placeholder={"Enter Recipients Address"}
-                  placeholderTextColor={Colors.borderColor}
-                  style={styles.qrModalTextInput}
-                />
-              </View>
-              <View style={styles.qrModalInfoView}>
-                <View style={{ marginRight: 15 }}>
-                  <Text style={styles.qrModalInfoTitleText}>Qr</Text>
-                  <Text style={styles.qrModalInfoInfoText}>
-                    Scan a QR code to send money or receive information from
-                    another Hexa wallet
-                  </Text>
-                </View>
-                <Ionicons
-                  name="ios-arrow-forward"
-                  color={Colors.textColorGrey}
-                  size={15}
-                  style={{ alignSelf: "center" }}
-                />
-              </View>
-            </ScrollView>
-          </KeyboardAvoidingView>
-        </View>
-      );
+      return <QrCodeModalContents />;
     }
   }
 
@@ -543,7 +392,7 @@ export default function Home(props) {
       MoreTabBottomSheet.current.snapTo(0);
     } else if (tabTitle == "Add") {
       setTimeout(() => {
-        setModaldata(addData);
+        setModaldata([]);
         setSelected(tabTitle);
       }, 10);
       bottomSheet.current.snapTo(1);
@@ -563,6 +412,70 @@ export default function Home(props) {
       <NoInternetModalContents
         onPressTryAgain={() => {}}
         onPressIgnore={() => {}}
+      />
+    );
+  };
+
+  const renderErrorModalContent = () => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={"Something went wrong"}
+        info={"There seems to a problem"}
+        note={"Please try again"}
+        proceedButtonText={"Try Again"}
+        isIgnoreButton={true}
+        onPressProceed={() => {
+          ErrorBottomSheet.current.snapTo(0);
+        }}
+        onPressIgnore={() => {
+          ErrorBottomSheet.current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require("../assets/images/icons/errorImage.png")}
+      />
+    );
+  };
+
+  const renderErrorModalHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          ErrorBottomSheet.current.snapTo(0);
+          setTimeout(() => {
+            setTabBarZIndex(0);
+          }, 10);
+        }}
+      />
+    );
+  };
+
+  const renderPinChangeSuccessModalContent = () => {
+    return (
+      <ErrorModalContents
+        modalRef={PinChangeSuccessBottomSheet}
+        title={"Pin Changed Successfully"}
+        info={"Lorem ipsum dolor sit amet, consectetur"}
+        note={"sed do eiusmod tempor incididunt ut labore et"}
+        proceedButtonText={"View Settings"}
+        isIgnoreButton={false}
+        onPressProceed={() => {
+          PinChangeSuccessBottomSheet.current.snapTo(0);
+        }}
+        isBottomImage={true}
+      />
+    );
+  };
+
+  const renderPinChangeSuccessModalHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          PinChangeSuccessBottomSheet.current.snapTo(0);
+          setTimeout(() => {
+            setTabBarZIndex(0);
+          }, 10);
+        }}
       />
     );
   };
@@ -589,21 +502,28 @@ export default function Home(props) {
       />
     );
   };
-
-  // const renderCustodianRequestOtpModalContent = () => {
-  //   if (!custodyRequest) return <View></View>;
-  //   return (
-  //     <CustodianRequestOtpModalContents
-  //       custodyRequest={custodyRequest}
-  //       modalRef={CustodianRequestOtpBottomSheet}
-  //       downloadStatus={success => {
-  //         setTabBarZIndex(0);
-  //         CustodianRequestOtpBottomSheet.current.snapTo(0);
-  //         if (success) CustodianRequestAcceptBottomSheet.current.snapTo(1);
-  //       }}
-  //     />
-  //   );
-  // };
+  const renderCustodianRequestOtpModalContent = () => {
+    return (
+      <CustodianRequestOtpModalContents
+        title1stLine={"Enter OTP to"}
+        title2ndLine={"accept request"}
+        info1stLine={"Please enter the 6 digit OTP the owner"}
+        info2ndLine={"of secret shared with you"}
+        subInfo1stLine={
+          "The OTP is time sensitive, please be sure to enter the OTP "
+        }
+        subInfo2ndLine={"shared within 15minutes"}
+        modalRef={CustodianRequestOtpBottomSheet}
+        onPressConfirm={() => {
+          setTimeout(() => {
+            setTabBarZIndex(0);
+          }, 10);
+          CustodianRequestOtpBottomSheet.current.snapTo(0);
+          CustodianRequestAcceptBottomSheet.current.snapTo(1);
+        }}
+      />
+    );
+  };
 
   const renderCustodianRequestRejectedModalContent = () => {
     if (!custodyRequest) return <View></View>;
@@ -611,7 +531,7 @@ export default function Home(props) {
       <CustodianRequestRejectedModalContents
         onPressViewThrustedContacts={() => {
           setTimeout(() => {
-            setTabBarZIndex(9999);
+            setTabBarZIndex(999);
           }, 10);
           CustodianRequestRejectedBottomSheet.current.snapTo(0);
         }}
@@ -628,7 +548,7 @@ export default function Home(props) {
         onPressAssociateContacts={() => {}}
         onPressSkip={() => {
           setTimeout(() => {
-            setTabBarZIndex(9999);
+            setTabBarZIndex(999);
           }, 10);
           CustodianRequestAcceptBottomSheet.current.snapTo(0);
         }}
@@ -663,11 +583,10 @@ export default function Home(props) {
   };
 
   const onPressElement = item => {
-    setTimeout(() => {
-      setTabBarZIndex(0);
-    }, 10);
     if (item.title == "Address Book") {
-      MoreTabBottomSheet.current.snapTo(0);
+      setTimeout(() => {
+        setTabBarZIndex(0);
+      }, 10);
       addressBookBottomSheet.current.snapTo(1);
     }
   };
@@ -700,7 +619,6 @@ export default function Home(props) {
             setTabBarZIndex(999);
           }, 10);
           addressBookBottomSheet.current.snapTo(0);
-          bottomSheet.current.snapTo(1);
         }}
       />
     );
@@ -714,7 +632,33 @@ export default function Home(props) {
             setTabBarZIndex(999);
           }, 10);
           addressBookBottomSheet.current.snapTo(0);
-          bottomSheet.current.snapTo(1);
+        }}
+      />
+    );
+  };
+
+  const renderTransactionDetailsContents = () => {
+    return (
+      <TransactionDetailsContents
+        onPressBack={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 10);
+          transactionDetailsBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderTransactionDetailsHeader = () => {
+    return (
+      <SmallHeaderModal
+        headerColor={Colors.backgroundColor}
+        onPressHandle={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 10);
+          transactionDetailsBottomSheet.current.snapTo(0);
         }}
       />
     );
@@ -754,6 +698,299 @@ export default function Home(props) {
             setTabBarZIndex(999);
           }, 10);
           CustodianRequestAcceptBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderAddModalContents = () => {
+    if (selectToAdd == "Getbittr") {
+      return (
+        <GetBittrModalContents
+          onPressBack={() => {
+            setTimeout(() => {
+              setTabBarZIndex(999);
+            }, 10);
+            AddBottomSheet.current.snapTo(0);
+          }}
+        />
+      );
+    } else if (selectToAdd == "Fastbitcoins") {
+      return (
+        <FastBitcoinModalContents
+          onPressSellTab={() => {
+            setTimeout(() => {
+              setTabSelected("sell");
+            }, 5);
+            fastBitcoinSellCalculationBottomSheet.current.snapTo(1);
+          }}
+          onPressRedeemTab={() => {
+            setTimeout(() => {
+              setTabSelected("redeem");
+            }, 5);
+            fastBitcoinRedeemCalculationBottomSheet.current.snapTo(1);
+          }}
+          onPressBack={() => {
+            setTimeout(() => {
+              setTabBarZIndex(999);
+            }, 10);
+            AddBottomSheet.current.snapTo(0);
+          }}
+        />
+      );
+    } else if (selectToAdd == "Add Contact") {
+      return (
+        <AddContactsModalContents
+          onPressFriendAndFamily={() => {
+            setTimeout(() => {
+              setTabSelected("sell");
+            }, 5);
+            FamilyAndFriendAddressBookBottomSheet.current.snapTo(1);
+          }}
+          onPressBiller={() => {
+            setTimeout(() => {
+              setTabSelected("redeem");
+            }, 5);
+            FamilyAndFriendAddressBookBottomSheet.current.snapTo(1);
+          }}
+          onPressBack={() => {
+            setTimeout(() => {
+              setTabBarZIndex(999);
+            }, 10);
+            AddBottomSheet.current.snapTo(0);
+          }}
+        />
+      );
+    } else {
+      return null;
+    }
+  };
+
+  const renderAddModalHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 10);
+          AddBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderFastBitcoinRedeemCalculationContents = () => {
+    return (
+      <FastBitcoinCalculationModalContents
+        navigation={props.navigation}
+        modalRef={fastBitcoinRedeemCalculationBottomSheet}
+        pageInfo={
+          "Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do eiusmod tempor"
+        }
+        pageTitle={"Redeem Voucher"}
+        noteTitle={"Lorem ipsum"}
+        noteInfo={"Lorem ipsum dolor sit amet, consectetur"}
+        proceedButtonText="Calculate"
+        onPressBack={() => {
+          fastBitcoinRedeemCalculationBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderFastBitcoinSellCalculationContents = () => {
+    return (
+      <FastBitcoinCalculationModalContents
+        navigation={props.navigation}
+        modalRef={fastBitcoinSellCalculationBottomSheet}
+        pageInfo={
+          "Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do eiusmod tempor"
+        }
+        pageTitle={"Sell Bitcoins"}
+        noteTitle={"Lorem ipsum"}
+        noteInfo={"Lorem ipsum dolor sit amet, consectetur"}
+        proceedButtonText={"Calculate"}
+        onPressBack={() => {
+          fastBitcoinSellCalculationBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderFastBitcoinSellCalculationHeader = () => {
+    return (
+      <SmallHeaderModal
+        onPressHandle={() => {
+          fastBitcoinSellCalculationBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderFastBitcoinRedeemCalculationHeader = () => {
+    return (
+      <SmallHeaderModal
+        onPressHandle={() => {
+          fastBitcoinRedeemCalculationBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderContactSelectedFromAddressBookContents = () => {
+    return (
+      <SelectedContactFromAddressBook
+        onPressProceed={() => {
+          ContactSelectedFromAddressBookQrCodeBottomSheet.current.snapTo(1);
+        }}
+        onPressBack={() => {
+          ContactSelectedFromAddressBookBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderContactSelectedFromAddressBookHeader = () => {
+    return (
+      <SmallHeaderModal
+        onPressHandle={() => {
+          ContactSelectedFromAddressBookBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderContactSelectedFromAddressBookQrCodeContents = () => {
+    return (
+      <SelectedContactFromAddressBookQrCode
+        onPressProceed={() => {
+          ContactSelectedFromAddressBookQrCodeBottomSheet.current.snapTo(0);
+        }}
+        onPressBack={() => {
+          ContactSelectedFromAddressBookQrCodeBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderContactSelectedFromAddressBookQrCodeHeader = () => {
+    return (
+      <SmallHeaderModal
+        onPressHandle={() => {
+          ContactSelectedFromAddressBookQrCodeBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderFamilyAndFriendAddressBookContents = () => {
+    return (
+      <FamilyandFriendsAddressBookModalContents
+        modalRef={FamilyAndFriendAddressBookBottomSheet}
+        proceedButtonText={"Confirm & Proceed"}
+        onPressProceed={() => {
+          ContactSelectedFromAddressBookBottomSheet.current.snapTo(1);
+        }}
+        onPressBack={() => {
+          FamilyAndFriendAddressBookBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderFamilyAndFriendAddressBookHeader = () => {
+    return (
+      <SmallHeaderModal
+        onPressHandle={() => {
+          FamilyAndFriendAddressBookBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const submitRecoveryQuestion = () => {
+    HealthCheckSecurityQuestionBottomSheet.current.snapTo(0);
+    HealthCheckGoogleAuthBottomSheet.current.snapTo(1);
+    Keyboard.dismiss();
+  };
+
+  const renderHealthCheckSecurityQuestionContents = () => {
+    return (
+      <HealthCheckSecurityQuestionModalContents
+        onQuestionSelect={value => {
+          setDropdownBoxValue(value);
+        }}
+        onTextChange={text => {
+          setAnswer(text);
+        }}
+        onPressConfirm={() => submitRecoveryQuestion()}
+        onPressKnowMore={() => {}}
+        bottomSheetRef={HealthCheckSecurityQuestionBottomSheet}
+      />
+    );
+  };
+
+  const renderHealthCheckSecurityQuestionHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          HealthCheckSecurityQuestionBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderHealthCheckGoogleAuthContents = () => {
+    return (
+      <HealthCheckGoogleAuthModalContents
+        modalRef={HealthCheckGoogleAuthBottomSheet}
+        onPressConfirm={() => {
+          Keyboard.dismiss();
+          HealthCheckGoogleAuthBottomSheet.current.snapTo(0);
+          HealthCheckSuccessBottomSheet.current.snapTo(1);
+        }}
+      />
+    );
+  };
+
+  const renderHealthCheckGoogleAuthHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          HealthCheckGoogleAuthBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderHealthCheckSuccessModalContent = () => {
+    return (
+      <ErrorModalContents
+        modalRef={HealthCheckSuccessBottomSheet}
+        title={"Health Check Successful"}
+        info={"Questions Successfully Backed Up"}
+        note={"Hexa will remind you to help\nremember the answers"}
+        proceedButtonText={"View Health"}
+        isIgnoreButton={false}
+        onPressProceed={() => {
+          HealthCheckSuccessBottomSheet.current.snapTo(0);
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 10);
+        }}
+        isBottomImage={true}
+      />
+    );
+  };
+
+  const renderHealthCheckSuccessModalHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          HealthCheckSuccessBottomSheet.current.snapTo(0);
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 10);
         }}
       />
     );
@@ -887,7 +1124,14 @@ export default function Home(props) {
               </TouchableOpacity>
             </View>
             <View style={{ flex: 4, alignItems: "flex-end" }}>
-              <HomePageShield shieldStatus={100} />
+              <TouchableOpacity
+                activeOpacity={10}
+                onPress={() => {
+                  HealthCheckSecurityQuestionBottomSheet.current.snapTo(1);
+                }}
+              >
+                <HomePageShield shieldStatus={100} />
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -973,16 +1217,9 @@ export default function Home(props) {
         </View>
       </View>
       <BottomSheet
-        enabledInnerScrolling={true}
-        ref={addressBookBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("90%") : hp("90%")
-        ]}
-        renderContent={renderAddressBookContents}
-        renderHeader={renderAddressBookHeader}
-      />
-      <BottomSheet
+        onCloseEnd={() => {
+          bottomSheet.current.snapTo(1);
+        }}
         enabledInnerScrolling={true}
         ref={bottomSheet}
         snapPoints={[
@@ -999,6 +1236,9 @@ export default function Home(props) {
         renderHeader={renderHeader}
       />
       <BottomSheet
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
         enabledInnerScrolling={true}
         ref={NoInternetBottomSheet}
         snapPoints={[-50, hp("60%")]}
@@ -1006,14 +1246,17 @@ export default function Home(props) {
         renderHeader={renderNoInternetModalHeader}
       />
       <BottomSheet
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
         enabledInnerScrolling={true}
         ref={CustodianRequestBottomSheet}
         snapPoints={[-50, hp("60%")]}
         renderContent={renderCustodianRequestModalContent}
         renderHeader={renderCustodianRequestModalHeader}
       />
-
       {/* <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={CustodianRequestOtpBottomSheet}
         snapPoints={[
@@ -1025,6 +1268,9 @@ export default function Home(props) {
         renderHeader={renderCustodianRequestOtpModalHeader}
       /> */}
       <BottomSheet
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
         enabledInnerScrolling={true}
         ref={CustodianRequestRejectedBottomSheet}
         snapPoints={[-50, hp("60%")]}
@@ -1032,6 +1278,10 @@ export default function Home(props) {
         renderHeader={renderCustodianRequestRejectedModalHeader}
       />
       <BottomSheet
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+          bottomSheet.current.snapTo(1);
+        }}
         enabledInnerScrolling={true}
         ref={MoreTabBottomSheet}
         snapPoints={[
@@ -1041,13 +1291,185 @@ export default function Home(props) {
         renderContent={renderMoreTabContents}
         renderHeader={renderMoreTabHeader}
       />
-
       <BottomSheet
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
         enabledInnerScrolling={true}
         ref={CustodianRequestAcceptBottomSheet}
         snapPoints={[-50, hp("60%")]}
         renderContent={renderCustodianRequestAcceptModalContent}
         renderHeader={renderCustodianRequestAcceptModalHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("37%") : hp("45%")
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
+        enabledInnerScrolling={true}
+        ref={PinChangeSuccessBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("37%") : hp("45%")
+        ]}
+        renderContent={renderPinChangeSuccessModalContent}
+        renderHeader={renderPinChangeSuccessModalHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {}}
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
+        enabledInnerScrolling={true}
+        ref={transactionDetailsBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("90%") : hp("90%")
+        ]}
+        renderContent={renderTransactionDetailsContents}
+        renderHeader={renderTransactionDetailsHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {}}
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
+        enabledInnerScrolling={true}
+        ref={addressBookBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("90%") : hp("90%")
+        ]}
+        renderContent={renderAddressBookContents}
+        renderHeader={renderAddressBookHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
+        enabledInnerScrolling={true}
+        ref={AddBottomSheet}
+        snapPoints={[-50, hp("63%")]}
+        renderContent={renderAddModalContents}
+        renderHeader={renderAddModalHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
+        enabledInnerScrolling={true}
+        ref={fastBitcoinRedeemCalculationBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("90%") : hp("90%"),
+          Platform.OS == "ios" ? hp("90%") : hp("50%")
+        ]}
+        renderContent={renderFastBitcoinRedeemCalculationContents}
+        renderHeader={renderFastBitcoinRedeemCalculationHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
+        enabledInnerScrolling={true}
+        ref={fastBitcoinSellCalculationBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("90%") : hp("90%"),
+          Platform.OS == "ios" ? hp("90%") : hp("50%")
+        ]}
+        renderContent={renderFastBitcoinSellCalculationContents}
+        renderHeader={renderFastBitcoinSellCalculationHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {}}
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
+        enabledInnerScrolling={true}
+        ref={FamilyAndFriendAddressBookBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("90%") : hp("90%")
+        ]}
+        renderContent={renderFamilyAndFriendAddressBookContents}
+        renderHeader={renderFamilyAndFriendAddressBookHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {}}
+        enabledInnerScrolling={true}
+        ref={ContactSelectedFromAddressBookBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("90%") : hp("90%")
+        ]}
+        renderContent={renderContactSelectedFromAddressBookContents}
+        renderHeader={renderContactSelectedFromAddressBookHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {}}
+        enabledInnerScrolling={true}
+        ref={ContactSelectedFromAddressBookQrCodeBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("90%") : hp("90%")
+        ]}
+        renderContent={renderContactSelectedFromAddressBookQrCodeContents}
+        renderHeader={renderContactSelectedFromAddressBookQrCodeHeader}
+      />
+      <BottomSheet
+        onOpenStart={() => {
+          setTabBarZIndex(0);
+        }}
+        // onCloseEnd={() => { setTabBarZIndex(999); }}
+        enabledInnerScrolling={true}
+        ref={HealthCheckSecurityQuestionBottomSheet}
+        snapPoints={[
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? 0 : 0,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("67%") : hp("75%"),
+          Platform.OS == "ios" ? hp("90%") : hp("72%")
+        ]}
+        renderContent={renderHealthCheckSecurityQuestionContents}
+        renderHeader={renderHealthCheckSecurityQuestionHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
+        // onCloseEnd={() => { setTabBarZIndex(999); }}
+        enabledInnerScrolling={true}
+        ref={HealthCheckGoogleAuthBottomSheet}
+        snapPoints={[-50, hp("58%"), hp("90%")]}
+        renderContent={renderHealthCheckGoogleAuthContents}
+        renderHeader={renderHealthCheckGoogleAuthHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
+        enabledInnerScrolling={true}
+        ref={HealthCheckSuccessBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("37%") : hp("45%")
+        ]}
+        renderContent={renderHealthCheckSuccessModalContent}
+        renderHeader={renderHealthCheckSuccessModalHeader}
       />
       {/* TODO: If we open full modal above tab bar first change zIndex to 0 and when we close that modal please zIndex to 999 by using setTabBarZIndex(0) or setTabBarZIndex(999) */}
       <View style={{ ...styles.bottomTabBarContainer, zIndex: tabBarZIndex }}>
@@ -1145,9 +1567,6 @@ export default function Home(props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   card: {
     margin: 0,
     width: wp("42.6%"),
@@ -1238,11 +1657,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 15
   },
-  modalContentContainer: {
-    height: "100%",
-    backgroundColor: Colors.white,
-    paddingBottom: hp("10%")
-  },
   headerViewContainer: {
     marginTop: hp("3%"),
     marginLeft: 20,
@@ -1286,11 +1700,6 @@ const styles = StyleSheet.create({
     fontSize: RFValue(13, 812),
     color: Colors.white
   },
-  headerShieldImage: {
-    width: wp("16%"),
-    height: wp("25%"),
-    resizeMode: "contain"
-  },
   cardBitCoinImage: {
     width: wp("3%"),
     height: wp("3%"),
@@ -1317,114 +1726,5 @@ const styles = StyleSheet.create({
   },
   tabBarTabView: {
     padding: wp("5%")
-  },
-  separatorView: {
-    marginLeft: 15,
-    marginRight: 15,
-    height: 2,
-    backgroundColor: Colors.backgroundColor
-  },
-  transactionModalElementView: {
-    backgroundColor: Colors.white,
-    padding: 10,
-    flexDirection: "row",
-    display: "flex",
-    justifyContent: "space-between"
-  },
-  modalElementInfoView: {
-    padding: 10,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  transactionModalTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(12, 812),
-    marginBottom: 3,
-    fontFamily: Fonts.FiraSansRegular
-  },
-  transactionModalDateText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(10, 812),
-    fontFamily: Fonts.FiraSansRegular
-  },
-  transactionModalAmountView: {
-    padding: 10,
-    flexDirection: "row",
-    display: "flex",
-    alignItems: "center"
-  },
-  transactionModalAmountText: {
-    marginLeft: 5,
-    marginRight: 5,
-    fontSize: RFValue(20, 812),
-    fontFamily: Fonts.OpenSans
-  },
-  transactionModalAmountUnitText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(10, 812),
-    fontFamily: Fonts.OpenSans
-  },
-  addModalView: {
-    backgroundColor: Colors.white,
-    padding: 7,
-    flexDirection: "row",
-    display: "flex",
-    justifyContent: "space-between"
-  },
-  addModalTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(14, 812)
-  },
-  addModalInfoText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(11, 812)
-  },
-  qrModalScrollView: {
-    display: "flex",
-    backgroundColor: Colors.white
-  },
-  qrModalImageNTextInputView: {
-    marginTop: 15,
-    justifyContent: "center",
-    alignItems: "center",
-    borderBottomColor: Colors.backgroundColor,
-    borderBottomWidth: 3
-  },
-  qrModalImage: {
-    width: wp("72%"),
-    height: wp("72%"),
-    borderRadius: 20,
-    borderWidth: 2.5,
-    borderColor: Colors.backgroundColor
-  },
-  qrModalTextInput: {
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: Colors.backgroundColor,
-    width: wp("72%"),
-    height: 60,
-    marginTop: 25,
-    marginBottom: 25,
-    paddingLeft: 15,
-    paddingRight: 15,
-    fontSize: RFValue(11, 812),
-    fontFamily: Fonts.FiraSansMedium
-  },
-  qrModalInfoView: {
-    paddingTop: 20,
-    paddingBottom: 20,
-    paddingLeft: 30,
-    paddingRight: 30,
-    flexDirection: "row",
-    alignSelf: "center"
-  },
-  qrModalInfoTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18, 812)
-  },
-  qrModalInfoInfoText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(12, 812)
   }
 });
