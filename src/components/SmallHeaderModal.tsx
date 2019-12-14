@@ -14,9 +14,9 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 
 
 export default function SmallHeaderModal(props) {
-    return <TouchableOpacity activeOpacity={10} onPress={() => props.onPressHandle()} style={styles.modalHeader}>
-    <View style={styles.modalHeaderHandle} />
-</TouchableOpacity>
+    return <TouchableOpacity activeOpacity={10} onPress={() => props.onPressHandle()} style={{ ...styles.modalHeader, backgroundColor: props.headerColor ? props.headerColor : Colors.white, }}>
+        <View style={styles.modalHeaderHandle} />
+    </TouchableOpacity>
 }
 
 const styles = StyleSheet.create({
@@ -29,7 +29,6 @@ const styles = StyleSheet.create({
         marginTop: 15
     },
     modalHeader: {
-        backgroundColor: Colors.white,
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
         borderLeftWidth: 1,

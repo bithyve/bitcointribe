@@ -12,7 +12,7 @@ import RestoreSelectedContactsList from "../pages/Recovery/RestoreSelectedContac
 import NewWalletName from "../pages/NewWalletName";
 import NewWalletQuestion from "../pages/NewWalletQuestion";
 import RestoreWalletBySecondaryDevice from "../pages/Recovery/RestoreWalletBySecondaryDevice";
-import RestoreWalletUsingDocuments from "../pages/RestoreWalletUsingDocuments";
+import RestoreWalletUsingDocuments from "../pages/Recovery/RestoreWalletUsingDocuments";
 import RestoreWalletByContacts from "../pages/Recovery/RestoreWalletByContacts";
 import Home from "../pages/Home";
 import ReLogin from "../pages/ReLogin";

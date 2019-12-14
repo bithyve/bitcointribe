@@ -816,7 +816,7 @@ export default function Home(props) {
   useEffect(() => {
     if (recoveryRequest) {
       Alert.alert(JSON.stringify(recoveryRequest));
-    }
+    } //TODO: connect the recovery guardian modal
   }, [recoveryRequest]);
 
   return (

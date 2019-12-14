@@ -79,11 +79,36 @@ export default function CommunicationModeModalContents(props) {
         </View>
         <View style={styles.contactProfileView}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Image
-              source={require("../assets/images/icons/pexels-photo.png")}
-              style={styles.contactProfileImage}
-            />
-            <Text style={styles.contactNameText}>{contact.name}</Text>
+            <View
+              style={{
+                backgroundColor: Colors.backgroundColor,
+                flex: 1,
+                height: 80,
+                justifyContent: "center",
+                marginLeft: 60,
+                overflow: "hidden",
+                position: "relative",
+                borderRadius: 10
+              }}
+            >
+              <Text style={styles.contactNameText}>Sophie Babel</Text>
+            </View>
+            <View
+              style={{
+                backgroundColor: Colors.white,
+                width: 80,
+                height: 80,
+                borderRadius: 80 / 2,
+                position: "absolute",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <Image
+                source={require("../assets/images/icons/pexels-photo.png")}
+                style={{ ...styles.contactProfileImage }}
+              />
+            </View>
           </View>
         </View>
         <View>
@@ -175,7 +200,7 @@ const styles = StyleSheet.create({
     color: Colors.black,
     fontSize: RFValue(25, 812),
     fontFamily: Fonts.FiraSansRegular,
-    marginLeft: 20
+    marginLeft: 25
   },
   contactIconImage: {
     width: 20,

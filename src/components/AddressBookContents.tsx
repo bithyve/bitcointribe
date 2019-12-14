@@ -15,7 +15,7 @@ import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
 import CommonStyles from "../common/Styles";
 import { RFValue } from "react-native-responsive-fontsize";
-import ContactList from "./ContactList";
+import ContactList from "../components/ContactList";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function AddressBookContents(props) {
@@ -140,7 +140,7 @@ export default function AddressBookContents(props) {
         </View>
       </View>
       <View>
-        <Text style={styles.pageTitle}>Pending Actions</Text>
+        <Text style={styles.pageTitle}>Pending Action</Text>
         <Text style={styles.pageInfoText}>
           Lorem ipsum dolor sit amet, consectetur adipiscing
         </Text>
