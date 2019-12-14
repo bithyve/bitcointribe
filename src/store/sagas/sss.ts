@@ -157,7 +157,11 @@ function* requestShareWorker({ payload }) {
     RECOVERY_SHARES: {
       ...DECENTRALIZED_BACKUP.RECOVERY_SHARES,
       [payload.shareIndex]: {
-        REQUEST_DETAILS: { tag: WALLET_SETUP.walletName, otp, encryptedKey }
+        REQUEST_DETAILS: {
+          TAG: WALLET_SETUP.walletName,
+          OTP: otp,
+          ENCRYPTED_KEY: encryptedKey
+        }
       }
     }
   };
@@ -257,7 +261,7 @@ function* downloadMetaShareWorker({ payload }) {
         DECENTRALIZED_BACKUP.RECOVERY_SHARES
       ).map(key => {
         const recoveryShare = DECENTRALIZED_BACKUP.RECOVERY_SHARES[key];
-        if (recoveryShare.REQUEST_DETAILS.otp === otp) {
+        if (recoveryShare.REQUEST_DETAILS.OTP === otp) {
           return {
             REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
             META_SHARE: metaShare,

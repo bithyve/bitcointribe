@@ -30,29 +30,24 @@ const RecoveryScreen = props => {
       <Button
         title="Request Share"
         onPress={() => {
-          dispatch(
-            requestShare(
-              WALLET_SETUP.walletName,
-              Object.keys(RECOVERY_SHARES).length
-            )
-          );
+          dispatch(requestShare(Object.keys(RECOVERY_SHARES).length));
         }}
       />
       {Object.keys(RECOVERY_SHARES).map(key => {
         const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[key];
         if (META_SHARE) return;
-        const { otp, encryptedKey } = REQUEST_DETAILS;
+        const { OTP, ENCRYPTED_KEY } = REQUEST_DETAILS;
 
         return (
-          <View style={{ marginTop: 10 }} key={encryptedKey}>
-            {otp && encryptedKey ? (
+          <View style={{ marginTop: 10 }} key={ENCRYPTED_KEY}>
+            {OTP && ENCRYPTED_KEY ? (
               <View>
-                <Text>OTP: {otp}</Text>
-                <Text>EncryptedKey: {encryptedKey}</Text>
+                <Text>OTP: {OTP}</Text>
+                <Text>EncryptedKey: {ENCRYPTED_KEY}</Text>
                 <Button
                   title="Download"
                   onPress={() =>
-                    dispatch(downloadMShare(otp, encryptedKey, "recovery"))
+                    dispatch(downloadMShare(OTP, ENCRYPTED_KEY, "recovery"))
                   }
                 />
               </View>
