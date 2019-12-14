@@ -262,7 +262,9 @@ export default function RestoreSelectedContactsList(props) {
         </TouchableOpacity>
         <View style={styles.separator} />
         <TouchableOpacity
-          onPress={() => props.navigation.navigate("RestoreWalletByContacts")}
+          onPress={() =>
+            props.navigation.navigate("RestoreWalletByContacts", { index: 1 })
+          }
         >
           <View
             style={{

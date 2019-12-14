@@ -13,7 +13,7 @@ import NewWalletName from "../pages/NewWalletName";
 import NewWalletQuestion from "../pages/NewWalletQuestion";
 import RestoreWalletBySecondaryDevice from "../pages/Recovery/RestoreWalletBySecondaryDevice";
 import RestoreWalletUsingDocuments from "../pages/RestoreWalletUsingDocuments";
-import RestoreWalletByContacts from "../pages/RestoreWalletByContacts";
+import RestoreWalletByContacts from "../pages/Recovery/RestoreWalletByContacts";
 import Home from "../pages/Home";
 import ReLogin from "../pages/ReLogin";
 import Accounts from "../pages/Accounts";
@@ -26,6 +26,7 @@ import TrustedContacts from "../pages/ManageBackup/TrustedContacts";
 import Cloud from "../pages/ManageBackup/Cloud";
 import WalletNameRecovery from "../pages/Recovery/WalletNameRecovery";
 import QuestionRecovery from "../pages/Recovery/QuestionRecovery";
+import RecoveryCommunication from "../pages/Recovery/RecoveryCommunication";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -40,7 +41,8 @@ const SetupNavigator = createStackNavigator(
     RestoreSelectedContactsList,
     RestoreWalletBySecondaryDevice,
     RestoreWalletUsingDocuments,
-    RestoreWalletByContacts
+    RestoreWalletByContacts,
+    RecoveryCommunication
   },
   {
     initialRouteName: "Launch",
