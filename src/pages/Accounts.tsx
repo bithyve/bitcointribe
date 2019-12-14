@@ -4,6 +4,7 @@ import {
   Text,
   View,
   SafeAreaView,
+  TouchableWithoutFeedback,
   TouchableOpacity,
   StatusBar,
   Dimensions,
@@ -24,20 +25,29 @@ import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import CommonStyles from "../common/Styles";
 import ToggleSwitch from "../components/ToggleSwitch";
-import Carousel, {
-  Pagination,
-  getInputRangeFromIndexes
-} from "react-native-snap-carousel";
+import Carousel, { getInputRangeFromIndexes } from "react-native-snap-carousel";
 import BottomSheet from "reanimated-bottom-sheet";
 import DeviceInfo from "react-native-device-info";
 import TransparentHeaderModal from "../components/TransparentHeaderModal";
 import SendModalContents from "../components/SendModalContents";
+import CustodianRequestOtpModalContents from "../components/CustodianRequestOtpModalContents";
+import SendStatusModalContents from "../components/SendStatusModalContents";
 
 export default function Accounts(props) {
   const sliderWidth = Dimensions.get("window").width;
   const [bottomSheet, setBottomSheet] = useState(React.createRef());
   const [SendBottomSheet, setSendBottomSheet] = useState(React.createRef());
   const [ReceiveBottomSheet, setReceiveBottomSheet] = useState(
+    React.createRef()
+  );
+  const [
+    CustodianRequestOtpBottomSheet,
+    setCustodianRequestOtpBottomSheet
+  ] = useState(React.createRef());
+  const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
+    React.createRef()
+  );
+  const [SendErrorBottomSheet, setSendErrorBottomSheet] = useState(
     React.createRef()
   );
   const [transactionData, setTransactionData] = useState([
@@ -140,7 +150,18 @@ export default function Accounts(props) {
   const [carousel, setCarousel] = useState(React.createRef());
 
   const renderSendContents = () => {
-    return <SendModalContents onPressBack={() => {}} />;
+    return (
+      <SendModalContents
+        onPressBack={() => {
+          SendBottomSheet.current.snapTo(0);
+        }}
+        onPressContinue={() => {
+          SendBottomSheet.current.snapTo(0);
+          CustodianRequestOtpBottomSheet.current.snapTo(1);
+        }}
+        modalRef={SendBottomSheet}
+      />
+    );
   };
 
   const renderItem = ({ item, index }) => {
@@ -274,8 +295,8 @@ export default function Accounts(props) {
   const renderAddressBookContents = () => {
     return (
       <View style={styles.modalContentContainer}>
-        <View style={{ margin: 20 }}>
-          <Text style={styles.modalHeaderTitleText}>{"Transaction"}</Text>
+        <View style={{ marginLeft: 20, marginTop: 20 }}>
+          <Text style={styles.modalHeaderTitleText}>{"Transactions"}</Text>
         </View>
         <FlatList
           data={transactionData}
@@ -362,6 +383,110 @@ export default function Accounts(props) {
       />
     );
   };
+  const renderSendModalHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          SendBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderSendOtpModalContents = () => {
+    return (
+      <CustodianRequestOtpModalContents
+        title1stLine={"Enter OTP to"}
+        title2ndLine={"authenticate"}
+        info1stLine={"Lorem ipsum dolor sit amet, consectetur"}
+        info2ndLine={"adipiscing elit, sed do eiusmod tempor"}
+        subInfo1stLine={
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit,"
+        }
+        subInfo2ndLine={"sed do eiusmod tempor incididunt ut labore et dolore"}
+        modalRef={CustodianRequestOtpBottomSheet}
+        onPressConfirm={() => {
+          CustodianRequestOtpBottomSheet.current.snapTo(0);
+          SendSuccessBottomSheet.current.snapTo(1);
+        }}
+      />
+    );
+  };
+  const renderSendOTPModalHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          CustodianRequestOtpBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderSuccessStatusContents = () => {
+    return (
+      <SendStatusModalContents
+        title1stLine={"Sent Successfully"}
+        title2ndLine={"to Contact"}
+        info1stLine={"Bitcoins successfully sent to Contact"}
+        info2ndLine={""}
+        userName={"Arpan Jain"}
+        modalRef={SendSuccessBottomSheet}
+        isSuccess={true}
+        onPressViewAccount={() => {
+          SendSuccessBottomSheet.current.snapTo(0);
+        }}
+        transactionId={"38123819421304"}
+        transactionDateTime={"11:00am, 19 June 2019"}
+      />
+    );
+  };
+  const renderSendSuccessHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          SendSuccessBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderSendErrorContents = () => {
+    return (
+      <SendStatusModalContents
+        title1stLine={"Could not Send "}
+        title2ndLine={"Amount to Contact"}
+        info1stLine={"There seems to be a problem"}
+        info2ndLine={""}
+        subInfo1stLine={
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        }
+        subInfo2ndLine={"sed do eiusmod tempor incididunt ut labore et dolore"}
+        userName={"Arpan Jain"}
+        modalRef={SendErrorBottomSheet}
+        isSuccess={false}
+        onPressTryAgain={() => {
+          SendErrorBottomSheet.current.snapTo(0);
+        }}
+        onPressSkip={() => {
+          SendErrorBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+  const renderSendErrorHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          SendErrorBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  useEffect(() => {
+    SendErrorBottomSheet.current.snapTo(1);
+    // SendBottomSheet.current.snapTo(1)
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -413,7 +538,7 @@ export default function Accounts(props) {
               <ToggleSwitch
                 activeOnImage={require("../assets/images/icons/icon_bitcoin_light.png")}
                 inactiveOnImage={require("../assets/images/icons/icon_bitcoin_dark.png")}
-                activeOffImage={require("../assets/images/icons/icon_dollar_light.png")}
+                activeOffImage={require("../assets/images/icons/icon_dollar_white.png")}
                 inactiveOffImage={require("../assets/images/icons/icon_dollar_dark.png")}
                 toggleColor={Colors.lightBlue}
                 toggleCircleColor={Colors.blue}
@@ -627,9 +752,13 @@ export default function Accounts(props) {
       <BottomSheet
         enabledInnerScrolling={true}
         ref={SendBottomSheet}
-        snapPoints={[-50, hp("90%")]}
+        snapPoints={[
+          -50,
+          hp("90%"),
+          Platform.OS == "android" ? hp("50%") : hp("90%")
+        ]}
         renderContent={renderSendContents}
-        renderHeader={renderAddressBookHeader}
+        renderHeader={renderSendModalHeader}
       />
       <BottomSheet
         enabledInnerScrolling={true}
@@ -637,6 +766,34 @@ export default function Accounts(props) {
         snapPoints={[-50, hp("90%")]}
         renderContent={renderAddressBookContents}
         renderHeader={renderAddressBookHeader}
+      />
+
+      <BottomSheet
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
+        ref={CustodianRequestOtpBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("67%") : hp("60%"),
+          Platform.OS == "ios" ? hp("80%") : hp("70%")
+        ]}
+        renderContent={renderSendOtpModalContents}
+        renderHeader={renderSendOTPModalHeader}
+      />
+
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={SendSuccessBottomSheet}
+        snapPoints={[-50, hp("60%")]}
+        renderContent={renderSuccessStatusContents}
+        renderHeader={renderSendSuccessHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={SendErrorBottomSheet}
+        snapPoints={[-50, hp("60%")]}
+        renderContent={renderSendErrorContents}
+        renderHeader={renderSendErrorHeader}
       />
     </View>
   );
@@ -708,8 +865,8 @@ const styles = StyleSheet.create({
   separatorView: {
     marginLeft: 15,
     marginRight: 15,
-    height: 0.5,
-    backgroundColor: Colors.textColorGrey
+    height: 1,
+    backgroundColor: Colors.borderColor
   },
   bottomCardView: {
     flex: 1,
