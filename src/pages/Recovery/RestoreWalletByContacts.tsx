@@ -9,44 +9,43 @@ import {
   Platform
 } from "react-native";
 import Colors from "../../common/Colors";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from "react-native-responsive-screen";
 import CommonStyles from "../../common/Styles";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import HeaderTitle from "../../components/HeaderTitle";
-import { RFValue } from "react-native-responsive-fontsize";
 import ContactList from "../../components/ContactList";
-import { uploadEncMShare } from "../../store/actions/sss";
+import { requestShare } from "../../store/actions/sss";
 import { useDispatch, useSelector } from "react-redux";
-import { getIconByStatus } from "../ManageBackup/utils";
 
 const RestoreWalletByContact = props => {
-  const [selectedStatus, setSelectedStatus] = useState("error"); // for preserving health of this entity
   const [contacts, setContacts] = useState([]);
 
   const index = props.navigation.getParam("index");
+  if (index !== 1 && index !== 2) throw new Error("Contact index out of bound");
 
-  function selectedContactsList(list) {
-    if (list.length > 0) setContacts([...list]);
-  }
+  const { RECOVERY_SHARES } = useSelector(
+    state => state.storage.database.DECENTRALIZED_BACKUP
+  );
+
+  const { REQUEST_DETAILS } = RECOVERY_SHARES[index]
+    ? RECOVERY_SHARES[index]
+    : { REQUEST_DETAILS: null };
 
   const dispatch = useDispatch();
-  const { DECENTRALIZED_BACKUP } = useSelector(state => state.storage.database);
-  const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
+  useEffect(() => {
+    if (!REQUEST_DETAILS) dispatch(requestShare(index));
+  }, []);
 
   const continueNProceed = async () => {
-    if (!SHARES_TRANSFER_DETAILS[index]) dispatch(uploadEncMShare(index));
-    else console.log(SHARES_TRANSFER_DETAILS[index]);
-    // communicationModeBottomSheet.current.snapTo(1);
-    props.navigation.navigate("CommunicationMode", {
+    props.navigation.navigate("RecoveryCommunication", {
       contact: contacts[0],
       index
     });
   };
 
+  function selectedContactsList(list) {
+    if (list.length > 0) setContacts([...list]);
+  }
   // function requestHeader() {
   //   return (
   //     <TouchableOpacity
