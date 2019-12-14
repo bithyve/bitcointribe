@@ -44,9 +44,11 @@ export default function Login(props) {
   );
 
   const custodyRequest = props.navigation.getParam("custodyRequest");
+  const recoveryRequest = props.navigation.getParam("recoveryRequest");
   if (isAuthenticated)
     AsyncStorage.getItem("walletExists").then(exists => {
-      if (exists) props.navigation.navigate("Home", { custodyRequest });
+      if (exists)
+        props.navigation.navigate("Home", { custodyRequest, recoveryRequest });
       else props.navigation.replace("RestoreAndRecoverWallet");
     });
 

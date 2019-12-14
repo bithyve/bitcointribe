@@ -22,9 +22,14 @@ export default function Launch(props) {
           else {
             const splits = url.split("/");
             const requester = splits[3];
-            if (splits[4] === "sss" && splits[5] === "ek") {
-              const custodyRequest = { requester, ek: splits[6] };
-              props.navigation.replace("Login", { custodyRequest });
+            if (splits[4] === "sss") {
+              if (splits[5] === "ek") {
+                const custodyRequest = { requester, ek: splits[6] };
+                props.navigation.replace("Login", { custodyRequest });
+              } else if (splits[5] === "rk") {
+                const recoveryRequest = { requester, rk: splits[6] };
+                props.navigation.replace("Login", { recoveryRequest });
+              }
             }
           }
         else props.navigation.replace("PasscodeConfirm");
