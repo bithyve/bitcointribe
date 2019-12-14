@@ -5,94 +5,73 @@ import {
   SafeAreaView,
   TouchableOpacity,
   StatusBar,
-  Text,
-  Image,
   KeyboardAvoidingView,
-  Platform,
-  TextInput,
-  ScrollView,
-  AsyncStorage,
-  FlatList
+  Platform
 } from "react-native";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import Fonts from "../common/Fonts";
-import Colors from "../common/Colors";
-import CommonStyles from "../common/Styles";
+import Colors from "../../common/Colors";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
+import CommonStyles from "../../common/Styles";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import HeaderTitle from "../../components/HeaderTitle";
 import { RFValue } from "react-native-responsive-fontsize";
-import BottomSheet from "reanimated-bottom-sheet";
-import HeaderTitle from "../components/HeaderTitle";
-import ContactList from "../components/ContactList";
-import DeviceInfo from "react-native-device-info";
-import RadioButton from "../components/RadioButton";
-import CommunicationModeModalContents from "../components/CommunicationModeModalContents";
+import ContactList from "../../components/ContactList";
+import { uploadEncMShare } from "../../store/actions/sss";
+import { useDispatch, useSelector } from "react-redux";
+import { getIconByStatus } from "../ManageBackup/utils";
 
-export default function RestoreWalletByContacts(props) {
+const RestoreWalletByContact = props => {
+  const [selectedStatus, setSelectedStatus] = useState("error"); // for preserving health of this entity
   const [contacts, setContacts] = useState([]);
-  const [requestBottomSheet, setRequestBottomSheet] = useState(
-    React.createRef()
-  );
-  const [communicationModeBottomSheet, setCommunicationMode] = useState(
-    React.createRef()
-  );
+
+  const index = props.navigation.getParam("index");
 
   function selectedContactsList(list) {
-    setContacts(list);
+    if (list.length > 0) setContacts([...list]);
   }
+
+  const dispatch = useDispatch();
+  const { DECENTRALIZED_BACKUP } = useSelector(state => state.storage.database);
+  const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
 
   const continueNProceed = async () => {
-    communicationModeBottomSheet.current.snapTo(1);
+    if (!SHARES_TRANSFER_DETAILS[index]) dispatch(uploadEncMShare(index));
+    else console.log(SHARES_TRANSFER_DETAILS[index]);
+    // communicationModeBottomSheet.current.snapTo(1);
+    props.navigation.navigate("CommunicationMode", {
+      contact: contacts[0],
+      index
+    });
   };
 
-  const saveCommunicationMode = async selectedContactMode => {
-    if (contacts.length > 0) {
-      if (
-        contacts[0].communicationMode &&
-        contacts[0].communicationMode.length > 0
-      ) {
-        contacts[1].communicationMode = selectedContactMode;
-      } else {
-        contacts[0].communicationMode = selectedContactMode;
-      }
-    } else {
-      contacts[0].communicationMode = selectedContactMode;
-    }
-    setContacts(contacts);
-    await AsyncStorage.setItem("selectedContacts", JSON.stringify(contacts));
-    console.log("contacts", contacts);
-    props.navigation.navigate("RestoreSelectedContactsList");
-  };
+  // function requestHeader() {
+  //   return (
+  //     <TouchableOpacity
+  //       activeOpacity={10}
+  //       onPress={() => closeModal()}
+  //       style={{ ...styles.modalHeaderContainer }}
+  //     >
+  //       <View style={styles.modalHeaderHandle} />
+  //     </TouchableOpacity>
+  //   );
+  // }
 
-  function requestHeader() {
-    return (
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => closeModal()}
-        style={{ ...styles.modalHeaderContainer }}
-      >
-        <View style={styles.modalHeaderHandle} />
-      </TouchableOpacity>
-    );
-  }
+  // function closeModal() {
+  //   communicationModeBottomSheet.current.snapTo(0);
+  //   return;
+  // }
 
-  function closeModal() {
-    communicationModeBottomSheet.current.snapTo(0);
-    return;
-  }
-
-  function renderCommunicationModeContent() {
-    return (
-      <CommunicationModeModalContents
-        onPressProceed={selectedContactMode =>
-          saveCommunicationMode(selectedContactMode)
-        }
-      />
-    );
-  }
+  // function renderCommunicationModeContent() {
+  //   return (
+  //     <CommunicationModeModalContents
+  //       onPressProceed={communicate}
+  //       contact={contacts[0]}
+  //     />
+  //   );
+  // }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -141,7 +120,7 @@ export default function RestoreWalletByContacts(props) {
             onSelectContact={list => selectedContactsList(list)}
           />
         </KeyboardAvoidingView>
-        <BottomSheet
+        {/* <BottomSheet
           enabledInnerScrolling={true}
           ref={communicationModeBottomSheet}
           snapPoints={[
@@ -152,11 +131,11 @@ export default function RestoreWalletByContacts(props) {
           ]}
           renderContent={renderCommunicationModeContent}
           renderHeader={requestHeader}
-        />
+        /> */}
       </View>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   modalHeaderContainer: {
@@ -172,3 +151,5 @@ const styles = StyleSheet.create({
     marginBottom: 7
   }
 });
+
+export default RestoreWalletByContact;
