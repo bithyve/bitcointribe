@@ -14,13 +14,8 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
-import { TouchableNativeFeedback } from "react-native-gesture-handler";
 
 export default function CustodianRequestModalContents(props) {
-  let TouchableElement;
-  TouchableElement =
-    Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity;
-
   return (
     <View style={{ ...styles.modalContentContainer, height: "100%" }}>
       <View>
@@ -80,15 +75,15 @@ export default function CustodianRequestModalContents(props) {
             alignItems: "center"
           }}
         >
-          <TouchableElement
+          <TouchableOpacity
             onPress={() => {
               props.onPressAcceptSecret();
             }}
             style={{ ...styles.successModalButtonView }}
           >
             <Text style={styles.proceedButtonText}>Accept Secret</Text>
-          </TouchableElement>
-          <TouchableElement
+          </TouchableOpacity>
+          <TouchableOpacity
             onPress={() => props.onPressRejectSecret()}
             style={{
               height: wp("13%"),
@@ -100,7 +95,7 @@ export default function CustodianRequestModalContents(props) {
             <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
               Reject Secret
             </Text>
-          </TouchableElement>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
