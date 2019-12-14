@@ -12,7 +12,7 @@ export interface Database {
   DECENTRALIZED_BACKUP: {
     RECOVERY_SHARES: {
       [SHARE_INDEX: string]: {
-        REQUEST_DETAILS: { tag: string; otp: string; encryptedKey: string };
+        REQUEST_DETAILS: { TAG: string; OTP: string; ENCRYPTED_KEY: string };
         META_SHARE?: MetaShare;
         ENC_DYNAMIC_NONPMDD?: EncDynamicNonPMDD;
       };
