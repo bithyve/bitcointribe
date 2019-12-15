@@ -19,15 +19,16 @@ import {
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
-import BottomSheet from "reanimated-bottom-sheet";
+import CopyThisText from "../../components/CopyThisText";
 import KnowMoreButton from "../../components/KnowMoreButton";
 import { useDispatch, useSelector } from "react-redux";
 import { initHealthCheck } from "../../store/actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
-import SecondaryDevice from "../../components/containers/backups/SecondaryDevice";
-import Contacts from "../../components/containers/backups/Contacts";
-import Cloud from "../../components/containers/backups/Cloud";
 import HomePageShield from "../../components/HomePageShield";
+import BackupStyles from "./Styles";
+import ContactList from "../../components/ContactList";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import BottomInfoBox from "../../components/BottomInfoBox";
 
 function getImageByType(type) {
   if (type == "secondaryDevice") {
@@ -170,11 +171,13 @@ export default function ManageBackup(props) {
 
   function renderCloudContent() {
     return (
-      <View style={styles.modalContainer}>
-        <View style={styles.modalHeaderTitleView}>
+      <View style={BackupStyles.modalContainer}>
+        <View style={BackupStyles.modalHeaderTitleView}>
           <View style={{ marginTop: hp("2%") }}>
-            <Text style={styles.modalHeaderTitleText}>Cloud</Text>
-            <Text style={styles.modalHeaderInfoText}>Never backed up</Text>
+            <Text style={BackupStyles.modalHeaderTitleText}>Cloud</Text>
+            <Text style={BackupStyles.modalHeaderInfoText}>
+              Never backed up
+            </Text>
           </View>
           <Image
             style={styles.cardIconImage}
@@ -237,11 +240,15 @@ export default function ManageBackup(props) {
 
   function renderTrustedContactsContent() {
     return (
-      <View style={styles.modalContainer}>
-        <View style={styles.modalHeaderTitleView}>
+      <View style={BackupStyles.modalContainer}>
+        <View style={BackupStyles.modalHeaderTitleView}>
           <View style={{ marginTop: hp("2%") }}>
-            <Text style={styles.modalHeaderTitleText}>Trusted Contact</Text>
-            <Text style={styles.modalHeaderInfoText}>Never backed up</Text>
+            <Text style={BackupStyles.modalHeaderTitleText}>
+              Trusted Contact
+            </Text>
+            <Text style={BackupStyles.modalHeaderInfoText}>
+              Never backed up
+            </Text>
           </View>
           <Image
             style={styles.cardIconImage}
@@ -271,8 +278,8 @@ export default function ManageBackup(props) {
           </Text>
           <ContactList
             style={{}}
-            onPressContinue={() => continueNProceed()}
-            onSelectContact={list => selectedContactsList(list)}
+            onPressContinue={() => {}}
+            onSelectContact={list => {}}
           />
         </View>
       </View>
@@ -281,13 +288,13 @@ export default function ManageBackup(props) {
 
   const renderSecondaryDeviceContents = () => {
     return (
-      <View style={styles.modalContainer}>
-        <View style={styles.modalHeaderTitleView}>
+      <View style={BackupStyles.modalContainer}>
+        <View style={BackupStyles.modalHeaderTitleView}>
           <View style={{ marginTop: hp("2%") }}>
-            <Text style={styles.modalHeaderTitleText}>
+            <Text style={BackupStyles.modalHeaderTitleText}>
               {"Secondary Device"}
             </Text>
-            <Text style={styles.modalHeaderInfoText}>
+            <Text style={BackupStyles.modalHeaderInfoText}>
               Last backup{" "}
               <Text
                 style={{
@@ -305,7 +312,7 @@ export default function ManageBackup(props) {
             source={getIconByStatus(selectedStatus)}
           />
         </View>
-        <View style={styles.modalContentView}>
+        <View style={BackupStyles.modalContentView}>
           <Image
             style={{ width: hp("27%"), height: hp("27%"), alignSelf: "center" }}
             source={require("../../assets/images/qrcode.png")}
@@ -327,7 +334,7 @@ export default function ManageBackup(props) {
       <TouchableOpacity
         activeOpacity={10}
         onPress={() => {
-          secondaryDeviceBottomSheet.current.snapTo(0);
+          (secondaryDeviceBottomSheet as any).current.snapTo(0);
         }}
         style={styles.modalHeader}
       >
@@ -341,7 +348,7 @@ export default function ManageBackup(props) {
       <TouchableOpacity
         activeOpacity={10}
         onPress={() => {
-          trustedContactsBottomSheet.current.snapTo(0);
+          (trustedContactsBottomSheet as any).current.snapTo(0);
         }}
         style={styles.modalHeader}
       >
@@ -355,7 +362,7 @@ export default function ManageBackup(props) {
       <TouchableOpacity
         activeOpacity={10}
         onPress={() => {
-          cloudBottomSheet.current.snapTo(0);
+          (cloudBottomSheet as any).current.snapTo(0);
         }}
         style={styles.modalHeader}
       >
@@ -441,7 +448,6 @@ export default function ManageBackup(props) {
                 circleShadowColor={Colors.borderColor}
                 shieldImage={require("../../assets/images/icons/protector_gray.png")}
                 shieldStatus={0}
-              />
               />
             </View>
           </View>
@@ -645,5 +651,41 @@ const styles = StyleSheet.create({
     height: 14,
     resizeMode: "contain",
     marginLeft: "auto"
+  },
+  listElements: {
+    flexDirection: "row",
+    marginLeft: 20,
+    marginRight: 20,
+    borderBottomWidth: 0.5,
+    borderColor: Colors.borderColor,
+    paddingTop: 25,
+    paddingBottom: 25,
+    paddingLeft: 10,
+    alignItems: "center"
+  },
+  listElementsTitle: {
+    color: Colors.blue,
+    fontSize: RFValue(13, 812),
+    marginLeft: 13,
+    fontFamily: Fonts.FiraSansRegular
+  },
+  listElementsInfo: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(11, 812),
+    marginLeft: 13,
+    marginTop: 5,
+    fontFamily: Fonts.FiraSansRegular
+  },
+  listElementIcon: {
+    paddingRight: 5,
+    marginLeft: 25,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  listElementsIconImage: {
+    resizeMode: "contain",
+    width: 25,
+    height: 25,
+    alignSelf: "center"
   }
 });
