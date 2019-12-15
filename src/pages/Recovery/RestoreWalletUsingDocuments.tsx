@@ -7,7 +7,8 @@ import {
   ScrollView,
   StatusBar,
   Text,
-  Image
+  Image,
+  AsyncStorage
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -18,6 +19,16 @@ import { RFValue } from "react-native-responsive-fontsize";
 import HeaderTitle from "../../components/HeaderTitle";
 
 export default function RestoreSelectedContactsList(props) {
+  const selectDocument = async type => {
+    if (type == "cloud") {
+      await AsyncStorage.setItem(
+        "selectedDocuments",
+        JSON.stringify([{ title: "Cloud", status: "" }])
+      );
+      props.navigation.navigate("RestoreSelectedContactsList");
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -47,10 +58,13 @@ export default function RestoreSelectedContactsList(props) {
           />
         </View>
         <View style={{ flex: 8 }}>
-          <View style={styles.listElements}>
+          <TouchableOpacity
+            onPress={() => selectDocument("cloud")}
+            style={styles.listElements}
+          >
             <Image
               style={styles.listElementsIconImage}
-              source={require("../assets/images/icons/icon-print.png")}
+              source={require("../../assets/images/icons/icon-print.png")}
             />
             <View style={{ justifyContent: "space-between", flex: 1 }}>
               <Text style={styles.listElementsTitle}>Cloud</Text>
@@ -67,11 +81,11 @@ export default function RestoreSelectedContactsList(props) {
                 style={{ alignSelf: "center" }}
               />
             </View>
-          </View>
-          <View style={styles.listElements}>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.listElements}>
             <Image
               style={styles.listElementsIconImage}
-              source={require("../assets/images/icons/icon-print.png")}
+              source={require("../../assets/images/icons/icon-print.png")}
             />
             <View style={{ justifyContent: "space-between", flex: 1 }}>
               <Text style={styles.listElementsTitle}>Email</Text>
@@ -88,11 +102,11 @@ export default function RestoreSelectedContactsList(props) {
                 style={{ alignSelf: "center" }}
               />
             </View>
-          </View>
-          <View style={styles.listElements}>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.listElements}>
             <Image
               style={styles.listElementsIconImage}
-              source={require("../assets/images/icons/icon-print.png")}
+              source={require("../../assets/images/icons/icon-print.png")}
             />
             <View style={{ justifyContent: "space-between", flex: 1 }}>
               <Text style={styles.listElementsTitle}>Print</Text>
@@ -108,8 +122,8 @@ export default function RestoreSelectedContactsList(props) {
                 style={{ alignSelf: "center" }}
               />
             </View>
-          </View>
-          <View style={styles.listElements}>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.listElements}>
             <Image
               style={{
                 resizeMode: "contain",
@@ -117,7 +131,7 @@ export default function RestoreSelectedContactsList(props) {
                 height: 25,
                 alignSelf: "center"
               }}
-              source={require("../assets/images/icons/icon-usb.png")}
+              source={require("../../assets/images/icons/icon-usb.png")}
             />
             <View style={{ justifyContent: "space-between", flex: 1 }}>
               <Text style={styles.listElementsTitle}>Local</Text>
@@ -133,7 +147,7 @@ export default function RestoreSelectedContactsList(props) {
                 style={{ alignSelf: "center" }}
               />
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>

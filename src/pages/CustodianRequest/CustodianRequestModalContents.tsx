@@ -36,7 +36,7 @@ export default function CustodianRequestModalContents(props) {
           >
             <Image
               style={styles.successModalAmountImage}
-              source={require("./../assets/images/icons/icon_wallet.png")}
+              source={require("../../assets/images/icons/icon_wallet.png")}
             />
             <Text style={styles.successModalWalletNameText}>
               {props.userName}

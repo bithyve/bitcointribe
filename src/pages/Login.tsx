@@ -66,7 +66,8 @@ export default function Login(props) {
           <Text style={styles.headerTitleText}>Welcome Back!</Text>
           <View>
             <Text style={styles.headerInfoText}>
-              Please enter a <Text style={styles.boldItalicText}>passcode</Text>
+              Please enter your{" "}
+              <Text style={styles.boldItalicText}>passcode</Text>
             </Text>
             <View>
               <View style={styles.passcodeTextInputView}>
