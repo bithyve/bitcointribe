@@ -35,9 +35,12 @@ import Entypo from "react-native-vector-icons/Entypo";
 import RecoveryQuestionModalContents from "../../components/RecoveryQuestionModalContents";
 import RecoverySuccessModalContents from "../../components/RecoverySuccessModalContents";
 import RecoveryWalletNameModalContents from "../../components/RecoveryWalletNameModalContents";
+import ErrorModalContents from "../../components/ErrorModalContents";
 
 export default function RestoreSelectedContactsList(props) {
   const [selectedContacts, setSelectedContacts] = useState([]);
+  const [selectedDocuments, setSelectedDocuments] = useState([]);
+
   const [walletNameBottomSheet, setWalletNameBottomSheet] = useState(
     React.createRef()
   );
@@ -59,6 +62,7 @@ export default function RestoreSelectedContactsList(props) {
     question: ""
   });
   const [answer, setAnswer] = useState("");
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
 
   // function openCloseModal() {
   //   if (!walletName) {
@@ -84,9 +88,14 @@ export default function RestoreSelectedContactsList(props) {
     if (contactList) {
       setSelectedContacts(JSON.parse(contactList));
     }
+    let documentList = await AsyncStorage.getItem("selectedDocuments");
+    if (documentList) {
+      setSelectedDocuments(JSON.parse(documentList));
+    }
   };
 
   useEffect(() => {
+    ErrorBottomSheet.current.snapTo(1);
     let focusListener = props.navigation.addListener("didFocus", () => {
       getSelectedContactList();
     });
@@ -209,6 +218,55 @@ export default function RestoreSelectedContactsList(props) {
       />
     );
   }
+
+  const handleDocuments = async () => {
+    let selectedDocuments = JSON.parse(
+      await AsyncStorage.getItem("selectedDocuments")
+    );
+    if (!selectedDocuments[0].status) {
+      selectedDocuments[0].status = "rejected";
+    } else if (selectedDocuments[0].status == "rejected") {
+      selectedDocuments[0].status = "received";
+    }
+    AsyncStorage.setItem(
+      "selectedDocuments",
+      JSON.stringify(selectedDocuments)
+    );
+    getSelectedContactList();
+  };
+
+  const renderErrorModalContent = () => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={"Recovery Secret Request"}
+        titleNextLine={"from Cloud unsuccessful"}
+        info={"There seems to a problem"}
+        note={"You can choose to try again or select a different source"}
+        noteNextLine={"for Personal Copies"}
+        proceedButtonText={"Try Again"}
+        cancelButtonText={"Select others"}
+        isIgnoreButton={true}
+        onPressProceed={() => {
+          ErrorBottomSheet.current.snapTo(0);
+        }}
+        onPressIgnore={() => {
+          ErrorBottomSheet.current.snapTo(0);
+        }}
+        isBottomImage={false}
+      />
+    );
+  };
+
+  const renderErrorModalHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          ErrorBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -442,30 +500,137 @@ export default function RestoreSelectedContactsList(props) {
 
         <View style={styles.separator} />
         <TouchableOpacity
-          style={{ ...styles.listElements, marginBottom: hp("5%") }}
           onPress={() =>
             props.navigation.navigate("RestoreWalletUsingDocuments")
           }
         >
-          <Image
-            style={styles.iconImage}
-            source={require("../../assets/images/icons/files-and-folders-2.png")}
-          />
-          <View style={styles.textInfoView}>
-            <Text style={styles.listElementsTitle}>Personal Copies (Two)</Text>
-            <Text style={styles.listElementsInfo}>
-              Select one or two of the sources where you have kept the Recovery
-              Secret
-            </Text>
-          </View>
-          <View style={styles.listElementIcon}>
-            <Ionicons
-              name="ios-arrow-forward"
-              color={Colors.textColorGrey}
-              size={15}
-              style={{ alignSelf: "center" }}
+          <View
+            style={{
+              ...styles.listElements,
+              marginBottom: selectedDocuments.length > 0 ? 0 : hp("5%")
+            }}
+          >
+            <Image
+              style={styles.iconImage}
+              source={require("../../assets/images/icons/files-and-folders-2.png")}
             />
+            <View style={styles.textInfoView}>
+              <Text style={styles.listElementsTitle}>
+                Personal Copies (Two)
+              </Text>
+              <Text style={styles.listElementsInfo}>
+                Select one or two of the sources where you have kept the
+                Recovery Secret
+              </Text>
+            </View>
+            <View style={styles.listElementIcon}>
+              <Ionicons
+                name="ios-arrow-forward"
+                color={Colors.textColorGrey}
+                size={15}
+                style={{ alignSelf: "center" }}
+              />
+            </View>
           </View>
+          {selectedDocuments.length > 0 && (
+            <View style={{}}>
+              {selectedDocuments.map(value => {
+                return (
+                  <TouchableOpacity
+                    activeOpacity={value.status != "received" ? 0 : 10}
+                    onPress={() =>
+                      value.status != "received" ? handleDocuments() : {}
+                    }
+                    style={{ ...styles.selectedContactView, marginBottom: 15 }}
+                  >
+                    <View>
+                      <Text style={styles.selectedContactName}>
+                        {value.title}
+                      </Text>
+                    </View>
+                    {value.status == "received" ? (
+                      <View
+                        style={{ flexDirection: "row", marginLeft: "auto" }}
+                      >
+                        <View
+                          style={{
+                            ...styles.secretReceivedView,
+                            backgroundColor: Colors.green
+                          }}
+                        >
+                          <Text
+                            style={{
+                              ...styles.secretReceivedText,
+                              color: Colors.darkGreen
+                            }}
+                          >
+                            Secret Entered
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            ...styles.secretReceivedCheckSignView,
+                            backgroundColor: Colors.green
+                          }}
+                        >
+                          <Feather
+                            name={"check"}
+                            size={12}
+                            color={Colors.darkGreen}
+                          />
+                        </View>
+                      </View>
+                    ) : value.status == "rejected" ? (
+                      <View
+                        style={{ flexDirection: "row", marginLeft: "auto" }}
+                      >
+                        <View
+                          style={{
+                            ...styles.secretReceivedView,
+                            backgroundColor: Colors.lightRed
+                          }}
+                        >
+                          <Text
+                            style={{
+                              ...styles.secretReceivedText,
+                              color: Colors.red
+                            }}
+                          >
+                            Secret Invalid
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            height: 25,
+                            width: 25,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            marginLeft: 5
+                          }}
+                        >
+                          <Entypo
+                            name={"dots-three-horizontal"}
+                            size={15}
+                            color={Colors.borderColor}
+                          />
+                        </View>
+                      </View>
+                    ) : (
+                      <TouchableOpacity
+                        onPress={() => handleDocuments()}
+                        style={{ flexDirection: "row", marginLeft: "auto" }}
+                      >
+                        <Text>{value.status}</Text>
+                        <View style={styles.dotsView} />
+                        <View style={styles.dotsView} />
+                        <View style={styles.dotsView} />
+                      </TouchableOpacity>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
         </TouchableOpacity>
         <View style={{ justifyContent: "center" }}>
           <TouchableOpacity
@@ -505,7 +670,7 @@ export default function RestoreSelectedContactsList(props) {
         ref={recoveryQuestionBottomSheet}
         snapPoints={[
           Platform.OS == "ios" && DeviceInfo.hasNotch() ? 0 : 0,
-          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("67%") : hp("72%"),
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("67%") : hp("75%"),
           Platform.OS == "ios" ? hp("90%") : hp("72%")
         ]}
         renderContent={renderRecoveryQuestionContent}
@@ -520,6 +685,18 @@ export default function RestoreSelectedContactsList(props) {
         ]}
         renderContent={RequestModalContentFunction}
         renderHeader={RequestHeaderFunction}
+      />
+      <BottomSheet
+        onOpenEnd={() => {}}
+        onCloseEnd={() => {}}
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("37%") : hp("45%")
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
       />
     </View>
   );

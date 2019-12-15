@@ -30,7 +30,7 @@ export default function CustodianRequestRejectedModalContents(props) {
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Image
               style={styles.successModalAmountImage}
-              source={require("./../assets/images/icons/icon_wallet.png")}
+              source={require("../../assets/images/icons/icon_wallet.png")}
             />
             <Text style={styles.successModalWalletNameText}>
               {props.userName}
@@ -64,7 +64,7 @@ export default function CustodianRequestRejectedModalContents(props) {
             <Text style={styles.proceedButtonText}>View Trusted Contacts</Text>
           </TouchableOpacity>
           <Image
-            source={require("../assets/images/icons/reject.png")}
+            source={require("../../assets/images/icons/reject.png")}
             style={styles.successModalImage}
           />
         </View>
