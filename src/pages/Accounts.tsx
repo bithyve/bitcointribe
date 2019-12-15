@@ -484,7 +484,7 @@ export default function Accounts(props) {
   };
 
   useEffect(() => {
-    (SendErrorBottomSheet as any).current.snapTo(1);
+    //(SendErrorBottomSheet as any).current.snapTo(1);
     // (SendBottomSheet as any).current.snapTo(1)
   }, []);
 

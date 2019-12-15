@@ -449,7 +449,6 @@ export default function ManageBackup(props) {
                 shieldImage={require("../../assets/images/icons/protector_gray.png")}
                 shieldStatus={0}
               />
-              />
             </View>
           </View>
           <FlatList
