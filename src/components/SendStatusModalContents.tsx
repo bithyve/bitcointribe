@@ -1,12 +1,5 @@
-import React from "react";
-import {
-  View,
-  Image,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  Platform
-} from "react-native";
+import React, { useState } from "react";
+import { View, Image, TouchableOpacity, Text, StyleSheet } from "react-native";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -15,7 +8,7 @@ import {
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 
-export default function CustodianRequestModalContents(props) {
+export default function SendStatusModalContents(props) {
   return (
     <View style={{ ...styles.modalContentContainer, height: "100%" }}>
       <View>
@@ -27,10 +20,13 @@ export default function CustodianRequestModalContents(props) {
           }}
         >
           <Text style={styles.modalTitleText}>
-            You have been selected as a{"\n"}guardian for Hexa Wallet
+            {props.title1stLine}
+            {"\n"}
+            {props.title2ndLine}
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: wp("1.5%") }}>
-            Please contact the sender to get{"\n"}the OTP and accept the secret
+            {props.info1stLine}
+            {props.info2ndLine ? "\n" + props.info2ndLine : ""}
           </Text>
         </View>
         <View style={styles.box}>
@@ -49,25 +45,42 @@ export default function CustodianRequestModalContents(props) {
               {props.userName}
             </Text>
           </View>
-          <View style={styles.separator} />
-          <View
-            style={{
-              marginTop: hp("2%"),
-              marginLeft: wp("2%"),
-              marginRight: wp("2%")
-            }}
-          >
-            <Text
-              style={{ ...styles.modalTitleText, fontSize: RFValue(11, 812) }}
-            >
-              Message from the Sender
-            </Text>
-            <Text style={{ ...styles.modalInfoText }}>
-              Please accept my secret, this will help me recover{"\n"}my wallet
-              later
+        </View>
+        {props.isSuccess ? (
+          <View style={styles.sendSuccessView}>
+            <View style={{}}>
+              <Text style={styles.sendSuccessInfoTitle}>
+                Wallet Transactions Id:{" "}
+              </Text>
+              <Text style={styles.sendSuccessInfoTitle}>Date and Time: </Text>
+            </View>
+            <View style={{}}>
+              <Text
+                style={{
+                  ...styles.sendSuccessInfoTitle,
+                  fontFamily: Fonts.FiraSansMediumItalic
+                }}
+              >
+                {props.transactionId}
+              </Text>
+              <Text
+                style={{
+                  ...styles.sendSuccessInfoTitle,
+                  fontFamily: Fonts.FiraSansMediumItalic
+                }}
+              >
+                {props.transactionDateTime}
+              </Text>
+            </View>
+          </View>
+        ) : (
+          <View style={styles.sendSuccessView}>
+            <Text style={{ ...styles.modalInfoText, marginTop: wp("1.5%") }}>
+              {props.subInfo1stLine}
+              {props.subInfo2ndLine ? "\n" + props.subInfo2ndLine : ""}
             </Text>
           </View>
-        </View>
+        )}
         <View
           style={{
             flexDirection: "row",
@@ -76,26 +89,45 @@ export default function CustodianRequestModalContents(props) {
           }}
         >
           <TouchableOpacity
-            onPress={() => {
-              props.onPressAcceptSecret();
-            }}
+            onPress={() =>
+              props.isSuccess
+                ? props.onPressViewAccount()
+                : props.onPressTryAgain()
+            }
             style={{ ...styles.successModalButtonView }}
           >
-            <Text style={styles.proceedButtonText}>Accept Secret</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => props.onPressRejectSecret()}
-            style={{
-              height: wp("13%"),
-              width: wp("35%"),
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
-              Reject Secret
+            <Text style={styles.proceedButtonText}>
+              {props.isSuccess ? "View Account" : "Try Again"}
             </Text>
           </TouchableOpacity>
+          {!props.isSuccess && (
+            <TouchableOpacity
+              onPress={() => props.onPressSkip()}
+              style={{
+                height: wp("13%"),
+                width: wp("35%"),
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
+                Skip
+              </Text>
+            </TouchableOpacity>
+          )}
+          <Image
+            style={{
+              width: wp("25%"),
+              height: hp("18%"),
+              marginLeft: "auto",
+              resizeMode: "cover"
+            }}
+            source={
+              props.isSuccess
+                ? require("../assets/images/icons/sendSuccess.png")
+                : require("../assets/images/icons/sendError.png")
+            }
+          />
         </View>
       </View>
     </View>
@@ -120,10 +152,10 @@ const styles = StyleSheet.create({
     marginRight: wp("5%"),
     marginLeft: wp("5%"),
     paddingTop: hp("2%"),
-    paddingBottom: hp("2%"),
     marginBottom: hp("3%"),
     borderRadius: 10,
-    justifyContent: "center"
+    justifyContent: "center",
+    paddingLeft: wp("5%")
   },
   successModalHeaderView: {
     marginTop: hp("5%"),
@@ -197,5 +229,16 @@ const styles = StyleSheet.create({
     marginLeft: wp("2%"),
     marginRight: wp("2%"),
     backgroundColor: Colors.borderColor
+  },
+  sendSuccessView: {
+    marginRight: wp("8%"),
+    marginLeft: wp("8%"),
+    marginBottom: hp("3%"),
+    flexDirection: "row"
+  },
+  sendSuccessInfoTitle: {
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(11, 812)
   }
 });
