@@ -308,7 +308,7 @@ export default function ManageBackup(props) {
         <View style={styles.modalContentView}>
           <Image
             style={{ width: hp("27%"), height: hp("27%"), alignSelf: "center" }}
-            source={require("../assets/images/qrcode.png")}
+            source={require("../../assets/images/qrcode.png")}
           />
           <CopyThisText text="lk2j3429-85213-5134=50t-934285623877wer78er7" />
         </View>
@@ -439,7 +439,7 @@ export default function ManageBackup(props) {
             <View style={{ flex: 1 }}>
               <HomePageShield
                 circleShadowColor={Colors.borderColor}
-                shieldImage={require("../assets/images/icons/protector_gray.png")}
+                shieldImage={require("../../assets/images/icons/protector_gray.png")}
                 shieldStatus={0}
               />
               />

@@ -1058,7 +1058,7 @@ export default function Home(props) {
 
   return (
     <ImageBackground
-      source={require("./../assets/images/home-bg.png")}
+      source={require("../assets/images/home-bg.png")}
       style={{ width: "100%", height: "100%", flex: 1 }}
       imageStyle={{ resizeMode: "stretch" }}
     >
@@ -1078,7 +1078,7 @@ export default function Home(props) {
               <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
                 <Image
                   style={CommonStyles.homepageAmountImage}
-                  source={require("./../assets/images/icons/icon_bitcoin_light.png")}
+                  source={require("../assets/images/icons/icon_bitcoin_light.png")}
                 />
                 <Text
                   style={{

@@ -64,7 +64,7 @@ export default function RestoreSelectedContactsList(props) {
           >
             <Image
               style={styles.listElementsIconImage}
-              source={require("../assets/images/icons/icon-print.png")}
+              source={require("../../assets/images/icons/icon-print.png")}
             />
             <View style={{ justifyContent: "space-between", flex: 1 }}>
               <Text style={styles.listElementsTitle}>Cloud</Text>
@@ -85,7 +85,7 @@ export default function RestoreSelectedContactsList(props) {
           <TouchableOpacity style={styles.listElements}>
             <Image
               style={styles.listElementsIconImage}
-              source={require("../assets/images/icons/icon-print.png")}
+              source={require("../../assets/images/icons/icon-print.png")}
             />
             <View style={{ justifyContent: "space-between", flex: 1 }}>
               <Text style={styles.listElementsTitle}>Email</Text>
@@ -106,7 +106,7 @@ export default function RestoreSelectedContactsList(props) {
           <TouchableOpacity style={styles.listElements}>
             <Image
               style={styles.listElementsIconImage}
-              source={require("../assets/images/icons/icon-print.png")}
+              source={require("../../assets/images/icons/icon-print.png")}
             />
             <View style={{ justifyContent: "space-between", flex: 1 }}>
               <Text style={styles.listElementsTitle}>Print</Text>
@@ -131,7 +131,7 @@ export default function RestoreSelectedContactsList(props) {
                 height: 25,
                 alignSelf: "center"
               }}
-              source={require("../assets/images/icons/icon-usb.png")}
+              source={require("../../assets/images/icons/icon-usb.png")}
             />
             <View style={{ justifyContent: "space-between", flex: 1 }}>
               <Text style={styles.listElementsTitle}>Local</Text>

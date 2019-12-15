@@ -512,7 +512,7 @@ export default function RestoreSelectedContactsList(props) {
           >
             <Image
               style={styles.iconImage}
-              source={require("../assets/images/icons/files-and-folders-2.png")}
+              source={require("../../assets/images/icons/files-and-folders-2.png")}
             />
             <View style={styles.textInfoView}>
               <Text style={styles.listElementsTitle}>
