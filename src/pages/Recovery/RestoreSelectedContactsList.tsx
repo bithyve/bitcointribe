@@ -95,7 +95,7 @@ export default function RestoreSelectedContactsList(props) {
   };
 
   useEffect(() => {
-    ErrorBottomSheet.current.snapTo(1);
+    (ErrorBottomSheet as any).current.snapTo(1);
     let focusListener = props.navigation.addListener("didFocus", () => {
       getSelectedContactList();
     });
@@ -106,39 +106,39 @@ export default function RestoreSelectedContactsList(props) {
 
   useEffect(() => {
     if (walletNameOpenModal == "closed") {
-      walletNameBottomSheet.current.snapTo(0);
+      (walletNameBottomSheet as any).current.snapTo(0);
     }
     if (walletNameOpenModal == "half") {
-      walletNameBottomSheet.current.snapTo(1);
+      (walletNameBottomSheet as any).current.snapTo(1);
     }
     if (walletNameOpenModal == "full") {
-      walletNameBottomSheet.current.snapTo(2);
+      (walletNameBottomSheet as any).current.snapTo(2);
     }
   }, [walletNameOpenModal]);
 
   const openRequestModal = () => {
-    requestBottomSheet.current.snapTo(1);
+    (requestBottomSheet as any).current.snapTo(1);
   };
 
-  function renderContent() {
-    return (
-      <RecoveryWalletNameModalContents
-        onTextChange={text => {
-          setWalletName(text);
-        }}
-        onPressTextBoxFocus={() => {
-          setWalletNameOpenModal("full");
-        }}
-        onPressTextBoxBlur={() => {
-          setWalletNameOpenModal("half");
-        }}
-        onPressProceed={() => {
-          walletNameBottomSheet.current.snapTo(0);
-          recoveryQuestionBottomSheet.current.snapTo(1);
-        }}
-      />
-    );
-  }
+  // function renderContent() {
+  //   return (
+  //     <RecoveryWalletNameModalContents
+  //       onTextChange={text => {
+  //         setWalletName(text);
+  //       }}
+  //       onPressTextBoxFocus={() => {
+  //         setWalletNameOpenModal("full");
+  //       }}
+  //       onPressTextBoxBlur={() => {
+  //         setWalletNameOpenModal("half");
+  //       }}
+  //       onPressProceed={() => {
+  //         walletNameBottomSheet.current.snapTo(0);
+  //         recoveryQuestionBottomSheet.current.snapTo(1);
+  //       }}
+  //     />
+  //   );
+  // }
 
   const onPressRequest = async () => {
     let selectedContacts = JSON.parse(
@@ -152,7 +152,7 @@ export default function RestoreSelectedContactsList(props) {
     }
     AsyncStorage.setItem("selectedContacts", JSON.stringify(selectedContacts));
     getSelectedContactList();
-    requestBottomSheet.current.snapTo(0);
+    (requestBottomSheet as any).current.snapTo(0);
   };
 
   const RequestModalContentFunction = () => {
@@ -168,7 +168,7 @@ export default function RestoreSelectedContactsList(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          requestBottomSheet.current.snapTo(0);
+          (requestBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -179,15 +179,15 @@ export default function RestoreSelectedContactsList(props) {
   }
 
   function closeModal() {
-    successMessageBottomSheet.current.snapTo(0);
-    recoveryQuestionBottomSheet.current.snapTo(0);
-    walletNameBottomSheet.current.snapTo(0);
+    (successMessageBottomSheet as any).current.snapTo(0);
+    (recoveryQuestionBottomSheet as any).current.snapTo(0);
+    (walletNameBottomSheet.current as any).snapTo(0);
     return;
   }
 
   const submitRecoveryQuestion = () => {
-    recoveryQuestionBottomSheet.current.snapTo(0);
-    successMessageBottomSheet.current.snapTo(1);
+    (recoveryQuestionBottomSheet.current as any).snapTo(0);
+    (successMessageBottomSheet.current as any).snapTo(1);
   };
 
   function renderRecoveryQuestionContent() {
@@ -248,10 +248,10 @@ export default function RestoreSelectedContactsList(props) {
         cancelButtonText={"Select others"}
         isIgnoreButton={true}
         onPressProceed={() => {
-          ErrorBottomSheet.current.snapTo(0);
+          (ErrorBottomSheet as any).current.snapTo(0);
         }}
         onPressIgnore={() => {
-          ErrorBottomSheet.current.snapTo(0);
+          (ErrorBottomSheet as any).current.snapTo(0);
         }}
         isBottomImage={false}
       />
@@ -262,7 +262,7 @@ export default function RestoreSelectedContactsList(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          ErrorBottomSheet.current.snapTo(0);
+          (ErrorBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -636,7 +636,7 @@ export default function RestoreSelectedContactsList(props) {
           <TouchableOpacity
             style={{ ...styles.questionConfirmButton, margin: 20 }}
             onPress={() => {
-              walletNameBottomSheet.current.snapTo(1);
+              (walletNameBottomSheet as any).current.snapTo(1);
             }}
           >
             <Text style={styles.proceedButtonText}>Continue</Text>
@@ -644,7 +644,7 @@ export default function RestoreSelectedContactsList(props) {
         </View>
       </ScrollView>
 
-      <BottomSheet
+      {/* <BottomSheet
         enabledInnerScrolling={true}
         ref={walletNameBottomSheet}
         snapPoints={[
@@ -654,7 +654,7 @@ export default function RestoreSelectedContactsList(props) {
         ]}
         renderContent={renderContent}
         renderHeader={renderHeader}
-      />
+      /> */}
       <BottomSheet
         enabledInnerScrolling={true}
         ref={successMessageBottomSheet}
@@ -665,7 +665,7 @@ export default function RestoreSelectedContactsList(props) {
         renderContent={renderSuccessContent}
         renderHeader={renderHeader}
       />
-      <BottomSheet
+      {/* <BottomSheet
         enabledInnerScrolling={true}
         ref={recoveryQuestionBottomSheet}
         snapPoints={[
@@ -675,7 +675,7 @@ export default function RestoreSelectedContactsList(props) {
         ]}
         renderContent={renderRecoveryQuestionContent}
         renderHeader={renderHeader}
-      />
+      /> */}
       <BottomSheet
         enabledInnerScrolling={true}
         ref={requestBottomSheet}

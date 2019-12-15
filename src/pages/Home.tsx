@@ -13,7 +13,8 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Linking,
-  Alert
+  Alert,
+  Keyboard
 } from "react-native";
 import { useSelector } from "react-redux";
 import CardView from "react-native-cardview";
@@ -57,7 +58,6 @@ import HealthCheckSecurityQuestionModalContents from "../components/HealthCheckS
 import HealthCheckGoogleAuthModalContents from "../components/HealthCheckGoogleAuthModalContents";
 import { AppState } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
-
 // Note: For health check modal open we have added touchable to shield of homepage and correct question is "Name of your favourite food?" second option from dropdown, correct answer is "Sweets".
 
 export default function Home(props) {
@@ -278,14 +278,14 @@ export default function Home(props) {
   }
 
   useEffect(function() {
-    PinChangeSuccessBottomSheet.current.snapTo(1);
-    ErrorBottomSheet.current.snapTo(1);
-    NoInternetBottomSheet.current.snapTo(0);
+    (PinChangeSuccessBottomSheet as any).current.snapTo(1);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    (NoInternetBottomSheet as any).current.snapTo(0);
     setTimeout(() => {
       setTabBarZIndex(0);
     }, 10);
-    CustodianRequestBottomSheet.current.snapTo(1);
-    bottomSheet.current.snapTo(1);
+    (CustodianRequestBottomSheet as any).current.snapTo(1);
+    (bottomSheet as any).current.snapTo(1);
   }, []);
 
   function renderContent() {
@@ -296,7 +296,7 @@ export default function Home(props) {
             setTimeout(() => {
               setTabBarZIndex(0);
             }, 10);
-            transactionDetailsBottomSheet.current.snapTo(1);
+            (transactionDetailsBottomSheet as any).current.snapTo(1);
           }}
           transactionData={modaldata}
         />
@@ -314,7 +314,7 @@ export default function Home(props) {
                 setTabBarZIndex(0);
                 setSelectToAdd(type);
               }, 10);
-              AddBottomSheet.current.snapTo(1);
+              (AddBottomSheet as any).current.snapTo(1);
             }
           }}
           addData={modaldata}
@@ -353,25 +353,25 @@ export default function Home(props) {
 
   useEffect(() => {
     if (openmodal == "closed") {
-      bottomSheet.current.snapTo(1);
+      (bottomSheet as any).current.snapTo(1);
     }
     if (openmodal == "half") {
-      bottomSheet.current.snapTo(2);
+      (bottomSheet as any).current.snapTo(2);
     }
     if (openmodal == "full") {
-      bottomSheet.current.snapTo(3);
+      (bottomSheet as any).current.snapTo(3);
     }
   }, [openmodal]);
 
   useEffect(() => {
     if (openmodal == "closed") {
-      bottomSheet.current.snapTo(1);
+      (bottomSheet as any).current.snapTo(1);
     }
     if (openmodal == "half") {
-      bottomSheet.current.snapTo(2);
+      (bottomSheet as any).current.snapTo(2);
     }
     if (openmodal == "full") {
-      bottomSheet.current.snapTo(3);
+      (bottomSheet as any).current.snapTo(3);
     }
   }, []);
 
@@ -381,29 +381,29 @@ export default function Home(props) {
         setSelected(tabTitle);
         setSelected(tabTitle);
       }, 10);
-      bottomSheet.current.snapTo(0);
-      MoreTabBottomSheet.current.snapTo(1);
+      (bottomSheet as any).current.snapTo(0);
+      (MoreTabBottomSheet as any).current.snapTo(1);
     } else if (tabTitle == "Transactions") {
       setTimeout(() => {
         setModaldata(transactionData);
         setSelected(tabTitle);
       }, 10);
-      bottomSheet.current.snapTo(1);
-      MoreTabBottomSheet.current.snapTo(0);
+      (bottomSheet as any).current.snapTo(1);
+      (MoreTabBottomSheet as any).current.snapTo(0);
     } else if (tabTitle == "Add") {
       setTimeout(() => {
         setModaldata([]);
         setSelected(tabTitle);
       }, 10);
-      bottomSheet.current.snapTo(1);
-      MoreTabBottomSheet.current.snapTo(0);
+      (bottomSheet as any).current.snapTo(1);
+      (MoreTabBottomSheet as any).current.snapTo(0);
     } else if (tabTitle == "QR") {
       setTimeout(() => {
         setModaldata(transactionData);
         setSelected(tabTitle);
       }, 10);
-      bottomSheet.current.snapTo(1);
-      MoreTabBottomSheet.current.snapTo(0);
+      (bottomSheet as any).current.snapTo(1);
+      (MoreTabBottomSheet as any).current.snapTo(0);
     }
   }
 
@@ -426,10 +426,10 @@ export default function Home(props) {
         proceedButtonText={"Try Again"}
         isIgnoreButton={true}
         onPressProceed={() => {
-          ErrorBottomSheet.current.snapTo(0);
+          (ErrorBottomSheet as any).current.snapTo(0);
         }}
         onPressIgnore={() => {
-          ErrorBottomSheet.current.snapTo(0);
+          (ErrorBottomSheet as any).current.snapTo(0);
         }}
         isBottomImage={true}
         bottomImage={require("../assets/images/icons/errorImage.png")}
@@ -441,7 +441,7 @@ export default function Home(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          ErrorBottomSheet.current.snapTo(0);
+          (ErrorBottomSheet as any).current.snapTo(0);
           setTimeout(() => {
             setTabBarZIndex(0);
           }, 10);
@@ -460,7 +460,7 @@ export default function Home(props) {
         proceedButtonText={"View Settings"}
         isIgnoreButton={false}
         onPressProceed={() => {
-          PinChangeSuccessBottomSheet.current.snapTo(0);
+          (PinChangeSuccessBottomSheet as any).current.snapTo(0);
         }}
         isBottomImage={true}
       />
@@ -471,7 +471,7 @@ export default function Home(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          PinChangeSuccessBottomSheet.current.snapTo(0);
+          (PinChangeSuccessBottomSheet as any).current.snapTo(0);
           setTimeout(() => {
             setTabBarZIndex(0);
           }, 10);
@@ -489,15 +489,15 @@ export default function Home(props) {
           setTimeout(() => {
             setTabBarZIndex(0);
           }, 10);
-          CustodianRequestBottomSheet.current.snapTo(0);
+          (CustodianRequestBottomSheet as any).current.snapTo(0);
           props.navigation.navigate("CustodianRequestOTP", { custodyRequest });
         }}
         onPressRejectSecret={() => {
           setTimeout(() => {
             setTabBarZIndex(0);
           }, 10);
-          CustodianRequestBottomSheet.current.snapTo(0);
-          CustodianRequestRejectedBottomSheet.current.snapTo(1);
+          (CustodianRequestBottomSheet as any).current.snapTo(0);
+          (CustodianRequestRejectedBottomSheet as any).current.snapTo(1);
         }}
       />
     );
@@ -518,8 +518,8 @@ export default function Home(props) {
           setTimeout(() => {
             setTabBarZIndex(0);
           }, 10);
-          CustodianRequestOtpBottomSheet.current.snapTo(0);
-          CustodianRequestAcceptBottomSheet.current.snapTo(1);
+          (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
+          (CustodianRequestAcceptBottomSheet as any).current.snapTo(1);
         }}
       />
     );
@@ -533,7 +533,7 @@ export default function Home(props) {
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 10);
-          CustodianRequestRejectedBottomSheet.current.snapTo(0);
+          (CustodianRequestRejectedBottomSheet as any).current.snapTo(0);
         }}
         userName={custodyRequest.requester}
       />
@@ -550,7 +550,7 @@ export default function Home(props) {
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 10);
-          CustodianRequestAcceptBottomSheet.current.snapTo(0);
+          (CustodianRequestAcceptBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -563,7 +563,7 @@ export default function Home(props) {
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 10);
-          NoInternetBottomSheet.current.snapTo(0);
+          (NoInternetBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -576,7 +576,7 @@ export default function Home(props) {
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 10);
-          CustodianRequestBottomSheet.current.snapTo(0);
+          (CustodianRequestBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -587,7 +587,7 @@ export default function Home(props) {
       setTimeout(() => {
         setTabBarZIndex(0);
       }, 10);
-      addressBookBottomSheet.current.snapTo(1);
+      (addressBookBottomSheet as any).current.snapTo(1);
     }
   };
 
@@ -601,8 +601,8 @@ export default function Home(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          MoreTabBottomSheet.current.snapTo(0);
-          bottomSheet.current.snapTo(1);
+          (MoreTabBottomSheet as any).current.snapTo(0);
+          (bottomSheet as any).current.snapTo(1);
           setTimeout(() => {
             setSelected("Transactions");
           }, 10);
@@ -618,7 +618,7 @@ export default function Home(props) {
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 10);
-          addressBookBottomSheet.current.snapTo(0);
+          (addressBookBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -631,7 +631,7 @@ export default function Home(props) {
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 10);
-          addressBookBottomSheet.current.snapTo(0);
+          (addressBookBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -644,7 +644,7 @@ export default function Home(props) {
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 10);
-          transactionDetailsBottomSheet.current.snapTo(0);
+          (transactionDetailsBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -658,7 +658,7 @@ export default function Home(props) {
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 10);
-          transactionDetailsBottomSheet.current.snapTo(0);
+          (transactionDetailsBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -671,7 +671,7 @@ export default function Home(props) {
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 10);
-          CustodianRequestOtpBottomSheet.current.snapTo(0);
+          (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -684,7 +684,7 @@ export default function Home(props) {
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 10);
-          CustodianRequestRejectedBottomSheet.current.snapTo(0);
+          (CustodianRequestRejectedBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -697,7 +697,7 @@ export default function Home(props) {
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 10);
-          CustodianRequestAcceptBottomSheet.current.snapTo(0);
+          (CustodianRequestAcceptBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -711,7 +711,7 @@ export default function Home(props) {
             setTimeout(() => {
               setTabBarZIndex(999);
             }, 10);
-            AddBottomSheet.current.snapTo(0);
+            (AddBottomSheet as any).current.snapTo(0);
           }}
         />
       );
@@ -722,19 +722,19 @@ export default function Home(props) {
             setTimeout(() => {
               setTabSelected("sell");
             }, 5);
-            fastBitcoinSellCalculationBottomSheet.current.snapTo(1);
+            (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(1);
           }}
           onPressRedeemTab={() => {
             setTimeout(() => {
               setTabSelected("redeem");
             }, 5);
-            fastBitcoinRedeemCalculationBottomSheet.current.snapTo(1);
+            (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(1);
           }}
           onPressBack={() => {
             setTimeout(() => {
               setTabBarZIndex(999);
             }, 10);
-            AddBottomSheet.current.snapTo(0);
+            (AddBottomSheet as any).current.snapTo(0);
           }}
         />
       );
@@ -745,19 +745,19 @@ export default function Home(props) {
             setTimeout(() => {
               setTabSelected("sell");
             }, 5);
-            FamilyAndFriendAddressBookBottomSheet.current.snapTo(1);
+            (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBiller={() => {
             setTimeout(() => {
               setTabSelected("redeem");
             }, 5);
-            FamilyAndFriendAddressBookBottomSheet.current.snapTo(1);
+            (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBack={() => {
             setTimeout(() => {
               setTabBarZIndex(999);
             }, 10);
-            AddBottomSheet.current.snapTo(0);
+            (AddBottomSheet as any).current.snapTo(0);
           }}
         />
       );
@@ -773,7 +773,7 @@ export default function Home(props) {
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 10);
-          AddBottomSheet.current.snapTo(0);
+          (AddBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -792,7 +792,7 @@ export default function Home(props) {
         noteInfo={"Lorem ipsum dolor sit amet, consectetur"}
         proceedButtonText="Calculate"
         onPressBack={() => {
-          fastBitcoinRedeemCalculationBottomSheet.current.snapTo(0);
+          (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -811,7 +811,7 @@ export default function Home(props) {
         noteInfo={"Lorem ipsum dolor sit amet, consectetur"}
         proceedButtonText={"Calculate"}
         onPressBack={() => {
-          fastBitcoinSellCalculationBottomSheet.current.snapTo(0);
+          (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -821,7 +821,7 @@ export default function Home(props) {
     return (
       <SmallHeaderModal
         onPressHandle={() => {
-          fastBitcoinSellCalculationBottomSheet.current.snapTo(0);
+          (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -831,7 +831,7 @@ export default function Home(props) {
     return (
       <SmallHeaderModal
         onPressHandle={() => {
-          fastBitcoinRedeemCalculationBottomSheet.current.snapTo(0);
+          (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -841,10 +841,12 @@ export default function Home(props) {
     return (
       <SelectedContactFromAddressBook
         onPressProceed={() => {
-          ContactSelectedFromAddressBookQrCodeBottomSheet.current.snapTo(1);
+          (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
+            1
+          );
         }}
         onPressBack={() => {
-          ContactSelectedFromAddressBookBottomSheet.current.snapTo(0);
+          (ContactSelectedFromAddressBookBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -854,7 +856,7 @@ export default function Home(props) {
     return (
       <SmallHeaderModal
         onPressHandle={() => {
-          ContactSelectedFromAddressBookBottomSheet.current.snapTo(0);
+          (ContactSelectedFromAddressBookBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -864,10 +866,14 @@ export default function Home(props) {
     return (
       <SelectedContactFromAddressBookQrCode
         onPressProceed={() => {
-          ContactSelectedFromAddressBookQrCodeBottomSheet.current.snapTo(0);
+          (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
+            0
+          );
         }}
         onPressBack={() => {
-          ContactSelectedFromAddressBookQrCodeBottomSheet.current.snapTo(0);
+          (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
+            0
+          );
         }}
       />
     );
@@ -877,7 +883,9 @@ export default function Home(props) {
     return (
       <SmallHeaderModal
         onPressHandle={() => {
-          ContactSelectedFromAddressBookQrCodeBottomSheet.current.snapTo(0);
+          (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
+            0
+          );
         }}
       />
     );
@@ -889,10 +897,10 @@ export default function Home(props) {
         modalRef={FamilyAndFriendAddressBookBottomSheet}
         proceedButtonText={"Confirm & Proceed"}
         onPressProceed={() => {
-          ContactSelectedFromAddressBookBottomSheet.current.snapTo(1);
+          (ContactSelectedFromAddressBookBottomSheet as any).current.snapTo(1);
         }}
         onPressBack={() => {
-          FamilyAndFriendAddressBookBottomSheet.current.snapTo(0);
+          (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -902,15 +910,15 @@ export default function Home(props) {
     return (
       <SmallHeaderModal
         onPressHandle={() => {
-          FamilyAndFriendAddressBookBottomSheet.current.snapTo(0);
+          (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(0);
         }}
       />
     );
   };
 
   const submitRecoveryQuestion = () => {
-    HealthCheckSecurityQuestionBottomSheet.current.snapTo(0);
-    HealthCheckGoogleAuthBottomSheet.current.snapTo(1);
+    (HealthCheckSecurityQuestionBottomSheet as any).current.snapTo(0);
+    (HealthCheckGoogleAuthBottomSheet as any).current.snapTo(1);
     Keyboard.dismiss();
   };
 
@@ -934,7 +942,7 @@ export default function Home(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          HealthCheckSecurityQuestionBottomSheet.current.snapTo(0);
+          (HealthCheckSecurityQuestionBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -946,8 +954,8 @@ export default function Home(props) {
         modalRef={HealthCheckGoogleAuthBottomSheet}
         onPressConfirm={() => {
           Keyboard.dismiss();
-          HealthCheckGoogleAuthBottomSheet.current.snapTo(0);
-          HealthCheckSuccessBottomSheet.current.snapTo(1);
+          (HealthCheckGoogleAuthBottomSheet as any).current.snapTo(0);
+          (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
         }}
       />
     );
@@ -957,7 +965,7 @@ export default function Home(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          HealthCheckGoogleAuthBottomSheet.current.snapTo(0);
+          (HealthCheckGoogleAuthBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -973,7 +981,7 @@ export default function Home(props) {
         proceedButtonText={"View Health"}
         isIgnoreButton={false}
         onPressProceed={() => {
-          HealthCheckSuccessBottomSheet.current.snapTo(0);
+          (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 10);
@@ -987,7 +995,7 @@ export default function Home(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          HealthCheckSuccessBottomSheet.current.snapTo(0);
+          (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 10);
@@ -1011,8 +1019,9 @@ export default function Home(props) {
     AppState.addEventListener("change", handleAppStateChange);
 
     NetInfo.addEventListener(state => {
-      if (!state.isConnected) NoInternetBottomSheet.current.snapTo(1);
-      else if (state.isConnected) NoInternetBottomSheet.current.snapTo(0);
+      if (!state.isConnected) (NoInternetBottomSheet as any).current.snapTo(1);
+      else if (state.isConnected)
+        (NoInternetBottomSheet as any).current.snapTo(0);
     });
   }, []);
 
@@ -1045,8 +1054,8 @@ export default function Home(props) {
       setTimeout(() => {
         setTabBarZIndex(0);
       }, 10);
-      CustodianRequestBottomSheet.current.snapTo(1);
-      bottomSheet.current.snapTo(1);
+      (CustodianRequestBottomSheet as any).current.snapTo(1);
+      (bottomSheet as any).current.snapTo(1);
     }
   }, [custodyRequest]);
 
@@ -1127,7 +1136,9 @@ export default function Home(props) {
               <TouchableOpacity
                 activeOpacity={10}
                 onPress={() => {
-                  HealthCheckSecurityQuestionBottomSheet.current.snapTo(1);
+                  (HealthCheckSecurityQuestionBottomSheet as any).current.snapTo(
+                    1
+                  );
                 }}
               >
                 <HomePageShield shieldStatus={100} />
@@ -1218,7 +1229,7 @@ export default function Home(props) {
       </View>
       <BottomSheet
         onCloseEnd={() => {
-          bottomSheet.current.snapTo(1);
+          (bottomSheet as any).current.snapTo(1);
         }}
         enabledInnerScrolling={true}
         ref={bottomSheet}
@@ -1280,7 +1291,7 @@ export default function Home(props) {
       <BottomSheet
         onCloseEnd={() => {
           setTabBarZIndex(999);
-          bottomSheet.current.snapTo(1);
+          (bottomSheet as any).current.snapTo(1);
         }}
         enabledInnerScrolling={true}
         ref={MoreTabBottomSheet}
@@ -1540,7 +1551,7 @@ export default function Home(props) {
           style={styles.tabBarTabView}
           onPress={() => {
             setOpenmodal("closed");
-            MoreTabBottomSheet.current.snapTo(1);
+            (MoreTabBottomSheet as any).current.snapTo(1);
             selectTab("More");
           }}
         >

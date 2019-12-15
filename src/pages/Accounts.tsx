@@ -153,11 +153,11 @@ export default function Accounts(props) {
     return (
       <SendModalContents
         onPressBack={() => {
-          SendBottomSheet.current.snapTo(0);
+          (SendBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={() => {
-          SendBottomSheet.current.snapTo(0);
-          CustodianRequestOtpBottomSheet.current.snapTo(1);
+          (SendBottomSheet as any).current.snapTo(0);
+          (CustodianRequestOtpBottomSheet as any).current.snapTo(1);
         }}
         modalRef={SendBottomSheet}
       />
@@ -378,7 +378,7 @@ export default function Accounts(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          bottomSheet.current.snapTo(0);
+          (bottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -387,7 +387,7 @@ export default function Accounts(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          SendBottomSheet.current.snapTo(0);
+          (SendBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -406,8 +406,8 @@ export default function Accounts(props) {
         subInfo2ndLine={"sed do eiusmod tempor incididunt ut labore et dolore"}
         modalRef={CustodianRequestOtpBottomSheet}
         onPressConfirm={() => {
-          CustodianRequestOtpBottomSheet.current.snapTo(0);
-          SendSuccessBottomSheet.current.snapTo(1);
+          (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
+          (SendSuccessBottomSheet as any).current.snapTo(1);
         }}
       />
     );
@@ -416,7 +416,7 @@ export default function Accounts(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          CustodianRequestOtpBottomSheet.current.snapTo(0);
+          (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -433,7 +433,7 @@ export default function Accounts(props) {
         modalRef={SendSuccessBottomSheet}
         isSuccess={true}
         onPressViewAccount={() => {
-          SendSuccessBottomSheet.current.snapTo(0);
+          (SendSuccessBottomSheet as any).current.snapTo(0);
         }}
         transactionId={"38123819421304"}
         transactionDateTime={"11:00am, 19 June 2019"}
@@ -444,7 +444,7 @@ export default function Accounts(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          SendSuccessBottomSheet.current.snapTo(0);
+          (SendSuccessBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -465,10 +465,10 @@ export default function Accounts(props) {
         modalRef={SendErrorBottomSheet}
         isSuccess={false}
         onPressTryAgain={() => {
-          SendErrorBottomSheet.current.snapTo(0);
+          (SendErrorBottomSheet as any).current.snapTo(0);
         }}
         onPressSkip={() => {
-          SendErrorBottomSheet.current.snapTo(0);
+          (SendErrorBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -477,15 +477,15 @@ export default function Accounts(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          SendErrorBottomSheet.current.snapTo(0);
+          (SendErrorBottomSheet as any).current.snapTo(0);
         }}
       />
     );
   };
 
   useEffect(() => {
-    SendErrorBottomSheet.current.snapTo(1);
-    // SendBottomSheet.current.snapTo(1)
+    (SendErrorBottomSheet as any).current.snapTo(1);
+    // (SendBottomSheet as any).current.snapTo(1)
   }, []);
 
   return (
@@ -587,7 +587,7 @@ export default function Accounts(props) {
             </Text>
             <Text
               onPress={() => {
-                bottomSheet.current.snapTo(1);
+                (bottomSheet as any).current.snapTo(1);
               }}
               style={{
                 color: Colors.textColorGrey,
@@ -678,7 +678,7 @@ export default function Accounts(props) {
           >
             <TouchableOpacity
               onPress={() => {
-                SendBottomSheet.current.snapTo(1);
+                (SendBottomSheet as any).current.snapTo(1);
               }}
               style={styles.bottomCardView}
             >
