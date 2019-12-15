@@ -15,23 +15,31 @@ import {
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Entypo from "react-native-vector-icons/Entypo";
-import Colors from "../common/Colors";
-import Fonts from "../common/Fonts";
+import Colors from "../../common/Colors";
+import Fonts from "../../common/Fonts";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import CommonStyles from "../common/Styles";
-import ToggleSwitch from "../components/ToggleSwitch";
+import CommonStyles from "../../common/Styles";
+import ToggleSwitch from "../../components/ToggleSwitch";
 import Carousel, { getInputRangeFromIndexes } from "react-native-snap-carousel";
 import BottomSheet from "reanimated-bottom-sheet";
 import DeviceInfo from "react-native-device-info";
-import TransparentHeaderModal from "../components/TransparentHeaderModal";
-import SendModalContents from "../components/SendModalContents";
-import CustodianRequestOtpModalContents from "../components/CustodianRequestOtpModalContents";
-import SendStatusModalContents from "../components/SendStatusModalContents";
+import TransparentHeaderModal from "../../components/TransparentHeaderModal";
+import SendModalContents from "../../components/SendModalContents";
+import CustodianRequestOtpModalContents from "../../components/CustodianRequestOtpModalContents";
+import SendStatusModalContents from "../../components/SendStatusModalContents";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  TEST_ACCOUNT,
+  REGULAR_ACCOUNT,
+  SECURE_ACCOUNT
+} from "../../common/constants/serviceTypes";
+import CopyThisText from "../../components/CopyThisText";
+import BottomInfoBox from "../../components/BottomInfoBox";
 
 export default function Accounts(props) {
   const sliderWidth = Dimensions.get("window").width;
@@ -127,22 +135,22 @@ export default function Accounts(props) {
       accountType: "Test Account",
       accountInfo: "Pam’s Test Account",
       balance: "400,000",
-      backgroundImage: require("../assets/images/carouselImages/test_account_background.png"),
-      accountTypeImage: require("../assets/images/icons/icon_test_white.png")
+      backgroundImage: require("../../assets/images/carouselImages/test_account_background.png"),
+      accountTypeImage: require("../../assets/images/icons/icon_test_white.png")
     },
     {
       accountType: "Regular Account",
       accountInfo: "Fast and easy",
       balance: "400,000",
-      backgroundImage: require("../assets/images/carouselImages/regular_account_background.png"),
-      accountTypeImage: require("../assets/images/icons/icon_regular_account.png")
+      backgroundImage: require("../../assets/images/carouselImages/regular_account_background.png"),
+      accountTypeImage: require("../../assets/images/icons/icon_regular_account.png")
     },
     {
       accountType: "Savings account",
       accountInfo: "Multi-factor security",
       balance: "2,000,000",
-      backgroundImage: require("../assets/images/carouselImages/savings_account_background.png"),
-      accountTypeImage: require("../assets/images/icons/icon_secureaccount_white.png")
+      backgroundImage: require("../../assets/images/carouselImages/savings_account_background.png"),
+      accountTypeImage: require("../../assets/images/icons/icon_secureaccount_white.png")
     }
   ]);
   const [carouselInitIndex, setCarouselInitIndex] = useState(true);
@@ -231,7 +239,7 @@ export default function Accounts(props) {
               height: wp("5%"),
               resizeMode: "contain"
             }}
-            source={require("../assets/images/icons/icon_settings.png")}
+            source={require("../../assets/images/icons/icon_settings.png")}
           />
           {item.accountType == "Savings account" && (
             <Text
@@ -249,7 +257,7 @@ export default function Accounts(props) {
           <View style={{ flexDirection: "row" }}>
             <Image
               style={styles.cardBitCoinImage}
-              source={require("../assets/images/icons/icon_bitcoin_light.png")}
+              source={require("../../assets/images/icons/icon_bitcoin_light.png")}
             />
             <Text style={styles.cardAmountText}>{item.balance}</Text>
             <Text style={styles.cardAmountUnitText}>sat</Text>
@@ -345,7 +353,7 @@ export default function Accounts(props) {
               </View>
               <View style={styles.transactionModalAmountView}>
                 <Image
-                  source={require("../assets/images/icons/icon_bitcoin_gray.png")}
+                  source={require("../../assets/images/icons/icon_bitcoin_gray.png")}
                   style={{ width: 12, height: 12, resizeMode: "contain" }}
                 />
                 <Text
@@ -488,6 +496,19 @@ export default function Accounts(props) {
     // (SendBottomSheet as any).current.snapTo(1)
   }, []);
 
+  const serviceType = props.navigation.getParam("serviceType");
+  const dispatch = useDispatch();
+  const { loading, service } = useSelector(
+    state => state.accounts[serviceType]
+  );
+
+  const { balances, receivingAddress, transactions } =
+    serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
+  const netBalance = service
+    ? balances.balance + balances.unconfirmedBalance
+    : 0;
+  console.log({ balances, receivingAddress, transactions });
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -536,10 +557,10 @@ export default function Accounts(props) {
               }}
             >
               <ToggleSwitch
-                activeOnImage={require("../assets/images/icons/icon_bitcoin_light.png")}
-                inactiveOnImage={require("../assets/images/icons/icon_bitcoin_dark.png")}
-                activeOffImage={require("../assets/images/icons/icon_dollar_white.png")}
-                inactiveOffImage={require("../assets/images/icons/icon_dollar_dark.png")}
+                activeOnImage={require("../../assets/images/icons/icon_bitcoin_light.png")}
+                inactiveOnImage={require("../../assets/images/icons/icon_bitcoin_dark.png")}
+                activeOffImage={require("../../assets/images/icons/icon_dollar_white.png")}
+                inactiveOffImage={require("../../assets/images/icons/icon_dollar_dark.png")}
                 toggleColor={Colors.lightBlue}
                 toggleCircleColor={Colors.blue}
                 onpress={() => {
@@ -643,7 +664,7 @@ export default function Accounts(props) {
                   </View>
                   <View style={styles.transactionModalAmountView}>
                     <Image
-                      source={require("../assets/images/icons/icon_bitcoin_gray.png")}
+                      source={require("../../assets/images/icons/icon_bitcoin_gray.png")}
                       style={{ width: 12, height: 12, resizeMode: "contain" }}
                     />
                     <Text
@@ -683,7 +704,7 @@ export default function Accounts(props) {
               style={styles.bottomCardView}
             >
               <Image
-                source={require("../assets/images/icons/icon_send.png")}
+                source={require("../../assets/images/icons/icon_send.png")}
                 style={styles.bottomCardSendReceiveImage}
               />
               <View style={{ marginLeft: wp("3%") }}>
@@ -694,11 +715,13 @@ export default function Accounts(props) {
               </View>
             </TouchableOpacity>
             <TouchableOpacity
-              // onPress={()=>{ReceiveBottomSheet.current.snapTo(1)}}
+              onPress={() => {
+                props.navigation.navigate("ReceivingAddress", { serviceType });
+              }}
               style={styles.bottomCardView}
             >
               <Image
-                source={require("../assets/images/icons/icon_recieve.png")}
+                source={require("../../assets/images/icons/icon_recieve.png")}
                 style={styles.bottomCardSendReceiveImage}
               />
               <View style={{ marginLeft: wp("3%") }}>
@@ -714,7 +737,7 @@ export default function Accounts(props) {
           >
             <TouchableOpacity style={styles.bottomCardView}>
               <Image
-                source={require("../assets/images/icons/icon_buy.png")}
+                source={require("../../assets/images/icons/icon_buy.png")}
                 style={styles.bottomCardImage}
               />
               <View style={{ marginLeft: wp("3%") }}>
@@ -726,7 +749,7 @@ export default function Accounts(props) {
             </TouchableOpacity>
             <TouchableOpacity style={styles.bottomCardView}>
               <Image
-                source={require("../assets/images/icons/icon_sell.png")}
+                source={require("../../assets/images/icons/icon_sell.png")}
                 style={styles.bottomCardImage}
               />
               <View style={{ marginLeft: wp("3%") }}>
@@ -760,13 +783,13 @@ export default function Accounts(props) {
         renderContent={renderSendContents}
         renderHeader={renderSendModalHeader}
       />
-      <BottomSheet
+      {/* <BottomSheet
         enabledInnerScrolling={true}
         ref={ReceiveBottomSheet}
         snapPoints={[-50, hp("90%")]}
-        renderContent={renderAddressBookContents}
-        renderHeader={renderAddressBookHeader}
-      />
+        renderContent={renderReceivingAddrContents}
+        renderHeader={renderReceivingAddrHeader}
+      /> */}
 
       <BottomSheet
         enabledGestureInteraction={false}
@@ -917,5 +940,61 @@ const styles = StyleSheet.create({
     fontSize: RFValue(18, 812),
     fontFamily: Fonts.FiraSansRegular
     // marginLeft: 15
+  },
+  cardIconImage: {
+    width: 12,
+    height: 14,
+    resizeMode: "contain",
+    marginLeft: "auto"
+  },
+  modalContainer: {
+    height: "100%",
+    backgroundColor: Colors.white,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderTopWidth: 1,
+    borderColor: Colors.borderColor,
+    alignSelf: "center",
+    width: "100%"
+  },
+  modalHeaderTitleView: {
+    borderBottomWidth: 1,
+    borderColor: Colors.borderColor,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingBottom: 15,
+    paddingTop: 10,
+    marginLeft: 20,
+    marginTop: 20,
+    marginRight: 20,
+    marginBottom: 15
+  },
+  modalHeaderInfoText: {
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(12, 812),
+    marginTop: 5
+  },
+  modalContentView: {
+    flex: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  modalHeaderHandle: {
+    width: 50,
+    height: 5,
+    backgroundColor: Colors.borderColor,
+    borderRadius: 10,
+    alignSelf: "center",
+    marginTop: 7
+  },
+  modalHeaderContainer: {
+    paddingTop: 20
   }
 });

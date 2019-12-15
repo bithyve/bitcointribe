@@ -58,6 +58,11 @@ import HealthCheckSecurityQuestionModalContents from "../components/HealthCheckS
 import HealthCheckGoogleAuthModalContents from "../components/HealthCheckGoogleAuthModalContents";
 import { AppState } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
+import {
+  TEST_ACCOUNT,
+  REGULAR_ACCOUNT,
+  SECURE_ACCOUNT
+} from "../common/constants/serviceTypes";
 // Note: For health check modal open we have added touchable to shield of homepage and correct question is "Name of your favourite food?" second option from dropdown, correct answer is "Sweets".
 
 export default function Home(props) {
@@ -142,52 +147,30 @@ export default function Home(props) {
   ] = useState(React.createRef());
   const [bottomSheet, setBottomSheet] = useState(React.createRef());
   const [data, setData] = useState([
-    [
-      {
-        title: "Test Account",
-        unit: "tsats",
-        amount: "400,000",
-        account: "Murtuza’s Test Account",
-        accountType: "test",
-        bitcoinicon: require("../assets/images/icons/icon_bitcoin_test.png")
-      },
-      {
-        title: "Test Account",
-        unit: "sats",
-        amount: "2,000,000",
-        account: "Multi-factor security",
-        accountType: "secure",
-        bitcoinicon: require("../assets/images/icons/icon_bitcoin_gray.png")
-      }
-    ],
-    [
-      {
-        title: "Regular Account",
-        unit: "sats",
-        amount: "5,000",
-        account: "Fast and easy",
-        accountType: "saving",
-        bitcoinicon: require("../assets/images/icons/icon_bitcoin_gray.png")
-      },
-      {
-        title: "Saving Account",
-        unit: "sats",
-        amount: "60,000",
-        account: "Fast and easy",
-        accountType: "saving",
-        bitcoinicon: require("../assets/images/icons/icon_bitcoin_gray.png")
-      }
-    ],
-    [
-      {
-        title: "Regular Account",
-        unit: "sats",
-        amount: "5,000",
-        account: "Murtuza’s Test Account",
-        accountType: "regular",
-        bitcoinicon: require("../assets/images/icons/icon_bitcoin_gray.png")
-      }
-    ]
+    {
+      title: "Test Account",
+      unit: "tsats",
+      amount: "400,000",
+      account: "Murtuza’s Test Account",
+      accountType: "test",
+      bitcoinicon: require("../assets/images/icons/icon_bitcoin_test.png")
+    },
+    {
+      title: "Regular Account",
+      unit: "sats",
+      amount: "5,000",
+      account: "Fast and easy",
+      accountType: "regular",
+      bitcoinicon: require("../assets/images/icons/icon_bitcoin_gray.png")
+    },
+    {
+      title: "Saving Account",
+      unit: "sats",
+      amount: "60,000",
+      account: "Fast and easy",
+      accountType: "saving",
+      bitcoinicon: require("../assets/images/icons/icon_bitcoin_gray.png")
+    }
   ]);
   const [transactionData, setTransactionData] = useState([
     {
@@ -1144,71 +1127,74 @@ export default function Home(props) {
             renderItem={Items => {
               return (
                 <View style={{ flexDirection: "column" }}>
-                  {Items.item.map(value => {
-                    return (
-                      <TouchableOpacity
-                        onPress={() => {
-                          props.navigation.navigate("Accounts");
-                        }}
-                      >
-                        <CardView cornerRadius={10} style={styles.card}>
-                          <View style={{ flexDirection: "row" }}>
-                            <Image
-                              style={{ width: wp("10%"), height: wp("10%") }}
-                              source={getIconByAccountType(value.accountType)}
-                            />
-                            {value.accountType == "secure" ? (
-                              <TouchableOpacity
-                                onPress={() => {
-                                  alert("2FA");
-                                }}
-                                style={{ marginLeft: "auto" }}
-                              >
-                                <Text
-                                  style={{
-                                    color: Colors.blue,
-                                    fontSize: RFValue(11, 812),
-                                    fontFamily: Fonts.FiraSansRegular
-                                  }}
-                                >
-                                  2FA
-                                </Text>
-                              </TouchableOpacity>
-                            ) : null}
-                          </View>
-                          <View style={{ flex: 1, justifyContent: "flex-end" }}>
-                            <Text style={styles.cardTitle}>{value.title}</Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      props.navigation.navigate("Accounts", {
+                        serviceType:
+                          Items.item.accountType === "test"
+                            ? TEST_ACCOUNT
+                            : Items.item.accountType === "regular"
+                            ? REGULAR_ACCOUNT
+                            : SECURE_ACCOUNT
+                      });
+                    }}
+                  >
+                    <CardView cornerRadius={10} style={styles.card}>
+                      <View style={{ flexDirection: "row" }}>
+                        <Image
+                          style={{ width: wp("10%"), height: wp("10%") }}
+                          source={getIconByAccountType(Items.item.accountType)}
+                        />
+                        {Items.item.accountType == "secure" ? (
+                          <TouchableOpacity
+                            onPress={() => {
+                              alert("2FA");
+                            }}
+                            style={{ marginLeft: "auto" }}
+                          >
                             <Text
                               style={{
-                                color: Colors.textColorGrey,
-                                fontSize: RFValue(11, 812)
+                                color: Colors.blue,
+                                fontSize: RFValue(11, 812),
+                                fontFamily: Fonts.FiraSansRegular
                               }}
                             >
-                              {value.account}
+                              2FA
                             </Text>
-                            <View
-                              style={{
-                                flexDirection: "row",
-                                alignItems: "flex-end",
-                                marginTop: hp("1%")
-                              }}
-                            >
-                              <Image
-                                style={styles.cardBitCoinImage}
-                                source={value.bitcoinicon}
-                              />
-                              <Text style={styles.cardAmountText}>
-                                {value.amount}
-                              </Text>
-                              <Text style={styles.cardAmountUnitText}>
-                                {value.unit}
-                              </Text>
-                            </View>
-                          </View>
-                        </CardView>
-                      </TouchableOpacity>
-                    );
-                  })}
+                          </TouchableOpacity>
+                        ) : null}
+                      </View>
+                      <View style={{ flex: 1, justifyContent: "flex-end" }}>
+                        <Text style={styles.cardTitle}>{Items.item.title}</Text>
+                        <Text
+                          style={{
+                            color: Colors.textColorGrey,
+                            fontSize: RFValue(11, 812)
+                          }}
+                        >
+                          {Items.item.account}
+                        </Text>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "flex-end",
+                            marginTop: hp("1%")
+                          }}
+                        >
+                          <Image
+                            style={styles.cardBitCoinImage}
+                            source={Items.item.bitcoinicon}
+                          />
+                          <Text style={styles.cardAmountText}>
+                            {Items.item.amount}
+                          </Text>
+                          <Text style={styles.cardAmountUnitText}>
+                            {Items.item.unit}
+                          </Text>
+                        </View>
+                      </View>
+                    </CardView>
+                  </TouchableOpacity>
                 </View>
               );
             }}
