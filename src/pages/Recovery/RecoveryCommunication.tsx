@@ -138,7 +138,7 @@ export default function RecoveryCommunication(props) {
               }}
             >
               <Image
-                source={require("../assets/images/icons/pexels-photo.png")}
+                source={require("../../assets/images/icons/pexels-photo.png")}
                 style={{ ...styles.contactProfileImage }}
               />
             </View>
