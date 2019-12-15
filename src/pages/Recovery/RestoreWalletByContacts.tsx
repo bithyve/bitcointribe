@@ -136,6 +136,8 @@ const RestoreWalletByContact = props => {
   );
 };
 
+export default RestoreWalletByContact;
+
 const styles = StyleSheet.create({
   modalHeaderContainer: {
     paddingTop: 20
@@ -150,5 +152,3 @@ const styles = StyleSheet.create({
     marginBottom: 7
   }
 });
-
-export default RestoreWalletByContact;
