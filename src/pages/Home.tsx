@@ -277,16 +277,16 @@ export default function Home(props) {
     }
   }
 
-  useEffect(function() {
-    (PinChangeSuccessBottomSheet as any).current.snapTo(1);
-    (ErrorBottomSheet as any).current.snapTo(1);
-    (NoInternetBottomSheet as any).current.snapTo(0);
-    setTimeout(() => {
-      setTabBarZIndex(0);
-    }, 10);
-    (CustodianRequestBottomSheet as any).current.snapTo(1);
-    (bottomSheet as any).current.snapTo(1);
-  }, []);
+  // useEffect(function() {
+  //   (PinChangeSuccessBottomSheet as any).current.snapTo(1);
+  //   (ErrorBottomSheet as any).current.snapTo(1);
+  //   (NoInternetBottomSheet as any).current.snapTo(0);
+  //   setTimeout(() => {
+  //     setTabBarZIndex(0);
+  //   }, 10);
+  //   (CustodianRequestBottomSheet as any).current.snapTo(1);
+  //   (bottomSheet as any).current.snapTo(1);
+  // }, []);
 
   function renderContent() {
     if (selected == "Transactions") {
@@ -350,18 +350,6 @@ export default function Home(props) {
       setOpenmodal("closed");
     }
   }
-
-  useEffect(() => {
-    if (openmodal == "closed") {
-      (bottomSheet as any).current.snapTo(1);
-    }
-    if (openmodal == "half") {
-      (bottomSheet as any).current.snapTo(2);
-    }
-    if (openmodal == "full") {
-      (bottomSheet as any).current.snapTo(3);
-    }
-  }, [openmodal]);
 
   useEffect(() => {
     if (openmodal == "closed") {

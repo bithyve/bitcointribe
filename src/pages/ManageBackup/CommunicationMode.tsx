@@ -126,7 +126,7 @@ export default function CommunicationMode(props) {
                 borderRadius: 10
               }}
             >
-              <Text style={styles.contactNameText}>Sophie Babel</Text>
+              <Text style={styles.contactNameText}>{contact.name}</Text>
             </View>
             <View
               style={{
