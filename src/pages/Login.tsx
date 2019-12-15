@@ -44,9 +44,11 @@ export default function Login(props) {
   );
 
   const custodyRequest = props.navigation.getParam("custodyRequest");
+  const recoveryRequest = props.navigation.getParam("recoveryRequest");
   if (isAuthenticated)
     AsyncStorage.getItem("walletExists").then(exists => {
-      if (exists) props.navigation.navigate("Home", { custodyRequest });
+      if (exists)
+        props.navigation.navigate("Home", { custodyRequest, recoveryRequest });
       else props.navigation.replace("RestoreAndRecoverWallet");
     });
 
@@ -64,7 +66,8 @@ export default function Login(props) {
           <Text style={styles.headerTitleText}>Welcome Back!</Text>
           <View>
             <Text style={styles.headerInfoText}>
-              Please enter a <Text style={styles.boldItalicText}>passcode</Text>
+              Please enter your{" "}
+              <Text style={styles.boldItalicText}>passcode</Text>
             </Text>
             <View>
               <View style={styles.passcodeTextInputView}>

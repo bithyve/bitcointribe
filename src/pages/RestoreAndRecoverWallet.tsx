@@ -35,7 +35,7 @@ const RestoreAndRecoverWallet = props => {
           >
             <Image
               style={styles.iconImage}
-              source={require("./../assets/images/icons/icon_newwallet.png")}
+              source={require("../assets/images/icons/icon_newwallet.png")}
             />
             <View style={styles.textView}>
               <Text style={styles.touchableText}>
@@ -69,7 +69,7 @@ const RestoreAndRecoverWallet = props => {
           >
             <Image
               style={styles.iconImage}
-              source={require("./../assets/images/icons/icon_secrets.png")}
+              source={require("../assets/images/icons/icon_secrets.png")}
             />
             <View style={styles.textView}>
               <Text style={styles.touchableText}>Using Recovery Secrets</Text>

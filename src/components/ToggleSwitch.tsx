@@ -27,7 +27,7 @@ export default class ToggleSwitch extends Component {
                 </View>) :
                 (<View style={{ flexDirection: 'row' }}>
                     <View style={{ backgroundColor: this.props.toggleCircleColor ? this.props.toggleCircleColor : Colors.white, height: wp('8%'), width: wp('8%'), borderRadius: wp('8%') / 2, alignItems: 'center', justifyContent: 'center',marginLeft:2 }}>
-                        <Image source={this.props.activeOffImage ?this.props.activeOffImage: require('../assets/images/icons/icon_bitcoin_dark.png')} style={{ width: wp('3.5%'), height: wp('3.5%'), resizeMode: "contain" }} />
+                        <Image source={this.props.activeOffImage ?this.props.activeOffImage: require('../assets/images/icons/icon_dollar_dark.png')} style={{ width: wp('3.5%'), height: wp('3.5%'), resizeMode: "contain" }} />
                     </View>
                     <View style={{ height: wp('8%'), width: wp('8%'), justifyContent: 'center', alignItems: 'center', marginLeft: this.props.toggle ? 'auto' : 0, marginRight:-3 }}>
                         <Image source={this.props.inactiveOnImage ?this.props.inactiveOnImage: require('../assets/images/icons/icon_bitcoin_gray.png')} style={{ width: wp('3.5%'), height: wp('3.5%'), resizeMode: "contain" }} />
