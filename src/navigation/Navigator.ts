@@ -30,6 +30,7 @@ import RecoveryCommunication from "../pages/Recovery/RecoveryCommunication";
 import ReceivingAddress from "../pages/Accounts/ReceivingAddress";
 import TransactionDetails from "../pages/Accounts/TransactionDetails";
 import Send from "../pages/Accounts/Send";
+import TwoFAToken from "../pages/Accounts/TwoFAToken";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -65,7 +66,8 @@ const MODAL_ROUTES = [
   "CustodianRequestAccepted",
   "ReceivingAddress",
   "TransactionDetails",
-  "Send"
+  "Send",
+  "TwoFAToken"
 ];
 const HomeNavigator = createStackNavigator(
   {
@@ -86,7 +88,8 @@ const HomeNavigator = createStackNavigator(
     CustodianRequestAccepted,
     ReceivingAddress,
     TransactionDetails,
-    Send
+    Send,
+    TwoFAToken
   },
   {
     headerLayoutPreset: "center",
