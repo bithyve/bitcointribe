@@ -40,6 +40,7 @@ import {
 } from "../../common/constants/serviceTypes";
 import CopyThisText from "../../components/CopyThisText";
 import BottomInfoBox from "../../components/BottomInfoBox";
+import { fetchBalance } from "../../store/actions/accounts";
 
 export default function Accounts(props) {
   const sliderWidth = Dimensions.get("window").width;
@@ -134,25 +135,23 @@ export default function Accounts(props) {
     {
       accountType: "Test Account",
       accountInfo: "Pam’s Test Account",
-      balance: "400,000",
       backgroundImage: require("../../assets/images/carouselImages/test_account_background.png"),
       accountTypeImage: require("../../assets/images/icons/icon_test_white.png")
     },
     {
       accountType: "Regular Account",
       accountInfo: "Fast and easy",
-      balance: "400,000",
       backgroundImage: require("../../assets/images/carouselImages/regular_account_background.png"),
       accountTypeImage: require("../../assets/images/icons/icon_regular_account.png")
     },
     {
       accountType: "Savings account",
       accountInfo: "Multi-factor security",
-      balance: "2,000,000",
       backgroundImage: require("../../assets/images/carouselImages/savings_account_background.png"),
       accountTypeImage: require("../../assets/images/icons/icon_secureaccount_white.png")
     }
   ]);
+
   const [carouselInitIndex, setCarouselInitIndex] = useState(true);
   const [switchOn, setSwitchOn] = useState(true);
   const [carousel, setCarousel] = useState(React.createRef());
@@ -259,7 +258,7 @@ export default function Accounts(props) {
               style={styles.cardBitCoinImage}
               source={require("../../assets/images/icons/icon_bitcoin_light.png")}
             />
-            <Text style={styles.cardAmountText}>{item.balance}</Text>
+            <Text style={styles.cardAmountText}>{netBalance}</Text>
             <Text style={styles.cardAmountUnitText}>sat</Text>
           </View>
         </View>
@@ -491,23 +490,28 @@ export default function Accounts(props) {
     );
   };
 
-  useEffect(() => {
-    //(SendErrorBottomSheet as any).current.snapTo(1);
-    // (SendBottomSheet as any).current.snapTo(1)
-  }, []);
+  // useEffect(() => {
+  //(SendErrorBottomSheet as any).current.snapTo(1);
+  // (SendBottomSheet as any).current.snapTo(1)
+  // }, []);
 
-  const serviceType = props.navigation.getParam("serviceType");
-  const dispatch = useDispatch();
+  const [serviceType, setServiceType] = useState(
+    props.navigation.getParam("serviceType")
+  );
   const { loading, service } = useSelector(
     state => state.accounts[serviceType]
   );
 
-  const { balances, receivingAddress, transactions } =
+  const { balances, transactions } =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
   const netBalance = service
     ? balances.balance + balances.unconfirmedBalance
     : 0;
-  console.log({ balances, receivingAddress, transactions });
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!netBalance) dispatch(fetchBalance(serviceType));
+  }, [serviceType]);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -579,7 +583,14 @@ export default function Accounts(props) {
             renderItem={renderItem}
             sliderWidth={sliderWidth}
             itemWidth={sliderWidth * 0.95}
-            onSnapToItem={index => setCarouselInitIndex(index)}
+            onSnapToItem={index => {
+              setCarouselInitIndex(index);
+              index === 0
+                ? setServiceType(TEST_ACCOUNT)
+                : index === 1
+                ? setServiceType(REGULAR_ACCOUNT)
+                : setServiceType(SECURE_ACCOUNT);
+            }}
             style={{ activeSlideAlignment: "center" }}
             scrollInterpolator={scrollInterpolator}
             slideInterpolatedStyle={slideInterpolatedStyle}
