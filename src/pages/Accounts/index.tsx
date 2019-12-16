@@ -11,7 +11,8 @@ import {
   Image,
   ImageBackground,
   FlatList,
-  Platform
+  Platform,
+  RefreshControl
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Entypo from "react-native-vector-icons/Entypo";
@@ -41,6 +42,7 @@ import {
 import CopyThisText from "../../components/CopyThisText";
 import BottomInfoBox from "../../components/BottomInfoBox";
 import { fetchBalance, fetchTransactions } from "../../store/actions/accounts";
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function Accounts(props) {
   const sliderWidth = Dimensions.get("window").width;
@@ -524,7 +526,21 @@ export default function Accounts(props) {
   }, [serviceType]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
+    <ScrollView
+      contentContainerStyle={{
+        flex: 1,
+        backgroundColor: Colors.backgroundColor
+      }}
+      refreshControl={
+        <RefreshControl
+          refreshing={loading.transactions || loading.balances}
+          onRefresh={() => {
+            dispatch(fetchBalance(serviceType));
+            dispatch(fetchTransactions(serviceType));
+          }}
+        />
+      }
+    >
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar />
       <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -842,7 +858,7 @@ export default function Accounts(props) {
         renderContent={renderSendErrorContents}
         renderHeader={renderSendErrorHeader}
       />
-    </View>
+    </ScrollView>
   );
 }
 

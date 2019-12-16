@@ -5,33 +5,66 @@ import {
   TouchableOpacity,
   Text,
   TextInput,
-  StyleSheet
+  StyleSheet,
+  ActivityIndicator
 } from "react-native";
-import Colors from "../common/Colors";
-import Fonts from "../common/Fonts";
+import Colors from "../../common/Colors";
+import Fonts from "../../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
-
-export default function CustodianRequestOtpModalContents(props) {
-  const [passcode, setPasscode] = useState("");
-  const inputRef = useRef(null);
-  const [scrollViewRef, setscrollViewRef] = useState(React.createRef());
+import { useDispatch, useSelector } from "react-redux";
+import {
+  transferST3,
+  clearTransfer,
+  fetchTransactions
+} from "../../store/actions/accounts";
+import SendStatusModalContents from "../../components/SendStatusModalContents";
+export default function TwoFAToken(props) {
+  const [token, setToken] = useState("");
+  const serviceType = props.navigation.getParam("serviceType");
+  const recipientAddress = props.navigation.getParam("recipientAddress");
 
   function onPressNumber(text) {
-    let tmpPasscode = passcode;
-    if (passcode.length < 6) {
-      tmpPasscode += text;
-      setPasscode(tmpPasscode);
+    let tmpToken = token;
+    if (token.length < 6) {
+      tmpToken += text;
+      setToken(tmpToken);
     }
   }
+
+  const dispatch = useDispatch();
+  const renderSuccessStatusContents = () => (
+    <SendStatusModalContents
+      title1stLine={"Sent Successfully"}
+      title2ndLine={""}
+      info1stLine={"Bitcoins successfully sent to"}
+      info2ndLine={""}
+      userName={recipientAddress}
+      // modalRef={SendSuccessBottomSheet}
+      isSuccess={true}
+      onPressViewAccount={() => {
+        dispatch(clearTransfer(serviceType));
+        dispatch(fetchTransactions(serviceType));
+        props.navigation.navigate("Accounts");
+      }}
+      transactionId={transfer.txid}
+      transactionDateTime={Date()}
+    />
+  );
+
+  const { transfer, loading, service } = useSelector(
+    state => state.accounts[serviceType]
+  );
+
+  if (transfer.txid) return renderSuccessStatusContents();
+  console.log({ twoFASecret: service.secureHDWallet.twoFASetup.secret }); // TODO: secret display and removal mech
 
   return (
     <View style={{ ...styles.modalContentContainer, height: "100%" }}>
       <View
-        ref={scrollViewRef}
         style={{
           marginRight: wp("8%"),
           marginLeft: wp("8%")
@@ -39,14 +72,14 @@ export default function CustodianRequestOtpModalContents(props) {
       >
         <View style={{ ...styles.otpRequestHeaderView }}>
           <Text style={styles.modalTitleText}>
-            {props.title1stLine}
-            {"\n"}
-            {props.title2ndLine}
+            {"Enter OTP to"} {"\n"}
+            {"authenticate"}
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: hp("1.5%") }}>
-            {props.info1stLine}
+            {"Lorem ipsum dolor sit amet, consectetur"}
+
             {"\n"}
-            {props.info2ndLine}
+            {"adipiscing elit, sed do eiusmod tempor"}
           </Text>
         </View>
         <View style={{ marginBottom: hp("2%") }}>
@@ -73,16 +106,6 @@ export default function CustodianRequestOtpModalContents(props) {
                   this.textInput.focus();
                 }
               }}
-              // onFocus={() => {
-              // 	if (passcode.length == 0) {
-              // 		props.modalRef.current.snapTo(2)
-              // 	}
-              // }}
-              // onBlur={() => {
-              // 	if (passcode.length == 0 || passcode.length == 6) {
-              // 		props.modalRef.current.snapTo(1)
-              // 	}
-              // }}
             />
 
             <TextInput
@@ -107,9 +130,6 @@ export default function CustodianRequestOtpModalContents(props) {
                   this.textInput.focus();
                 }
               }}
-              //   onFocus={() => {
-              //     props.modalRef.current.snapTo(2);
-              //   }}
             />
 
             <TextInput
@@ -134,9 +154,6 @@ export default function CustodianRequestOtpModalContents(props) {
                   this.textInput2.focus();
                 }
               }}
-              //   onFocus={() => {
-              //     props.modalRef.current.snapTo(2);
-              //   }}
             />
 
             <TextInput
@@ -161,9 +178,6 @@ export default function CustodianRequestOtpModalContents(props) {
                   this.textInput3.focus();
                 }
               }}
-              //   onFocus={() => {
-              //     props.modalRef.current.snapTo(2);
-              //   }}
             />
 
             <TextInput
@@ -188,9 +202,6 @@ export default function CustodianRequestOtpModalContents(props) {
                   this.textInput4.focus();
                 }
               }}
-              //   onFocus={() => {
-              //     props.modalRef.current.snapTo(2);
-              //   }}
             />
             <TextInput
               maxLength={1}
@@ -213,14 +224,6 @@ export default function CustodianRequestOtpModalContents(props) {
                   this.textInput5.focus();
                 }
               }}
-              //   onFocus={() => {
-              //     props.modalRef.current.snapTo(2);
-              //   }}
-              //   onBlur={() => {
-              //     if (passcode.length == 0) {
-              //       props.modalRef.current.snapTo(1);
-              //     }
-              //   }}
             />
           </View>
         </View>
@@ -232,17 +235,23 @@ export default function CustodianRequestOtpModalContents(props) {
           }}
         >
           <Text style={{ ...styles.modalInfoText }}>
-            {props.subInfo1stLine}
+            {"Lorem ipsum dolor sit amet, consectetur adipiscing elit,"}
             {"\n"}
-            {props.subInfo2ndLine}
+            {"sed do eiusmod tempor incididunt ut labore et dolore"}
           </Text>
         </View>
         <View style={{ flexDirection: "row", marginTop: "auto" }}>
           <TouchableOpacity
-            onPress={passcode => props.onPressConfirm(passcode)}
+            onPress={() => {
+              dispatch(transferST3(serviceType, token));
+            }}
             style={{ ...styles.confirmModalButtonView }}
           >
-            <Text style={styles.confirmButtonText}>Confirm</Text>
+            {loading.transfer ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <Text style={styles.confirmButtonText}>Confirm</Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>
