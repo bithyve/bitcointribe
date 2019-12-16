@@ -413,7 +413,7 @@ export default function ManageBackup(props) {
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.navigate("Home");
+              props.navigation.goBack();
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>

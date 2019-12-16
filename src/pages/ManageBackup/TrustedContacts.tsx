@@ -5,7 +5,9 @@ import {
   StyleSheet,
   Image,
   Platform,
-  SafeAreaView, StatusBar, TouchableOpacity 
+  SafeAreaView,
+  StatusBar,
+  TouchableOpacity
 } from "react-native";
 import Fonts from "../../common/Fonts";
 import BackupStyles from "./Styles";
@@ -80,21 +82,17 @@ const TrustedContacts = props => {
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={BackupStyles.headerContainer}>
-          <TouchableOpacity
-            style={BackupStyles.headerLeftIconContainer}
-            onPress={() => {
-              props.navigation.navigate("Home");
-            }}
-          >
-            <View style={BackupStyles.headerLeftIconInnerContainer}>
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </View>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={BackupStyles.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <View style={BackupStyles.headerLeftIconInnerContainer}>
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </View>
+        </TouchableOpacity>
+      </View>
       <View style={BackupStyles.modalHeaderTitleView}>
         <View style={{ marginTop: hp("1%") }}>
           <Text style={BackupStyles.modalHeaderTitleText}>Trusted Contact</Text>
@@ -141,7 +139,7 @@ const TrustedContacts = props => {
         renderContent={renderCommunicationModeContent}
         renderHeader={requestHeader}
       /> */}
-   </SafeAreaView>
+    </SafeAreaView>
   );
 };
 
