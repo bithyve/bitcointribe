@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Image, FlatList } from "react-native";
+import { View, Text, StyleSheet, Image, FlatList, SafeAreaView, StatusBar, TouchableOpacity  } from "react-native";
 import Fonts from "../../common/Fonts";
 import Colors from "../../common/Colors";
 import BackupStyles from "./Styles";
@@ -7,6 +7,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { getIconByStatus } from "./utils";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 const Cloud = props => {
   const [selectedStatus, setSelectedStatus] = useState("error"); // for preserving health of this entity
@@ -34,9 +35,26 @@ const Cloud = props => {
   ]);
 
   return (
-    <View style={BackupStyles.modalContainer}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={BackupStyles.headerContainer}>
+          <TouchableOpacity
+            style={BackupStyles.headerLeftIconContainer}
+            onPress={() => {
+              props.navigation.navigate("Home");
+            }}
+          >
+            <View style={BackupStyles.headerLeftIconInnerContainer}>
+              <FontAwesome
+                name="long-arrow-left"
+                color={Colors.blue}
+                size={17}
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
       <View style={BackupStyles.modalHeaderTitleView}>
-        <View style={{ marginTop: hp("2%") }}>
+        <View style={{ marginTop: hp("1%") }}>
           <Text style={BackupStyles.modalHeaderTitleText}>Cloud</Text>
           <Text style={BackupStyles.modalHeaderInfoText}>Never backed up</Text>
         </View>
@@ -95,7 +113,7 @@ const Cloud = props => {
           />
         </View>
       </View>
-    </View>
+      </SafeAreaView>
   );
 };
 
