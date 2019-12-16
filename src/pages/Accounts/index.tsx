@@ -11,7 +11,8 @@ import {
   Image,
   ImageBackground,
   FlatList,
-  Platform
+  Platform,
+  RefreshControl
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Entypo from "react-native-vector-icons/Entypo";
@@ -41,6 +42,7 @@ import {
 import CopyThisText from "../../components/CopyThisText";
 import BottomInfoBox from "../../components/BottomInfoBox";
 import { fetchBalance, fetchTransactions } from "../../store/actions/accounts";
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function Accounts(props) {
   const sliderWidth = Dimensions.get("window").width;
@@ -299,21 +301,24 @@ export default function Accounts(props) {
     };
   };
 
-  const renderAddressBookContents = () => {
+  const renderTransactionsContent = () => {
     return (
       <View style={styles.modalContentContainer}>
         <View style={{ marginLeft: 20, marginTop: 20 }}>
           <Text style={styles.modalHeaderTitleText}>{"Transactions"}</Text>
         </View>
         <FlatList
-          data={transactionData}
+          data={transactions.transactionDetails}
           ItemSeparatorComponent={() => (
             <View style={{ backgroundColor: Colors.white }}>
               <View style={styles.separatorView} />
             </View>
           )}
           renderItem={({ item }) => (
-            <View
+            <TouchableOpacity
+              onPress={() =>
+                props.navigation.navigate("TransactionDetails", { item })
+              }
               style={{
                 ...styles.transactionModalElementView,
                 backgroundColor: Colors.white
@@ -323,13 +328,13 @@ export default function Accounts(props) {
                 <View style={{ justifyContent: "center" }}>
                   <FontAwesome
                     name={
-                      item.transactionStatus == "receive"
+                      item.transactionType == "Received"
                         ? "long-arrow-down"
                         : "long-arrow-up"
                     }
                     size={15}
                     color={
-                      item.transactionStatus == "receive"
+                      item.transactionType == "Received"
                         ? Colors.green
                         : Colors.red
                     }
@@ -337,16 +342,16 @@ export default function Accounts(props) {
                 </View>
                 <View style={{ justifyContent: "center", marginLeft: 10 }}>
                   <Text style={styles.transactionModalTitleText}>
-                    {item.title}{" "}
+                    {item.accountType}{" "}
                   </Text>
                   <Text style={styles.transactionModalDateText}>
                     {item.date}{" "}
-                    <Entypo
+                    {/* <Entypo
                       size={10}
                       name={"dot-single"}
                       color={Colors.textColorGrey}
                     />
-                    {item.time}
+                    {item.time} */}
                   </Text>
                 </View>
               </View>
@@ -359,14 +364,16 @@ export default function Accounts(props) {
                   style={{
                     ...styles.transactionModalAmountText,
                     color:
-                      item.transactionStatus == "receive"
+                      item.transactionType == "Received"
                         ? Colors.green
                         : Colors.red
                   }}
                 >
-                  {item.price}
+                  {item.amount}
                 </Text>
-                <Text style={styles.transactionModalAmountUnitText}>6+</Text>
+                <Text style={styles.transactionModalAmountUnitText}>
+                  {item.confirmations < 6 ? item.confirmations : "6+"}
+                </Text>
                 <Ionicons
                   name="ios-arrow-forward"
                   color={Colors.textColorGrey}
@@ -374,14 +381,14 @@ export default function Accounts(props) {
                   style={{ marginLeft: 20, alignSelf: "center" }}
                 />
               </View>
-            </View>
+            </TouchableOpacity>
           )}
         />
       </View>
     );
   };
 
-  const renderAddressBookHeader = () => {
+  const renderTransactionsHeader = () => {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
@@ -519,7 +526,21 @@ export default function Accounts(props) {
   }, [serviceType]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
+    <ScrollView
+      contentContainerStyle={{
+        flex: 1,
+        backgroundColor: Colors.backgroundColor
+      }}
+      refreshControl={
+        <RefreshControl
+          refreshing={loading.transactions || loading.balances}
+          onRefresh={() => {
+            dispatch(fetchBalance(serviceType));
+            dispatch(fetchTransactions(serviceType));
+          }}
+        />
+      }
+    >
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar />
       <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -639,14 +660,19 @@ export default function Accounts(props) {
           </View>
           <View>
             <FlatList
-              data={transactions.transactionDetails}
+              data={transactions.transactionDetails.slice(0, 3)}
               ItemSeparatorComponent={() => (
                 <View style={{ backgroundColor: Colors.backgroundColor }}>
                   <View style={styles.separatorView} />
                 </View>
               )}
               renderItem={({ item }) => (
-                <View style={styles.transactionModalElementView}>
+                <TouchableOpacity
+                  onPress={() =>
+                    props.navigation.navigate("TransactionDetails", { item })
+                  }
+                  style={styles.transactionModalElementView}
+                >
                   <View style={styles.modalElementInfoView}>
                     <View style={{ justifyContent: "center" }}>
                       <FontAwesome
@@ -695,7 +721,7 @@ export default function Accounts(props) {
                       {item.amount}
                     </Text>
                     <Text style={styles.transactionModalAmountUnitText}>
-                      {item.confirmations}+
+                      {item.confirmations < 6 ? item.confirmations : "6+"}
                     </Text>
                     <Ionicons
                       name="ios-arrow-forward"
@@ -704,7 +730,7 @@ export default function Accounts(props) {
                       style={{ marginLeft: 20, alignSelf: "center" }}
                     />
                   </View>
-                </View>
+                </TouchableOpacity>
               )}
             />
           </View>
@@ -714,9 +740,7 @@ export default function Accounts(props) {
             style={{ flexDirection: "row", marginLeft: 10, marginRight: 10 }}
           >
             <TouchableOpacity
-              onPress={() => {
-                (SendBottomSheet as any).current.snapTo(1);
-              }}
+              onPress={() => props.navigation.navigate("Send", { serviceType })}
               style={styles.bottomCardView}
             >
               <Image
@@ -785,8 +809,8 @@ export default function Accounts(props) {
           -50,
           Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("60%") : hp("60%")
         ]}
-        renderContent={renderAddressBookContents}
-        renderHeader={renderAddressBookHeader}
+        renderContent={renderTransactionsContent}
+        renderHeader={renderTransactionsHeader}
       />
       <BottomSheet
         enabledInnerScrolling={true}
@@ -834,7 +858,7 @@ export default function Accounts(props) {
         renderContent={renderSendErrorContents}
         renderHeader={renderSendErrorHeader}
       />
-    </View>
+    </ScrollView>
   );
 }
 
