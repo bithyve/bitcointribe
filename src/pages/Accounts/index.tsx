@@ -40,7 +40,7 @@ import {
 } from "../../common/constants/serviceTypes";
 import CopyThisText from "../../components/CopyThisText";
 import BottomInfoBox from "../../components/BottomInfoBox";
-import { fetchBalance } from "../../store/actions/accounts";
+import { fetchBalance, fetchTransactions } from "../../store/actions/accounts";
 
 export default function Accounts(props) {
   const sliderWidth = Dimensions.get("window").width;
@@ -513,6 +513,11 @@ export default function Accounts(props) {
     if (!netBalance) dispatch(fetchBalance(serviceType));
   }, [serviceType]);
 
+  useEffect(() => {
+    if (!transactions.totalTransactions)
+      dispatch(fetchTransactions(serviceType));
+  }, [serviceType]);
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -634,7 +639,7 @@ export default function Accounts(props) {
           </View>
           <View>
             <FlatList
-              data={transactionData.slice(0, 3)}
+              data={transactions.transactionDetails}
               ItemSeparatorComponent={() => (
                 <View style={{ backgroundColor: Colors.backgroundColor }}>
                   <View style={styles.separatorView} />
@@ -646,13 +651,13 @@ export default function Accounts(props) {
                     <View style={{ justifyContent: "center" }}>
                       <FontAwesome
                         name={
-                          item.transactionStatus == "receive"
+                          item.transactionType == "Received"
                             ? "long-arrow-down"
                             : "long-arrow-up"
                         }
                         size={15}
                         color={
-                          item.transactionStatus == "receive"
+                          item.transactionType == "Received"
                             ? Colors.green
                             : Colors.red
                         }
@@ -660,16 +665,16 @@ export default function Accounts(props) {
                     </View>
                     <View style={{ justifyContent: "center", marginLeft: 10 }}>
                       <Text style={styles.transactionModalTitleText}>
-                        {item.title}{" "}
+                        {item.accountType}{" "}
                       </Text>
                       <Text style={styles.transactionModalDateText}>
                         {item.date}{" "}
-                        <Entypo
+                        {/* <Entypo
                           size={10}
                           name={"dot-single"}
                           color={Colors.textColorGrey}
-                        />
-                        {item.time}
+                        /> */}
+                        {/* {item.time} */}
                       </Text>
                     </View>
                   </View>
@@ -682,15 +687,15 @@ export default function Accounts(props) {
                       style={{
                         ...styles.transactionModalAmountText,
                         color:
-                          item.transactionStatus == "receive"
+                          item.transactionType == "Received"
                             ? Colors.green
                             : Colors.red
                       }}
                     >
-                      {item.price}
+                      {item.amount}
                     </Text>
                     <Text style={styles.transactionModalAmountUnitText}>
-                      6+
+                      {item.confirmations}+
                     </Text>
                     <Ionicons
                       name="ios-arrow-forward"
