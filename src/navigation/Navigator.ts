@@ -28,6 +28,7 @@ import WalletNameRecovery from "../pages/Recovery/WalletNameRecovery";
 import QuestionRecovery from "../pages/Recovery/QuestionRecovery";
 import RecoveryCommunication from "../pages/Recovery/RecoveryCommunication";
 import ReceivingAddress from "../pages/Accounts/ReceivingAddress";
+import TransactionDetails from "../pages/Accounts/TransactionDetails";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -61,7 +62,8 @@ const MODAL_ROUTES = [
   "Cloud",
   "CustodianRequestOTP",
   "CustodianRequestAccepted",
-  "ReceivingAddress"
+  "ReceivingAddress",
+  "TransactionDetails"
 ];
 const HomeNavigator = createStackNavigator(
   {
@@ -80,7 +82,8 @@ const HomeNavigator = createStackNavigator(
     Cloud,
     CustodianRequestOTP,
     CustodianRequestAccepted,
-    ReceivingAddress
+    ReceivingAddress,
+    TransactionDetails
   },
   {
     headerLayoutPreset: "center",
