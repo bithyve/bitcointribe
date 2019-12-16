@@ -173,7 +173,7 @@ export default function ManageBackup(props) {
     return (
       <View style={BackupStyles.modalContainer}>
         <View style={BackupStyles.modalHeaderTitleView}>
-          <View style={{ marginTop: hp("2%") }}>
+          <View style={{ marginTop: hp("1%") }}>
             <Text style={BackupStyles.modalHeaderTitleText}>Cloud</Text>
             <Text style={BackupStyles.modalHeaderInfoText}>
               Never backed up
