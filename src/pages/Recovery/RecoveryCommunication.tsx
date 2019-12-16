@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
-  Alert
+  Alert,
 } from "react-native";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";

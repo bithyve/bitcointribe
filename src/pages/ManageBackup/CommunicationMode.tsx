@@ -7,9 +7,12 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
-  Alert
+  Alert,
+  SafeAreaView,
+  StatusBar
 } from "react-native";
 import Colors from "../../common/Colors";
+import BackupStyles from "./Styles";
 import Fonts from "../../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
 import {
@@ -19,6 +22,7 @@ import {
 import RadioButton from "../../components/RadioButton";
 import { useSelector } from "react-redux";
 import { textWithoutEncoding, email } from "react-native-communications";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function CommunicationMode(props) {
   const contact = props.navigation.getParam("contact");
@@ -102,9 +106,22 @@ export default function CommunicationMode(props) {
   const { loading } = useSelector(state => state.sss);
 
   return (
-    <View style={{ ...styles.modalContentContainer, height: "100%" }}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={BackupStyles.headerContainer}>
+        <TouchableOpacity
+          style={BackupStyles.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <View style={BackupStyles.headerLeftIconInnerContainer}>
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </View>
+        </TouchableOpacity>
+      </View>
       <View style={{ height: "100%" }}>
-        <View style={{ marginTop: hp("3.5%"), marginBottom: hp("2%") }}>
+        <View style={{ marginTop: hp("2%"), marginBottom: hp("2%") }}>
           <Text style={styles.commModeModalHeaderText}>
             Select Mode of Communication{"\n"}for Contact
           </Text>
@@ -184,7 +201,7 @@ export default function CommunicationMode(props) {
           </TouchableOpacity>
         ) : null}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
