@@ -173,7 +173,7 @@ export default function ManageBackup(props) {
     return (
       <View style={BackupStyles.modalContainer}>
         <View style={BackupStyles.modalHeaderTitleView}>
-          <View style={{ marginTop: hp("2%") }}>
+          <View style={{ marginTop: hp("1%") }}>
             <Text style={BackupStyles.modalHeaderTitleText}>Cloud</Text>
             <Text style={BackupStyles.modalHeaderInfoText}>
               Never backed up
@@ -413,7 +413,7 @@ export default function ManageBackup(props) {
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.navigate("Home");
+              props.navigation.goBack();
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>

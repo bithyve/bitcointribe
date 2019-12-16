@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ActivityIndicator, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  Image,
+  SafeAreaView,
+  StatusBar,
+  TouchableOpacity
+} from "react-native";
 import Fonts from "../../common/Fonts";
 import BackupStyles from "./Styles";
 import {
@@ -12,6 +21,8 @@ import CopyThisText from "../../components/CopyThisText";
 import { useDispatch, useSelector } from "react-redux";
 import { uploadEncMShare } from "../../store/actions/sss";
 import { getIconByStatus } from "./utils";
+import Colors from "../../common/Colors";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 const SecondaryDevice = props => {
   const [selectedStatus, setSelectedStatus] = useState("error"); // for preserving health of this entity
@@ -38,9 +49,22 @@ const SecondaryDevice = props => {
   }, []);
 
   return (
-    <View style={BackupStyles.modalContainer}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={BackupStyles.headerContainer}>
+        <TouchableOpacity
+          style={BackupStyles.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <View style={BackupStyles.headerLeftIconInnerContainer}>
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </View>
+        </TouchableOpacity>
+      </View>
       <View style={BackupStyles.modalHeaderTitleView}>
-        <View style={{ marginTop: hp("2%") }}>
+        <View style={{ marginTop: hp("1%") }}>
           <Text style={BackupStyles.modalHeaderTitleText}>
             Secondary Device
           </Text>
@@ -77,7 +101,7 @@ const SecondaryDevice = props => {
           "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna"
         }
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
