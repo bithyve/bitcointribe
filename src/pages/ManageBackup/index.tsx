@@ -119,7 +119,7 @@ export default function ManageBackup(props) {
       time: "1 day ago",
       status: "success",
       type: "security",
-      route: "Cloud"
+      route: "HealthCheckSecurityAnswer"
     }
   ]);
 
