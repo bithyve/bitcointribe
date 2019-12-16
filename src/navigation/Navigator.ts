@@ -28,6 +28,10 @@ import WalletNameRecovery from "../pages/Recovery/WalletNameRecovery";
 import QuestionRecovery from "../pages/Recovery/QuestionRecovery";
 import RecoveryCommunication from "../pages/Recovery/RecoveryCommunication";
 import ReceivingAddress from "../pages/Accounts/ReceivingAddress";
+import TransactionDetails from "../pages/Accounts/TransactionDetails";
+import Send from "../pages/Accounts/Send";
+import TwoFAToken from "../pages/Accounts/TwoFAToken";
+import HealthCheckSecurityAnswer from "../pages/ManageBackup/HealthCheckSecurityAnswer";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -61,7 +65,11 @@ const MODAL_ROUTES = [
   "Cloud",
   "CustodianRequestOTP",
   "CustodianRequestAccepted",
-  "ReceivingAddress"
+  "ReceivingAddress",
+  "TransactionDetails",
+  "Send",
+  "TwoFAToken",
+  "HealthCheckSecurityAnswer"
 ];
 const HomeNavigator = createStackNavigator(
   {
@@ -80,7 +88,11 @@ const HomeNavigator = createStackNavigator(
     Cloud,
     CustodianRequestOTP,
     CustodianRequestAccepted,
-    ReceivingAddress
+    ReceivingAddress,
+    TransactionDetails,
+    Send,
+    TwoFAToken,
+    HealthCheckSecurityAnswer
   },
   {
     headerLayoutPreset: "center",
