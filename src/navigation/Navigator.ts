@@ -27,6 +27,7 @@ import Cloud from "../pages/ManageBackup/Cloud";
 import WalletNameRecovery from "../pages/Recovery/WalletNameRecovery";
 import QuestionRecovery from "../pages/Recovery/QuestionRecovery";
 import RecoveryCommunication from "../pages/Recovery/RecoveryCommunication";
+import ReceivingAddress from "../pages/Accounts/ReceivingAddress";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -59,7 +60,8 @@ const MODAL_ROUTES = [
   "TrustedContacts",
   "Cloud",
   "CustodianRequestOTP",
-  "CustodianRequestAccepted"
+  "CustodianRequestAccepted",
+  "ReceivingAddress"
 ];
 const HomeNavigator = createStackNavigator(
   {
@@ -77,7 +79,8 @@ const HomeNavigator = createStackNavigator(
     TrustedContacts,
     Cloud,
     CustodianRequestOTP,
-    CustodianRequestAccepted
+    CustodianRequestAccepted,
+    ReceivingAddress
   },
   {
     headerLayoutPreset: "center",
