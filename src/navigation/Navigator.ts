@@ -29,6 +29,7 @@ import QuestionRecovery from "../pages/Recovery/QuestionRecovery";
 import RecoveryCommunication from "../pages/Recovery/RecoveryCommunication";
 import ReceivingAddress from "../pages/Accounts/ReceivingAddress";
 import TransactionDetails from "../pages/Accounts/TransactionDetails";
+import Send from "../pages/Accounts/Send";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -63,7 +64,8 @@ const MODAL_ROUTES = [
   "CustodianRequestOTP",
   "CustodianRequestAccepted",
   "ReceivingAddress",
-  "TransactionDetails"
+  "TransactionDetails",
+  "Send"
 ];
 const HomeNavigator = createStackNavigator(
   {
@@ -83,7 +85,8 @@ const HomeNavigator = createStackNavigator(
     CustodianRequestOTP,
     CustodianRequestAccepted,
     ReceivingAddress,
-    TransactionDetails
+    TransactionDetails,
+    Send
   },
   {
     headerLayoutPreset: "center",
