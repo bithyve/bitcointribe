@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Image,
@@ -27,6 +27,9 @@ import {
   clearTransfer,
   transferST2
 } from "../../store/actions/accounts";
+import SendStatusModalContents from "../../components/SendStatusModalContents";
+import TransparentHeaderModal from "../../components/TransparentHeaderModal";
+import BottomSheet from "reanimated-bottom-sheet";
 
 export default function Send(props) {
   const serviceType = props.navigation.getParam("serviceType");
@@ -35,6 +38,9 @@ export default function Send(props) {
   const [token, setToken] = useState("");
   const [description, setDescription] = useState("");
   const [sliderValue, setSliderValue] = useState(4);
+  const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
+    React.createRef()
+  );
 
   const stage2 = () => (
     <View style={{ margin: 40 }}>
@@ -64,11 +70,34 @@ export default function Send(props) {
     </View>
   );
 
+  const renderSuccessStatusContents = () => {
+    return (
+      <SendStatusModalContents
+        title1stLine={"Sent Successfully"}
+        title2ndLine={""}
+        info1stLine={"Bitcoins successfully sent to"}
+        info2ndLine={""}
+        userName={recipientAddress}
+        modalRef={SendSuccessBottomSheet}
+        isSuccess={true}
+        onPressViewAccount={() => {
+          dispatch(clearTransfer(serviceType));
+          props.navigation.navigate("Accounts");
+        }}
+        transactionId={transfer.txid}
+        transactionDateTime={Date()}
+      />
+    );
+  };
+
   const dispatch = useDispatch();
 
   const { transfer, loading, service } = useSelector(
     state => state.accounts[serviceType]
   );
+
+  if (transfer.txid) return renderSuccessStatusContents();
+
   return (
     <View style={styles.modalContentContainer}>
       <KeyboardAvoidingView
