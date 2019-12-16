@@ -724,9 +724,7 @@ export default function Accounts(props) {
             style={{ flexDirection: "row", marginLeft: 10, marginRight: 10 }}
           >
             <TouchableOpacity
-              onPress={() => {
-                (SendBottomSheet as any).current.snapTo(1);
-              }}
+              onPress={() => props.navigation.navigate("Send", { serviceType })}
               style={styles.bottomCardView}
             >
               <Image
