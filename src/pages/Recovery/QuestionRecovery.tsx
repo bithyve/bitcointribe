@@ -6,7 +6,9 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TextInput
+  TextInput, 
+  SafeAreaView,
+  StatusBar
 } from "react-native";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
@@ -46,6 +48,8 @@ export default function RecoveryQuestionModalContents(props) {
   }, [insertedIntoDB]);
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+    <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
     <View style={{ ...styles.modalContentContainer, height: "100%" }}>
       <View>
         <View style={{ flexDirection: "row", padding: wp("7%") }}>
@@ -176,6 +180,7 @@ export default function RecoveryQuestionModalContents(props) {
         </View>
       </View>
     </View>
+    </SafeAreaView>
   );
 }
 

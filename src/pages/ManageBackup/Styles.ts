@@ -10,6 +10,29 @@ export default StyleSheet.create({
     resizeMode: "contain",
     marginLeft: "auto"
   },
+  headerContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
+    alignItems: 'center',
+    height: 54,
+    backgroundColor: Colors.white,
+    borderBottomColor: Colors.white,
+    borderBottomWidth: 0.5,
+},
+headerLeftIconContainer: { 
+    height: 54 
+},
+headerLeftIconInnerContainer:{
+    width: 54,
+    height: 54,
+    justifyContent: 'center',
+    alignItems: 'center',
+},
+  modalContainer1: {
+    height: "100%",
+    alignSelf: "center",
+    width: "100%"
+  },
   modalContainer: {
     height: "100%",
     backgroundColor: Colors.white,
@@ -31,11 +54,10 @@ export default StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 10,
     paddingBottom: 15,
-    paddingTop: 10,
     marginLeft: 20,
-    marginTop: 20,
+    marginTop: 5,
     marginRight: 20,
-    marginBottom: 15
+    marginBottom: 10
   },
   modalHeaderTitleText: {
     color: Colors.blue,

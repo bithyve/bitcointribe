@@ -6,7 +6,9 @@ import {
   StyleSheet,
   TextInput,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  SafeAreaView,
+  StatusBar
 } from "react-native";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
@@ -23,6 +25,8 @@ export default function WalletNameRecovery(props) {
   const [walletName, setWalletName] = useState("");
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+    <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
     <KeyboardAvoidingView
       style={styles.modalContentContainer}
       behavior={Platform.OS == "ios" ? "padding" : ""}
@@ -112,6 +116,7 @@ export default function WalletNameRecovery(props) {
         </View>
       </View>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
