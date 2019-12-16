@@ -31,6 +31,7 @@ import ReceivingAddress from "../pages/Accounts/ReceivingAddress";
 import TransactionDetails from "../pages/Accounts/TransactionDetails";
 import Send from "../pages/Accounts/Send";
 import TwoFAToken from "../pages/Accounts/TwoFAToken";
+import HealthCheckSecurityAnswer from "../pages/ManageBackup/HealthCheckSecurityAnswer";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -67,7 +68,8 @@ const MODAL_ROUTES = [
   "ReceivingAddress",
   "TransactionDetails",
   "Send",
-  "TwoFAToken"
+  "TwoFAToken",
+  "HealthCheckSecurityAnswer"
 ];
 const HomeNavigator = createStackNavigator(
   {
@@ -89,7 +91,8 @@ const HomeNavigator = createStackNavigator(
     ReceivingAddress,
     TransactionDetails,
     Send,
-    TwoFAToken
+    TwoFAToken,
+    HealthCheckSecurityAnswer
   },
   {
     headerLayoutPreset: "center",
