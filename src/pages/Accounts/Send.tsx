@@ -25,11 +25,15 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   transferST1,
   clearTransfer,
-  transferST2
+  transferST2,
+  fetchTransactions,
+  transferST3
 } from "../../store/actions/accounts";
 import SendStatusModalContents from "../../components/SendStatusModalContents";
 import TransparentHeaderModal from "../../components/TransparentHeaderModal";
 import BottomSheet from "reanimated-bottom-sheet";
+import CustodianRequestOtpModalContents from "../../components/CustodianRequestOtpModalContents";
+import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
 
 export default function Send(props) {
   const serviceType = props.navigation.getParam("serviceType");
@@ -70,33 +74,34 @@ export default function Send(props) {
     </View>
   );
 
-  const renderSuccessStatusContents = () => {
-    return (
-      <SendStatusModalContents
-        title1stLine={"Sent Successfully"}
-        title2ndLine={""}
-        info1stLine={"Bitcoins successfully sent to"}
-        info2ndLine={""}
-        userName={recipientAddress}
-        modalRef={SendSuccessBottomSheet}
-        isSuccess={true}
-        onPressViewAccount={() => {
-          dispatch(clearTransfer(serviceType));
-          props.navigation.navigate("Accounts");
-        }}
-        transactionId={transfer.txid}
-        transactionDateTime={Date()}
-      />
-    );
-  };
+  const renderSuccessStatusContents = () => (
+    <SendStatusModalContents
+      title1stLine={"Sent Successfully"}
+      title2ndLine={""}
+      info1stLine={"Bitcoins successfully sent to"}
+      info2ndLine={""}
+      userName={recipientAddress}
+      modalRef={SendSuccessBottomSheet}
+      isSuccess={true}
+      onPressViewAccount={() => {
+        dispatch(clearTransfer(serviceType));
+        dispatch(fetchTransactions(serviceType));
+        props.navigation.navigate("Accounts");
+      }}
+      transactionId={transfer.txid}
+      transactionDateTime={Date()}
+    />
+  );
 
   const dispatch = useDispatch();
 
-  const { transfer, loading, service } = useSelector(
+  const { transfer, loading } = useSelector(
     state => state.accounts[serviceType]
   );
 
   if (transfer.txid) return renderSuccessStatusContents();
+  else if (!transfer.txid && transfer.executed === "ST2")
+    props.navigation.navigate("TwoFAToken", { serviceType, recipientAddress });
 
   return (
     <View style={styles.modalContentContainer}>
@@ -326,7 +331,7 @@ export default function Send(props) {
               {loading.transfer ? (
                 <ActivityIndicator size="small" />
               ) : (
-                <Text style={styles.buttonText}>Confirm & Send</Text>
+                <Text style={styles.buttonText}>Confirm</Text>
               )}
             </TouchableOpacity>
             <TouchableOpacity
