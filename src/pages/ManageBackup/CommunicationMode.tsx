@@ -109,102 +109,98 @@ export default function CommunicationMode(props) {
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={BackupStyles.headerContainer}>
-          <TouchableOpacity
-            style={BackupStyles.headerLeftIconContainer}
-            onPress={() => {
-              props.navigation.navigate("Home");
-            }}
-          >
-            <View style={BackupStyles.headerLeftIconInnerContainer}>
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </View>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={BackupStyles.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <View style={BackupStyles.headerLeftIconInnerContainer}>
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </View>
+        </TouchableOpacity>
+      </View>
       <View style={{ height: "100%" }}>
-          <View style={{ marginTop: hp("2%"), marginBottom: hp("2%") }}>
-            <Text style={styles.commModeModalHeaderText}>
-              Select Mode of Communication{"\n"}for Contact
+        <View style={{ marginTop: hp("2%"), marginBottom: hp("2%") }}>
+          <Text style={styles.commModeModalHeaderText}>
+            Select Mode of Communication{"\n"}for Contact
           </Text>
-            <Text style={styles.commModeModalInfoText}>
-              You can choose a primary number or email
+          <Text style={styles.commModeModalInfoText}>
+            You can choose a primary number or email
           </Text>
-          </View>
-          <View style={styles.contactProfileView}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <View
-                style={{
-                  backgroundColor: Colors.backgroundColor,
-                  flex: 1,
-                  height: 80,
-                  justifyContent: "center",
-                  marginLeft: 60,
-                  overflow: "hidden",
-                  position: "relative",
-                  borderRadius: 10
-                }}
-              >
-                <Text style={styles.contactNameText}>{contact.name}</Text>
-              </View>
-              <View
-                style={{
-                  backgroundColor: Colors.white,
-                  width: 80,
-                  height: 80,
-                  borderRadius: 80 / 2,
-                  position: "absolute",
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
-              >
-                <Image
-                  source={require("../../assets/images/icons/pexels-photo.png")}
-                  style={{ ...styles.contactProfileImage }}
-                />
-              </View>
-            </View>
-          </View>
-          <View>
-            <ScrollView>
-              {contactInfo.map((item, index) => {
-                return (
-                  <TouchableOpacity
-                    onPress={() => onContactSelect(index)}
-                    style={styles.contactInfo}
-                  >
-                    <RadioButton
-                      size={15}
-                      color={Colors.lightBlue}
-                      borderColor={Colors.borderColor}
-                      isChecked={item.isSelected}
-                      onpress={() => onContactSelect(index)}
-                    />
-                    <Text style={styles.contactInfoText}>{item.info}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-          </View>
-          {selectedContactMode ? (
-            <TouchableOpacity
-              onPress={() => communicate(selectedContactMode)}
-              disabled={loading.uploadMetaShare}
+        </View>
+        <View style={styles.contactProfileView}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View
               style={{
-                ...styles.proceedButtonView,
-                backgroundColor: Colors.blue
+                backgroundColor: Colors.backgroundColor,
+                flex: 1,
+                height: 80,
+                justifyContent: "center",
+                marginLeft: 60,
+                overflow: "hidden",
+                position: "relative",
+                borderRadius: 10
               }}
             >
-              {loading.uploadMetaShare ? (
-                <ActivityIndicator size="small" />
-              ) : (
-                  <Text style={styles.proceedButtonText}>Proceed</Text>
-                )}
-            </TouchableOpacity>
-          ) : null}
+              <Text style={styles.contactNameText}>{contact.name}</Text>
+            </View>
+            <View
+              style={{
+                backgroundColor: Colors.white,
+                width: 80,
+                height: 80,
+                borderRadius: 80 / 2,
+                position: "absolute",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <Image
+                source={require("../../assets/images/icons/pexels-photo.png")}
+                style={{ ...styles.contactProfileImage }}
+              />
+            </View>
+          </View>
         </View>
+        <View>
+          <ScrollView>
+            {contactInfo.map((item, index) => {
+              return (
+                <TouchableOpacity
+                  onPress={() => onContactSelect(index)}
+                  style={styles.contactInfo}
+                >
+                  <RadioButton
+                    size={15}
+                    color={Colors.lightBlue}
+                    borderColor={Colors.borderColor}
+                    isChecked={item.isSelected}
+                    onpress={() => onContactSelect(index)}
+                  />
+                  <Text style={styles.contactInfoText}>{item.info}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+        {selectedContactMode ? (
+          <TouchableOpacity
+            onPress={() => communicate(selectedContactMode)}
+            disabled={loading.uploadMetaShare}
+            style={{
+              ...styles.proceedButtonView,
+              backgroundColor: Colors.blue
+            }}
+          >
+            {loading.uploadMetaShare ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <Text style={styles.proceedButtonText}>Proceed</Text>
+            )}
+          </TouchableOpacity>
+        ) : null}
+      </View>
     </SafeAreaView>
   );
 }
