@@ -5,7 +5,9 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  ScrollView
+  ScrollView,
+  SafeAreaView,
+  StatusBar
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -22,6 +24,8 @@ import Entypo from "react-native-vector-icons/Entypo";
 export default function TransactionDetails(props) {
   const txDetails = props.navigation.getParam("item");
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+    <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -244,20 +248,13 @@ export default function TransactionDetails(props) {
         </View>
       </View>
     </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
   modalContainer: {
     height: "100%",
-    backgroundColor: Colors.backgroundColor,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderTopWidth: 1,
-    borderColor: Colors.borderColor,
-    alignSelf: "center",
-    width: "100%"
+     width: "100%"
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,
