@@ -63,7 +63,6 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT
 } from "../common/constants/serviceTypes";
-// Note: For health check modal open we have added touchable to shield of homepage and correct question is "Name of your favourite food?" second option from dropdown, correct answer is "Sweets".
 
 export default function Home(props) {
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
@@ -164,11 +163,11 @@ export default function Home(props) {
       bitcoinicon: require("../assets/images/icons/icon_bitcoin_gray.png")
     },
     {
-      title: "Saving Account",
+      title: "Secure Account",
       unit: "sats",
       amount: "60,000",
       account: "Fast and easy",
-      accountType: "saving",
+      accountType: "secure",
       bitcoinicon: require("../assets/images/icons/icon_bitcoin_gray.png")
     }
   ]);
@@ -978,6 +977,22 @@ export default function Home(props) {
   const database = useSelector(state => state.storage.database);
   const walletName = database ? database.WALLET_SETUP.walletName : "";
 
+  const accounts = useSelector(state => state.accounts);
+  const testBalance = accounts[TEST_ACCOUNT].service
+    ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    : 0;
+  const regularBalance = accounts[REGULAR_ACCOUNT].service
+    ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    : 0;
+  const secureBalance = accounts[SECURE_ACCOUNT].service
+    ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
+    : 0;
+  const accumulativeBalance = regularBalance + secureBalance;
+
   const handleAppStateChange = nextAppState => {
     setTimeout(
       () =>
@@ -1066,7 +1081,7 @@ export default function Home(props) {
                     color: Colors.white
                   }}
                 >
-                  20,65,000
+                  {accumulativeBalance}
                 </Text>
                 <Text
                   style={{
@@ -1186,7 +1201,12 @@ export default function Home(props) {
                             source={Items.item.bitcoinicon}
                           />
                           <Text style={styles.cardAmountText}>
-                            {Items.item.amount}
+                            {/* {Items.item.amount} */}
+                            {Items.item.accountType === "test"
+                              ? testBalance
+                              : Items.item.accountType === "regular"
+                              ? regularBalance
+                              : secureBalance}
                           </Text>
                           <Text style={styles.cardAmountUnitText}>
                             {Items.item.unit}
@@ -1421,7 +1441,9 @@ export default function Home(props) {
         onOpenStart={() => {
           setTabBarZIndex(0);
         }}
-       onCloseEnd={() => { setTabBarZIndex(999); }}
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
         enabledInnerScrolling={true}
         ref={HealthCheckSecurityQuestionBottomSheet}
         snapPoints={[
