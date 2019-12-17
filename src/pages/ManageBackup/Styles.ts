@@ -35,20 +35,11 @@ headerLeftIconInnerContainer:{
   },
   modalContainer: {
     height: "100%",
-    backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderTopWidth: 1,
-    borderColor: Colors.borderColor,
-    alignSelf: "center",
     width: "100%"
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,
     borderColor: Colors.borderColor,
-    justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
     paddingLeft: 10,
