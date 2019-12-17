@@ -10,7 +10,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
-  Button
+  Button,
+  SafeAreaView,
+  StatusBar
 } from "react-native";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
@@ -104,6 +106,8 @@ export default function Send(props) {
     props.navigation.navigate("TwoFAToken", { serviceType, recipientAddress });
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
     <View style={styles.modalContentContainer}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -114,7 +118,7 @@ export default function Send(props) {
           <View style={styles.modalHeaderTitleView}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <TouchableOpacity
-                onPress={() => {}}
+                onPress={() => {props.navigation.goBack();}}
                 style={{ height: 30, width: 30, justifyContent: "center" }}
               >
                 <FontAwesome
@@ -354,21 +358,13 @@ export default function Send(props) {
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   modalContentContainer: {
     height: "100%",
-    backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderLeftColor: Colors.borderColor,
-    borderLeftWidth: 1,
-    borderTopRightRadius: 10,
-    borderRightColor: Colors.borderColor,
-    borderRightWidth: 1,
-    borderTopColor: Colors.borderColor,
-    borderTopWidth: 1
   },
   modalHeaderTitleText: {
     color: Colors.blue,
