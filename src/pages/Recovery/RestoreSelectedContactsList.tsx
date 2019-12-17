@@ -636,7 +636,7 @@ export default function RestoreSelectedContactsList(props) {
           <TouchableOpacity
             style={{ ...styles.questionConfirmButton, margin: 20 }}
             onPress={() => {
-              (walletNameBottomSheet as any).current.snapTo(1);
+             // (walletNameBottomSheet as any).current.snapTo(1);
             }}
           >
             <Text style={styles.proceedButtonText}>Continue</Text>
