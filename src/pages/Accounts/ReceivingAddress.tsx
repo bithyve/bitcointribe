@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ActivityIndicator, Image } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity,SafeAreaView,
+  StatusBar } from "react-native";
 import Fonts from "../../common/Fonts";
 import BackupStyles from "../ManageBackup/Styles";
 import {
@@ -12,6 +13,8 @@ import CopyThisText from "../../components/CopyThisText";
 import { useDispatch, useSelector } from "react-redux";
 import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
 import { fetchAddress } from "../../store/actions/accounts";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import Colors from "../../common/Colors";
 
 const ReceivingAddress = props => {
   const serviceType = props.navigation.getParam("serviceType");
@@ -29,13 +32,25 @@ const ReceivingAddress = props => {
   }, [serviceType]);
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+    <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
     <View style={BackupStyles.modalContainer}>
       <View style={BackupStyles.modalHeaderTitleView}>
-        <View style={{ marginTop: hp("2%") }}>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <TouchableOpacity
+                onPress={() => {props.navigation.goBack();}}
+                style={{ height: 30, width: 30, justifyContent: "center" }}
+              >
+                <FontAwesome
+                  name="long-arrow-left"
+                  color={Colors.blue}
+                  size={17}
+                />
+              </TouchableOpacity>
           <Text style={BackupStyles.modalHeaderTitleText}>
             Receiving Address
           </Text>
-        </View>
+          </View>
       </View>
       <View style={BackupStyles.modalContentView}>
         {!receivingAddress ? (
@@ -54,6 +69,7 @@ const ReceivingAddress = props => {
         }
       />
     </View>
+    </SafeAreaView>
   );
 };
 

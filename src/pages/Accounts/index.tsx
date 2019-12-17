@@ -4,7 +4,7 @@ import {
   Text,
   View,
   SafeAreaView,
-  TouchableWithoutFeedback,
+  Alert,
   TouchableOpacity,
   StatusBar,
   Dimensions,
@@ -154,9 +154,29 @@ export default function Accounts(props) {
     }
   ]);
 
-  const [carouselInitIndex, setCarouselInitIndex] = useState(true);
+  const [carouselInitIndex, setCarouselInitIndex] = useState(0);
   const [switchOn, setSwitchOn] = useState(true);
   const [carousel, setCarousel] = useState(React.createRef());
+
+  useEffect(() => {
+    if(props.navigation.getParam("serviceType") == TEST_ACCOUNT){
+      setTimeout(() => {
+        carousel.current.snapToItem(0, true, false);
+        setCarouselInitIndex(0);
+      }, 200);
+    }
+    if(props.navigation.getParam("serviceType") == REGULAR_ACCOUNT){
+      setTimeout(() => {
+        carousel.current.snapToItem(1, true, false);
+      }, 200);
+    }
+    if(props.navigation.getParam("serviceType") == SECURE_ACCOUNT){
+      setTimeout(() => {
+        carousel.current.snapToItem(2, true, false);
+      }, 200);
+    }
+  }, []);
+
 
   const renderSendContents = () => {
     return (
@@ -526,24 +546,10 @@ export default function Accounts(props) {
   }, [serviceType]);
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        flex: 1,
-        backgroundColor: Colors.backgroundColor
-      }}
-      refreshControl={
-        <RefreshControl
-          refreshing={loading.transactions || loading.balances}
-          onRefresh={() => {
-            dispatch(fetchBalance(serviceType));
-            dispatch(fetchTransactions(serviceType));
-          }}
-        />
-      }
-    >
+    <View style={{flex: 1,
+      backgroundColor: Colors.backgroundColor}}>
       <SafeAreaView style={{ flex: 0 }} />
-      <StatusBar />
-      <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
+      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
         <View
           style={{
             ...CommonStyles.headerContainer,
@@ -601,6 +607,20 @@ export default function Accounts(props) {
             </View>
           </TouchableOpacity>
         </View>
+        <ScrollView
+        contentContainerStyle={{
+          backgroundColor: Colors.backgroundColor,
+        }}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading.transactions || loading.balances}
+            onRefresh={() => {
+              dispatch(fetchBalance(serviceType));
+              dispatch(fetchTransactions(serviceType));
+            }}
+          />
+        }
+      >
         <View style={{ paddingTop: hp("3%"), paddingBottom: hp("3%") }}>
           <Carousel
             ref={carousel}
@@ -621,7 +641,7 @@ export default function Accounts(props) {
             scrollInterpolator={scrollInterpolator}
             slideInterpolatedStyle={slideInterpolatedStyle}
             useScrollView={true}
-            extraData={carouselData}
+            extraData={carouselInitIndex}
           />
         </View>
         <View>
@@ -801,7 +821,7 @@ export default function Accounts(props) {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+        </ScrollView>
       <BottomSheet
         enabledInnerScrolling={true}
         ref={bottomSheet}
@@ -858,7 +878,7 @@ export default function Accounts(props) {
         renderContent={renderSendErrorContents}
         renderHeader={renderSendErrorHeader}
       />
-    </ScrollView>
+    </View>
   );
 }
 
