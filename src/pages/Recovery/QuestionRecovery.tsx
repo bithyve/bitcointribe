@@ -21,6 +21,8 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import KnowMoreButton from "../../components/KnowMoreButton";
 import { useDispatch, useSelector } from "react-redux";
 import { initializeRecovery } from "../../store/actions/setupAndAuth";
+import commonStyle from "../../common/Styles";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function RecoveryQuestionModalContents(props) {
   const walletName = props.navigation.getParam("walletName");
@@ -50,7 +52,19 @@ export default function RecoveryQuestionModalContents(props) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
     <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-    <View style={{ ...styles.modalContentContainer, height: "100%" }}>
+    <View style={commonStyle.headerContainer}>
+        <TouchableOpacity
+          style={commonStyle.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <View style={commonStyle.headerLeftIconInnerContainer}>
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </View>
+        </TouchableOpacity>
+      </View>
+    <View style={styles.modalContentContainer}>
       <View>
         <View style={{ flexDirection: "row", padding: wp("7%") }}>
           <View style={{ flex: 3, justifyContent: "center" }}>
@@ -188,14 +202,6 @@ const styles = StyleSheet.create({
   modalContentContainer: {
     height: "100%",
     backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderLeftColor: Colors.borderColor,
-    borderLeftWidth: 1,
-    borderTopRightRadius: 10,
-    borderRightColor: Colors.borderColor,
-    borderRightWidth: 1,
-    borderTopColor: Colors.borderColor,
-    borderTopWidth: 1
   },
   modalTitleText: {
     color: Colors.blue,
@@ -246,7 +252,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white
   },
   dropdownBoxOpened: {
-    marginTop: hp("2%"),
+    marginTop: hp("1%"),
+    marginBottom: hp("1%"),
     flexDirection: "row",
     borderColor: Colors.borderColor,
     borderWidth: 0.5,

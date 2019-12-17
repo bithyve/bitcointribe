@@ -19,6 +19,8 @@ import {
 } from "react-native-responsive-screen";
 import BottomInfoBox from "../../components/BottomInfoBox";
 import DeviceInfo from "react-native-device-info";
+import commonStyle from "../../common/Styles";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function WalletNameRecovery(props) {
   const [inputStyle, setInputStyle] = useState(styles.inputBox);
@@ -27,6 +29,18 @@ export default function WalletNameRecovery(props) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
     <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+    <View style={commonStyle.headerContainer}>
+        <TouchableOpacity
+          style={commonStyle.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <View style={commonStyle.headerLeftIconInnerContainer}>
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </View>
+        </TouchableOpacity>
+      </View>
     <KeyboardAvoidingView
       style={styles.modalContentContainer}
       behavior={Platform.OS == "ios" ? "padding" : ""}
@@ -36,7 +50,7 @@ export default function WalletNameRecovery(props) {
         <View style={{ display: "flex" }}>
           <View
             style={{
-              paddingTop: wp("8%"),
+              paddingTop: wp("2%"),
               paddingLeft: wp("7%"),
               paddingRight: wp("7%"),
               paddingBottom: wp("8%")
@@ -47,7 +61,6 @@ export default function WalletNameRecovery(props) {
                 color: Colors.blue,
                 fontSize: RFValue(18, 812),
                 fontFamily: Fonts.FiraSansMedium,
-                marginTop: 10
               }}
             >
               Type in the name{"\n"}of your wallet
@@ -124,14 +137,6 @@ const styles = StyleSheet.create({
   modalContentContainer: {
     height: "100%",
     backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderLeftColor: Colors.borderColor,
-    borderLeftWidth: 1,
-    borderTopRightRadius: 10,
-    borderRightColor: Colors.borderColor,
-    borderRightWidth: 1,
-    borderTopColor: Colors.borderColor,
-    borderTopWidth: 1
   },
   modalInfoText: {
     color: Colors.textColorGrey,
