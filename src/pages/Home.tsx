@@ -300,7 +300,7 @@ export default function Home(props) {
     // (NoInternetBottomSheet as any).current.snapTo(0);
     // setTimeout(() => {
     //   setTabBarZIndex(0);
-    // }, 10);
+    // }, 2);
     // (CustodianRequestBottomSheet as any).current.snapTo(1);
     (bottomSheet as any).current.snapTo(1);
   }, []);
@@ -404,7 +404,7 @@ export default function Home(props) {
               setTimeout(() => {
                 setTabBarZIndex(0);
                 setSelectToAdd(type);
-              }, 10);
+              }, 2);
               (AddBottomSheet as any).current.snapTo(1);
             }
           }}
@@ -452,35 +452,35 @@ export default function Home(props) {
     if (openmodal == "full") {
       (bottomSheet as any).current.snapTo(3);
     }
-  }, []);
+  }, [openmodal]);
 
   async function selectTab(tabTitle) {
     if (tabTitle == "More") {
       setTimeout(() => {
         setSelected(tabTitle);
         setSelected(tabTitle);
-      }, 10);
+      }, 2);
       (bottomSheet as any).current.snapTo(0);
       (MoreTabBottomSheet as any).current.snapTo(1);
     } else if (tabTitle == "Transactions") {
       setTimeout(() => {
         setModaldata(transactionData);
         setSelected(tabTitle);
-      }, 10);
+      }, 2);
       (bottomSheet as any).current.snapTo(1);
       (MoreTabBottomSheet as any).current.snapTo(0);
     } else if (tabTitle == "Add") {
       setTimeout(() => {
         setModaldata([]);
         setSelected(tabTitle);
-      }, 10);
+      }, 2);
       (bottomSheet as any).current.snapTo(1);
       (MoreTabBottomSheet as any).current.snapTo(0);
     } else if (tabTitle == "QR") {
       setTimeout(() => {
         setModaldata(transactionData);
         setSelected(tabTitle);
-      }, 10);
+      }, 2);
       (bottomSheet as any).current.snapTo(1);
       (MoreTabBottomSheet as any).current.snapTo(0);
     }
@@ -523,7 +523,7 @@ export default function Home(props) {
           (ErrorBottomSheet as any).current.snapTo(0);
           setTimeout(() => {
             setTabBarZIndex(0);
-          }, 10);
+          }, 2);
         }}
       />
     );
@@ -553,7 +553,7 @@ export default function Home(props) {
           (PinChangeSuccessBottomSheet as any).current.snapTo(0);
           setTimeout(() => {
             setTabBarZIndex(0);
-          }, 10);
+          }, 2);
         }}
       />
     );
@@ -567,14 +567,14 @@ export default function Home(props) {
         onPressAcceptSecret={() => {
           setTimeout(() => {
             setTabBarZIndex(0);
-          }, 10);
+          }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
           props.navigation.navigate("CustodianRequestOTP", { custodyRequest });
         }}
         onPressRejectSecret={() => {
           setTimeout(() => {
             setTabBarZIndex(0);
-          }, 10);
+          }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
           (CustodianRequestRejectedBottomSheet as any).current.snapTo(1);
         }}
@@ -596,7 +596,7 @@ export default function Home(props) {
         onPressConfirm={() => {
           setTimeout(() => {
             setTabBarZIndex(0);
-          }, 10);
+          }, 2);
           (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
           (CustodianRequestAcceptBottomSheet as any).current.snapTo(1);
         }}
@@ -611,7 +611,7 @@ export default function Home(props) {
         onPressViewThrustedContacts={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (CustodianRequestRejectedBottomSheet as any).current.snapTo(0);
         }}
         userName={custodyRequest.requester}
@@ -628,7 +628,7 @@ export default function Home(props) {
         onPressSkip={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (CustodianRequestAcceptBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -641,7 +641,7 @@ export default function Home(props) {
         onPressheader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (NoInternetBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -654,7 +654,7 @@ export default function Home(props) {
         onPressheader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -665,7 +665,7 @@ export default function Home(props) {
     if (item.title == "Address Book") {
       setTimeout(() => {
         setTabBarZIndex(0);
-      }, 10);
+      }, 2);
       (addressBookBottomSheet as any).current.snapTo(1);
     }
   };
@@ -684,7 +684,7 @@ export default function Home(props) {
           (bottomSheet as any).current.snapTo(1);
           setTimeout(() => {
             setSelected("Transactions");
-          }, 10);
+          }, 2);
         }}
       />
     );
@@ -696,7 +696,7 @@ export default function Home(props) {
         onPressBack={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (addressBookBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -709,7 +709,7 @@ export default function Home(props) {
         onPressHandle={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (addressBookBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -722,7 +722,7 @@ export default function Home(props) {
         onPressBack={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (transactionDetailsBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -736,7 +736,7 @@ export default function Home(props) {
         onPressHandle={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (transactionDetailsBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -749,7 +749,7 @@ export default function Home(props) {
         onPressheader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -762,7 +762,7 @@ export default function Home(props) {
         onPressheader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (CustodianRequestRejectedBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -775,7 +775,7 @@ export default function Home(props) {
         onPressheader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (CustodianRequestAcceptBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -789,7 +789,7 @@ export default function Home(props) {
           onPressBack={() => {
             setTimeout(() => {
               setTabBarZIndex(999);
-            }, 10);
+            }, 2);
             (AddBottomSheet as any).current.snapTo(0);
           }}
         />
@@ -800,19 +800,19 @@ export default function Home(props) {
           onPressSellTab={() => {
             setTimeout(() => {
               setTabSelected("sell");
-            }, 5);
+            }, 2);
             (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(1);
           }}
           onPressRedeemTab={() => {
             setTimeout(() => {
               setTabSelected("redeem");
-            }, 5);
+            }, 2);
             (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(1);
           }}
           onPressBack={() => {
             setTimeout(() => {
               setTabBarZIndex(999);
-            }, 10);
+            }, 2);
             (AddBottomSheet as any).current.snapTo(0);
           }}
         />
@@ -823,19 +823,19 @@ export default function Home(props) {
           onPressFriendAndFamily={() => {
             setTimeout(() => {
               setTabSelected("sell");
-            }, 5);
+            }, 2);
             (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBiller={() => {
             setTimeout(() => {
               setTabSelected("redeem");
-            }, 5);
+            }, 2);
             (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBack={() => {
             setTimeout(() => {
               setTabBarZIndex(999);
-            }, 10);
+            }, 2);
             (AddBottomSheet as any).current.snapTo(0);
           }}
         />
@@ -851,7 +851,7 @@ export default function Home(props) {
         onPressheader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (AddBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -1063,7 +1063,7 @@ export default function Home(props) {
           (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
         }}
         isBottomImage={true}
       />
@@ -1077,7 +1077,7 @@ export default function Home(props) {
           (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
         }}
       />
     );
@@ -1129,7 +1129,7 @@ export default function Home(props) {
     if (custodyRequest) {
       setTimeout(() => {
         setTabBarZIndex(0);
-      }, 10);
+      }, 2);
       (CustodianRequestBottomSheet as any).current.snapTo(1);
       (bottomSheet as any).current.snapTo(1);
     }
