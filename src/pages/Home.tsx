@@ -63,9 +63,43 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT
 } from "../common/constants/serviceTypes";
-// Note: For health check modal open we have added touchable to shield of homepage and correct question is "Name of your favourite food?" second option from dropdown, correct answer is "Sweets".
 
 export default function Home(props) {
+  const database = useSelector(state => state.storage.database);
+  const walletName = database ? database.WALLET_SETUP.walletName : "";
+  const accounts = useSelector(state => state.accounts);
+
+  const testBalance = accounts[TEST_ACCOUNT].service
+    ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    : 0;
+  const regularBalance = accounts[REGULAR_ACCOUNT].service
+    ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    : 0;
+  const secureBalance = accounts[SECURE_ACCOUNT].service
+    ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
+    : 0;
+  const accumulativeBalance = regularBalance + secureBalance;
+
+  const testTransactions = accounts[TEST_ACCOUNT].service
+    ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+    : [];
+  const regularTransactions = accounts[REGULAR_ACCOUNT].service
+    ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions.transactionDetails
+    : [];
+  const secureTransactions = accounts[SECURE_ACCOUNT].service
+    ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
+        .transactionDetails
+    : [];
+  const accumulativeTransactions = [
+    ...testTransactions,
+    ...regularTransactions,
+    ...secureTransactions
+  ];
+
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
     id: "",
     question: ""
@@ -151,7 +185,7 @@ export default function Home(props) {
       title: "Test Account",
       unit: "tsats",
       amount: "400,000",
-      account: "Murtuza’s Test Account",
+      account: "Test it out",
       accountType: "test",
       bitcoinicon: require("../assets/images/icons/icon_bitcoin_test.png")
     },
@@ -164,11 +198,11 @@ export default function Home(props) {
       bitcoinicon: require("../assets/images/icons/icon_bitcoin_gray.png")
     },
     {
-      title: "Saving Account",
+      title: "Secure Account",
       unit: "sats",
       amount: "60,000",
-      account: "Fast and easy",
-      accountType: "saving",
+      account: "Resilient and Secure",
+      accountType: "secure",
       bitcoinicon: require("../assets/images/icons/icon_bitcoin_gray.png")
     }
   ]);
@@ -266,24 +300,98 @@ export default function Home(props) {
     // (NoInternetBottomSheet as any).current.snapTo(0);
     // setTimeout(() => {
     //   setTabBarZIndex(0);
-    // }, 10);
+    // }, 2);
     // (CustodianRequestBottomSheet as any).current.snapTo(1);
     (bottomSheet as any).current.snapTo(1);
   }, []);
 
+  const renderTransactionsContent = () => {
+    return (
+      <View style={styles.modalContentContainer}>
+        <FlatList
+          data={accumulativeTransactions}
+          ItemSeparatorComponent={() => (
+            <View style={{ backgroundColor: Colors.white }}>
+              <View style={styles.separatorView} />
+            </View>
+          )}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() =>
+                props.navigation.navigate("TransactionDetails", { item })
+              }
+              style={{
+                ...styles.transactionModalElementView,
+                backgroundColor: Colors.white
+              }}
+            >
+              <View style={styles.modalElementInfoView}>
+                <View style={{ justifyContent: "center" }}>
+                  <FontAwesome
+                    name={
+                      item.transactionType == "Received"
+                        ? "long-arrow-down"
+                        : "long-arrow-up"
+                    }
+                    size={15}
+                    color={
+                      item.transactionType == "Received"
+                        ? Colors.green
+                        : Colors.red
+                    }
+                  />
+                </View>
+                <View style={{ justifyContent: "center", marginLeft: 10 }}>
+                  <Text style={styles.transactionModalTitleText}>
+                    {item.accountType}{" "}
+                  </Text>
+                  <Text style={styles.transactionModalDateText}>
+                    {item.date}{" "}
+                    {/* <Entypo
+                      size={10}
+                      name={"dot-single"}
+                      color={Colors.textColorGrey}
+                    />
+                    {item.time} */}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.transactionModalAmountView}>
+                <Image
+                  source={require("../assets/images/icons/icon_bitcoin_gray.png")}
+                  style={{ width: 12, height: 12, resizeMode: "contain" }}
+                />
+                <Text
+                  style={{
+                    ...styles.transactionModalAmountText,
+                    color:
+                      item.transactionType == "Received"
+                        ? Colors.green
+                        : Colors.red
+                  }}
+                >
+                  {item.amount}
+                </Text>
+                <Text style={styles.transactionModalAmountUnitText}>
+                  {item.confirmations < 6 ? item.confirmations : "6+"}
+                </Text>
+                <Ionicons
+                  name="ios-arrow-forward"
+                  color={Colors.textColorGrey}
+                  size={12}
+                  style={{ marginLeft: 20, alignSelf: "center" }}
+                />
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+    );
+  };
+
   function renderContent() {
     if (selected == "Transactions") {
-      return (
-        <TransactionListModalContents
-          onPressTransaction={() => {
-            setTimeout(() => {
-              setTabBarZIndex(0);
-            }, 10);
-            (transactionDetailsBottomSheet as any).current.snapTo(1);
-          }}
-          transactionData={modaldata}
-        />
-      );
+      return renderTransactionsContent();
     } else if (selected == "Add") {
       return (
         <AddModalContents
@@ -296,7 +404,7 @@ export default function Home(props) {
               setTimeout(() => {
                 setTabBarZIndex(0);
                 setSelectToAdd(type);
-              }, 10);
+              }, 2);
               (AddBottomSheet as any).current.snapTo(1);
             }
           }}
@@ -344,35 +452,35 @@ export default function Home(props) {
     if (openmodal == "full") {
       (bottomSheet as any).current.snapTo(3);
     }
-  }, []);
+  }, [openmodal]);
 
   async function selectTab(tabTitle) {
     if (tabTitle == "More") {
       setTimeout(() => {
         setSelected(tabTitle);
         setSelected(tabTitle);
-      }, 10);
+      }, 2);
       (bottomSheet as any).current.snapTo(0);
       (MoreTabBottomSheet as any).current.snapTo(1);
     } else if (tabTitle == "Transactions") {
       setTimeout(() => {
         setModaldata(transactionData);
         setSelected(tabTitle);
-      }, 10);
+      }, 2);
       (bottomSheet as any).current.snapTo(1);
       (MoreTabBottomSheet as any).current.snapTo(0);
     } else if (tabTitle == "Add") {
       setTimeout(() => {
         setModaldata([]);
         setSelected(tabTitle);
-      }, 10);
+      }, 2);
       (bottomSheet as any).current.snapTo(1);
       (MoreTabBottomSheet as any).current.snapTo(0);
     } else if (tabTitle == "QR") {
       setTimeout(() => {
         setModaldata(transactionData);
         setSelected(tabTitle);
-      }, 10);
+      }, 2);
       (bottomSheet as any).current.snapTo(1);
       (MoreTabBottomSheet as any).current.snapTo(0);
     }
@@ -415,7 +523,7 @@ export default function Home(props) {
           (ErrorBottomSheet as any).current.snapTo(0);
           setTimeout(() => {
             setTabBarZIndex(0);
-          }, 10);
+          }, 2);
         }}
       />
     );
@@ -445,7 +553,7 @@ export default function Home(props) {
           (PinChangeSuccessBottomSheet as any).current.snapTo(0);
           setTimeout(() => {
             setTabBarZIndex(0);
-          }, 10);
+          }, 2);
         }}
       />
     );
@@ -459,14 +567,14 @@ export default function Home(props) {
         onPressAcceptSecret={() => {
           setTimeout(() => {
             setTabBarZIndex(0);
-          }, 10);
+          }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
           props.navigation.navigate("CustodianRequestOTP", { custodyRequest });
         }}
         onPressRejectSecret={() => {
           setTimeout(() => {
             setTabBarZIndex(0);
-          }, 10);
+          }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
           (CustodianRequestRejectedBottomSheet as any).current.snapTo(1);
         }}
@@ -488,7 +596,7 @@ export default function Home(props) {
         onPressConfirm={() => {
           setTimeout(() => {
             setTabBarZIndex(0);
-          }, 10);
+          }, 2);
           (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
           (CustodianRequestAcceptBottomSheet as any).current.snapTo(1);
         }}
@@ -503,7 +611,7 @@ export default function Home(props) {
         onPressViewThrustedContacts={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (CustodianRequestRejectedBottomSheet as any).current.snapTo(0);
         }}
         userName={custodyRequest.requester}
@@ -520,7 +628,7 @@ export default function Home(props) {
         onPressSkip={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (CustodianRequestAcceptBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -533,7 +641,7 @@ export default function Home(props) {
         onPressheader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (NoInternetBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -546,7 +654,7 @@ export default function Home(props) {
         onPressheader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -557,7 +665,7 @@ export default function Home(props) {
     if (item.title == "Address Book") {
       setTimeout(() => {
         setTabBarZIndex(0);
-      }, 10);
+      }, 2);
       (addressBookBottomSheet as any).current.snapTo(1);
     }
   };
@@ -576,7 +684,7 @@ export default function Home(props) {
           (bottomSheet as any).current.snapTo(1);
           setTimeout(() => {
             setSelected("Transactions");
-          }, 10);
+          }, 2);
         }}
       />
     );
@@ -588,7 +696,7 @@ export default function Home(props) {
         onPressBack={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (addressBookBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -601,7 +709,7 @@ export default function Home(props) {
         onPressHandle={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (addressBookBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -614,7 +722,7 @@ export default function Home(props) {
         onPressBack={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (transactionDetailsBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -628,7 +736,7 @@ export default function Home(props) {
         onPressHandle={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (transactionDetailsBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -641,7 +749,7 @@ export default function Home(props) {
         onPressheader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -654,7 +762,7 @@ export default function Home(props) {
         onPressheader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (CustodianRequestRejectedBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -667,7 +775,7 @@ export default function Home(props) {
         onPressheader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (CustodianRequestAcceptBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -681,7 +789,7 @@ export default function Home(props) {
           onPressBack={() => {
             setTimeout(() => {
               setTabBarZIndex(999);
-            }, 10);
+            }, 2);
             (AddBottomSheet as any).current.snapTo(0);
           }}
         />
@@ -692,19 +800,19 @@ export default function Home(props) {
           onPressSellTab={() => {
             setTimeout(() => {
               setTabSelected("sell");
-            }, 5);
+            }, 2);
             (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(1);
           }}
           onPressRedeemTab={() => {
             setTimeout(() => {
               setTabSelected("redeem");
-            }, 5);
+            }, 2);
             (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(1);
           }}
           onPressBack={() => {
             setTimeout(() => {
               setTabBarZIndex(999);
-            }, 10);
+            }, 2);
             (AddBottomSheet as any).current.snapTo(0);
           }}
         />
@@ -715,19 +823,19 @@ export default function Home(props) {
           onPressFriendAndFamily={() => {
             setTimeout(() => {
               setTabSelected("sell");
-            }, 5);
+            }, 2);
             (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBiller={() => {
             setTimeout(() => {
               setTabSelected("redeem");
-            }, 5);
+            }, 2);
             (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBack={() => {
             setTimeout(() => {
               setTabBarZIndex(999);
-            }, 10);
+            }, 2);
             (AddBottomSheet as any).current.snapTo(0);
           }}
         />
@@ -743,7 +851,7 @@ export default function Home(props) {
         onPressheader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
           (AddBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -955,7 +1063,7 @@ export default function Home(props) {
           (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
         }}
         isBottomImage={true}
       />
@@ -969,14 +1077,11 @@ export default function Home(props) {
           (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
           setTimeout(() => {
             setTabBarZIndex(999);
-          }, 10);
+          }, 2);
         }}
       />
     );
   };
-
-  const database = useSelector(state => state.storage.database);
-  const walletName = database ? database.WALLET_SETUP.walletName : "";
 
   const handleAppStateChange = nextAppState => {
     setTimeout(
@@ -1024,7 +1129,7 @@ export default function Home(props) {
     if (custodyRequest) {
       setTimeout(() => {
         setTabBarZIndex(0);
-      }, 10);
+      }, 2);
       (CustodianRequestBottomSheet as any).current.snapTo(1);
       (bottomSheet as any).current.snapTo(1);
     }
@@ -1066,7 +1171,7 @@ export default function Home(props) {
                     color: Colors.white
                   }}
                 >
-                  20,65,000
+                  {accumulativeBalance}
                 </Text>
                 <Text
                   style={{
@@ -1124,6 +1229,11 @@ export default function Home(props) {
             horizontal
             showsHorizontalScrollIndicator={false}
             data={data}
+            extraData={JSON.stringify({
+              testBalance,
+              regularBalance,
+              secureBalance
+            })}
             renderItem={Items => {
               return (
                 <View style={{ flexDirection: "column" }}>
@@ -1186,7 +1296,11 @@ export default function Home(props) {
                             source={Items.item.bitcoinicon}
                           />
                           <Text style={styles.cardAmountText}>
-                            {Items.item.amount}
+                            {Items.item.accountType === "test"
+                              ? testBalance
+                              : Items.item.accountType === "regular"
+                              ? regularBalance
+                              : secureBalance}
                           </Text>
                           <Text style={styles.cardAmountUnitText}>
                             {Items.item.unit}
@@ -1421,7 +1535,9 @@ export default function Home(props) {
         onOpenStart={() => {
           setTabBarZIndex(0);
         }}
-       onCloseEnd={() => { setTabBarZIndex(999); }}
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
         enabledInnerScrolling={true}
         ref={HealthCheckSecurityQuestionBottomSheet}
         snapPoints={[
@@ -1711,5 +1827,64 @@ const styles = StyleSheet.create({
   },
   tabBarTabView: {
     padding: wp("5%")
+  },
+  transactionModalElementView: {
+    backgroundColor: Colors.backgroundColor,
+    padding: hp("1%"),
+    flexDirection: "row",
+    display: "flex",
+    justifyContent: "space-between"
+  },
+  modalElementInfoView: {
+    padding: hp("1%"),
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  transactionModalTitleText: {
+    color: Colors.blue,
+    fontSize: RFValue(12, 812),
+    marginBottom: 3,
+    fontFamily: Fonts.FiraSansRegular
+  },
+  transactionModalDateText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(10, 812),
+    fontFamily: Fonts.FiraSansRegular
+  },
+  transactionModalAmountView: {
+    padding: 10,
+    flexDirection: "row",
+    display: "flex",
+    alignItems: "center"
+  },
+  transactionModalAmountText: {
+    marginLeft: 5,
+    marginRight: 5,
+    fontSize: RFValue(20, 812),
+    fontFamily: Fonts.OpenSans
+  },
+  transactionModalAmountUnitText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(10, 812),
+    fontFamily: Fonts.OpenSans
+  },
+  separatorView: {
+    marginLeft: 15,
+    marginRight: 15,
+    height: 1,
+    backgroundColor: Colors.borderColor
+  },
+  modalContentContainer: {
+    height: "100%",
+    backgroundColor: Colors.white,
+    borderTopLeftRadius: 10,
+    borderLeftColor: Colors.borderColor,
+    borderLeftWidth: 1,
+    borderTopRightRadius: 10,
+    borderRightColor: Colors.borderColor,
+    borderRightWidth: 1,
+    borderTopColor: Colors.borderColor,
+    borderTopWidth: 1
   }
 });

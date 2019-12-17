@@ -7,7 +7,8 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
-  Alert,
+  SafeAreaView,
+  StatusBar,
 } from "react-native";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
@@ -19,6 +20,8 @@ import {
 import RadioButton from "../../components/RadioButton";
 import { useSelector } from "react-redux";
 import { textWithoutEncoding, email } from "react-native-communications";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import commonStyle from "../../common/Styles";
 
 export default function RecoveryCommunication(props) {
   const contact = props.navigation.getParam("contact");
@@ -100,9 +103,23 @@ export default function RecoveryCommunication(props) {
   };
 
   return (
-    <View style={{ ...styles.modalContentContainer, height: "100%" }}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={commonStyle.headerContainer}>
+        <TouchableOpacity
+          style={commonStyle.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <View style={commonStyle.headerLeftIconInnerContainer}>
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </View>
+        </TouchableOpacity>
+      </View>
+    <View style={styles.modalContentContainer}>
       <View style={{ height: "100%" }}>
-        <View style={{ marginTop: hp("3.5%"), marginBottom: hp("2%") }}>
+        <View style={{ marginTop: hp("2%"), marginBottom: hp("2%") }}>
           <Text style={styles.commModeModalHeaderText}>
             Select Mode of Communication{"\n"}for Contact
           </Text>
@@ -183,6 +200,7 @@ export default function RecoveryCommunication(props) {
         ) : null}
       </View>
     </View>
+    </SafeAreaView>
   );
 }
 
@@ -190,14 +208,6 @@ const styles = StyleSheet.create({
   modalContentContainer: {
     height: "100%",
     backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderLeftColor: Colors.borderColor,
-    borderLeftWidth: 1,
-    borderTopRightRadius: 10,
-    borderRightColor: Colors.borderColor,
-    borderRightWidth: 1,
-    borderTopColor: Colors.borderColor,
-    borderTopWidth: 1
   },
   commModeModalHeaderText: {
     color: Colors.blue,

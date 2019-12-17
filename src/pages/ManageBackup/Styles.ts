@@ -2,6 +2,10 @@ import { StyleSheet } from "react-native";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp
+} from "react-native-responsive-screen";
 
 export default StyleSheet.create({
   cardIconImage: {
@@ -35,29 +39,19 @@ headerLeftIconInnerContainer:{
   },
   modalContainer: {
     height: "100%",
-    backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderTopWidth: 1,
-    borderColor: Colors.borderColor,
-    alignSelf: "center",
     width: "100%"
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,
     borderColor: Colors.borderColor,
-    justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-    paddingLeft: 10,
     paddingRight: 10,
-    paddingBottom: 15,
-    marginLeft: 20,
-    marginTop: 5,
-    marginRight: 20,
-    marginBottom: 10
+    paddingBottom: hp("1.5%"),
+    paddingTop: hp("1%"),
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: hp("1.5%")
   },
   modalHeaderTitleText: {
     color: Colors.blue,
