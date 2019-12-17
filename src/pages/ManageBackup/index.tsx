@@ -427,7 +427,7 @@ export default function ManageBackup(props) {
         </View>
         <ScrollView>
           <View style={{ flexDirection: "row", marginTop: 10 }}>
-            <View style={{ flex: 2 }}>
+            <View style={{ flex: 2}}>
               <Text style={{ ...CommonStyles.headerTitles, marginLeft: 25 }}>
                 Manage Backup
               </Text>
@@ -443,7 +443,7 @@ export default function ManageBackup(props) {
                 textStyle={{}}
               />
             </View>
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
               <HomePageShield
                 circleShadowColor={Colors.borderColor}
                 shieldImage={require("../../assets/images/icons/protector_gray.png")}
