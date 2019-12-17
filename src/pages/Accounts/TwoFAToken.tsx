@@ -6,10 +6,13 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  ActivityIndicator
+  ActivityIndicator,
+  SafeAreaView,
+  StatusBar,
 } from "react-native";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
+import commonStyle from "../../common/Styles";
 import { RFValue } from "react-native-responsive-fontsize";
 import {
   widthPercentageToDP as wp,
@@ -22,6 +25,8 @@ import {
   fetchTransactions
 } from "../../store/actions/accounts";
 import SendStatusModalContents from "../../components/SendStatusModalContents";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+
 export default function TwoFAToken(props) {
   const [token, setToken] = useState("");
   const serviceType = props.navigation.getParam("serviceType");
@@ -63,6 +68,20 @@ export default function TwoFAToken(props) {
   console.log({ twoFASecret: service.secureHDWallet.twoFASetup.secret }); // TODO: secret display and removal mech
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={commonStyle.headerContainer}>
+        <TouchableOpacity
+          style={commonStyle.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <View style={commonStyle.headerLeftIconInnerContainer}>
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </View>
+        </TouchableOpacity>
+      </View>
     <View style={{ ...styles.modalContentContainer, height: "100%" }}>
       <View
         style={{
@@ -256,21 +275,14 @@ export default function TwoFAToken(props) {
         </View>
       </View>
     </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   modalContentContainer: {
-    height: "50%",
+    height: "100%",
     backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderLeftColor: Colors.borderColor,
-    borderLeftWidth: 1,
-    borderTopRightRadius: 10,
-    borderRightColor: Colors.borderColor,
-    borderRightWidth: 1,
-    borderTopColor: Colors.borderColor,
-    borderTopWidth: 1
   },
   passcodeTextInputText: {
     color: Colors.blue,
