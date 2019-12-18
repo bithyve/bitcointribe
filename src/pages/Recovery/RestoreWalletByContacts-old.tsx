@@ -37,30 +37,30 @@ const RestoreWalletByContact = props => {
   //   if (!REQUEST_DETAILS) dispatch(requestShare(index));
   // }, []);
 
-  const continueNProceed = async () => {
-    props.navigation.navigate("RecoveryCommunication", {
-      contacts
-    });
-  };
+  // const continueNProceed = async () => {
+  //   props.navigation.navigate("RecoveryCommunication", {
+  //     contacts
+  //   });
+  // };
 
-  const saveCommunicationMode = async selectedContactMode => {
-    if (contacts.length > 0) {
-      if (
-        contacts[0].communicationMode &&
-        contacts[0].communicationMode.length > 0
-      ) {
-        contacts[1].communicationMode = selectedContactMode;
-      } else {
-        contacts[0].communicationMode = selectedContactMode;
-      }
-    } else {
-      contacts[0].communicationMode = selectedContactMode;
-    }
-    setContacts(contacts);
-    await AsyncStorage.setItem("selectedContacts", JSON.stringify(contacts));
-    console.log("contacts", contacts);
-    props.navigation.navigate("RestoreSelectedContactsList");
-  };
+  // const saveCommunicationMode = async selectedContactMode => {
+  //   if (contacts.length > 0) {
+  //     if (
+  //       contacts[0].communicationMode &&
+  //       contacts[0].communicationMode.length > 0
+  //     ) {
+  //       contacts[1].communicationMode = selectedContactMode;
+  //     } else {
+  //       contacts[0].communicationMode = selectedContactMode;
+  //     }
+  //   } else {
+  //     contacts[0].communicationMode = selectedContactMode;
+  //   }
+  //   setContacts(contacts);
+  //   await AsyncStorage.setItem("selectedContacts", JSON.stringify(contacts));
+  //   console.log("contacts", contacts);
+  //   props.navigation.navigate("RestoreSelectedContactsList");
+  // };
 
   function selectedContactsList(list) {
     if (list.length > 0) setContacts([...list]);
@@ -134,7 +134,7 @@ const RestoreWalletByContact = props => {
           />
           <ContactList
             style={{}}
-            onPressContinue={() => continueNProceed()}
+            onPressContinue={() => {}}
             onSelectContact={list => selectedContactsList(list)}
           />
         </KeyboardAvoidingView>

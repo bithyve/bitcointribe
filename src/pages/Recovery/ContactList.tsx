@@ -177,11 +177,15 @@ export default function ContactList(props) {
       //   console.log({ data });
       else {
         const contactData = data.map(contact => {
+          const communicationMode = [];
+          if (contact.phoneNumbers)
+            communicationMode.push(...contact.phoneNumbers);
+          if (contact.emails) communicationMode.push(...contact.emails);
           return {
             name: contact.name,
             id: contact.id,
             checked: false,
-            communicationMode: [],
+            communicationMode,
             status: ""
           };
         });
