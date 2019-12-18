@@ -26,16 +26,11 @@ import commonStyle from "../../common/Styles";
 export default function RecoveryCommunication(props) {
   const contact = props.navigation.getParam("contact");
   const index = props.navigation.getParam("index");
-
-  if (!contact) return <View></View>;
-
-  const communicationInfo = [];
-  if (contact.phoneNumbers) communicationInfo.push(...contact.phoneNumbers);
-  if (contact.emails) communicationInfo.push(...contact.emails);
+  console.log({ contact, index });
 
   const [selectedContactMode, setSelectedContactMode] = useState();
   const [contactInfo, setContactInfo] = useState(
-    communicationInfo.map(({ number, email }, index) => {
+    contact.communicationMode.map(({ number, email }, index) => {
       if (number || email) {
         return {
           id: index,
@@ -186,7 +181,10 @@ export default function RecoveryCommunication(props) {
           </View>
           {selectedContactMode ? (
             <TouchableOpacity
-              onPress={() => communicate(selectedContactMode)}
+              onPress={() => {
+                communicate(selectedContactMode);
+                props.navigation.goBack();
+              }}
               disabled={!REQUEST_DETAILS}
               style={{
                 ...styles.proceedButtonView,
