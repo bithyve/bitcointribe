@@ -33,9 +33,10 @@ import QRCode from "react-native-qrcode-svg";
 export default function RestoreWalletBySecondaryDevice(props) {
   const [secondaryQR, setSecondaryQR] = useState("");
 
-  const { RECOVERY_SHARES } = useSelector(
-    state => state.storage.database.DECENTRALIZED_BACKUP
+  const { WALLET_SETUP, DECENTRALIZED_BACKUP } = useSelector(
+    state => state.storage.database
   );
+  const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
 
   const { REQUEST_DETAILS } = RECOVERY_SHARES[0]
     ? RECOVERY_SHARES[0]
@@ -45,10 +46,16 @@ export default function RestoreWalletBySecondaryDevice(props) {
     ? setSecondaryQR(
         JSON.stringify({
           ...REQUEST_DETAILS,
-          type: "secondaryDeviceQR"
+          type: "secondaryDeviceQR",
+          mode: "recovery"
         })
       )
     : null;
+
+  const deepLink = REQUEST_DETAILS
+    ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/rk/` +
+      REQUEST_DETAILS.ENCRYPTED_KEY
+    : "";
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -100,7 +107,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
             ) : (
               <QRCode value={secondaryQR} size={hp("27%")} />
             )}
-            {secondaryQR ? <CopyThisText text={secondaryQR} /> : null}
+            {deepLink ? <CopyThisText text={deepLink} /> : null}
           </View>
           <View style={{ flex: 2, justifyContent: "flex-end" }}></View>
         </KeyboardAvoidingView>
