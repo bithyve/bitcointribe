@@ -5,72 +5,96 @@ import {
   SafeAreaView,
   TouchableOpacity,
   StatusBar,
+  Text,
+  Image,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  TextInput,
+  ScrollView,
+  AsyncStorage,
+  FlatList
 } from "react-native";
-import Colors from "../../common/Colors";
-import CommonStyles from "../../common/Styles";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import Fonts from "../../common/Fonts";
+import Colors from "../../common/Colors";
+import CommonStyles from "../../common/Styles";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp
+} from "react-native-responsive-screen";
+import { RFValue } from "react-native-responsive-fontsize";
+import BottomSheet from "reanimated-bottom-sheet";
 import HeaderTitle from "../../components/HeaderTitle";
-import ContactList from "../../components/ContactList";
-import { requestShare } from "../../store/actions/sss";
-import { useDispatch, useSelector } from "react-redux";
+import ContactList from "./ContactList";
+import DeviceInfo from "react-native-device-info";
+import RadioButton from "../../components/RadioButton";
+import CommunicationModeModalContents from "../../components/CommunicationModeModalContents";
 
-const RestoreWalletByContact = props => {
-  const [contacts, setContacts] = useState([]);
+export default function RestoreWalletByContacts(props) {
+  //   const [contacts, setContacts] = useState([]);
+  //   const [requestBottomSheet, setRequestBottomSheet] = useState(
+  //     React.createRef()
+  //   );
+  //   const [communicationModeBottomSheet, setCommunicationMode] = useState(
+  //     React.createRef()
+  //   );
 
-  const index = props.navigation.getParam("index");
-  if (index !== 1 && index !== 2) throw new Error("Contact index out of bound");
+  //   function selectedContactsList(list) {
+  //     setContacts(list);
+  //   }
 
-  const { RECOVERY_SHARES } = useSelector(
-    state => state.storage.database.DECENTRALIZED_BACKUP
-  );
-
-  const { REQUEST_DETAILS } = RECOVERY_SHARES[index]
-    ? RECOVERY_SHARES[index]
-    : { REQUEST_DETAILS: null };
-
-  const dispatch = useDispatch();
-  useEffect(() => {
-    if (!REQUEST_DETAILS) dispatch(requestShare(index));
-  }, []);
-
-  const continueNProceed = async () => {
-    props.navigation.navigate("RecoveryCommunication", {
-      contact: contacts[0],
-      index
-    });
+  const continueNProceed = async contacts => {
+    // communicationModeBottomSheet.current.snapTo(1);
+    await AsyncStorage.setItem("selectedContacts", JSON.stringify(contacts));
+    props.navigation.navigate("RestoreSelectedContactsList");
   };
 
-  function selectedContactsList(list) {
-    if (list.length > 0) setContacts([...list]);
-  }
-  // function requestHeader() {
-  //   return (
-  //     <TouchableOpacity
-  //       activeOpacity={10}
-  //       onPress={() => closeModal()}
-  //       style={{ ...styles.modalHeaderContainer }}
-  //     >
-  //       <View style={styles.modalHeaderHandle} />
-  //     </TouchableOpacity>
-  //   );
-  // }
+  //   const saveCommunicationMode = async selectedContactMode => {
+  //     if (contacts.length > 0) {
+  //       if (
+  //         contacts[0].communicationMode &&
+  //         contacts[0].communicationMode.length > 0
+  //       ) {
+  //         contacts[1].communicationMode = selectedContactMode;
+  //       } else {
+  //         contacts[0].communicationMode = selectedContactMode;
+  //       }
+  //     } else {
+  //       contacts[0].communicationMode = selectedContactMode;
+  //     }
+  //     setContacts(contacts);
+  //     await AsyncStorage.setItem("selectedContacts", JSON.stringify(contacts));
+  //     console.log("contacts", contacts);
+  //     props.navigation.navigate("RestoreSelectedContactsList");
+  //   };
 
-  // function closeModal() {
-  //   communicationModeBottomSheet.current.snapTo(0);
-  //   return;
-  // }
+  //   function requestHeader() {
+  //     return (
+  //       <TouchableOpacity
+  //         activeOpacity={10}
+  //         onPress={() => closeModal()}
+  //         style={{ ...styles.modalHeaderContainer }}
+  //       >
+  //         <View style={styles.modalHeaderHandle} />
+  //       </TouchableOpacity>
+  //     );
+  //   }
 
-  // function renderCommunicationModeContent() {
-  //   return (
-  //     <CommunicationModeModalContents
-  //       onPressProceed={communicate}
-  //       contact={contacts[0]}
-  //     />
-  //   );
-  // }
+  //   function closeModal() {
+  //     communicationModeBottomSheet.current.snapTo(0);
+  //     return;
+  //   }
+
+  //   function renderCommunicationModeContent() {
+  //     return (
+  //       <CommunicationModeModalContents
+  //         onPressProceed={selectedContactMode =>
+  //           saveCommunicationMode(selectedContactMode)
+  //         }
+  //       />
+  //     );
+  //   }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -113,11 +137,7 @@ const RestoreWalletByContact = props => {
             infoTextNormal={"Select contacts to "}
             infoTextBold={"send recovery request"}
           />
-          <ContactList
-            style={{}}
-            onPressContinue={() => continueNProceed()}
-            onSelectContact={list => selectedContactsList(list)}
-          />
+          <ContactList style={{}} continueNProceed={continueNProceed} />
         </KeyboardAvoidingView>
         {/* <BottomSheet
           enabledInnerScrolling={true}
@@ -134,9 +154,7 @@ const RestoreWalletByContact = props => {
       </View>
     </SafeAreaView>
   );
-};
-
-export default RestoreWalletByContact;
+}
 
 const styles = StyleSheet.create({
   modalHeaderContainer: {
