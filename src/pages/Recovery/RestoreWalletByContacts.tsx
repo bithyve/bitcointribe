@@ -47,6 +47,7 @@ export default function RestoreWalletByContacts(props) {
   const continueNProceed = async contacts => {
     // communicationModeBottomSheet.current.snapTo(1);
     await AsyncStorage.setItem("selectedContacts", JSON.stringify(contacts));
+    console.log({ contacts });
     props.navigation.navigate("RestoreSelectedContactsList");
   };
 
