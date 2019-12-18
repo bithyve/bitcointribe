@@ -8,7 +8,7 @@ import {
   ScrollView,
   ActivityIndicator,
   SafeAreaView,
-  StatusBar,
+  StatusBar
 } from "react-native";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
@@ -117,89 +117,89 @@ export default function RecoveryCommunication(props) {
           </View>
         </TouchableOpacity>
       </View>
-    <View style={styles.modalContentContainer}>
-      <View style={{ height: "100%" }}>
-        <View style={{ marginTop: hp("2%"), marginBottom: hp("2%") }}>
-          <Text style={styles.commModeModalHeaderText}>
-            Select Mode of Communication{"\n"}for Contact
-          </Text>
-          <Text style={styles.commModeModalInfoText}>
-            You can choose a primary number or email
-          </Text>
-        </View>
-        <View style={styles.contactProfileView}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <View
-              style={{
-                backgroundColor: Colors.backgroundColor,
-                flex: 1,
-                height: 80,
-                justifyContent: "center",
-                marginLeft: 60,
-                overflow: "hidden",
-                position: "relative",
-                borderRadius: 10
-              }}
-            >
-              <Text style={styles.contactNameText}>Sophie Babel</Text>
-            </View>
-            <View
-              style={{
-                backgroundColor: Colors.white,
-                width: 80,
-                height: 80,
-                borderRadius: 80 / 2,
-                position: "absolute",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/images/icons/pexels-photo.png")}
-                style={{ ...styles.contactProfileImage }}
-              />
+      <View style={styles.modalContentContainer}>
+        <View style={{ height: "100%" }}>
+          <View style={{ marginTop: hp("2%"), marginBottom: hp("2%") }}>
+            <Text style={styles.commModeModalHeaderText}>
+              Select Mode of Communication{"\n"}for Contact
+            </Text>
+            <Text style={styles.commModeModalInfoText}>
+              You can choose a primary number or email
+            </Text>
+          </View>
+          <View style={styles.contactProfileView}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <View
+                style={{
+                  backgroundColor: Colors.backgroundColor,
+                  flex: 1,
+                  height: 80,
+                  justifyContent: "center",
+                  marginLeft: 60,
+                  overflow: "hidden",
+                  position: "relative",
+                  borderRadius: 10
+                }}
+              >
+                <Text style={styles.contactNameText}>{contact.name}</Text>
+              </View>
+              <View
+                style={{
+                  backgroundColor: Colors.white,
+                  width: 80,
+                  height: 80,
+                  borderRadius: 80 / 2,
+                  position: "absolute",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <Image
+                  source={require("../../assets/images/icons/pexels-photo.png")}
+                  style={{ ...styles.contactProfileImage }}
+                />
+              </View>
             </View>
           </View>
+          <View>
+            <ScrollView>
+              {contactInfo.map((item, index) => {
+                return (
+                  <TouchableOpacity
+                    onPress={() => onContactSelect(index)}
+                    style={styles.contactInfo}
+                  >
+                    <RadioButton
+                      size={15}
+                      color={Colors.lightBlue}
+                      borderColor={Colors.borderColor}
+                      isChecked={item.isSelected}
+                      onpress={() => onContactSelect(index)}
+                    />
+                    <Text style={styles.contactInfoText}>{item.info}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+          {selectedContactMode ? (
+            <TouchableOpacity
+              onPress={() => communicate(selectedContactMode)}
+              disabled={!REQUEST_DETAILS}
+              style={{
+                ...styles.proceedButtonView,
+                backgroundColor: Colors.blue
+              }}
+            >
+              {!REQUEST_DETAILS ? (
+                <ActivityIndicator size="small" />
+              ) : (
+                <Text style={styles.proceedButtonText}>Proceed</Text>
+              )}
+            </TouchableOpacity>
+          ) : null}
         </View>
-        <View>
-          <ScrollView>
-            {contactInfo.map((item, index) => {
-              return (
-                <TouchableOpacity
-                  onPress={() => onContactSelect(index)}
-                  style={styles.contactInfo}
-                >
-                  <RadioButton
-                    size={15}
-                    color={Colors.lightBlue}
-                    borderColor={Colors.borderColor}
-                    isChecked={item.isSelected}
-                    onpress={() => onContactSelect(index)}
-                  />
-                  <Text style={styles.contactInfoText}>{item.info}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
-        {selectedContactMode ? (
-          <TouchableOpacity
-            onPress={() => communicate(selectedContactMode)}
-            disabled={!REQUEST_DETAILS}
-            style={{
-              ...styles.proceedButtonView,
-              backgroundColor: Colors.blue
-            }}
-          >
-            {!REQUEST_DETAILS ? (
-              <ActivityIndicator size="small" />
-            ) : (
-              <Text style={styles.proceedButtonText}>Proceed</Text>
-            )}
-          </TouchableOpacity>
-        ) : null}
       </View>
-    </View>
     </SafeAreaView>
   );
 }
@@ -207,7 +207,7 @@ export default function RecoveryCommunication(props) {
 const styles = StyleSheet.create({
   modalContentContainer: {
     height: "100%",
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.white
   },
   commModeModalHeaderText: {
     color: Colors.blue,

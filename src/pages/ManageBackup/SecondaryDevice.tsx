@@ -27,9 +27,10 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 const SecondaryDevice = props => {
   const [selectedStatus, setSelectedStatus] = useState("error"); // for preserving health of this entity
   const [secondaryQR, setSecondaryQR] = useState("");
-  const { SHARES_TRANSFER_DETAILS } = useSelector(
-    state => state.storage.database.DECENTRALIZED_BACKUP
+  const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
+    state => state.storage.database
   );
+  const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
   const { loading } = useSelector(state => state.sss);
 
   SHARES_TRANSFER_DETAILS[0] && !secondaryQR
@@ -40,6 +41,12 @@ const SecondaryDevice = props => {
         })
       )
     : null;
+
+  const deepLink = SHARES_TRANSFER_DETAILS[0]
+    ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
+      SHARES_TRANSFER_DETAILS[0].ENCRYPTED_KEY
+    : "";
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -93,7 +100,7 @@ const SecondaryDevice = props => {
         ) : (
           <QRCode value={secondaryQR} size={hp("27%")} />
         )}
-        {secondaryQR ? <CopyThisText text={secondaryQR} /> : null}
+        {deepLink ? <CopyThisText text={deepLink} /> : null}
       </View>
       <BottomInfoBox
         title={"Note"}
