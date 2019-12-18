@@ -36,6 +36,7 @@ import RecoveryQuestionModalContents from "../../components/RecoveryQuestionModa
 import RecoverySuccessModalContents from "../../components/RecoverySuccessModalContents";
 import RecoveryWalletNameModalContents from "../../components/RecoveryWalletNameModalContents";
 import ErrorModalContents from "../../components/ErrorModalContents";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function RestoreSelectedContactsList(props) {
   const [selectedContacts, setSelectedContacts] = useState([]);
@@ -96,12 +97,12 @@ export default function RestoreSelectedContactsList(props) {
 
   useEffect(() => {
     // (ErrorBottomSheet as any).current.snapTo(1);
-    // let focusListener = props.navigation.addListener("didFocus", () => {
-    //   getSelectedContactList();
-    // });
-    // return () => {
-    //   focusListener.remove();
-    // };
+    let focusListener = props.navigation.addListener("didFocus", () => {
+      getSelectedContactList();
+    });
+    return () => {
+      focusListener.remove();
+    };
   }, []);
 
   useEffect(() => {
@@ -268,6 +269,16 @@ export default function RestoreSelectedContactsList(props) {
     );
   };
 
+  const { RECOVERY_SHARES } = useSelector(
+    state => state.storage.database.DECENTRALIZED_BACKUP
+  );
+
+  const metaShares = [];
+  Object.keys(RECOVERY_SHARES).forEach(key => {
+    const { META_SHARE } = RECOVERY_SHARES[key];
+    if (META_SHARE) metaShares.push(META_SHARE);
+  });
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -354,20 +365,25 @@ export default function RestoreSelectedContactsList(props) {
           </View>
           {selectedContacts.length > 0 && (
             <View style={{}}>
-              {selectedContacts.map(value => {
+              {selectedContacts.map((contact, index) => {
                 return (
                   <TouchableOpacity
-                    activeOpacity={value.status == "" ? 0 : 10}
+                    activeOpacity={contact.status == "" ? 0 : 10}
                     onPress={() =>
-                      value.status == "" ? openRequestModal() : {}
+                      contact.status == ""
+                        ? props.navigation.navigate("RecoveryCommunication", {
+                            contact,
+                            index: index + 1
+                          })
+                        : {}
                     }
                     style={{ ...styles.selectedContactView, marginBottom: 15 }}
                   >
                     <View>
                       <Text style={styles.selectedContactName}>
-                        {value.name.split(" ")[0]}{" "}
+                        {contact.name.split(" ")[0]}{" "}
                         <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                          {value.name.split(" ")[1]}
+                          {contact.name.split(" ")[1]}
                         </Text>
                       </Text>
                       <Text
@@ -376,12 +392,12 @@ export default function RestoreSelectedContactsList(props) {
                           fontSize: RFValue(11, 812)
                         }}
                       >
-                        {value.communicationMode
-                          ? value.communicationMode[0].info
+                        {contact.communicationMode.length
+                          ? contact.communicationMode[0].info
                           : ""}
                       </Text>
                     </View>
-                    {value.status == "received" ? (
+                    {contact.status == "received" ? (
                       <View
                         style={{ flexDirection: "row", marginLeft: "auto" }}
                       >
@@ -413,7 +429,7 @@ export default function RestoreSelectedContactsList(props) {
                           />
                         </View>
                       </View>
-                    ) : value.status == "inTransit" ? (
+                    ) : contact.status == "inTransit" ? (
                       <View
                         style={{ flexDirection: "row", marginLeft: "auto" }}
                       >
@@ -445,7 +461,7 @@ export default function RestoreSelectedContactsList(props) {
                           />
                         </View>
                       </View>
-                    ) : value.status == "rejected" ? (
+                    ) : contact.status == "rejected" ? (
                       <View
                         style={{ flexDirection: "row", marginLeft: "auto" }}
                       >
@@ -482,10 +498,15 @@ export default function RestoreSelectedContactsList(props) {
                       </View>
                     ) : (
                       <TouchableOpacity
-                        onPress={() => openRequestModal()}
+                        onPress={() =>
+                          props.navigation.navigate("RecoveryCommunication", {
+                            contact,
+                            index: index + 1
+                          })
+                        }
                         style={{ flexDirection: "row", marginLeft: "auto" }}
                       >
-                        <Text>{value.status}</Text>
+                        <Text>{contact.status}</Text>
                         <View style={styles.dotsView} />
                         <View style={styles.dotsView} />
                         <View style={styles.dotsView} />
@@ -632,16 +653,18 @@ export default function RestoreSelectedContactsList(props) {
             </View>
           )}
         </TouchableOpacity>
-        <View style={{ justifyContent: "center" }}>
-          <TouchableOpacity
-            style={{ ...styles.questionConfirmButton, margin: 20 }}
-            onPress={() => {
-              // (walletNameBottomSheet as any).current.snapTo(1);
-            }}
-          >
-            <Text style={styles.proceedButtonText}>Continue</Text>
-          </TouchableOpacity>
-        </View>
+        {metaShares.length >= 3 ? (
+          <View style={{ justifyContent: "center" }}>
+            <TouchableOpacity
+              style={{ ...styles.questionConfirmButton, margin: 20 }}
+              onPress={() => {
+                // (walletNameBottomSheet as any).current.snapTo(1);
+              }}
+            >
+              <Text style={styles.proceedButtonText}>Restore</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
       </ScrollView>
 
       {/* <BottomSheet
