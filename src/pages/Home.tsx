@@ -159,6 +159,9 @@ export default function Home(props) {
     PinChangeSuccessBottomSheet,
     setPinChangeSuccessBottomSheet
   ] = useState(React.createRef());
+  const [RecoveryRequestBottomSheet, setRecoveryRequestBottomSheet] = useState(
+    React.createRef()
+  );
   const [
     CustodianRequestBottomSheet,
     setCustodianRequestBottomSheet
@@ -581,6 +584,30 @@ export default function Home(props) {
       />
     );
   };
+
+  const renderRecoveryRequestModalContent = () => {
+    if (!recoveryRequest) return <View></View>;
+
+    return (
+      <CustodianRequestModalContents
+        userName={recoveryRequest.requester}
+        onPressAcceptSecret={() => {
+          setTimeout(() => {
+            setTabBarZIndex(0);
+          }, 2);
+          (RecoveryRequestBottomSheet as any).current.snapTo(0);
+          props.navigation.navigate("RecoveryRequestOTP", { recoveryRequest });
+        }}
+        onPressRejectSecret={() => {
+          setTimeout(() => {
+            setTabBarZIndex(0);
+          }, 2);
+          (RecoveryRequestBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
   const renderCustodianRequestOtpModalContent = () => {
     return (
       <CustodianRequestOtpModalContents
@@ -656,6 +683,19 @@ export default function Home(props) {
             setTabBarZIndex(999);
           }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderRecoveryRequestModalHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 2);
+          (RecoveryRequestBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -1137,7 +1177,9 @@ export default function Home(props) {
 
   useEffect(() => {
     if (recoveryRequest) {
-      Alert.alert(JSON.stringify(recoveryRequest));
+      // Alert.alert(JSON.stringify(recoveryRequest));
+      (RecoveryRequestBottomSheet as any).current.snapTo(1);
+      (bottomSheet as any).current.snapTo(1);
     } //TODO: connect the recovery guardian modal
   }, [recoveryRequest]);
 
@@ -1353,6 +1395,16 @@ export default function Home(props) {
         snapPoints={[-50, hp("60%")]}
         renderContent={renderCustodianRequestModalContent}
         renderHeader={renderCustodianRequestModalHeader}
+      />
+      <BottomSheet
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
+        enabledInnerScrolling={true}
+        ref={RecoveryRequestBottomSheet}
+        snapPoints={[-50, hp("60%")]}
+        renderContent={renderRecoveryRequestModalContent}
+        renderHeader={renderRecoveryRequestModalHeader}
       />
       {/* <BottomSheet
         enabledGestureInteraction={false}

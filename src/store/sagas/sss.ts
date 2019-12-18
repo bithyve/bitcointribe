@@ -17,7 +17,8 @@ import {
   DOWNLOAD_DYNAMIC_NONPMDD,
   RECOVER_WALLET,
   RESTORE_DYNAMIC_NONPMDD,
-  GENERATE_PDF
+  GENERATE_PDF,
+  requestedShareUploaded
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
@@ -196,8 +197,10 @@ function* uploadRequestedShareWorker({ payload }) {
   if (res.status === 200 && res.data.success === true) {
     // yield success
     console.log("Upload successful!");
+    yield put(requestedShareUploaded(tag, true));
   } else {
     console.log({ res });
+    yield put(requestedShareUploaded(tag, false, res.err));
   }
   yield put(switchS3Loader("uploadRequestedShare"));
 }

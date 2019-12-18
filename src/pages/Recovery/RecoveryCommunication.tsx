@@ -80,6 +80,8 @@ export default function RecoveryCommunication(props) {
     ? RECOVERY_SHARES[index]
     : { REQUEST_DETAILS: null };
 
+  console.log({ REQUEST_DETAILS });
+
   const communicate = async selectedContactMode => {
     const deepLink =
       `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/rk/` + // rk: recovery key

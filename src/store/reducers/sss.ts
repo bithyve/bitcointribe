@@ -1,7 +1,8 @@
 import {
   HEALTH_CHECK_INITIALIZED,
   S3_LOADING,
-  MNEMONIC_RECOVERED
+  MNEMONIC_RECOVERED,
+  REQUESTED_SHARE_UPLOADED
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { SERVICES_ENRICHED } from "../actions/storage";
@@ -23,6 +24,9 @@ const initialState: {
     restoreWallet: Boolean;
   };
   mnemonic: String;
+  requestedShareUpload: {
+    [tag: string]: { status: Boolean; err?: String };
+  };
 } = {
   service: null,
   loading: {
@@ -38,7 +42,8 @@ const initialState: {
     restoreDynamicNonPMDD: false,
     restoreWallet: false
   },
-  mnemonic: ""
+  mnemonic: "",
+  requestedShareUpload: {}
 };
 
 export default (state = initialState, action) => {
@@ -62,6 +67,18 @@ export default (state = initialState, action) => {
       return {
         ...state,
         service: action.payload.services[S3_SERVICE]
+      };
+
+    case REQUESTED_SHARE_UPLOADED:
+      return {
+        ...state,
+        requestedShareUpload: {
+          ...state.requestedShareUpload,
+          [action.payload.tag]: {
+            status: action.payload.status,
+            err: action.payload.err
+          }
+        }
       };
 
     case S3_LOADING:
