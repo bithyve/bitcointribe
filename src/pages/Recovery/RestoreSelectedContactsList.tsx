@@ -36,6 +36,7 @@ import RecoveryQuestionModalContents from "../../components/RecoveryQuestionModa
 import RecoverySuccessModalContents from "../../components/RecoverySuccessModalContents";
 import RecoveryWalletNameModalContents from "../../components/RecoveryWalletNameModalContents";
 import ErrorModalContents from "../../components/ErrorModalContents";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function RestoreSelectedContactsList(props) {
   const [selectedContacts, setSelectedContacts] = useState([]);
@@ -96,12 +97,12 @@ export default function RestoreSelectedContactsList(props) {
 
   useEffect(() => {
     // (ErrorBottomSheet as any).current.snapTo(1);
-    // let focusListener = props.navigation.addListener("didFocus", () => {
-    //   getSelectedContactList();
-    // });
-    // return () => {
-    //   focusListener.remove();
-    // };
+    let focusListener = props.navigation.addListener("didFocus", () => {
+      getSelectedContactList();
+    });
+    return () => {
+      focusListener.remove();
+    };
   }, []);
 
   useEffect(() => {
@@ -267,6 +268,16 @@ export default function RestoreSelectedContactsList(props) {
       />
     );
   };
+
+  const { RECOVERY_SHARES } = useSelector(
+    state => state.storage.database.DECENTRALIZED_BACKUP
+  );
+
+  const metaShares = [];
+  Object.keys(RECOVERY_SHARES).forEach(key => {
+    const { META_SHARE } = RECOVERY_SHARES[key];
+    if (META_SHARE) metaShares.push(META_SHARE);
+  });
 
   return (
     <View style={{ flex: 1 }}>
@@ -632,16 +643,18 @@ export default function RestoreSelectedContactsList(props) {
             </View>
           )}
         </TouchableOpacity>
-        <View style={{ justifyContent: "center" }}>
-          <TouchableOpacity
-            style={{ ...styles.questionConfirmButton, margin: 20 }}
-            onPress={() => {
-              // (walletNameBottomSheet as any).current.snapTo(1);
-            }}
-          >
-            <Text style={styles.proceedButtonText}>Continue</Text>
-          </TouchableOpacity>
-        </View>
+        {metaShares.length >= 3 ? (
+          <View style={{ justifyContent: "center" }}>
+            <TouchableOpacity
+              style={{ ...styles.questionConfirmButton, margin: 20 }}
+              onPress={() => {
+                // (walletNameBottomSheet as any).current.snapTo(1);
+              }}
+            >
+              <Text style={styles.proceedButtonText}>Restore</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
       </ScrollView>
 
       {/* <BottomSheet
