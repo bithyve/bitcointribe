@@ -79,11 +79,16 @@ export const recoverWallet = () => {
 
 // types and action creators (saga): dispatched by saga workers
 export const HEALTH_CHECK_INITIALIZED = "HEALTH_CHECK_INITIALIZED";
+export const REQUESTED_SHARE_UPLOADED = "REQUESTED_SHARE_UPLOADED";
 export const MNEMONIC_RECOVERED = "MNEMONIC_RECOVERED";
 export const S3_LOADING = "S3_LOADING";
 
 export const healthCheckInitialized = () => {
   return { type: HEALTH_CHECK_INITIALIZED };
+};
+
+export const requestedShareUploaded = (tag, status, err?) => {
+  return { type: REQUESTED_SHARE_UPLOADED, payload: { tag, status, err } };
 };
 
 export const mnemonicRecovered = mnemonic => {
