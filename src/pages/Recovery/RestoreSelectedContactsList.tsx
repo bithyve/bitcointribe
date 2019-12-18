@@ -95,13 +95,13 @@ export default function RestoreSelectedContactsList(props) {
   };
 
   useEffect(() => {
-    (ErrorBottomSheet as any).current.snapTo(1);
-    let focusListener = props.navigation.addListener("didFocus", () => {
-      getSelectedContactList();
-    });
-    return () => {
-      focusListener.remove();
-    };
+    // (ErrorBottomSheet as any).current.snapTo(1);
+    // let focusListener = props.navigation.addListener("didFocus", () => {
+    //   getSelectedContactList();
+    // });
+    // return () => {
+    //   focusListener.remove();
+    // };
   }, []);
 
   useEffect(() => {
@@ -636,7 +636,7 @@ export default function RestoreSelectedContactsList(props) {
           <TouchableOpacity
             style={{ ...styles.questionConfirmButton, margin: 20 }}
             onPress={() => {
-             // (walletNameBottomSheet as any).current.snapTo(1);
+              // (walletNameBottomSheet as any).current.snapTo(1);
             }}
           >
             <Text style={styles.proceedButtonText}>Continue</Text>
