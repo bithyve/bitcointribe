@@ -6,7 +6,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  ActivityIndicator
+  TextInput
 } from "react-native";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
@@ -15,56 +15,49 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import RadioButton from "../components/RadioButton";
-import { useSelector } from "react-redux";
 
 export default function CommunicationModeModalContents(props) {
-  const { contact } = props;
-  if (!contact) return <View></View>;
-
-  const communicationInfo = [];
-  if (contact.phoneNumbers) communicationInfo.push(...contact.phoneNumbers);
-  if (contact.emails) communicationInfo.push(...contact.emails);
-
-  const [selectedContactMode, setSelectedContactMode] = useState();
-  const [contactInfo, setContactInfo] = useState(
-    communicationInfo.map(({ number, email }, index) => {
-      if (number || email) {
-        return {
-          id: index,
-          info: number || email,
-          isSelected: false,
-          type: number ? "number" : "email"
-        };
-      }
-    })
-  );
-
-  const onContactSelect = index => {
-    setContactInfo([
-      ...contactInfo.map(item => {
-        if (item !== contactInfo[index]) {
-          return {
-            ...item,
-            isSelected: false
-          };
-        } else {
-          return {
-            ...item,
-            isSelected: !item.isSelected
-          };
-        }
-      })
-    ]);
-    // contactInfo[index].isSelected would become true during the next render cycle (batched state updates)
-    if (!contactInfo[index].isSelected) {
-      setSelectedContactMode({ ...contactInfo[index], isSelected: true });
-    } else {
-      setSelectedContactMode(null);
+  const [selectedContactMode, setSelectedContactMode] = useState([]);
+  const [contactInfo, setContactInfo] = useState([
+    {
+      id: 1,
+      info: "+91 000 000 0000",
+      isSelected: false
+    },
+    {
+      id: 2,
+      info: "+44 0000 000000",
+      isSelected: false
+    },
+    {
+      id: 3,
+      info: "sophiebabel@bithyve.com",
+      isSelected: false
     }
+  ]);
+  const [radioOnOff, setRadioOnOff] = useState(false);
+  const onContactSelect = async index => {
+    contactInfo[index].isSelected = !contactInfo[index].isSelected;
+    setContactInfo(contactInfo);
+    if (contactInfo[index].isSelected) {
+      selectedContactMode.push(contactInfo[index]);
+    } else if (
+      selectedContactMode.findIndex(
+        value => value.id == contactInfo[index].id
+      ) > -1 &&
+      !contactInfo[index].isSelected
+    ) {
+      selectedContactMode.splice(
+        selectedContactMode.findIndex(temp => temp.id == contactInfo[index].id),
+        1
+      );
+    }
+    setSelectedContactMode(selectedContactMode);
+    console.log("selectedContactMode", selectedContactMode);
+    setRadioOnOff(!radioOnOff);
   };
-
-  const { loading } = useSelector(state => state.sss);
 
   return (
     <View style={{ ...styles.modalContentContainer, height: "100%" }}>
@@ -132,22 +125,17 @@ export default function CommunicationModeModalContents(props) {
             })}
           </ScrollView>
         </View>
-        {selectedContactMode ? (
+        {selectedContactMode.length > 0 && (
           <TouchableOpacity
             onPress={() => props.onPressProceed(selectedContactMode)}
-            disabled={loading.uploadMetaShare}
             style={{
               ...styles.proceedButtonView,
               backgroundColor: Colors.blue
             }}
           >
-            {loading.uploadMetaShare ? (
-              <ActivityIndicator size="small" />
-            ) : (
-              <Text style={styles.proceedButtonText}>Proceed</Text>
-            )}
+            <Text style={styles.proceedButtonText}>Proceed</Text>
           </TouchableOpacity>
-        ) : null}
+        )}
       </View>
     </View>
   );

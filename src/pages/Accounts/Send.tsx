@@ -108,263 +108,265 @@ export default function Send(props) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-    <View style={styles.modalContentContainer}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS == "ios" ? "padding" : ""}
-        enabled
-      >
-        <ScrollView>
-          <View style={styles.modalHeaderTitleView}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <TouchableOpacity
-                onPress={() => {props.navigation.goBack();}}
-                style={{ height: 30, width: 30, justifyContent: "center" }}
-              >
-                <FontAwesome
-                  name="long-arrow-left"
-                  color={Colors.blue}
-                  size={17}
-                />
-              </TouchableOpacity>
-              <Text style={styles.modalHeaderTitleText}>{"Send"}</Text>
+      <View style={styles.modalContentContainer}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS == "ios" ? "padding" : ""}
+          enabled
+        >
+          <ScrollView>
+            <View style={styles.modalHeaderTitleView}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    props.navigation.goBack();
+                  }}
+                  style={{ height: 30, width: 30, justifyContent: "center" }}
+                >
+                  <FontAwesome
+                    name="long-arrow-left"
+                    color={Colors.blue}
+                    size={17}
+                  />
+                </TouchableOpacity>
+                <Text style={styles.modalHeaderTitleText}>{"Send"}</Text>
+              </View>
             </View>
-          </View>
-          <View style={{ paddingLeft: 20, paddingRight: 20 }}>
-            <View style={styles.textBoxView}>
-              <TextInput
-                // ref={refs => setTextContactNameRef(refs)}
-                style={styles.textBox}
-                placeholder={"Address"}
-                value={recipientAddress}
-                onChangeText={setRecipientAddress}
-                placeholderTextColor={Colors.borderColor}
-                // onFocus={() => {
-                //   props.modalRef.current.snapTo(2);
-                // }}
-                // onBlur={() => {
-                //   if (
-                //     !textAmountRef.isFocused() &&
-                //     !descriptionRef.isFocused()
-                //   ) {
-                //     props.modalRef.current.snapTo(1);
-                //   }
-                // }}
-              />
-              {/* <View style={styles.contactNameInputImageView}>
+            <View style={{ paddingLeft: 20, paddingRight: 20 }}>
+              <View style={styles.textBoxView}>
+                <TextInput
+                  // ref={refs => setTextContactNameRef(refs)}
+                  style={styles.textBox}
+                  placeholder={"Address"}
+                  value={recipientAddress}
+                  onChangeText={setRecipientAddress}
+                  placeholderTextColor={Colors.borderColor}
+                  // onFocus={() => {
+                  //   props.modalRef.current.snapTo(2);
+                  // }}
+                  // onBlur={() => {
+                  //   if (
+                  //     !textAmountRef.isFocused() &&
+                  //     !descriptionRef.isFocused()
+                  //   ) {
+                  //     props.modalRef.current.snapTo(1);
+                  //   }
+                  // }}
+                />
+                {/* <View style={styles.contactNameInputImageView}>
                 <Image
                   style={styles.textBoxImage}
                   source={require("../../assets/images/icons/phone-book.png")}
                 />
               </View> */}
-            </View>
-            <View style={styles.textBoxView}>
-              <View style={styles.amountInputImage}>
-                <Image
-                  style={styles.textBoxImage}
-                  source={require("../../assets/images/icons/icon_bitcoin_gray.png")}
+              </View>
+              <View style={styles.textBoxView}>
+                <View style={styles.amountInputImage}>
+                  <Image
+                    style={styles.textBoxImage}
+                    source={require("../../assets/images/icons/icon_bitcoin_gray.png")}
+                  />
+                </View>
+                <TextInput
+                  // ref={refs => setTextAmountRef(refs)}
+                  style={{ ...styles.textBox, paddingLeft: 10 }}
+                  placeholder={"Enter Amount"}
+                  value={amount}
+                  onChangeText={setAmount}
+                  placeholderTextColor={Colors.borderColor}
+                  // onFocus={() => {
+                  //   props.modalRef.current.snapTo(2);
+                  // }}
+                  // onBlur={() => {
+                  //   if (
+                  //     !descriptionRef.isFocused() &&
+                  //     !textContactNameRef.isFocused()
+                  //   ) {
+                  //     props.modalRef.current.snapTo(1);
+                  //   }
+                  // }}
                 />
               </View>
-              <TextInput
-                // ref={refs => setTextAmountRef(refs)}
-                style={{ ...styles.textBox, paddingLeft: 10 }}
-                placeholder={"Enter Amount"}
-                value={amount}
-                onChangeText={setAmount}
-                placeholderTextColor={Colors.borderColor}
-                // onFocus={() => {
-                //   props.modalRef.current.snapTo(2);
-                // }}
-                // onBlur={() => {
-                //   if (
-                //     !descriptionRef.isFocused() &&
-                //     !textContactNameRef.isFocused()
-                //   ) {
-                //     props.modalRef.current.snapTo(1);
-                //   }
-                // }}
-              />
+              <View style={{ ...styles.textBoxView, height: 100 }}>
+                <TextInput
+                  // ref={refs => setDescriptionRef(refs)}
+                  multiline={true}
+                  numberOfLines={4}
+                  style={{
+                    ...styles.textBox,
+                    paddingRight: 20,
+                    marginTop: 10,
+                    marginBottom: 10
+                  }}
+                  placeholder={"Description (Optional)"}
+                  value={description}
+                  onChangeText={setDescription}
+                  placeholderTextColor={Colors.borderColor}
+                  // onFocus={() => {
+                  //   props.modalRef.current.snapTo(2);
+                  // }}
+                  // onBlur={() => {
+                  //   if (
+                  //     !textAmountRef.isFocused() &&
+                  //     !textContactNameRef.isFocused()
+                  //   ) {
+                  //     props.modalRef.current.snapTo(1);
+                  //   }
+                  // }}
+                />
+              </View>
             </View>
-            <View style={{ ...styles.textBoxView, height: 100 }}>
-              <TextInput
-                // ref={refs => setDescriptionRef(refs)}
-                multiline={true}
-                numberOfLines={4}
-                style={{
-                  ...styles.textBox,
-                  paddingRight: 20,
-                  marginTop: 10,
-                  marginBottom: 10
-                }}
-                placeholder={"Description (Optional)"}
-                value={description}
-                onChangeText={setDescription}
-                placeholderTextColor={Colors.borderColor}
-                // onFocus={() => {
-                //   props.modalRef.current.snapTo(2);
-                // }}
-                // onBlur={() => {
-                //   if (
-                //     !textAmountRef.isFocused() &&
-                //     !textContactNameRef.isFocused()
-                //   ) {
-                //     props.modalRef.current.snapTo(1);
-                //   }
-                // }}
-              />
-            </View>
-          </View>
-          <View
-            style={{
-              height: 1,
-              backgroundColor: Colors.borderColor,
-              marginRight: 10,
-              marginLeft: 10,
-              marginTop: hp("3%"),
-              marginBottom: hp("3%")
-            }}
-          />
-          <View style={{ paddingLeft: 20, paddingRight: 20 }}>
-            <Text
-              style={{
-                color: Colors.blue,
-                fontSize: RFValue(13, 812),
-                fontFamily: Fonts.FiraSansRegular
-              }}
-            >
-              Transaction Priority
-            </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(12, 812),
-                fontFamily: Fonts.FiraSansRegular
-              }}
-            >
-              Set priority for your transaction
-            </Text>
             <View
               style={{
-                ...styles.textBoxView,
-                height: 55,
-                marginTop: hp("2%"),
-                alignItems: "center",
-                paddingLeft: 10,
-                paddingRight: 10
+                height: 1,
+                backgroundColor: Colors.borderColor,
+                marginRight: 10,
+                marginLeft: 10,
+                marginTop: hp("3%"),
+                marginBottom: hp("3%")
               }}
-            >
-              <Slider
-                style={{ flex: 1, marginRight: 10 }}
-                minimumValue={0}
-                maximumValue={10}
-                minimumTrackTintColor={Colors.blue}
-                maximumTrackTintColor={Colors.borderColor}
-                thumbStyle={{
-                  borderWidth: 5,
-                  borderColor: Colors.white,
-                  backgroundColor: Colors.blue,
-                  height: 30,
-                  width: 30,
-                  borderRadius: 15
+            />
+            <View style={{ paddingLeft: 20, paddingRight: 20 }}>
+              <Text
+                style={{
+                  color: Colors.blue,
+                  fontSize: RFValue(13, 812),
+                  fontFamily: Fonts.FiraSansRegular
                 }}
-                trackStyle={{ height: 8, borderRadius: 10 }}
-                thumbTouchSize={{
-                  width: 30,
-                  height: 30,
-                  backgroundColor: "blue"
-                }}
-                value={sliderValue}
-                onValueChange={value => setSliderValue(value)}
-              />
+              >
+                Transaction Priority
+              </Text>
               <Text
                 style={{
                   color: Colors.textColorGrey,
-                  fontSize: RFValue(13, 812),
-                  fontFamily: Fonts.FiraSansRegular,
-                  marginLeft: "auto"
+                  fontSize: RFValue(12, 812),
+                  fontFamily: Fonts.FiraSansRegular
                 }}
               >
-                Low
+                Set priority for your transaction
+              </Text>
+              <View
+                style={{
+                  ...styles.textBoxView,
+                  height: 55,
+                  marginTop: hp("2%"),
+                  alignItems: "center",
+                  paddingLeft: 10,
+                  paddingRight: 10
+                }}
+              >
+                <Slider
+                  style={{ flex: 1, marginRight: 10 }}
+                  minimumValue={0}
+                  maximumValue={10}
+                  minimumTrackTintColor={Colors.blue}
+                  maximumTrackTintColor={Colors.borderColor}
+                  thumbStyle={{
+                    borderWidth: 5,
+                    borderColor: Colors.white,
+                    backgroundColor: Colors.blue,
+                    height: 30,
+                    width: 30,
+                    borderRadius: 15
+                  }}
+                  trackStyle={{ height: 8, borderRadius: 10 }}
+                  thumbTouchSize={{
+                    width: 30,
+                    height: 30,
+                    backgroundColor: "blue"
+                  }}
+                  value={sliderValue}
+                  onValueChange={value => setSliderValue(value)}
+                />
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue(13, 812),
+                    fontFamily: Fonts.FiraSansRegular,
+                    marginLeft: "auto"
+                  }}
+                >
+                  Low
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{ paddingLeft: 20, paddingRight: 20, marginTop: hp("5%") }}
+            >
+              <Text
+                style={{
+                  color: Colors.blue,
+                  fontSize: RFValue(13, 812),
+                  fontFamily: Fonts.FiraSansRegular
+                }}
+              >
+                Transaction Fee
+              </Text>
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12, 812),
+                  fontFamily: Fonts.FiraSansRegular
+                }}
+              >
+                Transaction fee will be calculated in the next step according to
+                the amount of money being sent
               </Text>
             </View>
-          </View>
-          <View
-            style={{ paddingLeft: 20, paddingRight: 20, marginTop: hp("5%") }}
-          >
-            <Text
+            <View
               style={{
-                color: Colors.blue,
-                fontSize: RFValue(13, 812),
-                fontFamily: Fonts.FiraSansRegular
+                paddingLeft: 20,
+                paddingRight: 20,
+                flexDirection: "row",
+                marginTop: hp("5%"),
+                marginBottom: hp("3%")
               }}
             >
-              Transaction Fee
-            </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(12, 812),
-                fontFamily: Fonts.FiraSansRegular
-              }}
-            >
-              Transaction fee will be calculated in the next step according to
-              the amount of money being sent
-            </Text>
-          </View>
-          <View
-            style={{
-              paddingLeft: 20,
-              paddingRight: 20,
-              flexDirection: "row",
-              marginTop: hp("5%"),
-              marginBottom: hp("3%")
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => {
-                dispatch(
-                  transferST1(serviceType, {
-                    recipientAddress,
-                    amount: parseInt(amount)
-                  })
-                );
-              }}
-              disabled={loading.transfer}
-              style={styles.confirmButtonView}
-            >
-              {loading.transfer ? (
-                <ActivityIndicator size="small" />
-              ) : (
-                <Text style={styles.buttonText}>Confirm</Text>
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                ...styles.confirmButtonView,
-                width: wp("30%"),
-                backgroundColor: Colors.white
-              }}
-              onPress={() => {
-                dispatch(clearTransfer(serviceType));
-                props.navigation.goBack();
-              }}
-            >
-              <Text style={{ ...styles.buttonText, color: Colors.blue }}>
-                Cancel
-              </Text>
-            </TouchableOpacity>
-          </View>
-          {transfer.executed === "ST1" ? stage2() : null}
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </View>
+              <TouchableOpacity
+                onPress={() => {
+                  dispatch(
+                    transferST1(serviceType, {
+                      recipientAddress,
+                      amount: parseInt(amount)
+                    })
+                  );
+                }}
+                disabled={loading.transfer}
+                style={styles.confirmButtonView}
+              >
+                {loading.transfer ? (
+                  <ActivityIndicator size="small" />
+                ) : (
+                  <Text style={styles.buttonText}>Confirm</Text>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  ...styles.confirmButtonView,
+                  width: wp("30%"),
+                  backgroundColor: Colors.white
+                }}
+                onPress={() => {
+                  dispatch(clearTransfer(serviceType));
+                  props.navigation.goBack();
+                }}
+              >
+                <Text style={{ ...styles.buttonText, color: Colors.blue }}>
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+            </View>
+            {transfer.executed === "ST1" ? stage2() : null}
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   modalContentContainer: {
-    height: "100%",
+    height: "100%"
   },
   modalHeaderTitleText: {
     color: Colors.blue,
