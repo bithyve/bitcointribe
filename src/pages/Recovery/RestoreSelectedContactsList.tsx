@@ -365,20 +365,25 @@ export default function RestoreSelectedContactsList(props) {
           </View>
           {selectedContacts.length > 0 && (
             <View style={{}}>
-              {selectedContacts.map(value => {
+              {selectedContacts.map((contact, index) => {
                 return (
                   <TouchableOpacity
-                    activeOpacity={value.status == "" ? 0 : 10}
+                    activeOpacity={contact.status == "" ? 0 : 10}
                     onPress={() =>
-                      value.status == "" ? openRequestModal() : {}
+                      contact.status == ""
+                        ? props.navigation.navigate("RecoveryCommunication", {
+                            contact,
+                            index: index + 1
+                          })
+                        : {}
                     }
                     style={{ ...styles.selectedContactView, marginBottom: 15 }}
                   >
                     <View>
                       <Text style={styles.selectedContactName}>
-                        {value.name.split(" ")[0]}{" "}
+                        {contact.name.split(" ")[0]}{" "}
                         <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                          {value.name.split(" ")[1]}
+                          {contact.name.split(" ")[1]}
                         </Text>
                       </Text>
                       <Text
@@ -387,12 +392,12 @@ export default function RestoreSelectedContactsList(props) {
                           fontSize: RFValue(11, 812)
                         }}
                       >
-                        {value.communicationMode
-                          ? value.communicationMode[0].info
+                        {contact.communicationMode.length
+                          ? contact.communicationMode[0].info
                           : ""}
                       </Text>
                     </View>
-                    {value.status == "received" ? (
+                    {contact.status == "received" ? (
                       <View
                         style={{ flexDirection: "row", marginLeft: "auto" }}
                       >
@@ -424,7 +429,7 @@ export default function RestoreSelectedContactsList(props) {
                           />
                         </View>
                       </View>
-                    ) : value.status == "inTransit" ? (
+                    ) : contact.status == "inTransit" ? (
                       <View
                         style={{ flexDirection: "row", marginLeft: "auto" }}
                       >
@@ -456,7 +461,7 @@ export default function RestoreSelectedContactsList(props) {
                           />
                         </View>
                       </View>
-                    ) : value.status == "rejected" ? (
+                    ) : contact.status == "rejected" ? (
                       <View
                         style={{ flexDirection: "row", marginLeft: "auto" }}
                       >
@@ -496,7 +501,7 @@ export default function RestoreSelectedContactsList(props) {
                         onPress={() => openRequestModal()}
                         style={{ flexDirection: "row", marginLeft: "auto" }}
                       >
-                        <Text>{value.status}</Text>
+                        <Text>{contact.status}</Text>
                         <View style={styles.dotsView} />
                         <View style={styles.dotsView} />
                         <View style={styles.dotsView} />
