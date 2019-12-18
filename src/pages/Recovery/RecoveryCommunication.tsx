@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Image,
@@ -18,15 +18,15 @@ import {
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import RadioButton from "../../components/RadioButton";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { textWithoutEncoding, email } from "react-native-communications";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import commonStyle from "../../common/Styles";
+import { requestShare } from "../../store/actions/sss";
 
 export default function RecoveryCommunication(props) {
   const contact = props.navigation.getParam("contact");
   const index = props.navigation.getParam("index");
-  console.log({ contact, index });
 
   const [selectedContactMode, setSelectedContactMode] = useState();
   const [contactInfo, setContactInfo] = useState(
@@ -74,8 +74,12 @@ export default function RecoveryCommunication(props) {
   const { REQUEST_DETAILS } = RECOVERY_SHARES[index]
     ? RECOVERY_SHARES[index]
     : { REQUEST_DETAILS: null };
-
   console.log({ REQUEST_DETAILS });
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!REQUEST_DETAILS) dispatch(requestShare(index));
+  }, []);
 
   const communicate = async selectedContactMode => {
     const deepLink =

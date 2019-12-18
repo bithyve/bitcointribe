@@ -498,7 +498,12 @@ export default function RestoreSelectedContactsList(props) {
                       </View>
                     ) : (
                       <TouchableOpacity
-                        onPress={() => openRequestModal()}
+                        onPress={() =>
+                          props.navigation.navigate("RecoveryCommunication", {
+                            contact,
+                            index: index + 1
+                          })
+                        }
                         style={{ flexDirection: "row", marginLeft: "auto" }}
                       >
                         <Text>{contact.status}</Text>
