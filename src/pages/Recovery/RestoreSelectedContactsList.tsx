@@ -11,7 +11,8 @@ import {
   Platform,
   TextInput,
   KeyboardAvoidingView,
-  AsyncStorage
+  AsyncStorage,
+  Alert
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -37,6 +38,7 @@ import RecoverySuccessModalContents from "../../components/RecoverySuccessModalC
 import RecoveryWalletNameModalContents from "../../components/RecoveryWalletNameModalContents";
 import ErrorModalContents from "../../components/ErrorModalContents";
 import { useDispatch, useSelector } from "react-redux";
+import { downloadMShare } from "../../store/actions/sss";
 
 export default function RestoreSelectedContactsList(props) {
   const [selectedContacts, setSelectedContacts] = useState([]);
@@ -279,6 +281,42 @@ export default function RestoreSelectedContactsList(props) {
     if (META_SHARE) metaShares.push(META_SHARE);
   });
 
+  const dispatch = useDispatch();
+
+  const downloadSecret = shareIndex => {
+    const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[shareIndex];
+
+    if (!META_SHARE) {
+      const { OTP, ENCRYPTED_KEY } = REQUEST_DETAILS;
+      console.log({ OTP, ENCRYPTED_KEY });
+      dispatch(downloadMShare(OTP, ENCRYPTED_KEY, "recovery"));
+    } else {
+      Alert.alert("Downloaded", "Secret already downloaded");
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      if (RECOVERY_SHARES[1])
+        if (RECOVERY_SHARES[1].META_SHARE)
+          selectedContacts[0].status = "received";
+        else if (RECOVERY_SHARES[1].REQUEST_DETAILS)
+          selectedContacts[0].status = "inTransit";
+
+      if (RECOVERY_SHARES[2])
+        if (RECOVERY_SHARES[2].META_SHARE)
+          selectedContacts[1].status = "received";
+        else if (RECOVERY_SHARES[2].REQUEST_DETAILS)
+          selectedContacts[1].status = "inTransit";
+
+      await AsyncStorage.setItem(
+        "selectedContacts",
+        JSON.stringify(selectedContacts)
+      );
+      getSelectedContactList();
+    })();
+  }, [RECOVERY_SHARES]);
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -448,18 +486,19 @@ export default function RestoreSelectedContactsList(props) {
                             Secret In-Transit
                           </Text>
                         </View>
-                        <View
+                        <TouchableOpacity
                           style={{
                             ...styles.secretReceivedCheckSignView,
                             backgroundColor: Colors.lightBlue
                           }}
+                          onPress={() => downloadSecret(index + 1)}
                         >
                           <Ionicons
-                            name={"md-time"}
+                            name={"download"}
                             size={15}
                             color={Colors.blue}
                           />
-                        </View>
+                        </TouchableOpacity>
                       </View>
                     ) : contact.status == "rejected" ? (
                       <View
@@ -498,12 +537,7 @@ export default function RestoreSelectedContactsList(props) {
                       </View>
                     ) : (
                       <TouchableOpacity
-                        onPress={() =>
-                          props.navigation.navigate("RecoveryCommunication", {
-                            contact,
-                            index: index + 1
-                          })
-                        }
+                        onPress={() => {}}
                         style={{ flexDirection: "row", marginLeft: "auto" }}
                       >
                         <Text>{contact.status}</Text>
