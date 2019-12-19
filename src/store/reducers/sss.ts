@@ -2,7 +2,8 @@ import {
   HEALTH_CHECK_INITIALIZED,
   S3_LOADING,
   MNEMONIC_RECOVERED,
-  REQUESTED_SHARE_UPLOADED
+  REQUESTED_SHARE_UPLOADED,
+  RESET_REQUESTED_SHARE_UPLOADS
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { SERVICES_ENRICHED } from "../actions/storage";
@@ -79,6 +80,12 @@ export default (state = initialState, action) => {
             err: action.payload.err
           }
         }
+      };
+
+    case RESET_REQUESTED_SHARE_UPLOADS:
+      return {
+        ...state,
+        requestedShareUpload: initialState.requestedShareUpload
       };
 
     case S3_LOADING:

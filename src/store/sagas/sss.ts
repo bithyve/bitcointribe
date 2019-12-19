@@ -199,7 +199,6 @@ function* uploadRequestedShareWorker({ payload }) {
     console.log("Upload successful!");
     yield put(requestedShareUploaded(tag, true));
   } else {
-    console.log({ res });
     yield put(requestedShareUploaded(tag, false, res.err));
   }
   yield put(switchS3Loader("uploadRequestedShare"));
@@ -232,8 +231,8 @@ function* downloadMetaShareWorker({ payload }) {
     res = yield call(
       S3Service.downloadAndValidateShare,
       encryptedKey,
-      otp
-      // existingShares
+      otp,
+      existingShares
     );
   } else {
     res = yield call(S3Service.downloadAndValidateShare, encryptedKey, otp);

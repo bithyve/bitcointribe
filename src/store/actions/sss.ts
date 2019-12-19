@@ -14,6 +14,7 @@ export const DOWNLOAD_DYNAMIC_NONPMDD = "DOWNLOAD_DYNAMIC_NONPMDD";
 export const RESTORE_DYNAMIC_NONPMDD = "RESTORE_DYNAMIC_NONPMDD";
 export const RECOVER_MNEMONIC = "RECOVER_MNEMONIC";
 export const RECOVER_WALLET = "RECOVER_WALLET";
+export const RESET_REQUESTED_SHARE_UPLOADS = "RESET_REQUESTED_SHARE_UPLOADS";
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -75,6 +76,10 @@ export const recoverMmnemonic = (metaShares, securityAns) => {
 
 export const recoverWallet = () => {
   return { type: RECOVER_WALLET };
+};
+
+export const resetRequestedShareUpload = () => {
+  return { type: RESET_REQUESTED_SHARE_UPLOADS };
 };
 
 // types and action creators (saga): dispatched by saga workers
