@@ -2,9 +2,10 @@
 //  PdfGenerate.swift
 //  HEXA
 //
-//  Created by developer on 16/12/19.
+//  Created by developer on 19/12/19.
 //  Copyright © 2019 Facebook. All rights reserved.
 //
+
 
 import Foundation
 import PDFGenerator
@@ -51,7 +52,7 @@ import QRCoder
         print("qrcodestring=",qrCodeString)
         print("working");
         var txtTitle = UILabel();
-        var txtPart = UILabel();  
+        var txtPart = UILabel();
         var txtQrCodeString = UILabel();
         var txtMessage = UILabel();
         var qrCodeImage = UIImageView();
@@ -67,7 +68,7 @@ import QRCoder
         txtTitle.font = UIFont.systemFont(ofSize: 10.0)
         txtTitle.textAlignment = .left
         txtTitle.sizeToFit()
-        v1.addSubview(txtTitle)  
+        v1.addSubview(txtTitle)
         
 //          let imageTitle:UIImage? = (title as String).image(withAttributes: [.font: UIFont.systemFont(ofSize: 80.0)])
 //          let imageViewTitle = UIImageView()
@@ -93,7 +94,7 @@ import QRCoder
              
              
         qrCodeImage.image = generator.createImage(value: qrcode[0] as! String,size: CGSize(width: 80, height: 80))
-        qrCodeImage.frame = CGRect(x: 10, y: (txtPart.frame.origin.y +  txtPart.frame.height) , width: 80, height: 80)  
+        qrCodeImage.frame = CGRect(x: 10, y: (txtPart.frame.origin.y +  txtPart.frame.height) , width: 80, height: 80)
         v1.addSubview(qrCodeImage)
           
           
@@ -350,7 +351,7 @@ import QRCoder
         txtQrCodeString.frame = CGRect(x:10,y: ( qrCodeImage.frame.origin.y + qrCodeImage.frame.height),width:v5.bounds.size.width - 10, height:v5.bounds.size.height)
         txtQrCodeString.font =  UIFont.systemFont(ofSize: 6.0)
         txtQrCodeString.textAlignment = .center
-        txtQrCodeString.sizeToFit();  
+        txtQrCodeString.sizeToFit();
         v5.addSubview(txtQrCodeString);
 
         txtMessage = UILabel();
