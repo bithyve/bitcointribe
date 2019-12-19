@@ -1,65 +1,37 @@
-# Hexa Wallet
+## Building HEXA
 
-Hexa Wallet is a user friendly mobile bitcoin wallet that enables p2p commerce.
-
-![Hexa Wallet](hexa.png)
-
-There are various types of accounts that are supported in the Hexa Wallet:
-
-1. Savings Account: A savings account is a standard bitcoin wallet optimal for daily use
-2. Secure Account: A secure account is a bitcoin wallet secured by 2FA optimal for storing larger amounts of bitcoin
-
-Hexa requires a pin to unlock and access funds and Accounts are protected by a seed restoration feature which can be used to import wallets from other devices or from an older version of Hexa.
-
-### Design Considerations
-
-The various design considerations that Hexa chose to undertake are over at [the wiki](https://github.com/thecryptobee/Hexa-Wallet/wiki/Design-Considerations)
-
-### Developing locally
-
-#### Prerequisites:
+### Prerequisites:
 
 - [Node](https://nodejs.org/en/)
-- [yarn](https://www.npmjs.com/package/yarn)
-- [React-Native](https://www.npmjs.com/package/react-native)] + [rn-nodeify](https://www.npmjs.com/package/rn-nodeify)
+- [Yarn](https://yarnpkg.com/lang/en/)
+- [CocoaPods](https://cocoapods.org/)
 - [Xcode](https://developer.apple.com/xcode/)
-- iOS Simulator on Xcode
-
-#### Installing hexa
+- [Android Studio](https://developer.android.com/studio)
 
 ```
-git clone https://github.com/bithyve/hexa.git
-cd hexa
-sudo yarn install
+git clone https://github.com/bithyve/_HEXA.git
+cd _HEXA
+yarn install
 ```
 
-Make sure you have a `.env.dev` similar to `.env.example` in your project's root directory before running hexa. If this file is not present with the correct values the app will not run correctly.
+Make sure you have a `.env` similar to `.env.example` in your project's root directory before running hexa. If this file is not present with the appropriate values then the app will crash abruptly.
 
-#### Run on android
-
-```
-npm run android-dev
-```
-
-#### Run on ios using terminal
+### Run on iOS
 
 ```
-npm run ios-dev
+yarn ios
 ```
 
-#### Run on ios using xcode:
-
-If fonts reference issue showing following this steps
+### Run on Android
 
 ```
-In Xcode, go to File->Project/Workspace settings.
-Change the build system to Legacy Build system.
+yarn android
 ```
 
-### Contributing
+## Contributing
 
-Please feel free to open a pull requests and issues with bugfixes and suggestions.
+Please feel free to open a pull requests, issues with bugfixes and suggestions.
 
-### License
+## License
 
 [LICENSE](LICENSE)
