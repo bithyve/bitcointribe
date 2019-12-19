@@ -23,7 +23,7 @@ export default function CustodianRequestModalContents(props) {
           style={{
             ...styles.successModalHeaderView,
             marginRight: wp("8%"),
-            marginLeft: wp("8%")
+            marginLeft: wp("8%"),
           }}
         >
           <Text style={styles.modalTitleText}>
