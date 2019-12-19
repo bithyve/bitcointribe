@@ -7,8 +7,6 @@ import com.oblador.vectoricons.VectorIconsPackage;
 import com.tradle.react.UdpSocketsModule;
 import com.peel.react.TcpSocketsModule;
 import com.peel.react.rnos.RNOSModule;
-import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
-import com.cmcewen.blurview.BlurViewPackage;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.horcrux.svg.SvgPackage;
 import com.christopherdro.htmltopdf.RNHTMLtoPDFPackage;
@@ -60,8 +58,6 @@ public class MainApplication extends Application implements ReactApplication {
             new UdpSocketsModule(),
             new TcpSocketsModule(),
             new RNOSModule(),
-            new ReactNativeConfigPackage(),
-            new BlurViewPackage(),
             new NetInfoPackage(),
             new SvgPackage(),
             new RNHTMLtoPDFPackage(),
