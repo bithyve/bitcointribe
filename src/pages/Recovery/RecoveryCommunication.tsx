@@ -187,7 +187,7 @@ export default function RecoveryCommunication(props) {
             <TouchableOpacity
               onPress={() => {
                 communicate(selectedContactMode);
-                props.navigation.goBack();
+                setTimeout(() => props.navigation.goBack(), 5);
               }}
               disabled={!REQUEST_DETAILS}
               style={{
