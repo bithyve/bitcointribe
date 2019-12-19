@@ -40,6 +40,8 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
+  - PDFGenerator (3.1.0)
+  - QRCoder (1.1.0)
   - React (0.59.10):
     - React/Core (= 0.59.10)
   - react-native-html-to-pdf (0.8.0):
@@ -152,6 +154,8 @@ DEPENDENCIES:
   - EXWebBrowser (from `../node_modules/expo-web-browser/ios`)
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
+  - PDFGenerator
+  - QRCoder
   - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-randombytes (from `../node_modules/react-native-randombytes`)
@@ -193,6 +197,8 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - boost-for-react-native
+    - PDFGenerator
+    - QRCoder
 
 EXTERNAL SOURCES:
   DoubleConversion:
@@ -319,6 +325,8 @@ SPEC CHECKSUMS:
   EXWebBrowser: 18924c3d2a3a1aa95d413672f058beff589c80f4
   Folly: de497beb10f102453a1afa9edbf8cf8a251890de
   glog: aefd1eb5dda2ab95ba0938556f34b98e2da3a60d
+  PDFGenerator: 17d6bc525db0a3fcd156fbf00f9d1b8d5cc75d1e
+  QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
   react-native-html-to-pdf: 1d1199917f56a98377d431bce84c2f275e48eb71
   react-native-netinfo: 0da34082d2cec3100c9b5073bb217e35f1142bdd
@@ -344,6 +352,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 1e70fe58b872355f0ecb44fb81bb1a16484047f0
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: 81f4e6d8dcd55e338136074401b541ef6764d46a
+PODFILE CHECKSUM: 59fb800ea7332ad30181791502df1c42d5dd147d
 
-COCOAPODS: 1.8.3
+COCOAPODS: 1.8.4

@@ -20,7 +20,7 @@ target 'HEXA' do
     'RCTVibration',
     'RCTWebSocket',
   ]
-
+  
   pod 'yoga', :path => '../node_modules/react-native/ReactCommon/yoga'
 
   pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
@@ -31,6 +31,9 @@ target 'HEXA' do
   pod 'RNScreens', :path => '../node_modules/react-native-screens'
 
   use_unimodules!
+  
+  pod 'PDFGenerator'
+   pod 'QRCoder'
 
   pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
 

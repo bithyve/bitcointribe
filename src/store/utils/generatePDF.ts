@@ -52,106 +52,47 @@ export default async (pdfData, fileName, title, password) => {
     secondaryXpub,
     bhXpub
   } = pdfData;
-
-  const qrCodes: string[] = [];
-  const chunkedQR: string[][] = [];
+  const qrcode: string[] = [];
+  const qrCodeString: string[][] = [];
   qrData.forEach(qrString => {
-    qrCodes.push(getFormattedString(qrString));
-    chunkedQR.push(chunkArray(qrString, 4));
+    qrcode.push(getFormattedString(qrString));
+    // qrCodeString.push(chunkArray(qrString, 4));
+    qrCodeString.push(qrString);
   });
+  let pdfDatas = {
+    title,
+    fileName,
+    password,
+    qrcode,
+    qrCodeString,
+    secondaryXpub,
+    twoFAQR,
+    twoFASecret,
+    secondaryMnemonic,
+    bhXpub
+  };
+  let pdfPath = await getPdfPath(JSON.stringify(pdfDatas));
+  return pdfPath;
+};
 
-  let chunkedSecondaryMnemonic = chunkArray(secondaryMnemonic.split(" "), 2);
-  chunkedSecondaryMnemonic = chunkedSecondaryMnemonic.map(chunk =>
-    chunk
-      .toString()
-      .split(",")
-      .join(" ")
-  );
-  let chunkedBHXpub = chunkArray(bhXpub, 2);
-
-  const shareParts: string[] = [];
-  for (let index = 0; index < 8; index++) {
-    const part =
-      `<h3 style='text-decoration: underline;'>Part ${index + 1}<h3>` +
-      new QRCode(qrCodes[index]).svg() +
-      "<p align='center'>" +
-      chunkedQR[index][0].toString() +
-      "</p>" +
-      "<p align='center'>" +
-      chunkedQR[index][1].toString() +
-      "</p>" +
-      "<p align='center'>" +
-      chunkedQR[index][2].toString() +
-      "</p>" +
-      "<p align='center'>" +
-      chunkedQR[index][3].toString() +
-      "</p>";
-    shareParts.push(part);
-  }
-
-  const html =
-    "<h1>" +
-    title.toString() +
-    "</h1>" +
-    shareParts.join("") +
-    "<h3 style='text-decoration: underline;'>Secondary Xpub (Encrypted):<h3>" +
-    new QRCode(secondaryXpub).svg() +
-    "<p align='center'>Scan the above QR Code using your HEXA wallet in order to restore your Secure Account.</p>" +
-    "<p>2FA Secret:<p><br/>" +
-    new QRCode(twoFAQR).svg() +
-    "<p align='center'>" +
-    twoFASecret +
-    "</p>" +
-    "<p>Following assets can be used to recover your funds using the open - sourced ga - recovery tool.</p><br/><br/>" +
-    "<p>Secondary Mnemonic:<p>" +
-    "<p align='center'>" +
-    chunkedSecondaryMnemonic[0] +
-    "</p>" +
-    "<p align='center'>" +
-    chunkedSecondaryMnemonic[1] +
-    "</p><br/>" +
-    "<p>BitHyve Xpub:<p>" +
-    "<p align='center'>" +
-    chunkedBHXpub[0].toString() +
-    "</p>" +
-    "<p align='center'>" +
-    chunkedBHXpub[1].toString() +
-    "</p>";
-
+const getPdfPath = async pdfData => {
   if (Platform.OS == "ios") {
-    let options = {
-      padding: 0,
-      height: 842,
-      width: 595,
-      html,
-      fileName: fileName,
-      directory: "Documents"
-    };
-
-    const file = await RNHTMLtoPDF.convert(options);
     const PdfPassword = NativeModules.PdfPassword;
-    PdfPassword.addEvent("/" + fileName + ".pdf", password);
-    Alert.alert("PDF saved", file.filePath, [
-      { text: "Okay", style: "destructive" }
-    ]);
-    return file.filePath;
-  } else if (Platform.OS == "android") {
-    // TODO: PDF password protection @Android
-    let options = {
-      html,
-      height: 842,
-      width: 595,
-      fileName: fileName,
-      directory: "docs"
-    };
+    return await PdfPassword.addEvent(pdfData);
+  } else {
     if (!(await requestStoragePermission())) {
       throw new Error("Storage Permission Denied");
     }
-    let file = await RNHTMLtoPDF.convert(options);
-    Alert.alert("PDF saved", file.filePath, [
-      { text: "Okay", style: "destructive" }
-    ]);
-    return file.filePath;
-    // setPdfAndroidPasswrod(file.filePath, password);
+    var PdfPassword = NativeModules.PdfPassword;
+    return await PdfPassword.setPdfPasswrod(
+      pdfData,
+      (err: any) => {
+        console.log(err);
+      },
+      (path: any) => {
+        console.log(path);
+        return "file://" + path;
+      }
+    );
   }
 };
