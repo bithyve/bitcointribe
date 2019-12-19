@@ -74,7 +74,6 @@ export default function RecoveryCommunication(props) {
   const { REQUEST_DETAILS } = RECOVERY_SHARES[index]
     ? RECOVERY_SHARES[index]
     : { REQUEST_DETAILS: null };
-  console.log({ REQUEST_DETAILS });
 
   const dispatch = useDispatch();
   useEffect(() => {
