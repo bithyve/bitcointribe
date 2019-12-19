@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
     View,
     Image,
-    TouchableOpacity,
     Text,
     StyleSheet,
     ScrollView
@@ -16,14 +15,15 @@ import ContactList from "../components/ContactList";
 import FontAwesome from "react-native-vector-icons/FontAwesome"
 import Ionicons from "react-native-vector-icons/Ionicons";
 import BottomInfoBox from './BottomInfoBox';
+import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
 
 export default function AddContactsModalContents(props) {
     return (<View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
             <View style={{ flexDirection: 'row', }}>
-                <TouchableOpacity onPress={() => props.onPressBack()} style={{ height: 30, width: 30, }}>
+            <AppBottomSheetTouchableWrapper onPress={() => props.onPressBack()} style={{ height: 30, width: 30, }}>
                     <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-                </TouchableOpacity>
+            </AppBottomSheetTouchableWrapper>
                 <View>
                     <Text style={styles.modalHeaderTitleText}>{"Add Contact"}</Text>
                     <Text style={styles.modalHeaderInfoText}>Add contact from your{"\n"}address book</Text>
@@ -31,7 +31,7 @@ export default function AddContactsModalContents(props) {
             </View>
         </View>
         <View style={{ flex: 1, }}>
-            <TouchableOpacity onPress={()=>props.onPressFriendAndFamily()} style={styles.cardView}>
+            <AppBottomSheetTouchableWrapper onPress={()=>props.onPressFriendAndFamily()} style={styles.cardView}>
                 <Image source={require("../assets/images/icons/user.png")} style={styles.image} />
                 <View style={{ marginLeft: 10 }}>
                     <Text style={styles.titleText}>Friends and Family</Text>
@@ -43,8 +43,8 @@ export default function AddContactsModalContents(props) {
                     size={12}
                     style={{ marginLeft: 'auto', marginRight: 20 }}
                 />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>props.onPressBiller()} style={styles.cardView}>
+            </AppBottomSheetTouchableWrapper>
+            <AppBottomSheetTouchableWrapper onPress={()=>props.onPressBiller()} style={styles.cardView}>
                 <Image source={require("../assets/images/icons/invoice.png")} style={styles.image} />
                 <View style={{ marginLeft: 10 }}>
                     <Text style={styles.titleText}>Billers</Text>
@@ -56,7 +56,7 @@ export default function AddContactsModalContents(props) {
                     size={12}
                     style={{ marginLeft: 'auto', marginRight: 20 }}
                 />
-            </TouchableOpacity>
+            </AppBottomSheetTouchableWrapper>
         </View>
         <View style={{  }}>
             <BottomInfoBox title={'Lorem ipsum'} infoText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'} />
