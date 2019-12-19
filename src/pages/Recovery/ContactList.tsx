@@ -6,7 +6,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  AsyncStorage,
   PermissionsAndroid,
   Platform,
   Alert
@@ -22,6 +21,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import RadioButton from "../../components/RadioButton";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import * as ExpoContacts from "expo-contacts";
+import AsyncStorage from "@react-native-community/async-storage";
 
 async function requestContactsPermission() {
   try {

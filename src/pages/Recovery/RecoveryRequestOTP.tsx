@@ -16,7 +16,11 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
-import { downloadMShare, uploadRequestedShare } from "../../store/actions/sss";
+import {
+  downloadMShare,
+  uploadRequestedShare,
+  resetRequestedShareUpload
+} from "../../store/actions/sss";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function RecoveryRequestOTP(props) {
@@ -59,11 +63,11 @@ export default function RecoveryRequestOTP(props) {
 
   useEffect(() => {
     if (requestedShareUpload[requester]) {
-      console.log(requestedShareUpload[requester]);
       if (!requestedShareUpload[requester].status) {
         Alert.alert("Upload failed", requestedShareUpload[requester].err);
       } else {
-        props.navigation.navigate("Home");
+        dispatch(resetRequestedShareUpload());
+        props.navigation.goBack();
       }
     }
   }, [requestedShareUpload]);
