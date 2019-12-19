@@ -7290,7 +7290,6 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
-				Base,
 			);
 			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
 			productRefGroup = C688F1901F29652F0FE5FB566E6BD214 /* Products */;
@@ -8626,30 +8625,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		006090048E68F64BD04CF07D8C8AF1BE /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E0D71DB81B188CC1E7F5CC75DFDE7401 /* React.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/React/React-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = React;
-				PRODUCT_NAME = React;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
 		009F4E7B114E6A98B04A56813A3B202B /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7901F78831613C25BD091809C0F620E8 /* UMPermissionsInterface.xcconfig */;
@@ -8664,53 +8639,6 @@
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
-		};
-		099BC73B88202B40F7D6BAB94E7C0E13 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = B84498106C5BC1D7CD9F2997A791EC6D /* EXRandom.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXRandom/EXRandom-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXRandom;
-				PRODUCT_NAME = EXRandom;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		0B5052AB0CF3E91D959495D45C6892CD /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1E486700FE365AFD961012560C3963D7 /* DoubleConversion.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/DoubleConversion/DoubleConversion-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = DoubleConversion;
-				PRODUCT_NAME = DoubleConversion;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
 		};
 		0C02B6BEB6C6FA2D626E480698129E89 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -8750,6 +8678,82 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
+		};
+		0E9A514BC0BB755801F8F494F3D9A668 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7032E2CB421C8943D80DCA58C3018831 /* EXKeepAwake.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXKeepAwake/EXKeepAwake-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXKeepAwake;
+				PRODUCT_NAME = EXKeepAwake;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		107A38331BA622EFD23AA607C2765C98 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 283A8075CA42B0D60E6A4ADAC253A793 /* EXPermissions.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXPermissions/EXPermissions-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXPermissions;
+				PRODUCT_NAME = EXPermissions;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		12FAC84E34D27F50918DC68E37434C4A /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A454B89A53F9AF1DFD9D64215FBBCECF /* EXWebBrowser.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXWebBrowser/EXWebBrowser-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXWebBrowser;
+				PRODUCT_NAME = EXWebBrowser;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
 		};
 		196DFA3E4A09A28224918543529A1885 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -8815,152 +8819,7 @@
 			};
 			name = Debug;
 		};
-		22D8BE23BBE7EC0CA22409F77FE22FCA /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 068461EB0A0DBB13A7CA56CB294180E3 /* EXSecureStore.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXSecureStore/EXSecureStore-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXSecureStore;
-				PRODUCT_NAME = EXSecureStore;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		247DC6527BD5C27F748347E500FAFF0C /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7A354A5B98A7A384667F482011A1E634 /* EXLinearGradient.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXLinearGradient/EXLinearGradient-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXLinearGradient;
-				PRODUCT_NAME = EXLinearGradient;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		2A9E085CD0A92FBA9A51D6E504E5107A /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 293C837170A67B0B2A9FF5AE22309D35 /* RNSVG.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/RNSVG/RNSVG-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = RNSVG;
-				PRODUCT_NAME = RNSVG;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		2AD38E81ABFCFAEF981D1A27861F06E5 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 299184A0B93D016081488ECF716CA6BF /* EXContacts.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXContacts/EXContacts-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXContacts;
-				PRODUCT_NAME = EXContacts;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		2CF649DAC0B398559A7AAE751C940B9A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2B4777B88C22B2CB59A5041478B13B19 /* EXFont.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXFont/EXFont-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXFont;
-				PRODUCT_NAME = EXFont;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		2D5127D08DB362B955ACBA3DFA0CB89A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = A454B89A53F9AF1DFD9D64215FBBCECF /* EXWebBrowser.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXWebBrowser/EXWebBrowser-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXWebBrowser;
-				PRODUCT_NAME = EXWebBrowser;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		30FAA0CE493A4C291A9F66B23635E8F1 /* Release */ = {
+		1D076E0A7F5C0B094B98EC9D8B9DD6CE /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 1E486700FE365AFD961012560C3963D7 /* DoubleConversion.xcconfig */;
 			buildSettings = {
@@ -8979,12 +8838,216 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		337079FC0FB13C8C1A58CD13D46435CC /* Release */ = {
+		23F280B2DA05728953E073E7FB40017F /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9C37C8A036E251375F4F2F483023FBD4 /* UMCore.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/UMCore/UMCore-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = UMCore;
+				PRODUCT_NAME = UMCore;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		2953790EFB1BD8A9E78C65D8FCEEACFB /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BA841DAF0215FCA63EC171B804999CE6 /* EXConstants.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXConstants/EXConstants-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXConstants;
+				PRODUCT_NAME = EXConstants;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		2BDD6CB481CA233502EAB16639F563A2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7CF5271B0FE66082B04FC3524DF6E168 /* Folly.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/Folly/Folly-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = folly;
+				PRODUCT_NAME = Folly;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		32E8469CF6182293224E7AE325847D44 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 70D337CEC0E61FAD996667C86979B152 /* RNScreens.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/RNScreens/RNScreens-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = RNScreens;
+				PRODUCT_NAME = RNScreens;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		355A610F8115B13FFF5E4FDBE7A4CD57 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 359F6E97EC424C809E97E9607E5A55D5 /* yoga.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/yoga/yoga-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = yoga;
+				PRODUCT_NAME = yoga;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		371989D182BF95DFA0EC5239D0C21ADD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 63C47CE4E7239D7E533C44CDC8549AEA /* RNReanimated.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/RNReanimated/RNReanimated-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = RNReanimated;
+				PRODUCT_NAME = RNReanimated;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		38460A807DCD322592FD68BAA05D51E5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B84498106C5BC1D7CD9F2997A791EC6D /* EXRandom.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXRandom/EXRandom-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXRandom;
+				PRODUCT_NAME = EXRandom;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		39788C2E5025D81B1F56F4F62015EC56 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 044BCC2EC71660BA31E5AC8661F58723 /* UMReactNativeAdapter.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/UMReactNativeAdapter/UMReactNativeAdapter-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = UMReactNativeAdapter;
+				PRODUCT_NAME = UMReactNativeAdapter;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		3C2209A72B905CEDAC16D43E4DA43012 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 283A8075CA42B0D60E6A4ADAC253A793 /* EXPermissions.xcconfig */;
 			buildSettings = {
@@ -9004,101 +9067,32 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		346D6C62EB6D59C2AFEA1D852F500C98 /* Debug */ = {
+		46341C80D550AA5660496DC5EDD6DB27 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 11FAA69E9DECEB5E578989473AA87D75 /* glog.xcconfig */;
+			baseConfigurationReference = 70D337CEC0E61FAD996667C86979B152 /* RNScreens.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/glog/glog-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = glog;
-				PRODUCT_NAME = glog;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		41DED995F8041E73BCD221F8125FEAF4 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1BC87C1663F033C281489A48356D69B3 /* RNDeviceInfo.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/RNDeviceInfo/RNDeviceInfo-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = RNDeviceInfo;
-				PRODUCT_NAME = RNDeviceInfo;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		451668EDB6F70E8C776DACC133D62BC6 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = CF0BCE19E98079EDCC24171D884FA6F2 /* RNGestureHandler.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/RNGestureHandler/RNGestureHandler-prefix.pch";
+				GCC_PREFIX_HEADER = "Target Support Files/RNScreens/RNScreens-prefix.pch";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = RNGestureHandler;
-				PRODUCT_NAME = RNGestureHandler;
+				PRODUCT_MODULE_NAME = RNScreens;
+				PRODUCT_NAME = RNScreens;
 				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		4D37042DC90892588747F618874DEA33 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = ED93F3395314EE3F340F9976DB31F505 /* react-native-html-to-pdf.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/react-native-html-to-pdf/react-native-html-to-pdf-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = react_native_html_to_pdf;
-				PRODUCT_NAME = "react-native-html-to-pdf";
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -9132,6 +9126,32 @@
 			};
 			name = Debug;
 		};
+		50249922A303BF655E9EEF9873D67098 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7032E2CB421C8943D80DCA58C3018831 /* EXKeepAwake.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXKeepAwake/EXKeepAwake-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXKeepAwake;
+				PRODUCT_NAME = EXKeepAwake;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		5467E0BBD3DAAE72B51C36245CC36C4F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = C8E872FC9F40B6341F8CBDB6F3F3C15F /* UMTaskManagerInterface.xcconfig */;
@@ -9146,31 +9166,84 @@
 			};
 			name = Debug;
 		};
-		582080F69AB25BEDAD089E66869DC30D /* Release */ = {
+		5B78195EA714001F01FE597B1E20C148 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7CF5271B0FE66082B04FC3524DF6E168 /* Folly.xcconfig */;
+			baseConfigurationReference = 11FAA69E9DECEB5E578989473AA87D75 /* glog.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/Folly/Folly-prefix.pch";
+				GCC_PREFIX_HEADER = "Target Support Files/glog/glog-prefix.pch";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = folly;
-				PRODUCT_NAME = Folly;
+				PRODUCT_MODULE_NAME = glog;
+				PRODUCT_NAME = glog;
 				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5BAE7DF2844C3923525A6955BDF8DE5A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 546EEE7C38CA3F15F4D899CDFA7B1C6B /* boost-for-react-native.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5CCD0C0244EA6AC8EE74B9F725BAB5DF /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E0D71DB81B188CC1E7F5CC75DFDE7401 /* React.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/React/React-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = React;
+				PRODUCT_NAME = React;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		5843584095DD262251485E573B0220B1 /* Debug */ = {
+		5DC883AB0B0414AD48BB3AB4F3269D66 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A981AF8434A24F1A0C7360F5AF1A0169 /* UMConstantsInterface.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6149F2722D83BD065079977A08A3C877 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A8B9AD6548A08A51420C99BE04D30745 /* react-native-randombytes.xcconfig */;
 			buildSettings = {
@@ -9189,131 +9262,61 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		5929669FEAA1084FAF741E4797B30AD8 /* Debug */ = {
+		6326DEB19C916138F5CCE1D5B60A74F0 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 359F6E97EC424C809E97E9607E5A55D5 /* yoga.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/yoga/yoga-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = yoga;
-				PRODUCT_NAME = yoga;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		5AE18CE3CAD0A7E16A0B4464F2ED7BC7 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = CF0BCE19E98079EDCC24171D884FA6F2 /* RNGestureHandler.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/RNGestureHandler/RNGestureHandler-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = RNGestureHandler;
-				PRODUCT_NAME = RNGestureHandler;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		5BAE7DF2844C3923525A6955BDF8DE5A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 546EEE7C38CA3F15F4D899CDFA7B1C6B /* boost-for-react-native.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		5BB9D9E7C75138BAB1D5EE6C22120C31 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 283A8075CA42B0D60E6A4ADAC253A793 /* EXPermissions.xcconfig */;
+			baseConfigurationReference = 299184A0B93D016081488ECF716CA6BF /* EXContacts.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXPermissions/EXPermissions-prefix.pch";
+				GCC_PREFIX_HEADER = "Target Support Files/EXContacts/EXContacts-prefix.pch";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXPermissions;
-				PRODUCT_NAME = EXPermissions;
+				PRODUCT_MODULE_NAME = EXContacts;
+				PRODUCT_NAME = EXContacts;
 				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		5DC883AB0B0414AD48BB3AB4F3269D66 /* Release */ = {
+		6513D57E09C36B05CF916F7E8A662077 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A981AF8434A24F1A0C7360F5AF1A0169 /* UMConstantsInterface.xcconfig */;
+			baseConfigurationReference = FFBE954285117F2BDEF4F6DCAF6BE798 /* EXFileSystem.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXFileSystem/EXFileSystem-prefix.pch";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXFileSystem;
+				PRODUCT_NAME = EXFileSystem;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
-		};
-		63CE7EAEEE40CC82D239D9D92FF3027B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7A354A5B98A7A384667F482011A1E634 /* EXLinearGradient.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXLinearGradient/EXLinearGradient-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXLinearGradient;
-				PRODUCT_NAME = EXLinearGradient;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
 		};
 		65EB1A7A5D1465B289935D8C2F1BBD30 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -9356,6 +9359,55 @@
 			};
 			name = Release;
 		};
+		678E43FFB17DC0E8CE054064777173D6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E0D71DB81B188CC1E7F5CC75DFDE7401 /* React.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/React/React-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = React;
+				PRODUCT_NAME = React;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6A441642FC3FFE19200089E9B23E8FF7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 63C47CE4E7239D7E533C44CDC8549AEA /* RNReanimated.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/RNReanimated/RNReanimated-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = RNReanimated;
+				PRODUCT_NAME = RNReanimated;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		6BF70C686C798EFFB57237DC98500513 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7901F78831613C25BD091809C0F620E8 /* UMPermissionsInterface.xcconfig */;
@@ -9366,6 +9418,55 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		737D073839062785B358E9BE4DD325CA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 044BCC2EC71660BA31E5AC8661F58723 /* UMReactNativeAdapter.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/UMReactNativeAdapter/UMReactNativeAdapter-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = UMReactNativeAdapter;
+				PRODUCT_NAME = UMReactNativeAdapter;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7517F9E40868037D9A09A37D9CF7879D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6840E8EDA6338288B85D0C129C42D53A /* RNCAsyncStorage.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/RNCAsyncStorage/RNCAsyncStorage-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = RNCAsyncStorage;
+				PRODUCT_NAME = RNCAsyncStorage;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -9410,29 +9511,30 @@
 			};
 			name = Debug;
 		};
-		783A62B13F9DD7618BCF7244CD676BAA /* Release */ = {
+		78DB800C1263FF7DD1C1FDC2C665A2B6 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 70D337CEC0E61FAD996667C86979B152 /* RNScreens.xcconfig */;
+			baseConfigurationReference = 7A354A5B98A7A384667F482011A1E634 /* EXLinearGradient.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/RNScreens/RNScreens-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				GCC_PREFIX_HEADER = "Target Support Files/EXLinearGradient/EXLinearGradient-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = RNScreens;
-				PRODUCT_NAME = RNScreens;
+				PRODUCT_MODULE_NAME = EXLinearGradient;
+				PRODUCT_NAME = EXLinearGradient;
 				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
 			};
-			name = Release;
+			name = Debug;
 		};
 		79B3E0F885BF8B866097919EC7654A4B /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -9447,6 +9549,31 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
+		};
+		7D99E7A973DFAD38B1B956C1380A1E0C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 293C837170A67B0B2A9FF5AE22309D35 /* RNSVG.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/RNSVG/RNSVG-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = RNSVG;
+				PRODUCT_NAME = RNSVG;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
 		};
 		7ED2663CADBE5D8B55630D2A2DBE74FD /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -9463,25 +9590,53 @@
 			};
 			name = Release;
 		};
-		82A6F5C3C086B1FA10CFE1CA67E0844F /* Debug */ = {
+		81810FDF89C3599029549CED500F6DB8 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1BC87C1663F033C281489A48356D69B3 /* RNDeviceInfo.xcconfig */;
+			baseConfigurationReference = 7A354A5B98A7A384667F482011A1E634 /* EXLinearGradient.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/RNDeviceInfo/RNDeviceInfo-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				GCC_PREFIX_HEADER = "Target Support Files/EXLinearGradient/EXLinearGradient-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = RNDeviceInfo;
-				PRODUCT_NAME = RNDeviceInfo;
+				PRODUCT_MODULE_NAME = EXLinearGradient;
+				PRODUCT_NAME = EXLinearGradient;
 				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		83397D6AC147BB15D1360B863354BE6E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C9C7CD5AEEF6CAFAD05D97C28CF403E6 /* EXAppLoaderProvider.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXAppLoaderProvider/EXAppLoaderProvider-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXAppLoaderProvider;
+				PRODUCT_NAME = EXAppLoaderProvider;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -9501,56 +9656,7 @@
 			};
 			name = Release;
 		};
-		844A484943A4015909BC7AFF0FE1A66E /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 068461EB0A0DBB13A7CA56CB294180E3 /* EXSecureStore.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXSecureStore/EXSecureStore-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXSecureStore;
-				PRODUCT_NAME = EXSecureStore;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		84656029028D7372794E55D736A7D365 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FFBE954285117F2BDEF4F6DCAF6BE798 /* EXFileSystem.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXFileSystem/EXFileSystem-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXFileSystem;
-				PRODUCT_NAME = EXFileSystem;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		8B833AFF88CFEFA7CC1A90DDBDE0F287 /* Release */ = {
+		87598C9B790157DE7C207F97B2A9C25B /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 299184A0B93D016081488ECF716CA6BF /* EXContacts.xcconfig */;
 			buildSettings = {
@@ -9570,212 +9676,37 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		932715893B5D8A998947BDF948EDEA0F /* Debug */ = {
+		8CA11A54CDE332C5341A8BB42E4D4E53 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3A526D0390273423BF9F443B94C64BF5 /* UMBarCodeScannerInterface.xcconfig */;
+			baseConfigurationReference = CF0BCE19E98079EDCC24171D884FA6F2 /* RNGestureHandler.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/RNGestureHandler/RNGestureHandler-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = RNGestureHandler;
+				PRODUCT_NAME = RNGestureHandler;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		9570C6D1F2EF5176443A4E0217E6F4D9 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 11FAA69E9DECEB5E578989473AA87D75 /* glog.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/glog/glog-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = glog;
-				PRODUCT_NAME = glog;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		99053FDEE62615336D386E0CD69EDC16 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 359F6E97EC424C809E97E9607E5A55D5 /* yoga.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/yoga/yoga-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = yoga;
-				PRODUCT_NAME = yoga;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		9CAE17F3AEAA92514573A6AFC28F58F8 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 670FFED66245269944835CB47393B988 /* UMFaceDetectorInterface.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		9E9CB378550C377DF0962B393357B8DE /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = ED93F3395314EE3F340F9976DB31F505 /* react-native-html-to-pdf.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/react-native-html-to-pdf/react-native-html-to-pdf-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = react_native_html_to_pdf;
-				PRODUCT_NAME = "react-native-html-to-pdf";
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		A0CE7427B29B950D5C3D9D14D5F0956F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = A981AF8434A24F1A0C7360F5AF1A0169 /* UMConstantsInterface.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		A1F040D3C7F85DFCB7EF5ADB3DA3C311 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2B4777B88C22B2CB59A5041478B13B19 /* EXFont.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXFont/EXFont-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXFont;
-				PRODUCT_NAME = EXFont;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		A98AB95E4E0BDC99DBD7D6B29E788B84 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 779A31C53AB553A19540467815DBC3B5 /* react-native-video.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/react-native-video/react-native-video-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = react_native_video;
-				PRODUCT_NAME = "react-native-video";
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		A9EF79AC7613BA0E695AB49D67766860 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7CF5271B0FE66082B04FC3524DF6E168 /* Folly.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/Folly/Folly-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = folly;
-				PRODUCT_NAME = Folly;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		AA3C608C1EFBFF6195298DABF3846DE1 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 220C2D0E400CDC66D40E897FD6ABE23A /* UMSensorsInterface.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		AB12FE21A483E604127CB887A19228D4 /* Debug */ = {
+		9196DE162BF6BE7FB5BC55DF69E5C5D6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9C37C8A036E251375F4F2F483023FBD4 /* UMCore.xcconfig */;
 			buildSettings = {
@@ -9795,6 +9726,386 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		92705EC75960144200E5BA52665C4BEA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 359F6E97EC424C809E97E9607E5A55D5 /* yoga.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/yoga/yoga-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = yoga;
+				PRODUCT_NAME = yoga;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		932715893B5D8A998947BDF948EDEA0F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3A526D0390273423BF9F443B94C64BF5 /* UMBarCodeScannerInterface.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9604AA22DAA9813C617001945DA2905B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B84498106C5BC1D7CD9F2997A791EC6D /* EXRandom.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXRandom/EXRandom-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXRandom;
+				PRODUCT_NAME = EXRandom;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9650C0C9C7943243C15290426069BE5A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 743234C3619EA0CA1ABC24B1FA15F758 /* EXSQLite.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXSQLite/EXSQLite-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXSQLite;
+				PRODUCT_NAME = EXSQLite;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		970934DF8EE274F0F30F983B3320F076 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 743234C3619EA0CA1ABC24B1FA15F758 /* EXSQLite.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXSQLite/EXSQLite-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXSQLite;
+				PRODUCT_NAME = EXSQLite;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		98D1BE1C631327534141623ED69DFAB0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FFBE954285117F2BDEF4F6DCAF6BE798 /* EXFileSystem.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXFileSystem/EXFileSystem-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXFileSystem;
+				PRODUCT_NAME = EXFileSystem;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9CAE17F3AEAA92514573A6AFC28F58F8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 670FFED66245269944835CB47393B988 /* UMFaceDetectorInterface.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9D7C7C3A1425C18171275C2A383FA8CE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1BC87C1663F033C281489A48356D69B3 /* RNDeviceInfo.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/RNDeviceInfo/RNDeviceInfo-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = RNDeviceInfo;
+				PRODUCT_NAME = RNDeviceInfo;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9E4629B8ED285910D0D6496669F9B8B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 11FAA69E9DECEB5E578989473AA87D75 /* glog.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/glog/glog-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = glog;
+				PRODUCT_NAME = glog;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9F110BCA7685A89644D4F4C4A207157F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7CF5271B0FE66082B04FC3524DF6E168 /* Folly.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/Folly/Folly-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = folly;
+				PRODUCT_NAME = Folly;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A0CE7427B29B950D5C3D9D14D5F0956F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A981AF8434A24F1A0C7360F5AF1A0169 /* UMConstantsInterface.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A1128026191BE0B7C480B8DB3E0ECB12 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2B4777B88C22B2CB59A5041478B13B19 /* EXFont.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXFont/EXFont-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXFont;
+				PRODUCT_NAME = EXFont;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A1A5ECC15436861A9A03EC29E1DDFB80 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 293C837170A67B0B2A9FF5AE22309D35 /* RNSVG.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/RNSVG/RNSVG-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = RNSVG;
+				PRODUCT_NAME = RNSVG;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A277844B4179003213DB9934C5F3D678 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3B5239C4475227922D877A5169E745BD /* EXLocation.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXLocation/EXLocation-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXLocation;
+				PRODUCT_NAME = EXLocation;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A8C1E9F4FD518EE364EB181F809B8288 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3B5239C4475227922D877A5169E745BD /* EXLocation.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXLocation/EXLocation-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXLocation;
+				PRODUCT_NAME = EXLocation;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A9DDD88892F0185431CE2D7B008B8C4E /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A8B9AD6548A08A51420C99BE04D30745 /* react-native-randombytes.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/react-native-randombytes/react-native-randombytes-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = react_native_randombytes;
+				PRODUCT_NAME = "react-native-randombytes";
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AA3C608C1EFBFF6195298DABF3846DE1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 220C2D0E400CDC66D40E897FD6ABE23A /* UMSensorsInterface.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -9921,7 +10232,150 @@
 			};
 			name = Release;
 		};
-		B1DA7B8F876C5DA29436161FBE0B5966 /* Release */ = {
+		B03A301E27366E28A1EFA09BB9516F48 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = ED93F3395314EE3F340F9976DB31F505 /* react-native-html-to-pdf.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/react-native-html-to-pdf/react-native-html-to-pdf-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = react_native_html_to_pdf;
+				PRODUCT_NAME = "react-native-html-to-pdf";
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B32EDFE85F305B91543F6E6AC7AC59AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2D3D545B6E7AB6E22E78BEE7A127BCB0 /* UMFileSystemInterface.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		B42D017C6D860A3F2FBE85BB31D36C04 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2B4777B88C22B2CB59A5041478B13B19 /* EXFont.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXFont/EXFont-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXFont;
+				PRODUCT_NAME = EXFont;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		B6C3F6BA22869B1FE7AC06CF26F93C6C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 546EEE7C38CA3F15F4D899CDFA7B1C6B /* boost-for-react-native.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BE5AE6E1F2B58CFF3217A86780F6336C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4D0B438411646EA2F3E0597FBAB93327 /* UMCameraInterface.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BFA8D06B767734EECC80665B75DDF785 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1E486700FE365AFD961012560C3963D7 /* DoubleConversion.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/DoubleConversion/DoubleConversion-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = DoubleConversion;
+				PRODUCT_NAME = DoubleConversion;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C053CFC528E471BD26CB6977AFCEF3DB /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6840E8EDA6338288B85D0C129C42D53A /* RNCAsyncStorage.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/RNCAsyncStorage/RNCAsyncStorage-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = RNCAsyncStorage;
+				PRODUCT_NAME = RNCAsyncStorage;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C1413F798E37FBF0F0B0CBF49398107C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BA841DAF0215FCA63EC171B804999CE6 /* EXConstants.xcconfig */;
 			buildSettings = {
@@ -9941,242 +10395,7 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		B32EDFE85F305B91543F6E6AC7AC59AD /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2D3D545B6E7AB6E22E78BEE7A127BCB0 /* UMFileSystemInterface.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		B51CCF622C950AF0C795A047DEBC1C75 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 044BCC2EC71660BA31E5AC8661F58723 /* UMReactNativeAdapter.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/UMReactNativeAdapter/UMReactNativeAdapter-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = UMReactNativeAdapter;
-				PRODUCT_NAME = UMReactNativeAdapter;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		B6C3F6BA22869B1FE7AC06CF26F93C6C /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 546EEE7C38CA3F15F4D899CDFA7B1C6B /* boost-for-react-native.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		B6C7034271AD612C0CE2EE28606818D0 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = C9C7CD5AEEF6CAFAD05D97C28CF403E6 /* EXAppLoaderProvider.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXAppLoaderProvider/EXAppLoaderProvider-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXAppLoaderProvider;
-				PRODUCT_NAME = EXAppLoaderProvider;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		B6F6F7FCDB96EF02E4F17C3FC4ECE9EB /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9C37C8A036E251375F4F2F483023FBD4 /* UMCore.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/UMCore/UMCore-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = UMCore;
-				PRODUCT_NAME = UMCore;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		B700C4F626481C654E377CEBB6186F5E /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 63C47CE4E7239D7E533C44CDC8549AEA /* RNReanimated.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/RNReanimated/RNReanimated-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = RNReanimated;
-				PRODUCT_NAME = RNReanimated;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		B79764148D35C3C80501CE3F189D8BBC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 779A31C53AB553A19540467815DBC3B5 /* react-native-video.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/react-native-video/react-native-video-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = react_native_video;
-				PRODUCT_NAME = "react-native-video";
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		B8D46E1C5FBB498BF9D23E015AEBF2E8 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 70D337CEC0E61FAD996667C86979B152 /* RNScreens.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/RNScreens/RNScreens-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = RNScreens;
-				PRODUCT_NAME = RNScreens;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		BE5AE6E1F2B58CFF3217A86780F6336C /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4D0B438411646EA2F3E0597FBAB93327 /* UMCameraInterface.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		BEA641D5851D41F1304AEEF1C7EFC4F4 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = C9C7CD5AEEF6CAFAD05D97C28CF403E6 /* EXAppLoaderProvider.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXAppLoaderProvider/EXAppLoaderProvider-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXAppLoaderProvider;
-				PRODUCT_NAME = EXAppLoaderProvider;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		C3480FCDCA5C5F127DEBD61F15D98240 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6840E8EDA6338288B85D0C129C42D53A /* RNCAsyncStorage.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/RNCAsyncStorage/RNCAsyncStorage-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = RNCAsyncStorage;
-				PRODUCT_NAME = RNCAsyncStorage;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -10206,123 +10425,52 @@
 			};
 			name = Debug;
 		};
-		D67F492D20BE2D9B1B95AB2AE57FC383 /* Release */ = {
+		D806CEAC4FA5B7E6664392A789CEFF79 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A454B89A53F9AF1DFD9D64215FBBCECF /* EXWebBrowser.xcconfig */;
+			baseConfigurationReference = 068461EB0A0DBB13A7CA56CB294180E3 /* EXSecureStore.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXWebBrowser/EXWebBrowser-prefix.pch";
+				GCC_PREFIX_HEADER = "Target Support Files/EXSecureStore/EXSecureStore-prefix.pch";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXWebBrowser;
-				PRODUCT_NAME = EXWebBrowser;
+				PRODUCT_MODULE_NAME = EXSecureStore;
+				PRODUCT_NAME = EXSecureStore;
 				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		D8B1019F5745609A0FF4625871DBB4F8 /* Release */ = {
+		DB9E714E74F88B6DD317822487883DBA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AD19EE81C2A8B5A3B5CF09A30D3E6AC0 /* react-native-netinfo.xcconfig */;
+			baseConfigurationReference = 1BC87C1663F033C281489A48356D69B3 /* RNDeviceInfo.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/react-native-netinfo/react-native-netinfo-prefix.pch";
+				GCC_PREFIX_HEADER = "Target Support Files/RNDeviceInfo/RNDeviceInfo-prefix.pch";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = react_native_netinfo;
-				PRODUCT_NAME = "react-native-netinfo";
+				PRODUCT_MODULE_NAME = RNDeviceInfo;
+				PRODUCT_NAME = RNDeviceInfo;
 				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		D9A5F690F786A9BD6E74CB8FCA8571E3 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7032E2CB421C8943D80DCA58C3018831 /* EXKeepAwake.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXKeepAwake/EXKeepAwake-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXKeepAwake;
-				PRODUCT_NAME = EXKeepAwake;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		DA81CC4F587D4E8C3DA18C72FB266434 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = AD19EE81C2A8B5A3B5CF09A30D3E6AC0 /* react-native-netinfo.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/react-native-netinfo/react-native-netinfo-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = react_native_netinfo;
-				PRODUCT_NAME = "react-native-netinfo";
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		DD270D435ECE155F15160AC84E97BDB5 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = B84498106C5BC1D7CD9F2997A791EC6D /* EXRandom.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXRandom/EXRandom-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXRandom;
-				PRODUCT_NAME = EXRandom;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -10343,315 +10491,226 @@
 			};
 			name = Release;
 		};
-		E034B48E1C5A34D9A0EDBDF9C5133CAB /* Release */ = {
+		E809830BD2056118488E6C90EDEC186C /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 743234C3619EA0CA1ABC24B1FA15F758 /* EXSQLite.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXSQLite/EXSQLite-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXSQLite;
-				PRODUCT_NAME = EXSQLite;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		E05DC453BFCDB2F24750FDCA0AB2F57A /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3B5239C4475227922D877A5169E745BD /* EXLocation.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXLocation/EXLocation-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXLocation;
-				PRODUCT_NAME = EXLocation;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		E6DBE0D7408E7ED2EE58748C09F2764D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 293C837170A67B0B2A9FF5AE22309D35 /* RNSVG.xcconfig */;
+			baseConfigurationReference = ED93F3395314EE3F340F9976DB31F505 /* react-native-html-to-pdf.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/RNSVG/RNSVG-prefix.pch";
+				GCC_PREFIX_HEADER = "Target Support Files/react-native-html-to-pdf/react-native-html-to-pdf-prefix.pch";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = RNSVG;
-				PRODUCT_NAME = RNSVG;
+				PRODUCT_MODULE_NAME = react_native_html_to_pdf;
+				PRODUCT_NAME = "react-native-html-to-pdf";
 				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
-			name = Debug;
+			name = Release;
 		};
-		E739B0F4C6D749CD7AC66F568A67B345 /* Release */ = {
+		EA99698342FF9F26D64D62357BA23E05 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6840E8EDA6338288B85D0C129C42D53A /* RNCAsyncStorage.xcconfig */;
+			baseConfigurationReference = AD19EE81C2A8B5A3B5CF09A30D3E6AC0 /* react-native-netinfo.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/RNCAsyncStorage/RNCAsyncStorage-prefix.pch";
+				GCC_PREFIX_HEADER = "Target Support Files/react-native-netinfo/react-native-netinfo-prefix.pch";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = RNCAsyncStorage;
-				PRODUCT_NAME = RNCAsyncStorage;
+				PRODUCT_MODULE_NAME = react_native_netinfo;
+				PRODUCT_NAME = "react-native-netinfo";
 				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		E76A43EAB8C119D6AF6F5D27D681E596 /* Release */ = {
+		EB9D4FF27A66AB5460886EA1D7F6EF2D /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 044BCC2EC71660BA31E5AC8661F58723 /* UMReactNativeAdapter.xcconfig */;
+			baseConfigurationReference = 779A31C53AB553A19540467815DBC3B5 /* react-native-video.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/UMReactNativeAdapter/UMReactNativeAdapter-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				GCC_PREFIX_HEADER = "Target Support Files/react-native-video/react-native-video-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = UMReactNativeAdapter;
-				PRODUCT_NAME = UMReactNativeAdapter;
+				PRODUCT_MODULE_NAME = react_native_video;
+				PRODUCT_NAME = "react-native-video";
 				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		E93B475CAC02FC0B5D17C6369836FE8C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3B5239C4475227922D877A5169E745BD /* EXLocation.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXLocation/EXLocation-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXLocation;
-				PRODUCT_NAME = EXLocation;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		E9406309DF7E38FE5851830DC04E68A9 /* Debug */ = {
+		F5317622CF38820F2468A09116FA8344 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 63C47CE4E7239D7E533C44CDC8549AEA /* RNReanimated.xcconfig */;
+			baseConfigurationReference = CF0BCE19E98079EDCC24171D884FA6F2 /* RNGestureHandler.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/RNReanimated/RNReanimated-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = RNReanimated;
-				PRODUCT_NAME = RNReanimated;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		ED88AAC1F581C314E95A1FB31F89C24E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = BA841DAF0215FCA63EC171B804999CE6 /* EXConstants.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXConstants/EXConstants-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXConstants;
-				PRODUCT_NAME = EXConstants;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		ED8F518E1C694F9B9EDA2BC86DA45B83 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FFBE954285117F2BDEF4F6DCAF6BE798 /* EXFileSystem.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXFileSystem/EXFileSystem-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXFileSystem;
-				PRODUCT_NAME = EXFileSystem;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		F2F8803547468D8B8979643D9A71EA3D /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = A8B9AD6548A08A51420C99BE04D30745 /* react-native-randombytes.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/react-native-randombytes/react-native-randombytes-prefix.pch";
+				GCC_PREFIX_HEADER = "Target Support Files/RNGestureHandler/RNGestureHandler-prefix.pch";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = react_native_randombytes;
-				PRODUCT_NAME = "react-native-randombytes";
+				PRODUCT_MODULE_NAME = RNGestureHandler;
+				PRODUCT_NAME = RNGestureHandler;
 				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		F5082D99280571E3939F8CE70F2C6F71 /* Debug */ = {
+		F59F0D772DF91BB788096ED8808C56B2 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7032E2CB421C8943D80DCA58C3018831 /* EXKeepAwake.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXKeepAwake/EXKeepAwake-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXKeepAwake;
-				PRODUCT_NAME = EXKeepAwake;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		F51262B2E48C4BA6C8DE5E7F6ED4A026 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 743234C3619EA0CA1ABC24B1FA15F758 /* EXSQLite.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/EXSQLite/EXSQLite-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = EXSQLite;
-				PRODUCT_NAME = EXSQLite;
-				PUBLIC_HEADERS_FOLDER_PATH = "";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		F931DB40E9B3266D660B12248D2A9ADA /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E0D71DB81B188CC1E7F5CC75DFDE7401 /* React.xcconfig */;
+			baseConfigurationReference = AD19EE81C2A8B5A3B5CF09A30D3E6AC0 /* react-native-netinfo.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				GCC_PREFIX_HEADER = "Target Support Files/React/React-prefix.pch";
+				GCC_PREFIX_HEADER = "Target Support Files/react-native-netinfo/react-native-netinfo-prefix.pch";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
-				PRODUCT_MODULE_NAME = React;
-				PRODUCT_NAME = React;
+				PRODUCT_MODULE_NAME = react_native_netinfo;
+				PRODUCT_NAME = "react-native-netinfo";
 				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		FA402AD52FB31D9F7215703DB1B44B09 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C9C7CD5AEEF6CAFAD05D97C28CF403E6 /* EXAppLoaderProvider.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXAppLoaderProvider/EXAppLoaderProvider-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXAppLoaderProvider;
+				PRODUCT_NAME = EXAppLoaderProvider;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		FB07E6977070F8E59EF014F06F5DFEBB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 068461EB0A0DBB13A7CA56CB294180E3 /* EXSecureStore.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXSecureStore/EXSecureStore-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXSecureStore;
+				PRODUCT_NAME = EXSecureStore;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		FBFFAAAD143D5203AF55B1DFDE1C9F19 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 779A31C53AB553A19540467815DBC3B5 /* react-native-video.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/react-native-video/react-native-video-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = react_native_video;
+				PRODUCT_NAME = "react-native-video";
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		FC71C31E2668416B9072953D27DC64CE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A454B89A53F9AF1DFD9D64215FBBCECF /* EXWebBrowser.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				GCC_PREFIX_HEADER = "Target Support Files/EXWebBrowser/EXWebBrowser-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_MODULE_NAME = EXWebBrowser;
+				PRODUCT_NAME = EXWebBrowser;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -10662,8 +10721,8 @@
 		0569CCDF3B3B687CF01EE8D4001AA7CC /* Build configuration list for PBXNativeTarget "DoubleConversion" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				0B5052AB0CF3E91D959495D45C6892CD /* Debug */,
-				30FAA0CE493A4C291A9F66B23635E8F1 /* Release */,
+				BFA8D06B767734EECC80665B75DDF785 /* Debug */,
+				1D076E0A7F5C0B094B98EC9D8B9DD6CE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10671,8 +10730,8 @@
 		06913B6544249EF767AD12F912D91905 /* Build configuration list for PBXNativeTarget "yoga" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				5929669FEAA1084FAF741E4797B30AD8 /* Debug */,
-				99053FDEE62615336D386E0CD69EDC16 /* Release */,
+				92705EC75960144200E5BA52665C4BEA /* Debug */,
+				355A610F8115B13FFF5E4FDBE7A4CD57 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10680,8 +10739,8 @@
 		08C4767D793682C307862495EDFC6F37 /* Build configuration list for PBXNativeTarget "EXWebBrowser" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2D5127D08DB362B955ACBA3DFA0CB89A /* Debug */,
-				D67F492D20BE2D9B1B95AB2AE57FC383 /* Release */,
+				FC71C31E2668416B9072953D27DC64CE /* Debug */,
+				12FAC84E34D27F50918DC68E37434C4A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10689,8 +10748,8 @@
 		097AF50B67E3908773078466CE352AD4 /* Build configuration list for PBXNativeTarget "EXAppLoaderProvider" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				B6C7034271AD612C0CE2EE28606818D0 /* Debug */,
-				BEA641D5851D41F1304AEEF1C7EFC4F4 /* Release */,
+				83397D6AC147BB15D1360B863354BE6E /* Debug */,
+				FA402AD52FB31D9F7215703DB1B44B09 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10716,8 +10775,8 @@
 		1F60A19FB20118BAECFD4E1DDF7B4B0B /* Build configuration list for PBXNativeTarget "EXConstants" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				ED88AAC1F581C314E95A1FB31F89C24E /* Debug */,
-				B1DA7B8F876C5DA29436161FBE0B5966 /* Release */,
+				C1413F798E37FBF0F0B0CBF49398107C /* Debug */,
+				2953790EFB1BD8A9E78C65D8FCEEACFB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10734,8 +10793,8 @@
 		286BB7E7AEBC7BF39D7841C4DDDFE995 /* Build configuration list for PBXNativeTarget "EXContacts" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2AD38E81ABFCFAEF981D1A27861F06E5 /* Debug */,
-				8B833AFF88CFEFA7CC1A90DDBDE0F287 /* Release */,
+				6326DEB19C916138F5CCE1D5B60A74F0 /* Debug */,
+				87598C9B790157DE7C207F97B2A9C25B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10743,8 +10802,8 @@
 		2B6428FFF38416BBA79908FC75D55142 /* Build configuration list for PBXNativeTarget "RNDeviceInfo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				82A6F5C3C086B1FA10CFE1CA67E0844F /* Debug */,
-				41DED995F8041E73BCD221F8125FEAF4 /* Release */,
+				9D7C7C3A1425C18171275C2A383FA8CE /* Debug */,
+				DB9E714E74F88B6DD317822487883DBA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10752,8 +10811,8 @@
 		2EE2205F0CF18F86CE454E8D76FCE1D9 /* Build configuration list for PBXNativeTarget "EXLinearGradient" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				63CE7EAEEE40CC82D239D9D92FF3027B /* Debug */,
-				247DC6527BD5C27F748347E500FAFF0C /* Release */,
+				78DB800C1263FF7DD1C1FDC2C665A2B6 /* Debug */,
+				81810FDF89C3599029549CED500F6DB8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10797,8 +10856,8 @@
 		63856FF929326F4C9C4843BBAB8FFB21 /* Build configuration list for PBXNativeTarget "Folly" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A9EF79AC7613BA0E695AB49D67766860 /* Debug */,
-				582080F69AB25BEDAD089E66869DC30D /* Release */,
+				9F110BCA7685A89644D4F4C4A207157F /* Debug */,
+				2BDD6CB481CA233502EAB16639F563A2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10833,8 +10892,8 @@
 		694A8CE4B2F3D4A51F73B435FF654E3C /* Build configuration list for PBXNativeTarget "EXPermissions" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				5BB9D9E7C75138BAB1D5EE6C22120C31 /* Debug */,
-				337079FC0FB13C8C1A58CD13D46435CC /* Release */,
+				107A38331BA622EFD23AA607C2765C98 /* Debug */,
+				3C2209A72B905CEDAC16D43E4DA43012 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10851,8 +10910,8 @@
 		700F96780E1976367ECB74AB250D0CB6 /* Build configuration list for PBXNativeTarget "UMCore" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				AB12FE21A483E604127CB887A19228D4 /* Debug */,
-				B6F6F7FCDB96EF02E4F17C3FC4ECE9EB /* Release */,
+				9196DE162BF6BE7FB5BC55DF69E5C5D6 /* Debug */,
+				23F280B2DA05728953E073E7FB40017F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10860,8 +10919,8 @@
 		7AD4AECB6A1752111D1AB4CAC9E31F80 /* Build configuration list for PBXNativeTarget "RNSVG" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E6DBE0D7408E7ED2EE58748C09F2764D /* Debug */,
-				2A9E085CD0A92FBA9A51D6E504E5107A /* Release */,
+				A1A5ECC15436861A9A03EC29E1DDFB80 /* Debug */,
+				7D99E7A973DFAD38B1B956C1380A1E0C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10878,8 +10937,8 @@
 		8B0E35CF593D9C608A42A5318387BC8B /* Build configuration list for PBXNativeTarget "EXRandom" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				099BC73B88202B40F7D6BAB94E7C0E13 /* Debug */,
-				DD270D435ECE155F15160AC84E97BDB5 /* Release */,
+				9604AA22DAA9813C617001945DA2905B /* Debug */,
+				38460A807DCD322592FD68BAA05D51E5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10887,8 +10946,8 @@
 		913138D43225773C4430483BA181BA0E /* Build configuration list for PBXNativeTarget "RNGestureHandler" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				5AE18CE3CAD0A7E16A0B4464F2ED7BC7 /* Debug */,
-				451668EDB6F70E8C776DACC133D62BC6 /* Release */,
+				8CA11A54CDE332C5341A8BB42E4D4E53 /* Debug */,
+				F5317622CF38820F2468A09116FA8344 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10896,8 +10955,8 @@
 		9C9BBD800CA78A84605951B2BA7A9D53 /* Build configuration list for PBXNativeTarget "React" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				F931DB40E9B3266D660B12248D2A9ADA /* Debug */,
-				006090048E68F64BD04CF07D8C8AF1BE /* Release */,
+				678E43FFB17DC0E8CE054064777173D6 /* Debug */,
+				5CCD0C0244EA6AC8EE74B9F725BAB5DF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10905,8 +10964,8 @@
 		A5006B87774AE59DF205B12C414EF99C /* Build configuration list for PBXNativeTarget "react-native-html-to-pdf" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4D37042DC90892588747F618874DEA33 /* Debug */,
-				9E9CB378550C377DF0962B393357B8DE /* Release */,
+				B03A301E27366E28A1EFA09BB9516F48 /* Debug */,
+				E809830BD2056118488E6C90EDEC186C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10914,8 +10973,8 @@
 		A508DCBBFBBE5ACA7CF4A44DCDCE09EC /* Build configuration list for PBXNativeTarget "RNReanimated" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E9406309DF7E38FE5851830DC04E68A9 /* Debug */,
-				B700C4F626481C654E377CEBB6186F5E /* Release */,
+				371989D182BF95DFA0EC5239D0C21ADD /* Debug */,
+				6A441642FC3FFE19200089E9B23E8FF7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10923,8 +10982,8 @@
 		A5E26912396C0872A0828DE4C5B01B85 /* Build configuration list for PBXNativeTarget "EXFont" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2CF649DAC0B398559A7AAE751C940B9A /* Debug */,
-				A1F040D3C7F85DFCB7EF5ADB3DA3C311 /* Release */,
+				A1128026191BE0B7C480B8DB3E0ECB12 /* Debug */,
+				B42D017C6D860A3F2FBE85BB31D36C04 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10932,8 +10991,8 @@
 		C5BBA73A30BF0E404D993D09476101C3 /* Build configuration list for PBXNativeTarget "EXLocation" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E93B475CAC02FC0B5D17C6369836FE8C /* Debug */,
-				E05DC453BFCDB2F24750FDCA0AB2F57A /* Release */,
+				A277844B4179003213DB9934C5F3D678 /* Debug */,
+				A8C1E9F4FD518EE364EB181F809B8288 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10950,8 +11009,8 @@
 		D1F6C76ED5163E7759B6950D3E493582 /* Build configuration list for PBXNativeTarget "UMReactNativeAdapter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				B51CCF622C950AF0C795A047DEBC1C75 /* Debug */,
-				E76A43EAB8C119D6AF6F5D27D681E596 /* Release */,
+				737D073839062785B358E9BE4DD325CA /* Debug */,
+				39788C2E5025D81B1F56F4F62015EC56 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10959,8 +11018,8 @@
 		DBCE0E8A55B3887D34AD4504CA29D4AC /* Build configuration list for PBXNativeTarget "react-native-video" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				B79764148D35C3C80501CE3F189D8BBC /* Debug */,
-				A98AB95E4E0BDC99DBD7D6B29E788B84 /* Release */,
+				EB9D4FF27A66AB5460886EA1D7F6EF2D /* Debug */,
+				FBFFAAAD143D5203AF55B1DFDE1C9F19 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10968,8 +11027,8 @@
 		DCC33DEBD9C9202AA5B666B36285A9D4 /* Build configuration list for PBXNativeTarget "react-native-netinfo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				DA81CC4F587D4E8C3DA18C72FB266434 /* Debug */,
-				D8B1019F5745609A0FF4625871DBB4F8 /* Release */,
+				F59F0D772DF91BB788096ED8808C56B2 /* Debug */,
+				EA99698342FF9F26D64D62357BA23E05 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -10977,8 +11036,8 @@
 		DD0690375E475E04D44DEDC55D553B0E /* Build configuration list for PBXNativeTarget "glog" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				346D6C62EB6D59C2AFEA1D852F500C98 /* Debug */,
-				9570C6D1F2EF5176443A4E0217E6F4D9 /* Release */,
+				5B78195EA714001F01FE597B1E20C148 /* Debug */,
+				9E4629B8ED285910D0D6496669F9B8B1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -11004,8 +11063,8 @@
 		E036FFB87BA8298B55146E726DD4A888 /* Build configuration list for PBXNativeTarget "RNScreens" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				B8D46E1C5FBB498BF9D23E015AEBF2E8 /* Debug */,
-				783A62B13F9DD7618BCF7244CD676BAA /* Release */,
+				46341C80D550AA5660496DC5EDD6DB27 /* Debug */,
+				32E8469CF6182293224E7AE325847D44 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -11013,8 +11072,8 @@
 		E755D7171EE28A0BD3F13C7FB6B31334 /* Build configuration list for PBXNativeTarget "RNCAsyncStorage" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C3480FCDCA5C5F127DEBD61F15D98240 /* Debug */,
-				E739B0F4C6D749CD7AC66F568A67B345 /* Release */,
+				7517F9E40868037D9A09A37D9CF7879D /* Debug */,
+				C053CFC528E471BD26CB6977AFCEF3DB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -11022,8 +11081,8 @@
 		E77BBAB4946787183EE563264F3756D3 /* Build configuration list for PBXNativeTarget "EXSQLite" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				F51262B2E48C4BA6C8DE5E7F6ED4A026 /* Debug */,
-				E034B48E1C5A34D9A0EDBDF9C5133CAB /* Release */,
+				9650C0C9C7943243C15290426069BE5A /* Debug */,
+				970934DF8EE274F0F30F983B3320F076 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -11031,8 +11090,8 @@
 		EF1F89582207E2E77BE484CC4ED2D965 /* Build configuration list for PBXNativeTarget "EXSecureStore" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				22D8BE23BBE7EC0CA22409F77FE22FCA /* Debug */,
-				844A484943A4015909BC7AFF0FE1A66E /* Release */,
+				FB07E6977070F8E59EF014F06F5DFEBB /* Debug */,
+				D806CEAC4FA5B7E6664392A789CEFF79 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -11040,8 +11099,8 @@
 		F14911A861225857FBB39CFBB12FA5FF /* Build configuration list for PBXNativeTarget "react-native-randombytes" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				5843584095DD262251485E573B0220B1 /* Debug */,
-				F2F8803547468D8B8979643D9A71EA3D /* Release */,
+				6149F2722D83BD065079977A08A3C877 /* Debug */,
+				A9DDD88892F0185431CE2D7B008B8C4E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -11049,8 +11108,8 @@
 		F1776E52FEA103CF28C3992DC4DD90F2 /* Build configuration list for PBXNativeTarget "EXKeepAwake" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				F5082D99280571E3939F8CE70F2C6F71 /* Debug */,
-				D9A5F690F786A9BD6E74CB8FCA8571E3 /* Release */,
+				0E9A514BC0BB755801F8F494F3D9A668 /* Debug */,
+				50249922A303BF655E9EEF9873D67098 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -11058,8 +11117,8 @@
 		FBC40A7F6CC2304CFC78A61E757FCC99 /* Build configuration list for PBXNativeTarget "EXFileSystem" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				84656029028D7372794E55D736A7D365 /* Debug */,
-				ED8F518E1C694F9B9EDA2BC86DA45B83 /* Release */,
+				98D1BE1C631327534141623ED69DFAB0 /* Debug */,
+				6513D57E09C36B05CF916F7E8A662077 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

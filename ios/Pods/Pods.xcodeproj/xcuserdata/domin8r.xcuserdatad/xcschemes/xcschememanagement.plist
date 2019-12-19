@@ -79,7 +79,17 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>PDFGenerator.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>Pods-HEXA.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>QRCoder.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
