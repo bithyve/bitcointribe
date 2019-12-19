@@ -6,7 +6,8 @@ import { take, fork } from "redux-saga/effects";
 
 export const serviceGenerator = async (
   securityAns: string,
-  mnemonic?: string
+  mnemonic?: string,
+  metaShares?: any
 ): Promise<{
   regularAcc: RegularAccount;
   testAcc: TestAccount;
@@ -24,15 +25,26 @@ export const serviceGenerator = async (
   // Test account
   const testAcc = new TestAccount();
 
+  // Share generation
+  const s3Service = new S3Service(primaryMnemonic);
+  res = s3Service.generateShares(securityAns); // TODO: Generates new shares, swap with a mech that re-stores the shares used for wallet restoration
+  if (res.status !== 200) throw new Error("Share generation failed");
+
+  let secondaryXpub = "";
+  let bhXpub = "";
+  if (metaShares) {
+    res = s3Service.decryptStaticNonPMDD(metaShares[0].encryptedStaticNonPMDD);
+    if (res.status !== 200) throw new Error("Failed to decrypt StaticNPMDD");
+    secondaryXpub = res.data.decryptedStaticNonPMDD.secondaryXpub;
+    bhXpub = res.data.decryptedStaticNonPMDD.bhXpub;
+  }
+
   // Secure account
   const secureAcc = new SecureAccount(primaryMnemonic);
-  res = await secureAcc.setupSecureAccount();
-  if (res.status !== 200) throw new Error("Secure account setup failed");
+  if (!secondaryXpub) res = await secureAcc.setupSecureAccount();
+  else res = await secureAcc.importSecureAccount(secondaryXpub, bhXpub); // restoring
+  if (res.status !== 200) throw new Error("Secure account setup/import failed");
 
-  // share generation
-  const s3Service = new S3Service(primaryMnemonic);
-  res = s3Service.generateShares(securityAns);
-  if (res.status !== 200) throw new Error("Share generation failed");
   return {
     regularAcc,
     testAcc,

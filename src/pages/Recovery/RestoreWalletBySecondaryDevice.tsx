@@ -10,7 +10,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   TextInput,
-  ActivityIndicator
+  ActivityIndicator,
+  Button
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -27,7 +28,7 @@ import BottomInfoBox from "../../components/BottomInfoBox";
 import CopyThisText from "../../components/CopyThisText";
 import KnowMoreButton from "../../components/KnowMoreButton";
 import { useDispatch, useSelector } from "react-redux";
-import { requestShare } from "../../store/actions/sss";
+import { requestShare, downloadMShare } from "../../store/actions/sss";
 import QRCode from "react-native-qrcode-svg";
 
 export default function RestoreWalletBySecondaryDevice(props) {
@@ -38,10 +39,10 @@ export default function RestoreWalletBySecondaryDevice(props) {
   );
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
 
-  const { REQUEST_DETAILS } = RECOVERY_SHARES[0]
+  const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[0]
     ? RECOVERY_SHARES[0]
-    : { REQUEST_DETAILS: null };
-
+    : { REQUEST_DETAILS: null, META_SHARE: null };
+  console.log({ REQUEST_DETAILS });
   REQUEST_DETAILS && !secondaryQR
     ? setSecondaryQR(
         JSON.stringify({
@@ -109,6 +110,25 @@ export default function RestoreWalletBySecondaryDevice(props) {
             )}
             {deepLink ? <CopyThisText text={deepLink} /> : null}
           </View>
+
+          {REQUEST_DETAILS ? (
+            <View>
+              <Button
+                title={META_SHARE ? "Downloaded" : "Download"}
+                disabled={!!META_SHARE}
+                onPress={() =>
+                  dispatch(
+                    downloadMShare(
+                      REQUEST_DETAILS.OTP,
+                      REQUEST_DETAILS.ENCRYPTED_KEY,
+                      "recovery"
+                    )
+                  )
+                }
+              />
+            </View>
+          ) : null}
+
           <View style={{ flex: 2, justifyContent: "flex-end" }}></View>
         </KeyboardAvoidingView>
       </View>

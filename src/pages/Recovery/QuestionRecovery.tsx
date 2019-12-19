@@ -6,7 +6,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TextInput, 
+  TextInput,
   SafeAreaView,
   StatusBar
 } from "react-native";
@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { initializeRecovery } from "../../store/actions/setupAndAuth";
 import commonStyle from "../../common/Styles";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import AsyncStorage from "@react-native-community/async-storage";
 
 export default function RecoveryQuestionModalContents(props) {
   const walletName = props.navigation.getParam("walletName");
@@ -45,14 +46,18 @@ export default function RecoveryQuestionModalContents(props) {
 
   const { insertedIntoDB } = useSelector(state => state.storage);
   useEffect(() => {
-    if (insertedIntoDB)
-      props.navigation.navigate("RestoreSelectedContactsList");
+    (async () => {
+      if (insertedIntoDB) {
+        await AsyncStorage.setItem("recoveryExists", "true");
+        props.navigation.navigate("RestoreSelectedContactsList");
+      }
+    })();
   }, [insertedIntoDB]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-    <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-    <View style={commonStyle.headerContainer}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={commonStyle.headerContainer}>
         <TouchableOpacity
           style={commonStyle.headerLeftIconContainer}
           onPress={() => {
@@ -64,136 +69,136 @@ export default function RecoveryQuestionModalContents(props) {
           </View>
         </TouchableOpacity>
       </View>
-    <View style={styles.modalContentContainer}>
-      <View>
-        <View style={{ flexDirection: "row", padding: wp("7%") }}>
-          <View style={{ flex: 3, justifyContent: "center" }}>
-            <Text style={styles.modalTitleText}>
-              Enter Security Question{"\n"}and Answer
-            </Text>
-            <Text style={{ ...styles.modalInfoText, marginTop: wp("1.5%") }}>
-              To recover your wallet you have to select the security question
-              and enter its answer
-            </Text>
+      <View style={styles.modalContentContainer}>
+        <View>
+          <View style={{ flexDirection: "row", padding: wp("7%") }}>
+            <View style={{ flex: 3, justifyContent: "center" }}>
+              <Text style={styles.modalTitleText}>
+                Enter Security Question{"\n"}and Answer
+              </Text>
+              <Text style={{ ...styles.modalInfoText, marginTop: wp("1.5%") }}>
+                To recover your wallet you have to select the security question
+                and enter its answer
+              </Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <KnowMoreButton
+                onpress={() => {}}
+                containerStyle={{ marginLeft: "auto", marginTop: 10 }}
+                textStyle={{}}
+              />
+            </View>
           </View>
-          <View style={{ flex: 1 }}>
-            <KnowMoreButton
-              onpress={() => {}}
-              containerStyle={{ marginLeft: "auto", marginTop: 10 }}
-              textStyle={{}}
-            />
-          </View>
-        </View>
-        <View style={{ paddingLeft: wp("6%"), paddingRight: wp("6%") }}>
-          <TouchableOpacity
-            activeOpacity={10}
-            style={
-              dropdownBoxOpenClose
-                ? styles.dropdownBoxOpened
-                : styles.dropdownBox
-            }
-            onPress={() => {
-              setDropdownBoxOpenClose(!dropdownBoxOpenClose);
-            }}
-          >
-            <Text
-              style={{
-                ...styles.dropdownBoxText,
-                color: dropdownBoxValue.question
-                  ? Colors.textColorGrey
-                  : Colors.borderColor
+          <View style={{ paddingLeft: wp("6%"), paddingRight: wp("6%") }}>
+            <TouchableOpacity
+              activeOpacity={10}
+              style={
+                dropdownBoxOpenClose
+                  ? styles.dropdownBoxOpened
+                  : styles.dropdownBox
+              }
+              onPress={() => {
+                setDropdownBoxOpenClose(!dropdownBoxOpenClose);
               }}
             >
-              {dropdownBoxValue.question
-                ? dropdownBoxValue.question
-                : "Select Security Question"}
-            </Text>
-            <Ionicons
-              style={{ marginLeft: "auto" }}
-              name={dropdownBoxOpenClose ? "ios-arrow-up" : "ios-arrow-down"}
-              size={15}
-              color={Colors.borderColor}
-            />
-          </TouchableOpacity>
-          <View style={{ position: "relative" }}>
-            {dropdownBoxOpenClose && (
-              <View style={styles.dropdownBoxModal}>
-                <ScrollView>
-                  {dropdownBoxList.map((value, index) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setDropdownBoxValue(value);
-                        setDropdownBoxOpenClose(false);
-                      }}
-                      style={{
-                        ...styles.dropdownBoxModalElementView,
-                        borderTopLeftRadius: index == 0 ? 10 : 0,
-                        borderTopRightRadius: index == 0 ? 10 : 0,
-                        borderBottomLeftRadius:
-                          index == dropdownBoxList.length - 1 ? 10 : 0,
-                        borderBottomRightRadius:
-                          index == dropdownBoxList.length - 1 ? 10 : 0,
-                        paddingTop: index == 0 ? 5 : 0,
-                        backgroundColor:
-                          dropdownBoxValue.id == value.id
-                            ? Colors.lightBlue
-                            : Colors.white
-                      }}
-                    >
-                      <Text
+              <Text
+                style={{
+                  ...styles.dropdownBoxText,
+                  color: dropdownBoxValue.question
+                    ? Colors.textColorGrey
+                    : Colors.borderColor
+                }}
+              >
+                {dropdownBoxValue.question
+                  ? dropdownBoxValue.question
+                  : "Select Security Question"}
+              </Text>
+              <Ionicons
+                style={{ marginLeft: "auto" }}
+                name={dropdownBoxOpenClose ? "ios-arrow-up" : "ios-arrow-down"}
+                size={15}
+                color={Colors.borderColor}
+              />
+            </TouchableOpacity>
+            <View style={{ position: "relative" }}>
+              {dropdownBoxOpenClose && (
+                <View style={styles.dropdownBoxModal}>
+                  <ScrollView>
+                    {dropdownBoxList.map((value, index) => (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setDropdownBoxValue(value);
+                          setDropdownBoxOpenClose(false);
+                        }}
                         style={{
-                          color:
+                          ...styles.dropdownBoxModalElementView,
+                          borderTopLeftRadius: index == 0 ? 10 : 0,
+                          borderTopRightRadius: index == 0 ? 10 : 0,
+                          borderBottomLeftRadius:
+                            index == dropdownBoxList.length - 1 ? 10 : 0,
+                          borderBottomRightRadius:
+                            index == dropdownBoxList.length - 1 ? 10 : 0,
+                          paddingTop: index == 0 ? 5 : 0,
+                          backgroundColor:
                             dropdownBoxValue.id == value.id
-                              ? Colors.blue
-                              : Colors.black,
-                          fontFamily: Fonts.FiraSansRegular,
-                          fontSize: RFValue(12, 812)
+                              ? Colors.lightBlue
+                              : Colors.white
                         }}
                       >
-                        {value.question}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            )}
-            <TextInput
-              style={{
-                ...styles.inputBox,
-                width: "100%",
-                marginTop: 15,
-                marginBottom: hp("6%")
+                        <Text
+                          style={{
+                            color:
+                              dropdownBoxValue.id == value.id
+                                ? Colors.blue
+                                : Colors.black,
+                            fontFamily: Fonts.FiraSansRegular,
+                            fontSize: RFValue(12, 812)
+                          }}
+                        >
+                          {value.question}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+              <TextInput
+                style={{
+                  ...styles.inputBox,
+                  width: "100%",
+                  marginTop: 15,
+                  marginBottom: hp("6%")
+                }}
+                placeholder={"Enter Security Answer"}
+                placeholderTextColor={Colors.borderColor}
+                value={answer}
+                onChangeText={text => {
+                  setAnswer(text);
+                }}
+                onFocus={() => {
+                  setDropdownBoxOpenClose(false);
+                }}
+                onBlur={() => {
+                  setDropdownBoxOpenClose(false);
+                }}
+              />
+              <Text style={styles.modalInfoText}>
+                The Security Answer is case sensitive, make sure you{"\n"}enter
+                the case, numeric or symbolic values correctly
+              </Text>
+            </View>
+            <TouchableOpacity
+              disabled={dropdownBoxValue.id && answer ? false : true}
+              onPress={() => {
+                dispatch(initializeRecovery(walletName, answer));
               }}
-              placeholder={"Enter Security Answer"}
-              placeholderTextColor={Colors.borderColor}
-              value={answer}
-              onChangeText={text => {
-                setAnswer(text);
-              }}
-              onFocus={() => {
-                setDropdownBoxOpenClose(false);
-              }}
-              onBlur={() => {
-                setDropdownBoxOpenClose(false);
-              }}
-            />
-            <Text style={styles.modalInfoText}>
-              The Security Answer is case sensitive, make sure you{"\n"}enter
-              the case, numeric or symbolic values correctly
-            </Text>
+              style={styles.questionConfirmButton}
+            >
+              <Text style={styles.proceedButtonText}>Confirm</Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            disabled={dropdownBoxValue.id && answer ? false : true}
-            onPress={() => {
-              dispatch(initializeRecovery(walletName, answer));
-            }}
-            style={styles.questionConfirmButton}
-          >
-            <Text style={styles.proceedButtonText}>Confirm</Text>
-          </TouchableOpacity>
         </View>
       </View>
-    </View>
     </SafeAreaView>
   );
 }
@@ -201,7 +206,7 @@ export default function RecoveryQuestionModalContents(props) {
 const styles = StyleSheet.create({
   modalContentContainer: {
     height: "100%",
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.white
   },
   modalTitleText: {
     color: Colors.blue,
