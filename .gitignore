@@ -1,8 +1,9 @@
 # OSX
+#
 .DS_Store
-.vscode
 
 # Xcode
+#
 build/
 *.pbxuser
 !default.pbxuser
@@ -19,34 +20,21 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
-ios/Pods
+project.xcworkspace
 
-# Android
+# Android/IntelliJ
+#
 build/
-android/app/build
-android/app/release
 .idea
 .gradle
 local.properties
 *.iml
-*.apk
-android/.gradle
-android/app/google-services.json
-android/java_pid1017.hprof
 
 # node.js
+#
 node_modules/
 npm-debug.log
 yarn-error.log
-
-#Environment
-.env.dev
-.env
-env.dev
-.env.local
-.env.prod
-.env.live
-.env.staging
 
 # BUCK
 buck-out/
@@ -54,8 +42,11 @@ buck-out/
 *.keystore
 
 # fastlane
+#
 # It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
 # screenshots whenever they are needed.
+# For more information about the recommended setup visit:
+# https://docs.fastlane.tools/best-practices/source-control/
 
 */fastlane/report.xml
 */fastlane/Preview.html
@@ -64,5 +55,9 @@ buck-out/
 # Bundle artifact
 *.jsbundle
 
-# react-native-config codegen
-ios/tmp.xcconfig
+# CocoaPods
+/ios/Pods/
+
+# environment variables
+#
+.env
