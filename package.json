@@ -10,9 +10,9 @@
     "test": "jest"
   },
   "dependencies": {
+    "@babel/runtime": "^7.7.7",
     "@react-native-community/async-storage": "^1.6.2",
-    "@react-native-community/blur": "^3.3.1",
-    "@react-native-community/netinfo": "3.2.1",
+    "@react-native-community/netinfo": "^5.0.0",
     "@tradle/react-native-http": "^2.0.0",
     "assert": "^1.1.1",
     "asyncstorage-down": "^4.2.0",
@@ -47,7 +47,6 @@
     "react-native": "0.59.10",
     "react-native-cardview": "^2.0.5",
     "react-native-communications": "^2.2.1",
-    "react-native-config": "^0.11.7",
     "react-native-crypto": "^2.1.0",
     "react-native-device-info": "^5.3.1",
     "react-native-dotenv": "^0.2.0",

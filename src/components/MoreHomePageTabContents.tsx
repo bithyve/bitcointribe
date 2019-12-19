@@ -11,6 +11,7 @@ import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
 import { RFValue } from 'react-native-responsive-fontsize';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
 
 export default function MoreHomePageTabContents(props) {
     const [addData, setAddData] = useState([
@@ -35,7 +36,7 @@ export default function MoreHomePageTabContents(props) {
                     data={addData}
                     ItemSeparatorComponent={() => <View style={{ backgroundColor: Colors.white }}><View style={styles.separatorView} /></View>}
                     renderItem={({ item }) =>
-                        <TouchableOpacity onPress={()=>props.onPressElements(item)} style={styles.addModalView}>
+                        <AppBottomSheetTouchableWrapper onPress={()=>props.onPressElements(item)} style={styles.addModalView}>
                             <View style={styles.modalElementInfoView}>
                                 <View style={{ justifyContent: "center", }}>
                                     <Image source={item.image} style={{ width: 25, height: 25, resizeMode:'contain' }} />
@@ -45,7 +46,7 @@ export default function MoreHomePageTabContents(props) {
                                     <Text style={styles.addModalInfoText}>{item.info}</Text>
                                 </View>
                             </View>
-                        </TouchableOpacity>
+                        </AppBottomSheetTouchableWrapper>
                     }
                 />
             </View>

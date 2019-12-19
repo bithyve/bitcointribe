@@ -2,6 +2,8 @@ import React, { useState, useRef } from "react";
 import {
   View,
   Image,
+  SafeAreaView,
+  StatusBar,
   TouchableOpacity,
   Text,
   TextInput,
@@ -14,7 +16,8 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
-
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import CommonStyle from "../common/Styles";
 export default function CustodianRequestOtpModalContents(props) {
   const [passcode, setPasscode] = useState("");
   const inputRef = useRef(null);
@@ -29,7 +32,21 @@ export default function CustodianRequestOtpModalContents(props) {
   }
 
   return (
-    <View style={{ ...styles.modalContentContainer, height: "100%" }}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={CommonStyle.headerContainer}>
+        <TouchableOpacity
+          style={CommonStyle.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <View style={CommonStyle.headerLeftIconInnerContainer}>
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </View>
+        </TouchableOpacity>
+      </View>
+    <View style={styles.modalContentContainer}>
       <View
         ref={scrollViewRef}
         style={{
@@ -247,21 +264,14 @@ export default function CustodianRequestOtpModalContents(props) {
         </View>
       </View>
     </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   modalContentContainer: {
-    height: "50%",
+    height: "100%",
     backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderLeftColor: Colors.borderColor,
-    borderLeftWidth: 1,
-    borderTopRightRadius: 10,
-    borderRightColor: Colors.borderColor,
-    borderRightWidth: 1,
-    borderTopColor: Colors.borderColor,
-    borderTopWidth: 1
   },
   passcodeTextInputText: {
     color: Colors.blue,

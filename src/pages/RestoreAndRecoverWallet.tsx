@@ -17,6 +17,7 @@ import Fonts from "../common/Fonts";
 import Colors from "../common/Colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import BottomInfoBox from "../components/BottomInfoBox";
+import AsyncStorage from "@react-native-community/async-storage";
 
 const RestoreAndRecoverWallet = props => {
   return (
@@ -60,7 +61,11 @@ const RestoreAndRecoverWallet = props => {
             wallet.
           </Text>
           <TouchableOpacity
-            onPress={() => props.navigation.navigate("WalletNameRecovery")}
+            onPress={async () => {
+              if (await AsyncStorage.getItem("recoveryExists"))
+                props.navigation.navigate("RestoreSelectedContactsList");
+              else props.navigation.navigate("WalletNameRecovery");
+            }}
             style={{
               ...styles.NewWalletTouchableView,
               paddingTop: 20,
