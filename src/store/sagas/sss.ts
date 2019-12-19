@@ -302,14 +302,12 @@ function* generatePDFWorker({ payload }) {
     console.log({ err: res.err });
     return;
   }
-
   const secureAccount: SecureAccount = yield select(
     state => state.accounts[SECURE_ACCOUNT].service
   );
   const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
   const { qrData, secret } = secureAccount.secureHDWallet.twoFASetup;
   const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
-
   const secureAssets = {
     secondaryMnemonic,
     twoFASecret: secret,
@@ -317,21 +315,18 @@ function* generatePDFWorker({ payload }) {
     secondaryXpub: secondary,
     bhXpub: bh
   };
-
   const pdfData = {
     qrData: res.data.qrData,
     ...secureAssets
   };
-
   const { securityAns } = yield select(
     state => state.storage.database.WALLET_SETUP
   );
-
   try {
     const generatedPDFPath = yield call(
       generatePDF,
       pdfData,
-      `HexaShare${payload.shareIndex}`,
+      `HexaShare${payload.shareIndex}.pdf`,
       `Hexa Share ${payload.shareIndex}`,
       securityAns
     );
@@ -340,7 +335,7 @@ function* generatePDFWorker({ payload }) {
     console.log({ err });
   }
 
-  yield put(switchS3Loader("generatePDF"));
+  // yield put(switchS3Loader("generatePDF"));
 }
 
 export const generatePDFWatcher = createWatcher(

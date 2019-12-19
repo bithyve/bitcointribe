@@ -31,6 +31,10 @@ target 'HEXA' do
   pod 'RNScreens', :path => '../node_modules/react-native-screens'
 
   use_unimodules!
+  
+  pod 'PDFGenerator'
+  pod 'QRCoder'
+
 
   pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
 
@@ -46,5 +50,13 @@ target 'HEXA' do
 
 
   pod 'react-native-netinfo', :path => '../node_modules/@react-native-community/netinfo'
+
+  pod 'react-native-blur', :path => '../node_modules/@react-native-community/blur'
+
+  pod 'TcpSockets', :path => '../node_modules/react-native-tcp'
+
+  pod 'react-native-udp', :path => '../node_modules/react-native-udp'
+
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
 end
