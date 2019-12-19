@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
     View,
-    TouchableOpacity,
     Text,
     StyleSheet,
     Platform,
@@ -13,6 +12,7 @@ import Fonts from "../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome from "react-native-vector-icons/FontAwesome"
 import DeviceInfo from 'react-native-device-info';
+import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
 
 export default function GetBittrModalContents(props) {
     const signUp = () => {
@@ -28,9 +28,9 @@ export default function GetBittrModalContents(props) {
     return (<View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
             <View style={{ flexDirection: 'row', }}>
-                <TouchableOpacity onPress={() => props.onPressBack()} style={{ height: 30, width: 30, }}>
+                <AppBottomSheetTouchableWrapper onPress={() => props.onPressBack()} style={{ height: 30, width: 30, }}>
                     <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-                </TouchableOpacity>
+                </AppBottomSheetTouchableWrapper>
                 <View style={{ marginRight: 20, }}>
                     <Text style={styles.modalHeaderTitleText}>{"Get Bittr"}</Text>
                     <Text style={styles.modalHeaderInfoText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna</Text>
@@ -41,13 +41,13 @@ export default function GetBittrModalContents(props) {
             <Text style={styles.infoText}>Link your Gitbittr account to your wallet</Text>
         </View>
         <View style={{ flexDirection: 'row', marginBottom: Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp('4%') : hp('3%') }}>
-            <TouchableOpacity onPress={()=>signUp()} style={{
+            <AppBottomSheetTouchableWrapper onPress={()=>signUp()} style={{
                 marginLeft: 20,
                 backgroundColor: Colors.blue, width: wp('35%'), height: wp('13%'), justifyContent: 'center', alignItems: 'center', borderRadius: 10
-            }}><Text style={{ color: Colors.white, fontSize: RFValue(13, 812), fontFamily: Fonts.FiraSansMedium }}>SignUp</Text></TouchableOpacity>
-            <TouchableOpacity style={{
+            }}><Text style={{ color: Colors.white, fontSize: RFValue(13, 812), fontFamily: Fonts.FiraSansMedium }}>SignUp</Text></AppBottomSheetTouchableWrapper>
+            <AppBottomSheetTouchableWrapper style={{
                 marginRight: 20, width: wp('35%'), height: wp('13%'), justifyContent: 'center', alignItems: 'center', borderRadius: 10
-            }}><Text style={{ color: Colors.blue, fontSize: RFValue(13, 812), fontFamily: Fonts.FiraSansMedium }}>Sign In</Text></TouchableOpacity>
+            }}><Text style={{ color: Colors.blue, fontSize: RFValue(13, 812), fontFamily: Fonts.FiraSansMedium }}>Sign In</Text></AppBottomSheetTouchableWrapper>
         </View>
     </View>
     )

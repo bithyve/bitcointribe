@@ -7,7 +7,8 @@ import {
   StyleSheet,
   ScrollView,
   TextInput,
-  Platform
+  SafeAreaView,
+  StatusBar
 } from "react-native";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
@@ -17,6 +18,8 @@ import {
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import commonStyle from "../../common/Styles";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function HealthCheckSecurityAnswer(props) {
   const securityQuestion = "Name of your favourite food?";
@@ -39,7 +42,21 @@ export default function HealthCheckSecurityAnswer(props) {
   const [errorText, setErrorText] = useState("");
 
   return (
-    <View style={{ ...styles.modalContentContainer, height: "100%" }}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={commonStyle.headerContainer}>
+        <TouchableOpacity
+          style={commonStyle.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <View style={commonStyle.headerLeftIconInnerContainer}>
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </View>
+        </TouchableOpacity>
+      </View>
+    <View style={styles.modalContentContainer}>
       <View>
         <View style={{ flexDirection: "row", padding: wp("7%") }}>
           <View style={{ flex: 1, justifyContent: "center" }}>
@@ -204,6 +221,7 @@ export default function HealthCheckSecurityAnswer(props) {
         </View>
       </View>
     </View>
+    </SafeAreaView>
   );
 }
 
@@ -211,14 +229,6 @@ const styles = StyleSheet.create({
   modalContentContainer: {
     height: "100%",
     backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderLeftColor: Colors.borderColor,
-    borderLeftWidth: 1,
-    borderTopRightRadius: 10,
-    borderRightColor: Colors.borderColor,
-    borderRightWidth: 1,
-    borderTopColor: Colors.borderColor,
-    borderTopWidth: 1
   },
   modalTitleText: {
     color: Colors.blue,

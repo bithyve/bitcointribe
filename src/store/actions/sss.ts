@@ -14,6 +14,7 @@ export const DOWNLOAD_DYNAMIC_NONPMDD = "DOWNLOAD_DYNAMIC_NONPMDD";
 export const RESTORE_DYNAMIC_NONPMDD = "RESTORE_DYNAMIC_NONPMDD";
 export const RECOVER_MNEMONIC = "RECOVER_MNEMONIC";
 export const RECOVER_WALLET = "RECOVER_WALLET";
+export const RESET_REQUESTED_SHARE_UPLOADS = "RESET_REQUESTED_SHARE_UPLOADS";
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -77,13 +78,23 @@ export const recoverWallet = () => {
   return { type: RECOVER_WALLET };
 };
 
+export const resetRequestedShareUpload = () => {
+  return { type: RESET_REQUESTED_SHARE_UPLOADS };
+};
+
 // types and action creators (saga): dispatched by saga workers
 export const HEALTH_CHECK_INITIALIZED = "HEALTH_CHECK_INITIALIZED";
+export const REQUESTED_SHARE_UPLOADED = "REQUESTED_SHARE_UPLOADED";
 export const MNEMONIC_RECOVERED = "MNEMONIC_RECOVERED";
 export const S3_LOADING = "S3_LOADING";
+export const DOWNLOADED_MSHARE = "DOWNLOADED_MSHARE";
 
 export const healthCheckInitialized = () => {
   return { type: HEALTH_CHECK_INITIALIZED };
+};
+
+export const requestedShareUploaded = (tag, status, err?) => {
+  return { type: REQUESTED_SHARE_UPLOADED, payload: { tag, status, err } };
 };
 
 export const mnemonicRecovered = mnemonic => {
@@ -92,4 +103,8 @@ export const mnemonicRecovered = mnemonic => {
 
 export const switchS3Loader = beingLoaded => {
   return { type: S3_LOADING, payload: { beingLoaded } };
+};
+
+export const downloadedMShare = (otp, status, err?) => {
+  return { type: DOWNLOADED_MSHARE, payload: { otp, status, err } };
 };

@@ -11,7 +11,7 @@ import {
   Platform,
   TextInput,
   KeyboardAvoidingView,
-  AsyncStorage
+  Alert
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -36,6 +36,9 @@ import RecoveryQuestionModalContents from "../../components/RecoveryQuestionModa
 import RecoverySuccessModalContents from "../../components/RecoverySuccessModalContents";
 import RecoveryWalletNameModalContents from "../../components/RecoveryWalletNameModalContents";
 import ErrorModalContents from "../../components/ErrorModalContents";
+import { useDispatch, useSelector } from "react-redux";
+import { downloadMShare, recoverWallet } from "../../store/actions/sss";
+import AsyncStorage from "@react-native-community/async-storage";
 
 export default function RestoreSelectedContactsList(props) {
   const [selectedContacts, setSelectedContacts] = useState([]);
@@ -95,7 +98,7 @@ export default function RestoreSelectedContactsList(props) {
   };
 
   useEffect(() => {
-    (ErrorBottomSheet as any).current.snapTo(1);
+    // (ErrorBottomSheet as any).current.snapTo(1);
     let focusListener = props.navigation.addListener("didFocus", () => {
       getSelectedContactList();
     });
@@ -268,6 +271,69 @@ export default function RestoreSelectedContactsList(props) {
     );
   };
 
+  const dispatch = useDispatch();
+
+  const { DECENTRALIZED_BACKUP, SERVICES } = useSelector(
+    state => state.storage.database
+  );
+
+  const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
+  const metaShares = [];
+  Object.keys(RECOVERY_SHARES).forEach(key => {
+    const { META_SHARE } = RECOVERY_SHARES[key];
+    if (META_SHARE) metaShares.push(META_SHARE);
+  });
+
+  useEffect(() => {
+    (async () => {
+      if (SERVICES) {
+        await AsyncStorage.setItem("walletExists", "true");
+        props.navigation.navigate("Home");
+      }
+    })();
+  }, [SERVICES]);
+
+  const downloadSecret = shareIndex => {
+    const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[shareIndex];
+
+    if (!META_SHARE) {
+      const { OTP, ENCRYPTED_KEY } = REQUEST_DETAILS;
+      console.log({ OTP, ENCRYPTED_KEY });
+      dispatch(downloadMShare(OTP, ENCRYPTED_KEY, "recovery"));
+    } else {
+      Alert.alert("Downloaded", "Secret already downloaded");
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      let mod = false;
+      selectedContacts.forEach((contact, index) => {
+        if (RECOVERY_SHARES[index + 1]) {
+          if (RECOVERY_SHARES[index + 1].META_SHARE) {
+            if (selectedContacts[index].status !== "received") {
+              selectedContacts[index].status = "received";
+              mod = true;
+            }
+          } else if (RECOVERY_SHARES[index + 1].REQUEST_DETAILS) {
+            if (selectedContacts[index].status !== "inTransit") {
+              selectedContacts[index].status = "inTransit";
+              mod = true;
+            }
+          }
+        }
+      });
+
+      if (mod) {
+        await AsyncStorage.setItem(
+          "selectedContacts",
+          JSON.stringify(selectedContacts)
+        );
+        getSelectedContactList();
+      }
+    })();
+  }, [RECOVERY_SHARES, selectedContacts]);
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -354,20 +420,25 @@ export default function RestoreSelectedContactsList(props) {
           </View>
           {selectedContacts.length > 0 && (
             <View style={{}}>
-              {selectedContacts.map(value => {
+              {selectedContacts.map((contact, index) => {
                 return (
                   <TouchableOpacity
-                    activeOpacity={value.status == "" ? 0 : 10}
+                    activeOpacity={contact.status == "" ? 0 : 10}
                     onPress={() =>
-                      value.status == "" ? openRequestModal() : {}
+                      contact.status == ""
+                        ? props.navigation.navigate("RecoveryCommunication", {
+                            contact,
+                            index: index + 1
+                          })
+                        : {}
                     }
                     style={{ ...styles.selectedContactView, marginBottom: 15 }}
                   >
                     <View>
                       <Text style={styles.selectedContactName}>
-                        {value.name.split(" ")[0]}{" "}
+                        {contact.name.split(" ")[0]}{" "}
                         <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                          {value.name.split(" ")[1]}
+                          {contact.name.split(" ")[1]}
                         </Text>
                       </Text>
                       <Text
@@ -376,12 +447,12 @@ export default function RestoreSelectedContactsList(props) {
                           fontSize: RFValue(11, 812)
                         }}
                       >
-                        {value.communicationMode
-                          ? value.communicationMode[0].info
+                        {contact.communicationMode.length
+                          ? contact.communicationMode[0].info
                           : ""}
                       </Text>
                     </View>
-                    {value.status == "received" ? (
+                    {contact.status == "received" ? (
                       <View
                         style={{ flexDirection: "row", marginLeft: "auto" }}
                       >
@@ -413,7 +484,7 @@ export default function RestoreSelectedContactsList(props) {
                           />
                         </View>
                       </View>
-                    ) : value.status == "inTransit" ? (
+                    ) : contact.status == "inTransit" ? (
                       <View
                         style={{ flexDirection: "row", marginLeft: "auto" }}
                       >
@@ -432,20 +503,21 @@ export default function RestoreSelectedContactsList(props) {
                             Secret In-Transit
                           </Text>
                         </View>
-                        <View
+                        <TouchableOpacity
                           style={{
                             ...styles.secretReceivedCheckSignView,
                             backgroundColor: Colors.lightBlue
                           }}
+                          onPress={() => downloadSecret(index + 1)}
                         >
                           <Ionicons
-                            name={"md-time"}
+                            name={"download"}
                             size={15}
                             color={Colors.blue}
                           />
-                        </View>
+                        </TouchableOpacity>
                       </View>
-                    ) : value.status == "rejected" ? (
+                    ) : contact.status == "rejected" ? (
                       <View
                         style={{ flexDirection: "row", marginLeft: "auto" }}
                       >
@@ -482,10 +554,10 @@ export default function RestoreSelectedContactsList(props) {
                       </View>
                     ) : (
                       <TouchableOpacity
-                        onPress={() => openRequestModal()}
+                        onPress={() => {}}
                         style={{ flexDirection: "row", marginLeft: "auto" }}
                       >
-                        <Text>{value.status}</Text>
+                        <Text>{contact.status}</Text>
                         <View style={styles.dotsView} />
                         <View style={styles.dotsView} />
                         <View style={styles.dotsView} />
@@ -497,7 +569,6 @@ export default function RestoreSelectedContactsList(props) {
             </View>
           )}
         </TouchableOpacity>
-
         <View style={styles.separator} />
         <TouchableOpacity
           onPress={() =>
@@ -632,16 +703,16 @@ export default function RestoreSelectedContactsList(props) {
             </View>
           )}
         </TouchableOpacity>
-        <View style={{ justifyContent: "center" }}>
-          <TouchableOpacity
-            style={{ ...styles.questionConfirmButton, margin: 20 }}
-            onPress={() => {
-             // (walletNameBottomSheet as any).current.snapTo(1);
-            }}
-          >
-            <Text style={styles.proceedButtonText}>Continue</Text>
-          </TouchableOpacity>
-        </View>
+        {metaShares.length >= 3 ? (
+          <View>
+            <TouchableOpacity
+              style={{ ...styles.questionConfirmButton, margin: 20 }}
+              onPress={() => dispatch(recoverWallet())}
+            >
+              <Text style={styles.proceedButtonText}>Restore</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
       </ScrollView>
 
       {/* <BottomSheet

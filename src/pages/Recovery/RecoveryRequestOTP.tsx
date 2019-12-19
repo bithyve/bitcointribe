@@ -1,27 +1,45 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Image,
-  SafeAreaView,
-  StatusBar,
   TouchableOpacity,
   Text,
   TextInput,
-  StyleSheet
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+  SafeAreaView,
+  StatusBar,
 } from "react-native";
-import Colors from "../common/Colors";
-import Fonts from "../common/Fonts";
+import Colors from "../../common/Colors";
+import Fonts from "../../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
+import {
+  downloadMShare,
+  uploadRequestedShare,
+  resetRequestedShareUpload
+} from "../../store/actions/sss";
+import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import CommonStyle from "../common/Styles";
-export default function CustodianRequestOtpModalContents(props) {
+import CommonStyle from "../../common/Styles";
+
+export default function RecoveryRequestOTP(props) {
+  const recoveryRequest = props.navigation.getParam("recoveryRequest");
+  const { requester, rk } = recoveryRequest;
   const [passcode, setPasscode] = useState("");
   const inputRef = useRef(null);
-  const [scrollViewRef, setscrollViewRef] = useState(React.createRef());
+  const [
+    RecoveryRequestRejectedBottomSheet,
+    setRecoveryRequestRejectedBottomSheet
+  ] = useState(React.createRef());
+  const [
+    RecoveryRequestAcceptBottomSheet,
+    setRecoveryRequestAcceptBottomSheet
+  ] = useState(React.createRef());
 
   function onPressNumber(text) {
     let tmpPasscode = passcode;
@@ -30,6 +48,33 @@ export default function CustodianRequestOtpModalContents(props) {
       setPasscode(tmpPasscode);
     }
   }
+
+  const dispatch = useDispatch();
+  const { loading, requestedShareUpload } = useSelector(state => state.sss);
+  const { UNDER_CUSTODY } = useSelector(
+    state => state.storage.database.DECENTRALIZED_BACKUP
+  );
+
+  const onOTPSubmit = () => {
+    if (passcode.length !== 6 || !rk) return;
+    !UNDER_CUSTODY[requester]
+      ? Alert.alert(
+          "Upload failed",
+          "You do not have any secret under custody for this requester"
+        )
+      : dispatch(uploadRequestedShare(requester, rk, passcode));
+  };
+
+  useEffect(() => {
+    if (requestedShareUpload[requester]) {
+      if (!requestedShareUpload[requester].status) {
+        Alert.alert("Upload failed", requestedShareUpload[requester].err);
+      } else {
+        dispatch(resetRequestedShareUpload());
+        props.navigation.goBack();
+      }
+    }
+  }, [requestedShareUpload]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -48,7 +93,6 @@ export default function CustodianRequestOtpModalContents(props) {
       </View>
     <View style={styles.modalContentContainer}>
       <View
-        ref={scrollViewRef}
         style={{
           marginRight: wp("8%"),
           marginLeft: wp("8%")
@@ -56,23 +100,20 @@ export default function CustodianRequestOtpModalContents(props) {
       >
         <View style={{ ...styles.otpRequestHeaderView }}>
           <Text style={styles.modalTitleText}>
-            {props.title1stLine}
-            {"\n"}
-            {props.title2ndLine}
+            Enter OTP to{"\n"}accept request
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: hp("1.5%") }}>
-            {props.info1stLine}
-            {"\n"}
-            {props.info2ndLine}
+            Please enter the 6 digit OTP the owner{"\n"}of secret shared with
+            you
           </Text>
         </View>
         <View style={{ marginBottom: hp("2%") }}>
           <View style={styles.passcodeTextInputView}>
             <TextInput
               maxLength={1}
-              returnKeyType="done"
-              returnKeyLabel="Done"
-              keyboardType="number-pad"
+              //   returnKeyType="done"
+              //   returnKeyLabel="Done"
+              //   keyboardType="number-pad"
               ref={input => {
                 this.textInput = input;
               }}
@@ -91,22 +132,22 @@ export default function CustodianRequestOtpModalContents(props) {
                 }
               }}
               // onFocus={() => {
-              // 	if (passcode.length == 0) {
-              // 		props.modalRef.current.snapTo(2)
-              // 	}
+              //   if (passcode.length == 0) {
+              //     props.modalRef.current.snapTo(2);
+              //   }
               // }}
               // onBlur={() => {
-              // 	if (passcode.length == 0 || passcode.length == 6) {
-              // 		props.modalRef.current.snapTo(1)
-              // 	}
+              //   if (passcode.length == 0 || passcode.length == 6) {
+              //     props.modalRef.current.snapTo(1);
+              //   }
               // }}
             />
 
             <TextInput
               maxLength={1}
-              returnKeyType="done"
-              returnKeyLabel="Done"
-              keyboardType="number-pad"
+              //   returnKeyType="done"
+              //   returnKeyLabel="Done"
+              //   keyboardType="number-pad"
               ref={input => {
                 this.textInput2 = input;
               }}
@@ -124,16 +165,16 @@ export default function CustodianRequestOtpModalContents(props) {
                   this.textInput.focus();
                 }
               }}
-              //   onFocus={() => {
-              //     props.modalRef.current.snapTo(2);
-              //   }}
+              // onFocus={() => {
+              //   props.modalRef.current.snapTo(2);
+              // }}
             />
 
             <TextInput
               maxLength={1}
-              returnKeyType="done"
-              returnKeyLabel="Done"
-              keyboardType="number-pad"
+              //   returnKeyType="done"
+              //   returnKeyLabel="Done"
+              //   keyboardType="number-pad"
               ref={input => {
                 this.textInput3 = input;
               }}
@@ -151,16 +192,16 @@ export default function CustodianRequestOtpModalContents(props) {
                   this.textInput2.focus();
                 }
               }}
-              //   onFocus={() => {
-              //     props.modalRef.current.snapTo(2);
-              //   }}
+              // onFocus={() => {
+              //   props.modalRef.current.snapTo(2);
+              // }}
             />
 
             <TextInput
               maxLength={1}
-              returnKeyType="done"
-              returnKeyLabel="Done"
-              keyboardType="number-pad"
+              //   returnKeyType="done"
+              //   returnKeyLabel="Done"
+              //   keyboardType="number-pad"
               ref={input => {
                 this.textInput4 = input;
               }}
@@ -178,16 +219,16 @@ export default function CustodianRequestOtpModalContents(props) {
                   this.textInput3.focus();
                 }
               }}
-              //   onFocus={() => {
-              //     props.modalRef.current.snapTo(2);
-              //   }}
+              // onFocus={() => {
+              //   props.modalRef.current.snapTo(2);
+              // }}
             />
 
             <TextInput
               maxLength={1}
-              returnKeyType="done"
-              returnKeyLabel="Done"
-              keyboardType="number-pad"
+              //   returnKeyType="done"
+              //   returnKeyLabel="Done"
+              //   keyboardType="number-pad"
               ref={input => {
                 this.textInput5 = input;
               }}
@@ -205,15 +246,15 @@ export default function CustodianRequestOtpModalContents(props) {
                   this.textInput4.focus();
                 }
               }}
-              //   onFocus={() => {
-              //     props.modalRef.current.snapTo(2);
-              //   }}
+              // onFocus={() => {
+              //   props.modalRef.current.snapTo(2);
+              // }}
             />
             <TextInput
               maxLength={1}
-              returnKeyType="done"
-              returnKeyLabel="Done"
-              keyboardType="number-pad"
+              //   returnKeyType="done"
+              //   returnKeyLabel="Done"
+              //   keyboardType="number-pad"
               ref={input => {
                 this.textInput6 = input;
               }}
@@ -230,14 +271,14 @@ export default function CustodianRequestOtpModalContents(props) {
                   this.textInput5.focus();
                 }
               }}
-              //   onFocus={() => {
-              //     props.modalRef.current.snapTo(2);
-              //   }}
-              //   onBlur={() => {
-              //     if (passcode.length == 0) {
-              //       props.modalRef.current.snapTo(1);
-              //     }
-              //   }}
+              // onFocus={() => {
+              //   props.modalRef.current.snapTo(2);
+              // }}
+              // onBlur={() => {
+              //   if (passcode.length == 0) {
+              //     props.modalRef.current.snapTo(1);
+              //   }
+              // }}
             />
           </View>
         </View>
@@ -249,17 +290,20 @@ export default function CustodianRequestOtpModalContents(props) {
           }}
         >
           <Text style={{ ...styles.modalInfoText }}>
-            {props.subInfo1stLine}
-            {"\n"}
-            {props.subInfo2ndLine}
+            The OTP is time sensitive, please be sure to enter the OTP {"\n"}
+            shared within 10 minutes
           </Text>
         </View>
         <View style={{ flexDirection: "row", marginTop: "auto" }}>
           <TouchableOpacity
-            onPress={passcode => props.onPressConfirm(passcode)}
+            onPress={onOTPSubmit}
             style={{ ...styles.confirmModalButtonView }}
           >
-            <Text style={styles.confirmButtonText}>Confirm</Text>
+            {loading.uploadRequestedShare ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <Text style={styles.confirmButtonText}>Upload</Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -325,7 +369,7 @@ const styles = StyleSheet.create({
     lineHeight: 18
   },
   otpRequestHeaderView: {
-    marginTop: hp("5%"),
+    marginTop: hp("2%"),
     marginBottom: hp("2%")
   },
   modalTitleText: {

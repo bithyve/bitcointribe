@@ -32,7 +32,7 @@ import TransactionDetails from "../pages/Accounts/TransactionDetails";
 import Send from "../pages/Accounts/Send";
 import TwoFAToken from "../pages/Accounts/TwoFAToken";
 import HealthCheckSecurityAnswer from "../pages/ManageBackup/HealthCheckSecurityAnswer";
-
+import RecoveryRequestOTP from "../pages/Recovery/RecoveryRequestOTP";
 const SetupNavigator = createStackNavigator(
   {
     Launch,
@@ -69,7 +69,8 @@ const MODAL_ROUTES = [
   "TransactionDetails",
   "Send",
   "TwoFAToken",
-  "HealthCheckSecurityAnswer"
+  "HealthCheckSecurityAnswer",
+  "RecoveryRequestOTP"
 ];
 const HomeNavigator = createStackNavigator(
   {
@@ -92,7 +93,8 @@ const HomeNavigator = createStackNavigator(
     TransactionDetails,
     Send,
     TwoFAToken,
-    HealthCheckSecurityAnswer
+    HealthCheckSecurityAnswer,
+    RecoveryRequestOTP
   },
   {
     headerLayoutPreset: "center",
