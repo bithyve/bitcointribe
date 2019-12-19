@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
     View,
     Image,
-    TouchableOpacity,
     Text,
     StyleSheet,
     ScrollView
@@ -16,14 +15,15 @@ import ContactList from "../components/ContactList";
 import FontAwesome from "react-native-vector-icons/FontAwesome"
 import Ionicons from "react-native-vector-icons/Ionicons";
 import BottomInfoBox from './BottomInfoBox';
+import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
 
 export default function FastBitcoinModalContents(props) {
     return (<View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
             <View style={{ flexDirection: 'row', }}>
-                <TouchableOpacity onPress={() => props.onPressBack()} style={{ height: 30, width: 30, }}>
+                <AppBottomSheetTouchableWrapper onPress={() => props.onPressBack()} style={{ height: 30, width: 30, }}>
                     <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-                </TouchableOpacity>
+                </AppBottomSheetTouchableWrapper>
                 <View>
                     <Text style={styles.modalHeaderTitleText}>{"Fast Bitcoin"}</Text>
                     <Text style={styles.modalHeaderInfoText}>Buy and sell bitcoins with cash,{"\n"}Lightning deposits and deliveries enabled</Text>
@@ -31,7 +31,7 @@ export default function FastBitcoinModalContents(props) {
             </View>
         </View>
         <View style={{ flex: 1, }}>
-            <TouchableOpacity onPress={()=>props.onPressSellTab()} style={styles.cardView}>
+            <AppBottomSheetTouchableWrapper onPress={()=>props.onPressSellTab()} style={styles.cardView}>
                 <Image source={require("../assets/images/icons/fastbitcoin_dark.png")} style={styles.image} />
                 <View style={{ marginLeft: 10 }}>
                     <Text style={styles.titleText}>Sell</Text>
@@ -43,8 +43,8 @@ export default function FastBitcoinModalContents(props) {
                     size={12}
                     style={{ marginLeft: 'auto', marginRight: 20 }}
                 />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>props.onPressRedeemTab()} style={styles.cardView}>
+            </AppBottomSheetTouchableWrapper>
+            <AppBottomSheetTouchableWrapper onPress={()=>props.onPressRedeemTab()} style={styles.cardView}>
                 <Image source={require("../assets/images/icons/fastbitcoin_dark.png")} style={styles.image} />
                 <View style={{ marginLeft: 10 }}>
                     <Text style={styles.titleText}>Redeem</Text>
@@ -56,7 +56,7 @@ export default function FastBitcoinModalContents(props) {
                     size={12}
                     style={{ marginLeft: 'auto', marginRight: 20 }}
                 />
-            </TouchableOpacity>
+            </AppBottomSheetTouchableWrapper>
         </View>
         <View style={{  }}>
             <BottomInfoBox title={'Lorem ipsum'} infoText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'} />

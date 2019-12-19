@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
     View,
     Image,
-    TouchableOpacity,
     Text,
     StyleSheet,
 } from 'react-native';
@@ -10,6 +9,7 @@ import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
 import { RFValue } from 'react-native-responsive-fontsize';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
 
 export default function ErrorModalContents(props) {
     return (<View style={{ ...styles.modalContentContainer, height: '100%', }}>
@@ -22,19 +22,19 @@ export default function ErrorModalContents(props) {
                 <Text style={{ ...styles.modalInfoText, marginBottom: hp('1%'), marginTop: 'auto' }}>{props.note}{props.noteNextLine ? "\n" + props.noteNextLine : null}</Text>
             </View>
             <View style={{height: hp('18%'), flexDirection: 'row', marginTop: 'auto', alignItems: 'center', }} >
-                <TouchableOpacity
+                <AppBottomSheetTouchableWrapper
                     onPress={() => props.onPressProceed()}
                     style={{ ...styles.successModalButtonView }}
                 >
                     <Text style={styles.proceedButtonText}>{props.proceedButtonText}</Text>
-                </TouchableOpacity>
+                </AppBottomSheetTouchableWrapper>
                 {props.isIgnoreButton &&
-                    <TouchableOpacity
+                    <AppBottomSheetTouchableWrapper
                         onPress={() => props.onPressIgnore()}
                         style={{ height: wp('13%'), width: wp('35%'), justifyContent: 'center', alignItems: 'center', }}
                     >
                         <Text style={{ ...styles.proceedButtonText, color: Colors.blue, }}>{props.cancelButtonText ? props.cancelButtonText : 'Ignore'}</Text>
-                    </TouchableOpacity>
+                    </AppBottomSheetTouchableWrapper>
                 }
                 {props.isBottomImage &&
                     <Image source={props.bottomImage ? props.bottomImage : require('../assets/images/icons/noInternet.png') } style={styles.successModalImage} />

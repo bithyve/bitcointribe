@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
     View,
     Image,
-    TouchableOpacity,
     Text,
     StyleSheet,
 } from 'react-native';
@@ -11,6 +10,8 @@ import Fonts from "../common/Fonts";
 import { RFValue } from 'react-native-responsive-fontsize';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Entypo from "react-native-vector-icons/Entypo"
+import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
+
 export default function NoInternetModalContents(props) {
 
     return (<View style={{ ...styles.modalContentContainer, height: '100%', }}>
@@ -33,13 +34,13 @@ export default function NoInternetModalContents(props) {
                 </View>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 'auto', alignItems:'center' }} >
-                <TouchableOpacity
+                <AppBottomSheetTouchableWrapper
                     onPress={() => props.onPressTryAgain()}
                     style={{ ...styles.successModalButtonView }}
                 >
                     <Text style={styles.proceedButtonText}>Try Again</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
+                </AppBottomSheetTouchableWrapper>
+                <AppBottomSheetTouchableWrapper
                     onPress={() => props.onPressIgnore()}
                     style={{
                         height: wp('13%'),
@@ -49,7 +50,7 @@ export default function NoInternetModalContents(props) {
                     }}
                 >
                     <Text style={{...styles.proceedButtonText, color:Colors.blue, }}>Ignore</Text>
-                </TouchableOpacity>
+                </AppBottomSheetTouchableWrapper>
                 <Image source={require('../assets/images/icons/noInternet.png')} style={styles.successModalImage} />
             </View>
         </View>
