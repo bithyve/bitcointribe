@@ -14,6 +14,7 @@ import Fonts from "../common/Fonts";
 import { RFValue } from 'react-native-responsive-fontsize';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
 
 export default function HealthCheckSecurityQuestionModalContents(props) {
     const securityQuestion = "Name of your favourite food?";
@@ -41,16 +42,16 @@ export default function HealthCheckSecurityQuestionModalContents(props) {
                 </View>
             </View>
             <View style={{ paddingLeft: wp('6%'), paddingRight: wp('6%'), }}>
-                <TouchableOpacity activeOpacity={10} style={[dropdownBoxOpenClose ? styles.dropdownBoxOpened : styles.dropdownBox, { borderColor: errorText == "Wrong question selected" ? Colors.red : Colors.borderColor }]} onPress={() => { setDropdownBoxOpenClose(!dropdownBoxOpenClose); }}>
+                <AppBottomSheetTouchableWrapper activeOpacity={10} style={[dropdownBoxOpenClose ? styles.dropdownBoxOpened : styles.dropdownBox, { borderColor: errorText == "Wrong question selected" ? Colors.red : Colors.borderColor }]} onPress={() => { setDropdownBoxOpenClose(!dropdownBoxOpenClose); }}>
                     <Text style={{ ...styles.dropdownBoxText, color: dropdownBoxValue.question ? Colors.textColorGrey : Colors.borderColor }}>{dropdownBoxValue.question ? dropdownBoxValue.question : 'Select Security Question'}</Text>
                     <Ionicons style={{ marginLeft: 'auto' }} name={dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'} size={15} color={Colors.borderColor} />
-                </TouchableOpacity>
+                </AppBottomSheetTouchableWrapper>
                 <View style={{ position: 'relative', }}>
                     {dropdownBoxOpenClose &&
                         <View style={styles.dropdownBoxModal}>
                             <ScrollView>
                                 {dropdownBoxList.map((value, index) =>
-                                    <TouchableOpacity onPress={() => {
+                                    <AppBottomSheetTouchableWrapper onPress={() => {
                                         if (securityQuestion != value.question) {
                                             setErrorText("Wrong question selected")
                                         }
@@ -68,7 +69,7 @@ export default function HealthCheckSecurityQuestionModalContents(props) {
                                         backgroundColor: dropdownBoxValue.id == value.id ? Colors.lightBlue : Colors.white,
                                     }}>
                                         <Text style={{ color: dropdownBoxValue.id == value.id ? Colors.blue : Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12, 812) }}>{value.question}</Text>
-                                    </TouchableOpacity>
+                                    </AppBottomSheetTouchableWrapper>
                                 )}
                             </ScrollView>
                         </View>
@@ -104,13 +105,13 @@ export default function HealthCheckSecurityQuestionModalContents(props) {
                     }
                     <Text style={styles.modalInfoText}>Security question and answer is never stored anywhere{"\n"}and even your contacts don’t know this answer</Text>
                 </View>
-                <TouchableOpacity
+                <AppBottomSheetTouchableWrapper
                     disabled={errorText ? true : false}
                     onPress={() => props.onPressConfirm()}
                     style={styles.questionConfirmButton}
                 >
                     <Text style={styles.proceedButtonText}>{errorText ? 'Try Again' : 'Confirm'}</Text>
-                </TouchableOpacity>
+                </AppBottomSheetTouchableWrapper>
             </View>
         </View>
     </View>
