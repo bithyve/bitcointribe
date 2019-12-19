@@ -558,7 +558,8 @@ function* recoverWalletWorker({ payload }) {
     const { regularAcc, testAcc, secureAcc, s3Service } = yield call(
       serviceGenerator,
       securityAns,
-      mnemonic
+      mnemonic,
+      metaShares
     );
 
     const SERVICES = {

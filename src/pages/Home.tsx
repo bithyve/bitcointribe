@@ -1929,6 +1929,6 @@ const styles = StyleSheet.create({
   },
   modalContentContainer: {
     height: "100%",
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.white
   }
 });
