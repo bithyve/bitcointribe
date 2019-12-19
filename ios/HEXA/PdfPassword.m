@@ -8,7 +8,7 @@
 
 RCT_EXPORT_MODULE();
   
-  
+     
 //-(NSString*)applicationDocumentDirectory{
 //  //  return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
 //  NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -35,7 +35,7 @@ RCT_EXPORT_METHOD(addEvent:(NSString *)pdfData
   pdf.bhXpub = [json objectForKey:@"bhXpub"];
   NSString *pdfPath =  [pdf generatePdf];
   NSLog(pdfPath);
-  resolve(pdfPath);  
+  resolve(pdfPath);
   //return pdfPath;
 }
 
@@ -43,4 +43,6 @@ RCT_EXPORT_METHOD(addEvent:(NSString *)pdfData
 
   
 @end
+
+
 
