@@ -18,7 +18,8 @@ import {
   RECOVER_WALLET,
   RESTORE_DYNAMIC_NONPMDD,
   GENERATE_PDF,
-  requestedShareUploaded
+  requestedShareUploaded,
+  downloadedMShare
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { insertIntoDB } from "../actions/storage";
@@ -199,7 +200,6 @@ function* uploadRequestedShareWorker({ payload }) {
     console.log("Upload successful!");
     yield put(requestedShareUploaded(tag, true));
   } else {
-    console.log({ res });
     yield put(requestedShareUploaded(tag, false, res.err));
   }
   yield put(switchS3Loader("uploadRequestedShare"));
@@ -232,8 +232,8 @@ function* downloadMetaShareWorker({ payload }) {
     res = yield call(
       S3Service.downloadAndValidateShare,
       encryptedKey,
-      otp
-      // existingShares
+      otp,
+      existingShares
     );
   } else {
     res = yield call(S3Service.downloadAndValidateShare, encryptedKey, otp);
@@ -260,18 +260,18 @@ function* downloadMetaShareWorker({ payload }) {
         }
       };
     } else {
-      const updatedRecoveryShares = Object.keys(
-        DECENTRALIZED_BACKUP.RECOVERY_SHARES
-      ).map(key => {
+      const updatedRecoveryShares = {};
+      Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach(key => {
         const recoveryShare = DECENTRALIZED_BACKUP.RECOVERY_SHARES[key];
         if (recoveryShare.REQUEST_DETAILS.OTP === otp) {
-          return {
+          updatedRecoveryShares[key] = {
             REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
             META_SHARE: metaShare,
             ENC_DYNAMIC_NONPMDD: dynamicNonPMDD
           };
+        } else {
+          updatedRecoveryShares[key] = recoveryShare;
         }
-        return recoveryShare;
       });
 
       updatedBackup = {
@@ -281,8 +281,10 @@ function* downloadMetaShareWorker({ payload }) {
     }
 
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+    yield put(downloadedMShare(otp, true));
   } else {
     console.log({ err: res.err });
+    yield put(downloadedMShare(otp, false, res.err));
   }
   yield put(switchS3Loader("downloadMetaShare"));
 }
