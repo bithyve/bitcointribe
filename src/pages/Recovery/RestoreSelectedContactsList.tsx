@@ -37,7 +37,7 @@ import RecoverySuccessModalContents from "../../components/RecoverySuccessModalC
 import RecoveryWalletNameModalContents from "../../components/RecoveryWalletNameModalContents";
 import ErrorModalContents from "../../components/ErrorModalContents";
 import { useDispatch, useSelector } from "react-redux";
-import { downloadMShare } from "../../store/actions/sss";
+import { downloadMShare, recoverWallet } from "../../store/actions/sss";
 import AsyncStorage from "@react-native-community/async-storage";
 
 export default function RestoreSelectedContactsList(props) {
@@ -271,17 +271,27 @@ export default function RestoreSelectedContactsList(props) {
     );
   };
 
-  const { RECOVERY_SHARES } = useSelector(
-    state => state.storage.database.DECENTRALIZED_BACKUP
+  const dispatch = useDispatch();
+
+  const { DECENTRALIZED_BACKUP, SERVICES } = useSelector(
+    state => state.storage.database
   );
 
+  const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
   const metaShares = [];
   Object.keys(RECOVERY_SHARES).forEach(key => {
     const { META_SHARE } = RECOVERY_SHARES[key];
     if (META_SHARE) metaShares.push(META_SHARE);
   });
 
-  const dispatch = useDispatch();
+  useEffect(() => {
+    (async () => {
+      if (SERVICES) {
+        await AsyncStorage.setItem("walletExists", "true");
+        props.navigation.navigate("Home");
+      }
+    })();
+  }, [SERVICES]);
 
   const downloadSecret = shareIndex => {
     const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[shareIndex];
@@ -559,7 +569,6 @@ export default function RestoreSelectedContactsList(props) {
             </View>
           )}
         </TouchableOpacity>
-
         <View style={styles.separator} />
         <TouchableOpacity
           onPress={() =>
@@ -695,12 +704,10 @@ export default function RestoreSelectedContactsList(props) {
           )}
         </TouchableOpacity>
         {metaShares.length >= 3 ? (
-          <View style={{ justifyContent: "center" }}>
+          <View>
             <TouchableOpacity
               style={{ ...styles.questionConfirmButton, margin: 20 }}
-              onPress={() => {
-                // (walletNameBottomSheet as any).current.snapTo(1);
-              }}
+              onPress={() => dispatch(recoverWallet())}
             >
               <Text style={styles.proceedButtonText}>Restore</Text>
             </TouchableOpacity>
