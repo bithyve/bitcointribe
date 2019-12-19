@@ -157,8 +157,6 @@ dependencies {
     implementation project(':react-native-udp')
     implementation project(':react-native-tcp')
     implementation project(':react-native-os')
-    implementation project(':react-native-config')
-    implementation project(':@react-native-community_blur')
     implementation project(':@react-native-community_netinfo')
     implementation project(':react-native-svg')
     implementation project(':react-native-html-to-pdf')
