@@ -3,7 +3,8 @@ import {
   S3_LOADING,
   MNEMONIC_RECOVERED,
   REQUESTED_SHARE_UPLOADED,
-  RESET_REQUESTED_SHARE_UPLOADS
+  RESET_REQUESTED_SHARE_UPLOADS,
+  DOWNLOADED_MSHARE
 } from "../actions/sss";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { SERVICES_ENRICHED } from "../actions/storage";
@@ -28,6 +29,9 @@ const initialState: {
   requestedShareUpload: {
     [tag: string]: { status: Boolean; err?: String };
   };
+  downloadedMShare: {
+    [otp: string]: { status: Boolean; err?: String };
+  };
 } = {
   service: null,
   loading: {
@@ -44,7 +48,8 @@ const initialState: {
     restoreWallet: false
   },
   mnemonic: "",
-  requestedShareUpload: {}
+  requestedShareUpload: {},
+  downloadedMShare: {}
 };
 
 export default (state = initialState, action) => {
@@ -86,6 +91,18 @@ export default (state = initialState, action) => {
       return {
         ...state,
         requestedShareUpload: initialState.requestedShareUpload
+      };
+
+    case DOWNLOADED_MSHARE:
+      return {
+        ...state,
+        downloadedMShare: {
+          ...state.downloadedMShare,
+          [action.payload.otp]: {
+            status: action.payload.status,
+            err: action.payload.err
+          }
+        }
       };
 
     case S3_LOADING:

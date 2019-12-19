@@ -11,7 +11,6 @@ import {
   Platform,
   TextInput,
   KeyboardAvoidingView,
-  AsyncStorage,
   Alert
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -39,6 +38,7 @@ import RecoveryWalletNameModalContents from "../../components/RecoveryWalletName
 import ErrorModalContents from "../../components/ErrorModalContents";
 import { useDispatch, useSelector } from "react-redux";
 import { downloadMShare } from "../../store/actions/sss";
+import AsyncStorage from "@react-native-community/async-storage";
 
 export default function RestoreSelectedContactsList(props) {
   const [selectedContacts, setSelectedContacts] = useState([]);
@@ -297,25 +297,32 @@ export default function RestoreSelectedContactsList(props) {
 
   useEffect(() => {
     (async () => {
-      if (RECOVERY_SHARES[1])
-        if (RECOVERY_SHARES[1].META_SHARE)
-          selectedContacts[0].status = "received";
-        else if (RECOVERY_SHARES[1].REQUEST_DETAILS)
-          selectedContacts[0].status = "inTransit";
+      let mod = false;
+      selectedContacts.forEach((contact, index) => {
+        if (RECOVERY_SHARES[index + 1]) {
+          if (RECOVERY_SHARES[index + 1].META_SHARE) {
+            if (selectedContacts[index].status !== "received") {
+              selectedContacts[index].status = "received";
+              mod = true;
+            }
+          } else if (RECOVERY_SHARES[index + 1].REQUEST_DETAILS) {
+            if (selectedContacts[index].status !== "inTransit") {
+              selectedContacts[index].status = "inTransit";
+              mod = true;
+            }
+          }
+        }
+      });
 
-      if (RECOVERY_SHARES[2])
-        if (RECOVERY_SHARES[2].META_SHARE)
-          selectedContacts[1].status = "received";
-        else if (RECOVERY_SHARES[2].REQUEST_DETAILS)
-          selectedContacts[1].status = "inTransit";
-
-      await AsyncStorage.setItem(
-        "selectedContacts",
-        JSON.stringify(selectedContacts)
-      );
-      getSelectedContactList();
+      if (mod) {
+        await AsyncStorage.setItem(
+          "selectedContacts",
+          JSON.stringify(selectedContacts)
+        );
+        getSelectedContactList();
+      }
     })();
-  }, [RECOVERY_SHARES]);
+  }, [RECOVERY_SHARES, selectedContacts]);
 
   return (
     <View style={{ flex: 1 }}>

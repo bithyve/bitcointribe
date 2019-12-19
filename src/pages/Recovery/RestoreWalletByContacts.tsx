@@ -11,7 +11,6 @@ import {
   Platform,
   TextInput,
   ScrollView,
-  AsyncStorage,
   FlatList
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -30,6 +29,7 @@ import ContactList from "./ContactList";
 import DeviceInfo from "react-native-device-info";
 import RadioButton from "../../components/RadioButton";
 import CommunicationModeModalContents from "../../components/CommunicationModeModalContents";
+import AsyncStorage from "@react-native-community/async-storage";
 
 export default function RestoreWalletByContacts(props) {
   //   const [contacts, setContacts] = useState([]);
