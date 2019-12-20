@@ -8,7 +8,8 @@ import {
   StatusBar,
   Text,
   Image,
-  FlatList
+  FlatList,
+  Platform
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Fonts from "../../common/Fonts";
@@ -29,6 +30,10 @@ import BackupStyles from "./Styles";
 import ContactList from "../../components/ContactList";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import BottomInfoBox from "../../components/BottomInfoBox";
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import WalletBackupAndRecoveryContents from '../../components/Helper/WalletBackupAndRecoveryContents';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
 
 function getImageByType(type) {
   if (type == "secondaryDevice") {
@@ -46,6 +51,7 @@ function getImageByType(type) {
 }
 
 export default function ManageBackup(props) {
+  const [WalletBackupAndRecoveryBottomSheet, setWalletBackupAndRecoveryBottomSheet] = useState(React.createRef());
   const [secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet] = useState(
     React.createRef()
   );
@@ -168,6 +174,7 @@ export default function ManageBackup(props) {
       setSelectedStatus("warning");
     }
   }
+  
 
   function renderCloudContent() {
     return (
@@ -402,11 +409,35 @@ export default function ManageBackup(props) {
   const dispatch = useDispatch();
   const s3Service: S3Service = useSelector(state => state.sss.service);
   useEffect(() => {
+    WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
   }, []);
 
+  const renderWalletBackupAndRecoveryContents = () => {
+		return <WalletBackupAndRecoveryContents
+		onPressManageBackup={()=>{
+		WalletBackupAndRecoveryBottomSheet.current.snapTo(0);}}
+		onSkip={() => {
+			WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
+		}}  
+		onStartBackup={() => {
+			WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
+		}} />
+	}
+
+	const renderWalletBackupAndRecoveryHeader = () => {
+		return <SmallHeaderModal
+		borderColor={Colors.blue}
+		headerColor={Colors.blue}
+		 onPressHandle={() => {
+			setTimeout(() => { setTabBarZIndex(999); }, 10);
+			WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
+		}} />
+	}
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 0 }}/>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={{ flex: 1 }}>
         <View style={CommonStyles.headerContainer}>
@@ -549,8 +580,15 @@ export default function ManageBackup(props) {
           renderContent={renderCloudContent}
           renderHeader={renderCloudHeader}
         /> */}
+        <BottomSheet
+				enabledInnerScrolling={true}
+				ref={WalletBackupAndRecoveryBottomSheet}
+				snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('90%') : hp('90%')]}
+				renderContent={renderWalletBackupAndRecoveryContents}
+				renderHeader={renderWalletBackupAndRecoveryHeader}
+			/>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
