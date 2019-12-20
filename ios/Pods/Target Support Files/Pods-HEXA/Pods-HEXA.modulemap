@@ -1,6 +1,0 @@
-module Pods_HEXA {
-  umbrella header "Pods-HEXA-umbrella.h"
-
-  export *
-  module * { export * }
-}

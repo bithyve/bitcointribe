@@ -1,1 +1,0 @@
-../../../../../node_modules/expo/node_modules/unimodules-barcode-scanner-interface/ios/UMBarCodeScannerInterface/UMBarCodeScannerInterface.h

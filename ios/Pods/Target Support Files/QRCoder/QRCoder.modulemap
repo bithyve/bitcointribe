@@ -1,6 +1,0 @@
-module QRCoder {
-  umbrella header "QRCoder-umbrella.h"
-
-  export *
-  module * { export * }
-}
