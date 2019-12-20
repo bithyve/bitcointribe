@@ -33,6 +33,8 @@ import Send from "../pages/Accounts/Send";
 import TwoFAToken from "../pages/Accounts/TwoFAToken";
 import HealthCheckSecurityAnswer from "../pages/ManageBackup/HealthCheckSecurityAnswer";
 import RecoveryRequestOTP from "../pages/Recovery/RecoveryRequestOTP";
+import SettingManagePin from "../pages/SettingManagePin";
+
 const SetupNavigator = createStackNavigator(
   {
     Launch,
@@ -94,7 +96,8 @@ const HomeNavigator = createStackNavigator(
     Send,
     TwoFAToken,
     HealthCheckSecurityAnswer,
-    RecoveryRequestOTP
+    RecoveryRequestOTP,
+    SettingManagePin
   },
   {
     headerLayoutPreset: "center",
