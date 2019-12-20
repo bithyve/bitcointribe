@@ -1,6 +1,0 @@
-module PDFGenerator {
-  umbrella header "PDFGenerator-umbrella.h"
-
-  export *
-  module * { export * }
-}
