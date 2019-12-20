@@ -9,8 +9,8 @@
 - [Android Studio](https://developer.android.com/studio)
 
 ```
-git clone https://github.com/bithyve/_HEXA.git
-cd _HEXA
+git clone https://github.com/bithyve/hexa.git
+cd hexa
 yarn install
 ```
 
