@@ -1425,6 +1425,7 @@ export default function Home(props) {
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
+        onOpenStart={()=>{setTabBarZIndex(0);}}
         enabledInnerScrolling={true}
         ref={RecoveryRequestBottomSheet}
         snapPoints={[-50, hp('60%')]}
