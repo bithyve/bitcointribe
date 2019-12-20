@@ -41,7 +41,11 @@ import {
 } from '../../common/constants/serviceTypes';
 import CopyThisText from '../../components/CopyThisText';
 import BottomInfoBox from '../../components/BottomInfoBox';
-import { fetchBalance, fetchTransactions } from '../../store/actions/accounts';
+import {
+  fetchBalance,
+  fetchTransactions,
+  getTestcoins,
+} from '../../store/actions/accounts';
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function Accounts(props) {
@@ -536,7 +540,10 @@ export default function Accounts(props) {
 
   const dispatch = useDispatch();
   useEffect(() => {
-    if (!netBalance) dispatch(fetchBalance(serviceType));
+    if (!netBalance) {
+      if (serviceType === TEST_ACCOUNT) dispatch(getTestcoins(serviceType));
+      else dispatch(fetchBalance(serviceType)); // TODO: do periodic auto search
+    }
   }, [serviceType]);
 
   useEffect(() => {
@@ -613,7 +620,6 @@ export default function Accounts(props) {
             refreshing={loading.transactions || loading.balances}
             onRefresh={() => {
               dispatch(fetchBalance(serviceType));
-              dispatch(fetchTransactions(serviceType));
             }}
           />
         }
