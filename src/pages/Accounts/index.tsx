@@ -47,6 +47,7 @@ import {
   getTestcoins,
 } from '../../store/actions/accounts';
 import { ScrollView } from 'react-native-gesture-handler';
+import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
 
 export default function Accounts(props) {
   const sliderWidth = Dimensions.get('window').width;
@@ -338,7 +339,7 @@ export default function Accounts(props) {
             </View>
           )}
           renderItem={({ item }) => (
-            <TouchableOpacity
+            <AppBottomSheetTouchableWrapper
               onPress={() =>
                 props.navigation.navigate('TransactionDetails', { item })
               }
@@ -404,7 +405,7 @@ export default function Accounts(props) {
                   style={{ marginLeft: 20, alignSelf: 'center' }}
                 />
               </View>
-            </TouchableOpacity>
+            </AppBottomSheetTouchableWrapper>
           )}
         />
       </View>

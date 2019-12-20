@@ -103,9 +103,9 @@ export default function CustodianRequestOTP(props) {
           <View style={styles.passcodeTextInputView}>
             <TextInput
               maxLength={1}
-              //   returnKeyType="done"
-              //   returnKeyLabel="Done"
-              //   keyboardType="number-pad"
+              autoCorrect={false}
+              autoFocus={false}
+              keyboardType="email-address"
               ref={input => {
                 this.textInput = input;
               }}
@@ -123,23 +123,13 @@ export default function CustodianRequestOTP(props) {
                   this.textInput.focus();
                 }
               }}
-              // onFocus={() => {
-              //   if (passcode.length == 0) {
-              //     props.modalRef.current.snapTo(2);
-              //   }
-              // }}
-              // onBlur={() => {
-              //   if (passcode.length == 0 || passcode.length == 6) {
-              //     props.modalRef.current.snapTo(1);
-              //   }
-              // }}
             />
 
             <TextInput
               maxLength={1}
-              //   returnKeyType="done"
-              //   returnKeyLabel="Done"
-              //   keyboardType="number-pad"
+              autoCorrect={false}
+              autoFocus={false}
+              keyboardType="email-address"
               ref={input => {
                 this.textInput2 = input;
               }}
@@ -157,16 +147,13 @@ export default function CustodianRequestOTP(props) {
                   this.textInput.focus();
                 }
               }}
-              // onFocus={() => {
-              //   props.modalRef.current.snapTo(2);
-              // }}
             />
 
             <TextInput
               maxLength={1}
-              //   returnKeyType="done"
-              //   returnKeyLabel="Done"
-              //   keyboardType="number-pad"
+              autoCorrect={false}
+              autoFocus={false}
+              keyboardType="email-address"
               ref={input => {
                 this.textInput3 = input;
               }}
@@ -184,21 +171,17 @@ export default function CustodianRequestOTP(props) {
                   this.textInput2.focus();
                 }
               }}
-              // onFocus={() => {
-              //   props.modalRef.current.snapTo(2);
-              // }}
             />
 
             <TextInput
               maxLength={1}
-              //   returnKeyType="done"
-              //   returnKeyLabel="Done"
-              //   keyboardType="number-pad"
+              autoCorrect={false}
+              autoFocus={false}
               ref={input => {
                 this.textInput4 = input;
               }}
               style={[
-                this.textInput3 && this.textInput3.isFocused()
+                this.textInput4 && this.textInput4.isFocused()
                   ? styles.textBoxActive
                   : styles.textBoxStyles
               ]}
@@ -211,21 +194,18 @@ export default function CustodianRequestOTP(props) {
                   this.textInput3.focus();
                 }
               }}
-              // onFocus={() => {
-              //   props.modalRef.current.snapTo(2);
-              // }}
             />
 
             <TextInput
               maxLength={1}
-              //   returnKeyType="done"
-              //   returnKeyLabel="Done"
-              //   keyboardType="number-pad"
+              autoCorrect={false}
+              autoFocus={false}
+              keyboardType="email-address"
               ref={input => {
                 this.textInput5 = input;
               }}
               style={[
-                this.textInput3 && this.textInput3.isFocused()
+                this.textInput5 && this.textInput5.isFocused()
                   ? styles.textBoxActive
                   : styles.textBoxStyles
               ]}
@@ -238,20 +218,17 @@ export default function CustodianRequestOTP(props) {
                   this.textInput4.focus();
                 }
               }}
-              // onFocus={() => {
-              //   props.modalRef.current.snapTo(2);
-              // }}
             />
             <TextInput
               maxLength={1}
-              //   returnKeyType="done"
-              //   returnKeyLabel="Done"
-              //   keyboardType="number-pad"
+              autoCorrect={false}
+              autoFocus={false}
+              keyboardType="email-address"
               ref={input => {
                 this.textInput6 = input;
               }}
               style={[
-                this.textInput3 && this.textInput3.isFocused()
+                this.textInput6 && this.textInput6.isFocused()
                   ? styles.textBoxActive
                   : styles.textBoxStyles
               ]}
@@ -263,14 +240,6 @@ export default function CustodianRequestOTP(props) {
                   this.textInput5.focus();
                 }
               }}
-              // onFocus={() => {
-              //   props.modalRef.current.snapTo(2);
-              // }}
-              // onBlur={() => {
-              //   if (passcode.length == 0) {
-              //     props.modalRef.current.snapTo(1);
-              //   }
-              // }}
             />
           </View>
         </View>
