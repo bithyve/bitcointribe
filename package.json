@@ -45,6 +45,7 @@
     "react": "16.8.3",
     "react-dom": "16.8.3",
     "react-native": "0.59.10",
+    "react-native-camera": "^3.15.0",
     "react-native-cardview": "^2.0.5",
     "react-native-communications": "^2.2.1",
     "react-native-crypto": "^2.1.0",
