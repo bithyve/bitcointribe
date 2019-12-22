@@ -1,9 +1,9 @@
-import { call, put } from "redux-saga/effects";
-import { createWatcher, serviceGenerator } from "../utils/utilities";
-import AsyncStorage from "@react-native-community/async-storage";
+import { call, put } from 'redux-saga/effects';
+import { createWatcher, serviceGenerator } from '../utils/utilities';
+import AsyncStorage from '@react-native-community/async-storage';
 
-import * as Cipher from "../../common/encryption";
-import * as SecureStore from "../../storage/secure-store";
+import * as Cipher from '../../common/encryption';
+import * as SecureStore from '../../storage/secure-store';
 import {
   INIT_SETUP,
   CREDS_AUTH,
@@ -13,54 +13,54 @@ import {
   setupInitialized,
   switchSetupLoader,
   switchReLogin,
-  INIT_RECOVERY
-} from "../actions/setupAndAuth";
-import { insertIntoDB, keyFetched, fetchFromDB } from "../actions/storage";
-import { Database } from "../../common/interfaces/Interfaces";
+  INIT_RECOVERY,
+} from '../actions/setupAndAuth';
+import { insertIntoDB, keyFetched, fetchFromDB } from '../actions/storage';
+import { Database } from '../../common/interfaces/Interfaces';
 
 function* initSetupWorker({ payload }) {
-  yield put(switchSetupLoader("initializing"));
+  yield put(switchSetupLoader('initializing'));
 
-  const { walletName, securityAns } = payload;
+  const { walletName, security } = payload;
   const { regularAcc, testAcc, secureAcc, s3Service } = yield call(
     serviceGenerator,
-    securityAns
+    security.answer,
   );
 
   const initialDatabase: Database = {
-    WALLET_SETUP: { walletName, securityAns },
+    WALLET_SETUP: { walletName, security },
     DECENTRALIZED_BACKUP: {
       RECOVERY_SHARES: {},
       SHARES_TRANSFER_DETAILS: {},
       UNDER_CUSTODY: {},
-      DYNAMIC_NONPMDD: {}
+      DYNAMIC_NONPMDD: {},
     },
     SERVICES: {
       REGULAR_ACCOUNT: JSON.stringify(regularAcc),
       TEST_ACCOUNT: JSON.stringify(testAcc),
       SECURE_ACCOUNT: JSON.stringify(secureAcc),
-      S3_SERVICE: JSON.stringify(s3Service)
-    }
+      S3_SERVICE: JSON.stringify(s3Service),
+    },
   };
 
   yield put(insertIntoDB(initialDatabase));
-  yield call(AsyncStorage.setItem, "walletExists", "true");
+  yield call(AsyncStorage.setItem, 'walletExists', 'true');
   yield put(setupInitialized());
 }
 
 export const initSetupWatcher = createWatcher(initSetupWorker, INIT_SETUP);
 
 function* initRecoveryWorker({ payload }) {
-  const { walletName, securityAns } = payload;
+  const { walletName, security } = payload;
 
   const initialDatabase: Database = {
-    WALLET_SETUP: { walletName, securityAns },
+    WALLET_SETUP: { walletName, security },
     DECENTRALIZED_BACKUP: {
       RECOVERY_SHARES: {},
       SHARES_TRANSFER_DETAILS: {},
       UNDER_CUSTODY: {},
-      DYNAMIC_NONPMDD: {}
-    }
+      DYNAMIC_NONPMDD: {},
+    },
   };
 
   yield put(insertIntoDB(initialDatabase));
@@ -70,11 +70,11 @@ function* initRecoveryWorker({ payload }) {
 
 export const initRecoveryWatcher = createWatcher(
   initRecoveryWorker,
-  INIT_RECOVERY
+  INIT_RECOVERY,
 );
 
 function* credentialsStorageWorker({ payload }) {
-  yield put(switchSetupLoader("storingCreds"));
+  yield put(switchSetupLoader('storingCreds'));
 
   //hash the pin
   const hash = yield call(Cipher.hash, payload.passcode);
@@ -85,22 +85,22 @@ function* credentialsStorageWorker({ payload }) {
 
   //store the AES key against the hash
   if (!(yield call(SecureStore.store, hash, encryptedKey))) {
-    yield call(AsyncStorage.setItem, "hasCreds", "false");
+    yield call(AsyncStorage.setItem, 'hasCreds', 'false');
     return;
   }
 
   yield put(keyFetched(AES_KEY));
-  yield call(AsyncStorage.setItem, "hasCreds", "true");
+  yield call(AsyncStorage.setItem, 'hasCreds', 'true');
   yield put(credsStored());
 }
 
 export const credentialStorageWatcher = createWatcher(
   credentialsStorageWorker,
-  STORE_CREDS
+  STORE_CREDS,
 );
 
 function* credentialsAuthWorker({ payload }) {
-  yield put(switchSetupLoader("authenticating"));
+  yield put(switchSetupLoader('authenticating'));
 
   let key;
   try {
@@ -113,7 +113,7 @@ function* credentialsAuthWorker({ payload }) {
     else yield put(credsAuthenticated(false));
     return;
   }
-  if (!key) throw new Error("Key missing");
+  if (!key) throw new Error('Key missing');
 
   if (payload.reLogin) {
     yield put(switchReLogin(true));
@@ -126,5 +126,5 @@ function* credentialsAuthWorker({ payload }) {
 
 export const credentialsAuthWatcher = createWatcher(
   credentialsAuthWorker,
-  CREDS_AUTH
+  CREDS_AUTH,
 );
