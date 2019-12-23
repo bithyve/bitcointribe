@@ -1,6 +1,7 @@
 // types and action creators: dispatched by components and sagas
 export const INIT_DB = 'INIT_DB';
 export const FETCH_FROM_DB = 'FETCH_FROM_DB';
+export const FETCHSSS_FROM_DB = 'FETCHSSS_FROM_DB';
 export const INSERT_INTO_DB = 'INSERT_INTO_DB';
 export const KEY_FETCHED = 'KEY_FETCHED';
 export const ENRICH_SERVICES = 'ENRICH_SERVICES';
@@ -11,6 +12,10 @@ export const initializeDB = () => {
 
 export const fetchFromDB = () => {
   return { type: FETCH_FROM_DB };
+};
+
+export const fetchSSSFromDB = () => {
+  return { type: FETCHSSS_FROM_DB };
 };
 
 export const insertIntoDB = data => {

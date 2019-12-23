@@ -54,6 +54,7 @@ function getImageByType( type ) {
 
 import { useDispatch, useSelector } from "react-redux";
 import { initHealthCheck } from "../../store/actions/sss";
+import { fetchSSSFromDB } from "../../store/actions/storage";
 import { generatePDF } from "../../store/actions/sss";
 
 
@@ -142,6 +143,17 @@ export default function ManageBackup( props ) {
       route: "HealthCheckSecurityAnswer"
     }
   ] );
+
+  const dispatch = useDispatch();
+  const s3Service: S3Service = useSelector( state => state.sss.service );
+  const { loading } = useSelector( state => state.sss );
+
+  useEffect( () => {
+    //dispatch( generatePDF( 4 ) );
+    dispatch( fetchSSSFromDB() )
+    WalletBackupAndRecoveryBottomSheet.current.snapTo( 1 );
+    if ( !s3Service.sss.healthCheckInitialized ) dispatch( initHealthCheck() );
+  }, [] );
 
   // function selectedContactsList(list) {
   //   setContacts(list);
@@ -420,15 +432,7 @@ export default function ManageBackup( props ) {
   //   );
   // }
 
-  const dispatch = useDispatch();
-  const s3Service: S3Service = useSelector( state => state.sss.service );
-  const { loading } = useSelector( state => state.sss );
 
-  useEffect( () => {
-    dispatch( generatePDF( 4 ) );
-    WalletBackupAndRecoveryBottomSheet.current.snapTo( 1 );
-    if ( !s3Service.sss.healthCheckInitialized ) dispatch( initHealthCheck() );
-  }, [] );
 
   const renderWalletBackupAndRecoveryContents = () => {
     return <WalletBackupAndRecoveryContents

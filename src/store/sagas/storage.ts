@@ -4,6 +4,7 @@ import {
   INIT_DB,
   dbInitialized,
   FETCH_FROM_DB,
+  FETCHSSS_FROM_DB,
   dbFetched,
   INSERT_INTO_DB,
   dbInserted,
@@ -48,6 +49,31 @@ function* fetchDBWorker() {
 }
 
 export const fetchDBWatcher = createWatcher(fetchDBWorker, FETCH_FROM_DB);
+
+function* fetchSSSDBWorker() {
+  try {
+    const key = yield select(state => state.storage.key);
+    const database = yield call(dataManager.fetchSSS, key);
+
+    console.log({ key, database });
+
+    // if (key && database) {
+    //   yield put(dbFetched(database));
+    //   yield put(enrichServices(database));
+    // } else {
+    //   console.log(
+    //     'Failed to fetch the database; either key is missing or database is empty',
+    //   );
+    // }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export const fetchSSSDBWatcher = createWatcher(
+  fetchSSSDBWorker,
+  FETCHSSS_FROM_DB,
+);
 
 function* insertDBWorker({ payload }) {
   try {

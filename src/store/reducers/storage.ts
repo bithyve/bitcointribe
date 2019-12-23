@@ -2,20 +2,22 @@ import {
   DB_INITIALIZED,
   DB_FETCHED,
   DB_INSERTED,
-  KEY_FETCHED
-} from "../actions/storage";
-import { Database } from "../../common/interfaces/Interfaces";
+  KEY_FETCHED,
+} from '../actions/storage';
+import { Database } from '../../common/interfaces/Interfaces';
 
 const initialState: {
   databaseInitialized: Boolean;
   insertedIntoDB: Boolean;
   key: String;
   database: Database;
+  databaseSSS: {};
 } = {
   databaseInitialized: false,
   insertedIntoDB: false,
-  key: "",
-  database: null
+  key: '',
+  database: null,
+  databaseSSS: {},
 };
 
 export default (state = initialState, action) => {
@@ -23,17 +25,17 @@ export default (state = initialState, action) => {
     case DB_INITIALIZED:
       return {
         ...state,
-        databaseInitialized: action.payload.initialized
+        databaseInitialized: action.payload.initialized,
       };
 
     case DB_FETCHED:
       const newState = {
         ...state,
         database: action.payload.database,
-        insertedIntoDB: true
+        insertedIntoDB: true,
       };
       return {
-        ...newState
+        ...newState,
       };
 
     case DB_INSERTED:
@@ -41,18 +43,18 @@ export default (state = initialState, action) => {
         ...state,
         database: {
           ...state.database,
-          ...action.payload.updatedEntity
+          ...action.payload.updatedEntity,
         },
-        insertedIntoDB: true
+        insertedIntoDB: true,
       };
       return {
-        ...updatedState
+        ...updatedState,
       };
 
     case KEY_FETCHED:
       return {
         ...state,
-        key: action.payload.key
+        key: action.payload.key,
       };
   }
   return state;

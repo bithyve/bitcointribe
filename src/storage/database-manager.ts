@@ -18,6 +18,21 @@ const fetch = async key => {
   }
 };
 
+const fetchSSS = async key => {
+  try {
+    const data = await db.fetchSSS();
+    if (data.rows._array.length === 0) {
+      return;
+    }
+    const encryptedDatabase = data.rows._array[0].encData;
+    const database = decrypt(encryptedDatabase, key);
+
+    return database;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 const insert = async (database, key, inserted = true) => {
   const encryptedDatabase = encrypt(database, key);
 
@@ -49,6 +64,7 @@ const insertSSS = async (database, key, inserted = true) => {
 export default {
   initialize,
   fetch,
+  fetchSSS,
   insert,
   insertSSS,
 };

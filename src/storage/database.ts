@@ -51,6 +51,24 @@ export const fetch = () => {
   });
 };
 
+export const fetchSSS = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      tx.executeSql(
+        'SELECT * FROM sss;',
+        [],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, err) => {
+          reject(err);
+          return false;
+        },
+      );
+    });
+  });
+};
+
 export const insert = encData => {
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
