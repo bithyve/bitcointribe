@@ -1,5 +1,5 @@
-import * as db from "./database";
-import { encrypt, decrypt } from "../common/encryption";
+import * as db from './database';
+import { encrypt, decrypt } from '../common/encryption';
 
 const initialize = () => db.init();
 
@@ -32,8 +32,22 @@ const insert = async (database, key, inserted = true) => {
   return true;
 };
 
+const insertSSS = async (database, key, inserted = true) => {
+  const encryptedDatabase = encrypt(database, key);
+  try {
+    inserted
+      ? await db.updateSSS(encryptedDatabase)
+      : await db.insertSSS(encryptedDatabase);
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+  return true;
+};
+
 export default {
   initialize,
   fetch,
-  insert
+  insert,
+  insertSSS,
 };

@@ -19,7 +19,7 @@ export const init = () => {
     });
     db.transaction(tx => {
       tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS manageBackup (id INTEGER PRIMARY KEY NOT NULL, encData TEXT NOT NULL);',
+        'CREATE TABLE IF NOT EXISTS sss (id INTEGER PRIMARY KEY NOT NULL, encData TEXT NOT NULL);',
         [],
         () => {
           resolve();
@@ -69,11 +69,11 @@ export const insert = encData => {
   });
 };
 
-export const insertManageBackup = encData => {
+export const insertSSS = encData => {
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
       tx.executeSql(
-        'INSERT INTO manageBackup (encData) VALUES (?);',
+        'INSERT INTO sss (encData) VALUES (?);',
         [encData],
         (_, result) => {
           resolve(result);
@@ -92,6 +92,24 @@ export const update = encData => {
     db.transaction(tx => {
       tx.executeSql(
         `UPDATE base SET encData=? WHERE id=1`,
+        [encData],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, err) => {
+          reject(err);
+          return false;
+        },
+      );
+    });
+  });
+};
+
+export const updateSSS = encData => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      tx.executeSql(
+        `UPDATE sss SET encData=? WHERE id=1`,
         [encData],
         (_, result) => {
           resolve(result);
