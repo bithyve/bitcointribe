@@ -10,6 +10,7 @@ import {
   enrichServices,
   ENRICH_SERVICES,
   servicesEnriched,
+  DB_INSERTEDSSS,
 } from '../actions/storage';
 import dataManager from '../../storage/database-manager';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
@@ -83,19 +84,28 @@ export const insertDBWatcher = createWatcher(insertDBWorker, INSERT_INTO_DB);
 
 function* insertSSSDBWorker({ payload }) {
   try {
+    console.log({ payload });
+
     const storage = yield select(state => state.storage);
     const { database, insertedIntoDB, key } = storage;
+
+    console.log({ storage });
+
     const updatedDB = {
-      ...database,
+      insertedIntoDB: true,
       ...payload,
     };
-    const inserted = yield call(
-      dataManager.insertSSS,
-      updatedDB,
-      key,
-      insertedIntoDB,
-    );
+    const inserted = yield call(dataManager.insertSSS, updatedDB, key, false);
+    console.log({ inserted });
 
+    // console.log({ database });
+
+    // const inserted = yield call(
+    //   dataManager.insertSSS,
+    //   updatedDB,
+    //   key,
+    //   insertedIntoDB,
+    // );
     // if (!inserted) {
     //   // dispatch failure
     //   console.log('Failed to insert into DB');
@@ -109,7 +119,7 @@ function* insertSSSDBWorker({ payload }) {
 }
 export const insertSSSDBWatcher = createWatcher(
   insertSSSDBWorker,
-  INSERT_INTO_DB,
+  DB_INSERTEDSSS,
 );
 
 function* servicesEnricherWorker() {

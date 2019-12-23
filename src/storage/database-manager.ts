@@ -34,6 +34,7 @@ const insert = async (database, key, inserted = true) => {
 
 const insertSSS = async (database, key, inserted = true) => {
   const encryptedDatabase = encrypt(database, key);
+  console.log({ encryptedDatabase });
   try {
     inserted
       ? await db.updateSSS(encryptedDatabase)

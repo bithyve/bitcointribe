@@ -41,7 +41,7 @@ const chunkArray = (arr: any, n: any) => {
   return chunks;
 };
 
-export default generatePDF = async (pdfData, fileName, title, password) => {
+export default async (pdfData, fileName, title, password) => {
   const {
     qrData,
     secondaryMnemonic,
@@ -50,8 +50,6 @@ export default generatePDF = async (pdfData, fileName, title, password) => {
     secondaryXpub,
     bhXpub,
   } = pdfData;
-  console.log({ qrData });
-
   const qrcode: string[] = [];
   const qrCodeString: string[][] = [];
   qrData.forEach(qrString => {
@@ -72,7 +70,7 @@ export default generatePDF = async (pdfData, fileName, title, password) => {
     bhXpub,
   };
   let pdfPath = await getPdfPath(pdfDatas);
-  console.log({ pdfPath });
+  //console.log({ pdfPath });
   return pdfPath;
 };
 const getPdfPath = async (pdfData: any) => {
@@ -84,14 +82,13 @@ const getPdfPath = async (pdfData: any) => {
       throw new Error('Storage Permission Denied');
     }
     var PdfPassword = await NativeModules.PdfPassword;
-    console.log({ PdfPassword });
     await PdfPassword.createPdf(
       JSON.stringify(pdfData),
       async (err: any) => {
         return await err;
       },
       async (path: any) => {
-        console.log({ path });
+        //console.log({ path });
         return (await 'file://') + path;
       },
     );

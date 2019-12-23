@@ -21,6 +21,8 @@ import {
   requestedShareUploaded,
   downloadedMShare,
 } from '../actions/sss';
+import { dbInsertedSSS } from '../actions/storage';
+
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { insertIntoDB } from '../actions/storage';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
@@ -330,11 +332,14 @@ function* generatePDFWorker({ payload }) {
       `Hexa Share ${payload.shareIndex}`,
       securityAns,
     );
-    console.log({ generatedPDFPath });
+    let path = {
+      pdfPath: generatedPDFPath,
+    };
+    yield put(dbInsertedSSS(path));
   } catch (err) {
     console.log({ err });
   }
-  yield put(switchS3Loader('generatePDF'));
+  //yield put(switchS3Loader('generatePDF'));
 }
 
 export const generatePDFWatcher = createWatcher(

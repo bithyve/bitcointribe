@@ -1,9 +1,9 @@
 // types and action creators: dispatched by components and sagas
-export const INIT_DB = "INIT_DB";
-export const FETCH_FROM_DB = "FETCH_FROM_DB";
-export const INSERT_INTO_DB = "INSERT_INTO_DB";
-export const KEY_FETCHED = "KEY_FETCHED";
-export const ENRICH_SERVICES = "ENRICH_SERVICES";
+export const INIT_DB = 'INIT_DB';
+export const FETCH_FROM_DB = 'FETCH_FROM_DB';
+export const INSERT_INTO_DB = 'INSERT_INTO_DB';
+export const KEY_FETCHED = 'KEY_FETCHED';
+export const ENRICH_SERVICES = 'ENRICH_SERVICES';
 
 export const initializeDB = () => {
   return { type: INIT_DB };
@@ -26,10 +26,11 @@ export const enrichServices = database => {
 };
 
 // types and action creators (saga): dispatched by saga workers
-export const DB_INITIALIZED = "DB_INITIALIZED";
-export const DB_FETCHED = "DB_FETCHED";
-export const DB_INSERTED = "DB_INSERTED";
-export const SERVICES_ENRICHED = "SERVICES_ENRICHED";
+export const DB_INITIALIZED = 'DB_INITIALIZED';
+export const DB_FETCHED = 'DB_FETCHED';
+export const DB_INSERTED = 'DB_INSERTED';
+export const DB_INSERTEDSSS = 'DB_INSERTEDSSS';
+export const SERVICES_ENRICHED = 'SERVICES_ENRICHED';
 
 export const dbInitialized = initialized => {
   return { type: DB_INITIALIZED, payload: { initialized } };
@@ -41,6 +42,10 @@ export const dbFetched = database => {
 
 export const dbInserted = updatedEntity => {
   return { type: DB_INSERTED, payload: { updatedEntity } };
+};
+
+export const dbInsertedSSS = (pdfDetails: any) => {
+  return { type: DB_INSERTEDSSS, payload: { pdfDetails } };
 };
 
 export const servicesEnriched = services => {
