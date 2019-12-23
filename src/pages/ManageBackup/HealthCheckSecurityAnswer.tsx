@@ -26,7 +26,7 @@ export default function HealthCheckSecurityAnswer(props) {
   const { security } = useSelector(
     state => state.storage.database.WALLET_SETUP,
   );
-  const securityQuestion = security.quest ion;
+  const securityQuestion = security.question;
   const securityAnswer = security.answer;
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
