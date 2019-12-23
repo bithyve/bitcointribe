@@ -16,102 +16,103 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import KnowMoreButton from "../components/KnowMoreButton";
 
-export default function EmailModalContents(props) {
-    return <SafeAreaView style={{ flex: 1 }}>
-    <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-    <View style={styles.modalContainer}>
-        <View style={styles.modalHeaderTitleView}>
-            <TouchableOpacity onPress={() => props.navigation.goBack()} style={{ height: 30, width: 30, justifyContent: 'center', }}>
-                <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-            </TouchableOpacity>
-            <View style={{ marginTop: hp('2%') }}>
-                <Text style={styles.modalHeaderTitleText}>Email</Text>
-                <Text style={styles.modalHeaderInfoText}>Select a source</Text>
-            </View>
-            <KnowMoreButton onpress={() => { }} containerStyle={{ marginTop: 10, marginLeft: 'auto' }} textStyle={{}} />
-        </View>
-        <Text style={{
-            marginLeft: 20, color: Colors.textColorGrey,
-            fontFamily: Fonts.FiraSansRegular,
-            fontSize: RFValue(12, 812),
-        }}>Select email to <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>store recovery secret</Text></Text>
 
-        <View style={{ flex: 1 }}>
-            <TouchableOpacity style={styles.listElements} onPress={() => props.onPressElement('cloud')}>
-                <Image style={styles.listElementsIconImage} source={require('../assets/images/icons/logo_brand_brands_logos_icloud.png')} />
-                <View style={{ justifyContent: 'space-between', flex: 1, }}>
-                    <Text style={styles.listElementsTitle}>iCloud</Text>
-                    <Text style={styles.listElementsInfo} >
-                        Store backup in iCloud Drive
+export default function EmailModalContents( props ) {
+    return <SafeAreaView style={ { flex: 1 } }>
+        <StatusBar backgroundColor={ Colors.white } barStyle="dark-content" />
+        <View style={ styles.modalContainer }>
+            <View style={ styles.modalHeaderTitleView }>
+                <TouchableOpacity onPress={ () => props.navigation.goBack() } style={ { height: 30, width: 30, justifyContent: 'center', } }>
+                    <FontAwesome name="long-arrow-left" color={ Colors.blue } size={ 17 } />
+                </TouchableOpacity>
+                <View style={ { marginTop: hp( '2%' ) } }>
+                    <Text style={ styles.modalHeaderTitleText }>Email</Text>
+                    <Text style={ styles.modalHeaderInfoText }>Select a source</Text>
+                </View>
+                <KnowMoreButton onpress={ () => { } } containerStyle={ { marginTop: 10, marginLeft: 'auto' } } textStyle={ {} } />
+            </View>
+            <Text style={ {
+                marginLeft: 20, color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue( 12, 812 ),
+            } }>Select email to <Text style={ { fontFamily: Fonts.FiraSansMediumItalic } }>store recovery secret</Text></Text>
+
+            <View style={ { flex: 1 } }>
+                <TouchableOpacity style={ styles.listElements } onPress={ () => props.onPressElement( 'cloud' ) }>
+                    <Image style={ styles.listElementsIconImage } source={ require( '../assets/images/icons/logo_brand_brands_logos_icloud.png' ) } />
+                    <View style={ { justifyContent: 'space-between', flex: 1, } }>
+                        <Text style={ styles.listElementsTitle }>iCloud</Text>
+                        <Text style={ styles.listElementsInfo } >
+                            Store backup in iCloud Drive
 						</Text>
-                </View>
-                <View style={styles.listElementIcon}>
-                    <Ionicons
-                        name="ios-arrow-forward"
-                        color={Colors.textColorGrey}
-                        size={15}
-                        style={{ alignSelf: 'center' }}
-                    />
-                </View>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.listElements} onPress={() => props.onPressElement('email')}>
-                <Image style={styles.listElementsIconImage} source={require('../assets/images/icons/gmail.png')} />
-                <View style={{ justifyContent: 'space-between', flex: 1 }}>
-                    <Text style={styles.listElementsTitle}>Gmail</Text>
-                    <Text style={styles.listElementsInfo} numberOfLines={1}>
-                        Store backup in Gmail
+                    </View>
+                    <View style={ styles.listElementIcon }>
+                        <Ionicons
+                            name="ios-arrow-forward"
+                            color={ Colors.textColorGrey }
+                            size={ 15 }
+                            style={ { alignSelf: 'center' } }
+                        />
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={ styles.listElements } onPress={ () => props.onPressElement( 'email' ) }>
+                    <Image style={ styles.listElementsIconImage } source={ require( '../assets/images/icons/print.png' ) } />
+                    <View style={ { justifyContent: 'space-between', flex: 1 } }>
+                        <Text style={ styles.listElementsTitle }>Gmail</Text>
+                        <Text style={ styles.listElementsInfo } numberOfLines={ 1 }>
+                            Store backup in Gmail
 								</Text>
-                </View>
-                <View style={styles.listElementIcon}>
-                    <Ionicons
-                        name="ios-arrow-forward"
-                        color={Colors.textColorGrey}
-                        size={15}
-                        style={{ alignSelf: 'center' }}
-                    />
-                </View>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.listElements} onPress={() => props.onPressElement('print')}>
-                <Image style={styles.listElementsIconImage} source={require('../assets/images/icons/outlook.png')} />
-                <View style={{ justifyContent: 'space-between', flex: 1 }}>
-                    <Text style={styles.listElementsTitle}>Outlook</Text>
-                    <Text style={styles.listElementsInfo} numberOfLines={1}>
-                        Store backup in Outlook
+                    </View>
+                    <View style={ styles.listElementIcon }>
+                        <Ionicons
+                            name="ios-arrow-forward"
+                            color={ Colors.textColorGrey }
+                            size={ 15 }
+                            style={ { alignSelf: 'center' } }
+                        />
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={ styles.listElements } onPress={ () => props.onPressElement( 'print' ) }>
+                    <Image style={ styles.listElementsIconImage } source={ require( '../assets/images/icons/print.png' ) } />
+                    <View style={ { justifyContent: 'space-between', flex: 1 } }>
+                        <Text style={ styles.listElementsTitle }>Outlook</Text>
+                        <Text style={ styles.listElementsInfo } numberOfLines={ 1 }>
+                            Store backup in Outlook
 								</Text>
-                </View>
-                <View style={styles.listElementIcon}>
-                    <Ionicons
-                        name="ios-arrow-forward"
-                        color={Colors.textColorGrey}
-                        size={15}
-                        style={{ alignSelf: 'center' }}
-                    />
-                </View>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.listElements} onPress={() => props.onPressElement('local')}>
-                <Image style={{ resizeMode: 'contain', width: 20, height: 25, alignSelf: 'center' }} source={require('../assets/images/icons/yahoo.png')} />
-                <View style={{ justifyContent: 'space-between', flex: 1 }}>
-                    <Text style={styles.listElementsTitle}>Yahoo</Text>
-                    <Text style={styles.listElementsInfo}>
-                        Store backup in Yahoo
+                    </View>
+                    <View style={ styles.listElementIcon }>
+                        <Ionicons
+                            name="ios-arrow-forward"
+                            color={ Colors.textColorGrey }
+                            size={ 15 }
+                            style={ { alignSelf: 'center' } }
+                        />
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={ styles.listElements } onPress={ () => props.onPressElement( 'local' ) }>
+                    <Image style={ { resizeMode: 'contain', width: 20, height: 25, alignSelf: 'center' } } source={ require( '../assets/images/icons/print.png' ) } />
+                    <View style={ { justifyContent: 'space-between', flex: 1 } }>
+                        <Text style={ styles.listElementsTitle }>Yahoo</Text>
+                        <Text style={ styles.listElementsInfo }>
+                            Store backup in Yahoo
 								</Text>
-                </View>
-                <View style={styles.listElementIcon}>
-                    <Ionicons
-                        name="ios-arrow-forward"
-                        color={Colors.textColorGrey}
-                        size={15}
-                        style={{ alignSelf: 'center' }}
-                    />
-                </View>
-            </TouchableOpacity>
+                    </View>
+                    <View style={ styles.listElementIcon }>
+                        <Ionicons
+                            name="ios-arrow-forward"
+                            color={ Colors.textColorGrey }
+                            size={ 15 }
+                            style={ { alignSelf: 'center' } }
+                        />
+                    </View>
+                </TouchableOpacity>
+            </View>
         </View>
-    </View>
     </SafeAreaView>
 }
 
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
     modalContainer: {
         height: '100%',
         backgroundColor: Colors.white,
@@ -131,13 +132,13 @@ const styles = StyleSheet.create({
     },
     modalHeaderTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue( 18, 812 ),
         fontFamily: Fonts.FiraSansMedium
     },
     modalHeaderInfoText: {
         color: Colors.textColorGrey,
         fontFamily: Fonts.FiraSansRegular,
-        fontSize: RFValue(12, 812),
+        fontSize: RFValue( 12, 812 ),
         marginTop: 5
     },
     listElements: {
@@ -153,13 +154,13 @@ const styles = StyleSheet.create({
     },
     listElementsTitle: {
         color: Colors.blue,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue( 13, 812 ),
         marginLeft: 13,
         fontFamily: Fonts.FiraSansRegular
     },
     listElementsInfo: {
         color: Colors.textColorGrey,
-        fontSize: RFValue(11, 812),
+        fontSize: RFValue( 11, 812 ),
         marginLeft: 13,
         marginTop: 5,
         fontFamily: Fonts.FiraSansRegular
@@ -176,4 +177,4 @@ const styles = StyleSheet.create({
         height: 25,
         alignSelf: 'center'
     }
-})
+} )

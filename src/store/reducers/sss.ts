@@ -4,11 +4,11 @@ import {
   MNEMONIC_RECOVERED,
   REQUESTED_SHARE_UPLOADED,
   RESET_REQUESTED_SHARE_UPLOADS,
-  DOWNLOADED_MSHARE
-} from "../actions/sss";
-import S3Service from "../../bitcoin/services/sss/S3Service";
-import { SERVICES_ENRICHED } from "../actions/storage";
-import { S3_SERVICE } from "../../common/constants/serviceTypes";
+  DOWNLOADED_MSHARE,
+} from '../actions/sss';
+import S3Service from '../../bitcoin/services/sss/S3Service';
+import { SERVICES_ENRICHED } from '../actions/storage';
+import { S3_SERVICE } from '../../common/constants/serviceTypes';
 
 const initialState: {
   service: S3Service;
@@ -45,11 +45,11 @@ const initialState: {
     updateDynamicNonPMDD: false,
     downloadDynamicNonPMDD: false,
     restoreDynamicNonPMDD: false,
-    restoreWallet: false
+    restoreWallet: false,
   },
-  mnemonic: "",
+  mnemonic: '',
   requestedShareUpload: {},
-  downloadedMShare: {}
+  downloadedMShare: {},
 };
 
 export default (state = initialState, action) => {
@@ -59,20 +59,20 @@ export default (state = initialState, action) => {
         ...state,
         loading: {
           ...state.loading,
-          hcInit: false
-        }
+          hcInit: false,
+        },
       };
 
     case MNEMONIC_RECOVERED:
       return {
         ...state,
-        mnemonic: action.payload.mnemonic
+        mnemonic: action.payload.mnemonic,
       };
 
     case SERVICES_ENRICHED:
       return {
         ...state,
-        service: action.payload.services[S3_SERVICE]
+        service: action.payload.services[S3_SERVICE],
       };
 
     case REQUESTED_SHARE_UPLOADED:
@@ -82,15 +82,15 @@ export default (state = initialState, action) => {
           ...state.requestedShareUpload,
           [action.payload.tag]: {
             status: action.payload.status,
-            err: action.payload.err
-          }
-        }
+            err: action.payload.err,
+          },
+        },
       };
 
     case RESET_REQUESTED_SHARE_UPLOADS:
       return {
         ...state,
-        requestedShareUpload: initialState.requestedShareUpload
+        requestedShareUpload: initialState.requestedShareUpload,
       };
 
     case DOWNLOADED_MSHARE:
@@ -100,9 +100,9 @@ export default (state = initialState, action) => {
           ...state.downloadedMShare,
           [action.payload.otp]: {
             status: action.payload.status,
-            err: action.payload.err
-          }
-        }
+            err: action.payload.err,
+          },
+        },
       };
 
     case S3_LOADING:
@@ -112,8 +112,8 @@ export default (state = initialState, action) => {
           ...state.loading,
           [action.payload.beingLoaded]: !state.loading[
             action.payload.beingLoaded
-          ]
-        }
+          ],
+        },
       };
   }
   return state;

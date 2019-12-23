@@ -49,24 +49,24 @@ import {
 import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
 
-export default function Accounts(props) {
-  const sliderWidth = Dimensions.get('window').width;
-  const [bottomSheet, setBottomSheet] = useState(React.createRef());
-  const [SendBottomSheet, setSendBottomSheet] = useState(React.createRef());
-  const [ReceiveBottomSheet, setReceiveBottomSheet] = useState(
+export default function Accounts( props ) {
+  const sliderWidth = Dimensions.get( 'window' ).width;
+  const [ bottomSheet, setBottomSheet ] = useState( React.createRef() );
+  const [ SendBottomSheet, setSendBottomSheet ] = useState( React.createRef() );
+  const [ ReceiveBottomSheet, setReceiveBottomSheet ] = useState(
     React.createRef(),
   );
   const [
     CustodianRequestOtpBottomSheet,
     setCustodianRequestOtpBottomSheet,
-  ] = useState(React.createRef());
-  const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
+  ] = useState( React.createRef() );
+  const [ SendSuccessBottomSheet, setSendSuccessBottomSheet ] = useState(
     React.createRef(),
   );
-  const [SendErrorBottomSheet, setSendErrorBottomSheet] = useState(
+  const [ SendErrorBottomSheet, setSendErrorBottomSheet ] = useState(
     React.createRef(),
   );
-  const [transactionData, setTransactionData] = useState([
+  const [ transactionData, setTransactionData ] = useState( [
     {
       title: 'Spending accounts',
       date: '30 November 2019',
@@ -137,189 +137,189 @@ export default function Accounts(props) {
       price: '0.1',
       transactionStatus: 'send',
     },
-  ]);
-  const [carouselData, setCarouselData] = useState([
+  ] );
+  const [ carouselData, setCarouselData ] = useState( [
     {
       accountType: 'Test Account',
       accountInfo: 'Test it out!',
-      backgroundImage: require('../../assets/images/carouselImages/test_account_background.png'),
-      accountTypeImage: require('../../assets/images/icons/icon_test_white.png'),
+      backgroundImage: require( '../../assets/images/carouselImages/test_account_background.png' ),
+      accountTypeImage: require( '../../assets/images/icons/icon_test_white.png' ),
     },
     {
       accountType: 'Regular Account',
       accountInfo: 'Fast and easy',
-      backgroundImage: require('../../assets/images/carouselImages/regular_account_background.png'),
-      accountTypeImage: require('../../assets/images/icons/icon_regular_account.png'),
+      backgroundImage: require( '../../assets/images/carouselImages/regular_account_background.png' ),
+      accountTypeImage: require( '../../assets/images/icons/icon_regular_account.png' ),
     },
     {
       accountType: 'Savings account',
       accountInfo: 'Multi-factor security',
-      backgroundImage: require('../../assets/images/carouselImages/savings_account_background.png'),
-      accountTypeImage: require('../../assets/images/icons/icon_secureaccount_white.png'),
+      backgroundImage: require( '../../assets/images/carouselImages/savings_account_background.png' ),
+      accountTypeImage: require( '../../assets/images/icons/icon_secureaccount_white.png' ),
     },
-  ]);
+  ] );
 
-  const [carouselInitIndex, setCarouselInitIndex] = useState(0);
-  const [switchOn, setSwitchOn] = useState(true);
-  const [carousel, setCarousel] = useState(React.createRef());
+  const [ carouselInitIndex, setCarouselInitIndex ] = useState( 0 );
+  const [ switchOn, setSwitchOn ] = useState( true );
+  const [ carousel, setCarousel ] = useState( React.createRef() );
 
-  useEffect(() => {
-    if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
-      setTimeout(() => {
-        carousel.current.snapToItem(0, true, false);
-        setCarouselInitIndex(0);
-      }, 200);
+  useEffect( () => {
+    if ( props.navigation.getParam( 'serviceType' ) == TEST_ACCOUNT ) {
+      setTimeout( () => {
+        carousel.current.snapToItem( 0, true, false );
+        setCarouselInitIndex( 0 );
+      }, 200 );
     }
-    if (props.navigation.getParam('serviceType') == REGULAR_ACCOUNT) {
-      setTimeout(() => {
-        carousel.current.snapToItem(1, true, false);
-      }, 200);
+    if ( props.navigation.getParam( 'serviceType' ) == REGULAR_ACCOUNT ) {
+      setTimeout( () => {
+        carousel.current.snapToItem( 1, true, false );
+      }, 200 );
     }
-    if (props.navigation.getParam('serviceType') == SECURE_ACCOUNT) {
-      setTimeout(() => {
-        carousel.current.snapToItem(2, true, false);
-      }, 200);
+    if ( props.navigation.getParam( 'serviceType' ) == SECURE_ACCOUNT ) {
+      setTimeout( () => {
+        carousel.current.snapToItem( 2, true, false );
+      }, 200 );
     }
-  }, []);
+  }, [] );
 
   const renderSendContents = () => {
     return (
       <SendModalContents
-        onPressBack={() => {
-          (SendBottomSheet as any).current.snapTo(0);
-        }}
-        onPressContinue={() => {
-          (SendBottomSheet as any).current.snapTo(0);
-          (CustodianRequestOtpBottomSheet as any).current.snapTo(1);
-        }}
-        modalRef={SendBottomSheet}
+        onPressBack={ () => {
+          ( SendBottomSheet as any ).current.snapTo( 0 );
+        } }
+        onPressContinue={ () => {
+          ( SendBottomSheet as any ).current.snapTo( 0 );
+          ( CustodianRequestOtpBottomSheet as any ).current.snapTo( 1 );
+        } }
+        modalRef={ SendBottomSheet }
       />
     );
   };
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ( { item, index } ) => {
     return (
       <ImageBackground
-        source={item.backgroundImage}
-        imageStyle={{
-          height: hp('20%'),
+        source={ item.backgroundImage }
+        imageStyle={ {
+          height: hp( '20%' ),
           borderRadius: 10,
-        }}
-        style={{
-          height: hp('20%'),
+        } }
+        style={ {
+          height: hp( '20%' ),
           borderRadius: 10,
           margin: 5,
-          padding: hp('2%'),
+          padding: hp( '2%' ),
           elevation: 5,
           shadowColor:
             index == 0
               ? Colors.blue
               : index == 1
-              ? Colors.yellow
-              : index == 2
-              ? Colors.green
-              : Colors.borderColor,
+                ? Colors.yellow
+                : index == 2
+                  ? Colors.green
+                  : Colors.borderColor,
           shadowOpacity: 0.2,
           shadowOffset: { width: 0, height: 7 },
           flexDirection: 'row',
           justifyContent: 'space-between',
-        }}
+        } }
       >
-        <View style={{ justifyContent: 'space-between' }}>
+        <View style={ { justifyContent: 'space-between' } }>
           <Image
-            source={item.accountTypeImage}
-            style={{
-              width: wp('15%'),
-              height: wp('15%'),
+            source={ item.accountTypeImage }
+            style={ {
+              width: wp( '15%' ),
+              height: wp( '15%' ),
               resizeMode: 'contain',
-            }}
+            } }
           />
-          <View style={{}}>
+          <View style={ {} }>
             <Text
-              style={{
+              style={ {
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(15, 812),
+                fontSize: RFValue( 15, 812 ),
                 color: Colors.white,
-              }}
+              } }
             >
-              {item.accountType}
+              { item.accountType }
             </Text>
             <Text
-              style={{
+              style={ {
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12, 812),
+                fontSize: RFValue( 12, 812 ),
                 color: Colors.white,
-              }}
+              } }
             >
-              {item.accountInfo}
+              { item.accountInfo }
             </Text>
           </View>
         </View>
 
-        <View style={{ justifyContent: 'space-between' }}>
+        <View style={ { justifyContent: 'space-between' } }>
           <Image
-            style={{
+            style={ {
               marginLeft: 'auto',
-              width: wp('5%'),
-              height: wp('5%'),
+              width: wp( '5%' ),
+              height: wp( '5%' ),
               resizeMode: 'contain',
-            }}
-            source={require('../../assets/images/icons/icon_settings.png')}
+            } }
+            source={ require( '../../assets/images/icons/icon_settings.png' ) }
           />
-          {item.accountType == 'Savings account' && (
+          { item.accountType == 'Savings account' && (
             <Text
-              style={{
+              style={ {
                 marginLeft: 'auto',
                 fontFamily: Fonts.FiraSansMedium,
-                fontSize: RFValue(15, 812),
+                fontSize: RFValue( 15, 812 ),
                 color: Colors.white,
                 alignSelf: 'center',
-              }}
+              } }
             >
               2FA
             </Text>
-          )}
-          <View style={{ flexDirection: 'row' }}>
+          ) }
+          <View style={ { flexDirection: 'row' } }>
             <Image
-              style={styles.cardBitCoinImage}
-              source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+              style={ styles.cardBitCoinImage }
+              source={ require( '../../assets/images/icons/icon_bitcoin_light.png' ) }
             />
-            <Text style={styles.cardAmountText}>{netBalance}</Text>
-            <Text style={styles.cardAmountUnitText}>sat</Text>
+            <Text style={ styles.cardAmountText }>{ netBalance }</Text>
+            <Text style={ styles.cardAmountUnitText }>sat</Text>
           </View>
         </View>
       </ImageBackground>
     );
   };
-  const scrollInterpolator = (index, carouselProps) => {
-    const range = [1, 0, -1];
-    const inputRange = getInputRangeFromIndexes(range, index, carouselProps);
+  const scrollInterpolator = ( index, carouselProps ) => {
+    const range = [ 1, 0, -1 ];
+    const inputRange = getInputRangeFromIndexes( range, index, carouselProps );
     const outputRange = range;
     return { inputRange, outputRange };
   };
 
-  const slideInterpolatedStyle = (index, animatedValue, carouselProps) => {
+  const slideInterpolatedStyle = ( index, animatedValue, carouselProps ) => {
     return {
-      opacity: animatedValue.interpolate({
-        inputRange: [-1, 0, 1],
-        outputRange: [0.5, 1, 0.5],
+      opacity: animatedValue.interpolate( {
+        inputRange: [ -1, 0, 1 ],
+        outputRange: [ 0.5, 1, 0.5 ],
         extrapolate: 'clamp',
-      }),
+      } ),
       transform: [
         {
-          translateX: animatedValue.interpolate({
-            inputRange: [-1, 0, 1],
+          translateX: animatedValue.interpolate( {
+            inputRange: [ -1, 0, 1 ],
             outputRange: [
               carouselProps.itemWidth / 100,
               0,
               -carouselProps.itemWidth / 100,
             ],
             extrapolate: 'clamp',
-          }),
-          scale: animatedValue.interpolate({
-            inputRange: [-1, 0, 1],
-            outputRange: [1, 1, 1],
-          }),
+          } ),
+          scale: animatedValue.interpolate( {
+            inputRange: [ -1, 0, 1 ],
+            outputRange: [ 1, 1, 1 ],
+          } ),
         },
       ],
     };
@@ -327,36 +327,36 @@ export default function Accounts(props) {
 
   const renderTransactionsContent = () => {
     return (
-      <View style={styles.modalContentContainer}>
-        <View style={{ marginLeft: 20, marginTop: 20 }}>
-          <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
+      <View style={ styles.modalContentContainer }>
+        <View style={ { marginLeft: 20, marginTop: 20 } }>
+          <Text style={ styles.modalHeaderTitleText }>{ 'Transactions' }</Text>
         </View>
         <FlatList
-          data={transactions.transactionDetails}
-          ItemSeparatorComponent={() => (
-            <View style={{ backgroundColor: Colors.white }}>
-              <View style={styles.separatorView} />
+          data={ transactions.transactionDetails }
+          ItemSeparatorComponent={ () => (
+            <View style={ { backgroundColor: Colors.white } }>
+              <View style={ styles.separatorView } />
             </View>
-          )}
-          renderItem={({ item }) => (
+          ) }
+          renderItem={ ( { item } ) => (
             <AppBottomSheetTouchableWrapper
-              onPress={() =>
-                props.navigation.navigate('TransactionDetails', { item })
+              onPress={ () =>
+                props.navigation.navigate( 'TransactionDetails', { item } )
               }
-              style={{
+              style={ {
                 ...styles.transactionModalElementView,
                 backgroundColor: Colors.white,
-              }}
+              } }
             >
-              <View style={styles.modalElementInfoView}>
-                <View style={{ justifyContent: 'center' }}>
+              <View style={ styles.modalElementInfoView }>
+                <View style={ { justifyContent: 'center' } }>
                   <FontAwesome
                     name={
                       item.transactionType == 'Received'
                         ? 'long-arrow-down'
                         : 'long-arrow-up'
                     }
-                    size={15}
+                    size={ 15 }
                     color={
                       item.transactionType == 'Received'
                         ? Colors.green
@@ -364,12 +364,12 @@ export default function Accounts(props) {
                     }
                   />
                 </View>
-                <View style={{ justifyContent: 'center', marginLeft: 10 }}>
-                  <Text style={styles.transactionModalTitleText}>
-                    {item.accountType}{' '}
+                <View style={ { justifyContent: 'center', marginLeft: 10 } }>
+                  <Text style={ styles.transactionModalTitleText }>
+                    { item.accountType }{ ' ' }
                   </Text>
-                  <Text style={styles.transactionModalDateText}>
-                    {item.date}{' '}
+                  <Text style={ styles.transactionModalDateText }>
+                    { item.date }{ ' ' }
                     {/* <Entypo
                       size={10}
                       name={"dot-single"}
@@ -379,34 +379,34 @@ export default function Accounts(props) {
                   </Text>
                 </View>
               </View>
-              <View style={styles.transactionModalAmountView}>
+              <View style={ styles.transactionModalAmountView }>
                 <Image
-                  source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                  style={{ width: 12, height: 12, resizeMode: 'contain' }}
+                  source={ require( '../../assets/images/icons/icon_bitcoin_gray.png' ) }
+                  style={ { width: 12, height: 12, resizeMode: 'contain' } }
                 />
                 <Text
-                  style={{
+                  style={ {
                     ...styles.transactionModalAmountText,
                     color:
                       item.transactionType == 'Received'
                         ? Colors.green
                         : Colors.red,
-                  }}
+                  } }
                 >
-                  {item.amount}
+                  { item.amount }
                 </Text>
-                <Text style={styles.transactionModalAmountUnitText}>
-                  {item.confirmations < 6 ? item.confirmations : '6+'}
+                <Text style={ styles.transactionModalAmountUnitText }>
+                  { item.confirmations < 6 ? item.confirmations : '6+' }
                 </Text>
                 <Ionicons
                   name="ios-arrow-forward"
-                  color={Colors.textColorGrey}
-                  size={12}
-                  style={{ marginLeft: 20, alignSelf: 'center' }}
+                  color={ Colors.textColorGrey }
+                  size={ 12 }
+                  style={ { marginLeft: 20, alignSelf: 'center' } }
                 />
               </View>
             </AppBottomSheetTouchableWrapper>
-          )}
+          ) }
         />
       </View>
     );
@@ -415,18 +415,18 @@ export default function Accounts(props) {
   const renderTransactionsHeader = () => {
     return (
       <TransparentHeaderModal
-        onPressheader={() => {
-          (bottomSheet as any).current.snapTo(0);
-        }}
+        onPressheader={ () => {
+          ( bottomSheet as any ).current.snapTo( 0 );
+        } }
       />
     );
   };
   const renderSendModalHeader = () => {
     return (
       <TransparentHeaderModal
-        onPressheader={() => {
-          (SendBottomSheet as any).current.snapTo(0);
-        }}
+        onPressheader={ () => {
+          ( SendBottomSheet as any ).current.snapTo( 0 );
+        } }
       />
     );
   };
@@ -434,28 +434,28 @@ export default function Accounts(props) {
   const renderSendOtpModalContents = () => {
     return (
       <CustodianRequestOtpModalContents
-        title1stLine={'Enter OTP to'}
-        title2ndLine={'authenticate'}
-        info1stLine={'Lorem ipsum dolor sit amet, consectetur'}
-        info2ndLine={'adipiscing elit, sed do eiusmod tempor'}
+        title1stLine={ 'Enter OTP to' }
+        title2ndLine={ 'authenticate' }
+        info1stLine={ 'Lorem ipsum dolor sit amet, consectetur' }
+        info2ndLine={ 'adipiscing elit, sed do eiusmod tempor' }
         subInfo1stLine={
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit,'
         }
-        subInfo2ndLine={'sed do eiusmod tempor incididunt ut labore et dolore'}
-        modalRef={CustodianRequestOtpBottomSheet}
-        onPressConfirm={() => {
-          (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
-          (SendSuccessBottomSheet as any).current.snapTo(1);
-        }}
+        subInfo2ndLine={ 'sed do eiusmod tempor incididunt ut labore et dolore' }
+        modalRef={ CustodianRequestOtpBottomSheet }
+        onPressConfirm={ () => {
+          ( CustodianRequestOtpBottomSheet as any ).current.snapTo( 0 );
+          ( SendSuccessBottomSheet as any ).current.snapTo( 1 );
+        } }
       />
     );
   };
   const renderSendOTPModalHeader = () => {
     return (
       <TransparentHeaderModal
-        onPressheader={() => {
-          (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
-        }}
+        onPressheader={ () => {
+          ( CustodianRequestOtpBottomSheet as any ).current.snapTo( 0 );
+        } }
       />
     );
   };
@@ -463,27 +463,27 @@ export default function Accounts(props) {
   const renderSuccessStatusContents = () => {
     return (
       <SendStatusModalContents
-        title1stLine={'Sent Successfully'}
-        title2ndLine={'to Contact'}
-        info1stLine={'Bitcoins successfully sent to Contact'}
-        info2ndLine={''}
-        userName={'Arpan Jain'}
-        modalRef={SendSuccessBottomSheet}
-        isSuccess={true}
-        onPressViewAccount={() => {
-          (SendSuccessBottomSheet as any).current.snapTo(0);
-        }}
-        transactionId={'38123819421304'}
-        transactionDateTime={'11:00am, 19 June 2019'}
+        title1stLine={ 'Sent Successfully' }
+        title2ndLine={ 'to Contact' }
+        info1stLine={ 'Bitcoins successfully sent to Contact' }
+        info2ndLine={ '' }
+        userName={ 'Arpan Jain' }
+        modalRef={ SendSuccessBottomSheet }
+        isSuccess={ true }
+        onPressViewAccount={ () => {
+          ( SendSuccessBottomSheet as any ).current.snapTo( 0 );
+        } }
+        transactionId={ '38123819421304' }
+        transactionDateTime={ '11:00am, 19 June 2019' }
       />
     );
   };
   const renderSendSuccessHeader = () => {
     return (
       <TransparentHeaderModal
-        onPressheader={() => {
-          (SendSuccessBottomSheet as any).current.snapTo(0);
-        }}
+        onPressheader={ () => {
+          ( SendSuccessBottomSheet as any ).current.snapTo( 0 );
+        } }
       />
     );
   };
@@ -491,32 +491,32 @@ export default function Accounts(props) {
   const renderSendErrorContents = () => {
     return (
       <SendStatusModalContents
-        title1stLine={'Could not Send '}
-        title2ndLine={'Amount to Contact'}
-        info1stLine={'There seems to be a problem'}
-        info2ndLine={''}
+        title1stLine={ 'Could not Send ' }
+        title2ndLine={ 'Amount to Contact' }
+        info1stLine={ 'There seems to be a problem' }
+        info2ndLine={ '' }
         subInfo1stLine={
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
         }
-        subInfo2ndLine={'sed do eiusmod tempor incididunt ut labore et dolore'}
-        userName={'Arpan Jain'}
-        modalRef={SendErrorBottomSheet}
-        isSuccess={false}
-        onPressTryAgain={() => {
-          (SendErrorBottomSheet as any).current.snapTo(0);
-        }}
-        onPressSkip={() => {
-          (SendErrorBottomSheet as any).current.snapTo(0);
-        }}
+        subInfo2ndLine={ 'sed do eiusmod tempor incididunt ut labore et dolore' }
+        userName={ 'Arpan Jain' }
+        modalRef={ SendErrorBottomSheet }
+        isSuccess={ false }
+        onPressTryAgain={ () => {
+          ( SendErrorBottomSheet as any ).current.snapTo( 0 );
+        } }
+        onPressSkip={ () => {
+          ( SendErrorBottomSheet as any ).current.snapTo( 0 );
+        } }
       />
     );
   };
   const renderSendErrorHeader = () => {
     return (
       <TransparentHeaderModal
-        onPressheader={() => {
-          (SendErrorBottomSheet as any).current.snapTo(0);
-        }}
+        onPressheader={ () => {
+          ( SendErrorBottomSheet as any ).current.snapTo( 0 );
+        } }
       />
     );
   };
@@ -526,11 +526,11 @@ export default function Accounts(props) {
   // (SendBottomSheet as any).current.snapTo(1)
   // }, []);
 
-  const [serviceType, setServiceType] = useState(
-    props.navigation.getParam('serviceType'),
+  const [ serviceType, setServiceType ] = useState(
+    props.navigation.getParam( 'serviceType' ),
   );
   const { loading, service } = useSelector(
-    state => state.accounts[serviceType],
+    state => state.accounts[ serviceType ],
   );
 
   const { balances, transactions } =
@@ -540,172 +540,172 @@ export default function Accounts(props) {
     : 0;
 
   const dispatch = useDispatch();
-  useEffect(() => {
-    if (!netBalance) {
-      if (serviceType === TEST_ACCOUNT) dispatch(getTestcoins(serviceType));
-      else dispatch(fetchBalance(serviceType)); // TODO: do periodic auto search
+  useEffect( () => {
+    if ( !netBalance ) {
+      if ( serviceType === TEST_ACCOUNT ) dispatch( getTestcoins( serviceType ) );
+      else dispatch( fetchBalance( serviceType ) ); // TODO: do periodic auto search
     }
-  }, [serviceType]);
+  }, [ serviceType ] );
 
-  useEffect(() => {
-    if (!transactions.totalTransactions)
-      dispatch(fetchTransactions(serviceType));
-  }, [serviceType]);
+  useEffect( () => {
+    if ( !transactions.totalTransactions )
+      dispatch( fetchTransactions( serviceType ) );
+  }, [ serviceType ] );
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
-      <SafeAreaView style={{ flex: 0 }} />
+    <View style={ { flex: 1, backgroundColor: Colors.backgroundColor } }>
+      <SafeAreaView style={ { flex: 0 } } />
       <StatusBar
-        backgroundColor={Colors.backgroundColor}
+        backgroundColor={ Colors.backgroundColor }
         barStyle="dark-content"
       />
       <View
-        style={{
+        style={ {
           ...CommonStyles.headerContainer,
           justifyContent: 'space-between',
           backgroundColor: Colors.backgroundColor,
           borderBottomWidth: 0,
-        }}
+        } }
       >
         <TouchableOpacity
-          style={{ ...CommonStyles.headerLeftIconContainer }}
-          onPress={() => {
-            props.navigation.navigate('Home');
-          }}
+          style={ { ...CommonStyles.headerLeftIconContainer } }
+          onPress={ () => {
+            props.navigation.navigate( 'Home' );
+          } }
         >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          <View style={ CommonStyles.headerLeftIconInnerContainer }>
+            <FontAwesome name="long-arrow-left" color={ Colors.blue } size={ 17 } />
           </View>
         </TouchableOpacity>
         <Text
-          style={{
+          style={ {
             color: Colors.blue,
-            fontSize: RFValue(20, 812),
+            fontSize: RFValue( 20, 812 ),
             fontFamily: Fonts.FiraSansRegular,
             textAlign: 'center',
-          }}
+          } }
         >
           Accounts
         </Text>
         <TouchableOpacity
-          style={{ height: 54, justifyContent: 'center' }}
-          onPress={() => {}}
+          style={ { height: 54, justifyContent: 'center' } }
+          onPress={ () => { } }
         >
           <View
-            style={{
+            style={ {
               ...CommonStyles.headerLeftIconInnerContainer,
               paddingRight: 30,
-            }}
+            } }
           >
             <ToggleSwitch
-              activeOnImage={require('../../assets/images/icons/icon_bitcoin_light.png')}
-              inactiveOnImage={require('../../assets/images/icons/icon_bitcoin_dark.png')}
-              activeOffImage={require('../../assets/images/icons/icon_dollar_white.png')}
-              inactiveOffImage={require('../../assets/images/icons/icon_dollar_dark.png')}
-              toggleColor={Colors.lightBlue}
-              toggleCircleColor={Colors.blue}
-              onpress={() => {
-                setSwitchOn(!switchOn);
-              }}
-              toggle={switchOn}
+              activeOnImage={ require( '../../assets/images/icons/icon_bitcoin_light.png' ) }
+              inactiveOnImage={ require( '../../assets/images/icons/icon_bitcoin_dark.png' ) }
+              activeOffImage={ require( '../../assets/images/icons/icon_dollar_white.png' ) }
+              inactiveOffImage={ require( '../../assets/images/icons/icon_dollar_dark.png' ) }
+              toggleColor={ Colors.lightBlue }
+              toggleCircleColor={ Colors.blue }
+              onpress={ () => {
+                setSwitchOn( !switchOn );
+              } }
+              toggle={ switchOn }
             />
           </View>
         </TouchableOpacity>
       </View>
       <ScrollView
-        contentContainerStyle={{
+        contentContainerStyle={ {
           backgroundColor: Colors.backgroundColor,
-        }}
+        } }
         refreshControl={
           <RefreshControl
-            refreshing={loading.transactions || loading.balances}
-            onRefresh={() => {
-              dispatch(fetchBalance(serviceType));
-            }}
+            refreshing={ loading.transactions || loading.balances }
+            onRefresh={ () => {
+              dispatch( fetchBalance( serviceType ) );
+            } }
           />
         }
       >
-        <View style={{ paddingTop: hp('3%'), paddingBottom: hp('3%') }}>
+        <View style={ { paddingTop: hp( '3%' ), paddingBottom: hp( '3%' ) } }>
           <Carousel
-            ref={carousel}
-            data={carouselData}
-            initialNumToRender={carouselInitIndex}
-            renderItem={renderItem}
-            sliderWidth={sliderWidth}
-            itemWidth={sliderWidth * 0.95}
-            onSnapToItem={index => {
-              setCarouselInitIndex(index);
+            ref={ carousel }
+            data={ carouselData }
+            initialNumToRender={ carouselInitIndex }
+            renderItem={ renderItem }
+            sliderWidth={ sliderWidth }
+            itemWidth={ sliderWidth * 0.95 }
+            onSnapToItem={ index => {
+              setCarouselInitIndex( index );
               index === 0
-                ? setServiceType(TEST_ACCOUNT)
+                ? setServiceType( TEST_ACCOUNT )
                 : index === 1
-                ? setServiceType(REGULAR_ACCOUNT)
-                : setServiceType(SECURE_ACCOUNT);
-            }}
-            style={{ activeSlideAlignment: 'center' }}
-            scrollInterpolator={scrollInterpolator}
-            slideInterpolatedStyle={slideInterpolatedStyle}
-            useScrollView={true}
-            extraData={carouselInitIndex}
+                  ? setServiceType( REGULAR_ACCOUNT )
+                  : setServiceType( SECURE_ACCOUNT );
+            } }
+            style={ { activeSlideAlignment: 'center' } }
+            scrollInterpolator={ scrollInterpolator }
+            slideInterpolatedStyle={ slideInterpolatedStyle }
+            useScrollView={ true }
+            extraData={ carouselInitIndex }
           />
         </View>
         <View>
           <View
-            style={{
+            style={ {
               backgroundColor: Colors.backgroundColor,
               flexDirection: 'row',
               marginLeft: 20,
               marginRight: 20,
-              marginBottom: hp('2%'),
-            }}
+              marginBottom: hp( '2%' ),
+            } }
           >
             <Text
-              style={{
+              style={ {
                 color: Colors.textColorGrey,
-                fontSize: RFValue(13, 812),
+                fontSize: RFValue( 13, 812 ),
                 fontFamily: Fonts.FiraSansRegular,
-              }}
+              } }
             >
               Today
             </Text>
             <Text
-              onPress={() => {
-                (bottomSheet as any).current.snapTo(1);
-              }}
-              style={{
+              onPress={ () => {
+                ( bottomSheet as any ).current.snapTo( 1 );
+              } }
+              style={ {
                 color: Colors.textColorGrey,
-                fontSize: RFValue(12, 812),
+                fontSize: RFValue( 12, 812 ),
                 fontFamily: Fonts.FiraSansItalic,
                 textDecorationLine: 'underline',
                 marginLeft: 'auto',
-              }}
+              } }
             >
               View More
             </Text>
           </View>
           <View>
             <FlatList
-              data={transactions.transactionDetails.slice(0, 3)}
-              ItemSeparatorComponent={() => (
-                <View style={{ backgroundColor: Colors.backgroundColor }}>
-                  <View style={styles.separatorView} />
+              data={ transactions.transactionDetails.slice( 0, 3 ) }
+              ItemSeparatorComponent={ () => (
+                <View style={ { backgroundColor: Colors.backgroundColor } }>
+                  <View style={ styles.separatorView } />
                 </View>
-              )}
-              renderItem={({ item }) => (
+              ) }
+              renderItem={ ( { item } ) => (
                 <TouchableOpacity
-                  onPress={() =>
-                    props.navigation.navigate('TransactionDetails', { item })
+                  onPress={ () =>
+                    props.navigation.navigate( 'TransactionDetails', { item } )
                   }
-                  style={styles.transactionModalElementView}
+                  style={ styles.transactionModalElementView }
                 >
-                  <View style={styles.modalElementInfoView}>
-                    <View style={{ justifyContent: 'center' }}>
+                  <View style={ styles.modalElementInfoView }>
+                    <View style={ { justifyContent: 'center' } }>
                       <FontAwesome
                         name={
                           item.transactionType == 'Received'
                             ? 'long-arrow-down'
                             : 'long-arrow-up'
                         }
-                        size={15}
+                        size={ 15 }
                         color={
                           item.transactionType == 'Received'
                             ? Colors.green
@@ -713,112 +713,112 @@ export default function Accounts(props) {
                         }
                       />
                     </View>
-                    <View style={{ justifyContent: 'center', marginLeft: 10 }}>
-                      <Text style={styles.transactionModalTitleText}>
-                        {item.accountType}{' '}
+                    <View style={ { justifyContent: 'center', marginLeft: 10 } }>
+                      <Text style={ styles.transactionModalTitleText }>
+                        { item.accountType }{ ' ' }
                       </Text>
-                      <Text style={styles.transactionModalDateText}>
-                        {item.date}{' '}
+                      <Text style={ styles.transactionModalDateText }>
+                        { item.date }{ ' ' }
                         {/* <Entypo
                           size={10}
                           name={"dot-single"}
                           color={Colors.textColorGrey}
                         /> */}
-                        {/* {item.time} */}
+                        {/* {item.time} */ }
                       </Text>
                     </View>
                   </View>
-                  <View style={styles.transactionModalAmountView}>
+                  <View style={ styles.transactionModalAmountView }>
                     <Image
-                      source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                      style={{ width: 12, height: 12, resizeMode: 'contain' }}
+                      source={ require( '../../assets/images/icons/icon_bitcoin_gray.png' ) }
+                      style={ { width: 12, height: 12, resizeMode: 'contain' } }
                     />
                     <Text
-                      style={{
+                      style={ {
                         ...styles.transactionModalAmountText,
                         color:
                           item.transactionType == 'Received'
                             ? Colors.green
                             : Colors.red,
-                      }}
+                      } }
                     >
-                      {item.amount}
+                      { item.amount }
                     </Text>
-                    <Text style={styles.transactionModalAmountUnitText}>
-                      {item.confirmations < 6 ? item.confirmations : '6+'}
+                    <Text style={ styles.transactionModalAmountUnitText }>
+                      { item.confirmations < 6 ? item.confirmations : '6+' }
                     </Text>
                     <Ionicons
                       name="ios-arrow-forward"
-                      color={Colors.textColorGrey}
-                      size={12}
-                      style={{ marginLeft: 20, alignSelf: 'center' }}
+                      color={ Colors.textColorGrey }
+                      size={ 12 }
+                      style={ { marginLeft: 20, alignSelf: 'center' } }
                     />
                   </View>
                 </TouchableOpacity>
-              )}
+              ) }
             />
           </View>
         </View>
-        <View style={{ marginTop: hp('2%') }}>
+        <View style={ { marginTop: hp( '2%' ) } }>
           <View
-            style={{ flexDirection: 'row', marginLeft: 10, marginRight: 10 }}
+            style={ { flexDirection: 'row', marginLeft: 10, marginRight: 10 } }
           >
             <TouchableOpacity
-              onPress={() => props.navigation.navigate('Send', { serviceType })}
-              style={styles.bottomCardView}
+              onPress={ () => props.navigation.navigate( 'Send', { serviceType } ) }
+              style={ styles.bottomCardView }
             >
               <Image
-                source={require('../../assets/images/icons/icon_send.png')}
-                style={styles.bottomCardSendReceiveImage}
+                source={ require( '../../assets/images/icons/icon_send.png' ) }
+                style={ styles.bottomCardSendReceiveImage }
               />
-              <View style={{ marginLeft: wp('3%') }}>
-                <Text style={styles.bottomCardTitleText}>Send</Text>
-                <Text style={styles.bottomCardInfoText}>
+              <View style={ { marginLeft: wp( '3%' ) } }>
+                <Text style={ styles.bottomCardTitleText }>Send</Text>
+                <Text style={ styles.bottomCardInfoText }>
                   Tran Fee : 0.032 (sats)
                 </Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => {
-                props.navigation.navigate('ReceivingAddress', { serviceType });
-              }}
-              style={styles.bottomCardView}
+              onPress={ () => {
+                props.navigation.navigate( 'ReceivingAddress', { serviceType } );
+              } }
+              style={ styles.bottomCardView }
             >
               <Image
-                source={require('../../assets/images/icons/icon_recieve.png')}
-                style={styles.bottomCardSendReceiveImage}
+                source={ require( '../../assets/images/icons/icon_recieve.png' ) }
+                style={ styles.bottomCardSendReceiveImage }
               />
-              <View style={{ marginLeft: wp('3%') }}>
-                <Text style={styles.bottomCardTitleText}>Receive</Text>
-                <Text style={styles.bottomCardInfoText}>
+              <View style={ { marginLeft: wp( '3%' ) } }>
+                <Text style={ styles.bottomCardTitleText }>Receive</Text>
+                <Text style={ styles.bottomCardInfoText }>
                   Tran Fee : 0.032 (sats)
                 </Text>
               </View>
             </TouchableOpacity>
           </View>
           <View
-            style={{ flexDirection: 'row', marginLeft: 10, marginRight: 10 }}
+            style={ { flexDirection: 'row', marginLeft: 10, marginRight: 10 } }
           >
-            <TouchableOpacity style={styles.bottomCardView}>
+            <TouchableOpacity style={ styles.bottomCardView }>
               <Image
-                source={require('../../assets/images/icons/icon_buy.png')}
-                style={styles.bottomCardImage}
+                source={ require( '../../assets/images/icons/icon_buy.png' ) }
+                style={ styles.bottomCardImage }
               />
-              <View style={{ marginLeft: wp('3%') }}>
-                <Text style={styles.bottomCardTitleText}>Buy</Text>
-                <Text style={styles.bottomCardInfoText}>
+              <View style={ { marginLeft: wp( '3%' ) } }>
+                <Text style={ styles.bottomCardTitleText }>Buy</Text>
+                <Text style={ styles.bottomCardInfoText }>
                   Ex Rate : 0.032 (sats)
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bottomCardView}>
+            <TouchableOpacity style={ styles.bottomCardView }>
               <Image
-                source={require('../../assets/images/icons/icon_sell.png')}
-                style={styles.bottomCardImage}
+                source={ require( '../../assets/images/icons/icon_sell.png' ) }
+                style={ styles.bottomCardImage }
               />
-              <View style={{ marginLeft: wp('3%') }}>
-                <Text style={styles.bottomCardTitleText}>Sell</Text>
-                <Text style={styles.bottomCardInfoText}>
+              <View style={ { marginLeft: wp( '3%' ) } }>
+                <Text style={ styles.bottomCardTitleText }>Sell</Text>
+                <Text style={ styles.bottomCardInfoText }>
                   Ex Rate : 0.032 (sats)
                 </Text>
               </View>
@@ -827,25 +827,25 @@ export default function Accounts(props) {
         </View>
       </ScrollView>
       <BottomSheet
-        enabledInnerScrolling={true}
-        ref={bottomSheet}
-        snapPoints={[
+        enabledInnerScrolling={ true }
+        ref={ bottomSheet }
+        snapPoints={ [
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('60%') : hp('60%'),
-        ]}
-        renderContent={renderTransactionsContent}
-        renderHeader={renderTransactionsHeader}
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '60%' ) : hp( '60%' ),
+        ] }
+        renderContent={ renderTransactionsContent }
+        renderHeader={ renderTransactionsHeader }
       />
       <BottomSheet
-        enabledInnerScrolling={true}
-        ref={SendBottomSheet}
-        snapPoints={[
+        enabledInnerScrolling={ true }
+        ref={ SendBottomSheet }
+        snapPoints={ [
           -50,
-          hp('90%'),
-          Platform.OS == 'android' ? hp('50%') : hp('90%'),
-        ]}
-        renderContent={renderSendContents}
-        renderHeader={renderSendModalHeader}
+          hp( '90%' ),
+          Platform.OS == 'android' ? hp( '50%' ) : hp( '90%' ),
+        ] }
+        renderContent={ renderSendContents }
+        renderHeader={ renderSendModalHeader }
       />
       {/* <BottomSheet
         enabledInnerScrolling={true}
@@ -856,80 +856,80 @@ export default function Accounts(props) {
       /> */}
 
       <BottomSheet
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={CustodianRequestOtpBottomSheet}
-        snapPoints={[
+        enabledGestureInteraction={ false }
+        enabledInnerScrolling={ true }
+        ref={ CustodianRequestOtpBottomSheet }
+        snapPoints={ [
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('67%') : hp('60%'),
-          Platform.OS == 'ios' ? hp('80%') : hp('70%'),
-        ]}
-        renderContent={renderSendOtpModalContents}
-        renderHeader={renderSendOTPModalHeader}
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '67%' ) : hp( '60%' ),
+          Platform.OS == 'ios' ? hp( '80%' ) : hp( '70%' ),
+        ] }
+        renderContent={ renderSendOtpModalContents }
+        renderHeader={ renderSendOTPModalHeader }
       />
 
       <BottomSheet
-        enabledInnerScrolling={true}
-        ref={SendSuccessBottomSheet}
-        snapPoints={[-50, hp('60%')]}
-        renderContent={renderSuccessStatusContents}
-        renderHeader={renderSendSuccessHeader}
+        enabledInnerScrolling={ true }
+        ref={ SendSuccessBottomSheet }
+        snapPoints={ [ -50, hp( '60%' ) ] }
+        renderContent={ renderSuccessStatusContents }
+        renderHeader={ renderSendSuccessHeader }
       />
       <BottomSheet
-        enabledInnerScrolling={true}
-        ref={SendErrorBottomSheet}
-        snapPoints={[-50, hp('60%')]}
-        renderContent={renderSendErrorContents}
-        renderHeader={renderSendErrorHeader}
+        enabledInnerScrolling={ true }
+        ref={ SendErrorBottomSheet }
+        snapPoints={ [ -50, hp( '60%' ) ] }
+        renderContent={ renderSendErrorContents }
+        renderHeader={ renderSendErrorHeader }
       />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   cardBitCoinImage: {
-    width: wp('3%'),
-    height: wp('3%'),
+    width: wp( '3%' ),
+    height: wp( '3%' ),
     marginRight: 5,
     marginTop: 'auto',
-    marginBottom: wp('1.2%'),
+    marginBottom: wp( '1.2%' ),
     resizeMode: 'contain',
   },
   cardAmountText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(21, 812),
+    fontSize: RFValue( 21, 812 ),
     marginRight: 5,
   },
   cardAmountUnitText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue( 13, 812 ),
     marginBottom: 2,
     marginTop: 'auto',
   },
   transactionModalElementView: {
     backgroundColor: Colors.backgroundColor,
-    padding: hp('1%'),
+    padding: hp( '1%' ),
     flexDirection: 'row',
     display: 'flex',
     justifyContent: 'space-between',
   },
   modalElementInfoView: {
-    padding: hp('1%'),
+    padding: hp( '1%' ),
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
   transactionModalTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue( 12, 812 ),
     marginBottom: 3,
     fontFamily: Fonts.FiraSansRegular,
   },
   transactionModalDateText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(10, 812),
+    fontSize: RFValue( 10, 812 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   transactionModalAmountView: {
@@ -941,12 +941,12 @@ const styles = StyleSheet.create({
   transactionModalAmountText: {
     marginLeft: 5,
     marginRight: 5,
-    fontSize: RFValue(20, 812),
+    fontSize: RFValue( 20, 812 ),
     fontFamily: Fonts.OpenSans,
   },
   transactionModalAmountUnitText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(10, 812),
+    fontSize: RFValue( 10, 812 ),
     fontFamily: Fonts.OpenSans,
   },
   separatorView: {
@@ -958,7 +958,7 @@ const styles = StyleSheet.create({
   bottomCardView: {
     flex: 1,
     margin: 5,
-    height: hp('8%'),
+    height: hp( '8%' ),
     borderWidth: 1,
     borderColor: Colors.borderColor,
     backgroundColor: Colors.white,
@@ -968,24 +968,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bottomCardImage: {
-    width: wp('10%'),
-    height: wp('10%'),
+    width: wp( '10%' ),
+    height: wp( '10%' ),
     resizeMode: 'contain',
   },
   bottomCardSendReceiveImage: {
-    width: wp('7%'),
-    height: wp('7%'),
+    width: wp( '7%' ),
+    height: wp( '7%' ),
     resizeMode: 'contain',
   },
   bottomCardInfoText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(9, 812),
+    fontSize: RFValue( 9, 812 ),
   },
   bottomCardTitleText: {
     color: Colors.black,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(15, 812),
+    fontSize: RFValue( 15, 812 ),
   },
   modalContentContainer: {
     height: '100%',
@@ -1001,7 +1001,7 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18, 812),
+    fontSize: RFValue( 18, 812 ),
     fontFamily: Fonts.FiraSansRegular,
     // marginLeft: 15
   },
@@ -1041,7 +1041,7 @@ const styles = StyleSheet.create({
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue( 12, 812 ),
     marginTop: 5,
   },
   modalContentView: {
@@ -1061,4 +1061,4 @@ const styles = StyleSheet.create({
   modalHeaderContainer: {
     paddingTop: 20,
   },
-});
+} );

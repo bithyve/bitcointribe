@@ -1,19 +1,17 @@
-import RNHTMLtoPDF from "react-native-html-to-pdf";
-import { Platform, NativeModules, Alert } from "react-native";
-import QRCode from "qrcode-svg";
-import { PermissionsAndroid } from "react-native";
+import { Platform, NativeModules, Alert } from 'react-native';
+import { PermissionsAndroid } from 'react-native';
 
 async function requestStoragePermission() {
   try {
     await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
       {
-        title: "Hexa Storage Permission",
-        message: "Storage permission is required to store the PDF",
-        buttonNeutral: "Ask Me Later",
-        buttonNegative: "Cancel",
-        buttonPositive: "OK"
-      }
+        title: 'Hexa Storage Permission',
+        message: 'Storage permission is required to store the PDF',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
     );
     return PermissionsAndroid.RESULTS.GRANTED;
   } catch (err) {
@@ -22,14 +20,14 @@ async function requestStoragePermission() {
 }
 
 const getFormattedString = (qrString: string) => {
-  qrString = qrString.split('"').join("Dquote");
-  qrString = qrString.split(":").join("Qutation");
-  qrString = qrString.split("{").join("Lbrace");
-  qrString = qrString.split("}").join("Rbrace");
-  qrString = qrString.split("/").join("Slash");
-  qrString = qrString.split(",").join("Comma");
-  qrString = qrString.split("'").join("Squote");
-  qrString = qrString.split(" ").join("Space");
+  qrString = qrString.split('"').join('Dquote');
+  qrString = qrString.split(':').join('Qutation');
+  qrString = qrString.split('{').join('Lbrace');
+  qrString = qrString.split('}').join('Rbrace');
+  qrString = qrString.split('/').join('Slash');
+  qrString = qrString.split(',').join('Comma');
+  qrString = qrString.split("'").join('Squote');
+  qrString = qrString.split(' ').join('Space');
   return qrString;
 };
 
@@ -43,15 +41,17 @@ const chunkArray = (arr: any, n: any) => {
   return chunks;
 };
 
-export default async (pdfData, fileName, title, password) => {
+export default generatePDF = async (pdfData, fileName, title, password) => {
   const {
     qrData,
     secondaryMnemonic,
     twoFASecret,
     twoFAQR,
     secondaryXpub,
-    bhXpub
+    bhXpub,
   } = pdfData;
+  console.log({ qrData });
+
   const qrcode: string[] = [];
   const qrCodeString: string[][] = [];
   qrData.forEach(qrString => {
@@ -69,30 +69,32 @@ export default async (pdfData, fileName, title, password) => {
     twoFAQR,
     twoFASecret,
     secondaryMnemonic,
-    bhXpub
+    bhXpub,
   };
-  let pdfPath = await getPdfPath(JSON.stringify(pdfDatas));
+  let pdfPath = await getPdfPath(pdfDatas);
+  console.log({ pdfPath });
   return pdfPath;
 };
-
-const getPdfPath = async pdfData => {
-  if (Platform.OS == "ios") {
+const getPdfPath = async (pdfData: any) => {
+  if (Platform.OS == 'ios') {
     const PdfPassword = NativeModules.PdfPassword;
-    return await PdfPassword.addEvent(pdfData);
+    return await PdfPassword.createPdf(JSON.stringify(pdfData));
   } else {
     if (!(await requestStoragePermission())) {
-      throw new Error("Storage Permission Denied");
+      throw new Error('Storage Permission Denied');
     }
-    var PdfPassword = NativeModules.PdfPassword;
-    return await PdfPassword.setPdfPasswrod(
-      pdfData,
-      (err: any) => {
-        console.log(err);
+    var PdfPassword = await NativeModules.PdfPassword;
+    console.log({ PdfPassword });
+    await PdfPassword.createPdf(
+      JSON.stringify(pdfData),
+      async (err: any) => {
+        return await err;
       },
-      (path: any) => {
-        console.log(path);
-        return "file://" + path;
-      }
+      async (path: any) => {
+        console.log({ path });
+        return (await 'file://') + path;
+      },
     );
+    return 'file:///storage/emulated/0/' + pdfData.fileName;
   }
 };
