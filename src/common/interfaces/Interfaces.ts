@@ -1,14 +1,17 @@
-import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
-import TestAccount from "../../bitcoin/services/accounts/TestAccount";
-import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
-import S3Service from "../../bitcoin/services/sss/S3Service";
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
+import S3Service from '../../bitcoin/services/sss/S3Service';
 import {
   MetaShare,
-  EncDynamicNonPMDD
-} from "../../bitcoin/utilities/Interface";
+  EncDynamicNonPMDD,
+} from '../../bitcoin/utilities/Interface';
 
 export interface Database {
-  WALLET_SETUP: { walletName: string; securityAns: string };
+  WALLET_SETUP: {
+    walletName: string;
+    security: { question: string; answer: string };
+  };
   DECENTRALIZED_BACKUP: {
     RECOVERY_SHARES: {
       [SHARE_INDEX: string]: {
