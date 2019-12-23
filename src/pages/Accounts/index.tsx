@@ -51,7 +51,14 @@ import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetT
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 
-export default function Accounts(props) {
+import { copilot, walkthroughable, CopilotStep } from 'react-native-copilot';
+import TooltipComponent from "../../components/Copilot/CopilotTooltip";
+
+const WalkthroughableText = walkthroughable(Text);
+const WalkthroughableImage = walkthroughable(Image);
+const WalkthroughableTouchableOpacity = walkthroughable(TouchableOpacity);
+
+function Accounts(props) {
   const sliderWidth = Dimensions.get('window').width;
   const [bottomSheet, setBottomSheet] = useState(React.createRef());
   const [SendBottomSheet, setSendBottomSheet] = useState(React.createRef());
@@ -183,6 +190,8 @@ export default function Accounts(props) {
 
   useEffect(() => {
     if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
+      props.copilotEvents.on('stepChange', handleStepChange);
+      props.start();
       setTimeout(() => {
         carousel.current.snapToItem(0, true, false);
         setCarouselInitIndex(0);
@@ -200,6 +209,10 @@ export default function Accounts(props) {
       }, 200);
     }
   }, []);
+  
+  const handleStepChange = (step) => {
+    console.log(`Current step is: ${step.name}`);
+  }
 
   const renderSendContents = () => {
     return (
@@ -918,90 +931,100 @@ export default function Accounts(props) {
           <View
             style={{ flexDirection: 'row', marginLeft: 10, marginRight: 10 }}
           >
-            <TouchableOpacity
-              onPress={() => {
-                if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
-                  SendHelperBottomSheet.current.snapTo(1);
+            <CopilotStep text="Try Sending" order={1} name="sendTransaction">
+              <WalkthroughableTouchableOpacity
+                onPress={() => {
+                  if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
+                    SendHelperBottomSheet.current.snapTo(1);
+                  }
+                  else {
+                    props.navigation.navigate('Send', { serviceType })
+                  }
                 }
-                else {
-                  props.navigation.navigate('Send', { serviceType })
                 }
-              }
-              }
-              style={styles.bottomCardView}
-            >
-              <Image
-                source={require('../../assets/images/icons/icon_send.png')}
-                style={styles.bottomCardSendReceiveImage}
-              />
-              <View style={{ marginLeft: wp('3%') }}>
-                <Text style={styles.bottomCardTitleText}>Send</Text>
-                <Text style={styles.bottomCardInfoText}>
-                  Tran Fee : 0.032 (sats)
+                style={styles.bottomCardView}
+              >
+                <Image
+                  source={require('../../assets/images/icons/icon_send.png')}
+                  style={styles.bottomCardSendReceiveImage}
+                />
+                <View style={{ marginLeft: wp('3%') }}>
+                  <Text style={styles.bottomCardTitleText}>Send</Text>
+                  <Text style={styles.bottomCardInfoText}>
+                    Tran Fee : 0.032 (sats)
                 </Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
-                  ReceiveHelperBottomSheet.current.snapTo(1)
-                }
-                else {
-                  props.navigation.navigate('ReceivingAddress', { serviceType });
-                }
-              }}
-              style={styles.bottomCardView}
-            >
-              <Image
-                source={require('../../assets/images/icons/icon_recieve.png')}
-                style={styles.bottomCardSendReceiveImage}
-              />
-              <View style={{ marginLeft: wp('3%') }}>
-                <Text style={styles.bottomCardTitleText}>Receive</Text>
-                <Text style={styles.bottomCardInfoText}>
-                  Tran Fee : 0.032 (sats)
+                </View>
+              </WalkthroughableTouchableOpacity>
+            </CopilotStep>
+            <CopilotStep text="Try Receiving" order={2} name="receiveTransaction">
+              <WalkthroughableTouchableOpacity
+                onPress={() => {
+                  if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
+                    ReceiveHelperBottomSheet.current.snapTo(1)
+                  }
+                  else {
+                    props.navigation.navigate('ReceivingAddress', { serviceType });
+                  }
+                }}
+                style={styles.bottomCardView}
+              >
+                <Image
+                  source={require('../../assets/images/icons/icon_recieve.png')}
+                  style={styles.bottomCardSendReceiveImage}
+                />
+                <View style={{ marginLeft: wp('3%') }}>
+                  <Text style={styles.bottomCardTitleText}>Receive</Text>
+                  <Text style={styles.bottomCardInfoText}>
+                    Tran Fee : 0.032 (sats)
                 </Text>
-              </View>
-            </TouchableOpacity>
+                </View>
+              </WalkthroughableTouchableOpacity>
+            </CopilotStep>
           </View>
           <View
             style={{ flexDirection: 'row', marginLeft: 10, marginRight: 10 }}
           >
-            <TouchableOpacity onPress={() => {
-              if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) { 
-                BuyHelperBottomSheet.current.snapTo(1)
-            }else{
-
-            }}} style={styles.bottomCardView}>
-              <Image
-                source={require('../../assets/images/icons/icon_buy.png')}
-                style={styles.bottomCardImage}
-              />
-              <View style={{ marginLeft: wp('3%') }}>
-                <Text style={styles.bottomCardTitleText}>Buy</Text>
-                <Text style={styles.bottomCardInfoText}>
-                  Ex Rate : 0.032 (sats)
+            <CopilotStep text="Buy your bitcoins here" order={3} name="Buy">
+              <WalkthroughableTouchableOpacity
+              onPress={() => {
+                if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) { 
+                  BuyHelperBottomSheet.current.snapTo(1)
+              }else{
+  
+              }}} style={styles.bottomCardView}>
+                <Image
+                  source={require('../../assets/images/icons/icon_buy.png')}
+                  style={styles.bottomCardImage}
+                />
+                <View style={{ marginLeft: wp('3%') }}>
+                  <Text style={styles.bottomCardTitleText}>Buy</Text>
+                  <Text style={styles.bottomCardInfoText}>
+                    Ex Rate : 0.032 (sats)
                 </Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => {
-              if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) { 
-                SellHelperBottomSheet.current.snapTo(1)}
-              else{
-
-              }}
-                } style={styles.bottomCardView}>
-              <Image
-                source={require('../../assets/images/icons/icon_sell.png')}
-                style={styles.bottomCardImage}
-              />
-              <View style={{ marginLeft: wp('3%') }}>
-                <Text style={styles.bottomCardTitleText}>Sell</Text>
-                <Text style={styles.bottomCardInfoText}>
-                  Ex Rate : 0.032 (sats)
+                </View>
+              </WalkthroughableTouchableOpacity>
+            </CopilotStep>
+            <CopilotStep text="Sell your bitcoins here" order={4} name="Sell">
+              <WalkthroughableTouchableOpacity style={styles.bottomCardView}
+              onPress={() => {
+                if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) { 
+                  SellHelperBottomSheet.current.snapTo(1)}
+                else{
+  
+                }}
+                  }>
+                <Image
+                  source={require('../../assets/images/icons/icon_sell.png')}
+                  style={styles.bottomCardImage}
+                />
+                <View style={{ marginLeft: wp('3%') }}>
+                  <Text style={styles.bottomCardTitleText}>Sell</Text>
+                  <Text style={styles.bottomCardInfoText}>
+                    Ex Rate : 0.032 (sats)
                 </Text>
-              </View>
-            </TouchableOpacity>
+                </View>
+              </WalkthroughableTouchableOpacity>
+            </CopilotStep>
           </View>
         </View>
       </ScrollView>
@@ -1298,4 +1321,46 @@ const styles = StyleSheet.create({
   modalHeaderContainer: {
     paddingTop: 20,
   },
+  copilotTooltip: {
+    backgroundColor: 'rgba(0,0,0,0)',
+    paddingTop: 5,
+    marginBottom: 30
+
+  },
+  stepNumber: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderRadius: 14,
+    borderColor: '#FFFFFF',
+    backgroundColor: '#27ae60',
+  },
+  stepNumberText: {
+    fontSize: 10,
+    backgroundColor: 'transparent',
+    color: '#FFFFFF',
+  },
 });
+const circleSvgPath = ({ position, canvasSize }): string =>
+  `M0,0H${canvasSize.x}V${canvasSize.y}H0V0ZM${position.x._value},${
+  position.y._value
+  }Za50 50 0 1 0 100 0 50 50 0 1 0-100 0`;
+
+const StepNumber = ({
+  currentStepNumber,
+}) => (
+    <View>
+      <Text>{''}</Text>
+    </View>
+  );
+
+export default copilot({
+  animated: true, // Can be true or false
+  overlay: 'svg', // Can be either view or svg
+  tooltipComponent: TooltipComponent,
+  tooltipStyle: styles.copilotTooltip,
+  stepNumberComponent: StepNumber,
+  backdropColor: "rgba(0, 0, 0, 0.8)",
+ // svgMaskPath: circleSvgPath, // Circle
+})(Accounts);
