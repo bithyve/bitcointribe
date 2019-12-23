@@ -48,6 +48,8 @@ import {
 } from '../../store/actions/accounts';
 import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
+import SmallHeaderModal from '../../components/SmallHeaderModal';
+import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 
 export default function Accounts(props) {
   const sliderWidth = Dimensions.get('window').width;
@@ -64,6 +66,22 @@ export default function Accounts(props) {
     React.createRef(),
   );
   const [SendErrorBottomSheet, setSendErrorBottomSheet] = useState(
+    React.createRef(),
+  );
+
+  const [SendHelperBottomSheet, setSendHelperBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [ReceiveHelperBottomSheet, setReceiveHelperBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [SellHelperBottomSheet, setSellHelperBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [BuyHelperBottomSheet, setBuyHelperBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [TestAccountHelperBottomSheet, setTestAccountHelperBottomSheet] = useState(
     React.createRef(),
   );
   const [transactionData, setTransactionData] = useState([
@@ -169,6 +187,7 @@ export default function Accounts(props) {
         carousel.current.snapToItem(0, true, false);
         setCarouselInitIndex(0);
       }, 200);
+      TestAccountHelperBottomSheet.current.snapTo(1);
     }
     if (props.navigation.getParam('serviceType') == REGULAR_ACCOUNT) {
       setTimeout(() => {
@@ -215,10 +234,10 @@ export default function Accounts(props) {
             index == 0
               ? Colors.blue
               : index == 1
-              ? Colors.yellow
-              : index == 2
-              ? Colors.green
-              : Colors.borderColor,
+                ? Colors.yellow
+                : index == 2
+                  ? Colors.green
+                  : Colors.borderColor,
           shadowOpacity: 0.2,
           shadowOffset: { width: 0, height: 7 },
           flexDirection: 'row',
@@ -522,7 +541,7 @@ export default function Accounts(props) {
   };
 
   // useEffect(() => {
-  //(SendErrorBottomSheet as any).current.snapTo(1);
+  // (SendErrorBottomSheet as any).current.snapTo(1);
   // (SendBottomSheet as any).current.snapTo(1)
   // }, []);
 
@@ -551,6 +570,142 @@ export default function Accounts(props) {
     if (!transactions.totalTransactions)
       dispatch(fetchTransactions(serviceType));
   }, [serviceType]);
+
+  const renderSendHelperContents = () => {
+    return (
+      <TestAccountHelperModalContents
+        topButtonText={"Sending Through the Test Account"}
+        helperInfo={"When you want to send bitcoins or sats (a very\nsmall fraction of a bitcoin), you have to send it\nto an address of the recipient.\n\nPretty much like an email address but one that\nchanges every time you send it to them.\n\nFor this you can either scan a QR code from the\nrecipient or enter a very long sequence of\nnumbers and letters which is the recipients\nbitcoin address.\n\nNote that if you make someone a “Trusted\nContact”, all this is done for you within the app\nand you don’t have to enter an address every\ntime.\n"}
+        continueButtonText={"Continue"}
+        quitButtonText={"Quit"}
+        onPressContinue={() => {
+          if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
+          (SendHelperBottomSheet as any).current.snapTo(0);
+            props.navigation.navigate('Send', { serviceType })
+          }
+        }}
+        onPressQuit={() => {
+          (SendHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+  const renderSendHelperHeader = () => {
+    return (
+      <SmallHeaderModal
+        onPressHandle={() => {
+          (SendHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderReceiveHelperContents = () => {
+    return (
+      <TestAccountHelperModalContents
+        topButtonText={"Receiving Through the Test Account"}
+        helperInfo={"For receiving bitcoins, you need to give an\naddress to the sender. Mostly in form of a QR\ncode.\n\nThis is pretty much like an email address but\nyour app generates a new one for you every time\nyou want to do a transaction.\n\nThe sender will scan this address or copy a long\nsequence of letters and numbers to send you the\nbitcoins or sats (a very small fraction of a\nbitcoin)\n\nNote that if you want to receive bitcoins/ sats\nfrom a “Trusted Contact”, the app does all this\nfor you and you don’t need to send a new\naddress every time.\n"}
+        continueButtonText={"Continue"}
+        quitButtonText={"Quit"}
+        onPressContinue={() => {
+          if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
+            (ReceiveHelperBottomSheet as any).current.snapTo(0);
+            props.navigation.navigate('ReceivingAddress', { serviceType })
+            }
+        }}
+        onPressQuit={() => {
+          (ReceiveHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+  const renderReceiveHelperHeader = () => {
+    return (
+      <SmallHeaderModal
+        onPressHandle={() => {
+          (ReceiveHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+  const renderSellHelperContents = () => {
+    return (
+      <TestAccountHelperModalContents
+        topButtonText={"Selling Bitcoins from the Test Account"}
+        helperInfo={"Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod\ntempor invidunt ut labore et dolore magna\n\nLorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod\ntempor invidunt ut labore et dolore magna\n\nLorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod\ntempor invidunt ut labore et dolore magna\n\nLorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod\ntempor invidunt ut labore et dolore magna\n\n"}
+        continueButtonText={"Continue"}
+        quitButtonText={"Quit"}
+        onPressContinue={() => {
+          (SellHelperBottomSheet as any).current.snapTo(0);
+        }}
+        onPressQuit={() => {
+          (SellHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+  const renderSellHelperHeader = () => {
+    return (
+      <SmallHeaderModal
+        onPressHandle={() => {
+          (SellHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderBuyHelperContents = () => {
+    return (
+      <TestAccountHelperModalContents
+        topButtonText={"Buying Bitcoins from the Test Account"}
+        helperInfo={"Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod\ntempor invidunt ut labore et dolore magna\n\nLorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod\ntempor invidunt ut labore et dolore magna\n\nLorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod\ntempor invidunt ut labore et dolore magna\n\nLorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod\ntempor invidunt ut labore et dolore magna\n\n"}
+        continueButtonText={"Continue"}
+        quitButtonText={"Quit"}
+        onPressContinue={() => {
+          (BuyHelperBottomSheet as any).current.snapTo(0);
+        }}
+        onPressQuit={() => {
+          (BuyHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+  const renderBuyHelperHeader = () => {
+    return (
+      <SmallHeaderModal
+        onPressHandle={() => {
+          (BuyHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderTestAccountsHelperContents = () => {
+    return (
+      <TestAccountHelperModalContents
+        topButtonText={"Test Account"}
+        boldPara={"If you are new to Bitcoin, this account is\ndesigned for you. It comes pre-loaded\nwith some test bitcoins (not real)"}
+        helperInfo={"\n\nYou can even send and receive test bitcoins\nfrom other Hexa wallet test accounts\n\n\n\nThese are not actual bitcoins and are of no\nintrinsic value. The testnet sats do not add up\nin your wallet balance\n\n\n"}
+        continueButtonText={"Continue"}
+        quitButtonText={"Quit"}
+        onPressContinue={() => {
+          (TestAccountHelperBottomSheet as any).current.snapTo(0);
+        }}
+        onPressQuit={() => {
+          (TestAccountHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+  const renderTestAccountsHelperHeader = () => {
+    return (
+      <SmallHeaderModal
+        onPressHandle={() => {
+          (TestAccountHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -589,7 +744,7 @@ export default function Accounts(props) {
         </Text>
         <TouchableOpacity
           style={{ height: 54, justifyContent: 'center' }}
-          onPress={() => {}}
+          onPress={() => { }}
         >
           <View
             style={{
@@ -638,8 +793,8 @@ export default function Accounts(props) {
               index === 0
                 ? setServiceType(TEST_ACCOUNT)
                 : index === 1
-                ? setServiceType(REGULAR_ACCOUNT)
-                : setServiceType(SECURE_ACCOUNT);
+                  ? setServiceType(REGULAR_ACCOUNT)
+                  : setServiceType(SECURE_ACCOUNT);
             }}
             style={{ activeSlideAlignment: 'center' }}
             scrollInterpolator={scrollInterpolator}
@@ -764,7 +919,15 @@ export default function Accounts(props) {
             style={{ flexDirection: 'row', marginLeft: 10, marginRight: 10 }}
           >
             <TouchableOpacity
-              onPress={() => props.navigation.navigate('Send', { serviceType })}
+              onPress={() => {
+                if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
+                  SendHelperBottomSheet.current.snapTo(1);
+                }
+                else {
+                  props.navigation.navigate('Send', { serviceType })
+                }
+              }
+              }
               style={styles.bottomCardView}
             >
               <Image
@@ -780,7 +943,12 @@ export default function Accounts(props) {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                props.navigation.navigate('ReceivingAddress', { serviceType });
+                if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
+                  ReceiveHelperBottomSheet.current.snapTo(1)
+                }
+                else {
+                  props.navigation.navigate('ReceivingAddress', { serviceType });
+                }
               }}
               style={styles.bottomCardView}
             >
@@ -799,7 +967,12 @@ export default function Accounts(props) {
           <View
             style={{ flexDirection: 'row', marginLeft: 10, marginRight: 10 }}
           >
-            <TouchableOpacity style={styles.bottomCardView}>
+            <TouchableOpacity onPress={() => {
+              if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) { 
+                BuyHelperBottomSheet.current.snapTo(1)
+            }else{
+
+            }}} style={styles.bottomCardView}>
               <Image
                 source={require('../../assets/images/icons/icon_buy.png')}
                 style={styles.bottomCardImage}
@@ -811,7 +984,13 @@ export default function Accounts(props) {
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bottomCardView}>
+            <TouchableOpacity onPress={() => {
+              if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) { 
+                SellHelperBottomSheet.current.snapTo(1)}
+              else{
+
+              }}
+                } style={styles.bottomCardView}>
               <Image
                 source={require('../../assets/images/icons/icon_sell.png')}
                 style={styles.bottomCardImage}
@@ -881,6 +1060,64 @@ export default function Accounts(props) {
         snapPoints={[-50, hp('60%')]}
         renderContent={renderSendErrorContents}
         renderHeader={renderSendErrorHeader}
+      />
+
+
+      {/* helper modals */}
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={SendHelperBottomSheet}
+        snapPoints={[
+          -50,
+          hp('90%'),
+          Platform.OS == 'android' ? hp('50%') : hp('90%'),
+        ]}
+        renderContent={renderSendHelperContents}
+        renderHeader={renderSendHelperHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ReceiveHelperBottomSheet}
+        snapPoints={[
+          -50,
+          hp('90%'),
+          Platform.OS == 'android' ? hp('50%') : hp('90%'),
+        ]}
+        renderContent={renderReceiveHelperContents}
+        renderHeader={renderReceiveHelperHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={SellHelperBottomSheet}
+        snapPoints={[
+          -50,
+          hp('90%'),
+          Platform.OS == 'android' ? hp('50%') : hp('90%'),
+        ]}
+        renderContent={renderSellHelperContents}
+        renderHeader={renderSellHelperHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={BuyHelperBottomSheet}
+        snapPoints={[
+          -50,
+          hp('90%'),
+          Platform.OS == 'android' ? hp('50%') : hp('90%'),
+        ]}
+        renderContent={renderBuyHelperContents}
+        renderHeader={renderBuyHelperHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={TestAccountHelperBottomSheet}
+        snapPoints={[
+          -50,
+          hp('90%'),
+          Platform.OS == 'android' ? hp('50%') : hp('90%'),
+        ]}
+        renderContent={renderTestAccountsHelperContents}
+        renderHeader={renderTestAccountsHelperHeader}
       />
     </View>
   );
