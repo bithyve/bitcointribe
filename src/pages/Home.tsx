@@ -16,7 +16,6 @@ import {
   Alert,
   Keyboard,
 } from 'react-native';
-import { useSelector } from 'react-redux';
 import CardView from 'react-native-cardview';
 import Fonts from './../common/Fonts';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -56,7 +55,7 @@ import SelectedContactFromAddressBook from '../components/SelectedContactFromAdd
 import SelectedContactFromAddressBookQrCode from '../components/SelectedContactFromAddressBookQrCode';
 import HealthCheckSecurityQuestionModalContents from '../components/HealthCheckSecurityQuestionModalContents';
 import HealthCheckGoogleAuthModalContents from '../components/HealthCheckGoogleAuthModalContents';
-import SettingManagePin from "./SettingManagePin";
+import SettingManagePin from './SettingManagePin';
 import { AppState } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import {
@@ -66,6 +65,8 @@ import {
 } from '../common/constants/serviceTypes';
 import AllAccountsContents from '../components/AllAccountsContents';
 import SettingsContents from '../components/SettingsContents';
+import { useDispatch, useSelector } from 'react-redux';
+import { checkMSharesHealth } from '../store/actions/sss';
 
 export default function Home(props) {
   const database = useSelector(state => state.storage.database);
@@ -74,16 +75,16 @@ export default function Home(props) {
 
   const testBalance = accounts[TEST_ACCOUNT].service
     ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-    accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
     : 0;
   const regularBalance = accounts[REGULAR_ACCOUNT].service
     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-    accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
     : 0;
   const secureBalance = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-    accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-      .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
     : 0;
   const accumulativeBalance = regularBalance + secureBalance;
 
@@ -95,7 +96,7 @@ export default function Home(props) {
     : [];
   const secureTransactions = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-      .transactionDetails
+        .transactionDetails
     : [];
   const accumulativeTransactions = [
     ...testTransactions,
@@ -147,7 +148,9 @@ export default function Home(props) {
     fastBitcoinRedeemCalculationBottomSheet,
     setFastBitcoinRedeemCalculationBottomSheet,
   ] = useState(React.createRef());
-  const [AllAccountsBottomSheet, setAllAccountsBottomSheet] = useState(React.createRef());
+  const [AllAccountsBottomSheet, setAllAccountsBottomSheet] = useState(
+    React.createRef(),
+  );
   const [addressBookBottomSheet, setAddressBookBottomSheet] = useState(
     React.createRef(),
   );
@@ -185,7 +188,9 @@ export default function Home(props) {
     transactionDetailsBottomSheet,
     setTransactionDetailsBottomSheet,
   ] = useState(React.createRef());
-  const [settingsBottomSheet, setSettingsBottomSheet] = useState(React.createRef());
+  const [settingsBottomSheet, setSettingsBottomSheet] = useState(
+    React.createRef(),
+  );
   const [bottomSheet, setBottomSheet] = useState(React.createRef());
   const [data, setData] = useState([
     {
@@ -301,7 +306,7 @@ export default function Home(props) {
     }
   }
 
-  useEffect(function () {
+  useEffect(function() {
     // (PinChangeSuccessBottomSheet as any).current.snapTo(1);
     // (ErrorBottomSheet as any).current.snapTo(1);
     // (NoInternetBottomSheet as any).current.snapTo(0);
@@ -520,8 +525,8 @@ export default function Home(props) {
   const renderNoInternetModalContent = () => {
     return (
       <NoInternetModalContents
-        onPressTryAgain={() => { }}
-        onPressIgnore={() => { }}
+        onPressTryAgain={() => {}}
+        onPressIgnore={() => {}}
       />
     );
   };
@@ -679,7 +684,7 @@ export default function Home(props) {
     return (
       <CustodianRequestAcceptModalContents
         userName={custodyRequest.requester}
-        onPressAssociateContacts={() => { }}
+        onPressAssociateContacts={() => {}}
         onPressSkip={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -735,64 +740,80 @@ export default function Home(props) {
         setTabBarZIndex(0);
       }, 2);
       (addressBookBottomSheet as any).current.snapTo(1);
-    }
-    else if (item.title == "Settings") {
+    } else if (item.title == 'Settings') {
       setTimeout(() => {
         setTabBarZIndex(0);
       }, 10);
-      settingsBottomSheet.current.snapTo(1);
-    }
-    else if (item.title == "All Accounts") {
+      (settingsBottomSheet as any).current.snapTo(1);
+    } else if (item.title == 'All Accounts') {
       setTimeout(() => {
         setTabBarZIndex(0);
       }, 10);
-      AllAccountsBottomSheet.current.snapTo(1);
+      (AllAccountsBottomSheet as any).current.snapTo(1);
     }
   };
 
-  const managePinProceed = (pin) => {
-    settingsBottomSheet.current.snapTo(0);
-    PinChangeSuccessBottomSheet.current.snapTo(1);
-  }
+  const managePinProceed = pin => {
+    (settingsBottomSheet as any).current.snapTo(0);
+    (PinChangeSuccessBottomSheet as any).current.snapTo(1);
+  };
 
   const renderSettingsContents = () => {
-    return <SettingsContents
-      onPressManagePIn={() => { return props.navigation.navigate('SettingManagePin', { _managePinProceed: (pin) => managePinProceed(pin) }); }}
-      onPressBack={() => {
-        setTimeout(() => {
-          setTabBarZIndex(999);
-        }, 10);
-        settingsBottomSheet.current.snapTo(0);
-      }} />
-  }
+    return (
+      <SettingsContents
+        onPressManagePIn={() => {
+          return props.navigation.navigate('SettingManagePin', {
+            _managePinProceed: pin => managePinProceed(pin),
+          });
+        }}
+        onPressBack={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 10);
+          (settingsBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
 
   const renderSettingsHeader = () => {
-    return <SmallHeaderModal onPressHandle={() => {
-      setTimeout(() => {
-        setTabBarZIndex(999);
-      }, 10);
-      settingsBottomSheet.current.snapTo(0);
-    }} />
-  }
+    return (
+      <SmallHeaderModal
+        onPressHandle={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 10);
+          (settingsBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
 
   const renderAllAccountsContents = () => {
-    return <AllAccountsContents
-      onPressBack={() => {
-        setTimeout(() => {
-          setTabBarZIndex(999);
-        }, 10);
-        AllAccountsBottomSheet.current.snapTo(0);
-      }} />
-  }
+    return (
+      <AllAccountsContents
+        onPressBack={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 10);
+          (AllAccountsBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
 
   const renderAllAccountsHeader = () => {
-    return <SmallHeaderModal onPressHandle={() => {
-      setTimeout(() => {
-        setTabBarZIndex(999);
-      }, 10);
-      AllAccountsBottomSheet.current.snapTo(0);
-    }} />
-  }
+    return (
+      <SmallHeaderModal
+        onPressHandle={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 10);
+          (AllAccountsBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
 
   const renderMoreTabContents = () => {
     return (
@@ -1135,7 +1156,7 @@ export default function Home(props) {
           setAnswer(text);
         }}
         onPressConfirm={() => submitRecoveryQuestion()}
-        onPressKnowMore={() => { }}
+        onPressKnowMore={() => {}}
         bottomSheetRef={HealthCheckSecurityQuestionBottomSheet}
       />
     );
@@ -1215,16 +1236,6 @@ export default function Home(props) {
     ); // producing a subtle delay to let deep link event listener make the first move
   };
 
-  useEffect(() => {
-    AppState.addEventListener('change', handleAppStateChange);
-
-    NetInfo.addEventListener(state => {
-      if (!state.isConnected) (NoInternetBottomSheet as any).current.snapTo(1);
-      else if (state.isConnected)
-        (NoInternetBottomSheet as any).current.snapTo(0);
-    });
-  }, []);
-
   const handleDeepLink = event => {
     const splits = event.url.split('/');
     const requester = splits[3];
@@ -1241,6 +1252,14 @@ export default function Home(props) {
   };
 
   useEffect(() => {
+    AppState.addEventListener('change', handleAppStateChange);
+
+    NetInfo.addEventListener(state => {
+      if (!state.isConnected) (NoInternetBottomSheet as any).current.snapTo(1);
+      else if (state.isConnected)
+        (NoInternetBottomSheet as any).current.snapTo(0);
+    });
+
     Linking.addEventListener('url', handleDeepLink);
 
     // return () => Linking.removeEventListener("url", handleDeepLink);
@@ -1257,15 +1276,38 @@ export default function Home(props) {
       (CustodianRequestBottomSheet as any).current.snapTo(1);
       (bottomSheet as any).current.snapTo(1);
     }
-  }, [custodyRequest]);
 
-  useEffect(() => {
     if (recoveryRequest) {
-      // Alert.alert(JSON.stringify(recoveryRequest));
+      setTimeout(() => {
+        setTabBarZIndex(0);
+      }, 2);
       (RecoveryRequestBottomSheet as any).current.snapTo(1);
       (bottomSheet as any).current.snapTo(1);
     } //TODO: connect the recovery guardian modal
-  }, [recoveryRequest]);
+  }, [custodyRequest, recoveryRequest]);
+
+  const dispatch = useDispatch();
+  const s3Service = useSelector(state => state.sss.service);
+
+  useEffect(() => {
+    if (s3Service) {
+      const {
+        healthCheckInitialized,
+        healthCheckStatus,
+        metaShares,
+      } = s3Service.sss;
+
+      console.log({ healthCheckInitialized });
+      if (healthCheckInitialized) {
+        dispatch(checkMSharesHealth());
+        if (!Object.keys(healthCheckStatus).length) {
+          for (let key of Object.keys(healthCheckStatus)) {
+            console.log(healthCheckStatus[key]);
+          }
+        }
+      }
+    }
+  }, [s3Service]);
 
   return (
     <ImageBackground
@@ -1371,8 +1413,8 @@ export default function Home(props) {
                           Items.item.accountType === 'test'
                             ? TEST_ACCOUNT
                             : Items.item.accountType === 'regular'
-                              ? REGULAR_ACCOUNT
-                              : SECURE_ACCOUNT,
+                            ? REGULAR_ACCOUNT
+                            : SECURE_ACCOUNT,
                       });
                     }}
                   >
@@ -1426,8 +1468,8 @@ export default function Home(props) {
                             {Items.item.accountType === 'test'
                               ? testBalance
                               : Items.item.accountType === 'regular'
-                                ? regularBalance
-                                : secureBalance}
+                              ? regularBalance
+                              : secureBalance}
                           </Text>
                           <Text style={styles.cardAmountUnitText}>
                             {Items.item.unit}
@@ -1453,8 +1495,8 @@ export default function Home(props) {
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('17%')
             : Platform.OS == 'android'
-              ? hp('20%')
-              : hp('18%'),
+            ? hp('20%')
+            : hp('18%'),
           hp('50%'),
           hp('90%'),
         ]}
@@ -1485,7 +1527,9 @@ export default function Home(props) {
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
-        onOpenStart={() => { setTabBarZIndex(0); }}
+        onOpenStart={() => {
+          setTabBarZIndex(0);
+        }}
         enabledInnerScrolling={true}
         ref={RecoveryRequestBottomSheet}
         snapPoints={[-50, hp('60%')]}
@@ -1529,18 +1573,28 @@ export default function Home(props) {
         renderHeader={renderMoreTabHeader}
       />
       <BottomSheet
-        onOpenEnd={() => { setTabBarZIndex(0); }}
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
         enabledInnerScrolling={true}
         ref={AllAccountsBottomSheet}
-        snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('90%') : hp('90%')]}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('90%') : hp('90%'),
+        ]}
         renderContent={renderAllAccountsContents}
         renderHeader={renderAllAccountsHeader}
       />
       <BottomSheet
-        onOpenEnd={() => { setTabBarZIndex(0); }}
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
         enabledInnerScrolling={true}
         ref={settingsBottomSheet}
-        snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('90%') : hp('90%')]}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('90%') : hp('90%'),
+        ]}
         renderContent={renderSettingsContents}
         renderHeader={renderSettingsHeader}
       />
@@ -1581,7 +1635,7 @@ export default function Home(props) {
         renderHeader={renderPinChangeSuccessModalHeader}
       />
       <BottomSheet
-        onOpenEnd={() => { }}
+        onOpenEnd={() => {}}
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
@@ -1595,7 +1649,7 @@ export default function Home(props) {
         renderHeader={renderTransactionDetailsHeader}
       />
       <BottomSheet
-        onOpenEnd={() => { }}
+        onOpenEnd={() => {}}
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
@@ -1650,7 +1704,7 @@ export default function Home(props) {
         renderHeader={renderFastBitcoinSellCalculationHeader}
       />
       <BottomSheet
-        onOpenEnd={() => { }}
+        onOpenEnd={() => {}}
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
@@ -1664,7 +1718,7 @@ export default function Home(props) {
         renderHeader={renderFamilyAndFriendAddressBookHeader}
       />
       <BottomSheet
-        onOpenEnd={() => { }}
+        onOpenEnd={() => {}}
         enabledInnerScrolling={true}
         ref={ContactSelectedFromAddressBookBottomSheet}
         snapPoints={[
@@ -1675,7 +1729,7 @@ export default function Home(props) {
         renderHeader={renderContactSelectedFromAddressBookHeader}
       />
       <BottomSheet
-        onOpenEnd={() => { }}
+        onOpenEnd={() => {}}
         enabledInnerScrolling={true}
         ref={ContactSelectedFromAddressBookQrCodeBottomSheet}
         snapPoints={[
@@ -1741,13 +1795,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>transactions</Text>
             </View>
           ) : (
-              <View style={{ flexDirection: 'row' }}>
-                <Image
-                  source={require('../assets/images/HomePageIcons/icon_transactions.png')}
-                  style={styles.tabBarImage}
-                />
-              </View>
-            )}
+            <View style={{ flexDirection: 'row' }}>
+              <Image
+                source={require('../assets/images/HomePageIcons/icon_transactions.png')}
+                style={styles.tabBarImage}
+              />
+            </View>
+          )}
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => selectTab('Add')}
@@ -1762,13 +1816,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>add</Text>
             </View>
           ) : (
-              <View style={{ flexDirection: 'row' }}>
-                <Image
-                  source={require('../assets/images/HomePageIcons/icon_add.png')}
-                  style={styles.tabBarImage}
-                />
-              </View>
-            )}
+            <View style={{ flexDirection: 'row' }}>
+              <Image
+                source={require('../assets/images/HomePageIcons/icon_add.png')}
+                style={styles.tabBarImage}
+              />
+            </View>
+          )}
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => selectTab('QR')}
@@ -1783,13 +1837,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>qr</Text>
             </View>
           ) : (
-              <View style={{ flexDirection: 'row' }}>
-                <Image
-                  source={require('../assets/images/HomePageIcons/icon_qr.png')}
-                  style={styles.tabBarImage}
-                />
-              </View>
-            )}
+            <View style={{ flexDirection: 'row' }}>
+              <Image
+                source={require('../assets/images/HomePageIcons/icon_qr.png')}
+                style={styles.tabBarImage}
+              />
+            </View>
+          )}
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.tabBarTabView}
@@ -1808,13 +1862,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>More</Text>
             </View>
           ) : (
-              <View style={{ flexDirection: 'row' }}>
-                <Image
-                  source={require('../assets/images/HomePageIcons/icon_more.png')}
-                  style={styles.tabBarImage}
-                />
-              </View>
-            )}
+            <View style={{ flexDirection: 'row' }}>
+              <Image
+                source={require('../assets/images/HomePageIcons/icon_more.png')}
+                style={styles.tabBarImage}
+              />
+            </View>
+          )}
         </TouchableOpacity>
       </View>
     </ImageBackground>
