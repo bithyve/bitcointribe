@@ -21,6 +21,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import commonStyle from '../../common/Styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useSelector } from 'react-redux';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default function HealthCheckSecurityAnswer(props) {
   const { security } = useSelector(
@@ -212,14 +213,17 @@ export default function HealthCheckSecurityAnswer(props) {
               </Text>
             </View>
             <TouchableOpacity
-              disabled={errorText ? true : false}
-              onPress={() => {
-                // onPressConfirm();
+              disabled={errorText || !answer ? true : false}
+              onPress={async () => {
+                AsyncStorage.setItem(
+                  'SecurityAnsTimestamp',
+                  JSON.stringify(Date.now()),
+                );
               }}
               style={styles.questionConfirmButton}
             >
               <Text style={styles.proceedButtonText}>
-                {errorText ? 'Try Again' : 'Confirm'}
+                {errorText || !answer ? 'Try Again' : 'Confirm'}
               </Text>
             </TouchableOpacity>
           </View>
