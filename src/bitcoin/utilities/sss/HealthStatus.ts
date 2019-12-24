@@ -1,4 +1,4 @@
-import config from "../../Config";
+import config from '../../Config';
 const HEXA_HEALTH = config.HEALTH_STATUS.HEXA_HEALTH;
 const ENTITY_HEALTH = config.HEALTH_STATUS.ENTITY_HEALTH;
 const TIME_SLOTS = config.HEALTH_STATUS.TIME_SLOTS;
@@ -14,44 +14,9 @@ export default class HealthStatus {
     this.counter = {
       good: 0,
       bad: 0,
-      ugly: 0
+      ugly: 0,
     };
   }
-
-  public appHealthStatus = (
-    qaTimestamp: number,
-    shares: [
-      { shareId: string; updatedAt: number },
-      { shareId: string; updatedAt: number },
-      { shareId: string; updatedAt: number },
-      { shareId: string; updatedAt: number },
-      { shareId: string; updatedAt: number }
-    ]
-  ): {
-    sharesInfo: Array<{ shareId: number; shareStage: string }>;
-    qaStatus: string;
-    overallStatus: string;
-  } => {
-    let overallStatus: string = HEXA_HEALTH.STAGE1;
-    const qaRes = this.qaHealthStatus(qaTimestamp);
-    const qaStatus = qaRes.qaStage;
-    let sharesData: any;
-    let sharesInfo: any;
-    sharesData = this.shareHealthStatus(shares);
-    sharesInfo = sharesData.sharesInfo;
-    if (this.counter.ugly > 3 || this.counter.bad > 4) {
-      overallStatus = HEXA_HEALTH.STAGE1;
-    } else if (this.counter.ugly > 2 || this.counter.bad > 3) {
-      overallStatus = HEXA_HEALTH.STAGE2;
-    } else if (this.counter.ugly > 1 || this.counter.bad > 2) {
-      overallStatus = HEXA_HEALTH.STAGE3;
-    } else if (this.counter.ugly > 0 || this.counter.bad > 1) {
-      overallStatus = HEXA_HEALTH.STAGE4;
-    } else if (this.counter.good >= 6) {
-      overallStatus = HEXA_HEALTH.STAGE5;
-    }
-    return { sharesInfo, qaStatus, overallStatus };
-  };
 
   private qaHealthStatus = (time: number): { qaStage: string } => {
     let qaStage: string = ENTITY_HEALTH.STAGE1;
@@ -80,8 +45,8 @@ export default class HealthStatus {
       { shareId: string; updatedAt: number },
       { shareId: string; updatedAt: number },
       { shareId: string; updatedAt: number },
-      { shareId: string; updatedAt: number }
-    ]
+      { shareId: string; updatedAt: number },
+    ],
   ): {
     sharesInfo: Array<{ shareId: number; shareStage: string }>;
   } => {
@@ -90,7 +55,7 @@ export default class HealthStatus {
       const obj = shares[itr];
       sharesInfo.push({
         shareId: obj.shareId,
-        shareStage: ENTITY_HEALTH.STAGE1
+        shareStage: ENTITY_HEALTH.STAGE1,
       });
     }
     const delta: number[] = new Array(5);
@@ -119,5 +84,40 @@ export default class HealthStatus {
     }
 
     return { sharesInfo };
+  };
+
+  public appHealthStatus = (
+    qaTimestamp: number,
+    shares: [
+      { shareId: string; updatedAt: number },
+      { shareId: string; updatedAt: number },
+      { shareId: string; updatedAt: number },
+      { shareId: string; updatedAt: number },
+      { shareId: string; updatedAt: number },
+    ],
+  ): {
+    sharesInfo: Array<{ shareId: number; shareStage: string }>;
+    qaStatus: string;
+    overallStatus: string;
+  } => {
+    let overallStatus: string = HEXA_HEALTH.STAGE1;
+    const qaRes = this.qaHealthStatus(qaTimestamp);
+    const qaStatus = qaRes.qaStage;
+    let sharesData: any;
+    let sharesInfo: any;
+    sharesData = this.shareHealthStatus(shares);
+    sharesInfo = sharesData.sharesInfo;
+    if (this.counter.ugly > 3 || this.counter.bad > 4) {
+      overallStatus = HEXA_HEALTH.STAGE1;
+    } else if (this.counter.ugly > 2 || this.counter.bad > 3) {
+      overallStatus = HEXA_HEALTH.STAGE2;
+    } else if (this.counter.ugly > 1 || this.counter.bad > 2) {
+      overallStatus = HEXA_HEALTH.STAGE3;
+    } else if (this.counter.ugly > 0 || this.counter.bad > 1) {
+      overallStatus = HEXA_HEALTH.STAGE4;
+    } else if (this.counter.good >= 6) {
+      overallStatus = HEXA_HEALTH.STAGE5;
+    }
+    return { sharesInfo, qaStatus, overallStatus };
   };
 }
