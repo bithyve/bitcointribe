@@ -48,6 +48,7 @@
     "react-native-camera": "^3.15.0",
     "react-native-cardview": "^2.0.5",
     "react-native-communications": "^2.2.1",
+    "react-native-copilot": "^2.4.6",
     "react-native-crypto": "^2.1.0",
     "react-native-device-info": "^5.3.1",
     "react-native-dotenv": "^0.2.0",

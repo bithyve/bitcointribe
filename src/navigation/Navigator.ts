@@ -36,6 +36,8 @@ import RecoveryRequestOTP from "../pages/Recovery/RecoveryRequestOTP";
 import SettingManagePin from "../pages/SettingManagePin";
 import RestoreByCloudQrCodeContents from "../pages/RestoreByCloudQrCodeContents";
 import EmailModalContents from "../pages/EmailModalContents";
+import Buy from '../pages/Accounts/Buy';
+import Sell from '../pages/Accounts/Sell';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -101,7 +103,9 @@ const HomeNavigator = createStackNavigator(
     RecoveryRequestOTP,
     SettingManagePin,
     RestoreByCloudQrCodeContents,
-    EmailModalContents
+    EmailModalContents,
+    Buy,
+    Sell
   },
   {
     headerLayoutPreset: "center",

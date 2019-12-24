@@ -5797,6 +5797,11 @@ minizlib@^1.2.1:
   dependencies:
     minipass "^2.9.0"
 
+mitt@^1.1.3:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/mitt/-/mitt-1.2.0.tgz#cb24e6569c806e31bd4e3995787fe38a04fdf90d"
+  integrity sha512-r6lj77KlwqLhIUku9UWYes7KJtsczvolZkzp8hbaDPPaE24OmWl5s539Mytlj22siEQKosZ26qCBgda2PKwoJw==
+
 mixin-deep@^1.2.0:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/mixin-deep/-/mixin-deep-1.3.2.tgz#1120b43dc359a785dce65b55b82e257ccf479566"
@@ -6796,6 +6801,14 @@ react-native-communications@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/react-native-communications/-/react-native-communications-2.2.1.tgz#7883b56b20a002eeb790c113f8616ea8692ca795"
   integrity sha1-eIO1ayCgAu63kMET+GFuqGksp5U=
+
+react-native-copilot@^2.4.6:
+  version "2.4.6"
+  resolved "https://registry.yarnpkg.com/react-native-copilot/-/react-native-copilot-2.4.6.tgz#bcb407de671b922139573f4fc3d682390819590d"
+  integrity sha512-aCyuKydTmJbt8Vtk844Koq9vleV1dT/O1OvLs5MTn3hVM5ya6ro/XD2QaExTbrQCGwfrmy3Ciun3QQNP6xH1Pw==
+  dependencies:
+    hoist-non-react-statics "^3.0.1"
+    mitt "^1.1.3"
 
 react-native-crypto@^2.1.0:
   version "2.2.0"

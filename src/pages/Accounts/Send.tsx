@@ -12,7 +12,8 @@ import {
   ActivityIndicator,
   Button,
   SafeAreaView,
-  StatusBar
+  StatusBar,
+  AsyncStorage
 } from "react-native";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
@@ -35,7 +36,9 @@ import SendStatusModalContents from "../../components/SendStatusModalContents";
 import TransparentHeaderModal from "../../components/TransparentHeaderModal";
 import BottomSheet from "reanimated-bottom-sheet";
 import CustodianRequestOtpModalContents from "../../components/CustodianRequestOtpModalContents";
-import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
+import { SECURE_ACCOUNT, TEST_ACCOUNT, REGULAR_ACCOUNT, } from "../../common/constants/serviceTypes";
+import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
 
 export default function Send(props) {
   const serviceType = props.navigation.getParam("serviceType");
@@ -44,9 +47,20 @@ export default function Send(props) {
   const [token, setToken] = useState("");
   const [description, setDescription] = useState("");
   const [sliderValue, setSliderValue] = useState(4);
-  const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
-    React.createRef()
-  );
+  const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(React.createRef());
+  const [SendHelperBottomSheet, setSendHelperBottomSheet] = useState(React.createRef());
+
+  const checkNShowHelperModal = async () => {
+    let isSendHelperDone = await AsyncStorage.getItem("isSendHelperDone");
+    if (!isSendHelperDone) {
+      AsyncStorage.setItem("isSendHelperDone", 'true');
+      SendHelperBottomSheet.current.snapTo(1);
+    }
+  }
+
+  useEffect(() => {
+    checkNShowHelperModal()
+  }, [])
 
   const stage2 = () => (
     <View style={{ margin: 40 }}>
@@ -58,21 +72,21 @@ export default function Send(props) {
       {loading.transfer ? (
         <ActivityIndicator size="small" style={{ marginVertical: 5 }} />
       ) : (
-        <View>
-          <Button
-            title="Send"
-            onPress={() => {
-              dispatch(transferST2(serviceType));
-            }}
-          />
-          <Button
-            title="Cancel"
-            onPress={() => {
-              dispatch(clearTransfer(serviceType));
-            }}
-          />
-        </View>
-      )}
+          <View>
+            <Button
+              title="Send"
+              onPress={() => {
+                dispatch(transferST2(serviceType));
+              }}
+            />
+            <Button
+              title="Cancel"
+              onPress={() => {
+                dispatch(clearTransfer(serviceType));
+              }}
+            />
+          </View>
+        )}
     </View>
   );
 
@@ -105,8 +119,38 @@ export default function Send(props) {
   else if (!transfer.txid && transfer.executed === "ST2")
     props.navigation.navigate("TwoFAToken", { serviceType, recipientAddress });
 
+  const renderSendHelperContents = () => {
+    return (
+      <TestAccountHelperModalContents
+        topButtonText={"Sending Through the Test Account"}
+        helperInfo={"When you want to send bitcoins or sats (a very\nsmall fraction of a bitcoin), you have to send it\nto an address of the recipient.\n\nPretty much like an email address but one that\nchanges every time you send it to them.\n\nFor this you can either scan a QR code from the\nrecipient or enter a very long sequence of\nnumbers and letters which is the recipients\nbitcoin address.\n\nNote that if you make someone a “Trusted\nContact”, all this is done for you within the app\nand you don’t have to enter an address every\ntime.\n"}
+        continueButtonText={"Continue"}
+        quitButtonText={"Quit"}
+        onPressContinue={() => {
+          if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
+            (SendHelperBottomSheet as any).current.snapTo(0);
+            props.navigation.navigate('Send', { serviceType })
+          }
+        }}
+        onPressQuit={() => {
+          (SendHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+  const renderSendHelperHeader = () => {
+    return (
+      <SmallHeaderModal
+        onPressHandle={() => {
+          (SendHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={styles.modalContentContainer}>
         <KeyboardAvoidingView
@@ -141,17 +185,17 @@ export default function Send(props) {
                   value={recipientAddress}
                   onChangeText={setRecipientAddress}
                   placeholderTextColor={Colors.borderColor}
-                  // onFocus={() => {
-                  //   props.modalRef.current.snapTo(2);
-                  // }}
-                  // onBlur={() => {
-                  //   if (
-                  //     !textAmountRef.isFocused() &&
-                  //     !descriptionRef.isFocused()
-                  //   ) {
-                  //     props.modalRef.current.snapTo(1);
-                  //   }
-                  // }}
+                // onFocus={() => {
+                //   props.modalRef.current.snapTo(2);
+                // }}
+                // onBlur={() => {
+                //   if (
+                //     !textAmountRef.isFocused() &&
+                //     !descriptionRef.isFocused()
+                //   ) {
+                //     props.modalRef.current.snapTo(1);
+                //   }
+                // }}
                 />
                 {/* <View style={styles.contactNameInputImageView}>
                 <Image
@@ -174,17 +218,17 @@ export default function Send(props) {
                   value={amount}
                   onChangeText={setAmount}
                   placeholderTextColor={Colors.borderColor}
-                  // onFocus={() => {
-                  //   props.modalRef.current.snapTo(2);
-                  // }}
-                  // onBlur={() => {
-                  //   if (
-                  //     !descriptionRef.isFocused() &&
-                  //     !textContactNameRef.isFocused()
-                  //   ) {
-                  //     props.modalRef.current.snapTo(1);
-                  //   }
-                  // }}
+                // onFocus={() => {
+                //   props.modalRef.current.snapTo(2);
+                // }}
+                // onBlur={() => {
+                //   if (
+                //     !descriptionRef.isFocused() &&
+                //     !textContactNameRef.isFocused()
+                //   ) {
+                //     props.modalRef.current.snapTo(1);
+                //   }
+                // }}
                 />
               </View>
               <View style={{ ...styles.textBoxView, height: 100 }}>
@@ -202,17 +246,17 @@ export default function Send(props) {
                   value={description}
                   onChangeText={setDescription}
                   placeholderTextColor={Colors.borderColor}
-                  // onFocus={() => {
-                  //   props.modalRef.current.snapTo(2);
-                  // }}
-                  // onBlur={() => {
-                  //   if (
-                  //     !textAmountRef.isFocused() &&
-                  //     !textContactNameRef.isFocused()
-                  //   ) {
-                  //     props.modalRef.current.snapTo(1);
-                  //   }
-                  // }}
+                // onFocus={() => {
+                //   props.modalRef.current.snapTo(2);
+                // }}
+                // onBlur={() => {
+                //   if (
+                //     !textAmountRef.isFocused() &&
+                //     !textContactNameRef.isFocused()
+                //   ) {
+                //     props.modalRef.current.snapTo(1);
+                //   }
+                // }}
                 />
               </View>
             </View>
@@ -319,7 +363,7 @@ export default function Send(props) {
                 paddingRight: 20,
                 flexDirection: "row",
                 marginTop: hp("5%"),
-                marginBottom: hp("3%")
+                marginBottom: hp("5%")
               }}
             >
               <TouchableOpacity
@@ -337,8 +381,8 @@ export default function Send(props) {
                 {loading.transfer ? (
                   <ActivityIndicator size="small" />
                 ) : (
-                  <Text style={styles.buttonText}>Confirm</Text>
-                )}
+                    <Text style={styles.buttonText}>Confirm</Text>
+                  )}
               </TouchableOpacity>
               <TouchableOpacity
                 style={{
@@ -359,8 +403,18 @@ export default function Send(props) {
             {transfer.executed === "ST1" ? stage2() : null}
           </ScrollView>
         </KeyboardAvoidingView>
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={SendHelperBottomSheet}
+          snapPoints={[
+            -50,
+            hp('95%'),
+          ]}
+          renderContent={renderSendHelperContents}
+          renderHeader={renderSendHelperHeader}
+        />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
