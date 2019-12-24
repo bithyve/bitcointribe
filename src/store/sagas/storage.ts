@@ -13,6 +13,7 @@ import {
   servicesEnriched,
   DB_INSERTEDSSS,
 } from '../actions/storage';
+import { generatePDF } from '../actions/sss';
 import dataManager from '../../storage/database-manager';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -54,9 +55,10 @@ function* fetchSSSDBWorker() {
   try {
     const key = yield select(state => state.storage.key);
     const database = yield call(dataManager.fetchSSS, key);
-
+    //if (database == undefined) {
+    yield put(generatePDF({ personalcopy1: 4, personalcopy2: 5 }));
+    //}
     console.log({ key, database });
-
     // if (key && database) {
     //   yield put(dbFetched(database));
     //   yield put(enrichServices(database));

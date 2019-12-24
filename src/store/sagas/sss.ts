@@ -297,13 +297,27 @@ export const downloadMetaShareWatcher = createWatcher(
 );
 
 function* generatePDFWorker({ payload }) {
-  yield put(switchS3Loader('generatePDF'));
+  console.log({ payload });
+
+  // yield put(switchS3Loader('generatePDF'));
   const s3Service: S3Service = yield select(state => state.sss.service);
-  const res = yield call(s3Service.createQR, payload.shareIndex - 1);
-  if (res.status !== 200) {
-    console.log({ err: res.err });
+  const resQRPersonalCopy1 = yield call(
+    s3Service.createQR,
+    payload.personalcopy1 - 1,
+  );
+  if (resQRPersonalCopy1.status !== 200) {
+    console.log({ err: resQRPersonalCopy1.err });
     return;
   }
+  const resQRPersonalCopy2 = yield call(
+    s3Service.createQR,
+    payload.personalcopy2 - 1,
+  );
+  if (resQRPersonalCopy2.status !== 200) {
+    console.log({ err: resQRPersonalCopy2.err });
+    return;
+  }
+
   const secureAccount: SecureAccount = yield select(
     state => state.accounts[SECURE_ACCOUNT].service,
   );
@@ -317,24 +331,38 @@ function* generatePDFWorker({ payload }) {
     secondaryXpub: secondary,
     bhXpub: bh,
   };
-  const pdfData = {
-    qrData: res.data.qrData,
+  const pdfDataPersonalCopy1 = {
+    qrData: resQRPersonalCopy1.data.qrData,
     ...secureAssets,
   };
-  const { securityAns } = yield select(
+  const pdfDataPersonalCopy2 = {
+    qrData: resQRPersonalCopy2.data.qrData,
+    ...secureAssets,
+  };
+  const { securityAns, walletName } = yield select(
     state => state.storage.database.WALLET_SETUP,
   );
+
   try {
-    const generatedPDFPath = yield call(
+    const personalCopy1PdfPath = yield call(
       generatePDF,
-      pdfData,
-      `HexaShare${payload.shareIndex}.pdf`,
-      `Hexa Share ${payload.shareIndex}`,
+      pdfDataPersonalCopy1,
+      `Hexa ${walletName} Recovery Secret (Personal Copy 1).pdf`,
+      `Hexa Share ${payload.personalcopy1}`,
+      securityAns,
+    );
+    const personalCopy2PdfPath = yield call(
+      generatePDF,
+      pdfDataPersonalCopy2,
+      `Hexa ${walletName} Recovery Secret (Personal Copy 2).pdf`,
+      `Hexa Share ${payload.personalcopy2}`,
       securityAns,
     );
     let path = {
-      pdfPath: generatedPDFPath,
+      personalCopy1PdfPath,
+      personalCopy2PdfPath,
     };
+    console.log({ path });
     yield put(dbInsertedSSS(path));
   } catch (err) {
     console.log({ err });
