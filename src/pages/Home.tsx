@@ -1304,13 +1304,11 @@ export default function Home(props) {
     if (s3Service) {
       const { healthCheckInitialized, healthCheckStatus } = s3Service.sss;
 
-      console.log({ healthCheckInitialized, healthCheckStatus });
       if (healthCheckInitialized) {
         dispatch(checkMSharesHealth());
         if (Object.keys(healthCheckStatus).length) {
           for (let key of Object.keys(healthCheckStatus)) {
-            console.log({ key });
-            console.log(healthCheckStatus[key]);
+            console.log(key, healthCheckStatus[key]);
           }
         }
       }

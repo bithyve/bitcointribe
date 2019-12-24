@@ -40,13 +40,7 @@ export default class HealthStatus {
   };
 
   private shareHealthStatus = (
-    shares: [
-      { shareId: string; updatedAt: number },
-      { shareId: string; updatedAt: number },
-      { shareId: string; updatedAt: number },
-      { shareId: string; updatedAt: number },
-      { shareId: string; updatedAt: number },
-    ],
+    shares: { shareId: string; updatedAt: number }[],
   ): {
     sharesInfo: Array<{ shareId: number; shareStage: string }>;
   } => {
@@ -88,13 +82,7 @@ export default class HealthStatus {
 
   public appHealthStatus = (
     qaTimestamp: number,
-    shares: [
-      { shareId: string; updatedAt: number },
-      { shareId: string; updatedAt: number },
-      { shareId: string; updatedAt: number },
-      { shareId: string; updatedAt: number },
-      { shareId: string; updatedAt: number },
-    ],
+    shares: { shareId: string; updatedAt: number }[],
   ): {
     sharesInfo: Array<{ shareId: number; shareStage: string }>;
     qaStatus: string;
