@@ -43,7 +43,7 @@ export default function TestAccountHelperModalContents(props) {
         <View style={{
             flexDirection: 'row',
             marginTop: hp('1%'),
-            marginBottom: hp('1%'),
+            marginBottom: hp('5%'),
             justifyContent: 'center',
             alignItems: 'center'
         }}>

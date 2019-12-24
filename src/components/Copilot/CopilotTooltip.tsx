@@ -4,30 +4,25 @@ import { RFValue } from "react-native-responsive-fontsize";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
 import { withNavigation } from 'react-navigation';
-import { cps } from 'redux-saga/effects';
 
 function CopilotTooltip(props) {
 
     const onPressOk = () => {
         if (props.currentStep.name == "sendTransaction") {
-            AsyncStorage.setItem("isSendHelperDone", 'true');
             props.handleStop();
             props.navigation.navigate('Send', { serviceType: "TEST_ACCOUNT" })
         }
         else if (props.currentStep.name == "receiveTransaction") {
-            AsyncStorage.setItem("isReceiveHelperDone", 'true');
             props.handleStop();
             props.navigation.navigate('ReceivingAddress', { serviceType: "TEST_ACCOUNT" })
         }
         else if (props.currentStep.name == "Buy") {
-            AsyncStorage.setItem("isBuyHelperDone", 'true');
             props.handleStop();
-            props.navigation.navigate('ReceivingAddress', { serviceType: "TEST_ACCOUNT" })
+            props.navigation.navigate('Buy', { serviceType: "TEST_ACCOUNT" })
         }
         else if (props.currentStep.name == "Sell") {
-            AsyncStorage.setItem("isSellHelperDone", 'true');
             props.handleStop();
-            props.navigation.navigate('ReceivingAddress', { serviceType: "TEST_ACCOUNT" })
+            props.navigation.navigate('Sell', { serviceType: "TEST_ACCOUNT" })
         }
         else if (props.currentStep.name == "transaction") {
             AsyncStorage.setItem("isTransactionHelperDone", 'true');
