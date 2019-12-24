@@ -1288,6 +1288,7 @@ export default function Home(props) {
 
   const dispatch = useDispatch();
   const s3Service = useSelector(state => state.sss.service);
+  const { serviceEnriched } = useSelector(state => state.sss);
 
   useEffect(() => {
     // HC up-streaming
@@ -1296,27 +1297,25 @@ export default function Home(props) {
         dispatch(updateMSharesHealth());
       }
     }
+  }, []);
 
+  useEffect(() => {
     // HC down-streaming
-
     if (s3Service) {
-      const {
-        healthCheckInitialized,
-        healthCheckStatus,
-        metaShares,
-      } = s3Service.sss;
+      const { healthCheckInitialized, healthCheckStatus } = s3Service.sss;
 
-      console.log({ healthCheckInitialized });
+      console.log({ healthCheckInitialized, healthCheckStatus });
       if (healthCheckInitialized) {
         dispatch(checkMSharesHealth());
         if (Object.keys(healthCheckStatus).length) {
           for (let key of Object.keys(healthCheckStatus)) {
+            console.log({ key });
             console.log(healthCheckStatus[key]);
           }
         }
       }
     }
-  }, []);
+  }, [serviceEnriched]);
 
   return (
     <ImageBackground
