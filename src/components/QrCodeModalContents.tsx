@@ -21,15 +21,20 @@ import ContactList from "../components/ContactList";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Entypo from "react-native-vector-icons/Entypo";
-import { RNCamera } from 'react-native-camera';
+import { RNCamera } from 'react-native-camera'; \
+let scanQR = true;
 
 export default function QrCodeModalContents( props ) {
 
 	const [ cameraRef, setcameraRef ] = useState( React.createRef() );
 	const barcodeRecognized = async ( barcodes ) => {
-		console.log( { barcodes } );
+		if ( scanQR ) {
+			console.log( { barcodes } );
+			scanQR = false
+		}
 		//	await props.onScanQRCode( barcodes.data )
 	};
+
 
 	return ( <View style={ styles.modalContentContainer }>
 		<KeyboardAvoidingView style={ { flex: 1 } } behavior={ Platform.OS == 'ios' ? 'padding' : '' } enabled>
