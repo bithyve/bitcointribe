@@ -351,7 +351,7 @@ function* generatePDFWorker({ payload }) {
       generatePDF,
       pdfDataPersonalCopy2,
       `Hexa ${walletName} Recovery Secret (Personal Copy 2).pdf`,
-      `Hexa Share ${payload.personalcopy2}`,
+      `Hexa Share  ${payload.personalcopy2}`,
       securityAns,
     );
     let path = {

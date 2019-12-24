@@ -20,12 +20,11 @@ import {
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
+import { RNCamera } from 'react-native-camera';
+
+
 import CopyThisText from "../../components/CopyThisText";
 import KnowMoreButton from "../../components/KnowMoreButton";
-
-
-
-
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import HomePageShield from "../../components/HomePageShield";
 import BackupStyles from "./Styles";
@@ -59,410 +58,422 @@ import { generatePDF } from "../../store/actions/sss";
 
 
 export default function ManageBackup( props ) {
-  const [ WalletBackupAndRecoveryBottomSheet, setWalletBackupAndRecoveryBottomSheet ] = useState( React.createRef() );
-  const [ secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet ] = useState(
-    React.createRef()
-  );
-  const [ trustedContactsBottomSheet, setTrustedContactsBottomSheet ] = useState(
-    React.createRef()
-  );
-  const [ cloudBottomSheet, setCloudBottomSheet ] = useState( React.createRef() );
-  const [ selectedType, setSelectedType ] = useState( "" );
-  const [ selectedStatus, setSelectedStatus ] = useState( "error" );
-  const [ contacts, setContacts ] = useState( [] );
-  const [ cloudData, setCloudData ] = useState( [
-    {
-      title: "iCloud Drive",
-      info: "Store backup in iCloud Drive",
-      imageIcon: require( "../../assets/images/icons/logo_brand_brands_logos_icloud.png" )
-    },
-    {
-      title: "Google Drive",
-      info: "Store backup in Google Drive",
-      imageIcon: require( "../../assets/images/icons/logo_brand_brands_logos_icloud.png" )
-    },
-    {
-      title: "One Drive",
-      info: "Store backup in One Drive",
-      imageIcon: require( "../../assets/images/icons/logo_brand_brands_logos_icloud.png" )
-    },
-    {
-      title: "DropBox Storage",
-      info: "Store backup in Dropbox Storage",
-      imageIcon: require( "../../assets/images/icons/logo_brand_brands_logos_icloud.png" )
-    }
-  ] );
-  const [ pageData, setPageData ] = useState( [
-    {
-      title: "Secondary Device",
-      time: "3 months ago",
-      status: "error",
-      type: "secondaryDevice",
-      route: "SecondaryDevice"
-    },
-    {
-      title: "Trusted Contact 1",
-      time: "1 month ago",
-      status: "error",
-      type: "contact",
-      route: "TrustedContacts"
-    },
-    {
-      title: "Trusted Contact 2",
-      time: "12 days ago",
-      status: "warning",
-      type: "contact",
-      route: "TrustedContacts"
-    },
-    {
-      title: "Personal Copy 1",
-      time: "2 days ago",
-      status: "success",
-      type: "cloud",
-      route: "Cloud"
-    },
-    {
-      title: "Personal Copy 2",
-      time: "2 days ago",
-      status: "success",
-      type: "cloud",
-      route: "Cloud"
-    },
-    {
-      title: "Print",
-      time: "3 days ago",
-      status: "success",
-      type: "print",
-      route: "Cloud"
-    },
-    {
-      title: "Security Questions",
-      time: "1 day ago",
-      status: "success",
-      type: "security",
-      route: "HealthCheckSecurityAnswer"
-    }
-  ] );
 
-  const dispatch = useDispatch();
-  const s3Service: S3Service = useSelector( state => state.sss.service );
-  const { loading } = useSelector( state => state.sss );
-
-  useEffect( () => {
-    //dispatch( generatePDF( 4 ) );
-    dispatch( fetchSSSFromDB() )
-    WalletBackupAndRecoveryBottomSheet.current.snapTo( 1 );
-    if ( !s3Service.sss.healthCheckInitialized ) dispatch( initHealthCheck() );
-  }, [] );
-
-  // function selectedContactsList(list) {
-  //   setContacts(list);
-  // }
-
-  // function continueNProceed() {
-  //   bottomSheet.current.snapTo(0);
-  // setTimeout(() => {
-  //   setSelectedType("cloud");
-  //   setSelectedStatus("success");
-  // }, 1000);
-  //}
-
-  // const [contactIndex, setContactIndex] = useState();
-  // function openModal(type, title?) {
-  //   // title as dummy identifier for Trusted Contact index
-  //   setSelectedType(type);
-  //   if (title)
-  //     title === "Trusted Contact 1" ? setContactIndex(1) : setContactIndex(2);
-
-  //   bottomSheet.current.snapTo(1);
-  // }
-
-  //   function onCloseEnd() {
-  //     if (selectedType == "secondaryDevice") {
-  //       setSelectedType("contact");
-  //       setSelectedStatus("warning");
-  //     }
+  // const [ WalletBackupAndRecoveryBottomSheet, setWalletBackupAndRecoveryBottomSheet ] = useState( React.createRef() );
+  // const [ secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet ] = useState(
+  //   React.createRef()
+  // );
+  // const [ trustedContactsBottomSheet, setTrustedContactsBottomSheet ] = useState(
+  //   React.createRef()
+  // );
+  // const [ cloudBottomSheet, setCloudBottomSheet ] = useState( React.createRef() );
+  // const [ selectedType, setSelectedType ] = useState( "" );
+  // const [ selectedStatus, setSelectedStatus ] = useState( "error" );
+  // const [ contacts, setContacts ] = useState( [] );
+  // const [ cloudData, setCloudData ] = useState( [
+  //   {
+  //     title: "iCloud Drive",
+  //     info: "Store backup in iCloud Drive",
+  //     imageIcon: require( "../../assets/images/icons/logo_brand_brands_logos_icloud.png" )
+  //   },
+  //   {
+  //     title: "Google Drive",
+  //     info: "Store backup in Google Drive",
+  //     imageIcon: require( "../../assets/images/icons/logo_brand_brands_logos_icloud.png" )
+  //   },
+  //   {
+  //     title: "One Drive",
+  //     info: "Store backup in One Drive",
+  //     imageIcon: require( "../../assets/images/icons/logo_brand_brands_logos_icloud.png" )
+  //   },
+  //   {
+  //     title: "DropBox Storage",
+  //     info: "Store backup in Dropbox Storage",
+  //     imageIcon: require( "../../assets/images/icons/logo_brand_brands_logos_icloud.png" )
   //   }
+  // ] );
+  // const [ pageData, setPageData ] = useState( [
+  //   {
+  //     title: "Secondary Device",
+  //     time: "3 months ago",
+  //     status: "error",
+  //     type: "secondaryDevice",
+  //     route: "SecondaryDevice"
+  //   },
+  //   {
+  //     title: "Trusted Contact 1",
+  //     time: "1 month ago",
+  //     status: "error",
+  //     type: "contact",
+  //     route: "TrustedContacts"
+  //   },
+  //   {
+  //     title: "Trusted Contact 2",
+  //     time: "12 days ago",
+  //     status: "warning",
+  //     type: "contact",
+  //     route: "TrustedContacts"
+  //   },
+  //   {
+  //     title: "Personal Copy 1",
+  //     time: "2 days ago",
+  //     status: "success",
+  //     type: "cloud",
+  //     route: "Cloud"
+  //   },
+  //   {
+  //     title: "Personal Copy 2",
+  //     time: "2 days ago",
+  //     status: "success",
+  //     type: "cloud",
+  //     route: "Cloud"
+  //   },
+  //   {
+  //     title: "Print",
+  //     time: "3 days ago",
+  //     status: "success",
+  //     type: "print",
+  //     route: "Cloud"
+  //   },
+  //   {
+  //     title: "Security Questions",
+  //     time: "1 day ago",
+  //     status: "success",
+  //     type: "security",
+  //     route: "HealthCheckSecurityAnswer"
+  //   }
+  // ] );
 
-  const getIconByStatus = status => {
-    if ( status == "error" ) {
-      return require( "../../assets/images/icons/icon_error_red.png" );
-    } else if ( status == "warning" ) {
-      return require( "../../assets/images/icons/icon_error_yellow.png" );
-    } else if ( status == "success" ) {
-      return require( "../../assets/images/icons/icon_check.png" );
-    }
-  };
+  // const dispatch = useDispatch();
+  // const s3Service: S3Service = useSelector( state => state.sss.service );
+  // const { loading } = useSelector( state => state.sss );
 
-  function onCloseEnd() {
-    if ( selectedType == "secondaryDevice" ) {
-      setSelectedType( "contact" );
-      setSelectedStatus( "warning" );
-    }
-  }
+  // useEffect( () => {
+  //   //dispatch( generatePDF( 4 ) );
+  //   dispatch( fetchSSSFromDB() )
+  //   WalletBackupAndRecoveryBottomSheet.current.snapTo( 1 );
+  //   if ( !s3Service.sss.healthCheckInitialized ) dispatch( initHealthCheck() );
+  // }, [] );
 
+  // // function selectedContactsList(list) {
+  // //   setContacts(list);
+  // // }
 
-  function renderCloudContent() {
-    return (
-      <View style={ BackupStyles.modalContainer }>
-        <View style={ BackupStyles.modalHeaderTitleView }>
-          <View style={ { marginTop: hp( "1%" ) } }>
-            <Text style={ BackupStyles.modalHeaderTitleText }>Cloud</Text>
-            <Text style={ BackupStyles.modalHeaderInfoText }>
-              Never backed up
-            </Text>
-          </View>
-          <Image
-            style={ styles.cardIconImage }
-            source={ getIconByStatus( selectedStatus ) }
-          />
-        </View>
-        <View style={ { flex: 1 } }>
-          <Text
-            style={ {
-              marginLeft: 30,
-              color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
-              fontSize: RFValue( 12, 812 ),
-              marginTop: 5,
-              marginBottom: 5
-            } }
-          >
-            Select cloud drive to{ " " }
-            <Text
-              style={ {
-                fontFamily: Fonts.FiraSansMediumItalic,
-                fontWeight: "bold",
-                fontStyle: "italic"
-              } }
-            >
-              store recovery secret
-            </Text>
-          </Text>
-          <View style={ { flex: 1 } }>
-            <FlatList
-              data={ cloudData }
-              renderItem={ ( { item, index } ) => (
-                <View style={ styles.listElements }>
-                  <Image
-                    style={ styles.listElementsIconImage }
-                    source={ item.imageIcon }
-                  />
-                  <View style={ { justifyContent: "space-between", flex: 1 } }>
-                    <Text style={ styles.listElementsTitle }>{ item.title }</Text>
-                    <Text style={ styles.listElementsInfo } numberOfLines={ 1 }>
-                      { item.info }
-                    </Text>
-                  </View>
-                  <View style={ styles.listElementIcon }>
-                    <Ionicons
-                      name="ios-arrow-forward"
-                      color={ Colors.textColorGrey }
-                      size={ 15 }
-                      style={ { alignSelf: "center" } }
-                    />
-                  </View>
-                </View>
-              ) }
-            />
-          </View>
-        </View>
-      </View>
-    );
-  }
+  // // function continueNProceed() {
+  // //   bottomSheet.current.snapTo(0);
+  // // setTimeout(() => {
+  // //   setSelectedType("cloud");
+  // //   setSelectedStatus("success");
+  // // }, 1000);
+  // //}
 
-  function renderTrustedContactsContent() {
-    return (
-      <View style={ BackupStyles.modalContainer }>
-        <View style={ BackupStyles.modalHeaderTitleView }>
-          <View style={ { marginTop: hp( "2%" ) } }>
-            <Text style={ BackupStyles.modalHeaderTitleText }>
-              Trusted Contact
-            </Text>
-            <Text style={ BackupStyles.modalHeaderInfoText }>
-              Never backed up
-            </Text>
-          </View>
-          <Image
-            style={ styles.cardIconImage }
-            source={ getIconByStatus( selectedStatus ) }
-          />
-        </View>
-        <View style={ { flex: 1 } }>
-          <Text
-            style={ {
-              marginLeft: 30,
-              color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
-              fontSize: RFValue( 12, 812 ),
-              marginTop: 5
-            } }
-          >
-            Select contact to{ " " }
-            <Text
-              style={ {
-                fontFamily: Fonts.FiraSansMediumItalic,
-                fontWeight: "bold",
-                fontStyle: "italic"
-              } }
-            >
-              send recovery secret
-            </Text>
-          </Text>
-          <ContactList
-            style={ {} }
-            onPressContinue={ () => { } }
-            onSelectContact={ list => { } }
-          />
-        </View>
-      </View>
-    );
-  }
+  // // const [contactIndex, setContactIndex] = useState();
+  // // function openModal(type, title?) {
+  // //   // title as dummy identifier for Trusted Contact index
+  // //   setSelectedType(type);
+  // //   if (title)
+  // //     title === "Trusted Contact 1" ? setContactIndex(1) : setContactIndex(2);
 
-  const renderSecondaryDeviceContents = () => {
-    return (
-      <View style={ BackupStyles.modalContainer }>
-        <View style={ BackupStyles.modalHeaderTitleView }>
-          <View style={ { marginTop: hp( "2%" ) } }>
-            <Text style={ BackupStyles.modalHeaderTitleText }>
-              { "Secondary Device" }
-            </Text>
-            <Text style={ BackupStyles.modalHeaderInfoText }>
-              Last backup{ " " }
-              <Text
-                style={ {
-                  fontFamily: Fonts.FiraSansMediumItalic,
-                  fontWeight: "bold",
-                  fontStyle: "italic"
-                } }
-              >
-                { "3 months ago" }
-              </Text>
-            </Text>
-          </View>
-          <Image
-            style={ styles.cardIconImage }
-            source={ getIconByStatus( selectedStatus ) }
-          />
-        </View>
-        <View style={ BackupStyles.modalContentView }>
-          <Image
-            style={ { width: hp( "27%" ), height: hp( "27%" ), alignSelf: "center" } }
-            source={ require( "../../assets/images/qrcode.png" ) }
-          />
-          <CopyThisText text="lk2j3429-85213-5134=50t-934285623877wer78er7" />
-        </View>
-        <BottomInfoBox
-          title={ "Note" }
-          infoText={
-            "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna"
-          }
-        />
-      </View>
-    );
-  };
+  // //   bottomSheet.current.snapTo(1);
+  // // }
 
-  function renderSecondaryDeviceHeader() {
-    return (
-      <TouchableOpacity
-        activeOpacity={ 10 }
-        onPress={ () => {
-          ( secondaryDeviceBottomSheet as any ).current.snapTo( 0 );
-        } }
-        style={ styles.modalHeader }
-      >
-        <View style={ styles.modalHeaderHandle } />
-      </TouchableOpacity>
-    );
-  }
+  // //   function onCloseEnd() {
+  // //     if (selectedType == "secondaryDevice") {
+  // //       setSelectedType("contact");
+  // //       setSelectedStatus("warning");
+  // //     }
+  // //   }
 
-  function renderTrustedContactsHeader() {
-    return (
-      <TouchableOpacity
-        activeOpacity={ 10 }
-        onPress={ () => {
-          ( trustedContactsBottomSheet as any ).current.snapTo( 0 );
-        } }
-        style={ styles.modalHeader }
-      >
-        <View style={ styles.modalHeaderHandle } />
-      </TouchableOpacity>
-    );
-  }
+  // const getIconByStatus = status => {
+  //   if ( status == "error" ) {
+  //     return require( "../../assets/images/icons/icon_error_red.png" );
+  //   } else if ( status == "warning" ) {
+  //     return require( "../../assets/images/icons/icon_error_yellow.png" );
+  //   } else if ( status == "success" ) {
+  //     return require( "../../assets/images/icons/icon_check.png" );
+  //   }
+  // };
 
-  function renderCloudHeader() {
-    return (
-      <TouchableOpacity
-        activeOpacity={ 10 }
-        onPress={ () => {
-          ( cloudBottomSheet as any ).current.snapTo( 0 );
-        } }
-        style={ styles.modalHeader }
-      >
-        <View style={ styles.modalHeaderHandle } />
-      </TouchableOpacity>
-    );
-  }
-
-  // function renderContent() {
-  //   switch (selectedType) {
-  //     case "secondaryDevice":
-  //       props.navigation.navigate("SecondaryDevice");
-  //       break;
-  //     case "contact":
-  //       props.navigation.navigate("TrustedContacts", { index: contactIndex });
-  //       break;
-  //     case "cloud":
-  //       props.navigation.navigate("Cloud");
-  //       break;
+  // function onCloseEnd() {
+  //   if ( selectedType == "secondaryDevice" ) {
+  //     setSelectedType( "contact" );
+  //     setSelectedStatus( "warning" );
   //   }
   // }
 
-  // function renderHeader() {
+
+  // function renderCloudContent() {
+  //   return (
+  //     <View style={ BackupStyles.modalContainer }>
+  //       <View style={ BackupStyles.modalHeaderTitleView }>
+  //         <View style={ { marginTop: hp( "1%" ) } }>
+  //           <Text style={ BackupStyles.modalHeaderTitleText }>Cloud</Text>
+  //           <Text style={ BackupStyles.modalHeaderInfoText }>
+  //             Never backed up
+  //           </Text>
+  //         </View>
+  //         <Image
+  //           style={ styles.cardIconImage }
+  //           source={ getIconByStatus( selectedStatus ) }
+  //         />
+  //       </View>
+  //       <View style={ { flex: 1 } }>
+  //         <Text
+  //           style={ {
+  //             marginLeft: 30,
+  //             color: Colors.textColorGrey,
+  //             fontFamily: Fonts.FiraSansRegular,
+  //             fontSize: RFValue( 12, 812 ),
+  //             marginTop: 5,
+  //             marginBottom: 5
+  //           } }
+  //         >
+  //           Select cloud drive to{ " " }
+  //           <Text
+  //             style={ {
+  //               fontFamily: Fonts.FiraSansMediumItalic,
+  //               fontWeight: "bold",
+  //               fontStyle: "italic"
+  //             } }
+  //           >
+  //             store recovery secret
+  //           </Text>
+  //         </Text>
+  //         <View style={ { flex: 1 } }>
+  //           <FlatList
+  //             data={ cloudData }
+  //             renderItem={ ( { item, index } ) => (
+  //               <View style={ styles.listElements }>
+  //                 <Image
+  //                   style={ styles.listElementsIconImage }
+  //                   source={ item.imageIcon }
+  //                 />
+  //                 <View style={ { justifyContent: "space-between", flex: 1 } }>
+  //                   <Text style={ styles.listElementsTitle }>{ item.title }</Text>
+  //                   <Text style={ styles.listElementsInfo } numberOfLines={ 1 }>
+  //                     { item.info }
+  //                   </Text>
+  //                 </View>
+  //                 <View style={ styles.listElementIcon }>
+  //                   <Ionicons
+  //                     name="ios-arrow-forward"
+  //                     color={ Colors.textColorGrey }
+  //                     size={ 15 }
+  //                     style={ { alignSelf: "center" } }
+  //                   />
+  //                 </View>
+  //               </View>
+  //             ) }
+  //           />
+  //         </View>
+  //       </View>
+  //     </View>
+  //   );
+  // }
+
+  // function renderTrustedContactsContent() {
+  //   return (
+  //     <View style={ BackupStyles.modalContainer }>
+  //       <View style={ BackupStyles.modalHeaderTitleView }>
+  //         <View style={ { marginTop: hp( "2%" ) } }>
+  //           <Text style={ BackupStyles.modalHeaderTitleText }>
+  //             Trusted Contact
+  //           </Text>
+  //           <Text style={ BackupStyles.modalHeaderInfoText }>
+  //             Never backed up
+  //           </Text>
+  //         </View>
+  //         <Image
+  //           style={ styles.cardIconImage }
+  //           source={ getIconByStatus( selectedStatus ) }
+  //         />
+  //       </View>
+  //       <View style={ { flex: 1 } }>
+  //         <Text
+  //           style={ {
+  //             marginLeft: 30,
+  //             color: Colors.textColorGrey,
+  //             fontFamily: Fonts.FiraSansRegular,
+  //             fontSize: RFValue( 12, 812 ),
+  //             marginTop: 5
+  //           } }
+  //         >
+  //           Select contact to{ " " }
+  //           <Text
+  //             style={ {
+  //               fontFamily: Fonts.FiraSansMediumItalic,
+  //               fontWeight: "bold",
+  //               fontStyle: "italic"
+  //             } }
+  //           >
+  //             send recovery secret
+  //           </Text>
+  //         </Text>
+  //         <ContactList
+  //           style={ {} }
+  //           onPressContinue={ () => { } }
+  //           onSelectContact={ list => { } }
+  //         />
+  //       </View>
+  //     </View>
+  //   );
+  // }
+
+  // const renderSecondaryDeviceContents = () => {
+  //   return (
+  //     <View style={ BackupStyles.modalContainer }>
+  //       <View style={ BackupStyles.modalHeaderTitleView }>
+  //         <View style={ { marginTop: hp( "2%" ) } }>
+  //           <Text style={ BackupStyles.modalHeaderTitleText }>
+  //             { "Secondary Device" }
+  //           </Text>
+  //           <Text style={ BackupStyles.modalHeaderInfoText }>
+  //             Last backup{ " " }
+  //             <Text
+  //               style={ {
+  //                 fontFamily: Fonts.FiraSansMediumItalic,
+  //                 fontWeight: "bold",
+  //                 fontStyle: "italic"
+  //               } }
+  //             >
+  //               { "3 months ago" }
+  //             </Text>
+  //           </Text>
+  //         </View>
+  //         <Image
+  //           style={ styles.cardIconImage }
+  //           source={ getIconByStatus( selectedStatus ) }
+  //         />
+  //       </View>
+  //       <View style={ BackupStyles.modalContentView }>
+  //         <Image
+  //           style={ { width: hp( "27%" ), height: hp( "27%" ), alignSelf: "center" } }
+  //           source={ require( "../../assets/images/qrcode.png" ) }
+  //         />
+  //         <CopyThisText text="lk2j3429-85213-5134=50t-934285623877wer78er7" />
+  //       </View>
+  //       <BottomInfoBox
+  //         title={ "Note" }
+  //         infoText={
+  //           "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna"
+  //         }
+  //       />
+  //     </View>
+  //   );
+  // };
+
+  // function renderSecondaryDeviceHeader() {
   //   return (
   //     <TouchableOpacity
-  //       activeOpacity={10}
-  //       onPress={() => {
-  //         bottomSheet.current.snapTo(0);
-  //       }}
-  //       style={styles.modalHeader}
+  //       activeOpacity={ 10 }
+  //       onPress={ () => {
+  //         ( secondaryDeviceBottomSheet as any ).current.snapTo( 0 );
+  //       } }
+  //       style={ styles.modalHeader }
   //     >
-  //       <View style={styles.modalHeaderHandle} />
+  //       <View style={ styles.modalHeaderHandle } />
   //     </TouchableOpacity>
   //   );
   // }
 
+  // function renderTrustedContactsHeader() {
+  //   return (
+  //     <TouchableOpacity
+  //       activeOpacity={ 10 }
+  //       onPress={ () => {
+  //         ( trustedContactsBottomSheet as any ).current.snapTo( 0 );
+  //       } }
+  //       style={ styles.modalHeader }
+  //     >
+  //       <View style={ styles.modalHeaderHandle } />
+  //     </TouchableOpacity>
+  //   );
+  // }
+
+  // function renderCloudHeader() {
+  //   return (
+  //     <TouchableOpacity
+  //       activeOpacity={ 10 }
+  //       onPress={ () => {
+  //         ( cloudBottomSheet as any ).current.snapTo( 0 );
+  //       } }
+  //       style={ styles.modalHeader }
+  //     >
+  //       <View style={ styles.modalHeaderHandle } />
+  //     </TouchableOpacity>
+  //   );
+  // }
+
+  // // function renderContent() {
+  // //   switch (selectedType) {
+  // //     case "secondaryDevice":
+  // //       props.navigation.navigate("SecondaryDevice");
+  // //       break;
+  // //     case "contact":
+  // //       props.navigation.navigate("TrustedContacts", { index: contactIndex });
+  // //       break;
+  // //     case "cloud":
+  // //       props.navigation.navigate("Cloud");
+  // //       break;
+  // //   }
+  // // }
+
+  // // function renderHeader() {
+  // //   return (
+  // //     <TouchableOpacity
+  // //       activeOpacity={10}
+  // //       onPress={() => {
+  // //         bottomSheet.current.snapTo(0);
+  // //       }}
+  // //       style={styles.modalHeader}
+  // //     >
+  // //       <View style={styles.modalHeaderHandle} />
+  // //     </TouchableOpacity>
+  // //   );
+  // // }
 
 
-  const renderWalletBackupAndRecoveryContents = () => {
-    return <WalletBackupAndRecoveryContents
-      onPressManageBackup={ () => {
-        WalletBackupAndRecoveryBottomSheet.current.snapTo( 0 );
-      } }
-      onSkip={ () => {
-        WalletBackupAndRecoveryBottomSheet.current.snapTo( 0 );
-      } }
-      onStartBackup={ () => {
-        WalletBackupAndRecoveryBottomSheet.current.snapTo( 0 );
-      } } />
-  }
 
-  const renderWalletBackupAndRecoveryHeader = () => {
-    return <SmallHeaderModal
-      borderColor={ Colors.blue }
-      headerColor={ Colors.blue }
-      onPressHandle={ () => {
-        setTimeout( () => { setTabBarZIndex( 999 ); }, 10 );
-        WalletBackupAndRecoveryBottomSheet.current.snapTo( 0 );
-      } } />
-  }
+  // const renderWalletBackupAndRecoveryContents = () => {
+  //   return <WalletBackupAndRecoveryContents
+  //     onPressManageBackup={ () => {
+  //       WalletBackupAndRecoveryBottomSheet.current.snapTo( 0 );
+  //     } }
+  //     onSkip={ () => {
+  //       WalletBackupAndRecoveryBottomSheet.current.snapTo( 0 );
+  //     } }
+  //     onStartBackup={ () => {
+  //       WalletBackupAndRecoveryBottomSheet.current.snapTo( 0 );
+  //     } } />
+  // }
+
+  // const renderWalletBackupAndRecoveryHeader = () => {
+  //   return <SmallHeaderModal
+  //     borderColor={ Colors.blue }
+  //     headerColor={ Colors.blue }
+  //     onPressHandle={ () => {
+  //       setTimeout( () => { setTabBarZIndex( 999 ); }, 10 );
+  //       WalletBackupAndRecoveryBottomSheet.current.snapTo( 0 );
+  //     } } />
+  // }
 
 
   return (
     <View style={ { flex: 1 } }>
       <SafeAreaView style={ { flex: 0 } } />
       <StatusBar backgroundColor={ Colors.white } barStyle="dark-content" />
-      <View style={ { flex: 1 } }>
+      <RNCamera
+        ref={ ref => {
+          this.camera = ref;
+        } }
+        style={ {
+          flex: 1,
+          width: '100%',
+          height: 20
+        } }
+      >
+      </RNCamera>
+      {/* <View style={ { flex: 1 } }>
         <View style={ CommonStyles.headerContainer }>
           <TouchableOpacity
             style={ CommonStyles.headerLeftIconContainer }
@@ -602,7 +613,7 @@ export default function ManageBackup( props ) {
           snapPoints={[-30, hp("90%")]}
           renderContent={renderCloudContent}
           renderHeader={renderCloudHeader}
-        /> */}
+        /> 
         <BottomSheet
           enabledInnerScrolling={ true }
           ref={ WalletBackupAndRecoveryBottomSheet }
@@ -610,7 +621,7 @@ export default function ManageBackup( props ) {
           renderContent={ renderWalletBackupAndRecoveryContents }
           renderHeader={ renderWalletBackupAndRecoveryHeader }
         />
-      </View>
+      </View> */}
     </View>
   );
 }
