@@ -66,7 +66,7 @@ import {
 import AllAccountsContents from '../components/AllAccountsContents';
 import SettingsContents from '../components/SettingsContents';
 import { useDispatch, useSelector } from 'react-redux';
-import { checkMSharesHealth } from '../store/actions/sss';
+import { checkMSharesHealth, updateMSharesHealth } from '../store/actions/sss';
 
 export default function Home(props) {
   const database = useSelector(state => state.storage.database);
@@ -1290,6 +1290,15 @@ export default function Home(props) {
   const s3Service = useSelector(state => state.sss.service);
 
   useEffect(() => {
+    // HC up-streaming
+    if (database) {
+      if (Object.keys(database.DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
+        dispatch(updateMSharesHealth());
+      }
+    }
+
+    // HC down-streaming
+
     if (s3Service) {
       const {
         healthCheckInitialized,
@@ -1300,14 +1309,14 @@ export default function Home(props) {
       console.log({ healthCheckInitialized });
       if (healthCheckInitialized) {
         dispatch(checkMSharesHealth());
-        if (!Object.keys(healthCheckStatus).length) {
+        if (Object.keys(healthCheckStatus).length) {
           for (let key of Object.keys(healthCheckStatus)) {
             console.log(healthCheckStatus[key]);
           }
         }
       }
     }
-  }, [s3Service]);
+  }, []);
 
   return (
     <ImageBackground
