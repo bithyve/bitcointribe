@@ -12,6 +12,7 @@ import {
   ENRICH_SERVICES,
   servicesEnriched,
   DB_INSERTEDSSS,
+  dbFetchedSSS,
 } from '../actions/storage';
 import { generatePDF } from '../actions/sss';
 import dataManager from '../../storage/database-manager';
@@ -55,18 +56,17 @@ function* fetchSSSDBWorker() {
   try {
     const key = yield select(state => state.storage.key);
     const database = yield call(dataManager.fetchSSS, key);
-    //if (database == undefined) {
-    yield put(generatePDF({ personalcopy1: 4, personalcopy2: 5 }));
-    //}
+    if (key && database == undefined) {
+      yield put(generatePDF({ personalcopy1: 4, personalcopy2: 5 }));
+    }
     console.log({ key, database });
-    // if (key && database) {
-    //   yield put(dbFetched(database));
-    //   yield put(enrichServices(database));
-    // } else {
-    //   console.log(
-    //     'Failed to fetch the database; either key is missing or database is empty',
-    //   );
-    // }
+    if (key && database) {
+      // yield put(dbFetchedSSS(database));
+    } else {
+      console.log(
+        'Failed to fetch the database; either key is missing or database is empty',
+      );
+    }
   } catch (err) {
     console.log(err);
   }
@@ -112,35 +112,14 @@ export const insertDBWatcher = createWatcher(insertDBWorker, INSERT_INTO_DB);
 
 function* insertSSSDBWorker({ payload }) {
   try {
-    console.log({ payload });
-
     const storage = yield select(state => state.storage);
-    const { database, insertedIntoDB, key } = storage;
-
-    console.log({ storage });
-
+    const { key } = storage;
     const updatedDB = {
       insertedIntoDB: true,
       ...payload,
     };
     const inserted = yield call(dataManager.insertSSS, updatedDB, key, false);
     console.log({ inserted });
-
-    // console.log({ database });
-
-    // const inserted = yield call(
-    //   dataManager.insertSSS,
-    //   updatedDB,
-    //   key,
-    //   insertedIntoDB,
-    // );
-    // if (!inserted) {
-    //   // dispatch failure
-    //   console.log('Failed to insert into DB');
-    //   return;
-    // }
-    // yield put(dbInserted(payload));
-    //!insertedIntoDB ? yield put(enrichServices(updatedDB)) : null; // enriching services post initial insertion
   } catch (err) {
     console.log(err);
   }

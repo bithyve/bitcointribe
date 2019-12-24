@@ -297,8 +297,6 @@ export const downloadMetaShareWatcher = createWatcher(
 );
 
 function* generatePDFWorker({ payload }) {
-  console.log({ payload });
-
   // yield put(switchS3Loader('generatePDF'));
   const s3Service: S3Service = yield select(state => state.sss.service);
   const resQRPersonalCopy1 = yield call(
@@ -317,7 +315,6 @@ function* generatePDFWorker({ payload }) {
     console.log({ err: resQRPersonalCopy2.err });
     return;
   }
-
   const secureAccount: SecureAccount = yield select(
     state => state.accounts[SECURE_ACCOUNT].service,
   );
@@ -342,7 +339,6 @@ function* generatePDFWorker({ payload }) {
   const { securityAns, walletName } = yield select(
     state => state.storage.database.WALLET_SETUP,
   );
-
   try {
     const personalCopy1PdfPath = yield call(
       generatePDF,

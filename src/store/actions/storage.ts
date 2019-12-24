@@ -36,6 +36,7 @@ export const DB_FETCHED = 'DB_FETCHED';
 export const DB_INSERTED = 'DB_INSERTED';
 export const DB_INSERTEDSSS = 'DB_INSERTEDSSS';
 export const SERVICES_ENRICHED = 'SERVICES_ENRICHED';
+export const DB_FETCHEDSSS = 'DB_FETCHEDSSS';
 
 export const dbInitialized = initialized => {
   return { type: DB_INITIALIZED, payload: { initialized } };
@@ -55,4 +56,8 @@ export const dbInsertedSSS = (pdfDetails: any) => {
 
 export const servicesEnriched = services => {
   return { type: SERVICES_ENRICHED, payload: { services } };
+};
+
+export const dbFetchedSSS = database => {
+  return { type: DB_FETCHEDSSS, payload: { database } };
 };
