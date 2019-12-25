@@ -117,6 +117,11 @@ export default function Home(props) {
   const [tabSelected, setTabSelected] = useState('sell');
   const [switchOn, setSwitchOn] = useState(true);
   const [selected, setSelected] = useState('Transactions');
+  const [ReshareBottomSheet, setReshareBottomSheet] = useState(React.createRef());
+  const [ConfirmBottomSheet, setConfirmBottomSheet] = useState(React.createRef());
+  const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
+  const [RegenerateBottomSheet, setRegenerateBottomSheet] = useState(React.createRef());
+
   const [ShareRecoverySecretBottomSheet, setShareRecoverySecretBottomSheet] = useState(React.createRef());
   const [ShareRecoverySecretOtpBottomSheet, setShareRecoverySecretOtpBottomSheet] = useState(React.createRef());
   const [
@@ -313,7 +318,6 @@ export default function Home(props) {
   }
 
   useEffect(function () {
-    ShareRecoverySecretOtpBottomSheet.current.snapTo(1);
     // (PinChangeSuccessBottomSheet as any).current.snapTo(1);
     // (ErrorBottomSheet as any).current.snapTo(1);
     // (NoInternetBottomSheet as any).current.snapTo(0);
@@ -1410,6 +1414,143 @@ export default function Home(props) {
     );
   };
 
+  const renderReshareContent = () => {
+    return (
+      <ErrorModalContents
+        modalRef={ReshareBottomSheet}
+        title={'Reshare Recovery Secret\nwith Trusted Contact'}
+        info={'Did your contact not receive the Recovery Secret?'}
+        note={'You can reshare the Recovery Secret with your Trusted\nContact via Email or Sms'}
+        proceedButtonText={'Reshare'}
+        cancelButtonText={"Back"}
+        isIgnoreButton={true}
+        onPressProceed={() => {
+          (ReshareBottomSheet as any).current.snapTo(0);
+        }}
+        onPressIgnore={() => {
+          (ReshareBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={false}
+      />
+    );
+  };
+
+  const renderReshareHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          (ReshareBottomSheet as any).current.snapTo(0);
+          setTimeout(() => {
+            setTabBarZIndex(0);
+          }, 2);
+        }}
+      />
+    );
+  };
+
+  const renderConfirmContent = () => {
+    return (
+      <ErrorModalContents
+        modalRef={ConfirmBottomSheet}
+        title={'Confirm Recovery Secret\nwith Trusted Contact'}
+        info={'Your Trusted Contact seems away from their Hexa App'}
+        note={'You can send them a reminder to open their app to\nensure they have your Recovery Secret'}
+        proceedButtonText={'Confirm'}
+        cancelButtonText={"Back"}
+        isIgnoreButton={true}
+        onPressProceed={() => {
+          (ConfirmBottomSheet as any).current.snapTo(0);
+        }}
+        onPressIgnore={() => {
+          (ConfirmBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={false}
+      />
+    );
+  };
+
+  const renderConfirmHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          (ConfirmBottomSheet as any).current.snapTo(0);
+          setTimeout(() => {
+            setTabBarZIndex(0);
+          }, 2);
+        }}
+      />
+    );
+  };
+
+  const renderChangeContent = () => {
+    return (
+      <ErrorModalContents
+        modalRef={ChangeBottomSheet}
+        title={'Change your\nTrusted Contact'}
+        info={'Having problems with your Trusted Contact'}
+        note={'You can change the Trusted Contact you selected to share\nyour Recovery Secret'}
+        proceedButtonText={'Change'}
+        cancelButtonText={"Back"}
+        isIgnoreButton={true}
+        onPressProceed={() => {
+          (ChangeBottomSheet as any).current.snapTo(0);
+        }}
+        onPressIgnore={() => {
+          (ChangeBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={false}
+      />
+    );
+  };
+
+  const renderChangeHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          (ChangeBottomSheet as any).current.snapTo(0);
+          setTimeout(() => {
+            setTabBarZIndex(0);
+          }, 2);
+        }}
+      />
+    );
+  };
+
+  const renderRegenerateContent = () => {
+    return (
+      <ErrorModalContents
+        modalRef={RegenerateBottomSheet}
+        title={'Regenerate\nRecovery Secrets'}
+        info={'Did you make too many errors?'}
+        note={'You can regenerate your Recovery Secrets\nand start over'}
+        proceedButtonText={'Regenerate'}
+        cancelButtonText={"Back"}
+        isIgnoreButton={true}
+        onPressProceed={() => {
+          (RegenerateBottomSheet as any).current.snapTo(0);
+        }}
+        onPressIgnore={() => {
+          (RegenerateBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={false}
+      />
+    );
+  };
+
+  const renderRegenerateHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          (RegenerateBottomSheet as any).current.snapTo(0);
+          setTimeout(() => {
+            setTabBarZIndex(0);
+          }, 2);
+        }}
+      />
+    );
+  };
+
+
   return (
     <ImageBackground
       source={require('../assets/images/home-bg.png')}
@@ -1926,6 +2067,63 @@ export default function Home(props) {
         ]}
         renderContent={renderShareRecoverySecretOtpModalContent}
         renderHeader={renderShareRecoverySecretOtpModalHeader}
+      />
+
+      <BottomSheet
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
+        onCloseEnd={()=>{setTabBarZIndex(999);}}
+        enabledInnerScrolling={true}
+        ref={ReshareBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
+        ]}
+        renderContent={renderReshareContent}
+        renderHeader={renderReshareHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
+        onCloseEnd={()=>{setTabBarZIndex(999);}}
+        enabledInnerScrolling={true}
+        ref={ChangeBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
+        ]}
+        renderContent={renderChangeContent}
+        renderHeader={renderChangeHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
+        onCloseEnd={()=>{setTabBarZIndex(999);}}
+        enabledInnerScrolling={true}
+        ref={ConfirmBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
+        ]}
+        renderContent={renderConfirmContent}
+        renderHeader={renderConfirmHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
+        onCloseEnd={()=>{setTabBarZIndex(999);}}
+        enabledInnerScrolling={true}
+        ref={RegenerateBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
+        ]}
+        renderContent={renderRegenerateContent}
+        renderHeader={renderRegenerateHeader}
       />
       {/* TODO: If we open full modal above tab bar first change zIndex to 0 and when we close that modal please zIndex to 999 by using setTabBarZIndex(0) or setTabBarZIndex(999) */}
       <View style={{ ...styles.bottomTabBarContainer, zIndex: tabBarZIndex }}>
