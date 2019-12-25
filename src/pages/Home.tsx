@@ -1288,7 +1288,7 @@ export default function Home(props) {
 
   const dispatch = useDispatch();
   const s3Service = useSelector(state => state.sss.service);
-  const { serviceEnriched } = useSelector(state => state.sss);
+  const { serviceEnriched, overallHealth } = useSelector(state => state.sss);
 
   useEffect(() => {
     // HC up-streaming
@@ -1387,7 +1387,11 @@ export default function Home(props) {
                   );
                 }}
               >
-                <HomePageShield shieldStatus={100} />
+                {overallHealth ? (
+                  <HomePageShield shieldStatus={overallHealth.overallStatus} />
+                ) : (
+                  <HomePageShield shieldStatus={0} />
+                )}
               </TouchableOpacity>
             </View>
           </View>

@@ -5,6 +5,7 @@ import {
   REQUESTED_SHARE_UPLOADED,
   RESET_REQUESTED_SHARE_UPLOADS,
   DOWNLOADED_MSHARE,
+  OVERALL_HEALTH_CALCULATED,
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { SERVICES_ENRICHED } from '../actions/storage';
@@ -33,6 +34,11 @@ const initialState: {
   downloadedMShare: {
     [otp: string]: { status: Boolean; err?: String };
   };
+  overallHealth: {
+    overallStatus: string;
+    qaStatus: string;
+    sharesInfo: { shareId: string; shareStage: string }[];
+  };
 } = {
   service: null,
   serviceEnriched: false,
@@ -52,6 +58,7 @@ const initialState: {
   mnemonic: '',
   requestedShareUpload: {},
   downloadedMShare: {},
+  overallHealth: null,
 };
 
 export default (state = initialState, action) => {
@@ -106,6 +113,12 @@ export default (state = initialState, action) => {
             err: action.payload.err,
           },
         },
+      };
+
+    case OVERALL_HEALTH_CALCULATED:
+      return {
+        ...state,
+        overallHealth: action.payload.overallHealth,
       };
 
     case S3_LOADING:

@@ -415,8 +415,7 @@ export default function ManageBackup(props) {
     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
   }, []);
 
-  const defect = useSelector(state => state.sss);
-  useEffect(() => {});
+  const { overallHealth } = useSelector(state => state.sss);
 
   const renderWalletBackupAndRecoveryContents = () => {
     return (
@@ -495,11 +494,19 @@ export default function ManageBackup(props) {
                 alignItems: 'center',
               }}
             >
-              <HomePageShield
-                circleShadowColor={Colors.borderColor}
-                shieldImage={require('../../assets/images/icons/protector_gray.png')}
-                shieldStatus={0}
-              />
+              {overallHealth ? (
+                <HomePageShield
+                  circleShadowColor={Colors.borderColor}
+                  shieldImage={require('../../assets/images/icons/protector_gray.png')}
+                  shieldStatus={overallHealth.overallStatus}
+                />
+              ) : (
+                <HomePageShield
+                  circleShadowColor={Colors.borderColor}
+                  shieldImage={require('../../assets/images/icons/protector_gray.png')}
+                  shieldStatus={0}
+                />
+              )}
             </View>
           </View>
           <FlatList
