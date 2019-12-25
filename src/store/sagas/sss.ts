@@ -22,6 +22,7 @@ import {
   downloadedMShare,
   OVERALL_HEALTH,
   overallHealth,
+  overallHealthCalculated,
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { insertIntoDB } from '../actions/storage';
@@ -439,7 +440,11 @@ function* overallHealthWorker({ payload }) {
     JSON.parse(securityTimestamp) ? JSON.parse(securityTimestamp) : 0,
     shareStatus,
   );
-  console.log({ overallHealth });
+
+  if (overallHealth) {
+    overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
+    yield put(overallHealthCalculated(overallHealth));
+  }
 }
 
 export const overallHealthWatcher = createWatcher(
