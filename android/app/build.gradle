@@ -103,9 +103,10 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "1.0"   
+        missingDimensionStrategy 'react-native-camera', 'general' 
         multiDexEnabled true
-    }
+    }  
      signingConfigs {
         release {
             if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
@@ -152,6 +153,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-camera')
    
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-udp')

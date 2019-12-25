@@ -11,7 +11,9 @@ import sssReducer from './reducers/sss';
 import {
   initDBWatcher,
   fetchDBWatcher,
+  fetchSSSDBWatcher,
   insertDBWatcher,
+  insertSSSDBWatcher,
   servicesEnricherWatcher,
 } from './sagas/storage';
 import {
@@ -69,7 +71,9 @@ const rootSaga = function*() {
     // database watchers
     initDBWatcher,
     fetchDBWatcher,
+    fetchSSSDBWatcher,
     insertDBWatcher,
+    insertSSSDBWatcher,
     servicesEnricherWatcher,
 
     // wallet setup watcher

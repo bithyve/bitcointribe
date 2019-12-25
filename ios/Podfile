@@ -50,4 +50,6 @@ target 'HEXA' do
 
   pod 'react-native-netinfo', :path => '../node_modules/@react-native-community/netinfo'
 
+  pod 'react-native-camera', :path => '../node_modules/react-native-camera'
+
 end

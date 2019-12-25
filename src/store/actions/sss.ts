@@ -41,9 +41,11 @@ export const downloadMShare = (otp, encryptedKey, downloadType?) => {
 };
 
 export const generatePDF = shareIndex => {
+  console.log({ ...shareIndex });
+
   return {
     type: GENERATE_PDF,
-    payload: { shareIndex },
+    payload: { ...shareIndex },
   };
 };
 
