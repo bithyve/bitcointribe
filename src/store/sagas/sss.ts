@@ -24,6 +24,8 @@ import {
   overallHealth,
   overallHealthCalculated,
 } from '../actions/sss';
+import { dbInsertedSSS } from '../actions/storage';
+
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { insertIntoDB } from '../actions/storage';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
@@ -300,11 +302,22 @@ export const downloadMetaShareWatcher = createWatcher(
 );
 
 function* generatePDFWorker({ payload }) {
-  yield put(switchS3Loader('generatePDF'));
+  // yield put(switchS3Loader('generatePDF'));
   const s3Service: S3Service = yield select(state => state.sss.service);
-  const res = yield call(s3Service.createQR, payload.shareIndex - 1);
-  if (res.status !== 200) {
-    console.log({ err: res.err });
+  const resQRPersonalCopy1 = yield call(
+    s3Service.createQR,
+    payload.personalcopy1 - 1,
+  );
+  if (resQRPersonalCopy1.status !== 200) {
+    console.log({ err: resQRPersonalCopy1.err });
+    return;
+  }
+  const resQRPersonalCopy2 = yield call(
+    s3Service.createQR,
+    payload.personalcopy2 - 1,
+  );
+  if (resQRPersonalCopy2.status !== 200) {
+    console.log({ err: resQRPersonalCopy2.err });
     return;
   }
   const secureAccount: SecureAccount = yield select(
@@ -320,27 +333,42 @@ function* generatePDFWorker({ payload }) {
     secondaryXpub: secondary,
     bhXpub: bh,
   };
-  const pdfData = {
-    qrData: res.data.qrData,
+  const pdfDataPersonalCopy1 = {
+    qrData: resQRPersonalCopy1.data.qrData,
     ...secureAssets,
   };
-  const { security } = yield select(
+  const pdfDataPersonalCopy2 = {
+    qrData: resQRPersonalCopy2.data.qrData,
+    ...secureAssets,
+  };
+  const { securityAns, walletName } = yield select(
     state => state.storage.database.WALLET_SETUP,
   );
   try {
-    const generatedPDFPath = yield call(
+    const personalCopy1PdfPath = yield call(
       generatePDF,
-      pdfData,
-      `HexaShare${payload.shareIndex}.pdf`,
-      `Hexa Share ${payload.shareIndex}`,
-      security.answer,
+      pdfDataPersonalCopy1,
+      `Hexa ${walletName} Recovery Secret (Personal Copy 1).pdf`,
+      `Hexa Share ${payload.personalcopy1}`,
+      securityAns,
     );
-    console.log({ generatedPDFPath });
+    const personalCopy2PdfPath = yield call(
+      generatePDF,
+      pdfDataPersonalCopy2,
+      `Hexa ${walletName} Recovery Secret (Personal Copy 2).pdf`,
+      `Hexa Share  ${payload.personalcopy2}`,
+      securityAns,
+    );
+    let path = {
+      personalCopy1PdfPath,
+      personalCopy2PdfPath,
+    };
+    console.log({ path });
+    yield put(dbInsertedSSS(path));
   } catch (err) {
     console.log({ err });
   }
-
-  // yield put(switchS3Loader("generatePDF"));
+  //yield put(switchS3Loader('generatePDF'));
 }
 
 export const generatePDFWatcher = createWatcher(

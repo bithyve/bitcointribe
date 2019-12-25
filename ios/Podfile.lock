@@ -44,6 +44,14 @@ PODS:
   - QRCoder (1.1.0)
   - React (0.59.10):
     - React/Core (= 0.59.10)
+  - react-native-camera (3.15.0):
+    - React
+    - react-native-camera/RCT (= 3.15.0)
+    - react-native-camera/RN (= 3.15.0)
+  - react-native-camera/RCT (3.15.0):
+    - React
+  - react-native-camera/RN (3.15.0):
+    - React
   - react-native-html-to-pdf (0.8.0):
     - React
   - react-native-netinfo (5.0.0):
@@ -156,6 +164,7 @@ DEPENDENCIES:
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - PDFGenerator
   - QRCoder
+  - react-native-camera (from `../node_modules/react-native-camera`)
   - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-randombytes (from `../node_modules/react-native-randombytes`)
@@ -248,6 +257,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   React:
     :path: "../node_modules/react-native"
+  react-native-camera:
+    :path: "../node_modules/react-native-camera"
   react-native-html-to-pdf:
     :path: "../node_modules/react-native-html-to-pdf"
   react-native-netinfo:
@@ -328,6 +339,7 @@ SPEC CHECKSUMS:
   PDFGenerator: 17d6bc525db0a3fcd156fbf00f9d1b8d5cc75d1e
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
+  react-native-camera: 52114c432860b89986c9ee4919d00a48a6ba7abb
   react-native-html-to-pdf: 1d1199917f56a98377d431bce84c2f275e48eb71
   react-native-netinfo: 841c2a83fe7df998fed56fd48b73229f17a5aa5b
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
@@ -352,6 +364,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 1e70fe58b872355f0ecb44fb81bb1a16484047f0
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: 187b0d7b124e5d310f7767cb02f4d1a07cb47933
+PODFILE CHECKSUM: 6c829f7a22301872bd968518c1bb2bfc17bd5511
 
-COCOAPODS: 1.8.3
+COCOAPODS: 1.8.4
