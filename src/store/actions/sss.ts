@@ -15,6 +15,7 @@ export const RESTORE_DYNAMIC_NONPMDD = 'RESTORE_DYNAMIC_NONPMDD';
 export const RECOVER_MNEMONIC = 'RECOVER_MNEMONIC';
 export const RECOVER_WALLET = 'RECOVER_WALLET';
 export const RESET_REQUESTED_SHARE_UPLOADS = 'RESET_REQUESTED_SHARE_UPLOADS';
+export const OVERALL_HEALTH = 'OVERALL_HEALTH';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -52,6 +53,10 @@ export const updateMSharesHealth = () => {
 
 export const checkMSharesHealth = () => {
   return { type: CHECK_MSHARES_HEALTH };
+};
+
+export const overallHealth = s3Service => {
+  return { type: OVERALL_HEALTH, payload: { s3Service } };
 };
 
 export const requestShare = shareIndex => {

@@ -52,8 +52,8 @@ export default class HealthStatus {
         shareStage: ENTITY_HEALTH.STAGE1,
       });
     }
-    const delta: number[] = new Array(5);
-    const numberOfDays: number[] = new Array(5);
+    const delta: number[] = new Array(shares.length);
+    const numberOfDays: number[] = new Array(shares.length);
     for (let i = 0; i < delta.length; i++) {
       const obj = shares[i];
       delta[i] = Math.abs(Date.now() - obj.updatedAt);
