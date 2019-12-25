@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   View,
   Image,
@@ -9,24 +9,24 @@ import {
   ActivityIndicator,
   Alert,
   SafeAreaView,
-  StatusBar
-} from "react-native";
-import Colors from "../../common/Colors";
-import BackupStyles from "./Styles";
-import Fonts from "../../common/Fonts";
-import { RFValue } from "react-native-responsive-fontsize";
+  StatusBar,
+} from 'react-native';
+import Colors from '../../common/Colors';
+import BackupStyles from './Styles';
+import Fonts from '../../common/Fonts';
+import { RFValue } from 'react-native-responsive-fontsize';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from "react-native-responsive-screen";
-import RadioButton from "../../components/RadioButton";
-import { useSelector } from "react-redux";
-import { textWithoutEncoding, email } from "react-native-communications";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import RadioButton from '../../components/RadioButton';
+import { useSelector } from 'react-redux';
+import { textWithoutEncoding, email } from 'react-native-communications';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default function CommunicationMode(props) {
-  const contact = props.navigation.getParam("contact");
-  const index = props.navigation.getParam("index");
+  const contact = props.navigation.getParam('contact');
+  const index = props.navigation.getParam('index');
 
   if (!contact) return <View></View>;
 
@@ -42,10 +42,10 @@ export default function CommunicationMode(props) {
           id: index,
           info: number || email,
           isSelected: false,
-          type: number ? "number" : "email"
+          type: number ? 'number' : 'email',
         };
       }
-    })
+    }),
   );
 
   const onContactSelect = index => {
@@ -54,15 +54,15 @@ export default function CommunicationMode(props) {
         if (item !== contactInfo[index]) {
           return {
             ...item,
-            isSelected: false
+            isSelected: false,
           };
         } else {
           return {
             ...item,
-            isSelected: !item.isSelected
+            isSelected: !item.isSelected,
           };
         }
-      })
+      }),
     ]);
     // contactInfo[index].isSelected would become true during the next render cycle (batched state updates)
     if (!contactInfo[index].isSelected) {
@@ -73,13 +73,13 @@ export default function CommunicationMode(props) {
   };
 
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
-    state => state.storage.database
+    state => state.storage.database,
   );
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
 
   const communicate = async selectedContactMode => {
     if (!SHARES_TRANSFER_DETAILS[index]) {
-      Alert.alert("Failed to share");
+      Alert.alert('Failed to share');
       return;
     }
     const deepLink =
@@ -87,17 +87,17 @@ export default function CommunicationMode(props) {
       SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY;
 
     switch (selectedContactMode.type) {
-      case "number":
+      case 'number':
         textWithoutEncoding(selectedContactMode.info, deepLink);
         break;
 
-      case "email":
+      case 'email':
         email(
           [selectedContactMode.info],
           null,
           null,
-          "Guardian request",
-          deepLink
+          'Guardian request',
+          deepLink,
         );
         break;
     }
@@ -120,27 +120,27 @@ export default function CommunicationMode(props) {
           </View>
         </TouchableOpacity>
       </View>
-      <View style={{ height: "100%" }}>
-        <View style={{ marginTop: hp("2%"), marginBottom: hp("2%") }}>
+      <View style={{ height: '100%' }}>
+        <View style={{ marginTop: hp('2%'), marginBottom: hp('2%') }}>
           <Text style={styles.commModeModalHeaderText}>
-            Select Mode of Communication{"\n"}for Contact
+            Select Mode of Communication{'\n'}for Contact
           </Text>
           <Text style={styles.commModeModalInfoText}>
             You can choose a primary number or email
           </Text>
         </View>
         <View style={styles.contactProfileView}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View
               style={{
                 backgroundColor: Colors.backgroundColor,
                 flex: 1,
                 height: 80,
-                justifyContent: "center",
+                justifyContent: 'center',
                 marginLeft: 60,
-                overflow: "hidden",
-                position: "relative",
-                borderRadius: 10
+                overflow: 'hidden',
+                position: 'relative',
+                borderRadius: 10,
               }}
             >
               <Text style={styles.contactNameText}>{contact.name}</Text>
@@ -151,13 +151,13 @@ export default function CommunicationMode(props) {
                 width: 80,
                 height: 80,
                 borderRadius: 80 / 2,
-                position: "absolute",
-                justifyContent: "center",
-                alignItems: "center"
+                position: 'absolute',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}
             >
               <Image
-                source={require("../../assets/images/icons/pexels-photo.png")}
+                source={require('../../assets/images/icons/pexels-photo.png')}
                 style={{ ...styles.contactProfileImage }}
               />
             </View>
@@ -190,7 +190,7 @@ export default function CommunicationMode(props) {
             disabled={loading.uploadMetaShare}
             style={{
               ...styles.proceedButtonView,
-              backgroundColor: Colors.blue
+              backgroundColor: Colors.blue,
             }}
           >
             {loading.uploadMetaShare ? (
@@ -207,7 +207,7 @@ export default function CommunicationMode(props) {
 
 const styles = StyleSheet.create({
   modalContentContainer: {
-    height: "100%",
+    height: '100%',
     backgroundColor: Colors.white,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
@@ -216,14 +216,14 @@ const styles = StyleSheet.create({
     borderRightColor: Colors.borderColor,
     borderRightWidth: 1,
     borderTopColor: Colors.borderColor,
-    borderTopWidth: 1
+    borderTopWidth: 1,
   },
   commModeModalHeaderText: {
     color: Colors.blue,
     fontFamily: Fonts.FiraSansMedium,
     fontSize: RFValue(18, 812),
     marginLeft: 20,
-    marginRight: 20
+    marginRight: 20,
   },
   commModeModalInfoText: {
     color: Colors.textColorGrey,
@@ -231,62 +231,62 @@ const styles = StyleSheet.create({
     fontSize: RFValue(11, 812),
     marginLeft: 20,
     marginRight: 20,
-    marginTop: hp("0.7%")
+    marginTop: hp('0.7%'),
   },
   contactProfileView: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginLeft: 20,
     marginRight: 20,
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: hp("3%"),
-    marginTop: hp("3.5%")
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: hp('3%'),
+    marginTop: hp('3.5%'),
   },
   contactProfileImage: {
     width: 70,
     height: 70,
-    resizeMode: "cover",
-    borderRadius: 70 / 2
+    resizeMode: 'cover',
+    borderRadius: 70 / 2,
   },
   contactNameText: {
     color: Colors.black,
     fontSize: RFValue(25, 812),
     fontFamily: Fonts.FiraSansRegular,
-    marginLeft: 25
+    marginLeft: 25,
   },
   contactIconImage: {
     width: 20,
     height: 20,
-    resizeMode: "cover"
+    resizeMode: 'cover',
   },
   contactInfo: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginLeft: 20,
     marginRight: 20,
-    marginTop: hp("2%"),
-    marginBottom: hp("2%")
+    marginTop: hp('2%'),
+    marginBottom: hp('2%'),
   },
   contactInfoText: {
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(13, 812),
-    marginLeft: 10
+    marginLeft: 10,
   },
   proceedButtonView: {
     marginLeft: 20,
-    marginTop: hp("3.5%"),
-    height: wp("13%"),
-    width: wp("30%"),
-    justifyContent: "center",
-    alignItems: "center",
+    marginTop: hp('3.5%'),
+    height: wp('13%'),
+    width: wp('30%'),
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 }
+    shadowOffset: { width: 15, height: 15 },
   },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue(13, 812),
-    fontFamily: Fonts.FiraSansMedium
-  }
+    fontFamily: Fonts.FiraSansMedium,
+  },
 });

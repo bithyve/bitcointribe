@@ -1,12 +1,12 @@
-import config from "../../Config";
-import { ErrMap } from "../../utilities/ErrMap";
+import config from '../../Config';
+import { ErrMap } from '../../utilities/ErrMap';
 import {
   BuddyStaticNonPMDD,
   EncDynamicNonPMDD,
   MetaShare,
-  SocialStaticNonPMDD
-} from "../../utilities/Interface";
-import SSS from "../../utilities/sss/SSS";
+  SocialStaticNonPMDD,
+} from '../../utilities/Interface';
+import SSS from '../../utilities/sss/SSS';
 
 export default class S3Service {
   public static fromJSON = (json: string) => {
@@ -17,7 +17,7 @@ export default class S3Service {
       metaShares,
       healthCheckInitialized,
       walletId,
-      healthCheckStatus
+      healthCheckStatus,
     }: {
       mnemonic: string;
       encryptedSecrets: string[];
@@ -32,13 +32,13 @@ export default class S3Service {
       metaShares,
       healthCheckInitialized,
       walletId,
-      healthCheckStatus
+      healthCheckStatus,
     });
   };
 
   public static recoverFromSecrets = (
     encryptedSecrets: string[],
-    answer: string
+    answer: string,
   ):
     | {
         status: number;
@@ -65,7 +65,7 @@ export default class S3Service {
 
   public static downloadShare = async (
     encryptedKey: string,
-    otp: string
+    otp: string,
   ): Promise<
     | {
         status: number;
@@ -91,7 +91,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await SSS.downloadShare(encryptedKey, otp)
+        data: await SSS.downloadShare(encryptedKey, otp),
       };
     } catch (err) {
       return { status: 502, err: err.message, message: ErrMap[502] };
@@ -99,7 +99,7 @@ export default class S3Service {
   };
 
   public static downloadDynamicNonPMDD = async (
-    walletId: string
+    walletId: string,
   ): Promise<
     | {
         status: number;
@@ -119,7 +119,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await SSS.downloadDynamicNonPMDD(walletId)
+        data: await SSS.downloadDynamicNonPMDD(walletId),
       };
     } catch (err) {
       return { status: 516, err: err.message, message: ErrMap[516] };
@@ -128,7 +128,7 @@ export default class S3Service {
 
   public static generateEncryptedMetaShare = (
     metaShare: MetaShare,
-    key?: string
+    key?: string,
   ):
     | {
         status: number;
@@ -149,7 +149,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: SSS.encryptMetaShare(metaShare, key)
+        data: SSS.encryptMetaShare(metaShare, key),
       };
     } catch (err) {
       return { status: 522, err: err.message, message: ErrMap[522] };
@@ -165,7 +165,7 @@ export default class S3Service {
     encryptedKey: string,
     otp: string,
     metaShare: MetaShare,
-    dynamicNonPMDD?: EncDynamicNonPMDD
+    dynamicNonPMDD?: EncDynamicNonPMDD,
   ): Promise<
     | {
         status: number;
@@ -189,8 +189,8 @@ export default class S3Service {
           encryptedKey,
           otp,
           metaShare,
-          dynamicNonPMDD
-        )
+          dynamicNonPMDD,
+        ),
       };
     } catch (err) {
       return { status: 503, err: err.message, message: ErrMap[503] };
@@ -201,7 +201,7 @@ export default class S3Service {
     encryptedKey: string,
     otp: string,
     existingShares: MetaShare[] = [],
-    walletId?: string
+    walletId?: string,
   ): Promise<
     | {
         status: number;
@@ -226,8 +226,8 @@ export default class S3Service {
           encryptedKey,
           otp,
           existingShares,
-          walletId
-        )
+          walletId,
+        ),
       };
     } catch (err) {
       return { status: 503, err: err.message, message: ErrMap[503] };
@@ -236,7 +236,7 @@ export default class S3Service {
 
   public static decryptViaOTP = (
     otpEncryptedData: string,
-    otp: string
+    otp: string,
   ):
     | {
         status: number;
@@ -255,7 +255,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: SSS.decryptViaOTP(otpEncryptedData, otp)
+        data: SSS.decryptViaOTP(otpEncryptedData, otp),
       };
     } catch (err) {
       return { status: 504, err: err.message, message: ErrMap[504] };
@@ -263,7 +263,7 @@ export default class S3Service {
   };
 
   public static recoverMetaShareFromQR = (
-    qrData: string[]
+    qrData: string[],
   ):
     | {
         status: number;
@@ -282,7 +282,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: SSS.recoverMetaShareFromQR(qrData)
+        data: SSS.recoverMetaShareFromQR(qrData),
       };
     } catch (err) {
       return { status: 505, err: err.message, message: ErrMap[505] };
@@ -290,7 +290,7 @@ export default class S3Service {
   };
 
   public static updateHealth = async (
-    metaShares: MetaShare[]
+    metaShares: MetaShare[],
   ): Promise<
     | {
         status: number;
@@ -317,7 +317,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await SSS.updateHealth(metaShares)
+        data: await SSS.updateHealth(metaShares),
       };
     } catch (err) {
       return { status: 506, err: err.message, message: ErrMap[506] };
@@ -325,7 +325,7 @@ export default class S3Service {
   };
 
   public static getShareId = (
-    encryptedShare: string
+    encryptedShare: string,
   ):
     | {
         status: number;
@@ -344,7 +344,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: { shareId: SSS.getShareId(encryptedShare) }
+        data: { shareId: SSS.getShareId(encryptedShare) },
       };
     } catch (err) {
       return { status: 507, err: err.message, message: ErrMap[507] };
@@ -369,7 +369,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: { key: SSS.generateKey(SSS.cipherSpec.keyLength) }
+        data: { key: SSS.generateKey(SSS.cipherSpec.keyLength) },
       };
     } catch (err) {
       return { status: 508, err: err.message, message: ErrMap[508] };
@@ -377,7 +377,7 @@ export default class S3Service {
   };
 
   public static encryptViaOTP = (
-    key: string
+    key: string,
   ):
     | {
         status: number;
@@ -397,7 +397,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: SSS.encryptViaOTP(key)
+        data: SSS.encryptViaOTP(key),
       };
     } catch (err) {
       return { status: 509, err: err.message, message: ErrMap[509] };
@@ -413,13 +413,13 @@ export default class S3Service {
       healthCheckInitialized: boolean;
       walletId: string;
       healthCheckStatus: {};
-    }
+    },
   ) {
     this.sss = new SSS(mnemonic, stateVars);
   }
 
   public generateShares = (
-    answer: string
+    answer: string,
   ):
     | {
         status: number;
@@ -445,7 +445,7 @@ export default class S3Service {
   };
 
   public encryptStaticNonPMDD = (
-    staticNonPMDD: SocialStaticNonPMDD | BuddyStaticNonPMDD
+    staticNonPMDD: SocialStaticNonPMDD | BuddyStaticNonPMDD,
   ):
     | {
         status: number;
@@ -463,11 +463,11 @@ export default class S3Service {
       } => {
     try {
       const { encryptedStaticNonPMDD } = this.sss.encryptStaticNonPMDD(
-        staticNonPMDD
+        staticNonPMDD,
       );
       return {
         status: config.STATUS.SUCCESS,
-        data: { encryptedStaticNonPMDD }
+        data: { encryptedStaticNonPMDD },
       };
     } catch (err) {
       return { status: 511, err: err.message, message: ErrMap[511] };
@@ -492,7 +492,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: { walletId: this.sss.walletId }
+        data: { walletId: this.sss.walletId },
       };
     } catch (err) {
       return { status: 512, err: err.message, message: ErrMap[512] };
@@ -518,7 +518,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.initializeHealthcheck()
+        data: await this.sss.initializeHealthcheck(),
       };
     } catch (err) {
       return { status: 513, err: err.message, message: ErrMap[513] };
@@ -529,7 +529,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          healthCheckStatus: {};
+          healthCheckStatus: { [shareId: string]: number };
         };
         err?: undefined;
         message?: undefined;
@@ -544,7 +544,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.checkHealth()
+        data: await this.sss.checkHealth(),
       };
     } catch (err) {
       return { status: 514, err: err.message, message: ErrMap[514] };
@@ -552,7 +552,7 @@ export default class S3Service {
   };
 
   public updateDynamicNonPMDD = async (
-    dynamicNonPMDD: any
+    dynamicNonPMDD: any,
   ): Promise<
     | {
         status: number;
@@ -571,12 +571,12 @@ export default class S3Service {
   > => {
     try {
       const { encryptedDynamicNonPMDD } = await this.sss.encryptDynamicNonPMDD(
-        dynamicNonPMDD
+        dynamicNonPMDD,
       );
 
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.updateDynamicNonPMDD(encryptedDynamicNonPMDD)
+        data: await this.sss.updateDynamicNonPMDD(encryptedDynamicNonPMDD),
       };
     } catch (err) {
       return { status: 515, err: err.message, message: ErrMap[515] };
@@ -584,7 +584,7 @@ export default class S3Service {
   };
 
   public decryptDynamicNonPMDD = (
-    encryptedDynamicNonPMDD: string
+    encryptedDynamicNonPMDD: string,
   ):
     | {
         status: number;
@@ -603,7 +603,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.sss.decryptDynamicNonPMDD(encryptedDynamicNonPMDD)
+        data: this.sss.decryptDynamicNonPMDD(encryptedDynamicNonPMDD),
       };
     } catch (err) {
       return { status: 518, err: err.message, message: ErrMap[518] };
@@ -611,7 +611,7 @@ export default class S3Service {
   };
 
   public restoreDynamicNonPMDD = (
-    dynamicNonPMDDs: EncDynamicNonPMDD[]
+    dynamicNonPMDDs: EncDynamicNonPMDD[],
   ):
     | {
         status: number;
@@ -629,13 +629,13 @@ export default class S3Service {
       } => {
     try {
       const { decryptedDynamicNonPMDD } = this.sss.restoreDynamicNonPMDD(
-        dynamicNonPMDDs
+        dynamicNonPMDDs,
       );
       return {
         status: config.STATUS.SUCCESS,
         data: {
-          latestDynamicNonPMDD: decryptedDynamicNonPMDD
-        }
+          latestDynamicNonPMDD: decryptedDynamicNonPMDD,
+        },
       };
     } catch (err) {
       return { status: 517, err: err.message, message: ErrMap[517] };
@@ -643,7 +643,7 @@ export default class S3Service {
   };
 
   public decryptStaticNonPMDD = (
-    encryptedNonPMDD: string
+    encryptedNonPMDD: string,
   ):
     | {
         status: number;
@@ -662,7 +662,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.sss.decryptStaticNonPMDD(encryptedNonPMDD)
+        data: this.sss.decryptStaticNonPMDD(encryptedNonPMDD),
       };
     } catch (err) {
       return { status: 519, err: err.message, message: ErrMap[519] };
@@ -677,7 +677,7 @@ export default class S3Service {
       bhXpub: string;
     },
     tag: string,
-    version?: number
+    version?: number,
   ):
     | {
         status: number;
@@ -696,7 +696,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.sss.createMetaShares(secureAssets, tag, version)
+        data: this.sss.createMetaShares(secureAssets, tag, version),
       };
     } catch (err) {
       return { status: 520, err: err.message, message: ErrMap[520] };
@@ -704,7 +704,7 @@ export default class S3Service {
   };
 
   public createQR = (
-    index: number
+    index: number,
   ):
     | {
         status: number;
@@ -721,7 +721,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.sss.createQR(index)
+        data: this.sss.createQR(index),
       };
     } catch (err) {
       return { status: 521, err: err.message, message: ErrMap[521] };
@@ -730,7 +730,7 @@ export default class S3Service {
 
   public uploadShare = async (
     shareIndex: number,
-    dynamicNonPMDD?: EncDynamicNonPMDD
+    dynamicNonPMDD?: EncDynamicNonPMDD,
   ): Promise<
     | {
         status: number;
@@ -751,7 +751,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.uploadShare(shareIndex, dynamicNonPMDD)
+        data: await this.sss.uploadShare(shareIndex, dynamicNonPMDD),
       };
     } catch (err) {
       return { status: 523, err: err.message, message: ErrMap[523] };

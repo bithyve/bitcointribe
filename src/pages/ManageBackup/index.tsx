@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -9,124 +9,127 @@ import {
   Text,
   Image,
   FlatList,
-  Platform
-} from "react-native";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Fonts from "../../common/Fonts";
-import Colors from "../../common/Colors";
-import CommonStyles from "../../common/Styles";
+  Platform,
+} from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Fonts from '../../common/Fonts';
+import Colors from '../../common/Colors';
+import CommonStyles from '../../common/Styles';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from "react-native-responsive-screen";
-import { RFValue } from "react-native-responsive-fontsize";
-import CopyThisText from "../../components/CopyThisText";
-import KnowMoreButton from "../../components/KnowMoreButton";
-import { useDispatch, useSelector } from "react-redux";
-import { initHealthCheck } from "../../store/actions/sss";
-import S3Service from "../../bitcoin/services/sss/S3Service";
-import HomePageShield from "../../components/HomePageShield";
-import BackupStyles from "./Styles";
-import ContactList from "../../components/ContactList";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import BottomInfoBox from "../../components/BottomInfoBox";
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import { RFValue } from 'react-native-responsive-fontsize';
+import CopyThisText from '../../components/CopyThisText';
+import KnowMoreButton from '../../components/KnowMoreButton';
+import { useDispatch, useSelector } from 'react-redux';
+import { initHealthCheck } from '../../store/actions/sss';
+import S3Service from '../../bitcoin/services/sss/S3Service';
+import HomePageShield from '../../components/HomePageShield';
+import BackupStyles from './Styles';
+import ContactList from '../../components/ContactList';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import BottomInfoBox from '../../components/BottomInfoBox';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import WalletBackupAndRecoveryContents from '../../components/Helper/WalletBackupAndRecoveryContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 
 function getImageByType(type) {
-  if (type == "secondaryDevice") {
-    return require("../../assets/images/icons/icon_secondarydevice.png");
-  } else if (type == "contact") {
-    return require("../../assets/images/icons/icon_user.png");
-  } else if (type == "cloud") {
-    return require("../../assets/images/icons/icon_cloud.png");
+  if (type == 'secondaryDevice') {
+    return require('../../assets/images/icons/icon_secondarydevice.png');
+  } else if (type == 'contact') {
+    return require('../../assets/images/icons/icon_user.png');
+  } else if (type == 'cloud') {
+    return require('../../assets/images/icons/icon_cloud.png');
   }
-  if (type == "print") {
-    return require("../../assets/images/icons/print.png");
-  } else if (type == "security") {
-    return require("../../assets/images/icons/icon_securityquestion.png");
+  if (type == 'print') {
+    return require('../../assets/images/icons/print.png');
+  } else if (type == 'security') {
+    return require('../../assets/images/icons/icon_securityquestion.png');
   }
 }
 
 export default function ManageBackup(props) {
-  const [WalletBackupAndRecoveryBottomSheet, setWalletBackupAndRecoveryBottomSheet] = useState(React.createRef());
+  const [
+    WalletBackupAndRecoveryBottomSheet,
+    setWalletBackupAndRecoveryBottomSheet,
+  ] = useState(React.createRef());
   const [secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet] = useState(
-    React.createRef()
+    React.createRef(),
   );
   const [trustedContactsBottomSheet, setTrustedContactsBottomSheet] = useState(
-    React.createRef()
+    React.createRef(),
   );
   const [cloudBottomSheet, setCloudBottomSheet] = useState(React.createRef());
-  const [selectedType, setSelectedType] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("error");
+  const [selectedType, setSelectedType] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('error');
   const [contacts, setContacts] = useState([]);
   const [cloudData, setCloudData] = useState([
     {
-      title: "iCloud Drive",
-      info: "Store backup in iCloud Drive",
-      imageIcon: require("../../assets/images/icons/logo_brand_brands_logos_icloud.png")
+      title: 'iCloud Drive',
+      info: 'Store backup in iCloud Drive',
+      imageIcon: require('../../assets/images/icons/logo_brand_brands_logos_icloud.png'),
     },
     {
-      title: "Google Drive",
-      info: "Store backup in Google Drive",
-      imageIcon: require("../../assets/images/icons/logo_brand_brands_logos_icloud.png")
+      title: 'Google Drive',
+      info: 'Store backup in Google Drive',
+      imageIcon: require('../../assets/images/icons/logo_brand_brands_logos_icloud.png'),
     },
     {
-      title: "One Drive",
-      info: "Store backup in One Drive",
-      imageIcon: require("../../assets/images/icons/logo_brand_brands_logos_icloud.png")
+      title: 'One Drive',
+      info: 'Store backup in One Drive',
+      imageIcon: require('../../assets/images/icons/logo_brand_brands_logos_icloud.png'),
     },
     {
-      title: "DropBox Storage",
-      info: "Store backup in Dropbox Storage",
-      imageIcon: require("../../assets/images/icons/logo_brand_brands_logos_icloud.png")
-    }
+      title: 'DropBox Storage',
+      info: 'Store backup in Dropbox Storage',
+      imageIcon: require('../../assets/images/icons/logo_brand_brands_logos_icloud.png'),
+    },
   ]);
   const [pageData, setPageData] = useState([
     {
-      title: "Secondary Device",
-      time: "3 months ago",
-      status: "error",
-      type: "secondaryDevice",
-      route: "SecondaryDevice"
+      title: 'Secondary Device',
+      time: '3 months ago',
+      status: 'error',
+      type: 'secondaryDevice',
+      route: 'SecondaryDevice',
     },
     {
-      title: "Trusted Contact 1",
-      time: "1 month ago",
-      status: "error",
-      type: "contact",
-      route: "TrustedContacts"
+      title: 'Trusted Contact 1',
+      time: '1 month ago',
+      status: 'error',
+      type: 'contact',
+      route: 'TrustedContacts',
     },
     {
-      title: "Trusted Contact 2",
-      time: "12 days ago",
-      status: "warning",
-      type: "contact",
-      route: "TrustedContacts"
+      title: 'Trusted Contact 2',
+      time: '12 days ago',
+      status: 'warning',
+      type: 'contact',
+      route: 'TrustedContacts',
     },
     {
-      title: "Cloud",
-      time: "2 days ago",
-      status: "success",
-      type: "cloud",
-      route: "Cloud"
+      title: 'Cloud',
+      time: '2 days ago',
+      status: 'success',
+      type: 'cloud',
+      route: 'Cloud',
     },
     {
-      title: "Print",
-      time: "3 days ago",
-      status: "success",
-      type: "print",
-      route: "Cloud"
+      title: 'Print',
+      time: '3 days ago',
+      status: 'success',
+      type: 'print',
+      route: 'Cloud',
     },
     {
-      title: "Security Questions",
-      time: "1 day ago",
-      status: "success",
-      type: "security",
-      route: "HealthCheckSecurityAnswer"
-    }
+      title: 'Security Questions',
+      time: '1 day ago',
+      status: 'success',
+      type: 'security',
+      route: 'HealthCheckSecurityAnswer',
+    },
   ]);
 
   // function selectedContactsList(list) {
@@ -159,28 +162,27 @@ export default function ManageBackup(props) {
   //   }
 
   const getIconByStatus = status => {
-    if (status == "error") {
-      return require("../../assets/images/icons/icon_error_red.png");
-    } else if (status == "warning") {
-      return require("../../assets/images/icons/icon_error_yellow.png");
-    } else if (status == "success") {
-      return require("../../assets/images/icons/icon_check.png");
+    if (status == 'error') {
+      return require('../../assets/images/icons/icon_error_red.png');
+    } else if (status == 'warning') {
+      return require('../../assets/images/icons/icon_error_yellow.png');
+    } else if (status == 'success') {
+      return require('../../assets/images/icons/icon_check.png');
     }
   };
 
   function onCloseEnd() {
-    if (selectedType == "secondaryDevice") {
-      setSelectedType("contact");
-      setSelectedStatus("warning");
+    if (selectedType == 'secondaryDevice') {
+      setSelectedType('contact');
+      setSelectedStatus('warning');
     }
   }
-  
 
   function renderCloudContent() {
     return (
       <View style={BackupStyles.modalContainer}>
         <View style={BackupStyles.modalHeaderTitleView}>
-          <View style={{ marginTop: hp("1%") }}>
+          <View style={{ marginTop: hp('1%') }}>
             <Text style={BackupStyles.modalHeaderTitleText}>Cloud</Text>
             <Text style={BackupStyles.modalHeaderInfoText}>
               Never backed up
@@ -199,15 +201,15 @@ export default function ManageBackup(props) {
               fontFamily: Fonts.FiraSansRegular,
               fontSize: RFValue(12, 812),
               marginTop: 5,
-              marginBottom: 5
+              marginBottom: 5,
             }}
           >
-            Select cloud drive to{" "}
+            Select cloud drive to{' '}
             <Text
               style={{
                 fontFamily: Fonts.FiraSansMediumItalic,
-                fontWeight: "bold",
-                fontStyle: "italic"
+                fontWeight: 'bold',
+                fontStyle: 'italic',
               }}
             >
               store recovery secret
@@ -222,7 +224,7 @@ export default function ManageBackup(props) {
                     style={styles.listElementsIconImage}
                     source={item.imageIcon}
                   />
-                  <View style={{ justifyContent: "space-between", flex: 1 }}>
+                  <View style={{ justifyContent: 'space-between', flex: 1 }}>
                     <Text style={styles.listElementsTitle}>{item.title}</Text>
                     <Text style={styles.listElementsInfo} numberOfLines={1}>
                       {item.info}
@@ -233,7 +235,7 @@ export default function ManageBackup(props) {
                       name="ios-arrow-forward"
                       color={Colors.textColorGrey}
                       size={15}
-                      style={{ alignSelf: "center" }}
+                      style={{ alignSelf: 'center' }}
                     />
                   </View>
                 </View>
@@ -249,7 +251,7 @@ export default function ManageBackup(props) {
     return (
       <View style={BackupStyles.modalContainer}>
         <View style={BackupStyles.modalHeaderTitleView}>
-          <View style={{ marginTop: hp("2%") }}>
+          <View style={{ marginTop: hp('2%') }}>
             <Text style={BackupStyles.modalHeaderTitleText}>
               Trusted Contact
             </Text>
@@ -269,15 +271,15 @@ export default function ManageBackup(props) {
               color: Colors.textColorGrey,
               fontFamily: Fonts.FiraSansRegular,
               fontSize: RFValue(12, 812),
-              marginTop: 5
+              marginTop: 5,
             }}
           >
-            Select contact to{" "}
+            Select contact to{' '}
             <Text
               style={{
                 fontFamily: Fonts.FiraSansMediumItalic,
-                fontWeight: "bold",
-                fontStyle: "italic"
+                fontWeight: 'bold',
+                fontStyle: 'italic',
               }}
             >
               send recovery secret
@@ -297,20 +299,20 @@ export default function ManageBackup(props) {
     return (
       <View style={BackupStyles.modalContainer}>
         <View style={BackupStyles.modalHeaderTitleView}>
-          <View style={{ marginTop: hp("2%") }}>
+          <View style={{ marginTop: hp('2%') }}>
             <Text style={BackupStyles.modalHeaderTitleText}>
-              {"Secondary Device"}
+              {'Secondary Device'}
             </Text>
             <Text style={BackupStyles.modalHeaderInfoText}>
-              Last backup{" "}
+              Last backup{' '}
               <Text
                 style={{
                   fontFamily: Fonts.FiraSansMediumItalic,
-                  fontWeight: "bold",
-                  fontStyle: "italic"
+                  fontWeight: 'bold',
+                  fontStyle: 'italic',
                 }}
               >
-                {"3 months ago"}
+                {'3 months ago'}
               </Text>
             </Text>
           </View>
@@ -321,15 +323,15 @@ export default function ManageBackup(props) {
         </View>
         <View style={BackupStyles.modalContentView}>
           <Image
-            style={{ width: hp("27%"), height: hp("27%"), alignSelf: "center" }}
-            source={require("../../assets/images/qrcode.png")}
+            style={{ width: hp('27%'), height: hp('27%'), alignSelf: 'center' }}
+            source={require('../../assets/images/qrcode.png')}
           />
           <CopyThisText text="lk2j3429-85213-5134=50t-934285623877wer78er7" />
         </View>
         <BottomInfoBox
-          title={"Note"}
+          title={'Note'}
           infoText={
-            "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna"
+            'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna'
           }
         />
       </View>
@@ -413,31 +415,42 @@ export default function ManageBackup(props) {
     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
   }, []);
 
-  const renderWalletBackupAndRecoveryContents = () => {
-		return <WalletBackupAndRecoveryContents
-		onPressManageBackup={()=>{
-		WalletBackupAndRecoveryBottomSheet.current.snapTo(0);}}
-		onSkip={() => {
-			WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
-		}}  
-		onStartBackup={() => {
-			WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
-		}} />
-	}
+  const { overallHealth } = useSelector(state => state.sss);
 
-	const renderWalletBackupAndRecoveryHeader = () => {
-		return <SmallHeaderModal
-		borderColor={Colors.blue}
-		headerColor={Colors.blue}
-		 onPressHandle={() => {
-			setTimeout(() => { setTabBarZIndex(999); }, 10);
-			WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
-		}} />
-	}
+  const renderWalletBackupAndRecoveryContents = () => {
+    return (
+      <WalletBackupAndRecoveryContents
+        onPressManageBackup={() => {
+          WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
+        }}
+        onSkip={() => {
+          WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
+        }}
+        onStartBackup={() => {
+          WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderWalletBackupAndRecoveryHeader = () => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.blue}
+        headerColor={Colors.blue}
+        onPressHandle={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 10);
+          WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
 
   return (
     <View style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 0 }}/>
+      <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={{ flex: 1 }}>
         <View style={CommonStyles.headerContainer}>
@@ -457,8 +470,8 @@ export default function ManageBackup(props) {
           </TouchableOpacity>
         </View>
         <ScrollView>
-          <View style={{ flexDirection: "row", marginTop: 10 }}>
-            <View style={{ flex: 2}}>
+          <View style={{ flexDirection: 'row', marginTop: 10 }}>
+            <View style={{ flex: 2 }}>
               <Text style={{ ...CommonStyles.headerTitles, marginLeft: 25 }}>
                 Manage Backup
               </Text>
@@ -474,12 +487,26 @@ export default function ManageBackup(props) {
                 textStyle={{}}
               />
             </View>
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <HomePageShield
-                circleShadowColor={Colors.borderColor}
-                shieldImage={require("../../assets/images/icons/protector_gray.png")}
-                shieldStatus={0}
-              />
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              {overallHealth ? (
+                <HomePageShield
+                  circleShadowColor={Colors.borderColor}
+                  shieldImage={require('../../assets/images/icons/protector_gray.png')}
+                  shieldStatus={overallHealth.overallStatus}
+                />
+              ) : (
+                <HomePageShield
+                  circleShadowColor={Colors.borderColor}
+                  shieldImage={require('../../assets/images/icons/protector_gray.png')}
+                  shieldStatus={0}
+                />
+              )}
             </View>
           </View>
           <FlatList
@@ -495,21 +522,21 @@ export default function ManageBackup(props) {
                   onPress={() =>
                     props.navigation.navigate(item.route, {
                       index:
-                        item.title === "Trusted Contact 1"
+                        item.title === 'Trusted Contact 1'
                           ? 1
-                          : item.title === "Trusted Contact 2"
+                          : item.title === 'Trusted Contact 2'
                           ? 2
-                          : undefined
+                          : undefined,
                     })
                   }
                   style={{
                     ...styles.manageBackupCard,
                     borderColor:
-                      item.status == "error"
+                      item.status == 'error'
                         ? Colors.red
-                        : item.status == "warning"
+                        : item.status == 'warning'
                         ? Colors.yellow
-                        : item.status == "success"
+                        : item.status == 'success'
                         ? Colors.green
                         : Colors.blue,
                     elevation:
@@ -525,7 +552,7 @@ export default function ManageBackup(props) {
                         ? { width: 0, height: 10 }
                         : { width: 0, height: 0 },
                     shadowRadius:
-                      selectedType && item.type == selectedType ? 10 : 0
+                      selectedType && item.type == selectedType ? 10 : 0,
                   }}
                 >
                   <Image
@@ -535,12 +562,12 @@ export default function ManageBackup(props) {
                   <View style={{ marginLeft: 15 }}>
                     <Text style={styles.cardTitleText}>{item.title}</Text>
                     <Text style={styles.cardTimeText}>
-                      Last backup{" "}
+                      Last backup{' '}
                       <Text
                         style={{
                           fontFamily: Fonts.FiraSansMediumItalic,
-                          fontWeight: "bold",
-                          fontStyle: "italic"
+                          fontWeight: 'bold',
+                          fontStyle: 'italic',
                         }}
                       >
                         {item.time}
@@ -581,12 +608,17 @@ export default function ManageBackup(props) {
           renderHeader={renderCloudHeader}
         /> */}
         <BottomSheet
-				enabledInnerScrolling={true}
-				ref={WalletBackupAndRecoveryBottomSheet}
-				snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('90%') : hp('90%')]}
-				renderContent={renderWalletBackupAndRecoveryContents}
-				renderHeader={renderWalletBackupAndRecoveryHeader}
-			/>
+          enabledInnerScrolling={true}
+          ref={WalletBackupAndRecoveryBottomSheet}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('90%')
+              : hp('90%'),
+          ]}
+          renderContent={renderWalletBackupAndRecoveryContents}
+          renderHeader={renderWalletBackupAndRecoveryHeader}
+        />
       </View>
     </View>
   );
@@ -595,33 +627,33 @@ export default function ManageBackup(props) {
 const styles = StyleSheet.create({
   knowMoreButton: {
     marginTop: 10,
-    height: wp("6%"),
-    width: wp("18%"),
+    height: wp('6%'),
+    width: wp('18%'),
     marginLeft: 25,
     backgroundColor: Colors.lightBlue,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 5
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
   },
   knowMoreButtonText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12, 812)
+    fontSize: RFValue(12, 812),
   },
   shieldImage: {
-    width: wp("16%"),
-    height: wp("25%"),
-    resizeMode: "contain",
-    marginLeft: "auto",
-    marginRight: 20
+    width: wp('16%'),
+    height: wp('25%'),
+    resizeMode: 'contain',
+    marginLeft: 'auto',
+    marginRight: 20,
   },
   modalHeaderHandle: {
     width: 50,
     height: 5,
     backgroundColor: Colors.borderColor,
     borderRadius: 10,
-    alignSelf: "center",
-    marginTop: 15
+    alignSelf: 'center',
+    marginTop: 15,
   },
   modalHeader: {
     backgroundColor: Colors.white,
@@ -631,9 +663,9 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderTopWidth: 1,
     height: 25,
-    width: "80%",
-    alignSelf: "center",
-    borderColor: Colors.borderColor
+    width: '80%',
+    alignSelf: 'center',
+    borderColor: Colors.borderColor,
   },
   addressView: {
     flex: 1,
@@ -643,11 +675,11 @@ const styles = StyleSheet.create({
     height: 50,
     paddingLeft: 15,
     paddingRight: 15,
-    justifyContent: "center"
+    justifyContent: 'center',
   },
   addressText: {
     fontSize: RFValue(13, 812),
-    color: Colors.lightBlue
+    color: Colors.lightBlue,
   },
   copyIconView: {
     width: 48,
@@ -655,8 +687,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.borderColor,
     borderTopRightRadius: 8,
     borderBottomRightRadius: 8,
-    justifyContent: "center",
-    alignItems: "center"
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   manageBackupCard: {
     padding: 20,
@@ -665,33 +697,33 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginLeft: 10,
     marginRight: 10,
-    alignItems: "center",
-    flexDirection: "row",
-    backgroundColor: Colors.white
+    alignItems: 'center',
+    flexDirection: 'row',
+    backgroundColor: Colors.white,
   },
   cardImage: {
     width: 30,
     height: 30,
-    resizeMode: "contain"
+    resizeMode: 'contain',
   },
   cardTitleText: {
     color: Colors.blue,
     fontSize: RFValue(13, 812),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   cardTimeText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(10, 812)
+    fontSize: RFValue(10, 812),
   },
   cardIconImage: {
     width: 12,
     height: 14,
-    resizeMode: "contain",
-    marginLeft: "auto"
+    resizeMode: 'contain',
+    marginLeft: 'auto',
   },
   listElements: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginLeft: 20,
     marginRight: 20,
     borderBottomWidth: 0.5,
@@ -699,31 +731,31 @@ const styles = StyleSheet.create({
     paddingTop: 25,
     paddingBottom: 25,
     paddingLeft: 10,
-    alignItems: "center"
+    alignItems: 'center',
   },
   listElementsTitle: {
     color: Colors.blue,
     fontSize: RFValue(13, 812),
     marginLeft: 13,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   listElementsInfo: {
     color: Colors.textColorGrey,
     fontSize: RFValue(11, 812),
     marginLeft: 13,
     marginTop: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   listElementIcon: {
     paddingRight: 5,
     marginLeft: 25,
-    justifyContent: "center",
-    alignItems: "center"
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   listElementsIconImage: {
-    resizeMode: "contain",
+    resizeMode: 'contain',
     width: 25,
     height: 25,
-    alignSelf: "center"
-  }
+    alignSelf: 'center',
+  },
 });

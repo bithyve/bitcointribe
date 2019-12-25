@@ -6,17 +6,17 @@ import {
   TRANSFER_ST2_EXECUTED,
   CLEAR_TRANSFER,
   TRANSFER_ST3_EXECUTED,
-  ACCOUNTS_LOADING
-} from "../actions/accounts";
-import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
-import TestAccount from "../../bitcoin/services/accounts/TestAccount";
-import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
-import { SERVICES_ENRICHED } from "../actions/storage";
+  ACCOUNTS_LOADING,
+} from '../actions/accounts';
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
+import { SERVICES_ENRICHED } from '../actions/storage';
 import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
-  SECURE_ACCOUNT
-} from "../../common/constants/serviceTypes";
+  SECURE_ACCOUNT,
+} from '../../common/constants/serviceTypes';
 
 const ACCOUNT_VARS: {
   service: RegularAccount | TestAccount | SecureAccount;
@@ -41,31 +41,32 @@ const ACCOUNT_VARS: {
   };
 } = {
   service: null,
-  receivingAddress: "",
+  receivingAddress: '',
   balances: {
     balance: 0,
-    unconfirmedBalance: 0
+    unconfirmedBalance: 0,
   },
   transactions: {},
   transfer: {
-    executed: "",
+    executed: '',
     stage1: {},
     stage2: {},
-    txid: ""
+    txid: '',
   },
   loading: {
     receivingAddress: false,
     balances: false,
     transactions: false,
     transfer: false,
-    testcoins: false
-  }
+    testcoins: false,
+  },
 };
 
 const initialState = {
+  servicesEnriched: false,
   REGULAR_ACCOUNT: ACCOUNT_VARS,
   TEST_ACCOUNT: ACCOUNT_VARS,
-  SECURE_ACCOUNT: ACCOUNT_VARS
+  SECURE_ACCOUNT: ACCOUNT_VARS,
 };
 
 export default (state = initialState, action) => {
@@ -79,9 +80,9 @@ export default (state = initialState, action) => {
           receivingAddress: action.payload.address,
           loading: {
             ...state[account].loading,
-            receivingAddress: false
-          }
-        }
+            receivingAddress: false,
+          },
+        },
       };
 
     case BALANCE_FETCHED:
@@ -92,9 +93,9 @@ export default (state = initialState, action) => {
           balances: action.payload.balances,
           loading: {
             ...state[account].loading,
-            balances: false
-          }
-        }
+            balances: false,
+          },
+        },
       };
 
     case TRANSACTIONS_FETCHED:
@@ -105,9 +106,9 @@ export default (state = initialState, action) => {
           transactions: action.payload.transactions,
           loading: {
             ...state[account].loading,
-            transactions: false
-          }
-        }
+            transactions: false,
+          },
+        },
       };
 
     case TRANSFER_ST1_EXECUTED:
@@ -118,13 +119,13 @@ export default (state = initialState, action) => {
           transfer: {
             ...state[account].transfer,
             stage1: { ...action.payload.result },
-            executed: "ST1"
+            executed: 'ST1',
           },
           loading: {
             ...state[account].loading,
-            transfer: false
-          }
-        }
+            transfer: false,
+          },
+        },
       };
 
     case CLEAR_TRANSFER:
@@ -133,9 +134,9 @@ export default (state = initialState, action) => {
         [account]: {
           ...state[account],
           transfer: {
-            ...initialState[account].transfer
-          }
-        }
+            ...initialState[account].transfer,
+          },
+        },
       };
 
     case TRANSFER_ST2_EXECUTED:
@@ -148,13 +149,13 @@ export default (state = initialState, action) => {
               transfer: {
                 ...state[account].transfer,
                 txid: action.payload.result,
-                executed: "ST2"
+                executed: 'ST2',
               },
               loading: {
                 ...state[account].loading,
-                transfer: false
-              }
-            }
+                transfer: false,
+              },
+            },
           };
         case SECURE_ACCOUNT:
           return {
@@ -164,13 +165,13 @@ export default (state = initialState, action) => {
               transfer: {
                 ...state[account].transfer,
                 stage2: { ...action.payload.result },
-                executed: "ST2"
+                executed: 'ST2',
               },
               loading: {
                 ...state[account].loading,
-                transfer: false
-              }
-            }
+                transfer: false,
+              },
+            },
           };
       }
 
@@ -182,13 +183,13 @@ export default (state = initialState, action) => {
           transfer: {
             ...state[account].transfer,
             txid: action.payload.result,
-            executing: false
+            executing: false,
           },
           loading: {
             ...state[account].loading,
-            transfer: false
-          }
-        }
+            transfer: false,
+          },
+        },
       };
 
     case SERVICES_ENRICHED:
@@ -196,16 +197,17 @@ export default (state = initialState, action) => {
         ...state,
         [REGULAR_ACCOUNT]: {
           ...state[REGULAR_ACCOUNT],
-          service: action.payload.services[REGULAR_ACCOUNT]
+          service: action.payload.services[REGULAR_ACCOUNT],
         },
         [TEST_ACCOUNT]: {
           ...state[TEST_ACCOUNT],
-          service: action.payload.services[TEST_ACCOUNT]
+          service: action.payload.services[TEST_ACCOUNT],
         },
         [SECURE_ACCOUNT]: {
           ...state[SECURE_ACCOUNT],
-          service: action.payload.services[SECURE_ACCOUNT]
-        }
+          service: action.payload.services[SECURE_ACCOUNT],
+        },
+        servicesEnriched: true,
       };
 
     case ACCOUNTS_LOADING:
@@ -217,9 +219,9 @@ export default (state = initialState, action) => {
             ...state[account].loading,
             [action.payload.beingLoaded]: !state[account].loading[
               action.payload.beingLoaded
-            ]
-          }
-        }
+            ],
+          },
+        },
       };
   }
   return state;

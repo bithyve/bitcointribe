@@ -15,6 +15,7 @@ export const RESTORE_DYNAMIC_NONPMDD = 'RESTORE_DYNAMIC_NONPMDD';
 export const RECOVER_MNEMONIC = 'RECOVER_MNEMONIC';
 export const RECOVER_WALLET = 'RECOVER_WALLET';
 export const RESET_REQUESTED_SHARE_UPLOADS = 'RESET_REQUESTED_SHARE_UPLOADS';
+export const OVERALL_HEALTH = 'OVERALL_HEALTH';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -54,6 +55,10 @@ export const checkMSharesHealth = () => {
   return { type: CHECK_MSHARES_HEALTH };
 };
 
+export const overallHealth = s3Service => {
+  return { type: OVERALL_HEALTH, payload: { s3Service } };
+};
+
 export const requestShare = shareIndex => {
   return { type: REQUEST_SHARE, payload: { shareIndex } };
 };
@@ -88,6 +93,7 @@ export const REQUESTED_SHARE_UPLOADED = 'REQUESTED_SHARE_UPLOADED';
 export const MNEMONIC_RECOVERED = 'MNEMONIC_RECOVERED';
 export const S3_LOADING = 'S3_LOADING';
 export const DOWNLOADED_MSHARE = 'DOWNLOADED_MSHARE';
+export const OVERALL_HEALTH_CALCULATED = 'OVERALL_HEALTH_CALCULATED';
 
 export const healthCheckInitialized = () => {
   return { type: HEALTH_CHECK_INITIALIZED };
@@ -107,4 +113,8 @@ export const switchS3Loader = beingLoaded => {
 
 export const downloadedMShare = (otp, status, err?) => {
   return { type: DOWNLOADED_MSHARE, payload: { otp, status, err } };
+};
+
+export const overallHealthCalculated = overallHealth => {
+  return { type: OVERALL_HEALTH_CALCULATED, payload: { overallHealth } };
 };
