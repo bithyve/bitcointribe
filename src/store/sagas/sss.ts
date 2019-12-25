@@ -20,6 +20,8 @@ import {
   GENERATE_PDF,
   requestedShareUploaded,
   downloadedMShare,
+  OVERALL_HEALTH,
+  overallHealth,
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { insertIntoDB } from '../actions/storage';
@@ -30,6 +32,8 @@ import {
   MetaShare,
 } from '../../bitcoin/utilities/Interface';
 import generatePDF from '../utils/generatePDF';
+import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
+import AsyncStorage from '@react-native-community/async-storage';
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select(state => state.sss.service);
@@ -393,7 +397,7 @@ function* checkMSharesHealthWorker() {
   const preInstance = JSON.stringify(s3Service);
   const res = yield call(s3Service.checkHealth);
   const postInstance = JSON.stringify(s3Service);
-
+  yield put(overallHealth(s3Service));
   if (res.status === 200) {
     if (preInstance !== postInstance) {
       const { SERVICES } = yield select(state => state.storage.database);
@@ -413,6 +417,34 @@ function* checkMSharesHealthWorker() {
 export const checkMSharesHealthWatcher = createWatcher(
   checkMSharesHealthWorker,
   CHECK_MSHARES_HEALTH,
+);
+
+function* overallHealthWorker({ payload }) {
+  const { healthCheckStatus } = payload.s3Service.sss;
+  const shareStatus = Object.keys(healthCheckStatus).map(key => {
+    return {
+      shareId: key,
+      updatedAt: healthCheckStatus[key],
+    };
+  });
+
+  const securityTimestamp = yield call(
+    AsyncStorage.getItem,
+    'SecurityAnsTimestamp',
+  );
+
+  const healthStatus = new HealthStatus();
+  const overallHealth = yield call(
+    healthStatus.appHealthStatus,
+    JSON.parse(securityTimestamp) ? JSON.parse(securityTimestamp) : 0,
+    shareStatus,
+  );
+  console.log({ overallHealth });
+}
+
+export const overallHealthWatcher = createWatcher(
+  overallHealthWorker,
+  OVERALL_HEALTH,
 );
 
 function* updateDynamicNonPMDDWorker() {

@@ -1,25 +1,25 @@
-import { applyMiddleware, createStore, combineReducers } from "redux";
-import { Provider } from "react-redux";
-import createSagaMiddleware from "redux-saga";
-import { call, all, spawn } from "redux-saga/effects";
-import { composeWithDevTools } from "redux-devtools-extension";
+import { applyMiddleware, createStore, combineReducers } from 'redux';
+import { Provider } from 'react-redux';
+import createSagaMiddleware from 'redux-saga';
+import { call, all, spawn } from 'redux-saga/effects';
+import { composeWithDevTools } from 'redux-devtools-extension';
 
-import storageReducer from "./reducers/storage";
-import setupAndAuthReducer from "./reducers/setupAndAuth";
-import accountsReducer from "./reducers/accounts";
-import sssReducer from "./reducers/sss";
+import storageReducer from './reducers/storage';
+import setupAndAuthReducer from './reducers/setupAndAuth';
+import accountsReducer from './reducers/accounts';
+import sssReducer from './reducers/sss';
 import {
   initDBWatcher,
   fetchDBWatcher,
   insertDBWatcher,
-  servicesEnricherWatcher
-} from "./sagas/storage";
+  servicesEnricherWatcher,
+} from './sagas/storage';
 import {
   initSetupWatcher,
   initRecoveryWatcher,
   credentialStorageWatcher,
-  credentialsAuthWatcher
-} from "./sagas/setupAndAuth";
+  credentialsAuthWatcher,
+} from './sagas/setupAndAuth';
 import {
   fetchAddrWatcher,
   fetchBalanceWatcher,
@@ -27,8 +27,8 @@ import {
   transferST1Watcher,
   transferST2Watcher,
   testcoinsWatcher,
-  transferST3Watcher
-} from "./sagas/accounts";
+  transferST3Watcher,
+} from './sagas/accounts';
 import {
   initHCWatcher,
   generateMetaSharesWatcher,
@@ -36,6 +36,7 @@ import {
   downloadMetaShareWatcher,
   updateMSharesHealthWatcher,
   checkMSharesHealthWatcher,
+  overallHealthWatcher,
   uploadRequestedShareWatcher,
   requestShareWatcher,
   updateDynamicNonPMDDWatcher,
@@ -43,8 +44,8 @@ import {
   recoverMnemonicWatcher,
   recoverWalletWatcher,
   restoreDynamicNonPMDDWatcher,
-  generatePDFWatcher
-} from "./sagas/sss";
+  generatePDFWatcher,
+} from './sagas/sss';
 
 // const rootSaga = function*() {
 //   yield all([
@@ -94,13 +95,14 @@ const rootSaga = function*() {
     generatePDFWatcher,
     updateMSharesHealthWatcher,
     checkMSharesHealthWatcher,
+    overallHealthWatcher,
     uploadRequestedShareWatcher,
     requestShareWatcher,
     updateDynamicNonPMDDWatcher,
     downloadDynamicNonPMDDWatcher,
     restoreDynamicNonPMDDWatcher,
     recoverMnemonicWatcher,
-    recoverWalletWatcher
+    recoverWalletWatcher,
   ];
 
   yield all(
@@ -114,8 +116,8 @@ const rootSaga = function*() {
             console.log(e);
           }
         }
-      })
-    )
+      }),
+    ),
   );
 };
 
@@ -123,13 +125,13 @@ const rootReducer = combineReducers({
   storage: storageReducer,
   setupAndAuth: setupAndAuthReducer,
   accounts: accountsReducer,
-  sss: sssReducer
+  sss: sssReducer,
 });
 
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(
   rootReducer,
-  composeWithDevTools(applyMiddleware(sagaMiddleware))
+  composeWithDevTools(applyMiddleware(sagaMiddleware)),
 );
 sagaMiddleware.run(rootSaga);
 

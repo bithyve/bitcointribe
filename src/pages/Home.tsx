@@ -1306,11 +1306,6 @@ export default function Home(props) {
 
       if (healthCheckInitialized) {
         dispatch(checkMSharesHealth());
-        if (Object.keys(healthCheckStatus).length) {
-          for (let key of Object.keys(healthCheckStatus)) {
-            console.log(key, healthCheckStatus[key]);
-          }
-        }
       }
     }
   }, [serviceEnriched]);
