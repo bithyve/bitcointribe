@@ -215,10 +215,11 @@ export default function HealthCheckSecurityAnswer(props) {
             <TouchableOpacity
               disabled={errorText || !answer ? true : false}
               onPress={async () => {
-                AsyncStorage.setItem(
+                await AsyncStorage.setItem(
                   'SecurityAnsTimestamp',
                   JSON.stringify(Date.now()),
                 );
+                props.navigation.goBack();
               }}
               style={styles.questionConfirmButton}
             >
