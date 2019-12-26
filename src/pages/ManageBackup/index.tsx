@@ -38,6 +38,7 @@ import SmallHeaderModal from '../../components/SmallHeaderModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { initHealthCheck } from '../../store/actions/sss';
 import { fetchSSSFromDB } from "../../store/actions/storage";
+import { requestSharePdf } from "../../store/actions/manageBackup";
 
 function getImageByType( type ) {
   if ( type == 'secondaryDevice' ) {
@@ -134,7 +135,7 @@ export default function ManageBackup( props ) {
       time: '3 days ago',
       status: 'error',
       type: 'print',
-      route: 'Cloud',
+      route: 'print',
     },
     {
       title: 'Security Questions',
@@ -588,7 +589,10 @@ export default function ManageBackup( props ) {
               // }}
               >
                 <TouchableOpacity
-                  onPress={ () =>
+                  onPress={ () => {
+                    if ( item.route == 'personalCopy' || item.route == 'print' ) {
+                      dispatch( requestSharePdf( item ) )
+                    }
                     props.navigation.navigate( item.route, {
                       index:
                         item.title === 'Trusted Contact 1'
@@ -597,6 +601,7 @@ export default function ManageBackup( props ) {
                             ? 2
                             : undefined,
                     } )
+                  }
                   }
                   style={ {
                     ...styles.manageBackupCard,

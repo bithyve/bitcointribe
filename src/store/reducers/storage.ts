@@ -60,7 +60,7 @@ export default (state = initialState, action) => {
     case DB_FETCHEDSSS:
       const updatedSSSState = {
         ...state,
-        database: {
+        databaseSSS: {
           ...action.payload.database,
         },
       };

@@ -3,6 +3,7 @@ package com.hexa;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import cl.json.RNSharePackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.tradle.react.UdpSocketsModule;
@@ -55,6 +56,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNSharePackage(),
             new RNCameraPackage(),
             new VectorIconsPackage(),
             new UdpSocketsModule(),

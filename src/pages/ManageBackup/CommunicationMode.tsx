@@ -24,20 +24,20 @@ import { useSelector } from 'react-redux';
 import { textWithoutEncoding, email } from 'react-native-communications';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-export default function CommunicationMode(props) {
-  const contact = props.navigation.getParam('contact');
-  const index = props.navigation.getParam('index');
+export default function CommunicationMode( props ) {
+  const contact = props.navigation.getParam( 'contact' );
+  const index = props.navigation.getParam( 'index' );
 
-  if (!contact) return <View></View>;
+  if ( !contact ) return <View></View>;
 
   const communicationInfo = [];
-  if (contact.phoneNumbers) communicationInfo.push(...contact.phoneNumbers);
-  if (contact.emails) communicationInfo.push(...contact.emails);
+  if ( contact.phoneNumbers ) communicationInfo.push( ...contact.phoneNumbers );
+  if ( contact.emails ) communicationInfo.push( ...contact.emails );
 
-  const [selectedContactMode, setSelectedContactMode] = useState();
-  const [contactInfo, setContactInfo] = useState(
-    communicationInfo.map(({ number, email }, index) => {
-      if (number || email) {
+  const [ selectedContactMode, setSelectedContactMode ] = useState();
+  const [ contactInfo, setContactInfo ] = useState(
+    communicationInfo.map( ( { number, email }, index ) => {
+      if ( number || email ) {
         return {
           id: index,
           info: number || email,
@@ -45,13 +45,13 @@ export default function CommunicationMode(props) {
           type: number ? 'number' : 'email',
         };
       }
-    }),
+    } ),
   );
 
   const onContactSelect = index => {
-    setContactInfo([
-      ...contactInfo.map(item => {
-        if (item !== contactInfo[index]) {
+    setContactInfo( [
+      ...contactInfo.map( item => {
+        if ( item !== contactInfo[ index ] ) {
           return {
             ...item,
             isSelected: false,
@@ -62,13 +62,13 @@ export default function CommunicationMode(props) {
             isSelected: !item.isSelected,
           };
         }
-      }),
-    ]);
+      } ),
+    ] );
     // contactInfo[index].isSelected would become true during the next render cycle (batched state updates)
-    if (!contactInfo[index].isSelected) {
-      setSelectedContactMode({ ...contactInfo[index], isSelected: true });
+    if ( !contactInfo[ index ].isSelected ) {
+      setSelectedContactMode( { ...contactInfo[ index ], isSelected: true } );
     } else {
-      setSelectedContactMode(null);
+      setSelectedContactMode( null );
     }
   };
 
@@ -78,22 +78,22 @@ export default function CommunicationMode(props) {
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
 
   const communicate = async selectedContactMode => {
-    if (!SHARES_TRANSFER_DETAILS[index]) {
-      Alert.alert('Failed to share');
+    if ( !SHARES_TRANSFER_DETAILS[ index ] ) {
+      Alert.alert( 'Failed to share' );
       return;
     }
     const deepLink =
-      `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
-      SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY;
+      `https://hexawallet.io/${ WALLET_SETUP.walletName }/sss/ek/` +
+      SHARES_TRANSFER_DETAILS[ index ].ENCRYPTED_KEY;
 
-    switch (selectedContactMode.type) {
+    switch ( selectedContactMode.type ) {
       case 'number':
-        textWithoutEncoding(selectedContactMode.info, deepLink);
+        textWithoutEncoding( selectedContactMode.info, deepLink );
         break;
 
       case 'email':
         email(
-          [selectedContactMode.info],
+          [ selectedContactMode.info ],
           null,
           null,
           'Guardian request',
@@ -103,36 +103,36 @@ export default function CommunicationMode(props) {
     }
   };
 
-  const { loading } = useSelector(state => state.sss);
+  const { loading } = useSelector( state => state.sss );
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={BackupStyles.headerContainer}>
+    <SafeAreaView style={ { flex: 1 } }>
+      <StatusBar backgroundColor={ Colors.white } barStyle="dark-content" />
+      <View style={ BackupStyles.headerContainer }>
         <TouchableOpacity
-          style={BackupStyles.headerLeftIconContainer}
-          onPress={() => {
+          style={ BackupStyles.headerLeftIconContainer }
+          onPress={ () => {
             props.navigation.goBack();
-          }}
+          } }
         >
-          <View style={BackupStyles.headerLeftIconInnerContainer}>
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          <View style={ BackupStyles.headerLeftIconInnerContainer }>
+            <FontAwesome name="long-arrow-left" color={ Colors.blue } size={ 17 } />
           </View>
         </TouchableOpacity>
       </View>
-      <View style={{ height: '100%' }}>
-        <View style={{ marginTop: hp('2%'), marginBottom: hp('2%') }}>
-          <Text style={styles.commModeModalHeaderText}>
-            Select Mode of Communication{'\n'}for Contact
+      <View style={ { height: '100%' } }>
+        <View style={ { marginTop: hp( '2%' ), marginBottom: hp( '2%' ) } }>
+          <Text style={ styles.commModeModalHeaderText }>
+            Select Mode of Communication{ '\n' }for Contact
           </Text>
-          <Text style={styles.commModeModalInfoText}>
+          <Text style={ styles.commModeModalInfoText }>
             You can choose a primary number or email
           </Text>
         </View>
-        <View style={styles.contactProfileView}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={ styles.contactProfileView }>
+          <View style={ { flexDirection: 'row', alignItems: 'center' } }>
             <View
-              style={{
+              style={ {
                 backgroundColor: Colors.backgroundColor,
                 flex: 1,
                 height: 80,
@@ -141,12 +141,12 @@ export default function CommunicationMode(props) {
                 overflow: 'hidden',
                 position: 'relative',
                 borderRadius: 10,
-              }}
+              } }
             >
-              <Text style={styles.contactNameText}>{contact.name}</Text>
+              <Text style={ styles.contactNameText }>{ contact.name }</Text>
             </View>
             <View
-              style={{
+              style={ {
                 backgroundColor: Colors.white,
                 width: 80,
                 height: 80,
@@ -154,58 +154,58 @@ export default function CommunicationMode(props) {
                 position: 'absolute',
                 justifyContent: 'center',
                 alignItems: 'center',
-              }}
+              } }
             >
               <Image
-                source={require('../../assets/images/icons/pexels-photo.png')}
-                style={{ ...styles.contactProfileImage }}
+                source={ require( '../../assets/images/icons/pexels-photo.png' ) }
+                style={ { ...styles.contactProfileImage } }
               />
             </View>
           </View>
         </View>
         <View>
           <ScrollView>
-            {contactInfo.map((item, index) => {
+            { contactInfo.map( ( item, index ) => {
               return (
                 <TouchableOpacity
-                  onPress={() => onContactSelect(index)}
-                  style={styles.contactInfo}
+                  onPress={ () => onContactSelect( index ) }
+                  style={ styles.contactInfo }
                 >
                   <RadioButton
-                    size={15}
-                    color={Colors.lightBlue}
-                    borderColor={Colors.borderColor}
-                    isChecked={item.isSelected}
-                    onpress={() => onContactSelect(index)}
+                    size={ 15 }
+                    color={ Colors.lightBlue }
+                    borderColor={ Colors.borderColor }
+                    isChecked={ item.isSelected }
+                    onpress={ () => onContactSelect( index ) }
                   />
-                  <Text style={styles.contactInfoText}>{item.info}</Text>
+                  <Text style={ styles.contactInfoText }>{ item.info }</Text>
                 </TouchableOpacity>
               );
-            })}
+            } ) }
           </ScrollView>
         </View>
-        {selectedContactMode ? (
+        { selectedContactMode ? (
           <TouchableOpacity
-            onPress={() => communicate(selectedContactMode)}
-            disabled={loading.uploadMetaShare}
-            style={{
+            onPress={ () => communicate( selectedContactMode ) }
+            disabled={ loading.uploadMetaShare }
+            style={ {
               ...styles.proceedButtonView,
               backgroundColor: Colors.blue,
-            }}
+            } }
           >
-            {loading.uploadMetaShare ? (
+            { loading.uploadMetaShare ? (
               <ActivityIndicator size="small" />
             ) : (
-              <Text style={styles.proceedButtonText}>Proceed</Text>
-            )}
+                <Text style={ styles.proceedButtonText }>Proceed</Text>
+              ) }
           </TouchableOpacity>
-        ) : null}
+        ) : null }
       </View>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
@@ -221,17 +221,17 @@ const styles = StyleSheet.create({
   commModeModalHeaderText: {
     color: Colors.blue,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(18, 812),
+    fontSize: RFValue( 18, 812 ),
     marginLeft: 20,
     marginRight: 20,
   },
   commModeModalInfoText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11, 812),
+    fontSize: RFValue( 11, 812 ),
     marginLeft: 20,
     marginRight: 20,
-    marginTop: hp('0.7%'),
+    marginTop: hp( '0.7%' ),
   },
   contactProfileView: {
     flexDirection: 'row',
@@ -239,8 +239,8 @@ const styles = StyleSheet.create({
     marginRight: 20,
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: hp('3%'),
-    marginTop: hp('3.5%'),
+    marginBottom: hp( '3%' ),
+    marginTop: hp( '3.5%' ),
   },
   contactProfileImage: {
     width: 70,
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   },
   contactNameText: {
     color: Colors.black,
-    fontSize: RFValue(25, 812),
+    fontSize: RFValue( 25, 812 ),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 25,
   },
@@ -263,19 +263,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: 20,
     marginRight: 20,
-    marginTop: hp('2%'),
-    marginBottom: hp('2%'),
+    marginTop: hp( '2%' ),
+    marginBottom: hp( '2%' ),
   },
   contactInfoText: {
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue( 13, 812 ),
     marginLeft: 10,
   },
   proceedButtonView: {
     marginLeft: 20,
-    marginTop: hp('3.5%'),
-    height: wp('13%'),
-    width: wp('30%'),
+    marginTop: hp( '3.5%' ),
+    height: wp( '13%' ),
+    width: wp( '30%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue( 13, 812 ),
     fontFamily: Fonts.FiraSansMedium,
   },
-});
+} );

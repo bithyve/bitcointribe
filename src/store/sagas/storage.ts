@@ -61,7 +61,7 @@ function* fetchSSSDBWorker() {
     }
     console.log({ key, database });
     if (key && database) {
-      // yield put(dbFetchedSSS(database));
+      yield put(dbFetchedSSS(database));
     } else {
       console.log(
         'Failed to fetch the database; either key is missing or database is empty',

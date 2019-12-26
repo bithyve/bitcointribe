@@ -62,6 +62,13 @@
 	<string>Give HEXA permission to access your photos</string>
 	<key>NSRemindersUsageDescription</key>
 	<string>Allow HEXA to access your reminders</string>
+  <key>LSApplicationQueriesSchemes</key>
+  <array>
+    <string>whatsapp</string>
+    <string>mailto</string>
+  </array>
+  
+  
 	<key>UIAppFonts</key>
 	<array>
 		<string>FiraSans-Bold.ttf</string>

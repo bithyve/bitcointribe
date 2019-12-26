@@ -89,9 +89,9 @@ const getPdfPath = async (pdfData: any) => {
       },
       async (path: any) => {
         //console.log({ path });
-        return (await 'file://') + path;
+        return (await 'file:/') + path;
       },
     );
-    return 'file:///storage/emulated/0/' + pdfData.fileName;
+    return 'file://storage/emulated/0/' + pdfData.fileName;
   }
 };

@@ -7,7 +7,7 @@ target 'HEXA' do
   pod 'React', :path => '../node_modules/react-native', :subspecs => [
     'Core',
     'CxxBridge',
-    'DevSupport',
+    'DevSupport',  
     'RCTActionSheet',
     'RCTAnimation',
     'RCTBlob',
@@ -51,5 +51,7 @@ target 'HEXA' do
   pod 'react-native-netinfo', :path => '../node_modules/@react-native-community/netinfo'
 
   pod 'react-native-camera', :path => '../node_modules/react-native-camera'
+    
+  pod 'RNShare', :path => '../node_modules/react-native-share'
 
 end
