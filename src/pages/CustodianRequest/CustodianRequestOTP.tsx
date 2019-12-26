@@ -116,7 +116,12 @@ export default function CustodianRequestOTP(props) {
               ]}
               onChangeText={value => {
                 onPressNumber(value);
-                if (value) this.textInput2.focus();
+                if (value) 
+                {
+                  setTimeout(() => {
+                    this.textInput2.focus();
+                  },10);
+                }
               }}
               onKeyPress={e => {
                 if (e.nativeEvent.key === "Backspace") {
@@ -140,7 +145,12 @@ export default function CustodianRequestOTP(props) {
               ]}
               onChangeText={value => {
                 onPressNumber(value);
-                if (value) this.textInput3.focus();
+                if (value) 
+                {
+                  setTimeout(() => {
+                    this.textInput3.focus();
+                  }, 10);
+                }
               }}
               onKeyPress={e => {
                 if (e.nativeEvent.key === "Backspace") {
@@ -164,7 +174,12 @@ export default function CustodianRequestOTP(props) {
               ]}
               onChangeText={value => {
                 onPressNumber(value);
-                if (value) this.textInput4.focus();
+                if (value) 
+                {
+                  setTimeout(() => {
+                  this.textInput4.focus();
+                }, 10);
+                }
               }}
               onKeyPress={e => {
                 if (e.nativeEvent.key === "Backspace") {
@@ -177,6 +192,7 @@ export default function CustodianRequestOTP(props) {
               maxLength={1}
               autoCorrect={false}
               autoFocus={false}
+              keyboardType="email-address"
               ref={input => {
                 this.textInput4 = input;
               }}
@@ -187,7 +203,12 @@ export default function CustodianRequestOTP(props) {
               ]}
               onChangeText={value => {
                 onPressNumber(value);
-                if (value) this.textInput5.focus();
+                if (value) 
+                {
+                  setTimeout(() => {
+                    this.textInput5.focus();
+                  }, 10);
+                }
               }}
               onKeyPress={e => {
                 if (e.nativeEvent.key === "Backspace") {
@@ -211,7 +232,12 @@ export default function CustodianRequestOTP(props) {
               ]}
               onChangeText={value => {
                 onPressNumber(value);
-                if (value) this.textInput6.focus();
+                if (value) 
+                {
+                  setTimeout(() => {
+                    this.textInput6.focus();
+                  }, 10);
+                }
               }}
               onKeyPress={e => {
                 if (e.nativeEvent.key === "Backspace") {
