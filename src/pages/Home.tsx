@@ -770,21 +770,24 @@ export default function Home( props ) {
   };
 
   const onPressElement = item => {
-    if ( item.title == 'Address Book' ) {
-      setTimeout( () => {
-        setTabBarZIndex( 0 );
-      }, 2 );
-      ( addressBookBottomSheet as any ).current.snapTo( 1 );
-    } else if ( item.title == 'Settings' ) {
-      setTimeout( () => {
-        setTabBarZIndex( 0 );
-      }, 10 );
-      ( settingsBottomSheet as any ).current.snapTo( 1 );
-    } else if ( item.title == 'All Accounts' ) {
-      setTimeout( () => {
-        setTabBarZIndex( 0 );
-      }, 10 );
-      ( AllAccountsBottomSheet as any ).current.snapTo( 1 );
+    if(item.title == 'Health of the App'){
+      props.navigation.navigate("HealthCheck");
+    }
+    if (item.title == 'Address Book') {
+      setTimeout(() => {
+        setTabBarZIndex(0);
+      }, 2);
+      (addressBookBottomSheet as any).current.snapTo(1);
+    } else if (item.title == 'Settings') {
+      setTimeout(() => {
+        setTabBarZIndex(0);
+      }, 10);
+      (settingsBottomSheet as any).current.snapTo(1);
+    } else if (item.title == 'All Accounts') {
+      setTimeout(() => {
+        setTabBarZIndex(0);
+      }, 10);
+      (AllAccountsBottomSheet as any).current.snapTo(1);
     }
   };
 
