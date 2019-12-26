@@ -21,14 +21,16 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import commonStyle from '../../common/Styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
+import { checkMSharesHealth } from '../../store/actions/sss';
 
 export default function HealthCheckSecurityAnswer(props) {
+  const dispatch = useDispatch();
   const { security } = useSelector(
     state => state.storage.database.WALLET_SETUP,
   );
@@ -69,6 +71,7 @@ export default function HealthCheckSecurityAnswer(props) {
           // setTimeout(() => {
           //   setTabBarZIndex(999);
           // }, 2);
+          dispatch(checkMSharesHealth());
           props.navigation.goBack();
         }}
         isBottomImage={true}
