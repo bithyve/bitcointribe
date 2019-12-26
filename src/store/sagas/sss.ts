@@ -37,6 +37,7 @@ import {
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
 import AsyncStorage from '@react-native-community/async-storage';
+import { Alert } from 'react-native';
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select(state => state.sss.service);
@@ -126,9 +127,10 @@ function* uploadEncMetaShareWorker({ payload }) {
   yield put(switchS3Loader('uploadMetaShare'));
 
   const res = yield call(s3Service.uploadShare, payload.shareIndex);
-  console.log({ otp: res.data.otp, encryptedKey: res.data.encryptedKey });
   if (res.status === 200) {
     const { otp, encryptedKey } = res.data;
+    console.log({ otp, encryptedKey });
+    Alert.alert('OTP', otp);
 
     const updatedBackup = {
       ...DECENTRALIZED_BACKUP,
