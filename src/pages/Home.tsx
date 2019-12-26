@@ -470,6 +470,10 @@ export default function Home(props) {
     );
   };
 
+  const getQrCodeData = (data) =>{
+    console.log("Qrcodedata", data);
+  }
+
   function renderContent1() {
     if (selected == 'Transactions') {
       return renderTransactionsContent();
@@ -477,7 +481,7 @@ export default function Home(props) {
       return renderAdd();
       //return
     } else if (selected == 'QR') {
-      return <QrCodeModalContents />;
+      return <QrCodeModalContents onPressQrScanner={()=>{ props.navigation.navigate("QrScanner", {scanedCode: getQrCodeData})}} />;
     }
   }
 
@@ -1093,6 +1097,7 @@ export default function Home(props) {
   const renderContactSelectedFromAddressBookContents = () => {
     return (
       <SelectedContactFromAddressBook
+        onPressQrScanner={()=>{ props.navigation.navigate("QrScanner", {scanedCode: getQrCodeData})}}
         onPressProceed={() => {
           (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
             1,

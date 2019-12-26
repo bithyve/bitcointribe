@@ -19,6 +19,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import RadioButton from "../components/RadioButton";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Entypo from "react-native-vector-icons/Entypo";
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 
 export default function SelectedContactFromAddressBook(props) {
     const [isAddToTrustedContact, setIsAddToTrustedContact] = useState(false);
@@ -35,19 +36,10 @@ export default function SelectedContactFromAddressBook(props) {
                 </View>
             </View>
         </View>
-        <View style={{ flex: 1, paddingBottom:hp('3%') }}>
-            <ImageBackground source={require('../assets/images/icons/iPhone-QR.png')} imageStyle={{width: wp('100%'),
-        height: wp('100%'),
-        borderRadius: 20,}} style={styles.qrModalImage} >
-                <View style={{ flexDirection: 'row', paddingTop: 12, paddingRight: 12, paddingLeft: 12, width: '100%' }}>
-                    <View style={{ borderLeftWidth: 1, borderTopColor: 'white', borderLeftColor: 'white', height: hp('5%'), width: hp('5%'), borderTopWidth: 1 }} />
-                    <View style={{ borderTopWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderTopColor: 'white', height: hp('5%'), width: hp('5%'), marginLeft: 'auto' }} />
-                </View>
-                <View style={{ marginTop: 'auto', flexDirection: 'row', paddingBottom: 12, paddingRight: 12, paddingLeft: 12, width: '100%', }}>
-                    <View style={{ borderLeftWidth: 1, borderBottomColor: 'white', borderLeftColor: 'white', height: hp('5%'), width: hp('5%'), borderBottomWidth: 1 }} />
-                    <View style={{ borderBottomWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderBottomColor: 'white', height: hp('5%'), width: hp('5%'), marginLeft: 'auto' }} />
-                </View>
-            </ImageBackground>
+        <View style={{ flex: 1, paddingBottom: hp('3%') }}>
+            <AppBottomSheetTouchableWrapper onPress={() => props.onPressQrScanner()} style={{ alignSelf: 'center', backgroundColor: Colors.blue, width: wp('50%'), height: wp('13%'), alignItems: 'center', justifyContent: 'center', borderRadius: 10 }}>
+                <Text style={{ color: Colors.white, fontFamily: Fonts.FiraSansMedium, fontSize: RFValue(13, 812) }}>Scan QrCode</Text>
+            </AppBottomSheetTouchableWrapper>
             <View style={{ marginTop: hp('2%'), marginLeft: 50, alignItems: 'center', flexDirection: 'row' }}>
                 <TouchableOpacity onPress={() => { setIsAddToTrustedContact(!isAddToTrustedContact) }} style={{ height: 20, width: 20, borderWidth: 1, borderColor: isAddToTrustedContact ? Colors.blue : Colors.borderColor, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }}>
                     {isAddToTrustedContact ?
@@ -61,14 +53,14 @@ export default function SelectedContactFromAddressBook(props) {
                     fontFamily: Fonts.FiraSansMedium, marginLeft: 10
                 }}>Add as Trusted Contact</Text>
             </View>
-            <View style={{ marginTop: hp('3%'),marginBottom: hp('3%'), marginLeft: 50, }}>
+            <View style={{ marginTop: hp('3%'), marginBottom: hp('3%'), marginLeft: 50, }}>
                 <Text style={{
                     color: Colors.textColorGrey,
                     fontSize: RFValue(11, 812),
                     fontFamily: Fonts.FiraSansMedium,
                 }}>Lorem ipsum dolor sit amet, consectetur{"\n"}adipiscing elit, sed do eiusmod tempor</Text>
             </View>
-            <TouchableOpacity onPress={()=>props.onPressProceed()} style={{backgroundColor:Colors.blue, width:wp('50%'),  height:wp('12%'), justifyContent:'center', alignItems:'center', borderRadius:10, alignSelf:'center', }}>
+            <TouchableOpacity onPress={() => props.onPressProceed()} style={{ backgroundColor: Colors.blue, width: wp('50%'), height: wp('12%'), justifyContent: 'center', alignItems: 'center', borderRadius: 10, alignSelf: 'center', }}>
                 <Text style={{
                     color: Colors.white,
                     fontSize: RFValue(13, 812),
