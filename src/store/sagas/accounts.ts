@@ -77,7 +77,7 @@ function* fetchBalanceWorker({ payload }) {
     //   [payload.serviceType]: JSON.stringify(service),
     // };
     // yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-    yield put(fetchTransactions(payload.serviceType));
+    yield put(fetchTransactions(payload.serviceType, service));
   } else {
     yield put(switchLoader(payload.serviceType, 'balances'));
   }
@@ -90,9 +90,9 @@ export const fetchBalanceWatcher = createWatcher(
 
 function* fetchTransactionsWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transactions'));
-  const service = yield select(
-    state => state.accounts[payload.serviceType].service,
-  );
+  const service = payload.service
+    ? payload.service
+    : yield select(state => state.accounts[payload.serviceType].service);
 
   const preFetchTransactions =
     payload.serviceType === SECURE_ACCOUNT

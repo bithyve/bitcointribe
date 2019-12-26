@@ -19,8 +19,8 @@ export const fetchBalance = serviceType => {
   return { type: FETCH_BALANCE, payload: { serviceType } };
 };
 
-export const fetchTransactions = serviceType => {
-  return { type: FETCH_TRANSACTIONS, payload: { serviceType } };
+export const fetchTransactions = (serviceType, service?) => {
+  return { type: FETCH_TRANSACTIONS, payload: { serviceType, service } };
 };
 
 export const transferST1 = (serviceType, transferInfo) => {
