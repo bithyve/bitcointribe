@@ -68,9 +68,6 @@ export default function HealthCheckSecurityAnswer(props) {
         isIgnoreButton={false}
         onPressProceed={() => {
           (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-          // setTimeout(() => {
-          //   setTabBarZIndex(999);
-          // }, 2);
           dispatch(checkMSharesHealth());
           props.navigation.goBack();
         }}
@@ -84,9 +81,6 @@ export default function HealthCheckSecurityAnswer(props) {
       <TransparentHeaderModal
         onPressheader={() => {
           (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-          // setTimeout(() => {
-          //   setTabBarZIndex(999);
-          // }, 2);
         }}
       />
     );
@@ -278,7 +272,6 @@ export default function HealthCheckSecurityAnswer(props) {
       </View>
       <BottomSheet
         onOpenEnd={() => {
-          // setTabBarZIndex(0);
         }}
         enabledInnerScrolling={true}
         ref={HealthCheckSuccessBottomSheet}

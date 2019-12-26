@@ -53,9 +53,9 @@ export default function Buy(props) {
   );
   const checkNShowHelperModal = async () => {
     let isBuyHelperDone = await AsyncStorage.getItem("isBuyHelperDone");
-    if (!isBuyHelperDone) {
-        AsyncStorage.setItem("isBuyHelperDone", 'true');
-        BuyHelperBottomSheet.current.snapTo(1);
+    if (!isBuyHelperDone && serviceType == TEST_ACCOUNT) {
+      AsyncStorage.setItem("isBuyHelperDone", 'true');
+      BuyHelperBottomSheet.current.snapTo(1);
     }
   }
 
@@ -101,7 +101,7 @@ export default function Buy(props) {
         >
           <ScrollView>
             <View style={styles.modalHeaderTitleView}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
                 <TouchableOpacity
                   onPress={() => {
                     props.navigation.goBack();
@@ -115,20 +115,35 @@ export default function Buy(props) {
                   />
                 </TouchableOpacity>
                 <Text style={styles.modalHeaderTitleText}>{"Buy"}</Text>
+                {serviceType == TEST_ACCOUNT ?
+                  <Text
+                    onPress={() => {
+                      AsyncStorage.setItem("isBuyHelperDone", 'true');
+                      BuyHelperBottomSheet.current.snapTo(1);
+                    }}
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(12, 812),
+                      marginLeft: 'auto',
+                    }}
+                  >
+                    Know More
+            </Text>
+                  : null}
               </View>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
         <BottomSheet
-        enabledInnerScrolling={true}
-        ref={BuyHelperBottomSheet}
-        snapPoints={[
-          -50,
-          hp('95%')
-        ]}
-        renderContent={renderBuyHelperContents}
-        renderHeader={renderBuyHelperHeader}
-      />
+          enabledInnerScrolling={true}
+          ref={BuyHelperBottomSheet}
+          snapPoints={[
+            -50,
+            hp('95%')
+          ]}
+          renderContent={renderBuyHelperContents}
+          renderHeader={renderBuyHelperHeader}
+        />
       </View>
     </View>
   );

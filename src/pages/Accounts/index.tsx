@@ -229,7 +229,7 @@ function Accounts(props) {
     if (isTransactionDetailsHelperDone == 'true') {
       setTransactionDetailsIsActive(false);
     }
-    if (!isTestAccountHelperDone) {
+    if (!isTestAccountHelperDone && props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
       TestAccountHelperBottomSheet.current.snapTo(1);
       AsyncStorage.setItem('isTestAccountHelperDone', 'true');
     } else {
@@ -239,32 +239,45 @@ function Accounts(props) {
   };
 
   useEffect(() => {
+    getServiceType(props.navigation.getParam('serviceType') ? props.navigation.getParam('serviceType') : serviceType);
     let focusListener = props.navigation.addListener('didFocus', () => {
-      if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
-        checkNHighlight();
-        setTimeout(() => {
-          carousel.current.snapToItem(0, true, false);
-          setCarouselInitIndex(0);
-        }, 200);
-      }
-      if (props.navigation.getParam('serviceType') == REGULAR_ACCOUNT) {
-        setTimeout(() => {
-          carousel.current.snapToItem(1, true, false);
-        }, 200);
-      }
-      if (props.navigation.getParam('serviceType') == SECURE_ACCOUNT) {
-        setTimeout(() => {
-          carousel.current.snapToItem(2, true, false);
-        }, 200);
-      }
+      setCarouselData1();
     });
     return () => {
       focusListener.remove();
     };
   }, []);
 
+  const setCarouselData1= ()=> {
+    if (serviceType == TEST_ACCOUNT) {
+      checkNHighlight();
+      setTimeout(() => {
+        carousel.current.snapToItem(0, true, false);
+        setCarouselInitIndex(0);
+      }, 200);
+    }
+    if (serviceType == REGULAR_ACCOUNT) {
+      setTimeout(() => {
+        carousel.current.snapToItem(1, true, false);
+      }, 200);
+    }
+    if (serviceType == SECURE_ACCOUNT) {
+      setTimeout(() => {
+        carousel.current.snapToItem(2, true, false);
+      }, 200);
+    }
+  }
   const handleStepChange = step => {
     console.log(`Current step is: ${step.name}`);
+  };
+
+  const getServiceType = serviceType => {
+    if(!serviceType) return;
+    setTimeout(() => {
+      setServiceType(serviceType);
+       }, 10);
+     
+      setCarouselData1();
   };
 
   const renderSendContents = () => {
@@ -771,6 +784,23 @@ function Accounts(props) {
           />
         }
       >
+        {props.navigation.getParam('serviceType') == TEST_ACCOUNT && serviceType == TEST_ACCOUNT ? 
+        <Text
+              onPress={() => {
+                TestAccountHelperBottomSheet.current.snapTo(1);
+                AsyncStorage.setItem('isTestAccountHelperDone', 'true');
+              }}
+              style={{
+                paddingTop: hp('1%'),
+                color: Colors.textColorGrey,
+                fontSize: RFValue(12, 812),
+                marginLeft: 'auto',
+                marginRight: wp('5%')
+              }}
+            >
+              Know More
+            </Text>
+        : null }
         <View style={{ paddingTop: hp('3%'), paddingBottom: hp('3%') }}>
           <Carousel
             ref={carousel}
@@ -997,7 +1027,7 @@ function Accounts(props) {
             >
               <WalkthroughableTouchableOpacity
                 onPress={() => {
-                  props.navigation.navigate('Send', { serviceType });
+                  props.navigation.navigate('Send', { serviceType, getServiceType : getServiceType });
                 }}
                 style={styles.bottomCardView}
               >

@@ -430,9 +430,6 @@ export default function ManageBackup(props) {
         borderColor={Colors.blue}
         headerColor={Colors.blue}
         onPressHandle={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 10);
           WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
         }}
       />
