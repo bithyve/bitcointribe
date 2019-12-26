@@ -39,6 +39,8 @@ import EmailModalContents from '../pages/EmailModalContents';
 import Buy from '../pages/Accounts/Buy';
 import Sell from '../pages/Accounts/Sell';
 import QrScanner from '../components/QrScanner';
+import AddressBook from '../pages/RecoverySecretShare/AddressBook';
+import ShareRecoverySecretOtp from '../pages/RecoverySecretShare/ShareRecoverySecretOtp';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -108,7 +110,9 @@ const HomeNavigator = createStackNavigator(
     EmailModalContents,
     Buy,
     Sell,
-    QrScanner
+    QrScanner,
+    AddressBook,
+    ShareRecoverySecretOtp
   },
   {
     headerLayoutPreset: 'center',

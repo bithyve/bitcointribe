@@ -336,6 +336,7 @@ export default function Home( props ) {
 
 
   useEffect(function() {
+    // RecoverySecretRequestBottomSheet.current.snapTo(1);
     // (PinChangeSuccessBottomSheet as any).current.snapTo(1);
     // (ErrorBottomSheet as any).current.snapTo(1);
     // (NoInternetBottomSheet as any).current.snapTo(0);
@@ -1334,6 +1335,7 @@ export default function Home( props ) {
             setTabBarZIndex(0);
           }, 2);
           (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
+          props.navigation.navigate("AddressBook");
         }}
         onPressReject={() => {
           setTimeout(() => {
