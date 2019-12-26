@@ -70,6 +70,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { checkMSharesHealth, updateMSharesHealth } from '../store/actions/sss';
 import RecoverySecretRequestModalContents from '../components/RecoverySecretRequestModalContesnts';
 import ShareRecoverySecretModalContents from '../components/ShareRecoverySecretModalContents';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default function Home(props) {
   const database = useSelector(state => state.storage.database);
@@ -1283,7 +1284,12 @@ export default function Home(props) {
 
   const dispatch = useDispatch();
   const s3Service = useSelector(state => state.sss.service);
-  const { serviceEnriched, overallHealth } = useSelector(state => state.sss);
+  const [overallHealth, setOverallHealth] = useState();
+
+  const health = useSelector(state => state.sss.overallHealth);
+  useEffect(() => {
+    if (health) setOverallHealth(health);
+  }, [health]);
 
   useEffect(() => {
     // HC up-streaming
@@ -1292,18 +1298,18 @@ export default function Home(props) {
         dispatch(updateMSharesHealth());
       }
     }
-  }, []);
 
-  useEffect(() => {
-    // HC down-streaming
-    if (s3Service) {
-      const { healthCheckInitialized, healthCheckStatus } = s3Service.sss;
-
-      if (healthCheckInitialized) {
-        dispatch(checkMSharesHealth());
+    console.log({ overallHealth });
+    (async () => {
+      if (!overallHealth) {
+        const storedHealth = await AsyncStorage.getItem('overallHealth');
+        console.log({ storedHealth });
+        if (storedHealth) {
+          setOverallHealth(JSON.parse(storedHealth));
+        }
       }
-    }
-  }, [serviceEnriched]);
+    })();
+  }, []);
 
   const renderRecoverySecretRequestModalContent = () => {
     return (
