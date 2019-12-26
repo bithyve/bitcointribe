@@ -1,5 +1,7 @@
 PODS:
   - boost-for-react-native (1.63.0)
+  - Crashlytics (3.14.0):
+    - Fabric (~> 1.10.2)
   - DoubleConversion (1.1.6)
   - EXAppLoaderProvider (7.0.0)
   - EXConstants (7.0.1):
@@ -35,6 +37,7 @@ PODS:
     - UMFileSystemInterface
   - EXWebBrowser (7.0.1):
     - UMCore
+  - Fabric (1.10.2)
   - Folly (2018.10.22.00):
     - boost-for-react-native
     - DoubleConversion
@@ -148,6 +151,7 @@ PODS:
   - yoga (0.59.10.React)
 
 DEPENDENCIES:
+  - Crashlytics
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - EXAppLoaderProvider (from `../node_modules/expo/node_modules/expo-app-loader-provider/ios`)
   - EXConstants (from `../node_modules/expo/node_modules/expo-constants/ios`)
@@ -162,6 +166,7 @@ DEPENDENCIES:
   - EXSecureStore (from `../node_modules/expo-secure-store/ios`)
   - EXSQLite (from `../node_modules/expo-sqlite/ios`)
   - EXWebBrowser (from `../node_modules/expo-web-browser/ios`)
+  - Fabric
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - PDFGenerator
@@ -209,6 +214,8 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - boost-for-react-native
+    - Crashlytics
+    - Fabric
     - PDFGenerator
     - QRCoder
 
@@ -325,6 +332,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
+  Crashlytics: 540b7e5f5da5a042647227a5e3ac51d85eed06df
   DoubleConversion: bb338842f62ab1d708ceb63ec3d999f0f3d98ecd
   EXAppLoaderProvider: 5d348813a9cf09b03bbe5b8b55437bc1bfbddbd1
   EXConstants: 857aa7b1c84e2878f8402d712061860bca16a697
@@ -339,6 +347,7 @@ SPEC CHECKSUMS:
   EXSecureStore: bf94958c936b2b9e3813509d2e7e6b8a263d40df
   EXSQLite: ddc1e6727bd7d36e649f07590fe3ae5511c1f039
   EXWebBrowser: 18924c3d2a3a1aa95d413672f058beff589c80f4
+  Fabric: 706c8b8098fff96c33c0db69cbf81f9c551d0d74
   Folly: de497beb10f102453a1afa9edbf8cf8a251890de
   glog: aefd1eb5dda2ab95ba0938556f34b98e2da3a60d
   PDFGenerator: 17d6bc525db0a3fcd156fbf00f9d1b8d5cc75d1e
@@ -370,6 +379,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 1e70fe58b872355f0ecb44fb81bb1a16484047f0
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: af6500da88b1644b6b25124bc00e4b5791df5c10
+PODFILE CHECKSUM: 897629fa481c70b12be760b756aef69d429c80c6
 
-COCOAPODS: 1.8.3
+COCOAPODS: 1.8.4
