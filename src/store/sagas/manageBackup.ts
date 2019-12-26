@@ -6,9 +6,7 @@ import Share from 'react-native-share';
 function* sharePdfWorker({ payload }) {
   const { databaseSSS } = yield select(state => state.storage);
   console.log({ databaseSSS });
-
   try {
-    console.log({ payload });
     let shareOptions = {
       title: '5th share',
       message:

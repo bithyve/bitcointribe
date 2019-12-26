@@ -118,6 +118,7 @@ function* insertSSSDBWorker({ payload }) {
       insertedIntoDB: true,
       ...payload,
     };
+    yield put(dbFetchedSSS(updatedDB));
     const inserted = yield call(dataManager.insertSSS, updatedDB, key, false);
     console.log({ inserted });
   } catch (err) {
