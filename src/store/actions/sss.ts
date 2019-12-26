@@ -57,7 +57,7 @@ export const checkMSharesHealth = () => {
   return { type: CHECK_MSHARES_HEALTH };
 };
 
-export const overallHealth = s3Service => {
+export const calculateOverallHealth = (s3Service?) => {
   return { type: OVERALL_HEALTH, payload: { s3Service } };
 };
 

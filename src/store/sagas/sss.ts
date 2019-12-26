@@ -21,7 +21,7 @@ import {
   requestedShareUploaded,
   downloadedMShare,
   OVERALL_HEALTH,
-  overallHealth,
+  calculateOverallHealth,
   overallHealthCalculated,
 } from '../actions/sss';
 import { dbInsertedSSS } from '../actions/storage';
@@ -426,7 +426,8 @@ function* checkMSharesHealthWorker() {
   const preInstance = JSON.stringify(s3Service);
   const res = yield call(s3Service.checkHealth);
   const postInstance = JSON.stringify(s3Service);
-  yield put(overallHealth(s3Service));
+  yield put(calculateOverallHealth(s3Service));
+
   if (res.status === 200) {
     if (preInstance !== postInstance) {
       const { SERVICES } = yield select(state => state.storage.database);
@@ -434,6 +435,7 @@ function* checkMSharesHealthWorker() {
         ...SERVICES,
         S3_SERVICE: JSON.stringify(s3Service),
       };
+
       yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
     }
   } else {
@@ -449,7 +451,11 @@ export const checkMSharesHealthWatcher = createWatcher(
 );
 
 function* overallHealthWorker({ payload }) {
-  const { healthCheckStatus } = payload.s3Service.sss;
+  const service = payload.s3Service
+    ? payload.s3Service
+    : yield select(state => state.sss.service);
+
+  const { healthCheckStatus } = service.sss;
   const shareStatus = Object.keys(healthCheckStatus).map(key => {
     return {
       shareId: key,
