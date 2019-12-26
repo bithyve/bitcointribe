@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,28 +7,29 @@ import {
   Image,
   SafeAreaView,
   StatusBar,
-  TouchableOpacity
-} from "react-native";
-import Fonts from "../../common/Fonts";
-import BackupStyles from "./Styles";
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import Fonts from '../../common/Fonts';
+import BackupStyles from './Styles';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from "react-native-responsive-screen";
-import BottomInfoBox from "../../components/BottomInfoBox";
-import QRCode from "react-native-qrcode-svg";
-import CopyThisText from "../../components/CopyThisText";
-import { useDispatch, useSelector } from "react-redux";
-import { uploadEncMShare } from "../../store/actions/sss";
-import { getIconByStatus } from "./utils";
-import Colors from "../../common/Colors";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import BottomInfoBox from '../../components/BottomInfoBox';
+import QRCode from 'react-native-qrcode-svg';
+import CopyThisText from '../../components/CopyThisText';
+import { useDispatch, useSelector } from 'react-redux';
+import { uploadEncMShare } from '../../store/actions/sss';
+import { getIconByStatus } from './utils';
+import Colors from '../../common/Colors';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const SecondaryDevice = props => {
-  const [selectedStatus, setSelectedStatus] = useState("error"); // for preserving health of this entity
-  const [secondaryQR, setSecondaryQR] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
+  const [secondaryQR, setSecondaryQR] = useState('');
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
-    state => state.storage.database
+    state => state.storage.database,
   );
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
   const { loading } = useSelector(state => state.sss);
@@ -37,15 +38,19 @@ const SecondaryDevice = props => {
     ? setSecondaryQR(
         JSON.stringify({
           ...SHARES_TRANSFER_DETAILS[0],
-          type: "secondaryDeviceQR"
-        })
+          type: 'secondaryDeviceQR',
+        }),
       )
+    : null;
+
+  SHARES_TRANSFER_DETAILS[0]
+    ? Alert.alert('OTP', SHARES_TRANSFER_DETAILS[0].OTP)
     : null;
 
   const deepLink = SHARES_TRANSFER_DETAILS[0]
     ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
       SHARES_TRANSFER_DETAILS[0].ENCRYPTED_KEY
-    : "";
+    : '';
 
   const dispatch = useDispatch();
 
@@ -71,19 +76,19 @@ const SecondaryDevice = props => {
         </TouchableOpacity>
       </View>
       <View style={BackupStyles.modalHeaderTitleView}>
-        <View style={{ marginTop: hp("1%") }}>
+        <View style={{ marginTop: hp('1%') }}>
           <Text style={BackupStyles.modalHeaderTitleText}>
             Secondary Device
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
-            Last backup{" "}
+            Last backup{' '}
             <Text
               style={{
                 fontFamily: Fonts.FiraSansMediumItalic,
-                fontWeight: "bold"
+                fontWeight: 'bold',
               }}
             >
-              {"3 months ago"}
+              {'3 months ago'}
             </Text>
           </Text>
         </View>
@@ -98,14 +103,14 @@ const SecondaryDevice = props => {
             <ActivityIndicator size="large" />
           </View>
         ) : (
-          <QRCode value={secondaryQR} size={hp("27%")} />
+          <QRCode value={secondaryQR} size={hp('27%')} />
         )}
         {deepLink ? <CopyThisText text={deepLink} /> : null}
       </View>
       <BottomInfoBox
-        title={"Note"}
+        title={'Note'}
         infoText={
-          "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna"
+          'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna'
         }
       />
     </SafeAreaView>
@@ -113,7 +118,7 @@ const SecondaryDevice = props => {
 };
 
 const styles = StyleSheet.create({
-  loader: { height: hp("27%"), justifyContent: "center" }
+  loader: { height: hp('27%'), justifyContent: 'center' },
 });
 
 export default SecondaryDevice;
