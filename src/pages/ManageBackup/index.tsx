@@ -448,6 +448,59 @@ export default function ManageBackup(props) {
 
   const { overallHealth } = useSelector(state => state.sss);
 
+  useEffect(() => {
+    if (overallHealth) {
+      const updatedPageData = [...pageData];
+      updatedPageData.forEach(data => {
+        switch (data.title) {
+          case 'Secondary Device':
+            if (overallHealth.sharesInfo[0].shareStage === 'Good') {
+              data.status = 'success';
+            } else if (overallHealth.sharesInfo[0].shareStage === 'Bad') {
+              data.status = 'warning';
+            } else if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
+              data.status = 'error';
+            }
+            break;
+
+          case 'Trusted Contact 1':
+            if (overallHealth.sharesInfo[1].shareStage === 'Good') {
+              data.status = 'success';
+            } else if (overallHealth.sharesInfo[1].shareStage === 'Bad') {
+              data.status = 'warning';
+            } else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
+              data.status = 'error';
+            }
+            break;
+
+          case 'Trusted Contact 2':
+            if (overallHealth.sharesInfo[2].shareStage === 'Good') {
+              data.status = 'success';
+            } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
+              data.status = 'warning';
+            } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
+              data.status = 'error';
+            }
+            break;
+
+          case 'Security Questions':
+            if (overallHealth.qaStatus === 'Good') {
+              data.status = 'success';
+            } else if (overallHealth.qaStatus === 'Bad') {
+              data.status = 'warning';
+            } else if (overallHealth.qaStatus === 'Ugly') {
+              data.status = 'error';
+            }
+            break;
+
+          default:
+            break;
+        }
+      });
+      setPageData(updatedPageData);
+    }
+  }, [overallHealth]);
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
