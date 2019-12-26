@@ -8,6 +8,8 @@ import storageReducer from './reducers/storage';
 import setupAndAuthReducer from './reducers/setupAndAuth';
 import accountsReducer from './reducers/accounts';
 import sssReducer from './reducers/sss';
+import manageBackupReducer from './reducers/manageBackup';
+
 import {
   initDBWatcher,
   fetchDBWatcher,
@@ -49,6 +51,8 @@ import {
   restoreDynamicNonPMDDWatcher,
   generatePDFWatcher,
 } from './sagas/sss';
+
+import { sharePdfWatcher } from './sagas/manageBackup';
 
 // const rootSaga = function*() {
 //   yield all([
@@ -109,6 +113,9 @@ const rootSaga = function*() {
     restoreDynamicNonPMDDWatcher,
     recoverMnemonicWatcher,
     recoverWalletWatcher,
+
+    // manage backup
+    sharePdfWatcher,
   ];
 
   yield all(
@@ -132,6 +139,7 @@ const rootReducer = combineReducers({
   setupAndAuth: setupAndAuthReducer,
   accounts: accountsReducer,
   sss: sssReducer,
+  manageBackup: manageBackupReducer,
 });
 
 const sagaMiddleware = createSagaMiddleware();

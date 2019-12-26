@@ -59,5 +59,6 @@ export const servicesEnriched = services => {
 };
 
 export const dbFetchedSSS = database => {
+  console.log({ database });
   return { type: DB_FETCHEDSSS, payload: { database } };
 };

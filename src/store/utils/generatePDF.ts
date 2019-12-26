@@ -1,22 +1,36 @@
 import { Platform, NativeModules, Alert } from 'react-native';
 import { PermissionsAndroid } from 'react-native';
 
+// async function requestStoragePermission() {
+//   try {
+//     await PermissionsAndroid.request(
+//       PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+//       {
+//         title: 'Hexa Storage Permission',
+//         message: 'Storage permission is required to store the PDF',
+//         buttonNeutral: 'Ask Me Later',
+//         buttonNegative: 'Cancel',
+//         buttonPositive: 'OK',
+//       },
+//     );
+
+//     return PermissionsAndroid.RESULTS.GRANTED;
+//   } catch (err) {
+//     console.warn(err);
+//   }
+// }
+
 async function requestStoragePermission() {
   try {
-    await PermissionsAndroid.request(
+    const userResponse = await PermissionsAndroid.requestMultiple([
       PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-      {
-        title: 'Hexa Storage Permission',
-        message: 'Storage permission is required to store the PDF',
-        buttonNeutral: 'Ask Me Later',
-        buttonNegative: 'Cancel',
-        buttonPositive: 'OK',
-      },
-    );
-    return PermissionsAndroid.RESULTS.GRANTED;
+      PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+    ]);
+    return userResponse;
   } catch (err) {
-    console.warn(err);
+    console.log(err);
   }
+  return null;
 }
 
 const getFormattedString = (qrString: string) => {
