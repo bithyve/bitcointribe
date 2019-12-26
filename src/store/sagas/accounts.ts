@@ -17,9 +17,14 @@ import {
   TRANSFER_ST3,
   executedST3,
   fetchTransactions,
+  ACCUMULATIVE_BAL_AND_TX,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
-import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
+import {
+  TEST_ACCOUNT,
+  REGULAR_ACCOUNT,
+  SECURE_ACCOUNT,
+} from '../../common/constants/serviceTypes';
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -72,7 +77,7 @@ function* fetchBalanceWorker({ payload }) {
     //   [payload.serviceType]: JSON.stringify(service),
     // };
     // yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-    yield put(fetchTransactions(payload.serviceType));
+    yield put(fetchTransactions(payload.serviceType, service));
   } else {
     yield put(switchLoader(payload.serviceType, 'balances'));
   }
@@ -85,9 +90,9 @@ export const fetchBalanceWatcher = createWatcher(
 
 function* fetchTransactionsWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transactions'));
-  const service = yield select(
-    state => state.accounts[payload.serviceType].service,
-  );
+  const service = payload.service
+    ? payload.service
+    : yield select(state => state.accounts[payload.serviceType].service);
 
   const preFetchTransactions =
     payload.serviceType === SECURE_ACCOUNT
@@ -211,3 +216,45 @@ function* testcoinsWorker({ payload }) {
 }
 
 export const testcoinsWatcher = createWatcher(testcoinsWorker, GET_TESTCOINS);
+
+function* accumulativeTxAndBalWorker() {
+  const accounts = yield select(state => state.accounts);
+  console.log({ accounts });
+
+  const testBalance = accounts[TEST_ACCOUNT].service
+    ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    : 0;
+  const regularBalance = accounts[REGULAR_ACCOUNT].service
+    ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    : 0;
+  const secureBalance = accounts[SECURE_ACCOUNT].service
+    ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
+    : 0;
+  const accumulativeBalance = regularBalance + secureBalance;
+
+  const testTransactions = accounts[TEST_ACCOUNT].service
+    ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+    : [];
+  const regularTransactions = accounts[REGULAR_ACCOUNT].service
+    ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions.transactionDetails
+    : [];
+  const secureTransactions = accounts[SECURE_ACCOUNT].service
+    ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
+        .transactionDetails
+    : [];
+  const accumulativeTransactions = [
+    ...testTransactions,
+    ...regularTransactions,
+    ...secureTransactions,
+  ];
+  console.log({ accumulativeBalance, accumulativeTransactions });
+}
+
+export const accumulativeTxAndBalWatcher = createWatcher(
+  accumulativeTxAndBalWorker,
+  ACCUMULATIVE_BAL_AND_TX,
+);
