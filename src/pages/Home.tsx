@@ -116,10 +116,7 @@ export default function Home(props) {
   const [tabSelected, setTabSelected] = useState('sell');
   const [switchOn, setSwitchOn] = useState(true);
   const [selected, setSelected] = useState('Transactions');
-  const [
-    HealthCheckSuccessBottomSheet,
-    setHealthCheckSuccessBottomSheet,
-  ] = useState(React.createRef());
+
   const [
     HealthCheckGoogleAuthBottomSheet,
     setHealthCheckGoogleAuthBottomSheet,
@@ -411,16 +408,17 @@ export default function Home(props) {
   //   }
   // }, [selectToAdd]);
 
-  function onClickFunc(type) {
-    alert('dfdß');
-    if (type == 'Fastbitcoins' || type == 'Getbittr' || type == 'Add Contact') {
-      setTimeout(() => {
-        setSelectToAdd(type);
-        setTabBarZIndex(0);
-      }, 2);
-    }
-    (AddBottomSheet as any).current.snapTo(1);
-  }
+  // function onClickFunc(type) {
+  //   alert('dfdß');
+  //   if (type == 'Fastbitcoins' || type == 'Getbittr' || type == 'Add Contact') {
+  //     setTimeout(() => {
+  //       setSelectToAdd(type);
+  //       setTabBarZIndex(0);
+  //     }, 2);
+  //   }
+  //   (AddBottomSheet as any).current.snapTo(1);
+  // }
+
   const renderAdd = () => {
     return (
       <AddModalContents
@@ -1180,7 +1178,7 @@ export default function Home(props) {
         onPressConfirm={() => {
           Keyboard.dismiss();
           (HealthCheckGoogleAuthBottomSheet as any).current.snapTo(0);
-          (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
+          //  (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
         }}
       />
     );
@@ -1191,39 +1189,6 @@ export default function Home(props) {
       <TransparentHeaderModal
         onPressheader={() => {
           (HealthCheckGoogleAuthBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderHealthCheckSuccessModalContent = () => {
-    return (
-      <ErrorModalContents
-        modalRef={HealthCheckSuccessBottomSheet}
-        title={'Health Check Successful'}
-        info={'Questions Successfully Backed Up'}
-        note={'Hexa will remind you to help\nremember the answers'}
-        proceedButtonText={'View Health'}
-        isIgnoreButton={false}
-        onPressProceed={() => {
-          (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-        }}
-        isBottomImage={true}
-      />
-    );
-  };
-
-  const renderHealthCheckSuccessModalHeader = () => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
         }}
       />
     );
@@ -1744,7 +1709,7 @@ export default function Home(props) {
         renderContent={renderContactSelectedFromAddressBookQrCodeContents}
         renderHeader={renderContactSelectedFromAddressBookQrCodeHeader}
       />
-      <BottomSheet
+      {/* <BottomSheet
         onOpenStart={() => {
           setTabBarZIndex(0);
         }}
@@ -1760,8 +1725,8 @@ export default function Home(props) {
         ]}
         renderContent={renderHealthCheckSecurityQuestionContents}
         renderHeader={renderHealthCheckSecurityQuestionHeader}
-      />
-      <BottomSheet
+      /> */}
+      {/* <BottomSheet
         onOpenEnd={() => {
           setTabBarZIndex(0);
         }}
@@ -1771,8 +1736,8 @@ export default function Home(props) {
         snapPoints={[-50, hp('58%'), hp('90%')]}
         renderContent={renderHealthCheckGoogleAuthContents}
         renderHeader={renderHealthCheckGoogleAuthHeader}
-      />
-      <BottomSheet
+      /> */}
+      {/* <BottomSheet
         onOpenEnd={() => {
           setTabBarZIndex(0);
         }}
@@ -1784,7 +1749,7 @@ export default function Home(props) {
         ]}
         renderContent={renderHealthCheckSuccessModalContent}
         renderHeader={renderHealthCheckSuccessModalHeader}
-      />
+      /> */}
       {/* TODO: If we open full modal above tab bar first change zIndex to 0 and when we close that modal please zIndex to 999 by using setTabBarZIndex(0) or setTabBarZIndex(999) */}
       <View style={{ ...styles.bottomTabBarContainer, zIndex: tabBarZIndex }}>
         <TouchableOpacity

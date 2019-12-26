@@ -9,6 +9,7 @@ import {
   TextInput,
   SafeAreaView,
   StatusBar,
+  Platform,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -22,6 +23,10 @@ import commonStyle from '../../common/Styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import TransparentHeaderModal from '../../components/TransparentHeaderModal';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
 
 export default function HealthCheckSecurityAnswer(props) {
   const { security } = useSelector(
@@ -45,6 +50,44 @@ export default function HealthCheckSecurityAnswer(props) {
     { id: '7', question: 'Name of your favourite teacher?' },
   ]);
   const [errorText, setErrorText] = useState('');
+  const [
+    HealthCheckSuccessBottomSheet,
+    setHealthCheckSuccessBottomSheet,
+  ] = useState(React.createRef());
+
+  const renderHealthCheckSuccessModalContent = () => {
+    return (
+      <ErrorModalContents
+        modalRef={HealthCheckSuccessBottomSheet}
+        title={'Health Check Successful'}
+        info={'Questions Successfully Backed Up'}
+        note={'Hexa will remind you to help\nremember the answers'}
+        proceedButtonText={'View Health'}
+        isIgnoreButton={false}
+        onPressProceed={() => {
+          (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
+          // setTimeout(() => {
+          //   setTabBarZIndex(999);
+          // }, 2);
+          props.navigation.goBack();
+        }}
+        isBottomImage={true}
+      />
+    );
+  };
+
+  const renderHealthCheckSuccessModalHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
+          // setTimeout(() => {
+          //   setTabBarZIndex(999);
+          // }, 2);
+        }}
+      />
+    );
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -219,7 +262,7 @@ export default function HealthCheckSecurityAnswer(props) {
                   'SecurityAnsTimestamp',
                   JSON.stringify(Date.now()),
                 );
-                props.navigation.goBack();
+                (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
               }}
               style={styles.questionConfirmButton}
             >
@@ -230,6 +273,19 @@ export default function HealthCheckSecurityAnswer(props) {
           </View>
         </View>
       </View>
+      <BottomSheet
+        onOpenEnd={() => {
+          // setTabBarZIndex(0);
+        }}
+        enabledInnerScrolling={true}
+        ref={HealthCheckSuccessBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
+        ]}
+        renderContent={renderHealthCheckSuccessModalContent}
+        renderHeader={renderHealthCheckSuccessModalHeader}
+      />
     </SafeAreaView>
   );
 }

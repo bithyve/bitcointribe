@@ -105,28 +105,28 @@ export default function ManageBackup(props) {
     {
       title: 'Trusted Contact 2',
       time: '12 days ago',
-      status: 'warning',
+      status: 'error',
       type: 'contact',
       route: 'TrustedContacts',
     },
     {
       title: 'Cloud',
       time: '2 days ago',
-      status: 'success',
+      status: 'error',
       type: 'cloud',
       route: 'Cloud',
     },
     {
       title: 'Print',
       time: '3 days ago',
-      status: 'success',
+      status: 'error',
       type: 'print',
       route: 'Cloud',
     },
     {
       title: 'Security Questions',
       time: '1 day ago',
-      status: 'success',
+      status: 'error',
       type: 'security',
       route: 'HealthCheckSecurityAnswer',
     },
@@ -171,214 +171,214 @@ export default function ManageBackup(props) {
     }
   };
 
-  function onCloseEnd() {
-    if (selectedType == 'secondaryDevice') {
-      setSelectedType('contact');
-      setSelectedStatus('warning');
-    }
-  }
+  // function onCloseEnd() {
+  //   if (selectedType == 'secondaryDevice') {
+  //     setSelectedType('contact');
+  //     setSelectedStatus('warning');
+  //   }
+  // }
 
-  function renderCloudContent() {
-    return (
-      <View style={BackupStyles.modalContainer}>
-        <View style={BackupStyles.modalHeaderTitleView}>
-          <View style={{ marginTop: hp('1%') }}>
-            <Text style={BackupStyles.modalHeaderTitleText}>Cloud</Text>
-            <Text style={BackupStyles.modalHeaderInfoText}>
-              Never backed up
-            </Text>
-          </View>
-          <Image
-            style={styles.cardIconImage}
-            source={getIconByStatus(selectedStatus)}
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text
-            style={{
-              marginLeft: 30,
-              color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
-              fontSize: RFValue(12, 812),
-              marginTop: 5,
-              marginBottom: 5,
-            }}
-          >
-            Select cloud drive to{' '}
-            <Text
-              style={{
-                fontFamily: Fonts.FiraSansMediumItalic,
-                fontWeight: 'bold',
-                fontStyle: 'italic',
-              }}
-            >
-              store recovery secret
-            </Text>
-          </Text>
-          <View style={{ flex: 1 }}>
-            <FlatList
-              data={cloudData}
-              renderItem={({ item, index }) => (
-                <View style={styles.listElements}>
-                  <Image
-                    style={styles.listElementsIconImage}
-                    source={item.imageIcon}
-                  />
-                  <View style={{ justifyContent: 'space-between', flex: 1 }}>
-                    <Text style={styles.listElementsTitle}>{item.title}</Text>
-                    <Text style={styles.listElementsInfo} numberOfLines={1}>
-                      {item.info}
-                    </Text>
-                  </View>
-                  <View style={styles.listElementIcon}>
-                    <Ionicons
-                      name="ios-arrow-forward"
-                      color={Colors.textColorGrey}
-                      size={15}
-                      style={{ alignSelf: 'center' }}
-                    />
-                  </View>
-                </View>
-              )}
-            />
-          </View>
-        </View>
-      </View>
-    );
-  }
+  // function renderCloudContent() {
+  //   return (
+  //     <View style={BackupStyles.modalContainer}>
+  //       <View style={BackupStyles.modalHeaderTitleView}>
+  //         <View style={{ marginTop: hp('1%') }}>
+  //           <Text style={BackupStyles.modalHeaderTitleText}>Cloud</Text>
+  //           <Text style={BackupStyles.modalHeaderInfoText}>
+  //             Never backed up
+  //           </Text>
+  //         </View>
+  //         <Image
+  //           style={styles.cardIconImage}
+  //           source={getIconByStatus(selectedStatus)}
+  //         />
+  //       </View>
+  //       <View style={{ flex: 1 }}>
+  //         <Text
+  //           style={{
+  //             marginLeft: 30,
+  //             color: Colors.textColorGrey,
+  //             fontFamily: Fonts.FiraSansRegular,
+  //             fontSize: RFValue(12, 812),
+  //             marginTop: 5,
+  //             marginBottom: 5,
+  //           }}
+  //         >
+  //           Select cloud drive to{' '}
+  //           <Text
+  //             style={{
+  //               fontFamily: Fonts.FiraSansMediumItalic,
+  //               fontWeight: 'bold',
+  //               fontStyle: 'italic',
+  //             }}
+  //           >
+  //             store recovery secret
+  //           </Text>
+  //         </Text>
+  //         <View style={{ flex: 1 }}>
+  //           <FlatList
+  //             data={cloudData}
+  //             renderItem={({ item, index }) => (
+  //               <View style={styles.listElements}>
+  //                 <Image
+  //                   style={styles.listElementsIconImage}
+  //                   source={item.imageIcon}
+  //                 />
+  //                 <View style={{ justifyContent: 'space-between', flex: 1 }}>
+  //                   <Text style={styles.listElementsTitle}>{item.title}</Text>
+  //                   <Text style={styles.listElementsInfo} numberOfLines={1}>
+  //                     {item.info}
+  //                   </Text>
+  //                 </View>
+  //                 <View style={styles.listElementIcon}>
+  //                   <Ionicons
+  //                     name="ios-arrow-forward"
+  //                     color={Colors.textColorGrey}
+  //                     size={15}
+  //                     style={{ alignSelf: 'center' }}
+  //                   />
+  //                 </View>
+  //               </View>
+  //             )}
+  //           />
+  //         </View>
+  //       </View>
+  //     </View>
+  //   );
+  // }
 
-  function renderTrustedContactsContent() {
-    return (
-      <View style={BackupStyles.modalContainer}>
-        <View style={BackupStyles.modalHeaderTitleView}>
-          <View style={{ marginTop: hp('2%') }}>
-            <Text style={BackupStyles.modalHeaderTitleText}>
-              Trusted Contact
-            </Text>
-            <Text style={BackupStyles.modalHeaderInfoText}>
-              Never backed up
-            </Text>
-          </View>
-          <Image
-            style={styles.cardIconImage}
-            source={getIconByStatus(selectedStatus)}
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text
-            style={{
-              marginLeft: 30,
-              color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
-              fontSize: RFValue(12, 812),
-              marginTop: 5,
-            }}
-          >
-            Select contact to{' '}
-            <Text
-              style={{
-                fontFamily: Fonts.FiraSansMediumItalic,
-                fontWeight: 'bold',
-                fontStyle: 'italic',
-              }}
-            >
-              send recovery secret
-            </Text>
-          </Text>
-          <ContactList
-            style={{}}
-            onPressContinue={() => {}}
-            onSelectContact={list => {}}
-          />
-        </View>
-      </View>
-    );
-  }
+  // function renderTrustedContactsContent() {
+  //   return (
+  //     <View style={BackupStyles.modalContainer}>
+  //       <View style={BackupStyles.modalHeaderTitleView}>
+  //         <View style={{ marginTop: hp('2%') }}>
+  //           <Text style={BackupStyles.modalHeaderTitleText}>
+  //             Trusted Contact
+  //           </Text>
+  //           <Text style={BackupStyles.modalHeaderInfoText}>
+  //             Never backed up
+  //           </Text>
+  //         </View>
+  //         <Image
+  //           style={styles.cardIconImage}
+  //           source={getIconByStatus(selectedStatus)}
+  //         />
+  //       </View>
+  //       <View style={{ flex: 1 }}>
+  //         <Text
+  //           style={{
+  //             marginLeft: 30,
+  //             color: Colors.textColorGrey,
+  //             fontFamily: Fonts.FiraSansRegular,
+  //             fontSize: RFValue(12, 812),
+  //             marginTop: 5,
+  //           }}
+  //         >
+  //           Select contact to{' '}
+  //           <Text
+  //             style={{
+  //               fontFamily: Fonts.FiraSansMediumItalic,
+  //               fontWeight: 'bold',
+  //               fontStyle: 'italic',
+  //             }}
+  //           >
+  //             send recovery secret
+  //           </Text>
+  //         </Text>
+  //         <ContactList
+  //           style={{}}
+  //           onPressContinue={() => {}}
+  //           onSelectContact={list => {}}
+  //         />
+  //       </View>
+  //     </View>
+  //   );
+  // }
 
-  const renderSecondaryDeviceContents = () => {
-    return (
-      <View style={BackupStyles.modalContainer}>
-        <View style={BackupStyles.modalHeaderTitleView}>
-          <View style={{ marginTop: hp('2%') }}>
-            <Text style={BackupStyles.modalHeaderTitleText}>
-              {'Secondary Device'}
-            </Text>
-            <Text style={BackupStyles.modalHeaderInfoText}>
-              Last backup{' '}
-              <Text
-                style={{
-                  fontFamily: Fonts.FiraSansMediumItalic,
-                  fontWeight: 'bold',
-                  fontStyle: 'italic',
-                }}
-              >
-                {'3 months ago'}
-              </Text>
-            </Text>
-          </View>
-          <Image
-            style={styles.cardIconImage}
-            source={getIconByStatus(selectedStatus)}
-          />
-        </View>
-        <View style={BackupStyles.modalContentView}>
-          <Image
-            style={{ width: hp('27%'), height: hp('27%'), alignSelf: 'center' }}
-            source={require('../../assets/images/qrcode.png')}
-          />
-          <CopyThisText text="lk2j3429-85213-5134=50t-934285623877wer78er7" />
-        </View>
-        <BottomInfoBox
-          title={'Note'}
-          infoText={
-            'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna'
-          }
-        />
-      </View>
-    );
-  };
+  // const renderSecondaryDeviceContents = () => {
+  //   return (
+  //     <View style={BackupStyles.modalContainer}>
+  //       <View style={BackupStyles.modalHeaderTitleView}>
+  //         <View style={{ marginTop: hp('2%') }}>
+  //           <Text style={BackupStyles.modalHeaderTitleText}>
+  //             {'Secondary Device'}
+  //           </Text>
+  //           <Text style={BackupStyles.modalHeaderInfoText}>
+  //             Last backup{' '}
+  //             <Text
+  //               style={{
+  //                 fontFamily: Fonts.FiraSansMediumItalic,
+  //                 fontWeight: 'bold',
+  //                 fontStyle: 'italic',
+  //               }}
+  //             >
+  //               {'3 months ago'}
+  //             </Text>
+  //           </Text>
+  //         </View>
+  //         <Image
+  //           style={styles.cardIconImage}
+  //           source={getIconByStatus(selectedStatus)}
+  //         />
+  //       </View>
+  //       <View style={BackupStyles.modalContentView}>
+  //         <Image
+  //           style={{ width: hp('27%'), height: hp('27%'), alignSelf: 'center' }}
+  //           source={require('../../assets/images/qrcode.png')}
+  //         />
+  //         <CopyThisText text="lk2j3429-85213-5134=50t-934285623877wer78er7" />
+  //       </View>
+  //       <BottomInfoBox
+  //         title={'Note'}
+  //         infoText={
+  //           'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna'
+  //         }
+  //       />
+  //     </View>
+  //   );
+  // };
 
-  function renderSecondaryDeviceHeader() {
-    return (
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => {
-          (secondaryDeviceBottomSheet as any).current.snapTo(0);
-        }}
-        style={styles.modalHeader}
-      >
-        <View style={styles.modalHeaderHandle} />
-      </TouchableOpacity>
-    );
-  }
+  // function renderSecondaryDeviceHeader() {
+  //   return (
+  //     <TouchableOpacity
+  //       activeOpacity={10}
+  //       onPress={() => {
+  //         (secondaryDeviceBottomSheet as any).current.snapTo(0);
+  //       }}
+  //       style={styles.modalHeader}
+  //     >
+  //       <View style={styles.modalHeaderHandle} />
+  //     </TouchableOpacity>
+  //   );
+  // }
 
-  function renderTrustedContactsHeader() {
-    return (
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => {
-          (trustedContactsBottomSheet as any).current.snapTo(0);
-        }}
-        style={styles.modalHeader}
-      >
-        <View style={styles.modalHeaderHandle} />
-      </TouchableOpacity>
-    );
-  }
+  // function renderTrustedContactsHeader() {
+  //   return (
+  //     <TouchableOpacity
+  //       activeOpacity={10}
+  //       onPress={() => {
+  //         (trustedContactsBottomSheet as any).current.snapTo(0);
+  //       }}
+  //       style={styles.modalHeader}
+  //     >
+  //       <View style={styles.modalHeaderHandle} />
+  //     </TouchableOpacity>
+  //   );
+  // }
 
-  function renderCloudHeader() {
-    return (
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => {
-          (cloudBottomSheet as any).current.snapTo(0);
-        }}
-        style={styles.modalHeader}
-      >
-        <View style={styles.modalHeaderHandle} />
-      </TouchableOpacity>
-    );
-  }
+  // function renderCloudHeader() {
+  //   return (
+  //     <TouchableOpacity
+  //       activeOpacity={10}
+  //       onPress={() => {
+  //         (cloudBottomSheet as any).current.snapTo(0);
+  //       }}
+  //       style={styles.modalHeader}
+  //     >
+  //       <View style={styles.modalHeaderHandle} />
+  //     </TouchableOpacity>
+  //   );
+  // }
 
   // function renderContent() {
   //   switch (selectedType) {
@@ -407,15 +407,6 @@ export default function ManageBackup(props) {
   //     </TouchableOpacity>
   //   );
   // }
-
-  const dispatch = useDispatch();
-  const s3Service: S3Service = useSelector(state => state.sss.service);
-  useEffect(() => {
-    WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
-    if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
-  }, []);
-
-  const { overallHealth } = useSelector(state => state.sss);
 
   const renderWalletBackupAndRecoveryContents = () => {
     return (
@@ -447,6 +438,15 @@ export default function ManageBackup(props) {
       />
     );
   };
+
+  const dispatch = useDispatch();
+  const s3Service: S3Service = useSelector(state => state.sss.service);
+  useEffect(() => {
+    WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
+    if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
+  }, []);
+
+  const { overallHealth } = useSelector(state => state.sss);
 
   return (
     <View style={{ flex: 1 }}>
