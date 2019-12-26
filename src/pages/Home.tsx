@@ -1304,11 +1304,9 @@ export default function Home(props) {
       }
     }
 
-    console.log({ overallHealth });
     (async () => {
       if (!overallHealth) {
         const storedHealth = await AsyncStorage.getItem('overallHealth');
-        console.log({ storedHealth });
         if (storedHealth) {
           setOverallHealth(JSON.parse(storedHealth));
         }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -11,52 +11,55 @@ import {
   Platform,
   TextInput,
   ActivityIndicator,
-  Button
-} from "react-native";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import Fonts from "../../common/Fonts";
-import Colors from "../../common/Colors";
-import CommonStyles from "../../common/Styles";
+  Button,
+  Alert,
+} from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Fonts from '../../common/Fonts';
+import Colors from '../../common/Colors';
+import CommonStyles from '../../common/Styles';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from "react-native-responsive-screen";
-import { RFValue } from "react-native-responsive-fontsize";
-import HeaderTitle from "../../components/HeaderTitle";
-import BottomInfoBox from "../../components/BottomInfoBox";
-import CopyThisText from "../../components/CopyThisText";
-import KnowMoreButton from "../../components/KnowMoreButton";
-import { useDispatch, useSelector } from "react-redux";
-import { requestShare, downloadMShare } from "../../store/actions/sss";
-import QRCode from "react-native-qrcode-svg";
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import { RFValue } from 'react-native-responsive-fontsize';
+import HeaderTitle from '../../components/HeaderTitle';
+import BottomInfoBox from '../../components/BottomInfoBox';
+import CopyThisText from '../../components/CopyThisText';
+import KnowMoreButton from '../../components/KnowMoreButton';
+import { useDispatch, useSelector } from 'react-redux';
+import { requestShare, downloadMShare } from '../../store/actions/sss';
+import QRCode from 'react-native-qrcode-svg';
 
 export default function RestoreWalletBySecondaryDevice(props) {
-  const [secondaryQR, setSecondaryQR] = useState("");
+  const [secondaryQR, setSecondaryQR] = useState('');
 
   const { WALLET_SETUP, DECENTRALIZED_BACKUP } = useSelector(
-    state => state.storage.database
+    state => state.storage.database,
   );
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
 
   const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[0]
     ? RECOVERY_SHARES[0]
     : { REQUEST_DETAILS: null, META_SHARE: null };
-  console.log({ REQUEST_DETAILS });
+
   REQUEST_DETAILS && !secondaryQR
     ? setSecondaryQR(
         JSON.stringify({
           ...REQUEST_DETAILS,
-          type: "secondaryDeviceQR",
-          mode: "recovery"
-        })
+          type: 'secondaryDeviceQR',
+          mode: 'recovery',
+        }),
       )
     : null;
+
+  REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
 
   const deepLink = REQUEST_DETAILS
     ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/rk/` +
       REQUEST_DETAILS.ENCRYPTED_KEY
-    : "";
+    : '';
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -71,7 +74,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.navigate("RestoreSelectedContactsList");
+              props.navigation.navigate('RestoreSelectedContactsList');
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -85,28 +88,28 @@ export default function RestoreWalletBySecondaryDevice(props) {
         </View>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS == "ios" ? "padding" : ""}
+          behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
           <View style={{ flex: 2 }}>
             <HeaderTitle
               isKnowMoreButton={true}
               onPressKnowMore={() => {}}
-              firstLineTitle={"Restore wallet using"}
-              secondLineTitle={"Secondary Device"}
+              firstLineTitle={'Restore wallet using'}
+              secondLineTitle={'Secondary Device'}
               infoTextNormal={
-                "Use the Recover Secret stored in your secondary device. "
+                'Use the Recover Secret stored in your secondary device. '
               }
-              infoTextBold={"you will need to have the other device with you"}
+              infoTextBold={'you will need to have the other device with you'}
             />
           </View>
           <View
-            style={{ flex: 4, alignItems: "center", justifyContent: "center" }}
+            style={{ flex: 4, alignItems: 'center', justifyContent: 'center' }}
           >
             {!secondaryQR ? (
               <ActivityIndicator size="large" />
             ) : (
-              <QRCode value={secondaryQR} size={hp("27%")} />
+              <QRCode value={secondaryQR} size={hp('27%')} />
             )}
             {deepLink ? <CopyThisText text={deepLink} /> : null}
           </View>
@@ -114,22 +117,22 @@ export default function RestoreWalletBySecondaryDevice(props) {
           {REQUEST_DETAILS ? (
             <View>
               <Button
-                title={META_SHARE ? "Downloaded" : "Download"}
+                title={META_SHARE ? 'Downloaded' : 'Download'}
                 disabled={!!META_SHARE}
                 onPress={() =>
                   dispatch(
                     downloadMShare(
                       REQUEST_DETAILS.OTP,
                       REQUEST_DETAILS.ENCRYPTED_KEY,
-                      "recovery"
-                    )
+                      'recovery',
+                    ),
                   )
                 }
               />
             </View>
           ) : null}
 
-          <View style={{ flex: 2, justifyContent: "flex-end" }}></View>
+          <View style={{ flex: 2, justifyContent: 'flex-end' }}></View>
         </KeyboardAvoidingView>
       </View>
     </SafeAreaView>
@@ -142,65 +145,65 @@ const styles = StyleSheet.create({
     fontSize: RFValue(25, 812),
     marginLeft: 15,
     marginBottom: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   labelStyle: {
     color: Colors.textColorGrey,
     fontSize: RFValue(12, 812),
     marginLeft: 15,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   bottomNoteText: {
     color: Colors.blue,
     fontSize: RFValue(13, 812),
     marginBottom: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue(12, 812),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   buttonView: {
-    height: wp("13%"),
-    width: wp("30%"),
-    justifyContent: "center",
-    alignItems: "center",
+    height: wp('13%'),
+    width: wp('30%'),
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 10,
     shadowOffset: { width: 0, height: 10 },
-    backgroundColor: Colors.blue
+    backgroundColor: Colors.blue,
   },
   buttonText: {
     color: Colors.white,
     fontSize: RFValue(13, 812),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.FiraSansMedium,
   },
   bottomButtonView: {
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingLeft: 30,
     paddingRight: 30,
     paddingBottom: 40,
     paddingTop: 30,
-    alignItems: "center"
+    alignItems: 'center',
   },
   statusIndicatorView: {
-    flexDirection: "row",
-    marginLeft: "auto"
+    flexDirection: 'row',
+    marginLeft: 'auto',
   },
   statusIndicatorActiveView: {
     height: 5,
     width: 25,
     backgroundColor: Colors.blue,
-    borderRadius: 10
+    borderRadius: 10,
   },
   statusIndicatorInactiveView: {
     width: 5,
     backgroundColor: Colors.lightBlue,
     borderRadius: 10,
-    marginLeft: 5
+    marginLeft: 5,
   },
   addressView: {
     flex: 1,
@@ -210,11 +213,11 @@ const styles = StyleSheet.create({
     height: 50,
     paddingLeft: 15,
     paddingRight: 15,
-    justifyContent: "center"
+    justifyContent: 'center',
   },
   addressText: {
     fontSize: RFValue(13, 812),
-    color: Colors.lightBlue
+    color: Colors.lightBlue,
   },
   copyIconView: {
     width: 48,
@@ -222,7 +225,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.borderColor,
     borderTopRightRadius: 8,
     borderBottomRightRadius: 8,
-    justifyContent: "center",
-    alignItems: "center"
-  }
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
