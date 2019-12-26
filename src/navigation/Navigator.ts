@@ -38,6 +38,7 @@ import RestoreByCloudQrCodeContents from '../pages/RestoreByCloudQrCodeContents'
 import EmailModalContents from '../pages/EmailModalContents';
 import Buy from '../pages/Accounts/Buy';
 import Sell from '../pages/Accounts/Sell';
+import QrScanner from '../components/QrScanner';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -107,6 +108,7 @@ const HomeNavigator = createStackNavigator(
     EmailModalContents,
     Buy,
     Sell,
+    QrScanner
   },
   {
     headerLayoutPreset: 'center',

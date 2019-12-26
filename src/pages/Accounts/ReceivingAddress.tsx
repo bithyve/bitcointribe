@@ -20,6 +20,7 @@ import Colors from "../../common/Colors";
 import BottomSheet from "reanimated-bottom-sheet";
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
+import { RFValue } from "react-native-responsive-fontsize";
 
 const ReceivingAddress = props => {
   const serviceType = props.navigation.getParam("serviceType");
@@ -30,7 +31,7 @@ const ReceivingAddress = props => {
 
   const checkNShowHelperModal = async () => {
     let isReceiveHelperDone = await AsyncStorage.getItem("isReceiveHelperDone");
-    if (!isReceiveHelperDone) {
+    if (!isReceiveHelperDone && serviceType == TEST_ACCOUNT) {
       AsyncStorage.setItem("isReceiveHelperDone", 'true');
       ReceiveHelperBottomSheet.current.snapTo(1);
     }
@@ -83,7 +84,7 @@ const ReceivingAddress = props => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={BackupStyles.modalContainer}>
         <View style={BackupStyles.modalHeaderTitleView}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
             <TouchableOpacity
               onPress={() => { props.navigation.goBack(); }}
               style={{ height: 30, width: 30, justifyContent: "center" }}
@@ -97,6 +98,21 @@ const ReceivingAddress = props => {
             <Text style={BackupStyles.modalHeaderTitleText}>
               Receiving Address
           </Text>
+            {serviceType == TEST_ACCOUNT ?
+              <Text
+                onPress={() => {
+                  AsyncStorage.setItem("isReceiveHelperDone", 'true');
+                  ReceiveHelperBottomSheet.current.snapTo(1);
+                }}
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12, 812),
+                  marginLeft: 'auto',
+                }}
+              >
+                Know More
+            </Text>
+              : null}
           </View>
         </View>
         <View style={BackupStyles.modalContentView}>

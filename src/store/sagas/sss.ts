@@ -21,7 +21,7 @@ import {
   requestedShareUploaded,
   downloadedMShare,
   OVERALL_HEALTH,
-  overallHealth,
+  calculateOverallHealth,
   overallHealthCalculated,
 } from '../actions/sss';
 import { dbInsertedSSS } from '../actions/storage';
@@ -37,6 +37,7 @@ import {
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
 import AsyncStorage from '@react-native-community/async-storage';
+import { Alert } from 'react-native';
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select(state => state.sss.service);
@@ -126,9 +127,10 @@ function* uploadEncMetaShareWorker({ payload }) {
   yield put(switchS3Loader('uploadMetaShare'));
 
   const res = yield call(s3Service.uploadShare, payload.shareIndex);
-  console.log({ otp: res.data.otp, encryptedKey: res.data.encryptedKey });
   if (res.status === 200) {
     const { otp, encryptedKey } = res.data;
+    console.log({ otp, encryptedKey });
+    Alert.alert('OTP', otp);
 
     const updatedBackup = {
       ...DECENTRALIZED_BACKUP,
@@ -426,7 +428,8 @@ function* checkMSharesHealthWorker() {
   const preInstance = JSON.stringify(s3Service);
   const res = yield call(s3Service.checkHealth);
   const postInstance = JSON.stringify(s3Service);
-  yield put(overallHealth(s3Service));
+  yield put(calculateOverallHealth(s3Service));
+
   if (res.status === 200) {
     if (preInstance !== postInstance) {
       const { SERVICES } = yield select(state => state.storage.database);
@@ -434,6 +437,7 @@ function* checkMSharesHealthWorker() {
         ...SERVICES,
         S3_SERVICE: JSON.stringify(s3Service),
       };
+
       yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
     }
   } else {
@@ -449,7 +453,11 @@ export const checkMSharesHealthWatcher = createWatcher(
 );
 
 function* overallHealthWorker({ payload }) {
-  const { healthCheckStatus } = payload.s3Service.sss;
+  const service = payload.s3Service
+    ? payload.s3Service
+    : yield select(state => state.sss.service);
+
+  const { healthCheckStatus } = service.sss;
   const shareStatus = Object.keys(healthCheckStatus).map(key => {
     return {
       shareId: key,
@@ -471,6 +479,11 @@ function* overallHealthWorker({ payload }) {
 
   if (overallHealth) {
     overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
+    yield call(
+      AsyncStorage.setItem,
+      'overallHealth',
+      JSON.stringify(overallHealth),
+    );
     yield put(overallHealthCalculated(overallHealth));
   }
 }

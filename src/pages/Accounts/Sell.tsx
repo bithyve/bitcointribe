@@ -53,9 +53,9 @@ export default function Sell(props) {
   );
   const checkNShowHelperModal = async () => {
     let isSellHelperDone = await AsyncStorage.getItem("isSellHelperDone");
-    if (!isSellHelperDone) {
-        AsyncStorage.setItem("isSellHelperDone", 'true');
-        SellHelperBottomSheet.current.snapTo(1);
+    if (!isSellHelperDone && serviceType == TEST_ACCOUNT) {
+      AsyncStorage.setItem("isSellHelperDone", 'true');
+      SellHelperBottomSheet.current.snapTo(1);
     }
   }
 
@@ -101,7 +101,7 @@ export default function Sell(props) {
         >
           <ScrollView>
             <View style={styles.modalHeaderTitleView}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
                 <TouchableOpacity
                   onPress={() => {
                     props.navigation.goBack();
@@ -114,21 +114,36 @@ export default function Sell(props) {
                     size={17}
                   />
                 </TouchableOpacity>
-                <Text style={styles.modalHeaderTitleText}>{"Send"}</Text>
+                <Text style={styles.modalHeaderTitleText}>{"Sell"}</Text>
+                {serviceType == TEST_ACCOUNT ?
+                  <Text
+                    onPress={() => {
+                      AsyncStorage.setItem("isSellHelperDone", 'true');
+                      SellHelperBottomSheet.current.snapTo(1);
+                    }}
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(12, 812),
+                      marginLeft: 'auto',
+                    }}
+                  >
+                    Know More
+            </Text>
+                  : null}
               </View>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
         <BottomSheet
-        enabledInnerScrolling={true}
-        ref={SellHelperBottomSheet}
-        snapPoints={[
-          -50,
-          hp('95%')
-        ]}
-        renderContent={renderSellHelperContents}
-        renderHeader={renderSellHelperHeader}
-      />
+          enabledInnerScrolling={true}
+          ref={SellHelperBottomSheet}
+          snapPoints={[
+            -50,
+            hp('95%')
+          ]}
+          renderContent={renderSellHelperContents}
+          renderHeader={renderSellHelperHeader}
+        />
       </View>
     </View>
   );

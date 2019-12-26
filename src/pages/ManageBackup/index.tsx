@@ -22,7 +22,8 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize';
 import CopyThisText from '../../components/CopyThisText';
 import KnowMoreButton from '../../components/KnowMoreButton';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { initHealthCheck, checkMSharesHealth } from '../../store/actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import HomePageShield from '../../components/HomePageShield';
 import BackupStyles from './Styles';
@@ -441,14 +442,12 @@ export default function ManageBackup( props ) {
   const renderWalletBackupAndRecoveryHeader = () => {
     return (
       <SmallHeaderModal
-        borderColor={ Colors.blue }
-        headerColor={ Colors.blue }
-        onPressHandle={ () => {
-          setTimeout( () => {
-            setTabBarZIndex( 999 );
-          }, 10 );
-          WalletBackupAndRecoveryBottomSheet.current.snapTo( 0 );
-        } }
+
+        borderColor={Colors.blue}
+        headerColor={Colors.blue}
+        onPressHandle={() => {
+          WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
+        }}
       />
     );
   };
@@ -517,6 +516,17 @@ export default function ManageBackup( props ) {
       setPageData( updatedPageData );
     }
   }, [ overallHealth ] );
+
+  useEffect(() => {
+    // HC down-streaming
+    if (s3Service) {
+      const { healthCheckInitialized } = s3Service.sss;
+
+      if (healthCheckInitialized) {
+        dispatch(checkMSharesHealth());
+      }
+    }
+  }, []);
 
   return (
     <View style={ { flex: 1 } }>

@@ -147,7 +147,7 @@ export default function ShareRecoverySecretModalContents(props) {
                                 autoFocus={false}
                                 keyboardType="email-address"
                                 ref={input => { this.textInput4 = input; }}
-                                style={[this.textInput3 && this.textInput3.isFocused() ? styles.textBoxActive : styles.textBoxStyles
+                                style={[this.textInput4 && this.textInput4.isFocused() ? styles.textBoxActive : styles.textBoxStyles
                                 ]}
                                 onChangeText={value => {
                                     onPressNumber(value);
@@ -171,7 +171,7 @@ export default function ShareRecoverySecretModalContents(props) {
                                 autoFocus={false}
                                 keyboardType="email-address"
                                 ref={input => { this.textInput5 = input; }}
-                                style={[this.textInput3 && this.textInput3.isFocused() ? styles.textBoxActive : styles.textBoxStyles
+                                style={[this.textInput5 && this.textInput5.isFocused() ? styles.textBoxActive : styles.textBoxStyles
                                 ]}
                                 onChangeText={value => {
                                     onPressNumber(value);
@@ -194,7 +194,7 @@ export default function ShareRecoverySecretModalContents(props) {
                                 autoFocus={false}
                                 keyboardType="email-address"
                                 ref={input => { this.textInput6 = input; }}
-                                style={[this.textInput3 && this.textInput3.isFocused() ? styles.textBoxActive : styles.textBoxStyles
+                                style={[this.textInput6 && this.textInput6.isFocused() ? styles.textBoxActive : styles.textBoxStyles
                                 ]}
                                 onChangeText={value => {
                                     onPressNumber(value);
