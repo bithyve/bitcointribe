@@ -210,8 +210,10 @@ export default function Home( props ) {
     React.createRef(),
   );
   const [ bottomSheet, setBottomSheet ] = useState( React.createRef() );
+  const [ newData, setNewData ] = useState( [] );
   const [ data, setData ] = useState( [
     {
+      id: 1,
       title: 'Test Account',
       unit: 'tsats',
       amount: '400,000',
@@ -220,6 +222,7 @@ export default function Home( props ) {
       bitcoinicon: require( '../assets/images/icons/icon_bitcoin_test.png' ),
     },
     {
+      id: 2,
       title: 'Regular Account',
       unit: 'sats',
       amount: '5,000',
@@ -228,6 +231,7 @@ export default function Home( props ) {
       bitcoinicon: require( '../assets/images/icons/icon_bitcoin_gray.png' ),
     },
     {
+      id: 3,
       title: 'Secure Account',
       unit: 'sats',
       amount: '60,000',
@@ -334,8 +338,29 @@ export default function Home( props ) {
     //   setTabBarZIndex(0);
     //  }, 2);
     // (CustodianRequestBottomSheet as any).current.snapTo(1);
+    updateAccountCardData();
     ( bottomSheet as any ).current.snapTo( 1 );
   }, [] );
+
+  const updateAccountCardData = () => {
+    let newArrayFinal = [];
+    let tempArray = [];
+    for (let a = 0; a < data.length; a++) {
+      tempArray.push(data[a])
+      console.log("tempArray", tempArray, tempArray.length);
+      if(tempArray.length == 2 || data[data.length-1].id == tempArray[0].id) { 
+        newArrayFinal.push(tempArray);
+        tempArray = [] 
+      }
+      
+    }
+    if(newArrayFinal){
+      setNewData(newArrayFinal);
+      console.log("newArrayFinal", newArrayFinal);
+    }
+    
+  }
+
 
   const renderTransactionsContent = () => {
     return (
@@ -1539,7 +1564,73 @@ export default function Home( props ) {
       </View>
       <View style={ { flex: 7 } }>
         <View style={ styles.cardViewContainer }>
-          <FlatList
+        <FlatList
+						horizontal
+						showsHorizontalScrollIndicator={false}
+						data={newData}
+						renderItem={(Items) => {
+							return <View style={{ flexDirection: 'column' }} >
+								{Items.item.map((value) => {
+									return <TouchableOpacity onPress={() => {
+                    props.navigation.navigate( 'Accounts', {
+                      serviceType:
+                      value.accountType === 'test'
+                          ? TEST_ACCOUNT
+                          : value.accountType === 'regular'
+                          ? REGULAR_ACCOUNT
+                          : SECURE_ACCOUNT,
+                    });
+                  }}>
+										<CardView cornerRadius={10} style={styles.card}>
+											<View style={{ flexDirection: 'row', }}>
+												<Image style={{ width: wp('10%'), height: wp('10%') }} source={getIconByAccountType(value.accountType)} />
+												{value.accountType == 'secure' ? (<TouchableOpacity onPress={() => { alert('2FA') }} style={{ marginLeft: 'auto' }}>
+													<Text style={{ color: Colors.blue, fontSize: RFValue(11, 812), fontFamily: Fonts.FiraSansRegular }}>2FA</Text>
+												</TouchableOpacity>) : null}
+
+											</View>
+											<View style={ { flex: 1, justifyContent: 'flex-end' } }>
+                        <Text style={ styles.cardTitle }>{ value.title }</Text>
+                        <Text
+                          style={ {
+                            color: Colors.textColorGrey,
+                            fontSize: RFValue( 11, 812 ),
+                          } }
+                        >
+                          { value.account }
+                        </Text>
+                        <View
+                          style={ {
+                            flexDirection: 'row',
+                            alignItems: 'flex-end',
+                            marginTop: hp( '1%' ),
+                          } }
+                        >
+                          <Image
+                            style={ styles.cardBitCoinImage }
+                            source={ value.bitcoinicon }
+                          />
+                          <Text style={ styles.cardAmountText }>
+                            { value.accountType === 'test'
+                              ? testBalance
+                              : value.accountType === 'regular'
+                              ? regularBalance
+                              : secureBalance}
+                          </Text>
+                          <Text style={ styles.cardAmountUnitText }>
+                            { value.unit }
+                          </Text>
+                        </View>
+                        </View>
+										</CardView>
+									</TouchableOpacity>
+								})
+								}
+							</View>
+						}
+						}
+					/>
+          {/* <FlatList
             horizontal
             showsHorizontalScrollIndicator={ false }
             data={ data }
@@ -1626,7 +1717,7 @@ export default function Home( props ) {
                 </View>
               );
             } }
-          />
+          /> */}
         </View>
       </View>
       <BottomSheet

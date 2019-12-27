@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   PermissionsAndroid,
   Platform,
-  Alert
+  Alert,
+  FlatList
 } from "react-native";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
@@ -174,6 +175,7 @@ export default function ContactList(props) {
     }
     ExpoContacts.getContactsAsync().then(({ data }) => {
       if (!data.length) Alert.alert("No contacts found!");
+      console.log(data.length);
       setContactData(data);
     });
   };
@@ -245,8 +247,41 @@ export default function ContactList(props) {
       </View>
       <View style={{ flex: 1, flexDirection: "row" }}>
         <View style={{ flex: 11 }}>
-          <ScrollView showsVerticalScrollIndicator={false} ref={scrollViewRef}>
-            {contactData.map((value, index) => {
+          {contactData ? <FlatList
+            data={contactData}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item, index }) =>{
+              let selected = false;
+              if (
+                selectedContacts.findIndex(temp => temp.id == item.id) > -1
+              ) {
+                selected = true;
+              }
+              return (
+              <TouchableOpacity
+                  onPress={() => onContactSelect(index)}
+                  style={styles.contactView}
+                  key={index}
+                >
+                  <RadioButton
+                    size={15}
+                    color={Colors.lightBlue}
+                    borderColor={Colors.borderColor}
+                    isChecked={selected}
+                    onpress={() => onContactSelect(index)}
+                  />
+                  <Text style={styles.contactText}>
+                    {item.name.split(" ")[0]}{" "}
+                    <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                      {item.name.split(" ")[1]}
+                    </Text>
+                  </Text>
+                </TouchableOpacity>
+            )
+          }
+        } 
+          /> : null}
+            {/* {contactData.map((value, index) => {
               let selected = false;
               if (
                 selectedContacts.findIndex(temp => temp.id == value.id) > -1
@@ -274,13 +309,11 @@ export default function ContactList(props) {
                   </Text>
                 </TouchableOpacity>
               );
-            })}
-          </ScrollView>
+            })} */}
         </View>
         <View style={styles.contactIndexView}>
           <TouchableOpacity
             onPress={() => {
-              scrollViewRef.current.scrollTo({ x: 60, y: 60, animated: true });
             }}
           >
             <Text style={styles.contactIndexText}>#</Text>
@@ -288,11 +321,7 @@ export default function ContactList(props) {
           {alphabetsList.map(value => (
             <TouchableOpacity
               onPress={() => {
-                scrollViewRef.current.scrollTo({
-                  x: 60,
-                  y: 60,
-                  animated: true
-                });
+                
               }}
             >
               <Text style={styles.contactIndexText}>{value}</Text>

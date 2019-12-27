@@ -10,6 +10,7 @@ import {
   Image,
   FlatList,
   Platform,
+  AsyncStorage
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
@@ -142,6 +143,7 @@ export default function ManageBackup(props) {
       route: 'HealthCheckSecurityAnswer',
     },
   ]);
+  
 
   // function selectedContactsList(list) {
   //   setContacts(list);
@@ -451,9 +453,18 @@ export default function ManageBackup(props) {
   const s3Service: S3Service = useSelector(state => state.sss.service);
   useEffect(() => {
     dispatch(fetchSSSFromDB());
-    WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
+    checkNShowHelperModal()
+    
     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
   }, []);
+
+  const checkNShowHelperModal = async () => {
+    let isManageBackupHelperDone = await AsyncStorage.getItem("isManageBackupHelperDone");
+    if (!isManageBackupHelperDone) {
+      AsyncStorage.setItem("isManageBackupHelperDone", 'true');
+      WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
+    }
+  }
 
   const { overallHealth } = useSelector(state => state.sss);
 
@@ -593,7 +604,9 @@ export default function ManageBackup(props) {
                 safeguard against loss of funds
               </Text>
               <KnowMoreButton
-                onpress={() => { }}
+                onpress={() => {
+                  WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
+                }}
                 containerStyle={{ marginTop: 10, marginLeft: 25 }}
                 textStyle={{}}
               />
