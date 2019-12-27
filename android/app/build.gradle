@@ -99,17 +99,17 @@ def enableProguardInReleaseBuilds = false
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-
+   
     defaultConfig {
         applicationId "com.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1      
-        versionName "1.0.0.271219"        
+        versionCode 1           
+        versionName "1.0.1.271219"        
         missingDimensionStrategy 'react-native-camera', 'general' 
         multiDexEnabled true
-    }       
-     signingConfigs {
+    }         
+     signingConfigs {   
         release {
             if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
                 storeFile file(MYAPP_UPLOAD_STORE_FILE)
@@ -117,7 +117,7 @@ android {
                 keyAlias MYAPP_UPLOAD_KEY_ALIAS
                 keyPassword MYAPP_UPLOAD_KEY_PASSWORD
             }
-        }
+        }   
     }
     splits {
         abi {
@@ -155,6 +155,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-print')
     implementation project(':react-native-share')
     implementation project(':react-native-camera')
      

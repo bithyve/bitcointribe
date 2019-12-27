@@ -288,7 +288,6 @@ function* downloadMetaShareWorker({ payload }) {
         RECOVERY_SHARES: updatedRecoveryShares,
       };
     }
-
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
     yield put(downloadedMShare(otp, true));
   } else {
@@ -346,7 +345,6 @@ function* generatePDFWorker({ payload }) {
   const { security, walletName } = yield select(
     state => state.storage.database.WALLET_SETUP,
   );
-  console.log({ security, walletName });
   try {
     const personalCopy1PdfPath = yield call(
       generatePDF,
@@ -366,7 +364,7 @@ function* generatePDFWorker({ payload }) {
       personalCopy1PdfPath,
       personalCopy2PdfPath,
     };
-    console.log({ path });
+    // console.log({ path });
     yield put(dbInsertedSSS(path));
   } catch (err) {
     console.log({ err });

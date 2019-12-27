@@ -55,4 +55,6 @@ target 'HEXA' do
     
   pod 'RNShare', :path => '../node_modules/react-native-share'
 
+  pod 'react-native-print', :path => '../node_modules/react-native-print'
+
 end
