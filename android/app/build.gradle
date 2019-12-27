@@ -1,6 +1,7 @@
 apply plugin: "com.android.application"
 
 import com.android.build.OutputFile
+apply plugin: 'io.fabric'
 
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
@@ -78,6 +79,7 @@ project.ext.react = [
 
 apply from: '../../node_modules/react-native-unimodules/gradle.groovy'
 apply from: "../../node_modules/react-native/react.gradle"
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -93,7 +95,7 @@ def enableSeparateBuildPerCPUArchitecture = false
  * Run Proguard to shrink the Java bytecode in release builds.
  */
 def enableProguardInReleaseBuilds = false
-
+    
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -102,11 +104,11 @@ android {
         applicationId "com.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"   
+        versionCode 1      
+        versionName "1.0.0.271219"        
         missingDimensionStrategy 'react-native-camera', 'general' 
         multiDexEnabled true
-    }  
+    }       
      signingConfigs {
         release {
             if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
@@ -155,7 +157,7 @@ android {
 dependencies {
     implementation project(':react-native-share')
     implementation project(':react-native-camera')
-   
+     
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-udp')
     implementation project(':react-native-tcp')
@@ -171,6 +173,9 @@ dependencies {
     implementation project(':react-native-screens')
     implementation project(':react-native-reanimated')
     implementation project(':react-native-gesture-handler')
+    compile('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
+    transitive = true;
+    }
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'com.itextpdf:itextg:5.5.10'
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
