@@ -26,7 +26,7 @@ const ShareSuccessPage = props => {
                 <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
                     <TouchableOpacity
                         onPress={() => {
-                            props.navigation.goBack();
+                            props.navigation.navigate("Home");
                         }}
                         style={{ height: 30, width: 30, justifyContent: "center" }}
                     >

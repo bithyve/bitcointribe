@@ -44,6 +44,9 @@ import ShareRecoverySecretOtp from '../pages/RecoverySecretShare/ShareRecoverySe
 import HealthCheck from '../pages/HealthCheck';
 import SecondaryDeviceHealthCheck from '../pages/HealthCheck/SecondaryDeviceHealthCheck';
 import ShareSuccessPage from "../pages/RecoverySecretShare/ShareSuccessPage";
+import TrustedContactHealthCheck from '../pages/HealthCheck/TrustedContactHealthCheck';
+import NoteHealthCheck from "../pages/HealthCheck/NoteHealthCheck";
+import CloudHealthCheck from '../pages/HealthCheck/CloudHealthCheck';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -118,7 +121,10 @@ const HomeNavigator = createStackNavigator(
     ShareRecoverySecretOtp,
     HealthCheck,
     SecondaryDeviceHealthCheck,
-    ShareSuccessPage
+    ShareSuccessPage,
+    TrustedContactHealthCheck,
+    NoteHealthCheck,
+    CloudHealthCheck
   },
   {
     headerLayoutPreset: 'center',

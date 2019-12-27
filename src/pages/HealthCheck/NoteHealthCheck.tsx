@@ -29,7 +29,7 @@ import ErrorModalContents from '../../components/ErrorModalContents';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from "react-native-device-info";
 
-const SecondaryDeviceHealthCheck = props => {
+const NoteHealthCheck = props => {
 	const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
 	const [SelectedOption, setSelectedOption] = useState(0);
 	const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
@@ -183,9 +183,9 @@ const SecondaryDeviceHealthCheck = props => {
 			</View>
 			<View style={{ ...BackupStyles.modalHeaderTitleView, marginLeft: 10, marginRight: 10, }}>
 				<View style={{ flex: 1, justifyContent: "center" }}>
-					<Text style={BackupStyles.modalHeaderTitleText}>Secondary Device</Text>
+					<Text style={BackupStyles.modalHeaderTitleText}>Note</Text>
 					<Text style={BackupStyles.modalHeaderInfoText}>
-						Last backup{' '}<Text style={{ fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', }}> {'3 months ago'}</Text>
+						Last backup{' '}<Text style={{ fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', }}> {'1 months ago'}</Text>
 					</Text>
 				</View>
 				<Image style={BackupStyles.cardIconImage} source={getIconByStatus(selectedStatus)} />
@@ -251,7 +251,7 @@ const SecondaryDeviceHealthCheck = props => {
 	);
 };
 
-export default SecondaryDeviceHealthCheck;
+export default NoteHealthCheck;
 
 const styles = StyleSheet.create({
 	modalHeaderTitleText: {
