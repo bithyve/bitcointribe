@@ -248,7 +248,7 @@ function Accounts(props) {
     };
   }, []);
 
-  const setCarouselData1= ()=> {
+  const setCarouselData1 = () => {
     if (serviceType == TEST_ACCOUNT) {
       checkNHighlight();
       setTimeout(() => {
@@ -272,12 +272,12 @@ function Accounts(props) {
   };
 
   const getServiceType = serviceType => {
-    if(!serviceType) return;
+    if (!serviceType) return;
     setTimeout(() => {
       setServiceType(serviceType);
-       }, 10);
-     
-      setCarouselData1();
+    }, 10);
+
+    setCarouselData1();
   };
 
   const renderSendContents = () => {
@@ -313,10 +313,10 @@ function Accounts(props) {
             index == 0
               ? Colors.blue
               : index == 1
-              ? Colors.yellow
-              : index == 2
-              ? Colors.green
-              : Colors.borderColor,
+                ? Colors.yellow
+                : index == 2
+                  ? Colors.green
+                  : Colors.borderColor,
           shadowOpacity: 0.2,
           shadowOffset: { width: 0, height: 7 },
           flexDirection: 'row',
@@ -355,15 +355,30 @@ function Accounts(props) {
         </View>
 
         <View style={{ justifyContent: 'space-between' }}>
-          <Image
-            style={{
-              marginLeft: 'auto',
-              width: wp('5%'),
-              height: wp('5%'),
-              resizeMode: 'contain',
-            }}
-            source={require('../../assets/images/icons/icon_settings.png')}
-          />
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {item.accountType == 'Test Account' && (
+              <Text
+                style={{marginRight:10,
+                  fontFamily: Fonts.FiraSansMedium,
+                  fontSize: RFValue(15, 812),
+                  color: Colors.white,
+                  alignSelf: 'center',
+                }}
+                onPress={() => { TestAccountHelperBottomSheet.current.snapTo(1); }}
+              >
+                Know More
+            </Text>
+            )}
+            <Image
+              style={{
+                marginLeft: 'auto',
+                width: wp('5%'),
+                height: wp('5%'),
+                resizeMode: 'contain',
+              }}
+              source={require('../../assets/images/icons/icon_settings.png')}
+            />
+          </View>
           {item.accountType == 'Savings account' && (
             <Text
               style={{
@@ -373,6 +388,7 @@ function Accounts(props) {
                 color: Colors.white,
                 alignSelf: 'center',
               }}
+              onPress={() => { }}
             >
               2FA
             </Text>
@@ -748,7 +764,7 @@ function Accounts(props) {
         </Text>
         <TouchableOpacity
           style={{ height: 54, justifyContent: 'center' }}
-          onPress={() => {}}
+          onPress={() => { }}
         >
           <View
             style={{
@@ -784,23 +800,6 @@ function Accounts(props) {
           />
         }
       >
-        {props.navigation.getParam('serviceType') == TEST_ACCOUNT && serviceType == TEST_ACCOUNT ? 
-        <Text
-              onPress={() => {
-                TestAccountHelperBottomSheet.current.snapTo(1);
-                AsyncStorage.setItem('isTestAccountHelperDone', 'true');
-              }}
-              style={{
-                paddingTop: hp('1%'),
-                color: Colors.textColorGrey,
-                fontSize: RFValue(12, 812),
-                marginLeft: 'auto',
-                marginRight: wp('5%')
-              }}
-            >
-              Know More
-            </Text>
-        : null }
         <View style={{ paddingTop: hp('3%'), paddingBottom: hp('3%') }}>
           <Carousel
             ref={carousel}
@@ -814,8 +813,8 @@ function Accounts(props) {
               index === 0
                 ? setServiceType(TEST_ACCOUNT)
                 : index === 1
-                ? setServiceType(REGULAR_ACCOUNT)
-                : setServiceType(SECURE_ACCOUNT);
+                  ? setServiceType(REGULAR_ACCOUNT)
+                  : setServiceType(SECURE_ACCOUNT);
             }}
             style={{ activeSlideAlignment: 'center' }}
             scrollInterpolator={scrollInterpolator}
@@ -919,40 +918,40 @@ function Accounts(props) {
                         </WalkthroughableView>
                       </CopilotStep>
                     ) : (
-                      <View style={styles.modalElementInfoView}>
-                        <View style={{ justifyContent: 'center' }}>
-                          <FontAwesome
-                            name={
-                              item.transactionType == 'Received'
-                                ? 'long-arrow-down'
-                                : 'long-arrow-up'
-                            }
-                            size={15}
-                            color={
-                              item.transactionType == 'Received'
-                                ? Colors.green
-                                : Colors.red
-                            }
-                          />
-                        </View>
-                        <View
-                          style={{ justifyContent: 'center', marginLeft: 10 }}
-                        >
-                          <Text style={styles.transactionModalTitleText}>
-                            {item.accountType}{' '}
-                          </Text>
-                          <Text style={styles.transactionModalDateText}>
-                            {item.date}{' '}
-                            {/* <Entypo
+                        <View style={styles.modalElementInfoView}>
+                          <View style={{ justifyContent: 'center' }}>
+                            <FontAwesome
+                              name={
+                                item.transactionType == 'Received'
+                                  ? 'long-arrow-down'
+                                  : 'long-arrow-up'
+                              }
+                              size={15}
+                              color={
+                                item.transactionType == 'Received'
+                                  ? Colors.green
+                                  : Colors.red
+                              }
+                            />
+                          </View>
+                          <View
+                            style={{ justifyContent: 'center', marginLeft: 10 }}
+                          >
+                            <Text style={styles.transactionModalTitleText}>
+                              {item.accountType}{' '}
+                            </Text>
+                            <Text style={styles.transactionModalDateText}>
+                              {item.date}{' '}
+                              {/* <Entypo
                           size={10}
                           name={"dot-single"}
                           color={Colors.textColorGrey}
                         /> */}
-                            {/* {item.time} */}
-                          </Text>
+                              {/* {item.time} */}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
-                    )}
+                      )}
                     <View style={styles.transactionModalAmountView}>
                       <Image
                         source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
@@ -994,20 +993,20 @@ function Accounts(props) {
                           </WalkthroughableView>
                         </CopilotStep>
                       ) : (
-                        <View
-                          style={{
-                            padding: 10,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          <Ionicons
-                            name="ios-arrow-forward"
-                            color={Colors.textColorGrey}
-                            size={12}
-                          />
-                        </View>
-                      )}
+                          <View
+                            style={{
+                              padding: 10,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <Ionicons
+                              name="ios-arrow-forward"
+                              color={Colors.textColorGrey}
+                              size={12}
+                            />
+                          </View>
+                        )}
                     </View>
                   </TouchableOpacity>
                 );
@@ -1027,7 +1026,7 @@ function Accounts(props) {
             >
               <WalkthroughableTouchableOpacity
                 onPress={() => {
-                  props.navigation.navigate('Send', { serviceType, getServiceType : getServiceType });
+                  props.navigation.navigate('Send', { serviceType, getServiceType: getServiceType });
                 }}
                 style={styles.bottomCardView}
               >

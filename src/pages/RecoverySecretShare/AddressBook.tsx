@@ -48,13 +48,16 @@ const AddressBook = props => {
                 </View>
                 <View style={{ marginLeft: 30, marginRight:30, marginTop:10, marginBottom:10, flexDirection: "row", alignItems:'center' }}>
                     <Text style={{ color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(13, 812) }}>Pamela Aalto</Text>
-                    <TouchableOpacity onPress={()=>{props.navigation.navigate("ShareRecoverySecretOtp")}} style={{ justifyContent:'center', alignItems:'center', width:wp("15%"), height:wp('8%'), borderRadius: 5, borderWidth: 1, borderColor: Colors.borderColor, marginLeft:'auto', backgroundColor:Colors.backgroundColor }}><Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(10, 812) }}>Share</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={()=>{props.navigation.navigate("ShareRecoverySecretOtp", {shareByType:"otp"})}} style={{ justifyContent:'center', alignItems:'center', width:wp("15%"), height:wp('8%'), borderRadius: 5, borderWidth: 1, borderColor: Colors.borderColor, marginLeft:'auto', backgroundColor:Colors.backgroundColor }}><Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(10, 812) }}>Share</Text></TouchableOpacity>
                 </View>
                 <View style={{ marginLeft: 30, marginRight:30, marginTop:10, marginBottom:10, flexDirection: "row", alignItems:'center' }}>
                     <Text style={{ color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(13, 812) }}>Pamela Aalto</Text>
-                    <TouchableOpacity onPress={()=>{props.navigation.navigate("ShareRecoverySecretOtp")}} style={{ justifyContent:'center', alignItems:'center', width:wp("15%"), height:wp('8%'), borderRadius: 5, borderWidth: 1, borderColor: Colors.borderColor, marginLeft:'auto', backgroundColor:Colors.backgroundColor }}><Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(10, 812) }}>Share</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={()=>{props.navigation.navigate("ShareRecoverySecretOtp", {shareByType:"qr"})}} style={{ justifyContent:'center', alignItems:'center', width:wp("15%"), height:wp('8%'), borderRadius: 5, borderWidth: 1, borderColor: Colors.borderColor, marginLeft:'auto', backgroundColor:Colors.backgroundColor }}><Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(10, 812) }}>Share</Text></TouchableOpacity>
                 </View>
             </View>
+            <View style={{  }}>
+            <BottomInfoBox title={'Lorem ipsum'} infoText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'} />
+        </View>
         </View>
     );
 };

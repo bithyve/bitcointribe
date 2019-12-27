@@ -43,6 +43,7 @@ import AddressBook from '../pages/RecoverySecretShare/AddressBook';
 import ShareRecoverySecretOtp from '../pages/RecoverySecretShare/ShareRecoverySecretOtp';
 import HealthCheck from '../pages/HealthCheck';
 import SecondaryDeviceHealthCheck from '../pages/HealthCheck/SecondaryDeviceHealthCheck';
+import ShareSuccessPage from "../pages/RecoverySecretShare/ShareSuccessPage";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -116,7 +117,8 @@ const HomeNavigator = createStackNavigator(
     AddressBook,
     ShareRecoverySecretOtp,
     HealthCheck,
-    SecondaryDeviceHealthCheck
+    SecondaryDeviceHealthCheck,
+    ShareSuccessPage
   },
   {
     headerLayoutPreset: 'center',
