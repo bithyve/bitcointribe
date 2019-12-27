@@ -343,23 +343,24 @@ function* generatePDFWorker({ payload }) {
     qrData: resQRPersonalCopy2.data.qrData,
     ...secureAssets,
   };
-  const { securityAns, walletName } = yield select(
+  const { security, walletName } = yield select(
     state => state.storage.database.WALLET_SETUP,
   );
+  console.log({ security, walletName });
   try {
     const personalCopy1PdfPath = yield call(
       generatePDF,
       pdfDataPersonalCopy1,
       `Hexa ${walletName} Recovery Secret (Personal Copy 1).pdf`,
       `Hexa Share ${payload.personalcopy1}`,
-      securityAns,
+      security.answer,
     );
     const personalCopy2PdfPath = yield call(
       generatePDF,
       pdfDataPersonalCopy2,
       `Hexa ${walletName} Recovery Secret (Personal Copy 2).pdf`,
       `Hexa Share  ${payload.personalcopy2}`,
-      securityAns,
+      security.answer,
     );
     let path = {
       personalCopy1PdfPath,

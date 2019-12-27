@@ -71,6 +71,8 @@ export default async (pdfData, fileName, title, password) => {
     // qrCodeString.push(chunkArray(qrString, 4));
     qrCodeString.push(qrString);
   });
+  console.log({ password });
+
   let pdfDatas = {
     title,
     fileName,
@@ -84,7 +86,7 @@ export default async (pdfData, fileName, title, password) => {
     bhXpub,
   };
   let pdfPath = await getPdfPath(pdfDatas);
-  //console.log({ pdfPath });
+  console.log({ pdfPath });
   return pdfPath;
 };
 const getPdfPath = async (pdfData: any) => {
@@ -92,6 +94,8 @@ const getPdfPath = async (pdfData: any) => {
     const PdfPassword = NativeModules.PdfPassword;
     return await PdfPassword.createPdf(JSON.stringify(pdfData));
   } else {
+    console.log({ pdfData });
+
     if (!(await requestStoragePermission())) {
       throw new Error('Storage Permission Denied');
     }
@@ -102,7 +106,7 @@ const getPdfPath = async (pdfData: any) => {
         return await err;
       },
       async (path: any) => {
-        //console.log({ path });
+        console.log({ path });
         return (await 'file://') + path;
       },
     );
