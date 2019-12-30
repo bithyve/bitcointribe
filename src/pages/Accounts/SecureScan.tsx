@@ -83,7 +83,6 @@ const SecureScan = props => {
           <QRCode value={secondaryQR} size={hp('27%')} />
         )}
         {deepLink ? <CopyThisText text={deepLink} /> : null}
-      <CopyThisText text={deepLink} />
     </View>
     <View style={{ margin: 20, }}>
     <View style={{ flexDirection: 'row', marginTop:20, marginBottom:20 }}>
