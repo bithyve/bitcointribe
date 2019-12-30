@@ -248,7 +248,7 @@ function Accounts(props) {
     };
   }, []);
 
-  const setCarouselData1 = () => {
+  const setCarouselData1 = async () => {
     if (serviceType == TEST_ACCOUNT) {
       checkNHighlight();
       setTimeout(() => {
@@ -262,11 +262,20 @@ function Accounts(props) {
       }, 200);
     }
     if (serviceType == SECURE_ACCOUNT) {
+      let isSecureAccountScanOpen = await AsyncStorage.getItem(
+        'isSecureAccountScanOpen',
+      );
+      if (!isSecureAccountScanOpen && props.navigation.getParam('serviceType') == SECURE_ACCOUNT) {
+        console.log("Security type", props.navigation.getParam('serviceType'));
+        AsyncStorage.setItem('isSecureAccountScanOpen', 'true');
+        props.navigation.navigate('SecureScan');
+      }
       setTimeout(() => {
         carousel.current.snapToItem(2, true, false);
       }, 200);
     }
   }
+
   const handleStepChange = step => {
     console.log(`Current step is: ${step.name}`);
   };
@@ -276,8 +285,6 @@ function Accounts(props) {
     setTimeout(() => {
       setServiceType(serviceType);
     }, 10);
-
-    setCarouselData1();
   };
 
   const renderSendContents = () => {
@@ -358,7 +365,8 @@ function Accounts(props) {
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             {item.accountType == 'Test Account' && (
               <Text
-                style={{marginRight:10,
+                style={{
+                  marginRight: 10,
                   fontFamily: Fonts.FiraSansMedium,
                   fontSize: RFValue(15, 812),
                   color: Colors.white,
@@ -380,18 +388,29 @@ function Accounts(props) {
             />
           </View>
           {item.accountType == 'Savings account' && (
-            <Text
+            <TouchableOpacity
               style={{
-                marginLeft: 'auto',
-                fontFamily: Fonts.FiraSansMedium,
-                fontSize: RFValue(15, 812),
-                color: Colors.white,
-                alignSelf: 'center',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
-              onPress={() => { }}
-            >
-              2FA
+              onPress={() => {
+                props.navigation.navigate('SecureScan');
+              }
+              } >
+              <Text
+                style={{
+                  margin: 10, 
+                  marginLeft: 'auto',
+                  fontFamily: Fonts.FiraSansMedium,
+                  fontSize: RFValue(15, 812),
+                  color: Colors.white,
+                  alignSelf: 'center',
+                }}
+                onPress={() => { }}
+              >
+                2FA
             </Text>
+            </TouchableOpacity>
           )}
           <View style={{ flexDirection: 'row' }}>
             <Image

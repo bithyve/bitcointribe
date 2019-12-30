@@ -52,6 +52,8 @@ import NewWalletNameRegenerateShare from '../pages/RegenerateShare/NewWalletName
 import NewWalletQuestionRegenerateShare from '../pages/RegenerateShare/NewWalletQuestionRegenerateShare';
 import NewWalletGenerationOTP from '../pages/RegenerateShare/NewWalletGenerationOTP';
 import WalletCreationSuccess from '../pages/RegenerateShare/WalletCreationSuccess';
+import SecureScan from '../pages/Accounts/SecureScan';
+import GoogleAuthenticatorOTP from '../pages/Accounts/GoogleAuthenticatorOTP';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -134,7 +136,9 @@ const HomeNavigator = createStackNavigator(
     NewWalletNameRegenerateShare,
     NewWalletQuestionRegenerateShare,
     NewWalletGenerationOTP,
-    WalletCreationSuccess
+    WalletCreationSuccess,
+    SecureScan,
+    GoogleAuthenticatorOTP
   },
   {
     headerLayoutPreset: 'center',
