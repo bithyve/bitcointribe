@@ -240,15 +240,17 @@ function Accounts(props) {
 
   useEffect(() => {
     getServiceType(props.navigation.getParam('serviceType') ? props.navigation.getParam('serviceType') : serviceType);
-    let focusListener = props.navigation.addListener('didFocus', () => {
-      setCarouselData1();
-    });
-    return () => {
-      focusListener.remove();
-    };
+    setCarouselData1();
+    // let focusListener = props.navigation.addListener('didFocus', () => {
+    //   setCarouselData1();
+    // });
+    // return () => {
+    //   focusListener.remove();
+    // };
   }, []);
 
   const setCarouselData1 = async () => {
+    console.log("Service type setCarouselData1", serviceType)
     if (serviceType == TEST_ACCOUNT) {
       checkNHighlight();
       setTimeout(() => {
@@ -266,7 +268,6 @@ function Accounts(props) {
         'isSecureAccountScanOpen',
       );
       if (!isSecureAccountScanOpen && props.navigation.getParam('serviceType') == SECURE_ACCOUNT) {
-        console.log("Security type", props.navigation.getParam('serviceType'));
         AsyncStorage.setItem('isSecureAccountScanOpen', 'true');
         props.navigation.navigate('SecureScan');
       }
@@ -281,6 +282,7 @@ function Accounts(props) {
   };
 
   const getServiceType = serviceType => {
+    console.log("SERVICE TYPE", serviceType);
     if (!serviceType) return;
     setTimeout(() => {
       setServiceType(serviceType);
@@ -678,6 +680,7 @@ function Accounts(props) {
       if (serviceType === TEST_ACCOUNT) dispatch(getTestcoins(serviceType));
       else dispatch(fetchBalance(serviceType)); // TODO: do periodic auto search
     }
+    setCarouselData1();
   }, [serviceType]);
 
   // useEffect( () => {
@@ -830,10 +833,10 @@ function Accounts(props) {
             onSnapToItem={index => {
               setCarouselInitIndex(index);
               index === 0
-                ? setServiceType(TEST_ACCOUNT)
+                ? getServiceType(TEST_ACCOUNT)
                 : index === 1
-                  ? setServiceType(REGULAR_ACCOUNT)
-                  : setServiceType(SECURE_ACCOUNT);
+                  ? getServiceType(REGULAR_ACCOUNT)
+                  : getServiceType(SECURE_ACCOUNT);
             }}
             style={{ activeSlideAlignment: 'center' }}
             scrollInterpolator={scrollInterpolator}
