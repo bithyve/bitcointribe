@@ -143,7 +143,7 @@ export default function ManageBackup(props) {
       route: 'HealthCheckSecurityAnswer',
     },
   ]);
-  
+
 
   // function selectedContactsList(list) {
   //   setContacts(list);
@@ -454,7 +454,7 @@ export default function ManageBackup(props) {
   useEffect(() => {
     dispatch(fetchSSSFromDB());
     checkNShowHelperModal()
-    
+
     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
   }, []);
 
@@ -538,8 +538,13 @@ export default function ManageBackup(props) {
         topButtonText={"Regenerate Shares"}
         continueButtonText={"Continue"}
         quitButtonText={"Quit"}
+        onPressRegenerateShare={() => {
+          (RegenerateShareHelperBottomSheet as any).current.snapTo(0);
+          props.navigation.navigate("NewWalletNameRegenerateShare");
+        }}
         onPressContinue={() => {
           (RegenerateShareHelperBottomSheet as any).current.snapTo(0);
+          props.navigation.navigate("NewWalletNameRegenerateShare");
         }}
         onPressQuit={() => {
           (RegenerateShareHelperBottomSheet as any).current.snapTo(0);
@@ -582,7 +587,7 @@ export default function ManageBackup(props) {
               marginLeft: 'auto',
               marginRight: 10,
             }}
-            onPress={() => {RegenerateShareHelperBottomSheet.current.snapTo(1)}}
+            onPress={() => { RegenerateShareHelperBottomSheet.current.snapTo(1) }}
           >
             <Image source={require("../../assets/images/icons/icon_settings1.png")} style={{
               width: wp("5%"),
