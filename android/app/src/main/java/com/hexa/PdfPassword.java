@@ -1,5 +1,6 @@
 package com.hexa;
 
+import android.content.Context;
 import android.os.Environment;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -10,6 +11,7 @@ import com.facebook.react.bridge.ReactMethod;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
@@ -18,6 +20,7 @@ import java.util.Date;
 
 import android.graphics.Bitmap;
 import android.os.Environment;
+import android.print.PrintManager;
 
 
 import com.itextpdf.text.Anchor;
@@ -42,11 +45,15 @@ import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import static com.itextpdf.text.pdf.PdfName.C;
 
 
 public class PdfPassword extends ReactContextBaseJavaModule {
@@ -56,8 +63,6 @@ public class PdfPassword extends ReactContextBaseJavaModule {
             Font.BOLD);
     private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12,
             Font.BOLD);
-
-
     public PdfPassword(ReactApplicationContext reactContext) {
         super(reactContext); // required by React Native
     }
@@ -79,7 +84,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
             PdfWriter pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(outPath));
             //Add password protection.
             pdfWriter.setEncryption(jsonObj.getString("password").getBytes(), jsonObj.getString("password").getBytes(),
-                    PdfWriter.ALLOW_COPY | PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128);
+                   PdfWriter.ALLOW_COPY | PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128);
             document.open();
             addMetaData(document);
             addTitlePage(document,pdfData);
@@ -312,6 +317,23 @@ public class PdfPassword extends ReactContextBaseJavaModule {
     private static void addEmptyLine(Paragraph paragraph, int number) {
         for (int i = 0; i < number; i++) {
             paragraph.add(new Paragraph(" "));
+        }
+    }
+
+
+    @ReactMethod
+    public void print(String descFile, Callback errorCallback, Callback successCallback) {
+        try {
+            JSONObject jsonObj = new JSONObject(descFile);
+            PdfReader reader = new PdfReader(jsonObj.getString("path"), jsonObj.getString("password").getBytes());
+            System.out.println(new String(reader.computeUserPassword()));
+            String outPath = Environment.getExternalStorageDirectory() +"/"+jsonObj.getString("filename");
+            PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(outPath));
+            stamper.close();
+            reader.close();
+            successCallback.invoke(outPath);
+        } catch (Exception e) {
+            errorCallback.invoke(e.getMessage());
         }
     }
 }

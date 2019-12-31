@@ -1,8 +1,8 @@
 apply plugin: "com.android.application"
 
 import com.android.build.OutputFile
-apply plugin: 'io.fabric'
-
+apply plugin: 'io.fabric'    
+     
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
  * and bundleReleaseJsAndAssets).
@@ -108,8 +108,8 @@ android {
         versionName "1.0.1.271219"        
         missingDimensionStrategy 'react-native-camera', 'general' 
         multiDexEnabled true
-    }         
-     signingConfigs {   
+    }              
+     signingConfigs {      
         release {
             if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
                 storeFile file(MYAPP_UPLOAD_STORE_FILE)

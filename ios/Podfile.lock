@@ -59,6 +59,8 @@ PODS:
     - React
   - react-native-netinfo (5.0.0):
     - React
+  - react-native-print (0.6.0):
+    - React
   - react-native-randombytes (3.5.3):
     - React
   - react-native-video (5.0.2):
@@ -174,6 +176,7 @@ DEPENDENCIES:
   - react-native-camera (from `../node_modules/react-native-camera`)
   - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
+  - react-native-print (from `../node_modules/react-native-print`)
   - react-native-randombytes (from `../node_modules/react-native-randombytes`)
   - react-native-video (from `../node_modules/react-native-video`)
   - React/Core (from `../node_modules/react-native`)
@@ -273,6 +276,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-html-to-pdf"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
+  react-native-print:
+    :path: "../node_modules/react-native-print"
   react-native-randombytes:
     :path: "../node_modules/react-native-randombytes"
   react-native-video:
@@ -356,6 +361,7 @@ SPEC CHECKSUMS:
   react-native-camera: 52114c432860b89986c9ee4919d00a48a6ba7abb
   react-native-html-to-pdf: 1d1199917f56a98377d431bce84c2f275e48eb71
   react-native-netinfo: 841c2a83fe7df998fed56fd48b73229f17a5aa5b
+  react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
   react-native-video: d01ed7ff1e38fa7dcc6c15c94cf505e661b7bfd0
   RNCAsyncStorage: 60a80e72d95bf02a01cace55d3697d9724f0d77f
@@ -379,6 +385,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 1e70fe58b872355f0ecb44fb81bb1a16484047f0
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: 897629fa481c70b12be760b756aef69d429c80c6
+PODFILE CHECKSUM: d1d51f64f2e4ef1ae3a7846811c5b36f175c2954
 
 COCOAPODS: 1.8.4
