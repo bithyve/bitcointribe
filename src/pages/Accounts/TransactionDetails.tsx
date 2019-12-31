@@ -23,6 +23,8 @@ import Entypo from "react-native-vector-icons/Entypo";
 
 export default function TransactionDetails(props) {
   const txDetails = props.navigation.getParam("item");
+  const getServiceType = props.navigation.state.params.getServiceType ? props.navigation.state.params.getServiceType : null;
+  const serviceType =props.navigation.getParam("serviceType") ? props.navigation.getParam("serviceType"): null;
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -31,7 +33,7 @@ export default function TransactionDetails(props) {
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <TouchableOpacity
               onPress={() => {
-                if(getServiceType){
+                if(getServiceType && serviceType){
                       getServiceType(serviceType)
                     }
                 props.navigation.goBack();
