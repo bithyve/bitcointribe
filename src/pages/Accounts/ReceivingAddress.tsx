@@ -86,7 +86,10 @@ const ReceivingAddress = props => {
         <View style={BackupStyles.modalHeaderTitleView}>
           <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
             <TouchableOpacity
-              onPress={() => { props.navigation.goBack(); }}
+              onPress={() => {
+                props.navigation.state.params.getServiceType(props.navigation.state.params.serviceType)
+                props.navigation.goBack();
+              }}
               style={{ height: 30, width: 30, justifyContent: "center" }}
             >
               <FontAwesome

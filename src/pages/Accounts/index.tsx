@@ -241,18 +241,10 @@ function Accounts(props) {
   useEffect(() => {
     getServiceType(props.navigation.getParam('serviceType') ? props.navigation.getParam('serviceType') : serviceType);
     setCarouselData1();
-    // let focusListener = props.navigation.addListener('didFocus', () => {
-    //   setCarouselData1();
-    // });
-    // return () => {
-    //   focusListener.remove();
-    // };
   }, []);
 
   const setCarouselData1 = async () => {
-    console.log("Service type setCarouselData1", serviceType)
     if (serviceType == TEST_ACCOUNT) {
-      checkNHighlight();
       setTimeout(() => {
         carousel.current.snapToItem(0, true, false);
         setCarouselInitIndex(0);
@@ -269,7 +261,7 @@ function Accounts(props) {
       );
       if (!isSecureAccountScanOpen && props.navigation.getParam('serviceType') == SECURE_ACCOUNT) {
         AsyncStorage.setItem('isSecureAccountScanOpen', 'true');
-        props.navigation.navigate('SecureScan');
+        props.navigation.navigate('SecureScan',{ serviceType, getServiceType:getServiceType });
       }
       setTimeout(() => {
         carousel.current.snapToItem(2, true, false);
@@ -282,11 +274,11 @@ function Accounts(props) {
   };
 
   const getServiceType = serviceType => {
-    console.log("SERVICE TYPE", serviceType);
     if (!serviceType) return;
     setTimeout(() => {
       setServiceType(serviceType);
     }, 10);
+    if(serviceType == TEST_ACCOUNT) checkNHighlight();
   };
 
   const renderSendContents = () => {
@@ -396,7 +388,7 @@ function Accounts(props) {
                 justifyContent: 'center',
               }}
               onPress={() => {
-                props.navigation.navigate('SecureScan');
+                props.navigation.navigate('SecureScan',{ serviceType, getServiceType:getServiceType });
               }
               } >
               <Text
@@ -408,7 +400,7 @@ function Accounts(props) {
                   color: Colors.white,
                   alignSelf: 'center',
                 }}
-                onPress={() => { }}
+                onPress={() => {props.navigation.navigate('SecureScan',{ serviceType, getServiceType:getServiceType }); }}
               >
                 2FA
             </Text>
@@ -476,7 +468,7 @@ function Accounts(props) {
           renderItem={({ item }) => (
             <AppBottomSheetTouchableWrapper
               onPress={() =>
-                props.navigation.navigate('TransactionDetails', { item })
+                props.navigation.navigate('TransactionDetails', { item, serviceType, getServiceType:getServiceType })
               }
               style={{
                 ...styles.transactionModalElementView,
@@ -735,6 +727,8 @@ function Accounts(props) {
         }}
         onPressQuit={() => {
           (TestAccountHelperBottomSheet as any).current.snapTo(0);
+          props.copilotEvents.on('stepChange', handleStepChange);
+          props.start();
         }}
       />
     );
@@ -831,12 +825,12 @@ function Accounts(props) {
             sliderWidth={sliderWidth}
             itemWidth={sliderWidth * 0.95}
             onSnapToItem={index => {
-              setCarouselInitIndex(index);
               index === 0
                 ? getServiceType(TEST_ACCOUNT)
                 : index === 1
                   ? getServiceType(REGULAR_ACCOUNT)
                   : getServiceType(SECURE_ACCOUNT);
+                  setCarouselInitIndex(index);
             }}
             style={{ activeSlideAlignment: 'center' }}
             scrollInterpolator={scrollInterpolator}
@@ -891,7 +885,7 @@ function Accounts(props) {
                 return (
                   <TouchableOpacity
                     onPress={() =>
-                      props.navigation.navigate('TransactionDetails', { item })
+                      props.navigation.navigate('TransactionDetails', { item, serviceType, getServiceType:getServiceType })
                     }
                     style={styles.transactionModalElementView}
                   >
@@ -1048,7 +1042,7 @@ function Accounts(props) {
             >
               <WalkthroughableTouchableOpacity
                 onPress={() => {
-                  props.navigation.navigate('Send', { serviceType, getServiceType: getServiceType });
+                  props.navigation.navigate('Send', { serviceType, getServiceType:getServiceType });
                 }}
                 style={styles.bottomCardView}
               >
@@ -1072,9 +1066,7 @@ function Accounts(props) {
             >
               <WalkthroughableTouchableOpacity
                 onPress={() => {
-                  props.navigation.navigate('ReceivingAddress', {
-                    serviceType,
-                  });
+                  props.navigation.navigate('ReceivingAddress', { serviceType, getServiceType:getServiceType });
                 }}
                 style={styles.bottomCardView}
               >
@@ -1102,7 +1094,7 @@ function Accounts(props) {
             >
               <WalkthroughableTouchableOpacity
                 onPress={() => {
-                  props.navigation.navigate('Buy', { serviceType });
+                  props.navigation.navigate('Buy', { serviceType, getServiceType:getServiceType });
                 }}
                 style={styles.bottomCardView}
               >
@@ -1127,7 +1119,7 @@ function Accounts(props) {
               <WalkthroughableTouchableOpacity
                 style={styles.bottomCardView}
                 onPress={() => {
-                  props.navigation.navigate('Sell', { serviceType });
+                  props.navigation.navigate('Sell', { serviceType, getServiceType:getServiceType });
                 }}
               >
                 <Image
@@ -1215,6 +1207,18 @@ function Accounts(props) {
         renderHeader={renderBuyHelperHeader}
       />
       <BottomSheet
+        onCloseStart={async () => {
+          let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
+          let isReceiveHelperDone = await AsyncStorage.getItem('isReceiveHelperDone');
+          let isBuyHelperDone = await AsyncStorage.getItem('isBuyHelperDone');
+          let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
+          let isTransactionHelperDone = await AsyncStorage.getItem('isTransactionHelperDone');
+          let isTransactionDetailsHelperDone = await AsyncStorage.getItem('isTransactionDetailsHelperDone');
+          if (!isSendHelperDone || !isReceiveHelperDone || !isBuyHelperDone || !isSellHelperDone || !isTransactionHelperDone || !isTransactionDetailsHelperDone) {
+            props.copilotEvents.on('stepChange', handleStepChange);
+            props.start();
+          }
+        }}
         enabledInnerScrolling={true}
         ref={TestAccountHelperBottomSheet}
         snapPoints={[

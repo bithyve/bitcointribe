@@ -157,10 +157,10 @@ export default function Send(props) {
         >
           <ScrollView>
             <View style={styles.modalHeaderTitleView}>
-              <View style={{ flex:1, flexDirection: "row", alignItems: "center" }}>
+              <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
                 <TouchableOpacity
                   onPress={() => {
-                    props.navigation.state.params.getServiceType(serviceType);
+                    props.navigation.state.params.getServiceType(props.navigation.state.params.serviceType)
                     props.navigation.goBack();
                   }}
                   style={{ height: 30, width: 30, justifyContent: "center" }}
@@ -173,24 +173,24 @@ export default function Send(props) {
                 </TouchableOpacity>
                 <Text style={styles.modalHeaderTitleText}>{"Send"}</Text>
                 {serviceType == TEST_ACCOUNT ?
-                <Text
-                  onPress={() => {
-                    AsyncStorage.setItem("isSendHelperDone", 'true');
-                    SendHelperBottomSheet.current.snapTo(1);
-                  }}
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue(12, 812),
-                    marginLeft: 'auto',
-                  }}
-                >
-                  Know More
+                  <Text
+                    onPress={() => {
+                      AsyncStorage.setItem("isSendHelperDone", 'true');
+                      SendHelperBottomSheet.current.snapTo(1);
+                    }}
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(12, 812),
+                      marginLeft: 'auto',
+                    }}
+                  >
+                    Know More
             </Text>
-                : null}
+                  : null}
               </View>
             </View>
             <View style={{ paddingLeft: 20, paddingRight: 20 }}>
-              
+
               <View style={styles.textBoxView}>
                 <TextInput
                   // ref={refs => setTextContactNameRef(refs)}
