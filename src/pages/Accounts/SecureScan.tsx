@@ -19,6 +19,8 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { uploadEncMShare } from '../../store/actions/sss';
 
 const SecureScan = props => {
+  const getServiceType = props.navigation.state.params.getServiceType ? props.navigation.state.params.getServiceType : null;
+  const serviceType = props.navigation.getParam("serviceType");
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
     state => state.storage.database,
   );
@@ -54,7 +56,9 @@ const SecureScan = props => {
         <TouchableOpacity
           style={BackupStyles.headerLeftIconContainer}
           onPress={() => {
-            props.navigation.state.params.getServiceType(props.navigation.state.params.serviceType)
+            if (getServiceType) {
+              getServiceType(serviceType)
+            }
             props.navigation.goBack();
           }}
         >

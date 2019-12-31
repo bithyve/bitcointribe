@@ -31,7 +31,9 @@ export default function TransactionDetails(props) {
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <TouchableOpacity
               onPress={() => {
-                props.navigation.state.params.getServiceType(props.navigation.state.params.serviceType)
+                if(getServiceType){
+                      getServiceType(serviceType)
+                    }
                 props.navigation.goBack();
               }}
               style={{ height: 30, width: 30, justifyContent: "center" }}
