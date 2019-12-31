@@ -23,6 +23,7 @@ import * as ExpoContacts from "expo-contacts";
 
 async function requestContactsPermission() {
   try {
+    global.isContactOpen = true;
     await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
       {

@@ -26,6 +26,7 @@ import { getIconByStatus } from './utils';
 export default function CloudHealthCheck(props) {
     const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
     const [qrData, setQrData] = useState("");
+    global.isCameraOpen = true;
     const barcodeRecognized = async (barcodes) => {
         if (barcodes.data) {
             props.navigation.state.params.scanedCode(barcodes.data);
@@ -124,13 +125,6 @@ const styles = StyleSheet.create({
     modalContainer: {
         height: '100%',
         backgroundColor: Colors.white,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderLeftWidth: 1,
-        borderRightWidth: 1,
-        borderTopWidth: 1,
-        borderColor: Colors.borderColor,
-        alignSelf: 'center',
         width: '100%'
     },
     modalHeaderTitleView: {
