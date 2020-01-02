@@ -71,6 +71,7 @@ import { checkMSharesHealth, updateMSharesHealth } from '../store/actions/sss';
 import RecoverySecretRequestModalContents from '../components/RecoverySecretRequestModalContesnts';
 import ShareRecoverySecretModalContents from '../components/ShareRecoverySecretModalContents';
 import AsyncStorage from '@react-native-community/async-storage';
+import moment from "moment";
 
 export default function Home(props) {
   const database = useSelector(state => state.storage.database);
@@ -403,7 +404,7 @@ export default function Home(props) {
                     {item.accountType}{' '}
                   </Text>
                   <Text style={styles.transactionModalDateText}>
-                    {item.date}{' '}
+                  {moment(item.date).utc().format("DD MMMM YYYY")}{' '}
                     {/* <Entypo
                       size={10}
                       name={"dot-single"}

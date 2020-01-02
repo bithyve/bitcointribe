@@ -54,6 +54,7 @@ import TestAccountHelperModalContents from '../../components/Helper/TestAccountH
 
 import { copilot, walkthroughable, CopilotStep } from 'react-native-copilot';
 import TooltipComponent from '../../components/Copilot/CopilotTooltip';
+import moment from "moment";
 
 const WalkthroughableText = walkthroughable(Text);
 const WalkthroughableImage = walkthroughable(Image);
@@ -453,6 +454,7 @@ function Accounts(props) {
   };
 
   const renderTransactionsContent = () => {
+    
     return (
       <View style={styles.modalContentContainer}>
         <View style={{ marginLeft: 20, marginTop: 20 }}>
@@ -465,7 +467,8 @@ function Accounts(props) {
               <View style={styles.separatorView} />
             </View>
           )}
-          renderItem={({ item }) => (
+          renderItem={({ item }) => { 
+            return(
             <AppBottomSheetTouchableWrapper
               onPress={() =>
                 props.navigation.navigate('TransactionDetails', { item, serviceType, getServiceType: getServiceType })
@@ -496,7 +499,7 @@ function Accounts(props) {
                     {item.accountType}{' '}
                   </Text>
                   <Text style={styles.transactionModalDateText}>
-                    {item.date}{' '}
+                    {moment(item.date).utc().format("DD MMMM YYYY")}{' '}
                     {/* <Entypo
                       size={10}
                       name={"dot-single"}
@@ -533,7 +536,7 @@ function Accounts(props) {
                 />
               </View>
             </AppBottomSheetTouchableWrapper>
-          )}
+          )}}
         />
       </View>
     );
@@ -923,7 +926,7 @@ function Accounts(props) {
                               {item.accountType}{' '}
                             </Text>
                             <Text style={styles.transactionModalDateText}>
-                              {item.date}{' '}
+                            {moment(item.date).utc().format("DD MMMM YYYY")}{' '}
                               {/* <Entypo
                           size={10}
                           name={"dot-single"}
@@ -958,7 +961,7 @@ function Accounts(props) {
                               {item.accountType}{' '}
                             </Text>
                             <Text style={styles.transactionModalDateText}>
-                              {item.date}{' '}
+                            {moment(item.date).utc().format("DD MMMM YYYY")}{' '}
                               {/* <Entypo
                           size={10}
                           name={"dot-single"}

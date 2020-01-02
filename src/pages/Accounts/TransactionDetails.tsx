@@ -19,7 +19,7 @@ import CommonStyles from "../../common/Styles";
 import { RFValue } from "react-native-responsive-fontsize";
 import ContactList from "../../components/ContactList";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Entypo from "react-native-vector-icons/Entypo";
+import moment from "moment";
 
 export default function TransactionDetails(props) {
   const txDetails = props.navigation.getParam("item");
@@ -89,7 +89,7 @@ export default function TransactionDetails(props) {
                   marginTop: hp("1%")
                 }}
               >
-                {txDetails.date}
+                {moment(txDetails.date).utc().format("DD MMMM YYYY")}
                 {/* <Entypo
                 size={10}
                 name={"dot-single"}
