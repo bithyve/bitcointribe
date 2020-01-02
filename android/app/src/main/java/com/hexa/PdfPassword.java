@@ -332,7 +332,18 @@ public class PdfPassword extends ReactContextBaseJavaModule {
             stamper.close();
             reader.close();
             successCallback.invoke(outPath);
+
         } catch (Exception e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
+    @ReactMethod
+    public  void deleteFile(String filePath,Callback errorCallback,Callback successCallback){
+        try{
+            File file = new File(filePath);
+            boolean deleted = file.delete();
+            successCallback.invoke(deleted);
+        }catch (Exception e){
             errorCallback.invoke(e.getMessage());
         }
     }

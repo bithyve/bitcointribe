@@ -1,7 +1,7 @@
 package com.hexa;
 
 import android.app.Application;
-
+  
 import com.facebook.react.ReactApplication;
 import com.christopherdro.RNPrint.RNPrintPackage;
 import cl.json.RNSharePackage;
