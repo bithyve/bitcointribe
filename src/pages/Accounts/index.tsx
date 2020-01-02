@@ -194,7 +194,7 @@ function Accounts(props) {
   const [carouselInitIndex, setCarouselInitIndex] = useState(0);
   const [switchOn, setSwitchOn] = useState(true);
   const [carousel, setCarousel] = useState(React.createRef());
-
+  
   const checkNHighlight = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
     let isReceiveHelperDone = await AsyncStorage.getItem('isReceiveHelperDone');
@@ -261,7 +261,7 @@ function Accounts(props) {
       );
       if (!isSecureAccountScanOpen && props.navigation.getParam('serviceType') == SECURE_ACCOUNT) {
         AsyncStorage.setItem('isSecureAccountScanOpen', 'true');
-        props.navigation.navigate('SecureScan',{ serviceType, getServiceType:getServiceType });
+        props.navigation.navigate('SecureScan', { serviceType, getServiceType: getServiceType });
       }
       setTimeout(() => {
         carousel.current.snapToItem(2, true, false);
@@ -278,7 +278,7 @@ function Accounts(props) {
     setTimeout(() => {
       setServiceType(serviceType);
     }, 10);
-    if(serviceType == TEST_ACCOUNT) checkNHighlight();
+    if (serviceType == TEST_ACCOUNT) checkNHighlight();
   };
 
   const renderSendContents = () => {
@@ -388,19 +388,19 @@ function Accounts(props) {
                 justifyContent: 'center',
               }}
               onPress={() => {
-                props.navigation.navigate('SecureScan',{ serviceType, getServiceType:getServiceType });
+                props.navigation.navigate('SecureScan', { serviceType, getServiceType: getServiceType });
               }
               } >
               <Text
                 style={{
-                  margin: 10, 
+                  margin: 10,
                   marginLeft: 'auto',
                   fontFamily: Fonts.FiraSansMedium,
                   fontSize: RFValue(15, 812),
                   color: Colors.white,
                   alignSelf: 'center',
                 }}
-                onPress={() => {props.navigation.navigate('SecureScan',{ serviceType, getServiceType:getServiceType }); }}
+                onPress={() => { props.navigation.navigate('SecureScan', { serviceType, getServiceType: getServiceType }); }}
               >
                 2FA
             </Text>
@@ -468,7 +468,7 @@ function Accounts(props) {
           renderItem={({ item }) => (
             <AppBottomSheetTouchableWrapper
               onPress={() =>
-                props.navigation.navigate('TransactionDetails', { item, serviceType, getServiceType:getServiceType })
+                props.navigation.navigate('TransactionDetails', { item, serviceType, getServiceType: getServiceType })
               }
               style={{
                 ...styles.transactionModalElementView,
@@ -808,12 +808,13 @@ function Accounts(props) {
           backgroundColor: Colors.backgroundColor,
         }}
         refreshControl={
+          serviceType !== TEST_ACCOUNT ?
           <RefreshControl
-            refreshing={loading.transactions || loading.balances}
-            onRefresh={() => {
-              dispatch(fetchBalance(serviceType));
-            }}
-          />
+              refreshing={loading.transactions || loading.balances}
+              onRefresh={() => {
+                dispatch(fetchBalance(serviceType));
+              }}
+            /> : null
         }
       >
         <View style={{ paddingTop: hp('3%'), paddingBottom: hp('3%') }}>
@@ -830,7 +831,7 @@ function Accounts(props) {
                 : index === 1
                   ? getServiceType(REGULAR_ACCOUNT)
                   : getServiceType(SECURE_ACCOUNT);
-                  setCarouselInitIndex(index);
+              setCarouselInitIndex(index);
             }}
             style={{ activeSlideAlignment: 'center' }}
             scrollInterpolator={scrollInterpolator}
@@ -885,7 +886,7 @@ function Accounts(props) {
                 return (
                   <TouchableOpacity
                     onPress={() =>
-                      props.navigation.navigate('TransactionDetails', { item, serviceType, getServiceType:getServiceType })
+                      props.navigation.navigate('TransactionDetails', { item, serviceType, getServiceType: getServiceType })
                     }
                     style={styles.transactionModalElementView}
                   >
@@ -1042,7 +1043,7 @@ function Accounts(props) {
             >
               <WalkthroughableTouchableOpacity
                 onPress={() => {
-                  props.navigation.navigate('Send', { serviceType, getServiceType:getServiceType });
+                  props.navigation.navigate('Send', { serviceType, getServiceType: getServiceType });
                 }}
                 style={styles.bottomCardView}
               >
@@ -1066,7 +1067,7 @@ function Accounts(props) {
             >
               <WalkthroughableTouchableOpacity
                 onPress={() => {
-                  props.navigation.navigate('ReceivingAddress', { serviceType, getServiceType:getServiceType });
+                  props.navigation.navigate('ReceivingAddress', { serviceType, getServiceType: getServiceType });
                 }}
                 style={styles.bottomCardView}
               >
@@ -1094,7 +1095,7 @@ function Accounts(props) {
             >
               <WalkthroughableTouchableOpacity
                 onPress={() => {
-                  props.navigation.navigate('Buy', { serviceType, getServiceType:getServiceType });
+                  props.navigation.navigate('Buy', { serviceType, getServiceType: getServiceType });
                 }}
                 style={styles.bottomCardView}
               >
@@ -1119,7 +1120,7 @@ function Accounts(props) {
               <WalkthroughableTouchableOpacity
                 style={styles.bottomCardView}
                 onPress={() => {
-                  props.navigation.navigate('Sell', { serviceType, getServiceType:getServiceType });
+                  props.navigation.navigate('Sell', { serviceType, getServiceType: getServiceType });
                 }}
               >
                 <Image

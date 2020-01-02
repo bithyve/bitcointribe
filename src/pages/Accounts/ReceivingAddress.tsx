@@ -60,7 +60,7 @@ const ReceivingAddress = props => {
         onPressContinue={() => {
           if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
             (ReceiveHelperBottomSheet as any).current.snapTo(0);
-            props.navigation.navigate('ReceivingAddress', { serviceType })
+            props.navigation.navigate('ReceivingAddress', { serviceType, getServiceType })
           }
         }}
         onPressQuit={() => {
