@@ -7,7 +7,7 @@ import {
   ScrollView,
   StatusBar,
   Text,
-  Image,
+  FlatList,
   KeyboardAvoidingView,
   Platform,
   Keyboard,
@@ -35,13 +35,18 @@ import { initializeSetup } from '../store/actions/setupAndAuth';
 export default function NewWalletQuestion(props) {
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
   const [dropdownBoxList, setDropdownBoxList] = useState([
-    { id: '1', question: 'Name of your first pet?' },
-    { id: '2', question: 'Name of your favourite food?' },
-    { id: '3', question: 'Name of your first company?' },
-    { id: '4', question: 'Name of your first employee?' },
-    { id: '5', question: 'Name of your first pet?' },
-    { id: '6', question: 'Name of your favourite teacher?' },
-    { id: '7', question: 'Name of your favourite teacher?' },
+    { id: '1', question: 'To what city did you go the first time you flew on a plane?' },
+    { id: '2', question: 'What is the first name of the person you first kissed?' },
+    { id: '3', question: 'What is the first name of your best friend in high school?' },
+    { id: '4', question: 'What is the first name of your oldest nephew?' },
+    { id: '5', question: 'What is the first name of your oldest niece?' },
+    { id: '6', question: 'What was the first name of your favourite childhood friend?' },
+    { id: '7', question: 'What was the last name of your third grade teacher?' },
+    { id: '8', question: 'What was the street name where your best friend in high school lived (street name only)?' },
+    { id: '9', question: 'In what city or town was your first job?' },
+    { id: '10', question: 'What was the last name of your favorite childhood teacher?' },
+    { id: '11', question: 'What was the name of the company where you had your first job?' },
+    { id: '12', question: 'What was the name of the street where you were living when you were 10 years old?' },
   ]);
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
     id: '',
@@ -96,13 +101,14 @@ export default function NewWalletQuestion(props) {
               Keyboard.dismiss();
             }}
           >
-            <ScrollView>
-              <HeaderTitle
-                firstLineTitle={'New Hexa Wallet'}
-                secondLineTitle={''}
-                infoTextNormal={'Setup '}
-                infoTextBold={'secret question and answer'}
-              />
+
+            <HeaderTitle
+              firstLineTitle={'New Hexa Wallet'}
+              secondLineTitle={''}
+              infoTextNormal={'Setup '}
+              infoTextBold={'secret question and answer'}
+            />
+            
               <TouchableOpacity
                 activeOpacity={10}
                 style={
@@ -128,13 +134,16 @@ export default function NewWalletQuestion(props) {
                   color={Colors.textColorGrey}
                 />
               </TouchableOpacity>
+              <ScrollView showsVerticalScrollIndicator={false}>
               {dropdownBoxOpenClose ? (
                 <View style={styles.dropdownBoxModal}>
                   {dropdownBoxList.map((value, index) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setDropdownBoxValue(value);
-                        setDropdownBoxOpenClose(false);
+                        setTimeout(() => {
+                          setDropdownBoxValue(value);
+                          setDropdownBoxOpenClose(false);
+                        }, 70);
                       }}
                       style={{
                         ...styles.dropdownBoxModalElementView,
@@ -146,9 +155,9 @@ export default function NewWalletQuestion(props) {
                           index == dropdownBoxList.length - 1 ? 10 : 0,
                         paddingTop: index == 0 ? 5 : 0,
                         backgroundColor:
-                          dropdownBoxValue.id == value.id
+                          dropdownBoxValue ? dropdownBoxValue.id == value.id
                             ? Colors.lightBlue
-                            : Colors.white,
+                            : Colors.white : Colors.white,
                       }}
                     >
                       <Text
@@ -256,8 +265,8 @@ export default function NewWalletQuestion(props) {
                   </View>
                 </View>
               ) : (
-                <View style={{ marginTop: 15 }} />
-              )}
+                  <View style={{ marginTop: 15 }} />
+                )}
               {confirmAnswer && answer && confirmAnswer != answer ? (
                 <View
                   style={{
@@ -282,32 +291,32 @@ export default function NewWalletQuestion(props) {
 
             <View style={styles.bottomButtonView}>
               {answer.trim() == confirmAnswer.trim() &&
-              confirmAnswer.trim() &&
-              answer.trim() ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    const security = {
-                      question: dropdownBoxValue.question,
-                      answer,
-                    };
-                    dispatch(initializeSetup(walletName, security));
-                  }}
-                  style={styles.buttonView}
-                >
-                  {!loading.initializing ? (
-                    <Text style={styles.buttonText}>Confirm & Proceed</Text>
-                  ) : (
-                    <ActivityIndicator size="small" />
-                  )}
-                </TouchableOpacity>
-              ) : (
-                <View
-                  style={{
-                    height: wp('13%'),
-                    width: wp('30%'),
-                  }}
-                />
-              )}
+                confirmAnswer.trim() &&
+                answer.trim() ? (
+                  <TouchableOpacity
+                    onPress={() => {
+                      const security = {
+                        question: dropdownBoxValue.question,
+                        answer,
+                      };
+                      dispatch(initializeSetup(walletName, security));
+                    }}
+                    style={styles.buttonView}
+                  >
+                    {!loading.initializing ? (
+                      <Text style={styles.buttonText}>Confirm & Proceed</Text>
+                    ) : (
+                        <ActivityIndicator size="small" />
+                      )}
+                  </TouchableOpacity>
+                ) : (
+                  <View
+                    style={{
+                      height: wp('13%'),
+                      width: wp('30%'),
+                    }}
+                  />
+                )}
               <View style={styles.statusIndicatorView}>
                 <View style={styles.statusIndicatorInactiveView} />
                 <View style={styles.statusIndicatorActiveView} />
