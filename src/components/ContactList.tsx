@@ -45,99 +45,6 @@ export default function ContactList(props) {
   const [scrollViewRef, setScrollViewRef] = useState(React.createRef());
   const [radioOnOff, setRadioOnOff] = useState(false);
   const [contactData, setContactData] = useState([]);
-  // const [contactData, setContactData] = useState([
-  //   {
-  //     name: "Shivani Altekar",
-  //     checked: false,
-  //     id: 1,
-  //     communicationMode: [],
-  //     status: ""
-  //   },
-  //   {
-  //     name: "Uma AmravatiKr",
-  //     checked: false,
-  //     id: 2,
-  //     communicationMode: [],
-  //     status: ""
-  //   },
-  //   {
-  //     name: "Adison Alter",
-  //     checked: false,
-  //     id: 3,
-  //     communicationMode: [],
-  //     status: ""
-  //   },
-  //   {
-  //     name: "Add Add",
-  //     checked: false,
-  //     id: 4,
-  //     communicationMode: [],
-  //     status: ""
-  //   },
-  //   {
-  //     name: "Raj Boke",
-  //     checked: false,
-  //     id: 5,
-  //     communicationMode: [],
-  //     status: ""
-  //   },
-  //   {
-  //     name: "Samantha Bhujange",
-  //     checked: false,
-  //     id: 6,
-  //     communicationMode: [],
-  //     status: ""
-  //   },
-  //   {
-  //     name: "Kaweri Balwihari",
-  //     checked: false,
-  //     id: 7,
-  //     communicationMode: [],
-  //     status: ""
-  //   },
-  //   {
-  //     name: "Radhesham Bichkule",
-  //     checked: false,
-  //     id: 8,
-  //     communicationMode: [],
-  //     status: ""
-  //   },
-  //   {
-  //     name: "Rameswar Bihari",
-  //     checked: false,
-  //     id: 9,
-  //     communicationMode: [],
-  //     status: ""
-  //   },
-  //   {
-  //     name: "Shahaji Buchade",
-  //     checked: false,
-  //     id: 10,
-  //     communicationMode: [],
-  //     status: ""
-  //   },
-  //   {
-  //     name: "Shabnam Chitale",
-  //     checked: false,
-  //     id: 11,
-  //     communicationMode: [],
-  //     status: ""
-  //   },
-  //   {
-  //     name: "Shabnam Chitale",
-  //     checked: false,
-  //     id: 11,
-  //     communicationMode: [],
-  //     status: ""
-  //   },
-  //   {
-  //     name: "Shabnam Chitale",
-  //     checked: false,
-  //     id: 11,
-  //     communicationMode: [],
-  //     status: ""
-  //   }
-  // ]);
   const [alphabetsList] = useState([
     "A",
     "B",
@@ -252,7 +159,7 @@ export default function ContactList(props) {
             data={contactData}
             extraData={props.onSelectContact}
             showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) =>{
+            renderItem={({ item, index }) => {
               let selected = false;
               if (
                 selectedContacts.findIndex(temp => temp.id == item.id) > -1
@@ -260,7 +167,7 @@ export default function ContactList(props) {
                 selected = true;
               }
               return (
-              <TouchableOpacity
+                <TouchableOpacity
                   onPress={() => onContactSelect(index)}
                   style={styles.contactView}
                   key={index}
@@ -279,11 +186,11 @@ export default function ContactList(props) {
                     </Text>
                   </Text>
                 </TouchableOpacity>
-            )
-          }
-        } 
+              )
+            }
+            }
           /> : null}
-            {/* {contactData.map((value, index) => {
+          {/* {contactData.map((value, index) => {
               let selected = false;
               if (
                 selectedContacts.findIndex(temp => temp.id == value.id) > -1
@@ -323,7 +230,7 @@ export default function ContactList(props) {
           {alphabetsList.map(value => (
             <TouchableOpacity
               onPress={() => {
-                
+
               }}
             >
               <Text style={styles.contactIndexText}>{value}</Text>

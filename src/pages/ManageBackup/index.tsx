@@ -68,8 +68,11 @@ export default function ManageBackup(props) {
   const [RegenerateShareHelperBottomSheet, setRegenerateShareHelperBottomSheet] = useState(React.createRef());
   const [cloudBottomSheet, setCloudBottomSheet] = useState(React.createRef());
   const [selectedType, setSelectedType] = useState('');
+  const [contactIndex, setContactIndex] = useState();
   const [selectedStatus, setSelectedStatus] = useState('error');
   const [contacts, setContacts] = useState([]);
+  const [isSecretShared1, setIsSecretShared1] = useState(false);
+  const [isSecretShared2, setIsSecretShared2] = useState(false);
   const [cloudData, setCloudData] = useState([
     {
       title: 'iCloud Drive',
@@ -95,6 +98,7 @@ export default function ManageBackup(props) {
   const [pageData, setPageData] = useState([
     {
       title: 'Secondary Device',
+      name: '',
       time: '3 months ago',
       status: 'error',
       type: 'secondaryDevice',
@@ -102,6 +106,7 @@ export default function ManageBackup(props) {
     },
     {
       title: 'Trusted Contact 1',
+      name: '',
       time: '1 month ago',
       status: 'error',
       type: 'contact',
@@ -109,6 +114,7 @@ export default function ManageBackup(props) {
     },
     {
       title: 'Trusted Contact 2',
+      name: '',
       time: '12 days ago',
       status: 'error',
       type: 'contact',
@@ -116,6 +122,7 @@ export default function ManageBackup(props) {
     },
     {
       title: 'Personal Copy 1',
+      name: '',
       time: '2 days ago',
       status: 'error',
       type: 'copy1',
@@ -123,6 +130,7 @@ export default function ManageBackup(props) {
     },
     {
       title: 'Personal Copy 2',
+      name: '',
       time: '2 days ago',
       status: 'error',
       type: 'copy2',
@@ -130,6 +138,7 @@ export default function ManageBackup(props) {
     },
     {
       title: 'Print',
+      name: '',
       time: '3 days ago',
       status: 'error',
       type: 'print',
@@ -137,6 +146,7 @@ export default function ManageBackup(props) {
     },
     {
       title: 'Security Questions',
+      name: '',
       time: '1 day ago',
       status: 'error',
       type: 'security',
@@ -562,6 +572,47 @@ export default function ManageBackup(props) {
     );
   };
 
+  const getTrustContact = (contacts, index) => {
+    console.log("Contacts", contacts);
+    if (!contacts) return;
+    setContacts(contacts);
+    setContactIndex(index)
+  }
+
+  useEffect(() => {
+    if (contacts) {
+      const updatedPageData = [...pageData];
+      console.log("updatedPageData", updatedPageData);
+      for (let i = 0; i < updatedPageData.length; i++) {
+        if (contactIndex == 1 && contacts.length == 2) {
+          { updatedPageData[i].title == "Trusted Contact 1" ? updatedPageData[i].name = contacts[0].name : updatedPageData[i].title == "Trusted Contact 2" ? updatedPageData[i].name = contacts[1].name : updatedPageData[i].name = '' }
+        }
+        if (contactIndex == 1 && contacts.length == 1) {
+          { updatedPageData[i].title == "Trusted Contact 1" ? updatedPageData[i].name = contacts[0].name : updatedPageData[i].name = '' }
+        }
+
+        if (contactIndex == 2 && contacts.length == 2) {
+          { updatedPageData[i].title == "Trusted Contact 1" ? updatedPageData[i].name = contacts[0].name : updatedPageData[i].title == "Trusted Contact 2" ? updatedPageData[i].name = contacts[1].name : updatedPageData[i].name = '' }
+        }
+        if (contactIndex == 2 && contacts.length == 1) {
+          { updatedPageData[i].title == "Trusted Contact 2" ? updatedPageData[i].name = contacts[0].name : updatedPageData[i].name = '' }
+        }
+
+      }
+      setPageData(updatedPageData);
+    }
+  }, [contacts]);
+
+  const secretSharedTrustedContact1 = isSecretShared1 => {
+    console.log("IsSecretShared1", isSecretShared1);
+    setIsSecretShared1(isSecretShared1);
+  }
+
+  const secretSharedTrustedContact2 = isSecretShared2 => {
+    console.log("IsSecretShared2", isSecretShared2);
+    setIsSecretShared2(isSecretShared2);
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -652,14 +703,28 @@ export default function ManageBackup(props) {
                     if (item.route == 'personalCopy' || item.route == 'print') {
                       dispatch(requestSharePdf(item));
                     }
-                    props.navigation.navigate(item.route, {
-                      index:
-                        item.title === 'Trusted Contact 1'
-                          ? 1
-                          : item.title === 'Trusted Contact 2'
-                            ? 2
-                            : undefined,
-                    });
+                    if (contacts.length != 2) {
+                      props.navigation.navigate(item.route, {
+                        index:
+                          item.title === 'Trusted Contact 1' ? 1
+                            : item.title === 'Trusted Contact 2' ? 2 : undefined,
+                        getTrustContact: getTrustContact,
+                        contacts: contacts ? contacts : []
+                      });
+                    } else{
+                      console.log("IsSecretShared", isSecretShared1, isSecretShared2);
+                      if(isSecretShared1 || isSecretShared2){
+                        props.navigation.navigate('TrustedContactHealthCheck');
+                      } else {
+                      props.navigation.navigate('CommunicationMode', {
+                          contact: item.title === 'Trusted Contact 1' ? contacts[0]
+                          : item.title === 'Trusted Contact 2' ? contacts[1] : undefined,
+                          index: item.title === 'Trusted Contact 1' ? 1
+                            : item.title === 'Trusted Contact 2' ? 2 : undefined,
+                            secretSharedTrustedContact1 : item.title === 'Trusted Contact 1' ? secretSharedTrustedContact1 : null, secretSharedTrustedContact2 :item.title === 'Trusted Contact 2' ? secretSharedTrustedContact2 : null,
+                        });
+                    }
+                  }
                   }}
                   style={{
                     ...styles.manageBackupCard,
@@ -692,7 +757,7 @@ export default function ManageBackup(props) {
                     source={getImageByType(item.type)}
                   />
                   <View style={{ marginLeft: 15 }}>
-                    <Text style={styles.cardTitleText}>{item.title}</Text>
+                    <Text style={styles.cardTitleText}>{item.name ? item.name : item.title}</Text>
                     <Text style={styles.cardTimeText}>
                       Last backup{' '}
                       <Text
