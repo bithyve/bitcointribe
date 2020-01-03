@@ -250,6 +250,7 @@ export default function ContactList(props) {
         <View style={{ flex: 11 }}>
           {contactData ? <FlatList
             data={contactData}
+            extraData={props.onSelectContact}
             showsVerticalScrollIndicator={false}
             renderItem={({ item, index }) =>{
               let selected = false;
