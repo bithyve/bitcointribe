@@ -41,6 +41,7 @@ import TestAccountHelperModalContents from '../../components/Helper/TestAccountH
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 
 export default function Buy(props) {
+  const getServiceType = props.navigation.state.params.getServiceType ? props.navigation.state.params.getServiceType : null;
   const serviceType = props.navigation.getParam("serviceType");
   const [recipientAddress, setRecipientAddress] = useState("");
   const [amount, setAmount] = useState();
@@ -104,6 +105,9 @@ export default function Buy(props) {
               <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
                 <TouchableOpacity
                   onPress={() => {
+                    if(getServiceType){
+                      getServiceType(serviceType)
+                    }
                     props.navigation.goBack();
                   }}
                   style={{ height: 30, width: 30, justifyContent: "center" }}

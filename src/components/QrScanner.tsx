@@ -16,6 +16,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 export default function QrScanner(props) {
     const [cameraRef, setcameraRef] = useState(React.createRef());
+    global.isCameraOpen = true;
     const barcodeRecognized = async (barcodes) => {
         if(barcodes.data){
             props.navigation.state.params.scanedCode(barcodes.data);

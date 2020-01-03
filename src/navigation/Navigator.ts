@@ -39,6 +39,21 @@ import EmailModalContents from '../pages/EmailModalContents';
 import Buy from '../pages/Accounts/Buy';
 import Sell from '../pages/Accounts/Sell';
 import QrScanner from '../components/QrScanner';
+import AddressBook from '../pages/RecoverySecretShare/AddressBook';
+import ShareRecoverySecretOtp from '../pages/RecoverySecretShare/ShareRecoverySecretOtp';
+import HealthCheck from '../pages/HealthCheck';
+import SecondaryDeviceHealthCheck from '../pages/HealthCheck/SecondaryDeviceHealthCheck';
+import ShareSuccessPage from "../pages/RecoverySecretShare/ShareSuccessPage";
+import TrustedContactHealthCheck from '../pages/HealthCheck/TrustedContactHealthCheck';
+import NoteHealthCheck from "../pages/HealthCheck/NoteHealthCheck";
+import CloudHealthCheck from '../pages/HealthCheck/CloudHealthCheck';
+import SweepFundsFromExistingAccount from "../pages/RegenerateShare/SweepFundsFromExistingAccount";
+import NewWalletNameRegenerateShare from '../pages/RegenerateShare/NewWalletNameRegenerateShare';
+import NewWalletQuestionRegenerateShare from '../pages/RegenerateShare/NewWalletQuestionRegenerateShare';
+import NewWalletGenerationOTP from '../pages/RegenerateShare/NewWalletGenerationOTP';
+import WalletCreationSuccess from '../pages/RegenerateShare/WalletCreationSuccess';
+import SecureScan from '../pages/Accounts/SecureScan';
+import GoogleAuthenticatorOTP from '../pages/Accounts/GoogleAuthenticatorOTP';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -108,7 +123,22 @@ const HomeNavigator = createStackNavigator(
     EmailModalContents,
     Buy,
     Sell,
-    QrScanner
+    QrScanner,
+    AddressBook,
+    ShareRecoverySecretOtp,
+    HealthCheck,
+    SecondaryDeviceHealthCheck,
+    ShareSuccessPage,
+    TrustedContactHealthCheck,
+    NoteHealthCheck,
+    CloudHealthCheck,
+    SweepFundsFromExistingAccount,
+    NewWalletNameRegenerateShare,
+    NewWalletQuestionRegenerateShare,
+    NewWalletGenerationOTP,
+    WalletCreationSuccess,
+    SecureScan,
+    GoogleAuthenticatorOTP
   },
   {
     headerLayoutPreset: 'center',

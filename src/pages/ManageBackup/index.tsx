@@ -10,6 +10,7 @@ import {
   Image,
   FlatList,
   Platform,
+  AsyncStorage
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
@@ -36,6 +37,7 @@ import WalletBackupAndRecoveryContents from '../../components/Helper/WalletBacku
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import { fetchSSSFromDB } from '../../store/actions/storage';
 import { requestSharePdf } from '../../store/actions/manageBackup';
+import RegenerateHealper from '../../components/Helper/RegenerateHealper';
 
 function getImageByType(type) {
   if (type == 'secondaryDevice') {
@@ -63,6 +65,7 @@ export default function ManageBackup(props) {
   const [trustedContactsBottomSheet, setTrustedContactsBottomSheet] = useState(
     React.createRef(),
   );
+  const [RegenerateShareHelperBottomSheet, setRegenerateShareHelperBottomSheet] = useState(React.createRef());
   const [cloudBottomSheet, setCloudBottomSheet] = useState(React.createRef());
   const [selectedType, setSelectedType] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('error');
@@ -140,6 +143,7 @@ export default function ManageBackup(props) {
       route: 'HealthCheckSecurityAnswer',
     },
   ]);
+
 
   // function selectedContactsList(list) {
   //   setContacts(list);
@@ -449,9 +453,18 @@ export default function ManageBackup(props) {
   const s3Service: S3Service = useSelector(state => state.sss.service);
   useEffect(() => {
     dispatch(fetchSSSFromDB());
-    WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
+    checkNShowHelperModal()
+
     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
   }, []);
+
+  const checkNShowHelperModal = async () => {
+    let isManageBackupHelperDone = await AsyncStorage.getItem("isManageBackupHelperDone");
+    if (!isManageBackupHelperDone) {
+      AsyncStorage.setItem("isManageBackupHelperDone", 'true');
+      WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
+    }
+  }
 
   const { overallHealth } = useSelector(state => state.sss);
 
@@ -519,6 +532,36 @@ export default function ManageBackup(props) {
     }
   }, []);
 
+  const renderBuyHelperContents = () => {
+    return (
+      <RegenerateHealper
+        topButtonText={"Regenerate Shares"}
+        continueButtonText={"Continue"}
+        quitButtonText={"Quit"}
+        onPressRegenerateShare={() => {
+          (RegenerateShareHelperBottomSheet as any).current.snapTo(0);
+          props.navigation.navigate("NewWalletNameRegenerateShare");
+        }}
+        onPressContinue={() => {
+          (RegenerateShareHelperBottomSheet as any).current.snapTo(0);
+          props.navigation.navigate("NewWalletNameRegenerateShare");
+        }}
+        onPressQuit={() => {
+          (RegenerateShareHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+  const renderBuyHelperHeader = () => {
+    return (
+      <SmallHeaderModal
+        onPressHandle={() => {
+          (RegenerateShareHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -539,6 +582,19 @@ export default function ManageBackup(props) {
               />
             </View>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              marginLeft: 'auto',
+              marginRight: 10,
+            }}
+            onPress={() => { RegenerateShareHelperBottomSheet.current.snapTo(1) }}
+          >
+            <Image source={require("../../assets/images/icons/icon_settings1.png")} style={{
+              width: wp("5%"),
+              height: wp("5%"),
+              resizeMode: "contain",
+            }} />
+          </TouchableOpacity>
         </View>
         <ScrollView>
           <View style={{ flexDirection: 'row', marginTop: 10 }}>
@@ -553,7 +609,9 @@ export default function ManageBackup(props) {
                 safeguard against loss of funds
               </Text>
               <KnowMoreButton
-                onpress={() => {}}
+                onpress={() => {
+                  WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
+                }}
                 containerStyle={{ marginTop: 10, marginLeft: 25 }}
                 textStyle={{}}
               />
@@ -572,12 +630,12 @@ export default function ManageBackup(props) {
                   shieldStatus={overallHealth.overallStatus}
                 />
               ) : (
-                <HomePageShield
-                  circleShadowColor={Colors.borderColor}
-                  shieldImage={require('../../assets/images/icons/protector_gray.png')}
-                  shieldStatus={0}
-                />
-              )}
+                  <HomePageShield
+                    circleShadowColor={Colors.borderColor}
+                    shieldImage={require('../../assets/images/icons/protector_gray.png')}
+                    shieldStatus={0}
+                  />
+                )}
             </View>
           </View>
           <FlatList
@@ -599,8 +657,8 @@ export default function ManageBackup(props) {
                         item.title === 'Trusted Contact 1'
                           ? 1
                           : item.title === 'Trusted Contact 2'
-                          ? 2
-                          : undefined,
+                            ? 2
+                            : undefined,
                     });
                   }}
                   style={{
@@ -609,10 +667,10 @@ export default function ManageBackup(props) {
                       item.status == 'error'
                         ? Colors.red
                         : item.status == 'warning'
-                        ? Colors.yellow
-                        : item.status == 'success'
-                        ? Colors.green
-                        : Colors.blue,
+                          ? Colors.yellow
+                          : item.status == 'success'
+                            ? Colors.green
+                            : Colors.blue,
                     elevation:
                       selectedType && item.type == selectedType ? 10 : 0,
                     shadowColor:
@@ -692,6 +750,16 @@ export default function ManageBackup(props) {
           ]}
           renderContent={renderWalletBackupAndRecoveryContents}
           renderHeader={renderWalletBackupAndRecoveryHeader}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={RegenerateShareHelperBottomSheet}
+          snapPoints={[
+            -50,
+            hp('95%')
+          ]}
+          renderContent={renderBuyHelperContents}
+          renderHeader={renderBuyHelperHeader}
         />
       </View>
     </View>
