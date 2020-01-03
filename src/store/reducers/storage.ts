@@ -21,8 +21,8 @@ const initialState: {
   databaseSSS: {},
 };
 
-export default (state = initialState, action) => {
-  switch (action.type) {
+export default ( state = initialState, action ) => {
+  switch ( action.type ) {
     case DB_INITIALIZED:
       return {
         ...state,
@@ -64,7 +64,7 @@ export default (state = initialState, action) => {
           ...action.payload.database,
         },
       };
-      console.log({ updatedSSSState });
+      console.log( { updatedSSSState } );
       return {
         ...updatedSSSState,
       };

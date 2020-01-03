@@ -5,7 +5,8 @@ import { Platform, NativeModules } from 'react-native';
 
 import { createWatcher } from '../utils/utilities';
 import { SHARE_PDF, DBUPDATE_PDF_SEND, dbUpdatePdfSharing } from '../actions/manageBackup';
-
+import { dbUpdateSSS } from "../actions/storage"
+import { socialMediaType } from "../utils/media";
 
 function* sharePdfWorker( { payload } ) {
   const { databaseSSS } = yield select( state => state.storage );
@@ -31,8 +32,7 @@ function* sharePdfWorker( { payload } ) {
       let res = yield Share.open( shareOptions ).then( async ( res: any ) => {
         return await res;
       } );
-      console.log( { res } );
-      yield put( dbUpdatePdfSharing( { copy: "copy1", res } ) );
+      yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: socialMediaType( res.app.split( "/", 1 )[ 0 ] ) } } ) );
     } else if ( payload.type == 'copy2' ) {
       let shareOptions = {
         title: 'Personal Copy 2',
@@ -47,9 +47,11 @@ function* sharePdfWorker( { payload } ) {
         subject: 'Personal copy 2',
       };
       // console.log( { shareOptions } );
-      yield Share.open( shareOptions ).then( async ( res: any ) => {
-        console.log( { res } );
+      let res = yield Share.open( shareOptions ).then( ( res: any ) => {
+        return res;
       } );
+      console.log( { res } );
+      yield put( dbUpdatePdfSharing( { copy: "copy2", socialMedia: { type: socialMediaType( res.app.split( "/", 1 )[ 0 ] ) } } ) );
     } else {
       console.log( { path: databaseSSS.pdfDetails.personalCopy1PdfPath } );
       let pdfDecr = {
@@ -76,44 +78,47 @@ function* sharePdfWorker( { payload } ) {
           filePath: databaseSSS.pdfDetails.copy1.path,
         } );
       }
+      yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: "Print" } } ) );
     }
   } catch ( error ) {
     console.log( { error } );
   }
 }
+export const sharePdfWatcher = createWatcher( sharePdfWorker, SHARE_PDF );
 
 function* dbUPdatePdfSharingWorker( { payload } ) {
   const { databaseSSS } = yield select( state => state.storage );
-  const { copy, res } = payload;
+  const { copy, socialMedia } = payload;
   try {
     let updatedBackup;
-    updatedBackup = {
-      ...databaseSSS,
-      pdfDetails: {
-        copy1: {
-          path: databaseSSS.pdfDetails.copy1.path,
-          flagShare: true,
-          shareDetails: res
-        },
-        copy2: databaseSSS.pdfDetails.copy2
+    if ( copy == "copy1" ) {
+      updatedBackup = {
+        ...databaseSSS,
+        pdfDetails: {
+          copy1: {
+            path: databaseSSS.pdfDetails.copy1.path,
+            flagShare: true,
+            shareDetails: socialMedia
+          },
+          copy2: databaseSSS.pdfDetails.copy2
+        }
+      }
+    } else {
+      updatedBackup = {
+        ...databaseSSS,
+        pdfDetails: {
+          copy1: databaseSSS.pdfDetails.copy1,
+          copy2: {
+            path: databaseSSS.pdfDetails.copy2.path,
+            flagShare: true,
+            shareDetails: socialMedia
+          }
+        }
       }
     }
-    console.log( { updatedBackup } );
-    console.log( { databaseSSS, payload } );
-
+    yield put( dbUpdateSSS( updatedBackup ) );
   } catch ( error ) {
     console.log( { error } );
-
   }
 }
-
-
-
-
-
-
-
-
-
-export const sharePdfWatcher = createWatcher( sharePdfWorker, SHARE_PDF );
 export const dbUpdatePdfSharingWatcher = createWatcher( dbUPdatePdfSharingWorker, DBUPDATE_PDF_SEND );

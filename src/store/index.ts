@@ -17,6 +17,7 @@ import {
   insertDBWatcher,
   insertSSSDBWatcher,
   servicesEnricherWatcher,
+  updateSSSDBWatcher
 } from './sagas/storage';
 import {
   initSetupWatcher,
@@ -80,6 +81,7 @@ const rootSaga = function* () {
     insertDBWatcher,
     insertSSSDBWatcher,
     servicesEnricherWatcher,
+    updateSSSDBWatcher,
 
     // wallet setup watcher
     initSetupWatcher,

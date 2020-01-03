@@ -35,6 +35,7 @@ export const DB_INITIALIZED = 'DB_INITIALIZED';
 export const DB_FETCHED = 'DB_FETCHED';
 export const DB_INSERTED = 'DB_INSERTED';
 export const DB_INSERTEDSSS = 'DB_INSERTEDSSS';
+export const DB_UPDATESSS = 'DB_UPDATESSS';
 export const SERVICES_ENRICHED = 'SERVICES_ENRICHED';
 export const DB_FETCHEDSSS = 'DB_FETCHEDSSS';
 
@@ -50,15 +51,19 @@ export const dbInserted = updatedEntity => {
   return { type: DB_INSERTED, payload: { updatedEntity } };
 };
 
-export const dbInsertedSSS = (pdfDetails: any) => {
+export const dbInsertedSSS = ( pdfDetails: any ) => {
   return { type: DB_INSERTEDSSS, payload: { pdfDetails } };
 };
+
+export const dbUpdateSSS = updatedEntity => {
+  return { type: DB_UPDATESSS, payload: { updatedEntity } }
+}
 
 export const servicesEnriched = services => {
   return { type: SERVICES_ENRICHED, payload: { services } };
 };
 
 export const dbFetchedSSS = database => {
-  console.log({ database });
+  console.log( { database } );
   return { type: DB_FETCHEDSSS, payload: { database } };
 };
