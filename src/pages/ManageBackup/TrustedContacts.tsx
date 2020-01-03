@@ -27,6 +27,7 @@ import { getIconByStatus } from './utils';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const TrustedContacts = props => {
+  const getTrustContact = props.navigation.state.params.getTrustContact ? props.navigation.state.params.getTrustContact : null;
   const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
   const [contacts, setContacts] = useState([]);
   const [communicationModeBottomSheet, setCommunicationMode] = useState(
@@ -34,6 +35,7 @@ const TrustedContacts = props => {
   );
 
   const index = props.navigation.getParam('index');
+  const selectedContacts = props.navigation.getParam('contacts');
 
   function selectedContactsList(list) {
     if (list.length > 0) setContacts([...list]);
@@ -49,11 +51,15 @@ const TrustedContacts = props => {
       Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
       console.log(SHARES_TRANSFER_DETAILS[index]);
     }
-    // communicationModeBottomSheet.current.snapTo(1);
-    props.navigation.navigate('CommunicationMode', {
-      contact: contacts[0],
-      index,
-    });
+    console.log("CONTACTS",contacts, index)
+    if(getTrustContact){
+      getTrustContact(contacts, index)
+    }
+    props.navigation.goBack();
+    // props.navigation.navigate('CommunicationMode', {
+    //   contact: contacts[0],
+    //   index,
+    // });
   };
 
   // function requestHeader() {
@@ -129,6 +135,7 @@ const TrustedContacts = props => {
         </Text>
         <ContactList
           style={{}}
+          //selectedContact = {}
           onPressContinue={continueNProceed}
           onSelectContact={selectedContactsList}
         />

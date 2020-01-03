@@ -25,6 +25,9 @@ import { textWithoutEncoding, email } from 'react-native-communications';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default function CommunicationMode( props ) {
+  const secretSharedTrustedContact1 = props.navigation.state.params.secretSharedTrustedContact1 ? props.navigation.state.params.secretSharedTrustedContact1 : null;
+  const secretSharedTrustedContact2 = props.navigation.state.params.secretSharedTrustedContact2 ? props.navigation.state.params.secretSharedTrustedContact2 : null;
+  
   const contact = props.navigation.getParam( 'contact' );
   const index = props.navigation.getParam( 'index' );
 
@@ -89,6 +92,13 @@ export default function CommunicationMode( props ) {
     switch ( selectedContactMode.type ) {
       case 'number':
         textWithoutEncoding( selectedContactMode.info, deepLink );
+        if(secretSharedTrustedContact1){
+          secretSharedTrustedContact1(true);
+        }
+        if(secretSharedTrustedContact2){
+          secretSharedTrustedContact2(true);
+        }
+        props.navigation.goBack();
         break;
 
       case 'email':
@@ -99,6 +109,13 @@ export default function CommunicationMode( props ) {
           'Guardian request',
           deepLink,
         );
+        if(secretSharedTrustedContact1){
+          secretSharedTrustedContact1(true);
+        }
+        if(secretSharedTrustedContact2){
+          secretSharedTrustedContact2(true);
+        }
+        props.navigation.goBack();
         break;
     }
   };
