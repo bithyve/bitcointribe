@@ -52,7 +52,7 @@ import {
   generatePDFWatcher,
 } from './sagas/sss';
 
-import { sharePdfWatcher } from './sagas/manageBackup';
+import { sharePdfWatcher, dbUpdatePdfSharingWatcher } from './sagas/manageBackup';
 
 // const rootSaga = function*() {
 //   yield all([
@@ -71,7 +71,7 @@ import { sharePdfWatcher } from './sagas/manageBackup';
 //   ]);
 // };
 
-const rootSaga = function*() {
+const rootSaga = function* () {
   const sagas = [
     // database watchers
     initDBWatcher,
@@ -116,37 +116,38 @@ const rootSaga = function*() {
 
     // manage backup
     sharePdfWatcher,
+    dbUpdatePdfSharingWatcher
   ];
 
   yield all(
-    sagas.map(saga =>
-      spawn(function*() {
-        while (true) {
+    sagas.map( saga =>
+      spawn( function* () {
+        while ( true ) {
           try {
-            yield call(saga);
+            yield call( saga );
             break;
-          } catch (e) {
-            console.log(e);
+          } catch ( e ) {
+            console.log( e );
           }
         }
-      }),
+      } ),
     ),
   );
 };
 
-const rootReducer = combineReducers({
+const rootReducer = combineReducers( {
   storage: storageReducer,
   setupAndAuth: setupAndAuthReducer,
   accounts: accountsReducer,
   sss: sssReducer,
   manageBackup: manageBackupReducer,
-});
+} );
 
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(
   rootReducer,
-  composeWithDevTools(applyMiddleware(sagaMiddleware)),
+  composeWithDevTools( applyMiddleware( sagaMiddleware ) ),
 );
-sagaMiddleware.run(rootSaga);
+sagaMiddleware.run( rootSaga );
 
 export { store, Provider };
