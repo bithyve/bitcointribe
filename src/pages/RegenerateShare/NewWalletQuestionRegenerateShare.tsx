@@ -19,6 +19,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fonts from '../../common/Fonts';
 import Colors from '../../common/Colors';
+import QuestionList from '../../common/QuestionList';
 import CommonStyles from '../../common/Styles';
 import {
     widthPercentageToDP as wp,
@@ -34,15 +35,7 @@ import { initializeSetup } from '../../store/actions/setupAndAuth';
 
 export default function NewWalletQuestionRegenerateShare(props) {
     const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
-    const [dropdownBoxList, setDropdownBoxList] = useState([
-        { id: '1', question: 'Name of your first pet?' },
-        { id: '2', question: 'Name of your favourite food?' },
-        { id: '3', question: 'Name of your first company?' },
-        { id: '4', question: 'Name of your first employee?' },
-        { id: '5', question: 'Name of your first pet?' },
-        { id: '6', question: 'Name of your favourite teacher?' },
-        { id: '7', question: 'Name of your favourite teacher?' },
-    ]);
+    const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
     const [dropdownBoxValue, setDropdownBoxValue] = useState({
         id: '',
         question: '',

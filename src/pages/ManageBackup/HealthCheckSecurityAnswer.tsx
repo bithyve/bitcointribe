@@ -12,6 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import Colors from '../../common/Colors';
+import QuestionList from '../../common/QuestionList';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import {
@@ -42,15 +43,7 @@ export default function HealthCheckSecurityAnswer(props) {
     question: '',
   });
   const [answer, setAnswer] = useState('');
-  const [dropdownBoxList, setDropdownBoxList] = useState([
-    { id: '1', question: 'Name of your first pet?' },
-    { id: '2', question: 'Name of your favourite food?' },
-    { id: '3', question: 'Name of your first company?' },
-    { id: '4', question: 'Name of your first employee?' },
-    { id: '5', question: 'Name of your first pet?' },
-    { id: '6', question: 'Name of your favourite teacher?' },
-    { id: '7', question: 'Name of your favourite teacher?' },
-  ]);
+  const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
   const [errorText, setErrorText] = useState('');
   const [
     HealthCheckSuccessBottomSheet,

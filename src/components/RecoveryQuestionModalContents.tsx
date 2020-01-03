@@ -9,6 +9,7 @@ import {
     TextInput
 } from 'react-native';
 import Colors from "../common/Colors";
+import QuestionList from '../common/QuestionList';
 import Fonts from "../common/Fonts";
 import { RFValue } from 'react-native-responsive-fontsize';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
@@ -19,15 +20,7 @@ export default function RecoveryQuestionModalContents(props) {
     const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
     const [dropdownBoxValue, setDropdownBoxValue] = useState({ id: '', question: '' });
     const [answer, setAnswer] = useState('');
-    const [dropdownBoxList, setDropdownBoxList] = useState([
-		{ id: '1', question: 'Name of your first pet?' },
-		{ id: '2', question: 'Name of your favourite food?' },
-		{ id: '3', question: 'Name of your first company?' },
-		{ id: '4', question: 'Name of your first employee?' },
-		{ id: '5', question: 'Name of your first pet?' },
-		{ id: '6', question: 'Name of your favourite teacher?' },
-		{ id: '7', question: 'Name of your favourite teacher?' }
-    ]);
+    const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
     
     return (<View style={{ ...styles.modalContentContainer, height: '100%' }}>
         <View >
