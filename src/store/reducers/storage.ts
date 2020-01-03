@@ -12,12 +12,14 @@ const initialState: {
   insertedIntoDB: Boolean;
   key: String;
   database: Database;
+  dbFetched: Boolean;
   databaseSSS: {};
 } = {
   databaseInitialized: false,
   insertedIntoDB: false,
   key: '',
   database: null,
+  dbFetched: false,
   databaseSSS: {},
 };
 
@@ -34,6 +36,7 @@ export default (state = initialState, action) => {
         ...state,
         database: action.payload.database,
         insertedIntoDB: true,
+        dbFetched: true,
       };
       return {
         ...newState,
