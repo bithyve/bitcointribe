@@ -462,12 +462,18 @@ export default function ManageBackup( props ) {
 
   const dispatch = useDispatch();
   const s3Service: S3Service = useSelector( state => state.sss.service );
+  const { databaseSSS } = useSelector( state => state.storage );
+  // const {}    
   useEffect( () => {
     dispatch( fetchSSSFromDB() );
     checkNShowHelperModal();
-
     if ( !s3Service.sss.healthCheckInitialized ) dispatch( initHealthCheck() );
   }, [] );
+
+  useEffect( () => {
+    console.log( { databaseSSS } );
+
+  }, [ databaseSSS ] )
 
   const checkNShowHelperModal = async () => {
     let isManageBackupHelperDone = await AsyncStorage.getItem(
