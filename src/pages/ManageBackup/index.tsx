@@ -470,6 +470,7 @@ export default function ManageBackup( props ) {
     if ( !s3Service.sss.healthCheckInitialized ) dispatch( initHealthCheck() );
   }, [] );
 
+
   useEffect( () => {
     console.log( { databaseSSS } );
 
