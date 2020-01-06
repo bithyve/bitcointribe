@@ -34,7 +34,7 @@ function* sharePdfWorker( { payload } ) {
       let res = yield Share.open( shareOptions ).then( async ( res: any ) => {
         return await res;
       } );
-      yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: socialMediaType( res.app.split( "/", 1 )[ 0 ] ) } } ) );
+      yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: socialMediaType( res.app.split( "/", 1 )[ 0 ] ), date: Math.floor( Date.now() / 1000 ) } } ) );
     } else if ( payload.type == 'copy2' ) {
       let shareOptions = {
         title: 'Personal Copy 2',
@@ -53,7 +53,7 @@ function* sharePdfWorker( { payload } ) {
         return res;
       } );
       console.log( { res } );
-      yield put( dbUpdatePdfSharing( { copy: "copy2", socialMedia: { type: socialMediaType( res.app.split( "/", 1 )[ 0 ] ) } } ) );
+      yield put( dbUpdatePdfSharing( { copy: "copy2", socialMedia: { type: socialMediaType( res.app.split( "/", 1 )[ 0 ] ) }, date: Math.floor( Date.now() / 1000 ) } ) );
     } else {
       console.log( { path: databaseSSS.pdfDetails.personalCopy1PdfPath } );
       let pdfDecr = {
@@ -80,15 +80,13 @@ function* sharePdfWorker( { payload } ) {
           filePath: databaseSSS.pdfDetails.copy1.path,
         } );
       }
-      yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: "Print" } } ) );
+      yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: "Print", date: Math.floor( Date.now() / 1000 ) } } ) );
     }
   } catch ( error ) {
     console.log( { error } );
   }
 }
 export const sharePdfWatcher = createWatcher( sharePdfWorker, SHARE_PDF );
-
-
 
 function* dbUPdatePdfSharingWorker( { payload } ) {
   const { databaseSSS } = yield select( state => state.storage );
