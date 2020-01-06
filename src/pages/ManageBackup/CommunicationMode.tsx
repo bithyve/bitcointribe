@@ -39,6 +39,7 @@ export default function CommunicationMode(props) {
 
   const contact = props.navigation.getParam('contact');
   const index = props.navigation.getParam('index');
+  if (!contact) return <View></View>;
   const dispatch = useDispatch();
 
   useEffect(() => {
