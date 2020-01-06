@@ -1,8 +1,8 @@
 apply plugin: "com.android.application"
 
 import com.android.build.OutputFile
-apply plugin: 'io.fabric'    
-     
+//apply plugin: 'io.fabric'      
+        
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
  * and bundleReleaseJsAndAssets).
@@ -174,9 +174,9 @@ dependencies {
     implementation project(':react-native-screens')
     implementation project(':react-native-reanimated')
     implementation project(':react-native-gesture-handler')
-    compile('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
-    transitive = true;
-    }
+    // compile('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
+    // transitive = true;
+    // }   
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'com.itextpdf:itextg:5.5.10'
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
