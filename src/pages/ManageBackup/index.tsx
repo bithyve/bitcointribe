@@ -755,32 +755,33 @@ export default function ManageBackup(props) {
                         contacts: contacts ? contacts : [],
                       });
                     } else {
-                      console.log(
-                        'IsSecretShared',
-                        isSecretShared1,
-                        isSecretShared2,
-                      );
-                      if (isSecretShared1 || isSecretShared2) {
-                        props.navigation.navigate('TrustedContactHealthCheck');
-                      } else {
-                        props.navigation.navigate('CommunicationMode', {
-                          contact: item.contactInfo,
-                          index:
-                            item.title === 'Trusted Contact 1'
-                              ? 1
-                              : item.title === 'Trusted Contact 2'
-                                ? 2
-                                : undefined,
-                          secretSharedTrustedContact1:
-                            item.title === 'Trusted Contact 1'
-                              ? secretSharedTrustedContact1
-                              : null,
-                          secretSharedTrustedContact2:
-                            item.title === 'Trusted Contact 2'
-                              ? secretSharedTrustedContact2
-                              : null,
-                        });
+                      if (item.type == 'contact'){
+                        if (isSecretShared1 || isSecretShared2) {
+                          props.navigation.navigate('TrustedContactHealthCheck');
+                        } else {
+                          props.navigation.navigate('CommunicationMode', {
+                            contact: item.contactInfo,
+                            index:
+                              item.title === 'Trusted Contact 1'
+                                ? 1
+                                : item.title === 'Trusted Contact 2'
+                                  ? 2
+                                  : undefined,
+                            secretSharedTrustedContact1:
+                              item.title === 'Trusted Contact 1'
+                                ? secretSharedTrustedContact1
+                                : null,
+                            secretSharedTrustedContact2:
+                              item.title === 'Trusted Contact 2'
+                                ? secretSharedTrustedContact2
+                                : null,
+                          });
+                        }
                       }
+                      else{
+                        props.navigation.navigate(item.route);
+                      }
+                      
                     }
                   }}
                   style={{
