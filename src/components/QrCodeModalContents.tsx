@@ -1,69 +1,55 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
-    View,
-    Image,
-    TouchableOpacity,
-    Text,
-    StyleSheet,
-    ScrollView,
-    FlatList,
-    KeyboardAvoidingView,
-    ImageBackground,
-    TextInput,
-    Platform
+	View,
+	Text,
+	StyleSheet,
+	ScrollView,
+	KeyboardAvoidingView,
+	TextInput,
+	Platform
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
-import CommonStyles from "../common/Styles";
 import { RFValue } from "react-native-responsive-fontsize";
-import ContactList from "../components/ContactList";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import Entypo from "react-native-vector-icons/Entypo";
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 
-export default function QrCodeModalContents(props) {
+export default function QrCodeModalContents( props ) {
 
-    return (<View style={styles.modalContentContainer}>
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : ''} enabled>
-            <ScrollView style={styles.qrModalScrollView}>
-                <View style={styles.qrModalImageNTextInputView}>
-                    <ImageBackground source={require('../assets/images/icons/iPhone-QR.png')} style={styles.qrModalImage} >
-                        <View style={{ flexDirection: 'row', paddingTop: 10, paddingRight: 5, paddingLeft: 10, width: '100%' }}>
-                            <View style={{ borderLeftWidth: 1, borderTopColor: 'white', borderLeftColor: 'white', height: hp('5%'), width: hp('5%'), borderTopWidth: 1 }} />
-                            <View style={{ borderTopWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderTopColor: 'white', height: hp('5%'), width: hp('5%'), marginLeft: 'auto' }} />
-                        </View>
-                        <View style={{ marginTop: 'auto', flexDirection: 'row', paddingBottom: 5, paddingRight: 5, paddingLeft: 10, width: '100%', }}>
-                            <View style={{ borderLeftWidth: 1, borderBottomColor: 'white', borderLeftColor: 'white', height: hp('5%'), width: hp('5%'), borderBottomWidth: 1 }} />
-                            <View style={{ borderBottomWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderBottomColor: 'white', height: hp('5%'), width: hp('5%'), marginLeft: 'auto' }} />
-                        </View>
-                    </ImageBackground>
-                    <TextInput placeholder={'Enter Recipients Address'} placeholderTextColor={Colors.borderColor} style={styles.qrModalTextInput} />
-                </View>
-                <View style={styles.qrModalInfoView}>
-                    <View style={{ marginRight: 15 }}>
-                        <Text style={styles.qrModalInfoTitleText}>QR</Text>
-                        <Text style={styles.qrModalInfoInfoText}>Scan a QR code to send money or receive information from another Hexa wallet</Text>
-                    </View>
-                    <Ionicons
-                        name="ios-arrow-forward"
-                        color={Colors.textColorGrey}
-                        size={15}
-                        style={{ alignSelf: 'center' }}
-                    />
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
-    </View>
-    )
+	return ( <View style={ styles.modalContentContainer }>
+		<KeyboardAvoidingView style={ { flex: 1 } } behavior={ Platform.OS == 'ios' ? 'padding' : '' } enabled>
+			<ScrollView style={ styles.qrModalScrollView }>
+				<View style={ styles.qrModalImageNTextInputView }>
+					<AppBottomSheetTouchableWrapper onPress={()=>props.onPressQrScanner()} style={{alignSelf:'center', backgroundColor:Colors.blue, width:wp('50%'), height:wp('13%'), alignItems:'center', justifyContent:'center', borderRadius:10}}>
+						<Text style={{color:Colors.white, fontFamily:Fonts.FiraSansMedium, fontSize:RFValue(13, 812)}}>Scan QrCode</Text>
+					</AppBottomSheetTouchableWrapper>
+					<TextInput placeholder={ 'Enter Recipients Address' } placeholderTextColor={ Colors.borderColor } style={ styles.qrModalTextInput } />
+				</View>
+				<View style={ styles.qrModalInfoView }>
+					<View style={ { marginRight: 15 } }>
+						<Text style={ styles.qrModalInfoTitleText }>QR</Text>
+						<Text style={ styles.qrModalInfoInfoText }>Scan a QR code to send money or receive information from another Hexa wallet</Text>
+					</View>
+					<Ionicons
+						name="ios-arrow-forward"
+						color={ Colors.textColorGrey }
+						size={ 15 }
+						style={ { alignSelf: 'center' } }
+					/>
+				</View>
+			</ScrollView>
+		</KeyboardAvoidingView>
+	</View >
+	)
 }
-const styles = StyleSheet.create({
-    modalContentContainer: {
+const styles = StyleSheet.create( {
+	modalContentContainer: {
 		height: '100%',
 		backgroundColor: Colors.white,
-		paddingBottom: hp('10%')
-    },
-    qrModalScrollView: {
+		paddingBottom: hp( '10%' )
+	},
+	qrModalScrollView: {
 		display: 'flex',
 		backgroundColor: Colors.white,
 	},
@@ -75,8 +61,8 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 3
 	},
 	qrModalImage: {
-		width: wp('72%'),
-		height: wp('72%'),
+		width: wp( '72%' ),
+		height: wp( '72%' ),
 		borderRadius: 20,
 		borderWidth: 2.5,
 		borderColor: Colors.backgroundColor
@@ -85,13 +71,13 @@ const styles = StyleSheet.create({
 		borderRadius: 20,
 		borderWidth: 1,
 		borderColor: Colors.backgroundColor,
-		width: wp('72%'),
+		width: wp( '72%' ),
 		height: 60,
 		marginTop: 25,
 		marginBottom: 25,
 		paddingLeft: 15,
 		paddingRight: 15,
-		fontSize: RFValue(11, 812),
+		fontSize: RFValue( 11, 812 ),
 		fontFamily: Fonts.FiraSansMedium
 	},
 	qrModalInfoView: {
@@ -104,11 +90,11 @@ const styles = StyleSheet.create({
 	},
 	qrModalInfoTitleText: {
 		color: Colors.blue,
-		fontSize: RFValue(18, 812)
+		fontSize: RFValue( 18, 812 )
 	},
 	qrModalInfoInfoText: {
 		color: Colors.textColorGrey,
-		fontSize: RFValue(12, 812)
+		fontSize: RFValue( 12, 812 )
 	}
-    
-})
+
+} )

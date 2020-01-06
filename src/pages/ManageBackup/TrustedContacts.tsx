@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,32 +7,35 @@ import {
   Platform,
   SafeAreaView,
   StatusBar,
-  TouchableOpacity
-} from "react-native";
-import Fonts from "../../common/Fonts";
-import BackupStyles from "./Styles";
-import Colors from "../../common/Colors";
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import Fonts from '../../common/Fonts';
+import BackupStyles from './Styles';
+import Colors from '../../common/Colors';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from "react-native-responsive-screen";
-import { RFValue } from "react-native-responsive-fontsize";
-import ContactList from "../../components/ContactList";
-import { uploadEncMShare } from "../../store/actions/sss";
-import { useDispatch, useSelector } from "react-redux";
-import CommunicationModeModalContents from "../../components/CommunicationModeModalContents";
-import DeviceInfo from "react-native-device-info";
-import { getIconByStatus } from "./utils";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import { RFValue } from 'react-native-responsive-fontsize';
+import ContactList from '../../components/ContactList';
+import { uploadEncMShare } from '../../store/actions/sss';
+import { useDispatch, useSelector } from 'react-redux';
+import CommunicationModeModalContents from '../../components/CommunicationModeModalContents';
+import DeviceInfo from 'react-native-device-info';
+import { getIconByStatus } from './utils';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const TrustedContacts = props => {
-  const [selectedStatus, setSelectedStatus] = useState("error"); // for preserving health of this entity
+  const getTrustContact = props.navigation.state.params.getTrustContact ? props.navigation.state.params.getTrustContact : null;
+  const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
   const [contacts, setContacts] = useState([]);
   const [communicationModeBottomSheet, setCommunicationMode] = useState(
-    React.createRef()
+    React.createRef(),
   );
 
-  const index = props.navigation.getParam("index");
+  const index = props.navigation.getParam('index');
+  const selectedContacts = props.navigation.getParam('contacts');
 
   function selectedContactsList(list) {
     if (list.length > 0) setContacts([...list]);
@@ -44,12 +47,19 @@ const TrustedContacts = props => {
 
   const continueNProceed = async () => {
     if (!SHARES_TRANSFER_DETAILS[index]) dispatch(uploadEncMShare(index));
-    else console.log(SHARES_TRANSFER_DETAILS[index]);
-    // communicationModeBottomSheet.current.snapTo(1);
-    props.navigation.navigate("CommunicationMode", {
-      contact: contacts[0],
-      index
-    });
+    else {
+      Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
+      console.log(SHARES_TRANSFER_DETAILS[index]);
+    }
+    console.log("CONTACTS",contacts, index)
+    if(getTrustContact){
+      getTrustContact(contacts, index)
+    }
+    props.navigation.goBack();
+    // props.navigation.navigate('CommunicationMode', {
+    //   contact: contacts[0],
+    //   index,
+    // });
   };
 
   // function requestHeader() {
@@ -94,7 +104,7 @@ const TrustedContacts = props => {
         </TouchableOpacity>
       </View>
       <View style={BackupStyles.modalHeaderTitleView}>
-        <View style={{ marginTop: hp("1%") }}>
+        <View style={{ marginTop: hp('1%') }}>
           <Text style={BackupStyles.modalHeaderTitleText}>Trusted Contact</Text>
           <Text style={BackupStyles.modalHeaderInfoText}>Never backed up</Text>
         </View>
@@ -110,14 +120,14 @@ const TrustedContacts = props => {
             color: Colors.textColorGrey,
             fontFamily: Fonts.FiraSansRegular,
             fontSize: RFValue(12, 812),
-            marginTop: 5
+            marginTop: 5,
           }}
         >
-          Select contact to{" "}
+          Select contact to{' '}
           <Text
             style={{
               fontFamily: Fonts.FiraSansMediumItalic,
-              fontWeight: "bold"
+              fontWeight: 'bold',
             }}
           >
             send recovery secret
@@ -125,6 +135,7 @@ const TrustedContacts = props => {
         </Text>
         <ContactList
           style={{}}
+          //selectedContact = {}
           onPressContinue={continueNProceed}
           onSelectContact={selectedContactsList}
         />
@@ -145,17 +156,17 @@ const TrustedContacts = props => {
 
 const styles = StyleSheet.create({
   modalHeaderContainer: {
-    paddingTop: 20
+    paddingTop: 20,
   },
   modalHeaderHandle: {
     width: 30,
     height: 5,
     backgroundColor: Colors.borderColor,
     borderRadius: 10,
-    alignSelf: "center",
+    alignSelf: 'center',
     marginTop: 7,
-    marginBottom: 7
-  }
+    marginBottom: 7,
+  },
 });
 
 export default TrustedContacts;

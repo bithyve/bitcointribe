@@ -8,9 +8,11 @@ import {
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
+import Toast from "../components/Toast";
 export default function CopyThisText(props) {
   function writeToClipboard() {
     Clipboard.setString(props.text);
+    Toast("Copied Successfully");
   }
 
   return (

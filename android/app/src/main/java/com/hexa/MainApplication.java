@@ -3,6 +3,9 @@ package com.hexa;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import cl.json.RNSharePackage;
+import cl.json.ShareApplication;
+import org.reactnative.camera.RNCameraPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.tradle.react.UdpSocketsModule;
 import com.peel.react.TcpSocketsModule;
@@ -36,13 +39,16 @@ import expo.modules.filesystem.FileSystemPackage;
 import java.util.Arrays;
 import java.util.List;
 
-import  com.hexa.PdfPasswordPackage;
+import com.hexa.PdfPasswordPackage;
 
-public class MainApplication extends Application implements ReactApplication {
+public class MainApplication extends Application implements ShareApplication, ReactApplication {
   private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(
-    new BasePackageList().getPackageList(),
-    Arrays.<SingletonModule>asList()
-  );
+      new BasePackageList().getPackageList(), Arrays.<SingletonModule>asList());
+
+  @Override
+  public String getFileProviderAuthority() {
+    return BuildConfig.APPLICATION_ID + ".provider";
+  }
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
     @Override
@@ -52,26 +58,12 @@ public class MainApplication extends Application implements ReactApplication {
 
     @Override
     protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
-            new VectorIconsPackage(),
-            new UdpSocketsModule(),
-            new TcpSocketsModule(),
-            new RNOSModule(),
-            new NetInfoPackage(),
-            new SvgPackage(),
-            new RNHTMLtoPDFPackage(),
-            new RNCardViewPackage(),
-            new ReactVideoPackage(),
-            new RNDeviceInfo(),
-            new RandomBytesPackage(),
-            new AsyncStoragePackage(),
-          new ReanimatedPackage(),
-          new RNGestureHandlerPackage(),
-          new RNScreensPackage(),
-          new PdfPasswordPackage(),
-          new ModuleRegistryAdapter(mModuleRegistryProvider)
-      );
+      return Arrays.<ReactPackage>asList(new MainReactPackage(), new RNSharePackage(), new RNCameraPackage(),
+          new VectorIconsPackage(), new UdpSocketsModule(), new TcpSocketsModule(), new RNOSModule(),
+          new NetInfoPackage(), new SvgPackage(), new RNHTMLtoPDFPackage(), new RNCardViewPackage(),
+          new ReactVideoPackage(), new RNDeviceInfo(), new RandomBytesPackage(), new AsyncStoragePackage(),
+          new ReanimatedPackage(), new RNGestureHandlerPackage(), new RNScreensPackage(), new PdfPasswordPackage(),
+          new ModuleRegistryAdapter(mModuleRegistryProvider));
     }
 
     @Override

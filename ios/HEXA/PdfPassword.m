@@ -16,7 +16,7 @@ RCT_EXPORT_MODULE();
 //  return documentsDirectory;
 //}
 
-RCT_EXPORT_METHOD(addEvent:(NSString *)pdfData
+RCT_EXPORT_METHOD(createPdf:(NSString *)pdfData
                   get:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {

@@ -14,6 +14,7 @@ import { text, email } from "react-native-communications";
 
 async function requestContactsPermission() {
   try {
+    global.isContactOpen = true;
     await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
       {

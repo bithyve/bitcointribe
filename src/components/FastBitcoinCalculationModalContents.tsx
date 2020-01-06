@@ -15,6 +15,7 @@ import {
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import Colors from "../common/Colors";
+import QuestionList from '../common/QuestionList';
 import Fonts from "../common/Fonts";
 import CommonStyles from "../common/Styles";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -33,15 +34,7 @@ export default function FastBitcoinCalculationModalContents(props) {
   });
   const [VoucherCodeRef, setVoucherCodeRef] = useState(React.createRef());
   const [BitcoinAddressRef, setBitcoinAddressRef] = useState(React.createRef());
-  const [dropdownBoxList, setDropdownBoxList] = useState([
-    { id: "1", question: "Name of your first pet?" },
-    { id: "2", question: "Name of your favourite food?" },
-    { id: "3", question: "Name of your first company?" },
-    { id: "4", question: "Name of your first employee?" },
-    { id: "5", question: "Name of your first pet?" },
-    { id: "6", question: "Name of your favourite teacher?" },
-    { id: "7", question: "Name of your favourite teacher?" }
-  ]);
+  const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
   const [VoucherCode, setVoucherCode] = useState("");
   const [BitcoinAddress, setBitcoinAddress] = useState("");
 

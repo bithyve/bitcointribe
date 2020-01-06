@@ -14,4 +14,4 @@
 @property (strong,nonatomic) NSString *secondaryMnemonic;
 @property (strong,nonatomic) NSString *bhXpub;
 - (void) generatePdf;
-@end  
+@end     

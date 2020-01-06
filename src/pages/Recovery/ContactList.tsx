@@ -25,6 +25,7 @@ import AsyncStorage from "@react-native-community/async-storage";
 
 async function requestContactsPermission() {
   try {
+    global.isContactOpen = true;
     await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
       {

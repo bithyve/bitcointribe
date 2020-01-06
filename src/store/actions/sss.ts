@@ -1,20 +1,21 @@
 // types and action creators: dispatched by components and sagas
 
-export const INIT_HEALTH_CHECK = "INIT_HEALTH_CHECK";
-export const PREPARE_MSHARES = "PREPARE_MSHARES";
-export const UPLOAD_ENC_MSHARE = "UPLOAD_ENC_MSHARES";
-export const UPLOAD_REQUESTED_SHARE = "UPLOAD_REQUESTED_SHARE";
-export const DOWNLOAD_MSHARE = "DOWNLOAD_MSHARE";
-export const GENERATE_PDF = "GENERATE_PDF";
-export const UPDATE_MSHARES_HEALTH = "UPDATE_MSHARES_HEALTH";
-export const CHECK_MSHARES_HEALTH = "CHECK_MSHARES_HEALTH";
-export const REQUEST_SHARE = "REQUEST_SHARE";
-export const UPDATE_DYNAMINC_NONPMDD = "UPDATE_DYNAMINC_NONPMDD";
-export const DOWNLOAD_DYNAMIC_NONPMDD = "DOWNLOAD_DYNAMIC_NONPMDD";
-export const RESTORE_DYNAMIC_NONPMDD = "RESTORE_DYNAMIC_NONPMDD";
-export const RECOVER_MNEMONIC = "RECOVER_MNEMONIC";
-export const RECOVER_WALLET = "RECOVER_WALLET";
-export const RESET_REQUESTED_SHARE_UPLOADS = "RESET_REQUESTED_SHARE_UPLOADS";
+export const INIT_HEALTH_CHECK = 'INIT_HEALTH_CHECK';
+export const PREPARE_MSHARES = 'PREPARE_MSHARES';
+export const UPLOAD_ENC_MSHARE = 'UPLOAD_ENC_MSHARES';
+export const UPLOAD_REQUESTED_SHARE = 'UPLOAD_REQUESTED_SHARE';
+export const DOWNLOAD_MSHARE = 'DOWNLOAD_MSHARE';
+export const GENERATE_PDF = 'GENERATE_PDF';
+export const UPDATE_MSHARES_HEALTH = 'UPDATE_MSHARES_HEALTH';
+export const CHECK_MSHARES_HEALTH = 'CHECK_MSHARES_HEALTH';
+export const REQUEST_SHARE = 'REQUEST_SHARE';
+export const UPDATE_DYNAMINC_NONPMDD = 'UPDATE_DYNAMINC_NONPMDD';
+export const DOWNLOAD_DYNAMIC_NONPMDD = 'DOWNLOAD_DYNAMIC_NONPMDD';
+export const RESTORE_DYNAMIC_NONPMDD = 'RESTORE_DYNAMIC_NONPMDD';
+export const RECOVER_MNEMONIC = 'RECOVER_MNEMONIC';
+export const RECOVER_WALLET = 'RECOVER_WALLET';
+export const RESET_REQUESTED_SHARE_UPLOADS = 'RESET_REQUESTED_SHARE_UPLOADS';
+export const OVERALL_HEALTH = 'OVERALL_HEALTH';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -35,14 +36,16 @@ export const uploadRequestedShare = (tag, encryptedKey, otp) => {
 export const downloadMShare = (otp, encryptedKey, downloadType?) => {
   return {
     type: DOWNLOAD_MSHARE,
-    payload: { otp, encryptedKey, downloadType }
+    payload: { otp, encryptedKey, downloadType },
   };
 };
 
 export const generatePDF = shareIndex => {
+  console.log({ ...shareIndex });
+
   return {
     type: GENERATE_PDF,
-    payload: { shareIndex }
+    payload: { ...shareIndex },
   };
 };
 
@@ -52,6 +55,10 @@ export const updateMSharesHealth = () => {
 
 export const checkMSharesHealth = () => {
   return { type: CHECK_MSHARES_HEALTH };
+};
+
+export const calculateOverallHealth = (s3Service?) => {
+  return { type: OVERALL_HEALTH, payload: { s3Service } };
 };
 
 export const requestShare = shareIndex => {
@@ -83,11 +90,12 @@ export const resetRequestedShareUpload = () => {
 };
 
 // types and action creators (saga): dispatched by saga workers
-export const HEALTH_CHECK_INITIALIZED = "HEALTH_CHECK_INITIALIZED";
-export const REQUESTED_SHARE_UPLOADED = "REQUESTED_SHARE_UPLOADED";
-export const MNEMONIC_RECOVERED = "MNEMONIC_RECOVERED";
-export const S3_LOADING = "S3_LOADING";
-export const DOWNLOADED_MSHARE = "DOWNLOADED_MSHARE";
+export const HEALTH_CHECK_INITIALIZED = 'HEALTH_CHECK_INITIALIZED';
+export const REQUESTED_SHARE_UPLOADED = 'REQUESTED_SHARE_UPLOADED';
+export const MNEMONIC_RECOVERED = 'MNEMONIC_RECOVERED';
+export const S3_LOADING = 'S3_LOADING';
+export const DOWNLOADED_MSHARE = 'DOWNLOADED_MSHARE';
+export const OVERALL_HEALTH_CALCULATED = 'OVERALL_HEALTH_CALCULATED';
 
 export const healthCheckInitialized = () => {
   return { type: HEALTH_CHECK_INITIALIZED };
@@ -107,4 +115,8 @@ export const switchS3Loader = beingLoaded => {
 
 export const downloadedMShare = (otp, status, err?) => {
   return { type: DOWNLOADED_MSHARE, payload: { otp, status, err } };
+};
+
+export const overallHealthCalculated = overallHealth => {
+  return { type: OVERALL_HEALTH_CALCULATED, payload: { overallHealth } };
 };

@@ -56,8 +56,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
             Font.BOLD);
     private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12,
             Font.BOLD);
-    static String user = "123456";
-    static String owner = "12345";
+
 
     public PdfPassword(ReactApplicationContext reactContext) {
         super(reactContext); // required by React Native
@@ -70,12 +69,12 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         return "PdfPassword";
     }
 
-    @ReactMethod
-    public void setPdfPasswrod(String pdfData, Callback errorCallback, Callback successCallback) {
+    @ReactMethod   
+    public void createPdf(String pdfData, Callback errorCallback, Callback successCallback) {
         try {
             JSONObject jsonObj = new JSONObject(pdfData);
             Document document = new Document(PageSize.A4);
-            String outPath = Environment.getExternalStorageDirectory() +"/"+jsonObj.getString("fileName");
+            String outPath = Environment.getExternalStorageDirectory() +"/Document/"+jsonObj.getString("fileName");
             //Create PDFWriter instance.
             PdfWriter pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(outPath));
             //Add password protection.
@@ -248,32 +247,18 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         codeQrImage.scaleAbsolute(250, 250);
         document.add(codeQrImage);
         preface = new Paragraph();
+        preface.add(new Paragraph(jsonObj.getString("secondaryXpub"),
+                smallBold));
+        document.add(preface);
+
+        preface = new Paragraph();
         preface.add(new Paragraph(
                 "Scan the above QR Code using your HEXA " +
                         "wallet in order to restore your Secure Account.",
                 smallBold));
         document.add(preface);
-        preface = new Paragraph();
-        preface.add(new Paragraph(
-                "2FA Secret:",
-                catFont));
-        document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(jsonObj.getString("twoFAQR"), 250, 250, null);
-        codeQrImage = barcodeQRCode.getImage();
-        codeQrImage.scaleAbsolute(250, 250);
-        document.add(codeQrImage);
-        preface = new Paragraph();
-        preface.add(new Paragraph(
-                jsonObj.getString("twoFASecret"),
-                smallBold));
-        document.add(preface);
-        preface = new Paragraph();
-        preface.add(new Paragraph(
-                "Following assets can be used to recover your funds using " +
-                        "the open - sourced ga - recovery tool.",
-                smallBold));
-        document.add(preface);
-        document.newPage();
+
+
         // Secondary Mnemonic and BitHyve Xpub
         preface = new Paragraph();
         preface.add(new Paragraph(
@@ -295,6 +280,33 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 jsonObj.getString("bhXpub"),
                 smallBold));
         document.add(preface);
+
+
+        document.newPage();
+        preface = new Paragraph();
+        preface.add(new Paragraph(
+                "2FA Secret:",
+                catFont));
+        document.add(preface);
+        barcodeQRCode = new BarcodeQRCode(jsonObj.getString("twoFAQR"), 250, 250, null);
+        codeQrImage = barcodeQRCode.getImage();
+        codeQrImage.scaleAbsolute(250, 250);
+        document.add(codeQrImage);
+        preface = new Paragraph();
+        preface.add(new Paragraph(
+                jsonObj.getString("twoFASecret"),
+                smallBold));
+        document.add(preface);
+        preface = new Paragraph();
+        preface.add(new Paragraph(
+                "Following assets can be used to recover your funds using " +
+                        "the open - sourced ga - recovery tool.",
+                smallBold));
+        document.add(preface);
+
+
+
+
     }
 
     private static void addEmptyLine(Paragraph paragraph, int number) {
