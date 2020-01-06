@@ -3,7 +3,6 @@ import Share from 'react-native-share';
 import RNPrint from 'react-native-print';
 import { Platform, NativeModules } from 'react-native';
 
-
 import { createWatcher } from '../utils/utilities';
 import { SHARE_PDF, DBUPDATE_PDF_SEND, dbUpdatePdfSharing } from '../actions/manageBackup';
 import { dbUpdateSSS } from "../actions/storage"
@@ -86,6 +85,7 @@ function* sharePdfWorker( { payload } ) {
     console.log( { error } );
   }
 }
+
 export const sharePdfWatcher = createWatcher( sharePdfWorker, SHARE_PDF );
 
 function* dbUPdatePdfSharingWorker( { payload } ) {
