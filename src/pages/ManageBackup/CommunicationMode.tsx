@@ -25,6 +25,7 @@ import { textWithoutEncoding, email } from 'react-native-communications';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch } from 'react-redux';
 import { uploadEncMShare } from '../../store/actions/sss';
+import ShareOtpWithTrustedContactContents from '../../components/ShareOtpWithTrustedContactContents';
 
 export default function CommunicationMode(props) {
   const secretSharedTrustedContact1 = props.navigation.state.params
@@ -43,7 +44,7 @@ export default function CommunicationMode(props) {
   useEffect(() => {
     if (!SHARES_TRANSFER_DETAILS[index]) dispatch(uploadEncMShare(index));
     else {
-      Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
+      //  Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
       console.log(SHARES_TRANSFER_DETAILS[index]);
     }
   }, []);
@@ -231,6 +232,12 @@ export default function CommunicationMode(props) {
               <Text style={styles.proceedButtonText}>Proceed</Text>
             )}
           </TouchableOpacity>
+        ) : null}
+        {SHARES_TRANSFER_DETAILS[index] ? (
+          <ShareOtpWithTrustedContactContents
+            onPressBack={() => {}}
+            OTP={SHARES_TRANSFER_DETAILS[index].OTP}
+          />
         ) : null}
       </View>
     </SafeAreaView>
