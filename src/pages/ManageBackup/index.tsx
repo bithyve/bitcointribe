@@ -623,10 +623,11 @@ export default function ManageBackup(props) {
     );
   };
 
-  const getTrustContact = (contacts, index) => {
-    // console.log('Contacts', contacts);
+  const getTrustContact = async (contacts, index) => {
     setContacts(contacts);
     setContactIndex(index);
+    const contactList = await AsyncStorage.getItem("SelectedContacts");
+    console.log('contactList', contactList);
   };
 
   useEffect(() => {

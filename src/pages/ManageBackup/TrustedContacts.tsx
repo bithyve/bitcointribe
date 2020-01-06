@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   Image,
-  Platform,
+  AsyncStorage,
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
@@ -48,11 +48,29 @@ const TrustedContacts = props => {
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
 
   const continueNProceed = async () => {
-    console.log('CONTACTS', contacts, index);
+    if (!SHARES_TRANSFER_DETAILS[index]) dispatch(uploadEncMShare(index));
+    else {
+      Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
+      console.log(SHARES_TRANSFER_DETAILS[index]);
+    }
     if (getTrustContact) {
-      getTrustContact(contacts, index);
+      getTrustContact(contacts, index)
     }
     props.navigation.goBack();
+    let contactListArray = [];
+    let contactList = JSON.parse(await AsyncStorage.getItem("SelectedContacts"));
+    if(contactList){
+      contactListArray = contactList;
+      for (let i = 0; i < contacts.length; i++) {
+        contactListArray.push(contacts[i]);
+      }
+    }
+    else{
+      for (let i = 0; i < contacts.length; i++) {
+        contactListArray.push(contacts[i]);
+      }
+    }   
+    await AsyncStorage.setItem('SelectedContacts', JSON.stringify(contactListArray));
     // props.navigation.navigate('CommunicationMode', {
     //   contact: contacts[0],
     //   index,
