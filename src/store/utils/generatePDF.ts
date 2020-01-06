@@ -84,7 +84,7 @@ export default async (pdfData, fileName, title, password) => {
     bhXpub,
   };
   let pdfPath = await getPdfPath(pdfDatas);
-  //console.log({ pdfPath });
+  // console.log({ pdfPath });
   return pdfPath;
 };
 const getPdfPath = async (pdfData: any) => {
@@ -102,10 +102,10 @@ const getPdfPath = async (pdfData: any) => {
         return await err;
       },
       async (path: any) => {
-        //console.log({ path });
-        return (await 'file://') + path;
+        // console.log({ path });
+        return await path;
       },
     );
-    return 'file:///storage/emulated/0/' + pdfData.fileName;
+    return '/storage/emulated/0/' + pdfData.fileName;
   }
 };
