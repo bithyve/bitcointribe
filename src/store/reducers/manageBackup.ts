@@ -4,8 +4,8 @@ const initialState = {
   shareDetails: {},
 };
 
-export default (state = initialState, action) => {
-  switch (action.type) {
+export default ( state = initialState, action ) => {
+  switch ( action.type ) {
     case FETCH_PDF_SHARE_DETAILS:
       const shareDetials = {
         ...state,

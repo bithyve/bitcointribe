@@ -1,8 +1,9 @@
 package com.hexa;
 
 import android.app.Application;
-
+  
 import com.facebook.react.ReactApplication;
+import com.christopherdro.RNPrint.RNPrintPackage;
 import cl.json.RNSharePackage;
 import cl.json.ShareApplication;
 import org.reactnative.camera.RNCameraPackage;
@@ -38,6 +39,8 @@ import expo.modules.filesystem.FileSystemPackage;
 
 import java.util.Arrays;
 import java.util.List;
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 
 import com.hexa.PdfPasswordPackage;
 
@@ -58,7 +61,8 @@ public class MainApplication extends Application implements ShareApplication, Re
 
     @Override
     protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(new MainReactPackage(), new RNSharePackage(), new RNCameraPackage(),
+      return Arrays.<ReactPackage>asList(new MainReactPackage(),
+            new RNPrintPackage(), new RNSharePackage(), new RNCameraPackage(),
           new VectorIconsPackage(), new UdpSocketsModule(), new TcpSocketsModule(), new RNOSModule(),
           new NetInfoPackage(), new SvgPackage(), new RNHTMLtoPDFPackage(), new RNCardViewPackage(),
           new ReactVideoPackage(), new RNDeviceInfo(), new RandomBytesPackage(), new AsyncStoragePackage(),
@@ -80,6 +84,7 @@ public class MainApplication extends Application implements ShareApplication, Re
   @Override
   public void onCreate() {
     super.onCreate();
+    Fabric.with(this, new Crashlytics());
     SoLoader.init(this, /* native exopackage */ false);
   }
 }

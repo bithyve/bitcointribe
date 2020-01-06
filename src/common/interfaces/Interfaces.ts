@@ -39,6 +39,10 @@ export interface Database {
   };
 }
 
+export interface DatabaseManageBackup {
+  PDFDETAILS: {};
+}
+
 export interface Services {
   REGULAR_ACCOUNT?: RegularAccount;
   TEST_ACCOUNT?: TestAccount;
