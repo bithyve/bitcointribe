@@ -10,7 +10,7 @@ import {
   Image,
   FlatList,
   Platform,
-  AsyncStorage
+  AsyncStorage,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
@@ -65,7 +65,10 @@ export default function ManageBackup(props) {
   const [trustedContactsBottomSheet, setTrustedContactsBottomSheet] = useState(
     React.createRef(),
   );
-  const [RegenerateShareHelperBottomSheet, setRegenerateShareHelperBottomSheet] = useState(React.createRef());
+  const [
+    RegenerateShareHelperBottomSheet,
+    setRegenerateShareHelperBottomSheet,
+  ] = useState(React.createRef());
   const [cloudBottomSheet, setCloudBottomSheet] = useState(React.createRef());
   const [selectedType, setSelectedType] = useState('');
   const [contactIndex, setContactIndex] = useState();
@@ -153,7 +156,6 @@ export default function ManageBackup(props) {
       route: 'HealthCheckSecurityAnswer',
     },
   ]);
-
 
   // function selectedContactsList(list) {
   //   setContacts(list);
@@ -463,20 +465,37 @@ export default function ManageBackup(props) {
   const s3Service: S3Service = useSelector(state => state.sss.service);
   useEffect(() => {
     dispatch(fetchSSSFromDB());
-    checkNShowHelperModal()
+    checkNShowHelperModal();
 
     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
   }, []);
 
   const checkNShowHelperModal = async () => {
-    let isManageBackupHelperDone = await AsyncStorage.getItem("isManageBackupHelperDone");
+    let isManageBackupHelperDone = await AsyncStorage.getItem(
+      'isManageBackupHelperDone',
+    );
     if (!isManageBackupHelperDone) {
-      AsyncStorage.setItem("isManageBackupHelperDone", 'true');
+      AsyncStorage.setItem('isManageBackupHelperDone', 'true');
       WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
     }
-  }
+  };
 
-  const { overallHealth } = useSelector(state => state.sss);
+  const [overallHealth, setOverallHealth] = useState();
+  const health = useSelector(state => state.sss.overallHealth);
+  useEffect(() => {
+    if (health) setOverallHealth(health);
+  }, [health]);
+
+  useEffect(() => {
+    (async () => {
+      if (!overallHealth) {
+        const storedHealth = await AsyncStorage.getItem('overallHealth');
+        if (storedHealth) {
+          setOverallHealth(JSON.parse(storedHealth));
+        }
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     if (overallHealth) {
@@ -545,16 +564,16 @@ export default function ManageBackup(props) {
   const renderBuyHelperContents = () => {
     return (
       <RegenerateHealper
-        topButtonText={"Regenerate Shares"}
-        continueButtonText={"Continue"}
-        quitButtonText={"Quit"}
+        topButtonText={'Regenerate Shares'}
+        continueButtonText={'Continue'}
+        quitButtonText={'Quit'}
         onPressRegenerateShare={() => {
           (RegenerateShareHelperBottomSheet as any).current.snapTo(0);
-          props.navigation.navigate("NewWalletNameRegenerateShare");
+          props.navigation.navigate('NewWalletNameRegenerateShare');
         }}
         onPressContinue={() => {
           (RegenerateShareHelperBottomSheet as any).current.snapTo(0);
-          props.navigation.navigate("NewWalletNameRegenerateShare");
+          props.navigation.navigate('NewWalletNameRegenerateShare');
         }}
         onPressQuit={() => {
           (RegenerateShareHelperBottomSheet as any).current.snapTo(0);
@@ -573,45 +592,64 @@ export default function ManageBackup(props) {
   };
 
   const getTrustContact = (contacts, index) => {
-    console.log("Contacts", contacts);
+    console.log('Contacts', contacts);
     if (!contacts) return;
     setContacts(contacts);
-    setContactIndex(index)
-  }
+    setContactIndex(index);
+  };
 
   useEffect(() => {
     if (contacts) {
       const updatedPageData = [...pageData];
-      console.log("updatedPageData", updatedPageData);
+      console.log('updatedPageData', updatedPageData);
       for (let i = 0; i < updatedPageData.length; i++) {
         if (contactIndex == 1 && contacts.length == 2) {
-          { updatedPageData[i].title == "Trusted Contact 1" ? updatedPageData[i].name = contacts[0].name : updatedPageData[i].title == "Trusted Contact 2" ? updatedPageData[i].name = contacts[1].name : updatedPageData[i].name = '' }
+          {
+            updatedPageData[i].title == 'Trusted Contact 1'
+              ? (updatedPageData[i].name = contacts[0].name)
+              : updatedPageData[i].title == 'Trusted Contact 2'
+              ? (updatedPageData[i].name = contacts[1].name)
+              : (updatedPageData[i].name = '');
+          }
         }
         if (contactIndex == 1 && contacts.length == 1) {
-          { updatedPageData[i].title == "Trusted Contact 1" ? updatedPageData[i].name = contacts[0].name : updatedPageData[i].name = '' }
+          {
+            updatedPageData[i].title == 'Trusted Contact 1'
+              ? (updatedPageData[i].name = contacts[0].name)
+              : (updatedPageData[i].name = '');
+          }
         }
 
         if (contactIndex == 2 && contacts.length == 2) {
-          { updatedPageData[i].title == "Trusted Contact 1" ? updatedPageData[i].name = contacts[0].name : updatedPageData[i].title == "Trusted Contact 2" ? updatedPageData[i].name = contacts[1].name : updatedPageData[i].name = '' }
+          {
+            updatedPageData[i].title == 'Trusted Contact 1'
+              ? (updatedPageData[i].name = contacts[0].name)
+              : updatedPageData[i].title == 'Trusted Contact 2'
+              ? (updatedPageData[i].name = contacts[1].name)
+              : (updatedPageData[i].name = '');
+          }
         }
         if (contactIndex == 2 && contacts.length == 1) {
-          { updatedPageData[i].title == "Trusted Contact 2" ? updatedPageData[i].name = contacts[0].name : updatedPageData[i].name = '' }
+          {
+            updatedPageData[i].title == 'Trusted Contact 2'
+              ? (updatedPageData[i].name = contacts[0].name)
+              : (updatedPageData[i].name = '');
+          }
         }
-
       }
       setPageData(updatedPageData);
     }
   }, [contacts]);
 
   const secretSharedTrustedContact1 = isSecretShared1 => {
-    console.log("IsSecretShared1", isSecretShared1);
+    console.log('IsSecretShared1', isSecretShared1);
     setIsSecretShared1(isSecretShared1);
-  }
+  };
 
   const secretSharedTrustedContact2 = isSecretShared2 => {
-    console.log("IsSecretShared2", isSecretShared2);
+    console.log('IsSecretShared2', isSecretShared2);
     setIsSecretShared2(isSecretShared2);
-  }
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -638,13 +676,18 @@ export default function ManageBackup(props) {
               marginLeft: 'auto',
               marginRight: 10,
             }}
-            onPress={() => { RegenerateShareHelperBottomSheet.current.snapTo(1) }}
+            onPress={() => {
+              RegenerateShareHelperBottomSheet.current.snapTo(1);
+            }}
           >
-            <Image source={require("../../assets/images/icons/icon_settings1.png")} style={{
-              width: wp("5%"),
-              height: wp("5%"),
-              resizeMode: "contain",
-            }} />
+            <Image
+              source={require('../../assets/images/icons/icon_settings1.png')}
+              style={{
+                width: wp('5%'),
+                height: wp('5%'),
+                resizeMode: 'contain',
+              }}
+            />
           </TouchableOpacity>
         </View>
         <ScrollView>
@@ -681,12 +724,12 @@ export default function ManageBackup(props) {
                   shieldStatus={overallHealth.overallStatus}
                 />
               ) : (
-                  <HomePageShield
-                    circleShadowColor={Colors.borderColor}
-                    shieldImage={require('../../assets/images/icons/protector_gray.png')}
-                    shieldStatus={0}
-                  />
-                )}
+                <HomePageShield
+                  circleShadowColor={Colors.borderColor}
+                  shieldImage={require('../../assets/images/icons/protector_gray.png')}
+                  shieldStatus={0}
+                />
+              )}
             </View>
           </View>
           <FlatList
@@ -706,25 +749,47 @@ export default function ManageBackup(props) {
                     if (contacts.length != 2) {
                       props.navigation.navigate(item.route, {
                         index:
-                          item.title === 'Trusted Contact 1' ? 1
-                            : item.title === 'Trusted Contact 2' ? 2 : undefined,
+                          item.title === 'Trusted Contact 1'
+                            ? 1
+                            : item.title === 'Trusted Contact 2'
+                            ? 2
+                            : undefined,
                         getTrustContact: getTrustContact,
-                        contacts: contacts ? contacts : []
+                        contacts: contacts ? contacts : [],
                       });
-                    } else{
-                      console.log("IsSecretShared", isSecretShared1, isSecretShared2);
-                      if(isSecretShared1 || isSecretShared2){
+                    } else {
+                      console.log(
+                        'IsSecretShared',
+                        isSecretShared1,
+                        isSecretShared2,
+                      );
+                      if (isSecretShared1 || isSecretShared2) {
                         props.navigation.navigate('TrustedContactHealthCheck');
                       } else {
-                      props.navigation.navigate('CommunicationMode', {
-                          contact: item.title === 'Trusted Contact 1' ? contacts[0]
-                          : item.title === 'Trusted Contact 2' ? contacts[1] : undefined,
-                          index: item.title === 'Trusted Contact 1' ? 1
-                            : item.title === 'Trusted Contact 2' ? 2 : undefined,
-                            secretSharedTrustedContact1 : item.title === 'Trusted Contact 1' ? secretSharedTrustedContact1 : null, secretSharedTrustedContact2 :item.title === 'Trusted Contact 2' ? secretSharedTrustedContact2 : null,
+                        props.navigation.navigate('CommunicationMode', {
+                          contact:
+                            item.title === 'Trusted Contact 1'
+                              ? contacts[0]
+                              : item.title === 'Trusted Contact 2'
+                              ? contacts[1]
+                              : undefined,
+                          index:
+                            item.title === 'Trusted Contact 1'
+                              ? 1
+                              : item.title === 'Trusted Contact 2'
+                              ? 2
+                              : undefined,
+                          secretSharedTrustedContact1:
+                            item.title === 'Trusted Contact 1'
+                              ? secretSharedTrustedContact1
+                              : null,
+                          secretSharedTrustedContact2:
+                            item.title === 'Trusted Contact 2'
+                              ? secretSharedTrustedContact2
+                              : null,
                         });
+                      }
                     }
-                  }
                   }}
                   style={{
                     ...styles.manageBackupCard,
@@ -732,10 +797,10 @@ export default function ManageBackup(props) {
                       item.status == 'error'
                         ? Colors.red
                         : item.status == 'warning'
-                          ? Colors.yellow
-                          : item.status == 'success'
-                            ? Colors.green
-                            : Colors.blue,
+                        ? Colors.yellow
+                        : item.status == 'success'
+                        ? Colors.green
+                        : Colors.blue,
                     elevation:
                       selectedType && item.type == selectedType ? 10 : 0,
                     shadowColor:
@@ -757,7 +822,9 @@ export default function ManageBackup(props) {
                     source={getImageByType(item.type)}
                   />
                   <View style={{ marginLeft: 15 }}>
-                    <Text style={styles.cardTitleText}>{item.name ? item.name : item.title}</Text>
+                    <Text style={styles.cardTitleText}>
+                      {item.name ? item.name : item.title}
+                    </Text>
                     <Text style={styles.cardTimeText}>
                       Last backup{' '}
                       <Text
@@ -819,10 +886,7 @@ export default function ManageBackup(props) {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={RegenerateShareHelperBottomSheet}
-          snapPoints={[
-            -50,
-            hp('95%')
-          ]}
+          snapPoints={[-50, hp('95%')]}
           renderContent={renderBuyHelperContents}
           renderHeader={renderBuyHelperHeader}
         />
