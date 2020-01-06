@@ -27,7 +27,9 @@ import { getIconByStatus } from './utils';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const TrustedContacts = props => {
-  const getTrustContact = props.navigation.state.params.getTrustContact ? props.navigation.state.params.getTrustContact : null;
+  const getTrustContact = props.navigation.state.params.getTrustContact
+    ? props.navigation.state.params.getTrustContact
+    : null;
   const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
   const [contacts, setContacts] = useState([]);
   const [communicationModeBottomSheet, setCommunicationMode] = useState(
@@ -46,14 +48,9 @@ const TrustedContacts = props => {
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
 
   const continueNProceed = async () => {
-    if (!SHARES_TRANSFER_DETAILS[index]) dispatch(uploadEncMShare(index));
-    else {
-      Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
-      console.log(SHARES_TRANSFER_DETAILS[index]);
-    }
-    console.log("CONTACTS",contacts, index)
-    if(getTrustContact){
-      getTrustContact(contacts, index)
+    console.log('CONTACTS', contacts, index);
+    if (getTrustContact) {
+      getTrustContact(contacts, index);
     }
     props.navigation.goBack();
     // props.navigation.navigate('CommunicationMode', {
