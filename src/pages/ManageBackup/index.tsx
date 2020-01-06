@@ -496,12 +496,7 @@ export default function ManageBackup(props) {
       }
     })();
   }, []);
-
-  useEffect(() => {
-    dispatch(fetchSSSFromDB());
-    WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
-    if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
-  }, []);
+  
   //const { overallHealth } = useSelector( state => state.sss );
   useEffect(() => {
     if (overallHealth) {
