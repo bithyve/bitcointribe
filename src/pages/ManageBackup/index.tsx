@@ -501,7 +501,7 @@ export default function ManageBackup( props ) {
     WalletBackupAndRecoveryBottomSheet.current.snapTo( 1 );
     if ( !s3Service.sss.healthCheckInitialized ) dispatch( initHealthCheck() );
   }, [] );
-  const { overallHealth } = useSelector( state => state.sss );
+  //const { overallHealth } = useSelector( state => state.sss );
   useEffect( () => {
     if ( overallHealth ) {
       const updatedPageData = [ ...pageData ];
