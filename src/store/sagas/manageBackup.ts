@@ -33,6 +33,8 @@ function* sharePdfWorker( { payload } ) {
       let res = yield Share.open( shareOptions ).then( async ( res: any ) => {
         return await res;
       } );
+      console.log( { res } );
+
       yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: socialMediaType( res.app.split( "/", 1 )[ 0 ] ), date: Math.floor( Date.now() / 1000 ) } } ) );
     } else if ( payload.type == 'copy2' ) {
       let shareOptions = {

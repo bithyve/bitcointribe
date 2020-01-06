@@ -39,21 +39,6 @@ import { fetchSSSFromDB } from '../../store/actions/storage';
 import { requestSharePdf } from '../../store/actions/manageBackup';
 import RegenerateHealper from '../../components/Helper/RegenerateHealper';
 
-function getImageByType(type) {
-  if (type == 'secondaryDevice') {
-    return require('../../assets/images/icons/icon_secondarydevice.png');
-  } else if (type == 'contact') {
-    return require('../../assets/images/icons/icon_user.png');
-  } else if (type == 'copy1' || type == 'copy2') {
-    return require('../../assets/images/icons/icon_cloud.png');
-  }
-  if (type == 'print') {
-    return require('../../assets/images/icons/print.png');
-  } else if (type == 'security') {
-    return require('../../assets/images/icons/icon_securityquestion.png');
-  }
-}
-
 export default function ManageBackup(props) {
   const [
     WalletBackupAndRecoveryBottomSheet,
@@ -101,7 +86,7 @@ export default function ManageBackup(props) {
   const [pageData, setPageData] = useState([
     {
       title: 'Secondary Device',
-      contactInfo: null,
+      personalInfo: null,
       time: '3 months ago',
       status: 'error',
       type: 'secondaryDevice',
@@ -109,7 +94,7 @@ export default function ManageBackup(props) {
     },
     {
       title: 'Trusted Contact 1',
-      contactInfo: null,
+      personalInfo: null,
       time: '1 month ago',
       status: 'error',
       type: 'contact',
@@ -117,7 +102,7 @@ export default function ManageBackup(props) {
     },
     {
       title: 'Trusted Contact 2',
-      contactInfo: null,
+      personalInfo: null,
       time: '12 days ago',
       status: 'error',
       type: 'contact',
@@ -125,7 +110,7 @@ export default function ManageBackup(props) {
     },
     {
       title: 'Personal Copy 1',
-      contactInfo: null,
+      personalInfo: null,
       time: '2 days ago',
       status: 'error',
       type: 'copy1',
@@ -133,7 +118,7 @@ export default function ManageBackup(props) {
     },
     {
       title: 'Personal Copy 2',
-      contactInfo: null,
+      personalInfo: null,
       time: '2 days ago',
       status: 'error',
       type: 'copy2',
@@ -141,7 +126,7 @@ export default function ManageBackup(props) {
     },
     // {
     //   title: 'Print',
-    // contactInfo: null,
+    // personalInfo: null,
     //   time: '3 days ago',
     //   status: 'error',
     //   type: 'print',
@@ -149,13 +134,41 @@ export default function ManageBackup(props) {
     // },
     {
       title: 'Security Questions',
-      contactInfo: null,
+      personalInfo: null,
       time: '1 day ago',
       status: 'error',
       type: 'security',
       route: 'HealthCheckSecurityAnswer',
     },
   ]);
+
+  function getImageByType(item) {
+    let type = item.type;
+    if (type == 'secondaryDevice') {
+      return require('../../assets/images/icons/icon_secondarydevice.png');
+    } else if (type == 'contact') {
+      return require('../../assets/images/icons/icon_user.png');
+    } else if (type == 'copy1' || type == 'copy2') {
+      if (item.personalInfo && item.personalInfo.flagShare && item.personalInfo.shareDetails.type == "GoogleDrive") {
+        return require('../../assets/images/icons/icon_cloud.png');
+      }
+      else if (item.personalInfo && item.personalInfo.flagShare && item.personalInfo.shareDetails.type == "EmailShare") {
+        return require('../../assets/images/icons/gmail.png');
+      }
+      else if (item.personalInfo && item.personalInfo.flagShare && (item.personalInfo.shareDetails.type == "PrintShare" || item.personalInfo.shareDetails.type == "other")) {
+        return require('../../assets/images/icons/print.png');
+      }
+      else {
+        return require('../../assets/images/icons/note.png');
+      }
+      // return require('../../assets/images/icons/icon_cloud.png');
+    }
+    if (type == 'print') {
+      return require('../../assets/images/icons/print.png');
+    } else if (type == 'security') {
+      return require('../../assets/images/icons/icon_securityquestion.png');
+    }
+  }
 
   // function selectedContactsList(list) {
   //   setContacts(list);
@@ -463,12 +476,30 @@ export default function ManageBackup(props) {
 
   const dispatch = useDispatch();
   const s3Service: S3Service = useSelector(state => state.sss.service);
+  const { databaseSSS } = useSelector(state => state.storage);
+  // const {}    
   useEffect(() => {
     dispatch(fetchSSSFromDB());
     checkNShowHelperModal();
-
     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
   }, []);
+
+
+  useEffect(() => {
+    // console.log("databaseSSS", databaseSSS);
+    // console.log("pageData, pageData", pageData)
+    if (databaseSSS.pdfDetails) {
+      pageData[3].personalInfo = databaseSSS.pdfDetails.copy1;
+      pageData[4].personalInfo = databaseSSS.pdfDetails.copy2;
+      if(databaseSSS.pdfDetails.copy1.flagShare){
+        pageData[3].status = "success";
+      }
+      if(databaseSSS.pdfDetails.copy2.flagShare){
+        pageData[4].status = "success";
+      }
+      setPageData(pageData);
+    }
+  }, [databaseSSS])
 
   const checkNShowHelperModal = async () => {
     let isManageBackupHelperDone = await AsyncStorage.getItem(
@@ -593,7 +624,7 @@ export default function ManageBackup(props) {
   };
 
   const getTrustContact = (contacts, index) => {
-    console.log('Contacts', contacts);
+    // console.log('Contacts', contacts);
     setContacts(contacts);
     setContactIndex(index);
   };
@@ -601,20 +632,20 @@ export default function ManageBackup(props) {
   useEffect(() => {
     if (contacts) {
       const updatedPageData = [...pageData];
-      console.log('updatedPageData', updatedPageData, contactIndex);
-      console.log("Contacts", contacts)
+      // console.log('updatedPageData', updatedPageData, contactIndex);
+      // console.log("Contacts", contacts)
       for (let i = 0; i < updatedPageData.length; i++) {
         if (contactIndex == 1) {
           if (contacts.length == 2) {
             updatedPageData[i].title == 'Trusted Contact 1'
-              ? (updatedPageData[i].contactInfo = contacts[0])
+              ? (updatedPageData[i].personalInfo = contacts[0])
               : updatedPageData[i].title == 'Trusted Contact 2'
-                ? (updatedPageData[i].contactInfo = contacts[1])
+                ? (updatedPageData[i].personalInfo = contacts[1])
                 : '';
           }
-          else if (!updatedPageData[1].contactInfo) {
+          else if (!updatedPageData[1].personalInfo) {
             updatedPageData[i].title == 'Trusted Contact 1'
-              ? (updatedPageData[i].contactInfo = contacts[0])
+              ? (updatedPageData[i].personalInfo = contacts[0])
               : '';
           }
         }
@@ -622,29 +653,29 @@ export default function ManageBackup(props) {
         if (contactIndex == 2) {
           if (contacts.length == 2) {
             updatedPageData[i].title == 'Trusted Contact 1'
-              ? (updatedPageData[i].contactInfo = contacts[0])
+              ? (updatedPageData[i].personalInfo = contacts[0])
               : updatedPageData[i].title == 'Trusted Contact 2'
-                ? (updatedPageData[i].contactInfo = contacts[1])
+                ? (updatedPageData[i].personalInfo = contacts[1])
                 : '';
-          } else if (!updatedPageData[2].contactInfo) {
+          } else if (!updatedPageData[2].personalInfo) {
             updatedPageData[i].title == 'Trusted Contact 2'
-              ? (updatedPageData[i].contactInfo = contacts[0])
+              ? (updatedPageData[i].personalInfo = contacts[0])
               : '';
           }
         }
       }
       setPageData(updatedPageData);
-      console.log("updatedPageData[i].contactInfo", pageData)
+      // console.log("updatedPageData[i].personalInfo", pageData)
     }
   }, [contacts]);
 
   const secretSharedTrustedContact1 = isSecretShared1 => {
-    console.log('IsSecretShared1', isSecretShared1);
+    // console.log('IsSecretShared1', isSecretShared1);
     setIsSecretShared1(isSecretShared1);
   };
 
   const secretSharedTrustedContact2 = isSecretShared2 => {
-    console.log('IsSecretShared2', isSecretShared2);
+    // console.log('IsSecretShared2', isSecretShared2);
     setIsSecretShared2(isSecretShared2);
   };
 
@@ -739,11 +770,12 @@ export default function ManageBackup(props) {
               // }}
               >
                 <TouchableOpacity
+                  disabled={item.personalInfo && item.personalInfo.flagShare ? true:false}
                   onPress={() => {
                     if (item.route == 'personalCopy' || item.route == 'print') {
                       dispatch(requestSharePdf(item));
                     }
-                    if (item.type == 'contact' && !item.contactInfo) {
+                    if (item.type == 'contact' && !item.personalInfo) {
                       props.navigation.navigate(item.route, {
                         index:
                           item.title === 'Trusted Contact 1'
@@ -760,7 +792,7 @@ export default function ManageBackup(props) {
                           props.navigation.navigate('TrustedContactHealthCheck');
                         } else {
                           props.navigation.navigate('CommunicationMode', {
-                            contact: item.contactInfo,
+                            contact: item.personalInfo,
                             index:
                               item.title === 'Trusted Contact 1'
                                 ? 1
@@ -812,11 +844,11 @@ export default function ManageBackup(props) {
                 >
                   <Image
                     style={styles.cardImage}
-                    source={getImageByType(item.type)}
+                    source={getImageByType(item)}
                   />
                   <View style={{ marginLeft: 15 }}>
                     <Text style={styles.cardTitleText}>
-                      {item.contactInfo ? item.contactInfo.name : item.title}
+                      {item.personalInfo && item.type=="contact" ? item.personalInfo.name : item.title}
                     </Text>
                     <Text style={styles.cardTimeText}>
                       Last backup{' '}
