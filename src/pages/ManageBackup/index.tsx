@@ -527,7 +527,7 @@ export default function ManageBackup(props) {
       }
     })();
   }, []);
-  
+
   //const { overallHealth } = useSelector( state => state.sss );
   useEffect(() => {
     if (overallHealth) {
@@ -752,12 +752,12 @@ export default function ManageBackup(props) {
                   shieldStatus={overallHealth.overallStatus}
                 />
               ) : (
-                  <HomePageShield
-                    circleShadowColor={Colors.borderColor}
-                    shieldImage={require('../../assets/images/icons/protector_gray.png')}
-                    shieldStatus={0}
-                  />
-                )}
+                <HomePageShield
+                  circleShadowColor={Colors.borderColor}
+                  shieldImage={require('../../assets/images/icons/protector_gray.png')}
+                  shieldStatus={0}
+                />
+              )}
             </View>
           </View>
           <FlatList
@@ -781,15 +781,17 @@ export default function ManageBackup(props) {
                           item.title === 'Trusted Contact 1'
                             ? 1
                             : item.title === 'Trusted Contact 2'
-                              ? 2
-                              : undefined,
+                            ? 2
+                            : undefined,
                         getTrustContact: getTrustContact,
                         contacts: contacts ? contacts : [],
                       });
                     } else {
-                      if (item.type == 'contact'){
+                      if (item.type == 'contact') {
                         if (isSecretShared1 || isSecretShared2) {
-                          props.navigation.navigate('TrustedContactHealthCheck');
+                          props.navigation.navigate(
+                            'TrustedContactHealthCheck',
+                          );
                         } else {
                           props.navigation.navigate('CommunicationMode', {
                             contact: item.personalInfo,
@@ -797,8 +799,8 @@ export default function ManageBackup(props) {
                               item.title === 'Trusted Contact 1'
                                 ? 1
                                 : item.title === 'Trusted Contact 2'
-                                  ? 2
-                                  : undefined,
+                                ? 2
+                                : undefined,
                             secretSharedTrustedContact1:
                               item.title === 'Trusted Contact 1'
                                 ? secretSharedTrustedContact1
@@ -809,11 +811,9 @@ export default function ManageBackup(props) {
                                 : null,
                           });
                         }
-                      }
-                      else{
+                      } else {
                         props.navigation.navigate(item.route);
                       }
-                      
                     }
                   }}
                   style={{
@@ -822,10 +822,10 @@ export default function ManageBackup(props) {
                       item.status == 'error'
                         ? Colors.red
                         : item.status == 'warning'
-                          ? Colors.yellow
-                          : item.status == 'success'
-                            ? Colors.green
-                            : Colors.blue,
+                        ? Colors.yellow
+                        : item.status == 'success'
+                        ? Colors.green
+                        : Colors.blue,
                     elevation:
                       selectedType && item.type == selectedType ? 10 : 0,
                     shadowColor:
