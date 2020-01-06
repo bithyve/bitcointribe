@@ -26,7 +26,9 @@ export const socialMediaType = ( packageName: any ) => {
             return "SlackShare";
         case "com.android.bluetooth":
             return "BluetoothShare";
+        case "com.google.android.apps.docs":
+            return "GoogleDrive";
         default:
             return "Other"
     }
-};
+};   

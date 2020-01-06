@@ -22,40 +22,40 @@ import { PermissionsAndroid } from 'react-native';
 
 async function requestStoragePermission() {
   try {
-    const userResponse = await PermissionsAndroid.requestMultiple([
+    const userResponse = await PermissionsAndroid.requestMultiple( [
       PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
       PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-    ]);
+    ] );
     return userResponse;
-  } catch (err) {
-    console.log(err);
+  } catch ( err ) {
+    console.log( err );
   }
   return null;
 }
 
-const getFormattedString = (qrString: string) => {
-  qrString = qrString.split('"').join('Dquote');
-  qrString = qrString.split(':').join('Qutation');
-  qrString = qrString.split('{').join('Lbrace');
-  qrString = qrString.split('}').join('Rbrace');
-  qrString = qrString.split('/').join('Slash');
-  qrString = qrString.split(',').join('Comma');
-  qrString = qrString.split("'").join('Squote');
-  qrString = qrString.split(' ').join('Space');
+const getFormattedString = ( qrString: string ) => {
+  qrString = qrString.split( '"' ).join( 'Dquote' );
+  qrString = qrString.split( ':' ).join( 'Qutation' );
+  qrString = qrString.split( '{' ).join( 'Lbrace' );
+  qrString = qrString.split( '}' ).join( 'Rbrace' );
+  qrString = qrString.split( '/' ).join( 'Slash' );
+  qrString = qrString.split( ',' ).join( 'Comma' );
+  qrString = qrString.split( "'" ).join( 'Squote' );
+  qrString = qrString.split( ' ' ).join( 'Space' );
   return qrString;
 };
 
-const chunkArray = (arr: any, n: any) => {
-  var chunkLength = Math.max(arr.length / n, 1);
+const chunkArray = ( arr: any, n: any ) => {
+  var chunkLength = Math.max( arr.length / n, 1 );
   var chunks = [];
-  for (var i = 0; i < n; i++) {
-    if (chunkLength * (i + 1) <= arr.length)
-      chunks.push(arr.slice(chunkLength * i, chunkLength * (i + 1)));
+  for ( var i = 0; i < n; i++ ) {
+    if ( chunkLength * ( i + 1 ) <= arr.length )
+      chunks.push( arr.slice( chunkLength * i, chunkLength * ( i + 1 ) ) );
   }
   return chunks;
 };
 
-export default async (pdfData, fileName, title, password) => {
+export default async ( pdfData, fileName, title, password ) => {
   const {
     qrData,
     secondaryMnemonic,
@@ -66,11 +66,11 @@ export default async (pdfData, fileName, title, password) => {
   } = pdfData;
   const qrcode: string[] = [];
   const qrCodeString: string[][] = [];
-  qrData.forEach(qrString => {
-    qrcode.push(getFormattedString(qrString));
+  qrData.forEach( qrString => {
+    qrcode.push( getFormattedString( qrString ) );
     // qrCodeString.push(chunkArray(qrString, 4));
-    qrCodeString.push(qrString);
-  });
+    qrCodeString.push( qrString );
+  } );
   let pdfDatas = {
     title,
     fileName,
@@ -83,25 +83,25 @@ export default async (pdfData, fileName, title, password) => {
     secondaryMnemonic,
     bhXpub,
   };
-  let pdfPath = await getPdfPath(pdfDatas);
+  let pdfPath = await getPdfPath( pdfDatas );
   // console.log({ pdfPath });
   return pdfPath;
 };
-const getPdfPath = async (pdfData: any) => {
-  if (Platform.OS == 'ios') {
+const getPdfPath = async ( pdfData: any ) => {
+  if ( Platform.OS == 'ios' ) {
     const PdfPassword = NativeModules.PdfPassword;
-    return await PdfPassword.createPdf(JSON.stringify(pdfData));
+    return await PdfPassword.createPdf( JSON.stringify( pdfData ) );
   } else {
-    if (!(await requestStoragePermission())) {
-      throw new Error('Storage Permission Denied');
+    if ( !( await requestStoragePermission() ) ) {
+      throw new Error( 'Storage Permission Denied' );
     }
     var PdfPassword = await NativeModules.PdfPassword;
     await PdfPassword.createPdf(
-      JSON.stringify(pdfData),
-      async (err: any) => {
+      JSON.stringify( pdfData ),
+      async ( err: any ) => {
         return await err;
       },
-      async (path: any) => {
+      async ( path: any ) => {
         // console.log({ path });
         return await path;
       },
