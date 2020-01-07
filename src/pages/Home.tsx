@@ -72,7 +72,8 @@ import RecoverySecretRequestModalContents from '../components/RecoverySecretRequ
 import ShareRecoverySecretModalContents from '../components/ShareRecoverySecretModalContents';
 import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
-import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
+import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
+import { getTestcoins } from '../store/actions/accounts';
 
 export default function Home(props) {
   const database = useSelector(state => state.storage.database);
@@ -81,16 +82,16 @@ export default function Home(props) {
 
   const testBalance = accounts[TEST_ACCOUNT].service
     ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-    accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
     : 0;
   const regularBalance = accounts[REGULAR_ACCOUNT].service
     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-    accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
     : 0;
   const secureBalance = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-    accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-      .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
     : 0;
   const accumulativeBalance = regularBalance + secureBalance;
 
@@ -103,7 +104,7 @@ export default function Home(props) {
 
   const secureTransactions = accounts[SECURE_ACCOUNT].service
     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-      .transactionDetails
+        .transactionDetails
     : [];
   const accumulativeTransactions = [
     ...testTransactions,
@@ -333,7 +334,7 @@ export default function Home(props) {
     }
   }
 
-  useEffect(function () {
+  useEffect(function() {
     // RecoverySecretRequestBottomSheet.current.snapTo(1);
     // (PinChangeSuccessBottomSheet as any).current.snapTo(1);
     // (ErrorBottomSheet as any).current.snapTo(1);
@@ -346,25 +347,31 @@ export default function Home(props) {
     (bottomSheet as any).current.snapTo(1);
   }, []);
 
-  const messageAsPerHealth = (health) => {
+  const messageAsPerHealth = health => {
     if (health == 0) {
-      return <Text style={styles.headerInfoText}>
-        The wallet backup is not secure.{"\n"}Please visit the health section to{"\n"}improve the health of your backup
-      </Text>
-    }
-    else if (health > 0 && health < 100) {
-      return <Text style={styles.headerInfoText}>
-        The wallet backup is not secured{"\n"}Please complete the setup to{"\n"}safeguard against loss of funds
-      </Text>
-    }
-    else{
-      return <Text style={styles.headerInfoText}>
-        <Text style={{ fontStyle: 'italic' }}>Great!! </Text>
-        The wallet backup is{"\n"}secure. Keep an eye on the{"\n"}health of the
-        backup here
+      return (
+        <Text style={styles.headerInfoText}>
+          The wallet backup is not secure.{'\n'}Please visit the health section
+          to{'\n'}improve the health of your backup
         </Text>
+      );
+    } else if (health > 0 && health < 100) {
+      return (
+        <Text style={styles.headerInfoText}>
+          The wallet backup is not secured{'\n'}Please complete the setup to
+          {'\n'}safeguard against loss of funds
+        </Text>
+      );
+    } else {
+      return (
+        <Text style={styles.headerInfoText}>
+          <Text style={{ fontStyle: 'italic' }}>Great!! </Text>
+          The wallet backup is{'\n'}secure. Keep an eye on the{'\n'}health of
+          the backup here
+        </Text>
+      );
     }
-  }
+  };
 
   const updateAccountCardData = () => {
     let newArrayFinal = [];
@@ -607,8 +614,8 @@ export default function Home(props) {
   const renderNoInternetModalContent = () => {
     return (
       <NoInternetModalContents
-        onPressTryAgain={() => { }}
-        onPressIgnore={() => { }}
+        onPressTryAgain={() => {}}
+        onPressIgnore={() => {}}
       />
     );
   };
@@ -766,7 +773,7 @@ export default function Home(props) {
     return (
       <CustodianRequestAcceptModalContents
         userName={custodyRequest.requester}
-        onPressAssociateContacts={() => { }}
+        onPressAssociateContacts={() => {}}
         onPressSkip={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -1244,7 +1251,7 @@ export default function Home(props) {
           setAnswer(text);
         }}
         onPressConfirm={() => submitRecoveryQuestion()}
-        onPressKnowMore={() => { }}
+        onPressKnowMore={() => {}}
         bottomSheetRef={HealthCheckSecurityQuestionBottomSheet}
       />
     );
@@ -1292,7 +1299,7 @@ export default function Home(props) {
     if (global.isContactOpen) {
       global.isContactOpen = false;
     }
-    var blockApp = setTimeout(function () {
+    var blockApp = setTimeout(function() {
       if (isNavigate) {
         props.navigation.navigate('ReLogin');
       }
@@ -1387,6 +1394,21 @@ export default function Home(props) {
     })();
   }, []);
 
+  const testAccService = useSelector(
+    state => state.accounts[TEST_ACCOUNT].service,
+  );
+  useEffect(() => {
+    (async () => {
+      if (!(await AsyncStorage.getItem('Received Testcoins'))) {
+        const { balances } = testAccService.hdWallet;
+        const netBalance = testAccService
+          ? balances.balance + balances.unconfirmedBalance
+          : 0;
+        if (!netBalance) dispatch(getTestcoins(TEST_ACCOUNT));
+      }
+    })();
+  }, []);
+
   const renderRecoverySecretRequestModalContent = () => {
     return (
       <RecoverySecretRequestModalContents
@@ -1448,7 +1470,7 @@ export default function Home(props) {
         onPressRequest={() => {
           ShareRecoverySecretBottomSheet.current.snapTo(1);
         }}
-        onPressViaQr={() => { }}
+        onPressViaQr={() => {}}
         modalRef={ShareRecoverySecretBottomSheet}
       />
     );
@@ -1481,7 +1503,7 @@ export default function Home(props) {
         onPressRequest={() => {
           ShareRecoverySecretOtpBottomSheet.current.snapTo(1);
         }}
-        onPressViaQr={() => { }}
+        onPressViaQr={() => {}}
         modalRef={ShareRecoverySecretOtpBottomSheet}
       />
     );
@@ -1586,7 +1608,9 @@ export default function Home(props) {
           </View>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ flex: 7 }}>
-              {messageAsPerHealth(overallHealth ? overallHealth.overallStatus : 0)}
+              {messageAsPerHealth(
+                overallHealth ? overallHealth.overallStatus : 0,
+              )}
               <TouchableOpacity
                 onPress={() => {
                   props.navigation.navigate('ManageBackup');
@@ -1629,8 +1653,8 @@ export default function Home(props) {
                               value.accountType === 'test'
                                 ? TEST_ACCOUNT
                                 : value.accountType === 'regular'
-                                  ? REGULAR_ACCOUNT
-                                  : SECURE_ACCOUNT,
+                                ? REGULAR_ACCOUNT
+                                : SECURE_ACCOUNT,
                           });
                         }}
                       >
@@ -1684,8 +1708,8 @@ export default function Home(props) {
                                 {value.accountType === 'test'
                                   ? testBalance
                                   : value.accountType === 'regular'
-                                    ? regularBalance
-                                    : secureBalance}
+                                  ? regularBalance
+                                  : secureBalance}
                               </Text>
                               <Text style={styles.cardAmountUnitText}>
                                 {value.unit}
@@ -1801,8 +1825,8 @@ export default function Home(props) {
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('17%')
             : Platform.OS == 'android'
-              ? hp('20%')
-              : hp('18%'),
+            ? hp('20%')
+            : hp('18%'),
           hp('50%'),
           hp('90%'),
         ]}
@@ -1954,7 +1978,7 @@ export default function Home(props) {
         renderHeader={renderPinChangeSuccessModalHeader}
       />
       <BottomSheet
-        onOpenEnd={() => { }}
+        onOpenEnd={() => {}}
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
@@ -1968,7 +1992,7 @@ export default function Home(props) {
         renderHeader={renderTransactionDetailsHeader}
       />
       <BottomSheet
-        onOpenEnd={() => { }}
+        onOpenEnd={() => {}}
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
@@ -2023,7 +2047,7 @@ export default function Home(props) {
         renderHeader={renderFastBitcoinSellCalculationHeader}
       />
       <BottomSheet
-        onOpenEnd={() => { }}
+        onOpenEnd={() => {}}
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
@@ -2037,7 +2061,7 @@ export default function Home(props) {
         renderHeader={renderFamilyAndFriendAddressBookHeader}
       />
       <BottomSheet
-        onOpenEnd={() => { }}
+        onOpenEnd={() => {}}
         enabledInnerScrolling={true}
         ref={ContactSelectedFromAddressBookBottomSheet}
         snapPoints={[
@@ -2048,7 +2072,7 @@ export default function Home(props) {
         renderHeader={renderContactSelectedFromAddressBookHeader}
       />
       <BottomSheet
-        onOpenEnd={() => { }}
+        onOpenEnd={() => {}}
         enabledInnerScrolling={true}
         ref={ContactSelectedFromAddressBookQrCodeBottomSheet}
         snapPoints={[
@@ -2165,13 +2189,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>transactions</Text>
             </View>
           ) : (
-              <View style={{ flexDirection: 'row' }}>
-                <Image
-                  source={require('../assets/images/HomePageIcons/icon_transactions.png')}
-                  style={styles.tabBarImage}
-                />
-              </View>
-            )}
+            <View style={{ flexDirection: 'row' }}>
+              <Image
+                source={require('../assets/images/HomePageIcons/icon_transactions.png')}
+                style={styles.tabBarImage}
+              />
+            </View>
+          )}
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => selectTab('Add')}
@@ -2186,13 +2210,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>add</Text>
             </View>
           ) : (
-              <View style={{ flexDirection: 'row' }}>
-                <Image
-                  source={require('../assets/images/HomePageIcons/icon_add.png')}
-                  style={styles.tabBarImage}
-                />
-              </View>
-            )}
+            <View style={{ flexDirection: 'row' }}>
+              <Image
+                source={require('../assets/images/HomePageIcons/icon_add.png')}
+                style={styles.tabBarImage}
+              />
+            </View>
+          )}
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => selectTab('QR')}
@@ -2207,13 +2231,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>qr</Text>
             </View>
           ) : (
-              <View style={{ flexDirection: 'row' }}>
-                <Image
-                  source={require('../assets/images/HomePageIcons/icon_qr.png')}
-                  style={styles.tabBarImage}
-                />
-              </View>
-            )}
+            <View style={{ flexDirection: 'row' }}>
+              <Image
+                source={require('../assets/images/HomePageIcons/icon_qr.png')}
+                style={styles.tabBarImage}
+              />
+            </View>
+          )}
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.tabBarTabView}
@@ -2232,13 +2256,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>More</Text>
             </View>
           ) : (
-              <View style={{ flexDirection: 'row' }}>
-                <Image
-                  source={require('../assets/images/HomePageIcons/icon_more.png')}
-                  style={styles.tabBarImage}
-                />
-              </View>
-            )}
+            <View style={{ flexDirection: 'row' }}>
+              <Image
+                source={require('../assets/images/HomePageIcons/icon_more.png')}
+                style={styles.tabBarImage}
+              />
+            </View>
+          )}
         </TouchableOpacity>
       </View>
     </ImageBackground>
