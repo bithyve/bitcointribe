@@ -37,6 +37,7 @@ function* sharePdfWorker( { payload } ) {
 
       yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: socialMediaType( res.app.split( "/", 1 )[ 0 ] ), date: Math.floor( Date.now() / 1000 ) } } ) );
     } else if ( payload.type == 'copy2' ) {
+      console.log( 'locking' );
       let shareOptions = {
         title: 'Personal Copy 2',
         message:
@@ -44,7 +45,7 @@ function* sharePdfWorker( { payload } ) {
         url:
           Platform.OS == 'android'
             ? 'file://' + databaseSSS.pdfDetails.copy2.path
-            : databaseSSS.pdfDetails.copy12.path,
+            : databaseSSS.pdfDetails.copy2.path,
         type: 'application/pdf',
         showAppsToView: true,
         subject: 'Personal copy 2',
@@ -120,6 +121,9 @@ function* dbUPdatePdfSharingWorker( { payload } ) {
         }
       }
     }
+
+    console.log( { updatedBackup } );
+
     yield put( dbUpdateSSS( updatedBackup ) );
   } catch ( error ) {
     console.log( { error } );
