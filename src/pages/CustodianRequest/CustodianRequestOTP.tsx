@@ -63,7 +63,7 @@ export default function CustodianRequestOTP(props) {
 
   useEffect(() => {
     if (UNDER_CUSTODY[requester]) {
-      passcode.length === 6
+      passcode.length === 6 || otp
         ? props.navigation.navigate('CustodianRequestAccepted', { requester })
         : Alert.alert(
             'Failed to store',
