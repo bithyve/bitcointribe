@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -38,6 +38,7 @@ import SmallHeaderModal from '../../components/SmallHeaderModal';
 import { fetchSSSFromDB } from '../../store/actions/storage';
 import { requestSharePdf } from '../../store/actions/manageBackup';
 import RegenerateHealper from '../../components/Helper/RegenerateHealper';
+import { ModalShareIntent } from "hexaComponents/Modal/ManageBackup";
 
 export default function ManageBackup( props ) {
   const [
@@ -54,6 +55,7 @@ export default function ManageBackup( props ) {
     RegenerateShareHelperBottomSheet,
     setRegenerateShareHelperBottomSheet,
   ] = useState( React.createRef() );
+  //const [ refShareIntentBottomSheet, setRefShareIntentBottomSheet ] = useRef();
   const [ cloudBottomSheet, setCloudBottomSheet ] = useState( React.createRef() );
   const [ selectedType, setSelectedType ] = useState( '' );
   const [ contactIndex, setContactIndex ] = useState();
@@ -61,6 +63,7 @@ export default function ManageBackup( props ) {
   const [ contacts, setContacts ] = useState( [] );
   const [ isSecretShared1, setIsSecretShared1 ] = useState( false );
   const [ isSecretShared2, setIsSecretShared2 ] = useState( false );
+  const [ arrModalShareIntent, setArrModalShareIntent ] = useState( { snapTop: 0 } );
   const [ cloudData, setCloudData ] = useState( [
     {
       title: 'iCloud Drive',
@@ -469,7 +472,7 @@ export default function ManageBackup( props ) {
   const dispatch = useDispatch();
   const s3Service: S3Service = useSelector( state => state.sss.service );
   const { databaseSSS } = useSelector( state => state.storage );
-  // const {}    
+  // const {}        
   useEffect( () => {
     dispatch( fetchSSSFromDB() );
     checkNShowHelperModal();
@@ -767,7 +770,10 @@ export default function ManageBackup( props ) {
                     console.log( { item } );
 
                     if ( item.route == 'personalCopy' ) {
-                      dispatch( requestSharePdf( item ) );
+                      // dispatch( requestSharePdf( item ) );
+                      setArrModalShareIntent( {
+                        snapTop: 1
+                      } )
                     }
                     if ( item.type == 'contact' && !item.personalInfo ) {
                       props.navigation.navigate( item.route, {
@@ -908,6 +914,13 @@ export default function ManageBackup( props ) {
           snapPoints={ [ -50, hp( '95%' ) ] }
           renderContent={ renderBuyHelperContents }
           renderHeader={ renderBuyHelperHeader }
+        />
+        <ModalShareIntent
+          data={ arrModalShareIntent }
+          onPressHandle={ () => {
+            setArrModalShareIntent( { ...arrModalShareIntent, snapTop: 0 } )
+          }
+          }
         />
       </View>
     </View>
