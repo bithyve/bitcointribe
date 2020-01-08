@@ -67,7 +67,11 @@ import {
 import AllAccountsContents from '../components/AllAccountsContents';
 import SettingsContents from '../components/SettingsContents';
 import { useDispatch, useSelector } from 'react-redux';
-import { checkMSharesHealth, updateMSharesHealth } from '../store/actions/sss';
+import {
+  checkMSharesHealth,
+  updateMSharesHealth,
+  downloadMShare,
+} from '../store/actions/sss';
 import RecoverySecretRequestModalContents from '../components/RecoverySecretRequestModalContesnts';
 import ShareRecoverySecretModalContents from '../components/ShareRecoverySecretModalContents';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -535,8 +539,21 @@ export default function Home(props) {
     );
   };
 
-  const getQrCodeData = data => {
-    console.log('Qrcodedata', data);
+  const getQrCodeData = qrData => {
+    // console.log('Qrcodedata', data);
+    const scannedData = JSON.parse(qrData);
+    switch (scannedData.type) {
+      case 'secondaryDeviceQR':
+        const custodyRequest = {
+          requester: scannedData.requester,
+          ek: scannedData.ENCRYPTED_KEY,
+          otp: scannedData.OTP,
+        };
+        props.navigation.navigate('Home', { custodyRequest });
+        break;
+      default:
+        break;
+    }
   };
 
   function renderContent1() {
