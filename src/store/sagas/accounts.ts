@@ -208,6 +208,7 @@ function* testcoinsWorker({ payload }) {
     state => state.accounts[payload.serviceType].service,
   );
   const res = yield call(service.getTestcoins);
+
   if (res.status === 200) {
     console.log('testcoins received');
     yield delay(3000); // 3 seconds delay for letting the transaction get broadcasted in the network

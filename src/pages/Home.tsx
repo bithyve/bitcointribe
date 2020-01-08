@@ -79,38 +79,55 @@ export default function Home(props) {
   const database = useSelector(state => state.storage.database);
   const walletName = database ? database.WALLET_SETUP.walletName : '';
   const accounts = useSelector(state => state.accounts);
+  const [balances, setBalances] = useState({
+    testBalance: 0,
+    regularBalance: 0,
+    secureBalance: 0,
+    accumulativeBalance: 0,
+  });
+  const [transactions, setTransactions] = useState([]);
+  useEffect(() => {
+    const testBalance = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      : 0;
+    const regularBalance = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      : 0;
+    const secureBalance = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+          .unconfirmedBalance
+      : 0;
+    const accumulativeBalance = regularBalance + secureBalance;
 
-  const testBalance = accounts[TEST_ACCOUNT].service
-    ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-    : 0;
-  const regularBalance = accounts[REGULAR_ACCOUNT].service
-    ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-    : 0;
-  const secureBalance = accounts[SECURE_ACCOUNT].service
-    ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
-    : 0;
-  const accumulativeBalance = regularBalance + secureBalance;
+    const testTransactions = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+      : [];
+    const regularTransactions = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
+          .transactionDetails
+      : [];
 
-  const testTransactions = accounts[TEST_ACCOUNT].service
-    ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
-    : [];
-  const regularTransactions = accounts[REGULAR_ACCOUNT].service
-    ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions.transactionDetails
-    : [];
+    const secureTransactions = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
+          .transactionDetails
+      : [];
+    const accumulativeTransactions = [
+      ...testTransactions,
+      ...regularTransactions,
+      ...secureTransactions,
+    ];
 
-  const secureTransactions = accounts[SECURE_ACCOUNT].service
-    ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-        .transactionDetails
-    : [];
-  const accumulativeTransactions = [
-    ...testTransactions,
-    ...regularTransactions,
-    ...secureTransactions,
-  ];
+    setBalances({
+      testBalance,
+      regularBalance,
+      secureBalance,
+      accumulativeBalance,
+    });
+    setTransactions(accumulativeTransactions);
+  }, [accounts]);
 
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
     id: '',
@@ -395,7 +412,7 @@ export default function Home(props) {
     return (
       <View style={styles.modalContentContainer}>
         <FlatList
-          data={accumulativeTransactions}
+          data={transactions}
           ItemSeparatorComponent={() => (
             <View style={{ backgroundColor: Colors.white }}>
               <View style={styles.separatorView} />
@@ -1367,7 +1384,7 @@ export default function Home(props) {
 
   const dispatch = useDispatch();
 
-  const s3Service = useSelector(state => state.sss.service);
+  // const s3Service = useSelector(state => state.sss.service);
   const [overallHealth, setOverallHealth] = useState();
 
   const health = useSelector(state => state.sss.overallHealth);
@@ -1398,16 +1415,17 @@ export default function Home(props) {
     state => state.accounts[TEST_ACCOUNT].service,
   );
   useEffect(() => {
-    (async () => {
-      if (!(await AsyncStorage.getItem('Received Testcoins'))) {
-        const { balances } = testAccService.hdWallet;
-        const netBalance = testAccService
-          ? balances.balance + balances.unconfirmedBalance
-          : 0;
-        if (!netBalance) dispatch(getTestcoins(TEST_ACCOUNT));
-      }
-    })();
-  }, []);
+    if (testAccService)
+      (async () => {
+        if (!(await AsyncStorage.getItem('Received Testcoins'))) {
+          const { balances } = testAccService.hdWallet;
+          const netBalance = testAccService
+            ? balances.balance + balances.unconfirmedBalance
+            : 0;
+          if (!netBalance) dispatch(getTestcoins(TEST_ACCOUNT));
+        }
+      })();
+  }, [testAccService]);
 
   const renderRecoverySecretRequestModalContent = () => {
     return (
@@ -1585,7 +1603,7 @@ export default function Home(props) {
                     color: Colors.white,
                   }}
                 >
-                  {accumulativeBalance}
+                  {balances.accumulativeBalance}
                 </Text>
                 <Text
                   style={{
@@ -1641,6 +1659,7 @@ export default function Home(props) {
             horizontal
             showsHorizontalScrollIndicator={false}
             data={newData}
+            extraData={balances}
             renderItem={Items => {
               return (
                 <View style={{ flexDirection: 'column' }}>
@@ -1706,10 +1725,10 @@ export default function Home(props) {
                               />
                               <Text style={styles.cardAmountText}>
                                 {value.accountType === 'test'
-                                  ? testBalance
+                                  ? balances.testBalance
                                   : value.accountType === 'regular'
-                                  ? regularBalance
-                                  : secureBalance}
+                                  ? balances.regularBalance
+                                  : balances.secureBalance}
                               </Text>
                               <Text style={styles.cardAmountUnitText}>
                                 {value.unit}

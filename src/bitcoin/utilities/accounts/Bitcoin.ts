@@ -501,7 +501,7 @@ export default class Bitcoin {
     funded: any;
   }> => {
     // const amount = Math.trunc(Math.random() * 1e5) / 1e8;
-    const amount = 10000;
+    const amount = 10000 / 1e8;
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post('/testnetFaucet', {
