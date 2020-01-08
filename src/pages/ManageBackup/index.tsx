@@ -153,7 +153,7 @@ export default function ManageBackup(props) {
         return require('../../assets/images/icons/icon_cloud.png');
       }
       else if (item.personalInfo && item.personalInfo.flagShare && item.personalInfo.shareDetails.type == "EmailShare") {
-        return require('../../assets/images/icons/gmail.png');
+        return require('../../assets/images/icons/icon_email_dark.png');
       }
       else if (item.personalInfo && item.personalInfo.flagShare && (item.personalInfo.shareDetails.type == "PrintShare" || item.personalInfo.shareDetails.type == "other")) {
         return require('../../assets/images/icons/print.png');
