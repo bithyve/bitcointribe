@@ -476,10 +476,8 @@ export default function ManageBackup( props ) {
     if ( !s3Service.sss.healthCheckInitialized ) dispatch( initHealthCheck() );
   }, [] );
 
-
   useEffect( () => {
-    // console.log("databaseSSS", databaseSSS);
-    // console.log("pageData, pageData", pageData)
+    console.log( { databaseSSS } );
     if ( databaseSSS.pdfDetails ) {
       pageData[ 3 ].personalInfo = databaseSSS.pdfDetails.copy1;
       pageData[ 4 ].personalInfo = databaseSSS.pdfDetails.copy2;
@@ -491,7 +489,7 @@ export default function ManageBackup( props ) {
       }
       setPageData( pageData );
     }
-  }, [ databaseSSS ] )
+  }, [ databaseSSS ] );
 
   const checkNShowHelperModal = async () => {
     let isManageBackupHelperDone = await AsyncStorage.getItem(
@@ -502,6 +500,7 @@ export default function ManageBackup( props ) {
       WalletBackupAndRecoveryBottomSheet.current.snapTo( 1 );
     }
   };
+
 
   const [ overallHealth, setOverallHealth ] = useState();
   const health = useSelector( state => state.sss.overallHealth );
@@ -755,7 +754,7 @@ export default function ManageBackup( props ) {
           </View>
           <FlatList
             data={ pageData }
-            extraData={ selectedType }
+            extraData={ this.state }
             renderItem={ ( { item, index } ) => (
               <View
               // style={{
