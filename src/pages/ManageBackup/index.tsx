@@ -149,16 +149,26 @@ export default function ManageBackup(props) {
     } else if (type == 'contact') {
       return require('../../assets/images/icons/icon_user.png');
     } else if (type == 'copy1' || type == 'copy2') {
-      if (item.personalInfo && item.personalInfo.flagShare && item.personalInfo.shareDetails.type == "GoogleDrive") {
+      if (
+        item.personalInfo &&
+        item.personalInfo.flagShare &&
+        item.personalInfo.shareDetails.type == 'GoogleDrive'
+      ) {
         return require('../../assets/images/icons/icon_cloud.png');
-      }
-      else if (item.personalInfo && item.personalInfo.flagShare && item.personalInfo.shareDetails.type == "EmailShare") {
+      } else if (
+        item.personalInfo &&
+        item.personalInfo.flagShare &&
+        item.personalInfo.shareDetails.type == 'EmailShare'
+      ) {
         return require('../../assets/images/icons/icon_email_dark.png');
-      }
-      else if (item.personalInfo && item.personalInfo.flagShare && (item.personalInfo.shareDetails.type == "PrintShare" || item.personalInfo.shareDetails.type == "other")) {
+      } else if (
+        item.personalInfo &&
+        item.personalInfo.flagShare &&
+        (item.personalInfo.shareDetails.type == 'PrintShare' ||
+          item.personalInfo.shareDetails.type == 'other')
+      ) {
         return require('../../assets/images/icons/print.png');
-      }
-      else {
+      } else {
         return require('../../assets/images/icons/note.png');
       }
       // return require('../../assets/images/icons/icon_cloud.png');
@@ -477,13 +487,12 @@ export default function ManageBackup(props) {
   const dispatch = useDispatch();
   const s3Service: S3Service = useSelector(state => state.sss.service);
   const { databaseSSS } = useSelector(state => state.storage);
-  // const {}    
+
   useEffect(() => {
     dispatch(fetchSSSFromDB());
     checkNShowHelperModal();
     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
   }, []);
-
 
   useEffect(() => {
     // console.log("databaseSSS", databaseSSS);
@@ -491,15 +500,15 @@ export default function ManageBackup(props) {
     if (databaseSSS.pdfDetails) {
       pageData[3].personalInfo = databaseSSS.pdfDetails.copy1;
       pageData[4].personalInfo = databaseSSS.pdfDetails.copy2;
-      if(databaseSSS.pdfDetails.copy1.flagShare){
-        pageData[3].status = "success";
+      if (databaseSSS.pdfDetails.copy1.flagShare) {
+        pageData[3].status = 'success';
       }
-      if(databaseSSS.pdfDetails.copy2.flagShare){
-        pageData[4].status = "success";
+      if (databaseSSS.pdfDetails.copy2.flagShare) {
+        pageData[4].status = 'success';
       }
       setPageData(pageData);
     }
-  }, [databaseSSS])
+  }, [databaseSSS]);
 
   const checkNShowHelperModal = async () => {
     let isManageBackupHelperDone = await AsyncStorage.getItem(
@@ -626,7 +635,7 @@ export default function ManageBackup(props) {
   const getTrustContact = async (contacts, index) => {
     setContacts(contacts);
     setContactIndex(index);
-    const contactList = await AsyncStorage.getItem("SelectedContacts");
+    const contactList = await AsyncStorage.getItem('SelectedContacts');
     console.log('contactList', contactList);
   };
 
@@ -641,10 +650,9 @@ export default function ManageBackup(props) {
             updatedPageData[i].title == 'Trusted Contact 1'
               ? (updatedPageData[i].personalInfo = contacts[0])
               : updatedPageData[i].title == 'Trusted Contact 2'
-                ? (updatedPageData[i].personalInfo = contacts[1])
-                : '';
-          }
-          else if (!updatedPageData[1].personalInfo) {
+              ? (updatedPageData[i].personalInfo = contacts[1])
+              : '';
+          } else if (!updatedPageData[1].personalInfo) {
             updatedPageData[i].title == 'Trusted Contact 1'
               ? (updatedPageData[i].personalInfo = contacts[0])
               : '';
@@ -656,8 +664,8 @@ export default function ManageBackup(props) {
             updatedPageData[i].title == 'Trusted Contact 1'
               ? (updatedPageData[i].personalInfo = contacts[0])
               : updatedPageData[i].title == 'Trusted Contact 2'
-                ? (updatedPageData[i].personalInfo = contacts[1])
-                : '';
+              ? (updatedPageData[i].personalInfo = contacts[1])
+              : '';
           } else if (!updatedPageData[2].personalInfo) {
             updatedPageData[i].title == 'Trusted Contact 2'
               ? (updatedPageData[i].personalInfo = contacts[0])
@@ -771,7 +779,11 @@ export default function ManageBackup(props) {
               // }}
               >
                 <TouchableOpacity
-                  disabled={item.personalInfo && item.personalInfo.flagShare ? true:false}
+                  disabled={
+                    item.personalInfo && item.personalInfo.flagShare
+                      ? true
+                      : false
+                  }
                   onPress={() => {
                     if (item.route == 'personalCopy' || item.route == 'print') {
                       dispatch(requestSharePdf(item));
@@ -849,7 +861,9 @@ export default function ManageBackup(props) {
                   />
                   <View style={{ marginLeft: 15 }}>
                     <Text style={styles.cardTitleText}>
-                      {item.personalInfo && item.type=="contact" ? item.personalInfo.name : item.title}
+                      {item.personalInfo && item.type == 'contact'
+                        ? item.personalInfo.name
+                        : item.title}
                     </Text>
                     <Text style={styles.cardTimeText}>
                       Last backup{' '}

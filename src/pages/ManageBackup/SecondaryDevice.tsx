@@ -37,6 +37,7 @@ const SecondaryDevice = props => {
   SHARES_TRANSFER_DETAILS[0] && !secondaryQR
     ? setSecondaryQR(
         JSON.stringify({
+          requester: WALLET_SETUP.walletName,
           ...SHARES_TRANSFER_DETAILS[0],
           type: 'secondaryDeviceQR',
         }),
