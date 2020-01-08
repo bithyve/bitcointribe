@@ -25,6 +25,7 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
+import AsyncStorage from '@react-native-community/async-storage';
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -207,9 +208,11 @@ function* testcoinsWorker({ payload }) {
     state => state.accounts[payload.serviceType].service,
   );
   const res = yield call(service.getTestcoins);
+
   if (res.status === 200) {
     console.log('testcoins received');
     yield delay(3000); // 3 seconds delay for letting the transaction get broadcasted in the network
+    yield call(AsyncStorage.setItem, 'Received Testcoins', 'true');
     yield put(fetchBalance(payload.serviceType));
   } else console.log('Failed to get testcoins');
   yield put(switchLoader(payload.serviceType, 'testcoins'));
