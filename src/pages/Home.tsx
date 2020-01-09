@@ -78,6 +78,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
 import { getTestcoins } from '../store/actions/accounts';
+import axios from 'axios';
 
 export default function Home(props) {
   const database = useSelector(state => state.storage.database);
@@ -1431,6 +1432,7 @@ export default function Home(props) {
   const testAccService = useSelector(
     state => state.accounts[TEST_ACCOUNT].service,
   );
+
   useEffect(() => {
     if (testAccService)
       (async () => {
@@ -1443,6 +1445,31 @@ export default function Home(props) {
         }
       })();
   }, [testAccService]);
+
+  useEffect(() => {
+    (async () => {
+      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
+      if (storedExchangeRates) {
+        const exchangeRates = JSON.parse(storedExchangeRates);
+        console.log({ exchangeRates });
+        if (Date.now() - exchangeRates.lastFetched < 1800000) {
+          return;
+        } // maintaining a half an hour difference b/w fetches
+      }
+      const res = await axios.get('https://blockchain.info/ticker');
+      console.log({ res });
+      if (res.status == 200) {
+        const exchangeRates = res.data;
+        exchangeRates.lastFetched = Date.now();
+        await AsyncStorage.setItem(
+          'exchangeRates',
+          JSON.stringify(exchangeRates),
+        );
+      } else {
+        console.log('Failed to retrieve exchange rates', res);
+      }
+    })();
+  }, []);
 
   const renderRecoverySecretRequestModalContent = () => {
     return (
