@@ -15,6 +15,7 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
 import Colors from '../../common/Colors';
+import { nameToInitials } from '../../common/CommonFunctions';
 import CommonStyles from '../../common/Styles';
 import {
   widthPercentageToDP as wp,
@@ -496,7 +497,7 @@ export default function ManageBackup(props) {
 
   useEffect(() => {
     (async () => {
-    const contactList = await AsyncStorage.getItem('SelectedContacts');
+      const contactList = await AsyncStorage.getItem('SelectedContacts');
     })();
     dispatch(fetchSSSFromDB());
     checkNShowHelperModal();
@@ -864,16 +865,22 @@ export default function ManageBackup(props) {
                       selectedType && item.type == selectedType ? 10 : 0,
                   }}
                 >
-                   {/* {item.personalInfo && !item.personalInfo.imageAvailable ? (<Text style={{
+                  {item.type == 'contact' && item.personalInfo && !item.personalInfo.imageAvailable ? (<View style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: Colors.shadowBlue,
+                    width: 35,
+                    height: 35,
+                    borderRadius: 30,
+                  }}><Text style={{
                     textAlign: 'center',
-                    backgroundColor: 'white',
                     fontSize: 13,
                     lineHeight: 13, //... One for top and one for bottom alignment
-                  }}>{item.personalInfo && item.personalInfo.firstName ? item.personalInfo.firstName.subString(0,1).toUpperCase() : '' + item.personalInfo && item.personalInfo.lastName ? item.personalInfo.lastName.subString(0,1).toUpperCase() : ''}</Text>) : } */}
-                 <Image
+                  }}>{item.personalInfo && item.personalInfo.name ? nameToInitials(item.personalInfo.name) : ''}</Text></View>) : <Image
                       style={styles.cardImage}
                       source={getImageByType(item)}
-                    />
+                    />}
+
 
                   <View style={{ marginLeft: 15 }}>
                     <Text style={styles.cardTitleText}>
