@@ -78,6 +78,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
 import { getTestcoins } from '../store/actions/accounts';
+import axios from 'axios';
 
 export default function Home(props) {
   const [KnowMoreBottomSheetsFlag, setKnowMoreBottomSheetsFlag] = useState(false);
@@ -87,6 +88,7 @@ export default function Home(props) {
   const database = useSelector(state => state.storage.database);
   const walletName = database ? database.WALLET_SETUP.walletName : '';
   const accounts = useSelector(state => state.accounts);
+  const [exchangeRates, setExchangeRates] = useState();
   const [balances, setBalances] = useState({
     testBalance: 0,
     regularBalance: 0,
@@ -1400,6 +1402,7 @@ export default function Home(props) {
   const testAccService = useSelector(
     state => state.accounts[TEST_ACCOUNT].service,
   );
+
   useEffect(() => {
     if (testAccService)
       (async () => {
@@ -1413,6 +1416,33 @@ export default function Home(props) {
       })();
   }, [testAccService]);
 
+  useEffect(() => {
+    (async () => {
+      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
+      if (storedExchangeRates) {
+        const exchangeRates = JSON.parse(storedExchangeRates);
+        if (Date.now() - exchangeRates.lastFetched < 1800000) {
+          setExchangeRates(exchangeRates);
+          return;
+        } // maintaining a half an hour difference b/w fetches
+      }
+      const res = await axios.get('https://blockchain.info/ticker');
+      console.log({ res });
+      if (res.status == 200) {
+        const exchangeRates = res.data;
+        exchangeRates.lastFetched = Date.now();
+        setExchangeRates(exchangeRates);
+        await AsyncStorage.setItem(
+          'exchangeRates',
+          JSON.stringify(exchangeRates),
+        );
+      } else {
+        console.log('Failed to retrieve exchange rates', res);
+      }
+    })();
+  }, []);
+
+  
   // const renderRecoverySecretRequestModalContent = () => {
   //   return (
   //     <RecoverySecretRequestModalContents
@@ -1589,7 +1619,12 @@ export default function Home(props) {
                     color: Colors.white,
                   }}
                 >
-                  {balances.accumulativeBalance}
+                  {switchOn
+                    ? balances.accumulativeBalance
+                    : (
+                        (balances.accumulativeBalance / 1e8) *
+                        exchangeRates['USD'].last
+                      ).toFixed(3)}
                 </Text>
                 <Text
                   style={{
@@ -1597,13 +1632,13 @@ export default function Home(props) {
                     color: Colors.white,
                   }}
                 >
-                  sats
+                  {switchOn ? 'sats' : 'USD'}
                 </Text>
               </View>
             </View>
             <View style={styles.headerToggleSwitchContainer}>
               <ToggleSwitch
-                onpress={() => {
+                onpress={async () => {
                   setSwitchOn(!switchOn);
                 }}
                 toggle={switchOn}
@@ -1645,7 +1680,7 @@ export default function Home(props) {
             horizontal
             showsHorizontalScrollIndicator={false}
             data={newData}
-            extraData={balances}
+            extraData={{ balances, switchOn }}
             renderItem={Items => {
               return (
                 <View style={{ flexDirection: 'column' }}>
@@ -1710,14 +1745,29 @@ export default function Home(props) {
                                 source={value.bitcoinicon}
                               />
                               <Text style={styles.cardAmountText}>
-                                {value.accountType === 'test'
-                                  ? balances.testBalance
-                                  : value.accountType === 'regular'
+                                {switchOn
+                                  ? value.accountType === 'test'
+                                    ? balances.testBalance
+                                    : value.accountType === 'regular'
                                     ? balances.regularBalance
-                                    : balances.secureBalance}
+                                    : balances.secureBalance
+                                  : value.accountType === 'test'
+                                  ? (
+                                      (balances.testBalance / 1e8) *
+                                      exchangeRates['USD'].last
+                                    ).toFixed(3)
+                                  : value.accountType === 'regular'
+                                  ? (
+                                      (balances.regularBalance / 1e8) *
+                                      exchangeRates['USD'].last
+                                    ).toFixed(3)
+                                  : (
+                                      (balances.secureBalance / 1e8) *
+                                      exchangeRates['USD'].last
+                                    ).toFixed(3)}
                               </Text>
                               <Text style={styles.cardAmountUnitText}>
-                                {value.unit}
+                                {switchOn ? value.unit : 'USD'}
                               </Text>
                             </View>
                           </View>
