@@ -14,7 +14,6 @@ import {
   DB_INSERTEDSSS,
   dbFetchedSSS,
   DB_UPDATESSS,
-
 } from '../actions/storage';
 import { generatePDF } from '../actions/sss';
 import dataManager from '../../storage/database-manager';
@@ -25,52 +24,52 @@ import S3Service from '../../bitcoin/services/sss/S3Service';
 
 function* initDBWorker() {
   try {
-    yield call( dataManager.initialize );
-    yield put( dbInitialized( true ) );
-  } catch ( err ) {
-    console.log( err );
-    yield put( dbInitialized( false ) );
+    yield call(dataManager.initialize);
+    yield put(dbInitialized(true));
+  } catch (err) {
+    console.log(err);
+    yield put(dbInitialized(false));
   }
 }
 
-export const initDBWatcher = createWatcher( initDBWorker, INIT_DB );
+export const initDBWatcher = createWatcher(initDBWorker, INIT_DB);
 
 function* fetchDBWorker() {
   try {
-    const key = yield select( state => state.storage.key );
-    const database = yield call( dataManager.fetch, key );
-    if ( key && database ) {
-      yield put( dbFetched( database ) );
-      yield put( enrichServices( database ) );
+    const key = yield select(state => state.storage.key);
+    const database = yield call(dataManager.fetch, key);
+    if (key && database) {
+      yield put(dbFetched(database));
+      yield put(enrichServices(database));
     } else {
       console.log(
         'Failed to fetch the database; either key is missing or database is empty',
       );
     }
-  } catch ( err ) {
-    console.log( err );
+  } catch (err) {
+    console.log(err);
   }
 }
 
-export const fetchDBWatcher = createWatcher( fetchDBWorker, FETCH_FROM_DB );
+export const fetchDBWatcher = createWatcher(fetchDBWorker, FETCH_FROM_DB);
 
 function* fetchSSSDBWorker() {
   try {
-    const key = yield select( state => state.storage.key );
-    const database = yield call( dataManager.fetchSSS, key );
-    if ( key && database == undefined ) {
-      yield put( generatePDF( { personalcopy1: 4, personalcopy2: 5 } ) );
+    const key = yield select(state => state.storage.key);
+    const database = yield call(dataManager.fetchSSS, key);
+    if (key && database == undefined) {
+      yield put(generatePDF({ personalcopy1: 4, personalcopy2: 5 }));
     }
-    console.log( { key, database } );
-    if ( key && database ) {
-      yield put( dbFetchedSSS( database ) );
+    console.log({ key, database });
+    if (key && database) {
+      yield put(dbFetchedSSS(database));
     } else {
       console.log(
         'Failed to fetch the database; either key is missing or database is empty',
       );
     }
-  } catch ( err ) {
-    console.log( err );
+  } catch (err) {
+    console.log(err);
   }
 }
 
@@ -79,13 +78,13 @@ export const fetchSSSDBWatcher = createWatcher(
   FETCHSSS_FROM_DB,
 );
 
-function* insertDBWorker( { payload } ) {
+function* insertDBWorker({ payload }) {
   try {
-    const storage = yield select( state => state.storage );
+    const storage = yield select(state => state.storage);
     const { database, insertedIntoDB, key } = storage;
-    if ( !key ) {
+    if (!key) {
       // dispatch failure
-      console.log( 'Key missing' );
+      console.log('Key missing');
       return;
     }
     const updatedDB = {
@@ -99,31 +98,32 @@ function* insertDBWorker( { payload } ) {
       key,
       insertedIntoDB,
     );
-    if ( !inserted ) {
+    if (!inserted) {
       // dispatch failure
-      console.log( 'Failed to insert into DB' );
+      console.log('Failed to insert into DB');
       return;
     }
-    yield put( dbInserted( payload ) );
-    !insertedIntoDB ? yield put( enrichServices( updatedDB ) ) : null; // enriching services post initial insertion
-  } catch ( err ) {
-    console.log( err );
+    yield put(dbInserted(payload));
+    // !insertedIntoDB ? yield put( enrichServices( updatedDB ) ) : null; // enriching services post initial insertion
+    yield put(enrichServices(updatedDB));
+  } catch (err) {
+    console.log(err);
   }
 }
-export const insertDBWatcher = createWatcher( insertDBWorker, INSERT_INTO_DB );
+export const insertDBWatcher = createWatcher(insertDBWorker, INSERT_INTO_DB);
 
-function* insertSSSDBWorker( { payload } ) {
+function* insertSSSDBWorker({ payload }) {
   try {
-    const storage = yield select( state => state.storage );
+    const storage = yield select(state => state.storage);
     const { key } = storage;
     const updatedDB = {
       insertedIntoDB: true,
       ...payload,
     };
-    const inserted = yield call( dataManager.insertSSS, updatedDB, key, false );
-    if ( inserted ) yield put( dbFetchedSSS( updatedDB ) );
-  } catch ( err ) {
-    console.log( err );
+    const inserted = yield call(dataManager.insertSSS, updatedDB, key, false);
+    if (inserted) yield put(dbFetchedSSS(updatedDB));
+  } catch (err) {
+    console.log(err);
   }
 }
 
@@ -132,28 +132,33 @@ export const insertSSSDBWatcher = createWatcher(
   DB_INSERTEDSSS,
 );
 
-function* updateSSSDBWorder( { payload } ) {
+function* updateSSSDBWorder({ payload }) {
   let { updatedEntity } = payload;
-  const storage = yield select( state => state.storage );
+  const storage = yield select(state => state.storage);
   const { key } = storage;
   try {
-    const inserted = yield call( dataManager.insertSSS, updatedEntity, key, true );
-    if ( inserted ) yield put( dbFetchedSSS( updatedEntity ) )
-  } catch ( error ) {
-    console.log( { error } );
+    const inserted = yield call(
+      dataManager.insertSSS,
+      updatedEntity,
+      key,
+      true,
+    );
+    if (inserted) yield put(dbFetchedSSS(updatedEntity));
+  } catch (error) {
+    console.log({ error });
   }
 }
 
 export const updateSSSDBWatcher = createWatcher(
   updateSSSDBWorder,
-  DB_UPDATESSS
+  DB_UPDATESSS,
 );
 
 function* servicesEnricherWorker() {
   try {
-    const { database } = yield select( state => state.storage );
-    if ( !database ) {
-      console.log( 'Database missing; services encrichment failed' );
+    const { database } = yield select(state => state.storage);
+    if (!database) {
+      console.log('Database missing; services encrichment failed');
       return;
     }
 
@@ -165,15 +170,15 @@ function* servicesEnricherWorker() {
     } = database.SERVICES;
 
     const services = {
-      REGULAR_ACCOUNT: RegularAccount.fromJSON( REGULAR_ACCOUNT ),
-      TEST_ACCOUNT: TestAccount.fromJSON( TEST_ACCOUNT ),
-      SECURE_ACCOUNT: SecureAccount.fromJSON( SECURE_ACCOUNT ),
-      S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
+      REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
+      TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
+      SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
+      S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
     };
 
-    yield put( servicesEnriched( services ) );
-  } catch ( err ) {
-    console.log( err );
+    yield put(servicesEnriched(services));
+  } catch (err) {
+    console.log(err);
   }
 }
 

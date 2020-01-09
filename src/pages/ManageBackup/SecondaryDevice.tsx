@@ -37,20 +37,17 @@ const SecondaryDevice = props => {
   SHARES_TRANSFER_DETAILS[0] && !secondaryQR
     ? setSecondaryQR(
         JSON.stringify({
+          requester: WALLET_SETUP.walletName,
           ...SHARES_TRANSFER_DETAILS[0],
           type: 'secondaryDeviceQR',
         }),
       )
     : null;
 
-  SHARES_TRANSFER_DETAILS[0]
-    ? Alert.alert('OTP', SHARES_TRANSFER_DETAILS[0].OTP)
-    : null;
-
-  const deepLink = SHARES_TRANSFER_DETAILS[0]
-    ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
-      SHARES_TRANSFER_DETAILS[0].ENCRYPTED_KEY
-    : '';
+  // const deepLink = SHARES_TRANSFER_DETAILS[0]
+  //   ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
+  //     SHARES_TRANSFER_DETAILS[0].ENCRYPTED_KEY
+  //   : '';
 
   const dispatch = useDispatch();
 
@@ -105,7 +102,7 @@ const SecondaryDevice = props => {
         ) : (
           <QRCode value={secondaryQR} size={hp('27%')} />
         )}
-        {deepLink ? <CopyThisText text={deepLink} /> : null}
+        {/* {deepLink ? <CopyThisText text={deepLink} /> : null} */}
       </View>
       <BottomInfoBox
         title={'Note'}

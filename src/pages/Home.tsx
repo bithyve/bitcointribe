@@ -67,48 +67,71 @@ import {
 import AllAccountsContents from '../components/AllAccountsContents';
 import SettingsContents from '../components/SettingsContents';
 import { useDispatch, useSelector } from 'react-redux';
-import { checkMSharesHealth, updateMSharesHealth } from '../store/actions/sss';
+import {
+  checkMSharesHealth,
+  updateMSharesHealth,
+  downloadMShare,
+} from '../store/actions/sss';
 import RecoverySecretRequestModalContents from '../components/RecoverySecretRequestModalContesnts';
 import ShareRecoverySecretModalContents from '../components/ShareRecoverySecretModalContents';
 import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
+import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
+import { getTestcoins } from '../store/actions/accounts';
 
 export default function Home( props ) {
   const database = useSelector( state => state.storage.database );
   const walletName = database ? database.WALLET_SETUP.walletName : '';
   const accounts = useSelector( state => state.accounts );
+  const [ balances, setBalances ] = useState( {
+    testBalance: 0,
+    regularBalance: 0,
+    secureBalance: 0,
+    accumulativeBalance: 0,
+  } );
+  const [ transactions, setTransactions ] = useState( [] );
+  useEffect( () => {
+    const testBalance = accounts[ TEST_ACCOUNT ].service
+      ? accounts[ TEST_ACCOUNT ].service.hdWallet.balances.balance +
+      accounts[ TEST_ACCOUNT ].service.hdWallet.balances.unconfirmedBalance
+      : 0;
+    const regularBalance = accounts[ REGULAR_ACCOUNT ].service
+      ? accounts[ REGULAR_ACCOUNT ].service.hdWallet.balances.balance +
+      accounts[ REGULAR_ACCOUNT ].service.hdWallet.balances.unconfirmedBalance
+      : 0;
+    const secureBalance = accounts[ SECURE_ACCOUNT ].service
+      ? accounts[ SECURE_ACCOUNT ].service.secureHDWallet.balances.balance +
+      accounts[ SECURE_ACCOUNT ].service.secureHDWallet.balances
+        .unconfirmedBalance
+      : 0;
+    const accumulativeBalance = regularBalance + secureBalance;
 
-  const testBalance = accounts[ TEST_ACCOUNT ].service
-    ? accounts[ TEST_ACCOUNT ].service.hdWallet.balances.balance +
-    accounts[ TEST_ACCOUNT ].service.hdWallet.balances.unconfirmedBalance
-    : 0;
-  const regularBalance = accounts[ REGULAR_ACCOUNT ].service
-    ? accounts[ REGULAR_ACCOUNT ].service.hdWallet.balances.balance +
-    accounts[ REGULAR_ACCOUNT ].service.hdWallet.balances.unconfirmedBalance
-    : 0;
-  const secureBalance = accounts[ SECURE_ACCOUNT ].service
-    ? accounts[ SECURE_ACCOUNT ].service.secureHDWallet.balances.balance +
-    accounts[ SECURE_ACCOUNT ].service.secureHDWallet.balances
-      .unconfirmedBalance
-    : 0;
-  const accumulativeBalance = regularBalance + secureBalance;
+    const testTransactions = accounts[ TEST_ACCOUNT ].service
+      ? accounts[ TEST_ACCOUNT ].service.hdWallet.transactions.transactionDetails
+      : [];
+    const regularTransactions = accounts[ REGULAR_ACCOUNT ].service
+      ? accounts[ REGULAR_ACCOUNT ].service.hdWallet.transactions
+        .transactionDetails
+      : [];
 
-  const testTransactions = accounts[ TEST_ACCOUNT ].service
-    ? accounts[ TEST_ACCOUNT ].service.hdWallet.transactions.transactionDetails
-    : [];
-  const regularTransactions = accounts[ REGULAR_ACCOUNT ].service
-    ? accounts[ REGULAR_ACCOUNT ].service.hdWallet.transactions.transactionDetails
-    : [];
+    const secureTransactions = accounts[ SECURE_ACCOUNT ].service
+      ? accounts[ SECURE_ACCOUNT ].service.secureHDWallet.transactions
+        .transactionDetails
+      : [];
+    const accumulativeTransactions = [
+      ...testTransactions,
+      ...regularTransactions,
+      ...secureTransactions,
+    ];
 
-  const secureTransactions = accounts[ SECURE_ACCOUNT ].service
-    ? accounts[ SECURE_ACCOUNT ].service.secureHDWallet.transactions
-      .transactionDetails
-    : [];
-  const accumulativeTransactions = [
-    ...testTransactions,
-    ...regularTransactions,
-    ...secureTransactions,
-  ];
+    setBalances( {
+      testBalance,
+      regularBalance,
+      secureBalance,
+      accumulativeBalance,
+    } );
+    setTransactions( accumulativeTransactions );
+  }, [ accounts ] );
 
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: '',
@@ -345,12 +368,37 @@ export default function Home( props ) {
     ( bottomSheet as any ).current.snapTo( 1 );
   }, [] );
 
+  const messageAsPerHealth = health => {
+    if ( health == 0 ) {
+      return (
+        <Text style={ styles.headerInfoText }>
+          The wallet backup is not secure.{ '\n' }Please visit the health section
+          to{ '\n' }improve the health of your backup
+        </Text>
+      );
+    } else if ( health > 0 && health < 100 ) {
+      return (
+        <Text style={ styles.headerInfoText }>
+          The wallet backup is not secured{ '\n' }Please complete the setup to
+          { '\n' }safeguard against loss of funds
+        </Text>
+      );
+    } else {
+      return (
+        <Text style={ styles.headerInfoText }>
+          <Text style={ { fontStyle: 'italic' } }>Great!! </Text>
+          The wallet backup is{ '\n' }secure. Keep an eye on the{ '\n' }health of
+          the backup here
+        </Text>
+      );
+    }
+  };
+
   const updateAccountCardData = () => {
     let newArrayFinal = [];
     let tempArray = [];
     for ( let a = 0; a < data.length; a++ ) {
       tempArray.push( data[ a ] );
-      console.log( 'tempArray', tempArray, tempArray.length );
       if (
         tempArray.length == 2 ||
         data[ data.length - 1 ].id == tempArray[ 0 ].id
@@ -361,7 +409,6 @@ export default function Home( props ) {
     }
     if ( newArrayFinal ) {
       setNewData( newArrayFinal );
-      console.log( 'newArrayFinal', newArrayFinal );
     }
   };
 
@@ -369,14 +416,14 @@ export default function Home( props ) {
     return (
       <View style={ styles.modalContentContainer }>
         <FlatList
-          data={ accumulativeTransactions }
+          data={ transactions }
           ItemSeparatorComponent={ () => (
             <View style={ { backgroundColor: Colors.white } }>
               <View style={ styles.separatorView } />
             </View>
           ) }
           renderItem={ ( { item } ) => (
-            <TouchableOpacity
+            <AppBottomSheetTouchableWrapper
               onPress={ () =>
                 props.navigation.navigate( 'TransactionDetails', { item } )
               }
@@ -444,7 +491,7 @@ export default function Home( props ) {
                   style={ { marginLeft: 20, alignSelf: 'center' } }
                 />
               </View>
-            </TouchableOpacity>
+            </AppBottomSheetTouchableWrapper>
           ) }
         />
       </View>
@@ -492,8 +539,21 @@ export default function Home( props ) {
     );
   };
 
-  const getQrCodeData = data => {
-    console.log( 'Qrcodedata', data );
+  const getQrCodeData = qrData => {
+    // console.log('Qrcodedata', data);
+    const scannedData = JSON.parse( qrData );
+    switch ( scannedData.type ) {
+      case 'secondaryDeviceQR':
+        const custodyRequest = {
+          requester: scannedData.requester,
+          ek: scannedData.ENCRYPTED_KEY,
+          otp: scannedData.OTP,
+        };
+        props.navigation.navigate( 'Home', { custodyRequest } );
+        break;
+      default:
+        break;
+    }
   };
 
   function renderContent1() {
@@ -1341,7 +1401,7 @@ export default function Home( props ) {
 
   const dispatch = useDispatch();
 
-  const s3Service = useSelector( state => state.sss.service );
+  // const s3Service = useSelector(state => state.sss.service);
   const [ overallHealth, setOverallHealth ] = useState();
 
   const health = useSelector( state => state.sss.overallHealth );
@@ -1367,6 +1427,22 @@ export default function Home( props ) {
       }
     } )();
   }, [] );
+
+  const testAccService = useSelector(
+    state => state.accounts[ TEST_ACCOUNT ].service,
+  );
+  useEffect( () => {
+    if ( testAccService )
+      ( async () => {
+        if ( !( await AsyncStorage.getItem( 'Received Testcoins' ) ) ) {
+          const { balances } = testAccService.hdWallet;
+          const netBalance = testAccService
+            ? balances.balance + balances.unconfirmedBalance
+            : 0;
+          if ( !netBalance ) dispatch( getTestcoins( TEST_ACCOUNT ) );
+        }
+      } )();
+  }, [ testAccService ] );
 
   const renderRecoverySecretRequestModalContent = () => {
     return (
@@ -1544,7 +1620,7 @@ export default function Home( props ) {
                     color: Colors.white,
                   } }
                 >
-                  { accumulativeBalance }
+                  { balances.accumulativeBalance }
                 </Text>
                 <Text
                   style={ {
@@ -1567,11 +1643,9 @@ export default function Home( props ) {
           </View>
           <View style={ { flexDirection: 'row' } }>
             <View style={ { flex: 7 } }>
-              <Text style={ styles.headerInfoText }>
-                <Text style={ { fontStyle: 'italic' } }>Great!! </Text>
-                The wallet backup is secure. Keep an eye on the health of the
-                backup here
-              </Text>
+              { messageAsPerHealth(
+                overallHealth ? overallHealth.overallStatus : 0,
+              ) }
               <TouchableOpacity
                 onPress={ () => {
                   props.navigation.navigate( 'ManageBackup' );
@@ -1602,6 +1676,7 @@ export default function Home( props ) {
             horizontal
             showsHorizontalScrollIndicator={ false }
             data={ newData }
+            extraData={ balances }
             renderItem={ Items => {
               return (
                 <View style={ { flexDirection: 'column' } }>
@@ -1667,10 +1742,10 @@ export default function Home( props ) {
                               />
                               <Text style={ styles.cardAmountText }>
                                 { value.accountType === 'test'
-                                  ? testBalance
+                                  ? balances.testBalance
                                   : value.accountType === 'regular'
-                                    ? regularBalance
-                                    : secureBalance }
+                                    ? balances.regularBalance
+                                    : balances.secureBalance }
                               </Text>
                               <Text style={ styles.cardAmountUnitText }>
                                 { value.unit }

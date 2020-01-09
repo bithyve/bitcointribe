@@ -29,6 +29,7 @@
 		6934F5A33DB24321AFF7B87E /* OpenSans-Semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AD117402FDBC444293748DFA /* OpenSans-Semibold.ttf */; };
 		82A58BADE0884E2D8A1E4373 /* OpenSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B5A1406E4C85431881D3C328 /* OpenSans-ExtraBold.ttf */; };
 		8953B15C1D9F43F4A4680696 /* OpenSans-SemiboldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A3E9C53E8CAF4EEC80636EE7 /* OpenSans-SemiboldItalic.ttf */; };
+		8B6E59A723C70042002F9CFC /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B6E59A623C70042002F9CFC /* CloudKit.framework */; };
 		8B9A0F2923AB4F3F00E80325 /* PdfGenerate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9A0F2823AB4F3F00E80325 /* PdfGenerate.swift */; };
 		987409B39E3B4AF080C94D3A /* Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A03B30E141C04C01919E0DED /* Foundation.ttf */; };
 		A339BF789280448399A74159 /* FiraSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F2A9765A861B43DD82371F49 /* FiraSans-Italic.ttf */; };
@@ -79,6 +80,7 @@
 		71B2178AB6874E9EAFFBC9C3 /* Fontisto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Fontisto.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf"; sourceTree = "<group>"; };
 		82FCC13143C2C470DB519765 /* Pods-HEXA.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA.release.xcconfig"; path = "Target Support Files/Pods-HEXA/Pods-HEXA.release.xcconfig"; sourceTree = "<group>"; };
 		8699703E76BE4C6CA78D3161 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
+		8B6E59A623C70042002F9CFC /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		8B9A0F2723AB4F3F00E80325 /* HEXA-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HEXA-Bridging-Header.h"; sourceTree = "<group>"; };
 		8B9A0F2823AB4F3F00E80325 /* PdfGenerate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PdfGenerate.swift; sourceTree = "<group>"; };
 		8CFFF238310D47B189028824 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
@@ -108,6 +110,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EFCD5774E907942F23B3A7F4 /* libPods-HEXA.a in Frameworks */,
+				8B6E59A723C70042002F9CFC /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,6 +148,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8B6E59A623C70042002F9CFC /* CloudKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
@@ -436,9 +440,9 @@
 				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.0.080120;
+				CURRENT_PROJECT_VERSION = 1.1.080120;
 				DEAD_CODE_STRIPPING = NO;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = Y5TCB759QL;
 				INFOPLIST_FILE = HEXA/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 0.5;
@@ -466,8 +470,8 @@
 				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.0.080120;
-				DEVELOPMENT_TEAM = "";
+				CURRENT_PROJECT_VERSION = 1.1.080120;
+				DEVELOPMENT_TEAM = Y5TCB759QL;
 				INFOPLIST_FILE = HEXA/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 0.5;
