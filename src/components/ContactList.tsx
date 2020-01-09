@@ -8,7 +8,9 @@ import {
   PermissionsAndroid,
   Platform,
   Alert,
-  FlatList
+  FlatList,
+  TextInput,
+  SafeAreaView
 } from "react-native";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
@@ -20,6 +22,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import RadioButton from "../components/RadioButton";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import * as ExpoContacts from "expo-contacts";
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
 
 async function requestContactsPermission() {
   try {
@@ -73,6 +76,8 @@ export default function ContactList(props) {
     "Y",
     "Z"
   ]);
+  const [searchBox, setSearchBox] = useState('');
+  const [filterContactData, setFilterContactData] = useState([]);
 
   const getContactsAsync = async () => {
     if (Platform.OS === "android") {
@@ -85,15 +90,42 @@ export default function ContactList(props) {
       if (!data.length) Alert.alert("No contacts found!");
       console.log(data.length);
       setContactData(data);
+
+      const contactList = data
+      .sort(function (a, b) {
+        if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+        return 0;
+      })
+      setFilterContactData(contactList);
     });
+
+    
   };
 
   useEffect(() => {
     getContactsAsync();
+    setSearchBox('');
   }, []);
 
+  const filterContacts = (keyword) => {
+    if (!keyword.length) {
+      setFilterContactData(contactData);
+      return;
+    }
+    let isFilter = true;
+    let filterContactsForDisplay = [];
+    for (let i = 0; i < contactData.length; i++) {
+      if (contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())) {
+        filterContactsForDisplay.push(contactData[i])
+      }
+    }
+    setFilterContactData(filterContactsForDisplay);
+  }
+
+
   function onContactSelect(index) {
-    let contacts = contactData;
+    let contacts = filterContactData;
     if (contacts[index].checked) {
       selectedContacts.splice(
         selectedContacts.findIndex(temp => temp.id == contacts[index].id),
@@ -116,15 +148,15 @@ export default function ContactList(props) {
         contacts[i].checked = false;
       }
     }
-    setContactData(contacts);
+    setFilterContactData(contacts);
     setRadioOnOff(!radioOnOff);
     props.onSelectContact(selectedContacts);
   }
 
   function onCancel(value) {
-    if (contactData.findIndex(tmp => tmp.id == value.id) > -1) {
-      contactData[
-        contactData.findIndex(tmp => tmp.id == value.id)
+    if (filterContactData.findIndex(tmp => tmp.id == value.id) > -1) {
+      filterContactData[
+        filterContactData.findIndex(tmp => tmp.id == value.id)
       ].checked = false;
     }
     selectedContacts.splice(
@@ -137,6 +169,7 @@ export default function ContactList(props) {
   }
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <View style={{ flex: 1, ...props.style }}>
       <View style={styles.selectedContactContainer}>
         {selectedContacts.map(value => (
@@ -153,10 +186,22 @@ export default function ContactList(props) {
           </View>
         ))}
       </View>
+      <View style={[styles.searchBoxContainer]}>
+          <View style={styles.searchBoxIcon}>
+            <EvilIcons style={{ alignSelf: 'center' }} name="search" size={20} color={Colors.textColorGrey} />
+          </View>
+          <TextInput
+            ref={element => setSearchBox(element)}
+            style={styles.searchBoxInput}
+            placeholder="Search"
+            placeholderTextColor={Colors.textColorGrey}
+            onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
+          />
+        </View>
       <View style={{ flex: 1, flexDirection: "row" }}>
         <View style={{ flex: 11 }}>
-          {contactData ? <FlatList
-            data={contactData}
+          {filterContactData ? <FlatList
+            data={filterContactData}
             extraData={props.onSelectContact}
             showsVerticalScrollIndicator={false}
             renderItem={({ item, index }) => {
@@ -190,35 +235,6 @@ export default function ContactList(props) {
             }
             }
           /> : null}
-          {/* {contactData.map((value, index) => {
-              let selected = false;
-              if (
-                selectedContacts.findIndex(temp => temp.id == value.id) > -1
-              ) {
-                selected = true;
-              }
-              return (
-                <TouchableOpacity
-                  onPress={() => onContactSelect(index)}
-                  style={styles.contactView}
-                  key={index}
-                >
-                  <RadioButton
-                    size={15}
-                    color={Colors.lightBlue}
-                    borderColor={Colors.borderColor}
-                    isChecked={selected}
-                    onpress={() => onContactSelect(index)}
-                  />
-                  <Text style={styles.contactText}>
-                    {value.name.split(" ")[0]}{" "}
-                    <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                      {value.name.split(" ")[1]}
-                    </Text>
-                  </Text>
-                </TouchableOpacity>
-              );
-            })} */}
         </View>
         <View style={styles.contactIndexView}>
           <TouchableOpacity
@@ -247,6 +263,7 @@ export default function ContactList(props) {
         </TouchableOpacity>
       )}
     </View>
+    </SafeAreaView>
   );
 }
 
@@ -314,5 +331,27 @@ const styles = StyleSheet.create({
     flex: 0.5,
     height: "100%",
     justifyContent: "space-evenly"
-  }
+  },
+  searchBoxContainer: {
+    flexDirection: "row",
+    borderBottomColor: Colors.borderColor,
+    borderBottomWidth: 0.5,
+    marginLeft: 10,
+    marginRight: 10,
+    height: 40,
+    justifyContent: 'center',
+
+  },
+  searchBoxIcon: {
+    justifyContent: 'center',
+    marginBottom: -10
+  },
+  searchBoxInput: {
+    flex: 1,
+    fontSize: 13,
+    color: Colors.blacl,
+    borderBottomColor: Colors.borderColor,
+    alignSelf: 'center',
+    marginBottom: -10
+  },
 });

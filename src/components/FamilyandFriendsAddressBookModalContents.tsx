@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Image,
     Text,
     StyleSheet,
     ScrollView,
-    TouchableOpacity
+    TextInput
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
@@ -17,6 +17,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import RadioButton from "../components/RadioButton";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
 
 export default function FamilyandFriendsAddressBookModalContents(props) {
     const [selectedContact, setSelectedContact] = useState({});
@@ -56,13 +57,41 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
         }
     ]);
     const [alphabetsList] = useState(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']);
+    const [searchBox, setSearchBox] = useState('');
+    const [filterContactData, setFilterContactData] = useState([]);
 
+    useEffect(() => {
+        setSearchBox('');
+        const contactList = contactData
+          .sort(function (a, b) {
+            if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+            if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+            return 0;
+          })
+        setFilterContactData(contactList);
+      }, []);
+
+      const filterContacts = (keyword) => {
+        if (!keyword.length) {
+          setFilterContactData(contactData);
+          return;
+        }
+        let isFilter = true;
+        let filterContactsForDisplay = [];
+        for (let i = 0; i < contactData.length; i++) {
+          if (contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())) {
+            filterContactsForDisplay.push(contactData[i])
+          }
+        }
+        setFilterContactData(filterContactsForDisplay);
+      }
+    
     const onContactSelect = (index) => {
-        if (setSelectedContact.id && contactData.findIndex((value) => value.id == setSelectedContact.id) > -1) {
+        if (setSelectedContact.id && filterContactData.findIndex((value) => value.id == setSelectedContact.id) > -1) {
             setSelectedContact({});
         }
         else {
-            setSelectedContact(contactData[index]);
+            setSelectedContact(filterContactData[index]);
         }
     }
 
@@ -107,10 +136,22 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
                 <Text style={styles.pageTitle}>Other Contacts</Text>
                 <Text style={styles.pageInfoText}>Lorem ipsum dolor sit amet, consectetur adipiscing</Text>
             </View>
+            <View style={[styles.searchBoxContainer]}>
+          <View style={styles.searchBoxIcon}>
+            <EvilIcons style={{ alignSelf: 'center' }} name="search" size={20} color={Colors.textColorGrey} />
+          </View>
+          <TextInput
+            ref={element => setSearchBox(element)}
+            style={styles.searchBoxInput}
+            placeholder="Search"
+            placeholderTextColor={Colors.textColorGrey}
+            onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
+          />
+        </View>
             <View style={{ flex: 1, flexDirection: 'row' }}>
                 <View style={{ flex: 11 }}>
                     <ScrollView showsVerticalScrollIndicator={false} >
-                        {contactData.map((value, index) => {
+                        {filterContactData.map((value, index) => {
                             return <AppBottomSheetTouchableWrapper onPress={() => onContactSelect(index)}  style={styles.contactView} >
                                 <RadioButton size={15} color={Colors.lightBlue} borderColor={Colors.borderColor} isChecked={selectedContact.id && selectedContact.id == value.id ? true : false} onpress={() => onContactSelect(index)} />
                                 <Text style={styles.contactText}>
@@ -259,4 +300,26 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.FiraSansMedium,
         fontSize: RFValue(13, 812)
     },
+    searchBoxContainer: {
+        flexDirection: "row",
+        borderBottomColor: Colors.borderColor,
+        borderBottomWidth: 0.5,
+        marginLeft: 10,
+        marginRight: 10,
+        height: 40,
+        justifyContent: 'center',
+    
+      },
+      searchBoxIcon: {
+        justifyContent: 'center',
+        marginBottom: -10
+      },
+      searchBoxInput: {
+        flex: 1,
+        fontSize: 13,
+        color: Colors.blacl,
+        borderBottomColor: Colors.borderColor,
+        alignSelf: 'center',
+        marginBottom: -10
+      },
 })

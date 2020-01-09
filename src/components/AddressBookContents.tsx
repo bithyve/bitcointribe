@@ -23,82 +23,19 @@ import EvilIcons from 'react-native-vector-icons/EvilIcons';
 export default function AddressBookContents(props) {
   const [contactData, setContactData] = useState([
     {
-      name: "Shivani Altekar",
+      name: "Anant Tapadia",
       checked: false,
       id: 1,
       communicationMode: [],
       status: ""
     },
     {
-      name: "Uma AmravatiKr",
+      name: "Mir Liyaqat Ali",
       checked: false,
       id: 2,
       communicationMode: [],
       status: ""
     },
-    {
-      name: "Adison Alter",
-      checked: false,
-      id: 3,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Add Add",
-      checked: false,
-      id: 4,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Raj Boke",
-      checked: false,
-      id: 5,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Samantha Bhujange",
-      checked: false,
-      id: 6,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Kaweri Balwihari",
-      checked: false,
-      id: 7,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Radhesham Bichkule",
-      checked: false,
-      id: 8,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Rameswar Bihari",
-      checked: false,
-      id: 9,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Shahaji Buchade",
-      checked: false,
-      id: 10,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Shabnam Chitale",
-      checked: false,
-      id: 11,
-      communicationMode: [],
-      status: ""
-    }
   ]);
   const [alphabetsList] = useState([
     "A",
@@ -139,7 +76,7 @@ export default function AddressBookContents(props) {
         if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
         return 0;
       })
-      setFilterContactData(contactList);
+    setFilterContactData(contactList);
   }, []);
 
   const filterContacts = (keyword) => {
@@ -176,70 +113,43 @@ export default function AddressBookContents(props) {
         <Text style={styles.pageInfoText}>
           Lorem ipsum dolor sit amet, consectetur adipiscing
         </Text>
-        <View style={styles.selectedContactsView}>
-          <Text style={styles.contactsNameText}>
-            Anant{" "}
-            <Text style={{ fontFamily: Fonts.FiraSansMedium }}>Tapadia</Text>
-          </Text>
-          <TouchableOpacity style={styles.shareButtonView}>
-            <Text style={styles.shareButtonText}>Share</Text>
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{ ...styles.selectedContactsView, marginBottom: hp("3%") }}
-        >
-          <Text style={styles.contactsNameText}>
-            Mir Liyaqat{" "}
-            <Text style={{ fontFamily: Fonts.FiraSansMedium }}>Ali</Text>
-          </Text>
-          <TouchableOpacity style={styles.shareButtonView}>
-            <Text style={styles.shareButtonText}>Share</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={[styles.searchBoxContainer]}>
+        <View style={[styles.searchBoxContainer]}>
           <View style={styles.searchBoxIcon}>
-            <EvilIcons style={{ alignSelf: 'center' }} name="search" size={20} color={Colors.darkGray} />
+            <EvilIcons style={{ alignSelf: 'center' }} name="search" size={20} color={Colors.textColorGrey} />
           </View>
           <TextInput
             ref={element => setSearchBox(element)}
             style={styles.searchBoxInput}
             placeholder="Search"
-            placeholderTextColor={Colors.darkGray}
+            placeholderTextColor={Colors.textColorGrey}
             onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
           />
         </View>
+      </View>
       <View style={{ flex: 1 }}>
         <View style={{ flex: 1, flexDirection: "row" }}>
           <View style={{ flex: 11 }}>
-          <FlatList
-            data={filterContactData}
-            extraData={filterContactData}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) => {
-              return (
-                <TouchableOpacity style={styles.contactView}>
-                  <Text style={styles.contactText}>
-                    {item.name.split(" ")[0]}{" "}
-                    <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                      {item.name.split(" ")[1]}
+            <FlatList
+              data={filterContactData}
+              extraData={filterContactData}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item, index }) => {
+                return (
+                  <View style={styles.selectedContactsView}>
+                    <Text style={styles.contactText}>
+                      {item.name.split(" ")[0]}{" "}
+                      <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                        {item.name.split(" ")[1]}
+                      </Text>
                     </Text>
-                  </Text>
-                </TouchableOpacity>
-              )
-            }
-            }
-              />
-          </View>
-          <View style={styles.contactIndexView}>
-            <TouchableOpacity>
-              <Text style={styles.contactIndexText}>#</Text>
-            </TouchableOpacity>
-            {alphabetsList.map(value => (
-              <TouchableOpacity>
-                <Text style={styles.contactIndexText}>{value}</Text>
-              </TouchableOpacity>
-            ))}
+                    <TouchableOpacity style={styles.shareButtonView}>
+                      <Text style={styles.shareButtonText}>Share</Text>
+                    </TouchableOpacity>
+                  </View>
+                )
+              }
+              }
+            />
           </View>
         </View>
       </View>
@@ -356,7 +266,7 @@ const styles = StyleSheet.create({
   },
   searchBoxInput: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 13,
     color: Colors.blacl,
     borderBottomColor: Colors.borderColor,
     alignSelf: 'center',
