@@ -21,7 +21,11 @@ export interface Database {
       };
     };
     SHARES_TRANSFER_DETAILS: {
-      [SHARE_INDEX: string]: { OTP: string; ENCRYPTED_KEY: string };
+      [SHARE_INDEX: string]: {
+        OTP: string;
+        ENCRYPTED_KEY: string;
+        UPLOADED_AT: number;
+      };
     };
     UNDER_CUSTODY: {
       [TAG: string]: {

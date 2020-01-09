@@ -42,14 +42,6 @@ export default function CommunicationMode(props) {
   if (!contact) return <View></View>;
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (!SHARES_TRANSFER_DETAILS[index]) dispatch(uploadEncMShare(index));
-    else {
-      //  Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
-      console.log(SHARES_TRANSFER_DETAILS[index]);
-    }
-  }, []);
-
   const communicationInfo = [];
   if (contact.phoneNumbers) communicationInfo.push(...contact.phoneNumbers);
   if (contact.emails) communicationInfo.push(...contact.emails);
@@ -138,6 +130,20 @@ export default function CommunicationMode(props) {
   };
 
   const { loading } = useSelector(state => state.sss);
+
+  useEffect(() => {
+    console.log('Running');
+    console.log({ DETAILS: SHARES_TRANSFER_DETAILS });
+    if (
+      !SHARES_TRANSFER_DETAILS[index] ||
+      Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
+    )
+      dispatch(uploadEncMShare(index));
+    else {
+      //  Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
+      console.log(SHARES_TRANSFER_DETAILS[index]);
+    }
+  }, [SHARES_TRANSFER_DETAILS[index]]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

@@ -34,16 +34,6 @@ const SecondaryDevice = props => {
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
   const { loading } = useSelector(state => state.sss);
 
-  SHARES_TRANSFER_DETAILS[0] && !secondaryQR
-    ? setSecondaryQR(
-        JSON.stringify({
-          requester: WALLET_SETUP.walletName,
-          ...SHARES_TRANSFER_DETAILS[0],
-          type: 'secondaryDeviceQR',
-        }),
-      )
-    : null;
-
   // const deepLink = SHARES_TRANSFER_DETAILS[0]
   //   ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
   //     SHARES_TRANSFER_DETAILS[0].ENCRYPTED_KEY
@@ -52,10 +42,22 @@ const SecondaryDevice = props => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!secondaryQR) {
+    if (SHARES_TRANSFER_DETAILS[0]) {
+      if (Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT < 600000) {
+        setSecondaryQR(
+          JSON.stringify({
+            requester: WALLET_SETUP.walletName,
+            ...SHARES_TRANSFER_DETAILS[0],
+            type: 'secondaryDeviceQR',
+          }),
+        );
+      } else {
+        dispatch(uploadEncMShare(0));
+      }
+    } else {
       dispatch(uploadEncMShare(0));
     }
-  }, []);
+  }, [SHARES_TRANSFER_DETAILS[0]]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
