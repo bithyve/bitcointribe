@@ -117,13 +117,16 @@ function* uploadEncMetaShareWorker({ payload }) {
 
   // preventing re-uploads till expiry
   if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]) {
-    console.log(
-      DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex],
-    );
-    return;
+    if (
+      Date.now() -
+        DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
+          .UPLOADED_AT <
+      600000
+    )
+      // re-upload after 10 minutes (removal sync w/ relayer)
+      return;
   }
 
-  // TODO: 10 min removal strategy
   yield put(switchS3Loader('uploadMetaShare'));
 
   const res = yield call(s3Service.uploadShare, payload.shareIndex);
@@ -135,7 +138,11 @@ function* uploadEncMetaShareWorker({ payload }) {
       ...DECENTRALIZED_BACKUP,
       SHARES_TRANSFER_DETAILS: {
         ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
-        [payload.shareIndex]: { OTP: otp, ENCRYPTED_KEY: encryptedKey },
+        [payload.shareIndex]: {
+          OTP: otp,
+          ENCRYPTED_KEY: encryptedKey,
+          UPLOADED_AT: Date.now(),
+        },
       },
     };
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
