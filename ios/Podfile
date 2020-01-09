@@ -57,8 +57,6 @@ target 'HEXA' do
 
   pod 'react-native-print', :path => '../node_modules/react-native-print'
 
-  pod 'react-native-document-picker', :path => '../node_modules/react-native-document-picker'
-
   pod 'react-native-mail', :path => '../node_modules/react-native-mail'
 
 end
