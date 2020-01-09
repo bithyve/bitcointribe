@@ -3,7 +3,7 @@ package com.hexa;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import org.rncloudfs.RNCloudFsPackage;
+import com.rnfs.RNFSPackage;
 import com.chirag.RNMail.RNMail;
 import com.christopherdro.RNPrint.RNPrintPackage;
 import cl.json.RNSharePackage;
@@ -63,12 +63,13 @@ public class MainApplication extends Application implements ShareApplication, Re
 
     @Override
     protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(new MainReactPackage(), new RNCloudFsPackage(), new RNMail(),
-          new RNPrintPackage(), new RNSharePackage(), new RNCameraPackage(), new VectorIconsPackage(),
-          new UdpSocketsModule(), new TcpSocketsModule(), new RNOSModule(), new NetInfoPackage(), new SvgPackage(),
-          new RNHTMLtoPDFPackage(), new RNCardViewPackage(), new ReactVideoPackage(), new RNDeviceInfo(),
-          new RandomBytesPackage(), new AsyncStoragePackage(), new ReanimatedPackage(), new RNGestureHandlerPackage(),
-          new RNScreensPackage(), new PdfPasswordPackage(), new ModuleRegistryAdapter(mModuleRegistryProvider));
+      return Arrays.<ReactPackage>asList(new MainReactPackage(),
+            new RNFSPackage(), new RNMail(), new RNPrintPackage(),
+          new RNSharePackage(), new RNCameraPackage(), new VectorIconsPackage(), new UdpSocketsModule(),
+          new TcpSocketsModule(), new RNOSModule(), new NetInfoPackage(), new SvgPackage(), new RNHTMLtoPDFPackage(),
+          new RNCardViewPackage(), new ReactVideoPackage(), new RNDeviceInfo(), new RandomBytesPackage(),
+          new AsyncStoragePackage(), new ReanimatedPackage(), new RNGestureHandlerPackage(), new RNScreensPackage(),
+          new PdfPasswordPackage(), new ModuleRegistryAdapter(mModuleRegistryProvider));
     }
 
     @Override
