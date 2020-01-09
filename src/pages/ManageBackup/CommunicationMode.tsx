@@ -26,6 +26,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch } from 'react-redux';
 import { uploadEncMShare } from '../../store/actions/sss';
 import ShareOtpWithTrustedContactContents from '../../components/ShareOtpWithTrustedContactContents';
+import { nameToInitials } from '../../common/CommonFunctions';
 
 export default function CommunicationMode(props) {
   const secretSharedTrustedContact1 = props.navigation.state.params
@@ -38,6 +39,7 @@ export default function CommunicationMode(props) {
     : null;
 
   const contact = props.navigation.getParam('contact');
+  console.log("CONTACT in Communication mode", contact);
   const index = props.navigation.getParam('index');
   if (!contact) return <View></View>;
   const dispatch = useDispatch();
@@ -198,11 +200,23 @@ export default function CommunicationMode(props) {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
-            >
-              <Image
-                source={require('../../assets/images/icons/pexels-photo.png')}
-                style={{ ...styles.contactProfileImage }}
-              />
+            > 
+            {contact.imageAvailable ? (<Image
+                  source={contact.image}
+                  style={{ ...styles.contactProfileImage }}
+                />) : (<View style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: Colors.shadowBlue,
+                    width: 70,
+                    height: 70,
+                    borderRadius: 70 / 2,
+                  }}><Text style={{
+                    textAlign: 'center',
+                    fontSize: 13,
+                    lineHeight: 13, //... One for top and one for bottom alignment
+                  }}>{nameToInitials(contact.name)}</Text></View>)
+                }
             </View>
           </View>
         </View>
