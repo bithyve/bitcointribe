@@ -144,10 +144,16 @@ export default function ManageBackup(props) {
 
   function getImageByType(item) {
     let type = item.type;
+    let title = item.title;
     if (type == 'secondaryDevice') {
       return require('../../assets/images/icons/icon_secondarydevice.png');
     } else if (type == 'contact') {
-      return require('../../assets/images/icons/icon_user.png');
+      if (item.personalInfo && item.personalInfo.imageAvailable) {
+        return item.personalInfo.image;
+      } else {
+        return require('../../assets/images/icons/icon_user.png');
+      }
+
     } else if (type == 'copy1' || type == 'copy2') {
       if (
         item.personalInfo &&
@@ -489,6 +495,9 @@ export default function ManageBackup(props) {
   const { databaseSSS } = useSelector(state => state.storage);
 
   useEffect(() => {
+    (async () => {
+    const contactList = await AsyncStorage.getItem('SelectedContacts');
+    })();
     dispatch(fetchSSSFromDB());
     checkNShowHelperModal();
     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
@@ -636,7 +645,7 @@ export default function ManageBackup(props) {
     setContacts(contacts);
     setContactIndex(index);
     const contactList = await AsyncStorage.getItem('SelectedContacts');
-    console.log('contactList', contactList);
+    console.log('contacts getTrustContact', contacts);
   };
 
   useEffect(() => {
@@ -650,8 +659,8 @@ export default function ManageBackup(props) {
             updatedPageData[i].title == 'Trusted Contact 1'
               ? (updatedPageData[i].personalInfo = contacts[0])
               : updatedPageData[i].title == 'Trusted Contact 2'
-              ? (updatedPageData[i].personalInfo = contacts[1])
-              : '';
+                ? (updatedPageData[i].personalInfo = contacts[1])
+                : '';
           } else if (!updatedPageData[1].personalInfo) {
             updatedPageData[i].title == 'Trusted Contact 1'
               ? (updatedPageData[i].personalInfo = contacts[0])
@@ -664,8 +673,8 @@ export default function ManageBackup(props) {
             updatedPageData[i].title == 'Trusted Contact 1'
               ? (updatedPageData[i].personalInfo = contacts[0])
               : updatedPageData[i].title == 'Trusted Contact 2'
-              ? (updatedPageData[i].personalInfo = contacts[1])
-              : '';
+                ? (updatedPageData[i].personalInfo = contacts[1])
+                : '';
           } else if (!updatedPageData[2].personalInfo) {
             updatedPageData[i].title == 'Trusted Contact 2'
               ? (updatedPageData[i].personalInfo = contacts[0])
@@ -761,12 +770,12 @@ export default function ManageBackup(props) {
                   shieldStatus={overallHealth.overallStatus}
                 />
               ) : (
-                <HomePageShield
-                  circleShadowColor={Colors.borderColor}
-                  shieldImage={require('../../assets/images/icons/protector_gray.png')}
-                  shieldStatus={0}
-                />
-              )}
+                  <HomePageShield
+                    circleShadowColor={Colors.borderColor}
+                    shieldImage={require('../../assets/images/icons/protector_gray.png')}
+                    shieldStatus={0}
+                  />
+                )}
             </View>
           </View>
           <FlatList
@@ -794,8 +803,8 @@ export default function ManageBackup(props) {
                           item.title === 'Trusted Contact 1'
                             ? 1
                             : item.title === 'Trusted Contact 2'
-                            ? 2
-                            : undefined,
+                              ? 2
+                              : undefined,
                         getTrustContact: getTrustContact,
                         contacts: contacts ? contacts : [],
                       });
@@ -812,8 +821,8 @@ export default function ManageBackup(props) {
                               item.title === 'Trusted Contact 1'
                                 ? 1
                                 : item.title === 'Trusted Contact 2'
-                                ? 2
-                                : undefined,
+                                  ? 2
+                                  : undefined,
                             secretSharedTrustedContact1:
                               item.title === 'Trusted Contact 1'
                                 ? secretSharedTrustedContact1
@@ -835,10 +844,10 @@ export default function ManageBackup(props) {
                       item.status == 'error'
                         ? Colors.red
                         : item.status == 'warning'
-                        ? Colors.yellow
-                        : item.status == 'success'
-                        ? Colors.green
-                        : Colors.blue,
+                          ? Colors.yellow
+                          : item.status == 'success'
+                            ? Colors.green
+                            : Colors.blue,
                     elevation:
                       selectedType && item.type == selectedType ? 10 : 0,
                     shadowColor:
@@ -855,10 +864,17 @@ export default function ManageBackup(props) {
                       selectedType && item.type == selectedType ? 10 : 0,
                   }}
                 >
-                  <Image
-                    style={styles.cardImage}
-                    source={getImageByType(item)}
-                  />
+                   {/* {item.personalInfo && !item.personalInfo.imageAvailable ? (<Text style={{
+                    textAlign: 'center',
+                    backgroundColor: 'white',
+                    fontSize: 13,
+                    lineHeight: 13, //... One for top and one for bottom alignment
+                  }}>{item.personalInfo && item.personalInfo.firstName ? item.personalInfo.firstName.subString(0,1).toUpperCase() : '' + item.personalInfo && item.personalInfo.lastName ? item.personalInfo.lastName.subString(0,1).toUpperCase() : ''}</Text>) : } */}
+                 <Image
+                      style={styles.cardImage}
+                      source={getImageByType(item)}
+                    />
+
                   <View style={{ marginLeft: 15 }}>
                     <Text style={styles.cardTitleText}>
                       {item.personalInfo && item.type == 'contact'

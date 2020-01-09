@@ -70,11 +70,9 @@ const TrustedContacts = props => {
       for (let i = 0; i < contacts.length; i++) {
         contactListArray.push(contacts[i]);
       }
-    }
-    await AsyncStorage.setItem(
-      'SelectedContacts',
-      JSON.stringify(contactListArray),
-    );
+    }   
+    console.log("CONTACTLIST ARRAY",contactListArray);
+    await AsyncStorage.setItem('SelectedContacts', JSON.stringify(contactListArray));
     // props.navigation.navigate('CommunicationMode', {
     //   contact: contacts[0],
     //   index,
