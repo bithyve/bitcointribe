@@ -24,12 +24,15 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import KnowMoreButton from '../components/KnowMoreButton';
 
 export default function ShareOtpWithTrustedContactContents(props) {
+  const OTP = props.navigation.getParam('OTP');
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
         <View style={{ flexDirection: 'row', flex: 1 }}>
           <TouchableOpacity
-            onPress={() => props.onPressBack()}
+            onPress={() => {
+              props.navigation.navigate('ManageBackup');
+            }}
             style={{ height: 30, width: 30 }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
@@ -86,7 +89,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
                 fontSize: RFValue(23, 812),
               }}
             >
-              {props.OTP[0]}
+              {OTP[0]}
             </Text>
           </View>
           <View
@@ -106,7 +109,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
                 fontSize: RFValue(23, 812),
               }}
             >
-              {props.OTP[1]}
+              {OTP[1]}
             </Text>
           </View>
           <View
@@ -126,7 +129,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
                 fontSize: RFValue(23, 812),
               }}
             >
-              {props.OTP[2]}
+              {OTP[2]}
             </Text>
           </View>
           <View
@@ -146,7 +149,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
                 fontSize: RFValue(23, 812),
               }}
             >
-              {props.OTP[3]}
+              {OTP[3]}
             </Text>
           </View>
           <View
@@ -166,7 +169,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
                 fontSize: RFValue(23, 812),
               }}
             >
-              {props.OTP[4]}
+              {OTP[4]}
             </Text>
           </View>
           <View
@@ -186,7 +189,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
                 fontSize: RFValue(23, 812),
               }}
             >
-              {props.OTP[5]}
+              {OTP[5]}
             </Text>
           </View>
         </View>
