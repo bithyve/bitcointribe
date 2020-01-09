@@ -31,6 +31,8 @@ export const socialMediaType = ( packageName: any ) => {
             return "GoogleDrive";
         case "com.apple.UIKit.activity.AirDrop":
             return "AirDrop"
+        case "com.apple.UIKit.activity.iCloud":
+            return "iCloud"
         default:
             return "Other"
     }

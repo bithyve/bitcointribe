@@ -40,6 +40,8 @@ import { requestSharePdf } from '../../store/actions/manageBackup';
 import RegenerateHealper from '../../components/Helper/RegenerateHealper';
 import { ModalShareIntent } from "hexaComponents/Modal/ManageBackup";
 
+let itemSelected = {};
+
 export default function ManageBackup( props ) {
   const [
     WalletBackupAndRecoveryBottomSheet,
@@ -64,6 +66,7 @@ export default function ManageBackup( props ) {
   const [ isSecretShared1, setIsSecretShared1 ] = useState( false );
   const [ isSecretShared2, setIsSecretShared2 ] = useState( false );
   const [ arrModalShareIntent, setArrModalShareIntent ] = useState( { snapTop: 0 } );
+
   const [ cloudData, setCloudData ] = useState( [
     {
       title: 'iCloud Drive',
@@ -117,7 +120,7 @@ export default function ManageBackup( props ) {
       time: '2 days ago',
       status: 'error',
       type: 'copy1',
-      route: 'personalCopy',
+      route: 'PersonalCopy',
     },
     {
       title: 'Personal Copy 2',
@@ -125,7 +128,7 @@ export default function ManageBackup( props ) {
       time: '2 days ago',
       status: 'error',
       type: 'copy2',
-      route: 'personalCopy',
+      route: 'PersonalCopy',
     },
     {
       title: 'Security Questions',
@@ -491,6 +494,7 @@ export default function ManageBackup( props ) {
         pageData[ 4 ].status = "success";
       }
       setPageData( pageData );
+      setArrModalShareIntent( { ...arrModalShareIntent, snapTop: 0 } )
     }
   }, [ databaseSSS ] );
 
@@ -767,13 +771,11 @@ export default function ManageBackup( props ) {
                 <TouchableOpacity
                   disabled={ item.personalInfo && item.personalInfo.flagShare ? true : false }
                   onPress={ () => {
-                    console.log( { item } );
-
-                    if ( item.route == 'personalCopy' ) {
-                      // dispatch( requestSharePdf( item ) );
+                    itemSelected = item;
+                    if ( item.route == 'PersonalCopy' ) {
                       setArrModalShareIntent( {
-                        snapTop: 1
-                      } )
+                        snapTop: 1,
+                      } );
                     }
                     if ( item.type == 'contact' && !item.personalInfo ) {
                       props.navigation.navigate( item.route, {
@@ -921,6 +923,11 @@ export default function ManageBackup( props ) {
             setArrModalShareIntent( { ...arrModalShareIntent, snapTop: 0 } )
           }
           }
+          onPressShare={ ( type ) => {
+            console.log( { type, itemSelected } );
+            setArrModalShareIntent( { ...arrModalShareIntent, snapTop: 0 } )
+            dispatch( requestSharePdf( type, itemSelected ) );
+          } }
         />
       </View>
     </View>

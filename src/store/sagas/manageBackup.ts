@@ -1,12 +1,26 @@
+
 import { call, put, select, delay } from 'redux-saga/effects';
 import Share from 'react-native-share';
 import RNPrint from 'react-native-print';
+import Mailer from 'react-native-mail';
 import { Platform, NativeModules } from 'react-native';
+
 
 import { createWatcher } from '../utils/utilities';
 import { SHARE_PDF, DBUPDATE_PDF_SEND, dbUpdatePdfSharing } from '../actions/manageBackup';
 import { dbUpdateSSS } from "../actions/storage"
 import { socialMediaType } from "../utils/media";
+
+function getMediaType( type ) {
+  switch ( type ) {
+    case "cloud":
+      return Share.Social.GOOGLEPLUS;
+    case "email":
+      return Share.Social.EMAIL;
+    default:
+      return Share.Social.PINTEREST
+  }
+}
 
 
 function* sharePdfWorker( { payload } ) {
@@ -14,46 +28,85 @@ function* sharePdfWorker( { payload } ) {
   const { security } = yield select(
     state => state.storage.database.WALLET_SETUP,
   );
+
   console.log( { databaseSSS, payload } );
+  let { type, item } = payload;
+  console.log( { type, item } );
+
   try {
-    if ( payload.type == 'copy1' ) {
-      let shareOptions = {
-        title: 'Personal Copy 1',
-        message:
-          'Please find attached the personal copy 1 share pdf, it is password protected by the answer to the security question.',
-        url:
-          Platform.OS == 'android'
-            ? 'file://' + databaseSSS.pdfDetails.copy1.path
-            : databaseSSS.pdfDetails.copy1.path,
-        type: 'application/pdf',
-        showAppsToView: true,
-        subject: 'Personal copy 1',
-      };
-      //console.log( { shareOptions } );
-      let res = yield Share.open( shareOptions ).then( async ( res: any ) => {
-        return await res;
-      } );
+    if ( item.type == 'copy1' && type != "Print" ) {
+      let res;
+      if ( type == "Cloud" ) {
+        let shareOptions = {
+          title: 'Personal Copy 1',
+          message:
+            'Please find attached the personal copy 1 share pdf, it is password protected by the answer to the security question.',
+          url:
+            Platform.OS == 'android'
+              ? 'file://' + databaseSSS.pdfDetails.copy1.path
+              : databaseSSS.pdfDetails.copy1.path,
+          type: 'application/pdf',
+          showAppsToView: true,
+          subject: 'Personal copy 1',
+        };
+        //console.log( { shareOptions } );
+        res = yield Share.open( shareOptions ).then( async ( res: any ) => {
+          return await res;
+        } );
+      } else {
+        res = Mailer.mail( {
+          subject: item.title,
+          body: '<b>Please find attached the personal copy 1 share pdf, it is password protected by the answer to the security question.</b>',
+          isHTML: true,
+          attachment: {
+            path: Platform.OS == 'android'
+              ? 'file://' + databaseSSS.pdfDetails.copy1.path
+              : databaseSSS.pdfDetails.copy1.path,  // The absolute path of the file from which to read data.
+            type: 'pdf',   // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+            name: item.title,   // Optional: Custom filename for attachment
+          }
+        }, ( error, event ) => {
+          console.log( { event, error } );
+          return event;
+        } );
+      }
       console.log( { res } );
       yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: socialMediaType( res.app.split( "/", 1 )[ 0 ] ), date: Math.floor( Date.now() / 1000 ) } } ) );
-    } else if ( payload.type == 'copy2' ) {
-      console.log( 'locking' );
-      let shareOptions = {
-        title: 'Personal Copy 2',
-        message:
-          'Please find attached the personal copy 2 share pdf, it is password protected by the answer to the security question.',
-        url:
-          Platform.OS == 'android'
-            ? 'file://' + databaseSSS.pdfDetails.copy2.path
-            : databaseSSS.pdfDetails.copy2.path,
-        type: 'application/pdf',
-        showAppsToView: true,
-        subject: 'Personal copy 2',
-      };
-      // console.log( { shareOptions } );
-      let res = yield Share.open( shareOptions ).then( ( res: any ) => {
-        return res;
-      } );
-      console.log( { res } );
+    } else if ( item.type == 'copy2' && type != "Print" ) {
+      let res;
+      if ( type == "Cloud" ) {
+        let shareOptions = {
+          title: 'Personal Copy 2',
+          message:
+            'Please find attached the personal copy 2 share pdf, it is password protected by the answer to the security question.',
+          url:
+            Platform.OS == 'android'
+              ? 'file://' + databaseSSS.pdfDetails.copy2.path
+              : databaseSSS.pdfDetails.copy2.path,
+          type: 'application/pdf',
+          showAppsToView: true,
+          subject: 'Personal copy 2',
+        };
+        res = yield Share.open( shareOptions ).then( ( res: any ) => {
+          return res;
+        } );
+      } else {
+        res = Mailer.mail( {
+          subject: item.title,
+          body: '<b>Please find attached the personal copy 2 share pdf, it is password protected by the answer to the security question.</b>',
+          isHTML: true,
+          attachment: {
+            path: Platform.OS == 'android'
+              ? 'file://' + databaseSSS.pdfDetails.copy2.path
+              : databaseSSS.pdfDetails.copy2.path,  // The absolute path of the file from which to read data.
+            type: 'pdf',   // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+            name: item.title,   // Optional: Custom filename for attachment
+          }
+        }, ( error, event ) => {
+          console.log( { event, error } );
+          return event;
+        } );
+      }
       yield put( dbUpdatePdfSharing( { copy: "copy2", socialMedia: { type: socialMediaType( res.app.split( "/", 1 )[ 0 ] ) }, date: Math.floor( Date.now() / 1000 ) } ) );
     } else {
       console.log( { path: databaseSSS.pdfDetails.personalCopy1PdfPath } );
@@ -88,8 +141,8 @@ function* sharePdfWorker( { payload } ) {
   }
 }
 
-export const sharePdfWatcher = createWatcher( sharePdfWorker, SHARE_PDF );
 
+export const sharePdfWatcher = createWatcher( sharePdfWorker, SHARE_PDF );
 function* dbUPdatePdfSharingWorker( { payload } ) {
   const { databaseSSS } = yield select( state => state.storage );
   const { copy, socialMedia } = payload;

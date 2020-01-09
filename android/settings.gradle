@@ -1,4 +1,9 @@
 apply from: '../node_modules/react-native-unimodules/gradle.groovy'
+include ':react-native-cloud-fs'
+project(':react-native-cloud-fs').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-cloud-fs/android')
+include ':react-native-mail'
+project(':react-native-mail').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-mail/android')
+
 
 include ':react-native-print'
 project(':react-native-print').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-print/android')

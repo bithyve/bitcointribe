@@ -16,7 +16,6 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		167C15C73DC24DCCBD4D46C1 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 340715C7D2234FB3BA9916F6 /* OpenSans-Regular.ttf */; };
 		1B14D77171054F41A1AF0762 /* OpenSans-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60D8EB5CBDCD47B7BCCBD0CC /* OpenSans-LightItalic.ttf */; };
-		1E62F97FE2064DD293A18D01 /* libRNCloudFs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C8E80D7B5CE14ACB8ECC8581 /* libRNCloudFs.a */; };
 		25297E7362264FC69767DBC0 /* FontAwesome5_Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BC2E713B33C44296BAE6D3B4 /* FontAwesome5_Regular.ttf */; };
 		27D64F7A069546F8AD736715 /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EE82E94F6E0540049C3B6B5A /* AntDesign.ttf */; };
 		282A1C8955094C1081835F0C /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0AD6EA51149C441CBEA9B29A /* FontAwesome.ttf */; };
@@ -50,16 +49,6 @@
 		F37784E6F88E43E98ED2D478 /* FiraSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 074A53823B4542088F1A334F /* FiraSans-SemiBold.ttf */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		8B6E59F123C736F2002F9CFC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2AF37085CB8E4A298961F228 /* RNCloudFs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 134814201AA4EA6300B7C361;
-			remoteInfo = RNCloudFs;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
 		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		016A8A456BCD41C68FCCEA11 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
@@ -75,7 +64,6 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = HEXA/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = HEXA/main.m; sourceTree = "<group>"; };
 		16C5F73D29C84B0596334466 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
-		2AF37085CB8E4A298961F228 /* RNCloudFs.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNCloudFs.xcodeproj; path = "../node_modules/react-native-cloud-fs/ios/RNCloudFs.xcodeproj"; sourceTree = "<group>"; };
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FB9F98AA281430D89E114A8 /* OpenSans-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-BoldItalic.ttf"; path = "../src/assets/fonts/OpenSans-BoldItalic.ttf"; sourceTree = "<group>"; };
 		340715C7D2234FB3BA9916F6 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Regular.ttf"; path = "../src/assets/fonts/OpenSans-Regular.ttf"; sourceTree = "<group>"; };
@@ -124,7 +112,6 @@
 			files = (
 				EFCD5774E907942F23B3A7F4 /* libPods-HEXA.a in Frameworks */,
 				8B6E59A723C70042002F9CFC /* CloudKit.framework in Frameworks */,
-				1E62F97FE2064DD293A18D01 /* libRNCloudFs.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -174,7 +161,6 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				2AF37085CB8E4A298961F228 /* RNCloudFs.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -209,14 +195,6 @@
 				C8E80D7B5CE14ACB8ECC8581 /* libRNCloudFs.a */,
 			);
 			name = "Recovered References";
-			sourceTree = "<group>";
-		};
-		8B6E59EE23C736F2002F9CFC /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				8B6E59F223C736F2002F9CFC /* libRNCloudFs.a */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		D6F68EE2494F4B278976CEEC /* Resources */ = {
@@ -310,28 +288,12 @@
 			mainGroup = 83CBB9F61A601CBA00E9B192;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 8B6E59EE23C736F2002F9CFC /* Products */;
-					ProjectRef = 2AF37085CB8E4A298961F228 /* RNCloudFs.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				13B07F861A680F5B00A75B9A /* HEXA */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		8B6E59F223C736F2002F9CFC /* libRNCloudFs.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRNCloudFs.a;
-			remoteRef = 8B6E59F123C736F2002F9CFC /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		13B07F8E1A680F5B00A75B9A /* Resources */ = {
@@ -496,6 +458,7 @@
 					"$(SRCROOT)/../node_modules/react-native-cloud-fs/ios",
 				);
 				INFOPLIST_FILE = HEXA/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -533,6 +496,7 @@
 					"$(SRCROOT)/../node_modules/react-native-cloud-fs/ios",
 				);
 				INFOPLIST_FILE = HEXA/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
