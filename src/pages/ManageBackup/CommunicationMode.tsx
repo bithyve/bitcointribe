@@ -107,7 +107,7 @@ export default function CommunicationMode(props) {
         if (secretSharedTrustedContact2) {
           secretSharedTrustedContact2(true);
         }
-        props.navigation.goBack();
+        // props.navigation.goBack();
         break;
 
       case 'email':
@@ -124,9 +124,12 @@ export default function CommunicationMode(props) {
         if (secretSharedTrustedContact2) {
           secretSharedTrustedContact2(true);
         }
-        props.navigation.goBack();
+        // props.navigation.goBack();
         break;
     }
+    props.navigation.navigate('ShareOtpWithTrustedContactContents', {
+      OTP: SHARES_TRANSFER_DETAILS[index].OTP,
+    });
   };
 
   const { loading } = useSelector(state => state.sss);
@@ -239,12 +242,6 @@ export default function CommunicationMode(props) {
               <Text style={styles.proceedButtonText}>Proceed</Text>
             )}
           </TouchableOpacity>
-        ) : null}
-        {SHARES_TRANSFER_DETAILS[index] ? (
-          <ShareOtpWithTrustedContactContents
-            onPressBack={() => {}}
-            OTP={SHARES_TRANSFER_DETAILS[index].OTP}
-          />
         ) : null}
       </View>
     </SafeAreaView>
