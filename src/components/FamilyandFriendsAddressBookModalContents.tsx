@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import {
     View,
     Image,
-    TouchableOpacity,
     Text,
     StyleSheet,
-    ScrollView
+    ScrollView,
+    TouchableOpacity
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
@@ -15,7 +15,8 @@ import { RFValue } from "react-native-responsive-fontsize";
 import ContactList from "../components/ContactList";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import RadioButton from "../components/RadioButton";
-import Ionicons from "react-native-vector-icons/Ionicons"
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
 
 export default function FamilyandFriendsAddressBookModalContents(props) {
     const [selectedContact, setSelectedContact] = useState({});
@@ -68,9 +69,9 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
     return (<View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
             <View style={{ flexDirection: 'row', }}>
-                <TouchableOpacity onPress={() => props.onPressBack()} style={{ height: 30, width: 30, }}>
+                <AppBottomSheetTouchableWrapper onPress={() => props.onPressBack()} style={{ height: 30, width: 30, }}>
                     <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-                </TouchableOpacity>
+                </AppBottomSheetTouchableWrapper>
                 <View>
                     <Text style={styles.modalHeaderTitleText}>Friends and Family</Text>
                     <Text numberOfLines={2} style={styles.modalHeaderInfoText}>{props.pageInfo}Lorem ipsum dolor sit amet, consectetur{"\n"}adipiscing elit, sed do eiusmod tempor</Text>
@@ -110,32 +111,32 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
                 <View style={{ flex: 11 }}>
                     <ScrollView showsVerticalScrollIndicator={false} >
                         {contactData.map((value, index) => {
-                            return <TouchableOpacity onPress={() => onContactSelect(index)}  style={styles.contactView} >
+                            return <AppBottomSheetTouchableWrapper onPress={() => onContactSelect(index)}  style={styles.contactView} >
                                 <RadioButton size={15} color={Colors.lightBlue} borderColor={Colors.borderColor} isChecked={selectedContact.id && selectedContact.id == value.id ? true : false} onpress={() => onContactSelect(index)} />
                                 <Text style={styles.contactText}>
                                     {value.name.split(' ')[0]} <Text style={{ fontFamily: Fonts.FiraSansMedium }}>{value.name.split(' ')[1]}</Text>
                                 </Text>
-                            </TouchableOpacity>
+                            </AppBottomSheetTouchableWrapper>
                         }
                         )}
                     </ScrollView>
                 </View>
                 <View style={styles.contactIndexView}>
-                    <TouchableOpacity >
+                    <AppBottomSheetTouchableWrapper >
                         <Text style={styles.contactIndexText}>#</Text>
-                    </TouchableOpacity>
+                    </AppBottomSheetTouchableWrapper>
                     {alphabetsList.map((value) =>
-                        <TouchableOpacity>
+                        <AppBottomSheetTouchableWrapper>
                             <Text style={styles.contactIndexText}>{value}</Text>
-                        </TouchableOpacity>
+                        </AppBottomSheetTouchableWrapper>
                     )}
                 </View>
             </View>
         </View>
         {selectedContact.id &&
-            <TouchableOpacity onPress={() => props.onPressProceed()} style={styles.bottomButtonView}>
+            <AppBottomSheetTouchableWrapper onPress={() => props.onPressProceed()}>
                 <Text style={styles.buttonText}>Confirm & Proceed</Text>
-            </TouchableOpacity>
+            </AppBottomSheetTouchableWrapper>
         }
     </View>
     )
@@ -251,7 +252,7 @@ const styles = StyleSheet.create({
         shadowColor: Colors.shadowBlue,
         shadowOpacity: 10,
         shadowOffset: { width: 0, height: 10 },
-        marginBottom: 20
+        marginBottom: 100
     },
     buttonText: {
         color: Colors.white,

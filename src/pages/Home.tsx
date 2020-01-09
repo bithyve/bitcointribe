@@ -81,6 +81,10 @@ import { getTestcoins } from '../store/actions/accounts';
 import axios from 'axios';
 
 export default function Home(props) {
+  const [KnowMoreBottomSheetsFlag, setKnowMoreBottomSheetsFlag] = useState(false);
+  const [addBottomSheetsFlag, setAddBottomSheetsFlag] = useState(false);
+  const [addSubBottomSheetsFlag, setAddSubBottomSheetsFlag] = useState(false);
+  const [familyAndFriendsBookBottomSheetsFlag, setFamilyAndFriendsBookBottomSheetsFlag] = useState(false);
   const database = useSelector(state => state.storage.database);
   const walletName = database ? database.WALLET_SETUP.walletName : '';
   const accounts = useSelector(state => state.accounts);
@@ -95,16 +99,16 @@ export default function Home(props) {
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     const regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     const secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
     const accumulativeBalance = regularBalance + secureBalance;
 
@@ -113,12 +117,12 @@ export default function Home(props) {
       : [];
     const regularTransactions = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
 
     const secureTransactions = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
     const accumulativeTransactions = [
       ...testTransactions,
@@ -146,13 +150,13 @@ export default function Home(props) {
   const [tabSelected, setTabSelected] = useState('sell');
   const [switchOn, setSwitchOn] = useState(true);
   const [selected, setSelected] = useState('Transactions');
-  const [RegenerateBottomSheet, setRegenerateBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [
-    ShareRecoverySecretBottomSheet,
-    setShareRecoverySecretBottomSheet,
-  ] = useState(React.createRef());
+  // const [RegenerateBottomSheet, setRegenerateBottomSheet] = useState(
+  //   React.createRef(),
+  // );
+  // const [
+  //   ShareRecoverySecretBottomSheet,
+  //   setShareRecoverySecretBottomSheet,
+  // ] = useState(React.createRef());
   const [
     ShareRecoverySecretOtpBottomSheet,
     setShareRecoverySecretOtpBottomSheet,
@@ -199,38 +203,34 @@ export default function Home(props) {
   const [MoreTabBottomSheet, setMoreTabBottomSheet] = useState(
     React.createRef(),
   );
-  const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const [
-    PinChangeSuccessBottomSheet,
-    setPinChangeSuccessBottomSheet,
-  ] = useState(React.createRef());
-  const [RecoveryRequestBottomSheet, setRecoveryRequestBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [
-    CustodianRequestBottomSheet,
-    setCustodianRequestBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    RecoverySecretRequestBottomSheet,
-    setRecoverySecretRequestBottomSheet,
-  ] = useState(React.createRef());
+  // const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
+  //   React.createRef(),
+  // );
+  // const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  // const [RecoveryRequestBottomSheet, setRecoveryRequestBottomSheet] = useState(
+  //   React.createRef(),
+  // );
+  // const [
+  //   CustodianRequestBottomSheet,
+  //   setCustodianRequestBottomSheet,
+  // ] = useState(React.createRef());
+  // const [
+  //   RecoverySecretRequestBottomSheet,
+  //   setRecoverySecretRequestBottomSheet,
+  // ] = useState(React.createRef());
 
   const [
     CustodianRequestOtpBottomSheet,
     setCustodianRequestOtpBottomSheet,
   ] = useState(React.createRef());
-  const [
-    CustodianRequestRejectedBottomSheet,
-    setCustodianRequestRejectedBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    CustodianRequestAcceptBottomSheet,
-    setCustodianRequestAcceptBottomSheet,
-  ] = useState(React.createRef());
+  // const [
+  //   CustodianRequestRejectedBottomSheet,
+  //   setCustodianRequestRejectedBottomSheet,
+  // ] = useState(React.createRef());
+  // const [
+  //   CustodianRequestAcceptBottomSheet,
+  //   setCustodianRequestAcceptBottomSheet,
+  // ] = useState(React.createRef());
   const [
     transactionDetailsBottomSheet,
     setTransactionDetailsBottomSheet,
@@ -357,17 +357,32 @@ export default function Home(props) {
     }
   }
 
-  useEffect(function() {
-    // RecoverySecretRequestBottomSheet.current.snapTo(1);
-    // (PinChangeSuccessBottomSheet as any).current.snapTo(1);
-    // (ErrorBottomSheet as any).current.snapTo(1);
-    // (NoInternetBottomSheet as any).current.snapTo(0);
-    // setTimeout(() => {
-    //   setTabBarZIndex(0);
-    //  }, 2);
-    // (CustodianRequestBottomSheet as any).current.snapTo(1);
+  useEffect(function () {
     updateAccountCardData();
     (bottomSheet as any).current.snapTo(1);
+    AppState.addEventListener('change', handleAppStateChange);
+    // NetInfo.addEventListener(state => {
+    //   if (!state.isConnected) (NoInternetBottomSheet as any).current.snapTo(1);
+    //   else if (state.isConnected)
+    //     (NoInternetBottomSheet as any).current.snapTo(0);
+    // });
+    Linking.addEventListener('url', handleDeepLink);
+    // return () => Linking.removeEventListener("url", handleDeepLink);
+    // HC up-streaming
+    if (database) {
+      if (Object.keys(database.DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
+        dispatch(updateMSharesHealth());
+      }
+    }
+
+    (async () => {
+      if (!overallHealth) {
+        const storedHealth = await AsyncStorage.getItem('overallHealth');
+        if (storedHealth) {
+          setOverallHealth(JSON.parse(storedHealth));
+        }
+      }
+    })();
   }, []);
 
   const messageAsPerHealth = health => {
@@ -530,6 +545,7 @@ export default function Home(props) {
             type == 'Add Contact'
           ) {
             setTimeout(() => {
+              setAddSubBottomSheetsFlag(true);
               setTabBarZIndex(0);
               setSelectToAdd(type);
             }, 2);
@@ -632,6 +648,7 @@ export default function Home(props) {
       (MoreTabBottomSheet as any).current.snapTo(0);
     } else if (tabTitle == 'Add') {
       setTimeout(() => {
+        setAddBottomSheetsFlag(true);
         setModaldata([]);
         setSelected(tabTitle);
       }, 2);
@@ -647,243 +664,216 @@ export default function Home(props) {
     }
   }
 
-  const renderNoInternetModalContent = () => {
-    return (
-      <NoInternetModalContents
-        onPressTryAgain={() => {}}
-        onPressIgnore={() => {}}
-      />
-    );
-  };
+  // const renderNoInternetModalContent = () => {
+  //   return (
+  //     <NoInternetModalContents
+  //       onPressTryAgain={() => {}}
+  //       onPressIgnore={() => {}}
+  //     />
+  //   );
+  // };
 
-  const renderErrorModalContent = () => {
-    return (
-      <ErrorModalContents
-        modalRef={ErrorBottomSheet}
-        title={'Something went wrong'}
-        info={'There seems to a problem'}
-        note={'Please try again'}
-        proceedButtonText={'Try Again'}
-        isIgnoreButton={true}
-        onPressProceed={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
-        onPressIgnore={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
-        isBottomImage={true}
-        bottomImage={require('../assets/images/icons/errorImage.png')}
-      />
-    );
-  };
+  // const renderErrorModalContent = () => {
+  //   return (
+  //     <ErrorModalContents
+  //       modalRef={ErrorBottomSheet}
+  //       title={'Something went wrong'}
+  //       info={'There seems to a problem'}
+  //       note={'Please try again'}
+  //       proceedButtonText={'Try Again'}
+  //       isIgnoreButton={true}
+  //       onPressProceed={() => {
+  //         (ErrorBottomSheet as any).current.snapTo(0);
+  //       }}
+  //       onPressIgnore={() => {
+  //         (ErrorBottomSheet as any).current.snapTo(0);
+  //       }}
+  //       isBottomImage={true}
+  //       bottomImage={require('../assets/images/icons/errorImage.png')}
+  //     />
+  //   );
+  // };
 
-  const renderErrorModalHeader = () => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-        }}
-      />
-    );
-  };
+  // const renderErrorModalHeader = () => {
+  //   return (
+  //     <TransparentHeaderModal
+  //       onPressheader={() => {
+  //         (ErrorBottomSheet as any).current.snapTo(0);
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //       }}
+  //     />
+  //   );
+  // };
 
-  const renderPinChangeSuccessModalContent = () => {
-    return (
-      <ErrorModalContents
-        modalRef={PinChangeSuccessBottomSheet}
-        title={'Pin Changed Successfully'}
-        info={'Lorem ipsum dolor sit amet, consectetur'}
-        note={'sed do eiusmod tempor incididunt ut labore et'}
-        proceedButtonText={'View Settings'}
-        isIgnoreButton={false}
-        onPressProceed={() => {
-          (PinChangeSuccessBottomSheet as any).current.snapTo(0);
-        }}
-        isBottomImage={true}
-      />
-    );
-  };
+  // const renderCustodianRequestModalContent = () => {
+  //   if (!custodyRequest) return <View></View>;
+  //   return (
+  //     <CustodianRequestModalContents
+  //       userName={custodyRequest.requester}
+  //       onPressAcceptSecret={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //         (CustodianRequestBottomSheet as any).current.snapTo(0);
+  //         props.navigation.navigate('CustodianRequestOTP', { custodyRequest });
+  //       }}
+  //       onPressRejectSecret={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //         (CustodianRequestBottomSheet as any).current.snapTo(0);
+  //         (CustodianRequestRejectedBottomSheet as any).current.snapTo(1);
+  //       }}
+  //     />
+  //   );
+  // };
 
-  const renderPinChangeSuccessModalHeader = () => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          (PinChangeSuccessBottomSheet as any).current.snapTo(0);
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-        }}
-      />
-    );
-  };
+  // const renderRecoveryRequestModalContent = () => {
+  //   if (!recoveryRequest) return <View></View>;
 
-  const renderCustodianRequestModalContent = () => {
-    if (!custodyRequest) return <View></View>;
-    return (
-      <CustodianRequestModalContents
-        userName={custodyRequest.requester}
-        onPressAcceptSecret={() => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-          (CustodianRequestBottomSheet as any).current.snapTo(0);
-          props.navigation.navigate('CustodianRequestOTP', { custodyRequest });
-        }}
-        onPressRejectSecret={() => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-          (CustodianRequestBottomSheet as any).current.snapTo(0);
-          (CustodianRequestRejectedBottomSheet as any).current.snapTo(1);
-        }}
-      />
-    );
-  };
+  //   return (
+  //     <CustodianRequestModalContents
+  //       userName={recoveryRequest.requester}
+  //       onPressAcceptSecret={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //         (RecoveryRequestBottomSheet as any).current.snapTo(0);
+  //         props.navigation.navigate('RecoveryRequestOTP', { recoveryRequest });
+  //       }}
+  //       onPressRejectSecret={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //         (RecoveryRequestBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // };
 
-  const renderRecoveryRequestModalContent = () => {
-    if (!recoveryRequest) return <View></View>;
+  // const renderCustodianRequestOtpModalContent = () => {
+  //   return (
+  //     <CustodianRequestOtpModalContents
+  //       title1stLine={'Enter OTP to'}
+  //       title2ndLine={'accept request'}
+  //       info1stLine={'Please enter the 6 digit OTP the owner'}
+  //       info2ndLine={'of secret shared with you'}
+  //       subInfo1stLine={
+  //         'The OTP is time sensitive, please be sure to enter the OTP '
+  //       }
+  //       subInfo2ndLine={'shared within 15minutes'}
+  //       modalRef={CustodianRequestOtpBottomSheet}
+  //       onPressConfirm={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //         (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
+  //         (CustodianRequestAcceptBottomSheet as any).current.snapTo(1);
+  //       }}
+  //     />
+  //   );
+  // };
 
-    return (
-      <CustodianRequestModalContents
-        userName={recoveryRequest.requester}
-        onPressAcceptSecret={() => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-          (RecoveryRequestBottomSheet as any).current.snapTo(0);
-          props.navigation.navigate('RecoveryRequestOTP', { recoveryRequest });
-        }}
-        onPressRejectSecret={() => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-          (RecoveryRequestBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
+  // const renderCustodianRequestRejectedModalContent = () => {
+  //   if (!custodyRequest) return <View></View>;
+  //   return (
+  //     <CustodianRequestRejectedModalContents
+  //       onPressViewThrustedContacts={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(999);
+  //         }, 2);
+  //         (CustodianRequestRejectedBottomSheet as any).current.snapTo(0);
+  //       }}
+  //       userName={custodyRequest.requester}
+  //     />
+  //   );
+  // };
 
-  const renderCustodianRequestOtpModalContent = () => {
-    return (
-      <CustodianRequestOtpModalContents
-        title1stLine={'Enter OTP to'}
-        title2ndLine={'accept request'}
-        info1stLine={'Please enter the 6 digit OTP the owner'}
-        info2ndLine={'of secret shared with you'}
-        subInfo1stLine={
-          'The OTP is time sensitive, please be sure to enter the OTP '
-        }
-        subInfo2ndLine={'shared within 15minutes'}
-        modalRef={CustodianRequestOtpBottomSheet}
-        onPressConfirm={() => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-          (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
-          (CustodianRequestAcceptBottomSheet as any).current.snapTo(1);
-        }}
-      />
-    );
-  };
+  // const renderCustodianRequestAcceptModalContent = () => {
+  //   if (!custodyRequest) return <View></View>;
+  //   return (
+  //     <CustodianRequestAcceptModalContents
+  //       userName={custodyRequest.requester}
+  //       onPressAssociateContacts={() => {}}
+  //       onPressSkip={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(999);
+  //         }, 2);
+  //         (CustodianRequestAcceptBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // };
 
-  const renderCustodianRequestRejectedModalContent = () => {
-    if (!custodyRequest) return <View></View>;
-    return (
-      <CustodianRequestRejectedModalContents
-        onPressViewThrustedContacts={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (CustodianRequestRejectedBottomSheet as any).current.snapTo(0);
-        }}
-        userName={custodyRequest.requester}
-      />
-    );
-  };
+  // const renderNoInternetModalHeader = () => {
+  //   return (
+  //     <TransparentHeaderModal
+  //       onPressheader={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(999);
+  //         }, 2);
+  //         (NoInternetBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // };
 
-  const renderCustodianRequestAcceptModalContent = () => {
-    if (!custodyRequest) return <View></View>;
-    return (
-      <CustodianRequestAcceptModalContents
-        userName={custodyRequest.requester}
-        onPressAssociateContacts={() => {}}
-        onPressSkip={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (CustodianRequestAcceptBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
+  // const renderCustodianRequestModalHeader = () => {
+  //   return (
+  //     <TransparentHeaderModal
+  //       onPressheader={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(999);
+  //         }, 2);
+  //         (CustodianRequestBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // };
 
-  const renderNoInternetModalHeader = () => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (NoInternetBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderCustodianRequestModalHeader = () => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (CustodianRequestBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderRecoveryRequestModalHeader = () => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (RecoveryRequestBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
+  // const renderRecoveryRequestModalHeader = () => {
+  //   return (
+  //     <TransparentHeaderModal
+  //       onPressheader={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(999);
+  //         }, 2);
+  //         (RecoveryRequestBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // };
 
   const onPressElement = item => {
     if (item.title == 'Health of the App') {
       props.navigation.navigate('HealthCheck');
     }
     if (item.title == 'Address Book') {
-      setTimeout(() => {
-        setTabBarZIndex(0);
-      }, 2);
       (addressBookBottomSheet as any).current.snapTo(1);
+      setTimeout(() => {
+        setTabBarZIndex(0);
+      }, 10);
     } else if (item.title == 'Settings') {
-      setTimeout(() => {
-        setTabBarZIndex(0);
-      }, 10);
       (settingsBottomSheet as any).current.snapTo(1);
-    } else if (item.title == 'All Accounts') {
       setTimeout(() => {
         setTabBarZIndex(0);
       }, 10);
+
+    } else if (item.title == 'All Accounts') {
       (AllAccountsBottomSheet as any).current.snapTo(1);
+      setTimeout(() => {
+        setTabBarZIndex(0);
+      }, 10);
     }
   };
 
-  const managePinProceed = pin => {
+  const managePinSuccessProceed = pin => {
+    setTimeout(() => {
+      setTabBarZIndex(999);
+    }, 10);
     (settingsBottomSheet as any).current.snapTo(0);
-    (PinChangeSuccessBottomSheet as any).current.snapTo(1);
   };
 
   const renderSettingsContents = () => {
@@ -891,7 +881,7 @@ export default function Home(props) {
       <SettingsContents
         onPressManagePIn={() => {
           return props.navigation.navigate('SettingManagePin', {
-            _managePinProceed: pin => managePinProceed(pin),
+            managePinSuccessProceed: pin => managePinSuccessProceed(pin),
           });
         }}
         onPressBack={() => {
@@ -1029,31 +1019,31 @@ export default function Home(props) {
     );
   };
 
-  const renderCustodianRequestRejectedModalHeader = () => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (CustodianRequestRejectedBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
+  // const renderCustodianRequestRejectedModalHeader = () => {
+  //   return (
+  //     <TransparentHeaderModal
+  //       onPressheader={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(999);
+  //         }, 2);
+  //         (CustodianRequestRejectedBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // };
 
-  const renderCustodianRequestAcceptModalHeader = () => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (CustodianRequestAcceptBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
+  // const renderCustodianRequestAcceptModalHeader = () => {
+  //   return (
+  //     <TransparentHeaderModal
+  //       onPressheader={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(999);
+  //         }, 2);
+  //         (CustodianRequestAcceptBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // };
 
   const renderAddModalContents = () => {
     if (selectToAdd == 'Getbittr') {
@@ -1061,6 +1051,7 @@ export default function Home(props) {
         <GetBittrModalContents
           onPressBack={() => {
             setTimeout(() => {
+              setAddSubBottomSheetsFlag(false)
               setTabBarZIndex(999);
             }, 2);
             (AddBottomSheet as any).current.snapTo(0);
@@ -1084,6 +1075,7 @@ export default function Home(props) {
           }}
           onPressBack={() => {
             setTimeout(() => {
+              setAddSubBottomSheetsFlag(false)
               setTabBarZIndex(999);
             }, 2);
             (AddBottomSheet as any).current.snapTo(0);
@@ -1095,18 +1087,19 @@ export default function Home(props) {
         <AddContactsModalContents
           onPressFriendAndFamily={() => {
             setTimeout(() => {
-              setTabSelected('sell');
+              setFamilyAndFriendsBookBottomSheetsFlag(true);
             }, 2);
             (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBiller={() => {
             setTimeout(() => {
-              setTabSelected('redeem');
+              setFamilyAndFriendsBookBottomSheetsFlag(true);
             }, 2);
             (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBack={() => {
             setTimeout(() => {
+              setAddSubBottomSheetsFlag(false)
               setTabBarZIndex(999);
             }, 2);
             (AddBottomSheet as any).current.snapTo(0);
@@ -1123,6 +1116,7 @@ export default function Home(props) {
       <TransparentHeaderModal
         onPressheader={() => {
           setTimeout(() => {
+            setAddSubBottomSheetsFlag(false)
             setTabBarZIndex(999);
           }, 2);
           (AddBottomSheet as any).current.snapTo(0);
@@ -1255,6 +1249,9 @@ export default function Home(props) {
           (ContactSelectedFromAddressBookBottomSheet as any).current.snapTo(1);
         }}
         onPressBack={() => {
+          setTimeout(() => {
+            setFamilyAndFriendsBookBottomSheetsFlag(false);
+          }, 2);
           (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -1265,6 +1262,9 @@ export default function Home(props) {
     return (
       <SmallHeaderModal
         onPressHandle={() => {
+          setTimeout(() => {
+            setFamilyAndFriendsBookBottomSheetsFlag(false);
+          }, 2);
           (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -1287,7 +1287,7 @@ export default function Home(props) {
           setAnswer(text);
         }}
         onPressConfirm={() => submitRecoveryQuestion()}
-        onPressKnowMore={() => {}}
+        onPressKnowMore={() => { }}
         bottomSheetRef={HealthCheckSecurityQuestionBottomSheet}
       />
     );
@@ -1335,7 +1335,7 @@ export default function Home(props) {
     if (global.isContactOpen) {
       global.isContactOpen = false;
     }
-    var blockApp = setTimeout(function() {
+    var blockApp = setTimeout(function () {
       if (isNavigate) {
         props.navigation.navigate('ReLogin');
       }
@@ -1367,39 +1367,26 @@ export default function Home(props) {
     }
   };
 
-  useEffect(() => {
-    AppState.addEventListener('change', handleAppStateChange);
-    NetInfo.addEventListener(state => {
-      if (!state.isConnected) (NoInternetBottomSheet as any).current.snapTo(1);
-      else if (state.isConnected)
-        (NoInternetBottomSheet as any).current.snapTo(0);
-    });
-
-    Linking.addEventListener('url', handleDeepLink);
-
-    // return () => Linking.removeEventListener("url", handleDeepLink);
-  }, []);
-
   const custodyRequest = props.navigation.getParam('custodyRequest');
   const recoveryRequest = props.navigation.getParam('recoveryRequest');
 
-  useEffect(() => {
-    if (custodyRequest) {
-      setTimeout(() => {
-        setTabBarZIndex(0);
-      }, 2);
-      (CustodianRequestBottomSheet as any).current.snapTo(1);
-      (bottomSheet as any).current.snapTo(1);
-    }
+  // useEffect(() => {
+  //   // if (custodyRequest) {
+  //   //   setTimeout(() => {
+  //   //     setTabBarZIndex(0);
+  //   //   }, 2);
+  //   //   (CustodianRequestBottomSheet as any).current.snapTo(1);
+  //   //   (bottomSheet as any).current.snapTo(1);
+  //   // }
 
-    if (recoveryRequest) {
-      setTimeout(() => {
-        setTabBarZIndex(0);
-      }, 2);
-      (RecoveryRequestBottomSheet as any).current.snapTo(1);
-      (bottomSheet as any).current.snapTo(1);
-    } //TODO: connect the recovery guardian modal
-  }, [custodyRequest, recoveryRequest]);
+  //   if (recoveryRequest) {
+  //     setTimeout(() => {
+  //       setTabBarZIndex(0);
+  //     }, 2);
+  //     (RecoveryRequestBottomSheet as any).current.snapTo(1);
+  //     (bottomSheet as any).current.snapTo(1);
+  //   } //TODO: connect the recovery guardian modal
+  // }, [custodyRequest, recoveryRequest]);
 
   const dispatch = useDispatch();
 
@@ -1411,24 +1398,6 @@ export default function Home(props) {
     console.log({ health });
     if (health) setOverallHealth(health);
   }, [health]);
-
-  useEffect(() => {
-    // HC up-streaming
-    if (database) {
-      if (Object.keys(database.DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
-        dispatch(updateMSharesHealth());
-      }
-    }
-
-    (async () => {
-      if (!overallHealth) {
-        const storedHealth = await AsyncStorage.getItem('overallHealth');
-        if (storedHealth) {
-          setOverallHealth(JSON.parse(storedHealth));
-        }
-      }
-    })();
-  }, []);
 
   const testAccService = useSelector(
     state => state.accounts[TEST_ACCOUNT].service,
@@ -1473,149 +1442,150 @@ export default function Home(props) {
     })();
   }, []);
 
-  const renderRecoverySecretRequestModalContent = () => {
-    return (
-      <RecoverySecretRequestModalContents
-        name={'Pamela Aalto'}
-        title={'You have a Recovery Request\nfrom your Trusted Contact'}
-        infoText={
-          'Please contact the sender to get\nthe OTP and share the secret'
-        }
-        subTitle={'Message from the Sender'}
-        subTitleInfo={
-          'I lost my hexa wallet, need the shares back to restore my\nwallet'
-        }
-        acceptButtonName={'Accept Request'}
-        rejectButtonName={'Reject Request'}
-        onPressAccept={() => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-          (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-          props.navigation.navigate('AddressBook');
-        }}
-        onPressReject={() => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-          (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
+  
+  // const renderRecoverySecretRequestModalContent = () => {
+  //   return (
+  //     <RecoverySecretRequestModalContents
+  //       name={'Pamela Aalto'}
+  //       title={'You have a Recovery Request\nfrom your Trusted Contact'}
+  //       infoText={
+  //         'Please contact the sender to get\nthe OTP and share the secret'
+  //       }
+  //       subTitle={'Message from the Sender'}
+  //       subTitleInfo={
+  //         'I lost my hexa wallet, need the shares back to restore my\nwallet'
+  //       }
+  //       acceptButtonName={'Accept Request'}
+  //       rejectButtonName={'Reject Request'}
+  //       onPressAccept={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //         (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
+  //         props.navigation.navigate('AddressBook');
+  //       }}
+  //       onPressReject={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //         (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // };
 
-  const renderRecoverySecretRequestModalHeader = () => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-        }}
-      />
-    );
-  };
+  // const renderRecoverySecretRequestModalHeader = () => {
+  //   return (
+  //     <TransparentHeaderModal
+  //       onPressheader={() => {
+  //         (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
+  //         setTimeout(() => {
+  //           setTabBarZIndex(999);
+  //         }, 2);
+  //       }}
+  //     />
+  //   );
+  // };
 
-  const renderShareRecoverySecretQrCodeModalContent = () => {
-    return (
-      <ShareRecoverySecretModalContents
-        title={'Share Recovery Secret\nto trusted contact'}
-        infoText={
-          'Share Recovery Secret to Trusted Contact, this will enable\nthem to restore their Hexa Wallet'
-        }
-        sunInfoText={
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt'
-        }
-        shareVia={'qr'}
-        name={'Pamela Aalto'}
-        contactInfo={'+44 0000 000000'}
-        buttonText={'Share via QR'}
-        onPressRequest={() => {
-          ShareRecoverySecretBottomSheet.current.snapTo(1);
-        }}
-        onPressViaQr={() => {}}
-        modalRef={ShareRecoverySecretBottomSheet}
-      />
-    );
-  };
+  // const renderShareRecoverySecretQrCodeModalContent = () => {
+  //   return (
+  //     <ShareRecoverySecretModalContents
+  //       title={'Share Recovery Secret\nto trusted contact'}
+  //       infoText={
+  //         'Share Recovery Secret to Trusted Contact, this will enable\nthem to restore their Hexa Wallet'
+  //       }
+  //       sunInfoText={
+  //         'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt'
+  //       }
+  //       shareVia={'qr'}
+  //       name={'Pamela Aalto'}
+  //       contactInfo={'+44 0000 000000'}
+  //       buttonText={'Share via QR'}
+  //       onPressRequest={() => {
+  //         ShareRecoverySecretBottomSheet.current.snapTo(1);
+  //       }}
+  //       onPressViaQr={() => {}}
+  //       modalRef={ShareRecoverySecretBottomSheet}
+  //     />
+  //   );
+  // };
 
-  const renderShareRecoverySecretQrCodeModalHeader = () => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          (ShareRecoverySecretBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
+  // const renderShareRecoverySecretQrCodeModalHeader = () => {
+  //   return (
+  //     <TransparentHeaderModal
+  //       onPressheader={() => {
+  //         (ShareRecoverySecretBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // };
 
-  const renderShareRecoverySecretOtpModalContent = () => {
-    return (
-      <ShareRecoverySecretModalContents
-        title={'Share Recovery Secret\nto trusted contact'}
-        infoText={
-          'Share Recovery Secret to Trusted Contact, this will enable\nthem to restore their Hexa Wallet'
-        }
-        sunInfoText={
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt'
-        }
-        shareVia={'otp'}
-        name={'Pamela Aalto'}
-        contactInfo={'+44 0000 000000'}
-        buttonText={'Share via QR'}
-        onPressRequest={() => {
-          ShareRecoverySecretOtpBottomSheet.current.snapTo(1);
-        }}
-        onPressViaQr={() => {}}
-        modalRef={ShareRecoverySecretOtpBottomSheet}
-      />
-    );
-  };
+  // const renderShareRecoverySecretOtpModalContent = () => {
+  //   return (
+  //     <ShareRecoverySecretModalContents
+  //       title={'Share Recovery Secret\nto trusted contact'}
+  //       infoText={
+  //         'Share Recovery Secret to Trusted Contact, this will enable\nthem to restore their Hexa Wallet'
+  //       }
+  //       sunInfoText={
+  //         'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt'
+  //       }
+  //       shareVia={'otp'}
+  //       name={'Pamela Aalto'}
+  //       contactInfo={'+44 0000 000000'}
+  //       buttonText={'Share via QR'}
+  //       onPressRequest={() => {
+  //         ShareRecoverySecretOtpBottomSheet.current.snapTo(1);
+  //       }}
+  //       onPressViaQr={() => {}}
+  //       modalRef={ShareRecoverySecretOtpBottomSheet}
+  //     />
+  //   );
+  // };
 
-  const renderShareRecoverySecretOtpModalHeader = () => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          (ShareRecoverySecretBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
+  // const renderShareRecoverySecretOtpModalHeader = () => {
+  //   return (
+  //     <TransparentHeaderModal
+  //       onPressheader={() => {
+  //         (ShareRecoverySecretBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // };
 
-  const renderRegenerateContent = () => {
-    return (
-      <ErrorModalContents
-        modalRef={RegenerateBottomSheet}
-        title={'Regenerate\nRecovery Secrets'}
-        info={'Did you make too many errors?'}
-        note={'You can regenerate your Recovery Secrets\nand start over'}
-        proceedButtonText={'Regenerate'}
-        cancelButtonText={'Back'}
-        isIgnoreButton={true}
-        onPressProceed={() => {
-          (RegenerateBottomSheet as any).current.snapTo(0);
-        }}
-        onPressIgnore={() => {
-          (RegenerateBottomSheet as any).current.snapTo(0);
-        }}
-        isBottomImage={false}
-      />
-    );
-  };
+  // const renderRegenerateContent = () => {
+  //   return (
+  //     <ErrorModalContents
+  //       modalRef={RegenerateBottomSheet}
+  //       title={'Regenerate\nRecovery Secrets'}
+  //       info={'Did you make too many errors?'}
+  //       note={'You can regenerate your Recovery Secrets\nand start over'}
+  //       proceedButtonText={'Regenerate'}
+  //       cancelButtonText={'Back'}
+  //       isIgnoreButton={true}
+  //       onPressProceed={() => {
+  //         (RegenerateBottomSheet as any).current.snapTo(0);
+  //       }}
+  //       onPressIgnore={() => {
+  //         (RegenerateBottomSheet as any).current.snapTo(0);
+  //       }}
+  //       isBottomImage={false}
+  //     />
+  //   );
+  // };
 
-  const renderRegenerateHeader = () => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          (RegenerateBottomSheet as any).current.snapTo(0);
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-        }}
-      />
-    );
-  };
+  // const renderRegenerateHeader = () => {
+  //   return (
+  //     <TransparentHeaderModal
+  //       onPressheader={() => {
+  //         (RegenerateBottomSheet as any).current.snapTo(0);
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //       }}
+  //     />
+  //   );
+  // };
 
   return (
     <ImageBackground
@@ -1723,8 +1693,8 @@ export default function Home(props) {
                               value.accountType === 'test'
                                 ? TEST_ACCOUNT
                                 : value.accountType === 'regular'
-                                ? REGULAR_ACCOUNT
-                                : SECURE_ACCOUNT,
+                                  ? REGULAR_ACCOUNT
+                                  : SECURE_ACCOUNT,
                           });
                         }}
                       >
@@ -1910,15 +1880,15 @@ export default function Home(props) {
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('17%')
             : Platform.OS == 'android'
-            ? hp('20%')
-            : hp('18%'),
+              ? hp('20%')
+              : hp('18%'),
           hp('50%'),
           hp('90%'),
         ]}
         renderContent={renderContent1}
         renderHeader={renderHeader}
       />
-      <BottomSheet
+      {/* <BottomSheet
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
@@ -1927,8 +1897,8 @@ export default function Home(props) {
         snapPoints={[-50, hp('60%')]}
         renderContent={renderNoInternetModalContent}
         renderHeader={renderNoInternetModalHeader}
-      />
-      <BottomSheet
+      /> */}
+      {/* <BottomSheet
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
@@ -1937,8 +1907,8 @@ export default function Home(props) {
         snapPoints={[-50, hp('60%')]}
         renderContent={renderCustodianRequestModalContent}
         renderHeader={renderCustodianRequestModalHeader}
-      />
-      <BottomSheet
+      /> */}
+      {/* <BottomSheet
         onOpenStart={() => {
           setTabBarZIndex(0);
         }}
@@ -1950,8 +1920,8 @@ export default function Home(props) {
         snapPoints={[-50, hp('60%')]}
         renderContent={renderRecoverySecretRequestModalContent}
         renderHeader={renderRecoverySecretRequestModalHeader}
-      />
-      <BottomSheet
+      /> */}
+      {/* <BottomSheet
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
@@ -1963,7 +1933,7 @@ export default function Home(props) {
         snapPoints={[-50, hp('60%')]}
         renderContent={renderRecoveryRequestModalContent}
         renderHeader={renderRecoveryRequestModalHeader}
-      />
+      /> */}
       {/* <BottomSheet
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}
@@ -1976,7 +1946,7 @@ export default function Home(props) {
         renderContent={renderCustodianRequestOtpModalContent}
         renderHeader={renderCustodianRequestOtpModalHeader}
       /> */}
-      <BottomSheet
+      {/* <BottomSheet
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
@@ -1985,7 +1955,7 @@ export default function Home(props) {
         snapPoints={[-50, hp('60%')]}
         renderContent={renderCustodianRequestRejectedModalContent}
         renderHeader={renderCustodianRequestRejectedModalHeader}
-      />
+      /> */}
       <BottomSheet
         onCloseEnd={() => {
           setTabBarZIndex(999);
@@ -2000,9 +1970,26 @@ export default function Home(props) {
         renderContent={renderMoreTabContents}
         renderHeader={renderMoreTabHeader}
       />
-      <BottomSheet
+      {KnowMoreBottomSheetsFlag ? <BottomSheet
+        onOpenEnd={() => { }}
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
+        enabledInnerScrolling={true}
+        ref={addressBookBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('90%') : hp('90%'),
+        ]}
+        renderContent={renderAddressBookContents}
+        renderHeader={renderAddressBookHeader}
+      /> : null}
+      {KnowMoreBottomSheetsFlag ? <BottomSheet
         onOpenEnd={() => {
           setTabBarZIndex(0);
+        }}
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
         }}
         enabledInnerScrolling={true}
         ref={AllAccountsBottomSheet}
@@ -2013,7 +2000,8 @@ export default function Home(props) {
         renderContent={renderAllAccountsContents}
         renderHeader={renderAllAccountsHeader}
       />
-      <BottomSheet
+        : null}
+      {KnowMoreBottomSheetsFlag ? <BottomSheet
         onOpenEnd={() => {
           setTabBarZIndex(0);
         }}
@@ -2025,8 +2013,8 @@ export default function Home(props) {
         ]}
         renderContent={renderSettingsContents}
         renderHeader={renderSettingsHeader}
-      />
-      <BottomSheet
+      /> : null}
+      {/* <BottomSheet
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
@@ -2035,8 +2023,8 @@ export default function Home(props) {
         snapPoints={[-50, hp('60%')]}
         renderContent={renderCustodianRequestAcceptModalContent}
         renderHeader={renderCustodianRequestAcceptModalHeader}
-      />
-      <BottomSheet
+      /> */}
+      {/* <BottomSheet
         onOpenEnd={() => {
           setTabBarZIndex(0);
         }}
@@ -2048,22 +2036,9 @@ export default function Home(props) {
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
-      />
+      /> */}
       <BottomSheet
-        onOpenEnd={() => {
-          setTabBarZIndex(0);
-        }}
-        enabledInnerScrolling={true}
-        ref={PinChangeSuccessBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
-        ]}
-        renderContent={renderPinChangeSuccessModalContent}
-        renderHeader={renderPinChangeSuccessModalHeader}
-      />
-      <BottomSheet
-        onOpenEnd={() => {}}
+        onOpenEnd={() => { }}
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
@@ -2076,34 +2051,21 @@ export default function Home(props) {
         renderContent={renderTransactionDetailsContents}
         renderHeader={renderTransactionDetailsHeader}
       />
-      <BottomSheet
-        onOpenEnd={() => {}}
-        onCloseEnd={() => {
-          setTabBarZIndex(999);
-        }}
-        enabledInnerScrolling={true}
-        ref={addressBookBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('90%') : hp('90%'),
-        ]}
-        renderContent={renderAddressBookContents}
-        renderHeader={renderAddressBookHeader}
-      />
-      <BottomSheet
+      {addBottomSheetsFlag ? <BottomSheet
         onOpenEnd={() => {
           setTabBarZIndex(0);
         }}
         onCloseEnd={() => {
           setTabBarZIndex(999);
+          setAddSubBottomSheetsFlag(false);
         }}
         enabledInnerScrolling={true}
         ref={AddBottomSheet}
         snapPoints={[-50, hp('63%')]}
         renderContent={renderAddModalContents}
         renderHeader={renderAddModalHeader}
-      />
-      <BottomSheet
+      /> : null}
+      {addSubBottomSheetsFlag ? <BottomSheet
         onOpenEnd={() => {
           setTabBarZIndex(0);
         }}
@@ -2116,8 +2078,8 @@ export default function Home(props) {
         ]}
         renderContent={renderFastBitcoinRedeemCalculationContents}
         renderHeader={renderFastBitcoinRedeemCalculationHeader}
-      />
-      <BottomSheet
+      /> : null}
+      {addSubBottomSheetsFlag ? <BottomSheet
         onOpenEnd={() => {
           setTabBarZIndex(0);
         }}
@@ -2130,11 +2092,12 @@ export default function Home(props) {
         ]}
         renderContent={renderFastBitcoinSellCalculationContents}
         renderHeader={renderFastBitcoinSellCalculationHeader}
-      />
-      <BottomSheet
-        onOpenEnd={() => {}}
+      /> : null}
+      {addSubBottomSheetsFlag ? <BottomSheet
+        onOpenEnd={() => { setTabBarZIndex(0); setFamilyAndFriendsBookBottomSheetsFlag(true)}}
         onCloseEnd={() => {
           setTabBarZIndex(999);
+          setFamilyAndFriendsBookBottomSheetsFlag(false);
         }}
         enabledInnerScrolling={true}
         ref={FamilyAndFriendAddressBookBottomSheet}
@@ -2144,9 +2107,9 @@ export default function Home(props) {
         ]}
         renderContent={renderFamilyAndFriendAddressBookContents}
         renderHeader={renderFamilyAndFriendAddressBookHeader}
-      />
-      <BottomSheet
-        onOpenEnd={() => {}}
+      /> : null}
+      {familyAndFriendsBookBottomSheetsFlag ? <BottomSheet
+        onOpenEnd={() => { }}
         enabledInnerScrolling={true}
         ref={ContactSelectedFromAddressBookBottomSheet}
         snapPoints={[
@@ -2155,9 +2118,9 @@ export default function Home(props) {
         ]}
         renderContent={renderContactSelectedFromAddressBookContents}
         renderHeader={renderContactSelectedFromAddressBookHeader}
-      />
-      <BottomSheet
-        onOpenEnd={() => {}}
+      />:null}
+      {familyAndFriendsBookBottomSheetsFlag ? <BottomSheet
+        onOpenEnd={() => { }}
         enabledInnerScrolling={true}
         ref={ContactSelectedFromAddressBookQrCodeBottomSheet}
         snapPoints={[
@@ -2166,7 +2129,7 @@ export default function Home(props) {
         ]}
         renderContent={renderContactSelectedFromAddressBookQrCodeContents}
         renderHeader={renderContactSelectedFromAddressBookQrCodeHeader}
-      />
+      />: null}
       {/* <BottomSheet
         onOpenStart={() => {
           setTabBarZIndex(0);
@@ -2209,7 +2172,7 @@ export default function Home(props) {
         renderHeader={renderHealthCheckSuccessModalHeader}
       /> */}
 
-      <BottomSheet
+      {/* <BottomSheet
         onOpenStart={() => {
           setTabBarZIndex(0);
         }}
@@ -2224,8 +2187,8 @@ export default function Home(props) {
         ]}
         renderContent={renderShareRecoverySecretQrCodeModalContent}
         renderHeader={renderShareRecoverySecretQrCodeModalHeader}
-      />
-      <BottomSheet
+      /> */}
+      {/* <BottomSheet
         onOpenStart={() => {
           setTabBarZIndex(0);
         }}
@@ -2241,8 +2204,8 @@ export default function Home(props) {
         ]}
         renderContent={renderShareRecoverySecretOtpModalContent}
         renderHeader={renderShareRecoverySecretOtpModalHeader}
-      />
-      <BottomSheet
+      /> */}
+      {/* <BottomSheet
         onOpenEnd={() => {
           setTabBarZIndex(0);
         }}
@@ -2257,7 +2220,7 @@ export default function Home(props) {
         ]}
         renderContent={renderRegenerateContent}
         renderHeader={renderRegenerateHeader}
-      />
+      /> */}
 
       {/* TODO: If we open full modal above tab bar first change zIndex to 0 and when we close that modal please zIndex to 999 by using setTabBarZIndex(0) or setTabBarZIndex(999) */}
       <View style={{ ...styles.bottomTabBarContainer, zIndex: tabBarZIndex }}>
@@ -2274,13 +2237,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>transactions</Text>
             </View>
           ) : (
-            <View style={{ flexDirection: 'row' }}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_transactions.png')}
-                style={styles.tabBarImage}
-              />
-            </View>
-          )}
+              <View style={{ flexDirection: 'row' }}>
+                <Image
+                  source={require('../assets/images/HomePageIcons/icon_transactions.png')}
+                  style={styles.tabBarImage}
+                />
+              </View>
+            )}
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => selectTab('Add')}
@@ -2295,13 +2258,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>add</Text>
             </View>
           ) : (
-            <View style={{ flexDirection: 'row' }}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_add.png')}
-                style={styles.tabBarImage}
-              />
-            </View>
-          )}
+              <View style={{ flexDirection: 'row' }}>
+                <Image
+                  source={require('../assets/images/HomePageIcons/icon_add.png')}
+                  style={styles.tabBarImage}
+                />
+              </View>
+            )}
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => selectTab('QR')}
@@ -2316,17 +2279,18 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>qr</Text>
             </View>
           ) : (
-            <View style={{ flexDirection: 'row' }}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_qr.png')}
-                style={styles.tabBarImage}
-              />
-            </View>
-          )}
+              <View style={{ flexDirection: 'row' }}>
+                <Image
+                  source={require('../assets/images/HomePageIcons/icon_qr.png')}
+                  style={styles.tabBarImage}
+                />
+              </View>
+            )}
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.tabBarTabView}
           onPress={() => {
+            setKnowMoreBottomSheetsFlag(true);
             setOpenmodal('closed');
             (MoreTabBottomSheet as any).current.snapTo(1);
             selectTab('More');
@@ -2341,13 +2305,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>More</Text>
             </View>
           ) : (
-            <View style={{ flexDirection: 'row' }}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_more.png')}
-                style={styles.tabBarImage}
-              />
-            </View>
-          )}
+              <View style={{ flexDirection: 'row' }}>
+                <Image
+                  source={require('../assets/images/HomePageIcons/icon_more.png')}
+                  style={styles.tabBarImage}
+                />
+              </View>
+            )}
         </TouchableOpacity>
       </View>
     </ImageBackground>
