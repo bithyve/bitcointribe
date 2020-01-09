@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Image,
   TouchableOpacity,
   Text,
   StyleSheet,
-  ScrollView
+  FlatList,
+  TextInput
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -17,6 +18,7 @@ import CommonStyles from "../common/Styles";
 import { RFValue } from "react-native-responsive-fontsize";
 import ContactList from "../components/ContactList";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
 
 export default function AddressBookContents(props) {
   const [contactData, setContactData] = useState([
@@ -126,6 +128,36 @@ export default function AddressBookContents(props) {
     "Y",
     "Z"
   ]);
+  const [searchBox, setSearchBox] = useState('');
+  const [filterContactData, setFilterContactData] = useState([]);
+
+  useEffect(() => {
+    setSearchBox('');
+    const contactList = contactData
+      .sort(function (a, b) {
+        if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+        return 0;
+      })
+      setFilterContactData(contactList);
+  }, []);
+
+  const filterContacts = (keyword) => {
+    if (!keyword.length) {
+      setFilterContactData(contactData);
+      return;
+    }
+    let isFilter = true;
+    let filterContactsForDisplay = [];
+    for (let i = 0; i < contactData.length; i++) {
+      if (contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())) {
+        filterContactsForDisplay.push(contactData[i])
+      }
+    }
+    setFilterContactData(filterContactsForDisplay);
+  }
+
+
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
@@ -165,23 +197,39 @@ export default function AddressBookContents(props) {
           </TouchableOpacity>
         </View>
       </View>
+      <View style={[styles.searchBoxContainer]}>
+          <View style={styles.searchBoxIcon}>
+            <EvilIcons style={{ alignSelf: 'center' }} name="search" size={20} color={Colors.darkGray} />
+          </View>
+          <TextInput
+            ref={element => setSearchBox(element)}
+            style={styles.searchBoxInput}
+            placeholder="Search"
+            placeholderTextColor={Colors.darkGray}
+            onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
+          />
+        </View>
       <View style={{ flex: 1 }}>
         <View style={{ flex: 1, flexDirection: "row" }}>
           <View style={{ flex: 11 }}>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              {contactData.map((value, index) => {
-                return (
-                  <TouchableOpacity style={styles.contactView}>
-                    <Text style={styles.contactText}>
-                      {value.name.split(" ")[0]}{" "}
-                      <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                        {value.name.split(" ")[1]}
-                      </Text>
+          <FlatList
+            data={filterContactData}
+            extraData={filterContactData}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item, index }) => {
+              return (
+                <TouchableOpacity style={styles.contactView}>
+                  <Text style={styles.contactText}>
+                    {item.name.split(" ")[0]}{" "}
+                    <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                      {item.name.split(" ")[1]}
                     </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
+                  </Text>
+                </TouchableOpacity>
+              )
+            }
+            }
+              />
           </View>
           <View style={styles.contactIndexView}>
             <TouchableOpacity>
@@ -291,5 +339,27 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontSize: RFValue(10, 812),
     fontFamily: Fonts.FiraSansRegular
-  }
+  },
+  searchBoxContainer: {
+    flexDirection: "row",
+    borderBottomColor: Colors.borderColor,
+    borderBottomWidth: 0.5,
+    marginLeft: 10,
+    marginRight: 10,
+    height: 40,
+    justifyContent: 'center',
+
+  },
+  searchBoxIcon: {
+    justifyContent: 'center',
+    marginBottom: -10
+  },
+  searchBoxInput: {
+    flex: 1,
+    fontSize: 16,
+    color: Colors.blacl,
+    borderBottomColor: Colors.borderColor,
+    alignSelf: 'center',
+    marginBottom: -10
+  },
 });
