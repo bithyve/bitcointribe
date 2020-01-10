@@ -146,6 +146,11 @@ export default function Send(props) {
     );
   };
 
+  const getQrCodeData = qrData => {
+     console.log('Qrcodedata', qrData);
+     setRecipientAddress(qrData);
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -214,12 +219,15 @@ export default function Send(props) {
                 //   }
                 // }}
                 />
-                {/* <View style={styles.contactNameInputImageView}>
+                <TouchableOpacity style={styles.contactNameInputImageView}
+                onPress={()=>{props.navigation.navigate('QrScanner', {
+                  scanedCode: getQrCodeData,
+                })}}>
                 <Image
                   style={styles.textBoxImage}
-                  source={require("../../assets/images/icons/phone-book.png")}
+                  source={require("../../assets/images/icons/qr-code.png")}
                 />
-              </View> */}
+              </TouchableOpacity>
               </View>
               <View style={styles.textBoxView}>
                 <View style={styles.amountInputImage}>
