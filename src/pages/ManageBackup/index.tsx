@@ -31,6 +31,10 @@ import BackupStyles from './Styles';
 import ContactList from '../../components/ContactList';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BottomInfoBox from '../../components/BottomInfoBox';
+import Icons from "../../common/Icons";
+
+
+
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import WalletBackupAndRecoveryContents from '../../components/Helper/WalletBackupAndRecoveryContents';
@@ -65,7 +69,7 @@ export default function ManageBackup( props ) {
   const [ contacts, setContacts ] = useState( [] );
   const [ isSecretShared1, setIsSecretShared1 ] = useState( false );
   const [ isSecretShared2, setIsSecretShared2 ] = useState( false );
-  const [ arrModalShareIntent, setArrModalShareIntent ] = useState( { snapTop: 0 } );
+  const [ arrModalShareIntent, setArrModalShareIntent ] = useState( { snapTop: 0, item: {} } );
 
   const [ cloudData, setCloudData ] = useState( [
     {
@@ -148,13 +152,13 @@ export default function ManageBackup( props ) {
       return require( '../../assets/images/icons/icon_user.png' );
     } else if ( type == 'copy1' || type == 'copy2' ) {
       if ( item.personalInfo && item.personalInfo.flagShare && item.personalInfo.shareDetails.type == "GoogleDrive" ) {
-        return require( '../../assets/images/icons/icon_cloud.png' );
+        return Icons.manageBackup.PersonalCopy.icloud;
       }
       else if ( item.personalInfo && item.personalInfo.flagShare && item.personalInfo.shareDetails.type == "Email" ) {
-        return require( '../../assets/images/icons/gmail.png' );
+        return Icons.manageBackup.PersonalCopy.email;
       }
       else if ( item.personalInfo && item.personalInfo.flagShare && ( item.personalInfo.shareDetails.type == "Print" ) ) {
-        return require( '../../assets/images/icons/print.png' );
+        return Icons.manageBackup.PersonalCopy.print;
       }
       else {
         return require( '../../assets/images/icons/note.png' );
@@ -775,6 +779,7 @@ export default function ManageBackup( props ) {
                     if ( item.route == 'PersonalCopy' ) {
                       setArrModalShareIntent( {
                         snapTop: 1,
+                        item
                       } );
                     }
                     if ( item.type == 'contact' && !item.personalInfo ) {

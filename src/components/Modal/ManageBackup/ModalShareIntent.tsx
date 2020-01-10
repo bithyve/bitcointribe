@@ -16,22 +16,31 @@ import Icons from "../../../../src/common/Icons";
 
 export default function ModalShareIntent( props ) {
 
-
+    const [ flagRefreshing, setFagRefreshing ] = useState( false );
     const [ arrShareOption, setArrShareOption ] = useState( [
         {
-            title: 'Cloud',
-            info: 'Store backup in iCloud Drive',
-            imageIcon: Icons.manageBackup.PersonalCopy.icloud,
-        },
-        {
-            title: 'Email',
-            info: 'Store backup in Google Drive',
+            id: 1,
+            title: 'Send pdf on email',
+            type: "Email",
+            flagShare: false,
+            info: 'The pdf document is password protected with the answer to your secret question',
             imageIcon: Icons.manageBackup.PersonalCopy.email,
         },
         {
-            title: 'Print',
-            info: 'Store backup in One Drive',
+            id: 2,
+            title: 'Print a copy',
+            type: "Print",
+            flagShare: false,
+            info: 'Keep the printed copy (6 pages) safe',
             imageIcon: Icons.manageBackup.PersonalCopy.print,
+        },
+        {
+            id: 3,
+            title: 'Store/ send pdf using other options',
+            type: "Other",
+            flagShare: false,
+            info: 'The pdf document is password protected with the answer to your secret question',
+            imageIcon: Icons.manageBackup.PersonalCopy.icloud,
         },
     ] );
 
@@ -40,13 +49,17 @@ export default function ModalShareIntent( props ) {
         setRefShareIntentBottomSheet,
     ] = useState( React.createRef() );
 
-
-
     useEffect( () => {
         console.log( { props } );
+        for ( var i = 0; i < arrShareOption.length; i++ )
+            if ( arrShareOption[ i ].type === 'Other' ) {
+                console.log( { i } );
+                arrShareOption[ i ].flagShare = true;
+                setFagRefreshing( true );
+                break;
+            }
         refShareIntentBottomSheet.current.snapTo( props.data.snapTop );
     }, [ props ] );
-
     const renderShareContents = () => {
         return (
             <View style={ [ styles.modalContainer ] }>
@@ -60,6 +73,7 @@ export default function ModalShareIntent( props ) {
                             onPress={ () => {
                                 props.navigation.goBack();
                             } }
+
                         >
                             <View style={ styles.headerLeftIconInnerContainer }>
                                 <FontAwesome name="long-arrow-left" color={ Colors.blue } size={ 17 } />
@@ -76,16 +90,20 @@ export default function ModalShareIntent( props ) {
                 <View style={ { flex: 1 } }>
                     <FlatList
                         data={ arrShareOption }
+                        // onRefresh={ onRefresh }  
+                        refreshing={ flagRefreshing }
                         renderItem={ ( { item, index } ) => (
-                            <TouchableOpacity onPress={ () => props.onPressShare( item.title )
-                            } style={ styles.listElements }>
+                            <TouchableOpacity
+                                onPress={ () => props.onPressShare( item.type ) }
+                                disabled={ item.flagShare }
+                                style={ [ styles.listElements, item.flagShare == true ? { backgroundColor: "#ccc", borderRadius: 5 } : null ] }>
                                 <Image
                                     style={ styles.listElementsIconImage }
                                     source={ item.imageIcon }
                                 />
                                 <View style={ { justifyContent: 'space-between', flex: 1 } }>
                                     <Text style={ styles.listElementsTitle }>{ item.title }</Text>
-                                    <Text style={ styles.listElementsInfo } numberOfLines={ 1 }>
+                                    <Text style={ styles.listElementsInfo }>
                                         { item.info }
                                     </Text>
                                 </View>
@@ -99,6 +117,7 @@ export default function ModalShareIntent( props ) {
                                 </View>
                             </TouchableOpacity>
                         ) }
+                        keyExtractor={ ( item, index ) => index.toString() }
                     />
                 </View>
             </View >

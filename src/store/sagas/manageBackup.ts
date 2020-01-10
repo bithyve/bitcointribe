@@ -12,16 +12,7 @@ import { SHARE_PDF, DBUPDATE_PDF_SEND, dbUpdatePdfSharing } from '../actions/man
 import { dbUpdateSSS } from "../actions/storage"
 import { socialMediaType } from "../utils/media";
 
-function getMediaType( type ) {
-  switch ( type ) {
-    case "cloud":
-      return Share.Social.GOOGLEPLUS;
-    case "email":
-      return Share.Social.EMAIL;
-    default:
-      return Share.Social.PINTEREST
-  }
-}
+
 
 
 
@@ -31,15 +22,12 @@ function* sharePdfWorker( { payload } ) {
   const { security } = yield select(
     state => state.storage.database.WALLET_SETUP,
   );
-
   console.log( { databaseSSS, payload } );
   let { type, item } = payload;
   console.log( { type, item } );
-
   try {
     if ( item.type == 'copy1' && type != "Print" ) {
-
-      if ( type == "Cloud" ) {
+      if ( type == "Other" ) {
         let shareOptions = {
           title: 'Personal Copy 1',
           message:
@@ -57,54 +45,6 @@ function* sharePdfWorker( { payload } ) {
           return await res;
         } );
         yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: socialMediaType( res.app.split( "/", 1 )[ 0 ] ), date: Math.floor( Date.now() / 1000 ) } } ) );
-        // var uploadUrl = Platform.OS == 'android'
-        //   ? 'file://' + databaseSSS.pdfDetails.copy1.path
-        //   : databaseSSS.pdfDetails.copy1.path;
-        // // For testing purposes, go to http://requestb.in/ and create your own link
-        // // create an array of objects of the files you want to upload
-
-        // const files = [
-        //   {
-        //     name: 'test1',
-        //     filename: 'test1.w4a',
-        //     filepath: uploadUrl,
-        //     filetype: 'application/pdf'
-        //   }
-        // ];
-
-        // const uploadBegin = ( response ) => {
-        //   var jobId = response.jobId;
-        //   console.log( 'UPLOAD HAS BEGUN! JobId: ' + jobId );
-        // };
-
-        // const uploadProgress = ( response ) => {
-        //   var percentage = Math.floor( ( response.totalBytesSent / response.totalBytesExpectedToSend ) * 100 );
-        //   console.log( 'UPLOAD IS ' + percentage + '% DONE!' );
-        // };
-
-        // // upload files
-        // RNFS.uploadFiles( {
-        //   toUrl: uploadUrl,
-        //   files: files,
-        //   method: 'POST',
-        //   headers: {
-        //     'Accept': 'application/pdf',
-        //   },
-        //   begin: uploadBegin,
-        //   progress: uploadProgress
-        // } ).promise.then( ( response ) => {
-        //   if ( response.statusCode == 200 ) {
-        //     console.log( 'FILES UPLOADED!' ); // response.statusCode, response.headers, response.body
-        //   } else {
-        //     console.log( 'SERVER ERROR' );
-        //   }
-        // } )
-        //   .catch( ( err ) => {
-        //     if ( err.description === "cancelled" ) {
-        //       // cancelled by user
-        //     }
-        //     console.log( err );
-        //   } );
       } else {
         let res = Mailer.mail( {
           subject: item.title,
@@ -119,12 +59,12 @@ function* sharePdfWorker( { payload } ) {
           }
         }, ( error, event ) => {
           console.log( { event, error } );
-          return event;
+          return "Email";
         } );
-        yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: "Email", date: Math.floor( Date.now() / 1000 ) } } ) );
+        yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: res, date: Math.floor( Date.now() / 1000 ) } } ) );
       }
     } else if ( item.type == 'copy2' && type != "Print" ) {
-      if ( type == "Cloud" ) {
+      if ( type == "Other" ) {
         let shareOptions = {
           title: 'Personal Copy 2',
           message:
@@ -155,9 +95,9 @@ function* sharePdfWorker( { payload } ) {
           }
         }, ( error, event ) => {
           console.log( { event, error } );
-          return event;
+          return "Email";
         } );
-        yield put( dbUpdatePdfSharing( { copy: "copy2", socialMedia: { type: "Email" }, date: Math.floor( Date.now() / 1000 ) } ) );
+        yield put( dbUpdatePdfSharing( { copy: "copy2", socialMedia: { type: res }, date: Math.floor( Date.now() / 1000 ) } ) );
       }
     } else {
       console.log( { path: databaseSSS.pdfDetails.personalCopy1PdfPath } );

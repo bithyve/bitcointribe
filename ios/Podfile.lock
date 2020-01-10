@@ -127,8 +127,6 @@ PODS:
     - React
   - RNDeviceInfo (5.4.0):
     - React
-  - RNFS (2.16.2):
-    - React
   - RNGestureHandler (1.3.0):
     - React
   - RNReanimated (1.4.0):
@@ -200,7 +198,6 @@ DEPENDENCIES:
   - React/RCTWebSocket (from `../node_modules/react-native`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
-  - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler/RNGestureHandler.podspec`)
   - RNReanimated (from `../node_modules/react-native-reanimated/RNReanimated.podspec`)
   - RNScreens (from `../node_modules/react-native-screens`)
@@ -294,8 +291,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/async-storage"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
-  RNFS:
-    :path: "../node_modules/react-native-fs"
   RNGestureHandler:
     :podspec: "../node_modules/react-native-gesture-handler/RNGestureHandler.podspec"
   RNReanimated:
@@ -377,7 +372,6 @@ SPEC CHECKSUMS:
   react-native-video: d01ed7ff1e38fa7dcc6c15c94cf505e661b7bfd0
   RNCAsyncStorage: 44395cb9c7c1523104c2b499eb426ef7aff82bca
   RNDeviceInfo: c7b1dc457611b9231bb780a882102e2c93edc7af
-  RNFS: 0d4191b1052bef9ce70deff00a5b4169c62bbd9b
   RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
   RNReanimated: b2ab0b693dddd2339bd2f300e770f6302d2e960c
   RNScreens: f28b48b8345f2f5f39ed6195518291515032a788
@@ -397,6 +391,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 1e70fe58b872355f0ecb44fb81bb1a16484047f0
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: add8494640447934ade8c5c6fb9cf44c4a892478
+PODFILE CHECKSUM: dc79131b31ec1be54c49397d03d74f415d04707a
 
 COCOAPODS: 1.8.4
