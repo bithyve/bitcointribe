@@ -55,13 +55,13 @@ headerLeftIconInnerContainer:{
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18, 812),
+    fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansMedium
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
     marginTop: 5
   },
   modalContentView: {

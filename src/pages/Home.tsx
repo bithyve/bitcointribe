@@ -396,16 +396,13 @@ export default function Home(props) {
     } else if (health > 0 && health < 100) {
       return (
         <Text style={styles.headerInfoText}>
-          The wallet backup is not secured{'\n'}Please complete the setup to
-          {'\n'}safeguard against loss of funds
+          The wallet backup is not secured.{'\n'}Please complete the setup to{'\n'}safeguard against loss of funds
         </Text>
       );
     } else {
       return (
         <Text style={styles.headerInfoText}>
-          <Text style={{ fontStyle: 'italic' }}>Great!! </Text>
-          The wallet backup is{'\n'}secure. Keep an eye on the{'\n'}health of
-          the backup here
+          <Text style={{ fontStyle: 'italic' }}>Great!! </Text>The wallet backup is{'\n'}secure. Keep an eye on the{'\n'}health of the backup here
         </Text>
       );
     }
@@ -539,18 +536,18 @@ export default function Home(props) {
     return (
       <AddModalContents
         onPressElements={type => {
-          // if (
-          //   type == 'Fastbitcoins' ||
-          //   type == 'Getbittr' ||
-          //   type == 'Add Contact'
-          // ) {
-          //   setTimeout(() => {
-          //     setAddSubBottomSheetsFlag(true);
-          //     setTabBarZIndex(0);
-          //     setSelectToAdd(type);
-          //   }, 2);
-          //   (AddBottomSheet as any).current.snapTo(1);
-          // }
+          if (
+            type == 'Fastbitcoins' ||
+            type == 'Getbittr' ||
+            type == 'Add Contact'
+          ) {
+            setTimeout(() => {
+              setAddSubBottomSheetsFlag(true);
+              setTabBarZIndex(0);
+              setSelectToAdd(type);
+            }, 2);
+            (AddBottomSheet as any).current.snapTo(1);
+          }
         }}
         addData={modaldata}
       />
@@ -591,7 +588,7 @@ export default function Home(props) {
         />
       );
     }
-    else if(selected == 'More'){
+    else if (selected == 'More') {
       return <MoreHomePageTabContents onPressElements={item => onPressElement(item)} />
     }
   }
@@ -638,6 +635,7 @@ export default function Home(props) {
     (bottomSheet as any).current.snapTo(2);
     if (tabTitle == 'More') {
       setTimeout(() => {
+        setKnowMoreBottomSheetsFlag(true);
         setSelected(tabTitle);
         setSelected(tabTitle);
       }, 2);
@@ -1418,7 +1416,7 @@ export default function Home(props) {
     })();
   }, []);
 
-  
+
   // const renderRecoverySecretRequestModalContent = () => {
   //   return (
   //     <RecoverySecretRequestModalContents
@@ -1598,9 +1596,9 @@ export default function Home(props) {
                   {switchOn
                     ? balances.accumulativeBalance
                     : (
-                        (balances.accumulativeBalance / 1e8) *
-                        exchangeRates['USD'].last
-                      ).toFixed(3)}
+                      (balances.accumulativeBalance / 1e8) *
+                      exchangeRates['USD'].last
+                    ).toFixed(3)}
                 </Text>
                 <Text
                   style={{
@@ -1690,7 +1688,7 @@ export default function Home(props) {
                                 <Text
                                   style={{
                                     color: Colors.blue,
-                                    fontSize: RFValue(11, 812),
+                                    fontSize: RFValue(11),
                                     fontFamily: Fonts.FiraSansRegular,
                                   }}
                                 >
@@ -1704,7 +1702,7 @@ export default function Home(props) {
                             <Text
                               style={{
                                 color: Colors.textColorGrey,
-                                fontSize: RFValue(11, 812),
+                                fontSize: RFValue(11),
                               }}
                             >
                               {value.account}
@@ -1725,22 +1723,22 @@ export default function Home(props) {
                                   ? value.accountType === 'test'
                                     ? balances.testBalance
                                     : value.accountType === 'regular'
-                                    ? balances.regularBalance
-                                    : balances.secureBalance
+                                      ? balances.regularBalance
+                                      : balances.secureBalance
                                   : value.accountType === 'test'
-                                  ? (
+                                    ? (
                                       (balances.testBalance / 1e8) *
                                       exchangeRates['USD'].last
                                     ).toFixed(3)
-                                  : value.accountType === 'regular'
-                                  ? (
-                                      (balances.regularBalance / 1e8) *
-                                      exchangeRates['USD'].last
-                                    ).toFixed(3)
-                                  : (
-                                      (balances.secureBalance / 1e8) *
-                                      exchangeRates['USD'].last
-                                    ).toFixed(3)}
+                                    : value.accountType === 'regular'
+                                      ? (
+                                        (balances.regularBalance / 1e8) *
+                                        exchangeRates['USD'].last
+                                      ).toFixed(3)
+                                      : (
+                                        (balances.secureBalance / 1e8) *
+                                        exchangeRates['USD'].last
+                                      ).toFixed(3)}
                               </Text>
                               <Text style={styles.cardAmountUnitText}>
                                 {switchOn ? value.unit : 'USD'}
@@ -1854,10 +1852,10 @@ export default function Home(props) {
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
-            ? hp('17%')
+            ? hp('18%')
             : Platform.OS == 'android'
               ? hp('20%')
-              : hp('18%'),
+              : hp('19%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
           hp('90%'),
         ]}
@@ -2056,7 +2054,7 @@ export default function Home(props) {
         renderHeader={renderFastBitcoinSellCalculationHeader}
       /> : null}
       {addSubBottomSheetsFlag ? <BottomSheet
-        onOpenEnd={() => { setTabBarZIndex(0); setFamilyAndFriendsBookBottomSheetsFlag(true)}}
+        onOpenEnd={() => { setTabBarZIndex(0); setFamilyAndFriendsBookBottomSheetsFlag(true) }}
         onCloseEnd={() => {
           setTabBarZIndex(999);
           setFamilyAndFriendsBookBottomSheetsFlag(false);
@@ -2080,7 +2078,7 @@ export default function Home(props) {
         ]}
         renderContent={renderContactSelectedFromAddressBookContents}
         renderHeader={renderContactSelectedFromAddressBookHeader}
-      />:null}
+      /> : null}
       {familyAndFriendsBookBottomSheetsFlag ? <BottomSheet
         onOpenEnd={() => { }}
         enabledInnerScrolling={true}
@@ -2091,7 +2089,7 @@ export default function Home(props) {
         ]}
         renderContent={renderContactSelectedFromAddressBookQrCodeContents}
         renderHeader={renderContactSelectedFromAddressBookQrCodeHeader}
-      />: null}
+      /> : null}
       {/* <BottomSheet
         onOpenStart={() => {
           setTabBarZIndex(0);
@@ -2289,7 +2287,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     color: Colors.blue,
-    fontSize: RFValue(10, 812),
+    fontSize: RFValue(10),
   },
   activeTabStyle: {
     flexDirection: 'row',
@@ -2305,7 +2303,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     color: Colors.blue,
     fontFamily: Fonts.firasonsRegular,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
   },
   bottomTabBarContainer: {
     backgroundColor: Colors.white,
@@ -2341,7 +2339,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     marginTop: 'auto',
     flex: 1,
-    height: 40,
+    height: Platform.OS == 'ios' ? 45 : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,
@@ -2362,7 +2360,7 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18, 812),
+    fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 15,
   },
@@ -2379,7 +2377,7 @@ const styles = StyleSheet.create({
   headerTitleText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(25, 812),
+    fontSize: RFValue(25),
     display: 'flex',
     marginBottom: hp('0.8%'),
   },
@@ -2390,15 +2388,14 @@ const styles = StyleSheet.create({
     marginBottom: hp('3%'),
   },
   headerInfoText: {
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
     color: Colors.white,
     marginBottom: hp('4%'),
-    width: wp('50%'),
   },
   headerButton: {
     backgroundColor: Colors.homepageButtonColor,
     height: hp('5%'),
-    width: wp('30%'),
+    width: wp('35%'),
     borderRadius: 5,
     alignSelf: 'flex-start',
     justifyContent: 'center',
@@ -2406,7 +2403,7 @@ const styles = StyleSheet.create({
   },
   headerButtonText: {
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     color: Colors.white,
   },
   cardBitCoinImage: {
@@ -2419,13 +2416,13 @@ const styles = StyleSheet.create({
   cardAmountText: {
     color: Colors.black,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(17, 812),
+    fontSize: RFValue(17),
     marginRight: 5,
   },
   cardAmountUnitText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11, 812),
+    fontSize: RFValue(11),
     marginBottom: 2,
   },
   tabBarImage: {
@@ -2451,13 +2448,13 @@ const styles = StyleSheet.create({
   },
   transactionModalTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
     marginBottom: 3,
     fontFamily: Fonts.FiraSansRegular,
   },
   transactionModalDateText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(10, 812),
+    fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular,
   },
   transactionModalAmountView: {
@@ -2469,12 +2466,12 @@ const styles = StyleSheet.create({
   transactionModalAmountText: {
     marginLeft: 5,
     marginRight: 5,
-    fontSize: RFValue(20, 812),
+    fontSize: RFValue(20),
     fontFamily: Fonts.OpenSans,
   },
   transactionModalAmountUnitText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(10, 812),
+    fontSize: RFValue(10),
     fontFamily: Fonts.OpenSans,
   },
   separatorView: {

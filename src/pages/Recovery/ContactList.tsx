@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(13, 812)
+    fontSize: RFValue(13)
   },
   bottomButtonView: {
     height: 50,
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   },
   selectedContactNameText: {
     color: Colors.white,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular
   },
   selectedContactContainer: {
@@ -302,11 +302,11 @@ const styles = StyleSheet.create({
   },
   contactText: {
     marginLeft: 10,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular
   },
   contactIndexText: {
-    fontSize: RFValue(10, 812),
+    fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular
   },
   contactIndexView: {

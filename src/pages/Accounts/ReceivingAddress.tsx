@@ -112,7 +112,7 @@ const ReceivingAddress = props => {
                 }}
                 style={{
                   color: Colors.textColorGrey,
-                  fontSize: RFValue(12, 812),
+                  fontSize: RFValue(12),
                   marginLeft: 'auto',
                 }}
               >

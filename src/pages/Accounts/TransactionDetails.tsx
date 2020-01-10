@@ -76,7 +76,7 @@ export default function TransactionDetails(props) {
                 style={{
                   color: Colors.blue,
                   fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(14, 812)
+                  fontSize: RFValue(14)
                 }}
               >
                 {txDetails.accountType}
@@ -85,7 +85,7 @@ export default function TransactionDetails(props) {
                 style={{
                   color: Colors.textColorGrey,
                   fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12, 812),
+                  fontSize: RFValue(12),
                   marginTop: hp("1%")
                 }}
               >
@@ -112,7 +112,7 @@ export default function TransactionDetails(props) {
               style={{
                 color: Colors.blue,
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12, 812)
+                fontSize: RFValue(12)
               }}
             >
               Amount
@@ -136,7 +136,7 @@ export default function TransactionDetails(props) {
                 style={{
                   color: Colors.textColorGrey,
                   fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12, 812),
+                  fontSize: RFValue(12),
                   marginLeft: 3
                 }}
               >
@@ -150,7 +150,7 @@ export default function TransactionDetails(props) {
                 style={{
                   color: Colors.blue,
                   fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12, 812)
+                  fontSize: RFValue(12)
                 }}
               >
                 To Address
@@ -159,7 +159,7 @@ export default function TransactionDetails(props) {
                 style={{
                   color: Colors.textColorGrey,
                   fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12, 812),
+                  fontSize: RFValue(12),
                   marginTop: hp("0.5%")
                 }}
               >
@@ -173,7 +173,7 @@ export default function TransactionDetails(props) {
                 style={{
                   color: Colors.blue,
                   fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12, 812)
+                  fontSize: RFValue(12)
                 }}
               >
                 From Address
@@ -182,7 +182,7 @@ export default function TransactionDetails(props) {
                 style={{
                   color: Colors.textColorGrey,
                   fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12, 812),
+                  fontSize: RFValue(12),
                   marginTop: hp("0.5%")
                 }}
               >
@@ -195,7 +195,7 @@ export default function TransactionDetails(props) {
               style={{
                 color: Colors.blue,
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12, 812)
+                fontSize: RFValue(12)
               }}
             >
               Fees
@@ -204,7 +204,7 @@ export default function TransactionDetails(props) {
               style={{
                 color: Colors.textColorGrey,
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12, 812),
+                fontSize: RFValue(12),
                 marginTop: hp("0.5%")
               }}
             >
@@ -216,7 +216,7 @@ export default function TransactionDetails(props) {
               style={{
                 color: Colors.blue,
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12, 812)
+                fontSize: RFValue(12)
               }}
             >
               Transaction ID
@@ -225,7 +225,7 @@ export default function TransactionDetails(props) {
               style={{
                 color: Colors.textColorGrey,
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12, 812),
+                fontSize: RFValue(12),
                 marginTop: hp("0.5%")
               }}
             >
@@ -237,7 +237,7 @@ export default function TransactionDetails(props) {
               style={{
                 color: Colors.blue,
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12, 812)
+                fontSize: RFValue(12)
               }}
             >
               Confirmations
@@ -246,7 +246,7 @@ export default function TransactionDetails(props) {
               style={{
                 color: Colors.textColorGrey,
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12, 812),
+                fontSize: RFValue(12),
                 marginTop: hp("0.5%")
               }}
             >
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18, 812),
+    fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansMedium
   },
   infoCardView: {

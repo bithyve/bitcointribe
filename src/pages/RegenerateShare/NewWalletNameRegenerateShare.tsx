@@ -109,14 +109,14 @@ export default function NewWalletNameRegenerateShare(props) {
 const styles = StyleSheet.create({
   pageTitle: {
     color: Colors.blue,
-    fontSize: RFValue(25, 812),
+    fontSize: RFValue(25),
     marginLeft: 20,
     marginBottom: 5,
     fontFamily: Fonts.FiraSansRegular
   },
   labelStyle: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
     marginLeft: 15,
     fontFamily: Fonts.FiraSansRegular
   },
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     paddingLeft: 15,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     marginBottom: 20
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     paddingLeft: 15,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     color: Colors.textColorGrey,
     elevation: 10,
     shadowColor: Colors.borderColor,
@@ -155,13 +155,13 @@ const styles = StyleSheet.create({
   },
   bottomNoteText: {
     color: Colors.blue,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     marginBottom: 5,
     fontFamily: Fonts.FiraSansRegular
   },
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
     fontFamily: Fonts.FiraSansRegular
   },
   buttonView: {
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium
   },
   bottomButtonView: {

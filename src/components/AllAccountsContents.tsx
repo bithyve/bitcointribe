@@ -99,7 +99,7 @@ export default function AllAccountsContents(props) {
 const styles = StyleSheet.create({
     headerTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(25, 812),
+        fontSize: RFValue(25),
         marginLeft: 20,
         marginTop: hp('10%'),
         fontFamily: Fonts.FiraSansRegular
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     },
     modalHeaderTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         fontFamily: Fonts.FiraSansMedium
     },
     listElements: {
@@ -144,13 +144,13 @@ const styles = StyleSheet.create({
     },
     listElementsTitle: {
         color: Colors.blue,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         marginLeft: 13,
         fontFamily: Fonts.FiraSansRegular
     },
     listElementsInfo: {
         color: Colors.textColorGrey,
-        fontSize: RFValue(11, 812),
+        fontSize: RFValue(11),
         marginLeft: 13,
         fontFamily: Fonts.FiraSansRegular,
         marginTop:hp('0.5%')

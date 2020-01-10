@@ -33,43 +33,43 @@ export default function TransactionDetailsContents(props) {
             </View>
             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
                 <View>
-                    <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(14, 812) }}>Regular account</Text>
-                    <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12, 812), marginTop: hp('1%') }}>30 November 2019 <Entypo size={10} name={'dot-single'} color={Colors.textColorGrey} /> 11:00am</Text>
+                    <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(14) }}>Regular account</Text>
+                    <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12), marginTop: hp('1%') }}>30 November 2019 <Entypo size={10} name={'dot-single'} color={Colors.textColorGrey} /> 11:00am</Text>
                 </View>
                 <FontAwesome style={{ marginLeft: 'auto' }} name="long-arrow-down" color={Colors.green} size={17} />
             </View>
         </View>
         <View style={{ flex: 1 }}>
             <View style={styles.infoCardView}>
-                <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12, 812) }}>Amount</Text>
+                <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12) }}>Amount</Text>
                 <View style={{ flexDirection: "row", alignItems: 'center', marginTop: hp('0.5%') }}>
                     <Image source={require("../assets/images/icons/icon_bitcoin_gray.png")} style={{ width: wp('3%'), height: wp('3%'), resizeMode: "contain" }} />
-                    <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12, 812), marginLeft: 3 }}>0.025</Text>
+                    <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12), marginLeft: 3 }}>0.025</Text>
                 </View>
             </View>
             <View style={styles.infoCardView}>
-                <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12, 812) }}>To Address</Text>
-                <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12, 812), marginTop: hp('0.5%') }}>8572308235034623</Text>
+                <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12) }}>To Address</Text>
+                <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12), marginTop: hp('0.5%') }}>8572308235034623</Text>
             </View>
             <View style={styles.infoCardView}>
-                <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12, 812) }}>From Address</Text>
-                <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12, 812), marginTop: hp('0.5%') }}>234255609325230</Text>
+                <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12) }}>From Address</Text>
+                <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12), marginTop: hp('0.5%') }}>234255609325230</Text>
             </View>
             <View style={styles.infoCardView}>
-                <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12, 812) }}>To Address</Text>
-                <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12, 812), marginTop: hp('0.5%') }}>0.00134</Text>
+                <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12) }}>To Address</Text>
+                <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12), marginTop: hp('0.5%') }}>0.00134</Text>
             </View>
             <View style={styles.infoCardView}>
-                <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12, 812) }}>Fees</Text>
-                <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12, 812), marginTop: hp('0.5%') }}>0.0001</Text>
+                <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12) }}>Fees</Text>
+                <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12), marginTop: hp('0.5%') }}>0.0001</Text>
             </View>
             <View style={styles.infoCardView}>
-                <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12, 812) }}>Transaction ID</Text>
-                <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12, 812), marginTop: hp('0.5%') }}>3242533466db</Text>
+                <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12) }}>Transaction ID</Text>
+                <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12), marginTop: hp('0.5%') }}>3242533466db</Text>
             </View>
             <View style={styles.infoCardView}>
-                <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12, 812) }}>Confirmations</Text>
-                <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12, 812), marginTop: hp('0.5%') }}>6+</Text>
+                <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12) }}>Confirmations</Text>
+                <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12), marginTop: hp('0.5%') }}>6+</Text>
             </View>
         </View>
     </View>
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     },
     modalHeaderTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         fontFamily: Fonts.FiraSansMedium
     },
     infoCardView: {

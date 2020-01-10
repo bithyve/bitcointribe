@@ -44,10 +44,10 @@ export default function GetBittrModalContents(props) {
             <AppBottomSheetTouchableWrapper onPress={()=>signUp()} style={{
                 marginLeft: 20,
                 backgroundColor: Colors.blue, width: wp('35%'), height: wp('13%'), justifyContent: 'center', alignItems: 'center', borderRadius: 10
-            }}><Text style={{ color: Colors.white, fontSize: RFValue(13, 812), fontFamily: Fonts.FiraSansMedium }}>SignUp</Text></AppBottomSheetTouchableWrapper>
+            }}><Text style={{ color: Colors.white, fontSize: RFValue(13), fontFamily: Fonts.FiraSansMedium }}>SignUp</Text></AppBottomSheetTouchableWrapper>
             <AppBottomSheetTouchableWrapper style={{
                 marginRight: 20, width: wp('35%'), height: wp('13%'), justifyContent: 'center', alignItems: 'center', borderRadius: 10
-            }}><Text style={{ color: Colors.blue, fontSize: RFValue(13, 812), fontFamily: Fonts.FiraSansMedium }}>Sign In</Text></AppBottomSheetTouchableWrapper>
+            }}><Text style={{ color: Colors.blue, fontSize: RFValue(13), fontFamily: Fonts.FiraSansMedium }}>Sign In</Text></AppBottomSheetTouchableWrapper>
         </View>
     </View>
     )
@@ -79,19 +79,19 @@ const styles = StyleSheet.create({
     },
     modalHeaderTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         fontFamily: Fonts.FiraSansMedium
     },
     modalHeaderInfoText: {
         color: Colors.textColorGrey,
-        fontSize: RFValue(11, 812),
+        fontSize: RFValue(11),
         fontFamily: Fonts.FiraSansRegular,
         marginTop: hp('0.7%')
     },
     infoText: {
         color: Colors.textColorGrey,
         fontFamily: Fonts.FiraSansRegular,
-        fontSize: RFValue(12, 812),
+        fontSize: RFValue(12),
         marginTop: hp('0.5%')
     },
 })

@@ -20,7 +20,7 @@ export default function KnowMoreButton(props) {
 const styles = StyleSheet.create({
     knowMoreButton: {
         height: wp('6%'),
-        width: wp('18%'),
+        width: wp('20%'),
         backgroundColor: Colors.lightBlue,
         justifyContent: 'center',
         alignItems: 'center',
@@ -29,6 +29,6 @@ const styles = StyleSheet.create({
     knowMoreButtonText: {
         color: Colors.white,
         fontFamily: Fonts.FiraSansRegular,
-        fontSize: RFValue(12, 812)
+        fontSize: RFValue(12)
     },
 })

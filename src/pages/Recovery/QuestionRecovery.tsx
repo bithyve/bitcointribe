@@ -145,7 +145,7 @@ export default function RecoveryQuestionModalContents(props) {
                                 ? Colors.blue
                                 : Colors.black,
                             fontFamily: Fonts.FiraSansRegular,
-                            fontSize: RFValue(12, 812),
+                            fontSize: RFValue(12),
                           }}
                         >
                           {value.question}
@@ -207,17 +207,17 @@ const styles = StyleSheet.create({
   },
   modalTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18, 812),
+    fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansMedium,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
     fontFamily: Fonts.FiraSansRegular,
   },
   dropdownBoxText: {
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
   },
   dropdownBoxModal: {
     borderRadius: 10,
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     width: wp('85%'),
     height: 50,
     paddingLeft: 15,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
   },
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     width: wp('85%'),
     height: 50,
     paddingLeft: 15,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     color: Colors.textColorGrey,
     elevation: 10,
     shadowColor: Colors.borderColor,
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium,
   },
 });

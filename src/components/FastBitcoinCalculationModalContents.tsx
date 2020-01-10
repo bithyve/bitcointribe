@@ -152,7 +152,7 @@ export default function FastBitcoinCalculationModalContents(props) {
                               ? Colors.blue
                               : Colors.black,
                           fontFamily: Fonts.FiraSansRegular,
-                          fontSize: RFValue(12, 812)
+                          fontSize: RFValue(12)
                         }}
                       >
                         {value.question}
@@ -206,7 +206,7 @@ export default function FastBitcoinCalculationModalContents(props) {
           <Text
             style={{
               color: Colors.white,
-              fontSize: RFValue(13, 812),
+              fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansMedium
             }}
           >
@@ -244,12 +244,12 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18, 812),
+    fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansMedium
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11, 812),
+    fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansRegular,
     marginTop: hp("0.7%")
   },
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(13, 812)
+    fontSize: RFValue(13)
   },
   textBoxImage: {
     width: wp("6%"),
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
   },
   dropdownBoxText: {
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(13, 812)
+    fontSize: RFValue(13)
   },
   dropdownBoxModal: {
     borderRadius: 10,

@@ -88,7 +88,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
               style={{
                 color: Colors.black,
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(23, 812),
+                fontSize: RFValue(23),
               }}
             >
               {OTP[0]}
@@ -108,7 +108,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
               style={{
                 color: Colors.black,
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(23, 812),
+                fontSize: RFValue(23),
               }}
             >
               {OTP[1]}
@@ -128,7 +128,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
               style={{
                 color: Colors.black,
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(23, 812),
+                fontSize: RFValue(23),
               }}
             >
               {OTP[2]}
@@ -148,7 +148,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
               style={{
                 color: Colors.black,
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(23, 812),
+                fontSize: RFValue(23),
               }}
             >
               {OTP[3]}
@@ -168,7 +168,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
               style={{
                 color: Colors.black,
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(23, 812),
+                fontSize: RFValue(23),
               }}
             >
               {OTP[4]}
@@ -188,7 +188,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
               style={{
                 color: Colors.black,
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(23, 812),
+                fontSize: RFValue(23),
               }}
             >
               {OTP[5]}
@@ -218,7 +218,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
           <Text
             style={{
               color: Colors.blue,
-              fontSize: RFValue(19, 812),
+              fontSize: RFValue(19),
               fontFamily: Fonts.FiraSansRegular,
               marginLeft: 10,
             }}
@@ -250,14 +250,15 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18, 812),
+    fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansMedium,
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11, 812),
+    fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansRegular,
     marginTop: hp('0.7%'),
+    marginRight:20,
     flexWrap: 'wrap',
   },
   qrModalImage: {

@@ -4,9 +4,9 @@ import {
     Image,
     Text,
     StyleSheet,
-    ScrollView,
     TextInput
 } from 'react-native';
+import { ScrollView } from "react-native-gesture-handler";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
@@ -175,9 +175,11 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
             </View>
         </View>
         {selectedContact.id &&
-            <AppBottomSheetTouchableWrapper onPress={() => props.onPressProceed()}>
+        <View style={styles.bottomButtonView}>
+            <AppBottomSheetTouchableWrapper  onPress={() => props.onPressProceed()}>
                 <Text style={styles.buttonText}>Confirm & Proceed</Text>
             </AppBottomSheetTouchableWrapper>
+            </View>
         }
     </View>
     )
@@ -209,12 +211,12 @@ const styles = StyleSheet.create({
     },
     modalHeaderTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         fontFamily: Fonts.FiraSansMedium
     },
     modalHeaderInfoText: {
         color: Colors.textColorGrey,
-        fontSize: RFValue(11, 812),
+        fontSize: RFValue(11),
         fontFamily: Fonts.FiraSansRegular,
         marginTop: hp('0.7%'),
         flexWrap: 'wrap'
@@ -227,11 +229,11 @@ const styles = StyleSheet.create({
     },
     contactText: {
         marginLeft: 10,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         fontFamily: Fonts.FiraSansRegular
     },
     contactIndexText: {
-        fontSize: RFValue(10, 812),
+        fontSize: RFValue(10),
         fontFamily: Fonts.FiraSansRegular
     },
     contactIndexView: {
@@ -248,7 +250,7 @@ const styles = StyleSheet.create({
         marginBottom:hp('1%')
     },
     contactsNameText: {
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         fontFamily: Fonts.FiraSansRegular
     },
     shareButtonView: {
@@ -263,20 +265,20 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     shareButtonText: {
-        fontSize: RFValue(10, 812),
+        fontSize: RFValue(10),
         fontFamily: Fonts.FiraSansRegular,
         color: Colors.textColorGrey
     },
     pageTitle: {
         marginLeft: 30,
         color: Colors.blue,
-        fontSize: RFValue(14, 812),
+        fontSize: RFValue(14),
         fontFamily: Fonts.FiraSansRegular
     },
     pageInfoText: {
         marginLeft: 30,
         color: Colors.textColorGrey,
-        fontSize: RFValue(10, 812),
+        fontSize: RFValue(10),
         fontFamily: Fonts.FiraSansRegular
     },
     bottomButtonView: {
@@ -293,12 +295,12 @@ const styles = StyleSheet.create({
         shadowColor: Colors.shadowBlue,
         shadowOpacity: 10,
         shadowOffset: { width: 0, height: 10 },
-        marginBottom: 100
+        marginBottom: 20
     },
     buttonText: {
         color: Colors.white,
         fontFamily: Fonts.FiraSansMedium,
-        fontSize: RFValue(13, 812)
+        fontSize: RFValue(13)
     },
     searchBoxContainer: {
         flexDirection: "row",

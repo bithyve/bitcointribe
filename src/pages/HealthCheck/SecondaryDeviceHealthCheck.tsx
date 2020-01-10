@@ -73,7 +73,7 @@ const SecondaryDeviceHealthCheck = props => {
                 title={'Change your\nTrusted Contact'}
                 info={'Having problems with your Trusted Contact'}
                 note={
-                    'You can change the Trusted Contact you selected to share\nyour Recovery Secret'
+                    'You can change the Trusted Contact you selected to share your Recovery Secret'
                 }
                 proceedButtonText={'Change'}
                 cancelButtonText={'Back'}
@@ -194,27 +194,27 @@ const SecondaryDeviceHealthCheck = props => {
 				{pageData.map((value) => {
 					if (SelectedOption == value.id) {
 						return <TouchableOpacity onPress={() => SelectOption(value.id)} style={{ margin: wp('3%'), backgroundColor: Colors.white, borderRadius: 10, height: wp('20%'), width: wp('90%'), justifyContent: 'center', paddingLeft: wp('3%'), paddingRight: wp('3%'), alignSelf: 'center' }}>
-							<Text style={{ color: Colors.blue, fontSize: RFValue(13, 812), fontFamily: Fonts.FiraSansRegular }}>{value.title}</Text>
-							<Text style={{ color: Colors.textColorGrey, fontSize: RFValue(10, 812), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.5%') }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text>
-							<Text style={{ color: Colors.textColorGrey, fontSize: RFValue(9, 812), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.3%') }}>{value.date}</Text>
+							<Text style={{ color: Colors.blue, fontSize: RFValue(13), fontFamily: Fonts.FiraSansRegular }}>{value.title}</Text>
+							<Text style={{ color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.5%') }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text>
+							<Text style={{ color: Colors.textColorGrey, fontSize: RFValue(9), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.3%') }}>{value.date}</Text>
 						</TouchableOpacity>
 					}
 					return <TouchableOpacity onPress={() => SelectOption(value.id)} style={{ margin: wp('3%'), backgroundColor: Colors.white, borderRadius: 10, height: wp('15%'), width: wp('85%'), justifyContent: 'center', paddingLeft: wp('3%'), paddingRight: wp('3%'), alignSelf: 'center' }}>
 						<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-							<Text style={{ color: Colors.textColorGrey, fontSize: RFValue(10, 812), fontFamily: Fonts.FiraSansRegular }}>{value.title}</Text>
-							<Text style={{ color: Colors.textColorGrey, fontSize: RFValue(9, 812), fontFamily: Fonts.FiraSansRegular, marginLeft: 'auto' }}>{value.date}</Text>
+							<Text style={{ color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular }}>{value.title}</Text>
+							<Text style={{ color: Colors.textColorGrey, fontSize: RFValue(9), fontFamily: Fonts.FiraSansRegular, marginLeft: 'auto' }}>{value.date}</Text>
 						</View>
-						<Text style={{ color: Colors.textColorGrey, fontSize: RFValue(8, 812), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.5%') }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>dolor sit</Text></Text>
+						<Text style={{ color: Colors.textColorGrey, fontSize: RFValue(8), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.5%') }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>dolor sit</Text></Text>
 					</TouchableOpacity>
 				})}
 			</ScrollView>
 			{SelectedOption ?
 				<View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, justifyContent: 'center', alignItems: 'center', height: hp('25%'), backgroundColor: Colors.white }}>
-					<Text style={{ marginTop: hp('1%'), marginBottom: hp('1%'), color: Colors.textColorGrey, fontSize: RFValue(10, 812), fontFamily: Fonts.FiraSansRegular, }}>consectetur Lorem ipsum dolor sit amet, consectetur sit <Text onPress={() => { ReshareBottomSheet.current.snapTo(1) }} style={{ color: Colors.blue, textDecorationLine: "underline" }}>Reshare</Text></Text>
+					<Text style={{ marginTop: hp('1%'), marginBottom: hp('1%'), color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular, }}>consectetur Lorem ipsum dolor sit amet, consectetur sit <Text onPress={() => { ReshareBottomSheet.current.snapTo(1) }} style={{ color: Colors.blue, textDecorationLine: "underline" }}>Reshare</Text></Text>
 
-					<Text style={{ marginTop: hp('1%'), marginBottom: hp('1%'), color: Colors.textColorGrey, fontSize: RFValue(10, 812), fontFamily: Fonts.FiraSansRegular, }}>Lorem ipsum dolor sit amet, consectetur sit amet <Text onPress={() => { ChangeBottomSheet.current.snapTo(1) }} style={{ color: Colors.blue, textDecorationLine: "underline" }}>Change Source</Text></Text>
+					<Text style={{ marginTop: hp('1%'), marginBottom: hp('1%'), color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular, }}>Lorem ipsum dolor sit amet, consectetur sit amet <Text onPress={() => { ChangeBottomSheet.current.snapTo(1) }} style={{ color: Colors.blue, textDecorationLine: "underline" }}>Change Source</Text></Text>
 
-					<TouchableOpacity onPress={()=>{ConfirmBottomSheet.current.snapTo(1)}} style={{ backgroundColor: Colors.blue, height: wp('13%'), width: wp('40%'), justifyContent: 'center', alignItems: 'center', borderRadius: 10, marginTop: hp('3%'), marginBottom: hp('3%') }}><Text style={{ color: Colors.white, fontSize: RFValue(10, 812), fontFamily: Fonts.FiraSansMedium, }}>Confirm</Text></TouchableOpacity>
+					<TouchableOpacity onPress={()=>{ConfirmBottomSheet.current.snapTo(1)}} style={{ backgroundColor: Colors.blue, height: wp('13%'), width: wp('40%'), justifyContent: 'center', alignItems: 'center', borderRadius: 10, marginTop: hp('3%'), marginBottom: hp('3%') }}><Text style={{ color: Colors.white, fontSize: RFValue(10), fontFamily: Fonts.FiraSansMedium, }}>Confirm</Text></TouchableOpacity>
 				</View> : null
 			}
 			<BottomSheet
@@ -256,7 +256,7 @@ export default SecondaryDeviceHealthCheck;
 const styles = StyleSheet.create({
 	modalHeaderTitleText: {
 		color: Colors.blue,
-		fontSize: RFValue(18, 812),
+		fontSize: RFValue(18),
 		fontFamily: Fonts.FiraSansRegular
 	},
 	modalHeaderTitleView: {

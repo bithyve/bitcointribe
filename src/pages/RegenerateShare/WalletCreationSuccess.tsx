@@ -67,7 +67,7 @@ const WalletCreationSuccess = props => {
                 </View>
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                <TouchableOpacity onPress={()=>{props.navigation.navigate("Home")}} style={{ height: wp("13%"), width: wp("40%"), backgroundColor: Colors.blue, borderRadius: 10, justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginLeft: 25 }}><Text style={{ color: Colors.white, fontFamily: Fonts.FiraSansMedium, fontSize: RFValue(13, 812) }}>Go to Wallet</Text></TouchableOpacity>
+                <TouchableOpacity onPress={()=>{props.navigation.navigate("Home")}} style={{ height: wp("13%"), width: wp("40%"), backgroundColor: Colors.blue, borderRadius: 10, justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginLeft: 25 }}><Text style={{ color: Colors.white, fontFamily: Fonts.FiraSansMedium, fontSize: RFValue(13) }}>Go to Wallet</Text></TouchableOpacity>
                 <Image source={require("../../assets/images/icons/illustration.png")} style={{ height: wp("40%"), width: wp("35%"), marginLeft: 'auto' }} />
             </View>
         </View>
@@ -79,7 +79,7 @@ export default WalletCreationSuccess;
 const styles = StyleSheet.create({
     modalHeaderTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         fontFamily: Fonts.FiraSansRegular
     },
     modalHeaderTitleView: {
@@ -101,14 +101,14 @@ const styles = StyleSheet.create({
     commModeModalHeaderText: {
         color: Colors.blue,
         fontFamily: Fonts.FiraSansMedium,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         marginLeft: 25,
         marginRight: 25
     },
     commModeModalInfoText: {
         color: Colors.textColorGrey,
         fontFamily: Fonts.FiraSansRegular,
-        fontSize: RFValue(11, 812),
+        fontSize: RFValue(11),
         marginLeft: 25,
         marginRight: 25,
     },
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     },
     successModalWalletNameText: {
         color: Colors.black,
-        fontSize: RFValue(25, 812),
+        fontSize: RFValue(25),
         fontFamily: Fonts.FiraSansRegular,
     },
     successModalAmountImage: {

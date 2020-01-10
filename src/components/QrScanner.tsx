@@ -47,7 +47,7 @@ export default function QrScanner(props) {
                     </TouchableOpacity>
                     <Text style={{
                         color: Colors.blue,
-                        fontSize: RFValue(18, 812),
+                        fontSize: RFValue(18),
                         fontFamily: Fonts.FiraSansMedium
                     }}>Scan QR code</Text>
                 </View>

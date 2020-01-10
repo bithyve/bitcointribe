@@ -444,7 +444,7 @@ export default function RestoreSelectedContactsList(props) {
                       <Text
                         style={{
                           ...styles.selectedContactName,
-                          fontSize: RFValue(11, 812)
+                          fontSize: RFValue(11)
                         }}
                       >
                         {contact.communicationMode.length
@@ -785,14 +785,14 @@ const styles = StyleSheet.create({
   },
   listElementsTitle: {
     color: Colors.blue,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     marginLeft: 13,
     marginBottom: 5,
     fontFamily: Fonts.FiraSansRegular
   },
   listElementsInfo: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11, 812),
+    fontSize: RFValue(11),
     marginLeft: 13,
     fontFamily: Fonts.FiraSansRegular
   },
@@ -837,7 +837,7 @@ const styles = StyleSheet.create({
   },
   selectedContactName: {
     marginLeft: 10,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey
   },
@@ -850,7 +850,7 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   secretReceivedText: {
-    fontSize: RFValue(9, 812),
+    fontSize: RFValue(9),
     fontFamily: Fonts.FiraSansMedium
   },
   secretReceivedCheckSignView: {
@@ -877,7 +877,7 @@ const styles = StyleSheet.create({
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium
   }
 });

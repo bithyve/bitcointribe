@@ -73,11 +73,11 @@ const styles = StyleSheet.create({
 	},
 	addModalTitleText: {
 		color: Colors.blue,
-		fontSize: RFValue(14, 812),
+		fontSize: RFValue(14),
 	},
 	addModalInfoText: {
 		color: Colors.textColorGrey,
-		fontSize: RFValue(11, 812),
+		fontSize: RFValue(11),
 	},
 	modalElementInfoView: {
 		padding: 10,

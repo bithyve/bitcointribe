@@ -95,13 +95,13 @@ const SecureScan = props => {
         <View style={{ flexDirection: 'row', marginTop: 20, marginBottom: 20 }}>
           <TouchableOpacity onPress={() => { props.navigation.navigate("GoogleAuthenticatorOTP") }} style={{ height: wp('13%'), width: wp('40%'), backgroundColor: Colors.blue, justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}><Text style={{
             color: Colors.white,
-            fontSize: RFValue(13, 812),
+            fontSize: RFValue(13),
             fontFamily: Fonts.FiraSansMedium
           }}>Continue</Text></TouchableOpacity>
           <TouchableOpacity onPress={() => { props.navigation.goBack(); }}
             style={{ height: wp('13%'), width: wp('30%'), justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}><Text style={{
               color: Colors.blue,
-              fontSize: RFValue(13, 812),
+              fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansMedium
             }}>Activate Later</Text></TouchableOpacity>
         </View>

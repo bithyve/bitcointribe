@@ -26,14 +26,14 @@ export default function RegenerateHealper(props) {
                         alignItems: 'center',
                         marginTop: hp('2%'), marginBottom: hp('2%')
                     }} >
-                        <Text style={{ color: Colors.white, fontFamily: Fonts.FiraSansMedium, fontSize: RFValue(20, 812) }}>{props.topButtonText}</Text>
+                        <Text style={{ color: Colors.white, fontFamily: Fonts.FiraSansMedium, fontSize: RFValue(14) }}>{props.topButtonText}</Text>
                     </AppBottomSheetTouchableWrapper>
                 </View>
                 <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                     <Image source={require("../../assets/images/icons/testAccountHelperImage.png")} style={{ width: wp("50%"), height: wp("50%"), resizeMode: "contain" }} />
                 </View>
                 {array.map((value) =>
-                    <View style={{justifyContent: 'center', alignItems: 'center', marginLeft: wp('10%'), marginRight: wp('10%'), marginTop: hp('2%'), marginBottom: hp('2%'), flexDirection: 'row' }}>
+                    <View style={{ justifyContent: 'center', alignItems: 'center', marginLeft: wp('10%'), marginRight: wp('10%'), marginTop: hp('2%'), marginBottom: hp('2%'), flexDirection: 'row' }}>
                         <View style={{
                             borderStyle: "dotted",
                             borderWidth: 2,
@@ -41,11 +41,11 @@ export default function RegenerateHealper(props) {
                             height: 15, width: 15,
                             borderColor: Colors.white
                         }} />
-                        <Text style={{ marginLeft: 20, color: Colors.white, fontSize: RFValue(12, 812), fontFamily: Fonts.FiraSansRegular }}>{"Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"}</Text>
+                        <Text style={{ marginLeft: 20, color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>{"Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod"}</Text>
                     </View>
                 )}
                 <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('2%') }}>
-                    <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12, 812), fontFamily: Fonts.FiraSansMedium }}>{"Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy"}</Text>
+                    <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>{"Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy"}</Text>
                 </View>
             </View>
         </ScrollView>
@@ -63,7 +63,7 @@ export default function RegenerateHealper(props) {
                 justifyContent: 'center',
                 alignItems: 'center',
             }}>
-                <Text style={{ color: Colors.blue, fontSize: RFValue(13, 812), fontFamily: Fonts.FiraSansRegular }}>{props.continueButtonText}</Text>
+                <Text style={{ color: Colors.blue, fontSize: RFValue(13), fontFamily: Fonts.FiraSansRegular }}>{props.continueButtonText}</Text>
             </AppBottomSheetTouchableWrapper>
             <AppBottomSheetTouchableWrapper onPress={() => props.onPressQuit()} style={{
                 width: wp('20%'), height: wp('13%'),
@@ -71,7 +71,7 @@ export default function RegenerateHealper(props) {
                 justifyContent: 'center',
                 alignItems: 'center',
             }}>
-                <Text style={{ color: Colors.white, fontSize: RFValue(13, 812), fontFamily: Fonts.FiraSansRegular }}>{props.quitButtonText}</Text>
+                <Text style={{ color: Colors.white, fontSize: RFValue(13), fontFamily: Fonts.FiraSansRegular }}>{props.quitButtonText}</Text>
             </AppBottomSheetTouchableWrapper>
         </View>
     </View>
