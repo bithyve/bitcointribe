@@ -122,7 +122,7 @@ export default function NewWalletQuestion(props) {
                   color={Colors.textColorGrey}
                 />
               </TouchableOpacity>
-              <ScrollView showsVerticalScrollIndicator={false}>
+              <ScrollView>
               {dropdownBoxOpenClose ? (
                 <View style={styles.dropdownBoxModal}>
                   {dropdownBoxList.map((value, index) => (
