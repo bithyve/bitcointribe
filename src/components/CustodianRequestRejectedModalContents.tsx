@@ -7,6 +7,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
+import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
 
 export default function CustodianRequestRejectedModalContents(props) {
   return (
@@ -57,12 +58,12 @@ export default function CustodianRequestRejectedModalContents(props) {
             alignItems: "center"
           }}
         >
-          <TouchableOpacity
+          <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressViewThrustedContacts()}
             style={{ ...styles.successModalButtonView }}
           >
             <Text style={styles.proceedButtonText}>View Trusted Contacts</Text>
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
           <Image
             source={require("../assets/images/icons/reject.png")}
             style={styles.successModalImage}

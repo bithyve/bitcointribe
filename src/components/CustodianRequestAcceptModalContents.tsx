@@ -7,6 +7,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
+import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
 
 export default function CustodianRequestAcceptModalContents(props) {
   return (
@@ -57,13 +58,13 @@ export default function CustodianRequestAcceptModalContents(props) {
             alignItems: "center"
           }}
         >
-          <TouchableOpacity
+          <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressAssociateContacts()}
             style={{ ...styles.successModalButtonView }}
           >
             <Text style={styles.proceedButtonText}>Associate Contact</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </AppBottomSheetTouchableWrapper>
+          <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressSkip()}
             style={{
               height: wp("13%"),
@@ -75,7 +76,7 @@ export default function CustodianRequestAcceptModalContents(props) {
             <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
               Skip
             </Text>
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
           <Image
             source={require("../assets/images/icons/accept.png")}
             style={styles.successModalImage}
