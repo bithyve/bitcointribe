@@ -840,14 +840,12 @@ function Accounts(props) {
           backgroundColor: Colors.backgroundColor,
         }}
         refreshControl={
-          serviceType !== TEST_ACCOUNT ? (
-            <RefreshControl
-              refreshing={loading.transactions || loading.balances}
-              onRefresh={() => {
-                dispatch(fetchBalance(serviceType));
-              }}
-            />
-          ) : null
+          <RefreshControl
+            refreshing={loading.transactions || loading.balances}
+            onRefresh={() => {
+              dispatch(fetchBalance(serviceType));
+            }}
+          />
         }
       >
         <View style={{ paddingTop: hp('3%'), paddingBottom: hp('3%') }}>

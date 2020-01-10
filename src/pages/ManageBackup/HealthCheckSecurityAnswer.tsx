@@ -264,8 +264,7 @@ export default function HealthCheckSecurityAnswer(props) {
         </View>
       </View>
       <BottomSheet
-        onOpenEnd={() => {
-        }}
+        onOpenEnd={() => {}}
         enabledInnerScrolling={true}
         ref={HealthCheckSuccessBottomSheet}
         snapPoints={[
