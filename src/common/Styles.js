@@ -25,13 +25,13 @@ export default StyleSheet.create({
     },
     headerTitles:{ 
         color: Colors.blue, 
-        fontSize: RFValue(25, 812), 
+        fontSize: RFValue(25), 
         marginLeft: 20, 
         fontFamily: Fonts.FiraSansRegular 
     },
     headerTitlesInfoText:{
         color: Colors.textColorGrey,
-        fontSize: RFValue(12, 812),
+        fontSize: RFValue(12),
         marginLeft: 20,
         fontWeight: 'normal',
         marginRight: 20,
@@ -40,13 +40,13 @@ export default StyleSheet.create({
     },
     homepageAmountText:{ 
         fontFamily: Fonts.FiraSansRegular, 
-        fontSize: RFValue(21, 812), 
+        fontSize: RFValue(21), 
         marginRight: 5 
     },
     homepageAmountUnitText:
     { 
         fontFamily: Fonts.FiraSansRegular, 
-        fontSize: RFValue(11, 812), 
+        fontSize: RFValue(11), 
         marginBottom: 3
     },
     homepageAmountImage:{ 

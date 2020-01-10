@@ -127,7 +127,7 @@ export default function Buy(props) {
                     }}
                     style={{
                       color: Colors.textColorGrey,
-                      fontSize: RFValue(12, 812),
+                      fontSize: RFValue(12),
                       marginLeft: 'auto',
                     }}
                   >
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18, 812),
+    fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular
   },
   modalHeaderTitleView: {
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(13, 812)
+    fontSize: RFValue(13)
   },
   confirmButtonView: {
     width: wp("50%"),
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium
   }
 });

@@ -151,7 +151,7 @@ export default function NewWalletQuestionRegenerateShare(props) {
                                                             ? Colors.blue
                                                             : Colors.black,
                                                     fontFamily: Fonts.FiraSansRegular,
-                                                    fontSize: RFValue(12, 812),
+                                                    fontSize: RFValue(12),
                                                 }}
                                             >
                                                 {value.question}
@@ -263,7 +263,7 @@ export default function NewWalletQuestionRegenerateShare(props) {
                                         style={{
                                             color: Colors.red,
                                             fontFamily: Fonts.FiraSansMediumItalic,
-                                            fontSize: RFValue(10, 812),
+                                            fontSize: RFValue(10),
                                             marginLeft: 'auto',
                                         }}
                                     >
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: Colors.white,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         fontFamily: Fonts.FiraSansMedium,
     },
     bottomButtonView: {
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
     modalInputBox: {
         flex: 1,
         height: 50,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         color: Colors.textColorGrey,
         fontFamily: Fonts.FiraSansRegular,
         paddingLeft: 15,
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
     dropdownBoxText: {
         color: Colors.textColorGrey,
         fontFamily: Fonts.FiraSansRegular,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
     },
     dropdownBoxModal: {
         borderRadius: 10,

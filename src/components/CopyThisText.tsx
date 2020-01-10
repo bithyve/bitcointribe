@@ -40,7 +40,7 @@ export default function CopyThisText(props) {
         <Text
           numberOfLines={1}
           style={{
-            fontSize: RFValue(13, 812),
+            fontSize: RFValue(13),
             color: Colors.lightBlue
           }}
         >

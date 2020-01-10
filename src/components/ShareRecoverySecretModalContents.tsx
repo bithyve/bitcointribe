@@ -37,7 +37,7 @@ export default function ShareRecoverySecretModalContents(props) {
                             <Text style={{
                                 color: Colors.textColorGrey,
                                 fontFamily: Fonts.FiraSansRegular,
-                                fontSize: RFValue(13, 812),
+                                fontSize: RFValue(13),
                                 marginLeft: 25,
                             }}>{props.contactInfo}</Text>
                         </View>
@@ -59,9 +59,9 @@ export default function ShareRecoverySecretModalContents(props) {
                     :
                     <View style={{}}>
                         <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
-                            <Text style={{color:Colors.textColorGrey, fontSize:RFValue(11, 812), fontFamily:Fonts.FiraSansRegular}}>Enter OTP</Text>
+                            <Text style={{color:Colors.textColorGrey, fontSize:RFValue(11), fontFamily:Fonts.FiraSansRegular}}>Enter OTP</Text>
                             {passcode.length==6 && passcode != correctPasscode ? 
-                            <Text style={{color:Colors.red, fontSize:RFValue(10, 812), fontFamily:Fonts.FiraSansMediumItalic}}>Incorrect OTP, Try Again</Text>: null}
+                            <Text style={{color:Colors.red, fontSize:RFValue(10), fontFamily:Fonts.FiraSansMediumItalic}}>Incorrect OTP, Try Again</Text>: null}
                         </View>
                         <View style={styles.passcodeTextInputView}>
                             <TextInput
@@ -240,14 +240,14 @@ const styles = StyleSheet.create({
     commModeModalHeaderText: {
         color: Colors.blue,
         fontFamily: Fonts.FiraSansMedium,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         marginLeft: 25,
         marginRight: 25
     },
     commModeModalInfoText: {
         color: Colors.textColorGrey,
         fontFamily: Fonts.FiraSansRegular,
-        fontSize: RFValue(11, 812),
+        fontSize: RFValue(11),
         marginLeft: 25,
         marginRight: 25,
         // marginTop: hp('0.7%')
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     },
     contactNameText: {
         color: Colors.black,
-        fontSize: RFValue(25, 812),
+        fontSize: RFValue(25),
         fontFamily: Fonts.FiraSansRegular,
         marginLeft: 25
     },
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: Colors.white,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         fontFamily: Fonts.FiraSansMedium,
     },
     passcodeTextInputView: {
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         marginLeft: 8,
         color: Colors.black,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         textAlign: "center",
         lineHeight: 18
     },
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         marginLeft: 8,
         color: Colors.black,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         textAlign: "center",
         lineHeight: 18
     },

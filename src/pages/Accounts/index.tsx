@@ -351,7 +351,7 @@ function Accounts(props) {
             <Text
               style={{
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(15, 812),
+                fontSize: RFValue(15),
                 color: Colors.white,
               }}
             >
@@ -360,7 +360,7 @@ function Accounts(props) {
             <Text
               style={{
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12, 812),
+                fontSize: RFValue(12),
                 color: Colors.white,
               }}
             >
@@ -376,7 +376,7 @@ function Accounts(props) {
                 style={{
                   marginRight: 10,
                   fontFamily: Fonts.FiraSansMedium,
-                  fontSize: RFValue(15, 812),
+                  fontSize: RFValue(15),
                   color: Colors.white,
                   alignSelf: 'center',
                 }}
@@ -415,7 +415,7 @@ function Accounts(props) {
                   margin: 10,
                   marginLeft: 'auto',
                   fontFamily: Fonts.FiraSansMedium,
-                  fontSize: RFValue(15, 812),
+                  fontSize: RFValue(15),
                   color: Colors.white,
                   alignSelf: 'center',
                 }}
@@ -803,7 +803,7 @@ function Accounts(props) {
         <Text
           style={{
             color: Colors.blue,
-            fontSize: RFValue(20, 812),
+            fontSize: RFValue(20),
             fontFamily: Fonts.FiraSansRegular,
             textAlign: 'center',
           }}
@@ -884,7 +884,7 @@ function Accounts(props) {
             <Text
               style={{
                 color: Colors.textColorGrey,
-                fontSize: RFValue(13, 812),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
@@ -896,7 +896,7 @@ function Accounts(props) {
               }}
               style={{
                 color: Colors.textColorGrey,
-                fontSize: RFValue(12, 812),
+                fontSize: RFValue(12),
                 fontFamily: Fonts.FiraSansItalic,
                 textDecorationLine: 'underline',
                 marginLeft: 'auto',
@@ -1310,13 +1310,13 @@ const styles = StyleSheet.create({
   cardAmountText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(21, 812),
+    fontSize: RFValue(21),
     marginRight: 5,
   },
   cardAmountUnitText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     marginBottom: 2,
     marginTop: 'auto',
   },
@@ -1335,13 +1335,13 @@ const styles = StyleSheet.create({
   },
   transactionModalTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
     marginBottom: 3,
     fontFamily: Fonts.FiraSansRegular,
   },
   transactionModalDateText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(10, 812),
+    fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular,
   },
   transactionModalAmountView: {
@@ -1353,12 +1353,12 @@ const styles = StyleSheet.create({
   transactionModalAmountText: {
     marginLeft: 5,
     marginRight: 5,
-    fontSize: RFValue(20, 812),
+    fontSize: RFValue(20),
     fontFamily: Fonts.OpenSans,
   },
   transactionModalAmountUnitText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(10, 812),
+    fontSize: RFValue(10),
     fontFamily: Fonts.OpenSans,
   },
   separatorView: {
@@ -1392,12 +1392,12 @@ const styles = StyleSheet.create({
   bottomCardInfoText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(9, 812),
+    fontSize: RFValue(9),
   },
   bottomCardTitleText: {
     color: Colors.black,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(15, 812),
+    fontSize: RFValue(15),
   },
   modalContentContainer: {
     height: '100%',
@@ -1413,7 +1413,7 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18, 812),
+    fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
     // marginLeft: 15
   },
@@ -1453,7 +1453,7 @@ const styles = StyleSheet.create({
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
     marginTop: 5,
   },
   modalContentView: {

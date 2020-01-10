@@ -27,7 +27,7 @@ export default function RequestModalContents(props) {
                             <Text style={{
                                 color: Colors.textColorGrey,
                                 fontFamily: Fonts.FiraSansRegular,
-                                fontSize: RFValue(13, 812),
+                                fontSize: RFValue(13),
                                 marginLeft: 25,
                             }}>sophiebabel@bithyve.com</Text>
                         </View>
@@ -74,14 +74,14 @@ const styles = StyleSheet.create({
     commModeModalHeaderText: {
         color: Colors.blue,
         fontFamily: Fonts.FiraSansMedium,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         marginLeft: 25,
         marginRight: 25
     },
     commModeModalInfoText: {
         color: Colors.textColorGrey,
         fontFamily: Fonts.FiraSansRegular,
-        fontSize: RFValue(11, 812),
+        fontSize: RFValue(11),
         marginLeft: 25,
         marginRight: 25,
         marginTop: hp('0.7%')
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     },
     contactNameText: {
         color: Colors.black,
-        fontSize: RFValue(25, 812),
+        fontSize: RFValue(25),
         fontFamily: Fonts.FiraSansRegular,
         marginLeft: 25
     },
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: Colors.white,
-        fontSize: RFValue(12, 812),
+        fontSize: RFValue(12),
         fontFamily: Fonts.FiraSansRegular,
         marginLeft: 10
     }

@@ -254,7 +254,7 @@ export default function ManageBackup(props) {
   //             marginLeft: 30,
   //             color: Colors.textColorGrey,
   //             fontFamily: Fonts.FiraSansRegular,
-  //             fontSize: RFValue(12, 812),
+  //             fontSize: RFValue(12),
   //             marginTop: 5,
   //             marginBottom: 5,
   //           }}
@@ -325,7 +325,7 @@ export default function ManageBackup(props) {
   //             marginLeft: 30,
   //             color: Colors.textColorGrey,
   //             fontFamily: Fonts.FiraSansRegular,
-  //             fontSize: RFValue(12, 812),
+  //             fontSize: RFValue(12),
   //             marginTop: 5,
   //           }}
   //         >
@@ -972,7 +972,7 @@ const styles = StyleSheet.create({
   knowMoreButtonText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
   },
   shieldImage: {
     width: wp('16%'),
@@ -1012,7 +1012,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   addressText: {
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     color: Colors.lightBlue,
   },
   copyIconView: {
@@ -1042,13 +1042,13 @@ const styles = StyleSheet.create({
   },
   cardTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular,
   },
   cardTimeText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(10, 812),
+    fontSize: RFValue(10),
   },
   cardIconImage: {
     width: 12,
@@ -1069,13 +1069,13 @@ const styles = StyleSheet.create({
   },
   listElementsTitle: {
     color: Colors.blue,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     marginLeft: 13,
     fontFamily: Fonts.FiraSansRegular,
   },
   listElementsInfo: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11, 812),
+    fontSize: RFValue(11),
     marginLeft: 13,
     marginTop: 5,
     fontFamily: Fonts.FiraSansRegular,

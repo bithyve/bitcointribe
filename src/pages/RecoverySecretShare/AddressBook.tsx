@@ -43,16 +43,16 @@ const AddressBook = props => {
             </View>
             <View style={{ flex: 1 }}>
                 <View style={{ margin:30 }}>
-                    <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(14, 812) }}>You are the Guardian of</Text>
-                    <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(10, 812) }}>Lorem ipsum dolor sit amet, consectetur adipiscing</Text>
+                    <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(14) }}>You are the Guardian of</Text>
+                    <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(10) }}>Lorem ipsum dolor sit amet, consectetur adipiscing</Text>
                 </View>
                 <View style={{ marginLeft: 30, marginRight:30, marginTop:10, marginBottom:10, flexDirection: "row", alignItems:'center' }}>
-                    <Text style={{ color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(13, 812) }}>Pamela Aalto</Text>
-                    <TouchableOpacity onPress={()=>{props.navigation.navigate("ShareRecoverySecretOtp", {shareByType:"otp"})}} style={{ justifyContent:'center', alignItems:'center', width:wp("15%"), height:wp('8%'), borderRadius: 5, borderWidth: 1, borderColor: Colors.borderColor, marginLeft:'auto', backgroundColor:Colors.backgroundColor }}><Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(10, 812) }}>Share</Text></TouchableOpacity>
+                    <Text style={{ color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(13) }}>Pamela Aalto</Text>
+                    <TouchableOpacity onPress={()=>{props.navigation.navigate("ShareRecoverySecretOtp", {shareByType:"otp"})}} style={{ justifyContent:'center', alignItems:'center', width:wp("15%"), height:wp('8%'), borderRadius: 5, borderWidth: 1, borderColor: Colors.borderColor, marginLeft:'auto', backgroundColor:Colors.backgroundColor }}><Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(10) }}>Share</Text></TouchableOpacity>
                 </View>
                 <View style={{ marginLeft: 30, marginRight:30, marginTop:10, marginBottom:10, flexDirection: "row", alignItems:'center' }}>
-                    <Text style={{ color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(13, 812) }}>Pamela Aalto</Text>
-                    <TouchableOpacity onPress={()=>{props.navigation.navigate("ShareRecoverySecretOtp", {shareByType:"qr"})}} style={{ justifyContent:'center', alignItems:'center', width:wp("15%"), height:wp('8%'), borderRadius: 5, borderWidth: 1, borderColor: Colors.borderColor, marginLeft:'auto', backgroundColor:Colors.backgroundColor }}><Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(10, 812) }}>Share</Text></TouchableOpacity>
+                    <Text style={{ color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(13) }}>Pamela Aalto</Text>
+                    <TouchableOpacity onPress={()=>{props.navigation.navigate("ShareRecoverySecretOtp", {shareByType:"qr"})}} style={{ justifyContent:'center', alignItems:'center', width:wp("15%"), height:wp('8%'), borderRadius: 5, borderWidth: 1, borderColor: Colors.borderColor, marginLeft:'auto', backgroundColor:Colors.backgroundColor }}><Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(10) }}>Share</Text></TouchableOpacity>
                 </View>
             </View>
             <View style={{  }}>
@@ -67,7 +67,7 @@ export default AddressBook;
 const styles = StyleSheet.create({
     modalHeaderTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         fontFamily: Fonts.FiraSansRegular
     },
     modalHeaderTitleView: {

@@ -117,7 +117,7 @@ const Contacts = props => {
             marginLeft: 30,
             color: Colors.textColorGrey,
             fontFamily: Fonts.FiraSansRegular,
-            fontSize: RFValue(12, 812),
+            fontSize: RFValue(12),
             marginTop: 5
           }}
         >

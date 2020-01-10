@@ -145,13 +145,13 @@ const styles = StyleSheet.create({
     },
     modalHeaderTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         fontFamily: Fonts.FiraSansMedium
     },
     modalHeaderInfoText: {
         color: Colors.textColorGrey,
         fontFamily: Fonts.FiraSansRegular,
-        fontSize: RFValue(12, 812),
+        fontSize: RFValue(12),
         marginTop: 5
     },
     listElements: {
@@ -167,13 +167,13 @@ const styles = StyleSheet.create({
     },
     listElementsTitle: {
         color: Colors.blue,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         marginLeft: 13,
         fontFamily: Fonts.FiraSansRegular
     },
     listElementsInfo: {
         color: Colors.textColorGrey,
-        fontSize: RFValue(11, 812),
+        fontSize: RFValue(11),
         marginLeft: 13,
         marginTop: 5,
         fontFamily: Fonts.FiraSansRegular

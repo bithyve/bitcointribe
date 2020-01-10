@@ -22,7 +22,7 @@ export default function QrCodeModalContents( props ) {
 			<ScrollView style={ styles.qrModalScrollView }>
 				<View style={ styles.qrModalImageNTextInputView }>
 					<AppBottomSheetTouchableWrapper onPress={()=>props.onPressQrScanner()} style={{alignSelf:'center', backgroundColor:Colors.blue, width:wp('50%'), height:wp('13%'), alignItems:'center', justifyContent:'center', borderRadius:10}}>
-						<Text style={{color:Colors.white, fontFamily:Fonts.FiraSansMedium, fontSize:RFValue(13, 812)}}>Scan QrCode</Text>
+						<Text style={{color:Colors.white, fontFamily:Fonts.FiraSansMedium, fontSize:RFValue(13)}}>Scan QrCode</Text>
 					</AppBottomSheetTouchableWrapper>
 					<TextInput placeholder={ 'Enter Recipients Address' } placeholderTextColor={ Colors.borderColor } style={ styles.qrModalTextInput } />
 				</View>

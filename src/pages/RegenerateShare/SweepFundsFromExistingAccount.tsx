@@ -67,8 +67,8 @@ const SweepFundsFromExistingAccount = props => {
                     marginLeft: 20, marginRight: 20, paddingBottom: 20, marginTop: 20, borderBottomWidth: 1,
                     borderColor: Colors.borderColor,
                 }}>
-                    <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(14, 812) }}>Your new wallet{"\n"}and back-up is ready</Text>
-                    <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(10, 812) }}>You can now sweep funds from your existing wallet to{"\n"}the new wallet</Text>
+                    <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(14) }}>Your new wallet{"\n"}and back-up is ready</Text>
+                    <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(10) }}>You can now sweep funds from your existing wallet to{"\n"}the new wallet</Text>
                 </View>
             </View>
             <ScrollView style={{}}>
@@ -92,12 +92,12 @@ const SweepFundsFromExistingAccount = props => {
                 <View style={{ flexDirection: 'row', marginTop:20, marginBottom:20 }}>
                     <TouchableOpacity onPress={()=>{props.navigation.navigate("NewWalletGenerationOTP")}} style={{ height: wp('13%'), width: wp('40%'), backgroundColor: Colors.blue, justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}><Text style={{
                         color: Colors.white,
-                        fontSize: RFValue(13, 812),
+                        fontSize: RFValue(13),
                         fontFamily: Fonts.FiraSansMedium
                     }}>Confirm</Text></TouchableOpacity>
                     <TouchableOpacity style={{ height: wp('13%'), width: wp('30%'), justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}><Text style={{
                         color: Colors.blue,
-                        fontSize: RFValue(13, 812),
+                        fontSize: RFValue(13),
                         fontFamily: Fonts.FiraSansMedium
                     }}>Cancel</Text></TouchableOpacity>
                 </View>
@@ -111,7 +111,7 @@ export default SweepFundsFromExistingAccount;
 const styles = StyleSheet.create({
     modalHeaderTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         fontFamily: Fonts.FiraSansRegular
     },
     modalHeaderTitleView: {
@@ -138,13 +138,13 @@ const styles = StyleSheet.create({
     },
     listElementsTitle: {
         color: Colors.blue,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         marginLeft: 13,
         fontFamily: Fonts.FiraSansRegular
     },
     listElementsInfo: {
         color: Colors.textColorGrey,
-        fontSize: RFValue(11, 812),
+        fontSize: RFValue(11),
         marginLeft: 13,
         fontFamily: Fonts.FiraSansRegular,
         marginTop: hp('0.5%')

@@ -278,14 +278,14 @@ const styles = StyleSheet.create({
   commModeModalHeaderText: {
     color: Colors.blue,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(18, 812),
+    fontSize: RFValue(18),
     marginLeft: 20,
     marginRight: 20,
   },
   commModeModalInfoText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11, 812),
+    fontSize: RFValue(11),
     marginLeft: 20,
     marginRight: 20,
     marginTop: hp('0.7%'),
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
   },
   contactNameText: {
     color: Colors.black,
-    fontSize: RFValue(25, 812),
+    fontSize: RFValue(25),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 25,
   },
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   },
   contactInfoText: {
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     marginLeft: 10,
   },
   proceedButtonView: {
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium,
   },
 });

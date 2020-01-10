@@ -142,26 +142,26 @@ export default function RestoreWalletBySecondaryDevice(props) {
 const styles = StyleSheet.create({
   pageTitle: {
     color: Colors.blue,
-    fontSize: RFValue(25, 812),
+    fontSize: RFValue(25),
     marginLeft: 15,
     marginBottom: 5,
     fontFamily: Fonts.FiraSansRegular,
   },
   labelStyle: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
     marginLeft: 15,
     fontFamily: Fonts.FiraSansRegular,
   },
   bottomNoteText: {
     color: Colors.blue,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     marginBottom: 5,
     fontFamily: Fonts.FiraSansRegular,
   },
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
     fontFamily: Fonts.FiraSansRegular,
   },
   buttonView: {
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium,
   },
   bottomButtonView: {
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   addressText: {
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     color: Colors.lightBlue,
   },
   copyIconView: {
