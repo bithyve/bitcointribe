@@ -591,6 +591,9 @@ export default function Home(props) {
         />
       );
     }
+    else if(selected == 'More'){
+      return <MoreHomePageTabContents onPressElements={item => onPressElement(item)} />
+    }
   }
 
   function renderHeader() {
@@ -632,35 +635,28 @@ export default function Home(props) {
   }, [openmodal]);
 
   async function selectTab(tabTitle) {
+    (bottomSheet as any).current.snapTo(2);
     if (tabTitle == 'More') {
       setTimeout(() => {
         setSelected(tabTitle);
         setSelected(tabTitle);
       }, 2);
-      (bottomSheet as any).current.snapTo(0);
-      (MoreTabBottomSheet as any).current.snapTo(1);
     } else if (tabTitle == 'Transactions') {
       setTimeout(() => {
         setModaldata(transactionData);
         setSelected(tabTitle);
       }, 2);
-      (bottomSheet as any).current.snapTo(1);
-      (MoreTabBottomSheet as any).current.snapTo(0);
     } else if (tabTitle == 'Add') {
       setTimeout(() => {
         setAddBottomSheetsFlag(true);
         setModaldata([]);
         setSelected(tabTitle);
       }, 2);
-      (bottomSheet as any).current.snapTo(1);
-      (MoreTabBottomSheet as any).current.snapTo(0);
     } else if (tabTitle == 'QR') {
       setTimeout(() => {
         setModaldata(transactionData);
         setSelected(tabTitle);
       }, 2);
-      (bottomSheet as any).current.snapTo(1);
-      (MoreTabBottomSheet as any).current.snapTo(0);
     }
   }
 
@@ -928,26 +924,6 @@ export default function Home(props) {
             setTabBarZIndex(999);
           }, 10);
           (AllAccountsBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderMoreTabContents = () => {
-    return (
-      <MoreHomePageTabContents onPressElements={item => onPressElement(item)} />
-    );
-  };
-
-  const renderMoreTabHeader = () => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          (MoreTabBottomSheet as any).current.snapTo(0);
-          (bottomSheet as any).current.snapTo(1);
-          setTimeout(() => {
-            setSelected('Transactions');
-          }, 2);
         }}
       />
     );
@@ -1882,7 +1858,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
               ? hp('20%')
               : hp('18%'),
-          hp('50%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
           hp('90%'),
         ]}
         renderContent={renderContent1}
@@ -1956,20 +1932,6 @@ export default function Home(props) {
         renderContent={renderCustodianRequestRejectedModalContent}
         renderHeader={renderCustodianRequestRejectedModalHeader}
       /> */}
-      <BottomSheet
-        onCloseEnd={() => {
-          setTabBarZIndex(999);
-          (bottomSheet as any).current.snapTo(1);
-        }}
-        enabledInnerScrolling={true}
-        ref={MoreTabBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
-        ]}
-        renderContent={renderMoreTabContents}
-        renderHeader={renderMoreTabHeader}
-      />
       {KnowMoreBottomSheetsFlag ? <BottomSheet
         onOpenEnd={() => { }}
         onCloseEnd={() => {
@@ -2289,12 +2251,7 @@ export default function Home(props) {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.tabBarTabView}
-          onPress={() => {
-            setKnowMoreBottomSheetsFlag(true);
-            setOpenmodal('closed');
-            (MoreTabBottomSheet as any).current.snapTo(1);
-            selectTab('More');
-          }}
+          onPress={() => selectTab('More')}
         >
           {selected == 'More' ? (
             <View style={styles.activeTabStyle}>

@@ -30,7 +30,6 @@ export default function MoreHomePageTabContents(props) {
     ])
     return (<View style={{ ...styles.modalContentContainer, height: '100%', }}>
         <View style={{ height: '100%', paddingBottom: hp('10%') }}>
-            <Text style={{ marginLeft: 20, marginTop: hp('3%'), color: Colors.blue, fontSize: RFValue(18, 812), fontFamily: Fonts.FiraSansRegular }}>More</Text>
             <View>
                 <FlatList
                     data={addData}
@@ -79,15 +78,7 @@ export default function MoreHomePageTabContents(props) {
 const styles = StyleSheet.create({
     modalContentContainer: {
         height: '100%',
-        backgroundColor: Colors.white,
-        borderTopLeftRadius: 10,
-        borderLeftColor: Colors.borderColor,
-        borderLeftWidth: 1,
-        borderTopRightRadius: 10,
-        borderRightColor: Colors.borderColor,
-        borderRightWidth: 1,
-        borderTopColor: Colors.borderColor,
-        borderTopWidth: 1,
+        backgroundColor: Colors.white
     },
     separatorView: {
         marginLeft: 15,
