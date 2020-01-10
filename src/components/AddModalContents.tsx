@@ -41,7 +41,7 @@ export default function AddModalContents(props) {
 			data={addData}
 			ItemSeparatorComponent={() => <View style={{ backgroundColor: Colors.white }}><View style={styles.separatorView} /></View>}
 			renderItem={({ item }) =>
-				<AppBottomSheetTouchableWrapper disabled={true} activeOpacity={0.2} onPress={() => props.onPressElements(item.title)} style={styles.addModalView} >
+				<AppBottomSheetTouchableWrapper disabled={true} onPress={() => props.onPressElements(item.title)} style={styles.addModalView} >
 						<View style={styles.modalElementInfoView}>
 							<View style={{ justifyContent: "center", }}>
 								<Image source={item.image} style={{ width: 25, height: 25 }} />
@@ -64,9 +64,8 @@ const styles = StyleSheet.create({
 		paddingBottom: hp('10%')
 	},
 	addModalView: {
-		//opacity: 0.25,
-		//backgroundColor: 'black',
-		backgroundColor: Colors.white,
+		opacity: 0.3,
+		backgroundColor: Colors.borderColor,//Colors.white,
 		padding: 7,
 		flexDirection: 'row',
 		display: 'flex',

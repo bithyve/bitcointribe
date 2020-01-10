@@ -9,6 +9,7 @@ import {
 } from 'react-native-responsive-screen';
 import { useDispatch } from 'react-redux';
 import { updateMSharesHealth } from '../../store/actions/sss';
+import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
 
 export default function CustodianRequestAccepted(props) {
   const requester = props.navigation.getParam('requester');
@@ -65,13 +66,13 @@ export default function CustodianRequestAccepted(props) {
             alignItems: 'center',
           }}
         >
-          <TouchableOpacity
+          <AppBottomSheetTouchableWrapper
             onPress={() => onPressAssociateContacts()}
             style={{ ...styles.successModalButtonView }}
           >
             <Text style={styles.proceedButtonText}>Associate Contact</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </AppBottomSheetTouchableWrapper>
+          <AppBottomSheetTouchableWrapper
             onPress={() => props.navigation.replace('Home')}
             style={{
               height: wp('13%'),
@@ -83,7 +84,7 @@ export default function CustodianRequestAccepted(props) {
             <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
               Skip
             </Text>
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
           <Image
             source={require('../../assets/images/icons/accept.png')}
             style={styles.successModalImage}

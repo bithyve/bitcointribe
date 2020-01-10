@@ -7,6 +7,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
+import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
 
 export default function CustodianRequestModalContents(props) {
   return (
@@ -68,15 +69,15 @@ export default function CustodianRequestModalContents(props) {
             alignItems: "center"
           }}
         >
-          <TouchableOpacity
+          <AppBottomSheetTouchableWrapper
             onPress={() => {
               props.onPressAcceptSecret();
             }}
             style={{ ...styles.successModalButtonView }}
           >
             <Text style={styles.proceedButtonText}>Accept Secret</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </AppBottomSheetTouchableWrapper>
+          <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressRejectSecret()}
             style={{
               height: wp("13%"),
@@ -88,7 +89,7 @@ export default function CustodianRequestModalContents(props) {
             <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
               Reject Secret
             </Text>
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
         </View>
       </View>
     </View>
