@@ -17,5 +17,4 @@ export default class Singleton {
     setSelectedPdfDetails( item: any ) {
         this.selectedPdfDetails = item;
     }
-
 }

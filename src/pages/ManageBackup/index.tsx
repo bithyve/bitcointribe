@@ -44,6 +44,8 @@ import { requestSharePdf } from '../../store/actions/manageBackup';
 import RegenerateHealper from '../../components/Helper/RegenerateHealper';
 import { ModalShareIntent } from "hexaComponents/Modal/ManageBackup";
 
+import Singleton from "hexaCommon/Singleton";
+
 let itemSelected = {};
 
 export default function ManageBackup( props ) {
@@ -775,6 +777,8 @@ export default function ManageBackup( props ) {
                 <TouchableOpacity
                   disabled={ item.personalInfo && item.personalInfo.flagShare ? true : false }
                   onPress={ () => {
+                    let singleton = Singleton.getInstance();
+                    singleton.setSelectedPdfDetails( pageData );
                     itemSelected = item;
                     if ( item.route == 'PersonalCopy' ) {
                       setArrModalShareIntent( {

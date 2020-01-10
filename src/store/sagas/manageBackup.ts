@@ -12,11 +12,6 @@ import { SHARE_PDF, DBUPDATE_PDF_SEND, dbUpdatePdfSharing } from '../actions/man
 import { dbUpdateSSS } from "../actions/storage"
 import { socialMediaType } from "../utils/media";
 
-
-
-
-
-
 function* sharePdfWorker( { payload } ) {
   const { databaseSSS } = yield select( state => state.storage );
   const { security } = yield select(
@@ -44,9 +39,10 @@ function* sharePdfWorker( { payload } ) {
         let res = yield Share.open( shareOptions ).then( async ( res: any ) => {
           return await res;
         } );
-        yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: socialMediaType( res.app.split( "/", 1 )[ 0 ] ), date: Math.floor( Date.now() / 1000 ) } } ) );
+        // yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: socialMediaType( res.app.split( "/", 1 )[ 0 ] ), date: Math.floor( Date.now() / 1000 ) } } ) );
+        yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: "Other", date: Math.floor( Date.now() / 1000 ) } } ) );
       } else {
-        let res = Mailer.mail( {
+        yield Mailer.mail( {
           subject: item.title,
           body: '<b>Please find attached the personal copy 1 share pdf, it is password protected by the answer to the security question.</b>',
           isHTML: true,
@@ -59,9 +55,8 @@ function* sharePdfWorker( { payload } ) {
           }
         }, ( error, event ) => {
           console.log( { event, error } );
-          return "Email";
         } );
-        yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: res, date: Math.floor( Date.now() / 1000 ) } } ) );
+        yield put( dbUpdatePdfSharing( { copy: "copy1", socialMedia: { type: "Email", date: Math.floor( Date.now() / 1000 ) } } ) );
       }
     } else if ( item.type == 'copy2' && type != "Print" ) {
       if ( type == "Other" ) {
@@ -80,9 +75,10 @@ function* sharePdfWorker( { payload } ) {
         let res = yield Share.open( shareOptions ).then( ( res: any ) => {
           return res;
         } );
-        yield put( dbUpdatePdfSharing( { copy: "copy2", socialMedia: { type: socialMediaType( res.app.split( "/", 1 )[ 0 ] ) }, date: Math.floor( Date.now() / 1000 ) } ) );
+        // yield put( dbUpdatePdfSharing( { copy: "copy2", socialMedia: { type: socialMediaType( res.app.split( "/", 1 )[ 0 ] ) }, date: Math.floor( Date.now() / 1000 ) } ) );
+        yield put( dbUpdatePdfSharing( { copy: "copy2", socialMedia: { type: "Other" }, date: Math.floor( Date.now() / 1000 ) } ) );
       } else {
-        let res = Mailer.mail( {
+        yield Mailer.mail( {
           subject: item.title,
           body: '<b>Please find attached the personal copy 2 share pdf, it is password protected by the answer to the security question.</b>',
           isHTML: true,
@@ -95,9 +91,8 @@ function* sharePdfWorker( { payload } ) {
           }
         }, ( error, event ) => {
           console.log( { event, error } );
-          return "Email";
         } );
-        yield put( dbUpdatePdfSharing( { copy: "copy2", socialMedia: { type: res }, date: Math.floor( Date.now() / 1000 ) } ) );
+        yield put( dbUpdatePdfSharing( { copy: "copy2", socialMedia: { type: "Email" }, date: Math.floor( Date.now() / 1000 ) } ) );
       }
     } else {
       console.log( { path: databaseSSS.pdfDetails.personalCopy1PdfPath } );

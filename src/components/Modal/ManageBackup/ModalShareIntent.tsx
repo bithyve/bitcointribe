@@ -12,11 +12,13 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from "../../../../src/common/Colors";
 import Fonts from "../../../../src/common/Fonts";
 import Icons from "../../../../src/common/Icons";
+import Singleton from "hexaCommon/Singleton";
 
 
 export default function ModalShareIntent( props ) {
 
     const [ flagRefreshing, setFagRefreshing ] = useState( false );
+    const [ pdfShareDetails, setPdfShareDetails ] = useState( {} )
     const [ arrShareOption, setArrShareOption ] = useState( [
         {
             id: 1,
@@ -50,16 +52,23 @@ export default function ModalShareIntent( props ) {
     ] = useState( React.createRef() );
 
     useEffect( () => {
-        console.log( { props } );
-        // for ( var i = 0; i < arrShareOption.length; i++ )
-        //     if ( arrShareOption[ i ].type === 'Other' ) {
-        //         console.log( { i } );
-        //         arrShareOption[ i ].flagShare = true;
-        //         setFagRefreshing( true );
-        //         break;
-        //     }  
+        let singleton = Singleton.getInstance();
+        let selectedPdfDetails = singleton.getSeletedPdfDetails();
+        let shareItem = selectedPdfDetails != undefined ? props.data.item.type == "copy1" ? selectedPdfDetails[ 4 ] : selectedPdfDetails[ 3 ] : null;
+        if ( shareItem != null ) {
+            let mediaShare = shareItem.personalInfo.shareDetails;
+            if ( mediaShare != {} )
+                for ( var i = 0; i < arrShareOption.length; i++ )
+                    if ( arrShareOption[ i ].type === mediaShare.type ) {
+                        console.log( { i } );
+                        arrShareOption[ i ].flagShare = true;
+                        setFagRefreshing( true );
+                        break;
+                    }
+        }
         refShareIntentBottomSheet.current.snapTo( props.data.snapTop );
     }, [ props ] );
+
     const renderShareContents = () => {
         return (
             <View style={ [ styles.modalContainer ] }>
