@@ -4,9 +4,9 @@ import {
     Image,
     Text,
     StyleSheet,
-    ScrollView,
     TextInput
 } from 'react-native';
+import { ScrollView } from "react-native-gesture-handler";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
@@ -175,9 +175,11 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
             </View>
         </View>
         {selectedContact.id &&
-            <AppBottomSheetTouchableWrapper onPress={() => props.onPressProceed()}>
+        <View style={styles.bottomButtonView}>
+            <AppBottomSheetTouchableWrapper  onPress={() => props.onPressProceed()}>
                 <Text style={styles.buttonText}>Confirm & Proceed</Text>
             </AppBottomSheetTouchableWrapper>
+            </View>
         }
     </View>
     )
@@ -293,7 +295,7 @@ const styles = StyleSheet.create({
         shadowColor: Colors.shadowBlue,
         shadowOpacity: 10,
         shadowOffset: { width: 0, height: 10 },
-        marginBottom: 100
+        marginBottom: 20
     },
     buttonText: {
         color: Colors.white,

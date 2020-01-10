@@ -539,18 +539,18 @@ export default function Home(props) {
     return (
       <AddModalContents
         onPressElements={type => {
-          // if (
-          //   type == 'Fastbitcoins' ||
-          //   type == 'Getbittr' ||
-          //   type == 'Add Contact'
-          // ) {
-          //   setTimeout(() => {
-          //     setAddSubBottomSheetsFlag(true);
-          //     setTabBarZIndex(0);
-          //     setSelectToAdd(type);
-          //   }, 2);
-          //   (AddBottomSheet as any).current.snapTo(1);
-          // }
+          if (
+            type == 'Fastbitcoins' ||
+            type == 'Getbittr' ||
+            type == 'Add Contact'
+          ) {
+            setTimeout(() => {
+              setAddSubBottomSheetsFlag(true);
+              setTabBarZIndex(0);
+              setSelectToAdd(type);
+            }, 2);
+            (AddBottomSheet as any).current.snapTo(1);
+          }
         }}
         addData={modaldata}
       />
