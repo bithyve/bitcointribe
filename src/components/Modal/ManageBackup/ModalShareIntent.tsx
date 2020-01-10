@@ -51,13 +51,13 @@ export default function ModalShareIntent( props ) {
 
     useEffect( () => {
         console.log( { props } );
-        for ( var i = 0; i < arrShareOption.length; i++ )
-            if ( arrShareOption[ i ].type === 'Other' ) {
-                console.log( { i } );
-                arrShareOption[ i ].flagShare = true;
-                setFagRefreshing( true );
-                break;
-            }
+        // for ( var i = 0; i < arrShareOption.length; i++ )
+        //     if ( arrShareOption[ i ].type === 'Other' ) {
+        //         console.log( { i } );
+        //         arrShareOption[ i ].flagShare = true;
+        //         setFagRefreshing( true );
+        //         break;
+        //     }  
         refShareIntentBottomSheet.current.snapTo( props.data.snapTop );
     }, [ props ] );
     const renderShareContents = () => {
@@ -71,9 +71,8 @@ export default function ModalShareIntent( props ) {
                         <TouchableOpacity
                             style={ styles.headerLeftIconContainer }
                             onPress={ () => {
-                                props.navigation.goBack();
+                                props.onPressHandle();
                             } }
-
                         >
                             <View style={ styles.headerLeftIconInnerContainer }>
                                 <FontAwesome name="long-arrow-left" color={ Colors.blue } size={ 17 } />
