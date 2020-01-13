@@ -50,7 +50,7 @@
     <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.provider" android:grantUriPermissions="true" android:exported="false">
       <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/filepaths" />
     </provider>  
-    <!-- <meta-data android:name="io.fabric.ApiKey" android:value="2d0b58f102661fcabd3be54e6516854e2b0983f6" /> -->
+     <meta-data android:name="io.fabric.ApiKey" android:value="2d0b58f102661fcabd3be54e6516854e2b0983f6" />
   </application>
 
 </manifest>

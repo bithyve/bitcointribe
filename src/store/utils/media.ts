@@ -1,33 +1,38 @@
 export const socialMediaType = ( packageName: any ) => {
     switch ( packageName ) {
         case "com.facebook.katana":
-            return "FacebookShare";
+            return "Facebook";
         case "com.facebook.pages.app":
             return "FacebookPagesManagerShare";
         case "com.twitter.android":
-            return "TwitterShare";
+            return "Twitter";
         case "com.whatsapp":
-            return "WhatsAppShare";
+            return "WhatsApp";
         case "com.instagram.android":
-            return "InstagramShare";
+            return "Instagram";
         case "com.google.android.apps.plus":
-            return "GooglePlusShare";
+            return "GooglePlus";
         case "com.google.android.gm":
-            return "EmailShare";
+        case "com.apple.UIKit.activity.Mail":
+            return "Email";
         case "com.pinterest":
-            return "PinterestShare"
+            return "Pinterest"
         case "com.android.mms":
-            return "SMSShare";
+            return "SMS";
         case "com.snapchat.android":
-            return "SnapChatShare";
+            return "SnapChat";
         case "com.facebook.orca":
-            return "MessengerShare";
+            return "Messenger";
         case "com.Slack":
-            return "SlackShare";
+            return "Slack";
         case "com.android.bluetooth":
-            return "BluetoothShare";
+            return "Bluetooth";
         case "com.google.android.apps.docs":
             return "GoogleDrive";
+        case "com.apple.UIKit.activity.AirDrop":
+            return "AirDrop"
+        case "com.apple.UIKit.activity.iCloud":
+            return "iCloud"
         default:
             return "Other"
     }

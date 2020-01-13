@@ -1,8 +1,8 @@
 // types and action creators: dispatched by components and sagas
 export const SHARE_PDF = 'SHARE_PDF';
 
-export const requestSharePdf = type => {
-  return { type: SHARE_PDF, payload: type };
+export const requestSharePdf = ( type, item ) => {
+  return { type: SHARE_PDF, payload: { type, item } };
 };
 
 // types and action creators (saga): dispatched by saga workers
