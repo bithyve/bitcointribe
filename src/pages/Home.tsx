@@ -214,9 +214,9 @@ export default function Home(props) {
   //   React.createRef(),
   // );
   // const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const [RecoveryRequestBottomSheet, setRecoveryRequestBottomSheet] = useState(
-    React.createRef(),
-  );
+  // const [RecoveryRequestBottomSheet, setRecoveryRequestBottomSheet] = useState(
+  //   React.createRef(),
+  // );
   const [
     CustodianRequestBottomSheet,
     setCustodianRequestBottomSheet,
@@ -755,28 +755,28 @@ export default function Home(props) {
     );
   }, [custodyRequest]);
 
-  const renderRecoveryRequestModalContent = useCallback(() => {
-    if (!recoveryRequest) return <View></View>;
+  // const renderRecoveryRequestModalContent = useCallback(() => {
+  //   if (!recoveryRequest) return <View></View>;
 
-    return (
-      <CustodianRequestModalContents
-        userName={recoveryRequest.requester}
-        onPressAcceptSecret={() => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-          (RecoveryRequestBottomSheet as any).current.snapTo(0);
-          props.navigation.navigate('RecoveryRequestOTP', { recoveryRequest });
-        }}
-        onPressRejectSecret={() => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-          (RecoveryRequestBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, [recoveryRequest]);
+  //   return (
+  //     <CustodianRequestModalContents
+  //       userName={recoveryRequest.requester}
+  //       onPressAcceptSecret={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //         (RecoveryRequestBottomSheet as any).current.snapTo(0);
+  //         props.navigation.navigate('RecoveryRequestOTP', { recoveryRequest });
+  //       }}
+  //       onPressRejectSecret={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //         (RecoveryRequestBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }, [recoveryRequest]);
 
   // const renderCustodianRequestOtpModalContent = () => {
   //   return (
@@ -858,18 +858,18 @@ export default function Home(props) {
     );
   }, []);
 
-  const renderRecoveryRequestModalHeader = useCallback(() => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (RecoveryRequestBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
+  // const renderRecoveryRequestModalHeader = useCallback(() => {
+  //   return (
+  //     <TransparentHeaderModal
+  //       onPressheader={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(999);
+  //         }, 2);
+  //         (RecoveryRequestBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }, []);
 
   const onPressElement = item => {
     if (item.title == 'Health of the App') {
@@ -1384,7 +1384,7 @@ export default function Home(props) {
       setTimeout(() => {
         setTabBarZIndex(0);
       }, 2);
-      (RecoveryRequestBottomSheet as any).current.snapTo(1);
+      (RecoverySecretRequestBottomSheet as any).current.snapTo(1);
       (bottomSheet as any).current.snapTo(1);
     }
   }, [custodyRequest, recoveryRequest]);
@@ -1443,49 +1443,50 @@ export default function Home(props) {
     })();
   }, []);
 
-  // const renderRecoverySecretRequestModalContent = () => {
-  //   return (
-  //     <RecoverySecretRequestModalContents
-  //       name={'Pamela Aalto'}
-  //       title={'You have a Recovery Request\nfrom your Trusted Contact'}
-  //       infoText={
-  //         'Please contact the sender to get\nthe OTP and share the secret'
-  //       }
-  //       subTitle={'Message from the Sender'}
-  //       subTitleInfo={
-  //         'I lost my hexa wallet, need the shares back to restore my\nwallet'
-  //       }
-  //       acceptButtonName={'Accept Request'}
-  //       rejectButtonName={'Reject Request'}
-  //       onPressAccept={() => {
-  //         setTimeout(() => {
-  //           setTabBarZIndex(0);
-  //         }, 2);
-  //         (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-  //         props.navigation.navigate('AddressBook');
-  //       }}
-  //       onPressReject={() => {
-  //         setTimeout(() => {
-  //           setTabBarZIndex(0);
-  //         }, 2);
-  //         (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-  //       }}
-  //     />
-  //   );
-  // };
+  const renderRecoverySecretRequestModalContent = useCallback(() => {
+    if (!recoveryRequest) return <View></View>;
+    return (
+      <RecoverySecretRequestModalContents
+        name={recoveryRequest.requester}
+        title={'You have a Recovery Request\nfrom your Trusted Contact'}
+        infoText={
+          'Please contact the sender to get\nthe OTP and share the secret'
+        }
+        subTitle={'Message from the Sender'}
+        subTitleInfo={
+          'I lost my hexa wallet, need the shares back to restore my\nwallet'
+        }
+        acceptButtonName={'Accept Request'}
+        rejectButtonName={'Reject Request'}
+        onPressAccept={() => {
+          setTimeout(() => {
+            setTabBarZIndex(0);
+          }, 2);
+          (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
+          props.navigation.navigate('RecoveryRequestOTP', { recoveryRequest });
+        }}
+        onPressReject={() => {
+          setTimeout(() => {
+            setTabBarZIndex(0);
+          }, 2);
+          (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, [recoveryRequest]);
 
-  // const renderRecoverySecretRequestModalHeader = () => {
-  //   return (
-  //     <TransparentHeaderModal
-  //       onPressheader={() => {
-  //         (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-  //         setTimeout(() => {
-  //           setTabBarZIndex(999);
-  //         }, 2);
-  //       }}
-  //     />
-  //   );
-  // };
+  const renderRecoverySecretRequestModalHeader = useCallback(() => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 2);
+        }}
+      />
+    );
+  }, []);
 
   // const renderShareRecoverySecretQrCodeModalContent = () => {
   //   return (
@@ -1919,7 +1920,7 @@ export default function Home(props) {
         renderContent={renderCustodianRequestModalContent}
         renderHeader={renderCustodianRequestModalHeader}
       />
-      {/* <BottomSheet
+      <BottomSheet
         onOpenStart={() => {
           setTabBarZIndex(0);
         }}
@@ -1931,8 +1932,8 @@ export default function Home(props) {
         snapPoints={[-50, hp('60%')]}
         renderContent={renderRecoverySecretRequestModalContent}
         renderHeader={renderRecoverySecretRequestModalHeader}
-      /> */}
-      <BottomSheet
+      />
+      {/* <BottomSheet
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
@@ -1944,7 +1945,7 @@ export default function Home(props) {
         snapPoints={[-50, hp('60%')]}
         renderContent={renderRecoveryRequestModalContent}
         renderHeader={renderRecoveryRequestModalHeader}
-      />
+      /> */}
       {/* <BottomSheet
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}
