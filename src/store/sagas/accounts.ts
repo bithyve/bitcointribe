@@ -78,7 +78,6 @@ function* fetchBalanceWorker({ payload }) {
     //   [payload.serviceType]: JSON.stringify(service),
     // };
     // yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-    yield put(fetchTransactions(payload.serviceType, service));
   } else {
     yield put(switchLoader(payload.serviceType, 'balances'));
   }

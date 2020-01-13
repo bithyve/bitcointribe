@@ -436,7 +436,9 @@ function Accounts(props) {
               source={require('../../assets/images/icons/icon_bitcoin_light.png')}
             />
             <Text style={styles.cardAmountText}>{netBalance}</Text>
-              <Text style={styles.cardAmountUnitText}>{item.accountType == 'Test Account' ? "tsats" : "sat"}</Text>
+            <Text style={styles.cardAmountUnitText}>
+              {item.accountType == 'Test Account' ? 'tsats' : 'sat'}
+            </Text>
           </View>
         </View>
       </ImageBackground>
@@ -844,6 +846,7 @@ function Accounts(props) {
             refreshing={loading.transactions || loading.balances}
             onRefresh={() => {
               dispatch(fetchBalance(serviceType));
+              dispatch(fetchTransactions(serviceType));
             }}
           />
         }
