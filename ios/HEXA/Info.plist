@@ -59,6 +59,18 @@
 		<key>NSExceptionDomains</key>
 		<dict/>
 	</dict>
+  <key>NSUbiquitousContainers</key>
+  <dict>  
+      <key>iCloud.io.hexawallet.hexa</key>
+      <dict>
+          <key>NSUbiquitousContainerIsDocumentScopePublic</key>
+          <true/>
+          <key>NSUbiquitousContainerSupportedFolderLevels</key>
+          <string>One</string>
+          <key>NSUbiquitousContainerName</key>
+          <string>Hexa</string>
+      </dict>
+  </dict>
 	<key>NSCalendarsUsageDescription</key>
 	<string>Allow HEXA to access your calendar</string>
 	<key>NSCameraUsageDescription</key>

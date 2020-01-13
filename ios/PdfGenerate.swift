@@ -43,11 +43,7 @@ import QRCoder
     //  image = "Test".image(size: CGSize(width: 300.0, height: 80.0))
     
     // Or even just
-    //var image:UIImage? = "Test".image()
-    
-    
-    
-    
+    //var image:UIImage? = "Test".image()  
     
     print("qrcodestring=",qrCodeString)
     print("working");
