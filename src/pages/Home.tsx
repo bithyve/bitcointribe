@@ -80,12 +80,13 @@ import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouc
 import { getTestcoins } from '../store/actions/accounts';
 import axios from 'axios';
 
-export default function Home( props ) {
-  const [ KnowMoreBottomSheetsFlag, setKnowMoreBottomSheetsFlag ] = useState( false );
-  const [ addBottomSheetsFlag, setAddBottomSheetsFlag ] = useState( false );
-  const [ addSubBottomSheetsFlag, setAddSubBottomSheetsFlag ] = useState( false );
-  const [ familyAndFriendsBookBottomSheetsFlag, setFamilyAndFriendsBookBottomSheetsFlag ] = useState( false );
-  const database = useSelector( state => state.storage.database );
+export default function Home(props) {
+  const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
+  const [KnowMoreBottomSheetsFlag, setKnowMoreBottomSheetsFlag] = useState(false);
+  const [addBottomSheetsFlag, setAddBottomSheetsFlag] = useState(false);
+  const [addSubBottomSheetsFlag, setAddSubBottomSheetsFlag] = useState(false);
+  const [familyAndFriendsBookBottomSheetsFlag, setFamilyAndFriendsBookBottomSheetsFlag] = useState(false);
+  const database = useSelector(state => state.storage.database);
   const walletName = database ? database.WALLET_SETUP.walletName : '';
   const accounts = useSelector( state => state.accounts );
   const [ exchangeRates, setExchangeRates ] = useState();
@@ -94,12 +95,13 @@ export default function Home( props ) {
     regularBalance: 0,
     secureBalance: 0,
     accumulativeBalance: 0,
-  } );
-  const [ transactions, setTransactions ] = useState( [] );
-  useEffect( () => {
-    const testBalance = accounts[ TEST_ACCOUNT ].service
-      ? accounts[ TEST_ACCOUNT ].service.hdWallet.balances.balance +
-      accounts[ TEST_ACCOUNT ].service.hdWallet.balances.unconfirmedBalance
+  });
+  const [qrData, setqrData] = useState('');
+  const [transactions, setTransactions] = useState([]);
+  useEffect(() => {
+    const testBalance = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     const regularBalance = accounts[ REGULAR_ACCOUNT ].service
       ? accounts[ REGULAR_ACCOUNT ].service.hdWallet.balances.balance +
@@ -580,8 +582,11 @@ export default function Home( props ) {
     } else if ( selected == 'QR' ) {
       return (
         <QrCodeModalContents
-          onPressQrScanner={ () => {
-            props.navigation.navigate( 'QrScanner', {
+          modalRef={bottomSheet}
+          isOpenedFlag={QrBottomSheetsFlag}
+          onQrScan={(qrData)=> getQrCodeData(qrData)}
+          onPressQrScanner={() => {
+            props.navigation.navigate('QrScanner', {
               scanedCode: getQrCodeData,
             } );
           } }
@@ -619,15 +624,28 @@ export default function Home( props ) {
     }
   }
 
-  useEffect( () => {
-    if ( openmodal == 'closed' ) {
-      ( bottomSheet as any ).current.snapTo( 1 );
+  useEffect(() => {
+    if (openmodal == 'closed') {
+      setTimeout(() => {
+        setQrBottomSheetsFlag(false);
+      }, 10);
+      (bottomSheet as any).current.snapTo(1);
     }
-    if ( openmodal == 'half' ) {
-      ( bottomSheet as any ).current.snapTo( 2 );
+    if (openmodal == 'half') {
+      if (selected == "QR") {
+        setTimeout(() => {
+          setQrBottomSheetsFlag(true);
+        }, 10)
+      }
+      (bottomSheet as any).current.snapTo(2);
     }
-    if ( openmodal == 'full' ) {
-      ( bottomSheet as any ).current.snapTo( 3 );
+    if (openmodal == 'full') {
+      if (selected == "QR") {
+        setTimeout(() => {
+          setQrBottomSheetsFlag(true);
+        }, 10)
+      }
+      (bottomSheet as any).current.snapTo(3);
     }
   }, [ openmodal ] );
 
@@ -1844,12 +1862,24 @@ export default function Home( props ) {
         </View>
       </View>
       <BottomSheet
-        onCloseEnd={ () => {
-          ( bottomSheet as any ).current.snapTo( 1 );
-        } }
-        enabledInnerScrolling={ true }
-        ref={ bottomSheet }
-        snapPoints={ [
+        onOpenEnd={() => {
+          if (selected == "QR") {
+            setQrBottomSheetsFlag(true);
+          }
+          else{
+            setQrBottomSheetsFlag(false);
+          }
+        }}
+        onCloseEnd={() => {
+          setQrBottomSheetsFlag(false);
+          (bottomSheet as any).current.snapTo(1);
+        }}
+        onCloseStart={()=>{
+          setQrBottomSheetsFlag(false);
+        }}
+        enabledInnerScrolling={true}
+        ref={bottomSheet}
+        snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp( '18%' )
