@@ -24,16 +24,14 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import KnowMoreButton from '../components/KnowMoreButton';
 
 export default function ShareOtpWithTrustedContactContents(props) {
-  const OTP = props.navigation.getParam('OTP');
+  const OTP = props.OTP;
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
         <View style={{ flexDirection: 'row', flex: 1 }}>
           <TouchableOpacity
             onPress={() => {
-              props.navigation.navigate('ManageBackup');
+              props.onPressBack();
             }}
             style={{ height: 30, width: 30 }}
           >
@@ -48,9 +46,9 @@ export default function ShareOtpWithTrustedContactContents(props) {
               to send you the recovery secret
             </Text>
           </View>
-          <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
+          {/* <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
             <KnowMoreButton
-              onpress={() => {}}
+              onpress={() => { }}
               containerStyle={{}}
               textStyle={{}}
             />
@@ -62,7 +60,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
                 resizeMode: 'contain',
               }}
             />
-          </View>
+          </View> */}
         </View>
       </View>
       <View style={{ flex: 1, marginLeft: 30, marginRight: 30 }}>
@@ -84,15 +82,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
               alignItems: 'center',
             }}
           >
-            <Text
-              style={{
-                color: Colors.black,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(23),
-              }}
-            >
-              {OTP[0]}
-            </Text>
+            <Text style={styles.otpText}>{OTP[0]}</Text>
           </View>
           <View
             style={{
@@ -104,15 +94,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
               alignItems: 'center',
             }}
           >
-            <Text
-              style={{
-                color: Colors.black,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(23),
-              }}
-            >
-              {OTP[1]}
-            </Text>
+            <Text style={styles.otpText}>{OTP[1]}</Text>
           </View>
           <View
             style={{
@@ -124,15 +106,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
               alignItems: 'center',
             }}
           >
-            <Text
-              style={{
-                color: Colors.black,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(23),
-              }}
-            >
-              {OTP[2]}
-            </Text>
+            <Text style={styles.otpText}>{OTP[2]}</Text>
           </View>
           <View
             style={{
@@ -144,15 +118,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
               alignItems: 'center',
             }}
           >
-            <Text
-              style={{
-                color: Colors.black,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(23),
-              }}
-            >
-              {OTP[3]}
-            </Text>
+            <Text style={styles.otpText}>{OTP[3]}</Text>
           </View>
           <View
             style={{
@@ -164,35 +130,10 @@ export default function ShareOtpWithTrustedContactContents(props) {
               alignItems: 'center',
             }}
           >
-            <Text
-              style={{
-                color: Colors.black,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(23),
-              }}
-            >
-              {OTP[4]}
-            </Text>
+            <Text style={styles.otpText}>{OTP[4]}</Text>
           </View>
-          <View
-            style={{
-              height: wp('12%'),
-              width: wp('12%'),
-              backgroundColor: Colors.backgroundColor,
-              borderRadius: 8,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <Text
-              style={{
-                color: Colors.black,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(23),
-              }}
-            >
-              {OTP[5]}
-            </Text>
+          <View style={styles.otpTextView}>
+            <Text style={styles.otpText}>{OTP[5]}</Text>
           </View>
         </View>
         <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
@@ -202,7 +143,7 @@ export default function ShareOtpWithTrustedContactContents(props) {
         <View
           style={{
             height: 1,
-            backgroundColor: Colors.blue,
+            backgroundColor: Colors.borderColor,
             marginTop: hp('5%'),
             marginBottom: hp('3%'),
           }}
@@ -228,17 +169,24 @@ export default function ShareOtpWithTrustedContactContents(props) {
         </View>
       </View>
     </View>
-    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
   modalContainer: {
-    height: '100%',
+    height: "100%",
     backgroundColor: Colors.white,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderTopWidth: 1,
+    borderColor: Colors.borderColor,
+    alignSelf: "center",
+    width: "100%"
   },
   modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
+    // borderBottomWidth: 1,
+    // borderColor: Colors.borderColor,
     alignItems: 'center',
     flexDirection: 'row',
     paddingRight: 10,
@@ -258,7 +206,7 @@ const styles = StyleSheet.create({
     fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansRegular,
     marginTop: hp('0.7%'),
-    marginRight:20,
+    marginRight: 20,
     flexWrap: 'wrap',
   },
   qrModalImage: {
@@ -266,4 +214,17 @@ const styles = StyleSheet.create({
     height: wp('100%'),
     borderRadius: 20,
   },
+  otpText:{
+    color: Colors.black,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(23),
+  },
+  otpTextView:{
+    height: wp('12%'),
+    width: wp('12%'),
+    backgroundColor: Colors.backgroundColor,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 });

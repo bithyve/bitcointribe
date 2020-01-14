@@ -29,18 +29,16 @@ import ShareOtpWithTrustedContactContents from '../../components/ShareOtpWithTru
 import { nameToInitials } from '../../common/CommonFunctions';
 
 export default function CommunicationMode(props) {
-  const secretSharedTrustedContact1 = props.navigation.state.params
-    .secretSharedTrustedContact1
-    ? props.navigation.state.params.secretSharedTrustedContact1
+  // const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
+  const secretSharedTrustedContact1 = props.secretSharedTrustedContact1
+    ? props.secretSharedTrustedContact1
     : null;
-  const secretSharedTrustedContact2 = props.navigation.state.params
-    .secretSharedTrustedContact2
-    ? props.navigation.state.params.secretSharedTrustedContact2
+  const secretSharedTrustedContact2 = props.secretSharedTrustedContact2
+    ? props.secretSharedTrustedContact2
     : null;
 
-  const contact = props.navigation.getParam('contact');
-  console.log("CONTACT in Communication mode", contact);
-  const index = props.navigation.getParam('index');
+  const contact = props.contact;
+  const index = props.index;
   if (!contact) return <View></View>;
   const dispatch = useDispatch();
 
@@ -61,6 +59,17 @@ export default function CommunicationMode(props) {
       }
     }),
   );
+
+  const getIconByStatus = status => {
+    if (status == "error") {
+      return require("../../assets/images/icons/icon_error_red.png");
+    } else if (status == "warning") {
+      return require("../../assets/images/icons/icon_error_yellow.png");
+    } else if (status == "success") {
+      return require("../../assets/images/icons/icon_check.png");
+    }
+  };
+  
 
   const onContactSelect = index => {
     setContactInfo([
@@ -109,7 +118,6 @@ export default function CommunicationMode(props) {
         if (secretSharedTrustedContact2) {
           secretSharedTrustedContact2(true);
         }
-        // props.navigation.goBack();
         break;
 
       case 'email':
@@ -126,19 +134,20 @@ export default function CommunicationMode(props) {
         if (secretSharedTrustedContact2) {
           secretSharedTrustedContact2(true);
         }
-        // props.navigation.goBack();
         break;
     }
-    props.navigation.navigate('ShareOtpWithTrustedContactContents', {
-      OTP: SHARES_TRANSFER_DETAILS[index].OTP,
-    });
+    console.log('contactsdfsfsdfsd', contact)
+    props.onPressContinue(SHARES_TRANSFER_DETAILS[index].OTP?SHARES_TRANSFER_DETAILS[index].OTP:null)
+    // props.navigation.navigate('ShareOtpWithTrustedContactContents', {
+    //   OTP:'123456'
+    //   // OTP: SHARES_TRANSFER_DETAILS[index].OTP,
+    // });
   };
 
   const { loading } = useSelector(state => state.sss);
 
   useEffect(() => {
-    console.log('Running');
-    console.log({ DETAILS: SHARES_TRANSFER_DETAILS });
+    // console.log({ DETAILS: SHARES_TRANSFER_DETAILS });
     if (
       !SHARES_TRANSFER_DETAILS[index] ||
       Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
@@ -146,34 +155,40 @@ export default function CommunicationMode(props) {
       dispatch(uploadEncMShare(index));
     else {
       //  Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
-      console.log(SHARES_TRANSFER_DETAILS[index]);
+      // console.log(SHARES_TRANSFER_DETAILS[index]);
     }
   }, [SHARES_TRANSFER_DETAILS[index]]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={BackupStyles.headerContainer}>
-        <TouchableOpacity
-          style={BackupStyles.headerLeftIconContainer}
-          onPress={() => {
-            props.navigation.goBack();
-          }}
-        >
-          <View style={BackupStyles.headerLeftIconInnerContainer}>
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+    <View style={{
+      height: "100%",
+      backgroundColor: Colors.white,
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
+      borderLeftWidth: 1,
+      borderRightWidth: 1,
+      borderTopWidth: 1,
+      borderColor: Colors.borderColor,
+      alignSelf: "center",
+      width: "100%"
+    }}>
+       <View style={{ ...BackupStyles.modalHeaderTitleView, marginLeft: 10, marginRight: 10, marginTop: 20, }}>
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity onPress={() => { props.onPressBack(); }} style={{ height: 30, width: 30, }} >
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.blue}
+              size={17}
+            />
+          </TouchableOpacity>
+          <View style={{ alignSelf: "center", flex: 1, justifyContent: "center" }}>
+            <Text style={BackupStyles.modalHeaderTitleText}>Select Mode of Communication{'\n'}for Contact</Text>
+            <Text style={BackupStyles.modalHeaderInfoText}>You can choose a primary number or email</Text>
           </View>
-        </TouchableOpacity>
+        </View>
+        <Image style={BackupStyles.cardIconImage} source={getIconByStatus('error')} />
       </View>
       <View style={{ height: '100%' }}>
-        <View style={{ marginTop: hp('2%'), marginBottom: hp('2%') }}>
-          <Text style={styles.commModeModalHeaderText}>
-            Select Mode of Communication{'\n'}for Contact
-          </Text>
-          <Text style={styles.commModeModalInfoText}>
-            You can choose a primary number or email
-          </Text>
-        </View>
         <View style={styles.contactProfileView}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View
@@ -258,7 +273,7 @@ export default function CommunicationMode(props) {
           </TouchableOpacity>
         ) : null}
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

@@ -88,7 +88,6 @@ export default function ContactList(props) {
     }
     ExpoContacts.getContactsAsync().then(({ data }) => {
       if (!data.length) Alert.alert("No contacts found!");
-      console.log(data.length);
       setContactData(data);
 
       const contactList = data
