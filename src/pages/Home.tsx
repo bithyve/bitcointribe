@@ -271,7 +271,7 @@ export default function Home(props) {
     },
     {
       id: 3,
-      title: 'Secure Account',
+      title: 'Savings Account',
       unit: 'sats',
       amount: '60,000',
       account: 'Resilient and Secure',
