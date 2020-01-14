@@ -42,9 +42,8 @@ import SmallHeaderModal from '../../components/SmallHeaderModal';
 import { fetchSSSFromDB } from '../../store/actions/storage';
 import { requestSharePdf } from '../../store/actions/manageBackup';
 import RegenerateHealper from '../../components/Helper/RegenerateHealper';
-import { ModalShareIntent } from 'hexaComponents/Modal/ManageBackup';
-
-import Singleton from 'hexaCommon/Singleton';
+import { ModalShareIntent } from '../../components/Modal/ManageBackup';
+import Singleton from '../../common/Singleton';
 
 let itemSelected = {};
 
