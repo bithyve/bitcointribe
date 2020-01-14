@@ -148,6 +148,13 @@ export default function Sell(props) {
                 ) : null}
               </View>
             </View>
+            <View
+              style={{
+                alignItems: 'center',
+              }}
+            >
+              <Text>Coming Soon!</Text>
+            </View>
           </ScrollView>
         </KeyboardAvoidingView>
         <BottomSheet

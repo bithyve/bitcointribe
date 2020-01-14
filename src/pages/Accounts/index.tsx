@@ -728,6 +728,18 @@ function Accounts(props) {
     }
   }, [serviceType]);
 
+  const [exchangeRates, setExchangeRates] = useState();
+
+  useEffect(() => {
+    (async () => {
+      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
+      if (storedExchangeRates) {
+        const exchangeRates = JSON.parse(storedExchangeRates);
+        setExchangeRates(exchangeRates);
+      }
+    })();
+  }, []);
+
   // useEffect( () => {
   //   if ( !transactions.totalTransactions )
   //     dispatch( fetchTransactions( serviceType ) );
@@ -1208,7 +1220,8 @@ function Accounts(props) {
                 <View style={{ marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Buy</Text>
                   <Text style={styles.bottomCardInfoText}>
-                    Ex Rate : 0.032 (tsats)
+                    Ex Rate : {exchangeRates ? exchangeRates['USD'].last : 0}{' '}
+                    (USD)
                   </Text>
                 </View>
               </WalkthroughableTouchableOpacity>
@@ -1235,7 +1248,8 @@ function Accounts(props) {
                 <View style={{ marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Sell</Text>
                   <Text style={styles.bottomCardInfoText}>
-                    Ex Rate : 0.032 (tsats)
+                    Ex Rate : {exchangeRates ? exchangeRates['USD'].last : 0}{' '}
+                    (USD)
                   </Text>
                 </View>
               </WalkthroughableTouchableOpacity>
