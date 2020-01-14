@@ -109,7 +109,7 @@ const SecondaryDevice = props => {
       <BottomInfoBox
         title={ 'Note' }
         infoText={
-          'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna'
+          `Scan the QR code on another device on which Hexa app is installed`
         }
       />
     </SafeAreaView>

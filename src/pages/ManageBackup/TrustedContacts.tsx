@@ -30,21 +30,21 @@ const TrustedContacts = props => {
   const getTrustContact = props.navigation.state.params.getTrustContact
     ? props.navigation.state.params.getTrustContact
     : null;
-  const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
-  const [contacts, setContacts] = useState([]);
-  const [communicationModeBottomSheet, setCommunicationMode] = useState(
+  const [ selectedStatus, setSelectedStatus ] = useState( 'error' ); // for preserving health of this entity
+  const [ contacts, setContacts ] = useState( [] );
+  const [ communicationModeBottomSheet, setCommunicationMode ] = useState(
     React.createRef(),
   );
 
-  const index = props.navigation.getParam('index');
-  const selectedContacts = props.navigation.getParam('contacts');
+  const index = props.navigation.getParam( 'index' );
+  const selectedContacts = props.navigation.getParam( 'contacts' );
 
-  function selectedContactsList(list) {
-    if (list.length > 0) setContacts([...list]);
+  function selectedContactsList( list ) {
+    if ( list.length > 0 ) setContacts( [ ...list ] );
   }
 
   const dispatch = useDispatch();
-  const { DECENTRALIZED_BACKUP } = useSelector(state => state.storage.database);
+  const { DECENTRALIZED_BACKUP } = useSelector( state => state.storage.database );
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
 
   const continueNProceed = async () => {
@@ -53,26 +53,26 @@ const TrustedContacts = props => {
     //   Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
     //   console.log(SHARES_TRANSFER_DETAILS[index]);
     // }
-    if (getTrustContact) {
-      getTrustContact(contacts, index);
+    if ( getTrustContact ) {
+      getTrustContact( contacts, index );
     }
     props.navigation.goBack();
     let contactListArray = [];
     let contactList = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
+      await AsyncStorage.getItem( 'SelectedContacts' ),
     );
-    if (contactList) {
+    if ( contactList ) {
       contactListArray = contactList;
-      for (let i = 0; i < contacts.length; i++) {
-        contactListArray.push(contacts[i]);
+      for ( let i = 0; i < contacts.length; i++ ) {
+        contactListArray.push( contacts[ i ] );
       }
     } else {
-      for (let i = 0; i < contacts.length; i++) {
-        contactListArray.push(contacts[i]);
+      for ( let i = 0; i < contacts.length; i++ ) {
+        contactListArray.push( contacts[ i ] );
       }
-    }   
-    console.log("CONTACTLIST ARRAY",contactListArray);
-    await AsyncStorage.setItem('SelectedContacts', JSON.stringify(contactListArray));
+    }
+    console.log( "CONTACTLIST ARRAY", contactListArray );
+    await AsyncStorage.setItem( 'SelectedContacts', JSON.stringify( contactListArray ) );
     // props.navigation.navigate('CommunicationMode', {
     //   contact: contacts[0],
     //   index,
@@ -106,55 +106,55 @@ const TrustedContacts = props => {
   // }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={BackupStyles.headerContainer}>
+    <SafeAreaView style={ { flex: 1 } }>
+      <StatusBar backgroundColor={ Colors.white } barStyle="dark-content" />
+      <View style={ BackupStyles.headerContainer }>
         <TouchableOpacity
-          style={BackupStyles.headerLeftIconContainer}
-          onPress={() => {
+          style={ BackupStyles.headerLeftIconContainer }
+          onPress={ () => {
             props.navigation.goBack();
-          }}
+          } }
         >
-          <View style={BackupStyles.headerLeftIconInnerContainer}>
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          <View style={ BackupStyles.headerLeftIconInnerContainer }>
+            <FontAwesome name="long-arrow-left" color={ Colors.blue } size={ 17 } />
           </View>
         </TouchableOpacity>
       </View>
-      <View style={BackupStyles.modalHeaderTitleView}>
-        <View style={{ marginTop: hp('1%') }}>
-          <Text style={BackupStyles.modalHeaderTitleText}>Trusted Contact</Text>
-          <Text style={BackupStyles.modalHeaderInfoText}>Never backed up</Text>
+      <View style={ BackupStyles.modalHeaderTitleView }>
+        <View style={ { marginTop: hp( '1%' ) } }>
+          <Text style={ BackupStyles.modalHeaderTitleText }>Trusted Contact</Text>
+          <Text style={ BackupStyles.modalHeaderInfoText }>Never backed up</Text>
         </View>
         <Image
-          style={BackupStyles.cardIconImage}
-          source={getIconByStatus(selectedStatus)}
+          style={ BackupStyles.cardIconImage }
+          source={ getIconByStatus( selectedStatus ) }
         />
       </View>
-      <View style={{ flex: 1 }}>
+      <View style={ { flex: 1 } }>
         <Text
-          style={{
+          style={ {
             marginLeft: 30,
             color: Colors.textColorGrey,
             fontFamily: Fonts.FiraSansRegular,
-            fontSize: RFValue(12),
+            fontSize: RFValue( 12 ),
             marginTop: 5,
-          }}
+          } }
         >
-          Select contact to{' '}
+          Select two contacts to { ' ' }
           <Text
-            style={{
+            style={ {
               fontFamily: Fonts.FiraSansMediumItalic,
               fontWeight: 'bold',
-            }}
+            } }
           >
-            send recovery secret
+            send Recovery Secrets
           </Text>
         </Text>
         <ContactList
-          style={{}}
+          style={ {} }
           //selectedContact = {}
-          onPressContinue={continueNProceed}
-          onSelectContact={selectedContactsList}
+          onPressContinue={ continueNProceed }
+          onSelectContact={ selectedContactsList }
         />
       </View>
       {/* <BottomSheet
@@ -171,7 +171,7 @@ const TrustedContacts = props => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalHeaderContainer: {
     paddingTop: 20,
   },
@@ -184,6 +184,6 @@ const styles = StyleSheet.create({
     marginTop: 7,
     marginBottom: 7,
   },
-});
+} );
 
 export default TrustedContacts;
