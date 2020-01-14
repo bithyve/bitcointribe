@@ -1080,6 +1080,7 @@ export default function ManageBackup(props) {
             dispatch(requestSharePdf(type, itemSelected));
           }}
         />
+        */}
         <BottomSheet
           enabledInnerScrolling={true}
           ref={ChangeBottomSheet}
