@@ -62,30 +62,36 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
 
     useEffect(() => {
         setSearchBox('');
-        const contactList = contactData
-          .sort(function (a, b) {
+        const contactList = data
+        .sort(function (a, b) {
+          if(a.name && b.name){
             if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
             if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-            return 0;
-          })
-        setFilterContactData(contactList);
-      }, []);
-
-      const filterContacts = (keyword) => {
-        if (!keyword.length) {
-          setFilterContactData(contactData);
-          return;
-        }
-        let isFilter = true;
-        let filterContactsForDisplay = [];
-        for (let i = 0; i < contactData.length; i++) {
-          if (contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())) {
-            filterContactsForDisplay.push(contactData[i])
           }
+          return 0;
+        })
+        setFilterContactData(contactList);
+    }, []);
+
+    const filterContacts = (keyword) => {
+        if (contactData.length > 0) {
+            if (!keyword.length) {
+                setFilterContactData(contactData);
+                return;
+            }
+            let isFilter = true;
+            let filterContactsForDisplay = [];
+            for (let i = 0; i < contactData.length; i++) {
+                if (contactData[i].name && contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())) {
+                    filterContactsForDisplay.push(contactData[i])
+                }
+            }
+            setFilterContactData(filterContactsForDisplay);
+        } else {
+            return;
         }
-        setFilterContactData(filterContactsForDisplay);
-      }
-    
+    }
+
     const onContactSelect = (index) => {
         if (setSelectedContact.id && filterContactData.findIndex((value) => value.id == setSelectedContact.id) > -1) {
             setSelectedContact({});
@@ -137,22 +143,22 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
                 <Text style={styles.pageInfoText}>Lorem ipsum dolor sit amet, consectetur adipiscing</Text>
             </View>
             <View style={[styles.searchBoxContainer]}>
-          <View style={styles.searchBoxIcon}>
-            <EvilIcons style={{ alignSelf: 'center' }} name="search" size={20} color={Colors.textColorGrey} />
-          </View>
-          <TextInput
-            ref={element => setSearchBox(element)}
-            style={styles.searchBoxInput}
-            placeholder="Search"
-            placeholderTextColor={Colors.textColorGrey}
-            onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
-          />
-        </View>
+                <View style={styles.searchBoxIcon}>
+                    <EvilIcons style={{ alignSelf: 'center' }} name="search" size={20} color={Colors.textColorGrey} />
+                </View>
+                <TextInput
+                    ref={element => setSearchBox(element)}
+                    style={styles.searchBoxInput}
+                    placeholder="Search"
+                    placeholderTextColor={Colors.textColorGrey}
+                    onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
+                />
+            </View>
             <View style={{ flex: 1, flexDirection: 'row' }}>
                 <View style={{ flex: 11 }}>
                     <ScrollView showsVerticalScrollIndicator={false} >
                         {filterContactData.map((value, index) => {
-                            return <AppBottomSheetTouchableWrapper onPress={() => onContactSelect(index)}  style={styles.contactView} >
+                            return <AppBottomSheetTouchableWrapper onPress={() => onContactSelect(index)} style={styles.contactView} >
                                 <RadioButton size={15} color={Colors.lightBlue} borderColor={Colors.borderColor} isChecked={selectedContact.id && selectedContact.id == value.id ? true : false} onpress={() => onContactSelect(index)} />
                                 <Text style={styles.contactText}>
                                     {value.name.split(' ')[0]} <Text style={{ fontFamily: Fonts.FiraSansMedium }}>{value.name.split(' ')[1]}</Text>
@@ -175,10 +181,10 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
             </View>
         </View>
         {selectedContact.id &&
-        <View style={styles.bottomButtonView}>
-            <AppBottomSheetTouchableWrapper  onPress={() => props.onPressProceed()}>
-                <Text style={styles.buttonText}>Confirm & Proceed</Text>
-            </AppBottomSheetTouchableWrapper>
+            <View style={styles.bottomButtonView}>
+                <AppBottomSheetTouchableWrapper onPress={() => props.onPressProceed()}>
+                    <Text style={styles.buttonText}>Confirm & Proceed</Text>
+                </AppBottomSheetTouchableWrapper>
             </View>
         }
     </View>
@@ -247,7 +253,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: 20,
         marginTop: hp('1.5%'),
-        marginBottom:hp('1%')
+        marginBottom: hp('1%')
     },
     contactsNameText: {
         fontSize: RFValue(13),
@@ -310,18 +316,18 @@ const styles = StyleSheet.create({
         marginRight: 10,
         height: 40,
         justifyContent: 'center',
-    
-      },
-      searchBoxIcon: {
+
+    },
+    searchBoxIcon: {
         justifyContent: 'center',
         marginBottom: -10
-      },
-      searchBoxInput: {
+    },
+    searchBoxInput: {
         flex: 1,
         fontSize: 13,
         color: Colors.blacl,
         borderBottomColor: Colors.borderColor,
         alignSelf: 'center',
         marginBottom: -10
-      },
+    },
 })

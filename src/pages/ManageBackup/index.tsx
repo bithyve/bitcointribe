@@ -1069,7 +1069,7 @@ export default function ManageBackup(props) {
           renderContent={renderBuyHelperContents}
           renderHeader={renderBuyHelperHeader}
         />
-        <ModalShareIntent
+        {/* <ModalShareIntent
           data={arrModalShareIntent}
           onPressHandle={() => {
             setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 })
