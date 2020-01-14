@@ -986,17 +986,17 @@ export default function ManageBackup( props ) {
           renderContent={ renderBuyHelperContents }
           renderHeader={ renderBuyHelperHeader }
         />
-        {/* <ModalShareIntent
-          data={arrModalShareIntent}
-          onPressHandle={() => {
-            setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
-          }}
-          onPressShare={type => {
-            console.log({ type, itemSelected });
-            setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
-            dispatch(requestSharePdf(type, itemSelected));
-          }}
-        /> */}
+        <ModalShareIntent
+          data={ arrModalShareIntent }
+          onPressHandle={ () => {
+            setArrModalShareIntent( { ...arrModalShareIntent, snapTop: 0 } );
+          } }
+          onPressShare={ type => {
+            console.log( { type, itemSelected } );
+            setArrModalShareIntent( { ...arrModalShareIntent, snapTop: 0 } );
+            dispatch( requestSharePdf( type, itemSelected ) );
+          } }
+        />
       </View>
     </View>
   );
