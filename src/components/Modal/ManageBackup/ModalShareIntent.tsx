@@ -12,7 +12,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from "../../../../src/common/Colors";
 import Fonts from "../../../../src/common/Fonts";
 import Icons from "../../../../src/common/Icons";
-import Singleton from "hexaCommon/Singleton";
+import Singleton from "../../../common/Singleton";
 
 
 export default function ModalShareIntent( props ) {

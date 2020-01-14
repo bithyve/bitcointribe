@@ -60,10 +60,10 @@ const WalkthroughableText = walkthroughable( Text );
 const WalkthroughableImage = walkthroughable( Image );
 const WalkthroughableTouchableOpacity = walkthroughable( TouchableOpacity );
 const WalkthroughableView = walkthroughable( View );
+import { UsNumberFormat } from "../../common/utilities";
 
 function Accounts( props ) {
   const sliderWidth = Dimensions.get( 'window' ).width;
-
   const [ SendIsActive, setSendIsActive ] = useState( true );
   const [ ReceiveIsActive, setReceiveIsActive ] = useState( true );
   const [ BuyIsActive, setBuyIsActive ] = useState( true );
@@ -353,6 +353,7 @@ function Accounts( props ) {
                 fontFamily: Fonts.FiraSansRegular,
                 fontSize: RFValue( 15 ),
                 color: Colors.white,
+                alignSelf: "flex-start",
               } }
             >
               { item.accountType }
@@ -362,6 +363,8 @@ function Accounts( props ) {
                 fontFamily: Fonts.FiraSansRegular,
                 fontSize: RFValue( 12 ),
                 color: Colors.white,
+                alignSelf: "flex-start",
+                marginTop: 5
               } }
             >
               { item.accountInfo }
@@ -435,10 +438,8 @@ function Accounts( props ) {
               style={ styles.cardBitCoinImage }
               source={ require( '../../assets/images/icons/icon_bitcoin_light.png' ) }
             />
-            <Text style={styles.cardAmountText}>{netBalance}</Text>
-            <Text style={styles.cardAmountUnitText}>
-              {item.accountType == 'Test Account' ? 'tsats' : 'sat'}
-            </Text>
+            <Text style={ styles.cardAmountText }>{ UsNumberFormat( netBalance ) }</Text>
+            <Text style={ styles.cardAmountUnitText }>{ item.accountType == 'Test Account' ? "tsats" : "sat" }</Text>
           </View>
         </View>
       </ImageBackground>
@@ -745,12 +746,14 @@ function Accounts( props ) {
   const renderTestAccountsHelperContents = () => {
     return (
       <TestAccountHelperModalContents
-        topButtonText={ 'Test Account' }
+        topButtonText={ `Test Account` }
         boldPara={
-          'If you are new to Bitcoin, this account is\ndesigned for you. It comes pre-loaded\nwith some test bitcoins (not real)'
+          `If you are new to Bitcoin, this account is designed for you. 
+          It comes pre-loaded with some test bitcoins`
         }
         helperInfo={
-          '\n\nYou can even send and receive test bitcoins\nfrom other Hexa wallet test accounts\n\n\n\nThese are not actual bitcoins and are of no\nintrinsic value. The testnet sats do not add up\nin your wallet balance\n\n\n'
+          `\nYou can even send and receive test bitcoins from other Hexa wallet test accounts
+           \nThe testnet sats do not add up in your wallet balance\n\n\n`
         }
         continueButtonText={ 'Continue' }
         quitButtonText={ 'Quit' }
@@ -843,11 +846,11 @@ function Accounts( props ) {
         } }
         refreshControl={
           <RefreshControl
-            refreshing={loading.transactions || loading.balances}
-            onRefresh={() => {
-              dispatch(fetchBalance(serviceType));
-              dispatch(fetchTransactions(serviceType));
-            }}
+            refreshing={ loading.transactions || loading.balances }
+            onRefresh={ () => {
+              dispatch( fetchBalance( serviceType ) );
+              dispatch( fetchTransactions( serviceType ) );
+            } }
 
           />
         }
@@ -1026,7 +1029,7 @@ function Accounts( props ) {
                               : Colors.red,
                         } }
                       >
-                        { item.amount }
+                        { UsNumberFormat( item.amount ) }
                       </Text>
                       <Text style={ styles.transactionModalAmountUnitText }>
                         { item.confirmations < 6 ? item.confirmations : '6+' }
