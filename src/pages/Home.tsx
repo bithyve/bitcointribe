@@ -280,6 +280,14 @@ export default function Home( props ) {
       bitcoinicon: require( '../assets/images/icons/icon_bitcoin_gray.png' ),
     },
   ] );
+
+  useEffect( () => {
+    setData(
+      [ ...data,
+      data[ 0 ].account = `${ walletName } Test Account`
+      ] );
+  }, [ walletName ] );
+
   const [ transactionData, setTransactionData ] = useState( [
     {
       title: 'Spending accounts',
