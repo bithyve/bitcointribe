@@ -90,17 +90,16 @@ export default function ContactList(props) {
       if (!data.length) Alert.alert("No contacts found!");
       console.log(data.length);
       setContactData(data);
-
-      const contactList = data
-      .sort(function (a, b) {
-        if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-        return 0;
-      })
+        const contactList = data
+        .sort(function (a, b) {
+          if(a.name && b.name){
+            if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+            if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+          }
+          return 0;
+        })
       setFilterContactData(contactList);
     });
-
-    
   };
 
   useEffect(() => {
@@ -109,18 +108,24 @@ export default function ContactList(props) {
   }, []);
 
   const filterContacts = (keyword) => {
-    if (!keyword.length) {
-      setFilterContactData(contactData);
+    console.log("contactData.length", contactData);
+    if (contactData.length > 0) {
+      if (!keyword.length) {
+        setFilterContactData(contactData);
+        return;
+      }
+      let isFilter = true;
+      let filterContactsForDisplay = [];
+      for (let i = 0; i < contactData.length; i++) {
+       if (contactData[i].name && contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())) {
+            filterContactsForDisplay.push(contactData[i])
+          }
+        
+      }
+      setFilterContactData(filterContactsForDisplay);
+    } else {
       return;
     }
-    let isFilter = true;
-    let filterContactsForDisplay = [];
-    for (let i = 0; i < contactData.length; i++) {
-      if (contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())) {
-        filterContactsForDisplay.push(contactData[i])
-      }
-    }
-    setFilterContactData(filterContactsForDisplay);
   }
 
 
@@ -168,25 +173,35 @@ export default function ContactList(props) {
     props.onSelectContact(selectedContacts);
   }
 
+  const addContact = async() => {
+    const contact = null;
+    const contactId = await ExpoContacts.addContactAsync(contact,null);
+    console.log("contactId",contactId)
+  }
+ 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-    <View style={{ flex: 1, ...props.style }}>
-      <View style={styles.selectedContactContainer}>
-        {selectedContacts.map(value => (
-          <View style={styles.selectedContactView}>
-            <Text style={styles.selectedContactNameText}>
-              {value.name.split(" ")[0]}{" "}
-              <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                {value.name.split(" ")[1]}
+      <View style={{ flex: 1, ...props.style }}>
+        <View style={styles.selectedContactContainer}>
+          {selectedContacts.map(value => (
+            <View style={styles.selectedContactView}>
+              <Text style={styles.selectedContactNameText}>
+                {value.name.split(" ")[0]}{" "}
+                <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                  {value.name.split(" ")[1]}
+                </Text>
               </Text>
-            </Text>
-            <TouchableOpacity onPress={() => onCancel(value)}>
-              <AntDesign name="close" size={17} color={Colors.white} />
-            </TouchableOpacity>
-          </View>
-        ))}
-      </View>
-      <View style={[styles.searchBoxContainer]}>
+              <TouchableOpacity onPress={() => onCancel(value)}>
+                <AntDesign name="close" size={17} color={Colors.white} />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+        <TouchableOpacity style={{marginLeft: 'auto', marginRight: 10,}} onPress={() => addContact()}>
+          <Text style={{fontSize: RFValue(13, 812),
+    fontFamily: Fonts.FiraSansRegular}}>Add contact</Text>
+        </TouchableOpacity>
+        <View style={[styles.searchBoxContainer]}>
           <View style={styles.searchBoxIcon}>
             <EvilIcons style={{ alignSelf: 'center' }} name="search" size={20} color={Colors.textColorGrey} />
           </View>
@@ -198,71 +213,71 @@ export default function ContactList(props) {
             onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
           />
         </View>
-      <View style={{ flex: 1, flexDirection: "row" }}>
-        <View style={{ flex: 11 }}>
-          {filterContactData ? <FlatList
-            data={filterContactData}
-            extraData={props.onSelectContact}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) => {
-              let selected = false;
-              if (
-                selectedContacts.findIndex(temp => temp.id == item.id) > -1
-              ) {
-                selected = true;
-              }
-              return (
-                <TouchableOpacity
-                  onPress={() => onContactSelect(index)}
-                  style={styles.contactView}
-                  key={index}
-                >
-                  <RadioButton
-                    size={15}
-                    color={Colors.lightBlue}
-                    borderColor={Colors.borderColor}
-                    isChecked={selected}
-                    onpress={() => onContactSelect(index)}
-                  />
-                  <Text style={styles.contactText}>
-                    {item.name.split(" ")[0]}{" "}
-                    <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                      {item.name.split(" ")[1]}
+        <View style={{ flex: 1, flexDirection: "row" }}>
+          <View style={{ flex: 11 }}>
+            {filterContactData ? <FlatList
+              data={filterContactData}
+              extraData={props.onSelectContact}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item, index }) => {
+                let selected = false;
+                if (
+                  selectedContacts.findIndex(temp => temp.id == item.id) > -1
+                ) {
+                  selected = true;
+                }
+                return (
+                  <TouchableOpacity
+                    onPress={() => onContactSelect(index)}
+                    style={styles.contactView}
+                    key={index}
+                  >
+                    <RadioButton
+                      size={15}
+                      color={Colors.lightBlue}
+                      borderColor={Colors.borderColor}
+                      isChecked={selected}
+                      onpress={() => onContactSelect(index)}
+                    />
+                    <Text style={styles.contactText}>
+                      {item.name.split(" ")[0]}{" "}
+                      <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                        {item.name.split(" ")[1]}
+                      </Text>
                     </Text>
-                  </Text>
-                </TouchableOpacity>
-              )
-            }
-            }
-          /> : null}
-        </View>
-        <View style={styles.contactIndexView}>
-          <TouchableOpacity
-            onPress={() => {
-            }}
-          >
-            <Text style={styles.contactIndexText}>#</Text>
-          </TouchableOpacity>
-          {alphabetsList.map(value => (
+                  </TouchableOpacity>
+                )
+              }
+              }
+            /> : null}
+          </View>
+          <View style={styles.contactIndexView}>
             <TouchableOpacity
               onPress={() => {
-
               }}
             >
-              <Text style={styles.contactIndexText}>{value}</Text>
+              <Text style={styles.contactIndexText}>#</Text>
             </TouchableOpacity>
-          ))}
+            {alphabetsList.map(value => (
+              <TouchableOpacity
+                onPress={() => {
+
+                }}
+              >
+                <Text style={styles.contactIndexText}>{value}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
+        {selectedContacts.length >= 1 && (
+          <TouchableOpacity
+            onPress={() => props.onPressContinue()}
+            style={styles.bottomButtonView}
+          >
+            <Text style={styles.buttonText}>Confirm & Proceed</Text>
+          </TouchableOpacity>
+        )}
       </View>
-      {selectedContacts.length >= 1 && (
-        <TouchableOpacity
-          onPress={() => props.onPressContinue()}
-          style={styles.bottomButtonView}
-        >
-          <Text style={styles.buttonText}>Confirm & Proceed</Text>
-        </TouchableOpacity>
-      )}
-    </View>
     </SafeAreaView>
   );
 }

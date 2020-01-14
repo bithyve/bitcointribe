@@ -70,28 +70,34 @@ export default function AddressBookContents(props) {
 
   useEffect(() => {
     setSearchBox('');
-    const contactList = contactData
-      .sort(function (a, b) {
-        if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-        return 0;
-      })
+      const contactList = contactData
+        .sort(function (a, b) {
+          if(a.name && b.name){
+            if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+            if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+          }
+          return 0;
+        })
     setFilterContactData(contactList);
   }, []);
 
   const filterContacts = (keyword) => {
-    if (!keyword.length) {
-      setFilterContactData(contactData);
+    if (contactData.length > 0) {
+      if (!keyword.length) {
+        setFilterContactData(contactData);
+        return;
+      }
+      let isFilter = true;
+      let filterContactsForDisplay = [];
+      for (let i = 0; i < contactData.length; i++) {
+        if (contactData[i].name && contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())) {
+          filterContactsForDisplay.push(contactData[i])
+        }
+      }
+      setFilterContactData(filterContactsForDisplay);
+    } else {
       return;
     }
-    let isFilter = true;
-    let filterContactsForDisplay = [];
-    for (let i = 0; i < contactData.length; i++) {
-      if (contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())) {
-        filterContactsForDisplay.push(contactData[i])
-      }
-    }
-    setFilterContactData(filterContactsForDisplay);
   }
 
 

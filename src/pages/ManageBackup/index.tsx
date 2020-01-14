@@ -985,7 +985,7 @@ export default function ManageBackup(props) {
           renderContent={renderBuyHelperContents}
           renderHeader={renderBuyHelperHeader}
         />
-        <ModalShareIntent
+        {/* <ModalShareIntent
           data={arrModalShareIntent}
           onPressHandle={() => {
             setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
@@ -995,7 +995,7 @@ export default function ManageBackup(props) {
             setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
             dispatch(requestSharePdf(type, itemSelected));
           }}
-        />
+        /> */}
       </View>
     </View>
   );
