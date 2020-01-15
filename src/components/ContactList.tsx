@@ -23,6 +23,7 @@ import RadioButton from "../components/RadioButton";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import * as ExpoContacts from "expo-contacts";
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
+import Contacts from 'react-native-contacts';
 
 async function requestContactsPermission() {
   try {
@@ -86,6 +87,7 @@ export default function ContactList(props) {
         return;
       }
     }
+   
     ExpoContacts.getContactsAsync().then(({ data }) => {
       if (!data.length) Alert.alert("No contacts found!");
       setContactData(data);
@@ -99,7 +101,7 @@ export default function ContactList(props) {
         })
       setFilterContactData(contactList);
     });
-  };
+  }
 
   useEffect(() => {
     getContactsAsync();
@@ -173,9 +175,17 @@ export default function ContactList(props) {
   }
 
   const addContact = async() => {
-    const contact = null;
-    const contactId = await ExpoContacts.addContactAsync(contact,null);
-    console.log("contactId",contactId)
+    var newPerson = {
+      displayName: ""
+    }
+    Contacts.openContactForm(newPerson, (err, contact) => {
+      if (err) throw err;
+      console.log("contact",contact);
+      if(contact){
+        getContactsAsync();
+        setSearchBox('');
+      }
+    })
   }
  
   return (

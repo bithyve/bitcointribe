@@ -59,4 +59,6 @@ target 'HEXA' do
 
   pod 'react-native-mail', :path => '../node_modules/react-native-mail'
 
+  pod 'react-native-contacts', :path => '../node_modules/react-native-contacts'
+
 end

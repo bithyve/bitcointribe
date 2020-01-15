@@ -8,7 +8,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
-  SafeAreaView,
+  AsyncStorage,
   StatusBar,
 } from 'react-native';
 import Colors from '../../common/Colors';
@@ -27,6 +27,8 @@ import { useDispatch } from 'react-redux';
 import { uploadEncMShare } from '../../store/actions/sss';
 import ShareOtpWithTrustedContactContents from '../../components/ShareOtpWithTrustedContactContents';
 import { nameToInitials } from '../../common/CommonFunctions';
+import Contacts from 'react-native-contacts';
+import * as ExpoContacts from 'expo-contacts';
 
 export default function CommunicationMode(props) {
   // const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
@@ -45,7 +47,7 @@ export default function CommunicationMode(props) {
   const communicationInfo = [];
   if (contact.phoneNumbers) communicationInfo.push(...contact.phoneNumbers);
   if (contact.emails) communicationInfo.push(...contact.emails);
-
+  const [Contact, setContact] = useState(contact);
   const [selectedContactMode, setSelectedContactMode] = useState();
   const [contactInfo, setContactInfo] = useState(
     communicationInfo.map(({ number, email }, index) => {
@@ -60,16 +62,32 @@ export default function CommunicationMode(props) {
     }),
   );
 
+  useEffect(() => {
+    (async () => {
+      let contactListArray = [];
+      const contactList = JSON.parse(
+        await AsyncStorage.getItem('SelectedContacts'),
+      );
+      if (contactList) {
+        contactListArray = contactList;
+        for (let i = 0; i < contactListArray.length; i++) {
+          if (contact.id == contactListArray[i].id) {
+            setContact(contactListArray[i]);
+          }
+        }
+      }
+    })();
+  }, []);
+
   const getIconByStatus = status => {
-    if (status == "error") {
-      return require("../../assets/images/icons/icon_error_red.png");
-    } else if (status == "warning") {
-      return require("../../assets/images/icons/icon_error_yellow.png");
-    } else if (status == "success") {
-      return require("../../assets/images/icons/icon_check.png");
+    if (status == 'error') {
+      return require('../../assets/images/icons/icon_error_red.png');
+    } else if (status == 'warning') {
+      return require('../../assets/images/icons/icon_error_yellow.png');
+    } else if (status == 'success') {
+      return require('../../assets/images/icons/icon_check.png');
     }
   };
-  
 
   const onContactSelect = index => {
     setContactInfo([
@@ -136,8 +154,12 @@ export default function CommunicationMode(props) {
         }
         break;
     }
-    console.log('contactsdfsfsdfsd', contact)
-    props.onPressContinue(SHARES_TRANSFER_DETAILS[index].OTP?SHARES_TRANSFER_DETAILS[index].OTP:null)
+    console.log('contactsdfsfsdfsd', contact);
+    props.onPressContinue(
+      SHARES_TRANSFER_DETAILS[index].OTP
+        ? SHARES_TRANSFER_DETAILS[index].OTP
+        : null,
+    );
     // props.navigation.navigate('ShareOtpWithTrustedContactContents', {
     //   OTP:'123456'
     //   // OTP: SHARES_TRANSFER_DETAILS[index].OTP,
@@ -159,35 +181,148 @@ export default function CommunicationMode(props) {
     }
   }, [SHARES_TRANSFER_DETAILS[index]]);
 
+  const editContact = () => {
+    let contactId = contact.id;
+    // ExpoContacts.presentFormAsync(contactId).then(() => {
+    //       console.log("DATA");
+    // })
+    var newPerson = {
+      recordID: contact.id ? contact.id : '',
+      emailAddresses: contact.emails ? contact.emails : [],
+      familyName: contact.lastName ? contact.lastName : '',
+      givenName: contact.firstName ? contact.firstName : '',
+      middleName: contact.middleName ? contact.middleName : '',
+      phoneNumbers: contact.phoneNumbers ? contact.phoneNumbers : [],
+    };
+
+    Contacts.openExistingContact(newPerson, async (err, contact) => {
+      if (err) throw err;
+      console.log('contact editContact', contact);
+      if (contact) {
+        let contactListArray = [];
+        const contactList = JSON.parse(
+          await AsyncStorage.getItem('SelectedContacts'),
+        );
+        if (contactList) {
+          contactListArray = contactList;
+          for (let i = 0; i < contactListArray.length; i++) {
+            if (contact.recordID == contactListArray[i].id) {
+              (contactListArray[i].id = contact.recordID
+                ? contact.recordID
+                : ''),
+                (contactListArray[i].emails = contact.emailAddresses
+                  ? contact.emailAddresses
+                  : ''),
+                (contactListArray[i].lastName = contact.familyName
+                  ? contact.familyName
+                  : ''),
+                (contactListArray[i].firstName = contact.givenName
+                  ? contact.givenName
+                  : ''),
+                (contactListArray[i].middleName = contact.middleName
+                  ? contact.middleName
+                  : ''),
+                (contactListArray[i].phoneNumbers = contact.phoneNumbers
+                  ? contact.phoneNumbers
+                  : ''),
+                (contactListArray[i].imageAvailable = contact.hasThumbnail
+                  ? contact.hasThumbnail
+                  : ''),
+                (contactListArray[i].image = contact.thumbnailPath
+                  ? contact.thumbnailPath
+                  : ''),
+                (contactListArray[i].name = contact.givenName
+                  ? contact.givenName
+                  : '' + contact.familyName
+                  ? contact.familyName
+                  : ''),
+                setContact(contactListArray[i]);
+              //await AsyncStorage.setItem('SelectedContacts', JSON.stringify(contactListArray[i]));
+            }
+          }
+        }
+      }
+    });
+  };
+
+  useEffect(() => {
+    (async () => {
+      if (contact) {
+        let contactListArray = [];
+        contactListArray = contact;
+        for (let i = 0; i < contactListArray.length; i++) {
+          if (contact.recordID == contactListArray[i].id) {
+            await AsyncStorage.setItem(
+              'SelectedContacts',
+              JSON.stringify(contactListArray[i]),
+            );
+          }
+        }
+      }
+    })();
+  }, [Contact]);
+
   return (
-    <View style={{
-      height: "100%",
-      backgroundColor: Colors.white,
-      borderTopLeftRadius: 10,
-      borderTopRightRadius: 10,
-      borderLeftWidth: 1,
-      borderRightWidth: 1,
-      borderTopWidth: 1,
-      borderColor: Colors.borderColor,
-      alignSelf: "center",
-      width: "100%"
-    }}>
-       <View style={{ ...BackupStyles.modalHeaderTitleView, marginLeft: 10, marginRight: 10, marginTop: 20, }}>
+    <View
+      style={{
+        height: '100%',
+        backgroundColor: Colors.white,
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderTopWidth: 1,
+        borderColor: Colors.borderColor,
+        alignSelf: 'center',
+        width: '100%',
+      }}
+    >
+      <View
+        style={{
+          ...BackupStyles.modalHeaderTitleView,
+          marginLeft: 10,
+          marginRight: 10,
+          marginTop: 20,
+        }}
+      >
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity onPress={() => { props.onPressBack(); }} style={{ height: 30, width: 30, }} >
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.blue}
-              size={17}
-            />
+          <TouchableOpacity
+            onPress={() => {
+              props.onPressBack();
+            }}
+            style={{ height: 30, width: 30 }}
+          >
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
-          <View style={{ alignSelf: "center", flex: 1, justifyContent: "center" }}>
-            <Text style={BackupStyles.modalHeaderTitleText}>Select Mode of Communication{'\n'}for Contact</Text>
-            <Text style={BackupStyles.modalHeaderInfoText}>You can choose a primary number or email</Text>
+          <View
+            style={{ alignSelf: 'center', flex: 1, justifyContent: 'center' }}
+          >
+            <Text style={BackupStyles.modalHeaderTitleText}>
+              Select Mode of Communication{'\n'}for Contact
+            </Text>
+            <Text style={BackupStyles.modalHeaderInfoText}>
+              You can choose a primary number or email
+            </Text>
           </View>
         </View>
-        <Image style={BackupStyles.cardIconImage} source={getIconByStatus('error')} />
+        <Image
+          style={BackupStyles.cardIconImage}
+          source={getIconByStatus('error')}
+        />
       </View>
+      <TouchableOpacity
+        style={{ marginLeft: 'auto', marginRight: 10 }}
+        onPress={() => editContact()}
+      >
+        <Text
+          style={{
+            fontSize: RFValue(13, 812),
+            fontFamily: Fonts.FiraSansRegular,
+          }}
+        >
+          Edit contact
+        </Text>
+      </TouchableOpacity>
       <View style={{ height: '100%' }}>
         <View style={styles.contactProfileView}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -203,7 +338,7 @@ export default function CommunicationMode(props) {
                 borderRadius: 10,
               }}
             >
-              <Text style={styles.contactNameText}>{contact.name}</Text>
+              <Text style={styles.contactNameText}>{Contact.name}</Text>
             </View>
             <View
               style={{
@@ -215,23 +350,34 @@ export default function CommunicationMode(props) {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
-            > 
-            {contact.imageAvailable ? (<Image
-                  source={contact.image}
+            >
+              {Contact.imageAvailable ? (
+                <Image
+                  source={Contact.image}
                   style={{ ...styles.contactProfileImage }}
-                />) : (<View style={{
+                />
+              ) : (
+                <View
+                  style={{
                     alignItems: 'center',
                     justifyContent: 'center',
                     backgroundColor: Colors.shadowBlue,
                     width: 70,
                     height: 70,
                     borderRadius: 70 / 2,
-                  }}><Text style={{
-                    textAlign: 'center',
-                    fontSize: 13,
-                    lineHeight: 13, //... One for top and one for bottom alignment
-                  }}>{nameToInitials(contact.name)}</Text></View>)
-                }
+                  }}
+                >
+                  <Text
+                    style={{
+                      textAlign: 'center',
+                      fontSize: 13,
+                      lineHeight: 13, //... One for top and one for bottom alignment
+                    }}
+                  >
+                    {nameToInitials(Contact.name)}
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
         </View>

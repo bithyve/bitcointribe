@@ -316,11 +316,17 @@ export default function ManageBackup(props) {
   }
 
   const getContacts = async (selectedContacts, index) => {
+    
+    let contactList = await AsyncStorage.getItem('SelectedContacts')
+    .then(req => JSON.parse(req))
+    .then(json => console.log(json))
+    .catch(error => console.log('error!'));
+    // JSON.parse(
+    //   await AsyncStorage.getItem('SelectedContacts'),
+    // );
     let contactListArray = [];
-    let contactList = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
     if (contactList) {
+      console.log("CONTACTLIST", contactList);
       contactListArray = contactList;
       if (selectedContacts.length == 2) {
         contactListArray[0] = selectedContacts[0];
@@ -332,10 +338,12 @@ export default function ManageBackup(props) {
       else if (selectedContacts.length == 1 && index == 1) {
         contactListArray[1] = selectedContacts[0];
       }
+      console.log("CONTACTLIST ARAAY if", contactListArray);
     } else {
       for (let i = 0; i < selectedContacts.length; i++) {
         contactListArray.push(selectedContacts[i]);
       }
+      console.log("CONTACTLIST ARAAY else", contactListArray);
     }
     setContact(contactListArray);
     await AsyncStorage.setItem('SelectedContacts', JSON.stringify(contactListArray));
