@@ -213,7 +213,7 @@ export default function ManageBackup( props ) {
   //       setSelectedType("contact");
   //       setSelectedStatus("warning");
   //     }
-  //   }       
+  //   }
 
   const getIconByStatus = status => {
     if ( status == 'error' ) {
@@ -390,7 +390,7 @@ export default function ManageBackup( props ) {
   //       />
   //     </View>
   //   );
-  // };   
+  // };
 
   // function renderSecondaryDeviceHeader() {
   //   return (
@@ -914,6 +914,7 @@ export default function ManageBackup( props ) {
                         source={ getImageByType( item ) }
                       />
                     ) }
+
                   <View style={ { marginLeft: 15 } }>
                     <Text style={ styles.cardTitleText }>
                       { item.personalInfo && item.type == 'contact'
