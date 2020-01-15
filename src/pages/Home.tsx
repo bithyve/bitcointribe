@@ -1612,10 +1612,17 @@ export default function Home(props) {
                 style={styles.headerTitleText}
               >{`${walletName}’s Wallet`}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                <Image
-                  style={CommonStyles.homepageAmountImage}
-                  source={require('../assets/images/icons/icon_bitcoin_light.png')}
-                />
+                {switchOn ? (
+                  <Image
+                    style={CommonStyles.homepageAmountImage}
+                    source={require('../assets/images/icons/icon_bitcoin_light.png')}
+                  />
+                ) : (
+                  <Image
+                    style={styles.cardBitCoinImage}
+                    source={require('../assets/images/icons/icon_dollar_white.png')}
+                  />
+                )}
                 <Text
                   style={{
                     ...CommonStyles.homepageAmountText,
@@ -1745,10 +1752,17 @@ export default function Home(props) {
                                 marginTop: hp('1%'),
                               }}
                             >
-                              <Image
-                                style={styles.cardBitCoinImage}
-                                source={value.bitcoinicon}
-                              />
+                              {value.accountType === 'test' || switchOn ? (
+                                <Image
+                                  style={styles.cardBitCoinImage}
+                                  source={value.bitcoinicon}
+                                />
+                              ) : (
+                                <Image
+                                  style={styles.cardBitCoinImage}
+                                  source={require('../assets/images/icons/icon_dollar_dark.png')}
+                                />
+                              )}
                               <Text style={styles.cardAmountText}>
                                 {switchOn
                                   ? value.accountType === 'test'

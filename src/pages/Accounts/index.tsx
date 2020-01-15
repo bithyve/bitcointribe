@@ -450,7 +450,12 @@ function Accounts(props) {
                 style={styles.cardBitCoinImage}
                 source={require('../../assets/images/icons/icon_bitcoin_light.png')}
               />
-            ) : null}
+            ) : (
+              <Image
+                style={styles.cardBitCoinImage}
+                source={require('../../assets/images/icons/icon_dollar_white.png')}
+              />
+            )}
             <Text style={styles.cardAmountText}>
               {item.accountType == 'Test Account'
                 ? UsNumberFormat(netBalance)
