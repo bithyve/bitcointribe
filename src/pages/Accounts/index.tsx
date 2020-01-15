@@ -269,24 +269,24 @@ function Accounts(props) {
         carousel.current.snapToItem(1, true, false);
       }, 200);
     }
-    if (serviceType == SECURE_ACCOUNT) {
-      let isSecureAccountScanOpen = await AsyncStorage.getItem(
-        'isSecureAccountScanOpen',
-      );
-      if (
-        !isSecureAccountScanOpen &&
-        props.navigation.getParam('serviceType') == SECURE_ACCOUNT
-      ) {
-        AsyncStorage.setItem('isSecureAccountScanOpen', 'true');
-        props.navigation.navigate('SecureScan', {
-          serviceType,
-          getServiceType: getServiceType,
-        });
-      }
-      setTimeout(() => {
-        carousel.current.snapToItem(2, true, false);
-      }, 200);
-    }
+    // if (serviceType == SECURE_ACCOUNT) {
+    //   let isSecureAccountScanOpen = await AsyncStorage.getItem(
+    //     'isSecureAccountScanOpen',
+    //   );
+    //   if (
+    //     !isSecureAccountScanOpen &&
+    //     props.navigation.getParam('serviceType') == SECURE_ACCOUNT
+    //   ) {
+    //     AsyncStorage.setItem('isSecureAccountScanOpen', 'true');
+    //     props.navigation.navigate('SecureScan', {
+    //       serviceType,
+    //       getServiceType: getServiceType,
+    //     });
+    //   }
+    //   setTimeout(() => {
+    //     carousel.current.snapToItem(2, true, false);
+    //   }, 200);
+    // }
   };
 
   const handleStepChange = step => {
@@ -444,15 +444,25 @@ function Accounts(props) {
             </TouchableOpacity>
           )}
           <View style={{ flexDirection: 'row' }}>
-            <Image
-              style={styles.cardBitCoinImage}
-              source={require('../../assets/images/icons/icon_bitcoin_light.png')}
-            />
+            {switchOn ? (
+              <Image
+                style={styles.cardBitCoinImage}
+                source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+              />
+            ) : null}
             <Text style={styles.cardAmountText}>
-              {UsNumberFormat(netBalance)}
+              {switchOn
+                ? UsNumberFormat(netBalance)
+                : exchangeRates
+                ? ((netBalance / 1e8) * exchangeRates['USD'].last).toFixed(2)
+                : null}
             </Text>
             <Text style={styles.cardAmountUnitText}>
-              {item.accountType == 'Test Account' ? 'tsats' : 'sats'}
+              {switchOn
+                ? item.accountType == 'Test Account'
+                  ? 'tsats'
+                  : 'sats'
+                : 'USD'}
             </Text>
           </View>
         </View>
@@ -568,6 +578,12 @@ function Accounts(props) {
                           : Colors.red,
                     }}
                   >
+                    {/* {switchOn
+                      ? item.amount
+                      : (
+                          (item.amount / 1e8) *
+                          exchangeRates['USD'].last
+                        ).toFixed(2)} */}
                     {item.amount}
                   </Text>
                   <Text style={styles.transactionModalAmountUnitText}>
@@ -724,6 +740,32 @@ function Accounts(props) {
     setCarouselData1();
   }, [serviceType]);
 
+  const [averageTxFee, setAverageTxFee] = useState(0);
+  useEffect(() => {
+    (async () => {
+      const storedAverageTxFee = await AsyncStorage.getItem(
+        'storedAverageTxFee',
+      );
+      if (storedAverageTxFee) {
+        const { averageTxFee, lastFetched } = JSON.parse(storedAverageTxFee);
+        if (Date.now() - lastFetched < 1800000) {
+          console.log('Using stored');
+          setAverageTxFee(averageTxFee);
+          return;
+        } // maintaining a half an hour difference b/w fetches
+      }
+
+      const txPriority = 'high';
+      const instance = service.hdWallet || service.secureHDWallet;
+      const { averageTxFee } = await instance.averageTransactionFee(txPriority);
+      setAverageTxFee(averageTxFee);
+      await AsyncStorage.setItem(
+        'storedAverageTxFee',
+        JSON.stringify({ averageTxFee, lastFetched: Date.now() }),
+      );
+    })();
+  }, []);
+
   useEffect(() => {
     if (serviceType === SECURE_ACCOUNT) {
       AsyncStorage.getItem('isSecureAccountHelperDone').then(done => {
@@ -745,6 +787,10 @@ function Accounts(props) {
         setExchangeRates(exchangeRates);
       }
     })();
+  }, []);
+
+  useEffect(() => {
+    async () => {};
   }, []);
 
   // useEffect( () => {
@@ -1167,7 +1213,8 @@ function Accounts(props) {
                 <View style={{ marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Send</Text>
                   <Text style={styles.bottomCardInfoText}>
-                    Tran Fee : 0.032 (tsats)
+                    Tran Fee : {averageTxFee} (
+                    {serviceType === TEST_ACCOUNT ? 'tsats' : 'sats'})
                   </Text>
                 </View>
               </WalkthroughableTouchableOpacity>
@@ -1194,7 +1241,8 @@ function Accounts(props) {
                 <View style={{ marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Receive</Text>
                   <Text style={styles.bottomCardInfoText}>
-                    Tran Fee : 0.032 (tsats)
+                    Tran Fee : {averageTxFee} (
+                    {serviceType === TEST_ACCOUNT ? 'tsats' : 'sats'})
                   </Text>
                 </View>
               </WalkthroughableTouchableOpacity>

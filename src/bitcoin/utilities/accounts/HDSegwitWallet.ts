@@ -241,21 +241,26 @@ export default class HDSegwitWallet extends Bitcoin {
         balance += utxo.value;
       });
 
-      const txnFee = await this.feeRatesPerByte(txnPriority);
-      console.log({ txnFee });
+      const { averageTxFee, feePerByte } = await this.averageTransactionFee(
+        txnPriority,
+      );
+      console.log({ averageTxFee, feePerByte });
+
       const { inputs, outputs, fee } = coinselect(
         inputUTXOs,
         outputUTXOs,
-        txnFee,
+        feePerByte,
       );
+
       console.log('-------Transaction--------');
-      console.log('\tFee', fee);
+      console.log('\tDynamic Fee', fee);
       console.log('\tInputs:', inputs);
       console.log('\tOutputs:', outputs);
+      console.log('Fee diff (static vs dynamic): ', averageTxFee - fee);
 
       if (!inputs) {
         // insufficient input utxos to compensate for output utxos + fee
-        return { fee, balance };
+        return { fee: averageTxFee, balance };
       }
 
       const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
@@ -263,6 +268,12 @@ export default class HDSegwitWallet extends Bitcoin {
       );
 
       inputs.forEach(input => txb.addInput(input.txId, input.vout, nSequence));
+
+      outputs.forEach(output => {
+        if (!output.address) {
+          output.value = output.value + fee - averageTxFee; // applying static fee (averageTxFee)
+        }
+      });
       const sortedOuts = await this.sortOutputs(outputs);
       sortedOuts.forEach(output => {
         console.log('Adding Output:', output);
@@ -272,7 +283,7 @@ export default class HDSegwitWallet extends Bitcoin {
       return {
         inputs,
         txb,
-        fee,
+        fee: averageTxFee,
         balance,
       };
     } catch (err) {

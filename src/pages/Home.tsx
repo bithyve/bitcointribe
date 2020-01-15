@@ -257,7 +257,7 @@ export default function Home(props) {
       title: 'Test Account',
       unit: 'tsats',
       amount: '400,000',
-      account: `${walletName} Test Account`,
+      account: `${walletName}'s Test Account`,
       accountType: 'test',
       bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
     },
@@ -280,10 +280,6 @@ export default function Home(props) {
       bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
     },
   ]);
-
-  useEffect(() => {
-    setData([...data, (data[0].account = `${walletName} Test Account`)]);
-  }, [walletName]);
 
   const [transactionData, setTransactionData] = useState([
     {
