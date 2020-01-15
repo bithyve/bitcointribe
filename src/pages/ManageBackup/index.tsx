@@ -34,7 +34,6 @@ import ContactList from '../../components/ContactList';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import Icons from "../../common/Icons";
-import TransparentHeaderModal from "../../components/TransparentHeaderModal";
 import ErrorModalContents from '../../components/ErrorModalContents';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
@@ -51,6 +50,8 @@ import TrustedContactModalContents from '../../components/ManageBackup/TrustedCo
 import ShareOtpWithTrustedContactContents from '../../components/ShareOtpWithTrustedContactContents';
 import TrustedContacts from './TrustedContacts';
 import CommunicationMode from './CommunicationMode';
+import ModalHeader from '../../components/ModalHeader';
+import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 
 let itemSelected = {};
 
@@ -160,6 +161,7 @@ export default function ManageBackup(props) {
       status: 'error',
       type: 'contact',
       route: 'TrustedContacts',
+      isOTPShared: false
     },
     {
       title: 'Trusted Contact 2',
@@ -168,6 +170,7 @@ export default function ManageBackup(props) {
       status: 'error',
       type: 'contact',
       route: 'TrustedContacts',
+      isOTPShared: false
     },
     {
       title: 'Personal Copy 1',
@@ -194,12 +197,21 @@ export default function ManageBackup(props) {
       route: 'HealthCheckSecurityAnswer',
     },
   ] );
+  const dispatch = useDispatch();
+  const s3Service: S3Service = useSelector( state => state.sss.service );
+  const { databaseSSS } = useSelector( state => state.storage );
+  const [ overallHealth, setOverallHealth ] = useState();
+  const health = useSelector( state => state.sss.overallHealth );
+  //const { overallHealth } = useSelector( state => state.sss );
+  const healthLoading = useSelector(
+    state => state.sss.loading.checkMSharesHealth,
+  );
 
   function getImageByType( item ) {
     let type = item.type;
     if (type == 'secondaryDevice') {
       return require('../../assets/images/icons/icon_secondarydevice.png');
-    } else if (type == 'contact') {
+    } else if (type == 'contact' ) {
       return require('../../assets/images/icons/icon_user.png');
     } else if (type == 'copy1' || type == 'copy2') {
       if (item.personalInfo && item.personalInfo.flagShare && item.personalInfo.shareDetails.type == "GoogleDrive") {
@@ -214,7 +226,6 @@ export default function ManageBackup(props) {
       else {
         return require('../../assets/images/icons/note.png');
       }
-      // return require('../../assets/images/icons/icon_cloud.png');
     }
     if ( type == 'print' ) {
       return require( '../../assets/images/icons/print.png' );
@@ -274,12 +285,13 @@ export default function ManageBackup(props) {
       <CommunicationMode
         secretSharedTrustedContact1={secretSharedTrustedContact1}
         secretSharedTrustedContact2={secretSharedTrustedContact2}
-        contact={Contact[0] ? Contact[0] : null}
+        contact={chosenContact ? chosenContact : null}
         index={chosenContactIndex}
         onPressBack={() => { CommunicationModeBottomSheet.current.snapTo(0) }}
-        onPressContinue={(OTP) => {
+        onPressContinue={(OTP, index) => {
           setTimeout(() => {
             setOTP(OTP);
+            setChosenContactIndex(index)
           }, 10);
           CommunicationModeBottomSheet.current.snapTo(0)
           shareOtpWithTrustedContactBottomSheet.current.snapTo(1)
@@ -290,26 +302,54 @@ export default function ManageBackup(props) {
 
   function renderCommunicationModeModalHeader() {
     return (
-      <TransparentHeaderModal
-        onPressheader={() => {
+      <ModalHeader
+        onPressHeader={() => {
           (CommunicationModeBottomSheet as any).current.snapTo(0);
         }} />
     );
   }
 
+  const onOTPShare = (index) => {
+    const updatedPageData = [...pageData];
+    if (index == 0 && !updatedPageData[1].isOTPShared) {
+      updatedPageData[1].isOTPShared = true;
+    }
+    if (index == 1 && !updatedPageData[2].isOTPShared) {
+      updatedPageData[2].isOTPShared = true;
+    }
+    setTimeout(() => {
+      setChosenContact(contacts[1]);
+      setChosenContactIndex(1);
+    }, 2);
+    if (updatedPageData[1].isOTPShared && !updatedPageData[2].isOTPShared && contacts.length == 2) {
+      shareOtpWithTrustedContactBottomSheet.current.snapTo(0)
+      CommunicationModeBottomSheet.current.snapTo(1);
+    }
+    else {
+      setTimeout(()=>{
+        setSelectedType('');
+      }, 10)
+      shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
+      
+    }
+    setTimeout(() => { setPageData(updatedPageData) }, 2);
+  }
+
   function renderShareOtpWithTrustedContactContent() {
     return (
       <ShareOtpWithTrustedContactContents
+        onPressOk={(index) => onOTPShare(index)}
         onPressBack={() => { shareOtpWithTrustedContactBottomSheet.current.snapTo(0) }}
         OTP={OTP}
+        index={chosenContactIndex}
       />
     );
   }
 
   function renderShareOtpWithTrustedContactHeader() {
     return (
-      <TransparentHeaderModal
-        onPressheader={() => {
+      <ModalHeader
+        onPressHeader={() => {
           (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
         }} />
     );
@@ -329,6 +369,7 @@ export default function ManageBackup(props) {
       console.log("CONTACTLIST", contactList);
       contactListArray = contactList;
       if (selectedContacts.length == 2) {
+        console.log("selectedContacts", typeof selectedContacts[0], selectedContacts[0])
         contactListArray[0] = selectedContacts[0];
         contactListArray[1] = selectedContacts[1];
       }
@@ -345,18 +386,31 @@ export default function ManageBackup(props) {
       }
       console.log("CONTACTLIST ARAAY else", contactListArray);
     }
-    setContact(contactListArray);
+    console.log("contactListArray", typeof contactListArray, contactListArray)
+    setTimeout(() => {
+      setContact(contactListArray);
+    }, 10);
     await AsyncStorage.setItem('SelectedContacts', JSON.stringify(contactListArray));
     let AsyncContacts = JSON.parse(await AsyncStorage.getItem('SelectedContacts'));
     if (AsyncContacts && AsyncContacts.length == 2 && chosenContactIndex == 0) {
-      setChosenContact(AsyncContacts[0])
+      setTimeout(() => {
+        setChosenContact(AsyncContacts[0]);
+      }, 10);
     }
     else if (AsyncContacts && AsyncContacts.length == 2 && chosenContactIndex == 1) {
-      setChosenContact(AsyncContacts[1])
+      setTimeout(() => {
+        setChosenContact(AsyncContacts[1]);
+      }, 10);
     }
     else if (AsyncContacts && AsyncContacts.length == 1) {
-      setChosenContact(AsyncContacts[0])
+      setTimeout(() => {
+        setChosenContact(AsyncContacts[0]);
+      }, 10);
     }
+    setTimeout(() => {
+      setContacts(selectedContacts);
+    }, 10);
+
     trustedContactsBottomSheet.current.snapTo(0);
     CommunicationModeBottomSheet.current.snapTo(1);
   }
@@ -373,22 +427,20 @@ export default function ManageBackup(props) {
 
   function renderTrustedContactsHeader() {
     return (
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => {
+      <ModalHeader
+        onPressHeader={() => {
           (trustedContactsBottomSheet as any).current.snapTo(0);
         }}
-        style={styles.modalHeader}
-      >
-        <View style={styles.modalHeaderHandle} />
-      </TouchableOpacity>
+      />
     );
   }
 
   const renderSecondaryDeviceContents = () => {
     return (
       <SecondaryDeviceModelContents
-        onPressOk={() => { secondaryDeviceBottomSheet.current.snapTo(0) }}
+        onPressOk={() => { setTimeout(()=>{
+          setSelectedType('');
+        }, 10); secondaryDeviceBottomSheet.current.snapTo(0); }}
         onPressBack={() => { secondaryDeviceBottomSheet.current.snapTo(0) }}
         onPressChange={() => { ChangeBottomSheet.current.snapTo(1) }}
         onPressConfirm={() => { ConfirmBottomSheet.current.snapTo(1) }}
@@ -399,15 +451,11 @@ export default function ManageBackup(props) {
 
   function renderSecondaryDeviceHeader() {
     return (
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => {
+      <ModalHeader
+        onPressHeader={() => {
           (secondaryDeviceBottomSheet as any).current.snapTo(0);
         }}
-        style={styles.modalHeader}
-      >
-        <View style={styles.modalHeaderHandle} />
-      </TouchableOpacity>
+      />
     );
   }
 
@@ -436,8 +484,8 @@ export default function ManageBackup(props) {
 
   const renderChangeHeader = () => {
     return (
-      <TransparentHeaderModal
-        onPressheader={() => {
+      <ModalHeader
+        onPressHeader={() => {
           (ChangeBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -469,8 +517,8 @@ export default function ManageBackup(props) {
 
   const renderReshareHeader = () => {
     return (
-      <TransparentHeaderModal
-        onPressheader={() => {
+      <ModalHeader
+        onPressHeader={() => {
           (ReshareBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -502,8 +550,8 @@ export default function ManageBackup(props) {
 
   const renderConfirmHeader = () => {
     return (
-      <TransparentHeaderModal
-        onPressheader={() => {
+      <ModalHeader
+        onPressHeader={() => {
           (ConfirmBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -556,138 +604,15 @@ export default function ManageBackup(props) {
 
   const renderWalletBackupAndRecoveryHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={ Colors.blue }
-        headerColor={ Colors.blue }
-        onPressHandle={ () => {
-          WalletBackupAndRecoveryBottomSheet.current.snapTo( 0 );
-        } }
+      <ModalHeader
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+          WalletBackupAndRecoveryBottomSheet.current.snapTo(0);
+        }}
       />
     );
   };
-
-  const dispatch = useDispatch();
-  const s3Service: S3Service = useSelector( state => state.sss.service );
-  const { databaseSSS } = useSelector( state => state.storage );
-
-  useEffect( () => {
-    // ( async () => {
-    //   const contactList = await AsyncStorage.getItem( 'SelectedContacts' );
-    // } )();
-    dispatch( fetchSSSFromDB() );
-    checkNShowHelperModal();
-    if ( !s3Service.sss.healthCheckInitialized ) dispatch( initHealthCheck() );
-  }, [] );
-
-  useEffect(() => {
-    if (databaseSSS.pdfDetails) {
-      pageData[3].personalInfo = databaseSSS.pdfDetails.copy1;
-      pageData[4].personalInfo = databaseSSS.pdfDetails.copy2;
-      if (databaseSSS.pdfDetails.copy1.flagShare) {
-        pageData[3].status = 'success';
-      }
-      if ( databaseSSS.pdfDetails.copy2.flagShare ) {
-        pageData[ 4 ].status = 'success';
-      }
-      setPageData( pageData );
-      setArrModalShareIntent( { ...arrModalShareIntent, snapTop: 0 } );
-    }
-  }, [ databaseSSS ] );
-
-  const checkNShowHelperModal = async () => {
-    let isManageBackupHelperDone = await AsyncStorage.getItem(
-      'isManageBackupHelperDone',
-    );
-    if ( !isManageBackupHelperDone ) {
-      AsyncStorage.setItem( 'isManageBackupHelperDone', 'true' );
-      WalletBackupAndRecoveryBottomSheet.current.snapTo( 1 );
-    }
-  };
-
-  const [ overallHealth, setOverallHealth ] = useState();
-  const health = useSelector( state => state.sss.overallHealth );
-  useEffect( () => {
-    if ( health ) setOverallHealth( health );
-  }, [ health ] );
-
-  useEffect( () => {
-    ( async () => {
-      if ( !overallHealth ) {
-        const storedHealth = await AsyncStorage.getItem( 'overallHealth' );
-        if ( storedHealth ) {
-          setOverallHealth( JSON.parse( storedHealth ) );
-        }
-      }
-    } )();
-  }, [] );
-
-  //const { overallHealth } = useSelector( state => state.sss );
-  useEffect( () => {
-    if ( overallHealth ) {
-      const updatedPageData = [ ...pageData ];
-      updatedPageData.forEach( data => {
-        switch ( data.title ) {
-          case 'Secondary Device':
-            if ( overallHealth.sharesInfo[ 0 ].shareStage === 'Good' ) {
-              data.status = 'success';
-            } else if ( overallHealth.sharesInfo[ 0 ].shareStage === 'Bad' ) {
-              data.status = 'warning';
-            } else if ( overallHealth.sharesInfo[ 0 ].shareStage === 'Ugly' ) {
-              data.status = 'error';
-            }
-            break;
-
-          case 'Trusted Contact 1':
-            if ( overallHealth.sharesInfo[ 1 ].shareStage === 'Good' ) {
-              data.status = 'success';
-            } else if ( overallHealth.sharesInfo[ 1 ].shareStage === 'Bad' ) {
-              data.status = 'warning';
-            } else if ( overallHealth.sharesInfo[ 1 ].shareStage === 'Ugly' ) {
-              data.status = 'error';
-            }
-            break;
-
-          case 'Trusted Contact 2':
-            if ( overallHealth.sharesInfo[ 2 ].shareStage === 'Good' ) {
-              data.status = 'success';
-            } else if ( overallHealth.sharesInfo[ 2 ].shareStage === 'Bad' ) {
-              data.status = 'warning';
-            } else if ( overallHealth.sharesInfo[ 2 ].shareStage === 'Ugly' ) {
-              data.status = 'error';
-            }
-            break;
-
-          case 'Security Questions':
-            if ( overallHealth.qaStatus === 'Good' ) {
-              data.status = 'success';
-            } else if ( overallHealth.qaStatus === 'Bad' ) {
-              data.status = 'warning';
-            } else if ( overallHealth.qaStatus === 'Ugly' ) {
-              data.status = 'error';
-            }
-            break;
-
-          default:
-            break;
-        }
-      } );
-      setPageData( updatedPageData );
-    }
-  }, [ overallHealth ] );
-
-  const healthLoading = useSelector(
-    state => state.sss.loading.checkMSharesHealth,
-  );
-  useEffect( () => {
-    // HC down-streaming
-    if ( s3Service ) {
-      const { healthCheckInitialized } = s3Service.sss;
-
-      if ( healthCheckInitialized ) {
-        dispatch( checkMSharesHealth() );
-      }
-    }
-  }, [] );
 
   const renderBuyHelperContents = () => {
     return (
@@ -719,25 +644,188 @@ export default function ManageBackup(props) {
     );
   };
 
-  // const getTrustContact = async (contacts, index) => {
-  //   setContacts(contacts);
-  //   setContactIndex(index);
-  //   const contactList1 = await AsyncStorage.getItem('SelectedContacts');
+  const secretSharedTrustedContact1 = isSecretShared1 => {
+    setIsSecretShared1(isSecretShared1);
+  };
 
-  //   CommunicationModeBottomSheet.current.snapTo(1);
-  // };
+  const secretSharedTrustedContact2 = isSecretShared2 => {
+    setIsSecretShared2(isSecretShared2);
+  };
+
+  useEffect(() => {
+    if (health) setOverallHealth(health);
+  }, [health]);
+
+  useEffect(() => {
+    (async () => {
+      if (!overallHealth) {
+        const storedHealth = await AsyncStorage.getItem('overallHealth');
+        if (storedHealth) {
+          setOverallHealth(JSON.parse(storedHealth));
+        }
+      }
+    })();
+  }, []);
+
+  //const { overallHealth } = useSelector( state => state.sss );
+  useEffect(() => {
+    if (overallHealth) {
+      const updatedPageData = [...pageData];
+      updatedPageData.forEach(data => {
+        switch (data.title) {
+          case 'Secondary Device':
+            if (overallHealth.sharesInfo[0].shareStage === 'Good') {
+              data.status = 'success';
+            } else if (overallHealth.sharesInfo[0].shareStage === 'Bad') {
+              data.status = 'warning';
+            } else if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
+              data.status = 'error';
+            }
+            break;
+
+          case 'Trusted Contact 1':
+            if (overallHealth.sharesInfo[1].shareStage === 'Good') {
+              data.status = 'success';
+            } else if (overallHealth.sharesInfo[1].shareStage === 'Bad') {
+              data.status = 'warning';
+            } else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
+              data.status = 'error';
+            }
+            break;
+
+          case 'Trusted Contact 2':
+            if (overallHealth.sharesInfo[2].shareStage === 'Good') {
+              data.status = 'success';
+            } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
+              data.status = 'warning';
+            } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
+              data.status = 'error';
+            }
+            break;
+
+          case 'Security Questions':
+            if (overallHealth.qaStatus === 'Good') {
+              data.status = 'success';
+            } else if (overallHealth.qaStatus === 'Bad') {
+              data.status = 'warning';
+            } else if (overallHealth.qaStatus === 'Ugly') {
+              data.status = 'error';
+            }
+            break;
+
+          default:
+            break;
+        }
+      });
+      setPageData(updatedPageData);
+    }
+    autoHighlightOptions()
+  }, [overallHealth]);
+
+  useEffect(() => {
+    // HC down-streaming
+    if (s3Service) {
+      const { healthCheckInitialized } = s3Service.sss;
+
+      if (healthCheckInitialized) {
+        dispatch(checkMSharesHealth());
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    // ( async () => {
+    //   const contactList = await AsyncStorage.getItem( 'SelectedContacts' );
+    // } )();
+    dispatch(fetchSSSFromDB());
+    if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
+    checkNShowHelperModal();
+  }, []);
+
+  const checkNShowHelperModal = async () => {
+    let isManageBackupHelperDone = await AsyncStorage.getItem(
+      'isManageBackupHelperDone',
+    );
+    if ( !isManageBackupHelperDone ) {
+      await AsyncStorage.setItem( 'isManageBackupHelperDone', 'true' );
+      setTimeout(() => {
+        // WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
+      }, 10);
+    }
+  };
+
+  const autoHighlightOptions = () =>{
+    console.log("overall health", overallHealth);
+    if(overallHealth){
+      if(overallHealth.sharesInfo[0].shareStage=='Ugly'){
+        setTimeout(() => {
+          setSelectedType("secondaryDevice");
+          setSelectedStatus("error");
+          setTimeout(()=>{
+            secondaryDeviceBottomSheet.current.snapTo(1);
+          }, 5000);
+        }, 2500);
+      }
+      else if(overallHealth.sharesInfo[1].shareStage=='Ugly'){
+        setTimeout(() => {
+          setSelectedType("contact");
+          setSelectedStatus("error");
+          setTimeout(()=>{
+            trustedContactsBottomSheet.current.snapTo(1);
+          }, 5000);
+        }, 2500);
+      }
+      else if(overallHealth.sharesInfo[2].shareStage=='Ugly'){
+        setTimeout(() => {
+          setSelectedType("contact");
+          setSelectedStatus("error");
+          setTimeout(()=>{
+            trustedContactsBottomSheet.current.snapTo(1);
+          }, 5000);
+        }, 2500);
+      }
+      else if(overallHealth.qaStatus=='Ugly'){
+        setTimeout(() => {
+          setSelectedType("security");
+          setSelectedStatus("error");
+          setTimeout(()=>{
+            props.navigation.navigate("HealthCheckSecurityAnswer");
+          }, 5000);
+        }, 2500);
+      }
+    }
+  }
+
+  useEffect(() => {
+    // console.log("databaseSSS", databaseSSS);
+    // console.log("pageData, pageData", pageData)
+    if (databaseSSS.pdfDetails) {
+      pageData[3].personalInfo = databaseSSS.pdfDetails.copy1;
+      pageData[4].personalInfo = databaseSSS.pdfDetails.copy2;
+      if (databaseSSS.pdfDetails.copy1.flagShare) {
+        pageData[3].status = 'success';
+      }
+      if (databaseSSS.pdfDetails.copy2.flagShare) {
+        pageData[4].status = 'success';
+      }
+      setPageData(pageData);
+      setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
+    }
+  }, [databaseSSS]);
 
   useEffect(() => {
     if (contacts) {
       const updatedPageData = [...pageData];
+      // console.log('updatedPageData', updatedPageData, contactIndex);
+      // console.log("Contacts", contacts)
       for (let i = 0; i < updatedPageData.length; i++) {
         if (contactIndex == 1) {
           if (contacts.length == 2) {
             updatedPageData[i].title == 'Trusted Contact 1'
               ? (updatedPageData[i].personalInfo = contacts[0])
               : updatedPageData[i].title == 'Trusted Contact 2'
-                ? (updatedPageData[i].personalInfo = contacts[1])
-                : '';
+              ? (updatedPageData[i].personalInfo = contacts[1])
+              : '';
           } else if (!updatedPageData[1].personalInfo) {
             updatedPageData[i].title == 'Trusted Contact 1'
               ? (updatedPageData[i].personalInfo = contacts[0])
@@ -750,8 +838,8 @@ export default function ManageBackup(props) {
             updatedPageData[i].title == 'Trusted Contact 1'
               ? (updatedPageData[i].personalInfo = contacts[0])
               : updatedPageData[i].title == 'Trusted Contact 2'
-                ? (updatedPageData[i].personalInfo = contacts[1])
-                : '';
+              ? (updatedPageData[i].personalInfo = contacts[1])
+              : '';
           } else if (!updatedPageData[2].personalInfo) {
             updatedPageData[i].title == 'Trusted Contact 2'
               ? (updatedPageData[i].personalInfo = contacts[0])
@@ -760,16 +848,9 @@ export default function ManageBackup(props) {
         }
       }
       setPageData(updatedPageData);
+      // console.log("updatedPageData[i].personalInfo", pageData)
     }
-  }, [ contacts ] );
-
-  const secretSharedTrustedContact1 = isSecretShared1 => {
-    setIsSecretShared1(isSecretShared1);
-  };
-
-  const secretSharedTrustedContact2 = isSecretShared2 => {
-    setIsSecretShared2(isSecretShared2);
-  };
+  }, [contacts]);
 
   return (
     <View style={ { flex: 1 } }>
@@ -866,15 +947,13 @@ export default function ManageBackup(props) {
             extraData={ this.state }
             renderItem={ ( { item, index } ) => (
               <View
-              // style={{
-              //   opacity: !selectedType || item.type == selectedType ? 1 : 0.5
-              // }}
+              style={{
+                opacity: !selectedType || item.type == selectedType ? 1 : 0.5
+              }}
               >
                 <TouchableOpacity
                   disabled={
-                    item.personalInfo && item.personalInfo.flagShare
-                      ? true
-                      : false
+                    !selectedType || item.type == selectedType ? false : true
                   }
                   onPress={() => {
                     // shareOtpWithTrustedContactBottomSheet.current.snapTo(1);

@@ -46,16 +46,10 @@ const TrustedContacts = props => {
     <View style={{
       height: "100%",
       backgroundColor: Colors.white,
-      borderTopLeftRadius: 10,
-      borderTopRightRadius: 10,
-      borderLeftWidth: 1,
-      borderRightWidth: 1,
-      borderTopWidth: 1,
-      borderColor: Colors.borderColor,
       alignSelf: "center",
       width: "100%"
     }}>
-      <View style={{ ...BackupStyles.modalHeaderTitleView, marginLeft: 10, marginRight: 10, marginTop: 20, }}>
+      <View style={{ ...BackupStyles.modalHeaderTitleView, marginLeft: 10, marginRight: 10, }}>
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity onPress={() => { props.onPressBack(); }} style={{ height: 30, width: 30, }} >
             <FontAwesome

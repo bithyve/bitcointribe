@@ -30,60 +30,38 @@ import BottomInfoBox from "../BottomInfoBox";
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 
 export default function SecondaryDeviceModelContents(props) {
-    const [selectedStatus, setSelectedStatus] = useState("error"); // for preserving health of this entity
-    const [secondaryQR, setSecondaryQR] = useState("");
-    const { SHARES_TRANSFER_DETAILS } = useSelector(
-        state => state.storage.database.DECENTRALIZED_BACKUP
-    );
-    const { loading } = useSelector(state => state.sss);
+    const [ selectedStatus, setSelectedStatus ] = useState( 'error' ); // for preserving health of this entity
+  const [ secondaryQR, setSecondaryQR ] = useState( '' );
+  const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
+    state => state.storage.database,
+  );
+  const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
+  const { loading } = useSelector( state => state.sss );
 
-    SHARES_TRANSFER_DETAILS[0] && !secondaryQR
-        ? setSecondaryQR(
-            JSON.stringify({
-                ...SHARES_TRANSFER_DETAILS[0],
-                type: "secondaryDeviceQR"
-            })
-        )
-        : null;
-    const dispatch = useDispatch();
+  // const deepLink = SHARES_TRANSFER_DETAILS[0]
+  //   ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
+  //     SHARES_TRANSFER_DETAILS[0].ENCRYPTED_KEY
+  //   : '';
 
-    useEffect(() => {
-        if (!secondaryQR) {
-            dispatch(uploadEncMShare(0));
+  const dispatch = useDispatch();
+
+    useEffect( () => {
+        if ( SHARES_TRANSFER_DETAILS[ 0 ] ) {
+        if ( Date.now() - SHARES_TRANSFER_DETAILS[ 0 ].UPLOADED_AT < 600000 ) {
+            setSecondaryQR(
+            JSON.stringify( {
+                requester: WALLET_SETUP.walletName,
+                ...SHARES_TRANSFER_DETAILS[ 0 ],
+                type: 'secondaryDeviceQR',
+            } ),
+            );
+        } else {
+            dispatch( uploadEncMShare( 0 ) );
         }
-    }, []);
-    const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
-    const [ReshareBottomSheet, setReshareBottomSheet] = useState(React.createRef());
-    const [ConfirmBottomSheet, setConfirmBottomSheet] = useState(React.createRef());
-    const [pageData1, setPageData1] = useState([
-        {
-            id: 1, title: "Recovery Secret Not Accessible", date: "19 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
-        },
-        {
-            id: 2, title: "Recovery Secret Received", date: "1 June ‘19, 9:00am", info: "consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet"
-        },
-        {
-            id: 3, title: "Recovery Secret In-Transit", date: "30 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
-        },
-        {
-            id: 4, title: "Recovery Secret Accessible", date: "24 May ‘19, 5:00pm", info: "Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet"
-        },
-        {
-            id: 5, title: "Recovery Secret In-Transit", date: "20 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
-        },
-        {
-            id: 6, title: "Recovery Secret Not Accessible", date: "19 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
+        } else {
+        dispatch( uploadEncMShare( 0 ) );
         }
-    ]);
-    const SelectOption = (Id) => {
-        if (Id == SelectedOption) {
-            setSelectedOption(0)
-        }
-        else {
-            setSelectedOption(Id)
-        }
-    }
-    const [SelectedOption, setSelectedOption] = useState(0);
+    }, [ SHARES_TRANSFER_DETAILS[ 0 ] ] );
 
     const getIconByStatus = status => {
         if (status == 'error') {
@@ -98,16 +76,11 @@ export default function SecondaryDeviceModelContents(props) {
     return <View style={{
         height: "100%",
         backgroundColor: Colors.white,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderLeftWidth: 1,
-        borderRightWidth: 1,
-        borderTopWidth: 1,
         borderColor: Colors.borderColor,
         alignSelf: "center",
         width: "100%"
     }}>
-        <View style={{ ...BackupStyles.modalHeaderTitleView, marginLeft: 10, marginRight: 10, marginTop: 10, }}>
+        <View style={{ ...BackupStyles.modalHeaderTitleView, marginLeft: 10, marginRight: 10, marginTop:5}}>
             <View style={{ flexDirection: 'row' }}>
                 <TouchableOpacity onPress={() => { props.onPressBack(); }} style={{ height: 30, width: 30, }} >
                     <FontAwesome
