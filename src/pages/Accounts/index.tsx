@@ -269,24 +269,24 @@ function Accounts(props) {
         carousel.current.snapToItem(1, true, false);
       }, 200);
     }
-    if (serviceType == SECURE_ACCOUNT) {
-      let isSecureAccountScanOpen = await AsyncStorage.getItem(
-        'isSecureAccountScanOpen',
-      );
-      if (
-        !isSecureAccountScanOpen &&
-        props.navigation.getParam('serviceType') == SECURE_ACCOUNT
-      ) {
-        AsyncStorage.setItem('isSecureAccountScanOpen', 'true');
-        props.navigation.navigate('SecureScan', {
-          serviceType,
-          getServiceType: getServiceType,
-        });
-      }
-      setTimeout(() => {
-        carousel.current.snapToItem(2, true, false);
-      }, 200);
-    }
+    // if (serviceType == SECURE_ACCOUNT) {
+    //   let isSecureAccountScanOpen = await AsyncStorage.getItem(
+    //     'isSecureAccountScanOpen',
+    //   );
+    //   if (
+    //     !isSecureAccountScanOpen &&
+    //     props.navigation.getParam('serviceType') == SECURE_ACCOUNT
+    //   ) {
+    //     AsyncStorage.setItem('isSecureAccountScanOpen', 'true');
+    //     props.navigation.navigate('SecureScan', {
+    //       serviceType,
+    //       getServiceType: getServiceType,
+    //     });
+    //   }
+    //   setTimeout(() => {
+    //     carousel.current.snapToItem(2, true, false);
+    //   }, 200);
+    // }
   };
 
   const handleStepChange = step => {
@@ -444,15 +444,23 @@ function Accounts(props) {
             </TouchableOpacity>
           )}
           <View style={{ flexDirection: 'row' }}>
-            <Image
-              style={styles.cardBitCoinImage}
-              source={require('../../assets/images/icons/icon_bitcoin_light.png')}
-            />
+            {switchOn ? (
+              <Image
+                style={styles.cardBitCoinImage}
+                source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+              />
+            ) : null}
             <Text style={styles.cardAmountText}>
-              {UsNumberFormat(netBalance)}
+              {switchOn
+                ? UsNumberFormat(netBalance)
+                : ((netBalance / 1e8) * exchangeRates['USD'].last).toFixed(2)}
             </Text>
             <Text style={styles.cardAmountUnitText}>
-              {item.accountType == 'Test Account' ? 'tsats' : 'sats'}
+              {switchOn
+                ? item.accountType == 'Test Account'
+                  ? 'tsats'
+                  : 'sats'
+                : 'USD'}
             </Text>
           </View>
         </View>
