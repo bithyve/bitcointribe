@@ -12,13 +12,13 @@ import Fonts from "../common/Fonts";
 import { RFValue } from 'react-native-responsive-fontsize';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-export default function SmallHeaderModal(props) {
-    return <TouchableOpacity activeOpacity={10} onPress={() => props.onPressHandle()} style={{ ...styles.modalHeader, borderColor: props.borderColor?props.borderColor: Colors.borderColor, backgroundColor: props.headerColor ? props.headerColor : Colors.white, }}>
-        <View style={styles.modalHeaderHandle} />
+export default function SmallHeaderModal( props ) {
+    return <TouchableOpacity activeOpacity={ 10 } onPress={ () => props.onPressHandle() } style={ { ...styles.modalHeader, borderColor: props.borderColor ? props.borderColor : Colors.borderColor, backgroundColor: props.headerColor ? props.headerColor : Colors.white, } }>
+        <View style={ styles.modalHeaderHandle } />
     </TouchableOpacity>
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
     modalHeaderHandle: {
         width: 50,
         height: 5,
@@ -37,4 +37,4 @@ const styles = StyleSheet.create({
         width: '80%',
         alignSelf: 'center',
     },
-})
+} )

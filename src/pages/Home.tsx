@@ -999,6 +999,7 @@ export default function Home( props ) {
     );
   };
 
+
   const renderTransactionDetailsHeader = () => {
     return (
       <SmallHeaderModal

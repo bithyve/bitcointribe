@@ -64,6 +64,7 @@ const ReceivingAddress = props => {
     if ( !receivingAddress ) dispatch( fetchAddress( serviceType ) );
   }, [ serviceType ] );
 
+
   const renderReceiveHelperContents = () => {
     return (
       <TestAccountHelperModalContents
@@ -88,6 +89,9 @@ const ReceivingAddress = props => {
       />
     );
   };
+
+
+
   const renderReceiveHelperHeader = () => {
     return (
       <SmallHeaderModal
@@ -167,7 +171,7 @@ const ReceivingAddress = props => {
           ref={ ReceiveHelperBottomSheet }
           snapPoints={ [ -50, hp( '95%' ) ] }
           renderContent={ renderReceiveHelperContents }
-        //renderHeader={renderReceiveHelperHeader}
+          renderHeader={ renderReceiveHelperHeader }
         />
       </View>
     </View>
