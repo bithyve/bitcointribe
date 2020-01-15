@@ -453,7 +453,9 @@ function Accounts(props) {
             <Text style={styles.cardAmountText}>
               {switchOn
                 ? UsNumberFormat(netBalance)
-                : ((netBalance / 1e8) * exchangeRates['USD'].last).toFixed(2)}
+                : exchangeRates
+                ? ((netBalance / 1e8) * exchangeRates['USD'].last).toFixed(2)
+                : null}
             </Text>
             <Text style={styles.cardAmountUnitText}>
               {switchOn
@@ -738,6 +740,32 @@ function Accounts(props) {
     setCarouselData1();
   }, [serviceType]);
 
+  const [averageTxFee, setAverageTxFee] = useState(0);
+  useEffect(() => {
+    (async () => {
+      const storedAverageTxFee = await AsyncStorage.getItem(
+        'storedAverageTxFee',
+      );
+      if (storedAverageTxFee) {
+        const { averageTxFee, lastFetched } = JSON.parse(storedAverageTxFee);
+        if (Date.now() - lastFetched < 1800000) {
+          console.log('Using stored');
+          setAverageTxFee(averageTxFee);
+          return;
+        } // maintaining a half an hour difference b/w fetches
+      }
+
+      const txPriority = 'high';
+      const instance = service.hdWallet || service.secureHDWallet;
+      const { averageTxFee } = await instance.averageTransactionFee(txPriority);
+      setAverageTxFee(averageTxFee);
+      await AsyncStorage.setItem(
+        'storedAverageTxFee',
+        JSON.stringify({ averageTxFee, lastFetched: Date.now() }),
+      );
+    })();
+  }, []);
+
   useEffect(() => {
     if (serviceType === SECURE_ACCOUNT) {
       AsyncStorage.getItem('isSecureAccountHelperDone').then(done => {
@@ -759,6 +787,10 @@ function Accounts(props) {
         setExchangeRates(exchangeRates);
       }
     })();
+  }, []);
+
+  useEffect(() => {
+    async () => {};
   }, []);
 
   // useEffect( () => {
@@ -1181,7 +1213,8 @@ function Accounts(props) {
                 <View style={{ marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Send</Text>
                   <Text style={styles.bottomCardInfoText}>
-                    Tran Fee : 0.032 (tsats)
+                    Tran Fee : {averageTxFee} (
+                    {serviceType === TEST_ACCOUNT ? 'tsats' : 'sats'})
                   </Text>
                 </View>
               </WalkthroughableTouchableOpacity>
@@ -1208,7 +1241,8 @@ function Accounts(props) {
                 <View style={{ marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Receive</Text>
                   <Text style={styles.bottomCardInfoText}>
-                    Tran Fee : 0.032 (tsats)
+                    Tran Fee : {averageTxFee} (
+                    {serviceType === TEST_ACCOUNT ? 'tsats' : 'sats'})
                   </Text>
                 </View>
               </WalkthroughableTouchableOpacity>

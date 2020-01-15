@@ -781,7 +781,7 @@ export default class Bitcoin {
   };
 
   public averageTransactionFee = async (
-    txnPriority,
+    txnPriority: string = 'high',
   ): Promise<{ averageTxFee: number; feePerByte: number }> => {
     const feePerByte = await this.feeRatesPerByte(txnPriority);
     const averageTxSize = 250; // the average Bitcoin transaction is about 250 bytes big (1 Inp; 2 Out)
