@@ -576,6 +576,12 @@ function Accounts(props) {
                           : Colors.red,
                     }}
                   >
+                    {/* {switchOn
+                      ? item.amount
+                      : (
+                          (item.amount / 1e8) *
+                          exchangeRates['USD'].last
+                        ).toFixed(2)} */}
                     {item.amount}
                   </Text>
                   <Text style={styles.transactionModalAmountUnitText}>
