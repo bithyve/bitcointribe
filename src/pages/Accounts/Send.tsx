@@ -54,9 +54,9 @@ export default function Send(props) {
   const [token, setToken] = useState('');
   const [description, setDescription] = useState('');
   const [sliderValue, setSliderValue] = useState(4);
-  const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
-    React.createRef(),
-  );
+  // const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
+  //   React.createRef(),
+  // );
   const [SendHelperBottomSheet, setSendHelperBottomSheet] = useState(
     React.createRef(),
   );
@@ -73,52 +73,52 @@ export default function Send(props) {
     checkNShowHelperModal();
   }, []);
 
-  const stage2 = () => (
-    <View style={{ margin: 40 }}>
-      <Text style={{ marginVertical: 5 }}>Sending to: {recipientAddress}</Text>
-      <Text style={{ marginVertical: 5 }}>Amount: {amount}</Text>
-      <Text style={{ marginVertical: 10 }}>
-        Transaction Fee: {transfer.stage1.fee}
-      </Text>
-      {loading.transfer ? (
-        <ActivityIndicator size="small" style={{ marginVertical: 5 }} />
-      ) : (
-        <View>
-          <Button
-            title="Send"
-            onPress={() => {
-              dispatch(transferST2(serviceType));
-            }}
-          />
-          <Button
-            title="Cancel"
-            onPress={() => {
-              dispatch(clearTransfer(serviceType));
-            }}
-          />
-        </View>
-      )}
-    </View>
-  );
+  // const stage2 = () => (
+  //   <View style={{ margin: 40 }}>
+  //     <Text style={{ marginVertical: 5 }}>Sending to: {recipientAddress}</Text>
+  //     <Text style={{ marginVertical: 5 }}>Amount: {amount}</Text>
+  //     <Text style={{ marginVertical: 10 }}>
+  //       Transaction Fee: {transfer.stage1.fee}
+  //     </Text>
+  //     {loading.transfer ? (
+  //       <ActivityIndicator size="small" style={{ marginVertical: 5 }} />
+  //     ) : (
+  //       <View>
+  //         <Button
+  //           title="Send"
+  //           onPress={() => {
+  //             dispatch(transferST2(serviceType));
+  //           }}
+  //         />
+  //         <Button
+  //           title="Cancel"
+  //           onPress={() => {
+  //             dispatch(clearTransfer(serviceType));
+  //           }}
+  //         />
+  //       </View>
+  //     )}
+  //   </View>
+  // );
 
-  const renderSuccessStatusContents = () => (
-    <SendStatusModalContents
-      title1stLine={'Sent Successfully'}
-      title2ndLine={''}
-      info1stLine={'Bitcoins successfully sent to'}
-      info2ndLine={''}
-      userName={recipientAddress}
-      modalRef={SendSuccessBottomSheet}
-      isSuccess={true}
-      onPressViewAccount={() => {
-        dispatch(clearTransfer(serviceType));
-        dispatch(fetchTransactions(serviceType));
-        props.navigation.navigate('Accounts');
-      }}
-      transactionId={transfer.txid}
-      transactionDateTime={Date()}
-    />
-  );
+  // const renderSuccessStatusContents = () => (
+  //   <SendStatusModalContents
+  //     title1stLine={'Sent Successfully'}
+  //     title2ndLine={''}
+  //     info1stLine={'Bitcoins successfully sent to'}
+  //     info2ndLine={''}
+  //     userName={recipientAddress}
+  //     modalRef={SendSuccessBottomSheet}
+  //     isSuccess={true}
+  //     onPressViewAccount={() => {
+  //       dispatch(clearTransfer(serviceType));
+  //       dispatch(fetchTransactions(serviceType));
+  //       props.navigation.navigate('Accounts');
+  //     }}
+  //     transactionId={transfer.txid}
+  //     transactionDateTime={Date()}
+  //   />
+  // );
 
   const dispatch = useDispatch();
 
@@ -126,9 +126,14 @@ export default function Send(props) {
     state => state.accounts[serviceType],
   );
 
-  if (transfer.txid) return renderSuccessStatusContents();
-  else if (!transfer.txid && transfer.executed === 'ST2')
-    props.navigation.navigate('TwoFAToken', { serviceType, recipientAddress });
+  useEffect(() => {
+    if (transfer.executed === 'ST1')
+      props.navigation.navigate('Confirmation', {
+        serviceType,
+        recipientAddress,
+        amount,
+      });
+  }, [transfer]);
 
   const renderSendHelperContents = () => {
     return (
@@ -257,7 +262,11 @@ export default function Send(props) {
                 <TextInput
                   // ref={refs => setTextAmountRef(refs)}
                   style={{ ...styles.textBox, paddingLeft: 10 }}
-                  placeholder={'Enter Amount in sats'}
+                  placeholder={
+                    serviceType === TEST_ACCOUNT
+                      ? 'Enter Amount in tsats'
+                      : 'Enter Amount in sats'
+                  }
                   value={amount}
                   onChangeText={setAmount}
                   placeholderTextColor={Colors.borderColor}
@@ -443,7 +452,7 @@ export default function Send(props) {
                 </Text>
               </TouchableOpacity>
             </View>
-            {transfer.executed === 'ST1' ? stage2() : null}
+            {/* {transfer.executed === 'ST1' ? stage2() : null} */}
           </ScrollView>
         </KeyboardAvoidingView>
         <BottomSheet

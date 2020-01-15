@@ -257,7 +257,7 @@ export default function Home(props) {
       title: 'Test Account',
       unit: 'tsats',
       amount: '400,000',
-      account: `${walletName} Test Account`,
+      account: `Test Account`,
       accountType: 'test',
       bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
     },
@@ -280,10 +280,6 @@ export default function Home(props) {
       bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
     },
   ]);
-
-  useEffect(() => {
-    setData([...data, (data[0].account = `${walletName} Test Account`)]);
-  }, [walletName]);
 
   const [transactionData, setTransactionData] = useState([
     {
@@ -1616,10 +1612,17 @@ export default function Home(props) {
                 style={styles.headerTitleText}
               >{`${walletName}’s Wallet`}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                <Image
-                  style={CommonStyles.homepageAmountImage}
-                  source={require('../assets/images/icons/icon_bitcoin_light.png')}
-                />
+                {switchOn ? (
+                  <Image
+                    style={CommonStyles.homepageAmountImage}
+                    source={require('../assets/images/icons/icon_bitcoin_light.png')}
+                  />
+                ) : (
+                  <Image
+                    style={styles.cardBitCoinImage}
+                    source={require('../assets/images/icons/icon_dollar_white.png')}
+                  />
+                )}
                 <Text
                   style={{
                     ...CommonStyles.homepageAmountText,
@@ -1639,7 +1642,7 @@ export default function Home(props) {
                     color: Colors.white,
                   }}
                 >
-                  {switchOn ? 'sats' : 'USD'}
+                  {switchOn ? 'sats' : 'usd'}
                 </Text>
               </View>
             </View>
@@ -1687,7 +1690,7 @@ export default function Home(props) {
             horizontal
             showsHorizontalScrollIndicator={false}
             data={newData}
-            extraData={{ balances, switchOn }}
+            extraData={{ balances, switchOn, walletName }}
             renderItem={Items => {
               return (
                 <View style={{ flexDirection: 'column' }}>
@@ -1738,7 +1741,9 @@ export default function Home(props) {
                                 fontSize: RFValue(11),
                               }}
                             >
-                              {value.account}
+                              {value.accountType === 'test'
+                                ? `${walletName}'s ${value.account}`
+                                : value.account}
                             </Text>
                             <View
                               style={{
@@ -1747,10 +1752,17 @@ export default function Home(props) {
                                 marginTop: hp('1%'),
                               }}
                             >
-                              <Image
-                                style={styles.cardBitCoinImage}
-                                source={value.bitcoinicon}
-                              />
+                              {value.accountType === 'test' || switchOn ? (
+                                <Image
+                                  style={styles.cardBitCoinImage}
+                                  source={value.bitcoinicon}
+                                />
+                              ) : (
+                                <Image
+                                  style={styles.cardBitCoinImage}
+                                  source={require('../assets/images/icons/icon_dollar_dark.png')}
+                                />
+                              )}
                               <Text style={styles.cardAmountText}>
                                 {switchOn
                                   ? value.accountType === 'test'
@@ -1759,10 +1771,7 @@ export default function Home(props) {
                                     ? UsNumberFormat(balances.regularBalance)
                                     : UsNumberFormat(balances.secureBalance)
                                   : value.accountType === 'test'
-                                  ? (
-                                      (balances.testBalance / 1e8) *
-                                      exchangeRates['USD'].last
-                                    ).toFixed(2)
+                                  ? UsNumberFormat(balances.testBalance)
                                   : value.accountType === 'regular'
                                   ? (
                                       (balances.regularBalance / 1e8) *
@@ -1774,7 +1783,11 @@ export default function Home(props) {
                                     ).toFixed(2)}
                               </Text>
                               <Text style={styles.cardAmountUnitText}>
-                                {switchOn ? value.unit : 'USD'}
+                                {switchOn
+                                  ? value.unit
+                                  : value.accountType === 'test'
+                                  ? value.unit
+                                  : 'usd'}
                               </Text>
                             </View>
                           </View>

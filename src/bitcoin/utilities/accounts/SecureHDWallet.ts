@@ -429,7 +429,13 @@ export default class SecureHDWallet extends Bitcoin {
       console.log('Input UTXOs:', inputUTXOs);
       const outputUTXOs = [{ address: recipientAddress, value: amount }];
       console.log('Output UTXOs:', outputUTXOs);
-      const txnFee = await this.feeRatesPerByte(txnPriority);
+      // const txnFee = await this.feeRatesPerByte(txnPriority);
+
+      const { averageTxFee, feePerByte } = await this.averageTransactionFee(
+        txnPriority,
+      );
+      console.log({ averageTxFee, feePerByte });
+
       let balance: number = 0;
       inputUTXOs.forEach(utxo => {
         balance += utxo.value;
@@ -437,7 +443,7 @@ export default class SecureHDWallet extends Bitcoin {
       const { inputs, outputs, fee } = coinselect(
         inputUTXOs,
         outputUTXOs,
-        txnFee,
+        feePerByte,
       );
       console.log('-------Transaction--------');
       console.log('\tFee', fee);
@@ -446,7 +452,7 @@ export default class SecureHDWallet extends Bitcoin {
 
       if (!inputs) {
         // insufficient input utxos to compensate for output utxos + fee
-        return { fee, balance };
+        return { fee: averageTxFee, balance };
       }
 
       const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
@@ -454,6 +460,12 @@ export default class SecureHDWallet extends Bitcoin {
       );
 
       inputs.forEach(input => txb.addInput(input.txId, input.vout, nSequence));
+
+      outputs.forEach(output => {
+        if (!output.address) {
+          output.value = output.value + fee - averageTxFee; // applying static fee (averageTxFee)
+        }
+      });
       const sortedOuts = await this.sortOutputs(outputs);
       sortedOuts.forEach(output => {
         console.log('Adding Output:', output);
@@ -463,7 +475,7 @@ export default class SecureHDWallet extends Bitcoin {
       return {
         inputs,
         txb,
-        fee,
+        fee: averageTxFee,
         balance,
       };
     } catch (err) {

@@ -1,9 +1,9 @@
-import * as bip39 from "bip39";
-import { Network, TransactionBuilder } from "bitcoinjs-lib";
-import config from "../../Config";
-import { ErrMap } from "../ErrMap";
-import HDSegwitWallet from "./HDSegwitWallet";
-import { Transactions } from "../Interface";
+import * as bip39 from 'bip39';
+import { Network, TransactionBuilder } from 'bitcoinjs-lib';
+import config from '../../Config';
+import { ErrMap } from '../ErrMap';
+import HDSegwitWallet from './HDSegwitWallet';
+import { Transactions } from '../Interface';
 
 export default class BaseAccount {
   private hdWallet: HDSegwitWallet;
@@ -24,11 +24,11 @@ export default class BaseAccount {
       receivingAddress: string;
       transactions: Transactions;
     },
-    network?: Network
+    network?: Network,
   ) {
     if (mnemonic) {
       if (!bip39.validateMnemonic(mnemonic)) {
-        throw new Error("Invalid Mnemonic");
+        throw new Error('Invalid Mnemonic');
       }
     }
     this.hdWallet = new HDSegwitWallet(
@@ -36,7 +36,7 @@ export default class BaseAccount {
       passphrase,
       dPathPurpose,
       stateVars,
-      network
+      network,
     );
   }
 
@@ -58,7 +58,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.getMnemonic()
+        data: this.hdWallet.getMnemonic(),
       };
     } catch (err) {
       return { status: 101, err: err.message, message: ErrMap[101] };
@@ -83,7 +83,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.getWalletId()
+        data: this.hdWallet.getWalletId(),
       };
     } catch (err) {
       return { status: 102, err: err.message, message: ErrMap[102] };
@@ -108,7 +108,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.getAccountId()
+        data: this.hdWallet.getAccountId(),
       };
     } catch (err) {
       return { status: 0o0, err: err.message, message: ErrMap[0o0] };
@@ -121,7 +121,7 @@ export default class BaseAccount {
       amount: number;
       label?: string;
       message?: string;
-    }
+    },
   ):
     | {
         status: number;
@@ -140,7 +140,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.generatePaymentURI(address, options)
+        data: this.hdWallet.generatePaymentURI(address, options),
       };
     } catch (err) {
       return { status: 103, err: err.message, message: ErrMap[103] };
@@ -148,7 +148,7 @@ export default class BaseAccount {
   };
 
   public decodePaymentURI = (
-    paymentURI: string
+    paymentURI: string,
   ):
     | {
         status: number;
@@ -172,7 +172,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.decodePaymentURI(paymentURI)
+        data: this.hdWallet.decodePaymentURI(paymentURI),
       };
     } catch (err) {
       return { status: 104, err: err.message, message: ErrMap[104] };
@@ -180,7 +180,7 @@ export default class BaseAccount {
   };
 
   public addressDiff = (
-    scannedStr: string
+    scannedStr: string,
   ):
     | {
         status: number;
@@ -199,7 +199,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.addressDiff(scannedStr)
+        data: this.hdWallet.addressDiff(scannedStr),
       };
     } catch (err) {
       return { status: 105, err: err.message, message: ErrMap[105] };
@@ -225,7 +225,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.getReceivingAddress()
+        data: await this.hdWallet.getReceivingAddress(),
       };
     } catch (err) {
       return { status: 0o1, err: err.message, message: ErrMap[0o1] };
@@ -252,7 +252,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.fetchBalance()
+        data: await this.hdWallet.fetchBalance(),
       };
     } catch (err) {
       return { status: 0o2, err: err.message, message: ErrMap[0o2] };
@@ -294,7 +294,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.fetchTransactions()
+        data: await this.hdWallet.fetchTransactions(),
       };
     } catch (err) {
       return { status: 0o3, err: err.message, message: ErrMap[0o3] };
@@ -302,7 +302,7 @@ export default class BaseAccount {
   };
 
   public getTransactionDetails = async (
-    txHash: string
+    txHash: string,
   ): Promise<
     | {
         status: number;
@@ -320,7 +320,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.fetchTransactionDetails(txHash)
+        data: await this.hdWallet.fetchTransactionDetails(txHash),
       };
     } catch (err) {
       return { status: 0o4, err: err.message, message: ErrMap[0o4] };
@@ -348,7 +348,7 @@ export default class BaseAccount {
       const { address } = await this.hdWallet.getReceivingAddress();
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.testnetFaucet(address)
+        data: await this.hdWallet.testnetFaucet(address),
       };
     } catch (err) {
       return { status: 0o5, err: err.message, message: ErrMap[0o5] };
@@ -358,7 +358,7 @@ export default class BaseAccount {
   public transferST1 = async (
     recipientAddress: string,
     amount: number,
-    priority?: string
+    priority?: string,
   ): Promise<
     | {
         status: number;
@@ -396,36 +396,36 @@ export default class BaseAccount {
           inputs,
           txb,
           fee,
-          balance
+          balance,
         } = await this.hdWallet.createHDTransaction(
           recipientAddress,
           amount,
-          priority
+          priority,
         );
 
         if (balance < amount + fee) {
           return {
             status: 0o6,
             err:
-              "Insufficient balance to compensate for transfer amount and the txn fee",
+              'Insufficient balance to compensate for transfer amount and the txn fee',
             message: ErrMap[0o6],
-            data: { fee }
+            data: { fee },
           };
         }
 
         if (inputs && txb) {
-          console.log("---- Transaction Created ----");
+          console.log('---- Transaction Created ----');
           return {
             status: config.STATUS.SUCCESS,
-            data: { inputs, txb, fee }
+            data: { inputs, txb, fee },
           };
         } else {
           throw new Error(
-            "Unable to create transaction: inputs failed at coinselect"
+            'Unable to create transaction: inputs failed at coinselect',
           );
         }
       } else {
-        throw new Error("Recipient address is wrong");
+        throw new Error('Recipient address is wrong');
       }
     } catch (err) {
       return { status: 106, err: err.message, message: ErrMap[106] };
@@ -439,7 +439,7 @@ export default class BaseAccount {
       value: number;
       address: string;
     }>,
-    txb: TransactionBuilder
+    txb: TransactionBuilder,
   ): Promise<
     | {
         status: number;
@@ -458,12 +458,12 @@ export default class BaseAccount {
   > => {
     try {
       const signedTxb = this.hdWallet.signHDTransaction(inputs, txb);
-      console.log("---- Transaction Signed ----");
+      console.log('---- Transaction Signed ----');
 
       const txHex = signedTxb.build().toHex();
       console.log({ txHex });
       const { txid } = await this.hdWallet.broadcastTransaction(txHex);
-      console.log("---- Transaction Broadcasted ----");
+      console.log('---- Transaction Broadcasted ----');
 
       return { status: config.STATUS.SUCCESS, data: { txid } };
     } catch (err) {

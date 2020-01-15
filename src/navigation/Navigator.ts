@@ -55,6 +55,7 @@ import WalletCreationSuccess from '../pages/RegenerateShare/WalletCreationSucces
 import SecureScan from '../pages/Accounts/SecureScan';
 import GoogleAuthenticatorOTP from '../pages/Accounts/GoogleAuthenticatorOTP';
 import ShareOtpWithTrustedContactContents from '../components/ShareOtpWithTrustedContactContents';
+import Confirmation from '../pages/Accounts/Confirmation';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -95,6 +96,7 @@ const MODAL_ROUTES = [
   'HealthCheckSecurityAnswer',
   'RecoveryRequestOTP',
   'ShareOtpWithTrustedContactContents',
+  'Confirmation',
 ];
 
 const HomeNavigator = createStackNavigator(
@@ -142,6 +144,7 @@ const HomeNavigator = createStackNavigator(
     SecureScan,
     GoogleAuthenticatorOTP,
     ShareOtpWithTrustedContactContents,
+    Confirmation,
   },
   {
     headerLayoutPreset: 'center',

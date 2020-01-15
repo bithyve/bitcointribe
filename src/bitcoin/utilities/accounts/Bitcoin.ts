@@ -780,6 +780,18 @@ export default class Bitcoin {
     }
   };
 
+  public averageTransactionFee = async (
+    txnPriority: string = 'high',
+  ): Promise<{ averageTxFee: number; feePerByte: number }> => {
+    const feePerByte = await this.feeRatesPerByte(txnPriority);
+    const averageTxSize = 250; // the average Bitcoin transaction is about 250 bytes big (1 Inp; 2 Out)
+    const inputUTXOSize = 147; // in bytes
+
+    // calculating fee considering 2 inputs per transaction
+    const averageTxFee = (averageTxSize + inputUTXOSize) * feePerByte;
+    return { averageTxFee, feePerByte };
+  };
+
   public isValidAddress = (address: string): boolean => {
     try {
       bitcoinJS.address.toOutputScript(address, this.network);
