@@ -1756,10 +1756,7 @@ export default function Home( props ) {
                                       ? UsNumberFormat( balances.regularBalance )
                                       : UsNumberFormat( balances.secureBalance )
                                   : value.accountType === 'test'
-                                    ? (
-                                      ( balances.testBalance / 1e8 ) *
-                                      exchangeRates[ 'USD' ].last
-                                    ).toFixed( 2 )
+                                    ? UsNumberFormat( balances.testBalance )
                                     : value.accountType === 'regular'
                                       ? (
                                         ( balances.regularBalance / 1e8 ) *
@@ -1770,9 +1767,11 @@ export default function Home( props ) {
                                         exchangeRates[ 'USD' ].last
                                       ).toFixed( 2 ) }
                               </Text>
+
                               <Text style={ styles.cardAmountUnitText }>
-                                { switchOn ? value.unit : 'usd' }
+                                { switchOn ? value.unit : value.accountType == "test" ? 'tsats' : 'usd' }
                               </Text>
+
                             </View>
                           </View>
                         </CardView>

@@ -268,13 +268,13 @@ function Accounts( props ) {
       setTimeout( () => {
         carousel.current.snapToItem( 0, true, false );
         //setCarouselInitIndex( 0 );
-      }, 2000 );
+      }, 1000 );
     }
     if ( serviceType == REGULAR_ACCOUNT ) {
       setTimeout( () => {
         carousel.current.snapToItem( 1, true, false );
         //setCarouselInitIndex( 1 );
-      }, 2000 );
+      }, 1000 );
     }
     if ( serviceType == SECURE_ACCOUNT ) {
       let isSecureAccountScanOpen = await AsyncStorage.getItem(
@@ -293,7 +293,7 @@ function Accounts( props ) {
       setTimeout( () => {
         carousel.current.snapToItem( 2, true, false );
         //setCarouselInitIndex( 2 );
-      }, 2000 );
+      }, 1000 );
     }
   };
 
