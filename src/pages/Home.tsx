@@ -79,6 +79,7 @@ import moment from 'moment';
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
 import { getTestcoins } from '../store/actions/accounts';
 import axios from 'axios';
+import { UsNumberFormat } from '../common/utilities';
 
 export default function Home(props) {
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
@@ -256,7 +257,7 @@ export default function Home(props) {
       title: 'Test Account',
       unit: 'tsats',
       amount: '400,000',
-      account: 'Test it out!',
+      account: `${walletName} Test Account`,
       accountType: 'test',
       bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
     },
@@ -271,14 +272,19 @@ export default function Home(props) {
     },
     {
       id: 3,
-      title: 'Secure Account',
+      title: 'Savings Account',
       unit: 'sats',
       amount: '60,000',
-      account: 'Resilient and Secure',
+      account: 'Multi-factor security',
       accountType: 'secure',
       bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
     },
   ]);
+
+  useEffect(() => {
+    setData([...data, (data[0].account = `${walletName} Test Account`)]);
+  }, [walletName]);
+
   const [transactionData, setTransactionData] = useState([
     {
       title: 'Spending accounts',
@@ -505,7 +511,7 @@ export default function Home(props) {
                         : Colors.red,
                   }}
                 >
-                  {item.amount}
+                  {UsNumberFormat(item.amount)}
                 </Text>
                 <Text style={styles.transactionModalAmountUnitText}>
                   {item.confirmations < 6 ? item.confirmations : '6+'}
@@ -1621,11 +1627,11 @@ export default function Home(props) {
                   }}
                 >
                   {switchOn
-                    ? balances.accumulativeBalance
+                    ? UsNumberFormat(balances.accumulativeBalance)
                     : (
                         (balances.accumulativeBalance / 1e8) *
                         exchangeRates['USD'].last
-                      ).toFixed(3)}
+                      ).toFixed(2)}
                 </Text>
                 <Text
                   style={{
@@ -1748,24 +1754,24 @@ export default function Home(props) {
                               <Text style={styles.cardAmountText}>
                                 {switchOn
                                   ? value.accountType === 'test'
-                                    ? balances.testBalance
+                                    ? UsNumberFormat(balances.testBalance)
                                     : value.accountType === 'regular'
-                                    ? balances.regularBalance
-                                    : balances.secureBalance
+                                    ? UsNumberFormat(balances.regularBalance)
+                                    : UsNumberFormat(balances.secureBalance)
                                   : value.accountType === 'test'
                                   ? (
                                       (balances.testBalance / 1e8) *
                                       exchangeRates['USD'].last
-                                    ).toFixed(3)
+                                    ).toFixed(2)
                                   : value.accountType === 'regular'
                                   ? (
                                       (balances.regularBalance / 1e8) *
                                       exchangeRates['USD'].last
-                                    ).toFixed(3)
+                                    ).toFixed(2)
                                   : (
                                       (balances.secureBalance / 1e8) *
                                       exchangeRates['USD'].last
-                                    ).toFixed(3)}
+                                    ).toFixed(2)}
                               </Text>
                               <Text style={styles.cardAmountUnitText}>
                                 {switchOn ? value.unit : 'USD'}

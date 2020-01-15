@@ -34,8 +34,8 @@ const TrustedContacts = props => {
   );
   const index = props.index;
 
-  function selectedContactsList(list) {
-    if (list.length > 0) setContacts([...list]);
+  function selectedContactsList( list ) {
+    if ( list.length > 0 ) setContacts( [ ...list ] );
   }
 
   const onPressContinue = () =>{
@@ -73,24 +73,24 @@ const TrustedContacts = props => {
         </View>
         <Image style={BackupStyles.cardIconImage} source={getIconByStatus(selectedStatus)} />
       </View>
-      <View style={{ flex: 1 }}>
+      <View style={ { flex: 1 } }>
         <Text
-          style={{
+          style={ {
             marginLeft: 30,
             color: Colors.textColorGrey,
             fontFamily: Fonts.FiraSansRegular,
-            fontSize: RFValue(12),
+            fontSize: RFValue( 12 ),
             marginTop: 5,
-          }}
+          } }
         >
-          Select contact to{' '}
+          Select two contacts to { ' ' }
           <Text
-            style={{
+            style={ {
               fontFamily: Fonts.FiraSansMediumItalic,
               fontWeight: 'bold',
-            }}
+            } }
           >
-            send recovery secret
+            send Recovery Secrets
           </Text>
         </Text>
         <ContactList
@@ -103,7 +103,7 @@ const TrustedContacts = props => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalHeaderContainer: {
     paddingTop: 20,
   },
@@ -116,6 +116,6 @@ const styles = StyleSheet.create({
     marginTop: 7,
     marginBottom: 7,
   },
-});
+} );
 
 export default TrustedContacts;
