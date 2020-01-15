@@ -445,25 +445,27 @@ function Accounts(props) {
             </TouchableOpacity>
           )}
           <View style={{ flexDirection: 'row' }}>
-            {switchOn ? (
+            {item.accountType == 'Test Account' || switchOn ? (
               <Image
                 style={styles.cardBitCoinImage}
                 source={require('../../assets/images/icons/icon_bitcoin_light.png')}
               />
             ) : null}
             <Text style={styles.cardAmountText}>
-              {switchOn
+              {item.accountType == 'Test Account'
+                ? UsNumberFormat(netBalance)
+                : switchOn
                 ? UsNumberFormat(netBalance)
                 : exchangeRates
                 ? ((netBalance / 1e8) * exchangeRates['USD'].last).toFixed(2)
                 : null}
             </Text>
             <Text style={styles.cardAmountUnitText}>
-              {switchOn
-                ? item.accountType == 'Test Account'
-                  ? 'tsats'
-                  : 'sats'
-                : 'USD'}
+              {item.accountType == 'Test Account'
+                ? 'tsats'
+                : switchOn
+                ? 'sats'
+                : 'usd'}
             </Text>
           </View>
         </View>
@@ -1287,7 +1289,7 @@ function Accounts(props) {
                   <Text style={styles.bottomCardTitleText}>Buy</Text>
                   <Text style={styles.bottomCardInfoText}>
                     Ex Rate : {exchangeRates ? exchangeRates['USD'].last : 0}{' '}
-                    (USD)
+                    (usd)
                   </Text>
                 </View>
               </WalkthroughableTouchableOpacity>
@@ -1315,7 +1317,7 @@ function Accounts(props) {
                   <Text style={styles.bottomCardTitleText}>Sell</Text>
                   <Text style={styles.bottomCardInfoText}>
                     Ex Rate : {exchangeRates ? exchangeRates['USD'].last : 0}{' '}
-                    (USD)
+                    (usd)
                   </Text>
                 </View>
               </WalkthroughableTouchableOpacity>
