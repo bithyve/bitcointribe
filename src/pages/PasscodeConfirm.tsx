@@ -81,7 +81,7 @@ export default function PasscodeConfirm( props ) {
           <Text style={ styles.headerTitleText }>Hello!</Text>
           <View>
             <Text style={ styles.headerInfoText }>
-              Please enter a <Text style={ styles.boldItalicText }>passcode</Text>
+              Please enter the <Text style={ styles.boldItalicText }>passcode</Text>
             </Text>
 
             <View>
