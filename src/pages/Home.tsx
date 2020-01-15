@@ -395,6 +395,7 @@ export default function Home(props) {
         }
       }
     })();
+    console.log("overallHealthoverallHealth", overallHealth)
   }, []);
 
   const messageAsPerHealth = health => {

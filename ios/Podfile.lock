@@ -55,6 +55,8 @@ PODS:
     - React
   - react-native-camera/RN (3.15.0):
     - React
+  - react-native-contacts (5.0.6):
+    - React
   - react-native-html-to-pdf (0.8.0):
     - React
   - react-native-mail (4.1.0):
@@ -176,6 +178,7 @@ DEPENDENCIES:
   - PDFGenerator
   - QRCoder
   - react-native-camera (from `../node_modules/react-native-camera`)
+  - react-native-contacts (from `../node_modules/react-native-contacts`)
   - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
   - react-native-mail (from `../node_modules/react-native-mail`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
@@ -275,6 +278,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native"
   react-native-camera:
     :path: "../node_modules/react-native-camera"
+  react-native-contacts:
+    :path: "../node_modules/react-native-contacts"
   react-native-html-to-pdf:
     :path: "../node_modules/react-native-html-to-pdf"
   react-native-mail:
@@ -364,6 +369,7 @@ SPEC CHECKSUMS:
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
   react-native-camera: 52114c432860b89986c9ee4919d00a48a6ba7abb
+  react-native-contacts: 9c89131a1f63af0618d54af5ca1cd88b06d41a05
   react-native-html-to-pdf: 1d1199917f56a98377d431bce84c2f275e48eb71
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
   react-native-netinfo: d3fb9723582eb9a111c128d37f896bae88c00f99
@@ -391,6 +397,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 1e70fe58b872355f0ecb44fb81bb1a16484047f0
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: dc79131b31ec1be54c49397d03d74f415d04707a
+PODFILE CHECKSUM: 0aa4ac3babc41b8dea15201c864175a5133e6b6e
 
 COCOAPODS: 1.8.3
