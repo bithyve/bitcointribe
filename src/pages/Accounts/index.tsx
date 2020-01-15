@@ -749,7 +749,6 @@ function Accounts(props) {
       if (storedAverageTxFee) {
         const { averageTxFee, lastFetched } = JSON.parse(storedAverageTxFee);
         if (Date.now() - lastFetched < 1800000) {
-          console.log('Using stored');
           setAverageTxFee(averageTxFee);
           return;
         } // maintaining a half an hour difference b/w fetches
