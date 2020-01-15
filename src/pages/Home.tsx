@@ -257,7 +257,7 @@ export default function Home(props) {
       title: 'Test Account',
       unit: 'tsats',
       amount: '400,000',
-      account: `${walletName}'s Test Account`,
+      account: `Test Account`,
       accountType: 'test',
       bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
     },
@@ -1683,7 +1683,7 @@ export default function Home(props) {
             horizontal
             showsHorizontalScrollIndicator={false}
             data={newData}
-            extraData={{ balances, switchOn }}
+            extraData={{ balances, switchOn, walletName }}
             renderItem={Items => {
               return (
                 <View style={{ flexDirection: 'column' }}>
@@ -1734,7 +1734,9 @@ export default function Home(props) {
                                 fontSize: RFValue(11),
                               }}
                             >
-                              {value.account}
+                              {value.accountType === 'test'
+                                ? `${walletName}'s ${value.account}`
+                                : value.account}
                             </Text>
                             <View
                               style={{

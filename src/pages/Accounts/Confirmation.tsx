@@ -81,6 +81,7 @@ const Confirmation = props => {
             title="Cancel"
             onPress={() => {
               dispatch(clearTransfer(serviceType));
+              props.navigation.goBack();
             }}
           />
         </View>

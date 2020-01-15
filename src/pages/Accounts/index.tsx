@@ -55,6 +55,7 @@ import TestAccountHelperModalContents from '../../components/Helper/TestAccountH
 import { copilot, walkthroughable, CopilotStep } from 'react-native-copilot';
 import TooltipComponent from '../../components/Copilot/CopilotTooltip';
 import moment from 'moment';
+import axios from 'axios';
 
 const WalkthroughableText = walkthroughable(Text);
 const WalkthroughableImage = walkthroughable(Image);
@@ -784,6 +785,19 @@ function Accounts(props) {
       if (storedExchangeRates) {
         const exchangeRates = JSON.parse(storedExchangeRates);
         setExchangeRates(exchangeRates);
+      }
+      const res = await axios.get('https://blockchain.info/ticker');
+      console.log({ res });
+      if (res.status == 200) {
+        const exchangeRates = res.data;
+        exchangeRates.lastFetched = Date.now();
+        setExchangeRates(exchangeRates);
+        await AsyncStorage.setItem(
+          'exchangeRates',
+          JSON.stringify(exchangeRates),
+        );
+      } else {
+        console.log('Failed to retrieve exchange rates', res);
       }
     })();
   }, []);
