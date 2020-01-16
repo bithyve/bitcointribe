@@ -211,7 +211,7 @@ export default function ManageBackup(props) {
     let type = item.type;
     if (type == 'secondaryDevice') {
       return require('../../assets/images/icons/icon_secondarydevice.png');
-    } else if (type == 'contact' ) {
+    } else if (type == 'contact') {
       return require('../../assets/images/icons/icon_user.png');
     } else if (type == 'copy1' || type == 'copy2') {
       if (item.personalInfo && item.personalInfo.flagShare && item.personalInfo.shareDetails.type == "GoogleDrive") {
@@ -309,7 +309,7 @@ export default function ManageBackup(props) {
     );
   }
 
-  const onOTPShare = (index) => {
+  const onOTPShare = async(index) => {
     const updatedPageData = [...pageData];
     if (index == 0 && !updatedPageData[1].isOTPShared) {
       updatedPageData[1].isOTPShared = true;
@@ -322,15 +322,16 @@ export default function ManageBackup(props) {
       setChosenContactIndex(1);
     }, 2);
     if (updatedPageData[1].isOTPShared && !updatedPageData[2].isOTPShared && contacts.length == 2) {
-      shareOtpWithTrustedContactBottomSheet.current.snapTo(0)
+      shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
       CommunicationModeBottomSheet.current.snapTo(1);
+      await AsyncStorage.setItem('contact1AutoHighlightFlags', 'true');
     }
     else {
       setTimeout(()=>{
         setSelectedType('');
       }, 10)
       shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
-      
+      await AsyncStorage.setItem('contact2AutoHighlightFlags', 'true');
     }
     setTimeout(() => { setPageData(updatedPageData) }, 2);
   }
@@ -435,16 +436,20 @@ export default function ManageBackup(props) {
     );
   }
 
+  const onPressSecondaryDeviceOk = async() =>{
+    let autoHighlightFlags = {};
+    setTimeout(()=>{
+      setSelectedType('');
+    }, 10); 
+    secondaryDeviceBottomSheet.current.snapTo(0);
+    await AsyncStorage.setItem('secondaryDeviceAutoHighlightFlags', 'true');
+  }
+
   const renderSecondaryDeviceContents = () => {
     return (
       <SecondaryDeviceModelContents
-        onPressOk={() => { setTimeout(()=>{
-          setSelectedType('');
-        }, 10); secondaryDeviceBottomSheet.current.snapTo(0); }}
-        onPressBack={() => { secondaryDeviceBottomSheet.current.snapTo(0) }}
-        onPressChange={() => { ChangeBottomSheet.current.snapTo(1) }}
-        onPressConfirm={() => { ConfirmBottomSheet.current.snapTo(1) }}
-        onPressReshare={() => { ReshareBottomSheet.current.snapTo(1) }}
+        onPressOk={() => onPressSecondaryDeviceOk()}
+        onPressBack={() => { onPressSecondaryDeviceOk() }}
       />
     );
   };
@@ -657,6 +662,7 @@ export default function ManageBackup(props) {
   }, [health]);
 
   useEffect(() => {
+    
     (async () => {
       if (!overallHealth) {
         const storedHealth = await AsyncStorage.getItem('overallHealth');
@@ -719,7 +725,6 @@ export default function ManageBackup(props) {
       });
       setPageData(updatedPageData);
     }
-    autoHighlightOptions()
   }, [overallHealth]);
 
   useEffect(() => {
@@ -740,6 +745,7 @@ export default function ManageBackup(props) {
     dispatch(fetchSSSFromDB());
     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
     checkNShowHelperModal();
+    autoHighlightOptions();
   }, []);
 
   const checkNShowHelperModal = async () => {
@@ -749,56 +755,82 @@ export default function ManageBackup(props) {
     if ( !isManageBackupHelperDone ) {
       await AsyncStorage.setItem( 'isManageBackupHelperDone', 'true' );
       setTimeout(() => {
-        // WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
+        WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
       }, 10);
     }
   };
 
-  const autoHighlightOptions = () =>{
-    console.log("overall health", overallHealth);
-    if(overallHealth){
-      if(overallHealth.sharesInfo[0].shareStage=='Ugly'){
-        setTimeout(() => {
-          setSelectedType("secondaryDevice");
+  useEffect(()=>{
+    // autoHighlightOptions();
+  },[selectedType]);
+
+  const autoHighlightOptions = async () =>{
+    let secondaryDeviceAutoHighlightFlags = await AsyncStorage.getItem('secondaryDeviceAutoHighlightFlags')
+    let contact1AutoHighlightFlags = await AsyncStorage.getItem('contact1AutoHighlightFlags')
+    let contact2AutoHighlightFlags = await AsyncStorage.getItem('contact2AutoHighlightFlags')
+    let personalCopy1AutoHighlightFlags = await AsyncStorage.getItem('personalCopy1AutoHighlightFlags')
+    let personalCopy2AutoHighlightFlags = await AsyncStorage.getItem('personalCopy2AutoHighlightFlags')
+    let securityAutoHighlightFlags = await AsyncStorage.getItem('securityAutoHighlightFlags');
+    
+    if(!secondaryDeviceAutoHighlightFlags || secondaryDeviceAutoHighlightFlags!='true'){
+      setTimeout(() => {
+        setSelectedType("secondaryDevice");
           setSelectedStatus("error");
-          setTimeout(()=>{
-            secondaryDeviceBottomSheet.current.snapTo(1);
-          }, 5000);
-        }, 2500);
-      }
-      else if(overallHealth.sharesInfo[1].shareStage=='Ugly'){
-        setTimeout(() => {
-          setSelectedType("contact");
-          setSelectedStatus("error");
-          setTimeout(()=>{
-            trustedContactsBottomSheet.current.snapTo(1);
-          }, 5000);
-        }, 2500);
-      }
-      else if(overallHealth.sharesInfo[2].shareStage=='Ugly'){
-        setTimeout(() => {
-          setSelectedType("contact");
-          setSelectedStatus("error");
-          setTimeout(()=>{
-            trustedContactsBottomSheet.current.snapTo(1);
-          }, 5000);
-        }, 2500);
-      }
-      else if(overallHealth.qaStatus=='Ugly'){
-        setTimeout(() => {
-          setSelectedType("security");
-          setSelectedStatus("error");
-          setTimeout(()=>{
-            props.navigation.navigate("HealthCheckSecurityAnswer");
-          }, 5000);
-        }, 2500);
-      }
+        setTimeout(()=>{
+          secondaryDeviceBottomSheet.current.snapTo(1);
+        }, 4000);
+      }, 2500);
+    }
+    else if(!contact1AutoHighlightFlags || contact1AutoHighlightFlags!='true'){
+      setTimeout(() => {
+        setSelectedType("contact");
+        setSelectedStatus("error");
+        setTimeout(()=>{
+          trustedContactsBottomSheet.current.snapTo(1);
+        }, 4000);
+      }, 2500);
+    }
+    else if(!contact2AutoHighlightFlags || contact2AutoHighlightFlags!='true'){
+      setTimeout(() => {
+        setSelectedType("contact");
+        setSelectedStatus("error");
+        setTimeout(()=>{
+          trustedContactsBottomSheet.current.snapTo(1);
+        }, 4000);
+      }, 2500);
+      
+    }
+    else if(!personalCopy1AutoHighlightFlags || personalCopy1AutoHighlightFlags!='true'){
+      setTimeout(() => {
+        setSelectedType("copy1");
+        setSelectedStatus("error");
+        setTimeout(()=>{
+          props.navigation.navigate("PersonalCopy");
+        }, 4000);
+      }, 2500);
+      
+    }
+    else if(!personalCopy2AutoHighlightFlags || personalCopy2AutoHighlightFlags!='true'){
+      setTimeout(() => {
+        setSelectedType("copy2");
+        setSelectedStatus("error");
+        setTimeout(()=>{
+          props.navigation.navigate("PersonalCopy");
+        }, 4000);
+      }, 2500);
+    }
+    else if(!securityAutoHighlightFlags || securityAutoHighlightFlags != 'true'){
+      setTimeout(() => {
+        setSelectedType("security");
+        setSelectedStatus("error");
+        setTimeout(()=>{
+          props.navigation.navigate("HealthCheckSecurityAnswer");
+        }, 4000);
+      }, 2500);
     }
   }
 
   useEffect(() => {
-    // console.log("databaseSSS", databaseSSS);
-    // console.log("pageData, pageData", pageData)
     if (databaseSSS.pdfDetails) {
       pageData[3].personalInfo = databaseSSS.pdfDetails.copy1;
       pageData[4].personalInfo = databaseSSS.pdfDetails.copy2;
@@ -816,8 +848,6 @@ export default function ManageBackup(props) {
   useEffect(() => {
     if (contacts) {
       const updatedPageData = [...pageData];
-      // console.log('updatedPageData', updatedPageData, contactIndex);
-      // console.log("Contacts", contacts)
       for (let i = 0; i < updatedPageData.length; i++) {
         if (contactIndex == 1) {
           if (contacts.length == 2) {
@@ -848,7 +878,6 @@ export default function ManageBackup(props) {
         }
       }
       setPageData(updatedPageData);
-      // console.log("updatedPageData[i].personalInfo", pageData)
     }
   }, [contacts]);
 
@@ -952,15 +981,14 @@ export default function ManageBackup(props) {
               }}
               >
                 <TouchableOpacity
-                  disabled={
-                    !selectedType || item.type == selectedType ? false : true
-                  }
+                  // disabled={
+                  //   !selectedType || item.type == selectedType ? false : true
+                  // }
                   onPress={() => {
-                    // shareOtpWithTrustedContactBottomSheet.current.snapTo(1);
                     if (item.type == 'secondaryDevice') {
                       secondaryDeviceBottomSheet.current.snapTo(1);
                     }
-                    if (item.type == 'contact') {
+                    else if (item.type == 'contact') {
                       if (item.title == "Trusted Contact 1") {
                         setTimeout(() => {
                           setChosenContactIndex(0);
@@ -972,6 +1000,9 @@ export default function ManageBackup(props) {
                         }, 10)
                       }
                       trustedContactsBottomSheet.current.snapTo(1);
+                    }
+                    else{
+                      props.navigation.navigate(item.route);
                     }
                     // let singleton = Singleton.getInstance();
                     // singleton.setSelectedPdfDetails(pageData);
@@ -1110,7 +1141,8 @@ export default function ManageBackup(props) {
           />
         </ScrollView>
         <BottomSheet
-          onCloseEnd={() => onCloseEnd()}
+          onCloseStart={() => onPressSecondaryDeviceOk()}
+          // onCloseEnd={() => onPressSecondaryDeviceOk()}
           enabledInnerScrolling={true}
           ref={secondaryDeviceBottomSheet}
           snapPoints={[-30, hp("90%")]}
