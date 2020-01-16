@@ -52,7 +52,7 @@ function* fetchAddrWorker({ payload }) {
 export const fetchAddrWatcher = createWatcher(fetchAddrWorker, FETCH_ADDR);
 
 function* fetchBalanceWorker({ payload }) {
-  yield put(switchLoader(payload.serviceType, 'balances'));
+  if (payload.loader) yield put(switchLoader(payload.serviceType, 'balances'));
   const service = yield select(
     state => state.accounts[payload.serviceType].service,
   );
@@ -76,7 +76,8 @@ function* fetchBalanceWorker({ payload }) {
     // };
     // yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {
-    yield put(switchLoader(payload.serviceType, 'balances'));
+    if (payload.loader)
+      yield put(switchLoader(payload.serviceType, 'balances'));
   }
 }
 

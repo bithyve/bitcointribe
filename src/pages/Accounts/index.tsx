@@ -744,6 +744,7 @@ function Accounts(props) {
     if (!netBalance) {
       // if (serviceType === TEST_ACCOUNT) dispatch(getTestcoins(serviceType));
       dispatch(fetchBalance(serviceType)); // TODO: do periodic auto search
+      dispatch(fetchTransactions(serviceType));
     }
     setCarouselData1();
   }, [serviceType]);
@@ -977,10 +978,11 @@ function Accounts(props) {
         }}
         refreshControl={
           <RefreshControl
-            refreshing={loading.transactions || loading.balances}
+            refreshing={loading.balances}
             onRefresh={() => {
-              dispatch(fetchBalance(serviceType));
+              const loader = true;
               dispatch(fetchTransactions(serviceType));
+              dispatch(fetchBalance(serviceType, loader));
             }}
           />
         }

@@ -69,17 +69,17 @@ const initialState = {
   SECURE_ACCOUNT: ACCOUNT_VARS,
 };
 
-export default ( state = initialState, action ) => {
+export default (state = initialState, action) => {
   const account = action.payload ? action.payload.serviceType : null;
-  switch ( action.type ) {
+  switch (action.type) {
     case ADDR_FETCHED:
       return {
         ...state,
-        [ account ]: {
-          ...state[ account ],
+        [account]: {
+          ...state[account],
           receivingAddress: action.payload.address,
           loading: {
-            ...state[ account ].loading,
+            ...state[account].loading,
             receivingAddress: false,
           },
         },
@@ -88,11 +88,11 @@ export default ( state = initialState, action ) => {
     case BALANCE_FETCHED:
       return {
         ...state,
-        [ account ]: {
-          ...state[ account ],
+        [account]: {
+          ...state[account],
           balances: action.payload.balances,
           loading: {
-            ...state[ account ].loading,
+            ...state[account].loading,
             balances: false,
           },
         },
@@ -101,11 +101,11 @@ export default ( state = initialState, action ) => {
     case TRANSACTIONS_FETCHED:
       return {
         ...state,
-        [ account ]: {
-          ...state[ account ],
+        [account]: {
+          ...state[account],
           transactions: action.payload.transactions,
           loading: {
-            ...state[ account ].loading,
+            ...state[account].loading,
             transactions: false,
           },
         },
@@ -114,15 +114,15 @@ export default ( state = initialState, action ) => {
     case TRANSFER_ST1_EXECUTED:
       return {
         ...state,
-        [ account ]: {
-          ...state[ account ],
+        [account]: {
+          ...state[account],
           transfer: {
-            ...state[ account ].transfer,
+            ...state[account].transfer,
             stage1: { ...action.payload.result },
             executed: 'ST1',
           },
           loading: {
-            ...state[ account ].loading,
+            ...state[account].loading,
             transfer: false,
           },
         },
@@ -131,28 +131,28 @@ export default ( state = initialState, action ) => {
     case CLEAR_TRANSFER:
       return {
         ...state,
-        [ account ]: {
-          ...state[ account ],
+        [account]: {
+          ...state[account],
           transfer: {
-            ...initialState[ account ].transfer,
+            ...initialState[account].transfer,
           },
         },
       };
 
     case TRANSFER_ST2_EXECUTED:
-      switch ( action.payload.serviceType ) {
+      switch (action.payload.serviceType) {
         case REGULAR_ACCOUNT || TEST_ACCOUNT:
           return {
             ...state,
-            [ account ]: {
-              ...state[ account ],
+            [account]: {
+              ...state[account],
               transfer: {
-                ...state[ account ].transfer,
+                ...state[account].transfer,
                 txid: action.payload.result,
                 executed: 'ST2',
               },
               loading: {
-                ...state[ account ].loading,
+                ...state[account].loading,
                 transfer: false,
               },
             },
@@ -160,15 +160,15 @@ export default ( state = initialState, action ) => {
         case SECURE_ACCOUNT:
           return {
             ...state,
-            [ account ]: {
-              ...state[ account ],
+            [account]: {
+              ...state[account],
               transfer: {
-                ...state[ account ].transfer,
+                ...state[account].transfer,
                 stage2: { ...action.payload.result },
                 executed: 'ST2',
               },
               loading: {
-                ...state[ account ].loading,
+                ...state[account].loading,
                 transfer: false,
               },
             },
@@ -178,15 +178,15 @@ export default ( state = initialState, action ) => {
     case TRANSFER_ST3_EXECUTED:
       return {
         ...state,
-        [ account ]: {
-          ...state[ account ],
+        [account]: {
+          ...state[account],
           transfer: {
-            ...state[ account ].transfer,
+            ...state[account].transfer,
             txid: action.payload.result,
             executing: false,
           },
           loading: {
-            ...state[ account ].loading,
+            ...state[account].loading,
             transfer: false,
           },
         },
@@ -195,17 +195,17 @@ export default ( state = initialState, action ) => {
     case SERVICES_ENRICHED:
       return {
         ...state,
-        [ REGULAR_ACCOUNT ]: {
-          ...state[ REGULAR_ACCOUNT ],
-          service: action.payload.services[ REGULAR_ACCOUNT ],
+        [REGULAR_ACCOUNT]: {
+          ...state[REGULAR_ACCOUNT],
+          service: action.payload.services[REGULAR_ACCOUNT],
         },
-        [ TEST_ACCOUNT ]: {
-          ...state[ TEST_ACCOUNT ],
-          service: action.payload.services[ TEST_ACCOUNT ],
+        [TEST_ACCOUNT]: {
+          ...state[TEST_ACCOUNT],
+          service: action.payload.services[TEST_ACCOUNT],
         },
-        [ SECURE_ACCOUNT ]: {
-          ...state[ SECURE_ACCOUNT ],
-          service: action.payload.services[ SECURE_ACCOUNT ],
+        [SECURE_ACCOUNT]: {
+          ...state[SECURE_ACCOUNT],
+          service: action.payload.services[SECURE_ACCOUNT],
         },
         servicesEnriched: true,
       };
@@ -213,11 +213,11 @@ export default ( state = initialState, action ) => {
     case ACCOUNTS_LOADING:
       return {
         ...state,
-        [ account ]: {
-          ...state[ account ],
+        [account]: {
+          ...state[account],
           loading: {
-            ...state[ account ].loading,
-            [ action.payload.beingLoaded ]: !state[ account ].loading[
+            ...state[account].loading,
+            [action.payload.beingLoaded]: !state[account].loading[
               action.payload.beingLoaded
             ],
           },
