@@ -93,7 +93,9 @@ export default function Sell(props) {
   const renderSellHelperHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+      borderColor={Colors.blue}
+      backgroundColor={Colors.blue}
+      onPressHeader={() => {
           (SellHelperBottomSheet as any).current.snapTo(0);
         }}
       />

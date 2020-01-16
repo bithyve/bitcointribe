@@ -62,7 +62,7 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
 
     useEffect(() => {
         setSearchBox('');
-        const contactList = data
+        const contactList = contactData
         .sort(function (a, b) {
           if(a.name && b.name){
             if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
@@ -194,12 +194,6 @@ const styles = StyleSheet.create({
     modalContainer: {
         height: '100%',
         backgroundColor: Colors.white,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderLeftWidth: 1,
-        borderRightWidth: 1,
-        borderTopWidth: 1,
-        borderColor: Colors.borderColor,
         alignSelf: 'center',
         width: '100%'
     },

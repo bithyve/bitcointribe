@@ -91,7 +91,9 @@ const ReceivingAddress = props => {
   const renderReceiveHelperHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+      borderColor={Colors.blue}
+      backgroundColor={Colors.blue}
+      onPressHeader={() => {
           (ReceiveHelperBottomSheet as any).current.snapTo(0);
         }}
       />

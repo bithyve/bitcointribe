@@ -924,7 +924,9 @@ export default function Home(props) {
   const renderSettingsHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+      borderColor={Colors.white}
+      backgroundColor={Colors.white}
+      onPressHeader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 10);
@@ -950,7 +952,9 @@ export default function Home(props) {
   const renderAllAccountsHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+      borderColor={Colors.white}
+      backgroundColor={Colors.white}
+      onPressHeader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 10);
@@ -976,7 +980,9 @@ export default function Home(props) {
   const renderAddressBookHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+      borderColor={Colors.white}
+      backgroundColor={Colors.white}
+      onPressHeader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 2);
@@ -1003,7 +1009,7 @@ export default function Home(props) {
     return (
       <SmallHeaderModal
         headerColor={Colors.backgroundColor}
-        onPressHandle={() => {
+        onPressHeader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
           }, 2);
@@ -1173,7 +1179,9 @@ export default function Home(props) {
   const renderFastBitcoinSellCalculationHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+      borderColor={Colors.white}
+      backgroundColor={Colors.white}
+      onPressHeader={() => {
           (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -1183,7 +1191,9 @@ export default function Home(props) {
   const renderFastBitcoinRedeemCalculationHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+      borderColor={Colors.white}
+      backgroundColor={Colors.white}
+      onPressHeader={() => {
           (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -1211,7 +1221,9 @@ export default function Home(props) {
   const renderContactSelectedFromAddressBookHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+      borderColor={Colors.white}
+      backgroundColor={Colors.white}
+      onPressHeader={() => {
           (ContactSelectedFromAddressBookBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -1238,7 +1250,9 @@ export default function Home(props) {
   const renderContactSelectedFromAddressBookQrCodeHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+      borderColor={Colors.white}
+      backgroundColor={Colors.white}
+      onPressHeader={() => {
           (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
             0,
           );
@@ -1268,7 +1282,9 @@ export default function Home(props) {
   const renderFamilyAndFriendAddressBookHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+      borderColor={Colors.white}
+      backgroundColor={Colors.white}
+      onPressHeader={() => {
           setTimeout(() => {
             setFamilyAndFriendsBookBottomSheetsFlag(false);
           }, 2);

@@ -674,7 +674,9 @@ function Accounts(props) {
   const renderBuyHelperHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+      borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
           (BuyHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -707,7 +709,9 @@ function Accounts(props) {
   const renderTestAccountsHelperHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+      borderColor={Colors.blue}
+      backgroundColor={Colors.blue}
+      onPressHeader={() => {
           (TestAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -739,7 +743,9 @@ function Accounts(props) {
   const renderSecureAccountsHelperHeader = useCallback(() => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+      borderColor={Colors.blue}
+      backgroundColor={Colors.blue}
+      onPressHeader={() => {
           (SecureAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -771,7 +777,9 @@ function Accounts(props) {
   const renderRegularAccountsHelperHeader = useCallback(() => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+      borderColor={Colors.blue}
+      backgroundColor={Colors.blue}
+      onPressHeader={() => {
           (RegularAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
