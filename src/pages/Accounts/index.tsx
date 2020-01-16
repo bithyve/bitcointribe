@@ -114,79 +114,7 @@ function Accounts(props) {
     RegularAccountHelperBottomSheet,
     setRegularAccountHelperBottomSheet,
   ] = useState(React.createRef());
-
-  const [transactionData, setTransactionData] = useState([
-    {
-      title: 'Spending accounts',
-      date: '30 November 2019',
-      time: '11:00 am',
-      price: '0.025',
-      transactionStatus: 'send',
-    },
-    {
-      title: 'Spending accounts',
-      date: '1 November 2019',
-      time: '11:00 am',
-      price: '0.015',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Spending accounts',
-      date: '30 Jully 2019',
-      time: '10:00 am',
-      price: '0.125',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Saving accounts',
-      date: '1 June 2019',
-      time: '12:00 am',
-      price: '0.5',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Saving accounts',
-      date: '11 May 2019',
-      time: '1:00 pm',
-      price: '0.1',
-      transactionStatus: 'send',
-    },
-    {
-      title: 'Spending accounts',
-      date: '30 November 2019',
-      time: '11:00 am',
-      price: '0.025',
-      transactionStatus: 'send',
-    },
-    {
-      title: 'Spending accounts',
-      date: '1 November 2019',
-      time: '11:00 am',
-      price: '0.015',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Spending accounts',
-      date: '30 Jully 2019',
-      time: '10:00 am',
-      price: '0.125',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Saving accounts',
-      date: '1 June 2019',
-      time: '12:00 am',
-      price: '0.5',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Saving accounts',
-      date: '12 May 2019',
-      time: '1:00 pm',
-      price: '0.1',
-      transactionStatus: 'send',
-    },
-  ]);
+  
   const [carouselData, setCarouselData] = useState([
     {
       accountType: 'Test Account',
@@ -208,9 +136,9 @@ function Accounts(props) {
     },
   ]);
 
-  const [carouselInitIndex, setCarouselInitIndex] = useState(0);
+  let [carouselInitIndex, setCarouselInitIndex] = useState(0);
   const [switchOn, setSwitchOn] = useState(true);
-  const [carousel, setCarousel] = useState(React.createRef());
+  let [carousel, setCarousel] = useState(React.createRef());
 
   const checkNHighlight = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
@@ -259,17 +187,18 @@ function Accounts(props) {
   };
 
   const setCarouselData1 = async () => {
+    console.log("SERVICETYPE", serviceType);
     if (serviceType == TEST_ACCOUNT) {
       setTimeout(() => {
         carousel.current.snapToItem(0, true, false);
         setCarouselInitIndex(0);
-      }, 200);
+      }, 3000);
     }
     if (serviceType == REGULAR_ACCOUNT) {
       setTimeout(() => {
         carousel.current.snapToItem(1, true, false);
         setCarouselInitIndex(1);
-      }, 200);
+      }, 3000);
     }
     if (serviceType == SECURE_ACCOUNT) {
       // let isSecureAccountScanOpen = await AsyncStorage.getItem(
@@ -288,7 +217,7 @@ function Accounts(props) {
       setTimeout(() => {
         carousel.current.snapToItem(2, true, false);
         setCarouselInitIndex(2);
-      }, 200);
+      }, 3000);
     }
   };
 
@@ -861,20 +790,26 @@ function Accounts(props) {
   const [averageTxFee, setAverageTxFee] = useState(0);
 
   const dispatch = useDispatch();
-
+  const [exchangeRates, setExchangeRates] = useState();
   useEffect(() => {
     if (!netBalance) {
       // if (serviceType === TEST_ACCOUNT) dispatch(getTestcoins(serviceType));
       dispatch(fetchBalance(serviceType)); // TODO: do periodic auto search
       dispatch(fetchTransactions(serviceType));
     }
+    if (serviceType === SECURE_ACCOUNT) {
+      AsyncStorage.getItem('isSecureAccountHelperDone').then(done => {
+        if (!done) {
+          SecureAccountHelperBottomSheet.current.snapTo(1);
+          AsyncStorage.setItem('isSecureAccountHelperDone', 'true');
+        }
+      });
+    }
+    console.log("IN useEffect1")
   }, [serviceType]);
 
   useEffect(() => {
     setCarouselData1();
-  }, []);
-
-  useEffect(() => {
     (async () => {
       const storedAverageTxFee = await AsyncStorage.getItem(
         'storedAverageTxFee',
@@ -895,24 +830,7 @@ function Accounts(props) {
         'storedAverageTxFee',
         JSON.stringify({ averageTxFee, lastFetched: Date.now() }),
       );
-    })();
-  }, []);
 
-  useEffect(() => {
-    if (serviceType === SECURE_ACCOUNT) {
-      AsyncStorage.getItem('isSecureAccountHelperDone').then(done => {
-        if (!done) {
-          SecureAccountHelperBottomSheet.current.snapTo(1);
-          AsyncStorage.setItem('isSecureAccountHelperDone', 'true');
-        }
-      });
-    }
-  }, [serviceType]);
-
-  const [exchangeRates, setExchangeRates] = useState();
-
-  useEffect(() => {
-    (async () => {
       const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
       if (storedExchangeRates) {
         const exchangeRates = JSON.parse(storedExchangeRates);
@@ -933,6 +851,8 @@ function Accounts(props) {
       }
     })();
   }, []);
+
+ 
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -1018,6 +938,7 @@ function Accounts(props) {
             sliderWidth={sliderWidth}
             itemWidth={sliderWidth * 0.95}
             onSnapToItem={index => {
+              console.log("INDEX", index, carouselInitIndex);
               index === 0
                 ? getServiceType(TEST_ACCOUNT)
                 : index === 1
