@@ -94,7 +94,9 @@ export default function Buy(props) {
   const renderBuyHelperHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+      borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
           (BuyHelperBottomSheet as any).current.snapTo(0);
         }}
       />

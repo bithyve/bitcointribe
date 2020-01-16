@@ -157,7 +157,9 @@ export default function Send(props) {
   const renderSendHelperHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+      borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
           (SendHelperBottomSheet as any).current.snapTo(0);
         }}
       />

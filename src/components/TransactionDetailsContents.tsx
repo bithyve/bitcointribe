@@ -79,12 +79,6 @@ const styles = StyleSheet.create({
     modalContainer: {
         height: '100%',
         backgroundColor: Colors.backgroundColor,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderLeftWidth: 1,
-        borderRightWidth: 1,
-        borderTopWidth: 1,
-        borderColor: Colors.borderColor,
         alignSelf: 'center',
         width: '100%'
     },
