@@ -447,7 +447,7 @@ export default function RestoreSelectedContactsList(props) {
                           fontSize: RFValue(11)
                         }}
                       >
-                        {contact.communicationMode.length
+                        {contact && contact.communicationMode && contact.communicationMode.length
                           ? contact.communicationMode[0].info
                           : ""}
                       </Text>

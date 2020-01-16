@@ -16,49 +16,90 @@ import { RFValue } from "react-native-responsive-fontsize";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import { RNCamera } from 'react-native-camera';
-import BottomInfoBox from '../components/BottomInfoBox';
 
-export default function QrCodeModalContents( props ) {
-	const [ openCameraFlag, setOpenCameraFlag ] = useState( false )
-	const barcodeRecognized = async ( barcodes ) => {
-		if ( barcodes.data ) {
-			setOpenCameraFlag( false );
-			props.modalRef.current.snapTo( 1 ); // closes modal
-			props.onQrScan( barcodes.data );
+export default function QrCodeModalContents(props) {
+	const [openCameraFlag, setOpenCameraFlag] = useState(false)
+	const barcodeRecognized = async (barcodes) => {
+		if (barcodes.data) {
+			setOpenCameraFlag(false);
+			props.modalRef.current.snapTo(1); // closes modal
+			props.onQrScan(barcodes.data);
 		}
 	};
 
-	return ( <View style={ styles.modalContentContainer }>
-		<KeyboardAvoidingView style={ { flex: 1 } } behavior={ Platform.OS == 'ios' ? 'padding' : '' } enabled>
-			<ScrollView style={ styles.qrModalScrollView }>
-				<View style={ styles.qrModalImageNTextInputView }>
-					<AppBottomSheetTouchableWrapper onPress={ () => props.onPressQrScanner() } style={ { alignSelf: 'center', backgroundColor: Colors.blue, width: wp( '50%' ), height: wp( '13%' ), alignItems: 'center', justifyContent: 'center', borderRadius: 10 } }>
-						<Text style={ { color: Colors.white, fontFamily: Fonts.FiraSansMedium, fontSize: RFValue( 13 ) } }>Scan QR code</Text>
-					</AppBottomSheetTouchableWrapper>
-					<TextInput placeholder={ 'Enter Recipients Address' } placeholderTextColor={ Colors.borderColor } style={ styles.qrModalTextInput } />
+	return (<View style={styles.modalContentContainer}>
+		<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : ''} enabled>
+			<ScrollView style={styles.qrModalScrollView}>
+				<View style={styles.qrModalImageNTextInputView}>
+					{props.isOpenedFlag && openCameraFlag ?
+						(<View style={{
+							width: wp('100%'),
+							height: wp('100%'),
+							overflow: "hidden",
+							borderRadius: 20,
+							marginTop: hp('3%')
+						}}>
+							<RNCamera
+								ref={(ref) => { this.cameraRef = ref; }}
+								style={{
+									width: wp('100%'),
+									height: wp('100%')
+								}}
+								onBarCodeRead={barcodeRecognized}
+							>
+								<View style={{ flexDirection: 'row', paddingTop: 12, paddingRight: 12, paddingLeft: 12, width: '100%' }}>
+									<View style={{ borderLeftWidth: 1, borderTopColor: 'white', borderLeftColor: 'white', height: hp('5%'), width: hp('5%'), borderTopWidth: 1 }} />
+									<View style={{ borderTopWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderTopColor: 'white', height: hp('5%'), width: hp('5%'), marginLeft: 'auto' }} />
+								</View>
+								<View style={{ marginTop: 'auto', flexDirection: 'row', paddingBottom: 12, paddingRight: 12, paddingLeft: 12, width: '100%', }}>
+									<View style={{ borderLeftWidth: 1, borderBottomColor: 'white', borderLeftColor: 'white', height: hp('5%'), width: hp('5%'), borderBottomWidth: 1 }} />
+									<View style={{ borderBottomWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderBottomColor: 'white', height: hp('5%'), width: hp('5%'), marginLeft: 'auto' }} />
+								</View>
+							</RNCamera>
+						</View>) : (
+							<AppBottomSheetTouchableWrapper onPress={() => setOpenCameraFlag(true)} >
+								<ImageBackground source={require("../assets/images/icons/iPhone-QR.png")} style={{
+									width: wp('100%'),
+									height: wp('100%'),
+									overflow: "hidden",
+									borderRadius: 20,
+									marginTop: hp('3%')
+								}} >
+									<View style={{ flexDirection: 'row', paddingTop: 12, paddingRight: 12, paddingLeft: 12, width: '100%' }}>
+										<View style={{ borderLeftWidth: 1, borderTopColor: 'white', borderLeftColor: 'white', height: hp('5%'), width: hp('5%'), borderTopWidth: 1 }} />
+										<View style={{ borderTopWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderTopColor: 'white', height: hp('5%'), width: hp('5%'), marginLeft: 'auto' }} />
+									</View>
+									<View style={{ marginTop: 'auto', flexDirection: 'row', paddingBottom: 12, paddingRight: 12, paddingLeft: 12, width: '100%', }}>
+										<View style={{ borderLeftWidth: 1, borderBottomColor: 'white', borderLeftColor: 'white', height: hp('5%'), width: hp('5%'), borderBottomWidth: 1 }} />
+										<View style={{ borderBottomWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderBottomColor: 'white', height: hp('5%'), width: hp('5%'), marginLeft: 'auto' }} />
+									</View>
+								</ImageBackground>
+							</AppBottomSheetTouchableWrapper>
+						)}
+					<TextInput placeholder={'Enter Recipients Address'} placeholderTextColor={Colors.borderColor} style={styles.qrModalTextInput} />
 				</View>
-				{/* <View style={ styles.qrModalInfoView }>
-					<View style={ { marginRight: 15 } }>
-						<Text style={ styles.qrModalInfoTitleText }>QR</Text>
-						<Text style={ styles.qrModalInfoInfoText }>Scan a QR code to send money or receive information from another Hexa wallet</Text>
+				<View style={styles.qrModalInfoView}>
+					<View style={{ marginRight: 15 }}>
+						<Text style={styles.qrModalInfoTitleText}>QR</Text>
+						<Text style={styles.qrModalInfoInfoText}>Scan a QR code to send money or receive information from another Hexa wallet</Text>
 					</View>
-				</View> */}
-				<BottomInfoBox
-					title={ 'QR' }
-					infoText={
-						`Scan a QR code to send money or receive information from another Hexa wallet`
-					}
-				/>
+					<Ionicons
+						name="ios-arrow-forward"
+						color={Colors.textColorGrey}
+						size={15}
+						style={{ alignSelf: 'center' }}
+					/>
+				</View>
 			</ScrollView>
 		</KeyboardAvoidingView>
 	</View >
 	)
 }
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
 	modalContentContainer: {
 		height: '100%',
 		backgroundColor: Colors.white,
-		paddingBottom: hp( '10%' )
+		paddingBottom: hp('10%')
 	},
 	qrModalScrollView: {
 		display: 'flex',
@@ -68,12 +109,12 @@ const styles = StyleSheet.create( {
 		marginTop: 15,
 		justifyContent: 'center',
 		alignItems: 'center',
-		// borderBottomColor: Colors.backgroundColor,
-		// borderBottomWidth: 3
+		borderBottomColor: Colors.backgroundColor,
+		borderBottomWidth: 3
 	},
 	qrModalImage: {
-		width: wp( '72%' ),
-		height: wp( '72%' ),
+		width: wp('72%'),
+		height: wp('72%'),
 		borderRadius: 20,
 		borderWidth: 2.5,
 		borderColor: Colors.backgroundColor
@@ -82,13 +123,13 @@ const styles = StyleSheet.create( {
 		borderRadius: 20,
 		borderWidth: 1,
 		borderColor: Colors.backgroundColor,
-		width: wp( '72%' ),
+		width: wp('72%'),
 		height: 60,
 		marginTop: 25,
 		marginBottom: 25,
 		paddingLeft: 15,
 		paddingRight: 15,
-		fontSize: RFValue( 11, 812 ),
+		fontSize: RFValue(11, 812),
 		fontFamily: Fonts.FiraSansMedium
 	},
 	qrModalInfoView: {
@@ -101,11 +142,11 @@ const styles = StyleSheet.create( {
 	},
 	qrModalInfoTitleText: {
 		color: Colors.blue,
-		fontSize: RFValue( 18, 812 )
+		fontSize: RFValue(18, 812)
 	},
 	qrModalInfoInfoText: {
 		color: Colors.textColorGrey,
-		fontSize: RFValue( 12, 812 )
+		fontSize: RFValue(12, 812)
 	}
 
-} )
+})
