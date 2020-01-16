@@ -395,7 +395,7 @@ export default function Home(props) {
         }
       }
     })();
-    console.log("overallHealthoverallHealth", overallHealth)
+    console.log('overallHealthoverallHealth', overallHealth);
   }, []);
 
   const messageAsPerHealth = health => {
@@ -2351,7 +2351,7 @@ export default function Home(props) {
                 source={require('../assets/images/HomePageIcons/icon_more.png')}
                 style={styles.tabBarImage}
               />
-              <Text style={styles.activeTabTextStyle}>More</Text>
+              <Text style={styles.activeTabTextStyle}>more</Text>
             </View>
           ) : (
             <View style={{ flexDirection: 'row' }}>

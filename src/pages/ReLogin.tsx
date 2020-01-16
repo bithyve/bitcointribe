@@ -70,10 +70,11 @@ export default function Login(props) {
       <StatusBar />
       <View style={{ flex: 1 }}>
         <View style={{}}>
-          <Text style={styles.headerTitleText}>Welcome Back!</Text>
+          <Text style={styles.headerTitleText}>Welcome back!</Text>
           <View>
             <Text style={styles.headerInfoText}>
-              Please enter a <Text style={styles.boldItalicText}>passcode</Text>
+              Please enter the{' '}
+              <Text style={styles.boldItalicText}>passcode</Text>
             </Text>
             <View>
               <View style={styles.passcodeTextInputView}>
@@ -95,9 +96,9 @@ export default function Login(props) {
                       <Text
                         style={{
                           fontSize: RFValue(10),
-                          textAlignVertical: "center",
-                          justifyContent: "center",
-                          alignItems: "center"
+                          textAlignVertical: 'center',
+                          justifyContent: 'center',
+                          alignItems: 'center',
                         }}
                       >
                         <FontAwesome
@@ -389,14 +390,14 @@ const styles = StyleSheet.create({
   textStyles: {
     color: Colors.black,
     fontSize: RFValue(13),
-    textAlign: "center",
-    lineHeight: 18
+    textAlign: 'center',
+    lineHeight: 18,
   },
   textFocused: {
     color: Colors.black,
     fontSize: RFValue(13),
-    textAlign: "center",
-    lineHeight: 18
+    textAlign: 'center',
+    lineHeight: 18,
   },
   keyPadRow: {
     flexDirection: 'row',
@@ -404,10 +405,10 @@ const styles = StyleSheet.create({
   },
   keyPadElementTouchable: {
     flex: 1,
-    height: hp("8%"),
+    height: hp('8%'),
     fontSize: RFValue(18),
-    justifyContent: "center",
-    alignItems: "center"
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   keyPadElementText: {
     color: Colors.blue,
@@ -431,7 +432,7 @@ const styles = StyleSheet.create({
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.FiraSansMedium,
   },
   boldItalicText: {
     fontFamily: Fonts.FiraSansMediumItalic,
@@ -453,8 +454,8 @@ const styles = StyleSheet.create({
   },
   passcodeTextInputText: {
     color: Colors.blue,
-    fontWeight: "bold",
-    fontSize: RFValue(13)
+    fontWeight: 'bold',
+    fontSize: RFValue(13),
   },
   passcodeTextInputView: {
     flexDirection: 'row',

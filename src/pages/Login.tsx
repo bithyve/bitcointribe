@@ -74,10 +74,10 @@ export default function Login(props) {
       <StatusBar />
       <View style={{ flex: 1 }}>
         <View style={{}}>
-          <Text style={styles.headerTitleText}>Welcome Back!</Text>
+          <Text style={styles.headerTitleText}>Welcome back!</Text>
           <View>
             <Text style={styles.headerInfoText}>
-              Please enter your{' '}
+              Please enter the{' '}
               <Text style={styles.boldItalicText}>passcode</Text>
             </Text>
             <View>

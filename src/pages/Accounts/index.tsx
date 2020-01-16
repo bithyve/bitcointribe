@@ -62,8 +62,12 @@ const WalkthroughableImage = walkthroughable(Image);
 const WalkthroughableTouchableOpacity = walkthroughable(TouchableOpacity);
 const WalkthroughableView = walkthroughable(View);
 import { UsNumberFormat } from '../../common/utilities';
+import { keyFetched } from '../../store/actions/storage';
 
 function Accounts(props) {
+  const [serviceType, setServiceType] = useState(
+    props.navigation.getParam('serviceType'),
+  );
   const sliderWidth = Dimensions.get('window').width;
   const [SendIsActive, setSendIsActive] = useState(true);
   const [ReceiveIsActive, setReceiveIsActive] = useState(true);
@@ -104,6 +108,11 @@ function Accounts(props) {
   const [
     SecureAccountHelperBottomSheet,
     setSecureAccountHelperBottomSheet,
+  ] = useState(React.createRef());
+
+  const [
+    RegularAccountHelperBottomSheet,
+    setRegularAccountHelperBottomSheet,
   ] = useState(React.createRef());
 
   const [transactionData, setTransactionData] = useState([
@@ -249,15 +258,6 @@ function Accounts(props) {
     }
   };
 
-  useEffect(() => {
-    getServiceType(
-      props.navigation.getParam('serviceType')
-        ? props.navigation.getParam('serviceType')
-        : serviceType,
-    );
-    setCarouselData1();
-  }, []);
-
   const setCarouselData1 = async () => {
     if (serviceType == TEST_ACCOUNT) {
       setTimeout(() => {
@@ -268,26 +268,28 @@ function Accounts(props) {
     if (serviceType == REGULAR_ACCOUNT) {
       setTimeout(() => {
         carousel.current.snapToItem(1, true, false);
+        setCarouselInitIndex(1);
       }, 200);
     }
-    // if (serviceType == SECURE_ACCOUNT) {
-    //   let isSecureAccountScanOpen = await AsyncStorage.getItem(
-    //     'isSecureAccountScanOpen',
-    //   );
-    //   if (
-    //     !isSecureAccountScanOpen &&
-    //     props.navigation.getParam('serviceType') == SECURE_ACCOUNT
-    //   ) {
-    //     AsyncStorage.setItem('isSecureAccountScanOpen', 'true');
-    //     props.navigation.navigate('SecureScan', {
-    //       serviceType,
-    //       getServiceType: getServiceType,
-    //     });
-    //   }
-    //   setTimeout(() => {
-    //     carousel.current.snapToItem(2, true, false);
-    //   }, 200);
-    // }
+    if (serviceType == SECURE_ACCOUNT) {
+      // let isSecureAccountScanOpen = await AsyncStorage.getItem(
+      //   'isSecureAccountScanOpen',
+      // );
+      // if (
+      //   !isSecureAccountScanOpen &&
+      //   props.navigation.getParam('serviceType') == SECURE_ACCOUNT
+      // ) {
+      //   AsyncStorage.setItem('isSecureAccountScanOpen', 'true');
+      //   props.navigation.navigate('SecureScan', {
+      //     serviceType,
+      //     getServiceType: getServiceType,
+      //   });
+      // }
+      setTimeout(() => {
+        carousel.current.snapToItem(2, true, false);
+        setCarouselInitIndex(2);
+      }, 200);
+    }
   };
 
   const handleStepChange = step => {
@@ -381,8 +383,7 @@ function Accounts(props) {
 
         <View style={{ justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            {(item.accountType == 'Test Account' ||
-              item.accountType == 'Savings Account') && (
+            {
               <Text
                 style={{
                   marginRight: 10,
@@ -396,11 +397,13 @@ function Accounts(props) {
                     TestAccountHelperBottomSheet.current.snapTo(1);
                   else if (item.accountType == 'Savings Account')
                     SecureAccountHelperBottomSheet.current.snapTo(1);
+                  else if (item.accountType == 'Regular Account')
+                    RegularAccountHelperBottomSheet.current.snapTo(1);
                 }}
               >
                 Know More
               </Text>
-            )}
+            }
             <Image
               style={{
                 marginLeft: 'auto',
@@ -721,104 +724,6 @@ function Accounts(props) {
     );
   };
 
-  // useEffect(() => {
-  // (SendErrorBottomSheet as any).current.snapTo(1);
-  // (SendBottomSheet as any).current.snapTo(1)
-  // }, []);
-
-  const [serviceType, setServiceType] = useState(
-    props.navigation.getParam('serviceType'),
-  );
-  const { loading, service } = useSelector(
-    state => state.accounts[serviceType],
-  );
-
-  const { balances, transactions } =
-    serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
-  const netBalance = service
-    ? balances.balance + balances.unconfirmedBalance
-    : 0;
-
-  const dispatch = useDispatch();
-  useEffect(() => {
-    if (!netBalance) {
-      // if (serviceType === TEST_ACCOUNT) dispatch(getTestcoins(serviceType));
-      dispatch(fetchBalance(serviceType)); // TODO: do periodic auto search
-      dispatch(fetchTransactions(serviceType));
-    }
-    setCarouselData1();
-  }, [serviceType]);
-
-  const [averageTxFee, setAverageTxFee] = useState(0);
-  useEffect(() => {
-    (async () => {
-      const storedAverageTxFee = await AsyncStorage.getItem(
-        'storedAverageTxFee',
-      );
-      if (storedAverageTxFee) {
-        const { averageTxFee, lastFetched } = JSON.parse(storedAverageTxFee);
-        if (Date.now() - lastFetched < 1800000) {
-          setAverageTxFee(averageTxFee);
-          return;
-        } // maintaining a half an hour difference b/w fetches
-      }
-
-      const txPriority = 'high';
-      const instance = service.hdWallet || service.secureHDWallet;
-      const { averageTxFee } = await instance.averageTransactionFee(txPriority);
-      setAverageTxFee(averageTxFee);
-      await AsyncStorage.setItem(
-        'storedAverageTxFee',
-        JSON.stringify({ averageTxFee, lastFetched: Date.now() }),
-      );
-    })();
-  }, []);
-
-  useEffect(() => {
-    if (serviceType === SECURE_ACCOUNT) {
-      AsyncStorage.getItem('isSecureAccountHelperDone').then(done => {
-        if (!done) {
-          SecureAccountHelperBottomSheet.current.snapTo(1);
-          AsyncStorage.setItem('isSecureAccountHelperDone', 'true');
-        }
-      });
-    }
-  }, [serviceType]);
-
-  const [exchangeRates, setExchangeRates] = useState();
-
-  useEffect(() => {
-    (async () => {
-      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
-      if (storedExchangeRates) {
-        const exchangeRates = JSON.parse(storedExchangeRates);
-        setExchangeRates(exchangeRates);
-      }
-      const res = await axios.get('https://blockchain.info/ticker');
-      console.log({ res });
-      if (res.status == 200) {
-        const exchangeRates = res.data;
-        exchangeRates.lastFetched = Date.now();
-        setExchangeRates(exchangeRates);
-        await AsyncStorage.setItem(
-          'exchangeRates',
-          JSON.stringify(exchangeRates),
-        );
-      } else {
-        console.log('Failed to retrieve exchange rates', res);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    async () => {};
-  }, []);
-
-  // useEffect( () => {
-  //   if ( !transactions.totalTransactions )
-  //     dispatch( fetchTransactions( serviceType ) );
-  // }, [ serviceType ] );
-
   const renderBuyHelperContents = () => {
     return (
       <TestAccountHelperModalContents
@@ -906,10 +811,127 @@ function Accounts(props) {
     return (
       <SmallHeaderModal
         onPressHandle={() => {
-          (TestAccountHelperBottomSheet as any).current.snapTo(0);
+          (SecureAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
     );
+  }, []);
+
+  const renderRegularAccountsHelperContents = useCallback(() => {
+    return (
+      <TestAccountHelperModalContents
+        topButtonText={'Regular Account'}
+        boldPara={
+          'If you are new to Bitcoin, this account is\ndesigned for you. It comes pre-loaded\nwith some test bitcoins (not real)'
+        }
+        helperInfo={
+          '\n\nYou can even send and receive test bitcoins\nfrom other Hexa wallet test accounts\n\n\n\nThese are not actual bitcoins and are of no\nintrinsic value. The testnet sats do not add up\nin your wallet balance\n\n\n'
+        }
+        continueButtonText={'Continue'}
+        quitButtonText={'Quit'}
+        onPressContinue={() => {
+          (RegularAccountHelperBottomSheet as any).current.snapTo(0);
+        }}
+        onPressQuit={() => {
+          (RegularAccountHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderRegularAccountsHelperHeader = useCallback(() => {
+    return (
+      <SmallHeaderModal
+        onPressHandle={() => {
+          (RegularAccountHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const { loading, service } = useSelector(
+    state => state.accounts[serviceType],
+  );
+
+  const { balances, transactions } =
+    serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
+  const netBalance = service
+    ? balances.balance + balances.unconfirmedBalance
+    : 0;
+  const [averageTxFee, setAverageTxFee] = useState(0);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!netBalance) {
+      // if (serviceType === TEST_ACCOUNT) dispatch(getTestcoins(serviceType));
+      dispatch(fetchBalance(serviceType)); // TODO: do periodic auto search
+      dispatch(fetchTransactions(serviceType));
+    }
+  }, [serviceType]);
+
+  useEffect(() => {
+    setCarouselData1();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const storedAverageTxFee = await AsyncStorage.getItem(
+        'storedAverageTxFee',
+      );
+      if (storedAverageTxFee) {
+        const { averageTxFee, lastFetched } = JSON.parse(storedAverageTxFee);
+        if (Date.now() - lastFetched < 1800000) {
+          setAverageTxFee(averageTxFee);
+          return;
+        } // maintaining a half an hour difference b/w fetches
+      }
+
+      const txPriority = 'high';
+      const instance = service.hdWallet || service.secureHDWallet;
+      const { averageTxFee } = await instance.averageTransactionFee(txPriority);
+      setAverageTxFee(averageTxFee);
+      await AsyncStorage.setItem(
+        'storedAverageTxFee',
+        JSON.stringify({ averageTxFee, lastFetched: Date.now() }),
+      );
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (serviceType === SECURE_ACCOUNT) {
+      AsyncStorage.getItem('isSecureAccountHelperDone').then(done => {
+        if (!done) {
+          SecureAccountHelperBottomSheet.current.snapTo(1);
+          AsyncStorage.setItem('isSecureAccountHelperDone', 'true');
+        }
+      });
+    }
+  }, [serviceType]);
+
+  const [exchangeRates, setExchangeRates] = useState();
+
+  useEffect(() => {
+    (async () => {
+      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
+      if (storedExchangeRates) {
+        const exchangeRates = JSON.parse(storedExchangeRates);
+        setExchangeRates(exchangeRates);
+      }
+      const res = await axios.get('https://blockchain.info/ticker');
+      console.log({ res });
+      if (res.status == 200) {
+        const exchangeRates = res.data;
+        exchangeRates.lastFetched = Date.now();
+        setExchangeRates(exchangeRates);
+        await AsyncStorage.setItem(
+          'exchangeRates',
+          JSON.stringify(exchangeRates),
+        );
+      } else {
+        console.log('Failed to retrieve exchange rates', res);
+      }
+    })();
   }, []);
 
   return (
@@ -1447,6 +1469,17 @@ function Accounts(props) {
         ]}
         renderContent={renderSecureAccountsHelperContents}
         renderHeader={renderSecureAccountsHelperHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={RegularAccountHelperBottomSheet}
+        snapPoints={[
+          -50,
+          hp('90%'),
+          Platform.OS == 'android' ? hp('50%') : hp('90%'),
+        ]}
+        renderContent={renderRegularAccountsHelperContents}
+        renderHeader={renderRegularAccountsHelperHeader}
       />
     </View>
   );

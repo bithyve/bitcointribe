@@ -345,7 +345,9 @@ export default class Bitcoin {
               confirmations: tx.NumberofConfirmations,
               status: tx.NumberofConfirmations ? 'Confirmed' : 'Unconfirmed',
               fee: tx.fee,
-              date: new Date(tx.Status.block_time * 1000).toUTCString(),
+              date: tx.Status.block_time
+                ? new Date(tx.Status.block_time * 1000).toUTCString()
+                : new Date(Date.now()).toUTCString(),
               transactionType: tx.transactionType,
               amount: tx.amount,
               accountType: tx.accountType,
