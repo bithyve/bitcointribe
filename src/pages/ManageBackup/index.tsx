@@ -776,10 +776,10 @@ export default function ManageBackup(props) {
       setTimeout(() => {
         setSelectedType("secondaryDevice");
           setSelectedStatus("error");
-        setTimeout(()=>{
-          secondaryDeviceBottomSheet.current.snapTo(1);
-        }, 4000);
-      }, 2500);
+          setTimeout(()=>{
+            secondaryDeviceBottomSheet.current.snapTo(1);
+          }, 500);
+      }, 250);
     }
     else if(!contact1AutoHighlightFlags || contact1AutoHighlightFlags!='true'){
       setTimeout(() => {
@@ -787,8 +787,8 @@ export default function ManageBackup(props) {
         setSelectedStatus("error");
         setTimeout(()=>{
           trustedContactsBottomSheet.current.snapTo(1);
-        }, 4000);
-      }, 2500);
+        }, 500);
+      }, 250);
     }
     else if(!contact2AutoHighlightFlags || contact2AutoHighlightFlags!='true'){
       setTimeout(() => {
@@ -796,8 +796,8 @@ export default function ManageBackup(props) {
         setSelectedStatus("error");
         setTimeout(()=>{
           trustedContactsBottomSheet.current.snapTo(1);
-        }, 4000);
-      }, 2500);
+        }, 500);
+      }, 250);
       
     }
     else if(!personalCopy1AutoHighlightFlags || personalCopy1AutoHighlightFlags!='true'){
@@ -806,8 +806,8 @@ export default function ManageBackup(props) {
         setSelectedStatus("error");
         setTimeout(()=>{
           props.navigation.navigate("PersonalCopy");
-        }, 4000);
-      }, 2500);
+        }, 500);
+      }, 250);
       
     }
     else if(!personalCopy2AutoHighlightFlags || personalCopy2AutoHighlightFlags!='true'){
@@ -816,8 +816,8 @@ export default function ManageBackup(props) {
         setSelectedStatus("error");
         setTimeout(()=>{
           props.navigation.navigate("PersonalCopy");
-        }, 4000);
-      }, 2500);
+        }, 500);
+      }, 250);
     }
     else if(!securityAutoHighlightFlags || securityAutoHighlightFlags != 'true'){
       setTimeout(() => {
@@ -825,8 +825,8 @@ export default function ManageBackup(props) {
         setSelectedStatus("error");
         setTimeout(()=>{
           props.navigation.navigate("HealthCheckSecurityAnswer");
-        }, 4000);
-      }, 2500);
+        }, 500);
+      }, 250);
     }
   }
 
