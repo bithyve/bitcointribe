@@ -263,15 +263,6 @@ export default function Home(props) {
     },
     {
       id: 2,
-      title: 'Regular Account',
-      unit: 'sats',
-      amount: '5,000',
-      account: 'Fast and easy',
-      accountType: 'regular',
-      bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
-    },
-    {
-      id: 3,
       title: 'Savings Account',
       unit: 'sats',
       amount: '60,000',
@@ -279,6 +270,16 @@ export default function Home(props) {
       accountType: 'secure',
       bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
     },
+    {
+      id: 3,
+      title: 'Regular Account',
+      unit: 'sats',
+      amount: '5,000',
+      account: 'Fast and easy',
+      accountType: 'regular',
+      bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
+    },
+    
   ]);
 
   const [transactionData, setTransactionData] = useState([
