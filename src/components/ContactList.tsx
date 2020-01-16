@@ -192,19 +192,20 @@ export default function ContactList(props) {
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, ...props.style }}>
         <View style={styles.selectedContactContainer}>
-          {selectedContacts.map(value => (
+          {selectedContacts.length > 0 ? selectedContacts.map(value => {
+            return(
             <View style={styles.selectedContactView}>
               <Text style={styles.selectedContactNameText}>
-                {value.name.split(" ")[0]}{" "}
+                {value.name ? value.name.split(" ")[0] : ''}{" "}
                 <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                  {value.name.split(" ")[1]}
+                  {value.name ? value.name.split(" ")[1] : ''}
                 </Text>
               </Text>
               <TouchableOpacity onPress={() => onCancel(value)}>
                 <AntDesign name="close" size={17} color={Colors.white} />
               </TouchableOpacity>
             </View>
-          ))}
+          )}): null}
         </View>
         <TouchableOpacity style={{marginLeft: 'auto', marginRight: 10,}} onPress={() => addContact()}>
           <Text style={{fontSize: RFValue(13, 812),

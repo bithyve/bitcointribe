@@ -25,7 +25,7 @@ import {
 import { RFValue } from "react-native-responsive-fontsize";
 import BottomSheet from "reanimated-bottom-sheet";
 import HeaderTitle from "../../components/HeaderTitle";
-import ContactList from "./ContactList";
+import ContactList from "../../components/ContactList";
 import DeviceInfo from "react-native-device-info";
 import RadioButton from "../../components/RadioButton";
 import CommunicationModeModalContents from "../../components/CommunicationModeModalContents";
@@ -43,6 +43,17 @@ export default function RestoreWalletByContacts(props) {
   //   function selectedContactsList(list) {
   //     setContacts(list);
   //   }
+  const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
+  const [contacts, setContacts] = useState([]);
+  function selectedContactsList( list ) {
+    if ( list.length > 0 ) setContacts( [ ...list ] );
+  }
+
+  const onPressContinue = async() =>{
+    await AsyncStorage.setItem("selectedContacts", JSON.stringify(contacts));
+    console.log({ contacts });
+    props.navigation.navigate("RestoreSelectedContactsList");
+  }
 
   const continueNProceed = async contacts => {
     // communicationModeBottomSheet.current.snapTo(1);
@@ -138,7 +149,12 @@ export default function RestoreWalletByContacts(props) {
             infoTextNormal={"Select contacts to "}
             infoTextBold={"send recovery request"}
           />
-          <ContactList style={{}} continueNProceed={continueNProceed} />
+          <ContactList
+          style={{}}
+          onPressContinue={onPressContinue}
+          onSelectContact={selectedContactsList}
+        />
+          {/* <ContactList style={{}} continueNProceed={continueNProceed} /> */}
         </KeyboardAvoidingView>
         {/* <BottomSheet
           enabledInnerScrolling={true}
