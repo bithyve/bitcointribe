@@ -46,6 +46,7 @@ export default function NewWalletQuestionRegenerateShare(props) {
     );
     const [confirmAnswer, setConfirmAnswer] = useState('');
     const [answer, setAnswer] = useState('');
+    let [counter, setCounter] = useState(0);
     const [hideShowConfirmAnswer, setHideShowConfirmAnswer] = useState(true);
     const [hideShowAnswer, setHdeShowAnswer] = useState(true);
     const [ansError, setAnsError] = useState('');
@@ -60,6 +61,14 @@ export default function NewWalletQuestionRegenerateShare(props) {
        if(event.text){
         if (answer && event.text != answer) {
           setAnsError('Answers do not match');
+          counter++;
+          setCounter(counter);
+          console.log("counter",counter);
+          if(counter > 3){
+            console.log("global.ansCounter",counter);
+            setHdeShowAnswer(!hideShowAnswer);
+            counter = 0;
+          }
         }else{
           setAnsError('');
         }

@@ -48,7 +48,7 @@ export default function NewWalletQuestion(props) {
   const [answer, setAnswer] = useState('');
   const [hideShowConfirmAnswer, setHideShowConfirmAnswer] = useState(true);
   const [hideShowAnswer, setHdeShowAnswer] = useState(true);
-  //global.ansCounter = 0;
+  let [counter, setCounter] = useState(0);
   const dispatch = useDispatch();
   const walletName = props.navigation.getParam('walletName');
   const [ansError, setAnsError] = useState('');
@@ -61,13 +61,14 @@ export default function NewWalletQuestion(props) {
     if(event.text){
     if (answer && event.text != answer) {
       setAnsError('Answers do not match');
-      // global.ansCounter++;
-      // console.log("global.ansCounter",global.ansCounter);
-      // if(global.ansCounter > 3){
-      //   console.log("global.ansCounter",global.ansCounter);
-      //   setHdeShowAnswer(!hideShowAnswer);
-      //   //global.ansCounter = 0;
-      // }
+      counter++;
+      setCounter(counter);
+      console.log("counter",counter);
+      if(counter > 3){
+        console.log("global.ansCounter",counter);
+        setHdeShowAnswer(!hideShowAnswer);
+        counter = 0;
+      }
     }else{
       setAnsError('');
     }

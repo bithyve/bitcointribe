@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Image,
@@ -49,6 +49,34 @@ export default function HealthCheckSecurityAnswer(props) {
     HealthCheckSuccessBottomSheet,
     setHealthCheckSuccessBottomSheet,
   ] = useState(React.createRef());
+
+  const setConfirm =(event) => {
+    if(event.text){
+        if (event.text.length > 0 && event.text != securityAnswer) {
+          setErrorText('Answer is incorrect');
+          
+        }else{
+          setErrorText('');
+        }
+       }else{
+        setErrorText('');
+      }
+      };
+      
+  const setBackspace =(event) => {
+    console.log("event,key", event.nativeEvent.key);
+   
+   if(event.nativeEvent.key == "Backspace"){
+    setErrorText('');
+   }
+  };
+
+  useEffect( () => {
+    if ( answer.trim() == securityAnswer.trim()) {
+      setErrorText('');
+      }
+  }, [answer] );
+
 
   const renderHealthCheckSuccessModalContent = () => {
     return (
@@ -206,15 +234,17 @@ export default function HealthCheckSecurityAnswer(props) {
                 placeholder={'Enter Answer'}
                 placeholderTextColor={Colors.borderColor}
                 value={answer}
+                autoCapitalize="none"
+                onKeyPress ={event => {
+                  setBackspace(event);
+                }}
                 onChangeText={text => {
-                  if (text.length > 0 && text != securityAnswer) {
-                    setErrorText('Answer is incorrect');
-                  } else {
-                    setErrorText('');
-                  }
                   setAnswer(text);
                   //onTextChange(answer);
                 }}
+                onSubmitEditing={
+                  (event) => (setConfirm(event.nativeEvent))
+                }
                 onFocus={() => {
                   // if (Platform.OS == "ios") {
                   //   props.bottomSheetRef.current.snapTo(2);

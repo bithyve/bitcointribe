@@ -174,6 +174,7 @@ export default function FastBitcoinCalculationModalContents(props) {
                 style={{ ...styles.textBox, paddingLeft: 10 }}
                 placeholder={"Enter Bitcoin Address"}
                 placeholderTextColor={Colors.borderColor}
+                autoCapitalize="none"
                 onFocus={() => {
                   props.modalRef.current.snapTo(2);
                 }}
