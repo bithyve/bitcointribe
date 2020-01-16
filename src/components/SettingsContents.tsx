@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     },
     modalHeaderTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         fontFamily: Fonts.FiraSansMedium
     },
     modalContentView: {
@@ -125,11 +125,11 @@ const styles = StyleSheet.create({
     },
     contactText: {
         marginLeft: 10,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         fontFamily: Fonts.FiraSansRegular
     },
     contactIndexText: {
-        fontSize: RFValue(10, 812),
+        fontSize: RFValue(10),
         fontFamily: Fonts.FiraSansRegular
     },
     contactIndexView: {
@@ -148,12 +148,12 @@ const styles = StyleSheet.create({
         borderBottomWidth:1
     },
     titleText: {
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         fontFamily: Fonts.FiraSansRegular,
         color: Colors.blue
     },
     infoText: {
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         fontFamily: Fonts.FiraSansRegular,
         color: Colors.textColorGrey,
         marginTop: 5
@@ -170,24 +170,24 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     shareButtonText: {
-        fontSize: RFValue(10, 812),
+        fontSize: RFValue(10),
         fontFamily: Fonts.FiraSansRegular,
         color: Colors.textColorGrey
     },
     pageTitle: {
         marginLeft: 30,
         color: Colors.blue,
-        fontSize: RFValue(14, 812),
+        fontSize: RFValue(14),
         fontFamily: Fonts.FiraSansRegular
     },
     pageInfoText: {
         marginLeft: 30,
         color: Colors.textColorGrey,
-        fontSize: RFValue(10, 812),
+        fontSize: RFValue(10),
         fontFamily: Fonts.FiraSansRegular
     },
     addModalTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(14, 812),
+        fontSize: RFValue(14),
     },
 })

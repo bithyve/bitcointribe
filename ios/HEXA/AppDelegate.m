@@ -14,7 +14,8 @@
 #import <UMCore/UMModuleRegistry.h>
 #import <UMReactNativeAdapter/UMNativeModulesProxy.h>
 #import <UMReactNativeAdapter/UMModuleRegistryAdapter.h>
-
+#import <Fabric/Fabric.h>
+#import <Crashlytics/Crashlytics.h>
 
 @implementation AppDelegate
 - (BOOL)application:(UIApplication *)application
@@ -48,7 +49,7 @@
   [self.window makeKeyAndVisible];
 
   [super application:application didFinishLaunchingWithOptions:launchOptions];
-
+  [Fabric with:@[[Crashlytics class]]];
   return YES;
 }
 
@@ -66,6 +67,6 @@
 #else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
-}
-
+}   
+   
 @end

@@ -76,7 +76,7 @@ const TrustedContactHealthCheck = props => {
                 title={'Change your\nTrusted Contact'}
                 info={'Having problems with your Trusted Contact'}
                 note={
-                    'You can change the Trusted Contact you selected to share\nyour Recovery Secret'
+                    'You can change the Trusted Contact you selected to share your Recovery Secret'
                 }
                 proceedButtonText={'Change'}
                 cancelButtonText={'Back'}
@@ -197,17 +197,17 @@ const TrustedContactHealthCheck = props => {
                 {pageData.map((value) => {
                     if (SelectedOption == value.id) {
                         return <TouchableOpacity onPress={() => SelectOption(value.id)} style={{ margin: wp('3%'), backgroundColor: Colors.white, borderRadius: 10, height: wp('20%'), width: wp('90%'), justifyContent: 'center', paddingLeft: wp('3%'), paddingRight: wp('3%'), alignSelf: 'center' }}>
-                            <Text style={{ color: Colors.blue, fontSize: RFValue(13, 812), fontFamily: Fonts.FiraSansRegular }}>{value.title}</Text>
-                            <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(10, 812), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.5%') }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text>
-                            <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(9, 812), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.3%') }}>{value.date}</Text>
+                            <Text style={{ color: Colors.blue, fontSize: RFValue(13), fontFamily: Fonts.FiraSansRegular }}>{value.title}</Text>
+                            <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.5%') }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text>
+                            <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(9), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.3%') }}>{value.date}</Text>
                         </TouchableOpacity>
                     }
                     return <TouchableOpacity onPress={() => SelectOption(value.id)} style={{ margin: wp('3%'), backgroundColor: Colors.white, borderRadius: 10, height: wp('15%'), width: wp('85%'), justifyContent: 'center', paddingLeft: wp('3%'), paddingRight: wp('3%'), alignSelf: 'center' }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(10, 812), fontFamily: Fonts.FiraSansRegular }}>{value.title}</Text>
-                            <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(9, 812), fontFamily: Fonts.FiraSansRegular, marginLeft: 'auto' }}>{value.date}</Text>
+                            <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular }}>{value.title}</Text>
+                            <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(9), fontFamily: Fonts.FiraSansRegular, marginLeft: 'auto' }}>{value.date}</Text>
                         </View>
-                        <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(8, 812), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.5%') }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>dolor sit</Text></Text>
+                        <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(8), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.5%') }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>dolor sit</Text></Text>
                     </TouchableOpacity>
                 })}
             </ScrollView>
@@ -217,7 +217,7 @@ const TrustedContactHealthCheck = props => {
 
                     <Text style={styles.bottomBoxText}>Lorem ipsum dolor sit amet, consectetur sit amet <Text onPress={() => { ChangeBottomSheet.current.snapTo(1) }} style={styles.bottomBoxTextUnderline}>Change Trusted Contact</Text></Text>
 
-                    <TouchableOpacity onPress={()=>{ConfirmBottomSheet.current.snapTo(1)}} style={{ backgroundColor: Colors.blue, height: wp('13%'), width: wp('40%'), justifyContent: 'center', alignItems: 'center', borderRadius: 10, marginTop: hp('3%'), marginBottom: hp('3%') }}><Text style={{ color: Colors.white, fontSize: RFValue(10, 812), fontFamily: Fonts.FiraSansMedium, }}>Confirm</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={()=>{ConfirmBottomSheet.current.snapTo(1)}} style={{ backgroundColor: Colors.blue, height: wp('13%'), width: wp('40%'), justifyContent: 'center', alignItems: 'center', borderRadius: 10, marginTop: hp('3%'), marginBottom: hp('3%') }}><Text style={{ color: Colors.white, fontSize: RFValue(10), fontFamily: Fonts.FiraSansMedium, }}>Confirm</Text></TouchableOpacity>
                 </View> : null
             }
             <BottomSheet
@@ -258,7 +258,7 @@ export default TrustedContactHealthCheck;
 const styles = StyleSheet.create({
     modalHeaderTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         fontFamily: Fonts.FiraSansRegular
     },
     modalHeaderTitleView: {
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
         marginTop: hp('1%'),
         marginBottom: hp('1%'),
         color: Colors.textColorGrey,
-        fontSize: RFValue(10, 812),
+        fontSize: RFValue(10),
         fontFamily: Fonts.FiraSansRegular,
     },
     bottomBoxTextUnderline: {

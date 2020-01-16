@@ -42,8 +42,8 @@ function CopilotTooltip(props) {
         <View style={styles.tooltipContainer}>
             <Text testID="stepDescription" style={styles.tooltipText}>{props.currentStep.text}</Text>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <TouchableOpacity onPress={() => onPressOk()} style={{ padding: 5 }} ><Text style={{ color: Colors.white, fontSize: RFValue(12, 812), fontFamily: Fonts.FiraSansMedium }}>Ok</Text></TouchableOpacity>
-                <TouchableOpacity style={{ padding: 5 }} onPress={() => props.handleStop()}><Text style={{ color: Colors.white, fontSize: RFValue(12, 812), fontFamily: Fonts.FiraSansMedium }}>Skip</Text></TouchableOpacity>
+                <TouchableOpacity onPress={() => onPressOk()} style={{ padding: 5 }} ><Text style={{ color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>Ok</Text></TouchableOpacity>
+                <TouchableOpacity style={{ padding: 5 }} onPress={() => props.handleStop()}><Text style={{ color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>Skip</Text></TouchableOpacity>
             </View>
         </View>
     );
@@ -52,7 +52,7 @@ function CopilotTooltip(props) {
 const styles = StyleSheet.create({
     tooltipText: {
         color: '#fff',
-        fontSize: RFValue(20, 812),
+        fontSize: RFValue(20),
         backgroundColor: 'rgba(0,0,0,0)'
     },
     tooltipContainer: {

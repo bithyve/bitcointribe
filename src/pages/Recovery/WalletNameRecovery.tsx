@@ -59,7 +59,7 @@ export default function WalletNameRecovery(props) {
             <Text
               style={{
                 color: Colors.blue,
-                fontSize: RFValue(18, 812),
+                fontSize: RFValue(18),
                 fontFamily: Fonts.FiraSansMedium,
               }}
             >
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
     fontFamily: Fonts.FiraSansRegular
   },
   inputBox: {
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     width: wp("85%"),
     height: 50,
     paddingLeft: 15,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular
   },
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     width: wp("85%"),
     height: 50,
     paddingLeft: 15,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     color: Colors.textColorGrey,
     elevation: 10,
     shadowColor: Colors.borderColor,
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium
   }
 });

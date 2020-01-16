@@ -43,17 +43,19 @@ import AddressBook from '../pages/RecoverySecretShare/AddressBook';
 import ShareRecoverySecretOtp from '../pages/RecoverySecretShare/ShareRecoverySecretOtp';
 import HealthCheck from '../pages/HealthCheck';
 import SecondaryDeviceHealthCheck from '../pages/HealthCheck/SecondaryDeviceHealthCheck';
-import ShareSuccessPage from "../pages/RecoverySecretShare/ShareSuccessPage";
+import ShareSuccessPage from '../pages/RecoverySecretShare/ShareSuccessPage';
 import TrustedContactHealthCheck from '../pages/HealthCheck/TrustedContactHealthCheck';
-import NoteHealthCheck from "../pages/HealthCheck/NoteHealthCheck";
+import NoteHealthCheck from '../pages/HealthCheck/NoteHealthCheck';
 import CloudHealthCheck from '../pages/HealthCheck/CloudHealthCheck';
-import SweepFundsFromExistingAccount from "../pages/RegenerateShare/SweepFundsFromExistingAccount";
+import SweepFundsFromExistingAccount from '../pages/RegenerateShare/SweepFundsFromExistingAccount';
 import NewWalletNameRegenerateShare from '../pages/RegenerateShare/NewWalletNameRegenerateShare';
 import NewWalletQuestionRegenerateShare from '../pages/RegenerateShare/NewWalletQuestionRegenerateShare';
 import NewWalletGenerationOTP from '../pages/RegenerateShare/NewWalletGenerationOTP';
 import WalletCreationSuccess from '../pages/RegenerateShare/WalletCreationSuccess';
 import SecureScan from '../pages/Accounts/SecureScan';
 import GoogleAuthenticatorOTP from '../pages/Accounts/GoogleAuthenticatorOTP';
+import ShareOtpWithTrustedContactContents from '../components/ShareOtpWithTrustedContactContents';
+import Confirmation from '../pages/Accounts/Confirmation';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -93,6 +95,8 @@ const MODAL_ROUTES = [
   'TwoFAToken',
   'HealthCheckSecurityAnswer',
   'RecoveryRequestOTP',
+  'ShareOtpWithTrustedContactContents',
+  'Confirmation',
 ];
 
 const HomeNavigator = createStackNavigator(
@@ -138,7 +142,9 @@ const HomeNavigator = createStackNavigator(
     NewWalletGenerationOTP,
     WalletCreationSuccess,
     SecureScan,
-    GoogleAuthenticatorOTP
+    GoogleAuthenticatorOTP,
+    ShareOtpWithTrustedContactContents,
+    Confirmation,
   },
   {
     headerLayoutPreset: 'center',

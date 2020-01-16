@@ -117,14 +117,14 @@ let styles = StyleSheet.create({
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(20, 812),
+    fontSize: RFValue(20),
     marginLeft: 15,
     marginRight: 15,
     fontFamily: Fonts.FiraSansRegular
   },
   headerInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
     marginLeft: 15,
     marginRight: 15,
     fontWeight: "normal",
@@ -150,7 +150,7 @@ let styles = StyleSheet.create({
   },
   touchableText: {
     color: Colors.blue,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular
   },
   arrowIconView: {

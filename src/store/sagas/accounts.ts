@@ -25,22 +25,20 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
+import AsyncStorage from '@react-native-community/async-storage';
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
   const service = yield select(
     state => state.accounts[payload.serviceType].service,
   );
-
   const preFetchAddress =
     payload.serviceType === SECURE_ACCOUNT
       ? service.secureHDWallet.receivingAddress
       : service.hdWallet.receivingAddress;
-
   const res = yield call(service.getAddress);
   const postFetchAddress =
     res.status === 200 ? res.data.address : preFetchAddress;
-
   if (
     res.status === 200 &&
     JSON.stringify(preFetchAddress) !== JSON.stringify(postFetchAddress)
@@ -54,7 +52,7 @@ function* fetchAddrWorker({ payload }) {
 export const fetchAddrWatcher = createWatcher(fetchAddrWorker, FETCH_ADDR);
 
 function* fetchBalanceWorker({ payload }) {
-  yield put(switchLoader(payload.serviceType, 'balances'));
+  if (payload.loader) yield put(switchLoader(payload.serviceType, 'balances'));
   const service = yield select(
     state => state.accounts[payload.serviceType].service,
   );
@@ -77,9 +75,9 @@ function* fetchBalanceWorker({ payload }) {
     //   [payload.serviceType]: JSON.stringify(service),
     // };
     // yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-    yield put(fetchTransactions(payload.serviceType, service));
   } else {
-    yield put(switchLoader(payload.serviceType, 'balances'));
+    if (payload.loader)
+      yield put(switchLoader(payload.serviceType, 'balances'));
   }
 }
 
@@ -207,10 +205,13 @@ function* testcoinsWorker({ payload }) {
     state => state.accounts[payload.serviceType].service,
   );
   const res = yield call(service.getTestcoins);
+
   if (res.status === 200) {
     console.log('testcoins received');
     yield delay(3000); // 3 seconds delay for letting the transaction get broadcasted in the network
+    yield call(AsyncStorage.setItem, 'Received Testcoins', 'true');
     yield put(fetchBalance(payload.serviceType));
+    yield put(fetchTransactions(payload.serviceType, service));
   } else console.log('Failed to get testcoins');
   yield put(switchLoader(payload.serviceType, 'testcoins'));
 }

@@ -1,5 +1,7 @@
 PODS:
   - boost-for-react-native (1.63.0)
+  - Crashlytics (3.14.0):
+    - Fabric (~> 1.10.2)
   - DoubleConversion (1.1.6)
   - EXAppLoaderProvider (7.0.0)
   - EXConstants (7.0.1):
@@ -35,6 +37,7 @@ PODS:
     - UMFileSystemInterface
   - EXWebBrowser (7.0.1):
     - UMCore
+  - Fabric (1.10.2)
   - Folly (2018.10.22.00):
     - boost-for-react-native
     - DoubleConversion
@@ -52,9 +55,15 @@ PODS:
     - React
   - react-native-camera/RN (3.15.0):
     - React
+  - react-native-contacts (5.0.6):
+    - React
   - react-native-html-to-pdf (0.8.0):
     - React
-  - react-native-netinfo (5.0.0):
+  - react-native-mail (4.1.0):
+    - React
+  - react-native-netinfo (5.2.0):
+    - React
+  - react-native-print (0.6.0):
     - React
   - react-native-randombytes (3.5.3):
     - React
@@ -116,9 +125,9 @@ PODS:
     - React/Core
     - React/fishhook
     - React/RCTBlob
-  - RNCAsyncStorage (1.6.2):
+  - RNCAsyncStorage (1.7.1):
     - React
-  - RNDeviceInfo (5.3.1):
+  - RNDeviceInfo (5.4.0):
     - React
   - RNGestureHandler (1.3.0):
     - React
@@ -128,7 +137,7 @@ PODS:
     - React
   - RNShare (1.2.1):
     - React
-  - RNSVG (9.13.3):
+  - RNSVG (9.13.6):
     - React
   - UMBarCodeScannerInterface (4.0.0)
   - UMCameraInterface (4.0.0)
@@ -148,6 +157,7 @@ PODS:
   - yoga (0.59.10.React)
 
 DEPENDENCIES:
+  - Crashlytics
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - EXAppLoaderProvider (from `../node_modules/expo/node_modules/expo-app-loader-provider/ios`)
   - EXConstants (from `../node_modules/expo/node_modules/expo-constants/ios`)
@@ -162,13 +172,17 @@ DEPENDENCIES:
   - EXSecureStore (from `../node_modules/expo-secure-store/ios`)
   - EXSQLite (from `../node_modules/expo-sqlite/ios`)
   - EXWebBrowser (from `../node_modules/expo-web-browser/ios`)
+  - Fabric
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - PDFGenerator
   - QRCoder
   - react-native-camera (from `../node_modules/react-native-camera`)
+  - react-native-contacts (from `../node_modules/react-native-contacts`)
   - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
+  - react-native-mail (from `../node_modules/react-native-mail`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
+  - react-native-print (from `../node_modules/react-native-print`)
   - react-native-randombytes (from `../node_modules/react-native-randombytes`)
   - react-native-video (from `../node_modules/react-native-video`)
   - React/Core (from `../node_modules/react-native`)
@@ -209,6 +223,8 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - boost-for-react-native
+    - Crashlytics
+    - Fabric
     - PDFGenerator
     - QRCoder
 
@@ -262,10 +278,16 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native"
   react-native-camera:
     :path: "../node_modules/react-native-camera"
+  react-native-contacts:
+    :path: "../node_modules/react-native-contacts"
   react-native-html-to-pdf:
     :path: "../node_modules/react-native-html-to-pdf"
+  react-native-mail:
+    :path: "../node_modules/react-native-mail"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
+  react-native-print:
+    :path: "../node_modules/react-native-print"
   react-native-randombytes:
     :path: "../node_modules/react-native-randombytes"
   react-native-video:
@@ -325,6 +347,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
+  Crashlytics: 540b7e5f5da5a042647227a5e3ac51d85eed06df
   DoubleConversion: bb338842f62ab1d708ceb63ec3d999f0f3d98ecd
   EXAppLoaderProvider: 5d348813a9cf09b03bbe5b8b55437bc1bfbddbd1
   EXConstants: 857aa7b1c84e2878f8402d712061860bca16a697
@@ -339,23 +362,27 @@ SPEC CHECKSUMS:
   EXSecureStore: bf94958c936b2b9e3813509d2e7e6b8a263d40df
   EXSQLite: ddc1e6727bd7d36e649f07590fe3ae5511c1f039
   EXWebBrowser: 18924c3d2a3a1aa95d413672f058beff589c80f4
+  Fabric: 706c8b8098fff96c33c0db69cbf81f9c551d0d74
   Folly: de497beb10f102453a1afa9edbf8cf8a251890de
   glog: aefd1eb5dda2ab95ba0938556f34b98e2da3a60d
   PDFGenerator: 17d6bc525db0a3fcd156fbf00f9d1b8d5cc75d1e
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
   react-native-camera: 52114c432860b89986c9ee4919d00a48a6ba7abb
+  react-native-contacts: 9c89131a1f63af0618d54af5ca1cd88b06d41a05
   react-native-html-to-pdf: 1d1199917f56a98377d431bce84c2f275e48eb71
-  react-native-netinfo: 841c2a83fe7df998fed56fd48b73229f17a5aa5b
+  react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
+  react-native-netinfo: d3fb9723582eb9a111c128d37f896bae88c00f99
+  react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
   react-native-video: d01ed7ff1e38fa7dcc6c15c94cf505e661b7bfd0
-  RNCAsyncStorage: 60a80e72d95bf02a01cace55d3697d9724f0d77f
-  RNDeviceInfo: 6f20764111df002b4484f90cbe0a861be29bcc6c
+  RNCAsyncStorage: 44395cb9c7c1523104c2b499eb426ef7aff82bca
+  RNDeviceInfo: c7b1dc457611b9231bb780a882102e2c93edc7af
   RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
   RNReanimated: b2ab0b693dddd2339bd2f300e770f6302d2e960c
   RNScreens: f28b48b8345f2f5f39ed6195518291515032a788
   RNShare: 48cf88cadf9ca2143cdaa557c1ec7f8808040ffc
-  RNSVG: f6177f8d7c095fada7cfee2e4bb7388ba426064c
+  RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f
   UMBarCodeScannerInterface: d5a6fdc98ed6241225b0a8432a7f4e2b397668bc
   UMCameraInterface: 68870a3197fee85bd5afca5609ba4a5b7257d19d
   UMConstantsInterface: d25b8e8887ca7aaf568c06caf08f4d40734ee4ef
@@ -370,6 +397,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 1e70fe58b872355f0ecb44fb81bb1a16484047f0
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: af6500da88b1644b6b25124bc00e4b5791df5c10
+PODFILE CHECKSUM: 0aa4ac3babc41b8dea15201c864175a5133e6b6e
 
 COCOAPODS: 1.8.3

@@ -13,6 +13,7 @@ import {
   servicesEnriched,
   DB_INSERTEDSSS,
   dbFetchedSSS,
+  DB_UPDATESSS,
 } from '../actions/storage';
 import { generatePDF } from '../actions/sss';
 import dataManager from '../../storage/database-manager';
@@ -103,7 +104,8 @@ function* insertDBWorker({ payload }) {
       return;
     }
     yield put(dbInserted(payload));
-    !insertedIntoDB ? yield put(enrichServices(updatedDB)) : null; // enriching services post initial insertion
+    // !insertedIntoDB ? yield put( enrichServices( updatedDB ) ) : null; // enriching services post initial insertion
+    yield put(enrichServices(updatedDB));
   } catch (err) {
     console.log(err);
   }
@@ -118,16 +120,38 @@ function* insertSSSDBWorker({ payload }) {
       insertedIntoDB: true,
       ...payload,
     };
-    yield put(dbFetchedSSS(updatedDB));
     const inserted = yield call(dataManager.insertSSS, updatedDB, key, false);
-    console.log({ inserted });
+    if (inserted) yield put(dbFetchedSSS(updatedDB));
   } catch (err) {
     console.log(err);
   }
 }
+
 export const insertSSSDBWatcher = createWatcher(
   insertSSSDBWorker,
   DB_INSERTEDSSS,
+);
+
+function* updateSSSDBWorder({ payload }) {
+  let { updatedEntity } = payload;
+  const storage = yield select(state => state.storage);
+  const { key } = storage;
+  try {
+    const inserted = yield call(
+      dataManager.insertSSS,
+      updatedEntity,
+      key,
+      true,
+    );
+    if (inserted) yield put(dbFetchedSSS(updatedEntity));
+  } catch (error) {
+    console.log({ error });
+  }
+}
+
+export const updateSSSDBWatcher = createWatcher(
+  updateSSSDBWorder,
+  DB_UPDATESSS,
 );
 
 function* servicesEnricherWorker() {

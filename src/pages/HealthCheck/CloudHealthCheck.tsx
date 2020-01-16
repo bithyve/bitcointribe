@@ -61,12 +61,12 @@ export default function CloudHealthCheck(props) {
             <View style={{ marginLeft: 30 }}>
                 <Text style={{
                     color: Colors.blue,
-                    fontSize: RFValue(13, 812),
+                    fontSize: RFValue(13),
                     fontFamily: Fonts.FiraSansMedium
                 }}>Lorem Ipsum Dolor</Text>
                 <Text numberOfLines={2} style={{
                     color: Colors.textColorGrey,
-                    fontSize: RFValue(11, 812),
+                    fontSize: RFValue(11),
                     fontFamily: Fonts.FiraSansMedium
                 }}>{props.pageInfo}Lorem ipsum dolor Lorem dolor sit amet,{"\n"}consectetur dolor sit</Text>
             </View>
@@ -140,12 +140,12 @@ const styles = StyleSheet.create({
     },
     modalHeaderTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         fontFamily: Fonts.FiraSansMedium
     },
     modalHeaderInfoText: {
         color: Colors.textColorGrey,
-        fontSize: RFValue(11, 812),
+        fontSize: RFValue(11),
         fontFamily: Fonts.FiraSansRegular,
         marginTop: hp('0.7%'),
         flexWrap: 'wrap'

@@ -15,8 +15,8 @@ export const fetchAddress = serviceType => {
   return { type: FETCH_ADDR, payload: { serviceType } };
 };
 
-export const fetchBalance = serviceType => {
-  return { type: FETCH_BALANCE, payload: { serviceType } };
+export const fetchBalance = (serviceType, loader?) => {
+  return { type: FETCH_BALANCE, payload: { serviceType, loader } };
 };
 
 export const fetchTransactions = (serviceType, service?) => {

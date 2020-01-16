@@ -7,6 +7,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
+import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
 
 export default function CustodianRequestRejectedModalContents(props) {
   return (
@@ -57,12 +58,12 @@ export default function CustodianRequestRejectedModalContents(props) {
             alignItems: "center"
           }}
         >
-          <TouchableOpacity
+          <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressViewThrustedContacts()}
             style={{ ...styles.successModalButtonView }}
           >
             <Text style={styles.proceedButtonText}>View Trusted Contacts</Text>
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
           <Image
             source={require("../../assets/images/icons/reject.png")}
             style={styles.successModalImage}
@@ -102,12 +103,12 @@ const styles = StyleSheet.create({
   },
   modalTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18, 812),
+    fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansMedium
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11, 812),
+    fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansRegular
   },
   successModalAmountView: {
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
   },
   successModalWalletNameText: {
     color: Colors.black,
-    fontSize: RFValue(25, 812),
+    fontSize: RFValue(25),
     fontFamily: Fonts.FiraSansRegular,
     textAlign: "center"
   },
@@ -130,13 +131,13 @@ const styles = StyleSheet.create({
   successModalAmountText: {
     color: Colors.black,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(21, 812),
+    fontSize: RFValue(21),
     marginLeft: 5
   },
   successModalAmountUnitText: {
     color: Colors.borderColor,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11, 812)
+    fontSize: RFValue(11)
   },
   successModalAmountInfoView: {
     flex: 0.4,
@@ -159,7 +160,7 @@ const styles = StyleSheet.create({
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium
   },
   successModalImage: {

@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Image,
-    TouchableOpacity,
     Text,
     StyleSheet,
-    ScrollView
+    TextInput
 } from 'react-native';
+import { ScrollView } from "react-native-gesture-handler";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
@@ -15,7 +15,9 @@ import { RFValue } from "react-native-responsive-fontsize";
 import ContactList from "../components/ContactList";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import RadioButton from "../components/RadioButton";
-import Ionicons from "react-native-vector-icons/Ionicons"
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
 
 export default function FamilyandFriendsAddressBookModalContents(props) {
     const [selectedContact, setSelectedContact] = useState({});
@@ -55,22 +57,56 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
         }
     ]);
     const [alphabetsList] = useState(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']);
+    const [searchBox, setSearchBox] = useState('');
+    const [filterContactData, setFilterContactData] = useState([]);
+
+    useEffect(() => {
+        setSearchBox('');
+        const contactList = data
+        .sort(function (a, b) {
+          if(a.name && b.name){
+            if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+            if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+          }
+          return 0;
+        })
+        setFilterContactData(contactList);
+    }, []);
+
+    const filterContacts = (keyword) => {
+        if (contactData.length > 0) {
+            if (!keyword.length) {
+                setFilterContactData(contactData);
+                return;
+            }
+            let isFilter = true;
+            let filterContactsForDisplay = [];
+            for (let i = 0; i < contactData.length; i++) {
+                if (contactData[i].name && contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())) {
+                    filterContactsForDisplay.push(contactData[i])
+                }
+            }
+            setFilterContactData(filterContactsForDisplay);
+        } else {
+            return;
+        }
+    }
 
     const onContactSelect = (index) => {
-        if (setSelectedContact.id && contactData.findIndex((value) => value.id == setSelectedContact.id) > -1) {
+        if (setSelectedContact.id && filterContactData.findIndex((value) => value.id == setSelectedContact.id) > -1) {
             setSelectedContact({});
         }
         else {
-            setSelectedContact(contactData[index]);
+            setSelectedContact(filterContactData[index]);
         }
     }
 
     return (<View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
             <View style={{ flexDirection: 'row', }}>
-                <TouchableOpacity onPress={() => props.onPressBack()} style={{ height: 30, width: 30, }}>
+                <AppBottomSheetTouchableWrapper onPress={() => props.onPressBack()} style={{ height: 30, width: 30, }}>
                     <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-                </TouchableOpacity>
+                </AppBottomSheetTouchableWrapper>
                 <View>
                     <Text style={styles.modalHeaderTitleText}>Friends and Family</Text>
                     <Text numberOfLines={2} style={styles.modalHeaderInfoText}>{props.pageInfo}Lorem ipsum dolor sit amet, consectetur{"\n"}adipiscing elit, sed do eiusmod tempor</Text>
@@ -106,36 +142,50 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
                 <Text style={styles.pageTitle}>Other Contacts</Text>
                 <Text style={styles.pageInfoText}>Lorem ipsum dolor sit amet, consectetur adipiscing</Text>
             </View>
+            <View style={[styles.searchBoxContainer]}>
+                <View style={styles.searchBoxIcon}>
+                    <EvilIcons style={{ alignSelf: 'center' }} name="search" size={20} color={Colors.textColorGrey} />
+                </View>
+                <TextInput
+                    ref={element => setSearchBox(element)}
+                    style={styles.searchBoxInput}
+                    placeholder="Search"
+                    placeholderTextColor={Colors.textColorGrey}
+                    onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
+                />
+            </View>
             <View style={{ flex: 1, flexDirection: 'row' }}>
                 <View style={{ flex: 11 }}>
                     <ScrollView showsVerticalScrollIndicator={false} >
-                        {contactData.map((value, index) => {
-                            return <TouchableOpacity onPress={() => onContactSelect(index)}  style={styles.contactView} >
+                        {filterContactData.map((value, index) => {
+                            return <AppBottomSheetTouchableWrapper onPress={() => onContactSelect(index)} style={styles.contactView} >
                                 <RadioButton size={15} color={Colors.lightBlue} borderColor={Colors.borderColor} isChecked={selectedContact.id && selectedContact.id == value.id ? true : false} onpress={() => onContactSelect(index)} />
                                 <Text style={styles.contactText}>
                                     {value.name.split(' ')[0]} <Text style={{ fontFamily: Fonts.FiraSansMedium }}>{value.name.split(' ')[1]}</Text>
                                 </Text>
-                            </TouchableOpacity>
+                            </AppBottomSheetTouchableWrapper>
                         }
                         )}
                     </ScrollView>
                 </View>
                 <View style={styles.contactIndexView}>
-                    <TouchableOpacity >
+                    <AppBottomSheetTouchableWrapper >
                         <Text style={styles.contactIndexText}>#</Text>
-                    </TouchableOpacity>
+                    </AppBottomSheetTouchableWrapper>
                     {alphabetsList.map((value) =>
-                        <TouchableOpacity>
+                        <AppBottomSheetTouchableWrapper>
                             <Text style={styles.contactIndexText}>{value}</Text>
-                        </TouchableOpacity>
+                        </AppBottomSheetTouchableWrapper>
                     )}
                 </View>
             </View>
         </View>
         {selectedContact.id &&
-            <TouchableOpacity onPress={() => props.onPressProceed()} style={styles.bottomButtonView}>
-                <Text style={styles.buttonText}>Confirm & Proceed</Text>
-            </TouchableOpacity>
+            <View style={styles.bottomButtonView}>
+                <AppBottomSheetTouchableWrapper onPress={() => props.onPressProceed()}>
+                    <Text style={styles.buttonText}>Confirm & Proceed</Text>
+                </AppBottomSheetTouchableWrapper>
+            </View>
         }
     </View>
     )
@@ -167,12 +217,12 @@ const styles = StyleSheet.create({
     },
     modalHeaderTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         fontFamily: Fonts.FiraSansMedium
     },
     modalHeaderInfoText: {
         color: Colors.textColorGrey,
-        fontSize: RFValue(11, 812),
+        fontSize: RFValue(11),
         fontFamily: Fonts.FiraSansRegular,
         marginTop: hp('0.7%'),
         flexWrap: 'wrap'
@@ -185,11 +235,11 @@ const styles = StyleSheet.create({
     },
     contactText: {
         marginLeft: 10,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         fontFamily: Fonts.FiraSansRegular
     },
     contactIndexText: {
-        fontSize: RFValue(10, 812),
+        fontSize: RFValue(10),
         fontFamily: Fonts.FiraSansRegular
     },
     contactIndexView: {
@@ -203,10 +253,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: 20,
         marginTop: hp('1.5%'),
-        marginBottom:hp('1%')
+        marginBottom: hp('1%')
     },
     contactsNameText: {
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         fontFamily: Fonts.FiraSansRegular
     },
     shareButtonView: {
@@ -221,20 +271,20 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     shareButtonText: {
-        fontSize: RFValue(10, 812),
+        fontSize: RFValue(10),
         fontFamily: Fonts.FiraSansRegular,
         color: Colors.textColorGrey
     },
     pageTitle: {
         marginLeft: 30,
         color: Colors.blue,
-        fontSize: RFValue(14, 812),
+        fontSize: RFValue(14),
         fontFamily: Fonts.FiraSansRegular
     },
     pageInfoText: {
         marginLeft: 30,
         color: Colors.textColorGrey,
-        fontSize: RFValue(10, 812),
+        fontSize: RFValue(10),
         fontFamily: Fonts.FiraSansRegular
     },
     bottomButtonView: {
@@ -256,6 +306,28 @@ const styles = StyleSheet.create({
     buttonText: {
         color: Colors.white,
         fontFamily: Fonts.FiraSansMedium,
-        fontSize: RFValue(13, 812)
+        fontSize: RFValue(13)
+    },
+    searchBoxContainer: {
+        flexDirection: "row",
+        borderBottomColor: Colors.borderColor,
+        borderBottomWidth: 0.5,
+        marginLeft: 10,
+        marginRight: 10,
+        height: 40,
+        justifyContent: 'center',
+
+    },
+    searchBoxIcon: {
+        justifyContent: 'center',
+        marginBottom: -10
+    },
+    searchBoxInput: {
+        flex: 1,
+        fontSize: 13,
+        color: Colors.blacl,
+        borderBottomColor: Colors.borderColor,
+        alignSelf: 'center',
+        marginBottom: -10
     },
 })

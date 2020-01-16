@@ -48,13 +48,62 @@ export default function NewWalletQuestionRegenerateShare(props) {
     const [answer, setAnswer] = useState('');
     const [hideShowConfirmAnswer, setHideShowConfirmAnswer] = useState(true);
     const [hideShowAnswer, setHdeShowAnswer] = useState(true);
-
+    const [ansError, setAnsError] = useState('');
     const dispatch = useDispatch();
     const walletName = props.navigation.getParam('walletName');
     // const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
     // if (isInitialized) {
     //     props.navigation.navigate('HomeNav');
     // }
+    const setConfirm =(event) => {
+        console.log("event,key", event.key);
+       if(event.text){
+        if (answer && event.text != answer) {
+          setAnsError('Answers do not match');
+        }else{
+          setAnsError('');
+        }
+       }else{
+        setAnsError('');
+      }
+      };
+      const setBackspace =(event) => {
+        console.log("event,key", event.nativeEvent.key);
+       
+       if(event.nativeEvent.key == "Backspace"){
+        setAnsError('');
+       }
+      };
+    
+      useEffect( () => {
+        if ( answer.trim() == confirmAnswer.trim()) {
+          setAnsError('');
+          }
+      }, [confirmAnswer] );
+    
+      const setButtonVisible = () => {
+        Keyboard.dismiss();
+        //setAnsError('');
+        return (
+          <TouchableOpacity
+            onPress={() => {
+              const security = {
+                question: dropdownBoxValue.question,
+                answer,
+              };
+              dispatch(initializeSetup(walletName, security));
+            }}
+            style={styles.buttonView}
+          >
+            {!loading.initializing ? (
+              <Text style={styles.buttonText}>Confirm & Proceed</Text>
+            ) : (
+              <ActivityIndicator size="small" />
+            )}
+          </TouchableOpacity>
+        );
+      };
+    
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -151,7 +200,7 @@ export default function NewWalletQuestionRegenerateShare(props) {
                                                             ? Colors.blue
                                                             : Colors.black,
                                                     fontFamily: Fonts.FiraSansRegular,
-                                                    fontSize: RFValue(12, 812),
+                                                    fontSize: RFValue(12),
                                                 }}
                                             >
                                                 {value.question}
@@ -169,7 +218,7 @@ export default function NewWalletQuestionRegenerateShare(props) {
                                             alignItems: 'center',
                                             paddingRight: 15,
                                             borderColor:
-                                                confirmAnswer && answer && confirmAnswer != answer
+                                            ansError
                                                     ? Colors.red
                                                     : Colors.borderColor,
                                         }}
@@ -179,6 +228,7 @@ export default function NewWalletQuestionRegenerateShare(props) {
                                             secureTextEntry={hideShowAnswer}
                                             placeholder={'Enter your answer'}
                                             placeholderTextColor={Colors.borderColor}
+                                            autoCapitalize = 'none'
                                             value={answer}
                                             onChangeText={text => setAnswer(text)}
                                             onFocus={() => {
@@ -212,7 +262,7 @@ export default function NewWalletQuestionRegenerateShare(props) {
                                             paddingRight: 15,
                                             marginTop: 15,
                                             borderColor:
-                                                confirmAnswer && answer && confirmAnswer != answer
+                                            ansError
                                                     ? Colors.red
                                                     : Colors.borderColor,
                                         }}
@@ -222,8 +272,16 @@ export default function NewWalletQuestionRegenerateShare(props) {
                                             secureTextEntry={hideShowConfirmAnswer}
                                             placeholder={'Confirm your answer'}
                                             placeholderTextColor={Colors.borderColor}
-                                            value={confirmAnswer}
-                                            onChangeText={text => setConfirmAnswer(text)}
+                                            autoCapitalize = 'none'
+                                            onKeyPress ={event => {
+                                                setBackspace(event);
+                                              }}
+                                              onChangeText={text => {
+                                                setConfirmAnswer(text);
+                                              }}
+                                              onSubmitEditing={
+                                                (event) => (setConfirm(event.nativeEvent))
+                                              }
                                             onFocus={() => {
                                                 setDropdownBoxOpenClose(false);
                                                 setConfirmAnswerInputStyle(styles.inputBoxFocused);
@@ -251,7 +309,7 @@ export default function NewWalletQuestionRegenerateShare(props) {
                             ) : (
                                     <View style={{ marginTop: 15 }} />
                                 )}
-                            {confirmAnswer && answer && confirmAnswer != answer ? (
+                           
                                 <View
                                     style={{
                                         marginLeft: 20,
@@ -263,30 +321,21 @@ export default function NewWalletQuestionRegenerateShare(props) {
                                         style={{
                                             color: Colors.red,
                                             fontFamily: Fonts.FiraSansMediumItalic,
-                                            fontSize: RFValue(10, 812),
+                                            fontSize: RFValue(10),
                                             marginLeft: 'auto',
                                         }}
                                     >
-                                        Answers do not match
+                                        {ansError}
                   </Text>
                                 </View>
-                            ) : null}
+                         
                         </ScrollView>
 
                         <View style={styles.bottomButtonView}>
                             {answer.trim() == confirmAnswer.trim() &&
                                 confirmAnswer.trim() &&
                                 answer.trim() ? (
-                                    <TouchableOpacity
-                                        onPress={() => {props.navigation.navigate("SweepFundsFromExistingAccount")}}
-                                        style={styles.buttonView}
-                                    >
-                                        {/* {!loading.initializing ? ( */}
-                                            <Text style={styles.buttonText}>Confirm & Proceed</Text>
-                                        {/* ) : (
-                                                <ActivityIndicator size="small" />
-                                            )} */}
-                                    </TouchableOpacity>
+                                    setButtonVisible()
                                 ) : (
                                     <View
                                         style={{
@@ -359,7 +408,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: Colors.white,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         fontFamily: Fonts.FiraSansMedium,
     },
     bottomButtonView: {
@@ -407,7 +456,7 @@ const styles = StyleSheet.create({
     modalInputBox: {
         flex: 1,
         height: 50,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         color: Colors.textColorGrey,
         fontFamily: Fonts.FiraSansRegular,
         paddingLeft: 15,
@@ -415,7 +464,7 @@ const styles = StyleSheet.create({
     dropdownBoxText: {
         color: Colors.textColorGrey,
         fontFamily: Fonts.FiraSansRegular,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
     },
     dropdownBoxModal: {
         borderRadius: 10,

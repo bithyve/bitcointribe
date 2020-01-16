@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
   passcodeTextInputText: {
     color: Colors.blue,
     fontWeight: "bold",
-    fontSize: RFValue(13, 812)
+    fontSize: RFValue(13)
   },
   textBoxStyles: {
     borderWidth: 0.5,
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     marginLeft: 8,
     color: Colors.black,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     textAlign: "center",
     lineHeight: 18
   },
@@ -347,19 +347,19 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     marginLeft: 8,
     color: Colors.black,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     textAlign: "center",
     lineHeight: 18
   },
   textStyles: {
     color: Colors.black,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     textAlign: "center",
     lineHeight: 18
   },
   textFocused: {
     color: Colors.black,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     textAlign: "center",
     lineHeight: 18
   },
@@ -369,12 +369,12 @@ const styles = StyleSheet.create({
   },
   modalTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18, 812),
+    fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansMedium
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11, 812),
+    fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansRegular
   },
   confirmModalButtonView: {
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
   },
   confirmButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium
   },
   passcodeTextInputView: {

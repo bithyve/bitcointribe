@@ -91,12 +91,12 @@ const styles = StyleSheet.create({
     },
     modalHeaderTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         fontFamily: Fonts.FiraSansMedium
     },
     modalHeaderInfoText: {
         color: Colors.textColorGrey,
-        fontSize: RFValue(11, 812),
+        fontSize: RFValue(11),
         fontFamily: Fonts.FiraSansRegular,
         marginTop: hp('0.7%')
     },
@@ -118,12 +118,12 @@ const styles = StyleSheet.create({
     titleText: {
         color: Colors.blue,
         fontFamily: Fonts.FiraSansRegular,
-        fontSize: RFValue(14, 812)
+        fontSize: RFValue(14)
     },
     infoText: {
         color: Colors.textColorGrey,
         fontFamily: Fonts.FiraSansRegular,
-        fontSize: RFValue(12, 812),
+        fontSize: RFValue(12),
         marginTop: hp('0.5%')
     },
     infoView: {

@@ -21,7 +21,11 @@ export interface Database {
       };
     };
     SHARES_TRANSFER_DETAILS: {
-      [SHARE_INDEX: string]: { OTP: string; ENCRYPTED_KEY: string };
+      [SHARE_INDEX: string]: {
+        OTP: string;
+        ENCRYPTED_KEY: string;
+        UPLOADED_AT: number;
+      };
     };
     UNDER_CUSTODY: {
       [TAG: string]: {
@@ -37,6 +41,10 @@ export interface Database {
     SECURE_ACCOUNT: string;
     S3_SERVICE: string;
   };
+}
+
+export interface DatabaseManageBackup {
+  PDFDETAILS: {};
 }
 
 export interface Services {

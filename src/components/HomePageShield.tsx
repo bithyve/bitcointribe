@@ -40,7 +40,7 @@ export default function HomePageShield(props) {
             {props.shieldStatus == 0 ?
                 <AntDesign size={20} color={Colors.white} name={'exclamation'} /> :
                 props.shieldStatus > 0 && props.shieldStatus < 100 ?
-                    <Text style={{color:Colors.white, fontSize:RFValue(10, 812), fontFamily:Fonts.FiraSansRegular}}>{props.shieldStatus}%</Text> :
+                    <Text style={{color:Colors.white, fontSize:RFValue(9), fontFamily:Fonts.FiraSansRegular}}>{props.shieldStatus}%</Text> :
                     props.shieldStatus == 100 ?
                         <AntDesign size={20} color={Colors.white} name={'check'} />
                         : null

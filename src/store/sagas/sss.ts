@@ -117,26 +117,32 @@ function* uploadEncMetaShareWorker({ payload }) {
 
   // preventing re-uploads till expiry
   if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]) {
-    console.log(
-      DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex],
-    );
-    return;
+    if (
+      Date.now() -
+        DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
+          .UPLOADED_AT <
+      600000
+    )
+      // re-upload after 10 minutes (removal sync w/ relayer)
+      return;
   }
 
-  // TODO: 10 min removal strategy
   yield put(switchS3Loader('uploadMetaShare'));
 
   const res = yield call(s3Service.uploadShare, payload.shareIndex);
   if (res.status === 200) {
     const { otp, encryptedKey } = res.data;
     console.log({ otp, encryptedKey });
-    Alert.alert('OTP', otp);
 
     const updatedBackup = {
       ...DECENTRALIZED_BACKUP,
       SHARES_TRANSFER_DETAILS: {
         ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
-        [payload.shareIndex]: { OTP: otp, ENCRYPTED_KEY: encryptedKey },
+        [payload.shareIndex]: {
+          OTP: otp,
+          ENCRYPTED_KEY: encryptedKey,
+          UPLOADED_AT: Date.now(),
+        },
       },
     };
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
@@ -288,7 +294,6 @@ function* downloadMetaShareWorker({ payload }) {
         RECOVERY_SHARES: updatedRecoveryShares,
       };
     }
-
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
     yield put(downloadedMShare(otp, true));
   } else {
@@ -343,7 +348,7 @@ function* generatePDFWorker({ payload }) {
     qrData: resQRPersonalCopy2.data.qrData,
     ...secureAssets,
   };
-  const { securityAns, walletName } = yield select(
+  const { security, walletName } = yield select(
     state => state.storage.database.WALLET_SETUP,
   );
   try {
@@ -352,20 +357,20 @@ function* generatePDFWorker({ payload }) {
       pdfDataPersonalCopy1,
       `Hexa ${walletName} Recovery Secret (Personal Copy 1).pdf`,
       `Hexa Share ${payload.personalcopy1}`,
-      securityAns,
+      security.answer,
     );
     const personalCopy2PdfPath = yield call(
       generatePDF,
       pdfDataPersonalCopy2,
       `Hexa ${walletName} Recovery Secret (Personal Copy 2).pdf`,
       `Hexa Share  ${payload.personalcopy2}`,
-      securityAns,
+      security.answer,
     );
     let path = {
-      personalCopy1PdfPath,
-      personalCopy2PdfPath,
+      copy1: { path: personalCopy1PdfPath, flagShare: false, shareDetails: {} },
+      copy2: { path: personalCopy2PdfPath, flagShare: false, shareDetails: {} },
     };
-    console.log({ path });
+    // console.log({ path });
     yield put(dbInsertedSSS(path));
   } catch (err) {
     console.log({ err });

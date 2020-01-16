@@ -96,8 +96,8 @@ export default function SendModalContents(props) {
                 </View>
                 <View style={{ height: 1, backgroundColor: Colors.borderColor, marginRight: 10, marginLeft: 10, marginTop: hp('3%'), marginBottom: hp('3%') }} />
                 <View style={{ paddingLeft: 20, paddingRight: 20 }}>
-                    <Text style={{ color: Colors.blue, fontSize: RFValue(13, 812), fontFamily: Fonts.FiraSansRegular }}>Transaction Priority</Text>
-                    <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(12, 812), fontFamily: Fonts.FiraSansRegular }}>Set priority for your transaction</Text>
+                    <Text style={{ color: Colors.blue, fontSize: RFValue(13), fontFamily: Fonts.FiraSansRegular }}>Transaction Priority</Text>
+                    <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>Set priority for your transaction</Text>
                     <View style={{ ...styles.textBoxView, height: 55, marginTop: hp('2%'), alignItems: 'center', paddingLeft: 10, paddingRight: 10 }}>
                         <Slider
                             style={{flex:1, marginRight:10}}
@@ -111,12 +111,12 @@ export default function SendModalContents(props) {
                             value={sliderValue}
                             onValueChange={(value) => setSliderValue(value)} 
                         />
-                        <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(13, 812), fontFamily: Fonts.FiraSansRegular, marginLeft: 'auto' }}>Low</Text>
+                        <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(13), fontFamily: Fonts.FiraSansRegular, marginLeft: 'auto' }}>Low</Text>
                     </View>
                 </View>
                 <View style={{ paddingLeft: 20, paddingRight: 20, marginTop: hp('5%') }}>
-                    <Text style={{ color: Colors.blue, fontSize: RFValue(13, 812), fontFamily: Fonts.FiraSansRegular }}>Transaction Fee</Text>
-                    <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(12, 812), fontFamily: Fonts.FiraSansRegular }}>Transaction fee will be calculated in the next step according to the amount of money being sent</Text>
+                    <Text style={{ color: Colors.blue, fontSize: RFValue(13), fontFamily: Fonts.FiraSansRegular }}>Transaction Fee</Text>
+                    <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>Transaction fee will be calculated in the next step according to the amount of money being sent</Text>
                 </View>
                 <View style={{ paddingLeft: 20, paddingRight: 20, flexDirection: 'row', marginTop: hp('5%'), marginBottom: hp('3%') }}>
                     <TouchableOpacity
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     },
     modalHeaderTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         fontFamily: Fonts.FiraSansRegular,
     },
     modalHeaderTitleView: {
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
         paddingLeft: 20,
         color: Colors.textColorGrey,
         fontFamily: Fonts.FiraSansMedium,
-        fontSize: RFValue(13, 812)
+        fontSize: RFValue(13)
     },
     confirmButtonView: {
         width: wp('50%'),
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: Colors.white,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         fontFamily: Fonts.FiraSansMedium
     }
 })

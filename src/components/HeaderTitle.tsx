@@ -24,7 +24,7 @@ export default function HeaderTitle(props) {
             }
         </View>
         <Text style={CommonStyles.headerTitlesInfoText} >
-            {props.infoTextNormal}<Text style={{ fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle:"italic", fontSize: RFValue(12, 812), }}>{props.infoTextBold}</Text>
+            {props.infoTextNormal}<Text style={{ fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle:"italic", fontSize: RFValue(12), }}>{props.infoTextBold}</Text>
         </Text>
     </View>
     )

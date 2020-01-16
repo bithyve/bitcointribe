@@ -32,13 +32,13 @@ const styles = StyleSheet.create({
     },
     bottomNoteText: {
         color: Colors.blue,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         marginBottom: 2,
         fontFamily: Fonts.FiraSansRegular
     },
     bottomNoteInfoText: {
         color: Colors.textColorGrey,
-        fontSize: RFValue(12, 812),
+        fontSize: RFValue(12),
         fontFamily: Fonts.FiraSansRegular
     },
 })

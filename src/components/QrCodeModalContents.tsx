@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	View,
 	Text,
@@ -6,7 +6,8 @@ import {
 	ScrollView,
 	KeyboardAvoidingView,
 	TextInput,
-	Platform
+	Platform,
+	ImageBackground
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
@@ -14,30 +15,40 @@ import Fonts from "../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
+import { RNCamera } from 'react-native-camera';
+import BottomInfoBox from '../components/BottomInfoBox';
 
 export default function QrCodeModalContents( props ) {
+	const [ openCameraFlag, setOpenCameraFlag ] = useState( false )
+	const barcodeRecognized = async ( barcodes ) => {
+		if ( barcodes.data ) {
+			setOpenCameraFlag( false );
+			props.modalRef.current.snapTo( 1 ); // closes modal
+			props.onQrScan( barcodes.data );
+		}
+	};
 
 	return ( <View style={ styles.modalContentContainer }>
 		<KeyboardAvoidingView style={ { flex: 1 } } behavior={ Platform.OS == 'ios' ? 'padding' : '' } enabled>
 			<ScrollView style={ styles.qrModalScrollView }>
 				<View style={ styles.qrModalImageNTextInputView }>
-					<AppBottomSheetTouchableWrapper onPress={()=>props.onPressQrScanner()} style={{alignSelf:'center', backgroundColor:Colors.blue, width:wp('50%'), height:wp('13%'), alignItems:'center', justifyContent:'center', borderRadius:10}}>
-						<Text style={{color:Colors.white, fontFamily:Fonts.FiraSansMedium, fontSize:RFValue(13, 812)}}>Scan QrCode</Text>
+					<AppBottomSheetTouchableWrapper onPress={ () => props.onPressQrScanner() } style={ { alignSelf: 'center', backgroundColor: Colors.blue, width: wp( '50%' ), height: wp( '13%' ), alignItems: 'center', justifyContent: 'center', borderRadius: 10 } }>
+						<Text style={ { color: Colors.white, fontFamily: Fonts.FiraSansMedium, fontSize: RFValue( 13 ) } }>Scan QR code</Text>
 					</AppBottomSheetTouchableWrapper>
 					<TextInput placeholder={ 'Enter Recipients Address' } placeholderTextColor={ Colors.borderColor } style={ styles.qrModalTextInput } />
 				</View>
-				<View style={ styles.qrModalInfoView }>
+				{/* <View style={ styles.qrModalInfoView }>
 					<View style={ { marginRight: 15 } }>
 						<Text style={ styles.qrModalInfoTitleText }>QR</Text>
 						<Text style={ styles.qrModalInfoInfoText }>Scan a QR code to send money or receive information from another Hexa wallet</Text>
 					</View>
-					<Ionicons
-						name="ios-arrow-forward"
-						color={ Colors.textColorGrey }
-						size={ 15 }
-						style={ { alignSelf: 'center' } }
-					/>
-				</View>
+				</View> */}
+				<BottomInfoBox
+					title={ 'QR' }
+					infoText={
+						`Scan a QR code to send money or receive information from another Hexa wallet`
+					}
+				/>
 			</ScrollView>
 		</KeyboardAvoidingView>
 	</View >
@@ -57,8 +68,8 @@ const styles = StyleSheet.create( {
 		marginTop: 15,
 		justifyContent: 'center',
 		alignItems: 'center',
-		borderBottomColor: Colors.backgroundColor,
-		borderBottomWidth: 3
+		// borderBottomColor: Colors.backgroundColor,
+		// borderBottomWidth: 3
 	},
 	qrModalImage: {
 		width: wp( '72%' ),

@@ -345,7 +345,9 @@ export default class Bitcoin {
               confirmations: tx.NumberofConfirmations,
               status: tx.NumberofConfirmations ? 'Confirmed' : 'Unconfirmed',
               fee: tx.fee,
-              date: new Date(tx.Status.block_time * 1000).toUTCString(),
+              date: tx.Status.block_time
+                ? new Date(tx.Status.block_time * 1000).toUTCString()
+                : new Date(Date.now()).toUTCString(),
               transactionType: tx.transactionType,
               amount: tx.amount,
               accountType: tx.accountType,
@@ -500,7 +502,8 @@ export default class Bitcoin {
     txid: any;
     funded: any;
   }> => {
-    const amount = Math.trunc(Math.random() * 1e5) / 1e8;
+    // const amount = Math.trunc(Math.random() * 1e5) / 1e8;
+    const amount = 10000 / 1e8;
     let res: AxiosResponse;
     try {
       res = await BH_AXIOS.post('/testnetFaucet', {
@@ -777,6 +780,18 @@ export default class Bitcoin {
         throw new Error('Falied to fetch feeRates');
       }
     }
+  };
+
+  public averageTransactionFee = async (
+    txnPriority: string = 'high',
+  ): Promise<{ averageTxFee: number; feePerByte: number }> => {
+    const feePerByte = await this.feeRatesPerByte(txnPriority);
+    const averageTxSize = 250; // the average Bitcoin transaction is about 250 bytes big (1 Inp; 2 Out)
+    const inputUTXOSize = 147; // in bytes
+
+    // calculating fee considering 2 inputs per transaction
+    const averageTxFee = (averageTxSize + inputUTXOSize) * feePerByte;
+    return { averageTxFee, feePerByte };
   };
 
   public isValidAddress = (address: string): boolean => {

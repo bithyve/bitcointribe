@@ -51,7 +51,7 @@ const Cloud = props => {
             marginLeft: 30,
             color: Colors.textColorGrey,
             fontFamily: Fonts.FiraSansRegular,
-            fontSize: RFValue(12, 812),
+            fontSize: RFValue(12),
             marginTop: 5,
             marginBottom: 5
           }}
@@ -112,13 +112,13 @@ const styles = StyleSheet.create({
   },
   listElementsTitle: {
     color: Colors.blue,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     marginLeft: 13,
     fontFamily: Fonts.FiraSansRegular
   },
   listElementsInfo: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11, 812),
+    fontSize: RFValue(11),
     marginLeft: 13,
     marginTop: 5,
     fontFamily: Fonts.FiraSansRegular

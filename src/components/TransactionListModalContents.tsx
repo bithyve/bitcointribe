@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     },
     transactionModalTitleText: {
 		color: Colors.blue,
-		fontSize: RFValue(12, 812),
+		fontSize: RFValue(12),
 		marginBottom: 3,
 		fontFamily: Fonts.FiraSansRegular
     },
@@ -86,17 +86,17 @@ const styles = StyleSheet.create({
     transactionModalAmountText: {
 		marginLeft: 5,
 		marginRight: 5,
-		fontSize: RFValue(20, 812),
+		fontSize: RFValue(20),
 		fontFamily: Fonts.OpenSans,
 	},
 	transactionModalAmountUnitText: {
 		color: Colors.textColorGrey,
-		fontSize: RFValue(10, 812),
+		fontSize: RFValue(10),
 		fontFamily: Fonts.OpenSans
     },
     transactionModalDateText: {
 		color: Colors.textColorGrey,
-		fontSize: RFValue(10, 812),
+		fontSize: RFValue(10),
 		fontFamily: Fonts.FiraSansRegular
 	},
 })

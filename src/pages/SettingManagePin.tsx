@@ -7,6 +7,7 @@ import {
     StyleSheet,
     SafeAreaView,
     StatusBar,
+    Platform
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
@@ -17,8 +18,16 @@ import ContactList from "../components/ContactList";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import ToggleSwitch from '../components/ToggleSwitch';
 import Ionicons from "react-native-vector-icons/Ionicons";
+import BottomSheet from 'reanimated-bottom-sheet';
+import ErrorModalContents from '../components/ErrorModalContents';
+import TransparentHeaderModal from '../components/TransparentHeaderModal';
+import DeviceInfo from 'react-native-device-info';
 
 export default function SettingManagePin(props) {
+    const [
+        PinChangeSuccessBottomSheet,
+        setPinChangeSuccessBottomSheet,
+    ] = useState(React.createRef());
     const [pin, setPin] = useState('');
     const [pinFlag, setPinFlag] = useState(true);
     function onPressNumber(text) {
@@ -33,8 +42,36 @@ export default function SettingManagePin(props) {
             setPin(pin.slice(0, -1));
         }
     }
-
     const [switchOn, setSwitchOn] = useState(false);
+    const renderPinChangeSuccessModalContent = () => {
+        return (
+            <ErrorModalContents
+                modalRef={PinChangeSuccessBottomSheet}
+                title={'Pin Changed Successfully'}
+                info={'Lorem ipsum dolor sit amet, consectetur'}
+                note={'sed do eiusmod tempor incididunt ut labore et'}
+                proceedButtonText={'View Settings'}
+                isIgnoreButton={false}
+                onPressProceed={() => {
+                    (PinChangeSuccessBottomSheet as any).current.snapTo(0);
+                    props.navigation.state.params.managePinSuccessProceed(pin);
+                    props.navigation.goBack();
+                }}
+                isBottomImage={true}
+            />
+        );
+    };
+
+    const renderPinChangeSuccessModalHeader = () => {
+        return (
+            <TransparentHeaderModal
+                onPressheader={() => {
+                    (PinChangeSuccessBottomSheet as any).current.snapTo(0);
+                }}
+            />
+        );
+    };
+
     return (<SafeAreaView style={{ flex: 1 }}>
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
         {/* <View style={CommonStyle.headerContainer}>
@@ -65,19 +102,19 @@ export default function SettingManagePin(props) {
                         <View style={styles.passcodeTextInputView}>
                             <View
                                 style={[pin.length == 0 && pinFlag == true ? styles.textBoxActive : styles.textBoxStyles]}>
-                                <Text style={[pin.length == 0 && pinFlag == true ? styles.textFocused : styles.textStyles]}>{pin.length >= 1 ? <Text style={{ fontSize: RFValue(10, 812), textAlignVertical: 'center', justifyContent: 'center', alignItems: 'center' }}><FontAwesome size={8} name={'circle'} color={Colors.black} /></Text> : pin.length == 0 && pinFlag == true ? <Text style={styles.passcodeTextInputText}>{"|"}</Text> : ''}</Text>
+                                <Text style={[pin.length == 0 && pinFlag == true ? styles.textFocused : styles.textStyles]}>{pin.length >= 1 ? <Text style={{ fontSize: RFValue(10), textAlignVertical: 'center', justifyContent: 'center', alignItems: 'center' }}><FontAwesome size={8} name={'circle'} color={Colors.black} /></Text> : pin.length == 0 && pinFlag == true ? <Text style={styles.passcodeTextInputText}>{"|"}</Text> : ''}</Text>
                             </View>
                             <View
                                 style={[pin.length == 1 ? styles.textBoxActive : styles.textBoxStyles]}>
-                                <Text style={[pin.length == 1 ? styles.textFocused : styles.textStyles]}>{pin.length >= 2 ? <Text style={{ fontSize: RFValue(10, 812) }}><FontAwesome size={8} name={'circle'} color={Colors.black} /></Text> : pin.length == 1 ? <Text style={styles.passcodeTextInputText}>{"|"}</Text> : ''}</Text>
+                                <Text style={[pin.length == 1 ? styles.textFocused : styles.textStyles]}>{pin.length >= 2 ? <Text style={{ fontSize: RFValue(10) }}><FontAwesome size={8} name={'circle'} color={Colors.black} /></Text> : pin.length == 1 ? <Text style={styles.passcodeTextInputText}>{"|"}</Text> : ''}</Text>
                             </View>
                             <View
                                 style={[pin.length == 2 ? styles.textBoxActive : styles.textBoxStyles]}>
-                                <Text style={[pin.length == 2 ? styles.textFocused : styles.textStyles]}>{pin.length >= 3 ? <Text style={{ fontSize: RFValue(10, 812) }}><FontAwesome size={8} name={'circle'} color={Colors.black} /></Text> : pin.length == 2 ? <Text style={styles.passcodeTextInputText}>{"|"}</Text> : ''}</Text>
+                                <Text style={[pin.length == 2 ? styles.textFocused : styles.textStyles]}>{pin.length >= 3 ? <Text style={{ fontSize: RFValue(10) }}><FontAwesome size={8} name={'circle'} color={Colors.black} /></Text> : pin.length == 2 ? <Text style={styles.passcodeTextInputText}>{"|"}</Text> : ''}</Text>
                             </View>
                             <View
                                 style={[pin.length == 3 ? styles.textBoxActive : styles.textBoxStyles]}>
-                                <Text style={[pin.length == 3 ? styles.textFocused : styles.textStyles]}>{pin.length >= 4 ? <Text style={{ fontSize: RFValue(10, 812) }}><FontAwesome size={8} name={'circle'} color={Colors.black} /></Text> : pin.length == 3 ? <Text style={styles.passcodeTextInputText}>{"|"}</Text> : ''}</Text>
+                                <Text style={[pin.length == 3 ? styles.textFocused : styles.textStyles]}>{pin.length >= 4 ? <Text style={{ fontSize: RFValue(10) }}><FontAwesome size={8} name={'circle'} color={Colors.black} /></Text> : pin.length == 3 ? <Text style={styles.passcodeTextInputText}>{"|"}</Text> : ''}</Text>
                             </View>
                         </View>
                     </View>
@@ -88,8 +125,7 @@ export default function SettingManagePin(props) {
                         <TouchableOpacity
                             disabled={pin.length == 4 ? false : true}
                             onPress={() => {
-                                props.navigation.state.params._managePinProceed(pin);
-                                props.navigation.goBack();
+                                PinChangeSuccessBottomSheet.current.snapTo(1);
                             }}
                             style={{ ...styles.proceedButtonView, backgroundColor: pin.length == 4 ? Colors.blue : Colors.lightBlue, }}
                         >
@@ -175,7 +211,17 @@ export default function SettingManagePin(props) {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </View >
+            </View>
+            <BottomSheet
+                enabledInnerScrolling={true}
+                ref={PinChangeSuccessBottomSheet}
+                snapPoints={[
+                    -50,
+                    Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
+                ]}
+                renderContent={renderPinChangeSuccessModalContent}
+                renderHeader={renderPinChangeSuccessModalHeader}
+            />
         </View>
     </SafeAreaView>
     )
@@ -188,13 +234,13 @@ const styles = StyleSheet.create({
     keyPadElementTouchable: {
         flex: 1,
         height: hp('8%'),
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         justifyContent: 'center',
         alignItems: 'center'
     },
     keyPadElementText: {
         color: Colors.blue,
-        fontSize: RFValue(25, 812),
+        fontSize: RFValue(25),
         fontFamily: Fonts.FiraSansRegular,
         fontStyle: 'normal'
     },
@@ -214,23 +260,23 @@ const styles = StyleSheet.create({
     },
     proceedButtonText: {
         color: Colors.white,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         fontFamily: Fonts.FiraSansMedium
     },
     passcodeTextInputText: {
         color: Colors.blue,
         fontWeight: 'bold',
-        fontSize: RFValue(13, 812)
+        fontSize: RFValue(13)
     },
     textStyles: {
         color: Colors.black,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         textAlign: 'center',
         lineHeight: 18,
     },
     textFocused: {
         color: Colors.black,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         textAlign: 'center',
         lineHeight: 18
     },
@@ -272,7 +318,7 @@ const styles = StyleSheet.create({
     },
     headerTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(25, 812),
+        fontSize: RFValue(25),
         marginLeft: 20,
         marginTop: hp('10%'),
         fontFamily: Fonts.FiraSansRegular
@@ -280,7 +326,7 @@ const styles = StyleSheet.create({
     headerInfoText: {
         marginTop: hp('2%'),
         color: Colors.textColorGrey,
-        fontSize: RFValue(12, 812),
+        fontSize: RFValue(12),
         marginLeft: 20,
         fontFamily: Fonts.FiraSansRegular
     },
@@ -302,7 +348,7 @@ const styles = StyleSheet.create({
     },
     modalHeaderTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(18, 812),
+        fontSize: RFValue(18),
         fontFamily: Fonts.FiraSansMedium
     },
     modalContentView: {
@@ -319,11 +365,11 @@ const styles = StyleSheet.create({
     },
     contactText: {
         marginLeft: 10,
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         fontFamily: Fonts.FiraSansRegular
     },
     contactIndexText: {
-        fontSize: RFValue(10, 812),
+        fontSize: RFValue(10),
         fontFamily: Fonts.FiraSansRegular
     },
     contactIndexView: {
@@ -342,12 +388,12 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1
     },
     titleText: {
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         fontFamily: Fonts.FiraSansRegular,
         color: Colors.blue
     },
     infoText: {
-        fontSize: RFValue(13, 812),
+        fontSize: RFValue(13),
         fontFamily: Fonts.FiraSansRegular,
         color: Colors.textColorGrey,
         marginTop: 5
@@ -364,24 +410,24 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     shareButtonText: {
-        fontSize: RFValue(10, 812),
+        fontSize: RFValue(10),
         fontFamily: Fonts.FiraSansRegular,
         color: Colors.textColorGrey
     },
     pageTitle: {
         marginLeft: 30,
         color: Colors.blue,
-        fontSize: RFValue(14, 812),
+        fontSize: RFValue(14),
         fontFamily: Fonts.FiraSansRegular
     },
     pageInfoText: {
         marginLeft: 30,
         color: Colors.textColorGrey,
-        fontSize: RFValue(10, 812),
+        fontSize: RFValue(10),
         fontFamily: Fonts.FiraSansRegular
     },
     addModalTitleText: {
         color: Colors.blue,
-        fontSize: RFValue(14, 812),
+        fontSize: RFValue(14),
     },
 })

@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Image,
   TouchableOpacity,
   Text,
   StyleSheet,
-  ScrollView
+  FlatList,
+  TextInput
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -17,86 +18,24 @@ import CommonStyles from "../common/Styles";
 import { RFValue } from "react-native-responsive-fontsize";
 import ContactList from "../components/ContactList";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
 
 export default function AddressBookContents(props) {
   const [contactData, setContactData] = useState([
     {
-      name: "Shivani Altekar",
+      name: "Anant Tapadia",
       checked: false,
       id: 1,
       communicationMode: [],
       status: ""
     },
     {
-      name: "Uma AmravatiKr",
+      name: "Mir Liyaqat Ali",
       checked: false,
       id: 2,
       communicationMode: [],
       status: ""
     },
-    {
-      name: "Adison Alter",
-      checked: false,
-      id: 3,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Add Add",
-      checked: false,
-      id: 4,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Raj Boke",
-      checked: false,
-      id: 5,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Samantha Bhujange",
-      checked: false,
-      id: 6,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Kaweri Balwihari",
-      checked: false,
-      id: 7,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Radhesham Bichkule",
-      checked: false,
-      id: 8,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Rameswar Bihari",
-      checked: false,
-      id: 9,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Shahaji Buchade",
-      checked: false,
-      id: 10,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Shabnam Chitale",
-      checked: false,
-      id: 11,
-      communicationMode: [],
-      status: ""
-    }
   ]);
   const [alphabetsList] = useState([
     "A",
@@ -126,6 +65,42 @@ export default function AddressBookContents(props) {
     "Y",
     "Z"
   ]);
+  const [searchBox, setSearchBox] = useState('');
+  const [filterContactData, setFilterContactData] = useState([]);
+
+  useEffect(() => {
+    setSearchBox('');
+      const contactList = contactData
+        .sort(function (a, b) {
+          if(a.name && b.name){
+            if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+            if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+          }
+          return 0;
+        })
+    setFilterContactData(contactList);
+  }, []);
+
+  const filterContacts = (keyword) => {
+    if (contactData.length > 0) {
+      if (!keyword.length) {
+        setFilterContactData(contactData);
+        return;
+      }
+      let isFilter = true;
+      let filterContactsForDisplay = [];
+      for (let i = 0; i < contactData.length; i++) {
+        if (contactData[i].name && contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())) {
+          filterContactsForDisplay.push(contactData[i])
+        }
+      }
+      setFilterContactData(filterContactsForDisplay);
+    } else {
+      return;
+    }
+  }
+
+
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
@@ -144,54 +119,43 @@ export default function AddressBookContents(props) {
         <Text style={styles.pageInfoText}>
           Lorem ipsum dolor sit amet, consectetur adipiscing
         </Text>
-        <View style={styles.selectedContactsView}>
-          <Text style={styles.contactsNameText}>
-            Anant{" "}
-            <Text style={{ fontFamily: Fonts.FiraSansMedium }}>Tapadia</Text>
-          </Text>
-          <TouchableOpacity style={styles.shareButtonView}>
-            <Text style={styles.shareButtonText}>Share</Text>
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{ ...styles.selectedContactsView, marginBottom: hp("3%") }}
-        >
-          <Text style={styles.contactsNameText}>
-            Mir Liyaqat{" "}
-            <Text style={{ fontFamily: Fonts.FiraSansMedium }}>Ali</Text>
-          </Text>
-          <TouchableOpacity style={styles.shareButtonView}>
-            <Text style={styles.shareButtonText}>Share</Text>
-          </TouchableOpacity>
+        <View style={[styles.searchBoxContainer]}>
+          <View style={styles.searchBoxIcon}>
+            <EvilIcons style={{ alignSelf: 'center' }} name="search" size={20} color={Colors.textColorGrey} />
+          </View>
+          <TextInput
+            ref={element => setSearchBox(element)}
+            style={styles.searchBoxInput}
+            placeholder="Search"
+            placeholderTextColor={Colors.textColorGrey}
+            onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
+          />
         </View>
       </View>
       <View style={{ flex: 1 }}>
         <View style={{ flex: 1, flexDirection: "row" }}>
           <View style={{ flex: 11 }}>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              {contactData.map((value, index) => {
+            <FlatList
+              data={filterContactData}
+              extraData={filterContactData}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item, index }) => {
                 return (
-                  <TouchableOpacity style={styles.contactView}>
+                  <View style={styles.selectedContactsView}>
                     <Text style={styles.contactText}>
-                      {value.name.split(" ")[0]}{" "}
+                      {item.name.split(" ")[0]}{" "}
                       <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                        {value.name.split(" ")[1]}
+                        {item.name.split(" ")[1]}
                       </Text>
                     </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-          </View>
-          <View style={styles.contactIndexView}>
-            <TouchableOpacity>
-              <Text style={styles.contactIndexText}>#</Text>
-            </TouchableOpacity>
-            {alphabetsList.map(value => (
-              <TouchableOpacity>
-                <Text style={styles.contactIndexText}>{value}</Text>
-              </TouchableOpacity>
-            ))}
+                    <TouchableOpacity style={styles.shareButtonView}>
+                      <Text style={styles.shareButtonText}>Share</Text>
+                    </TouchableOpacity>
+                  </View>
+                )
+              }
+              }
+            />
           </View>
         </View>
       </View>
@@ -224,7 +188,7 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18, 812),
+    fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansMedium
   },
   modalContentView: {
@@ -241,11 +205,11 @@ const styles = StyleSheet.create({
   },
   contactText: {
     marginLeft: 10,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular
   },
   contactIndexText: {
-    fontSize: RFValue(10, 812),
+    fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular
   },
   contactIndexView: {
@@ -261,7 +225,7 @@ const styles = StyleSheet.create({
     marginTop: 15
   },
   contactsNameText: {
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular
   },
   shareButtonView: {
@@ -276,20 +240,42 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   shareButtonText: {
-    fontSize: RFValue(10, 812),
+    fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey
   },
   pageTitle: {
     marginLeft: 30,
     color: Colors.blue,
-    fontSize: RFValue(14, 812),
+    fontSize: RFValue(14),
     fontFamily: Fonts.FiraSansRegular
   },
   pageInfoText: {
     marginLeft: 30,
     color: Colors.textColorGrey,
-    fontSize: RFValue(10, 812),
+    fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular
-  }
+  },
+  searchBoxContainer: {
+    flexDirection: "row",
+    borderBottomColor: Colors.borderColor,
+    borderBottomWidth: 0.5,
+    marginLeft: 10,
+    marginRight: 10,
+    height: 40,
+    justifyContent: 'center',
+
+  },
+  searchBoxIcon: {
+    justifyContent: 'center',
+    marginBottom: -10
+  },
+  searchBoxInput: {
+    flex: 1,
+    fontSize: 13,
+    color: Colors.blacl,
+    borderBottomColor: Colors.borderColor,
+    alignSelf: 'center',
+    marginBottom: -10
+  },
 });

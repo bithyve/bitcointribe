@@ -51,14 +51,15 @@ export default function Login(props) {
   useEffect(() => {
     const custodyRequest = props.navigation.getParam('custodyRequest');
     const recoveryRequest = props.navigation.getParam('recoveryRequest');
-    if (isAuthenticated && dbFetched)
+    if (isAuthenticated)
       AsyncStorage.getItem('walletExists').then(exists => {
-        if (exists)
-          props.navigation.navigate('Home', {
-            custodyRequest,
-            recoveryRequest,
-          });
-        else props.navigation.replace('RestoreAndRecoverWallet');
+        if (exists) {
+          if (dbFetched)
+            props.navigation.navigate('Home', {
+              custodyRequest,
+              recoveryRequest,
+            });
+        } else props.navigation.replace('RestoreAndRecoverWallet');
       });
   }, [isAuthenticated, dbFetched]);
 
@@ -73,10 +74,10 @@ export default function Login(props) {
       <StatusBar />
       <View style={{ flex: 1 }}>
         <View style={{}}>
-          <Text style={styles.headerTitleText}>Welcome Back!</Text>
+          <Text style={styles.headerTitleText}>Welcome back!</Text>
           <View>
             <Text style={styles.headerInfoText}>
-              Please enter your{' '}
+              Please enter the{' '}
               <Text style={styles.boldItalicText}>passcode</Text>
             </Text>
             <View>

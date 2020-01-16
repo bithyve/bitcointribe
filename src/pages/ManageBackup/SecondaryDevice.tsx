@@ -26,99 +26,98 @@ import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const SecondaryDevice = props => {
-  const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
-  const [secondaryQR, setSecondaryQR] = useState('');
+  const [ selectedStatus, setSelectedStatus ] = useState( 'error' ); // for preserving health of this entity
+  const [ secondaryQR, setSecondaryQR ] = useState( '' );
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
     state => state.storage.database,
   );
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
-  const { loading } = useSelector(state => state.sss);
+  const { loading } = useSelector( state => state.sss );
 
-  SHARES_TRANSFER_DETAILS[0] && !secondaryQR
-    ? setSecondaryQR(
-        JSON.stringify({
-          ...SHARES_TRANSFER_DETAILS[0],
-          type: 'secondaryDeviceQR',
-        }),
-      )
-    : null;
-
-  SHARES_TRANSFER_DETAILS[0]
-    ? Alert.alert('OTP', SHARES_TRANSFER_DETAILS[0].OTP)
-    : null;
-
-  const deepLink = SHARES_TRANSFER_DETAILS[0]
-    ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
-      SHARES_TRANSFER_DETAILS[0].ENCRYPTED_KEY
-    : '';
+  // const deepLink = SHARES_TRANSFER_DETAILS[0]
+  //   ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
+  //     SHARES_TRANSFER_DETAILS[0].ENCRYPTED_KEY
+  //   : '';
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (!secondaryQR) {
-      dispatch(uploadEncMShare(0));
+  useEffect( () => {
+    if ( SHARES_TRANSFER_DETAILS[ 0 ] ) {
+      if ( Date.now() - SHARES_TRANSFER_DETAILS[ 0 ].UPLOADED_AT < 600000 ) {
+        setSecondaryQR(
+          JSON.stringify( {
+            requester: WALLET_SETUP.walletName,
+            ...SHARES_TRANSFER_DETAILS[ 0 ],
+            type: 'secondaryDeviceQR',
+          } ),
+        );
+      } else {
+        dispatch( uploadEncMShare( 0 ) );
+      }
+    } else {
+      dispatch( uploadEncMShare( 0 ) );
     }
-  }, []);
+  }, [ SHARES_TRANSFER_DETAILS[ 0 ] ] );
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={BackupStyles.headerContainer}>
+    <SafeAreaView style={ { flex: 1 } }>
+      <StatusBar backgroundColor={ Colors.white } barStyle="dark-content" />
+      <View style={ BackupStyles.headerContainer }>
         <TouchableOpacity
-          style={BackupStyles.headerLeftIconContainer}
-          onPress={() => {
+          style={ BackupStyles.headerLeftIconContainer }
+          onPress={ () => {
             props.navigation.goBack();
-          }}
+          } }
         >
-          <View style={BackupStyles.headerLeftIconInnerContainer}>
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          <View style={ BackupStyles.headerLeftIconInnerContainer }>
+            <FontAwesome name="long-arrow-left" color={ Colors.blue } size={ 17 } />
           </View>
         </TouchableOpacity>
       </View>
-      <View style={BackupStyles.modalHeaderTitleView}>
-        <View style={{ marginTop: hp('1%') }}>
-          <Text style={BackupStyles.modalHeaderTitleText}>
+      <View style={ BackupStyles.modalHeaderTitleView }>
+        <View style={ { marginTop: hp( '1%' ) } }>
+          <Text style={ BackupStyles.modalHeaderTitleText }>
             Secondary Device
           </Text>
-          <Text style={BackupStyles.modalHeaderInfoText}>
-            Last backup{' '}
+          <Text style={ BackupStyles.modalHeaderInfoText }>
+            Last backup{ ' ' }
             <Text
-              style={{
+              style={ {
                 fontFamily: Fonts.FiraSansMediumItalic,
                 fontWeight: 'bold',
-              }}
+              } }
             >
-              {'3 months ago'}
+              { '3 months ago' }
             </Text>
           </Text>
         </View>
         <Image
-          style={BackupStyles.cardIconImage}
-          source={getIconByStatus(selectedStatus)}
+          style={ BackupStyles.cardIconImage }
+          source={ getIconByStatus( selectedStatus ) }
         />
       </View>
-      <View style={BackupStyles.modalContentView}>
-        {loading.uploadMetaShare || !secondaryQR ? (
-          <View style={styles.loader}>
+      <View style={ BackupStyles.modalContentView }>
+        { loading.uploadMetaShare || !secondaryQR ? (
+          <View style={ styles.loader }>
             <ActivityIndicator size="large" />
           </View>
         ) : (
-          <QRCode value={secondaryQR} size={hp('27%')} />
-        )}
-        {deepLink ? <CopyThisText text={deepLink} /> : null}
+            <QRCode value={ secondaryQR } size={ hp( '27%' ) } />
+          ) }
+        {/* {deepLink ? <CopyThisText text={deepLink} /> : null} */ }
       </View>
       <BottomInfoBox
-        title={'Note'}
+        title={ 'Note' }
         infoText={
-          'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna'
+          `Scan the QR code on another device on which Hexa app is installed`
         }
       />
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
-  loader: { height: hp('27%'), justifyContent: 'center' },
-});
+const styles = StyleSheet.create( {
+  loader: { height: hp( '27%' ), justifyContent: 'center' },
+} );
 
 export default SecondaryDevice;

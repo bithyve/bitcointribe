@@ -1,4 +1,12 @@
 apply from: '../node_modules/react-native-unimodules/gradle.groovy'
+include ':react-native-contacts'
+project(':react-native-contacts').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-contacts/android')
+
+
+include ':react-native-mail'
+project(':react-native-mail').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-mail/android')
+include ':react-native-print'
+project(':react-native-print').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-print/android')
 include ':react-native-share'
 project(':react-native-share').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-share/android')
 include ':react-native-camera'
