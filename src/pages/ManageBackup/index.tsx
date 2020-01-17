@@ -626,6 +626,7 @@ export default function ManageBackup(props) {
             } else if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
               data.status = 'error';
             }
+            data.time = overallHealth.sharesInfo[0].updatedAt;
             break;
 
           case 'Trusted Contact 1':
@@ -636,6 +637,8 @@ export default function ManageBackup(props) {
             } else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
               data.status = 'error';
             }
+            data.time = overallHealth.sharesInfo[1].updatedAt;
+
             break;
 
           case 'Trusted Contact 2':
@@ -646,6 +649,7 @@ export default function ManageBackup(props) {
             } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
               data.status = 'error';
             }
+            data.time = overallHealth.sharesInfo[2].updatedAt;
             break;
 
           case 'Security Questions':
@@ -656,6 +660,7 @@ export default function ManageBackup(props) {
             } else if (overallHealth.qaStatus.stage === 'Ugly') {
               data.status = 'error';
             }
+            data.time = overallHealth.qaStatus.updatedAt;
             break;
 
           default:
