@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   StatusBar,
   AsyncStorage,
+  Button,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from '../ManageBackup/Styles';
@@ -40,9 +41,16 @@ const ReceivingAddress = props => {
   const [ReceiveHelperBottomSheet, setReceiveHelperBottomSheet] = useState(
     React.createRef(),
   );
+  const [
+    SecureReceiveWarningBottomSheet,
+    setSecureReceiveWarningBottomSheet,
+  ] = useState(React.createRef());
+
   const { loading, service } = useSelector(
     state => state.accounts[serviceType],
   );
+  const { receivingAddress } =
+    serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
 
   const checkNShowHelperModal = async () => {
     let isReceiveHelperDone = await AsyncStorage.getItem('isReceiveHelperDone');
@@ -54,19 +62,7 @@ const ReceivingAddress = props => {
     }
   };
 
-  useEffect(() => {
-    checkNShowHelperModal();
-  }, []);
-
-  const { receivingAddress } =
-    serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
-
-  const dispatch = useDispatch();
-  useEffect(() => {
-    if (!receivingAddress) dispatch(fetchAddress(serviceType));
-  }, [serviceType]);
-
-  const renderReceiveHelperContents = () => {
+  const renderReceiveHelperContents = useCallback(() => {
     return (
       <TestAccountHelperModalContents
         topButtonText={'Receiving Through the Test Account'}
@@ -89,18 +85,77 @@ const ReceivingAddress = props => {
         }}
       />
     );
-  };
-  const renderReceiveHelperHeader = () => {
+  }, [serviceType]);
+
+  const renderReceiveHelperHeader = useCallback(() => {
     return (
       <SmallHeaderModal
-      borderColor={Colors.blue}
-      backgroundColor={Colors.blue}
-      onPressHeader={() => {
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
           (ReceiveHelperBottomSheet as any).current.snapTo(0);
         }}
       />
     );
-  };
+  }, []);
+
+  const renderSecureReceiveWarningContents = useCallback(() => {
+    return (
+      <View>
+        <BottomInfoBox
+          title={'Note'}
+          infoText={
+            "Please ensure that you have 2FA setted up (preferably on your secondary device), you'll require the 2FA token in order to send bitcoins from the savings account."
+          }
+        />
+        <View style={{ flexDirection: 'row' }}>
+          <Button
+            title="Ok, I understand"
+            onPress={() =>
+              (SecureReceiveWarningBottomSheet as any).current.snapTo(0)
+            }
+          />
+          <Button
+            title="Manage Backup"
+            onPress={() => props.navigation.replace('ManageBackup')}
+          />
+        </View>
+      </View>
+    );
+  }, [serviceType]);
+
+  const renderSecureReceiveWarningHeader = useCallback(() => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+          (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  useEffect(() => {
+    checkNShowHelperModal();
+  }, []);
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!receivingAddress) dispatch(fetchAddress(serviceType));
+  }, [serviceType]);
+
+  useEffect(() => {
+    (async () => {
+      if (serviceType === SECURE_ACCOUNT) {
+        if (!(await AsyncStorage.getItem('savingsWarning'))) {
+          // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
+          SecureReceiveWarningBottomSheet.current.snapTo(1);
+          await AsyncStorage.setItem('savingsWarning', 'true');
+        }
+      }
+    })();
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -172,6 +227,13 @@ const ReceivingAddress = props => {
           snapPoints={[-50, hp('95%')]}
           renderContent={renderReceiveHelperContents}
           renderHeader={renderReceiveHelperHeader}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={SecureReceiveWarningBottomSheet}
+          snapPoints={[-50, hp('95%')]}
+          renderContent={renderSecureReceiveWarningContents}
+          renderHeader={renderSecureReceiveWarningHeader}
         />
       </View>
     </View>
