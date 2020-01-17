@@ -68,14 +68,21 @@ export default function ModalShareIntent( props ) {
     }, [ props ] );
 
 
-    const onShare = (item)=>{
+    const onShare = async(item)=>{
         props.onPressShare( item.type );
-        console.log("props.data",propsData, props.data)
-        if(props.data.item.type=="copy1"){
-            AsyncStorage.setItem("personalCopy1AutoHighlightFlags", 'true')
+        let personalCopyCounter = await AsyncStorage.getItem("personalCopyCounter");
+        if(personalCopyCounter && personalCopyCounter == '1'){
+            await AsyncStorage.setItem("personalCopyCounter", '2')
+            await AsyncStorage.setItem("personalCopy2AutoHighlightFlags", 'true')
         }
-        else if(props.data.item.type=="copy2"){
-            AsyncStorage.setItem("personalCopy2AutoHighlightFlags", 'true')
+        else if(!personalCopyCounter){
+            await AsyncStorage.setItem("personalCopyCounter", '1')
+            await AsyncStorage.setItem("personalCopy1AutoHighlightFlags", 'true')
+        }
+        else{
+            await AsyncStorage.setItem("personalCopyCounter", '2')
+            await AsyncStorage.setItem("personalCopy2AutoHighlightFlags", 'true')
+            await AsyncStorage.setItem("personalCopy1AutoHighlightFlags", 'true')
         }
     }
 
