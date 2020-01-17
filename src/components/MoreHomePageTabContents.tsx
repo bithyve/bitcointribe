@@ -5,7 +5,8 @@ import {
     TouchableOpacity,
     Text,
     StyleSheet,
-    FlatList
+    FlatList,
+    Linking
 } from 'react-native';
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
@@ -28,6 +29,17 @@ export default function MoreHomePageTabContents( props ) {
             title: `All accounts and funds`, image: require( '../assets/images/icons/accounts.png' ), info: `View and manage all accounts and funds`,
         },
     ] )
+
+    const openLink = (url) =>{
+        Linking.canOpenURL(url).then(supported => {
+            if (supported) {
+              Linking.openURL(url);
+            } else {
+              console.log("Don't know how to open URI: " + url);
+            }
+          });
+    }
+
     return ( <View style={ { ...styles.modalContentContainer, height: '100%', } }>
         <View style={ { height: '100%', paddingBottom: hp( '10%' ) } }>
             <View>
@@ -64,11 +76,21 @@ export default function MoreHomePageTabContents( props ) {
                 paddingRight: 10,
                 marginTop: hp( '1%' )
             } }>
+                <AppBottomSheetTouchableWrapper onPress={ () => openLink("http://hexawallet.io/faq") }>
                 <Text style={ styles.addModalTitleText }>FAQ's</Text>
+                </AppBottomSheetTouchableWrapper>
+               
                 <View style={ { height: 20, width: 1, backgroundColor: Colors.borderColor } } />
+               
+                <AppBottomSheetTouchableWrapper>
                 <Text style={ styles.addModalTitleText }>Terms And Conditions</Text>
+                </AppBottomSheetTouchableWrapper>
+
                 <View style={ { height: 20, width: 1, backgroundColor: Colors.borderColor } } />
+                
+                <AppBottomSheetTouchableWrapper onPress={ () => openLink("http://hexawallet.io/privacy-policy") }>
                 <Text style={ styles.addModalTitleText }>Privacy Policy</Text>
+                </AppBottomSheetTouchableWrapper>
             </View>
         </View>
     </View>

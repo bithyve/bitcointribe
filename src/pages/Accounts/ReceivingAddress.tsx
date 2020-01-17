@@ -243,7 +243,7 @@ const ReceivingAddress = props => {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={SecureReceiveWarningBottomSheet}
-          snapPoints={[-50, hp('50%')]}
+          snapPoints={[-50, hp('95%')]}
           renderContent={renderSecureReceiveWarningContents}
           renderHeader={renderSecureReceiveWarningHeader}
         />
