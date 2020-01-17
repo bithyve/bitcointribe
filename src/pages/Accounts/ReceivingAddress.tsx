@@ -115,7 +115,7 @@ const ReceivingAddress = props => {
           />
           <Button
             title="Manage Backup"
-            onPress={() => props.navigation.navigate('ManageBackup')}
+            onPress={() => props.navigation.replace('ManageBackup')}
           />
         </View>
       </View>
@@ -212,12 +212,12 @@ const ReceivingAddress = props => {
             marginBottom: hp('5%'),
           }}
         >
-          {/* <BottomInfoBox
+          <BottomInfoBox
             title={'Note'}
             infoText={
               'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna'
             }
-          /> */}
+          />
         </View>
         <BottomSheet
           enabledInnerScrolling={true}
