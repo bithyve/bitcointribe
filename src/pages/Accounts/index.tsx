@@ -154,7 +154,7 @@ function Accounts(props) {
     let isTestAccountHelperDone = await AsyncStorage.getItem(
       'isTestAccountHelperDone',
     );
-
+    
     if (isSendHelperDone == 'true') {
       setSendIsActive(false);
     }
@@ -178,8 +178,10 @@ function Accounts(props) {
       !isTestAccountHelperDone &&
       props.navigation.getParam('serviceType') == TEST_ACCOUNT
     ) {
-      TestAccountHelperBottomSheet.current.snapTo(1);
-      AsyncStorage.setItem('isTestAccountHelperDone', 'true');
+      await AsyncStorage.setItem('isTestAccountHelperDone', 'true');
+      setTimeout(() => {
+        TestAccountHelperBottomSheet.current.snapTo(1);
+      }, 1000);
     } else {
       props.copilotEvents.on('stepChange', handleStepChange);
       props.start();
@@ -189,6 +191,7 @@ function Accounts(props) {
   const setCarouselData1 = async () => {
     console.log("SERVICETYPE", serviceType);
     if (serviceType == TEST_ACCOUNT) {
+      getServiceType(serviceType);
       setTimeout(() => {
         carousel.current.snapToItem(0, true, false);
         setCarouselInitIndex(0);

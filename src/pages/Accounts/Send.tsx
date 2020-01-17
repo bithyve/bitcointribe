@@ -64,8 +64,10 @@ export default function Send(props) {
   const checkNShowHelperModal = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
     if (!isSendHelperDone && serviceType == TEST_ACCOUNT) {
-      AsyncStorage.setItem('isSendHelperDone', 'true');
+     await AsyncStorage.setItem('isSendHelperDone', 'true');
+      setTimeout(() => {
       SendHelperBottomSheet.current.snapTo(1);
+   }, 1000);
     }
   };
 

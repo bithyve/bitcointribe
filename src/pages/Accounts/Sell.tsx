@@ -63,8 +63,10 @@ export default function Sell(props) {
   const checkNShowHelperModal = async () => {
     let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
     if (!isSellHelperDone && serviceType == TEST_ACCOUNT) {
-      AsyncStorage.setItem('isSellHelperDone', 'true');
+      await AsyncStorage.setItem('isSellHelperDone', 'true');
+      setTimeout(() => {
       SellHelperBottomSheet.current.snapTo(1);
+    }, 1000);
     }
   };
 
