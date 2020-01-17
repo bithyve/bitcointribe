@@ -411,6 +411,7 @@ export default class SecureHDWallet extends Bitcoin {
         balance: number;
         inputs?: undefined;
         txb?: undefined;
+        estimatedBlocks?: undefined;
       }
     | {
         inputs: Array<{
@@ -422,6 +423,7 @@ export default class SecureHDWallet extends Bitcoin {
         txb: bitcoinJS.TransactionBuilder;
         fee: number;
         balance: number;
+        estimatedBlocks: number;
       }
   > => {
     try {
@@ -431,9 +433,11 @@ export default class SecureHDWallet extends Bitcoin {
       console.log('Output UTXOs:', outputUTXOs);
       // const txnFee = await this.feeRatesPerByte(txnPriority);
 
-      const { averageTxFee, feePerByte } = await this.averageTransactionFee(
-        txnPriority,
-      );
+      const {
+        averageTxFee,
+        feePerByte,
+        estimatedBlocks,
+      } = await this.averageTransactionFee(txnPriority);
       console.log({ averageTxFee, feePerByte });
 
       let balance: number = 0;
@@ -453,6 +457,13 @@ export default class SecureHDWallet extends Bitcoin {
       if (!inputs) {
         // insufficient input utxos to compensate for output utxos + fee
         return { fee: averageTxFee, balance };
+      }
+
+      let reestimatedBlocks;
+      if (averageTxFee - fee >= 0) reestimatedBlocks = estimatedBlocks;
+      else {
+        // TODO: clever estimation mech
+        reestimatedBlocks = estimatedBlocks + 2; // effective priority: medium
       }
 
       const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
@@ -477,6 +488,7 @@ export default class SecureHDWallet extends Bitcoin {
         txb,
         fee: averageTxFee,
         balance,
+        estimatedBlocks: reestimatedBlocks,
       };
     } catch (err) {
       throw new Error(`Transaction creation failed: ${err.message}`);

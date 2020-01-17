@@ -66,7 +66,10 @@ const Confirmation = props => {
       <Text style={{ marginVertical: 10 }}>
         Transaction Fee: {transfer.stage1.fee}
       </Text>
-      <Text style={{ marginVertical: 10 }}>Estimated Blocks: 1-2</Text>
+      <Text style={{ marginVertical: 10 }}>
+        Estimated Blocks: {transfer.stage1.estimatedBlocks - 1}-
+        {transfer.stage1.estimatedBlocks}
+      </Text>
       {loading.transfer ? (
         <ActivityIndicator size="small" style={{ marginVertical: 5 }} />
       ) : (

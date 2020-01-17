@@ -1,8 +1,8 @@
-import { TransactionBuilder } from "bitcoinjs-lib";
-import config from "../../Config";
-import SecureHDWallet from "../../utilities/accounts/SecureHDWallet";
-import { ErrMap } from "../../utilities/ErrMap";
-import { Transactions } from "../../utilities/Interface";
+import { TransactionBuilder } from 'bitcoinjs-lib';
+import config from '../../Config';
+import SecureHDWallet from '../../utilities/accounts/SecureHDWallet';
+import { ErrMap } from '../../utilities/ErrMap';
+import { Transactions } from '../../utilities/Interface';
 
 export default class SecureAccount {
   public static fromJSON = (json: string) => {
@@ -20,7 +20,7 @@ export default class SecureAccount {
       balances,
       receivingAddress,
       transactions,
-      twoFASetup
+      twoFASetup,
     }: {
       primaryMnemonic: string;
       secondaryMnemonic: string;
@@ -56,7 +56,7 @@ export default class SecureAccount {
       balances,
       receivingAddress,
       transactions,
-      twoFASetup
+      twoFASetup,
     });
   };
 
@@ -84,7 +84,7 @@ export default class SecureAccount {
         qrData: string;
         secret: string;
       };
-    }
+    },
   ) {
     this.secureHDWallet = new SecureHDWallet(primaryMnemonic, stateVars);
   }
@@ -112,7 +112,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.setupSecureAccount()
+        data: await this.secureHDWallet.setupSecureAccount(),
       };
     } catch (err) {
       return { status: 301, err: err.message, message: ErrMap[301] };
@@ -122,7 +122,7 @@ export default class SecureAccount {
   public importSecureAccount = async (
     secondaryXpub: string,
     bhXpub?: string,
-    token?: number
+    token?: number,
   ): Promise<
     | {
         status: number;
@@ -142,18 +142,18 @@ export default class SecureAccount {
     try {
       if (!bhXpub) {
         if (!token) {
-          throw new Error("Neither a bhXpub nor a token is provided");
+          throw new Error('Neither a bhXpub nor a token is provided');
         }
         const res = await this.secureHDWallet.importBHXpub(token);
         bhXpub = res.bhXpub;
       }
       const { prepared } = this.secureHDWallet.prepareSecureAccount(
         bhXpub,
-        secondaryXpub
+        secondaryXpub,
       );
 
       if (!prepared) {
-        throw new Error("Import failed: unable to prepare secure account.");
+        throw new Error('Import failed: unable to prepare secure account.');
       }
       return { status: config.STATUS.SUCCESS, data: { imported: true } };
     } catch (err) {
@@ -162,7 +162,7 @@ export default class SecureAccount {
   };
 
   public decryptSecondaryXpub = (
-    encryptedSecXpub: string
+    encryptedSecXpub: string,
   ):
     | {
         status: number;
@@ -181,7 +181,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.secureHDWallet.decryptSecondaryXpub(encryptedSecXpub)
+        data: this.secureHDWallet.decryptSecondaryXpub(encryptedSecXpub),
       };
     } catch (err) {
       return { status: 303, err: err.message, message: ErrMap[303] };
@@ -190,7 +190,7 @@ export default class SecureAccount {
 
   public checkHealth = async (
     chunk: string,
-    pos: number
+    pos: number,
   ): Promise<
     | {
         status: number;
@@ -210,7 +210,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.checkHealth(chunk, pos)
+        data: await this.secureHDWallet.checkHealth(chunk, pos),
       };
     } catch (err) {
       return { status: 304, err: err.message, message: ErrMap[304] };
@@ -236,7 +236,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.isActive()
+        data: await this.secureHDWallet.isActive(),
       };
     } catch (err) {
       return { status: 305, err: err.message, message: ErrMap[305] };
@@ -244,7 +244,7 @@ export default class SecureAccount {
   };
 
   public resetTwoFA = async (
-    token: number
+    token: number,
   ): Promise<
     | {
         status: number;
@@ -265,7 +265,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.resetTwoFA(token)
+        data: await this.secureHDWallet.resetTwoFA(token),
       };
     } catch (err) {
       return { status: 306, err: err.message, message: ErrMap[306] };
@@ -290,7 +290,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.secureHDWallet.getSecondaryMnemonic()
+        data: this.secureHDWallet.getSecondaryMnemonic(),
       };
     } catch (err) {
       return { status: 307, err: err.message, message: ErrMap[307] };
@@ -315,7 +315,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.secureHDWallet.getSecondaryXpub()
+        data: this.secureHDWallet.getSecondaryXpub(),
       };
     } catch (err) {
       return { status: 308, err: err.message, message: ErrMap[308] };
@@ -340,7 +340,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.secureHDWallet.getAccountId()
+        data: this.secureHDWallet.getAccountId(),
       };
     } catch (err) {
       return { status: 0o0, err: err.message, message: ErrMap[0o0] };
@@ -366,7 +366,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.getReceivingAddress()
+        data: await this.secureHDWallet.getReceivingAddress(),
       };
     } catch (err) {
       return { status: 0o1, err: err.message, message: ErrMap[0o1] };
@@ -393,7 +393,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.fetchBalance()
+        data: await this.secureHDWallet.fetchBalance(),
       };
     } catch (err) {
       return { status: 0o2, err: err.message, message: ErrMap[0o2] };
@@ -435,7 +435,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.fetchTransactions()
+        data: await this.secureHDWallet.fetchTransactions(),
       };
     } catch (err) {
       return { status: 0o3, err: err.message, message: ErrMap[0o3] };
@@ -443,7 +443,7 @@ export default class SecureAccount {
   };
 
   public getTransactionDetails = async (
-    txHash: string
+    txHash: string,
   ): Promise<
     | {
         status: number;
@@ -461,7 +461,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.fetchTransactionDetails(txHash)
+        data: await this.secureHDWallet.fetchTransactionDetails(txHash),
       };
     } catch (err) {
       return { status: 0o4, err: err.message, message: ErrMap[0o4] };
@@ -489,7 +489,7 @@ export default class SecureAccount {
       const { address } = await this.secureHDWallet.getReceivingAddress();
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.testnetFaucet(address)
+        data: await this.secureHDWallet.testnetFaucet(address),
       };
     } catch (err) {
       return { status: 0o5, err: err.message, message: ErrMap[0o5] };
@@ -499,7 +499,7 @@ export default class SecureAccount {
   public transferST1 = async (
     recipientAddress: string,
     amount: number,
-    priority?: string
+    priority?: string,
   ): Promise<
     | {
         status: number;
@@ -509,6 +509,7 @@ export default class SecureAccount {
           fee: number;
           inputs?: undefined;
           txb?: undefined;
+          estimatedBlocks?: undefined;
         };
       }
     | {
@@ -522,6 +523,7 @@ export default class SecureAccount {
           }>;
           txb: TransactionBuilder;
           fee: number;
+          estimatedBlocks: number;
         };
         err?: undefined;
         message?: undefined;
@@ -533,40 +535,41 @@ export default class SecureAccount {
         // amount = Math.round(amount * 1e8); // converting into sats
         amount = Math.round(amount);
 
-        console.log("---- Creating Transaction ----");
+        console.log('---- Creating Transaction ----');
         const {
           inputs,
           txb,
           fee,
-          balance
+          balance,
+          estimatedBlocks,
         } = await this.secureHDWallet.createHDTransaction(
           recipientAddress,
           amount,
-          priority
+          priority,
         );
 
         if (balance < amount + fee) {
           return {
             status: 0o6,
             err:
-              "Insufficient balance to compensate for transfer amount and the txn fee",
+              'Insufficient balance to compensate for transfer amount and the txn fee',
             message: ErrMap[0o6],
-            data: { fee }
+            data: { fee },
           };
         }
         if (inputs && txb) {
-          console.log("---- Transaction Created ----");
+          console.log('---- Transaction Created ----');
           return {
             status: config.STATUS.SUCCESS,
-            data: { inputs, txb, fee }
+            data: { inputs, txb, fee, estimatedBlocks },
           };
         } else {
           throw new Error(
-            "Unable to create transaction: inputs failed at coinselect"
+            'Unable to create transaction: inputs failed at coinselect',
           );
         }
       } else {
-        throw new Error("Recipient address is wrong");
+        throw new Error('Recipient address is wrong');
       }
     } catch (err) {
       return { status: 309, err: err.message, message: ErrMap[309] };
@@ -580,7 +583,7 @@ export default class SecureAccount {
       value: number;
       address: string;
     }>,
-    txb: TransactionBuilder
+    txb: TransactionBuilder,
   ): Promise<
     | {
         status: number;
@@ -607,18 +610,18 @@ export default class SecureAccount {
     try {
       const {
         signedTxb,
-        childIndexArray
+        childIndexArray,
       } = await this.secureHDWallet.signHDTransaction(inputs, txb);
 
       const txHex = signedTxb.buildIncomplete().toHex();
 
       console.log(
-        "---- Transaction signed by the user (1st sig for 2/3 MultiSig)----"
+        '---- Transaction signed by the user (1st sig for 2/3 MultiSig)----',
       );
 
       return {
         status: config.STATUS.SUCCESS,
-        data: { txHex, childIndexArray }
+        data: { txHex, childIndexArray },
       };
     } catch (err) {
       return { status: 310, err: err.message, message: ErrMap[310] };
@@ -634,7 +637,7 @@ export default class SecureAccount {
         txId: string;
         vout: number;
       };
-    }>
+    }>,
   ): Promise<
     | {
         status: number;
@@ -657,8 +660,8 @@ export default class SecureAccount {
         data: await this.secureHDWallet.serverSigningAndBroadcast(
           token,
           txHex,
-          childIndexArray
-        )
+          childIndexArray,
+        ),
       };
     } catch (err) {
       return { status: 311, err: err.message, message: ErrMap[311] };

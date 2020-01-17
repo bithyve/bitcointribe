@@ -735,7 +735,12 @@ export default class Bitcoin {
     }
   };
 
-  public feeRatesPerByte = async (txnPriority: string = 'high') => {
+  public feeRatesPerByte = async (
+    txnPriority: string = 'high',
+  ): Promise<{
+    feePerByte: number;
+    estimatedBlocks: number;
+  }> => {
     try {
       let rates;
       if (this.network === bitcoinJS.networks.testnet) {
@@ -752,11 +757,11 @@ export default class Bitcoin {
 
       txnPriority = txnPriority.toLowerCase();
       if (txnPriority === 'high') {
-        return Math.round(rates['2']);
+        return { feePerByte: Math.round(rates['2']), estimatedBlocks: 2 }; // high: within 2 blocks
       } else if (txnPriority === 'medium') {
-        return Math.round(rates['4']);
+        return { feePerByte: Math.round(rates['4']), estimatedBlocks: 4 }; // medium: within 4 blocks
       } else if (txnPriority === 'low') {
-        return Math.round(rates['6']);
+        return { feePerByte: Math.round(rates['6']), estimatedBlocks: 6 }; // low: within 6 blocks
       }
     } catch (err) {
       console.log(
@@ -770,11 +775,20 @@ export default class Bitcoin {
           low_fee_per_kb,
         } = chainInfo;
         if (txnPriority === 'high') {
-          return Math.round(high_fee_per_kb / 1000);
+          return {
+            feePerByte: Math.round(high_fee_per_kb / 1000),
+            estimatedBlocks: 2,
+          };
         } else if (txnPriority === 'medium') {
-          return Math.round(medium_fee_per_kb / 1000);
+          return {
+            feePerByte: Math.round(medium_fee_per_kb / 1000),
+            estimatedBlocks: 4,
+          };
         } else if (txnPriority === 'low') {
-          return Math.round(low_fee_per_kb / 1000);
+          return {
+            feePerByte: Math.round(low_fee_per_kb / 1000),
+            estimatedBlocks: 6,
+          };
         }
       } catch (err) {
         throw new Error('Falied to fetch feeRates');
@@ -784,14 +798,20 @@ export default class Bitcoin {
 
   public averageTransactionFee = async (
     txnPriority: string = 'high',
-  ): Promise<{ averageTxFee: number; feePerByte: number }> => {
-    const feePerByte = await this.feeRatesPerByte(txnPriority);
+  ): Promise<{
+    averageTxFee: number;
+    feePerByte: number;
+    estimatedBlocks: number;
+  }> => {
+    const { feePerByte, estimatedBlocks } = await this.feeRatesPerByte(
+      txnPriority,
+    );
     const averageTxSize = 250; // the average Bitcoin transaction is about 250 bytes big (1 Inp; 2 Out)
     const inputUTXOSize = 147; // in bytes
 
     // calculating fee considering 2 inputs per transaction
     const averageTxFee = (averageTxSize + inputUTXOSize) * feePerByte;
-    return { averageTxFee, feePerByte };
+    return { averageTxFee, feePerByte, estimatedBlocks };
   };
 
   public isValidAddress = (address: string): boolean => {
@@ -841,12 +861,12 @@ export default class Bitcoin {
     console.log('Fetched the inputs');
     const outputUTXOs = [{ address: recipientAddress, value: amount }];
 
-    const txnFee = await this.feeRatesPerByte(txnPriority);
+    const { feePerByte } = await this.feeRatesPerByte(txnPriority);
 
     const { inputs, outputs, fee } = coinselect(
       inputUTXOs,
       outputUTXOs,
-      txnFee,
+      feePerByte,
     );
     console.log('-------Transaction--------');
     console.log('\tFee', fee);
