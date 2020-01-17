@@ -32,6 +32,7 @@ import {
   fetchTransactions,
   transferST3,
 } from '../../store/actions/accounts';
+import DeviceInfo from 'react-native-device-info';
 import SendStatusModalContents from '../../components/SendStatusModalContents';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -43,8 +44,11 @@ import {
 } from '../../common/constants/serviceTypes';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
+import QrCodeModalContents from '../../components/QrCodeModalContents';
 
 export default function Send(props) {
+  const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
+  const [bottomSheet, setBottomSheet] = useState(React.createRef());
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
     : null;
@@ -64,13 +68,13 @@ export default function Send(props) {
   const checkNShowHelperModal = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
     if (!isSendHelperDone && serviceType == TEST_ACCOUNT) {
-     await AsyncStorage.setItem('isSendHelperDone', 'true');
+      await AsyncStorage.setItem('isSendHelperDone', 'true');
       setTimeout(() => {
-      SendHelperBottomSheet.current.snapTo(1);
-   }, 1000);
+        SendHelperBottomSheet.current.snapTo(1);
+      }, 1000);
     }
   };
-
+  const [openmodal, setOpenmodal] = useState('closed');
   useEffect(() => {
     checkNShowHelperModal();
   }, []);
@@ -159,7 +163,7 @@ export default function Send(props) {
   const renderSendHelperHeader = () => {
     return (
       <SmallHeaderModal
-      borderColor={Colors.blue}
+        borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
           (SendHelperBottomSheet as any).current.snapTo(0);
@@ -172,6 +176,59 @@ export default function Send(props) {
     console.log('Qrcodedata', qrData);
     setRecipientAddress(qrData);
   };
+
+  const renderContent1 = () => {
+    return (
+      <QrCodeModalContents
+        flag={true}
+        modalRef={bottomSheet}
+        isOpenedFlag={QrBottomSheetsFlag}
+        onQrScan={qrData => getQrCodeData(qrData)}
+        onPressQrScanner={() => {
+          props.navigation.navigate('QrScanner', {
+            scanedCode: getQrCodeData,
+          });
+        }}
+      />
+    );
+  };
+
+  useEffect(() => {
+    if (openmodal == 'closed') {
+      setTimeout(() => {
+        setQrBottomSheetsFlag(false);
+      }, 10);
+      (bottomSheet as any).current.snapTo(0);
+    }
+    if (openmodal == 'full') {
+      setTimeout(() => {
+        setQrBottomSheetsFlag(true);
+      }, 10);
+      (bottomSheet as any).current.snapTo(1);
+    }
+  }, [openmodal]);
+
+  function openCloseModal() {
+    if (openmodal == 'closed') {
+      setOpenmodal('full');
+    }
+    if (openmodal == 'full') {
+      setOpenmodal('closed');
+    }
+  }
+
+  function renderHeader() {
+    return (
+      <TouchableOpacity
+        activeOpacity={10}
+        onPress={() => openCloseModal()}
+        style={styles.modalHeaderContainer}
+      >
+        <View style={styles.modalHeaderHandle} />
+        <Text style={styles.modalHeaderTitleText}>QR</Text>
+      </TouchableOpacity>
+    );
+  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -245,9 +302,10 @@ export default function Send(props) {
                 <TouchableOpacity
                   style={styles.contactNameInputImageView}
                   onPress={() => {
-                    props.navigation.navigate('QrScanner', {
-                      scanedCode: getQrCodeData,
-                    });
+                    (bottomSheet as any).current.snapTo(1);
+                    // props.navigation.navigate('QrScanner', {
+                    //   scanedCode: getQrCodeData,
+                    // });
                   }}
                 >
                   <Image
@@ -466,6 +524,23 @@ export default function Send(props) {
           renderContent={renderSendHelperContents}
           renderHeader={renderSendHelperHeader}
         />
+        <BottomSheet
+          onOpenEnd={() => {
+            setQrBottomSheetsFlag(true);
+          }}
+          onCloseEnd={() => {
+            setQrBottomSheetsFlag(false);
+            (bottomSheet as any).current.snapTo(0);
+          }}
+          onCloseStart={() => {
+            setQrBottomSheetsFlag(false);
+          }}
+          enabledInnerScrolling={true}
+          ref={bottomSheet}
+          snapPoints={[0, hp('90%')]}
+          renderContent={renderContent1}
+          renderHeader={renderHeader}
+        />
       </View>
     </View>
   );
@@ -474,6 +549,29 @@ export default function Send(props) {
 const styles = StyleSheet.create({
   modalContentContainer: {
     height: '100%',
+  },
+  modalHeaderContainer: {
+    backgroundColor: Colors.white,
+    marginTop: 'auto',
+    flex: 1,
+    height: Platform.OS == 'ios' ? 45 : 40,
+    borderTopLeftRadius: 10,
+    borderLeftColor: Colors.borderColor,
+    borderLeftWidth: 1,
+    borderTopRightRadius: 10,
+    borderRightColor: Colors.borderColor,
+    borderRightWidth: 1,
+    borderTopColor: Colors.borderColor,
+    borderTopWidth: 1,
+    zIndex: 9999,
+  },
+  modalHeaderHandle: {
+    width: 50,
+    height: 5,
+    backgroundColor: Colors.borderColor,
+    borderRadius: 10,
+    alignSelf: 'center',
+    marginTop: 7,
   },
   modalHeaderTitleText: {
     color: Colors.blue,

@@ -76,8 +76,10 @@ export default function QrCodeModalContents(props) {
 								</ImageBackground>
 							</AppBottomSheetTouchableWrapper>
 						)}
-					<TextInput placeholder={'Enter Recipients Address'} placeholderTextColor={Colors.borderColor} style={styles.qrModalTextInput} />
+						{ !props.flag ? <TextInput placeholder={'Enter Recipients Address'} placeholderTextColor={Colors.borderColor} style={styles.qrModalTextInput} /> : null}
+					
 				</View>
+				{ !props.flag ? 
 				<View style={styles.qrModalInfoView}>
 					<View style={{ marginRight: 15 }}>
 						<Text style={styles.qrModalInfoTitleText}>QR</Text>
@@ -89,7 +91,7 @@ export default function QrCodeModalContents(props) {
 						size={15}
 						style={{ alignSelf: 'center' }}
 					/>
-				</View>
+				</View> : null }
 			</ScrollView>
 		</KeyboardAvoidingView>
 	</View >
