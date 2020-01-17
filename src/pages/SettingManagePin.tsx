@@ -22,6 +22,7 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import ErrorModalContents from '../components/ErrorModalContents';
 import TransparentHeaderModal from '../components/TransparentHeaderModal';
 import DeviceInfo from 'react-native-device-info';
+import ModalHeader from '../components/ModalHeader';
 
 export default function SettingManagePin(props) {
     const [
@@ -64,8 +65,8 @@ export default function SettingManagePin(props) {
 
     const renderPinChangeSuccessModalHeader = () => {
         return (
-            <TransparentHeaderModal
-                onPressheader={() => {
+            <ModalHeader
+                onPressHeader={() => {
                     (PinChangeSuccessBottomSheet as any).current.snapTo(0);
                 }}
             />

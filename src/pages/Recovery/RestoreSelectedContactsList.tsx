@@ -39,6 +39,7 @@ import ErrorModalContents from "../../components/ErrorModalContents";
 import { useDispatch, useSelector } from "react-redux";
 import { downloadMShare, recoverWallet } from "../../store/actions/sss";
 import AsyncStorage from "@react-native-community/async-storage";
+import ModalHeader from '../../components/ModalHeader';
 
 export default function RestoreSelectedContactsList(props) {
   const [selectedContacts, setSelectedContacts] = useState([]);
@@ -263,8 +264,8 @@ export default function RestoreSelectedContactsList(props) {
 
   const renderErrorModalHeader = () => {
     return (
-      <TransparentHeaderModal
-        onPressheader={() => {
+      <ModalHeader
+        onPressHeader={() => {
           (ErrorBottomSheet as any).current.snapTo(0);
         }}
       />

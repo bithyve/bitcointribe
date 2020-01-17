@@ -28,6 +28,7 @@ import TransparentHeaderModal from "../../components/TransparentHeaderModal";
 import ErrorModalContents from '../../components/ErrorModalContents';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from "react-native-device-info";
+import ModalHeader from '../../components/ModalHeader';
 
 const TrustedContactHealthCheck = props => {
     const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
@@ -94,8 +95,8 @@ const TrustedContactHealthCheck = props => {
 
     const renderChangeHeader = () => {
         return (
-            <TransparentHeaderModal
-                onPressheader={() => {
+            <ModalHeader
+                onPressHeader={() => {
                     (ChangeBottomSheet as any).current.snapTo(0);
                 }}
             />
@@ -127,8 +128,8 @@ const TrustedContactHealthCheck = props => {
 
     const renderReshareHeader = () => {
         return (
-            <TransparentHeaderModal
-                onPressheader={() => {
+            <ModalHeader
+                onPressHeader={() => {
                     (ReshareBottomSheet as any).current.snapTo(0);
                 }}
             />
@@ -160,8 +161,8 @@ const TrustedContactHealthCheck = props => {
 
     const renderConfirmHeader = () => {
         return (
-            <TransparentHeaderModal
-                onPressheader={() => {
+            <ModalHeader
+                onPressHeader={() => {
                     (ConfirmBottomSheet as any).current.snapTo(0);
                 }}
             />

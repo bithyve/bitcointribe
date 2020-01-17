@@ -23,16 +23,11 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
-import CopyThisText from '../../components/CopyThisText';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { initHealthCheck, checkMSharesHealth } from '../../store/actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import HomePageShield from '../../components/HomePageShield';
-import BackupStyles from './Styles';
-import ContactList from '../../components/ContactList';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import BottomInfoBox from '../../components/BottomInfoBox';
 import Icons from "../../common/Icons";
 import ErrorModalContents from '../../components/ErrorModalContents';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -45,13 +40,12 @@ import RegenerateHealper from '../../components/Helper/RegenerateHealper';
 import { ModalShareIntent } from 'hexaComponents/Modal/ManageBackup';
 
 import Singleton from "hexaCommon/Singleton";
-import SecondaryDeviceModelContents from '../../components/ManageBackup/SecondaryDeviceModelContents';
-import TrustedContactModalContents from '../../components/ManageBackup/TrustedContactModalContents';
-import ShareOtpWithTrustedContactContents from '../../components/ShareOtpWithTrustedContactContents';
+import ShareOtpWithTrustedContact from './ShareOtpWithTrustedContact';
 import TrustedContacts from './TrustedContacts';
 import CommunicationMode from './CommunicationMode';
 import ModalHeader from '../../components/ModalHeader';
-import TransparentHeaderModal from '../../components/TransparentHeaderModal';
+import SecondaryDevice from "./SecondaryDevice";
+import HealthCheckSecurityQuestion from './HealthCheckSecurityQuestion';
 
 let itemSelected = {};
 
@@ -105,6 +99,13 @@ export default function ManageBackup(props) {
   const [CommunicationModeBottomSheet, setCommunicationModeBottomSheet] = useState(
     React.createRef(),
   );
+  const [SecurityQuestionBottomSheet, setSecurityQuestionBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [HealthCheckSuccessBottomSheet, setHealthCheckSuccessBottomSheet] = useState(
+    React.createRef(),
+  );
+  
   const [
     RegenerateShareHelperBottomSheet,
     setRegenerateShareHelperBottomSheet,
@@ -234,35 +235,6 @@ export default function ManageBackup(props) {
     }
   }
 
-  // function selectedContactsList(list) {
-  //   setContacts(list);
-  // }
-
-  // function continueNProceed() {
-  //   bottomSheet.current.snapTo(0);
-  // setTimeout(() => {
-  //   setSelectedType("cloud");
-  //   setSelectedStatus("success");
-  // }, 1000);
-  //}
-
-  // const [contactIndex, setContactIndex] = useState();
-  // function openModal(type, title?) {
-  //   // title as dummy identifier for Trusted Contact index
-  //   setSelectedType(type);
-  //   if (title)
-  //     title === "Trusted Contact 1" ? setContactIndex(1) : setContactIndex(2);
-
-  //   bottomSheet.current.snapTo(1);
-  // }
-
-  //   function onCloseEnd() {
-  //     if (selectedType == "secondaryDevice") {
-  //       setSelectedType("contact");
-  //       setSelectedStatus("warning");
-  //     }
-  //   }
-
   const getIconByStatus = status => {
     if ( status == 'error' ) {
       return require( '../../assets/images/icons/icon_error_red.png' );
@@ -273,11 +245,102 @@ export default function ManageBackup(props) {
     }
   };
 
-  function onCloseEnd() {
-    if (selectedType == 'secondaryDevice') {
-      setSelectedType('contact');
-      setSelectedStatus('warning');
+  const renderSecondaryDeviceContents = () => {
+    return (
+      <SecondaryDevice
+        onPressOk={() => onPressSecondaryDeviceOk()}
+        onPressBack={() => { onPressSecondaryDeviceOk() }}
+      />
+    );
+  };
+
+  function renderSecondaryDeviceHeader() {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (secondaryDeviceBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }
+
+  const onPressSecondaryDeviceOk = async() =>{
+    let autoHighlightFlags = {};
+    setTimeout(()=>{
+      setSelectedType('');
+    }, 10); 
+    secondaryDeviceBottomSheet.current.snapTo(0);
+    await AsyncStorage.setItem('secondaryDeviceAutoHighlightFlags', 'true');
+  }
+
+  function renderTrustedContactsContent() {
+    return (
+      <TrustedContacts
+        onPressBack={() => { trustedContactsBottomSheet.current.snapTo(0) }}
+        onPressContinue={(selectedContacts, index) => getContacts(selectedContacts, index)}
+        index={chosenContactIndex}
+      />
+    );
+  }
+
+  function renderTrustedContactsHeader() {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (trustedContactsBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }
+
+  const getContacts = async (selectedContacts, index) => {
+    let contactList = await AsyncStorage.getItem('SelectedContacts')
+    .then(req => JSON.parse(req))
+    .then(json => console.log(json))
+    .catch(error => console.log('error!'));
+    let contactListArray = [];
+    if (contactList) {
+      contactListArray = contactList;
+      if (selectedContacts.length == 2) {
+        contactListArray[0] = selectedContacts[0];
+        contactListArray[1] = selectedContacts[1];
+      }
+      else if (selectedContacts.length == 1 && index == 0) {
+        contactListArray[0] = selectedContacts[0];
+      }
+      else if (selectedContacts.length == 1 && index == 1) {
+        contactListArray[1] = selectedContacts[0];
+      }
+    } else {
+      for (let i = 0; i < selectedContacts.length; i++) {
+        contactListArray.push(selectedContacts[i]);
+      }
     }
+    setTimeout(() => {
+      setContact(contactListArray);
+    }, 10);
+    await AsyncStorage.setItem('SelectedContacts', JSON.stringify(contactListArray));
+    let AsyncContacts = JSON.parse(await AsyncStorage.getItem('SelectedContacts'));
+    if (AsyncContacts && AsyncContacts.length == 2 && chosenContactIndex == 0) {
+      setTimeout(() => {
+        setChosenContact(AsyncContacts[0]);
+      }, 10);
+    }
+    else if (AsyncContacts && AsyncContacts.length == 2 && chosenContactIndex == 1) {
+      setTimeout(() => {
+        setChosenContact(AsyncContacts[1]);
+      }, 10);
+    }
+    else if (AsyncContacts && AsyncContacts.length == 1) {
+      setTimeout(() => {
+        setChosenContact(AsyncContacts[0]);
+      }, 10);
+    }
+    setTimeout(() => {
+      setContacts(selectedContacts);
+    }, 10);
+    trustedContactsBottomSheet.current.snapTo(0);
+    CommunicationModeBottomSheet.current.snapTo(1);
   }
 
   function renderCommunicationModeModalContent() {
@@ -309,6 +372,26 @@ export default function ManageBackup(props) {
     );
   }
 
+  function renderShareOtpWithTrustedContactContent() {
+    return (
+      <ShareOtpWithTrustedContact
+        onPressOk={(index) => onOTPShare(index)}
+        onPressBack={() => { shareOtpWithTrustedContactBottomSheet.current.snapTo(0) }}
+        OTP={OTP}
+        index={chosenContactIndex}
+      />
+    );
+  }
+
+  function renderShareOtpWithTrustedContactHeader() {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
+        }} />
+    );
+  }
+
   const onOTPShare = async(index) => {
     const updatedPageData = [...pageData];
     if (index == 0 && !updatedPageData[1].isOTPShared) {
@@ -335,261 +418,6 @@ export default function ManageBackup(props) {
     }
     setTimeout(() => { setPageData(updatedPageData) }, 2);
   }
-
-  function renderShareOtpWithTrustedContactContent() {
-    return (
-      <ShareOtpWithTrustedContactContents
-        onPressOk={(index) => onOTPShare(index)}
-        onPressBack={() => { shareOtpWithTrustedContactBottomSheet.current.snapTo(0) }}
-        OTP={OTP}
-        index={chosenContactIndex}
-      />
-    );
-  }
-
-  function renderShareOtpWithTrustedContactHeader() {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
-        }} />
-    );
-  }
-
-  const getContacts = async (selectedContacts, index) => {
-    
-    let contactList = await AsyncStorage.getItem('SelectedContacts')
-    .then(req => JSON.parse(req))
-    .then(json => console.log(json))
-    .catch(error => console.log('error!'));
-    // JSON.parse(
-    //   await AsyncStorage.getItem('SelectedContacts'),
-    // );
-    let contactListArray = [];
-    if (contactList) {
-      console.log("CONTACTLIST", contactList);
-      contactListArray = contactList;
-      if (selectedContacts.length == 2) {
-        console.log("selectedContacts", typeof selectedContacts[0], selectedContacts[0])
-        contactListArray[0] = selectedContacts[0];
-        contactListArray[1] = selectedContacts[1];
-      }
-      else if (selectedContacts.length == 1 && index == 0) {
-        contactListArray[0] = selectedContacts[0];
-      }
-      else if (selectedContacts.length == 1 && index == 1) {
-        contactListArray[1] = selectedContacts[0];
-      }
-      console.log("CONTACTLIST ARAAY if", contactListArray);
-    } else {
-      for (let i = 0; i < selectedContacts.length; i++) {
-        contactListArray.push(selectedContacts[i]);
-      }
-      console.log("CONTACTLIST ARAAY else", contactListArray);
-    }
-    console.log("contactListArray", typeof contactListArray, contactListArray)
-    setTimeout(() => {
-      setContact(contactListArray);
-    }, 10);
-    await AsyncStorage.setItem('SelectedContacts', JSON.stringify(contactListArray));
-    let AsyncContacts = JSON.parse(await AsyncStorage.getItem('SelectedContacts'));
-    if (AsyncContacts && AsyncContacts.length == 2 && chosenContactIndex == 0) {
-      setTimeout(() => {
-        setChosenContact(AsyncContacts[0]);
-      }, 10);
-    }
-    else if (AsyncContacts && AsyncContacts.length == 2 && chosenContactIndex == 1) {
-      setTimeout(() => {
-        setChosenContact(AsyncContacts[1]);
-      }, 10);
-    }
-    else if (AsyncContacts && AsyncContacts.length == 1) {
-      setTimeout(() => {
-        setChosenContact(AsyncContacts[0]);
-      }, 10);
-    }
-    setTimeout(() => {
-      setContacts(selectedContacts);
-    }, 10);
-
-    trustedContactsBottomSheet.current.snapTo(0);
-    CommunicationModeBottomSheet.current.snapTo(1);
-  }
-
-  function renderTrustedContactsContent() {
-    return (
-      <TrustedContacts
-        onPressBack={() => { trustedContactsBottomSheet.current.snapTo(0) }}
-        onPressContinue={(selectedContacts, index) => getContacts(selectedContacts, index)}
-        index={chosenContactIndex}
-      />
-    );
-  }
-
-  function renderTrustedContactsHeader() {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (trustedContactsBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }
-
-  const onPressSecondaryDeviceOk = async() =>{
-    let autoHighlightFlags = {};
-    setTimeout(()=>{
-      setSelectedType('');
-    }, 10); 
-    secondaryDeviceBottomSheet.current.snapTo(0);
-    await AsyncStorage.setItem('secondaryDeviceAutoHighlightFlags', 'true');
-  }
-
-  const renderSecondaryDeviceContents = () => {
-    return (
-      <SecondaryDeviceModelContents
-        onPressOk={() => onPressSecondaryDeviceOk()}
-        onPressBack={() => { onPressSecondaryDeviceOk() }}
-      />
-    );
-  };
-
-  function renderSecondaryDeviceHeader() {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (secondaryDeviceBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }
-
-  const renderChangeContent = () => {
-    return (
-      <ErrorModalContents
-        modalRef={ChangeBottomSheet}
-        title={'Change your\nTrusted Contact'}
-        info={'Having problems with your Trusted Contact'}
-        note={
-          'You can change the Trusted Contact you selected to share your Recovery Secret'
-        }
-        proceedButtonText={'Change'}
-        cancelButtonText={'Back'}
-        isIgnoreButton={true}
-        onPressProceed={() => {
-          (ChangeBottomSheet as any).current.snapTo(0);
-        }}
-        onPressIgnore={() => {
-          (ChangeBottomSheet as any).current.snapTo(0);
-        }}
-        isBottomImage={false}
-      />
-    );
-  };
-
-  const renderChangeHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (ChangeBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderReshareContent = () => {
-    return (
-      <ErrorModalContents
-        modalRef={ReshareBottomSheet}
-        title={'Reshare Recovery Secret\nwith Trusted Contact'}
-        info={'Did your contact not receive the Recovery Secret?'}
-        note={
-          'You can reshare the Recovery Secret with your Trusted\nContact via Email or Sms'
-        }
-        proceedButtonText={'Reshare'}
-        cancelButtonText={'Back'}
-        isIgnoreButton={true}
-        onPressProceed={() => {
-          (ReshareBottomSheet as any).current.snapTo(0);
-        }}
-        onPressIgnore={() => {
-          (ReshareBottomSheet as any).current.snapTo(0);
-        }}
-        isBottomImage={false}
-      />
-    );
-  };
-
-  const renderReshareHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (ReshareBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderConfirmContent = () => {
-    return (
-      <ErrorModalContents
-        modalRef={ConfirmBottomSheet}
-        title={'Confirm Recovery Secret\nwith Trusted Contact'}
-        info={'Your Trusted Contact seems away from their Hexa App'}
-        note={
-          'You can send them a reminder to open their app to\nensure they have your Recovery Secret'
-        }
-        proceedButtonText={'Confirm'}
-        cancelButtonText={'Back'}
-        isIgnoreButton={true}
-        onPressProceed={() => {
-          (ConfirmBottomSheet as any).current.snapTo(0);
-        }}
-        onPressIgnore={() => {
-          (ConfirmBottomSheet as any).current.snapTo(0);
-        }}
-        isBottomImage={false}
-      />
-    );
-  };
-
-  const renderConfirmHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (ConfirmBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  // function renderContent() {
-  //   switch (selectedType) {
-  //     case "secondaryDevice":
-  //       props.navigation.navigate("SecondaryDevice");
-  //       break;
-  //     case "contact":
-  //       props.navigation.navigate("TrustedContacts", { index: contactIndex });
-  //       break;
-  //     case "cloud":
-  //       props.navigation.navigate("Cloud");
-  //       break;
-  //   }
-  // }
-
-  // function renderHeader() {
-  //   return (
-  //     <TouchableOpacity
-  //       activeOpacity={10}
-  //       onPress={() => {
-  //         bottomSheet.current.snapTo(0);
-  //       }}
-  //       style={styles.modalHeader}
-  //     >
-  //       <View style={styles.modalHeaderHandle} />
-  //     </TouchableOpacity>
-  //   );
-  // }
 
   const renderWalletBackupAndRecoveryContents = () => {
     return (
@@ -619,7 +447,7 @@ export default function ManageBackup(props) {
     );
   };
 
-  const renderBuyHelperContents = () => {
+  const renderRegenerateShareHelperContents = () => {
     return (
       <RegenerateHealper
         topButtonText={ 'Regenerate Shares' }
@@ -639,7 +467,7 @@ export default function ManageBackup(props) {
       />
     );
   };
-  const renderBuyHelperHeader = () => {
+  const renderRegenerateShareHelperHeader = () => {
     return (
       <SmallHeaderModal
         onPressHandle={ () => {
@@ -648,6 +476,58 @@ export default function ManageBackup(props) {
       />
     );
   };
+
+  const renderSecurityQuestionContent = () => {
+    return (
+      <HealthCheckSecurityQuestion
+        bottomSheetRef = {SecurityQuestionBottomSheet}
+        onPressConfirm={()=>{SecurityQuestionBottomSheet.current.snapTo(0); 
+          (HealthCheckSuccessBottomSheet as any).current.snapTo(1);}}
+      />
+    );
+  };
+  const renderSecurityQuestionHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={ () => {
+          ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 );
+        } }
+      />
+    );
+  };
+
+  const renderHealthCheckSuccessModalContent = () => {
+    return (
+      <ErrorModalContents
+        modalRef={HealthCheckSuccessBottomSheet}
+        title={'Health Check Successful'}
+        info={'Questions Successfully Backed Up'}
+        note={'Hexa will remind you to help\nremember the answers'}
+        proceedButtonText={'View Health'}
+        isIgnoreButton={false}
+        onPressProceed={() => {
+          (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
+          dispatch(checkMSharesHealth());
+        }}
+        isBottomImage={true}
+      />
+    );
+  };
+
+  const renderHealthCheckSuccessModalHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          onPressOnHealthCheckSuccess();
+        }}
+      />
+    );
+  };
+
+  const onPressOnHealthCheckSuccess = async() =>{
+    (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
+    await AsyncStorage.setItem("securityAutoHighlightFlags", 'true')
+  }
 
   const secretSharedTrustedContact1 = isSecretShared1 => {
     setIsSecretShared1(isSecretShared1);
@@ -662,7 +542,6 @@ export default function ManageBackup(props) {
   }, [health]);
 
   useEffect(() => {
-    
     (async () => {
       if (!overallHealth) {
         const storedHealth = await AsyncStorage.getItem('overallHealth');
@@ -673,7 +552,6 @@ export default function ManageBackup(props) {
     })();
   }, []);
 
-  //const { overallHealth } = useSelector( state => state.sss );
   useEffect(() => {
     if (overallHealth) {
       const updatedPageData = [...pageData];
@@ -731,7 +609,6 @@ export default function ManageBackup(props) {
     // HC down-streaming
     if (s3Service) {
       const { healthCheckInitialized } = s3Service.sss;
-
       if (healthCheckInitialized) {
         dispatch(checkMSharesHealth());
       }
@@ -739,9 +616,6 @@ export default function ManageBackup(props) {
   }, []);
 
   useEffect(() => {
-    // ( async () => {
-    //   const contactList = await AsyncStorage.getItem( 'SelectedContacts' );
-    // } )();
     dispatch(fetchSSSFromDB());
     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
     checkNShowHelperModal();
@@ -756,13 +630,9 @@ export default function ManageBackup(props) {
       await AsyncStorage.setItem( 'isManageBackupHelperDone', 'true' );
       setTimeout(() => {
         WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
-      }, 10);
+      }, 1000);
     }
   };
-
-  useEffect(()=>{
-    // autoHighlightOptions();
-  },[selectedType]);
 
   const autoHighlightOptions = async () =>{
     let secondaryDeviceAutoHighlightFlags = await AsyncStorage.getItem('secondaryDeviceAutoHighlightFlags')
@@ -805,7 +675,10 @@ export default function ManageBackup(props) {
         setSelectedType("copy1");
         setSelectedStatus("error");
         setTimeout(()=>{
-          props.navigation.navigate("PersonalCopy");
+          setArrModalShareIntent({
+            snapTop: 1,
+            item:pageData[3],
+          });
         }, 500);
       }, 250);
       
@@ -815,7 +688,10 @@ export default function ManageBackup(props) {
         setSelectedType("copy2");
         setSelectedStatus("error");
         setTimeout(()=>{
-          props.navigation.navigate("PersonalCopy");
+          setArrModalShareIntent({
+            snapTop: 1,
+            item:pageData[4],
+          });
         }, 500);
       }, 250);
     }
@@ -824,7 +700,7 @@ export default function ManageBackup(props) {
         setSelectedType("security");
         setSelectedStatus("error");
         setTimeout(()=>{
-          props.navigation.navigate("HealthCheckSecurityAnswer");
+          SecurityQuestionBottomSheet.current.snapTo(1);
         }, 500);
       }, 250);
     }
@@ -1001,58 +877,18 @@ export default function ManageBackup(props) {
                       }
                       trustedContactsBottomSheet.current.snapTo(1);
                     }
-                    else{
-                      props.navigation.navigate(item.route);
+                    else if(item.type=="copy1" || item.type == "copy2"){
+                      setArrModalShareIntent({
+                        snapTop: 1,
+                        item,
+                      });
                     }
-                    // let singleton = Singleton.getInstance();
-                    // singleton.setSelectedPdfDetails(pageData);
-                    // itemSelected = item;
-                    // if (item.route == 'PersonalCopy') {
-                    //   setArrModalShareIntent({
-                    //     snapTop: 1,
-                    //     item,
-                    //   });
-                    // }
-                    // if (item.type == 'contact' && !item.personalInfo) {
-                    //   props.navigation.navigate(item.route, {
-                    //     index:
-                    //       item.title === 'Trusted Contact 1'
-                    //         ? 1
-                    //         : item.title === 'Trusted Contact 2'
-                    //           ? 2
-                    //           : undefined,
-                    //     getTrustContact: getTrustContact,
-                    //     contacts: contacts ? contacts : [],
-                    //   });
-                    // } else {
-                    //   if (item.type == 'contact') {
-                    //     if (isSecretShared1 || isSecretShared2) {
-                    //       props.navigation.navigate(
-                    //         'TrustedContactHealthCheck',
-                    //       );
-                    //     } else {
-                    //       props.navigation.navigate('CommunicationMode', {
-                    //         contact: item.personalInfo,
-                    //         index:
-                    //           item.title === 'Trusted Contact 1'
-                    //             ? 1
-                    //             : item.title === 'Trusted Contact 2'
-                    //               ? 2
-                    //               : undefined,
-                    //         secretSharedTrustedContact1:
-                    //           item.title === 'Trusted Contact 1'
-                    //             ? secretSharedTrustedContact1
-                    //             : null,
-                    //         secretSharedTrustedContact2:
-                    //           item.title === 'Trusted Contact 2'
-                    //             ? secretSharedTrustedContact2
-                    //             : null,
-                    //       });
-                    //     }
-                    //   } else {
-                    //     props.navigation.navigate(item.route);
-                    //   }
-                    // }
+                    else if(item.type=="security"){
+                      SecurityQuestionBottomSheet.current.snapTo(1);
+                    }
+                    else{
+                      secondaryDeviceBottomSheet.current.snapTo(1);
+                    }
                   }}
                   style={{
                     ...styles.manageBackupCard,
@@ -1142,7 +978,6 @@ export default function ManageBackup(props) {
         </ScrollView>
         <BottomSheet
           onCloseStart={() => onPressSecondaryDeviceOk()}
-          // onCloseEnd={() => onPressSecondaryDeviceOk()}
           enabledInnerScrolling={true}
           ref={secondaryDeviceBottomSheet}
           snapPoints={[-30, hp("90%")]}
@@ -1150,7 +985,6 @@ export default function ManageBackup(props) {
           renderHeader={renderSecondaryDeviceHeader}
         />
         <BottomSheet
-          onCloseEnd={() => onCloseEnd()}
           enabledInnerScrolling={true}
           ref={trustedContactsBottomSheet}
           snapPoints={[-30, hp("90%")]}
@@ -1158,7 +992,6 @@ export default function ManageBackup(props) {
           renderHeader={renderTrustedContactsHeader}
         />
         <BottomSheet
-          onCloseEnd={() => onCloseEnd()}
           enabledInnerScrolling={true}
           ref={CommunicationModeBottomSheet}
           snapPoints={[-30, hp("75%")]}
@@ -1166,7 +999,6 @@ export default function ManageBackup(props) {
           renderHeader={renderCommunicationModeModalHeader}
         />
         <BottomSheet
-          onCloseEnd={() => onCloseEnd()}
           enabledInnerScrolling={true}
           ref={shareOtpWithTrustedContactBottomSheet}
           snapPoints={[-30, hp("70%")]}
@@ -1189,61 +1021,49 @@ export default function ManageBackup(props) {
           enabledInnerScrolling={ true }
           ref={ RegenerateShareHelperBottomSheet }
           snapPoints={ [ -50, hp( '95%' ) ] }
-          renderContent={ renderBuyHelperContents }
-          renderHeader={ renderBuyHelperHeader }
+          renderContent={ renderRegenerateShareHelperContents }
+          renderHeader={ renderRegenerateShareHelperHeader }
         />
         <ModalShareIntent
           data={ arrModalShareIntent }
           onPressHandle={ () => {
             setArrModalShareIntent( { ...arrModalShareIntent, snapTop: 0 } );
+            if(arrModalShareIntent.item && arrModalShareIntent.item.type=="copy1"){
+              AsyncStorage.setItem("personalCopy1AutoHighlightFlags", 'true')
+            }
+            else if(arrModalShareIntent.item && arrModalShareIntent.item.type=="copy2"){
+              AsyncStorage.setItem("personalCopy2AutoHighlightFlags", 'true')
+            }
+            setSelectedType("")
           } }
           onPressShare={ type => {
-            console.log( { type, itemSelected } );
             setArrModalShareIntent( { ...arrModalShareIntent, snapTop: 0 } );
             dispatch( requestSharePdf( type, itemSelected ) );
+            if(arrModalShareIntent.item && arrModalShareIntent.item.type=="copy1"){
+              AsyncStorage.setItem("personalCopy1AutoHighlightFlags", 'true')
+            }
+            else if(arrModalShareIntent.item && arrModalShareIntent.item.type=="copy2"){
+              AsyncStorage.setItem("personalCopy2AutoHighlightFlags", 'true')
+            }
+            setSelectedType("")
           } }
         />
-        {/* <ModalShareIntent
-          data={arrModalShareIntent}
-          onPressHandle={() => {
-            setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 })
-          }
-          }
-          onPressShare={(type) => {
-            setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 })
-            dispatch(requestSharePdf(type, itemSelected));
-          }}
-        />
-        */}
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={ChangeBottomSheet}
+          ref={SecurityQuestionBottomSheet}
+          snapPoints={[-30, hp("75%"), hp('90%')]}
+          renderContent={renderSecurityQuestionContent}
+          renderHeader={renderSecurityQuestionHeader}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={HealthCheckSuccessBottomSheet}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
           ]}
-          renderContent={renderChangeContent}
-          renderHeader={renderChangeHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={ReshareBottomSheet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
-          ]}
-          renderContent={renderReshareContent}
-          renderHeader={renderReshareHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={ConfirmBottomSheet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
-          ]}
-          renderContent={renderConfirmContent}
-          renderHeader={renderConfirmHeader}
+          renderContent={renderHealthCheckSuccessModalContent}
+          renderHeader={renderHealthCheckSuccessModalHeader}
         />
       </View>
     </View>
@@ -1251,70 +1071,12 @@ export default function ManageBackup(props) {
 }
 
 const styles = StyleSheet.create( {
-  knowMoreButton: {
-    marginTop: 10,
-    height: wp( '6%' ),
-    width: wp( '18%' ),
-    marginLeft: 25,
-    backgroundColor: Colors.lightBlue,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 5,
-  },
-  knowMoreButtonText: {
-    color: Colors.white,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue( 12 ),
-  },
   shieldImage: {
     width: wp( '16%' ),
     height: wp( '25%' ),
     resizeMode: 'contain',
     marginLeft: 'auto',
     marginRight: 20,
-  },
-  modalHeaderHandle: {
-    width: 50,
-    height: 5,
-    backgroundColor: Colors.borderColor,
-    borderRadius: 10,
-    alignSelf: 'center',
-    marginTop: 15,
-  },
-  modalHeader: {
-    backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderTopWidth: 1,
-    height: 25,
-    width: '80%',
-    alignSelf: 'center',
-    borderColor: Colors.borderColor,
-  },
-  addressView: {
-    flex: 1,
-    backgroundColor: Colors.backgroundColor,
-    borderBottomLeftRadius: 8,
-    borderTopLeftRadius: 8,
-    height: 50,
-    paddingLeft: 15,
-    paddingRight: 15,
-    justifyContent: 'center',
-  },
-  addressText: {
-    fontSize: RFValue( 13 ),
-    color: Colors.lightBlue,
-  },
-  copyIconView: {
-    width: 48,
-    height: 50,
-    backgroundColor: Colors.borderColor,
-    borderTopRightRadius: 8,
-    borderBottomRightRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   manageBackupCard: {
     padding: 20,
@@ -1347,56 +1109,5 @@ const styles = StyleSheet.create( {
     height: 14,
     resizeMode: 'contain',
     marginLeft: 'auto',
-  },
-  listElements: {
-    flexDirection: 'row',
-    marginLeft: 20,
-    marginRight: 20,
-    borderBottomWidth: 0.5,
-    borderColor: Colors.borderColor,
-    paddingTop: 25,
-    paddingBottom: 25,
-    paddingLeft: 10,
-    alignItems: 'center',
-  },
-  listElementsTitle: {
-    color: Colors.blue,
-    fontSize: RFValue( 13 ),
-    marginLeft: 13,
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  listElementsInfo: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
-    marginLeft: 13,
-    marginTop: 5,
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  listElementIcon: {
-    paddingRight: 5,
-    marginLeft: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  listElementsIconImage: {
-    resizeMode: 'contain',
-    width: 25,
-    height: 25,
-    alignSelf: 'center',
-  },
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular
-  },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    alignItems: "center",
-    flexDirection: "row",
-    paddingRight: 10,
-    paddingBottom: hp("1.5%"),
-    paddingTop: hp("1%"),
-    marginBottom: hp("1.5%")
   },
 });

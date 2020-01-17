@@ -9,15 +9,15 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
+import Colors from '../../common/Colors';
+import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
-import Toast from "../components/Toast";
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import Toast from "../../components/Toast";
 
-export default function ShareOtpWithTrustedContactContents(props) {
+export default function ShareOtpWithTrustedContact(props) {
   const OTP = props.OTP;
   const index = props.index;
   const writeToClipboard = () => {
