@@ -368,6 +368,7 @@ export default class BaseAccount {
           fee: number;
           inputs?: undefined;
           txb?: undefined;
+          estimatedBlocks?: undefined;
         };
       }
     | {
@@ -381,6 +382,7 @@ export default class BaseAccount {
           }>;
           txb: TransactionBuilder;
           fee: number;
+          estimatedBlocks: number;
         };
         err?: undefined;
         message?: undefined;
@@ -397,6 +399,7 @@ export default class BaseAccount {
           txb,
           fee,
           balance,
+          estimatedBlocks,
         } = await this.hdWallet.createHDTransaction(
           recipientAddress,
           amount,
@@ -417,7 +420,7 @@ export default class BaseAccount {
           console.log('---- Transaction Created ----');
           return {
             status: config.STATUS.SUCCESS,
-            data: { inputs, txb, fee },
+            data: { inputs, txb, fee, estimatedBlocks },
           };
         } else {
           throw new Error(
