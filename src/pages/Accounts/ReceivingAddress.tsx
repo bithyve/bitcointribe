@@ -9,6 +9,7 @@ import {
   StatusBar,
   AsyncStorage,
   Button,
+  ScrollView,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from '../ManageBackup/Styles';
@@ -55,10 +56,10 @@ const ReceivingAddress = props => {
   const checkNShowHelperModal = async () => {
     let isReceiveHelperDone = await AsyncStorage.getItem('isReceiveHelperDone');
     if (!isReceiveHelperDone && serviceType == TEST_ACCOUNT) {
-     await AsyncStorage.setItem('isReceiveHelperDone', 'true');
-     setTimeout(() => {
-      ReceiveHelperBottomSheet.current.snapTo(1);
-    }, 1000);
+      await AsyncStorage.setItem('isReceiveHelperDone', 'true');
+      setTimeout(() => {
+        ReceiveHelperBottomSheet.current.snapTo(1);
+      }, 1000);
     }
   };
 
@@ -101,25 +102,36 @@ const ReceivingAddress = props => {
 
   const renderSecureReceiveWarningContents = useCallback(() => {
     return (
-      <View>
-        <BottomInfoBox
-          title={'Note'}
-          infoText={
-            "Please ensure that you have 2FA setted up (preferably on your secondary device), you'll require the 2FA token in order to send bitcoins from the savings account."
-          }
-        />
-        <View style={{ flexDirection: 'row' }}>
-          <Button
-            title="Ok, I understand"
-            onPress={() =>
-              (SecureReceiveWarningBottomSheet as any).current.snapTo(0)
-            }
-          />
-          <Button
-            title="Manage Backup"
-            onPress={() => props.navigation.replace('ManageBackup')}
-          />
-        </View>
+      <View style={styles.modalContainer}>
+        <ScrollView>
+          <View
+            style={{
+              height: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: hp('2%')
+            }}
+          >
+            <BottomInfoBox
+              title={'Note'}
+              infoText={
+                "Please ensure that you have 2FA setted up (preferably on your secondary device), you'll require the 2FA token in order to send bitcoins from the savings account."
+              }
+            />
+            <View style={{ flexDirection: 'row' }}>
+              <Button
+                title="Ok, I understand"
+                onPress={() =>
+                  (SecureReceiveWarningBottomSheet as any).current.snapTo(0)
+                }
+              />
+              <Button
+                title="Manage Backup"
+                onPress={() => props.navigation.replace('ManageBackup')}
+              />
+            </View>
+          </View>
+        </ScrollView>
       </View>
     );
   }, [serviceType]);
@@ -127,8 +139,8 @@ const ReceivingAddress = props => {
   const renderSecureReceiveWarningHeader = useCallback(() => {
     return (
       <SmallHeaderModal
-        borderColor={Colors.blue}
-        backgroundColor={Colors.blue}
+        borderColor={Colors.borderColor}
+        backgroundColor={Colors.white}
         onPressHeader={() => {
           (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
         }}
@@ -149,10 +161,10 @@ const ReceivingAddress = props => {
     (async () => {
       if (serviceType === SECURE_ACCOUNT) {
         if (!(await AsyncStorage.getItem('savingsWarning'))) {
-          // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
-          SecureReceiveWarningBottomSheet.current.snapTo(1);
-          await AsyncStorage.setItem('savingsWarning', 'true');
-        }
+        // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
+        SecureReceiveWarningBottomSheet.current.snapTo(1);
+        await AsyncStorage.setItem('savingsWarning', 'true');
+         }
       }
     })();
   }, []);
@@ -231,7 +243,7 @@ const ReceivingAddress = props => {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={SecureReceiveWarningBottomSheet}
-          snapPoints={[-50, hp('95%')]}
+          snapPoints={[-50, hp('50%')]}
           renderContent={renderSecureReceiveWarningContents}
           renderHeader={renderSecureReceiveWarningHeader}
         />
@@ -242,6 +254,16 @@ const ReceivingAddress = props => {
 
 const styles = StyleSheet.create({
   loader: { height: hp('27%'), justifyContent: 'center' },
+  modalContainer: {
+    height: '100%',
+    backgroundColor: Colors.white,
+    alignSelf: 'center',
+    width: '100%',
+    paddingBottom: hp('5%'),
+    elevation: 10,
+    shadowOpacity: 10,
+    shadowOffset: { width: 0, height: 2 },
+  },
 });
 
 export default ReceivingAddress;
