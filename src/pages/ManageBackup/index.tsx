@@ -941,9 +941,9 @@ export default function ManageBackup(props) {
             extraData={this.state}
             renderItem={({ item, index }) => (
               <View
-                style={{
-                  opacity: !selectedType || item.type == selectedType ? 1 : 0.5,
-                }}
+              style={{
+                opacity: !selectedType || item.type == selectedType ? 1 : item.type=='copy1' || item.type=='copy2' && ( selectedType=="copy1" || selectedType=="copy2") ? 1 : 0.5
+              }}
               >
                 <TouchableOpacity
                   // disabled={
