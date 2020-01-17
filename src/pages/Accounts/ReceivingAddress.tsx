@@ -55,8 +55,10 @@ const ReceivingAddress = props => {
   const checkNShowHelperModal = async () => {
     let isReceiveHelperDone = await AsyncStorage.getItem('isReceiveHelperDone');
     if (!isReceiveHelperDone && serviceType == TEST_ACCOUNT) {
-      AsyncStorage.setItem('isReceiveHelperDone', 'true');
+     await AsyncStorage.setItem('isReceiveHelperDone', 'true');
+     setTimeout(() => {
       ReceiveHelperBottomSheet.current.snapTo(1);
+    }, 1000);
     }
   };
 
