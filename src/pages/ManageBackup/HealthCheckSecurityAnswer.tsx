@@ -29,6 +29,7 @@ import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import { checkMSharesHealth } from '../../store/actions/sss';
+import ModalHeader from '../../components/ModalHeader';
 
 export default function HealthCheckSecurityAnswer(props) {
   const dispatch = useDispatch();
@@ -99,8 +100,8 @@ export default function HealthCheckSecurityAnswer(props) {
 
   const renderHealthCheckSuccessModalHeader = () => {
     return (
-      <TransparentHeaderModal
-        onPressheader={() => {
+      <ModalHeader
+        onPressHeader={() => {
           (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
         }}
       />

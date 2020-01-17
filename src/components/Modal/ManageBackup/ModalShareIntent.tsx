@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList } from "react-native";
+import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, AsyncStorage } from "react-native";
 import BottomSheet from 'reanimated-bottom-sheet';
 import {
     widthPercentageToDP as wp,
@@ -7,15 +7,14 @@ import {
 } from 'react-native-responsive-screen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
-
 import Colors from "../../../../src/common/Colors";
 import Fonts from "../../../../src/common/Fonts";
 import Icons from "../../../../src/common/Icons";
 import Singleton from "../../../common/Singleton";
-
+import ModalHeader from '../../ModalHeader';
 
 export default function ModalShareIntent( props ) {
+    const propsData = props.data;
 
     const [ flagRefreshing, setFagRefreshing ] = useState( false );
     const [ pdfShareDetails, setPdfShareDetails ] = useState( {} )
@@ -60,7 +59,6 @@ export default function ModalShareIntent( props ) {
             if ( mediaShare != {} )
                 for ( var i = 0; i < arrShareOption.length; i++ )
                     if ( arrShareOption[ i ].type === mediaShare.type ) {
-                        console.log( { i } );
                         arrShareOption[ i ].flagShare = true;
                         setFagRefreshing( true );
                         break;
@@ -68,6 +66,18 @@ export default function ModalShareIntent( props ) {
         }
         refShareIntentBottomSheet.current.snapTo( props.data.snapTop );
     }, [ props ] );
+
+
+    const onShare = (item)=>{
+        props.onPressShare( item.type );
+        console.log("props.data",propsData, props.data)
+        if(props.data.item.type=="copy1"){
+            AsyncStorage.setItem("personalCopy1AutoHighlightFlags", 'true')
+        }
+        else if(props.data.item.type=="copy2"){
+            AsyncStorage.setItem("personalCopy2AutoHighlightFlags", 'true')
+        }
+    }
 
     const renderShareContents = () => {
         return (
@@ -102,7 +112,7 @@ export default function ModalShareIntent( props ) {
                         refreshing={ flagRefreshing }
                         renderItem={ ( { item, index } ) => (
                             <TouchableOpacity
-                                onPress={ () => props.onPressShare( item.type ) }
+                                onPress={ () => onShare(item) }
                                 disabled={ item.flagShare }
                                 style={ [ styles.listElements, item.flagShare == true ? { backgroundColor: "#ccc", borderRadius: 5 } : null ] }>
                                 <Image
@@ -128,16 +138,13 @@ export default function ModalShareIntent( props ) {
                         keyExtractor={ ( item, index ) => index.toString() }
                     />
                 </View>
-            </View >
+            </View>
         );
     };
 
     const renderShareHeader = () => {
         return (
-            <TouchableOpacity activeOpacity={ 10 } onPress={ () => props.onPressHandle() } style={ { ...styles.modalHeader, borderColor: props.borderColor ? props.borderColor : Colors.borderColor, backgroundColor: props.headerColor ? props.headerColor : Colors.white, } }>
-                <View style={ styles.modalHeaderHandle } />
-            </TouchableOpacity>
-
+            <ModalHeader onPressHeader={() => props.onPressHandle()}/>
         );
     };
 
@@ -155,53 +162,15 @@ export default function ModalShareIntent( props ) {
 const styles = StyleSheet.create( {
     modalContainer: {
         height: '100%',
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderLeftWidth: 1,
-        borderRightWidth: 1,
-        borderTopWidth: 1,
-        borderColor: Colors.blue,
         backgroundColor: Colors.white,
-        borderTopColor: Colors.borderColor,
         width: '100%',
-        paddingTop: hp( '2%' ),
         paddingBottom: hp( '5%' ),
-        // elevation: 10,
-        // shadowColor: Colors.borderColor,
-        // shadowOpacity: 10,
-        // shadowOffset: { width: 0, height: 2 },
-    },
-    modalHeaderHandle: {
-        width: 50,
-        height: 5,
-        backgroundColor: Colors.borderColor,
-        borderRadius: 10,
-        alignSelf: 'center',
-        marginTop: 15
-    },
-    modalHeader: {
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderLeftWidth: 1,
-        borderRightWidth: 1,
-        borderTopWidth: 1,
-        height: 25,
-        width: '80%',
-        alignSelf: 'center',
-    },
-    mediaIcon: {
-        width: 50,
-        height: 50,
-        resizeMode: 'contain',
     },
     headerContainer: {
         flexDirection: 'row',
         marginTop: 10,
         alignItems: 'center',
         height: 54,
-        // backgroundColor: Colors.white,
-        // borderBottomColor: Colors.white,
-        // borderBottomWidth: 0.5,
     },
     headerLeftIconContainer: {
         height: 54
@@ -213,8 +182,6 @@ const styles = StyleSheet.create( {
         alignItems: 'center',
     },
     modalHeaderTitleView: {
-        // borderBottomWidth: 1,
-        // borderColor: Colors.borderColor,
         alignItems: "center",
         flexDirection: "row",
         paddingRight: 10,

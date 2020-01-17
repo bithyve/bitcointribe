@@ -725,8 +725,8 @@ export default function Home(props) {
 
   // const renderErrorModalHeader = () => {
   //   return (
-  //     <TransparentHeaderModal
-  //       onPressheader={() => {
+  //     <ModalHeader
+  //       onPressHeader={() => {
   //         (ErrorBottomSheet as any).current.snapTo(0);
   //         setTimeout(() => {
   //           setTabBarZIndex(0);
@@ -1597,8 +1597,8 @@ export default function Home(props) {
 
   // const renderRegenerateHeader = () => {
   //   return (
-  //     <TransparentHeaderModal
-  //       onPressheader={() => {
+  //     <ModalHeader
+  //       onPressHeader={() => {
   //         (RegenerateBottomSheet as any).current.snapTo(0);
   //         setTimeout(() => {
   //           setTabBarZIndex(0);
