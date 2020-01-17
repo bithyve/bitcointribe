@@ -474,6 +474,7 @@ function* overallHealthWorker({ payload }) {
     AsyncStorage.getItem,
     'SecurityAnsTimestamp',
   );
+  console.log({ securityTimestamp });
 
   const healthStatus = new HealthStatus();
   const overallHealth = yield call(
@@ -489,7 +490,10 @@ function* overallHealthWorker({ payload }) {
       'overallHealth',
       JSON.stringify(overallHealth),
     );
+    console.log({ overallHealth });
     yield put(overallHealthCalculated(overallHealth));
+  } else {
+    throw new Error('Failed to calculate overall health');
   }
 }
 

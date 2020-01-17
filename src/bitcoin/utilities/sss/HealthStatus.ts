@@ -42,7 +42,11 @@ export default class HealthStatus {
   private shareHealthStatus = (
     shares: { shareId: string; updatedAt: number }[],
   ): {
-    sharesInfo: Array<{ shareId: number; shareStage: string }>;
+    sharesInfo: Array<{
+      shareId: number;
+      shareStage: string;
+      updatedAt: number;
+    }>;
   } => {
     const sharesInfo = [];
     for (let itr = 0; itr < shares.length; itr++) {
@@ -50,6 +54,7 @@ export default class HealthStatus {
       sharesInfo.push({
         shareId: obj.shareId,
         shareStage: ENTITY_HEALTH.STAGE1,
+        updatedAt: obj.updatedAt,
       });
     }
     const delta: number[] = new Array(shares.length);
@@ -84,8 +89,8 @@ export default class HealthStatus {
     qaTimestamp: number,
     shares: { shareId: string; updatedAt: number }[],
   ): {
-    sharesInfo: Array<{ shareId: number; shareStage: string }>;
-    qaStatus: string;
+    sharesInfo: { shareId: string; shareStage: string; updatedAt: number }[];
+    qaStatus: { stage: string; updatedAt: number };
     overallStatus: string;
   } => {
     let overallStatus: string = HEXA_HEALTH.STAGE1;
@@ -106,6 +111,10 @@ export default class HealthStatus {
     } else if (this.counter.good >= 6) {
       overallStatus = HEXA_HEALTH.STAGE5;
     }
-    return { sharesInfo, qaStatus, overallStatus };
+    return {
+      sharesInfo,
+      qaStatus: { stage: qaStatus, updatedAt: qaTimestamp },
+      overallStatus,
+    };
   };
 }

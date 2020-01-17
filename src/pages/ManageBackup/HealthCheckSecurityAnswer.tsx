@@ -51,33 +51,31 @@ export default function HealthCheckSecurityAnswer(props) {
     setHealthCheckSuccessBottomSheet,
   ] = useState(React.createRef());
 
-  const setConfirm =(event) => {
-    if(event.text){
-        if (event.text.length > 0 && event.text != securityAnswer) {
-          setErrorText('Answer is incorrect');
-          
-        }else{
-          setErrorText('');
-        }
-       }else{
+  const setConfirm = event => {
+    if (event.text) {
+      if (event.text.length > 0 && event.text != securityAnswer) {
+        setErrorText('Answer is incorrect');
+      } else {
         setErrorText('');
       }
-      };
-      
-  const setBackspace =(event) => {
-    console.log("event,key", event.nativeEvent.key);
-   
-   if(event.nativeEvent.key == "Backspace"){
-    setErrorText('');
-   }
+    } else {
+      setErrorText('');
+    }
   };
 
-  useEffect( () => {
-    if ( answer.trim() == securityAnswer.trim()) {
-      setErrorText('');
-      }
-  }, [answer] );
+  const setBackspace = event => {
+    console.log('event,key', event.nativeEvent.key);
 
+    if (event.nativeEvent.key == 'Backspace') {
+      setErrorText('');
+    }
+  };
+
+  useEffect(() => {
+    if (answer.trim() == securityAnswer.trim()) {
+      setErrorText('');
+    }
+  }, [answer]);
 
   const renderHealthCheckSuccessModalContent = () => {
     return (
@@ -236,16 +234,14 @@ export default function HealthCheckSecurityAnswer(props) {
                 placeholderTextColor={Colors.borderColor}
                 value={answer}
                 autoCapitalize="none"
-                onKeyPress ={event => {
+                onKeyPress={event => {
                   setBackspace(event);
                 }}
                 onChangeText={text => {
                   setAnswer(text);
                   //onTextChange(answer);
                 }}
-                onSubmitEditing={
-                  (event) => (setConfirm(event.nativeEvent))
-                }
+                onSubmitEditing={event => setConfirm(event.nativeEvent)}
                 onFocus={() => {
                   // if (Platform.OS == "ios") {
                   //   props.bottomSheetRef.current.snapTo(2);
@@ -283,6 +279,7 @@ export default function HealthCheckSecurityAnswer(props) {
                   'SecurityAnsTimestamp',
                   JSON.stringify(Date.now()),
                 );
+
                 (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
               }}
               style={styles.questionConfirmButton}
