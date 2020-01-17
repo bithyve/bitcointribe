@@ -25,6 +25,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 export default function Login(props) {
   const [passcode, setPasscode] = useState('');
   const [passcodeFlag, setPasscodeFlag] = useState(true);
+  const [checkAuth, setCheckAuth] = useState(false);
 
   const onPressNumber = useCallback(
     text => {
@@ -37,6 +38,7 @@ export default function Login(props) {
       }
       if (passcode && text == 'x') {
         setPasscode(passcode.slice(0, -1));
+        setCheckAuth(false)
       }
     },
     [passcode],
@@ -64,9 +66,7 @@ export default function Login(props) {
   }, [isAuthenticated, dbFetched]);
 
   useEffect(() => {
-    authenticationFailed
-      ? Alert.alert('Incorrect passcode', 'Please try again!')
-      : null;
+    authenticationFailed ? setCheckAuth(true) : setCheckAuth(false);
   }, [authenticationFailed]);
 
   return (
@@ -77,10 +77,10 @@ export default function Login(props) {
           <Text style={styles.headerTitleText}>Welcome back!</Text>
           <View>
             <Text style={styles.headerInfoText}>
-              Please enter the{' '}
+              Please enter your{' '}
               <Text style={styles.boldItalicText}>passcode</Text>
             </Text>
-            <View>
+            <View style={{alignSelf:'baseline'}}>
               <View style={styles.passcodeTextInputView}>
                 <View
                   style={[
@@ -205,9 +205,19 @@ export default function Login(props) {
                     )}
                   </Text>
                 </View>
+                
               </View>
+              {checkAuth ? (
+            <View style={{marginLeft: 'auto'}}>
+              <Text style={styles.errorText}>
+                Incorrect Passcode, Try Again!
+              </Text>
             </View>
+          ) : null}
+            </View>
+            
           </View>
+          
           {passcode.length == 4 ? (
             <View>
               <TouchableOpacity
@@ -424,7 +434,7 @@ const styles = StyleSheet.create({
   },
   proceedButtonView: {
     marginLeft: 20,
-    marginTop: hp('4%'),
+    marginTop: hp('6%'),
     height: wp('13%'),
     width: wp('30%'),
     justifyContent: 'center',
@@ -443,6 +453,12 @@ const styles = StyleSheet.create({
   boldItalicText: {
     fontFamily: Fonts.FiraSansMediumItalic,
     fontWeight: 'bold',
+    fontStyle: 'italic',
+  },
+  errorText: {
+    fontFamily: Fonts.FiraSansMediumItalic,
+    color: Colors.red,
+    fontSize: RFValue(11, 812),
     fontStyle: 'italic',
   },
   headerTitleText: {
@@ -466,6 +482,7 @@ const styles = StyleSheet.create({
   passcodeTextInputView: {
     flexDirection: 'row',
     marginTop: hp('4.5%'),
-    marginBottom: hp('4.5%'),
+    marginBottom: hp('1.5%'),
+    width: 'auto'
   },
 });
