@@ -490,6 +490,8 @@ function* overallHealthWorker({ payload }) {
       JSON.stringify(overallHealth),
     );
     yield put(overallHealthCalculated(overallHealth));
+  } else {
+    throw new Error('Failed to calculate overall health');
   }
 }
 
