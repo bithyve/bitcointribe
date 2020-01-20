@@ -50,6 +50,7 @@ import HealthCheckSecurityQuestion from './HealthCheckSecurityQuestion';
 let itemSelected = {};
 
 export default function ManageBackup(props) {
+  const [LoadOnTrustedContactBottomSheet, setLoadOnTrustedContactBottomSheet] = useState(false);
   const [OTP, setOTP] = useState('');
   const [chosenContactIndex, setChosenContactIndex] = useState(0);
   const [chosenContact, setChosenContact] = useState({});
@@ -339,7 +340,7 @@ export default function ManageBackup(props) {
   const getContacts = async (selectedContacts, index) => {
     let contactList = await AsyncStorage.getItem('SelectedContacts')
       .then(req => JSON.parse(req))
-      .then(json => console.log(json))
+      .then(json => console.log())
       .catch(error => console.log('error!'));
     let contactListArray = [];
     if (contactList) {
@@ -529,6 +530,8 @@ export default function ManageBackup(props) {
   const renderRegenerateShareHelperHeader = () => {
     return (
       <SmallHeaderModal
+      borderColor={Colors.blue}
+      backgroundColor={Colors.blue}
         onPressHandle={() => {
           (RegenerateShareHelperBottomSheet as any).current.snapTo(0);
         }}
@@ -739,6 +742,7 @@ export default function ManageBackup(props) {
         setSelectedType('contact');
         setSelectedStatus('error');
         setTimeout(() => {
+          setLoadOnTrustedContactBottomSheet(true);
           trustedContactsBottomSheet.current.snapTo(1);
         }, 500);
       }, 250);
@@ -750,6 +754,7 @@ export default function ManageBackup(props) {
         setSelectedType('contact');
         setSelectedStatus('error');
         setTimeout(() => {
+          setLoadOnTrustedContactBottomSheet(true);
           trustedContactsBottomSheet.current.snapTo(1);
         }, 500);
       }, 250);
@@ -870,6 +875,8 @@ export default function ManageBackup(props) {
             style={{
               marginLeft: 'auto',
               marginRight: 10,
+              padding: 10,
+              
             }}
             onPress={() => {
               RegenerateShareHelperBottomSheet.current.snapTo(1);
@@ -942,7 +949,7 @@ export default function ManageBackup(props) {
             renderItem={({ item, index }) => (
               <View
               style={{
-                opacity: !selectedType || item.type == selectedType ? 1 : item.type=='copy1' || item.type=='copy2' && ( selectedType=="copy1" || selectedType=="copy2") ? 1 : 0.5
+                opacity: (!selectedType || item.type == selectedType) ? 1 : (item.type=='copy1' || item.type=='copy2' && ( selectedType=="copy1" || selectedType=="copy2")) ? 1 : 0.5
               }}
               >
                 <TouchableOpacity
@@ -964,6 +971,7 @@ export default function ManageBackup(props) {
                         }, 10);
                       }
                       trustedContactsBottomSheet.current.snapTo(1);
+                      setLoadOnTrustedContactBottomSheet(true);
                     } else if (item.type == 'copy1' || item.type == 'copy2') {
                       setArrModalShareIntent({
                         snapTop: 1,
@@ -1076,13 +1084,13 @@ export default function ManageBackup(props) {
           renderContent={renderTrustedContactsContent}
           renderHeader={renderTrustedContactsHeader}
         />
-        <BottomSheet
+        {LoadOnTrustedContactBottomSheet ? <BottomSheet
           enabledInnerScrolling={true}
           ref={CommunicationModeBottomSheet}
           snapPoints={[-30, hp('75%')]}
           renderContent={renderCommunicationModeModalContent}
           renderHeader={renderCommunicationModeModalHeader}
-        />
+        />: null }
         <BottomSheet
           enabledInnerScrolling={true}
           ref={shareOtpWithTrustedContactBottomSheet}

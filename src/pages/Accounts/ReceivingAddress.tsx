@@ -206,7 +206,7 @@ const ReceivingAddress = props => {
                   marginLeft: 'auto',
                 }}
               >
-                Know More
+                Know more
               </Text>
             ) : null}
           </View>

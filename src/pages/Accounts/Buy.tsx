@@ -148,7 +148,7 @@ export default function Buy(props) {
                       marginLeft: 'auto',
                     }}
                   >
-                    Know More
+                    Know more
                   </Text>
                 ) : null}
               </View>

@@ -300,8 +300,8 @@ function Accounts(props) {
           </View>
         </View>
 
-        <View style={{ justifyContent: 'space-between' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ justifyContent: 'space-between'}}>
+          <View style={{ flexDirection: 'row', alignItems: 'center',}}>
             {
               <Text
                 style={{
@@ -310,6 +310,7 @@ function Accounts(props) {
                   fontSize: RFValue(15),
                   color: Colors.white,
                   alignSelf: 'center',
+                  padding: 10,
                 }}
                 onPress={() => {
                   if (item.accountType == 'Test Account')
@@ -320,7 +321,7 @@ function Accounts(props) {
                     RegularAccountHelperBottomSheet.current.snapTo(1);
                 }}
               >
-                Know More
+                Know more
               </Text>
             }
             <Image
@@ -329,6 +330,7 @@ function Accounts(props) {
                 width: wp('5%'),
                 height: wp('5%'),
                 resizeMode: 'contain',
+               padding: 10,
               }}
               source={require('../../assets/images/icons/icon_settings.png')}
             />
@@ -348,7 +350,9 @@ function Accounts(props) {
             >
               <Text
                 style={{
-                  margin: 10,
+                  paddingLeft: 10,
+                  paddingTop: 10,
+                  paddingBottom: 10,
                   marginLeft: 'auto',
                   fontFamily: Fonts.FiraSansMedium,
                   fontSize: RFValue(15),
@@ -978,9 +982,11 @@ function Accounts(props) {
                 fontFamily: Fonts.FiraSansItalic,
                 textDecorationLine: 'underline',
                 marginLeft: 'auto',
+                padding: 10,
+                backgroundColor: 'red'
               }}
             >
-              View More
+              View more
             </Text>
           </View>
           <View>
@@ -1408,6 +1414,7 @@ const styles = StyleSheet.create({
     height: wp('3%'),
     marginRight: 5,
     marginTop: 'auto',
+    marginLeft: 'auto',
     marginBottom: wp('1.2%'),
     resizeMode: 'contain',
   },
