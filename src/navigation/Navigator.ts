@@ -145,7 +145,12 @@ const HomeNavigator = createStackNavigator(
     GoogleAuthenticatorOTP,
     Confirmation,
     TwoFASetup,
-    ShareRecoveryOTP,
+    ShareRecoveryOTP: {
+      screen: ShareRecoveryOTP,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
   },
   {
     headerLayoutPreset: 'center',
