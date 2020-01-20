@@ -48,13 +48,13 @@ export default function RestoreWalletBySecondaryDevice(props) {
     ? setSecondaryQR(
         JSON.stringify({
           ...REQUEST_DETAILS,
-          type: 'secondaryDeviceQR',
-          mode: 'recovery',
+          requester: WALLET_SETUP.walletName,
+          type: 'secondaryDeviceQRRecovery',
         }),
       )
     : null;
-
-  REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
+  secondaryQR ? console.log(secondaryQR) : null;
+  // REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
 
   const deepLink = REQUEST_DETAILS
     ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/rk/` +
