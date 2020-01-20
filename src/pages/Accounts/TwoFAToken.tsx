@@ -69,7 +69,7 @@ export default function TwoFAToken(props) {
     return renderSuccessStatusContents();
   }
 
-  Alert.alert('2FA Secret Key', service.secureHDWallet.twoFASetup.secret); // TODO: secret display and removal mech
+  // Alert.alert('2FA Secret Key', service.secureHDWallet.twoFASetup.secret); // TODO: secret display and removal mech
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
