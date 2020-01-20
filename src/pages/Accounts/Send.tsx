@@ -535,6 +535,7 @@ export default function Send(props) {
                     transferST1(serviceType, {
                       recipientAddress,
                       amount: parseInt(amount),
+                      priority: sliderValueText.toLowerCase(),
                     }),
                   );
                 }}
