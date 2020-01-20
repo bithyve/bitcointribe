@@ -56,6 +56,7 @@ import SecureScan from '../pages/Accounts/SecureScan';
 import GoogleAuthenticatorOTP from '../pages/Accounts/GoogleAuthenticatorOTP';
 import Confirmation from '../pages/Accounts/Confirmation';
 import TwoFASetup from '../pages/Accounts/TwoFASetup';
+import ShareRecoveryOTP from '../pages/Recovery/ShareRecoveryOTP';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -144,6 +145,12 @@ const HomeNavigator = createStackNavigator(
     GoogleAuthenticatorOTP,
     Confirmation,
     TwoFASetup,
+    ShareRecoveryOTP: {
+      screen: ShareRecoveryOTP,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
   },
   {
     headerLayoutPreset: 'center',
