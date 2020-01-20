@@ -89,8 +89,8 @@ export default function CommunicationMode(props) {
       return require('../../assets/images/icons/icon_check.png');
     }
   };
-  
-  useEffect(()=>{
+
+  useEffect(() => {
     let contactInfo = communicationInfo.map(({ number, email }, index) => {
       if (number || email) {
         return {
@@ -104,7 +104,7 @@ export default function CommunicationMode(props) {
     setContactInfo(contactInfo);
   }, [contactInfo]);
 
-  useEffect(()=>{
+  useEffect(() => {
     let contactInfo = communicationInfo.map(({ number, email }, index) => {
       if (number || email) {
         return {
@@ -116,7 +116,7 @@ export default function CommunicationMode(props) {
       }
     });
     setContactInfo(contactInfo);
-  }, [contactInfo])
+  }, [contactInfo]);
 
   const onContactSelect = index => {
     setContactInfo([
@@ -183,8 +183,13 @@ export default function CommunicationMode(props) {
         }
         break;
     }
-    console.log('contactsdfsfsdfsd', contact)
-    props.onPressContinue(SHARES_TRANSFER_DETAILS[index].OTP?SHARES_TRANSFER_DETAILS[index].OTP:null, index)
+
+    props.onPressContinue(
+      SHARES_TRANSFER_DETAILS[index].OTP
+        ? SHARES_TRANSFER_DETAILS[index].OTP
+        : null,
+      index,
+    );
     // props.navigation.navigate('ShareOtpWithTrustedContactContents', {
     //   OTP:'123456'
     //   // OTP: SHARES_TRANSFER_DETAILS[index].OTP,
@@ -271,7 +276,7 @@ export default function CommunicationMode(props) {
   };
 
   useEffect(() => {
-      setContact(contact)
+    setContact(contact);
     // (async () => {
     //   if (Contact) {
     //     let contactListArray = [];
@@ -305,16 +310,23 @@ export default function CommunicationMode(props) {
         }}
       >
         <View style={{ flexDirection: 'row' }}>
-          <AppBottomSheetTouchableWrapper onPress={() => { props.onPressBack(); }} style={{ height: 30, width: 30, }} >
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.blue}
-              size={17}
-            />
+          <AppBottomSheetTouchableWrapper
+            onPress={() => {
+              props.onPressBack();
+            }}
+            style={{ height: 30, width: 30 }}
+          >
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </AppBottomSheetTouchableWrapper>
-          <View style={{ alignSelf: "center", flex: 1, justifyContent: "center" }}>
-            <Text style={BackupStyles.modalHeaderTitleText}>Select Mode of Communication{'\n'}for Contact</Text>
-            <Text style={BackupStyles.modalHeaderInfoText}>You can choose a primary number or email</Text>
+          <View
+            style={{ alignSelf: 'center', flex: 1, justifyContent: 'center' }}
+          >
+            <Text style={BackupStyles.modalHeaderTitleText}>
+              Select Mode of Communication{'\n'}for Contact
+            </Text>
+            <Text style={BackupStyles.modalHeaderInfoText}>
+              You can choose a primary number or email
+            </Text>
           </View>
         </View>
         <Image
@@ -386,14 +398,14 @@ export default function CommunicationMode(props) {
                       lineHeight: 13, //... One for top and one for bottom alignment
                     }}
                   >
-                    {Contact.name? nameToInitials(Contact.name): ""}
+                    {Contact.name ? nameToInitials(Contact.name) : ''}
                   </Text>
                 </View>
               )}
             </View>
           </View>
         </View>
-        <View style={{height:hp('20%')}}>
+        <View style={{ height: hp('20%') }}>
           <ScrollView>
             {contactInfo.map((item, index) => {
               return (

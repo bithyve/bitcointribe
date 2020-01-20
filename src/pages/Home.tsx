@@ -581,6 +581,14 @@ export default function Home(props) {
         };
         props.navigation.navigate('Home', { custodyRequest });
         break;
+      case 'secondaryDeviceQRRecovery':
+        const recoveryRequest = {
+          requester: scannedData.requester,
+          rk: scannedData.ENCRYPTED_KEY,
+          otp: scannedData.OTP,
+        };
+        props.navigation.navigate('Home', { recoveryRequest });
+
       default:
         break;
     }

@@ -29,9 +29,13 @@ export default function RecoveryCommunication(props) {
   const contact = props.navigation.getParam('contact');
   const index = props.navigation.getParam('index');
 
+  const communicationInfo = [];
+  if (contact.phoneNumbers) communicationInfo.push(...contact.phoneNumbers);
+  if (contact.emails) communicationInfo.push(...contact.emails);
+
   const [selectedContactMode, setSelectedContactMode] = useState();
   const [contactInfo, setContactInfo] = useState(
-    contact.communicationMode.map(({ number, email }, index) => {
+    communicationInfo.map(({ number, email }, index) => {
       if (number || email) {
         return {
           id: index,
