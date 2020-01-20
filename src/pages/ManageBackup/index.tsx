@@ -530,6 +530,8 @@ export default function ManageBackup(props) {
   const renderRegenerateShareHelperHeader = () => {
     return (
       <SmallHeaderModal
+      borderColor={Colors.blue}
+      backgroundColor={Colors.blue}
         onPressHandle={() => {
           (RegenerateShareHelperBottomSheet as any).current.snapTo(0);
         }}
@@ -873,6 +875,8 @@ export default function ManageBackup(props) {
             style={{
               marginLeft: 'auto',
               marginRight: 10,
+              padding: 10,
+              
             }}
             onPress={() => {
               RegenerateShareHelperBottomSheet.current.snapTo(1);

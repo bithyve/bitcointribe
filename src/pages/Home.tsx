@@ -1713,7 +1713,7 @@ export default function Home(props) {
                                 onPress={() => {
                                   alert('2FA');
                                 }}
-                                style={{ marginLeft: 'auto' }}
+                                style={{ marginLeft: 'auto' , paddingLeft: 10, paddingBottom:10 }}
                               >
                                 <Text
                                   style={{

@@ -207,9 +207,9 @@ export default function ContactList(props) {
             </View>
           )}): null}
         </View>
-        <TouchableOpacity style={{marginLeft: 'auto', marginRight: 10,}} onPress={() => addContact()}>
+        <TouchableOpacity style={{marginLeft: 'auto', marginRight: 10, padding: 10}} onPress={() => addContact()}>
           <Text style={{fontSize: RFValue(13, 812),
-    fontFamily: Fonts.FiraSansRegular}}>Add contact</Text>
+    fontFamily: Fonts.FiraSansRegular}} onPress={() => addContact()}>Add contact</Text>
         </TouchableOpacity>
         <View style={[styles.searchBoxContainer]}>
           <View style={styles.searchBoxIcon}>
