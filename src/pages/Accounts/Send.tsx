@@ -57,7 +57,8 @@ export default function Send(props) {
   const [amount, setAmount] = useState();
   const [token, setToken] = useState('');
   const [description, setDescription] = useState('');
-  const [sliderValue, setSliderValue] = useState(4);
+  const [sliderValue, setSliderValue] = useState(0);
+  const [sliderValueText, setSliderValueText] = useState('Low');
   // const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
   //   React.createRef(),
   // );
@@ -417,6 +418,7 @@ export default function Send(props) {
                   style={{ flex: 1, marginRight: 10 }}
                   minimumValue={0}
                   maximumValue={10}
+                  step={5}
                   minimumTrackTintColor={Colors.blue}
                   maximumTrackTintColor={Colors.borderColor}
                   thumbStyle={{
@@ -434,7 +436,10 @@ export default function Send(props) {
                     backgroundColor: 'blue',
                   }}
                   value={sliderValue}
-                  onValueChange={value => setSliderValue(value)}
+                  onValueChange={value => {
+                    {value == 0 ? setSliderValueText('Low') : value == 5 ? setSliderValueText('Medium') : setSliderValueText('High')}
+                    setSliderValue(value);
+                  }}
                 />
                 <Text
                   style={{
@@ -444,7 +449,7 @@ export default function Send(props) {
                     marginLeft: 'auto',
                   }}
                 >
-                  Low
+                  {sliderValueText}
                 </Text>
               </View>
             </View>
