@@ -350,7 +350,7 @@ export default function CommunicationMode(props) {
                 borderRadius: 10,
               }}
             >
-              <Text style={styles.contactNameText}>{Contact.name}</Text>
+              <Text style={styles.contactNameText}>{contact.name}</Text>
             </View>
             <View
               style={{
@@ -365,7 +365,7 @@ export default function CommunicationMode(props) {
             >
               {Contact.imageAvailable ? (
                 <Image
-                  source={Contact.image}
+                  source={contact.image}
                   style={{ ...styles.contactProfileImage }}
                 />
               ) : (
@@ -386,7 +386,7 @@ export default function CommunicationMode(props) {
                       lineHeight: 13, //... One for top and one for bottom alignment
                     }}
                   >
-                    {Contact.name? nameToInitials(Contact.name): ""}
+                    {contact.name? nameToInitials(contact.name): ""}
                   </Text>
                 </View>
               )}
