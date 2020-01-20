@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Clipboard } from 'react-native';
+import { View, Text, StyleSheet, Clipboard, SafeAreaView, StatusBar } from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -19,6 +19,8 @@ export default function ShareRecoveryOTP(props) {
     Toast('Copied Successfully');
   };
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+    <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
         <View style={{ flexDirection: 'row', flex: 1 }}>
@@ -110,6 +112,7 @@ export default function ShareRecoveryOTP(props) {
         </View>
       </View>
     </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
@@ -117,6 +120,7 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: Colors.white,
     alignSelf: 'center',
+    marginTop: hp('3%'),
     width: '100%',
   },
   modalHeaderTitleView: {
