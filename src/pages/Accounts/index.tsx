@@ -114,7 +114,7 @@ function Accounts(props) {
     RegularAccountHelperBottomSheet,
     setRegularAccountHelperBottomSheet,
   ] = useState(React.createRef());
-  
+
   const [carouselData, setCarouselData] = useState([
     {
       accountType: 'Test Account',
@@ -154,7 +154,7 @@ function Accounts(props) {
     let isTestAccountHelperDone = await AsyncStorage.getItem(
       'isTestAccountHelperDone',
     );
-    
+
     if (isSendHelperDone == 'true') {
       setSendIsActive(false);
     }
@@ -189,7 +189,7 @@ function Accounts(props) {
   };
 
   const setCarouselData1 = async () => {
-    console.log("SERVICETYPE", serviceType);
+    console.log('SERVICETYPE', serviceType);
     if (serviceType == TEST_ACCOUNT) {
       getServiceType(serviceType);
       setTimeout(() => {
@@ -204,19 +204,6 @@ function Accounts(props) {
       }, 3000);
     }
     if (serviceType == SECURE_ACCOUNT) {
-      // let isSecureAccountScanOpen = await AsyncStorage.getItem(
-      //   'isSecureAccountScanOpen',
-      // );
-      // if (
-      //   !isSecureAccountScanOpen &&
-      //   props.navigation.getParam('serviceType') == SECURE_ACCOUNT
-      // ) {
-      //   AsyncStorage.setItem('isSecureAccountScanOpen', 'true');
-      //   props.navigation.navigate('SecureScan', {
-      //     serviceType,
-      //     getServiceType: getServiceType,
-      //   });
-      // }
       setTimeout(() => {
         carousel.current.snapToItem(2, true, false);
         setCarouselInitIndex(2);
@@ -677,7 +664,7 @@ function Accounts(props) {
   const renderBuyHelperHeader = () => {
     return (
       <SmallHeaderModal
-      borderColor={Colors.blue}
+        borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
           (BuyHelperBottomSheet as any).current.snapTo(0);
@@ -712,9 +699,9 @@ function Accounts(props) {
   const renderTestAccountsHelperHeader = () => {
     return (
       <SmallHeaderModal
-      borderColor={Colors.blue}
-      backgroundColor={Colors.blue}
-      onPressHeader={() => {
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
           (TestAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -746,9 +733,9 @@ function Accounts(props) {
   const renderSecureAccountsHelperHeader = useCallback(() => {
     return (
       <SmallHeaderModal
-      borderColor={Colors.blue}
-      backgroundColor={Colors.blue}
-      onPressHeader={() => {
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
           (SecureAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -780,9 +767,9 @@ function Accounts(props) {
   const renderRegularAccountsHelperHeader = useCallback(() => {
     return (
       <SmallHeaderModal
-      borderColor={Colors.blue}
-      backgroundColor={Colors.blue}
-      onPressHeader={() => {
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
           (RegularAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -816,7 +803,7 @@ function Accounts(props) {
         }
       });
     }
-    console.log("IN useEffect1")
+    console.log('IN useEffect1');
   }, [serviceType]);
 
   useEffect(() => {
@@ -862,8 +849,6 @@ function Accounts(props) {
       }
     })();
   }, []);
-
- 
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -949,7 +934,7 @@ function Accounts(props) {
             sliderWidth={sliderWidth}
             itemWidth={sliderWidth * 0.95}
             onSnapToItem={index => {
-              console.log("INDEX", index, carouselInitIndex);
+              console.log('INDEX', index, carouselInitIndex);
               index === 0
                 ? getServiceType(TEST_ACCOUNT)
                 : index === 1

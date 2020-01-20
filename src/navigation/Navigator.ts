@@ -55,6 +55,7 @@ import WalletCreationSuccess from '../pages/RegenerateShare/WalletCreationSucces
 import SecureScan from '../pages/Accounts/SecureScan';
 import GoogleAuthenticatorOTP from '../pages/Accounts/GoogleAuthenticatorOTP';
 import Confirmation from '../pages/Accounts/Confirmation';
+import TwoFASetup from '../pages/Accounts/TwoFASetup';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -142,6 +143,7 @@ const HomeNavigator = createStackNavigator(
     SecureScan,
     GoogleAuthenticatorOTP,
     Confirmation,
+    TwoFASetup,
   },
   {
     headerLayoutPreset: 'center',
