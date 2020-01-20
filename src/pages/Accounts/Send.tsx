@@ -13,7 +13,6 @@ import {
   Button,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
   Keyboard,
 } from 'react-native';
 import Colors from '../../common/Colors';
@@ -47,6 +46,7 @@ import TestAccountHelperModalContents from '../../components/Helper/TestAccountH
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import QrCodeModalContents from '../../components/QrCodeModalContents';
 // import HealthCheckGoogleAuthModalContents from '../../components/HealthCheckGoogleAuthModalContents';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default function Send(props) {
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
@@ -259,11 +259,11 @@ export default function Send(props) {
   useEffect(() => {
     if (serviceType === SECURE_ACCOUNT) {
       (async () => {
-        if (await AsyncStorage.getItem('twoFASetup')) {
+        if (!(await AsyncStorage.getItem('twoFASetup'))) {
           props.navigation.navigate('TwoFASetup', {
             twoFASetup: service.secureHDWallet.twoFASetup,
           });
-          //  await AsyncStorage.setItem('twoFASetup', 'true');
+          await AsyncStorage.setItem('twoFASetup', 'true');
         }
       })();
     }
@@ -475,7 +475,13 @@ export default function Send(props) {
                   }}
                   value={sliderValue}
                   onValueChange={value => {
-                    {value == 0 ? setSliderValueText('Low') : value == 5 ? setSliderValueText('Medium') : setSliderValueText('High')}
+                    {
+                      value == 0
+                        ? setSliderValueText('Low')
+                        : value == 5
+                        ? setSliderValueText('Medium')
+                        : setSliderValueText('High');
+                    }
                     setSliderValue(value);
                   }}
                 />
