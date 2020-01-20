@@ -85,7 +85,7 @@ export default function RecoveryCommunication(props) {
     if (!REQUEST_DETAILS) dispatch(requestShare(index));
   }, []);
 
-  REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
+  // REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
 
   const communicate = async selectedContactMode => {
     const deepLink =
@@ -107,6 +107,11 @@ export default function RecoveryCommunication(props) {
         );
         break;
     }
+
+    console.log('Navigating');
+    props.navigation.navigate('ShareRecoveryOTP', {
+      OTP: REQUEST_DETAILS.OTP,
+    });
   };
 
   return (
@@ -193,7 +198,7 @@ export default function RecoveryCommunication(props) {
             <TouchableOpacity
               onPress={() => {
                 communicate(selectedContactMode);
-                setTimeout(() => props.navigation.goBack(), 5);
+                // setTimeout(() => props.navigation.goBack(), 5);
               }}
               disabled={!REQUEST_DETAILS}
               style={{
