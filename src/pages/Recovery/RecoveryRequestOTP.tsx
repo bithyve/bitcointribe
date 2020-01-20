@@ -61,7 +61,7 @@ export default function RecoveryRequestOTP(props) {
   };
 
   useEffect(() => {
-    if (otp) dispatch(downloadMShare(otp, rk)); // secondary device auto download
+    if (otp) dispatch(uploadRequestedShare(requester, rk, otp));
   }, []);
 
   useEffect(() => {
