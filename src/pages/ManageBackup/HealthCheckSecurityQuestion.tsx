@@ -174,6 +174,9 @@ export default function HealthCheckSecurityQuestion(props) {
                 placeholder={'Enter Answer'}
                 placeholderTextColor={Colors.borderColor}
                 value={answer}
+                textContentType="none"
+                autoCompleteType="off"
+                autoCorrect={false}
                 autoCapitalize="none"
                 onKeyPress={event => {
                   setBackspace(event);

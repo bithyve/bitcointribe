@@ -162,6 +162,9 @@ export default function RecoveryQuestionModalContents(props) {
                   marginTop: 15,
                   marginBottom: hp('6%'),
                 }}
+                textContentType="none"
+                autoCompleteType="off"
+                autoCorrect={false}
                 autoCapitalize = 'none'
                 placeholder={'Enter Security Answer'}
                 placeholderTextColor={Colors.borderColor}

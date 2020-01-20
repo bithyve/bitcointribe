@@ -241,6 +241,9 @@ export default function NewWalletQuestion(props) {
                       placeholder={'Enter your answer'}
                       placeholderTextColor={Colors.borderColor}
                       value={answer}
+                      autoCompleteType='off'
+                      textContentType='none'
+                      autoCorrect={false}
                       autoCapitalize="none"
                       onChangeText={text => setAnswer(text)}
                       onFocus={() => {
@@ -285,6 +288,9 @@ export default function NewWalletQuestion(props) {
                       placeholder={'Confirm your answer'}
                       placeholderTextColor={Colors.borderColor}
                       //value={confirmAnswer}
+                      textContentType='none'
+                      autoCompleteType='off'
+                      autoCorrect={false}
                       autoCapitalize="none"
                       onKeyPress ={event => {
                         setBackspace(event);

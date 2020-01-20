@@ -12,7 +12,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 export default function KnowMoreButton(props) {
 
     return (<TouchableOpacity onPress={()=>props.onpress()} style={{...styles.knowMoreButton, ...props.containerStyle}}>
-        <Text style={{...styles.knowMoreButtonText, ...props.textStyle}}>Know More</Text>
+        <Text style={{...styles.knowMoreButtonText, ...props.textStyle}} onPress={()=>props.onpress()}>Know more</Text>
     </TouchableOpacity>
     )
 }
@@ -29,6 +29,6 @@ const styles = StyleSheet.create({
     knowMoreButtonText: {
         color: Colors.white,
         fontFamily: Fonts.FiraSansRegular,
-        fontSize: RFValue(12)
+        fontSize: RFValue(12),
     },
 })
