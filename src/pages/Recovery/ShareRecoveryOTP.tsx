@@ -87,6 +87,7 @@ export default function ShareRecoveryOTP(props) {
           <AppBottomSheetTouchableWrapper
             onPress={() => {
               //props.onPressOk(index);
+              props.navigation.navigate('RestoreSelectedContactsList');
             }}
             style={{
               backgroundColor: Colors.blue,
