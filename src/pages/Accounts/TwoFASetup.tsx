@@ -23,38 +23,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { uploadEncMShare } from '../../store/actions/sss';
 
-const SecureScan = props => {
-  const getServiceType = props.navigation.state.params.getServiceType
-    ? props.navigation.state.params.getServiceType
-    : null;
-  const serviceType = props.navigation.getParam('serviceType');
-  const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
-    state => state.storage.database,
-  );
-  const { loading } = useSelector(state => state.sss);
-  const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
-  const [secondaryQR, setSecondaryQR] = useState('');
-  const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
-  SHARES_TRANSFER_DETAILS[0] && !secondaryQR
-    ? setSecondaryQR(
-        JSON.stringify({
-          ...SHARES_TRANSFER_DETAILS[0],
-          type: 'secondaryDeviceQR',
-        }),
-      )
-    : null;
-
-  const deepLink = SHARES_TRANSFER_DETAILS[0]
-    ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
-      SHARES_TRANSFER_DETAILS[0].ENCRYPTED_KEY
-    : '';
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (!secondaryQR) {
-      dispatch(uploadEncMShare(0));
-    }
-  }, []);
+const TwoFASetup = props => {
+  const twoFASetup = props.navigation.getParam('twoFASetup');
+  const { qrData, secret } = twoFASetup;
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -63,9 +34,6 @@ const SecureScan = props => {
         <TouchableOpacity
           style={BackupStyles.headerLeftIconContainer}
           onPress={() => {
-            if (getServiceType) {
-              getServiceType(serviceType);
-            }
             props.navigation.goBack();
           }}
         >
@@ -77,11 +45,11 @@ const SecureScan = props => {
       <View style={BackupStyles.modalHeaderTitleView}>
         <View style={{ marginTop: hp('1%') }}>
           <Text style={BackupStyles.modalHeaderTitleText}>
-            Activate Secure Account
+            Setup Two Factor Authentication
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
-            Please scan the following QR in Google Authenticator{'\n'}on to
-            activate your secure account
+            Please scan the following QR in Google Authenticator{'\n'}in order
+            to setup the 2FA
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
             Google Authenticator app should be{'\n'}installed on another device
@@ -89,20 +57,15 @@ const SecureScan = props => {
         </View>
       </View>
       <View style={BackupStyles.modalContentView}>
-        {loading.uploadMetaShare || !secondaryQR ? (
-          <View style={styles.loader}>
-            <ActivityIndicator size="large" />
-          </View>
-        ) : (
-          <QRCode value={secondaryQR} size={hp('27%')} />
-        )}
-        {deepLink ? <CopyThisText text={deepLink} /> : null}
+        <QRCode value={qrData} size={hp('27%')} />
+        <CopyThisText text={secret} />
       </View>
       <View style={{ margin: 20 }}>
         <View style={{ flexDirection: 'row', marginTop: 20, marginBottom: 20 }}>
           <TouchableOpacity
             onPress={() => {
-              props.navigation.navigate('GoogleAuthenticatorOTP');
+              // props.navigation.navigate('GoogleAuthenticatorOTP');
+              props.navigation.goBack();
             }}
             style={{
               height: wp('13%'),
@@ -135,7 +98,7 @@ const SecureScan = props => {
               borderRadius: 10,
             }}
           >
-            <Text
+            {/* <Text
               style={{
                 color: Colors.blue,
                 fontSize: RFValue(13),
@@ -143,7 +106,7 @@ const SecureScan = props => {
               }}
             >
               Activate Later
-            </Text>
+            </Text> */}
           </TouchableOpacity>
         </View>
       </View>
@@ -155,4 +118,4 @@ const styles = StyleSheet.create({
   loader: { height: hp('27%'), justifyContent: 'center' },
 });
 
-export default SecureScan;
+export default TwoFASetup;

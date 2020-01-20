@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Image,
@@ -14,6 +14,7 @@ import {
   SafeAreaView,
   StatusBar,
   AsyncStorage,
+  Keyboard,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -45,6 +46,7 @@ import {
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import QrCodeModalContents from '../../components/QrCodeModalContents';
+// import HealthCheckGoogleAuthModalContents from '../../components/HealthCheckGoogleAuthModalContents';
 
 export default function Send(props) {
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
@@ -129,7 +131,7 @@ export default function Send(props) {
 
   const dispatch = useDispatch();
 
-  const { transfer, loading } = useSelector(
+  const { transfer, loading, service } = useSelector(
     state => state.accounts[serviceType],
   );
 
@@ -230,6 +232,42 @@ export default function Send(props) {
       </TouchableOpacity>
     );
   }
+
+  // const renderHealthCheckGoogleAuthContents = useCallback(() => {
+  //   return (
+  //     <HealthCheckGoogleAuthModalContents
+  //       modalRef={HealthCheckGoogleAuthBottomSheet}
+  //       onPressConfirm={() => {
+  //         Keyboard.dismiss();
+  //         (HealthCheckGoogleAuthBottomSheet as any).current.snapTo(0);
+  //         //  (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
+  //       }}
+  //     />
+  //   );
+  // }, []);
+
+  // const renderHealthCheckGoogleAuthHeader = useCallback(() => {
+  //   return (
+  //     <TransparentHeaderModal
+  //       onPressheader={() => {
+  //         (HealthCheckGoogleAuthBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }, []);
+
+  useEffect(() => {
+    if (serviceType === SECURE_ACCOUNT) {
+      (async () => {
+        if (await AsyncStorage.getItem('twoFASetup')) {
+          props.navigation.navigate('TwoFASetup', {
+            twoFASetup: service.secureHDWallet.twoFASetup,
+          });
+          //  await AsyncStorage.setItem('twoFASetup', 'true');
+        }
+      })();
+    }
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
