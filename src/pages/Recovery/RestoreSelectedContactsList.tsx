@@ -40,7 +40,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { downloadMShare, recoverWallet } from '../../store/actions/sss';
 import AsyncStorage from '@react-native-community/async-storage';
 import ModalHeader from '../../components/ModalHeader';
-import RestoreByCloudQrCodeContents from '../Recovery/RestoreByCloudQrCodeContents';
+import RestoreByCloudQrCodeContents from './RestoreByCloudQrCodeContents';
 
 export default function RestoreSelectedContactsList(props) {
   const [selectedContacts, setSelectedContacts] = useState([]);
