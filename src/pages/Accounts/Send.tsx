@@ -49,6 +49,7 @@ import QrCodeModalContents from '../../components/QrCodeModalContents';
 import AsyncStorage from '@react-native-community/async-storage';
 
 export default function Send(props) {
+  const staticFees = props.navigation.getParam('staticFees');
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [bottomSheet, setBottomSheet] = useState(React.createRef());
   const getServiceType = props.navigation.state.params.getServiceType
@@ -60,7 +61,7 @@ export default function Send(props) {
   const [token, setToken] = useState('');
   const [description, setDescription] = useState('');
   const [sliderValue, setSliderValue] = useState(0);
-  const [sliderValueText, setSliderValueText] = useState('Low');
+  const [sliderValueText, setSliderValueText] = useState('Low Fee');
   // const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
   //   React.createRef(),
   // );
@@ -477,10 +478,10 @@ export default function Send(props) {
                   onValueChange={value => {
                     {
                       value == 0
-                        ? setSliderValueText('Low')
+                        ? setSliderValueText('Low Fee')
                         : value == 5
-                        ? setSliderValueText('Medium')
-                        : setSliderValueText('High');
+                        ? setSliderValueText('In the middle')
+                        : setSliderValueText('Fast Transaction');
                     }
                     setSliderValue(value);
                   }}
@@ -493,7 +494,17 @@ export default function Send(props) {
                     marginLeft: 'auto',
                   }}
                 >
-                  {sliderValueText}
+                  {sliderValueText} (
+                  {
+                    staticFees[
+                      sliderValueText === 'Low Fee'
+                        ? 'low'
+                        : sliderValueText === 'In the middle'
+                        ? 'medium'
+                        : 'high'
+                    ]
+                  }
+                  {serviceType === TEST_ACCOUNT ? ' tsats' : ' sats'})
                 </Text>
               </View>
             </View>
@@ -531,11 +542,17 @@ export default function Send(props) {
             >
               <TouchableOpacity
                 onPress={() => {
+                  const priority =
+                    sliderValueText === 'Low Fee'
+                      ? 'low'
+                      : sliderValueText === 'In the middle'
+                      ? 'medium'
+                      : 'high';
                   dispatch(
                     transferST1(serviceType, {
                       recipientAddress,
                       amount: parseInt(amount),
-                      priority: sliderValueText.toLowerCase(),
+                      priority,
                     }),
                   );
                 }}

@@ -300,8 +300,8 @@ function Accounts(props) {
           </View>
         </View>
 
-        <View style={{ justifyContent: 'space-between'}}>
-          <View style={{ flexDirection: 'row', alignItems: 'center',}}>
+        <View style={{ justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             {
               <Text
                 style={{
@@ -330,7 +330,7 @@ function Accounts(props) {
                 width: wp('5%'),
                 height: wp('5%'),
                 resizeMode: 'contain',
-               padding: 10,
+                padding: 10,
               }}
               source={require('../../assets/images/icons/icon_settings.png')}
             />
@@ -789,7 +789,7 @@ function Accounts(props) {
   const netBalance = service
     ? balances.balance + balances.unconfirmedBalance
     : 0;
-  const [averageTxFee, setAverageTxFee] = useState(0);
+  const [staticFees, setStaticFees] = useState(0);
 
   const dispatch = useDispatch();
   const [exchangeRates, setExchangeRates] = useState();
@@ -813,24 +813,21 @@ function Accounts(props) {
   useEffect(() => {
     setCarouselData1();
     (async () => {
-      const storedAverageTxFee = await AsyncStorage.getItem(
-        'storedAverageTxFee',
-      );
-      if (storedAverageTxFee) {
-        const { averageTxFee, lastFetched } = JSON.parse(storedAverageTxFee);
+      const storedStaticFees = await AsyncStorage.getItem('storedStaticFees');
+      if (storedStaticFees) {
+        const { staticFees, lastFetched } = JSON.parse(storedStaticFees);
         if (Date.now() - lastFetched < 1800000) {
-          setAverageTxFee(averageTxFee);
+          setStaticFees(staticFees);
           return;
         } // maintaining a half an hour difference b/w fetches
       }
 
-      const txPriority = 'high';
       const instance = service.hdWallet || service.secureHDWallet;
-      const { averageTxFee } = await instance.averageTransactionFee(txPriority);
-      setAverageTxFee(averageTxFee);
+      const staticFees = await instance.getStaticFee();
+      setStaticFees(staticFees);
       await AsyncStorage.setItem(
-        'storedAverageTxFee',
-        JSON.stringify({ averageTxFee, lastFetched: Date.now() }),
+        'storedStaticFees',
+        JSON.stringify({ staticFees, lastFetched: Date.now() }),
       );
 
       const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
@@ -983,7 +980,7 @@ function Accounts(props) {
                 textDecorationLine: 'underline',
                 marginLeft: 'auto',
                 padding: 10,
-                backgroundColor: 'red'
+                backgroundColor: 'red',
               }}
             >
               View more
@@ -1169,6 +1166,7 @@ function Accounts(props) {
                   props.navigation.navigate('Send', {
                     serviceType,
                     getServiceType: getServiceType,
+                    staticFees,
                   });
                 }}
                 style={styles.bottomCardView}
@@ -1180,7 +1178,7 @@ function Accounts(props) {
                 <View style={{ marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Send</Text>
                   <Text style={styles.bottomCardInfoText}>
-                    Tran Fee : {averageTxFee} (
+                    Tran Fee : {staticFees['high']} (
                     {serviceType === TEST_ACCOUNT ? 'tsats' : 'sats'})
                   </Text>
                 </View>
@@ -1208,7 +1206,7 @@ function Accounts(props) {
                 <View style={{ marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Receive</Text>
                   <Text style={styles.bottomCardInfoText}>
-                    Tran Fee : {averageTxFee} (
+                    Tran Fee : {staticFees['high']} (
                     {serviceType === TEST_ACCOUNT ? 'tsats' : 'sats'})
                   </Text>
                 </View>

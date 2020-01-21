@@ -814,6 +814,57 @@ export default class Bitcoin {
     return { averageTxFee, feePerByte, estimatedBlocks };
   };
 
+  public getStaticFee = async () => {
+    const averageTxSize = 250; // the average Bitcoin transaction is about 250 bytes big (1 Inp; 2 Out)
+    const inputUTXOSize = 147; // in bytes
+
+    try {
+      let rates;
+      if (this.network === bitcoinJS.networks.testnet) {
+        const res: AxiosResponse = await axios.get(
+          config.ESPLORA_API_ENDPOINTS.TESTNET.TXN_FEE,
+        );
+        rates = res.data;
+      } else {
+        const res: AxiosResponse = await axios.get(
+          config.ESPLORA_API_ENDPOINTS.MAINNET.TXN_FEE,
+        );
+        rates = res.data;
+      }
+
+      return {
+        high: Math.round((averageTxSize + inputUTXOSize) * rates['2']),
+        medium: Math.round((averageTxSize + inputUTXOSize) * rates['4']),
+        low: Math.round((averageTxSize + inputUTXOSize) * rates['6']),
+      };
+    } catch (err) {
+      console.log(
+        `Fee rates fetching failed @Bitcoin core: ${err}, using blockcypher fallback`,
+      );
+      try {
+        const chainInfo = await this.fetchChainInfo();
+        const {
+          high_fee_per_kb,
+          medium_fee_per_kb,
+          low_fee_per_kb,
+        } = chainInfo;
+        return {
+          high: Math.round(
+            (averageTxSize + inputUTXOSize) * (high_fee_per_kb / 1000),
+          ),
+          medium: Math.round(
+            (averageTxSize + inputUTXOSize) * (medium_fee_per_kb / 1000),
+          ),
+          low: Math.round(
+            (averageTxSize + inputUTXOSize) * (low_fee_per_kb / 1000),
+          ),
+        };
+      } catch (err) {
+        throw new Error('Falied to fetch feeRates');
+      }
+    }
+  };
+
   public isValidAddress = (address: string): boolean => {
     try {
       bitcoinJS.address.toOutputScript(address, this.network);
