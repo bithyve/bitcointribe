@@ -136,9 +136,17 @@ function Accounts(props) {
     },
   ]);
 
-  let [carouselInitIndex, setCarouselInitIndex] = useState(0);
+  let [carouselInitIndex, setCarouselInitIndex] = useState(
+    props.navigation.getParam('index'),
+  );
   const [switchOn, setSwitchOn] = useState(true);
   let [carousel, setCarousel] = useState(React.createRef());
+
+  const handleIndexChange = (index: number) => {
+    //setTimeout(() => {
+    setCarouselInitIndex(index);
+  //}, 2000);
+  };
 
   const checkNHighlight = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
@@ -188,28 +196,29 @@ function Accounts(props) {
     }
   };
 
-  const setCarouselData1 = async () => {
-    console.log('SERVICETYPE', serviceType);
-    if (serviceType == TEST_ACCOUNT) {
-      getServiceType(serviceType);
-      setTimeout(() => {
-        carousel.current.snapToItem(0, true, false);
-        setCarouselInitIndex(0);
-      }, 3000);
-    }
-    if (serviceType == REGULAR_ACCOUNT) {
-      setTimeout(() => {
-        carousel.current.snapToItem(1, true, false);
-        setCarouselInitIndex(1);
-      }, 3000);
-    }
-    if (serviceType == SECURE_ACCOUNT) {
-      setTimeout(() => {
-        carousel.current.snapToItem(2, true, false);
-        setCarouselInitIndex(2);
-      }, 3000);
-    }
-  };
+  // const setCarouselData1 = async () => {
+  //   console.log('SERVICETYPE', serviceType);
+  //   if (serviceType == TEST_ACCOUNT) {
+  //     getServiceType(serviceType);
+
+  //     setTimeout(() => {
+  //       carousel.current.snapToItem(0, true, false);
+  //       setCarouselInitIndex(0);
+  //     }, 3000);
+  //   }
+  //   if (serviceType == REGULAR_ACCOUNT) {
+  //     setTimeout(() => {
+  //       carousel.current.snapToItem(1, true, false);
+  //       setCarouselInitIndex(1);
+  //     }, 3000);
+  //   }
+  //   if (serviceType == SECURE_ACCOUNT) {
+  //     setTimeout(() => {
+  //       carousel.current.snapToItem(2, true, false);
+  //       setCarouselInitIndex(2);
+  //     }, 3000);
+  //   }
+  // };
 
   const handleStepChange = step => {
     console.log(`Current step is: ${step.name}`);
@@ -811,7 +820,13 @@ function Accounts(props) {
   }, [serviceType]);
 
   useEffect(() => {
-    setCarouselData1();
+    setTimeout(() => {
+      carousel.current.snapToItem(
+        props.navigation.getParam('index'),
+        true,
+        true,
+      );
+    }, 2000);
     (async () => {
       const storedStaticFees = await AsyncStorage.getItem('storedStaticFees');
       if (storedStaticFees) {
@@ -930,18 +945,25 @@ function Accounts(props) {
           <Carousel
             ref={carousel}
             data={carouselData}
-            initialNumToRender={carouselInitIndex}
-            renderItem={renderItem}
-            sliderWidth={sliderWidth}
-            itemWidth={sliderWidth * 0.95}
-            onSnapToItem={index => {
-              console.log('INDEX', index, carouselInitIndex);
+            firstItem={carouselInitIndex}
+            onBeforeSnapToItem={(index) => {
+              console.log('INDEX onBeforeSnapToItem', index, carouselInitIndex);
               index === 0
                 ? getServiceType(TEST_ACCOUNT)
                 : index === 1
                 ? getServiceType(REGULAR_ACCOUNT)
                 : getServiceType(SECURE_ACCOUNT);
-              setCarouselInitIndex(index);
+              handleIndexChange(index)
+            }
+            }
+            renderItem={renderItem}
+            sliderWidth={sliderWidth}
+            itemWidth={sliderWidth * 0.95}
+            onSnapToItem={index => {
+              console.log('INDEX', index, carouselInitIndex);
+              setTimeout(() => {
+                setCarouselInitIndex(index);
+              }, 2000);
             }}
             style={{ activeSlideAlignment: 'center' }}
             scrollInterpolator={scrollInterpolator}
@@ -965,6 +987,7 @@ function Accounts(props) {
                 color: Colors.textColorGrey,
                 fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
+                padding: 10,
               }}
             >
               Today
@@ -980,7 +1003,6 @@ function Accounts(props) {
                 textDecorationLine: 'underline',
                 marginLeft: 'auto',
                 padding: 10,
-                backgroundColor: 'red',
               }}
             >
               View more

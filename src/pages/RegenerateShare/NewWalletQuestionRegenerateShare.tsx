@@ -91,7 +91,6 @@ export default function NewWalletQuestionRegenerateShare(props) {
   }, [confirmAnswer]);
 
   const setButtonVisible = () => {
-    Keyboard.dismiss();
     //setAnsError('');
     return (
       <TouchableOpacity
@@ -286,6 +285,13 @@ export default function NewWalletQuestionRegenerateShare(props) {
                         setBackspace(event);
                       }}
                       onChangeText={text => {
+                        if (
+                          answer.trim() == text.trim() &&
+                          text.trim() &&
+                          answer.trim()
+                        ) {
+                          Keyboard.dismiss();
+                        }
                         setConfirmAnswer(text);
                       }}
                       onSubmitEditing={event => setConfirm(event.nativeEvent)}
