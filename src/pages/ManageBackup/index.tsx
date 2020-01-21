@@ -46,7 +46,7 @@ import CommunicationMode from './CommunicationMode';
 import ModalHeader from '../../components/ModalHeader';
 import SecondaryDevice from './SecondaryDevice';
 import HealthCheckSecurityQuestion from './HealthCheckSecurityQuestion';
-import RestoreByCloudQrCodeContents from './RestoreByCloudQrCodeContents';
+import RestoreByCloudQrCodeContents from '../Recovery/RestoreByCloudQrCodeContents';
 let itemSelected = {};
 
 export default function ManageBackup(props) {

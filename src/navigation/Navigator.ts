@@ -34,7 +34,7 @@ import TwoFAToken from '../pages/Accounts/TwoFAToken';
 import HealthCheckSecurityAnswer from '../pages/ManageBackup/HealthCheckSecurityAnswer';
 import RecoveryRequestOTP from '../pages/Recovery/RecoveryRequestOTP';
 import SettingManagePin from '../pages/SettingManagePin';
-import RestoreByCloudQrCodeContents from '../pages/ManageBackup/RestoreByCloudQrCodeContents';
+import RestoreByCloudQrCodeContents from '../pages/Recovery/RestoreByCloudQrCodeContents';
 import EmailModalContents from '../pages/EmailModalContents';
 import Buy from '../pages/Accounts/Buy';
 import Sell from '../pages/Accounts/Sell';

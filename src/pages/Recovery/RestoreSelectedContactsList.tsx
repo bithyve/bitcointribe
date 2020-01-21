@@ -40,6 +40,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { downloadMShare, recoverWallet } from '../../store/actions/sss';
 import AsyncStorage from '@react-native-community/async-storage';
 import ModalHeader from '../../components/ModalHeader';
+import RestoreByCloudQrCodeContents from '../Recovery/RestoreByCloudQrCodeContents';
 
 export default function RestoreSelectedContactsList(props) {
   const [selectedContacts, setSelectedContacts] = useState([]);
@@ -67,7 +68,11 @@ export default function RestoreSelectedContactsList(props) {
   });
   const [answer, setAnswer] = useState('');
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-
+  const [RestoreByCloudQrCode, setRestoreByCloudQrCode] = useState(
+    React.createRef(),
+  );
+  const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
+  const [openmodal, setOpenmodal] = useState('closed');
   // function openCloseModal() {
   //   if (!walletName) {
   //     walletNameBottomSheet.current.snapTo(0);
@@ -335,6 +340,53 @@ export default function RestoreSelectedContactsList(props) {
     })();
   }, [RECOVERY_SHARES, selectedContacts]);
 
+  useEffect(() => {
+    if (openmodal == 'closed') {
+      setTimeout(() => {
+        setQrBottomSheetsFlag(false);
+      }, 10);
+      (RestoreByCloudQrCode as any).current.snapTo(0);
+    }
+    if (openmodal == 'full') {
+      setTimeout(() => {
+        setQrBottomSheetsFlag(true);
+      }, 10);
+      (RestoreByCloudQrCode as any).current.snapTo(1);
+    }
+  }, [openmodal]);
+
+  function openCloseModal() {
+    if (openmodal == 'closed') {
+      setOpenmodal('full');
+    }
+    if (openmodal == 'full') {
+      setOpenmodal('closed');
+    }
+  }
+
+  function renderRestoreByCloudQrCodeContent() {
+    return (
+      <RestoreByCloudQrCodeContents
+        modalRef={RestoreByCloudQrCodeContents}
+        isOpenedFlag={QrBottomSheetsFlag}
+        onPressBack={() => {
+          (RestoreByCloudQrCode as any).current.snapTo(0);
+        }}
+      />
+    );
+  }
+
+  function renderRestoreByCloudQrCodeHeader() {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (RestoreByCloudQrCode as any).current.snapTo(0);
+          openCloseModal();
+        }}
+      />
+    );
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -572,8 +624,9 @@ export default function RestoreSelectedContactsList(props) {
         </TouchableOpacity>
         <View style={styles.separator} />
         <TouchableOpacity
-          onPress={() =>
-            props.navigation.navigate('RestoreWalletUsingDocuments')
+          onPress={
+            () => RestoreByCloudQrCode.current.snapTo(1)
+            // props.navigation.navigate('RestoreWalletUsingDocuments')
           }
         >
           <View
@@ -769,6 +822,24 @@ export default function RestoreSelectedContactsList(props) {
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
+      />
+
+      <BottomSheet
+        onOpenEnd={() => {
+          setQrBottomSheetsFlag(true);
+        }}
+        onCloseEnd={() => {
+          setQrBottomSheetsFlag(false);
+          (RestoreByCloudQrCode as any).current.snapTo(0);
+        }}
+        onCloseStart={() => {
+          setQrBottomSheetsFlag(false);
+        }}
+        enabledInnerScrolling={true}
+        ref={RestoreByCloudQrCode}
+        snapPoints={[-30, hp('90%')]}
+        renderContent={renderRestoreByCloudQrCodeContent}
+        renderHeader={renderRestoreByCloudQrCodeHeader}
       />
     </View>
   );
