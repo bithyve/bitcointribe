@@ -56,42 +56,41 @@ export default function NewWalletQuestion(props) {
   if (isInitialized) {
     props.navigation.navigate('HomeNav');
   }
- 
-  const setConfirm =(event) => {
-    if(event.text){
-    if (answer && event.text != answer) {
-      setAnsError('Answers do not match');
-      counter++;
-      setCounter(counter);
-      console.log("counter",counter);
-      if(counter > 3){
-        console.log("global.ansCounter",counter);
-        setHdeShowAnswer(!hideShowAnswer);
-        counter = 0;
+
+  const setConfirm = event => {
+    if (event.text) {
+      if (answer && event.text != answer) {
+        setAnsError('Answers do not match');
+        counter++;
+        setCounter(counter);
+        console.log('counter', counter);
+        if (counter > 3) {
+          console.log('global.ansCounter', counter);
+          setHdeShowAnswer(!hideShowAnswer);
+          counter = 0;
+        }
+      } else {
+        setAnsError('');
       }
-    }else{
+    } else {
       setAnsError('');
     }
-   }else{
-    setAnsError('');
-  }
   };
-  const setBackspace =(event) => {
-    console.log("event,key", event.nativeEvent.key);
-   
-   if(event.nativeEvent.key == "Backspace"){
-    setAnsError('');
-   }
+  const setBackspace = event => {
+    console.log('event,key', event.nativeEvent.key);
+
+    if (event.nativeEvent.key == 'Backspace') {
+      setAnsError('');
+    }
   };
 
-  useEffect( () => {
-    if ( answer.trim() == confirmAnswer.trim()) {
+  useEffect(() => {
+    if (answer.trim() == confirmAnswer.trim()) {
       setAnsError('');
-      }
-  }, [confirmAnswer] );
+    }
+  }, [confirmAnswer]);
 
   const setButtonVisible = () => {
-    Keyboard.dismiss();
     //setAnsError('');
     return (
       <TouchableOpacity
@@ -113,7 +112,6 @@ export default function NewWalletQuestion(props) {
     );
   };
 
-  
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -229,10 +227,7 @@ export default function NewWalletQuestion(props) {
                       flexDirection: 'row',
                       alignItems: 'center',
                       paddingRight: 15,
-                      borderColor:
-                        ansError
-                          ? Colors.red
-                          : Colors.borderColor,
+                      borderColor: ansError ? Colors.red : Colors.borderColor,
                     }}
                   >
                     <TextInput
@@ -241,8 +236,8 @@ export default function NewWalletQuestion(props) {
                       placeholder={'Enter your answer'}
                       placeholderTextColor={Colors.borderColor}
                       value={answer}
-                      autoCompleteType='off'
-                      textContentType='none'
+                      autoCompleteType="off"
+                      textContentType="none"
                       autoCorrect={false}
                       autoCapitalize="none"
                       onChangeText={text => setAnswer(text)}
@@ -276,10 +271,7 @@ export default function NewWalletQuestion(props) {
                       alignItems: 'center',
                       paddingRight: 15,
                       marginTop: 15,
-                      borderColor:
-                        ansError
-                          ? Colors.red
-                          : Colors.borderColor,
+                      borderColor: ansError ? Colors.red : Colors.borderColor,
                     }}
                   >
                     <TextInput
@@ -288,19 +280,24 @@ export default function NewWalletQuestion(props) {
                       placeholder={'Confirm your answer'}
                       placeholderTextColor={Colors.borderColor}
                       //value={confirmAnswer}
-                      textContentType='none'
-                      autoCompleteType='off'
+                      textContentType="none"
+                      autoCompleteType="off"
                       autoCorrect={false}
                       autoCapitalize="none"
-                      onKeyPress ={event => {
+                      onKeyPress={event => {
                         setBackspace(event);
                       }}
                       onChangeText={text => {
+                        if (
+                          answer.trim() == text.trim() &&
+                          text.trim() &&
+                          answer.trim()
+                        ) {
+                          Keyboard.dismiss();
+                        }
                         setConfirmAnswer(text);
                       }}
-                      onSubmitEditing={
-                        (event) => (setConfirm(event.nativeEvent))
-                      }
+                      onSubmitEditing={event => setConfirm(event.nativeEvent)}
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
                         setConfirmAnswerInputStyle(styles.inputBoxFocused);

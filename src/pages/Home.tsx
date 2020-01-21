@@ -1707,6 +1707,11 @@ export default function Home(props) {
                                 : value.accountType === 'regular'
                                 ? REGULAR_ACCOUNT
                                 : SECURE_ACCOUNT,
+                                index: value.accountType === 'test'
+                                ? 0
+                                : value.accountType === 'regular'
+                                ? 1
+                                : 2,
                           });
                         }}
                       >
