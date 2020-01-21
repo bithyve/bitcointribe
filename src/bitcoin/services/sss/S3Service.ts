@@ -18,6 +18,7 @@ export default class S3Service {
       healthCheckInitialized,
       walletId,
       healthCheckStatus,
+      pdfHealth,
     }: {
       mnemonic: string;
       encryptedSecrets: string[];
@@ -25,6 +26,7 @@ export default class S3Service {
       healthCheckInitialized: boolean;
       walletId: string;
       healthCheckStatus: {};
+      pdfHealth: {};
     } = sss;
 
     return new S3Service(mnemonic, {
@@ -33,6 +35,7 @@ export default class S3Service {
       healthCheckInitialized,
       walletId,
       healthCheckStatus,
+      pdfHealth,
     });
   };
 
@@ -413,6 +416,7 @@ export default class S3Service {
       healthCheckInitialized: boolean;
       walletId: string;
       healthCheckStatus: {};
+      pdfHealth: {};
     },
   ) {
     this.sss = new SSS(mnemonic, stateVars);
