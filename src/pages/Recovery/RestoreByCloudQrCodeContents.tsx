@@ -56,7 +56,7 @@ export default function RestoreByCloudQrCodeContents(props) {
       <View style={styles.modalHeaderTitleView}>
         <View style={{ flexDirection: 'row', flex: 1 }}>
           <AppBottomSheetTouchableWrapper
-            onPress={() => props.navigation.goBack()}
+            onPress={() => props.onPressBack()}
             style={{ height: 30, width: 30 }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
