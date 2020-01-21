@@ -23,6 +23,7 @@ import {
   OVERALL_HEALTH,
   calculateOverallHealth,
   overallHealthCalculated,
+  CHECK_PDF_HEALTH,
 } from '../actions/sss';
 import { dbInsertedSSS } from '../actions/storage';
 
@@ -327,6 +328,16 @@ function* generatePDFWorker({ payload }) {
     console.log({ err: resQRPersonalCopy2.err });
     return;
   }
+
+  const { SERVICES } = yield select(state => state.storage.database);
+  const updatedSERVICES = {
+    ...SERVICES,
+    S3_SERVICE: JSON.stringify(s3Service),
+  };
+
+  yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+  console.log({ s3Service });
+
   const secureAccount: SecureAccount = yield select(
     state => state.accounts[SECURE_ACCOUNT].service,
   );
@@ -455,6 +466,33 @@ function* checkMSharesHealthWorker() {
 export const checkMSharesHealthWatcher = createWatcher(
   checkMSharesHealthWorker,
   CHECK_MSHARES_HEALTH,
+);
+
+function* checkPDFHealthWorker({ payload }) {
+  const s3Service: S3Service = yield select(state => state.sss.service);
+  console.log({ pdfHealth: s3Service.sss.pdfHealth });
+  console.log({ payload });
+
+  // if (res.status === 200) {
+  //   if (preInstance !== postInstance) {
+  //     const { SERVICES } = yield select(state => state.storage.database);
+  //     const updatedSERVICES = {
+  //       ...SERVICES,
+  //       S3_SERVICE: JSON.stringify(s3Service),
+  //     };
+
+  //     yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+  //   }
+  // } else {
+  //   console.log({ err: res.err });
+  // }
+
+  // yield put(switchS3Loader('checkMSharesHealth'));
+}
+
+export const checkPDFHealthWatcher = createWatcher(
+  checkPDFHealthWorker,
+  CHECK_PDF_HEALTH,
 );
 
 function* overallHealthWorker({ payload }) {

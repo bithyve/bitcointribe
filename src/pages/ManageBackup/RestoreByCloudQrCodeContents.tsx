@@ -48,7 +48,7 @@ export default function RestoreByCloudQrCodeContents(props) {
       <View style={styles.modalHeaderTitleView}>
         <View style={{ flexDirection: 'row', flex: 1 }}>
           <AppBottomSheetTouchableWrapper
-            onPress={() => props.navigation.goBack()}
+            onPress={() => {}}
             style={{ height: 30, width: 30 }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
@@ -106,7 +106,9 @@ export default function RestoreByCloudQrCodeContents(props) {
             ? counter + 'nd'
             : counter == 3
             ? counter + 'rd'
-            : counter == 9 ? 8 : counter + 'th'}{' '}
+            : counter == 9
+            ? 8
+            : counter + 'th'}{' '}
           QR code on the{'\n'}PDF you have
         </Text>
       </View>
@@ -171,7 +173,7 @@ export default function RestoreByCloudQrCodeContents(props) {
           ) : (
             <View style={styles.statusIndicatorInactiveView} />
           )}
-          {qrDataArray.length == 7  || qrDataArray.length == 8 ? (
+          {qrDataArray.length == 7 || qrDataArray.length == 8 ? (
             <View style={styles.statusIndicatorActiveView} />
           ) : (
             <View style={styles.statusIndicatorInactiveView} />
