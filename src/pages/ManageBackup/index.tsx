@@ -849,11 +849,6 @@ export default function ManageBackup(props) {
   }, [databaseSSS]);
 
   useEffect(() => {
-    console.log('DIPATCHING');
-    dispatch(checkPDFHealth('qrData'));
-  }, []);
-
-  useEffect(() => {
     if (contacts) {
       const updatedPageData = [...pageData];
       for (let i = 0; i < updatedPageData.length; i++) {
@@ -1020,14 +1015,14 @@ export default function ManageBackup(props) {
                       // RestoreByCloudQrCode.current.snapTo(1);
                       props.navigation.navigate('QrScanner', {
                         scanedCode: qrData => {
-                          console.log({ qrData });
-                          dispatch(checkPDFHealth(qrData));
+                          const index = item.type === 'copy1' ? 3 : 4;
+                          dispatch(checkPDFHealth(qrData, index));
                         },
                       });
-                      setArrModalShareIntent({
-                        snapTop: 1,
-                        item,
-                      });
+                      // setArrModalShareIntent({
+                      //   snapTop: 1,
+                      //   item,
+                      // });
                     } else if (item.type == 'security') {
                       SecurityQuestionBottomSheet.current.snapTo(1);
                     } else {

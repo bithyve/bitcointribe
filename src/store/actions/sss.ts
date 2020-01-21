@@ -58,8 +58,8 @@ export const checkMSharesHealth = () => {
   return { type: CHECK_MSHARES_HEALTH };
 };
 
-export const checkPDFHealth = scannedQR => {
-  return { type: CHECK_PDF_HEALTH, payload: { scannedQR } };
+export const checkPDFHealth = (scannedQR, index) => {
+  return { type: CHECK_PDF_HEALTH, payload: { scannedQR, index } };
 };
 
 export const calculateOverallHealth = (s3Service?) => {

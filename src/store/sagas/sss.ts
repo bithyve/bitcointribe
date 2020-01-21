@@ -336,7 +336,6 @@ function* generatePDFWorker({ payload }) {
   };
 
   yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-  console.log({ s3Service });
 
   const secureAccount: SecureAccount = yield select(
     state => state.accounts[SECURE_ACCOUNT].service,
@@ -470,8 +469,19 @@ export const checkMSharesHealthWatcher = createWatcher(
 
 function* checkPDFHealthWorker({ payload }) {
   const s3Service: S3Service = yield select(state => state.sss.service);
-  console.log({ pdfHealth: s3Service.sss.pdfHealth });
-  console.log({ payload });
+  const { pdfHealth } = s3Service.sss;
+  const { scannedQR, index } = payload;
+
+  if (scannedQR === pdfHealth[index]) {
+    yield call(
+      AsyncStorage.setItem,
+      'PDF Health',
+      JSON.stringify({ pdfIndex: index, lastUpdated: Date.now() }),
+    );
+  } else {
+    console.log({ pdfHealth, payload });
+    Alert.alert('Invalid QR!', 'The scanned QR is wrong, please try again.');
+  }
 
   // if (res.status === 200) {
   //   if (preInstance !== postInstance) {
