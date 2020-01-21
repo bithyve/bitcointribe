@@ -46,7 +46,7 @@ import CommunicationMode from './CommunicationMode';
 import ModalHeader from '../../components/ModalHeader';
 import SecondaryDevice from './SecondaryDevice';
 import HealthCheckSecurityQuestion from './HealthCheckSecurityQuestion';
-
+import RestoreByCloudQrCodeContents from './RestoreByCloudQrCodeContents';
 let itemSelected = {};
 
 export default function ManageBackup(props) {
@@ -62,6 +62,8 @@ export default function ManageBackup(props) {
   const [ConfirmBottomSheet, setConfirmBottomSheet] = useState(
     React.createRef(),
   );
+  const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
+  const [openmodal, setOpenmodal] = useState('closed');
   const [pageData1, setPageData1] = useState([
     {
       id: 1,
@@ -137,6 +139,9 @@ export default function ManageBackup(props) {
     setRegenerateShareHelperBottomSheet,
   ] = useState(React.createRef());
   //const [ refShareIntentBottomSheet, setRefShareIntentBottomSheet ] = useRef();
+  const [RestoreByCloudQrCode, setRestoreByCloudQrCode] = useState(
+    React.createRef(),
+  );
   const [
     shareOtpWithTrustedContactBottomSheet,
     setShareOtpWithTrustedContactBottomSheet,
@@ -332,6 +337,54 @@ export default function ManageBackup(props) {
       <ModalHeader
         onPressHeader={() => {
           (trustedContactsBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }
+
+  useEffect(() => {
+    if (openmodal == 'closed') {
+      setTimeout(() => {
+        setQrBottomSheetsFlag(false);
+      }, 10);
+      (RestoreByCloudQrCode as any).current.snapTo(0);
+    }
+    if (openmodal == 'full') {
+      setTimeout(() => {
+        setQrBottomSheetsFlag(true);
+      }, 10);
+      (RestoreByCloudQrCode as any).current.snapTo(1);
+    }
+  }, [openmodal]);
+
+  function openCloseModal() {
+    if (openmodal == 'closed') {
+      setOpenmodal('full');
+    }
+    if (openmodal == 'full') {
+      setOpenmodal('closed');
+    }
+  }
+
+
+  function renderRestoreByCloudQrCodeContent() {
+    return (
+      <RestoreByCloudQrCodeContents
+        modalRef={RestoreByCloudQrCodeContents}
+        isOpenedFlag={QrBottomSheetsFlag}
+        onPressBack={() => {
+          (RestoreByCloudQrCode as any).current.snapTo(0);
+        }}
+      />
+    );
+  }
+
+  function renderRestoreByCloudQrCodeHeader() {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (RestoreByCloudQrCode as any).current.snapTo(0);
+          openCloseModal()
         }}
       />
     );
@@ -973,10 +1026,11 @@ export default function ManageBackup(props) {
                       trustedContactsBottomSheet.current.snapTo(1);
                       setLoadOnTrustedContactBottomSheet(true);
                     } else if (item.type == 'copy1' || item.type == 'copy2') {
-                      setArrModalShareIntent({
-                        snapTop: 1,
-                        item,
-                      });
+                      RestoreByCloudQrCode.current.snapTo(1);
+                      // setArrModalShareIntent({
+                      //   snapTop: 1,
+                      //   item,
+                      // });
                     } else if (item.type == 'security') {
                       SecurityQuestionBottomSheet.current.snapTo(1);
                     } else {
@@ -1157,6 +1211,23 @@ export default function ManageBackup(props) {
           snapPoints={[-30, hp('75%'), hp('90%')]}
           renderContent={renderSecurityQuestionContent}
           renderHeader={renderSecurityQuestionHeader}
+        />
+        <BottomSheet
+        onOpenEnd={() => {
+          setQrBottomSheetsFlag(true);
+        }}
+        onCloseEnd={() => {
+          setQrBottomSheetsFlag(false);
+          (RestoreByCloudQrCode as any).current.snapTo(0);
+        }}
+        onCloseStart={() => {
+          setQrBottomSheetsFlag(false);
+        }}
+          enabledInnerScrolling={true}
+          ref={RestoreByCloudQrCode}
+          snapPoints={[-30, hp('90%')]}
+          renderContent={renderRestoreByCloudQrCodeContent}
+          renderHeader={renderRestoreByCloudQrCodeHeader}
         />
         <BottomSheet
           enabledInnerScrolling={true}

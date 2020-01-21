@@ -21,8 +21,8 @@ export default function QrCodeModalContents(props) {
 	const [openCameraFlag, setOpenCameraFlag] = useState(false)
 	const barcodeRecognized = async (barcodes) => {
 		if (barcodes.data) {
-			setOpenCameraFlag(false);
-			props.modalRef.current.snapTo(1); // closes modal
+			!props.restoreQr ? setOpenCameraFlag(false) : setOpenCameraFlag(true);
+			props.modalRef ? props.modalRef.current.snapTo(1) : ''; // closes modal
 			props.onQrScan(barcodes.data);
 		}
 	};
