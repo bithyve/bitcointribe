@@ -21,7 +21,8 @@ export default class HealthStatus {
   private qaHealthStatus = (time: number): { qaStage: string } => {
     let qaStage: string = ENTITY_HEALTH.STAGE1;
     const delta = Math.abs(Date.now() - time);
-    const numberOfDays = Math.round(delta / (60 * 60 * 24 * 1000));
+    // const numberOfDays = Math.round(delta / (60 * 60 * 24 * 1000));
+    const numberOfDays = Math.round(delta / (60 * 1000));
 
     if (numberOfDays > TIME_SLOTS.SHARE_SLOT2) {
       qaStage = ENTITY_HEALTH.STAGE1;
@@ -65,7 +66,9 @@ export default class HealthStatus {
     }
 
     for (let i = 0; i < numberOfDays.length; i++) {
-      numberOfDays[i] = Math.floor(delta[i] / (60 * 60 * 24 * 1000));
+      // numberOfDays[i] = Math.floor(delta[i] / (60 * 60 * 24 * 1000));
+      numberOfDays[i] = Math.floor(delta[i] / (60 * 1000)); // in minutes; for test
+
       const obj = sharesInfo[i];
       if (numberOfDays[i] > TIME_SLOTS.SHARE_SLOT2) {
         obj.shareStage = ENTITY_HEALTH.STAGE1;
