@@ -148,6 +148,7 @@ function* uploadEncMetaShareWorker({ payload }) {
     };
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
   } else {
+    Alert.alert('Upload Failed!', res.err);
     console.log({ err: res.err });
   }
   yield put(switchS3Loader('uploadMetaShare'));
@@ -298,6 +299,7 @@ function* downloadMetaShareWorker({ payload }) {
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
     yield put(downloadedMShare(otp, true));
   } else {
+    Alert.alert('Download Failed!', res.err);
     console.log({ err: res.err });
     yield put(downloadedMShare(otp, false, res.err));
   }
