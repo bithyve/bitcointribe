@@ -217,7 +217,7 @@ export default function ManageBackup(props) {
     {
       title: 'Secondary Device',
       personalInfo: null,
-      time: '3 months ago',
+      time: 'never',
       status: 'error',
       type: 'secondaryDevice',
       route: 'SecondaryDevice',
@@ -225,7 +225,7 @@ export default function ManageBackup(props) {
     {
       title: 'Trusted Contact 1',
       personalInfo: null,
-      time: '1 month ago',
+      time: 'never',
       status: 'error',
       type: 'contact1',
       route: 'TrustedContacts',
@@ -234,7 +234,7 @@ export default function ManageBackup(props) {
     {
       title: 'Trusted Contact 2',
       personalInfo: null,
-      time: '12 days ago',
+      time: 'never',
       status: 'error',
       type: 'contact2',
       route: 'TrustedContacts',
@@ -243,7 +243,7 @@ export default function ManageBackup(props) {
     {
       title: 'Personal Copy 1',
       personalInfo: null,
-      time: '2 days ago',
+      time: 'never',
       status: 'error',
       type: 'copy1',
       route: 'PersonalCopy',
@@ -251,7 +251,7 @@ export default function ManageBackup(props) {
     {
       title: 'Personal Copy 2',
       personalInfo: null,
-      time: '2 days ago',
+      time: 'never',
       status: 'error',
       type: 'copy2',
       route: 'PersonalCopy',
@@ -259,7 +259,7 @@ export default function ManageBackup(props) {
     {
       title: 'Security Questions',
       personalInfo: null,
-      time: '1 day ago',
+      time: 'never',
       status: 'error',
       type: 'security',
       route: 'HealthCheckSecurityAnswer',
@@ -1018,6 +1018,7 @@ const renderConfirmContent = () => {
     (async () => {
       if (!overallHealth) {
         const storedHealth = await AsyncStorage.getItem('overallHealth');
+        console.log("storedHealth", storedHealth);
         if (storedHealth) {
           setOverallHealth(JSON.parse(storedHealth));
         }

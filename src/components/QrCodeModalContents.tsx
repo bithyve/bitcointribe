@@ -23,9 +23,21 @@ export default function QrCodeModalContents(props) {
 		if (barcodes.data) {
 			!props.restoreQr ? setOpenCameraFlag(false) : setOpenCameraFlag(true);
 			props.modalRef ? props.modalRef.current.snapTo(1) : ''; // closes modal
-			props.onQrScan(barcodes.data);
+			props.onQrScan(getFormattedString(barcodes.data));
 		}
 	};
+
+	const getFormattedString = ( qrString: string ) => {
+		qrString = qrString.split( 'Dquote' ).join( '"' );
+		qrString = qrString.split( 'Qutation' ).join( ':' );
+		qrString = qrString.split( 'Lbrace' ).join( '{' );
+		qrString = qrString.split( 'Rbrace' ).join( '}' );
+		qrString = qrString.split( 'Slash' ).join( '/' );
+		qrString = qrString.split( 'Comma' ).join( ',' );
+		qrString = qrString.split( 'Squote' ).join( "'" );
+		qrString = qrString.split( 'Space' ).join( ' ' );
+		return qrString;
+	  };
 
 	return (<View style={styles.modalContentContainer}>
 		<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : ''} enabled>
@@ -46,6 +58,7 @@ export default function QrCodeModalContents(props) {
 									height: wp('100%')
 								}}
 								onBarCodeRead={barcodeRecognized}
+						
 							>
 								<View style={{ flexDirection: 'row', paddingTop: 12, paddingRight: 12, paddingLeft: 12, width: '100%' }}>
 									<View style={{ borderLeftWidth: 1, borderTopColor: 'white', borderLeftColor: 'white', height: hp('5%'), width: hp('5%'), borderTopWidth: 1 }} />
