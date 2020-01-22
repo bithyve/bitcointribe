@@ -4,6 +4,8 @@ PODS:
     - Fabric (~> 1.10.2)
   - DoubleConversion (1.1.6)
   - EXAppLoaderProvider (7.0.0)
+  - EXBlur (8.0.0):
+    - UMCore
   - EXConstants (7.0.1):
     - UMConstantsInterface
     - UMCore
@@ -160,6 +162,7 @@ DEPENDENCIES:
   - Crashlytics
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - EXAppLoaderProvider (from `../node_modules/expo/node_modules/expo-app-loader-provider/ios`)
+  - EXBlur (from `../node_modules/expo-blur/ios`)
   - EXConstants (from `../node_modules/expo/node_modules/expo-constants/ios`)
   - EXContacts (from `../node_modules/expo-contacts/ios`)
   - EXFileSystem (from `../node_modules/expo/node_modules/expo-file-system/ios`)
@@ -234,6 +237,9 @@ EXTERNAL SOURCES:
   EXAppLoaderProvider:
     :path: !ruby/object:Pathname
     path: "../node_modules/expo/node_modules/expo-app-loader-provider/ios"
+  EXBlur:
+    :path: !ruby/object:Pathname
+    path: "../node_modules/expo-blur/ios"
   EXConstants:
     :path: !ruby/object:Pathname
     path: "../node_modules/expo/node_modules/expo-constants/ios"
@@ -350,6 +356,7 @@ SPEC CHECKSUMS:
   Crashlytics: 540b7e5f5da5a042647227a5e3ac51d85eed06df
   DoubleConversion: bb338842f62ab1d708ceb63ec3d999f0f3d98ecd
   EXAppLoaderProvider: 5d348813a9cf09b03bbe5b8b55437bc1bfbddbd1
+  EXBlur: d1604f66f89a9414f5ee65dfb23874437c1bb147
   EXConstants: 857aa7b1c84e2878f8402d712061860bca16a697
   EXContacts: 5ec0cb83ea2ea68694eac97ddf2a5cfefb8e2286
   EXFileSystem: 7e53a2c30a2eb6987ba6d5158ab908f947523228
@@ -399,4 +406,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 0aa4ac3babc41b8dea15201c864175a5133e6b6e
 
-COCOAPODS: 1.8.3
+COCOAPODS: 1.8.4
