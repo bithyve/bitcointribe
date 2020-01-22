@@ -42,7 +42,7 @@ const TrustedContactHealthCheck = props => {
     );
     const [pageData, setPageData] = useState([
         {
-            id: 1, title: "Recovery Secret not accessible", date: "19 May ‘19, 11:00am", info: "Confirm the health of recovery secret with your trusted contact"
+            id: 1, title: "Recovery Secret Not Accessible", date: "19 May ‘19, 11:00am", info: "Confirm the health of recovery secret with your trusted contact"
         },
         {
             id: 2, title: "Recovery Secret received", date: "1 June ‘19, 9:00am", info: "consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet"
@@ -213,7 +213,7 @@ const TrustedContactHealthCheck = props => {
                 })}
             </ScrollView>
             {SelectedOption ?
-                <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, justifyContent: 'center', alignItems: 'center', height: hp('25%'), backgroundColor: Colors.white }}>
+                <View style={{ justifyContent: 'center', alignItems: 'center', height: hp('25%'), backgroundColor: Colors.white }}>
                     <Text style={styles.bottomBoxText}>consectetur Lorem ipsum dolor sit amet, consectetur sit <Text onPress={() => { ReshareBottomSheet.current.snapTo(1) }} style={styles.bottomBoxTextUnderline}>Reshare</Text></Text>
 
                     <Text style={styles.bottomBoxText}>Lorem ipsum dolor sit amet, consectetur sit amet <Text onPress={() => { ChangeBottomSheet.current.snapTo(1) }} style={styles.bottomBoxTextUnderline}>Change Trusted Contact</Text></Text>
