@@ -25,7 +25,11 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { useDispatch, useSelector } from 'react-redux';
-import { initHealthCheck, checkMSharesHealth } from '../../store/actions/sss';
+import {
+  initHealthCheck,
+  checkMSharesHealth,
+  checkPDFHealth,
+} from '../../store/actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import HomePageShield from '../../components/HomePageShield';
 import Icons from '../../common/Icons';
@@ -46,11 +50,13 @@ import CommunicationMode from './CommunicationMode';
 import ModalHeader from '../../components/ModalHeader';
 import SecondaryDevice from './SecondaryDevice';
 import HealthCheckSecurityQuestion from './HealthCheckSecurityQuestion';
-import RestoreByCloudQrCodeContents from '../Recovery/RestoreByCloudQrCodeContents';
 let itemSelected = {};
 
 export default function ManageBackup(props) {
-  const [LoadOnTrustedContactBottomSheet, setLoadOnTrustedContactBottomSheet] = useState(false);
+  const [
+    LoadOnTrustedContactBottomSheet,
+    setLoadOnTrustedContactBottomSheet,
+  ] = useState(false);
   const [OTP, setOTP] = useState('');
   const [chosenContactIndex, setChosenContactIndex] = useState(0);
   const [chosenContact, setChosenContact] = useState({});
@@ -139,9 +145,7 @@ export default function ManageBackup(props) {
     setRegenerateShareHelperBottomSheet,
   ] = useState(React.createRef());
   //const [ refShareIntentBottomSheet, setRefShareIntentBottomSheet ] = useRef();
-  const [RestoreByCloudQrCode, setRestoreByCloudQrCode] = useState(
-    React.createRef(),
-  );
+
   const [
     shareOtpWithTrustedContactBottomSheet,
     setShareOtpWithTrustedContactBottomSheet,
@@ -342,20 +346,20 @@ export default function ManageBackup(props) {
     );
   }
 
-  useEffect(() => {
-    if (openmodal == 'closed') {
-      setTimeout(() => {
-        setQrBottomSheetsFlag(false);
-      }, 10);
-      (RestoreByCloudQrCode as any).current.snapTo(0);
-    }
-    if (openmodal == 'full') {
-      setTimeout(() => {
-        setQrBottomSheetsFlag(true);
-      }, 10);
-      (RestoreByCloudQrCode as any).current.snapTo(1);
-    }
-  }, [openmodal]);
+  // useEffect(() => {
+  //   if (openmodal == 'closed') {
+  //     setTimeout(() => {
+  //       setQrBottomSheetsFlag(false);
+  //     }, 10);
+  //     (RestoreByCloudQrCode as any).current.snapTo(0);
+  //   }
+  //   if (openmodal == 'full') {
+  //     setTimeout(() => {
+  //       setQrBottomSheetsFlag(true);
+  //     }, 10);
+  //     (RestoreByCloudQrCode as any).current.snapTo(1);
+  //   }
+  // }, [openmodal]);
 
   function openCloseModal() {
     if (openmodal == 'closed') {
@@ -364,30 +368,6 @@ export default function ManageBackup(props) {
     if (openmodal == 'full') {
       setOpenmodal('closed');
     }
-  }
-
-
-  function renderRestoreByCloudQrCodeContent() {
-    return (
-      <RestoreByCloudQrCodeContents
-        modalRef={RestoreByCloudQrCodeContents}
-        isOpenedFlag={QrBottomSheetsFlag}
-        onPressBack={() => {
-          (RestoreByCloudQrCode as any).current.snapTo(0);
-        }}
-      />
-    );
-  }
-
-  function renderRestoreByCloudQrCodeHeader() {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (RestoreByCloudQrCode as any).current.snapTo(0);
-          openCloseModal()
-        }}
-      />
-    );
   }
 
   const getContacts = async (selectedContacts, index) => {
@@ -583,8 +563,8 @@ export default function ManageBackup(props) {
   const renderRegenerateShareHelperHeader = () => {
     return (
       <SmallHeaderModal
-      borderColor={Colors.blue}
-      backgroundColor={Colors.blue}
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
         onPressHandle={() => {
           (RegenerateShareHelperBottomSheet as any).current.snapTo(0);
         }}
@@ -929,7 +909,6 @@ export default function ManageBackup(props) {
               marginLeft: 'auto',
               marginRight: 10,
               padding: 10,
-              
             }}
             onPress={() => {
               RegenerateShareHelperBottomSheet.current.snapTo(1);
@@ -1001,9 +980,16 @@ export default function ManageBackup(props) {
             extraData={this.state}
             renderItem={({ item, index }) => (
               <View
-              style={{
-                opacity: (!selectedType || item.type == selectedType) ? 1 : (item.type=='copy1' || item.type=='copy2' && ( selectedType=="copy1" || selectedType=="copy2")) ? 1 : 0.5
-              }}
+                style={{
+                  opacity:
+                    !selectedType || item.type == selectedType
+                      ? 1
+                      : item.type == 'copy1' ||
+                        (item.type == 'copy2' &&
+                          (selectedType == 'copy1' || selectedType == 'copy2'))
+                      ? 1
+                      : 0.5,
+                }}
               >
                 <TouchableOpacity
                   // disabled={
@@ -1026,7 +1012,13 @@ export default function ManageBackup(props) {
                       trustedContactsBottomSheet.current.snapTo(1);
                       setLoadOnTrustedContactBottomSheet(true);
                     } else if (item.type == 'copy1' || item.type == 'copy2') {
-                      RestoreByCloudQrCode.current.snapTo(1);
+                      // RestoreByCloudQrCode.current.snapTo(1);
+                      props.navigation.navigate('QrScanner', {
+                        scanedCode: qrData => {
+                          const index = item.type === 'copy1' ? 3 : 4;
+                          dispatch(checkPDFHealth(qrData, index));
+                        },
+                      });
                       // setArrModalShareIntent({
                       //   snapTop: 1,
                       //   item,
@@ -1138,13 +1130,15 @@ export default function ManageBackup(props) {
           renderContent={renderTrustedContactsContent}
           renderHeader={renderTrustedContactsHeader}
         />
-        {LoadOnTrustedContactBottomSheet ? <BottomSheet
-          enabledInnerScrolling={true}
-          ref={CommunicationModeBottomSheet}
-          snapPoints={[-30, hp('75%')]}
-          renderContent={renderCommunicationModeModalContent}
-          renderHeader={renderCommunicationModeModalHeader}
-        />: null }
+        {LoadOnTrustedContactBottomSheet ? (
+          <BottomSheet
+            enabledInnerScrolling={true}
+            ref={CommunicationModeBottomSheet}
+            snapPoints={[-30, hp('75%')]}
+            renderContent={renderCommunicationModeModalContent}
+            renderHeader={renderCommunicationModeModalHeader}
+          />
+        ) : null}
         <BottomSheet
           enabledInnerScrolling={true}
           ref={shareOtpWithTrustedContactBottomSheet}
@@ -1211,23 +1205,6 @@ export default function ManageBackup(props) {
           snapPoints={[-30, hp('75%'), hp('90%')]}
           renderContent={renderSecurityQuestionContent}
           renderHeader={renderSecurityQuestionHeader}
-        />
-        <BottomSheet
-        onOpenEnd={() => {
-          setQrBottomSheetsFlag(true);
-        }}
-        onCloseEnd={() => {
-          setQrBottomSheetsFlag(false);
-          (RestoreByCloudQrCode as any).current.snapTo(0);
-        }}
-        onCloseStart={() => {
-          setQrBottomSheetsFlag(false);
-        }}
-          enabledInnerScrolling={true}
-          ref={RestoreByCloudQrCode}
-          snapPoints={[-30, hp('90%')]}
-          renderContent={renderRestoreByCloudQrCodeContent}
-          renderHeader={renderRestoreByCloudQrCodeHeader}
         />
         <BottomSheet
           enabledInnerScrolling={true}

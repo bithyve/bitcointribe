@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Image,
-  Text,
-  StyleSheet,
-  Alert,
-  StatusBar,
-} from 'react-native';
+import { View, Image, Text, StyleSheet, Alert, StatusBar } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import {
   widthPercentageToDP as wp,
@@ -36,13 +29,16 @@ export default function RestoreByCloudQrCodeContents(props) {
     if (qrDataArray.length <= 8) {
       tempArray.push(qrData);
       setQrDataArray(tempArray);
-      let temp = counter == 1
-      ? counter + 'st'
-      : counter == 2
-      ? counter + 'nd'
-      : counter == 3
-      ? counter + 'rd'
-      : counter == 9 ? 8 : counter + 'th';
+      let temp =
+        counter == 1
+          ? counter + 'st'
+          : counter == 2
+          ? counter + 'nd'
+          : counter == 3
+          ? counter + 'rd'
+          : counter == 9
+          ? 8
+          : counter + 'th';
       Alert.alert(temp + ' QR code scanned, please scan the next one');
       counter++;
       setCounter(counter);
@@ -114,7 +110,9 @@ export default function RestoreByCloudQrCodeContents(props) {
             ? counter + 'nd'
             : counter == 3
             ? counter + 'rd'
-            : counter == 9 ? 8 : counter + 'th'}{' '}
+            : counter == 9
+            ? 8
+            : counter + 'th'}{' '}
           QR code on the{'\n'}PDF you have
         </Text>
       </View>
@@ -179,7 +177,7 @@ export default function RestoreByCloudQrCodeContents(props) {
           ) : (
             <View style={styles.statusIndicatorInactiveView} />
           )}
-          {qrDataArray.length == 7  || qrDataArray.length == 8 ? (
+          {qrDataArray.length == 7 || qrDataArray.length == 8 ? (
             <View style={styles.statusIndicatorActiveView} />
           ) : (
             <View style={styles.statusIndicatorInactiveView} />
