@@ -1193,11 +1193,13 @@ function Accounts(props) {
                 }}
                 style={styles.bottomCardView}
               >
+                <View style={{flex:1, justifyContent:'center', alignItems: 'center', marginLeft: 10}}>
                 <Image
                   source={require('../../assets/images/icons/icon_send.png')}
                   style={styles.bottomCardSendReceiveImage}
                 />
-                <View style={{ marginLeft: wp('3%') }}>
+                </View>
+                <View style={{ flex: 3, marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Send</Text>
                   <Text style={styles.bottomCardInfoText}>
                     Tran Fee : {staticFees['high']} (
@@ -1221,11 +1223,13 @@ function Accounts(props) {
                 }}
                 style={styles.bottomCardView}
               >
+                <View style={{flex:1, justifyContent:'center', alignItems: 'center', marginLeft: 10}}>
                 <Image
                   source={require('../../assets/images/icons/icon_recieve.png')}
                   style={styles.bottomCardSendReceiveImage}
                 />
-                <View style={{ marginLeft: wp('3%') }}>
+                </View>
+                <View style={{ flex:3, marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Receive</Text>
                   <Text style={styles.bottomCardInfoText}>
                     Tran Fee : {staticFees['high']} (
@@ -1253,11 +1257,13 @@ function Accounts(props) {
                 }}
                 style={styles.bottomCardView}
               >
+                <View style={{flex:1, justifyContent:'center', alignItems: 'center', marginLeft: 10}}>
                 <Image
                   source={require('../../assets/images/icons/icon_buy.png')}
                   style={styles.bottomCardImage}
                 />
-                <View style={{ marginLeft: wp('3%') }}>
+                </View>
+                <View style={{ flex: 3,marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Buy</Text>
                   <Text style={styles.bottomCardInfoText}>
                     Ex Rate : {exchangeRates ? exchangeRates['USD'].last : 0}{' '}
@@ -1281,11 +1287,13 @@ function Accounts(props) {
                   });
                 }}
               >
+                <View style={{flex:1, justifyContent:'center', alignItems: 'center',  marginLeft: 10}}>
                 <Image
                   source={require('../../assets/images/icons/icon_sell.png')}
                   style={styles.bottomCardImage}
                 />
-                <View style={{ marginLeft: wp('3%') }}>
+                </View>
+                <View style={{ flex:3, marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Sell</Text>
                   <Text style={styles.bottomCardInfoText}>
                     Ex Rate : {exchangeRates ? exchangeRates['USD'].last : 0}{' '}
@@ -1514,11 +1522,13 @@ const styles = StyleSheet.create({
     width: wp('10%'),
     height: wp('10%'),
     resizeMode: 'contain',
+   
   },
   bottomCardSendReceiveImage: {
     width: wp('7%'),
     height: wp('7%'),
     resizeMode: 'contain',
+   
   },
   bottomCardInfoText: {
     color: Colors.textColorGrey,
