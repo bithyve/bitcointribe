@@ -261,7 +261,7 @@ export default function ContactList(props) {
               }
             /> : null}
           </View>
-          <View style={styles.contactIndexView}>
+          {/* <View style={styles.contactIndexView}>
             <TouchableOpacity
               onPress={() => {
               }}
@@ -277,7 +277,7 @@ export default function ContactList(props) {
                 <Text style={styles.contactIndexText}>{value}</Text>
               </TouchableOpacity>
             ))}
-          </View>
+          </View> */}
         </View>
         {selectedContacts.length >= 1 && (
           <TouchableOpacity
