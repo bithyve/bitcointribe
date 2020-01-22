@@ -81,21 +81,25 @@ export default function ModalShareIntent(props) {
   }, [props]);
 
   const onShare = async item => {
-    props.onPressShare(item.type);
-
-    let personalCopyCounter = await AsyncStorage.getItem('personalCopyCounter');
-    if (personalCopyCounter && personalCopyCounter == '1') {
-      await AsyncStorage.setItem('personalCopyCounter', '2');
-      await AsyncStorage.setItem('personalCopy2AutoHighlightFlags', 'true');
-    } else if (!personalCopyCounter) {
-      await AsyncStorage.setItem('personalCopyCounter', '1');
-      await AsyncStorage.setItem('personalCopy1AutoHighlightFlags', 'true');
-    } else {
-      await AsyncStorage.setItem('personalCopyCounter', '2');
-      await AsyncStorage.setItem('personalCopy2AutoHighlightFlags', 'true');
-      await AsyncStorage.setItem('personalCopy1AutoHighlightFlags', 'true');
+        props.onPressShare( item.type );
+        let personalCopyCounter = await AsyncStorage.getItem("personalCopyCounter");
+        if(personalCopyCounter && personalCopyCounter == '1'){
+            await AsyncStorage.setItem("personalCopyCounter", '2')
+            await AsyncStorage.setItem("personalCopy2AutoHighlightFlags", 'true');
+            props.removeHighlightingFromCard();
+        }
+        else if(!personalCopyCounter){
+            await AsyncStorage.setItem("personalCopyCounter", '1')
+            await AsyncStorage.setItem("personalCopy1AutoHighlightFlags", 'true')
+            props.removeHighlightingFromCard();
+        }
+        else{
+            await AsyncStorage.setItem("personalCopyCounter", '2')
+            await AsyncStorage.setItem("personalCopy2AutoHighlightFlags", 'true')
+            await AsyncStorage.setItem("personalCopy1AutoHighlightFlags", 'true')
+            props.removeHighlightingFromCard();
+        }
     }
-  };
 
   const renderShareContents = () => {
     return (

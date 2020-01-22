@@ -210,7 +210,7 @@ const NoteHealthCheck = props => {
 				})}
 			</ScrollView>
 			{SelectedOption ?
-				<View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, justifyContent: 'center', alignItems: 'center', height: hp('25%'), backgroundColor: Colors.white }}>
+				<View style={{ justifyContent: 'center', alignItems: 'center', height: hp('25%'), backgroundColor: Colors.white }}>
 					<Text style={{ marginTop: hp('1%'), marginBottom: hp('1%'), color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular, }}>consectetur Lorem ipsum dolor sit amet, consectetur sit <Text onPress={() => { ReshareBottomSheet.current.snapTo(1) }} style={{ color: Colors.blue, textDecorationLine: "underline" }}>Reshare</Text></Text>
 
 					<Text style={{ marginTop: hp('1%'), marginBottom: hp('1%'), color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular, }}>Lorem ipsum dolor sit amet, consectetur sit amet <Text onPress={() => { ChangeBottomSheet.current.snapTo(1) }} style={{ color: Colors.blue, textDecorationLine: "underline" }}>Change Source</Text></Text>

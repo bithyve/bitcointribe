@@ -26,20 +26,18 @@ import { getIconByStatus } from './utils';
 export default function CloudHealthCheck(props) {
     const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
     const [qrData, setQrData] = useState("");
-    global.isCameraOpen = true;
     const barcodeRecognized = async (barcodes) => {
         if (barcodes.data) {
-            props.navigation.state.params.scanedCode(barcodes.data);
-            props.navigation.goBack();
+            props.scannedCode(barcodes.data);
+            props.goPressBack();
         }
     };
-    return (<View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
-        <SafeAreaView style={{ flex: 0, backgroundColor: Colors.backgroundColor }} />
-        <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+    return (<View style={{ height: '100%',
+    backgroundColor: Colors.backgroundColor, }}>
         <ScrollView style={styles.modalContainer}>
             <View style={{ ...styles.modalHeaderTitleView, paddingLeft: 10, paddingRight: 10, }}>
                 <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-                    <TouchableOpacity onPress={() => { props.navigation.goBack(); }} style={{ height: 30, width: 30, justifyContent: "center" }} >
+                    <TouchableOpacity onPress={() => { props.goPressBack(); }} style={{ height: 30, width: 30, justifyContent: "center" }} >
                         <FontAwesome
                             name="long-arrow-left"
                             color={Colors.blue}
@@ -68,7 +66,7 @@ export default function CloudHealthCheck(props) {
                     color: Colors.textColorGrey,
                     fontSize: RFValue(11),
                     fontFamily: Fonts.FiraSansMedium
-                }}>{props.pageInfo}Lorem ipsum dolor Lorem dolor sit amet,{"\n"}consectetur dolor sit</Text>
+                }}>Lorem ipsum dolor Lorem dolor sit amet,{"\n"}consectetur dolor sit</Text>
             </View>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <View style={{
