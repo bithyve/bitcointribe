@@ -688,6 +688,28 @@ export default function ManageBackup(props) {
             data.time = overallHealth.sharesInfo[2].updatedAt;
             break;
 
+          case 'Personal Copy 1':
+            if (overallHealth.sharesInfo[3].shareStage === 'Good') {
+              data.status = 'success';
+            } else if (overallHealth.sharesInfo[3].shareStage === 'Bad') {
+              data.status = 'warning';
+            } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
+              data.status = 'error';
+            }
+            data.time = overallHealth.sharesInfo[3].updatedAt;
+            break;
+
+          case 'Personal Copy 2':
+            if (overallHealth.sharesInfo[4].shareStage === 'Good') {
+              data.status = 'success';
+            } else if (overallHealth.sharesInfo[4].shareStage === 'Bad') {
+              data.status = 'warning';
+            } else if (overallHealth.sharesInfo[4].shareStage === 'Ugly') {
+              data.status = 'error';
+            }
+            data.time = overallHealth.sharesInfo[4].updatedAt;
+            break;
+
           case 'Security Questions':
             if (overallHealth.qaStatus.stage === 'Good') {
               data.status = 'success';
@@ -1012,17 +1034,48 @@ export default function ManageBackup(props) {
                       trustedContactsBottomSheet.current.snapTo(1);
                       setLoadOnTrustedContactBottomSheet(true);
                     } else if (item.type == 'copy1' || item.type == 'copy2') {
+                      console.log({ item });
                       // RestoreByCloudQrCode.current.snapTo(1);
-                      props.navigation.navigate('QrScanner', {
-                        scanedCode: qrData => {
-                          const index = item.type === 'copy1' ? 3 : 4;
-                          dispatch(checkPDFHealth(qrData, index));
-                        },
+                      AsyncStorage.getItem('pdfShared').then(pdfShared => {
+                        let shared = JSON.parse(pdfShared);
+                        console.log({ shared });
+                        if (shared) {
+                          if (item.type == 'copy1') {
+                            if (shared[3]) {
+                              props.navigation.navigate('QrScanner', {
+                                scanedCode: qrData => {
+                                  const index = 3;
+                                  dispatch(checkPDFHealth(qrData, index));
+                                },
+                              });
+                            } else {
+                              setArrModalShareIntent({
+                                snapTop: 1,
+                                item,
+                              });
+                            }
+                          } else if (item.type == 'copy2') {
+                            if (shared[4]) {
+                              props.navigation.navigate('QrScanner', {
+                                scanedCode: qrData => {
+                                  const index = 4;
+                                  dispatch(checkPDFHealth(qrData, index));
+                                },
+                              });
+                            } else {
+                              setArrModalShareIntent({
+                                snapTop: 1,
+                                item,
+                              });
+                            }
+                          }
+                        } else {
+                          setArrModalShareIntent({
+                            snapTop: 1,
+                            item,
+                          });
+                        }
                       });
-                      // setArrModalShareIntent({
-                      //   snapTop: 1,
-                      //   item,
-                      // });
                     } else if (item.type == 'security') {
                       SecurityQuestionBottomSheet.current.snapTo(1);
                     } else {
@@ -1182,9 +1235,23 @@ export default function ManageBackup(props) {
             }
             setSelectedType('');
           }}
-          onPressShare={type => {
+          onPressShare={async type => {
             setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
             dispatch(requestSharePdf(type, itemSelected));
+            let pdfShared = JSON.parse(await AsyncStorage.getItem('pdfShared'));
+            pdfShared = pdfShared ? pdfShared : {};
+            const updatedPDFShared = {
+              ...pdfShared,
+              [type == 'copy2' ? 4 : 3]: true,
+            };
+            console.log({ updatedPDFShared });
+            await AsyncStorage.setItem(
+              'pdfShared',
+              JSON.stringify({
+                ...updatedPDFShared,
+              }),
+            );
+
             if (
               arrModalShareIntent.item &&
               arrModalShareIntent.item.type == 'copy1'
