@@ -23,8 +23,6 @@ import ModalHeader from '../../ModalHeader';
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper';
 
 export default function ModalShareIntent(props) {
-  const propsData = props.data;
-
   const [flagRefreshing, setFagRefreshing] = useState(false);
   const [pdfShareDetails, setPdfShareDetails] = useState({});
   const [arrShareOption, setArrShareOption] = useState([
@@ -84,6 +82,7 @@ export default function ModalShareIntent(props) {
 
   const onShare = async item => {
     props.onPressShare(item.type);
+
     let personalCopyCounter = await AsyncStorage.getItem('personalCopyCounter');
     if (personalCopyCounter && personalCopyCounter == '1') {
       await AsyncStorage.setItem('personalCopyCounter', '2');

@@ -472,11 +472,36 @@ function* checkPDFHealthWorker({ payload }) {
   const { pdfHealth } = s3Service.sss;
   const { scannedQR, index } = payload;
 
-  if (scannedQR === pdfHealth[index]) {
+  if (scannedQR === pdfHealth[index].qrData) {
+    let storedPDFHealth = JSON.parse(
+      yield call(AsyncStorage.getItem, 'PDF Health'),
+    );
+
+    storedPDFHealth = storedPDFHealth ? storedPDFHealth : {};
+
+    let updatedPDFHealth = {
+      ...storedPDFHealth,
+      [index]: { shareId: pdfHealth[index].shareId, updatedAt: Date.now() },
+    };
+
+    if (!updatedPDFHealth[3]) {
+      updatedPDFHealth = {
+        ...updatedPDFHealth,
+        [3]: { shareId: pdfHealth[3].shareId, updatedAt: 0 },
+      };
+    }
+    if (!updatedPDFHealth[4]) {
+      updatedPDFHealth = {
+        ...updatedPDFHealth,
+        [4]: { shareId: pdfHealth[4].shareId, updatedAt: 0 },
+      };
+    }
+
+    console.log({ updatedPDFHealth });
     yield call(
       AsyncStorage.setItem,
       'PDF Health',
-      JSON.stringify({ pdfIndex: index, lastUpdated: Date.now() }),
+      JSON.stringify(updatedPDFHealth),
     );
   } else {
     console.log({ pdfHealth, payload });
@@ -511,7 +536,7 @@ function* overallHealthWorker({ payload }) {
     : yield select(state => state.sss.service);
 
   const { healthCheckStatus } = service.sss;
-  const shareStatus = Object.keys(healthCheckStatus).map(key => {
+  let shareStatus = Object.keys(healthCheckStatus).map(key => {
     return {
       shareId: key,
       updatedAt: healthCheckStatus[key],
@@ -523,6 +548,19 @@ function* overallHealthWorker({ payload }) {
     'SecurityAnsTimestamp',
   );
   console.log({ securityTimestamp });
+
+  let storedPDFHealth = JSON.parse(
+    yield call(AsyncStorage.getItem, 'PDF Health'),
+  );
+
+  if (!storedPDFHealth) {
+    storedPDFHealth = {
+      3: { shareId: 'placeHolderID3', updatedAt: 0 },
+      4: { shareId: 'placeHolderID4', updatedAt: 0 },
+    };
+  }
+  shareStatus[3] = storedPDFHealth[3];
+  shareStatus[4] = storedPDFHealth[4];
 
   const healthStatus = new HealthStatus();
   const overallHealth = yield call(

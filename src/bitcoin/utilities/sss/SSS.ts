@@ -923,7 +923,13 @@ export default class SSS {
         qrData[itr] = 'c0' + (itr + 1) + qrData[itr];
       }
       if (itr === 1) {
-        this.pdfHealth = { ...this.pdfHealth, [index]: qrData[itr] };
+        this.pdfHealth = {
+          ...this.pdfHealth,
+          [index]: {
+            shareId: this.metaShares[index].shareId,
+            qrData: qrData[itr],
+          },
+        };
       }
     }
     return { qrData };
