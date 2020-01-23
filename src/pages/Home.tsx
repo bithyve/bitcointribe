@@ -71,6 +71,7 @@ import {
   checkMSharesHealth,
   updateMSharesHealth,
   downloadMShare,
+  initHealthCheck,
 } from '../store/actions/sss';
 import RecoverySecretRequestModalContents from '../components/RecoverySecretRequestModalContesnts';
 import ShareRecoverySecretModalContents from '../components/ShareRecoverySecretModalContents';
@@ -1404,6 +1405,12 @@ export default function Home(props) {
     if (health) setOverallHealth(health);
   }, [health]);
 
+  const s3Service = useSelector(state => state.sss.service);
+  useEffect(() => {
+    if (s3Service)
+      if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
+  }, [s3Service]);
+
   const testAccService = useSelector(
     state => state.accounts[TEST_ACCOUNT].service,
   );
@@ -1707,7 +1714,8 @@ export default function Home(props) {
                                 : value.accountType === 'regular'
                                 ? REGULAR_ACCOUNT
                                 : SECURE_ACCOUNT,
-                                index: value.accountType === 'test'
+                            index:
+                              value.accountType === 'test'
                                 ? 0
                                 : value.accountType === 'regular'
                                 ? 1
@@ -1726,7 +1734,11 @@ export default function Home(props) {
                                 onPress={() => {
                                   alert('2FA');
                                 }}
-                                style={{ marginLeft: 'auto' , paddingLeft: 10, paddingBottom:10 }}
+                                style={{
+                                  marginLeft: 'auto',
+                                  paddingLeft: 10,
+                                  paddingBottom: 10,
+                                }}
                               >
                                 <Text
                                   style={{
