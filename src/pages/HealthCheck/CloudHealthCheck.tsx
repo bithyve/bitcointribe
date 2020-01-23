@@ -90,6 +90,7 @@ export default function CloudHealthCheck(props) {
                                 height: wp('100%')
                             }}
                             onBarCodeRead={barcodeRecognized}
+                            captureAudio={false}
                         >
                             <View style={{ flexDirection: 'row', paddingTop: 12, paddingRight: 12, paddingLeft: 12, width: '100%' }}>
                                 <View style={{ borderLeftWidth: 1, borderTopColor: 'white', borderLeftColor: 'white', height: hp('5%'), width: hp('5%'), borderTopWidth: 1 }} />
