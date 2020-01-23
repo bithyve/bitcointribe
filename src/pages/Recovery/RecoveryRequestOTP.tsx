@@ -30,7 +30,7 @@ import CommonStyle from '../../common/Styles';
 export default function RecoveryRequestOTP(props) {
   const recoveryRequest = props.navigation.getParam('recoveryRequest');
   const { requester, rk, otp } = recoveryRequest;
-  const [passcode, setPasscode] = useState('');
+  const [passcode, setPasscode] = useState([]);
   const inputRef = useRef(null);
   const [
     RecoveryRequestRejectedBottomSheet,
@@ -41,12 +41,10 @@ export default function RecoveryRequestOTP(props) {
     setRecoveryRequestAcceptBottomSheet,
   ] = useState(React.createRef());
 
-  function onPressNumber(text) {
-    let tmpPasscode = passcode;
-    if (passcode.length < 6) {
-      tmpPasscode += text;
-      setPasscode(tmpPasscode);
-    }
+  function onPressNumber(text, i) {
+    let tempPasscode = passcode;
+    tempPasscode[i] = text;
+    setPasscode(tempPasscode);
   }
 
   const dispatch = useDispatch();
@@ -56,7 +54,7 @@ export default function RecoveryRequestOTP(props) {
   );
 
   const onOTPSubmit = () => {
-    if (passcode.length !== 6 || !rk) return;
+    if (passcode.join('').length !== 6 || !rk) return;
     dispatch(uploadRequestedShare(requester, rk, passcode));
   };
 
@@ -112,8 +110,8 @@ export default function RecoveryRequestOTP(props) {
                 maxLength={1}
                 keyboardType="email-address"
                 value={otp ? otp[0] : null}
-                autoCorrect={false}
-                autoFocus={false}
+                selectTextOnFocus={true}
+                contextMenuHidden={true}
                 ref={input => {
                   this.textInput = input;
                 }}
@@ -123,25 +121,25 @@ export default function RecoveryRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value);
-                  if (value) {
-                    setTimeout(() => {
-                      this.textInput2.focus();
-                    }, 10);
+                  onPressNumber(value,0);
+                  if (value.length >= 1) {
+                    this.textInput2.focus();
                   }
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput.focus();
+                    onPressNumber('',0);
                   }
                 }}
               />
 
               <TextInput
                 maxLength={1}
-                autoCorrect={false}
+               
                 value={otp ? otp[1] : null}
-                autoFocus={false}
+                selectTextOnFocus={true}
+                contextMenuHidden={true}
                 keyboardType="email-address"
                 ref={input => {
                   this.textInput2 = input;
@@ -152,25 +150,23 @@ export default function RecoveryRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value);
-                  if (value) {
-                    setTimeout(() => {
-                      this.textInput3.focus();
-                    }, 10);
-                  }
+                  onPressNumber(value, 1);
+                  if (value.length >= 1) this.textInput3.focus();
                 }}
+                
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput.focus();
+                    onPressNumber('', 1);
                   }
                 }}
               />
 
               <TextInput
                 maxLength={1}
-                autoCorrect={false}
                 value={otp ? otp[2] : null}
-                autoFocus={false}
+                selectTextOnFocus={true}
+                contextMenuHidden={true}
                 keyboardType="email-address"
                 ref={input => {
                   this.textInput3 = input;
@@ -181,25 +177,23 @@ export default function RecoveryRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value);
-                  if (value) {
-                    setTimeout(() => {
-                      this.textInput4.focus();
-                    }, 10);
-                  }
+                  onPressNumber(value, 2);
+                  if (value.length >= 1) this.textInput4.focus();
+                  
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput2.focus();
+                    onPressNumber('', 2);
                   }
                 }}
               />
 
               <TextInput
                 maxLength={1}
-                autoCorrect={false}
                 value={otp ? otp[3] : null}
-                autoFocus={false}
+                selectTextOnFocus={true}
+                contextMenuHidden={true}
                 keyboardType="email-address"
                 ref={input => {
                   this.textInput4 = input;
@@ -210,25 +204,23 @@ export default function RecoveryRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value);
-                  if (value) {
-                    setTimeout(() => {
-                      this.textInput5.focus();
-                    }, 10);
-                  }
+                  onPressNumber(value, 3);
+                  if (value.length >= 1) this.textInput5.focus();
+                  
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput3.focus();
+                    onPressNumber('', 3);
                   }
                 }}
               />
 
               <TextInput
                 maxLength={1}
-                autoCorrect={false}
                 value={otp ? otp[4] : null}
-                autoFocus={false}
+                selectTextOnFocus={true}
+                contextMenuHidden={true}
                 keyboardType="email-address"
                 ref={input => {
                   this.textInput5 = input;
@@ -239,24 +231,22 @@ export default function RecoveryRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value);
-                  if (value) {
-                    setTimeout(() => {
-                      this.textInput6.focus();
-                    }, 10);
-                  }
+                  onPressNumber(value,4);
+                  if (value.length >= 1) this.textInput6.focus();
+                  
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput4.focus();
+                    onPressNumber('',4);
                   }
                 }}
               />
               <TextInput
                 maxLength={1}
-                autoCorrect={false}
                 value={otp ? otp[5] : null}
-                autoFocus={false}
+                selectTextOnFocus={true}
+                contextMenuHidden={true}
                 keyboardType="email-address"
                 ref={input => {
                   this.textInput6 = input;
@@ -267,11 +257,14 @@ export default function RecoveryRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value);
+                  onPressNumber(value,5);
+                  if (value.length >= 1) this.textInput6.focus();
+                  
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput5.focus();
+                    onPressNumber('',5);
                   }
                 }}
               />

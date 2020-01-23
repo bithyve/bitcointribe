@@ -79,6 +79,7 @@ export default function QrScanner(props) {
             height: wp('100%'),
           }}
           onBarCodeRead={barcodeRecognized}
+          captureAudio={false}
         >
           <View
             style={{
