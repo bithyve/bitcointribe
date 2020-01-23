@@ -214,7 +214,7 @@ export default function ContactList(props) {
             })}
           </ScrollView>
         </View>
-        <View style={styles.contactIndexView}>
+        {/* <View style={styles.contactIndexView}>
           <TouchableOpacity
             onPress={() => {
               scrollViewRef.current.scrollTo({ x: 60, y: 60, animated: true });
@@ -235,7 +235,7 @@ export default function ContactList(props) {
               <Text style={styles.contactIndexText}>{value}</Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </View> */}
       </View>
       {selectedContacts.length >= 1 && (
         <TouchableOpacity

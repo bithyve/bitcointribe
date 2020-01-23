@@ -168,7 +168,7 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
                         )}
                     </ScrollView>
                 </View>
-                <View style={styles.contactIndexView}>
+                {/* <View style={styles.contactIndexView}>
                     <AppBottomSheetTouchableWrapper >
                         <Text style={styles.contactIndexText}>#</Text>
                     </AppBottomSheetTouchableWrapper>
@@ -177,7 +177,7 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
                             <Text style={styles.contactIndexText}>{value}</Text>
                         </AppBottomSheetTouchableWrapper>
                     )}
-                </View>
+                </View> */}
             </View>
         </View>
         {selectedContact.id &&
