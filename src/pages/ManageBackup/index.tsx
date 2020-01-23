@@ -51,7 +51,8 @@ import SecondaryDevice from './SecondaryDevice';
 import HealthCheckSecurityQuestion from './HealthCheckSecurityQuestion';
 import SecondaryDeviceHealthCheck from '../HealthCheck/SecondaryDeviceHealthCheck';
 import CloudHealthCheck from '../HealthCheck/CloudHealthCheck';
-
+import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
+import moment from 'moment';
 let itemSelected = {};
 
 export default function ManageBackup(props) {
@@ -1544,6 +1545,7 @@ export default function ManageBackup(props) {
             </View>
           </View>
           {pageData.map((item, index) => {
+            console.log('item.time', typeof item.time);
             return (
               <View
                 style={{
@@ -1736,7 +1738,11 @@ export default function ManageBackup(props) {
                           fontStyle: 'italic',
                         }}
                       >
-                        {item.time}
+                        {(item.time.toString() &&
+                          item.time.toString() == '0') ||
+                        item.time.toString() == 'never'
+                          ? 'never'
+                          : timeFormatter(moment(new Date()), item.time)}
                       </Text>
                     </Text>
                   </View>
