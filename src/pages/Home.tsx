@@ -256,7 +256,10 @@ export default function Home(props) {
   const [settingsBottomSheet, setSettingsBottomSheet] = useState(
     React.createRef(),
   );
-  const [bottomSheet, setBottomSheet] = useState(React.createRef());
+  const [transactionTabBarBottomSheet, setTransactionBottomSheet] = useState(React.createRef());
+  const [addTabBarBottomSheet, setAddTabBarBottomSheet] = useState(React.createRef());
+  const [QrTabBarBottomSheet, setQrTabBarBottomSheet] = useState(React.createRef());
+  const [moreTabBarBottomSheet, setMoreTabBarBottomSheet] = useState(React.createRef());
   const [newData, setNewData] = useState([]);
   const custodyRequest = props.navigation.getParam('custodyRequest');
   const recoveryRequest = props.navigation.getParam('recoveryRequest');
@@ -390,7 +393,10 @@ export default function Home(props) {
 
   useEffect(function() {
     updateAccountCardData();
-    (bottomSheet as any).current.snapTo(1);
+    (transactionTabBarBottomSheet as any).current.snapTo(1);
+    (addTabBarBottomSheet as any).current.snapTo(0);
+    (QrTabBarBottomSheet as any).current.snapTo(0);
+    (moreTabBarBottomSheet as any).current.snapTo(0);
     AppState.addEventListener('change', handleAppStateChange);
     // NetInfo.addEventListener(state => {
     //   if (!state.isConnected) (NoInternetBottomSheet as any).current.snapTo(1);
@@ -546,48 +552,6 @@ export default function Home(props) {
     );
   };
 
-  // useEffect(() => {
-  //   if (selectToAdd) {
-  //     setTimeout(() => {
-  //       setTabBarZIndex(0);
-  //     }, 2);
-  //     AddBottomSheet.current.snapTo(1);
-  //   }
-  // }, [selectToAdd]);
-
-  // function onClickFunc(type) {
-  //   alert('dfdß');
-  //   if (type == 'Fastbitcoins' || type == 'Getbittr' || type == 'Add Contact') {
-  //     setTimeout(() => {
-  //       setSelectToAdd(type);
-  //       setTabBarZIndex(0);
-  //     }, 2);
-  //   }
-  //   (AddBottomSheet as any).current.snapTo(1);
-  // }
-
-  const renderAdd = () => {
-    return (
-      <AddModalContents
-        onPressElements={type => {
-          if (
-            type == 'Fastbitcoins' ||
-            type == 'Getbittr' ||
-            type == 'Add Contact'
-          ) {
-            setTimeout(() => {
-              setAddSubBottomSheetsFlag(true);
-              setTabBarZIndex(0);
-              setSelectToAdd(type);
-            }, 2);
-            (AddBottomSheet as any).current.snapTo(1);
-          }
-        }}
-        addData={modaldata}
-      />
-    );
-  };
-
   const getQrCodeData = qrData => {
     // console.log('Qrcodedata', data);
     const scannedData = JSON.parse(qrData);
@@ -613,44 +577,103 @@ export default function Home(props) {
     }
   };
 
-  function renderContent1() {
-    if (selected == 'Transactions') {
+  function renderTransactionContent() {
       return renderTransactionsContent();
-    } else if (selected == 'Add') {
-      return renderAdd();
-      //return
-    } else if (selected == 'QR') {
-      return (
-        <QrCodeModalContents
-          modalRef={bottomSheet}
-          isOpenedFlag={QrBottomSheetsFlag}
-          onQrScan={qrData => getQrCodeData(qrData)}
-          onPressQrScanner={() => {
-            props.navigation.navigate('QrScanner', {
-              scanedCode: getQrCodeData,
-            });
-          }}
-        />
-      );
-    } else if (selected == 'More') {
-      return (
-        <MoreHomePageTabContents
-          onPressElements={item => onPressElement(item)}
-        />
-      );
-    }
   }
 
-  function renderHeader() {
+  function renderTransactionHeader() {
     return (
       <TouchableOpacity
-        disabled={selected == 'More' ? true : false}
         activeOpacity={10}
         onPress={() => openCloseModal()}
         style={styles.modalHeaderContainer}
       >
         <View style={styles.modalHeaderHandle} />
-        <Text style={styles.modalHeaderTitleText}>{selected}</Text>
+        <Text style={styles.modalHeaderTitleText}>{"Transactions"}</Text>
+      </TouchableOpacity>
+    );
+  }
+
+  function renderAddContent() {
+    return (
+      <AddModalContents
+        onPressElements={type => {
+          if (
+            type == 'Fastbitcoins' ||
+            type == 'Getbittr' ||
+            type == 'Add Contact'
+          ) {
+            setTimeout(() => {
+              setAddSubBottomSheetsFlag(true);
+              setTabBarZIndex(0);
+              setSelectToAdd(type);
+            }, 2);
+            (AddBottomSheet as any).current.snapTo(1);
+          }
+        }}
+        addData={modaldata}
+      />
+    );
+  }
+
+  function renderAddHeader() {
+    return (
+      <TouchableOpacity
+        activeOpacity={10}
+        onPress={() => openCloseModal()}
+        style={styles.modalHeaderContainer}
+      >
+        <View style={styles.modalHeaderHandle} />
+        <Text style={styles.modalHeaderTitleText}>{"Add"}</Text>
+      </TouchableOpacity>
+    );
+  }
+
+  function renderQrContent() {
+    return (
+      <QrCodeModalContents
+        modalRef={QrTabBarBottomSheet}
+        isOpenedFlag={QrBottomSheetsFlag}
+        onQrScan={qrData => getQrCodeData(qrData)}
+        onPressQrScanner={() => {
+          props.navigation.navigate('QrScanner', {
+            scanedCode: getQrCodeData,
+          });
+        }}
+      />
+    );
+  }
+
+  function renderQrHeader() {
+    return (
+      <TouchableOpacity
+        activeOpacity={10}
+        onPress={() => openCloseModal()}
+        style={styles.modalHeaderContainer}
+      >
+        <View style={styles.modalHeaderHandle} />
+        <Text style={styles.modalHeaderTitleText}>{"Qr"}</Text>
+      </TouchableOpacity>
+    );
+  }
+
+  function renderMoreContent() {
+    return (
+      <MoreHomePageTabContents
+        onPressElements={item => onPressElement(item)}
+      />
+    );
+  }
+
+  function renderMoreHeader() {
+    return (
+      <TouchableOpacity
+        activeOpacity={10}
+        onPress={() => openCloseModal()}
+        style={styles.modalHeaderContainer}
+      >
+        <View style={styles.modalHeaderHandle} />
+        <Text style={styles.modalHeaderTitleText}>{"More"}</Text>
       </TouchableOpacity>
     );
   }
@@ -668,54 +691,95 @@ export default function Home(props) {
   }
 
   useEffect(() => {
-    if (openmodal == 'closed') {
-      setTimeout(() => {
-        setQrBottomSheetsFlag(false);
-      }, 10);
-      (bottomSheet as any).current.snapTo(1);
+    setTimeout(() => {
+      setQrBottomSheetsFlag(false);
+    }, 10);
+    if(selected=="Transactions"){
+      if (openmodal == 'closed') {
+        (transactionTabBarBottomSheet as any).current.snapTo(1);
+      }
+      if (openmodal == 'half') {
+        (transactionTabBarBottomSheet as any).current.snapTo(2);
+      }
+      if (openmodal == 'full') {
+        (transactionTabBarBottomSheet as any).current.snapTo(3);
+      }
     }
-    if (openmodal == 'half') {
-      if (selected == 'QR') {
+    else if(selected=="Add"){
+      if (openmodal == 'closed') {
+        setTimeout(() => {
+          setQrBottomSheetsFlag(false);
+        }, 10);
+        (addTabBarBottomSheet as any).current.snapTo(1);
+      }
+      if (openmodal == 'half' || openmodal == 'full') {
+        (addTabBarBottomSheet as any).current.snapTo(2);
+      }
+    }
+    else if(selected=="QR"){
+      if (openmodal == 'closed') {
+        setTimeout(() => {
+          setQrBottomSheetsFlag(false);
+        }, 10);
+        (QrTabBarBottomSheet as any).current.snapTo(1);
+      }
+      if (openmodal == 'half' || openmodal == 'full') {
         setTimeout(() => {
           setQrBottomSheetsFlag(true);
         }, 10);
+        (QrTabBarBottomSheet as any).current.snapTo(2);
       }
-      (bottomSheet as any).current.snapTo(2);
     }
-    if (openmodal == 'full') {
-      if (selected == 'QR') {
-        setTimeout(() => {
-          setQrBottomSheetsFlag(true);
-        }, 10);
+    else if(selected=="More"){
+      if (openmodal == 'closed') {
+        (moreTabBarBottomSheet as any).current.snapTo(1);
       }
-      (bottomSheet as any).current.snapTo(3);
+      if (openmodal == 'half' || openmodal == 'full') {
+        (moreTabBarBottomSheet as any).current.snapTo(2);
+      }
     }
   }, [openmodal]);
 
   async function selectTab(tabTitle) {
-    (bottomSheet as any).current.snapTo(2);
     if (tabTitle == 'More') {
       setTimeout(() => {
         setKnowMoreBottomSheetsFlag(true);
         setSelected(tabTitle);
         setSelected(tabTitle);
       }, 2);
-    } else if (tabTitle == 'Transactions') {
+      transactionTabBarBottomSheet.current.snapTo(0);
+      addTabBarBottomSheet.current.snapTo(0);
+      QrTabBarBottomSheet.current.snapTo(0);
+      moreTabBarBottomSheet.current.snapTo(2);
+    } 
+    if (tabTitle == 'Transactions') {
       setTimeout(() => {
         setModaldata(transactionData);
         setSelected(tabTitle);
       }, 2);
-    } else if (tabTitle == 'Add') {
+      transactionTabBarBottomSheet.current.snapTo(2);
+      addTabBarBottomSheet.current.snapTo(0);
+      QrTabBarBottomSheet.current.snapTo(0);
+      moreTabBarBottomSheet.current.snapTo(0);
+    } if (tabTitle == 'Add') {
       setTimeout(() => {
         setAddBottomSheetsFlag(true);
         setModaldata([]);
         setSelected(tabTitle);
       }, 2);
-    } else if (tabTitle == 'QR') {
+      transactionTabBarBottomSheet.current.snapTo(0);
+      addTabBarBottomSheet.current.snapTo(2);
+      QrTabBarBottomSheet.current.snapTo(0);
+      moreTabBarBottomSheet.current.snapTo(0);
+    } if (tabTitle == 'QR') {
       setTimeout(() => {
         setModaldata(transactionData);
         setSelected(tabTitle);
       }, 2);
+      transactionTabBarBottomSheet.current.snapTo(0);
+      addTabBarBottomSheet.current.snapTo(0);
+      QrTabBarBottomSheet.current.snapTo(2);
+      moreTabBarBottomSheet.current.snapTo(0);
     }
   }
 
@@ -1400,7 +1464,7 @@ export default function Home(props) {
         setTabBarZIndex(0);
       }, 2);
       (CustodianRequestBottomSheet as any).current.snapTo(1);
-      (bottomSheet as any).current.snapTo(1);
+      (transactionTabBarBottomSheet as any).current.snapTo(1);
     }
 
     if (recoveryRequest) {
@@ -1408,7 +1472,7 @@ export default function Home(props) {
         setTabBarZIndex(0);
       }, 2);
       (RecoverySecretRequestBottomSheet as any).current.snapTo(1);
-      (bottomSheet as any).current.snapTo(1);
+      (transactionTabBarBottomSheet as any).current.snapTo(1);
     }
   }, [custodyRequest, recoveryRequest]);
 
@@ -1877,25 +1941,16 @@ export default function Home(props) {
         />
       </TouchableWithoutFeedback> */}
       <BottomSheet
-        onOpenEnd={() => {
-          if (selected == 'QR') {
-            setQrBottomSheetsFlag(true);
-          } else {
-            setQrBottomSheetsFlag(false);
-          }
-        }}
         onCloseEnd={() => {
           setQrBottomSheetsFlag(false);
-          (bottomSheet as any).current.snapTo(1);
+          if(selected == 'Transactions')
+           (transactionTabBarBottomSheet as any).current.snapTo(1);
         }}
         onCloseStart={() => {
           setQrBottomSheetsFlag(false);
         }}
         enabledInnerScrolling={true}
-        // initialSnap={ zeroIndex }
-        // snapPoints={ snapPoints }
-        // callbackNode={ position }
-        ref={bottomSheet}
+        ref={transactionTabBarBottomSheet}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1906,8 +1961,88 @@ export default function Home(props) {
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
           hp('90%'),
         ]}
-        renderContent={renderContent1}
-        renderHeader={renderHeader}
+        renderContent={renderTransactionContent}
+        renderHeader={renderTransactionHeader}
+      />
+      <BottomSheet
+        onCloseEnd={() => {
+          setQrBottomSheetsFlag(false);
+          if(selected=="Add")
+          (addTabBarBottomSheet as any).current.snapTo(1);
+        }}
+        onCloseStart={() => {
+          setQrBottomSheetsFlag(false);
+        }}
+        enabledInnerScrolling={true}
+        ref={addTabBarBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch()
+            ? hp('18%')
+            : Platform.OS == 'android'
+            ? hp('20%')
+            : hp('19%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
+        ]}
+        renderContent={renderAddContent}
+        renderHeader={renderAddHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          if (selected == 'QR') {
+            setQrBottomSheetsFlag(true);
+          } else {
+            setQrBottomSheetsFlag(false);
+          }
+        }}
+        onCloseEnd={() => {
+          setQrBottomSheetsFlag(false);
+          if(selected=='QR')
+          (QrTabBarBottomSheet as any).current.snapTo(1);
+        }}
+        onCloseStart={() => {
+          setQrBottomSheetsFlag(false);
+        }}
+        enabledInnerScrolling={true}
+        // initialSnap={ zeroIndex }
+        // snapPoints={ snapPoints }
+        // callbackNode={ position }
+        // ref={bottomSheet}
+        ref={QrTabBarBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch()
+            ? hp('18%')
+            : Platform.OS == 'android'
+            ? hp('20%')
+            : hp('19%'),
+          hp('90%'),
+        ]}
+        renderContent={renderQrContent}
+        renderHeader={renderQrHeader}
+      />
+      <BottomSheet
+        onCloseEnd={() => {
+          setQrBottomSheetsFlag(false);
+          if(selected=="More")
+            (moreTabBarBottomSheet as any).current.snapTo(1);
+        }}
+        onCloseStart={() => {
+          setQrBottomSheetsFlag(false);
+        }}
+        enabledInnerScrolling={true}
+        ref={moreTabBarBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch()
+            ? hp('18%')
+            : Platform.OS == 'android'
+            ? hp('20%')
+            : hp('19%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
+        ]}
+        renderContent={renderMoreContent}
+        renderHeader={renderMoreHeader}
       />
       {/* <BottomSheet
         onCloseEnd={() => {
