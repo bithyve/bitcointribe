@@ -57,7 +57,7 @@ export default function Send(props) {
     : null;
   const serviceType = props.navigation.getParam('serviceType');
   const [recipientAddress, setRecipientAddress] = useState('');
-  const [amount, setAmount] = useState();
+  const [amount, setAmount] = useState('');
   const [token, setToken] = useState('');
   const [description, setDescription] = useState('');
   const [sliderValue, setSliderValue] = useState(0);
@@ -370,7 +370,8 @@ export default function Send(props) {
                       : 'Enter Amount in sats'
                   }
                   value={amount}
-                  onChangeText={setAmount}
+                  keyboardType={'numeric'}
+                  onChangeText={value => setAmount(value)}
                   placeholderTextColor={Colors.borderColor}
                   // onFocus={() => {
                   //   props.modalRef.current.snapTo(2);

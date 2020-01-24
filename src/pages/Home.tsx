@@ -258,7 +258,7 @@ export default function Home(props) {
       title: 'Test Account',
       unit: 'tsats',
       amount: '400,000',
-      account: `Test Account`,
+      account: `Learn Bitcoin`,
       accountType: 'test',
       bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
     },
@@ -280,6 +280,15 @@ export default function Home(props) {
       accountType: 'regular',
       bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
     },
+    // {
+    //   id: 4,
+    //   title: 'Add Account',
+    //   unit: '',
+    //   amount: '',
+    //   account: 'Add',
+    //   accountType: 'add',
+    //   bitcoinicon: require('../assets/images/icons/icon_add.png'),
+    // },
   ]);
 
   const [transactionData, setTransactionData] = useState([
@@ -1701,8 +1710,30 @@ export default function Home(props) {
             data={newData}
             extraData={{ balances, switchOn, walletName }}
             renderItem={Items => {
+              // if(newData.length - 1 == index){
+              //   return (
+              //     <TouchableOpacity>
+              //             <CardView cornerRadius={10} style={styles.card}>
+              //               <View style={{ flex: 1, justifyContent: 'center',alignItems: 'center' }}>
+              //                 <Image
+              //                   style={{ width: wp('10%'), height: wp('10%') }}
+              //                   source={require('../assets/images/icons/icon_add.png')}
+              //                 />
+              //                 <Text
+              //                   style={{
+              //                     color: Colors.textColorGrey,
+              //                     fontSize: RFValue(11),
+              //                   }}
+              //                 >
+              //                   Add Account
+              //                 </Text>
+              //                </View>
+              //             </CardView>
+              //           </TouchableOpacity>
+              //   )
+              // }
               return (
-                <View style={{ flexDirection: 'column' }}>
+                <View style={{ flexDirection: 'column' }}> 
                   {Items.item.map(value => {
                     return (
                       <TouchableOpacity
@@ -1760,9 +1791,7 @@ export default function Home(props) {
                                 fontSize: RFValue(11),
                               }}
                             >
-                              {value.accountType === 'test'
-                                ? `${walletName}'s ${value.account}`
-                                : value.account}
+                                {value.account}
                             </Text>
                             <View
                               style={{
@@ -1818,96 +1847,9 @@ export default function Home(props) {
               );
             }}
           />
-          {/* <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={ false }
-            data={ data }
-            extraData={ JSON.stringify( {
-              testBalance,
-              regularBalance,
-              secureBalance,
-            } ) }
-            renderItem={ Items => {
-              return (
-                <View style={ { flexDirection: 'column' } }>
-                  <TouchableOpacity
-                    onPress={ () => {
-                      props.navigation.navigate( 'Accounts', {
-                        serviceType:
-                          Items.item.accountType === 'test'
-                            ? TEST_ACCOUNT
-                            : Items.item.accountType === 'regular'
-                            ? REGULAR_ACCOUNT
-                            : SECURE_ACCOUNT,
-                      });
-                    }}
-                  >
-                    <CardView cornerRadius={ 10 } style={ styles.card }>
-                      <View style={ { flexDirection: 'row' } }>
-                        <Image
-                          style={ { width: wp( '10%' ), height: wp( '10%' ) } }
-                          source={ getIconByAccountType( Items.item.accountType ) }
-                        />
-                        { Items.item.accountType == 'secure' ? (
-                          <TouchableOpacity
-                            onPress={ () => {
-                              alert( '2FA' );
-                            } }
-                            style={ { marginLeft: 'auto' } }
-                          >
-                            <Text
-                              style={ {
-                                color: Colors.blue,
-                                fontSize: RFValue( 11, 812 ),
-                                fontFamily: Fonts.FiraSansRegular,
-                              } }
-                            >
-                              2FA
-                            </Text>
-                          </TouchableOpacity>
-                        ) : null }
-                      </View>
-                      <View style={ { flex: 1, justifyContent: 'flex-end' } }>
-                        <Text style={ styles.cardTitle }>{ Items.item.title }</Text>
-                        <Text
-                          style={ {
-                            color: Colors.textColorGrey,
-                            fontSize: RFValue( 11, 812 ),
-                          } }
-                        >
-                          { Items.item.account }
-                        </Text>
-                        <View
-                          style={ {
-                            flexDirection: 'row',
-                            alignItems: 'flex-end',
-                            marginTop: hp( '1%' ),
-                          } }
-                        >
-                          <Image
-                            style={ styles.cardBitCoinImage }
-                            source={ Items.item.bitcoinicon }
-                          />
-                          <Text style={ styles.cardAmountText }>
-                            { Items.item.accountType === 'test'
-                              ? testBalance
-                              : Items.item.accountType === 'regular'
-                              ? regularBalance
-                              : secureBalance}
-                          </Text>
-                          <Text style={ styles.cardAmountUnitText }>
-                            { Items.item.unit }
-                          </Text>
-                        </View>
-                      </View>
-                    </CardView>
-                  </TouchableOpacity>
-                </View>
-              );
-            } }
-          /> */}
         </View>
       </View>
+
       <BottomSheet
         onOpenEnd={() => {
           if (selected == 'QR') {
