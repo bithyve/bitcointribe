@@ -435,30 +435,6 @@ export default function ManageBackup(props) {
     );
   }
 
-  // useEffect(() => {
-  //   if (openmodal == 'closed') {
-  //     setTimeout(() => {
-  //       setQrBottomSheetsFlag(false);
-  //     }, 10);
-  //     (RestoreByCloudQrCode as any).current.snapTo(0);
-  //   }
-  //   if (openmodal == 'full') {
-  //     setTimeout(() => {
-  //       setQrBottomSheetsFlag(true);
-  //     }, 10);
-  //     (RestoreByCloudQrCode as any).current.snapTo(1);
-  //   }
-  // }, [openmodal]);
-
-  function openCloseModal() {
-    if (openmodal == 'closed') {
-      setOpenmodal('full');
-    }
-    if (openmodal == 'full') {
-      setOpenmodal('closed');
-    }
-  }
-
   const getContacts = async (selectedContacts, index) => {
     let contactList = JSON.parse(
       await AsyncStorage.getItem('SelectedContacts'),
@@ -1096,7 +1072,6 @@ export default function ManageBackup(props) {
     (async () => {
       if (!overallHealth) {
         const storedHealth = await AsyncStorage.getItem('overallHealth');
-        console.log('storedHealth', storedHealth);
         if (storedHealth) {
           setOverallHealth(JSON.parse(storedHealth));
         }
@@ -1479,9 +1454,10 @@ export default function ManageBackup(props) {
               marginRight: 10,
               padding: 10,
             }}
-            onPress={() => {
-              RegenerateShareHelperBottomSheet.current.snapTo(1);
-            }}
+            activeOpacity={1}
+            // onPress={() => {
+            //   RegenerateShareHelperBottomSheet.current.snapTo(1);
+            // }}
           >
             <Image
               source={require('../../assets/images/icons/icon_settings1.png')}
@@ -1545,7 +1521,6 @@ export default function ManageBackup(props) {
             </View>
           </View>
           {pageData.map((item, index) => {
-            console.log('item.time', typeof item.time);
             return (
               <View
                 style={{
@@ -1596,7 +1571,6 @@ export default function ManageBackup(props) {
                         setLoadOnTrustedContactBottomSheet(true);
                       }
                     } else if (item.type == 'copy1' || item.type == 'copy2') {
-                      console.log({ item });
                       // RestoreByCloudQrCode.current.snapTo(1);
                       AsyncStorage.getItem('pdfShared').then(pdfShared => {
                         let shared = JSON.parse(pdfShared);
@@ -1843,7 +1817,6 @@ export default function ManageBackup(props) {
               ...pdfShared,
               [type == 'copy2' ? 4 : 3]: true,
             };
-            console.log({ updatedPDFShared });
             await AsyncStorage.setItem(
               'pdfShared',
               JSON.stringify({

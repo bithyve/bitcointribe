@@ -98,6 +98,10 @@ export default function ShareRecoveryOTP(props) {
               alignItems: 'center',
               marginTop: hp('3%'),
               marginBottom: hp('3%'),
+              elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
             }}
           >
             <Text

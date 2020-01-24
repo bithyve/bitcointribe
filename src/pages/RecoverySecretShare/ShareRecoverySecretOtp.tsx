@@ -102,7 +102,10 @@ const ShareRecoverySecretOtp = props => {
                             <Text style={{ ...styles.commModeModalInfoText, marginBottom: hp('3.5%') }}>{"Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt"}</Text>
                             <View style={{ justifyContent: "center", alignItems: 'center', marginBottom: hp('5%'), paddingLeft: 20, paddingRight: 20, paddingBottom: 20 }}>
                                 {props.navigation.state.params.shareByType == 'qr' ?
-                                    <TouchableOpacity onPress={() => { props.navigation.navigate("QrScanner", { scanedCode: getQrCodeData }) }} style={{ backgroundColor: Colors.blue, height: wp('13%'), borderRadius: 10, width: wp('50%'), justifyContent: 'center', alignItems: 'center' }}>
+                                    <TouchableOpacity onPress={() => { props.navigation.navigate("QrScanner", { scanedCode: getQrCodeData }) }} style={{ backgroundColor: Colors.blue, height: wp('13%'), borderRadius: 10, width: wp('50%'), justifyContent: 'center', alignItems: 'center', elevation: 10,
+                                    shadowColor: Colors.shadowBlue,
+                                    shadowOpacity: 1,
+                                    shadowOffset: { width: 15, height: 15 }, }}>
                                         <Text style={styles.buttonText}>{"Share via QR"}</Text>
                                     </TouchableOpacity>
                                     :

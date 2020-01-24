@@ -106,7 +106,6 @@ export default function SecondaryDeviceModelContents(props) {
             ) : (
                     <QRCode value={secondaryQR} size={hp("27%")} />
                 )}
-            {secondaryQR ? <CopyThisText text={secondaryQR} /> : null}
             <AppBottomSheetTouchableWrapper onPress={()=>props.onPressOk()} style={{backgroundColor:Colors.blue, borderRadius:10, width:wp('50%'), height:wp('13%'), justifyContent:'center', alignItems:'center', marginTop:hp('3%'), marginBottom:hp('3%')}}>
                 <Text style={{color:Colors.white, fontSize:RFValue(13), fontFamily:Fonts.FiraSansMedium}}>Yes, I have shared</Text>
             </AppBottomSheetTouchableWrapper>

@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  ScrollView,
   ActivityIndicator,
   Alert,
   AsyncStorage,
@@ -30,6 +29,7 @@ import { nameToInitials } from '../../common/CommonFunctions';
 import Contacts from 'react-native-contacts';
 import * as ExpoContacts from 'expo-contacts';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import {ScrollView} from "react-native-gesture-handler";
 
 export default function CommunicationMode(props) {
   // const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
@@ -60,25 +60,36 @@ export default function CommunicationMode(props) {
           type: number ? 'number' : 'email',
         };
       }
-    }),
-  );
+    }));
 
-  useEffect(() => {
-    (async () => {
-      let contactListArray = [];
-      const contactList = JSON.parse(
-        await AsyncStorage.getItem('SelectedContacts'),
-      );
-      if (contactList) {
-        contactListArray = contactList;
-        for (let i = 0; i < contactListArray.length; i++) {
-          if (contact.id == contactListArray[i].id) {
-            setContact(contactListArray[i]);
-          }
+  useEffect(()=>{
+    setContact(contact);
+  });
+  
+  useEffect(()=>{
+    updateNewContactInfo();
+  },[Contact]);
+
+  const updateNewContactInfo = () =>{
+    let communicationInfo = [];
+    if (contact.phoneNumbers) communicationInfo.push(...contact.phoneNumbers);
+    if (contact.emails) communicationInfo.push(...contact.emails);
+    if(contactInfo.length == 0 || (contactInfo.length>0 && communicationInfo.findIndex((value)=>value.email ==contactInfo[0].info || value.number ==contactInfo[0].info)==-1 )){
+      let contactInfoTemp = communicationInfo.map(({ number, email }, index) => {
+        if (number || email) {
+          return {
+            id: index,
+            info: number || email,
+            isSelected: false,
+            type: number ? 'number' : 'email',
+          };
         }
-      }
-    })();
-  }, []);
+      });
+      setTimeout(() => {
+        setContactInfo(contactInfoTemp);
+      }, 2);
+    }
+  }
 
   const getIconByStatus = status => {
     if (status == 'error') {
@@ -89,34 +100,6 @@ export default function CommunicationMode(props) {
       return require('../../assets/images/icons/icon_check.png');
     }
   };
-
-  useEffect(() => {
-    let contactInfo = communicationInfo.map(({ number, email }, index) => {
-      if (number || email) {
-        return {
-          id: index,
-          info: number || email,
-          isSelected: false,
-          type: number ? 'number' : 'email',
-        };
-      }
-    });
-    setContactInfo(contactInfo);
-  }, [contactInfo]);
-
-  useEffect(() => {
-    let contactInfo = communicationInfo.map(({ number, email }, index) => {
-      if (number || email) {
-        return {
-          id: index,
-          info: number || email,
-          isSelected: false,
-          type: number ? 'number' : 'email',
-        };
-      }
-    });
-    setContactInfo(contactInfo);
-  }, [contactInfo]);
 
   const onContactSelect = index => {
     setContactInfo([
@@ -141,6 +124,14 @@ export default function CommunicationMode(props) {
       setSelectedContactMode(null);
     }
   };
+
+  useEffect(()=>{
+    if(!selectedContactMode){
+      let temp = [];setTimeout(() => {
+        setContactInfo(temp);
+      }, 1000);
+    }
+  }, [selectedContactMode])
 
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
     state => state.storage.database,
@@ -227,7 +218,7 @@ export default function CommunicationMode(props) {
 
     Contacts.openExistingContact(newPerson, async (err, contact) => {
       if (err) throw err;
-      console.log('contact editContact', contact);
+      // console.log('contact editContact', contact);
       if (contact) {
         let contactListArray = [];
         const contactList = JSON.parse(
@@ -274,24 +265,6 @@ export default function CommunicationMode(props) {
       }
     });
   };
-
-  useEffect(() => {
-    setContact(contact);
-    // (async () => {
-    //   if (Contact) {
-    //     let contactListArray = [];
-    //     contactListArray = Contact;
-    //     for (let i = 0; i < contactListArray.length; i++) {
-    //       if (Contact.recordID == contactListArray[i].id) {
-    //         await AsyncStorage.setItem(
-    //           'SelectedContacts',
-    //           JSON.stringify(contactListArray[i]),
-    //         );
-    //       }
-    //     }
-    //   }
-    // })();
-  }, [Contact]);
 
   return (
     <View
@@ -375,7 +348,7 @@ export default function CommunicationMode(props) {
                 alignItems: 'center',
               }}
             >
-              {Contact.imageAvailable ? (
+              {contact.imageAvailable ? (
                 <Image
                   source={contact.image}
                   style={{ ...styles.contactProfileImage }}
@@ -408,6 +381,7 @@ export default function CommunicationMode(props) {
         <View style={{ height: hp('20%') }}>
           <ScrollView>
             {contactInfo.map((item, index) => {
+              // console.log("contact commmunication", contact);
               return (
                 <AppBottomSheetTouchableWrapper
                   onPress={() => onContactSelect(index)}
@@ -429,7 +403,7 @@ export default function CommunicationMode(props) {
         </View>
         {selectedContactMode ? (
           <AppBottomSheetTouchableWrapper
-            onPress={() => communicate(selectedContactMode)}
+            onPress={() =>{ setSelectedContactMode(null); communicate(selectedContactMode)}}
             disabled={loading.uploadMetaShare}
             style={{
               ...styles.proceedButtonView,
