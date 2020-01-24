@@ -111,6 +111,10 @@ const SecureScan = props => {
               justifyContent: 'center',
               alignItems: 'center',
               borderRadius: 10,
+              elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
             }}
           >
             <Text

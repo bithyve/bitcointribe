@@ -48,11 +48,11 @@ const TwoFASetup = props => {
             Setup Two Factor Authentication
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
-            Please scan the following QR in Google Authenticator{'\n'}in order
+          Please scan the following QR on your authenticator app like Google Authenticator{'\n'}in order
             to setup the 2FA
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
-            Google Authenticator app should be{'\n'}installed on another device
+          The authenticator app should be{'\n'}installed on another device like your Secondary Device
           </Text>
         </View>
       </View>
@@ -74,6 +74,10 @@ const TwoFASetup = props => {
               justifyContent: 'center',
               alignItems: 'center',
               borderRadius: 10,
+              elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
             }}
           >
             <Text

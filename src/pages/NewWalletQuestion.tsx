@@ -115,7 +115,7 @@ export default function NewWalletQuestion(props) {
         style={styles.buttonView}
       >
         {!loading.initializing ? (
-          <Text style={styles.buttonText}>Confirm & Proceed</Text>
+          <Text style={styles.buttonText}>Confirm</Text>
         ) : (
           <ActivityIndicator size="small" />
         )}
@@ -450,8 +450,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
-    shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
     backgroundColor: Colors.blue,
   },
   buttonText: {

@@ -1454,9 +1454,10 @@ export default function ManageBackup(props) {
               marginRight: 10,
               padding: 10,
             }}
-            onPress={() => {
-              RegenerateShareHelperBottomSheet.current.snapTo(1);
-            }}
+            activeOpacity={1}
+            // onPress={() => {
+            //   RegenerateShareHelperBottomSheet.current.snapTo(1);
+            // }}
           >
             <Image
               source={require('../../assets/images/icons/icon_settings1.png')}

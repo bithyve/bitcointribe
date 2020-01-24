@@ -402,7 +402,7 @@ function Accounts(props) {
             </Text>
             <Text style={styles.cardAmountUnitText}>
               {item.accountType == 'Test Account'
-                ? 'tsats'
+                ? 't-sats'
                 : switchOn
                 ? 'sats'
                 : 'usd'}
@@ -1203,7 +1203,7 @@ function Accounts(props) {
                   <Text style={styles.bottomCardTitleText}>Send</Text>
                   <Text style={styles.bottomCardInfoText}>
                     Tran Fee : {staticFees['high']} (
-                    {serviceType === TEST_ACCOUNT ? 'tsats' : 'sats'})
+                    {serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'})
                   </Text>
                 </View>
               </WalkthroughableTouchableOpacity>
@@ -1233,7 +1233,7 @@ function Accounts(props) {
                   <Text style={styles.bottomCardTitleText}>Receive</Text>
                   <Text style={styles.bottomCardInfoText}>
                     Tran Fee : {staticFees['high']} (
-                    {serviceType === TEST_ACCOUNT ? 'tsats' : 'sats'})
+                    {serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'})
                   </Text>
                 </View>
               </WalkthroughableTouchableOpacity>

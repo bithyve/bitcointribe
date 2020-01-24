@@ -366,7 +366,7 @@ export default function Send(props) {
                   style={{ ...styles.textBox, paddingLeft: 10 }}
                   placeholder={
                     serviceType === TEST_ACCOUNT
-                      ? 'Enter Amount in tsats'
+                      ? 'Enter Amount in t-sats'
                       : 'Enter Amount in sats'
                   }
                   value={amount}
@@ -505,7 +505,7 @@ export default function Send(props) {
                         : 'high'
                     ]
                   }
-                  {serviceType === TEST_ACCOUNT ? ' tsats' : ' sats'})
+                  {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
                 </Text>
               </View>
             </View>
@@ -558,7 +558,11 @@ export default function Send(props) {
                   );
                 }}
                 disabled={loading.transfer}
-                style={styles.confirmButtonView}
+                style={{...styles.confirmButtonView,backgroundColor: Colors.blue,
+                  elevation: 10,
+                  shadowColor: Colors.shadowBlue,
+                  shadowOpacity: 1,
+                  shadowOffset: { width: 15, height: 15 },}}
               >
                 {loading.transfer ? (
                   <ActivityIndicator size="small" />
@@ -570,7 +574,6 @@ export default function Send(props) {
                 style={{
                   ...styles.confirmButtonView,
                   width: wp('30%'),
-                  backgroundColor: Colors.white,
                 }}
                 onPress={() => {
                   dispatch(clearTransfer(serviceType));
@@ -697,7 +700,6 @@ const styles = StyleSheet.create({
   confirmButtonView: {
     width: wp('50%'),
     height: wp('13%'),
-    backgroundColor: Colors.blue,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,

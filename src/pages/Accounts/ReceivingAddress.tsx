@@ -229,7 +229,7 @@ const ReceivingAddress = props => {
           <BottomInfoBox
             title={'Note'}
             infoText={
-              'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna'
+              'The QR code is your bitcoin address. The payer will scan it to send bitcoins. Alternatively copy the address displayed below it and send it to the payer'
             }
           />
         </View>

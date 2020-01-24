@@ -15,6 +15,8 @@ import {
   Linking,
   Alert,
   Keyboard,
+  Dimensions,
+  TouchableWithoutFeedback
 } from 'react-native';
 import CardView from 'react-native-cardview';
 import Fonts from './../common/Fonts';
@@ -25,7 +27,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import Animated from 'react-native-reanimated'
 import Colors from '../common/Colors';
 import DeviceInfo from 'react-native-device-info';
 import ToggleSwitch from '../components/ToggleSwitch';
@@ -81,6 +83,13 @@ import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouc
 import { getTestcoins } from '../store/actions/accounts';
 import axios from 'axios';
 import { UsNumberFormat } from '../common/utilities';
+
+// const { Value, abs, sub, min } = Animated
+// const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
+// const position = new Value( 1 )
+// const opacity = min( abs( sub( position, 1 ) ), 0.8 )
+// const zeroIndex = snapPoints.length - 1
+// const height = snapPoints[ 0 ]
 
 export default function Home(props) {
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
@@ -256,7 +265,7 @@ export default function Home(props) {
     {
       id: 1,
       title: 'Test Account',
-      unit: 'tsats',
+      unit: 't-sats',
       amount: '400,000',
       account: `Learn Bitcoin`,
       accountType: 'test',
@@ -280,15 +289,15 @@ export default function Home(props) {
       accountType: 'regular',
       bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
     },
-    // {
-    //   id: 4,
-    //   title: 'Add Account',
-    //   unit: '',
-    //   amount: '',
-    //   account: 'Add',
-    //   accountType: 'add',
-    //   bitcoinicon: require('../assets/images/icons/icon_add.png'),
-    // },
+    {
+      id: 4,
+      title: 'Add Account',
+      unit: '',
+      amount: '',
+      account: '',
+      accountType: 'add',
+      bitcoinicon: require('../assets/images/icons/icon_add.png'),
+    },
   ]);
 
   const [transactionData, setTransactionData] = useState([
@@ -1710,31 +1719,32 @@ export default function Home(props) {
             data={newData}
             extraData={{ balances, switchOn, walletName }}
             renderItem={Items => {
-              // if(newData.length - 1 == index){
-              //   return (
-              //     <TouchableOpacity>
-              //             <CardView cornerRadius={10} style={styles.card}>
-              //               <View style={{ flex: 1, justifyContent: 'center',alignItems: 'center' }}>
-              //                 <Image
-              //                   style={{ width: wp('10%'), height: wp('10%') }}
-              //                   source={require('../assets/images/icons/icon_add.png')}
-              //                 />
-              //                 <Text
-              //                   style={{
-              //                     color: Colors.textColorGrey,
-              //                     fontSize: RFValue(11),
-              //                   }}
-              //                 >
-              //                   Add Account
-              //                 </Text>
-              //                </View>
-              //             </CardView>
-              //           </TouchableOpacity>
-              //   )
-              // }
               return (
                 <View style={{ flexDirection: 'column' }}> 
                   {Items.item.map(value => {
+                    if(value.accountType === 'add'){
+                      return (
+                            <TouchableOpacity>
+                                    <CardView cornerRadius={10} style={styles.card}>
+                                      <View style={{ flex: 1, justifyContent: 'center',alignItems: 'center' }}>
+                                        <Image
+                                          style={{ width: wp('10%'), height: wp('10%') }}
+                                          source={require('../assets/images/icons/icon_add.png')}
+                                        />
+                                        <Text
+                                          style={{
+                                            color: Colors.textColorGrey,
+                                            fontSize: RFValue(11),
+                                          }}
+                                        >
+                                          Add Account
+                                        </Text>
+                                       </View>
+                                    </CardView>
+                                  </TouchableOpacity>
+                          )
+                    }
+                    else{
                     return (
                       <TouchableOpacity
                         onPress={() => {
@@ -1842,6 +1852,7 @@ export default function Home(props) {
                         </CardView>
                       </TouchableOpacity>
                     );
+                                }
                   })}
                 </View>
               );
@@ -1849,7 +1860,22 @@ export default function Home(props) {
           />
         </View>
       </View>
-
+      {/* <TouchableWithoutFeedback>
+        <Animated.View
+          style={
+            {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              flex: 1,
+              backgroundColor: '#000',
+              opacity,
+            }
+          }
+        />
+      </TouchableWithoutFeedback> */}
       <BottomSheet
         onOpenEnd={() => {
           if (selected == 'QR') {
@@ -1866,6 +1892,9 @@ export default function Home(props) {
           setQrBottomSheetsFlag(false);
         }}
         enabledInnerScrolling={true}
+        // initialSnap={ zeroIndex }
+        // snapPoints={ snapPoints }
+        // callbackNode={ position }
         ref={bottomSheet}
         snapPoints={[
           -50,

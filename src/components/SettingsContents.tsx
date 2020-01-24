@@ -30,7 +30,7 @@ export default function SettingsContents(props) {
             </View>
         </View>
         <View style={{ flex: 1 }}>
-            <View style={styles.selectedContactsView}>
+            {/* <View style={styles.selectedContactsView}>
                 <Image source={require('../assets/images/icons/icon_secrets.png')} style={{ width: wp('7%'), height: wp('7%'), resizeMode: 'contain', marginLeft: 0, marginRight: 10 }} />
                 <View style={{ justifyContent: 'center', marginRight: 10 }}>
                     <Text style={styles.titleText}>Jumble Keyboard</Text>
@@ -39,12 +39,12 @@ export default function SettingsContents(props) {
                 <View style={{ marginLeft: 'auto' }}>
                     <ToggleSwitch isNotImage={true} toggleColor={Colors.lightBlue} toggleCircleColor={Colors.blue} onpress={() => { setSwitchOn(!switchOn); }} toggle={switchOn} />
                 </View>
-            </View>
+            </View> */}
             <AppBottomSheetTouchableWrapper onPress={()=>props.onPressManagePIn()} style={{ ...styles.selectedContactsView, marginBottom: hp('3%') }}>
             <Image source={require('../assets/images/icons/icon_secrets.png')} style={{ width: wp('7%'), height: wp('7%'), resizeMode: 'contain', marginLeft: 0, marginRight: 10 }} />
                 <View>
                     <Text style={styles.titleText}>Manage Pin</Text>
-                    <Text style={styles.infoText}>Lorem ipsum dolor sit amet, consectetur</Text>
+                    <Text style={styles.infoText}>Manage Passcode Change your passcode</Text>
                 </View>
                 <View style={{width: wp('17%'), justifyContent:'center', alignItems:'center'}}>
                 <Ionicons
