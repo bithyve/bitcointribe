@@ -46,6 +46,8 @@ export default function NewWalletQuestion(props) {
   );
   const [confirmAnswer, setConfirmAnswer] = useState('');
   const [answer, setAnswer] = useState('');
+  const [answerMasked, setAnswerMasked] = useState('');
+  const [confirmAnswerMasked, setConfirmAnswerMasked] = useState('');
   const [hideShowConfirmAnswer, setHideShowConfirmAnswer] = useState(true);
   const [hideShowAnswer, setHdeShowAnswer] = useState(true);
   let [counter, setCounter] = useState(0);
@@ -80,7 +82,11 @@ export default function NewWalletQuestion(props) {
     console.log('event,key', event.nativeEvent.key);
 
     if (event.nativeEvent.key == 'Backspace') {
+      setTimeout(() => {
       setAnsError('');
+      setConfirmAnswer('')
+      setConfirmAnswerMasked('');
+    }, 70);
     }
   };
 
@@ -232,15 +238,17 @@ export default function NewWalletQuestion(props) {
                   >
                     <TextInput
                       style={styles.modalInputBox}
-                      secureTextEntry={hideShowAnswer}
                       placeholder={'Enter your answer'}
                       placeholderTextColor={Colors.borderColor}
-                      value={answer}
+                      value={hideShowAnswer ? answerMasked : answer}
                       autoCompleteType="off"
                       textContentType="none"
                       autoCorrect={false}
                       autoCapitalize="none"
-                      onChangeText={text => setAnswer(text)}
+                      onChangeText={text => {
+                        setAnswer(text)
+                        setAnswerMasked(text);
+                      }}
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
                         setAnswerInputStyle(styles.inputBoxFocused);
@@ -248,6 +256,20 @@ export default function NewWalletQuestion(props) {
                       onBlur={() => {
                         setAnswerInputStyle(styles.inputBox);
                         setDropdownBoxOpenClose(false);
+                        let temp='';
+                        for(let i = 0; i<answer.length;i++){
+                          temp+='*'
+                        }
+                        console.log("temp", temp, answer)
+                        setAnswerMasked(temp);
+                      }}
+                      onKeyPress={e => {
+                        if (e.nativeEvent.key === "Backspace") {
+                          setTimeout(() => {
+                        setAnswer('')
+                        setAnswerMasked('');
+                      }, 70);
+                        }
                       }}
                     />
                     <TouchableWithoutFeedback
@@ -276,10 +298,9 @@ export default function NewWalletQuestion(props) {
                   >
                     <TextInput
                       style={styles.modalInputBox}
-                      secureTextEntry={hideShowConfirmAnswer}
                       placeholder={'Confirm your answer'}
                       placeholderTextColor={Colors.borderColor}
-                      //value={confirmAnswer}
+                      value={hideShowAnswer ? confirmAnswerMasked : confirmAnswer}
                       textContentType="none"
                       autoCompleteType="off"
                       autoCorrect={false}
@@ -296,6 +317,7 @@ export default function NewWalletQuestion(props) {
                           Keyboard.dismiss();
                         }
                         setConfirmAnswer(text);
+                        setConfirmAnswerMasked(text);
                       }}
                       onSubmitEditing={event => setConfirm(event.nativeEvent)}
                       onFocus={() => {
@@ -305,7 +327,14 @@ export default function NewWalletQuestion(props) {
                       onBlur={() => {
                         setConfirmAnswerInputStyle(styles.inputBox);
                         setDropdownBoxOpenClose(false);
+                        let temp='';
+                        for(let i = 0; i<confirmAnswer.length;i++){
+                          temp+='*'
+                        }
+                        console.log("temp", temp, confirmAnswer)
+                        setConfirmAnswerMasked(temp);
                       }}
+                      
                     />
                     <TouchableWithoutFeedback
                       onPress={() => {
@@ -430,7 +459,6 @@ const styles = StyleSheet.create({
     paddingLeft: 30,
     paddingRight: 30,
     paddingBottom: 40,
-    paddingTop: 30,
     alignItems: 'center',
   },
   statusIndicatorView: {
