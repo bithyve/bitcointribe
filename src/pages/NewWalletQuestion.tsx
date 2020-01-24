@@ -32,6 +32,7 @@ import BottomInfoBox from '../components/BottomInfoBox';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { initializeSetup } from '../store/actions/setupAndAuth';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default function NewWalletQuestion(props) {
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
@@ -106,6 +107,10 @@ export default function NewWalletQuestion(props) {
             answer,
           };
           dispatch(initializeSetup(walletName, security));
+          AsyncStorage.setItem(
+            'SecurityAnsTimestamp',
+            JSON.stringify(Date.now()),
+          );
         }}
         style={styles.buttonView}
       >

@@ -41,7 +41,7 @@ export default function CommunicationMode(props) {
     : null;
 
   const contact = props.contact;
-  const index = props.index;
+  const index = props.index + 1; // synching w/ share indexes in DB
   if (!contact) return <View></View>;
   const dispatch = useDispatch();
 
@@ -398,8 +398,7 @@ export default function CommunicationMode(props) {
                       lineHeight: 13, //... One for top and one for bottom alignment
                     }}
                   >
-
-                    {contact.name? nameToInitials(contact.name): ""}
+                    {contact.name ? nameToInitials(contact.name) : ''}
                   </Text>
                 </View>
               )}

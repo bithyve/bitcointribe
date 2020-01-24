@@ -1195,7 +1195,7 @@ export default function ManageBackup(props) {
         }
       });
       setPageData(updatedPageData);
-      autoHighlightOptions();
+      //  autoHighlightOptions();
     }
   }, [overallHealth]);
 
