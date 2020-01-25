@@ -87,11 +87,12 @@ const TrustedContacts = props => {
             send Recovery Secrets
           </Text>
         </Text>
+        {props.LoadContacts ?
         <ContactList
           style={{}}
           onPressContinue={onPressContinue}
           onSelectContact={selectedContactsList}
-        />
+        />: null}
       </View>
     </View>
   );

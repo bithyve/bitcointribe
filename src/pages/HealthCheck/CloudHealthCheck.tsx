@@ -83,6 +83,7 @@ export default function CloudHealthCheck(props) {
                         borderRadius: 20,
                         marginTop: hp('3%')
                     }}>
+                        {props.LoadCamera?
                         <RNCamera
                             ref={(ref) => { this.cameraRef = ref; }}
                             style={{
@@ -101,6 +102,7 @@ export default function CloudHealthCheck(props) {
                                 <View style={{ borderBottomWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderBottomColor: 'white', height: hp('5%'), width: hp('5%'), marginLeft: 'auto' }} />
                             </View>
                         </RNCamera>
+                        : null}
                     </View>
                 </View>
             </View>

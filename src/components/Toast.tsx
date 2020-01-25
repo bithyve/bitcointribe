@@ -10,7 +10,7 @@ export default (message) => {
     hideOnPress: true,
     delay: 0,
     opacity: 0.9,
-    backgroundColor: Colors.blue,
+    backgroundColor: 'rgba(0, 108, 180, 0.5)',
     textColor: Colors.white,
   });
 };
