@@ -53,9 +53,9 @@ export default function AddressBookContents(props) {
       </View>
       <View>
         <Text style={styles.pageTitle}>You are the Guardian of</Text>
-        <Text style={styles.pageInfoText}>
+        {/* <Text style={styles.pageInfoText}>
           Lorem ipsum dolor sit amet, consectetur adipiscing
-        </Text>
+        </Text> */}
       </View>
       <View style={{ flex: 1, flexDirection: "row", marginBottom: 15 }}>
         <FlatList
@@ -83,9 +83,9 @@ export default function AddressBookContents(props) {
 
       <View>
         <Text style={styles.pageTitle}>Guardians of your Secrets</Text>
-        <Text style={styles.pageInfoText}>
+        {/* <Text style={styles.pageInfoText}>
           Lorem ipsum dolor sit amet, consectetur adipiscing
-        </Text>
+        </Text> */}
       </View>
       <View style={{ flex: 1, flexDirection: "row", marginBottom: 15  }}>
           <FlatList
