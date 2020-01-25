@@ -62,6 +62,7 @@ export default function Send(props) {
   const [description, setDescription] = useState('');
   const [sliderValue, setSliderValue] = useState(0);
   const [sliderValueText, setSliderValueText] = useState('Low Fee');
+  const [isSendHelperDone, setIsSendHelperDone] = useState(true);
   // const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
   //   React.createRef(),
   // );
@@ -74,8 +75,17 @@ export default function Send(props) {
     if (!isSendHelperDone && serviceType == TEST_ACCOUNT) {
       await AsyncStorage.setItem('isSendHelperDone', 'true');
       setTimeout(() => {
+        setIsSendHelperDone(true);
+      }, 10);
+      
+      setTimeout(() => {
         SendHelperBottomSheet.current.snapTo(1);
       }, 1000);
+    }
+    else{
+      setTimeout(() => {
+        setIsSendHelperDone(false);
+      }, 10);
     }
   };
   const [openmodal, setOpenmodal] = useState('closed');
@@ -170,7 +180,15 @@ export default function Send(props) {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          (SendHelperBottomSheet as any).current.snapTo(0);
+          console.log("isSendHelperDone",isSendHelperDone);
+          if (isSendHelperDone) {
+          (SendHelperBottomSheet as any).current.snapTo(2);
+          setTimeout(() => {
+            setIsSendHelperDone(false);
+          }, 10);
+          } else{
+            (SendHelperBottomSheet as any).current.snapTo(0);
+          }
         }}
       />
     );
@@ -178,7 +196,11 @@ export default function Send(props) {
 
   const getQrCodeData = qrData => {
     console.log('Qrcodedata', qrData);
-    setRecipientAddress(qrData);
+    if(qrData){
+      (bottomSheet as any).current.snapTo(0);
+      setRecipientAddress(qrData);
+    }
+    
   };
 
   const renderContent1 = () => {
@@ -305,7 +327,7 @@ export default function Send(props) {
                   <Text
                     onPress={() => {
                       AsyncStorage.setItem('isSendHelperDone', 'true');
-                      SendHelperBottomSheet.current.snapTo(1);
+                      SendHelperBottomSheet.current.snapTo(2);
                     }}
                     style={{
                       color: Colors.textColorGrey,
@@ -497,13 +519,13 @@ export default function Send(props) {
                 >
                   {sliderValueText} (
                   {
-                    staticFees[
+                    staticFees ? staticFees[
                       sliderValueText === 'Low Fee'
                         ? 'low'
                         : sliderValueText === 'In the middle'
                         ? 'medium'
                         : 'high'
-                    ]
+                    ] : ''
                   }
                   {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
                 </Text>
@@ -591,7 +613,11 @@ export default function Send(props) {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={SendHelperBottomSheet}
-          snapPoints={[-50, hp('95%')]}
+          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('18%')
+          : Platform.OS == 'android'
+          ? hp('20%')
+          : hp('19%'),hp('95%')]}
           renderContent={renderSendHelperContents}
           renderHeader={renderSendHelperHeader}
         />
@@ -648,6 +674,7 @@ const styles = StyleSheet.create({
     color: Colors.blue,
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
+    marginLeft: 15
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,

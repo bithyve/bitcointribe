@@ -10,8 +10,10 @@ import {
   AsyncStorage,
   Button,
   ScrollView,
+  Platform,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
+import DeviceInfo from 'react-native-device-info';
 import BackupStyles from '../ManageBackup/Styles';
 import {
   widthPercentageToDP as wp,
@@ -52,17 +54,39 @@ const ReceivingAddress = props => {
   );
   const { receivingAddress } =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
+    const [isReceiveHelperDone, setIsReceiveHelperDone] = useState(true);
 
   const checkNShowHelperModal = async () => {
-    let isReceiveHelperDone = await AsyncStorage.getItem('isReceiveHelperDone');
-    if (!isReceiveHelperDone && serviceType == TEST_ACCOUNT) {
+    let isReceiveHelperDone1 = await AsyncStorage.getItem('isReceiveHelperDone');
+    console.log("isReceiveHelperDone1", isReceiveHelperDone,isReceiveHelperDone1)
+    if (!isReceiveHelperDone1 && serviceType == TEST_ACCOUNT) {
       await AsyncStorage.setItem('isReceiveHelperDone', 'true');
+      setTimeout(() => {
+        setIsReceiveHelperDone(true);
+      }, 10);
       setTimeout(() => {
         ReceiveHelperBottomSheet.current.snapTo(1);
       }, 1000);
     }
+    else{
+      setTimeout(() => {
+        setIsReceiveHelperDone(false);
+      }, 10);
+    }
   };
 
+  useEffect(() => {
+    checkNShowHelperModal();
+    (async () => {
+      if (serviceType === SECURE_ACCOUNT) {
+        if (!(await AsyncStorage.getItem('savingsWarning'))) {
+        // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
+        SecureReceiveWarningBottomSheet.current.snapTo(1);
+        await AsyncStorage.setItem('savingsWarning', 'true');
+         }
+      }
+    })();
+  }, []);
   const renderReceiveHelperContents = useCallback(() => {
     return (
       <TestAccountHelperModalContents
@@ -88,17 +112,25 @@ const ReceivingAddress = props => {
     );
   }, [serviceType]);
 
-  const renderReceiveHelperHeader = useCallback(() => {
+  const renderReceiveHelperHeader = () => {
     return (
       <SmallHeaderModal
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          (ReceiveHelperBottomSheet as any).current.snapTo(0);
+          console.log("isReceiveHelperDone",isReceiveHelperDone);
+          if (isReceiveHelperDone) {
+            (ReceiveHelperBottomSheet as any).current.snapTo(2);
+            setTimeout(() => {
+              setIsReceiveHelperDone(false);
+            }, 10);
+          } else{
+            (ReceiveHelperBottomSheet as any).current.snapTo(0);
+          }
         }}
       />
     );
-  }, []);
+  }
 
   const renderSecureReceiveWarningContents = useCallback(() => {
     return (
@@ -148,26 +180,10 @@ const ReceivingAddress = props => {
     );
   }, []);
 
-  useEffect(() => {
-    checkNShowHelperModal();
-  }, []);
-
   const dispatch = useDispatch();
   useEffect(() => {
     if (!receivingAddress) dispatch(fetchAddress(serviceType));
   }, [serviceType]);
-
-  useEffect(() => {
-    (async () => {
-      if (serviceType === SECURE_ACCOUNT) {
-        if (!(await AsyncStorage.getItem('savingsWarning'))) {
-        // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
-        SecureReceiveWarningBottomSheet.current.snapTo(1);
-        await AsyncStorage.setItem('savingsWarning', 'true');
-         }
-      }
-    })();
-  }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -198,7 +214,7 @@ const ReceivingAddress = props => {
               <Text
                 onPress={() => {
                   AsyncStorage.setItem('isReceiveHelperDone', 'true');
-                  ReceiveHelperBottomSheet.current.snapTo(1);
+                  ReceiveHelperBottomSheet.current.snapTo(2);
                 }}
                 style={{
                   color: Colors.textColorGrey,
@@ -236,7 +252,11 @@ const ReceivingAddress = props => {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={ReceiveHelperBottomSheet}
-          snapPoints={[-50, hp('95%')]}
+          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('18%')
+          : Platform.OS == 'android'
+          ? hp('20%')
+          : hp('19%'),hp('95%')]}
           renderContent={renderReceiveHelperContents}
           renderHeader={renderReceiveHelperHeader}
         />

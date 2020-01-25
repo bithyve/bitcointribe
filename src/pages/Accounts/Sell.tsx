@@ -15,6 +15,7 @@ import {
   StatusBar,
   AsyncStorage,
 } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -139,7 +140,7 @@ export default function Sell(props) {
                   <Text
                     onPress={() => {
                       AsyncStorage.setItem('isSellHelperDone', 'true');
-                      SellHelperBottomSheet.current.snapTo(1);
+                      SellHelperBottomSheet.current.snapTo(2);
                     }}
                     style={{
                       color: Colors.textColorGrey,
@@ -164,7 +165,11 @@ export default function Sell(props) {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={SellHelperBottomSheet}
-          snapPoints={[-50, hp('95%')]}
+          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('18%')
+          : Platform.OS == 'android'
+          ? hp('20%')
+          : hp('19%'),hp('95%')]}
           renderContent={renderSellHelperContents}
           renderHeader={renderSellHelperHeader}
         />
