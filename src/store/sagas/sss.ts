@@ -573,7 +573,9 @@ function* overallHealthWorker({ payload }) {
   );
 
   if (overallHealth) {
-    overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
+    // overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
+    overallHealth.overallStatus = parseInt(overallHealth.overallStatus); // Conversion: stages to percentage
+
     yield call(
       AsyncStorage.setItem,
       'overallHealth',
