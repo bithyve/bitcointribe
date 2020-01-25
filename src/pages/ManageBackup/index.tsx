@@ -252,10 +252,10 @@ export default function ManageBackup(props) {
   const [contacts, setContacts] = useState([]);
   const [isSecretShared1, setIsSecretShared1] = useState(false);
   const [isSecretShared2, setIsSecretShared2] = useState(false);
-  const [arrModalShareIntent, setArrModalShareIntent] = useState({
-    snapTop: 0,
-    item: {},
-  });
+  // const [arrModalShareIntent, setArrModalShareIntent] = useState({
+  //   snapTop: 0,
+  //   item: {},
+  // });
 
   const [cloudData, setCloudData] = useState([
     {
@@ -553,18 +553,18 @@ export default function ManageBackup(props) {
             }),
           );
 
-          if (
-            arrModalShareIntent.item &&
-            arrModalShareIntent.item.type == 'copy1'
-          ) {
-            AsyncStorage.setItem('personalCopy1AutoHighlightFlags', 'true');
-          } else if (
-            arrModalShareIntent.item &&
-            arrModalShareIntent.item.type == 'copy2'
-          ) {
-            AsyncStorage.setItem('personalCopy2AutoHighlightFlags', 'true');
-          }
-          setSelectedType('');
+          // if (
+          //   arrModalShareIntent.item &&
+          //   arrModalShareIntent.item.type == 'copy1'
+          // ) {
+          //   AsyncStorage.setItem('personalCopy1AutoHighlightFlags', 'true');
+          // } else if (
+          //   arrModalShareIntent.item &&
+          //   arrModalShareIntent.item.type == 'copy2'
+          // ) {
+          //   AsyncStorage.setItem('personalCopy2AutoHighlightFlags', 'true');
+          // }
+          // setSelectedType('');
         }}
       />
     );
@@ -574,7 +574,7 @@ export default function ManageBackup(props) {
     return (
       <ModalHeader
         onPressHeader={() => {
-          (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
+          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -967,16 +967,16 @@ export default function ManageBackup(props) {
       trustedContactsBottomSheet.current.snapTo(1);
       TrustedContactHistoryBottomSheet.current.snapTo(0);
     } else if (SelectTypeToReshare == 'copy1') {
-      setArrModalShareIntent({
-        snapTop: 1,
-        item: pageData[3],
-      });
+      // setArrModalShareIntent({
+      //   snapTop: 1,
+      //   item: pageData[3],
+      // });
       PersonalCopyHistoryBottomSheet.current.snapTo(0);
     } else if (SelectTypeToReshare == 'copy2') {
-      setArrModalShareIntent({
-        snapTop: 1,
-        item: pageData[4],
-      });
+      // setArrModalShareIntent({
+      //   snapTop: 1,
+      //   item: pageData[4],
+      // });
       PersonalCopyHistoryBottomSheet.current.snapTo(0);
     } else if (SelectTypeToReshare == 'security') {
       SecurityQuestionBottomSheet.current.snapTo(1);
@@ -1397,18 +1397,18 @@ export default function ManageBackup(props) {
       !personalCopy1AutoHighlightFlags ||
       personalCopy1AutoHighlightFlags != 'true'
     ) {
-      setArrModalShareIntent({
-        snapTop: 1,
-        item: pageData[3],
-      });
+      // setArrModalShareIntent({
+      //   snapTop: 1,
+      //   item: pageData[3],
+      // });
     } else if (
       !personalCopy2AutoHighlightFlags ||
       personalCopy2AutoHighlightFlags != 'true'
     ) {
-      setArrModalShareIntent({
-        snapTop: 1,
-        item: pageData[4],
-      });
+      // setArrModalShareIntent({
+      //   snapTop: 1,
+      //   item: pageData[4],
+      // });
     } else if (
       !securityAutoHighlightFlags ||
       securityAutoHighlightFlags != 'true'
