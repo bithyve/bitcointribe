@@ -922,7 +922,7 @@ export default class SSS {
       } else if (index === 4) {
         qrData[itr] = 'c0' + (itr + 1) + qrData[itr];
       }
-      if (itr === 1) {
+      if (itr === 0) {
         this.pdfHealth = {
           ...this.pdfHealth,
           [index]: {

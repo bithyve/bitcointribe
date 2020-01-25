@@ -16,7 +16,7 @@ import {
   Alert,
   Keyboard,
   Dimensions,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from 'react-native';
 import CardView from 'react-native-cardview';
 import Fonts from './../common/Fonts';
@@ -27,7 +27,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Animated from 'react-native-reanimated'
+import Animated from 'react-native-reanimated';
 import Colors from '../common/Colors';
 import DeviceInfo from 'react-native-device-info';
 import ToggleSwitch from '../components/ToggleSwitch';
@@ -256,10 +256,18 @@ export default function Home(props) {
   const [settingsBottomSheet, setSettingsBottomSheet] = useState(
     React.createRef(),
   );
-  const [transactionTabBarBottomSheet, setTransactionBottomSheet] = useState(React.createRef());
-  const [addTabBarBottomSheet, setAddTabBarBottomSheet] = useState(React.createRef());
-  const [QrTabBarBottomSheet, setQrTabBarBottomSheet] = useState(React.createRef());
-  const [moreTabBarBottomSheet, setMoreTabBarBottomSheet] = useState(React.createRef());
+  const [transactionTabBarBottomSheet, setTransactionBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [addTabBarBottomSheet, setAddTabBarBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [QrTabBarBottomSheet, setQrTabBarBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [moreTabBarBottomSheet, setMoreTabBarBottomSheet] = useState(
+    React.createRef(),
+  );
   const [newData, setNewData] = useState([]);
   const custodyRequest = props.navigation.getParam('custodyRequest');
   const recoveryRequest = props.navigation.getParam('recoveryRequest');
@@ -555,6 +563,7 @@ export default function Home(props) {
   const getQrCodeData = qrData => {
     // console.log('Qrcodedata', data);
     const scannedData = JSON.parse(qrData);
+    console.log({ scannedData });
     switch (scannedData.type) {
       case 'secondaryDeviceQR':
         const custodyRequest = {
@@ -578,7 +587,7 @@ export default function Home(props) {
   };
 
   function renderTransactionContent() {
-      return renderTransactionsContent();
+    return renderTransactionsContent();
   }
 
   function renderTransactionHeader() {
@@ -589,7 +598,7 @@ export default function Home(props) {
         style={styles.modalHeaderContainer}
       >
         <View style={styles.modalHeaderHandle} />
-        <Text style={styles.modalHeaderTitleText}>{"Transactions"}</Text>
+        <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
       </TouchableOpacity>
     );
   }
@@ -624,7 +633,7 @@ export default function Home(props) {
         style={styles.modalHeaderContainer}
       >
         <View style={styles.modalHeaderHandle} />
-        <Text style={styles.modalHeaderTitleText}>{"Add"}</Text>
+        <Text style={styles.modalHeaderTitleText}>{'Add'}</Text>
       </TouchableOpacity>
     );
   }
@@ -652,16 +661,14 @@ export default function Home(props) {
         style={styles.modalHeaderContainer}
       >
         <View style={styles.modalHeaderHandle} />
-        <Text style={styles.modalHeaderTitleText}>{"Qr"}</Text>
+        <Text style={styles.modalHeaderTitleText}>{'Qr'}</Text>
       </TouchableOpacity>
     );
   }
 
   function renderMoreContent() {
     return (
-      <MoreHomePageTabContents
-        onPressElements={item => onPressElement(item)}
-      />
+      <MoreHomePageTabContents onPressElements={item => onPressElement(item)} />
     );
   }
 
@@ -673,7 +680,7 @@ export default function Home(props) {
         style={styles.modalHeaderContainer}
       >
         <View style={styles.modalHeaderHandle} />
-        <Text style={styles.modalHeaderTitleText}>{"More"}</Text>
+        <Text style={styles.modalHeaderTitleText}>{'More'}</Text>
       </TouchableOpacity>
     );
   }
@@ -694,7 +701,7 @@ export default function Home(props) {
     setTimeout(() => {
       setQrBottomSheetsFlag(false);
     }, 10);
-    if(selected=="Transactions"){
+    if (selected == 'Transactions') {
       if (openmodal == 'closed') {
         (transactionTabBarBottomSheet as any).current.snapTo(1);
       }
@@ -704,8 +711,7 @@ export default function Home(props) {
       if (openmodal == 'full') {
         (transactionTabBarBottomSheet as any).current.snapTo(3);
       }
-    }
-    else if(selected=="Add"){
+    } else if (selected == 'Add') {
       if (openmodal == 'closed') {
         setTimeout(() => {
           setQrBottomSheetsFlag(false);
@@ -715,8 +721,7 @@ export default function Home(props) {
       if (openmodal == 'half' || openmodal == 'full') {
         (addTabBarBottomSheet as any).current.snapTo(2);
       }
-    }
-    else if(selected=="QR"){
+    } else if (selected == 'QR') {
       if (openmodal == 'closed') {
         setTimeout(() => {
           setQrBottomSheetsFlag(false);
@@ -729,8 +734,7 @@ export default function Home(props) {
         }, 10);
         (QrTabBarBottomSheet as any).current.snapTo(2);
       }
-    }
-    else if(selected=="More"){
+    } else if (selected == 'More') {
       if (openmodal == 'closed') {
         (moreTabBarBottomSheet as any).current.snapTo(1);
       }
@@ -751,7 +755,7 @@ export default function Home(props) {
       addTabBarBottomSheet.current.snapTo(0);
       QrTabBarBottomSheet.current.snapTo(0);
       moreTabBarBottomSheet.current.snapTo(2);
-    } 
+    }
     if (tabTitle == 'Transactions') {
       setTimeout(() => {
         setModaldata(transactionData);
@@ -761,7 +765,8 @@ export default function Home(props) {
       addTabBarBottomSheet.current.snapTo(0);
       QrTabBarBottomSheet.current.snapTo(0);
       moreTabBarBottomSheet.current.snapTo(0);
-    } if (tabTitle == 'Add') {
+    }
+    if (tabTitle == 'Add') {
       setTimeout(() => {
         setAddBottomSheetsFlag(true);
         setModaldata([]);
@@ -771,7 +776,8 @@ export default function Home(props) {
       addTabBarBottomSheet.current.snapTo(2);
       QrTabBarBottomSheet.current.snapTo(0);
       moreTabBarBottomSheet.current.snapTo(0);
-    } if (tabTitle == 'QR') {
+    }
+    if (tabTitle == 'QR') {
       setTimeout(() => {
         setModaldata(transactionData);
         setSelected(tabTitle);
@@ -1784,139 +1790,148 @@ export default function Home(props) {
             extraData={{ balances, switchOn, walletName }}
             renderItem={Items => {
               return (
-                <View style={{ flexDirection: 'column' }}> 
+                <View style={{ flexDirection: 'column' }}>
                   {Items.item.map(value => {
-                    if(value.accountType === 'add'){
+                    if (value.accountType === 'add') {
                       return (
-                            <TouchableOpacity>
-                                    <CardView cornerRadius={10} style={styles.card}>
-                                      <View style={{ flex: 1, justifyContent: 'center',alignItems: 'center' }}>
-                                        <Image
-                                          style={{ width: wp('10%'), height: wp('10%') }}
-                                          source={require('../assets/images/icons/icon_add.png')}
-                                        />
-                                        <Text
-                                          style={{
-                                            color: Colors.textColorGrey,
-                                            fontSize: RFValue(11),
-                                          }}
-                                        >
-                                          Add Account
-                                        </Text>
-                                       </View>
-                                    </CardView>
-                                  </TouchableOpacity>
-                          )
-                    }
-                    else{
-                    return (
-                      <TouchableOpacity
-                        onPress={() => {
-                          props.navigation.navigate('Accounts', {
-                            serviceType:
-                              value.accountType === 'test'
-                                ? TEST_ACCOUNT
-                                : value.accountType === 'regular'
-                                ? REGULAR_ACCOUNT
-                                : SECURE_ACCOUNT,
-                            index:
-                              value.accountType === 'test'
-                                ? 0
-                                : value.accountType === 'regular'
-                                ? 1
-                                : 2,
-                          });
-                        }}
-                      >
-                        <CardView cornerRadius={10} style={styles.card}>
-                          <View style={{ flexDirection: 'row' }}>
-                            <Image
-                              style={{ width: wp('10%'), height: wp('10%') }}
-                              source={getIconByAccountType(value.accountType)}
-                            />
-                            {value.accountType == 'secure' ? (
-                              <TouchableOpacity
-                                onPress={() => {
-                                  alert('2FA');
-                                }}
-                                style={{
-                                  marginLeft: 'auto',
-                                  paddingLeft: 10,
-                                  paddingBottom: 10,
-                                }}
-                              >
-                                <Text
-                                  style={{
-                                    color: Colors.blue,
-                                    fontSize: RFValue(11),
-                                    fontFamily: Fonts.FiraSansRegular,
-                                  }}
-                                >
-                                  2FA
-                                </Text>
-                              </TouchableOpacity>
-                            ) : null}
-                          </View>
-                          <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-                            <Text style={styles.cardTitle}>{value.title}</Text>
-                            <Text
-                              style={{
-                                color: Colors.textColorGrey,
-                                fontSize: RFValue(11),
-                              }}
-                            >
-                                {value.account}
-                            </Text>
+                        <TouchableOpacity>
+                          <CardView cornerRadius={10} style={styles.card}>
                             <View
                               style={{
-                                flexDirection: 'row',
-                                alignItems: 'flex-end',
-                                marginTop: hp('1%'),
+                                flex: 1,
+                                justifyContent: 'center',
+                                alignItems: 'center',
                               }}
                             >
-                              {value.accountType === 'test' || switchOn ? (
-                                <Image
-                                  style={styles.cardBitCoinImage}
-                                  source={value.bitcoinicon}
-                                />
-                              ) : (
-                                <Image
-                                  style={styles.cardBitCoinImage}
-                                  source={require('../assets/images/icons/icon_dollar_dark.png')}
-                                />
-                              )}
-                              <Text style={styles.cardAmountText}>
-                                {switchOn
-                                  ? value.accountType === 'test'
-                                    ? UsNumberFormat(balances.testBalance)
-                                    : value.accountType === 'regular'
-                                    ? UsNumberFormat(balances.regularBalance)
-                                    : UsNumberFormat(balances.secureBalance)
-                                  : value.accountType === 'test'
-                                  ? UsNumberFormat(balances.testBalance)
-                                  : value.accountType === 'regular'
-                                  ? (
-                                      (balances.regularBalance / 1e8) *
-                                      exchangeRates['USD'].last
-                                    ).toFixed(2)
-                                  : (
-                                      (balances.secureBalance / 1e8) *
-                                      exchangeRates['USD'].last
-                                    ).toFixed(2)}
-                              </Text>
-                              <Text style={styles.cardAmountUnitText}>
-                                {switchOn
-                                  ? value.unit
-                                  : value.accountType === 'test'
-                                  ? value.unit
-                                  : 'usd'}
+                              <Image
+                                style={{ width: wp('10%'), height: wp('10%') }}
+                                source={require('../assets/images/icons/icon_add.png')}
+                              />
+                              <Text
+                                style={{
+                                  color: Colors.textColorGrey,
+                                  fontSize: RFValue(11),
+                                }}
+                              >
+                                Add Account
                               </Text>
                             </View>
-                          </View>
-                        </CardView>
-                      </TouchableOpacity>
-                    );
-                                }
+                          </CardView>
+                        </TouchableOpacity>
+                      );
+                    } else {
+                      return (
+                        <TouchableOpacity
+                          onPress={() => {
+                            props.navigation.navigate('Accounts', {
+                              serviceType:
+                                value.accountType === 'test'
+                                  ? TEST_ACCOUNT
+                                  : value.accountType === 'regular'
+                                  ? REGULAR_ACCOUNT
+                                  : SECURE_ACCOUNT,
+                              index:
+                                value.accountType === 'test'
+                                  ? 0
+                                  : value.accountType === 'regular'
+                                  ? 1
+                                  : 2,
+                            });
+                          }}
+                        >
+                          <CardView cornerRadius={10} style={styles.card}>
+                            <View style={{ flexDirection: 'row' }}>
+                              <Image
+                                style={{ width: wp('10%'), height: wp('10%') }}
+                                source={getIconByAccountType(value.accountType)}
+                              />
+                              {value.accountType == 'secure' ? (
+                                <TouchableOpacity
+                                  onPress={() => {
+                                    alert('2FA');
+                                  }}
+                                  style={{
+                                    marginLeft: 'auto',
+                                    paddingLeft: 10,
+                                    paddingBottom: 10,
+                                  }}
+                                >
+                                  <Text
+                                    style={{
+                                      color: Colors.blue,
+                                      fontSize: RFValue(11),
+                                      fontFamily: Fonts.FiraSansRegular,
+                                    }}
+                                  >
+                                    2FA
+                                  </Text>
+                                </TouchableOpacity>
+                              ) : null}
+                            </View>
+                            <View
+                              style={{ flex: 1, justifyContent: 'flex-end' }}
+                            >
+                              <Text style={styles.cardTitle}>
+                                {value.title}
+                              </Text>
+                              <Text
+                                style={{
+                                  color: Colors.textColorGrey,
+                                  fontSize: RFValue(11),
+                                }}
+                              >
+                                {value.account}
+                              </Text>
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  alignItems: 'flex-end',
+                                  marginTop: hp('1%'),
+                                }}
+                              >
+                                {value.accountType === 'test' || switchOn ? (
+                                  <Image
+                                    style={styles.cardBitCoinImage}
+                                    source={value.bitcoinicon}
+                                  />
+                                ) : (
+                                  <Image
+                                    style={styles.cardBitCoinImage}
+                                    source={require('../assets/images/icons/icon_dollar_dark.png')}
+                                  />
+                                )}
+                                <Text style={styles.cardAmountText}>
+                                  {switchOn
+                                    ? value.accountType === 'test'
+                                      ? UsNumberFormat(balances.testBalance)
+                                      : value.accountType === 'regular'
+                                      ? UsNumberFormat(balances.regularBalance)
+                                      : UsNumberFormat(balances.secureBalance)
+                                    : value.accountType === 'test'
+                                    ? UsNumberFormat(balances.testBalance)
+                                    : value.accountType === 'regular'
+                                    ? (
+                                        (balances.regularBalance / 1e8) *
+                                        exchangeRates['USD'].last
+                                      ).toFixed(2)
+                                    : (
+                                        (balances.secureBalance / 1e8) *
+                                        exchangeRates['USD'].last
+                                      ).toFixed(2)}
+                                </Text>
+                                <Text style={styles.cardAmountUnitText}>
+                                  {switchOn
+                                    ? value.unit
+                                    : value.accountType === 'test'
+                                    ? value.unit
+                                    : 'usd'}
+                                </Text>
+                              </View>
+                            </View>
+                          </CardView>
+                        </TouchableOpacity>
+                      );
+                    }
                   })}
                 </View>
               );
@@ -1943,8 +1958,8 @@ export default function Home(props) {
       <BottomSheet
         onCloseEnd={() => {
           setQrBottomSheetsFlag(false);
-          if(selected == 'Transactions')
-           (transactionTabBarBottomSheet as any).current.snapTo(1);
+          if (selected == 'Transactions')
+            (transactionTabBarBottomSheet as any).current.snapTo(1);
         }}
         onCloseStart={() => {
           setQrBottomSheetsFlag(false);
@@ -1967,8 +1982,8 @@ export default function Home(props) {
       <BottomSheet
         onCloseEnd={() => {
           setQrBottomSheetsFlag(false);
-          if(selected=="Add")
-          (addTabBarBottomSheet as any).current.snapTo(1);
+          if (selected == 'Add')
+            (addTabBarBottomSheet as any).current.snapTo(1);
         }}
         onCloseStart={() => {
           setQrBottomSheetsFlag(false);
@@ -1997,8 +2012,7 @@ export default function Home(props) {
         }}
         onCloseEnd={() => {
           setQrBottomSheetsFlag(false);
-          if(selected=='QR')
-          (QrTabBarBottomSheet as any).current.snapTo(1);
+          if (selected == 'QR') (QrTabBarBottomSheet as any).current.snapTo(1);
         }}
         onCloseStart={() => {
           setQrBottomSheetsFlag(false);
@@ -2024,7 +2038,7 @@ export default function Home(props) {
       <BottomSheet
         onCloseEnd={() => {
           setQrBottomSheetsFlag(false);
-          if(selected=="More")
+          if (selected == 'More')
             (moreTabBarBottomSheet as any).current.snapTo(1);
         }}
         onCloseStart={() => {

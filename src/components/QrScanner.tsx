@@ -22,9 +22,23 @@ export default function QrScanner(props) {
   global.isCameraOpen = true;
   const barcodeRecognized = async barcodes => {
     if (barcodes.data) {
-      props.navigation.state.params.scanedCode(barcodes.data);
+      props.navigation.state.params.scanedCode(
+        getFormattedString(barcodes.data),
+      );
       props.navigation.goBack();
     }
+  };
+
+  const getFormattedString = (qrString: string) => {
+    qrString = qrString.split('Dquote').join('"');
+    qrString = qrString.split('Qutation').join(':');
+    qrString = qrString.split('Lbrace').join('{');
+    qrString = qrString.split('Rbrace').join('}');
+    qrString = qrString.split('Slash').join('/');
+    qrString = qrString.split('Comma').join(',');
+    qrString = qrString.split('Squote').join("'");
+    qrString = qrString.split('Space').join(' ');
+    return qrString;
   };
 
   return (
