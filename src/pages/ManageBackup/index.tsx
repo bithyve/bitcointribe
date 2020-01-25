@@ -11,6 +11,7 @@ import {
   FlatList,
   Platform,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
@@ -1632,6 +1633,13 @@ export default function ManageBackup(props) {
                         setLoadOnTrustedContactBottomSheet(true);
                       }
                     } else if (item.type === 'copy1') {
+                      if (!databaseSSS && !databaseSSS.pdfDetails) {
+                        Alert.alert(
+                          'Generating Personal Copy',
+                          'Please, try again in a while',
+                        );
+                        return;
+                      }
                       AsyncStorage.getItem('personalCopy1Shared').then(
                         personalCopy1Shared => {
                           if (personalCopy1Shared) {
@@ -1665,6 +1673,13 @@ export default function ManageBackup(props) {
                         },
                       );
                     } else if (item.type == 'copy2') {
+                      if (!databaseSSS && !databaseSSS.pdfDetails) {
+                        Alert.alert(
+                          'Generating Personal Copy',
+                          'Please, try again in a while',
+                        );
+                        return;
+                      }
                       AsyncStorage.getItem('personalCopy2Shared').then(
                         personalCopy2Shared => {
                           if (personalCopy2Shared) {

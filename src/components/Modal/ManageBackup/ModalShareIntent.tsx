@@ -90,7 +90,7 @@ export default function ModalShareIntent(props) {
       const personalCopy1Shared = await AsyncStorage.getItem(
         'personalCopy1Shared',
       );
-      console.log('');
+
       if (personalCopy1Shared) {
         console.log('Dispatching alternate: copy2');
 
@@ -112,7 +112,7 @@ export default function ModalShareIntent(props) {
         'personalCopy2Shared',
       );
       if (personalCopy2Shared) {
-        console.log('Dispatching alternatet: copy1');
+        console.log('Dispatching alternate: copy1');
         dispatch(
           requestSharePdf(item.type, {
             title: 'Personal Copy 1',
