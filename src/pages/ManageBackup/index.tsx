@@ -120,6 +120,8 @@ export default function ManageBackup(props) {
   const [chosenContactIndex, setChosenContactIndex] = useState(0);
   const [chosenContact, setChosenContact] = useState({});
   const [Contact, setContact] = useState([]);
+  const [selectedPersonalCopy, setSelectedPersonalCopy] = useState('');
+
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
@@ -233,7 +235,11 @@ export default function ManageBackup(props) {
     RegenerateShareHelperBottomSheet,
     setRegenerateShareHelperBottomSheet,
   ] = useState(React.createRef());
-  //const [ refShareIntentBottomSheet, setRefShareIntentBottomSheet ] = useRef();
+
+  const [
+    PersonalCopyShareBottomSheet,
+    setPersonalCopyShareBottomSheet,
+  ] = useState(React.createRef());
 
   const [
     shareOtpWithTrustedContactBottomSheet,
@@ -520,6 +526,59 @@ export default function ManageBackup(props) {
       />
     );
   }
+
+  const renderPersonalCopyShareModalContent = () => {
+    return (
+      <ModalShareIntent
+        removeHighlightingFromCard={removeHighlightingFromCard}
+        data={selectedPersonalCopy ? selectedPersonalCopy : 'copy1'}
+        onPressHandle={() => {
+          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
+          //setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
+        }}
+        onPressShare={async type => {
+          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
+          // setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
+          dispatch(requestSharePdf(type, itemSelected));
+          let pdfShared = JSON.parse(await AsyncStorage.getItem('pdfShared'));
+          pdfShared = pdfShared ? pdfShared : {};
+          const updatedPDFShared = {
+            ...pdfShared,
+            [type == 'copy2' ? 4 : 3]: true,
+          };
+          await AsyncStorage.setItem(
+            'pdfShared',
+            JSON.stringify({
+              ...updatedPDFShared,
+            }),
+          );
+
+          if (
+            arrModalShareIntent.item &&
+            arrModalShareIntent.item.type == 'copy1'
+          ) {
+            AsyncStorage.setItem('personalCopy1AutoHighlightFlags', 'true');
+          } else if (
+            arrModalShareIntent.item &&
+            arrModalShareIntent.item.type == 'copy2'
+          ) {
+            AsyncStorage.setItem('personalCopy2AutoHighlightFlags', 'true');
+          }
+          setSelectedType('');
+        }}
+      />
+    );
+  };
+
+  const renderPersonalCopyShareModalHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
 
   function renderShareOtpWithTrustedContactContent() {
     return (
@@ -1392,20 +1451,20 @@ export default function ManageBackup(props) {
     }
   };
 
-  useEffect(() => {
-    if (databaseSSS.pdfDetails) {
-      pageData[3].personalInfo = databaseSSS.pdfDetails.copy1;
-      pageData[4].personalInfo = databaseSSS.pdfDetails.copy2;
-      if (databaseSSS.pdfDetails.copy1.flagShare) {
-        pageData[3].status = 'success';
-      }
-      if (databaseSSS.pdfDetails.copy2.flagShare) {
-        pageData[4].status = 'success';
-      }
-      setPageData(pageData);
-      setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
-    }
-  }, [databaseSSS]);
+  // useEffect(() => {
+  //   if (databaseSSS.pdfDetails) {
+  //     pageData[3].personalInfo = databaseSSS.pdfDetails.copy1;
+  //     pageData[4].personalInfo = databaseSSS.pdfDetails.copy2;
+  //     if (databaseSSS.pdfDetails.copy1.flagShare) {
+  //       pageData[3].status = 'success';
+  //     }
+  //     if (databaseSSS.pdfDetails.copy2.flagShare) {
+  //       pageData[4].status = 'success';
+  //     }
+  //     setPageData(pageData);
+  //     setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
+  //   }
+  // }, [databaseSSS]);
 
   useEffect(() => {
     onContactsUpdate();
@@ -1570,13 +1629,10 @@ export default function ManageBackup(props) {
                         trustedContactsBottomSheet.current.snapTo(1);
                         setLoadOnTrustedContactBottomSheet(true);
                       }
-                    } else if (item.type == 'copy1' || item.type == 'copy2') {
-                      // RestoreByCloudQrCode.current.snapTo(1);
-                      AsyncStorage.getItem('pdfShared').then(pdfShared => {
-                        let shared = JSON.parse(pdfShared);
-                        console.log({ shared });
-                        if (item.type == 'copy1') {
-                          if (shared && shared[3]) {
+                    } else if (item.type === 'copy1') {
+                      AsyncStorage.getItem('personalCopy1Shared').then(
+                        personalCopy1Shared => {
+                          if (personalCopy1Shared) {
                             props.navigation.navigate('QrScanner', {
                               scanedCode: qrData => {
                                 const index = 3;
@@ -1593,14 +1649,22 @@ export default function ManageBackup(props) {
                             ) {
                               PersonalCopyHistoryBottomSheet.current.snapTo(1);
                             } else {
-                              setArrModalShareIntent({
-                                snapTop: 1,
-                                item,
-                              });
+                              setSelectedPersonalCopy('copy1');
+                              (PersonalCopyShareBottomSheet as any).current.snapTo(
+                                1,
+                              );
+                              // setArrModalShareIntent({
+                              //   snapTop: 1,
+                              //   item,
+                              // });
                             }
                           }
-                        } else if (item.type == 'copy2') {
-                          if (shared[4]) {
+                        },
+                      );
+                    } else if (item.type == 'copy2') {
+                      AsyncStorage.getItem('personalCopy2Shared').then(
+                        personalCopy2Shared => {
+                          if (personalCopy2Shared) {
                             props.navigation.navigate('QrScanner', {
                               scanedCode: qrData => {
                                 const index = 4;
@@ -1617,14 +1681,19 @@ export default function ManageBackup(props) {
                             ) {
                               PersonalCopyHistoryBottomSheet.current.snapTo(1);
                             } else {
-                              setArrModalShareIntent({
-                                snapTop: 1,
-                                item,
-                              });
+                              setSelectedPersonalCopy('copy2');
+                              (PersonalCopyShareBottomSheet as any).current.snapTo(
+                                1,
+                              );
+
+                              // setArrModalShareIntent({
+                              //   snapTop: 1,
+                              //   item,
+                              // });
                             }
                           }
-                        }
-                      });
+                        },
+                      );
                     } else if (item.type == 'security') {
                       setTimeout(() => {
                         setSelectTypeToReshare('security');
@@ -1802,41 +1871,12 @@ export default function ManageBackup(props) {
           renderContent={renderRegenerateShareHelperContents}
           renderHeader={renderRegenerateShareHelperHeader}
         />
-        <ModalShareIntent
-          removeHighlightingFromCard={removeHighlightingFromCard}
-          data={arrModalShareIntent}
-          onPressHandle={() => {
-            setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
-          }}
-          onPressShare={async type => {
-            setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
-            dispatch(requestSharePdf(type, itemSelected));
-            let pdfShared = JSON.parse(await AsyncStorage.getItem('pdfShared'));
-            pdfShared = pdfShared ? pdfShared : {};
-            const updatedPDFShared = {
-              ...pdfShared,
-              [type == 'copy2' ? 4 : 3]: true,
-            };
-            await AsyncStorage.setItem(
-              'pdfShared',
-              JSON.stringify({
-                ...updatedPDFShared,
-              }),
-            );
-
-            if (
-              arrModalShareIntent.item &&
-              arrModalShareIntent.item.type == 'copy1'
-            ) {
-              AsyncStorage.setItem('personalCopy1AutoHighlightFlags', 'true');
-            } else if (
-              arrModalShareIntent.item &&
-              arrModalShareIntent.item.type == 'copy2'
-            ) {
-              AsyncStorage.setItem('personalCopy2AutoHighlightFlags', 'true');
-            }
-            setSelectedType('');
-          }}
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={PersonalCopyShareBottomSheet}
+          snapPoints={[-50, hp('95%')]}
+          renderContent={renderPersonalCopyShareModalContent}
+          renderHeader={renderPersonalCopyShareModalHeader}
         />
         <BottomSheet
           enabledInnerScrolling={true}
