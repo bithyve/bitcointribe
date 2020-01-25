@@ -34,6 +34,7 @@ import {
 } from '../../store/actions/accounts';
 import SendStatusModalContents from '../../components/SendStatusModalContents';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';
+import DeviceInfo from 'react-native-device-info';
 import BottomSheet from 'reanimated-bottom-sheet';
 import CustodianRequestOtpModalContents from '../../components/CustodianRequestOtpModalContents';
 import {
@@ -140,7 +141,7 @@ export default function Buy(props) {
                   <Text
                     onPress={() => {
                       AsyncStorage.setItem('isBuyHelperDone', 'true');
-                      BuyHelperBottomSheet.current.snapTo(1);
+                      BuyHelperBottomSheet.current.snapTo(2);
                     }}
                     style={{
                       color: Colors.textColorGrey,
@@ -165,7 +166,11 @@ export default function Buy(props) {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={BuyHelperBottomSheet}
-          snapPoints={[-50, hp('95%')]}
+          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('18%')
+          : Platform.OS == 'android'
+          ? hp('20%')
+          : hp('19%'),hp('95%')]}
           renderContent={renderBuyHelperContents}
           renderHeader={renderBuyHelperHeader}
         />

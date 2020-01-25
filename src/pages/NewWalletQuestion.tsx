@@ -55,10 +55,12 @@ export default function NewWalletQuestion(props) {
   const dispatch = useDispatch();
   const walletName = props.navigation.getParam('walletName');
   const [ansError, setAnsError] = useState('');
+  const [isEditable, setIsEditable] = useState(true);
+  const [isDisabled, setIsDisabled] = useState(false);
   const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   if (isInitialized) {
     props.navigation.navigate('HomeNav');
-  }
+  }  
 
   const setConfirm = event => {
     if (event.text) {
@@ -91,6 +93,7 @@ export default function NewWalletQuestion(props) {
     }
   };
 
+
   useEffect(() => {
     if (answer.trim() == confirmAnswer.trim()) {
       setAnsError('');
@@ -106,6 +109,8 @@ export default function NewWalletQuestion(props) {
             question: dropdownBoxValue.question,
             answer,
           };
+          setIsEditable(false);
+          setIsDisabled(true);
           dispatch(initializeSetup(walletName, security));
           AsyncStorage.setItem(
             'SecurityAnsTimestamp',
@@ -156,6 +161,8 @@ export default function NewWalletQuestion(props) {
               setDropdownBoxOpenClose(false);
               Keyboard.dismiss();
             }}
+            disabled={isDisabled}
+                      
           >
             <HeaderTitle
               firstLineTitle={'New Hexa Wallet'}
@@ -174,6 +181,8 @@ export default function NewWalletQuestion(props) {
               onPress={() => {
                 setDropdownBoxOpenClose(!dropdownBoxOpenClose);
               }}
+              disabled={isDisabled}
+                      
             >
               <Text style={styles.dropdownBoxText}>
                 {dropdownBoxValue.question
@@ -249,6 +258,7 @@ export default function NewWalletQuestion(props) {
                       autoCompleteType="off"
                       textContentType="none"
                       autoCorrect={false}
+                      editable={isEditable}
                       autoCapitalize="none"
                       onChangeText={text => {
                         setAnswer(text)
@@ -309,6 +319,7 @@ export default function NewWalletQuestion(props) {
                       textContentType="none"
                       autoCompleteType="off"
                       autoCorrect={false}
+                      editable={isEditable}
                       autoCapitalize="none"
                       onKeyPress={event => {
                         setBackspace(event);

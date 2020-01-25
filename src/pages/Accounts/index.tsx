@@ -1182,7 +1182,7 @@ function Accounts(props) {
               text="Try Sending"
               order={1}
               name="sendTransaction"
-            >
+              >
               <WalkthroughableTouchableOpacity
                 onPress={() => {
                   props.navigation.navigate('Send', {
@@ -1255,7 +1255,9 @@ function Accounts(props) {
                     getServiceType: getServiceType,
                   });
                 }}
-                style={styles.bottomCardView}
+                style={{...styles.bottomCardView, opacity: 0.3,
+                  backgroundColor: Colors.borderColor,}}
+                  disabled={ true }
               >
                 <View style={{flex:1, justifyContent:'center', alignItems: 'center', marginLeft: 10}}>
                 <Image
@@ -1279,7 +1281,9 @@ function Accounts(props) {
               name="Sell"
             >
               <WalkthroughableTouchableOpacity
-                style={styles.bottomCardView}
+                style={{...styles.bottomCardView, opacity: 0.3,
+                  backgroundColor: Colors.borderColor,}}
+                  disabled={ true }
                 onPress={() => {
                   props.navigation.navigate('Sell', {
                     serviceType,

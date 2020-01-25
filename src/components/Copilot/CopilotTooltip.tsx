@@ -6,7 +6,7 @@ import Fonts from "../../common/Fonts";
 import { withNavigation } from 'react-navigation';
 
 function CopilotTooltip(props) {
-
+    
     const onPressOk = () => {
         if (props.currentStep.name == "sendTransaction") {
             props.handleStop();
@@ -18,11 +18,11 @@ function CopilotTooltip(props) {
         }
         else if (props.currentStep.name == "Buy") {
             props.handleStop();
-            props.navigation.navigate('Buy', { serviceType: "TEST_ACCOUNT" })
+           // props.navigation.navigate('Buy', { serviceType: "TEST_ACCOUNT" })
         }
         else if (props.currentStep.name == "Sell") {
             props.handleStop();
-            props.navigation.navigate('Sell', { serviceType: "TEST_ACCOUNT" })
+           // props.navigation.navigate('Sell', { serviceType: "TEST_ACCOUNT" })
         }
         else if (props.currentStep.name == "transaction") {
             AsyncStorage.setItem("isTransactionHelperDone", 'true');
