@@ -10,7 +10,6 @@ import {
   Image,
   FlatList,
   Platform,
-  AsyncStorage,
   RefreshControl,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -53,6 +52,7 @@ import SecondaryDeviceHealthCheck from '../HealthCheck/SecondaryDeviceHealthChec
 import CloudHealthCheck from '../HealthCheck/CloudHealthCheck';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default function ManageBackup(props) {
   const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
@@ -530,7 +530,7 @@ export default function ManageBackup(props) {
     return (
       <ModalShareIntent
         removeHighlightingFromCard={removeHighlightingFromCard}
-        data={selectedPersonalCopy ? selectedPersonalCopy : 'copy1'}
+        selectedPersonalCopy={selectedPersonalCopy}
         onPressBack={() => {
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
           //setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
@@ -568,7 +568,7 @@ export default function ManageBackup(props) {
     );
   };
 
-  const renderPersonalCopyShareModalHeader = () => {
+  const renderPersonalCopyShareModalHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
@@ -576,7 +576,7 @@ export default function ManageBackup(props) {
         }}
       />
     );
-  };
+  }, []);
 
   function renderShareOtpWithTrustedContactContent() {
     return (
@@ -1642,15 +1642,16 @@ export default function ManageBackup(props) {
                               },
                             });
                           } else {
-                            setTimeout(() => {
-                              setSelectTypeToReshare('copy1');
-                            }, 10);
+                            // setTimeout(() => {
+                            //   setSelectTypeToReshare('copy1');
+                            // }, 10);
                             if (
                               personalCopy1AutoHighlightFlags == 'true' ||
                               personalCopy2AutoHighlightFlags == 'true'
                             ) {
                               PersonalCopyHistoryBottomSheet.current.snapTo(1);
                             } else {
+                              console.log({ item });
                               setSelectedPersonalCopy(item);
                               (PersonalCopyShareBottomSheet as any).current.snapTo(
                                 1,
@@ -1674,15 +1675,16 @@ export default function ManageBackup(props) {
                               },
                             });
                           } else {
-                            setTimeout(() => {
-                              setSelectTypeToReshare('copy2');
-                            }, 10);
+                            // setTimeout(() => {
+                            //   setSelectTypeToReshare('copy2');
+                            // }, 10);
                             if (
                               personalCopy1AutoHighlightFlags == 'true' ||
                               personalCopy2AutoHighlightFlags == 'true'
                             ) {
                               PersonalCopyHistoryBottomSheet.current.snapTo(1);
                             } else {
+                              console.log({ item });
                               setSelectedPersonalCopy(item);
                               (PersonalCopyShareBottomSheet as any).current.snapTo(
                                 1,

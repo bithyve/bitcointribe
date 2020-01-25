@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,7 +6,6 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
-  AsyncStorage,
 } from 'react-native';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {
@@ -23,11 +22,15 @@ import ModalHeader from '../../ModalHeader';
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper';
 import { useDispatch } from 'react-redux';
 import { requestSharePdf } from '../../../store/actions/manageBackup';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default function ModalShareIntent(props) {
+  console.log({ props });
   const { selectedPersonalCopy } = props;
-  console.log({ selectedPersonalCopy });
-  const [flagRefreshing, setFagRefreshing] = useState(false);
+  if (!selectedPersonalCopy) {
+    return <View></View>;
+  }
+  // const [flagRefreshing, setFagRefreshing] = useState(false);
   const [arrShareOption, setArrShareOption] = useState([
     {
       id: 1,
@@ -57,10 +60,6 @@ export default function ModalShareIntent(props) {
     },
   ]);
 
-  const [refShareIntentBottomSheet, setRefShareIntentBottomSheet] = useState(
-    React.createRef(),
-  );
-
   // useEffect(() => {
   //   let singleton = Singleton.getInstance();
   //   let selectedPdfDetails = singleton.getSeletedPdfDetails();
@@ -83,13 +82,57 @@ export default function ModalShareIntent(props) {
   //   refShareIntentBottomSheet.current.snapTo(props.data.snapTop);
   // }, [props]);
   const dispatch = useDispatch();
+
   const onShare = async item => {
-    dispatch(requestSharePdf(item.type, selectedPersonalCopy));
-    if (selectedPersonalCopy.type === 'copy1') {
-      await AsyncStorage.setItem('personalCopy1Shared', 'true');
-    } else if (selectedPersonalCopy.type === 'copy2') {
-      await AsyncStorage.setItem('personalCopy2Shared', 'true');
+    // TODO: Remove Hack: Avoiding state mix on ManageBackup due to multiple modals
+
+    if (props.selectedPersonalCopy.type === 'copy1') {
+      const personalCopy1Shared = await AsyncStorage.getItem(
+        'personalCopy1Shared',
+      );
+      console.log('');
+      if (personalCopy1Shared) {
+        console.log('Dispatching alternate: copy2');
+
+        dispatch(
+          requestSharePdf(item.type, {
+            title: 'Personal Copy 2',
+            personalInfo: null,
+            time: 'never',
+            status: 'error',
+            type: 'copy2',
+            route: 'PersonalCopy',
+          }),
+        );
+      } else {
+        dispatch(requestSharePdf(item.type, props.selectedPersonalCopy));
+      }
+    } else if (props.selectedPersonalCopy.type === 'copy2') {
+      const personalCopy2Shared = await AsyncStorage.getItem(
+        'personalCopy2Shared',
+      );
+      if (personalCopy2Shared) {
+        console.log('Dispatching alternatet: copy1');
+        dispatch(
+          requestSharePdf(item.type, {
+            title: 'Personal Copy 1',
+            personalInfo: null,
+            time: 'never',
+            status: 'error',
+            type: 'copy1',
+            route: 'PersonalCopy',
+          }),
+        );
+      } else {
+        dispatch(requestSharePdf(item.type, props.selectedPersonalCopy));
+      }
     }
+
+    // if (props.selectedPersonalCopy.type === 'copy1') {
+    //   await AsyncStorage.setItem('personalCopy1Shared', 'true');
+    // } else if (props.selectedPersonalCopy.type === 'copy2') {
+    //   await AsyncStorage.setItem('personalCopy2Shared', 'true');
+    // }
     props.onPressShare();
     // let personalCopyCounter = await AsyncStorage.getItem('personalCopyCounter');
     // if (personalCopyCounter && personalCopyCounter == '1') {
@@ -143,11 +186,12 @@ export default function ModalShareIntent(props) {
         <FlatList
           data={arrShareOption}
           // onRefresh={ onRefresh }
-          refreshing={flagRefreshing}
           renderItem={({ item, index }) => (
             <AppBottomSheetTouchableWrapper
-              onPress={() => onShare(item)}
-              disabled={item.flagShare}
+              onPress={() => {
+                onShare(item);
+              }}
+              // disabled={item.flagShare}
               style={[
                 styles.listElements,
                 item.flagShare == true
