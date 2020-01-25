@@ -21,10 +21,13 @@ import Icons from '../../../../src/common/Icons';
 import Singleton from '../../../common/Singleton';
 import ModalHeader from '../../ModalHeader';
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper';
+import { useDispatch } from 'react-redux';
+import { requestSharePdf } from '../../../store/actions/manageBackup';
 
 export default function ModalShareIntent(props) {
+  const { selectedPersonalCopy } = props;
+  console.log({ selectedPersonalCopy });
   const [flagRefreshing, setFagRefreshing] = useState(false);
-  const [pdfShareDetails, setPdfShareDetails] = useState({});
   const [arrShareOption, setArrShareOption] = useState([
     {
       id: 1,
@@ -58,136 +61,122 @@ export default function ModalShareIntent(props) {
     React.createRef(),
   );
 
-  useEffect(() => {
-    let singleton = Singleton.getInstance();
-    let selectedPdfDetails = singleton.getSeletedPdfDetails();
-    let shareItem =
-      selectedPdfDetails != undefined
-        ? props.data.item.type == 'copy1'
-          ? selectedPdfDetails[4]
-          : selectedPdfDetails[3]
-        : null;
-    if (shareItem != null) {
-      let mediaShare = shareItem.personalInfo.shareDetails;
-      if (mediaShare != {})
-        for (var i = 0; i < arrShareOption.length; i++)
-          if (arrShareOption[i].type === mediaShare.type) {
-            arrShareOption[i].flagShare = true;
-            setFagRefreshing(true);
-            break;
-          }
-    }
-    refShareIntentBottomSheet.current.snapTo(props.data.snapTop);
-  }, [props]);
-
+  // useEffect(() => {
+  //   let singleton = Singleton.getInstance();
+  //   let selectedPdfDetails = singleton.getSeletedPdfDetails();
+  //   let shareItem =
+  //     selectedPdfDetails != undefined
+  //       ? props.data.item.type == 'copy1'
+  //         ? selectedPdfDetails[4]
+  //         : selectedPdfDetails[3]
+  //       : null;
+  //   if (shareItem != null) {
+  //     let mediaShare = shareItem.personalInfo.shareDetails;
+  //     if (mediaShare != {})
+  //       for (var i = 0; i < arrShareOption.length; i++)
+  //         if (arrShareOption[i].type === mediaShare.type) {
+  //           arrShareOption[i].flagShare = true;
+  //           setFagRefreshing(true);
+  //           break;
+  //         }
+  //   }
+  //   refShareIntentBottomSheet.current.snapTo(props.data.snapTop);
+  // }, [props]);
+  const dispatch = useDispatch();
   const onShare = async item => {
-        props.onPressShare( item.type );
-        let personalCopyCounter = await AsyncStorage.getItem("personalCopyCounter");
-        if(personalCopyCounter && personalCopyCounter == '1'){
-            await AsyncStorage.setItem("personalCopyCounter", '2')
-            await AsyncStorage.setItem("personalCopy2AutoHighlightFlags", 'true');
-            props.removeHighlightingFromCard();
-        }
-        else if(!personalCopyCounter){
-            await AsyncStorage.setItem("personalCopyCounter", '1')
-            await AsyncStorage.setItem("personalCopy1AutoHighlightFlags", 'true')
-            props.removeHighlightingFromCard();
-        }
-        else{
-            await AsyncStorage.setItem("personalCopyCounter", '2')
-            await AsyncStorage.setItem("personalCopy2AutoHighlightFlags", 'true')
-            await AsyncStorage.setItem("personalCopy1AutoHighlightFlags", 'true')
-            props.removeHighlightingFromCard();
-        }
+    dispatch(requestSharePdf(item.type, selectedPersonalCopy));
+    if (selectedPersonalCopy.type === 'copy1') {
+      await AsyncStorage.setItem('personalCopy1Shared', 'true');
+    } else if (selectedPersonalCopy.type === 'copy2') {
+      await AsyncStorage.setItem('personalCopy2Shared', 'true');
     }
-
-  const renderShareContents = () => {
-    return (
-      <View style={[styles.modalContainer]}>
-        <View
-          style={{
-            flex: 0.2,
-            flexDirection: 'row',
-            borderBottomWidth: 0.5,
-            borderColor: Colors.borderColor,
-          }}
-        >
-          <View style={styles.headerContainer}>
-            <AppBottomSheetTouchableWrapper
-              style={styles.headerLeftIconContainer}
-              onPress={() => {
-                props.onPressHandle();
-              }}
-            >
-              <View style={styles.headerLeftIconInnerContainer}>
-                <FontAwesome
-                  name="long-arrow-left"
-                  color={Colors.blue}
-                  size={17}
-                />
-              </View>
-            </AppBottomSheetTouchableWrapper>
-          </View>
-          <View style={styles.modalHeaderTitleView}>
-            <View style={{ marginTop: hp('1%') }}>
-              <Text style={styles.modalHeaderTitleText}>Personal Copy</Text>
-              <Text style={styles.modalHeaderInfoText}>Select a source</Text>
-            </View>
-          </View>
-        </View>
-        <View style={{ flex: 1 }}>
-          <FlatList
-            data={arrShareOption}
-            // onRefresh={ onRefresh }
-            refreshing={flagRefreshing}
-            renderItem={({ item, index }) => (
-              <AppBottomSheetTouchableWrapper
-                onPress={() => onShare(item)}
-                disabled={item.flagShare}
-                style={[
-                  styles.listElements,
-                  item.flagShare == true
-                    ? { backgroundColor: '#ccc', borderRadius: 5 }
-                    : null,
-                ]}
-              >
-                <Image
-                  style={styles.listElementsIconImage}
-                  source={item.imageIcon}
-                />
-                <View style={{ justifyContent: 'space-between', flex: 1 }}>
-                  <Text style={styles.listElementsTitle}>{item.title}</Text>
-                  <Text style={styles.listElementsInfo}>{item.info}</Text>
-                </View>
-                <View style={styles.listElementIcon}>
-                  <Ionicons
-                    name="ios-arrow-forward"
-                    color={Colors.textColorGrey}
-                    size={15}
-                    style={{ alignSelf: 'center' }}
-                  />
-                </View>
-              </AppBottomSheetTouchableWrapper>
-            )}
-            keyExtractor={(item, index) => index.toString()}
-          />
-        </View>
-      </View>
-    );
-  };
-
-  const renderShareHeader = () => {
-    return <ModalHeader onPressHeader={() => props.onPressHandle()} />;
+    props.onPressShare();
+    // let personalCopyCounter = await AsyncStorage.getItem('personalCopyCounter');
+    // if (personalCopyCounter && personalCopyCounter == '1') {
+    //   await AsyncStorage.setItem('personalCopyCounter', '2');
+    //   await AsyncStorage.setItem('personalCopy2AutoHighlightFlags', 'true');
+    //   props.removeHighlightingFromCard();
+    // } else if (!personalCopyCounter) {
+    //   await AsyncStorage.setItem('personalCopyCounter', '1');
+    //   await AsyncStorage.setItem('personalCopy1AutoHighlightFlags', 'true');
+    //   props.removeHighlightingFromCard();
+    // } else {
+    //   await AsyncStorage.setItem('personalCopyCounter', '2');
+    //   await AsyncStorage.setItem('personalCopy2AutoHighlightFlags', 'true');
+    //   await AsyncStorage.setItem('personalCopy1AutoHighlightFlags', 'true');
+    //   props.removeHighlightingFromCard();
+    // }
   };
 
   return (
-    <BottomSheet
-      enabledInnerScrolling={true}
-      ref={refShareIntentBottomSheet}
-      snapPoints={[-50, hp('90%')]}
-      renderContent={renderShareContents}
-      renderHeader={renderShareHeader}
-    />
+    <View style={[styles.modalContainer]}>
+      <View
+        style={{
+          flex: 0.2,
+          flexDirection: 'row',
+          borderBottomWidth: 0.5,
+          borderColor: Colors.borderColor,
+        }}
+      >
+        <View style={styles.headerContainer}>
+          <AppBottomSheetTouchableWrapper
+            style={styles.headerLeftIconContainer}
+            onPress={props.onPressBack}
+          >
+            <View style={styles.headerLeftIconInnerContainer}>
+              <FontAwesome
+                name="long-arrow-left"
+                color={Colors.blue}
+                size={17}
+              />
+            </View>
+          </AppBottomSheetTouchableWrapper>
+        </View>
+        <View style={styles.modalHeaderTitleView}>
+          <View style={{ marginTop: hp('1%') }}>
+            <Text style={styles.modalHeaderTitleText}>Personal Copy</Text>
+            <Text style={styles.modalHeaderInfoText}>Select a source</Text>
+          </View>
+        </View>
+      </View>
+      <View style={{ flex: 1 }}>
+        <FlatList
+          data={arrShareOption}
+          // onRefresh={ onRefresh }
+          refreshing={flagRefreshing}
+          renderItem={({ item, index }) => (
+            <AppBottomSheetTouchableWrapper
+              onPress={() => onShare(item)}
+              disabled={item.flagShare}
+              style={[
+                styles.listElements,
+                item.flagShare == true
+                  ? { backgroundColor: '#ccc', borderRadius: 5 }
+                  : null,
+              ]}
+            >
+              <Image
+                style={styles.listElementsIconImage}
+                source={item.imageIcon}
+              />
+              <View style={{ justifyContent: 'space-between', flex: 1 }}>
+                <Text style={styles.listElementsTitle}>{item.title}</Text>
+                <Text style={styles.listElementsInfo}>{item.info}</Text>
+              </View>
+              <View style={styles.listElementIcon}>
+                <Ionicons
+                  name="ios-arrow-forward"
+                  color={Colors.textColorGrey}
+                  size={15}
+                  style={{ alignSelf: 'center' }}
+                />
+              </View>
+            </AppBottomSheetTouchableWrapper>
+          )}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      </View>
+    </View>
   );
 }
 

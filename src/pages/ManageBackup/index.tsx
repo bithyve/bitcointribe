@@ -53,7 +53,6 @@ import SecondaryDeviceHealthCheck from '../HealthCheck/SecondaryDeviceHealthChec
 import CloudHealthCheck from '../HealthCheck/CloudHealthCheck';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
-let itemSelected = {};
 
 export default function ManageBackup(props) {
   const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
@@ -120,7 +119,7 @@ export default function ManageBackup(props) {
   const [chosenContactIndex, setChosenContactIndex] = useState(0);
   const [chosenContact, setChosenContact] = useState({});
   const [Contact, setContact] = useState([]);
-  const [selectedPersonalCopy, setSelectedPersonalCopy] = useState('');
+  const [selectedPersonalCopy, setSelectedPersonalCopy] = useState();
 
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
@@ -532,26 +531,25 @@ export default function ManageBackup(props) {
       <ModalShareIntent
         removeHighlightingFromCard={removeHighlightingFromCard}
         data={selectedPersonalCopy ? selectedPersonalCopy : 'copy1'}
-        onPressHandle={() => {
+        onPressBack={() => {
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
           //setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
         }}
-        onPressShare={async type => {
+        onPressShare={() => {
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
           // setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
-          dispatch(requestSharePdf(type, itemSelected));
-          let pdfShared = JSON.parse(await AsyncStorage.getItem('pdfShared'));
-          pdfShared = pdfShared ? pdfShared : {};
-          const updatedPDFShared = {
-            ...pdfShared,
-            [type == 'copy2' ? 4 : 3]: true,
-          };
-          await AsyncStorage.setItem(
-            'pdfShared',
-            JSON.stringify({
-              ...updatedPDFShared,
-            }),
-          );
+          // let pdfShared = JSON.parse(await AsyncStorage.getItem('pdfShared'));
+          // pdfShared = pdfShared ? pdfShared : {};
+          // const updatedPDFShared = {
+          //   ...pdfShared,
+          //   [type == 'copy2' ? 4 : 3]: true,
+          // };
+          // await AsyncStorage.setItem(
+          //   'pdfShared',
+          //   JSON.stringify({
+          //     ...updatedPDFShared,
+          //   }),
+          // );
 
           // if (
           //   arrModalShareIntent.item &&
@@ -972,12 +970,14 @@ export default function ManageBackup(props) {
       //   item: pageData[3],
       // });
       PersonalCopyHistoryBottomSheet.current.snapTo(0);
+      (PersonalCopyShareBottomSheet as any).current.snapTo(1);
     } else if (SelectTypeToReshare == 'copy2') {
       // setArrModalShareIntent({
       //   snapTop: 1,
       //   item: pageData[4],
       // });
       PersonalCopyHistoryBottomSheet.current.snapTo(0);
+      (PersonalCopyShareBottomSheet as any).current.snapTo(1);
     } else if (SelectTypeToReshare == 'security') {
       SecurityQuestionBottomSheet.current.snapTo(1);
       SecurityQuestionHistoryBottomSheet.current.snapTo(0);
@@ -1401,6 +1401,7 @@ export default function ManageBackup(props) {
       //   snapTop: 1,
       //   item: pageData[3],
       // });
+      (PersonalCopyShareBottomSheet as any).current.snapTo(1);
     } else if (
       !personalCopy2AutoHighlightFlags ||
       personalCopy2AutoHighlightFlags != 'true'
@@ -1409,6 +1410,7 @@ export default function ManageBackup(props) {
       //   snapTop: 1,
       //   item: pageData[4],
       // });
+      (PersonalCopyShareBottomSheet as any).current.snapTo(1);
     } else if (
       !securityAutoHighlightFlags ||
       securityAutoHighlightFlags != 'true'
@@ -1649,7 +1651,7 @@ export default function ManageBackup(props) {
                             ) {
                               PersonalCopyHistoryBottomSheet.current.snapTo(1);
                             } else {
-                              setSelectedPersonalCopy('copy1');
+                              setSelectedPersonalCopy(item);
                               (PersonalCopyShareBottomSheet as any).current.snapTo(
                                 1,
                               );
@@ -1681,7 +1683,7 @@ export default function ManageBackup(props) {
                             ) {
                               PersonalCopyHistoryBottomSheet.current.snapTo(1);
                             } else {
-                              setSelectedPersonalCopy('copy2');
+                              setSelectedPersonalCopy(item);
                               (PersonalCopyShareBottomSheet as any).current.snapTo(
                                 1,
                               );
