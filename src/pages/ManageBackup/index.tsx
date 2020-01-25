@@ -56,6 +56,9 @@ import moment from 'moment';
 import AsyncStorage from '@react-native-community/async-storage';
 
 export default function ManageBackup(props) {
+  const [isNextStepDisable, setIsNextStepDisable] = useState(true);
+  const [LoadCamera, setLoadCamera] = useState(false);
+  const [LoadContacts, setLoadContacts] = useState(false);
   const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
   const [ReshareBottomSheet, setReshareBottomSheet] = useState(
     React.createRef(),
@@ -92,7 +95,7 @@ export default function ManageBackup(props) {
     setPersonalCopy2AutoHighlightFlags,
   ] = useState('');
   let [securityAutoHighlightFlags, setSecurityAutoHighlightFlags] = useState(
-    '',
+    'true',
   );
 
   const [
@@ -412,6 +415,7 @@ export default function ManageBackup(props) {
     let autoHighlightFlags = {};
     setTimeout(() => {
       setSelectedType('');
+      setSecondaryDeviceAutoHighlightFlags('true');
     }, 10);
     secondaryDeviceBottomSheet.current.snapTo(0);
     await AsyncStorage.setItem('secondaryDeviceAutoHighlightFlags', 'true');
@@ -420,6 +424,7 @@ export default function ManageBackup(props) {
   function renderTrustedContactsContent() {
     return (
       <TrustedContacts
+      LoadContacts={LoadContacts}
         onPressBack={() => {
           trustedContactsBottomSheet.current.snapTo(0);
         }}
@@ -611,18 +616,30 @@ export default function ManageBackup(props) {
     if (contacts.length == 2) {
       if (pageDataTemp[1].isOTPShared) {
         pageDataTemp[2].isOTPShared = true;
+        setTimeout(() => {
+          setContact2AutoHighlightFlags("true");
+        }, 2);
         await AsyncStorage.setItem('contact2AutoHighlightFlags', 'true');
       } else {
         pageDataTemp[1].isOTPShared = true;
+        setTimeout(() => {
+          setContact1AutoHighlightFlags("true");
+        }, 2);
         CommunicationModeBottomSheet.current.snapTo(1);
         await AsyncStorage.setItem('contact1AutoHighlightFlags', 'true');
       }
     } else {
       if (index == 0) {
         pageDataTemp[1].isOTPShared = true;
+        setTimeout(() => {
+          setContact1AutoHighlightFlags("true");
+        }, 2);
         await AsyncStorage.setItem('contact1AutoHighlightFlags', 'true');
       } else {
         pageDataTemp[2].isOTPShared = true;
+        setTimeout(() => {
+          setContact2AutoHighlightFlags("true");
+        }, 2);
         await AsyncStorage.setItem('contact2AutoHighlightFlags', 'true');
       }
     }
@@ -960,9 +977,15 @@ export default function ManageBackup(props) {
       secondaryDeviceBottomSheet.current.snapTo(1);
       SecondaryDeviceHistoryBottomSheet.current.snapTo(0);
     } else if (SelectTypeToReshare == 'contact1') {
+      setTimeout(() => {
+        setLoadContacts(true);
+      }, 2);
       trustedContactsBottomSheet.current.snapTo(1);
       TrustedContactHistoryBottomSheet.current.snapTo(0);
     } else if (SelectTypeToReshare == 'contact2') {
+      setTimeout(() => {
+        setLoadContacts(true);
+      }, 2);
       trustedContactsBottomSheet.current.snapTo(1);
       TrustedContactHistoryBottomSheet.current.snapTo(0);
     } else if (SelectTypeToReshare == 'copy1') {
@@ -1074,10 +1097,12 @@ export default function ManageBackup(props) {
   const renderPersonalCopyConfirmModalContent = () => {
     return (
       <CloudHealthCheck
+        LoadCamera={LoadCamera}
         modalRef={PersonalCopyConfirmBottomSheet}
         scannedCode={getScannerData}
         goPressBack={() => {
           setTimeout(() => {
+            setLoadCamera(false);
             setSelectedType('');
           }, 10);
           (PersonalCopyConfirmBottomSheet as any).current.snapTo(0);
@@ -1085,6 +1110,7 @@ export default function ManageBackup(props) {
         onPressProceed={() => {}}
         onPressIgnore={() => {
           setTimeout(() => {
+            setLoadCamera(false);
             setSelectedType('');
           }, 10);
           (PersonalCopyConfirmBottomSheet as any).current.snapTo(0);
@@ -1127,7 +1153,35 @@ export default function ManageBackup(props) {
     setIsSecretShared2(isSecretShared2);
   };
 
+  const setSetupFlowAsync = async() =>{
+    let secondaryDeviceAutoHighlightFlags = await AsyncStorage.getItem(
+      'secondaryDeviceAutoHighlightFlags',
+    );
+    let contact1AutoHighlightFlags = await AsyncStorage.getItem(
+      'contact1AutoHighlightFlags',
+    );
+    let contact2AutoHighlightFlags = await AsyncStorage.getItem(
+      'contact2AutoHighlightFlags',
+    );
+    let personalCopy1AutoHighlightFlags = await AsyncStorage.getItem(
+      'personalCopy1AutoHighlightFlags',
+    );
+    let personalCopy2AutoHighlightFlags = await AsyncStorage.getItem(
+      'personalCopy2AutoHighlightFlags',
+    );
+    let securityAutoHighlightFlags = await AsyncStorage.getItem(
+      'securityAutoHighlightFlags',
+    );
+    setSecondaryDeviceAutoHighlightFlags(secondaryDeviceAutoHighlightFlags);
+    setContact1AutoHighlightFlags(contact1AutoHighlightFlags);
+    setContact2AutoHighlightFlags(contact2AutoHighlightFlags);
+    setPersonalCopy1AutoHighlightFlags(personalCopy1AutoHighlightFlags);
+    setPersonalCopy2AutoHighlightFlags(personalCopy2AutoHighlightFlags);
+    setSecurityAutoHighlightFlags('true');
+  }
+
   useEffect(() => {
+    setSetupFlowAsync();
     autoHighlightOptions();
     (async () => {
       if (!overallHealth) {
@@ -1155,6 +1209,7 @@ export default function ManageBackup(props) {
 
   useEffect(() => {
     if (overallHealth) {
+      setIsNextStepDisable(false)
       const updatedPageData = [...pageData];
       updatedPageData.forEach(data => {
         switch (data.title) {
@@ -1268,30 +1323,6 @@ export default function ManageBackup(props) {
     setTimeout(() => {
       setContact(contactList);
     }, 10);
-    let secondaryDeviceAutoHighlightFlags = await AsyncStorage.getItem(
-      'secondaryDeviceAutoHighlightFlags',
-    );
-    let contact1AutoHighlightFlags = await AsyncStorage.getItem(
-      'contact1AutoHighlightFlags',
-    );
-    let contact2AutoHighlightFlags = await AsyncStorage.getItem(
-      'contact2AutoHighlightFlags',
-    );
-    let personalCopy1AutoHighlightFlags = await AsyncStorage.getItem(
-      'personalCopy1AutoHighlightFlags',
-    );
-    let personalCopy2AutoHighlightFlags = await AsyncStorage.getItem(
-      'personalCopy2AutoHighlightFlags',
-    );
-    let securityAutoHighlightFlags = await AsyncStorage.getItem(
-      'securityAutoHighlightFlags',
-    );
-    setSecondaryDeviceAutoHighlightFlags(secondaryDeviceAutoHighlightFlags);
-    setContact1AutoHighlightFlags(contact1AutoHighlightFlags);
-    setContact2AutoHighlightFlags(contact2AutoHighlightFlags);
-    setPersonalCopy1AutoHighlightFlags(personalCopy1AutoHighlightFlags);
-    setPersonalCopy2AutoHighlightFlags(personalCopy2AutoHighlightFlags);
-    setSecurityAutoHighlightFlags(securityAutoHighlightFlags);
     if (
       !secondaryDeviceAutoHighlightFlags ||
       secondaryDeviceAutoHighlightFlags != 'true'
@@ -1330,6 +1361,10 @@ export default function ManageBackup(props) {
           setSelectedType('contact1');
         } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
           setSelectedType('contact2');
+        } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
+          setSelectedType('copy1');
+        } else if (overallHealth.sharesInfo[4].shareStage === 'Ugly') {
+          setSelectedType('copy2');
         } else if (overallHealth.qaStatus.stage === 'Ugly') {
           setSelectedType('security');
         } else if (overallHealth.sharesInfo[0].shareStage === 'Bad') {
@@ -1346,33 +1381,10 @@ export default function ManageBackup(props) {
   };
 
   const nextStep = async () => {
-    let secondaryDeviceAutoHighlightFlags = await AsyncStorage.getItem(
-      'secondaryDeviceAutoHighlightFlags',
-    );
-    let contact1AutoHighlightFlags = await AsyncStorage.getItem(
-      'contact1AutoHighlightFlags',
-    );
-    let contact2AutoHighlightFlags = await AsyncStorage.getItem(
-      'contact2AutoHighlightFlags',
-    );
-    let personalCopy1AutoHighlightFlags = await AsyncStorage.getItem(
-      'personalCopy1AutoHighlightFlags',
-    );
-    let personalCopy2AutoHighlightFlags = await AsyncStorage.getItem(
-      'personalCopy2AutoHighlightFlags',
-    );
-    let securityAutoHighlightFlags = await AsyncStorage.getItem(
-      'securityAutoHighlightFlags',
-    );
     let AsyncContacts = JSON.parse(
       await AsyncStorage.getItem('SelectedContacts'),
     );
     setContact(AsyncContacts);
-    setContact1AutoHighlightFlags(contact1AutoHighlightFlags);
-    setContact2AutoHighlightFlags(contact2AutoHighlightFlags);
-    setPersonalCopy1AutoHighlightFlags(personalCopy1AutoHighlightFlags);
-    setPersonalCopy2AutoHighlightFlags(personalCopy2AutoHighlightFlags);
-    setSecurityAutoHighlightFlags(securityAutoHighlightFlags);
     if (
       !secondaryDeviceAutoHighlightFlags ||
       secondaryDeviceAutoHighlightFlags != 'true'
@@ -1383,6 +1395,7 @@ export default function ManageBackup(props) {
       contact1AutoHighlightFlags != 'true'
     ) {
       setTimeout(() => {
+          setLoadContacts(true);
         setLoadOnTrustedContactBottomSheet(true);
       }, 10);
       trustedContactsBottomSheet.current.snapTo(1);
@@ -1391,6 +1404,7 @@ export default function ManageBackup(props) {
       contact2AutoHighlightFlags != 'true'
     ) {
       setTimeout(() => {
+        setLoadContacts(true);
         setLoadOnTrustedContactBottomSheet(true);
       }, 10);
       trustedContactsBottomSheet.current.snapTo(1);
@@ -1434,6 +1448,18 @@ export default function ManageBackup(props) {
             setContactToConfirm(AsyncContacts[1]);
           }
           ConfirmBottomSheet.current.snapTo(1);
+        } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
+          //personal copy 1
+          setTimeout(() => {
+            setLoadCamera(true);
+          }, 2);
+          PersonalCopyConfirmBottomSheet.current.snapTo(1);
+        } else if (overallHealth.sharesInfo[4].shareStage === 'Ugly') {
+          //personal copy 2
+          setTimeout(() => {
+            setLoadCamera(true);
+          }, 2);
+          PersonalCopyConfirmBottomSheet.current.snapTo(1);
         } else if (overallHealth.qaStatus.stage === 'Ugly') {
           // Security question
           SecurityQuestionHistoryBottomSheet.current.snapTo(1);
@@ -1608,6 +1634,7 @@ export default function ManageBackup(props) {
                         TrustedContactHistoryBottomSheet.current.snapTo(1);
                       } else {
                         setTimeout(() => {
+                          setLoadContacts(true);
                           setChosenContactIndex(0);
                           if (item.personalInfo) {
                             setContactToConfirm(item.personalInfo);
@@ -1624,6 +1651,7 @@ export default function ManageBackup(props) {
                         TrustedContactHistoryBottomSheet.current.snapTo(1);
                       } else {
                         setTimeout(() => {
+                          setLoadContacts(true);
                           setChosenContactIndex(1);
                           if (item.personalInfo) {
                             setContactToConfirm(item.personalInfo);
@@ -1817,6 +1845,7 @@ export default function ManageBackup(props) {
             );
           })}
           <TouchableOpacity
+            disabled={isNextStepDisable}
             onPress={() => nextStep()}
             style={{
               height: wp('10%'),
@@ -1896,7 +1925,48 @@ export default function ManageBackup(props) {
           snapPoints={[-50, hp('95%')]}
           renderContent={renderPersonalCopyShareModalContent}
           renderHeader={renderPersonalCopyShareModalHeader}
-        />
+          />
+        {/* <ModalShareIntent
+          removeHighlightingFromCard={removeHighlightingFromCard}
+          data={arrModalShareIntent}
+          onPressHandle={() => {
+            setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
+          }}
+          onPressShare={async type => {
+            setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
+            dispatch(requestSharePdf(type, itemSelected));
+            let pdfShared = JSON.parse(await AsyncStorage.getItem('pdfShared'));
+            pdfShared = pdfShared ? pdfShared : {};
+            const updatedPDFShared = {
+              ...pdfShared,
+              [type == 'copy2' ? 4 : 3]: true,
+            };
+            await AsyncStorage.setItem(
+              'pdfShared',
+              JSON.stringify({
+                ...updatedPDFShared,
+              }),
+            );
+            if (
+              arrModalShareIntent.item &&
+              arrModalShareIntent.item.type == 'copy1'
+            ) {
+              setTimeout(() => {
+                setPersonalCopy1AutoHighlightFlags('true')
+              }, 10);
+              AsyncStorage.setItem('personalCopy1AutoHighlightFlags', 'true');
+            } else if (
+              arrModalShareIntent.item &&
+              arrModalShareIntent.item.type == 'copy2'
+            ) {
+              setTimeout(() => {
+                setPersonalCopy2AutoHighlightFlags('true')
+              }, 10);
+              AsyncStorage.setItem('personalCopy2AutoHighlightFlags', 'true');
+            }
+            setSelectedType('');
+          }}
+        /> */}
         <BottomSheet
           enabledInnerScrolling={true}
           ref={SecurityQuestionBottomSheet}
