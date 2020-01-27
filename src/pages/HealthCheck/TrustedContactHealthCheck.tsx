@@ -31,7 +31,7 @@ import DeviceInfo from "react-native-device-info";
 import ModalHeader from '../../components/ModalHeader';
 
 const TrustedContactHealthCheck = props => {
-    const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
+    const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
     const [SelectedOption, setSelectedOption] = useState(0);
     const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
     const [ReshareBottomSheet, setReshareBottomSheet] = useState(

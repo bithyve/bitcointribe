@@ -105,7 +105,7 @@ export default function NewWalletQuestion(props) {
     //setAnsError('');
     return (
       <TouchableOpacity
-        onPress={() => {
+        onPress={async() => {
           const security = {
             question: dropdownBoxValue.question,
             answer,
@@ -113,10 +113,13 @@ export default function NewWalletQuestion(props) {
           setIsEditable(false);
           setIsDisabled(true);
           dispatch(initializeSetup(walletName, security));
-          AsyncStorage.setItem(
-            'SecurityAnsTimestamp',
-            JSON.stringify(Date.now()),
-          );
+          await AsyncStorage.setItem('SecurityAnsTimestamp', JSON.stringify(Date.now()));
+          await AsyncStorage.setItem('secondaryDeviceAutoHighlightFlags',"false");
+          await AsyncStorage.setItem('contact1AutoHighlightFlags',"false");
+          await AsyncStorage.setItem('contact2AutoHighlightFlags',"false");
+          await AsyncStorage.setItem('personalCopy1AutoHighlightFlags',"false");
+          await AsyncStorage.setItem('personalCopy2AutoHighlightFlags',"false");
+          await AsyncStorage.setItem('securityAutoHighlightFlags',"true");
         }}
         style={styles.buttonView}
       >

@@ -32,7 +32,7 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import {ScrollView} from "react-native-gesture-handler";
 
 export default function CommunicationMode(props) {
-  // const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
+  // const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
   const secretSharedTrustedContact1 = props.secretSharedTrustedContact1
     ? props.secretSharedTrustedContact1
     : null;
@@ -41,7 +41,7 @@ export default function CommunicationMode(props) {
     : null;
 
   const contact = props.contact;
-  const index = props.index + 1; // synching w/ share indexes in DB
+  const index = props.index; // synching w/ share indexes in DB
   if (!contact) return <View></View>;
   const dispatch = useDispatch();
 
@@ -92,11 +92,11 @@ export default function CommunicationMode(props) {
   }
 
   const getIconByStatus = status => {
-    if (status == 'error') {
+    if (status == 'Ugly') {
       return require('../../assets/images/icons/icon_error_red.png');
-    } else if (status == 'warning') {
+    } else if (status == 'Bad') {
       return require('../../assets/images/icons/icon_error_yellow.png');
-    } else if (status == 'success') {
+    } else if (status == 'Good') {
       return require('../../assets/images/icons/icon_check.png');
     }
   };
@@ -174,7 +174,6 @@ export default function CommunicationMode(props) {
         }
         break;
     }
-
     props.onPressContinue(
       SHARES_TRANSFER_DETAILS[index].OTP
         ? SHARES_TRANSFER_DETAILS[index].OTP
@@ -304,7 +303,7 @@ export default function CommunicationMode(props) {
         </View>
         <Image
           style={BackupStyles.cardIconImage}
-          source={getIconByStatus('error')}
+          source={getIconByStatus('Ugly')}
         />
       </View>
       <TouchableOpacity
