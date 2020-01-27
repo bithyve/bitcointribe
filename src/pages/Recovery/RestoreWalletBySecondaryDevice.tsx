@@ -111,7 +111,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
             ) : (
               <QRCode value={secondaryQR} size={hp('27%')} />
             )}
-            {deepLink ? <CopyThisText text={deepLink} /> : null}
+            {/* {deepLink ? <CopyThisText text={deepLink} /> : null} */}
           </View>
 
           {REQUEST_DETAILS ? (

@@ -707,8 +707,6 @@ export const recoverMnemonicWatcher = createWatcher(
 );
 
 function* restoreShareFromQRWorker({ payload }) {
-  // yield put(switchS3Loader('restoreWallet'));
-
   const { qrArray } = payload;
   if (qrArray.length !== 8) {
     throw new Error('QR array is not of appropriate length');

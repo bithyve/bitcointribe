@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Clipboard, SafeAreaView, StatusBar } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Clipboard,
+  SafeAreaView,
+  StatusBar,
+} from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -20,103 +27,107 @@ export default function ShareRecoveryOTP(props) {
   };
   return (
     <SafeAreaView style={{ flex: 1 }}>
-    <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-    <View style={styles.modalContainer}>
-      <View style={styles.modalHeaderTitleView}>
-        <View style={{ flexDirection: 'row', flex: 1 }}>
-          <AppBottomSheetTouchableWrapper
-            onPress={() => {
-              //   props.onPressBack();
-              props.navigation.navigate('RestoreSelectedContactsList');
-            }}
-            style={{ height: 30, width: 30 }}
-          >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </AppBottomSheetTouchableWrapper>
-          <View>
-            <Text style={styles.modalHeaderTitleText}>
-              Share OTP with{'\n'}trusted contact
-            </Text>
-            <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-              Please provide this OTP to your trusted contact in order for them
-              to send you the recovery secret
-            </Text>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={styles.modalContainer}>
+        <View style={styles.modalHeaderTitleView}>
+          <View style={{ flexDirection: 'row', flex: 1 }}>
+            <AppBottomSheetTouchableWrapper
+              onPress={() => {
+                //   props.onPressBack();
+                props.navigation.navigate('RestoreSelectedContactsList');
+              }}
+              style={{ height: 30, width: 30 }}
+            >
+              <FontAwesome
+                name="long-arrow-left"
+                color={Colors.blue}
+                size={17}
+              />
+            </AppBottomSheetTouchableWrapper>
+            <View>
+              <Text style={styles.modalHeaderTitleText}>
+                Share OTP with{'\n'}trusted contact
+              </Text>
+              <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
+                Please provide this OTP to your trusted contact in order for
+                them to send you the recovery secret
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
-      <View style={{ flex: 1, marginLeft: 30, marginRight: 30 }}>
-        <AppBottomSheetTouchableWrapper
-          onPress={() => writeToClipboard()}
-          style={styles.otpView}
-        >
-          <View style={styles.otpTextView}>
-            <Text style={styles.otpText}>{OTP[0]}</Text>
-          </View>
-          <View style={styles.otpTextView}>
-            <Text style={styles.otpText}>{OTP[1]}</Text>
-          </View>
-          <View style={styles.otpTextView}>
-            <Text style={styles.otpText}>{OTP[2]}</Text>
-          </View>
-          <View style={styles.otpTextView}>
-            <Text style={styles.otpText}>{OTP[3]}</Text>
-          </View>
-          <View style={styles.otpTextView}>
-            <Text style={styles.otpText}>{OTP[4]}</Text>
-          </View>
-          <View style={styles.otpTextView}>
-            <Text style={styles.otpText}>{OTP[5]}</Text>
-          </View>
-        </AppBottomSheetTouchableWrapper>
-        <Text
-          numberOfLines={2}
-          style={{ ...styles.modalHeaderInfoText, marginBottom: hp('5%') }}
-        >
-          Tap on OTP to copy
-        </Text>
-        <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-          This OTP is only valid for 10 minutes, if the OTP{'\n'}expires you
-          will be asked to create a new one
-        </Text>
-        <View style={styles.separator} />
-        <View style={styles.bottomView}>
-          <View style={styles.bottomInnerView}>
-            <Ionicons color={Colors.blue} size={17} name={'md-time'} />
-            <Text style={styles.timerText}>09 : 12</Text>
-          </View>
+        <View style={{ flex: 1, marginLeft: 30, marginRight: 30 }}>
           <AppBottomSheetTouchableWrapper
-            onPress={() => {
-              //props.onPressOk(index);
-              props.navigation.navigate('RestoreSelectedContactsList');
-            }}
-            style={{
-              backgroundColor: Colors.blue,
-              borderRadius: 10,
-              width: wp('50%'),
-              height: wp('13%'),
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: hp('3%'),
-              marginBottom: hp('3%'),
-              elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
-            }}
+            onPress={() => writeToClipboard()}
+            style={styles.otpView}
           >
-            <Text
+            <View style={styles.otpTextView}>
+              <Text style={styles.otpText}>{OTP[0]}</Text>
+            </View>
+            <View style={styles.otpTextView}>
+              <Text style={styles.otpText}>{OTP[1]}</Text>
+            </View>
+            <View style={styles.otpTextView}>
+              <Text style={styles.otpText}>{OTP[2]}</Text>
+            </View>
+            <View style={styles.otpTextView}>
+              <Text style={styles.otpText}>{OTP[3]}</Text>
+            </View>
+            <View style={styles.otpTextView}>
+              <Text style={styles.otpText}>{OTP[4]}</Text>
+            </View>
+            <View style={styles.otpTextView}>
+              <Text style={styles.otpText}>{OTP[5]}</Text>
+            </View>
+          </AppBottomSheetTouchableWrapper>
+          <Text
+            numberOfLines={2}
+            style={{ ...styles.modalHeaderInfoText, marginBottom: hp('5%') }}
+          >
+            Tap on OTP to copy
+          </Text>
+          <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
+            This OTP is only valid for 10 minutes, if the OTP{'\n'}expires you
+            will be asked to create a new one
+          </Text>
+          <View style={styles.separator} />
+          <View style={styles.bottomView}>
+            <View style={styles.bottomInnerView}>
+              <Ionicons color={Colors.blue} size={17} name={'md-time'} />
+              <Text style={styles.timerText}>09 : 12</Text>
+            </View>
+            <AppBottomSheetTouchableWrapper
+              onPress={() => {
+                //props.onPressOk(index);
+                props.navigation.navigate('RestoreSelectedContactsList');
+              }}
               style={{
-                color: Colors.white,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansMedium,
+                backgroundColor: Colors.blue,
+                borderRadius: 10,
+                width: wp('50%'),
+                height: wp('13%'),
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: hp('3%'),
+                marginBottom: hp('3%'),
+                elevation: 10,
+                shadowColor: Colors.shadowBlue,
+                shadowOpacity: 1,
+                shadowOffset: { width: 15, height: 15 },
               }}
             >
-              Yes, I have shared
-            </Text>
-          </AppBottomSheetTouchableWrapper>
+              <Text
+                style={{
+                  color: Colors.white,
+                  fontSize: RFValue(13),
+                  fontFamily: Fonts.FiraSansMedium,
+                }}
+              >
+                Yes, I have shared
+              </Text>
+            </AppBottomSheetTouchableWrapper>
+          </View>
         </View>
       </View>
-    </View>
     </SafeAreaView>
   );
 }
