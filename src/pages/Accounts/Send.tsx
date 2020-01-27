@@ -159,10 +159,7 @@ export default function Send(props) {
     return (
       <TestAccountHelperModalContents
         topButtonText={`Sending Bitcoins`}
-        helperInfo={`When you want to send bitcoins or sats (a very small fraction 
-          of a bitcoin), you have to send it to an address of the recipient
-          \n\nPretty much like an email address but one that changes every time you send it to them
-          \n\nFor this you can either scan a QR code from therecipient or enter a very long sequence ofnumbers and letters which is the recipientsbitcoin address`}
+        helperInfo={`When you want to send bitcoins or sats (a very small fraction of a bitcoin), you have to send it to an address of the recipient \n\nPretty much like an email address but one that changes every time you send it to them \n\nFor this you can either scan a QR code from the recipient or enter a very long sequence ofnumbers and letters which is the recipientsbitcoin address`}
         continueButtonText={'Continue'}
         quitButtonText={'Quit'}
         onPressContinue={() => {
@@ -196,11 +193,8 @@ export default function Send(props) {
 
   const getQrCodeData = qrData => {
     console.log('Qrcodedata', qrData);
-    if(qrData){
-      (bottomSheet as any).current.snapTo(0);
+    (bottomSheet as any).current.snapTo(0);
       setRecipientAddress(qrData);
-    }
-    
   };
 
   const renderContent1 = () => {

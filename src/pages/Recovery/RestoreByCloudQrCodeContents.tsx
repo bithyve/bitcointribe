@@ -138,7 +138,6 @@ export default function RestoreByCloudQrCodeContents(props) {
       >
         <QrCodeModalContents
           flag={true}
-          restoreQr={true}
           //modalRef={props.modalRef}
           isOpenedFlag={props.isOpenedFlag}
           onQrScan={qrData => getQrCodeData(qrData)}
