@@ -21,6 +21,7 @@ export default function RestoreByCloudQrCodeContents(props) {
   const [recipientAddress, setRecipientAddress] = useState('');
   const [qrDataArray, setQrDataArray] = useState([]);
   let [counter, setCounter] = useState(1);
+  const dispatch = useDispatch();
 
   const getQrCodeData = qrData => {
     let tempArray = qrDataArray;
@@ -47,17 +48,13 @@ export default function RestoreByCloudQrCodeContents(props) {
     }
     console.log('tempArray', tempArray);
     console.log('qrDataArray', qrDataArray);
-  };
 
-  const dispatch = useDispatch();
-  useEffect(() => {
-    console.log('Checking');
     console.log({ length: qrDataArray.length });
     if (qrDataArray.length === 8) {
-      console.log('Regenerating share from QRs');
       dispatch(restoreShareFromQR(qrDataArray));
+      props.onPressBack();
     }
-  }, qrDataArray);
+  };
 
   return (
     <ScrollView style={styles.modalContainer}>

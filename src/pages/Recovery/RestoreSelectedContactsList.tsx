@@ -294,6 +294,7 @@ export default function RestoreSelectedContactsList(props) {
     (async () => {
       if (SERVICES) {
         await AsyncStorage.setItem('walletExists', 'true');
+        await AsyncStorage.setItem('walletRecovered', 'true');
         props.navigation.navigate('Home');
       }
     })();

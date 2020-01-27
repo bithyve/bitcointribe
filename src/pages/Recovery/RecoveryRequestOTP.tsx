@@ -55,7 +55,7 @@ export default function RecoveryRequestOTP(props) {
 
   const onOTPSubmit = () => {
     if (passcode.join('').length !== 6 || !rk) return;
-    dispatch(uploadRequestedShare(requester, rk, passcode));
+    dispatch(uploadRequestedShare(requester, rk, passcode.join('')));
   };
 
   useEffect(() => {
@@ -121,7 +121,7 @@ export default function RecoveryRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value,0);
+                  onPressNumber(value, 0);
                   if (value.length >= 1) {
                     this.textInput2.focus();
                   }
@@ -129,14 +129,13 @@ export default function RecoveryRequestOTP(props) {
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput.focus();
-                    onPressNumber('',0);
+                    onPressNumber('', 0);
                   }
                 }}
               />
 
               <TextInput
                 maxLength={1}
-               
                 value={otp ? otp[1] : null}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
@@ -153,7 +152,6 @@ export default function RecoveryRequestOTP(props) {
                   onPressNumber(value, 1);
                   if (value.length >= 1) this.textInput3.focus();
                 }}
-                
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput.focus();
@@ -179,7 +177,6 @@ export default function RecoveryRequestOTP(props) {
                 onChangeText={value => {
                   onPressNumber(value, 2);
                   if (value.length >= 1) this.textInput4.focus();
-                  
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
@@ -206,7 +203,6 @@ export default function RecoveryRequestOTP(props) {
                 onChangeText={value => {
                   onPressNumber(value, 3);
                   if (value.length >= 1) this.textInput5.focus();
-                  
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
@@ -231,14 +227,13 @@ export default function RecoveryRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value,4);
+                  onPressNumber(value, 4);
                   if (value.length >= 1) this.textInput6.focus();
-                  
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput4.focus();
-                    onPressNumber('',4);
+                    onPressNumber('', 4);
                   }
                 }}
               />
@@ -257,14 +252,13 @@ export default function RecoveryRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value,5);
+                  onPressNumber(value, 5);
                   if (value.length >= 1) this.textInput6.focus();
-                  
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput5.focus();
-                    onPressNumber('',5);
+                    onPressNumber('', 5);
                   }
                 }}
               />

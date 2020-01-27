@@ -80,7 +80,11 @@ import ShareRecoverySecretModalContents from '../components/ShareRecoverySecretM
 import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
-import { getTestcoins } from '../store/actions/accounts';
+import {
+  getTestcoins,
+  fetchBalance,
+  fetchTransactions,
+} from '../store/actions/accounts';
 import axios from 'axios';
 import { UsNumberFormat } from '../common/utilities';
 
@@ -1542,6 +1546,17 @@ export default function Home(props) {
     })();
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      if (await AsyncStorage.getItem('walletRecovered')) {
+        dispatch(fetchBalance(REGULAR_ACCOUNT));
+        dispatch(fetchBalance(SECURE_ACCOUNT));
+        dispatch(fetchTransactions(REGULAR_ACCOUNT));
+        dispatch(fetchTransactions(SECURE_ACCOUNT));
+      }
+    })();
+  }, []);
+
   const renderRecoverySecretRequestModalContent = useCallback(() => {
     if (!recoveryRequest) return <View></View>;
     return (
@@ -1795,8 +1810,14 @@ export default function Home(props) {
                     if (value.accountType === 'add') {
                       return (
                         <TouchableOpacity disabled={true}>
-                          <CardView cornerRadius={10} style={{...styles.card,  opacity: 0.4,
-                  backgroundColor: Colors.borderColor}}>
+                          <CardView
+                            cornerRadius={10}
+                            style={{
+                              ...styles.card,
+                              opacity: 0.4,
+                              backgroundColor: Colors.borderColor,
+                            }}
+                          >
                             <View
                               style={{
                                 flex: 1,
