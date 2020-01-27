@@ -213,6 +213,7 @@ function Accounts(props) {
       setServiceType(serviceType);
     }, 10);
     console.log("Service type in getServiceType", serviceType);
+    if (serviceType == TEST_ACCOUNT) checkNHighlight();
   };
 
   const renderSendContents = () => {
@@ -818,7 +819,7 @@ function Accounts(props) {
         true,
       );
     }, 2000);
-    if (serviceType == TEST_ACCOUNT) checkNHighlight();
+    getServiceType(serviceType);
     (async () => {
       const storedStaticFees = await AsyncStorage.getItem('storedStaticFees');
       if (storedStaticFees) {

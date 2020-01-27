@@ -45,7 +45,7 @@ export default function NewWalletQuestion(props) {
   const [confirmInputStyle, setConfirmAnswerInputStyle] = useState(
     styles.inputBox,
   );
-  const [confirmAnswer, setConfirmAnswer] = useState('');
+  let [confirmAnswer, setConfirmAnswer] = useState('');
   const [answer, setAnswer] = useState('');
   const [answerMasked, setAnswerMasked] = useState('');
   const [confirmAnswerMasked, setConfirmAnswerMasked] = useState('');
@@ -55,6 +55,7 @@ export default function NewWalletQuestion(props) {
   const dispatch = useDispatch();
   const walletName = props.navigation.getParam('walletName');
   const [ansError, setAnsError] = useState('');
+  let [tempAns, setTempAns] = useState('');
   const [isEditable, setIsEditable] = useState(true);
   const [isDisabled, setIsDisabled] = useState(false);
   const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
@@ -62,9 +63,9 @@ export default function NewWalletQuestion(props) {
     props.navigation.navigate('HomeNav');
   }  
 
-  const setConfirm = event => {
-    if (event.text) {
-      if (answer && event.text != answer) {
+  const setConfirm = confirmAnswer => {
+    if (confirmAnswer) {
+      if (answer && confirmAnswer != answer) {
         setAnsError('Answers do not match');
         counter++;
         setCounter(counter);
@@ -332,10 +333,11 @@ export default function NewWalletQuestion(props) {
                         ) {
                           Keyboard.dismiss();
                         }
+                        //setTempAns(confirmAnswer);
                         setConfirmAnswer(text);
                         setConfirmAnswerMasked(text);
                       }}
-                      onSubmitEditing={event => setConfirm(event.nativeEvent)}
+                      onSubmitEditing={event => setConfirm(confirmAnswer)}
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
                         setConfirmAnswerInputStyle(styles.inputBoxFocused);
@@ -410,8 +412,8 @@ export default function NewWalletQuestion(props) {
             </View>
             {dropdownBoxValue.id.trim() == '' ? (
               <BottomInfoBox
-                title={'This question will serve as a hint'}
-                infoText={'For you to remember what the answer was'}
+                title={'Note'}
+                infoText={'Secret question and answer are very important for your wallet and it’s backup'}
               />
             ) : null}
           </TouchableOpacity>

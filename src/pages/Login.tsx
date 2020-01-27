@@ -210,7 +210,7 @@ export default function Login(props) {
               {checkAuth ? (
             <View style={{marginLeft: 'auto'}}>
               <Text style={styles.errorText}>
-                Incorrect Passcode, Try Again!
+              Incorrect passcode, try again!
               </Text>
             </View>
           ) : null}
