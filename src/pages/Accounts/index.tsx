@@ -118,7 +118,7 @@ function Accounts(props) {
   const [carouselData, setCarouselData] = useState([
     {
       accountType: 'Test Account',
-      accountInfo: 'Test it out!',
+      accountInfo: 'Learn Bitcoin',
       backgroundImage: require('../../assets/images/carouselImages/test_account_background.png'),
       accountTypeImage: require('../../assets/images/icons/icon_test_white.png'),
     },
@@ -147,6 +147,7 @@ function Accounts(props) {
     setCarouselInitIndex(index);
   //}, 2000);
   };
+  const [isTestHelperDone, setIsTestHelperDone] = useState(true);
 
   const checkNHighlight = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
@@ -188,37 +189,19 @@ function Accounts(props) {
     ) {
       await AsyncStorage.setItem('isTestAccountHelperDone', 'true');
       setTimeout(() => {
+        setIsTestHelperDone(true);
+      }, 10);
+      setTimeout(() => {
         TestAccountHelperBottomSheet.current.snapTo(1);
       }, 1000);
     } else {
+        setTimeout(() => {
+          setIsTestHelperDone(false);
+        }, 10);
       props.copilotEvents.on('stepChange', handleStepChange);
       props.start();
     }
   };
-
-  // const setCarouselData1 = async () => {
-  //   console.log('SERVICETYPE', serviceType);
-  //   if (serviceType == TEST_ACCOUNT) {
-  //     getServiceType(serviceType);
-
-  //     setTimeout(() => {
-  //       carousel.current.snapToItem(0, true, false);
-  //       setCarouselInitIndex(0);
-  //     }, 3000);
-  //   }
-  //   if (serviceType == REGULAR_ACCOUNT) {
-  //     setTimeout(() => {
-  //       carousel.current.snapToItem(1, true, false);
-  //       setCarouselInitIndex(1);
-  //     }, 3000);
-  //   }
-  //   if (serviceType == SECURE_ACCOUNT) {
-  //     setTimeout(() => {
-  //       carousel.current.snapToItem(2, true, false);
-  //       setCarouselInitIndex(2);
-  //     }, 3000);
-  //   }
-  // };
 
   const handleStepChange = step => {
     console.log(`Current step is: ${step.name}`);
@@ -229,7 +212,7 @@ function Accounts(props) {
     setTimeout(() => {
       setServiceType(serviceType);
     }, 10);
-    if (serviceType == TEST_ACCOUNT) checkNHighlight();
+    console.log("Service type in getServiceType", serviceType);
   };
 
   const renderSendContents = () => {
@@ -715,7 +698,15 @@ function Accounts(props) {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          (TestAccountHelperBottomSheet as any).current.snapTo(0);
+          console.log("isTestHelperDone",isTestHelperDone);
+          if (isTestHelperDone) {
+          (TestAccountHelperBottomSheet as any).current.snapTo(2);
+          setTimeout(() => {
+            setIsTestHelperDone(false);
+          }, 10);
+          } else{
+            (TestAccountHelperBottomSheet as any).current.snapTo(0);
+          }
         }}
       />
     );
@@ -827,6 +818,7 @@ function Accounts(props) {
         true,
       );
     }, 2000);
+    if (serviceType == TEST_ACCOUNT) checkNHighlight();
     (async () => {
       const storedStaticFees = await AsyncStorage.getItem('storedStaticFees');
       if (storedStaticFees) {
@@ -1408,7 +1400,11 @@ function Accounts(props) {
         ref={TestAccountHelperBottomSheet}
         snapPoints={[
           -50,
-          hp('90%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('18%')
+          : Platform.OS == 'android'
+          ? hp('20%')
+          : hp('19%'),
           Platform.OS == 'android' ? hp('50%') : hp('90%'),
         ]}
         renderContent={renderTestAccountsHelperContents}

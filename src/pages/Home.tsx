@@ -972,8 +972,8 @@ export default function Home(props) {
   // }, []);
 
   const onPressElement = item => {
-    if (item.title == 'Health of the App') {
-      props.navigation.navigate('HealthCheck');
+    if (item.title == 'Backup Health') {
+      props.navigation.navigate('ManageBackup');
     }
     if (item.title == 'Address Book') {
       (addressBookBottomSheet as any).current.snapTo(1);
@@ -985,7 +985,7 @@ export default function Home(props) {
       setTimeout(() => {
         setTabBarZIndex(0);
       }, 10);
-    } else if (item.title == 'All Accounts') {
+    } else if (item.title == 'All accounts and funds') {
       (AllAccountsBottomSheet as any).current.snapTo(1);
       setTimeout(() => {
         setTabBarZIndex(0);
@@ -1794,8 +1794,9 @@ export default function Home(props) {
                   {Items.item.map(value => {
                     if (value.accountType === 'add') {
                       return (
-                        <TouchableOpacity>
-                          <CardView cornerRadius={10} style={styles.card}>
+                        <TouchableOpacity disabled={true}>
+                          <CardView cornerRadius={10} style={{...styles.card,  opacity: 0.4,
+                  backgroundColor: Colors.borderColor}}>
                             <View
                               style={{
                                 flex: 1,
