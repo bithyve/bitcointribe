@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Image, Text, StyleSheet, Alert, StatusBar } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import {
@@ -13,6 +13,8 @@ import KnowMoreButton from '../../components/KnowMoreButton';
 import QrScanner from '../../components/QrScanner';
 import QrCodeModalContents from '../../components/QrCodeModalContents';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import { useDispatch } from 'react-redux';
+import { restoreShareFromQR } from '../../store/actions/sss';
 
 export default function RestoreByCloudQrCodeContents(props) {
   const [qrData, setQrData] = useState('');
@@ -23,7 +25,7 @@ export default function RestoreByCloudQrCodeContents(props) {
   const getQrCodeData = qrData => {
     let tempArray = qrDataArray;
     setQrData(qrData);
-    for (let i = 0; i < qrDataArray.length; i++) {
+    for (let i = 0; i < 8; i++) {
       if (qrDataArray[i] == qrData) return;
     }
     if (qrDataArray.length <= 8) {
@@ -46,6 +48,16 @@ export default function RestoreByCloudQrCodeContents(props) {
     console.log('tempArray', tempArray);
     console.log('qrDataArray', qrDataArray);
   };
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    console.log('Checking');
+    console.log({ length: qrDataArray.length });
+    if (qrDataArray.length === 8) {
+      console.log('Regenerating share from QRs');
+      dispatch(restoreShareFromQR(qrDataArray));
+    }
+  }, qrDataArray);
 
   return (
     <ScrollView style={styles.modalContainer}>

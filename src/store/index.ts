@@ -52,6 +52,7 @@ import {
   restoreDynamicNonPMDDWatcher,
   generatePDFWatcher,
   checkPDFHealthWatcher,
+  restoreShareFromQRWatcher,
 } from './sagas/sss';
 
 import {
@@ -120,6 +121,7 @@ const rootSaga = function*() {
     restoreDynamicNonPMDDWatcher,
     recoverMnemonicWatcher,
     recoverWalletWatcher,
+    restoreShareFromQRWatcher,
 
     // manage backup
     sharePdfWatcher,
