@@ -24,6 +24,7 @@ import {
   calculateOverallHealth,
   overallHealthCalculated,
   CHECK_PDF_HEALTH,
+  RESTORE_SHARE_FROM_QR,
 } from '../actions/sss';
 import { dbInsertedSSS } from '../actions/storage';
 
@@ -280,14 +281,18 @@ function* downloadMetaShareWorker({ payload }) {
       const updatedRecoveryShares = {};
       Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach(key => {
         const recoveryShare = DECENTRALIZED_BACKUP.RECOVERY_SHARES[key];
-        if (recoveryShare.REQUEST_DETAILS.OTP === otp) {
-          updatedRecoveryShares[key] = {
-            REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
-            META_SHARE: metaShare,
-            ENC_DYNAMIC_NONPMDD: dynamicNonPMDD,
-          };
-        } else {
+        if (!recoveryShare.REQUEST_DETAILS) {
           updatedRecoveryShares[key] = recoveryShare;
+        } else {
+          if (recoveryShare.REQUEST_DETAILS.OTP === otp) {
+            updatedRecoveryShares[key] = {
+              REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
+              META_SHARE: metaShare,
+              ENC_DYNAMIC_NONPMDD: dynamicNonPMDD,
+            };
+          } else {
+            updatedRecoveryShares[key] = recoveryShare;
+          }
         }
       });
 
@@ -639,16 +644,19 @@ function* restoreDynamicNonPMDDWorker() {
   );
 
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
-  const dyanmicNonPMDDs: EncDynamicNonPMDD[] = Object.keys(RECOVERY_SHARES).map(
-    key => RECOVERY_SHARES[key].ENC_DYNAMIC_NONPMDD,
+  const dynamicNonPMDDs: EncDynamicNonPMDD[] = Object.keys(RECOVERY_SHARES).map(
+    key => {
+      if (RECOVERY_SHARES.ENC_DYNAMIC_NONPMDD)
+        return RECOVERY_SHARES[key].ENC_DYNAMIC_NONPMDD;
+    },
   );
 
-  if (!dyanmicNonPMDDs.length) {
+  if (!dynamicNonPMDDs.length) {
     console.log('DynamicNonPMDD not available');
     return;
   }
   const s3Service: S3Service = yield select(state => state.sss.service);
-  const res = yield call(s3Service.restoreDynamicNonPMDD, dyanmicNonPMDDs);
+  const res = yield call(s3Service.restoreDynamicNonPMDD, dynamicNonPMDDs);
 
   if (res.status === 200) {
     const metaShares: MetaShare[] = res.data.latestDynamicNonPMDD; // sync the DNP structure across redux-saga and nodeAlpha
@@ -696,6 +704,43 @@ function* recoverMnemonicWorker({ payload }) {
 export const recoverMnemonicWatcher = createWatcher(
   recoverMnemonicWorker,
   RECOVER_MNEMONIC,
+);
+
+function* restoreShareFromQRWorker({ payload }) {
+  // yield put(switchS3Loader('restoreWallet'));
+
+  const { qrArray } = payload;
+  if (qrArray.length !== 8) {
+    throw new Error('QR array is not of appropriate length');
+  }
+  const { DECENTRALIZED_BACKUP } = yield select(
+    state => state.storage.database,
+  );
+
+  const res = yield call(S3Service.recoverMetaShareFromQR, qrArray);
+  if (res.status == 200) {
+    const { metaShare } = res.data;
+    console.log({ metaShare });
+    const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
+    RECOVERY_SHARES[metaShare.meta.index] = {
+      META_SHARE: metaShare,
+    };
+
+    const updatedBackup = {
+      ...DECENTRALIZED_BACKUP,
+      RECOVERY_SHARES,
+    };
+    console.log({ updatedBackup });
+    yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+  } else {
+    Alert.alert('Unable to recover share from QR', res.err);
+    console.log({ err: res.err });
+  }
+}
+
+export const restoreShareFromQRWatcher = createWatcher(
+  restoreShareFromQRWorker,
+  RESTORE_SHARE_FROM_QR,
 );
 
 function* recoverWalletWorker({ payload }) {
