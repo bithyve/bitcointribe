@@ -43,7 +43,7 @@ export default function RestoreWalletByContacts(props) {
   //   function selectedContactsList(list) {
   //     setContacts(list);
   //   }
-  const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
+  const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
   const [contacts, setContacts] = useState([]);
   function selectedContactsList( list ) {
     if ( list.length > 0 ) setContacts( [ ...list ] );

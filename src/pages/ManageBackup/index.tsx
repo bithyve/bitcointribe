@@ -60,71 +60,28 @@ export default function ManageBackup(props) {
   const [LoadCamera, setLoadCamera] = useState(false);
   const [LoadContacts, setLoadContacts] = useState(false);
   const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
-  const [ReshareBottomSheet, setReshareBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [ConfirmBottomSheet, setConfirmBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [
-    SecondaryDeviceConfirmBottomSheet,
-    setSecondaryDeviceConfirmBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    PersonalCopyConfirmBottomSheet,
-    setPersonalCopyConfirmBottomSheet,
-  ] = useState(React.createRef());
+  const [ReshareBottomSheet, setReshareBottomSheet] = useState(React.createRef());
+  const [ConfirmBottomSheet, setConfirmBottomSheet] = useState(React.createRef());
+  const [SecondaryDeviceConfirmBottomSheet, setSecondaryDeviceConfirmBottomSheet] = useState(React.createRef());
+  const [PersonalCopyConfirmBottomSheet,setPersonalCopyConfirmBottomSheet] = useState(React.createRef());
   const [ContactToConfirm, setContactToConfirm] = useState({});
   const [SelectTypeToReshare, setSelectTypeToReshare] = useState({});
-  let [
-    secondaryDeviceAutoHighlightFlags,
-    setSecondaryDeviceAutoHighlightFlags,
-  ] = useState('');
-  let [contact1AutoHighlightFlags, setContact1AutoHighlightFlags] = useState(
-    '',
-  );
-  let [contact2AutoHighlightFlags, setContact2AutoHighlightFlags] = useState(
-    '',
-  );
-  let [
-    personalCopy1AutoHighlightFlags,
-    setPersonalCopy1AutoHighlightFlags,
-  ] = useState('');
-  let [
-    personalCopy2AutoHighlightFlags,
-    setPersonalCopy2AutoHighlightFlags,
-  ] = useState('');
-  let [securityAutoHighlightFlags, setSecurityAutoHighlightFlags] = useState(
-    'true',
-  );
+  let [secondaryDeviceAutoHighlightFlags,setSecondaryDeviceAutoHighlightFlags] = useState('');
+  let [contact1AutoHighlightFlags, setContact1AutoHighlightFlags] = useState('');
+  let [contact2AutoHighlightFlags, setContact2AutoHighlightFlags] = useState('');
+  let [personalCopy1AutoHighlightFlags,setPersonalCopy1AutoHighlightFlags] = useState('');
+  let [personalCopy2AutoHighlightFlags,setPersonalCopy2AutoHighlightFlags] = useState('');
+  let [securityAutoHighlightFlags, setSecurityAutoHighlightFlags] = useState('true');
 
-  const [
-    SecondaryDeviceHistoryBottomSheet,
-    setSecondaryDeviceHistoryBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    TrustedContactHistoryBottomSheet,
-    setTrustedContactHistoryBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    PersonalCopyHistoryBottomSheet,
-    setPersonalCopyHistoryBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    SecurityQuestionHistoryBottomSheet,
-    setSecurityQuestionHistoryBottomSheet,
-  ] = useState(React.createRef());
-
-  const [
-    LoadOnTrustedContactBottomSheet,
-    setLoadOnTrustedContactBottomSheet,
-  ] = useState(false);
+  const [SecondaryDeviceHistoryBottomSheet,setSecondaryDeviceHistoryBottomSheet] = useState(React.createRef());
+  const [TrustedContactHistoryBottomSheet,setTrustedContactHistoryBottomSheet] = useState(React.createRef());
+  const [PersonalCopyHistoryBottomSheet,setPersonalCopyHistoryBottomSheet] = useState(React.createRef());
+  const [SecurityQuestionHistoryBottomSheet,setSecurityQuestionHistoryBottomSheet] = useState(React.createRef());
+  const [LoadOnTrustedContactBottomSheet,setLoadOnTrustedContactBottomSheet] = useState(false);
   const [OTP, setOTP] = useState('');
-  const [chosenContactIndex, setChosenContactIndex] = useState(0);
+  const [chosenContactIndex, setChosenContactIndex] = useState(1);
   const [chosenContact, setChosenContact] = useState({});
-  const [Contact, setContact] = useState([]);
   const [selectedPersonalCopy, setSelectedPersonalCopy] = useState();
-
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
@@ -164,130 +121,26 @@ export default function ManageBackup(props) {
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
   ]);
-  const [pageData1, setPageData1] = useState([
-    {
-      id: 1,
-      title: 'Recovery Secret Not Accessible',
-      date: '19 May ‘19, 11:00am',
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-    {
-      id: 2,
-      title: 'Recovery Secret Received',
-      date: '1 June ‘19, 9:00am',
-      info:
-        'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
-    },
-    {
-      id: 3,
-      title: 'Recovery Secret In-Transit',
-      date: '30 May ‘19, 11:00am',
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-    {
-      id: 4,
-      title: 'Recovery Secret Accessible',
-      date: '24 May ‘19, 5:00pm',
-      info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
-    },
-    {
-      id: 5,
-      title: 'Recovery Secret In-Transit',
-      date: '20 May ‘19, 11:00am',
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-    {
-      id: 6,
-      title: 'Recovery Secret Not Accessible',
-      date: '19 May ‘19, 11:00am',
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-  ]);
-  const SelectOption = Id => {
-    if (Id == SelectedOption) {
-      setSelectedOption(0);
-    } else {
-      setSelectedOption(Id);
-    }
-  };
-  const [SelectedOption, setSelectedOption] = useState(0);
-  const [
-    WalletBackupAndRecoveryBottomSheet,
-    setWalletBackupAndRecoveryBottomSheet,
-  ] = useState(React.createRef());
-  const [secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [trustedContactsBottomSheet, setTrustedContactsBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [
-    CommunicationModeBottomSheet,
-    setCommunicationModeBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    SecurityQuestionBottomSheet,
-    setSecurityQuestionBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    HealthCheckSuccessBottomSheet,
-    setHealthCheckSuccessBottomSheet,
-  ] = useState(React.createRef());
-
-  const [
-    RegenerateShareHelperBottomSheet,
-    setRegenerateShareHelperBottomSheet,
-  ] = useState(React.createRef());
-
-  const [
-    PersonalCopyShareBottomSheet,
-    setPersonalCopyShareBottomSheet,
-  ] = useState(React.createRef());
-
-  const [
-    shareOtpWithTrustedContactBottomSheet,
-    setShareOtpWithTrustedContactBottomSheet,
-  ] = useState(React.createRef());
-  const [cloudBottomSheet, setCloudBottomSheet] = useState(React.createRef());
+  
+  const [WalletBackupAndRecoveryBottomSheet,setWalletBackupAndRecoveryBottomSheet] = useState(React.createRef());
+  const [secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet] = useState(React.createRef());
+  const [trustedContactsBottomSheet, setTrustedContactsBottomSheet] = useState(React.createRef());
+  const [CommunicationModeBottomSheet,setCommunicationModeBottomSheet] = useState(React.createRef());
+  const [SecurityQuestionBottomSheet, setSecurityQuestionBottomSheet] = useState(React.createRef());
+  const [HealthCheckSuccessBottomSheet,setHealthCheckSuccessBottomSheet] = useState(React.createRef());
+  const [RegenerateShareHelperBottomSheet,setRegenerateShareHelperBottomSheet] = useState(React.createRef());
+  const [PersonalCopyShareBottomSheet,setPersonalCopyShareBottomSheet] = useState(React.createRef());
+  const [shareOtpWithTrustedContactBottomSheet,setShareOtpWithTrustedContactBottomSheet] = useState(React.createRef());
   const [selectedType, setSelectedType] = useState('');
-  const [contactIndex, setContactIndex] = useState();
-  const [selectedStatus, setSelectedStatus] = useState('error');
   const [contacts, setContacts] = useState([]);
   const [isSecretShared1, setIsSecretShared1] = useState(false);
   const [isSecretShared2, setIsSecretShared2] = useState(false);
-  // const [arrModalShareIntent, setArrModalShareIntent] = useState({
-  //   snapTop: 0,
-  //   item: {},
-  // });
-
-  const [cloudData, setCloudData] = useState([
-    {
-      title: 'iCloud Drive',
-      info: 'Store backup in iCloud Drive',
-      imageIcon: require('../../assets/images/icons/logo_brand_brands_logos_icloud.png'),
-    },
-    {
-      title: 'Google Drive',
-      info: 'Store backup in Google Drive',
-      imageIcon: require('../../assets/images/icons/logo_brand_brands_logos_icloud.png'),
-    },
-    {
-      title: 'One Drive',
-      info: 'Store backup in One Drive',
-      imageIcon: require('../../assets/images/icons/logo_brand_brands_logos_icloud.png'),
-    },
-    {
-      title: 'DropBox Storage',
-      info: 'Store backup in Dropbox Storage',
-      imageIcon: require('../../assets/images/icons/logo_brand_brands_logos_icloud.png'),
-    },
-  ]);
   const [pageData, setPageData] = useState([
     {
       title: 'Secondary Device',
       personalInfo: null,
       time: 'never',
-      status: 'error',
+      status: 'Ugly',
       type: 'secondaryDevice',
       route: 'SecondaryDevice',
     },
@@ -295,7 +148,7 @@ export default function ManageBackup(props) {
       title: 'Trusted Contact 1',
       personalInfo: null,
       time: 'never',
-      status: 'error',
+      status: 'Ugly',
       type: 'contact1',
       route: 'TrustedContacts',
       isOTPShared: false,
@@ -304,7 +157,7 @@ export default function ManageBackup(props) {
       title: 'Trusted Contact 2',
       personalInfo: null,
       time: 'never',
-      status: 'error',
+      status: 'Ugly',
       type: 'contact2',
       route: 'TrustedContacts',
       isOTPShared: false,
@@ -313,7 +166,7 @@ export default function ManageBackup(props) {
       title: 'Personal Copy 1',
       personalInfo: null,
       time: 'never',
-      status: 'error',
+      status: 'Ugly',
       type: 'copy1',
       route: 'PersonalCopy',
     },
@@ -321,7 +174,7 @@ export default function ManageBackup(props) {
       title: 'Personal Copy 2',
       personalInfo: null,
       time: 'never',
-      status: 'error',
+      status: 'Ugly',
       type: 'copy2',
       route: 'PersonalCopy',
     },
@@ -329,7 +182,7 @@ export default function ManageBackup(props) {
       title: 'Security Questions',
       personalInfo: null,
       time: 'never',
-      status: 'error',
+      status: 'Ugly',
       type: 'security',
       route: 'HealthCheckSecurityAnswer',
     },
@@ -381,11 +234,11 @@ export default function ManageBackup(props) {
   }
 
   const getIconByStatus = status => {
-    if (status == 'error') {
+    if (status == 'Ugly') {
       return require('../../assets/images/icons/icon_error_red.png');
-    } else if (status == 'warning') {
+    } else if (status == 'Bad') {
       return require('../../assets/images/icons/icon_error_yellow.png');
-    } else if (status == 'success') {
+    } else if (status == 'Good') {
       return require('../../assets/images/icons/icon_check.png');
     }
   };
@@ -447,50 +300,40 @@ export default function ManageBackup(props) {
   }
 
   const getContacts = async (selectedContacts, index) => {
-    let contactList = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
-    let contactListArray = [];
-    if (contactList) {
-      contactListArray = contactList;
-      if (selectedContacts.length == 2) {
-        contactListArray[0] = selectedContacts[0];
-        contactListArray[1] = selectedContacts[1];
-      } else if (selectedContacts.length == 1 && index == 0) {
-        contactListArray[0] = selectedContacts[0];
-      } else if (selectedContacts.length == 1 && index == 1) {
-        contactListArray[1] = selectedContacts[0];
-      }
+    let contactList = JSON.parse(await AsyncStorage.getItem('SelectedContacts'));
+    if (!contactList) {
+      contactList = [];
+    }
+    if (selectedContacts.length == 2) {
+      contactList[0] = selectedContacts[0];
+      contactList[1] = selectedContacts[1];
     } else {
-      for (let i = 0; i < selectedContacts.length; i++) {
-        contactListArray.push(selectedContacts[i]);
+      if(index==1){
+        contactList[0] = selectedContacts[0];
+      }
+      if(index==2){
+        contactList[1] = selectedContacts[0];
       }
     }
+
     setTimeout(() => {
-      setContacts(contactListArray);
+      setContacts(contactList);
     }, 10);
     await AsyncStorage.setItem(
       'SelectedContacts',
-      JSON.stringify(contactListArray),
+      JSON.stringify(contactList),
     );
-    let AsyncContacts = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
-    if (AsyncContacts && AsyncContacts.length == 2 && chosenContactIndex == 0) {
+    if (contactList && contactList.length == 2 && chosenContactIndex == 1) {
       setTimeout(() => {
-        setChosenContact(AsyncContacts[0]);
+        setChosenContact(contactList[0]);
       }, 10);
-    } else if (
-      AsyncContacts &&
-      AsyncContacts.length == 2 &&
-      chosenContactIndex == 1
-    ) {
+    } else if (contactList && contactList.length == 2 && chosenContactIndex == 2) {
       setTimeout(() => {
-        setChosenContact(AsyncContacts[1]);
+        setChosenContact(contactList[1]);
       }, 10);
-    } else if (AsyncContacts && AsyncContacts.length == 1) {
+    } else if (contactList && contactList.length == 1) {
       setTimeout(() => {
-        setChosenContact(AsyncContacts[0]);
+        setChosenContact(contactList[0]);
       }, 10);
     }
     setTimeout(() => {
@@ -608,35 +451,43 @@ export default function ManageBackup(props) {
   }
 
   const onOTPShare = async index => {
-    let pageDataTemp = pageData;
-    setTimeout(() => {
-      setChosenContact(contacts[1]);
-      setChosenContactIndex(1);
-    }, 2);
+    if(index==2){
+      setTimeout(() => {
+        setChosenContact(contacts[0]);
+        setChosenContactIndex(1);
+      }, 2);
+    }
+    else if(index==1){
+      setTimeout(() => {
+        setChosenContact(contacts[1]);
+        setChosenContactIndex(2);
+      }, 2);
+    }
     if (contacts.length == 2) {
-      if (pageDataTemp[1].isOTPShared) {
-        pageDataTemp[2].isOTPShared = true;
-        setTimeout(() => {
-          setContact2AutoHighlightFlags("true");
-        }, 2);
-        await AsyncStorage.setItem('contact2AutoHighlightFlags', 'true');
-      } else {
-        pageDataTemp[1].isOTPShared = true;
+      if(!pageData[1].isOTPShared){
+        pageData[1].isOTPShared = true;
         setTimeout(() => {
           setContact1AutoHighlightFlags("true");
         }, 2);
         CommunicationModeBottomSheet.current.snapTo(1);
         await AsyncStorage.setItem('contact1AutoHighlightFlags', 'true');
       }
+      else if(!pageData[2].isOTPShared){
+        pageData[2].isOTPShared = true;
+        setTimeout(() => {
+          setContact2AutoHighlightFlags("true");
+        }, 2);
+        await AsyncStorage.setItem('contact2AutoHighlightFlags', 'true');
+      }
     } else {
-      if (index == 0) {
-        pageDataTemp[1].isOTPShared = true;
+      if (index == 1) {
+        pageData[1].isOTPShared = true;
         setTimeout(() => {
           setContact1AutoHighlightFlags("true");
         }, 2);
         await AsyncStorage.setItem('contact1AutoHighlightFlags', 'true');
-      } else {
-        pageDataTemp[2].isOTPShared = true;
+      } else if(index==2) {
+        pageData[2].isOTPShared = true;
         setTimeout(() => {
           setContact2AutoHighlightFlags("true");
         }, 2);
@@ -645,7 +496,7 @@ export default function ManageBackup(props) {
     }
     setTimeout(() => {
       setSelectedType('');
-      setPageData(pageDataTemp);
+      setPageData(pageData);
     }, 10);
     shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
   };
@@ -769,7 +620,7 @@ export default function ManageBackup(props) {
         data={secondaryDeviceHistory}
         title={'Secondary Device'}
         time={'3 months ago'}
-        status={'error'}
+        status={'Ugly'}
         reshareInfo={'consectetur Lorem ipsum dolor sit amet, consectetur sit '}
         changeInfo={'Lorem ipsum dolor sit amet, consectetur sit amet '}
         onPressChange={() => {
@@ -811,7 +662,7 @@ export default function ManageBackup(props) {
         data={secondaryDeviceHistory}
         title={title}
         time={'1 months ago'}
-        status={'error'}
+        status={'Ugly'}
         reshareInfo={'consectetur Lorem ipsum dolor sit amet, consectetur sit '}
         changeInfo={'Lorem ipsum dolor sit amet, consectetur sit amet '}
         onPressChange={() => {
@@ -848,7 +699,7 @@ export default function ManageBackup(props) {
         data={secondaryDeviceHistory}
         title={'Personal Copy'}
         time={'3 months ago'}
-        status={'error'}
+        status={'Ugly'}
         reshareInfo={'consectetur Lorem ipsum dolor sit amet, consectetur sit '}
         changeInfo={'Lorem ipsum dolor sit amet, consectetur sit amet '}
         onPressChange={() => {
@@ -885,7 +736,7 @@ export default function ManageBackup(props) {
         data={secondaryDeviceHistory}
         title={'Security Question'}
         time={'3 months ago'}
-        status={'error'}
+        status={'Ugly'}
         reshareInfo={'consectetur Lorem ipsum dolor sit amet, consectetur sit '}
         changeInfo={'Lorem ipsum dolor sit amet, consectetur sit amet '}
         onPressChange={() => {
@@ -1177,7 +1028,7 @@ export default function ManageBackup(props) {
     setContact2AutoHighlightFlags(contact2AutoHighlightFlags);
     setPersonalCopy1AutoHighlightFlags(personalCopy1AutoHighlightFlags);
     setPersonalCopy2AutoHighlightFlags(personalCopy2AutoHighlightFlags);
-    setSecurityAutoHighlightFlags('true');
+    setSecurityAutoHighlightFlags(securityAutoHighlightFlags);
   }
 
   useEffect(() => {
@@ -1214,69 +1065,32 @@ export default function ManageBackup(props) {
       updatedPageData.forEach(data => {
         switch (data.title) {
           case 'Secondary Device':
-            if (overallHealth.sharesInfo[0].shareStage === 'Good') {
-              data.status = 'success';
-            } else if (overallHealth.sharesInfo[0].shareStage === 'Bad') {
-              data.status = 'warning';
-            } else if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
-              data.status = 'error';
-            }
+            data.status = overallHealth.sharesInfo[0].shareStage;
             data.time = overallHealth.sharesInfo[0].updatedAt;
             break;
 
           case 'Trusted Contact 1':
-            if (overallHealth.sharesInfo[1].shareStage === 'Good') {
-              data.status = 'success';
-            } else if (overallHealth.sharesInfo[1].shareStage === 'Bad') {
-              data.status = 'warning';
-            } else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
-              data.status = 'error';
-            }
+            data.status = overallHealth.sharesInfo[1].shareStage;
             data.time = overallHealth.sharesInfo[1].updatedAt;
-
             break;
 
           case 'Trusted Contact 2':
-            if (overallHealth.sharesInfo[2].shareStage === 'Good') {
-              data.status = 'success';
-            } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
-              data.status = 'warning';
-            } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
-              data.status = 'error';
-            }
+            data.status = overallHealth.sharesInfo[2].shareStage;
             data.time = overallHealth.sharesInfo[2].updatedAt;
             break;
 
           case 'Personal Copy 1':
-            if (overallHealth.sharesInfo[3].shareStage === 'Good') {
-              data.status = 'success';
-            } else if (overallHealth.sharesInfo[3].shareStage === 'Bad') {
-              data.status = 'warning';
-            } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
-              data.status = 'error';
-            }
+            data.status = overallHealth.sharesInfo[3].shareStage;
             data.time = overallHealth.sharesInfo[3].updatedAt;
             break;
 
           case 'Personal Copy 2':
-            if (overallHealth.sharesInfo[4].shareStage === 'Good') {
-              data.status = 'success';
-            } else if (overallHealth.sharesInfo[4].shareStage === 'Bad') {
-              data.status = 'warning';
-            } else if (overallHealth.sharesInfo[4].shareStage === 'Ugly') {
-              data.status = 'error';
-            }
+            data.status = overallHealth.sharesInfo[4].shareStage;
             data.time = overallHealth.sharesInfo[4].updatedAt;
             break;
 
           case 'Security Questions':
-            if (overallHealth.qaStatus.stage === 'Good') {
-              data.status = 'success';
-            } else if (overallHealth.qaStatus.stage === 'Bad') {
-              data.status = 'warning';
-            } else if (overallHealth.qaStatus.stage === 'Ugly') {
-              data.status = 'error';
-            }
+            data.status = overallHealth.qaStatus.stage;
             data.time = overallHealth.qaStatus.updatedAt;
             break;
 
@@ -1285,7 +1099,7 @@ export default function ManageBackup(props) {
         }
       });
       setPageData(updatedPageData);
-      //  autoHighlightOptions();
+      autoHighlightOptions();
     }
   }, [overallHealth]);
 
@@ -1305,55 +1119,35 @@ export default function ManageBackup(props) {
     let contactList = JSON.parse(
       await AsyncStorage.getItem('SelectedContacts'),
     );
-    const updatedPageData = [...pageData];
-    if (contactList) {
-      if (contactList.length == 2) {
-        if (updatedPageData[1].type == 'contact1') {
-          updatedPageData[1].personalInfo = contactList[0];
-        }
-        if (updatedPageData[2].type == 'contact2') {
-          updatedPageData[2].personalInfo = contactList[1];
-        }
-      } else if (!updatedPageData[1].personalInfo) {
-        if (updatedPageData[0].title == 'Trusted Contact 1')
-          updatedPageData[0].personalInfo = contactList[0];
+    if (contactList.length) {
+      if(contactList.findIndex((value)=>value.type=="contact1") != -1){
+        pageData[1].personalInfo = contactList[contactList.findIndex((value)=>value.type=="contact1")];
+      }
+      if(contactList.findIndex((value)=>value.type=="contact2") != -1){
+        pageData[2].personalInfo = contactList[contactList.findIndex((value)=>value.type=="contact2")];
       }
     }
-    setPageData(updatedPageData);
-    setTimeout(() => {
-      setContact(contactList);
-    }, 10);
-    if (
-      !secondaryDeviceAutoHighlightFlags ||
-      secondaryDeviceAutoHighlightFlags != 'true'
-    ) {
+    console.log("contactList", contactList);
+    console.log('contactList.findIndex((value)=>value.type=="contact1")', contactList.findIndex((value)=>value.type=="contact1"));
+    console.log('contactList.findIndex((value)=>value.type=="contact2")', contactList.findIndex((value)=>value.type=="contact2"));
+    console.log('pageData', pageData);
+    setPageData(pageData);
+    setContacts(contactList);
+    if (secondaryDeviceAutoHighlightFlags != 'true') {
       setSelectedType('secondaryDevice');
-    } else if (
-      !contact1AutoHighlightFlags ||
-      contact1AutoHighlightFlags != 'true'
-    ) {
+    } else if (contact1AutoHighlightFlags != 'true') {
       setSelectedType('contact1');
-    } else if (
-      !contact2AutoHighlightFlags ||
-      contact2AutoHighlightFlags != 'true'
-    ) {
+    } else if (contact2AutoHighlightFlags != 'true') {
       setSelectedType('contact2');
-    } else if (
-      !personalCopy1AutoHighlightFlags ||
-      personalCopy1AutoHighlightFlags != 'true'
-    ) {
-      setSelectedType('copy1');
-    } else if (
-      !personalCopy2AutoHighlightFlags ||
-      personalCopy2AutoHighlightFlags != 'true'
-    ) {
-      setSelectedType('copy2');
-    } else if (
-      !securityAutoHighlightFlags ||
-      securityAutoHighlightFlags != 'true'
-    ) {
-      setSelectedType('security');
-    } else {
+    } 
+    // else if (personalCopy1AutoHighlightFlags != 'true') {
+    //   setSelectedType('copy1');
+    // } else if (personalCopy2AutoHighlightFlags != 'true') {
+    //   setSelectedType('copy2');
+    // } else if (securityAutoHighlightFlags != 'true') {
+    //   setSelectedType('security');
+    // } 
+    else {
       if (overallHealth) {
         if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
           setSelectedType('secondaryDevice');
@@ -1381,72 +1175,38 @@ export default function ManageBackup(props) {
   };
 
   const nextStep = async () => {
-    let AsyncContacts = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
-    setContact(AsyncContacts);
-    if (
-      !secondaryDeviceAutoHighlightFlags ||
-      secondaryDeviceAutoHighlightFlags != 'true'
-    ) {
+    if (secondaryDeviceAutoHighlightFlags != 'true') {
       secondaryDeviceBottomSheet.current.snapTo(1);
-    } else if (
-      !contact1AutoHighlightFlags ||
-      contact1AutoHighlightFlags != 'true'
-    ) {
-      setTimeout(() => {
-          setLoadContacts(true);
-        setLoadOnTrustedContactBottomSheet(true);
-      }, 10);
-      trustedContactsBottomSheet.current.snapTo(1);
-    } else if (
-      !contact2AutoHighlightFlags ||
-      contact2AutoHighlightFlags != 'true'
-    ) {
+    } else if (contact1AutoHighlightFlags != 'true') {
       setTimeout(() => {
         setLoadContacts(true);
         setLoadOnTrustedContactBottomSheet(true);
       }, 10);
       trustedContactsBottomSheet.current.snapTo(1);
-    } else if (
-      !personalCopy1AutoHighlightFlags ||
-      personalCopy1AutoHighlightFlags != 'true'
-    ) {
-      // setArrModalShareIntent({
-      //   snapTop: 1,
-      //   item: pageData[3],
-      // });
-      (PersonalCopyShareBottomSheet as any).current.snapTo(1);
-    } else if (
-      !personalCopy2AutoHighlightFlags ||
-      personalCopy2AutoHighlightFlags != 'true'
-    ) {
-      // setArrModalShareIntent({
-      //   snapTop: 1,
-      //   item: pageData[4],
-      // });
-      (PersonalCopyShareBottomSheet as any).current.snapTo(1);
-    } else if (
-      !securityAutoHighlightFlags ||
-      securityAutoHighlightFlags != 'true'
-    ) {
-      SecurityQuestionBottomSheet.current.snapTo(1);
-    } else {
+    } else if (contact2AutoHighlightFlags != 'true') {
+      setTimeout(() => {
+        setLoadContacts(true);
+        setLoadOnTrustedContactBottomSheet(true);
+      }, 10);
+      trustedContactsBottomSheet.current.snapTo(1);
+    } 
+    // else if (personalCopy1AutoHighlightFlags != 'true') {
+    //   (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+    // } else if (personalCopy2AutoHighlightFlags != 'true') {
+    //   (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+    // } else if (securityAutoHighlightFlags != 'true') {
+    //   SecurityQuestionBottomSheet.current.snapTo(1);
+    // } 
+    else {
       if (overallHealth) {
         if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
           // Secondary device
           SecondaryDeviceConfirmBottomSheet.current.snapTo(1);
         } else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
           //Trusted contact 1
-          if (AsyncContacts[0]) {
-            setContactToConfirm(AsyncContacts[0]);
-          }
           ConfirmBottomSheet.current.snapTo(1);
         } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
           //Trusted contact 2
-          if (AsyncContacts[1]) {
-            setContactToConfirm(AsyncContacts[1]);
-          }
           ConfirmBottomSheet.current.snapTo(1);
         } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
           //personal copy 1
@@ -1500,20 +1260,19 @@ export default function ManageBackup(props) {
   }, [contacts]);
 
   const onContactsUpdate = async () => {
-    if (contacts) {
-      const updatedPageData = [...pageData];
-      if (contacts.length == 2) {
-        updatedPageData[1].personalInfo = contacts[0];
-        updatedPageData[2].personalInfo = contacts[1];
-      } else if (!updatedPageData[1].personalInfo) {
-        if (contacts[0]) {
-          updatedPageData[1].personalInfo = contacts[0];
-        } else if (contacts[1]) {
-          updatedPageData[2].personalInfo = contacts[1];
-        }
+    console.log("contacts", contacts);
+    console.log('contacts.findIndex((value)=>value.type=="contact1")', contacts.findIndex((value)=>value.type=="contact1"));
+    console.log('contacts.findIndex((value)=>value.type=="contact2")', contacts.findIndex((value)=>value.type=="contact2"));
+    console.log('pageData', pageData);
+    if (contacts.length) {
+      if(contacts.findIndex((value)=>value.type=="contact1") != -1 ){
+        pageData[1].personalInfo = contacts[contacts.findIndex((value)=>value.type=="contact1")];
       }
-      setPageData(updatedPageData);
+      if(contacts.findIndex((value)=>value.type=="contact2") != -1){
+        pageData[2].personalInfo = contacts[contacts.findIndex((value)=>value.type=="contact2")];
+      }
     }
+    setPageData(pageData);
   };
 
   return (
@@ -1634,8 +1393,8 @@ export default function ManageBackup(props) {
                         TrustedContactHistoryBottomSheet.current.snapTo(1);
                       } else {
                         setTimeout(() => {
+                          setChosenContactIndex(1);
                           setLoadContacts(true);
-                          setChosenContactIndex(0);
                           if (item.personalInfo) {
                             setContactToConfirm(item.personalInfo);
                           }
@@ -1651,8 +1410,8 @@ export default function ManageBackup(props) {
                         TrustedContactHistoryBottomSheet.current.snapTo(1);
                       } else {
                         setTimeout(() => {
+                          setChosenContactIndex(2);
                           setLoadContacts(true);
-                          setChosenContactIndex(1);
                           if (item.personalInfo) {
                             setContactToConfirm(item.personalInfo);
                           }
@@ -1757,11 +1516,11 @@ export default function ManageBackup(props) {
                   style={{
                     ...styles.manageBackupCard,
                     borderColor:
-                      item.status == 'error'
+                      item.status == 'Ugly'
                         ? Colors.red
-                        : item.status == 'warning'
+                        : item.status == 'Bad'
                         ? Colors.yellow
-                        : item.status == 'success'
+                        : item.status == 'Good'
                         ? Colors.green
                         : Colors.blue,
                     elevation:

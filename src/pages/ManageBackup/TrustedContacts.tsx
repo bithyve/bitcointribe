@@ -27,7 +27,7 @@ import { getIconByStatus } from './utils';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const TrustedContacts = props => {
-  const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
+  const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
   const [contacts, setContacts] = useState([]);
   const [communicationModeBottomSheet, setCommunicationMode] = useState(
     React.createRef(),
@@ -39,6 +39,19 @@ const TrustedContacts = props => {
   }
 
   const onPressContinue = () =>{
+    if(contacts.length==2){
+      contacts[0].type="contact1";
+      contacts[1].type="contact2";
+    }
+    else if(contacts.length==1){
+      if(index==1)
+      {
+        contacts[0].type="contact1";
+      }
+      else if(index==2){
+        contacts[0].type="contact2";
+      }
+    }
     props.onPressContinue(contacts, index);
   }
 

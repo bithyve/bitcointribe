@@ -16,6 +16,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import { RNCamera } from 'react-native-camera';
+import BottomInfoBox from '../components/BottomInfoBox';
 
 export default function QrCodeModalContents(props) {
 	const [openCameraFlag, setOpenCameraFlag] = useState(false)
@@ -93,18 +94,25 @@ export default function QrCodeModalContents(props) {
 					
 				</View>
 				{ !props.flag ? 
-				<View style={styles.qrModalInfoView}>
-					<View style={{ marginRight: 15 }}>
-						<Text style={styles.qrModalInfoTitleText}>QR</Text>
-						<Text style={styles.qrModalInfoInfoText}>Scan a QR code to send money or receive information from another Hexa wallet</Text>
-					</View>
-					<Ionicons
-						name="ios-arrow-forward"
-						color={Colors.textColorGrey}
-						size={15}
-						style={{ alignSelf: 'center' }}
-					/>
-				</View> : null }
+				<BottomInfoBox
+				title={'QR'}
+				infoText={
+				  "Scan a QR code to send money or receive information from another Hexa wallet"
+				}
+			  />
+				// <View style={styles.qrModalInfoView}>
+				// 	<View style={{ marginRight: 15 }}>
+				// 		<Text style={styles.qrModalInfoTitleText}>QR</Text>
+				// 		<Text style={styles.qrModalInfoInfoText}>Scan a QR code to send money or receive information from another Hexa wallet</Text>
+				// 	</View>
+				// 	<Ionicons
+				// 		name="ios-arrow-forward"
+				// 		color={Colors.textColorGrey}
+				// 		size={15}
+				// 		style={{ alignSelf: 'center' }}
+				// 	/>
+				// </View>
+				 : null }
 			</ScrollView>
 		</KeyboardAvoidingView>
 	</View >
@@ -122,6 +130,7 @@ const styles = StyleSheet.create({
 	},
 	qrModalImageNTextInputView: {
 		marginTop: 15,
+		marginBottom: 15,
 		justifyContent: 'center',
 		alignItems: 'center',
 		borderBottomColor: Colors.backgroundColor,

@@ -77,12 +77,11 @@ export default function Send(props) {
       setTimeout(() => {
         setIsSendHelperDone(true);
       }, 10);
-      
+
       setTimeout(() => {
         SendHelperBottomSheet.current.snapTo(1);
       }, 1000);
-    }
-    else{
+    } else {
       setTimeout(() => {
         setIsSendHelperDone(false);
       }, 10);
@@ -177,13 +176,13 @@ export default function Send(props) {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          console.log("isSendHelperDone",isSendHelperDone);
+          console.log('isSendHelperDone', isSendHelperDone);
           if (isSendHelperDone) {
-          (SendHelperBottomSheet as any).current.snapTo(2);
-          setTimeout(() => {
-            setIsSendHelperDone(false);
-          }, 10);
-          } else{
+            (SendHelperBottomSheet as any).current.snapTo(2);
+            setTimeout(() => {
+              setIsSendHelperDone(false);
+            }, 10);
+          } else {
             (SendHelperBottomSheet as any).current.snapTo(0);
           }
         }}
@@ -193,8 +192,14 @@ export default function Send(props) {
 
   const getQrCodeData = qrData => {
     console.log('Qrcodedata', qrData);
-    (bottomSheet as any).current.snapTo(0);
-      setRecipientAddress(qrData);
+    setTimeout(() => {
+      setQrBottomSheetsFlag(false);
+    }, 10);
+    setTimeout(() => {
+      (bottomSheet as any).current.snapTo(0);
+    }, 10);
+
+    setRecipientAddress(qrData);
   };
 
   const renderContent1 = () => {
@@ -204,11 +209,6 @@ export default function Send(props) {
         modalRef={bottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={qrData => getQrCodeData(qrData)}
-        onPressQrScanner={() => {
-          props.navigation.navigate('QrScanner', {
-            scanedCode: getQrCodeData,
-          });
-        }}
       />
     );
   };
@@ -460,16 +460,19 @@ export default function Send(props) {
               >
                 Set priority for your transaction
               </Text>
+              
               <View
                 style={{
                   ...styles.textBoxView,
-                  height: 55,
+                  flexDirection: 'column',
+                  height: 80,
                   marginTop: hp('2%'),
                   alignItems: 'center',
                   paddingLeft: 10,
                   paddingRight: 10,
                 }}
               >
+                <View style={{flexDirection: 'row'}}>
                 <Slider
                   style={{ flex: 1, marginRight: 10 }}
                   minimumValue={0}
@@ -503,28 +506,80 @@ export default function Send(props) {
                     setSliderValue(value);
                   }}
                 />
-                <Text
+                </View>
+                <View
                   style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue(13),
-                    fontFamily: Fonts.FiraSansRegular,
-                    marginLeft: 'auto',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    marginBottom: 10
                   }}
                 >
-                  {sliderValueText} (
-                  {
-                    staticFees ? staticFees[
-                      sliderValueText === 'Low Fee'
-                        ? 'low'
-                        : sliderValueText === 'In the middle'
-                        ? 'medium'
-                        : 'high'
-                    ] : ''
-                  }
-                  {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
-                </Text>
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(13),
+                      fontFamily: Fonts.FiraSansRegular,
+                      textAlign: 'center',
+                      flex: 1, flexWrap: 'wrap'
+                    }}
+                  >
+                    {'Low Fee'} (
+                    {staticFees
+                      ? staticFees[
+                          sliderValueText === 'Low Fee'
+                            ? 'low'
+                            : sliderValueText === 'In the middle'
+                            ? 'medium'
+                            : 'high'
+                        ]
+                      : ''}
+                    {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
+                  </Text>
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(13),
+                      fontFamily: Fonts.FiraSansRegular,
+                      textAlign: 'center',
+                      flex: 1, flexWrap: 'wrap'
+                    }}
+                  >
+                    {'In the middle'} (
+                    {staticFees
+                      ? staticFees[
+                          sliderValueText === 'Low Fee'
+                            ? 'low'
+                            : sliderValueText === 'In the middle'
+                            ? 'medium'
+                            : 'high'
+                        ]
+                      : ''}
+                    {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
+                  </Text>
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(13),
+                      fontFamily: Fonts.FiraSansRegular,
+                      textAlign: 'center',
+                      flex: 1, flexWrap: 'wrap'
+                    }}
+                  >
+                    {'Fast Transaction'} (
+                    {staticFees
+                      ? staticFees[
+                          sliderValueText === 'Low Fee'
+                            ? 'low'
+                            : sliderValueText === 'In the middle'
+                            ? 'medium'
+                            : 'high'
+                        ]
+                      : ''}
+                    {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
+                  </Text>
+                </View>
+                </View>
               </View>
-            </View>
             <View
               style={{ paddingLeft: 20, paddingRight: 20, marginTop: hp('5%') }}
             >
@@ -574,11 +629,14 @@ export default function Send(props) {
                   );
                 }}
                 disabled={loading.transfer}
-                style={{...styles.confirmButtonView,backgroundColor: Colors.blue,
+                style={{
+                  ...styles.confirmButtonView,
+                  backgroundColor: Colors.blue,
                   elevation: 10,
                   shadowColor: Colors.shadowBlue,
                   shadowOpacity: 1,
-                  shadowOffset: { width: 15, height: 15 },}}
+                  shadowOffset: { width: 15, height: 15 },
+                }}
               >
                 {loading.transfer ? (
                   <ActivityIndicator size="small" />
@@ -607,11 +665,15 @@ export default function Send(props) {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={SendHelperBottomSheet}
-          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('18%')
-          : Platform.OS == 'android'
-          ? hp('20%')
-          : hp('19%'),hp('95%')]}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('18%')
+              : Platform.OS == 'android'
+              ? hp('20%')
+              : hp('19%'),
+            hp('95%'),
+          ]}
           renderContent={renderSendHelperContents}
           renderHeader={renderSendHelperHeader}
         />
@@ -668,7 +730,7 @@ const styles = StyleSheet.create({
     color: Colors.blue,
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
-    marginLeft: 15
+    marginLeft: 15,
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,

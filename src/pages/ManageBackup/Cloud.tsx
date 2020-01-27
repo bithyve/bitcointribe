@@ -22,7 +22,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { generatePDF } from '../../store/actions/sss';
 
 const Cloud = props => {
-  const [ selectedStatus, setSelectedStatus ] = useState( 'error' ); // for preserving health of this entity
+  const [ selectedStatus, setSelectedStatus ] = useState( 'Ugly' ); // for preserving health of this entity
   const [ cloudData, setCloudData ] = useState( [
     {
       title: 'iCloud Drive',

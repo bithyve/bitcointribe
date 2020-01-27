@@ -25,7 +25,7 @@ import BottomSheet from "reanimated-bottom-sheet";
 import { textWithoutEncoding, email } from "react-native-communications";
 
 const Contacts = props => {
-  const [selectedStatus, setSelectedStatus] = useState("error"); // for preserving health of this entity
+  const [selectedStatus, setSelectedStatus] = useState("Ugly"); // for preserving health of this entity
   const [contacts, setContacts] = useState([]);
   const [communicationModeBottomSheet, setCommunicationMode] = useState(
     React.createRef()

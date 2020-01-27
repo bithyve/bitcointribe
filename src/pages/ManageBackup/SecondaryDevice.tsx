@@ -30,7 +30,7 @@ import BottomInfoBox from "../../components/BottomInfoBox";
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 export default function SecondaryDeviceModelContents(props) {
-    const [ selectedStatus, setSelectedStatus ] = useState( 'error' ); // for preserving health of this entity
+    const [ selectedStatus, setSelectedStatus ] = useState( 'Ugly' ); // for preserving health of this entity
   const [ secondaryQR, setSecondaryQR ] = useState( '' );
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
     state => state.storage.database,
@@ -64,11 +64,11 @@ export default function SecondaryDeviceModelContents(props) {
     }, [ SHARES_TRANSFER_DETAILS[ 0 ] ] );
 
     const getIconByStatus = status => {
-        if (status == 'error') {
+        if (status == 'Ugly') {
             return require('../../assets/images/icons/icon_error_red.png');
-        } else if (status == 'warning') {
+        } else if (status == 'Bad') {
             return require('../../assets/images/icons/icon_error_yellow.png');
-        } else if (status == 'success') {
+        } else if (status == 'Good') {
             return require('../../assets/images/icons/icon_check.png');
         }
     };

@@ -24,7 +24,7 @@ import BackupStyles from './Styles';
 import { getIconByStatus } from './utils';
 
 export default function CloudHealthCheck(props) {
-    const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
+    const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
     const [qrData, setQrData] = useState("");
     const barcodeRecognized = async (barcodes) => {
         if (barcodes.data) {

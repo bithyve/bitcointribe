@@ -363,8 +363,8 @@ export default function NewWalletQuestionRegenerateShare(props) {
             </View>
             {dropdownBoxValue.id.trim() == '' ? (
               <BottomInfoBox
-                title={'This question will serve as a hint'}
-                infoText={'For you to remember what the answer was'}
+                title={'Note'}
+                infoText={'Secret question and answer are very important for your wallet and it’s backup'}
               />
             ) : null}
           </TouchableOpacity>

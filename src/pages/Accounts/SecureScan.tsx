@@ -32,7 +32,7 @@ const SecureScan = props => {
     state => state.storage.database,
   );
   const { loading } = useSelector(state => state.sss);
-  const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
+  const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
   const [secondaryQR, setSecondaryQR] = useState('');
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
   SHARES_TRANSFER_DETAILS[0] && !secondaryQR

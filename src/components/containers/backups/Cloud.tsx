@@ -8,7 +8,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 const Cloud = props => {
-  const [selectedStatus, setSelectedStatus] = useState("error"); // for preserving health of this entity
+  const [selectedStatus, setSelectedStatus] = useState("Ugly"); // for preserving health of this entity
   const [cloudData, setCloudData] = useState([
     {
       title: "iCloud Drive",
