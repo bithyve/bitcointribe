@@ -277,16 +277,18 @@ export default function ContactList(props) {
                 <Text style={styles.contactIndexText}>{value}</Text>
               </AppBottomSheetTouchableWrapper>
             ))}
-          </View> */}
-        </View>
+          </View>*/}
+        </View> 
         {selectedContacts.length >= 1 && (
+          <View style={{marginTop:'auto',}}>
           <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressContinue()}
             style={styles.bottomButtonView}
           >
             <Text style={styles.buttonText}>Confirm & Proceed</Text>
           </AppBottomSheetTouchableWrapper>
-        )}
+          </View>
+         )} 
       </View>
     </SafeAreaView>
   );
@@ -301,9 +303,9 @@ const styles = StyleSheet.create({
   bottomButtonView: {
     height: 50,
     width: wp("50%"),
-    position: "absolute",
+    // position: "absolute",
     backgroundColor: Colors.blue,
-    bottom: 0,
+    // bottom: 0,
     left: wp("25%"),
     borderRadius: 10,
     justifyContent: "center",
