@@ -199,7 +199,10 @@ function Accounts(props) {
           setIsTestHelperDone(false);
         }, 10);
       props.copilotEvents.on('stepChange', handleStepChange);
-      props.start();
+      setTimeout(()=>{
+        props.start();
+      }, 300);
+      
     }
   };
 

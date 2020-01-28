@@ -63,18 +63,26 @@ export default function NewWalletQuestion(props) {
     props.navigation.navigate('HomeNav');
   }  
 
-  const setConfirm = confirmAnswer => {
-    if (confirmAnswer) {
+  const setConfirm = confirmAnswer1 => {
+    if (confirmAnswer1) {
+      if(tempAns.indexOf('*') > -1) {
+        let temp = tempAns.replace(/[^a-zA-Z ]/g, "");
+        setConfirmAnswer(confirmAnswer.concat(temp));
+        console.log(tempAns.replace(/[^a-zA-Z ]/g, ""));
+        
+      }else{
+        setConfirmAnswer(tempAns)
+      }                
       if (answer && confirmAnswer != answer) {
         setAnsError('Answers do not match');
-        counter++;
-        setCounter(counter);
-        console.log('counter', counter);
-        if (counter > 3) {
-          console.log('global.ansCounter', counter);
-          setHdeShowAnswer(!hideShowAnswer);
-          counter = 0;
-        }
+        //counter++;
+       // setCounter(counter);
+       // console.log('counter', counter);
+        // if (counter > 3) {
+        //   console.log('global.ansCounter', counter);
+        //   setHdeShowAnswer(!hideShowAnswer);
+        //   counter = 0;
+        // }
       } else {
         setAnsError('');
       }
@@ -319,7 +327,7 @@ export default function NewWalletQuestion(props) {
                       style={styles.modalInputBox}
                       placeholder={'Confirm your answer'}
                       placeholderTextColor={Colors.borderColor}
-                      value={hideShowAnswer ? confirmAnswerMasked : confirmAnswer}
+                      value={hideShowConfirmAnswer ? confirmAnswerMasked : tempAns}
                       textContentType="none"
                       autoCompleteType="off"
                       autoCorrect={false}
@@ -329,18 +337,19 @@ export default function NewWalletQuestion(props) {
                         setBackspace(event);
                       }}
                       onChangeText={text => {
-                        if (
-                          answer.trim() == text.trim() &&
-                          text.trim() &&
-                          answer.trim()
-                        ) {
-                          Keyboard.dismiss();
-                        }
-                        //setTempAns(confirmAnswer);
-                        setConfirmAnswer(text);
+                        // if (
+                        //   answer.trim() == text.trim() &&
+                        //   text.trim() &&
+                        //   answer.trim()
+                        // ) {
+                        //   Keyboard.dismiss();
+                        // }
+                        setTempAns(text);
                         setConfirmAnswerMasked(text);
                       }}
-                      onSubmitEditing={event => setConfirm(confirmAnswer)}
+                      onSubmitEditing={event => 
+                        setConfirm(tempAns)}
+                      
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
                         setConfirmAnswerInputStyle(styles.inputBoxFocused);
