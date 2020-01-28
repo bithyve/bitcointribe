@@ -26,6 +26,12 @@ export default function RestoreByCloudQrCodeContents(props) {
 
   const getQrCodeData = qrData => {
     let tempArray = qrDataArray;
+    let shareCode = qrData.substring(0, 2);
+
+    if (shareCode !== 'e0' && shareCode !== 'c0') {
+      Alert.alert('Invalid QR', 'Please try again');
+      return;
+    }
     let startNumber1 = qrData.substring(2, 3);
     console.log('startNumber', startNumber1);
     setQrData(qrData);
