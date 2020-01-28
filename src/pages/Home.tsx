@@ -96,6 +96,7 @@ import { UsNumberFormat } from '../common/utilities';
 // const height = snapPoints[ 0 ]
 
 export default function Home(props) {
+  console.log('HOME RE-RENDER');
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [KnowMoreBottomSheetsFlag, setKnowMoreBottomSheetsFlag] = useState(
     false,
@@ -106,8 +107,13 @@ export default function Home(props) {
     familyAndFriendsBookBottomSheetsFlag,
     setFamilyAndFriendsBookBottomSheetsFlag,
   ] = useState(false);
-  const database = useSelector(state => state.storage.database);
-  const walletName = database ? database.WALLET_SETUP.walletName : '';
+  const WALLET_SETUP = useSelector(
+    state => state.storage.database.WALLET_SETUP,
+  );
+  const DECENTRALIZED_BACKUP = useSelector(
+    state => state.storage.database.DECENTRALIZED_BACKUP,
+  );
+  const walletName = WALLET_SETUP ? WALLET_SETUP.walletName : '';
   const accounts = useSelector(state => state.accounts);
   const [exchangeRates, setExchangeRates] = useState();
   const [balances, setBalances] = useState({
@@ -418,8 +424,8 @@ export default function Home(props) {
     Linking.addEventListener('url', handleDeepLink);
     // return () => Linking.removeEventListener("url", handleDeepLink);
     // HC up-streaming
-    if (database) {
-      if (Object.keys(database.DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
+    if (DECENTRALIZED_BACKUP) {
+      if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
         dispatch(updateMSharesHealth());
       }
     }
@@ -1491,17 +1497,18 @@ export default function Home(props) {
   // const s3Service = useSelector(state => state.sss.service);
   const [overallHealth, setOverallHealth] = useState();
 
-  const health = useSelector(state => state.sss.overallHealth);
-  useEffect(() => {
-    console.log({ health });
-    if (health) setOverallHealth(health);
-  }, [health]);
+  // const health = useSelector(state => state.sss.overallHealth);
+  // useEffect(() => {
+  //   console.log({ health });
+  //   if (health) setOverallHealth(health);
+  // }, [health]);
 
-  const s3Service = useSelector(state => state.sss.service);
+  // const s3Service = useSelector(state => state.sss.service);
   useEffect(() => {
-    if (s3Service)
-      if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
-  }, [s3Service]);
+    // if (s3Service)
+    //if (!s3Service.sss.healthCheckInitialized)
+    dispatch(initHealthCheck());
+  }, []);
 
   const testAccService = useSelector(
     state => state.accounts[TEST_ACCOUNT].service,
