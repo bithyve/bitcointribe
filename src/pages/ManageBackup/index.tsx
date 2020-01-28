@@ -1034,14 +1034,7 @@ export default function ManageBackup(props) {
   useEffect(() => {
     setSetupFlowAsync();
     autoHighlightOptions();
-    (async () => {
-      if (!overallHealth) {
-        const storedHealth = await AsyncStorage.getItem('overallHealth');
-        if (storedHealth) {
-          setOverallHealth(JSON.parse(storedHealth));
-        }
-      }
-    })();
+    getOverAllHealth();
     // HC down-streaming
     if (s3Service) {
       const { healthCheckInitialized } = s3Service.sss;
@@ -1053,6 +1046,13 @@ export default function ManageBackup(props) {
     // if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
     checkNShowHelperModal();
   }, []);
+
+  const getOverAllHealth = async () => {
+    const storedHealth = await AsyncStorage.getItem('overallHealth');
+    if (storedHealth) {
+      setOverallHealth(JSON.parse(storedHealth));
+    }
+  }
 
   useEffect(() => {
     if (health) setOverallHealth(health);
@@ -1119,19 +1119,6 @@ export default function ManageBackup(props) {
     let contactList = JSON.parse(
       await AsyncStorage.getItem('SelectedContacts'),
     );
-    if (contactList.length) {
-      if(contactList.findIndex((value)=>value.type=="contact1") != -1){
-        pageData[1].personalInfo = contactList[contactList.findIndex((value)=>value.type=="contact1")];
-      }
-      if(contactList.findIndex((value)=>value.type=="contact2") != -1){
-        pageData[2].personalInfo = contactList[contactList.findIndex((value)=>value.type=="contact2")];
-      }
-    }
-    console.log("contactList", contactList);
-    console.log('contactList.findIndex((value)=>value.type=="contact1")', contactList.findIndex((value)=>value.type=="contact1"));
-    console.log('contactList.findIndex((value)=>value.type=="contact2")', contactList.findIndex((value)=>value.type=="contact2"));
-    console.log('pageData', pageData);
-    setPageData(pageData);
     setContacts(contactList);
     if (secondaryDeviceAutoHighlightFlags != 'true') {
       setSelectedType('secondaryDevice');
@@ -1140,13 +1127,13 @@ export default function ManageBackup(props) {
     } else if (contact2AutoHighlightFlags != 'true') {
       setSelectedType('contact2');
     } 
-    // else if (personalCopy1AutoHighlightFlags != 'true') {
-    //   setSelectedType('copy1');
-    // } else if (personalCopy2AutoHighlightFlags != 'true') {
-    //   setSelectedType('copy2');
-    // } else if (securityAutoHighlightFlags != 'true') {
-    //   setSelectedType('security');
-    // } 
+    else if (personalCopy1AutoHighlightFlags != 'true') {
+      setSelectedType('copy1');
+    } else if (personalCopy2AutoHighlightFlags != 'true') {
+      setSelectedType('copy2');
+    } else if (securityAutoHighlightFlags != 'true') {
+      setSelectedType('security');
+    } 
     else {
       if (overallHealth) {
         if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
@@ -1167,11 +1154,24 @@ export default function ManageBackup(props) {
           setSelectedType('contact1');
         } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
           setSelectedType('contact2');
+        } else if (overallHealth.sharesInfo[3].shareStage === 'Bad') {
+          setSelectedType('copy1');
+        } else if (overallHealth.sharesInfo[4].shareStage === 'Bad') {
+          setSelectedType('copy2');
         } else if (overallHealth.qaStatus.stage === 'Bad') {
           setSelectedType('security');
         }
       }
     }
+    if (contactList.length) {
+      if(contactList.findIndex((value)=>value.type=="contact1") != -1){
+        pageData[1].personalInfo = contactList[contactList.findIndex((value)=>value.type=="contact1")];
+      }
+      if(contactList.findIndex((value)=>value.type=="contact2") != -1){
+        pageData[2].personalInfo = contactList[contactList.findIndex((value)=>value.type=="contact2")];
+      }
+    }
+    setPageData(pageData);
   };
 
   const nextStep = async () => {
@@ -1189,14 +1189,13 @@ export default function ManageBackup(props) {
         setLoadOnTrustedContactBottomSheet(true);
       }, 10);
       trustedContactsBottomSheet.current.snapTo(1);
+    } else if (personalCopy1AutoHighlightFlags != 'true') {
+      (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+    } else if (personalCopy2AutoHighlightFlags != 'true') {
+      (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+    } else if (securityAutoHighlightFlags != 'true') {
+      SecurityQuestionBottomSheet.current.snapTo(1);
     } 
-    // else if (personalCopy1AutoHighlightFlags != 'true') {
-    //   (PersonalCopyShareBottomSheet as any).current.snapTo(1);
-    // } else if (personalCopy2AutoHighlightFlags != 'true') {
-    //   (PersonalCopyShareBottomSheet as any).current.snapTo(1);
-    // } else if (securityAutoHighlightFlags != 'true') {
-    //   SecurityQuestionBottomSheet.current.snapTo(1);
-    // } 
     else {
       if (overallHealth) {
         if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
@@ -1222,7 +1221,7 @@ export default function ManageBackup(props) {
           PersonalCopyConfirmBottomSheet.current.snapTo(1);
         } else if (overallHealth.qaStatus.stage === 'Ugly') {
           // Security question
-          SecurityQuestionHistoryBottomSheet.current.snapTo(1);
+          SecurityQuestionBottomSheet.current.snapTo(1);
         } else if (overallHealth.sharesInfo[0].shareStage === 'Bad') {
           // Secondary device
           SecondaryDeviceHistoryBottomSheet.current.snapTo(1);
@@ -1232,9 +1231,23 @@ export default function ManageBackup(props) {
         } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
           //Trusted contact 2
           TrustedContactHistoryBottomSheet.current.snapTo(1);
-        } else if (overallHealth.qaStatus.stage === 'Bad') {
+        } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
+          //personal copy 1
+          setTimeout(() => {
+            setLoadCamera(true);
+          }, 2);
+          PersonalCopyConfirmBottomSheet.current.snapTo(1);
+        } 
+        else if (overallHealth.sharesInfo[4].shareStage === 'Ugly') {
+          //personal copy 2
+          setTimeout(() => {
+            setLoadCamera(true);
+          }, 2);
+          PersonalCopyConfirmBottomSheet.current.snapTo(1);
+        } 
+        else if (overallHealth.qaStatus.stage === 'Bad') {
           // Security question
-          SecurityQuestionHistoryBottomSheet.current.snapTo(1);
+          SecurityQuestionBottomSheet.current.snapTo(1);
         }
       }
     }
@@ -1260,10 +1273,6 @@ export default function ManageBackup(props) {
   }, [contacts]);
 
   const onContactsUpdate = async () => {
-    console.log("contacts", contacts);
-    console.log('contacts.findIndex((value)=>value.type=="contact1")', contacts.findIndex((value)=>value.type=="contact1"));
-    console.log('contacts.findIndex((value)=>value.type=="contact2")', contacts.findIndex((value)=>value.type=="contact2"));
-    console.log('pageData', pageData);
     if (contacts.length) {
       if(contacts.findIndex((value)=>value.type=="contact1") != -1 ){
         pageData[1].personalInfo = contacts[contacts.findIndex((value)=>value.type=="contact1")];
@@ -1446,7 +1455,6 @@ export default function ManageBackup(props) {
                             ) {
                               PersonalCopyHistoryBottomSheet.current.snapTo(1);
                             } else {
-                              console.log({ item });
                               setSelectedPersonalCopy(item);
                               (PersonalCopyShareBottomSheet as any).current.snapTo(
                                 1,
@@ -1486,12 +1494,10 @@ export default function ManageBackup(props) {
                             ) {
                               PersonalCopyHistoryBottomSheet.current.snapTo(1);
                             } else {
-                              console.log({ item });
                               setSelectedPersonalCopy(item);
                               (PersonalCopyShareBottomSheet as any).current.snapTo(
                                 1,
                               );
-
                               // setArrModalShareIntent({
                               //   snapTop: 1,
                               //   item,

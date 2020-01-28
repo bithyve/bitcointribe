@@ -177,7 +177,6 @@ const SecondaryDeviceHealthCheck = props => {
           );
         })}
       </ScrollView>
-      {SelectedOption ? (
         <View
           style={{
             justifyContent: 'center',
@@ -256,7 +255,6 @@ const SecondaryDeviceHealthCheck = props => {
             </Text>
           </TouchableOpacity>
         </View>
-      ) : null}
     </View>
   );
 };
