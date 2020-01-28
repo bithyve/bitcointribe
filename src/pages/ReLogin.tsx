@@ -24,6 +24,7 @@ import { credsAuth, switchReLogin } from '../store/actions/setupAndAuth';
 export default function Login(props) {
   const [passcode, setPasscode] = useState('');
   const [passcodeFlag, setPasscodeFlag] = useState(true);
+  const [checkAuth, setCheckAuth] = useState(false);
 
   function onPressNumber(text) {
     let tmpPasscode = passcode;
@@ -35,6 +36,7 @@ export default function Login(props) {
     }
     if (passcode && text == 'x') {
       setPasscode(passcode.slice(0, -1));
+      setCheckAuth(false);
     }
   }
 
@@ -49,9 +51,7 @@ export default function Login(props) {
   }
 
   useEffect(() => {
-    authenticationFailed
-      ? Alert.alert('Incorrect passcode', 'Please try again!')
-      : null;
+    authenticationFailed ? setCheckAuth(true) : setCheckAuth(false);
   }, [authenticationFailed]);
 
   const hardwareBackHandler = () => {
@@ -73,10 +73,10 @@ export default function Login(props) {
           <Text style={styles.headerTitleText}>Welcome back!</Text>
           <View>
             <Text style={styles.headerInfoText}>
-              Please enter the{' '}
+              Please enter your{' '}
               <Text style={styles.boldItalicText}>passcode</Text>
             </Text>
-            <View>
+            <View style={{alignSelf:'baseline'}}>
               <View style={styles.passcodeTextInputView}>
                 <View
                   style={[
@@ -95,7 +95,7 @@ export default function Login(props) {
                     {passcode.length >= 1 ? (
                       <Text
                         style={{
-                          fontSize: RFValue(10),
+                          fontSize: RFValue(10, 812),
                           textAlignVertical: 'center',
                           justifyContent: 'center',
                           alignItems: 'center',
@@ -129,7 +129,7 @@ export default function Login(props) {
                     ]}
                   >
                     {passcode.length >= 2 ? (
-                      <Text style={{ fontSize: RFValue(10) }}>
+                      <Text style={{ fontSize: RFValue(10, 812) }}>
                         <FontAwesome
                           size={8}
                           name={'circle'}
@@ -158,7 +158,7 @@ export default function Login(props) {
                     ]}
                   >
                     {passcode.length >= 3 ? (
-                      <Text style={{ fontSize: RFValue(10) }}>
+                      <Text style={{ fontSize: RFValue(10, 812) }}>
                         <FontAwesome
                           size={8}
                           name={'circle'}
@@ -187,7 +187,7 @@ export default function Login(props) {
                     ]}
                   >
                     {passcode.length >= 4 ? (
-                      <Text style={{ fontSize: RFValue(10) }}>
+                      <Text style={{ fontSize: RFValue(10, 812) }}>
                         <FontAwesome
                           size={8}
                           name={'circle'}
@@ -202,13 +202,22 @@ export default function Login(props) {
                   </Text>
                 </View>
               </View>
+              {checkAuth ? (
+            <View style={{marginLeft: 'auto'}}>
+              <Text style={styles.errorText}>
+              Incorrect passcode, try again!
+              </Text>
+            </View>
+          ) : null}
             </View>
           </View>
           {passcode.length == 4 ? (
             <View>
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
-                onPress={() => dispatch(credsAuth(passcode, true))}
+                onPress={() => {
+                  dispatch(credsAuth(passcode, true));
+                }}
                 style={{
                   ...styles.proceedButtonView,
                   backgroundColor:
@@ -389,13 +398,13 @@ const styles = StyleSheet.create({
   },
   textStyles: {
     color: Colors.black,
-    fontSize: RFValue(13),
+    fontSize: RFValue(13, 812),
     textAlign: 'center',
     lineHeight: 18,
   },
   textFocused: {
     color: Colors.black,
-    fontSize: RFValue(13),
+    fontSize: RFValue(13, 812),
     textAlign: 'center',
     lineHeight: 18,
   },
@@ -406,19 +415,19 @@ const styles = StyleSheet.create({
   keyPadElementTouchable: {
     flex: 1,
     height: hp('8%'),
-    fontSize: RFValue(18),
+    fontSize: RFValue(18, 812),
     justifyContent: 'center',
     alignItems: 'center',
   },
   keyPadElementText: {
     color: Colors.blue,
-    fontSize: RFValue(25),
+    fontSize: RFValue(25, 812),
     fontFamily: Fonts.FiraSansRegular,
     fontStyle: 'normal',
   },
   proceedButtonView: {
     marginLeft: 20,
-    marginTop: hp('4%'),
+    marginTop: hp('6%'),
     height: wp('13%'),
     width: wp('30%'),
     justifyContent: 'center',
@@ -431,8 +440,14 @@ const styles = StyleSheet.create({
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue(13, 812),
     fontFamily: Fonts.FiraSansMedium,
+  },
+  errorText: {
+    fontFamily: Fonts.FiraSansMediumItalic,
+    color: Colors.red,
+    fontSize: RFValue(11, 812),
+    fontStyle: 'italic',
   },
   boldItalicText: {
     fontFamily: Fonts.FiraSansMediumItalic,
@@ -441,25 +456,26 @@ const styles = StyleSheet.create({
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(25),
+    fontSize: RFValue(25, 812),
     marginLeft: 20,
     marginTop: hp('10%'),
     fontFamily: Fonts.FiraSansRegular,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12),
+    fontSize: RFValue(12, 812),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular,
   },
   passcodeTextInputText: {
     color: Colors.blue,
     fontWeight: 'bold',
-    fontSize: RFValue(13),
+    fontSize: RFValue(13, 812),
   },
   passcodeTextInputView: {
     flexDirection: 'row',
     marginTop: hp('4.5%'),
-    marginBottom: hp('4.5%'),
+    marginBottom: hp('1.5%'),
+    width: 'auto'
   },
 });

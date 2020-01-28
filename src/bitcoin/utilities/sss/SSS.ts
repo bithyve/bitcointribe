@@ -477,6 +477,7 @@ export default class SSS {
   public encryptedSecrets: string[];
   public metaShares: MetaShare[];
   public healthCheckInitialized: boolean;
+  public pdfHealth: {};
   public healthCheckStatus: {};
   private mnemonic: string;
 
@@ -488,6 +489,7 @@ export default class SSS {
       healthCheckInitialized: boolean;
       walletId: string;
       healthCheckStatus: {};
+      pdfHealth: {};
     },
   ) {
     if (bip39.validateMnemonic(mnemonic)) {
@@ -507,6 +509,7 @@ export default class SSS {
       ? stateVars.healthCheckInitialized
       : false;
     this.healthCheckStatus = stateVars ? stateVars.healthCheckStatus : {};
+    this.pdfHealth = stateVars ? stateVars.pdfHealth : {};
   }
 
   public stringToHex = (str: string): string => secrets.str2hex(str);
@@ -918,6 +921,15 @@ export default class SSS {
         qrData[itr] = 'e0' + (itr + 1) + qrData[itr];
       } else if (index === 4) {
         qrData[itr] = 'c0' + (itr + 1) + qrData[itr];
+      }
+      if (itr === 0) {
+        this.pdfHealth = {
+          ...this.pdfHealth,
+          [index]: {
+            shareId: this.metaShares[index].shareId,
+            qrData: qrData[itr],
+          },
+        };
       }
     }
     return { qrData };

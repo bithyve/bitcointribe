@@ -21,7 +21,8 @@ export default class HealthStatus {
   private qaHealthStatus = (time: number): { qaStage: string } => {
     let qaStage: string = ENTITY_HEALTH.STAGE1;
     const delta = Math.abs(Date.now() - time);
-    const numberOfDays = Math.round(delta / (60 * 60 * 24 * 1000));
+    // const numberOfDays = Math.round(delta / (60 * 60 * 24 * 1000));
+    const numberOfDays = Math.round(delta / (60 * 1000));
 
     if (numberOfDays > TIME_SLOTS.SHARE_SLOT2) {
       qaStage = ENTITY_HEALTH.STAGE1;
@@ -42,7 +43,11 @@ export default class HealthStatus {
   private shareHealthStatus = (
     shares: { shareId: string; updatedAt: number }[],
   ): {
-    sharesInfo: Array<{ shareId: number; shareStage: string }>;
+    sharesInfo: Array<{
+      shareId: number;
+      shareStage: string;
+      updatedAt: number;
+    }>;
   } => {
     const sharesInfo = [];
     for (let itr = 0; itr < shares.length; itr++) {
@@ -50,6 +55,7 @@ export default class HealthStatus {
       sharesInfo.push({
         shareId: obj.shareId,
         shareStage: ENTITY_HEALTH.STAGE1,
+        updatedAt: obj.updatedAt,
       });
     }
     const delta: number[] = new Array(shares.length);
@@ -60,7 +66,9 @@ export default class HealthStatus {
     }
 
     for (let i = 0; i < numberOfDays.length; i++) {
-      numberOfDays[i] = Math.floor(delta[i] / (60 * 60 * 24 * 1000));
+      // numberOfDays[i] = Math.floor(delta[i] / (60 * 60 * 24 * 1000));
+      numberOfDays[i] = Math.floor(delta[i] / (60 * 1000)); // in minutes; for test
+
       const obj = sharesInfo[i];
       if (numberOfDays[i] > TIME_SLOTS.SHARE_SLOT2) {
         obj.shareStage = ENTITY_HEALTH.STAGE1;
@@ -84,8 +92,8 @@ export default class HealthStatus {
     qaTimestamp: number,
     shares: { shareId: string; updatedAt: number }[],
   ): {
-    sharesInfo: Array<{ shareId: number; shareStage: string }>;
-    qaStatus: string;
+    sharesInfo: { shareId: string; shareStage: string; updatedAt: number }[];
+    qaStatus: { stage: string; updatedAt: number };
     overallStatus: string;
   } => {
     let overallStatus: string = HEXA_HEALTH.STAGE1;
@@ -106,6 +114,10 @@ export default class HealthStatus {
     } else if (this.counter.good >= 6) {
       overallStatus = HEXA_HEALTH.STAGE5;
     }
-    return { sharesInfo, qaStatus, overallStatus };
+    return {
+      sharesInfo,
+      qaStatus: { stage: qaStatus, updatedAt: qaTimestamp },
+      overallStatus,
+    };
   };
 }

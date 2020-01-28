@@ -24,22 +24,20 @@ import BackupStyles from './Styles';
 import { getIconByStatus } from './utils';
 
 export default function CloudHealthCheck(props) {
-    const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
+    const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
     const [qrData, setQrData] = useState("");
-    global.isCameraOpen = true;
     const barcodeRecognized = async (barcodes) => {
         if (barcodes.data) {
-            props.navigation.state.params.scanedCode(barcodes.data);
-            props.navigation.goBack();
+            props.scannedCode(barcodes.data);
+            props.goPressBack();
         }
     };
-    return (<View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
-        <SafeAreaView style={{ flex: 0, backgroundColor: Colors.backgroundColor }} />
-        <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+    return (<View style={{ height: '100%',
+    backgroundColor: Colors.backgroundColor, }}>
         <ScrollView style={styles.modalContainer}>
             <View style={{ ...styles.modalHeaderTitleView, paddingLeft: 10, paddingRight: 10, }}>
                 <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-                    <TouchableOpacity onPress={() => { props.navigation.goBack(); }} style={{ height: 30, width: 30, justifyContent: "center" }} >
+                    <TouchableOpacity onPress={() => { props.goPressBack(); }} style={{ height: 30, width: 30, justifyContent: "center" }} >
                         <FontAwesome
                             name="long-arrow-left"
                             color={Colors.blue}
@@ -68,7 +66,7 @@ export default function CloudHealthCheck(props) {
                     color: Colors.textColorGrey,
                     fontSize: RFValue(11),
                     fontFamily: Fonts.FiraSansMedium
-                }}>{props.pageInfo}Lorem ipsum dolor Lorem dolor sit amet,{"\n"}consectetur dolor sit</Text>
+                }}>Lorem ipsum dolor Lorem dolor sit amet,{"\n"}consectetur dolor sit</Text>
             </View>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <View style={{
@@ -85,6 +83,7 @@ export default function CloudHealthCheck(props) {
                         borderRadius: 20,
                         marginTop: hp('3%')
                     }}>
+                        {props.LoadCamera?
                         <RNCamera
                             ref={(ref) => { this.cameraRef = ref; }}
                             style={{
@@ -92,6 +91,7 @@ export default function CloudHealthCheck(props) {
                                 height: wp('100%')
                             }}
                             onBarCodeRead={barcodeRecognized}
+                            captureAudio={false}
                         >
                             <View style={{ flexDirection: 'row', paddingTop: 12, paddingRight: 12, paddingLeft: 12, width: '100%' }}>
                                 <View style={{ borderLeftWidth: 1, borderTopColor: 'white', borderLeftColor: 'white', height: hp('5%'), width: hp('5%'), borderTopWidth: 1 }} />
@@ -102,6 +102,7 @@ export default function CloudHealthCheck(props) {
                                 <View style={{ borderBottomWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderBottomColor: 'white', height: hp('5%'), width: hp('5%'), marginLeft: 'auto' }} />
                             </View>
                         </RNCamera>
+                        : null}
                     </View>
                 </View>
             </View>

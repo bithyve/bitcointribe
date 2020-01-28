@@ -37,70 +37,7 @@ export default function AddressBookContents(props) {
       status: ""
     },
   ]);
-  const [alphabetsList] = useState([
-    "A",
-    "B",
-    "C",
-    "D",
-    "E",
-    "F",
-    "G",
-    "H",
-    "I",
-    "J",
-    "K",
-    "L",
-    "M",
-    "N",
-    "O",
-    "P",
-    "Q",
-    "R",
-    "S",
-    "T",
-    "U",
-    "V",
-    "W",
-    "X",
-    "Y",
-    "Z"
-  ]);
-  const [searchBox, setSearchBox] = useState('');
-  const [filterContactData, setFilterContactData] = useState([]);
-
-  useEffect(() => {
-    setSearchBox('');
-      const contactList = contactData
-        .sort(function (a, b) {
-          if(a.name && b.name){
-            if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-            if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-          }
-          return 0;
-        })
-    setFilterContactData(contactList);
-  }, []);
-
-  const filterContacts = (keyword) => {
-    if (contactData.length > 0) {
-      if (!keyword.length) {
-        setFilterContactData(contactData);
-        return;
-      }
-      let isFilter = true;
-      let filterContactsForDisplay = [];
-      for (let i = 0; i < contactData.length; i++) {
-        if (contactData[i].name && contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())) {
-          filterContactsForDisplay.push(contactData[i])
-        }
-      }
-      setFilterContactData(filterContactsForDisplay);
-    } else {
-      return;
-    }
-  }
-
-
+  
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
@@ -115,29 +52,45 @@ export default function AddressBookContents(props) {
         </View>
       </View>
       <View>
-        <Text style={styles.pageTitle}>Pending Action</Text>
-        <Text style={styles.pageInfoText}>
+        <Text style={styles.pageTitle}>You are the Guardian of</Text>
+        {/* <Text style={styles.pageInfoText}>
           Lorem ipsum dolor sit amet, consectetur adipiscing
-        </Text>
-        <View style={[styles.searchBoxContainer]}>
-          <View style={styles.searchBoxIcon}>
-            <EvilIcons style={{ alignSelf: 'center' }} name="search" size={20} color={Colors.textColorGrey} />
-          </View>
-          <TextInput
-            ref={element => setSearchBox(element)}
-            style={styles.searchBoxInput}
-            placeholder="Search"
-            placeholderTextColor={Colors.textColorGrey}
-            onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
-          />
-        </View>
+        </Text> */}
       </View>
-      <View style={{ flex: 1 }}>
-        <View style={{ flex: 1, flexDirection: "row" }}>
-          <View style={{ flex: 11 }}>
-            <FlatList
-              data={filterContactData}
-              extraData={filterContactData}
+      <View style={{ flex: 1, flexDirection: "row", marginBottom: 15 }}>
+        <FlatList
+              data={contactData}
+              extraData={contactData}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item, index }) => {
+                return (
+                  <View style={styles.selectedContactsView}>
+                    <Text style={styles.contactText}>
+                      {item.name.split(" ")[0]}{" "}
+                      <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                        {item.name.split(" ")[1]}
+                      </Text>
+                    </Text>
+                    <TouchableOpacity style={styles.shareButtonView}>
+                      <Text style={styles.shareButtonText}>Share</Text>
+                    </TouchableOpacity>
+                  </View>
+                )
+              }
+              }
+            />
+      </View>
+
+      <View>
+        <Text style={styles.pageTitle}>Guardians of your Secrets</Text>
+        {/* <Text style={styles.pageInfoText}>
+          Lorem ipsum dolor sit amet, consectetur adipiscing
+        </Text> */}
+      </View>
+      <View style={{ flex: 1, flexDirection: "row", marginBottom: 15  }}>
+          <FlatList
+              data={contactData}
+              extraData={contactData}
               showsVerticalScrollIndicator={false}
               renderItem={({ item, index }) => {
                 return (
@@ -158,20 +111,12 @@ export default function AddressBookContents(props) {
             />
           </View>
         </View>
-      </View>
-    </View>
   );
 }
 const styles = StyleSheet.create({
   modalContainer: {
     height: "100%",
     backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderTopWidth: 1,
-    borderColor: Colors.borderColor,
     alignSelf: "center",
     width: "100%"
   },

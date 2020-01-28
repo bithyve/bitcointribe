@@ -23,6 +23,8 @@ import {
   OVERALL_HEALTH,
   calculateOverallHealth,
   overallHealthCalculated,
+  CHECK_PDF_HEALTH,
+  RESTORE_SHARE_FROM_QR,
 } from '../actions/sss';
 import { dbInsertedSSS } from '../actions/storage';
 
@@ -147,6 +149,7 @@ function* uploadEncMetaShareWorker({ payload }) {
     };
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
   } else {
+    Alert.alert('Upload Failed!', res.err);
     console.log({ err: res.err });
   }
   yield put(switchS3Loader('uploadMetaShare'));
@@ -278,14 +281,18 @@ function* downloadMetaShareWorker({ payload }) {
       const updatedRecoveryShares = {};
       Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach(key => {
         const recoveryShare = DECENTRALIZED_BACKUP.RECOVERY_SHARES[key];
-        if (recoveryShare.REQUEST_DETAILS.OTP === otp) {
-          updatedRecoveryShares[key] = {
-            REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
-            META_SHARE: metaShare,
-            ENC_DYNAMIC_NONPMDD: dynamicNonPMDD,
-          };
-        } else {
+        if (!recoveryShare.REQUEST_DETAILS) {
           updatedRecoveryShares[key] = recoveryShare;
+        } else {
+          if (recoveryShare.REQUEST_DETAILS.OTP === otp) {
+            updatedRecoveryShares[key] = {
+              REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
+              META_SHARE: metaShare,
+              ENC_DYNAMIC_NONPMDD: dynamicNonPMDD,
+            };
+          } else {
+            updatedRecoveryShares[key] = recoveryShare;
+          }
         }
       });
 
@@ -297,6 +304,7 @@ function* downloadMetaShareWorker({ payload }) {
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
     yield put(downloadedMShare(otp, true));
   } else {
+    Alert.alert('Download Failed!', res.err);
     console.log({ err: res.err });
     yield put(downloadedMShare(otp, false, res.err));
   }
@@ -327,6 +335,15 @@ function* generatePDFWorker({ payload }) {
     console.log({ err: resQRPersonalCopy2.err });
     return;
   }
+
+  const { SERVICES } = yield select(state => state.storage.database);
+  const updatedSERVICES = {
+    ...SERVICES,
+    S3_SERVICE: JSON.stringify(s3Service),
+  };
+
+  yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+
   const secureAccount: SecureAccount = yield select(
     state => state.accounts[SECURE_ACCOUNT].service,
   );
@@ -457,13 +474,77 @@ export const checkMSharesHealthWatcher = createWatcher(
   CHECK_MSHARES_HEALTH,
 );
 
+function* checkPDFHealthWorker({ payload }) {
+  const s3Service: S3Service = yield select(state => state.sss.service);
+  const { pdfHealth } = s3Service.sss;
+  const { scannedQR, index } = payload;
+  console.log({ scannedQR });
+
+  if (scannedQR === pdfHealth[index].qrData) {
+    let storedPDFHealth = JSON.parse(
+      yield call(AsyncStorage.getItem, 'PDF Health'),
+    );
+
+    storedPDFHealth = storedPDFHealth ? storedPDFHealth : {};
+
+    let updatedPDFHealth = {
+      ...storedPDFHealth,
+      [index]: { shareId: pdfHealth[index].shareId, updatedAt: Date.now() },
+    };
+
+    if (!updatedPDFHealth[3]) {
+      updatedPDFHealth = {
+        ...updatedPDFHealth,
+        [3]: { shareId: pdfHealth[3].shareId, updatedAt: 0 },
+      };
+    }
+    if (!updatedPDFHealth[4]) {
+      updatedPDFHealth = {
+        ...updatedPDFHealth,
+        [4]: { shareId: pdfHealth[4].shareId, updatedAt: 0 },
+      };
+    }
+
+    console.log({ updatedPDFHealth });
+    yield call(
+      AsyncStorage.setItem,
+      'PDF Health',
+      JSON.stringify(updatedPDFHealth),
+    );
+  } else {
+    console.log({ pdfHealth, payload });
+    Alert.alert('Invalid QR!', 'The scanned QR is wrong, please try again.');
+  }
+
+  // if (res.status === 200) {
+  //   if (preInstance !== postInstance) {
+  //     const { SERVICES } = yield select(state => state.storage.database);
+  //     const updatedSERVICES = {
+  //       ...SERVICES,
+  //       S3_SERVICE: JSON.stringify(s3Service),
+  //     };
+
+  //     yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+  //   }
+  // } else {
+  //   console.log({ err: res.err });
+  // }
+
+  // yield put(switchS3Loader('checkMSharesHealth'));
+}
+
+export const checkPDFHealthWatcher = createWatcher(
+  checkPDFHealthWorker,
+  CHECK_PDF_HEALTH,
+);
+
 function* overallHealthWorker({ payload }) {
   const service = payload.s3Service
     ? payload.s3Service
     : yield select(state => state.sss.service);
 
   const { healthCheckStatus } = service.sss;
-  const shareStatus = Object.keys(healthCheckStatus).map(key => {
+  let shareStatus = Object.keys(healthCheckStatus).map(key => {
     return {
       shareId: key,
       updatedAt: healthCheckStatus[key],
@@ -474,6 +555,20 @@ function* overallHealthWorker({ payload }) {
     AsyncStorage.getItem,
     'SecurityAnsTimestamp',
   );
+  console.log({ securityTimestamp });
+
+  let storedPDFHealth = JSON.parse(
+    yield call(AsyncStorage.getItem, 'PDF Health'),
+  );
+
+  if (!storedPDFHealth) {
+    storedPDFHealth = {
+      3: { shareId: 'placeHolderID3', updatedAt: 0 },
+      4: { shareId: 'placeHolderID4', updatedAt: 0 },
+    };
+  }
+  shareStatus[3] = storedPDFHealth[3];
+  shareStatus[4] = storedPDFHealth[4];
 
   const healthStatus = new HealthStatus();
   const overallHealth = yield call(
@@ -483,13 +578,18 @@ function* overallHealthWorker({ payload }) {
   );
 
   if (overallHealth) {
-    overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
+    // overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
+    overallHealth.overallStatus = parseInt(overallHealth.overallStatus); // Conversion: stages to percentage
+
     yield call(
       AsyncStorage.setItem,
       'overallHealth',
       JSON.stringify(overallHealth),
     );
+    console.log({ overallHealth });
     yield put(overallHealthCalculated(overallHealth));
+  } else {
+    throw new Error('Failed to calculate overall health');
   }
 }
 
@@ -544,16 +644,19 @@ function* restoreDynamicNonPMDDWorker() {
   );
 
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
-  const dyanmicNonPMDDs: EncDynamicNonPMDD[] = Object.keys(RECOVERY_SHARES).map(
-    key => RECOVERY_SHARES[key].ENC_DYNAMIC_NONPMDD,
+  const dynamicNonPMDDs: EncDynamicNonPMDD[] = Object.keys(RECOVERY_SHARES).map(
+    key => {
+      if (RECOVERY_SHARES.ENC_DYNAMIC_NONPMDD)
+        return RECOVERY_SHARES[key].ENC_DYNAMIC_NONPMDD;
+    },
   );
 
-  if (!dyanmicNonPMDDs.length) {
+  if (!dynamicNonPMDDs.length) {
     console.log('DynamicNonPMDD not available');
     return;
   }
   const s3Service: S3Service = yield select(state => state.sss.service);
-  const res = yield call(s3Service.restoreDynamicNonPMDD, dyanmicNonPMDDs);
+  const res = yield call(s3Service.restoreDynamicNonPMDD, dynamicNonPMDDs);
 
   if (res.status === 200) {
     const metaShares: MetaShare[] = res.data.latestDynamicNonPMDD; // sync the DNP structure across redux-saga and nodeAlpha
@@ -601,6 +704,41 @@ function* recoverMnemonicWorker({ payload }) {
 export const recoverMnemonicWatcher = createWatcher(
   recoverMnemonicWorker,
   RECOVER_MNEMONIC,
+);
+
+function* restoreShareFromQRWorker({ payload }) {
+  const { qrArray } = payload;
+  if (qrArray.length !== 8) {
+    throw new Error('QR array is not of appropriate length');
+  }
+  const { DECENTRALIZED_BACKUP } = yield select(
+    state => state.storage.database,
+  );
+
+  const res = yield call(S3Service.recoverMetaShareFromQR, qrArray);
+  if (res.status == 200) {
+    const { metaShare } = res.data;
+    console.log({ metaShare });
+    const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
+    RECOVERY_SHARES[metaShare.meta.index] = {
+      META_SHARE: metaShare,
+    };
+
+    const updatedBackup = {
+      ...DECENTRALIZED_BACKUP,
+      RECOVERY_SHARES,
+    };
+    console.log({ updatedBackup });
+    yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+  } else {
+    Alert.alert('Unable to recover share from QR', res.err);
+    console.log({ err: res.err });
+  }
+}
+
+export const restoreShareFromQRWatcher = createWatcher(
+  restoreShareFromQRWorker,
+  RESTORE_SHARE_FROM_QR,
 );
 
 function* recoverWalletWorker({ payload }) {

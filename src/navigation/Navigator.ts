@@ -34,7 +34,7 @@ import TwoFAToken from '../pages/Accounts/TwoFAToken';
 import HealthCheckSecurityAnswer from '../pages/ManageBackup/HealthCheckSecurityAnswer';
 import RecoveryRequestOTP from '../pages/Recovery/RecoveryRequestOTP';
 import SettingManagePin from '../pages/SettingManagePin';
-import RestoreByCloudQrCodeContents from '../pages/RestoreByCloudQrCodeContents';
+import RestoreByCloudQrCodeContents from '../pages/Recovery/RestoreByCloudQrCodeContents';
 import EmailModalContents from '../pages/EmailModalContents';
 import Buy from '../pages/Accounts/Buy';
 import Sell from '../pages/Accounts/Sell';
@@ -54,8 +54,9 @@ import NewWalletGenerationOTP from '../pages/RegenerateShare/NewWalletGeneration
 import WalletCreationSuccess from '../pages/RegenerateShare/WalletCreationSuccess';
 import SecureScan from '../pages/Accounts/SecureScan';
 import GoogleAuthenticatorOTP from '../pages/Accounts/GoogleAuthenticatorOTP';
-import ShareOtpWithTrustedContactContents from '../components/ShareOtpWithTrustedContactContents';
 import Confirmation from '../pages/Accounts/Confirmation';
+import TwoFASetup from '../pages/Accounts/TwoFASetup';
+import ShareRecoveryOTP from '../pages/Recovery/ShareRecoveryOTP';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -95,7 +96,6 @@ const MODAL_ROUTES = [
   'TwoFAToken',
   'HealthCheckSecurityAnswer',
   'RecoveryRequestOTP',
-  'ShareOtpWithTrustedContactContents',
   'Confirmation',
 ];
 
@@ -143,8 +143,14 @@ const HomeNavigator = createStackNavigator(
     WalletCreationSuccess,
     SecureScan,
     GoogleAuthenticatorOTP,
-    ShareOtpWithTrustedContactContents,
     Confirmation,
+    TwoFASetup,
+    ShareRecoveryOTP: {
+      screen: ShareRecoveryOTP,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
   },
   {
     headerLayoutPreset: 'center',

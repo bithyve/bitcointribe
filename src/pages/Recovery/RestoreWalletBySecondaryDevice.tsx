@@ -48,13 +48,13 @@ export default function RestoreWalletBySecondaryDevice(props) {
     ? setSecondaryQR(
         JSON.stringify({
           ...REQUEST_DETAILS,
-          type: 'secondaryDeviceQR',
-          mode: 'recovery',
+          requester: WALLET_SETUP.walletName,
+          type: 'secondaryDeviceQRRecovery',
         }),
       )
     : null;
-
-  REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
+  secondaryQR ? console.log(secondaryQR) : null;
+  // REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
 
   const deepLink = REQUEST_DETAILS
     ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/rk/` +
@@ -111,7 +111,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
             ) : (
               <QRCode value={secondaryQR} size={hp('27%')} />
             )}
-            {deepLink ? <CopyThisText text={deepLink} /> : null}
+            {/* {deepLink ? <CopyThisText text={deepLink} /> : null} */}
           </View>
 
           {REQUEST_DETAILS ? (
@@ -172,8 +172,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
-    shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
     backgroundColor: Colors.blue,
   },
   buttonText: {

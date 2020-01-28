@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,8 +8,12 @@ import {
   SafeAreaView,
   StatusBar,
   AsyncStorage,
+  Button,
+  ScrollView,
+  Platform,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
+import DeviceInfo from 'react-native-device-info';
 import BackupStyles from '../ManageBackup/Styles';
 import {
   widthPercentageToDP as wp,
@@ -40,34 +44,53 @@ const ReceivingAddress = props => {
   const [ReceiveHelperBottomSheet, setReceiveHelperBottomSheet] = useState(
     React.createRef(),
   );
+  const [
+    SecureReceiveWarningBottomSheet,
+    setSecureReceiveWarningBottomSheet,
+  ] = useState(React.createRef());
+
   const { loading, service } = useSelector(
     state => state.accounts[serviceType],
   );
+  const { receivingAddress } =
+    serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
+    const [isReceiveHelperDone, setIsReceiveHelperDone] = useState(true);
 
   const checkNShowHelperModal = async () => {
-    let isReceiveHelperDone = await AsyncStorage.getItem('isReceiveHelperDone');
-    if (!isReceiveHelperDone && serviceType == TEST_ACCOUNT) {
-      AsyncStorage.setItem('isReceiveHelperDone', 'true');
-      ReceiveHelperBottomSheet.current.snapTo(1);
+    let isReceiveHelperDone1 = await AsyncStorage.getItem('isReceiveHelperDone');
+    console.log("isReceiveHelperDone1", isReceiveHelperDone,isReceiveHelperDone1)
+    if (!isReceiveHelperDone1 && serviceType == TEST_ACCOUNT) {
+      await AsyncStorage.setItem('isReceiveHelperDone', 'true');
+      setTimeout(() => {
+        setIsReceiveHelperDone(true);
+      }, 10);
+      setTimeout(() => {
+        ReceiveHelperBottomSheet.current.snapTo(1);
+      }, 1000);
+    }
+    else{
+      setTimeout(() => {
+        setIsReceiveHelperDone(false);
+      }, 10);
     }
   };
 
   useEffect(() => {
     checkNShowHelperModal();
+    (async () => {
+      if (serviceType === SECURE_ACCOUNT) {
+        if (!(await AsyncStorage.getItem('savingsWarning'))) {
+        // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
+        SecureReceiveWarningBottomSheet.current.snapTo(1);
+        await AsyncStorage.setItem('savingsWarning', 'true');
+         }
+      }
+    })();
   }, []);
-
-  const { receivingAddress } =
-    serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
-
-  const dispatch = useDispatch();
-  useEffect(() => {
-    if (!receivingAddress) dispatch(fetchAddress(serviceType));
-  }, [serviceType]);
-
-  const renderReceiveHelperContents = () => {
+  const renderReceiveHelperContents = useCallback(() => {
     return (
       <TestAccountHelperModalContents
-        topButtonText={'Receiving Through the Test Account'}
+        topButtonText={'Receiving Bitcoins'}
         helperInfo={
           'For receiving bitcoins, you need to give an\naddress to the sender. Mostly in form of a QR\ncode.\n\nThis is pretty much like an email address but\nyour app generates a new one for you every time\nyou want to do a transaction.\n\nThe sender will scan this address or copy a long\nsequence of letters and numbers to send you the\nbitcoins or sats (a very small fraction of a\nbitcoin)\n\nNote that if you want to receive bitcoins/ sats\nfrom a “Trusted Contact”, the app does all this\nfor you and you don’t need to send a new\naddress every time.\n'
         }
@@ -87,16 +110,80 @@ const ReceivingAddress = props => {
         }}
       />
     );
-  };
+  }, [serviceType]);
+
   const renderReceiveHelperHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
-          (ReceiveHelperBottomSheet as any).current.snapTo(0);
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+          console.log("isReceiveHelperDone",isReceiveHelperDone);
+          if (isReceiveHelperDone) {
+            (ReceiveHelperBottomSheet as any).current.snapTo(2);
+            setTimeout(() => {
+              setIsReceiveHelperDone(false);
+            }, 10);
+          } else{
+            (ReceiveHelperBottomSheet as any).current.snapTo(0);
+          }
         }}
       />
     );
-  };
+  }
+
+  const renderSecureReceiveWarningContents = useCallback(() => {
+    return (
+      <View style={styles.modalContainer}>
+        <ScrollView>
+          <View
+            style={{
+              height: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: hp('2%')
+            }}
+          >
+            <BottomInfoBox
+              title={'Note'}
+              infoText={
+                "Please ensure that you have 2FA setted up (preferably on your secondary device), you'll require the 2FA token in order to send bitcoins from the savings account."
+              }
+            />
+            <View style={{ flexDirection: 'row' }}>
+              <Button
+                title="Ok, I understand"
+                onPress={() =>
+                  (SecureReceiveWarningBottomSheet as any).current.snapTo(0)
+                }
+              />
+              <Button
+                title="Manage Backup"
+                onPress={() => props.navigation.replace('ManageBackup')}
+              />
+            </View>
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }, [serviceType]);
+
+  const renderSecureReceiveWarningHeader = useCallback(() => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.borderColor}
+        backgroundColor={Colors.white}
+        onPressHeader={() => {
+          (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!receivingAddress) dispatch(fetchAddress(serviceType));
+  }, [serviceType]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -127,7 +214,7 @@ const ReceivingAddress = props => {
               <Text
                 onPress={() => {
                   AsyncStorage.setItem('isReceiveHelperDone', 'true');
-                  ReceiveHelperBottomSheet.current.snapTo(1);
+                  ReceiveHelperBottomSheet.current.snapTo(2);
                 }}
                 style={{
                   color: Colors.textColorGrey,
@@ -135,7 +222,7 @@ const ReceivingAddress = props => {
                   marginLeft: 'auto',
                 }}
               >
-                Know More
+                Know more
               </Text>
             ) : null}
           </View>
@@ -158,16 +245,27 @@ const ReceivingAddress = props => {
           <BottomInfoBox
             title={'Note'}
             infoText={
-              'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna'
+              'The QR code is your bitcoin address. The payer will scan it to send bitcoins. Alternatively copy the address displayed below it and send it to the payer'
             }
           />
         </View>
         <BottomSheet
           enabledInnerScrolling={true}
           ref={ReceiveHelperBottomSheet}
-          snapPoints={[-50, hp('95%')]}
+          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('18%')
+          : Platform.OS == 'android'
+          ? hp('20%')
+          : hp('19%'),hp('95%')]}
           renderContent={renderReceiveHelperContents}
           renderHeader={renderReceiveHelperHeader}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={SecureReceiveWarningBottomSheet}
+          snapPoints={[-50, hp('95%')]}
+          renderContent={renderSecureReceiveWarningContents}
+          renderHeader={renderSecureReceiveWarningHeader}
         />
       </View>
     </View>
@@ -176,6 +274,16 @@ const ReceivingAddress = props => {
 
 const styles = StyleSheet.create({
   loader: { height: hp('27%'), justifyContent: 'center' },
+  modalContainer: {
+    height: '100%',
+    backgroundColor: Colors.white,
+    alignSelf: 'center',
+    width: '100%',
+    paddingBottom: hp('5%'),
+    elevation: 10,
+    shadowOpacity: 10,
+    shadowOffset: { width: 0, height: 2 },
+  },
 });
 
 export default ReceivingAddress;

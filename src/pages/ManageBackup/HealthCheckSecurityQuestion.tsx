@@ -7,8 +7,6 @@ import {
   StyleSheet,
   ScrollView,
   TextInput,
-  SafeAreaView,
-  StatusBar,
   Platform,
 } from 'react-native';
 import Colors from '../../common/Colors';
@@ -20,19 +18,11 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import commonStyle from '../../common/Styles';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
-import ErrorModalContents from '../../components/ErrorModalContents';
-import TransparentHeaderModal from '../../components/TransparentHeaderModal';
-import BottomSheet from 'reanimated-bottom-sheet';
-import DeviceInfo from 'react-native-device-info';
-import { checkMSharesHealth } from '../../store/actions/sss';
-import ModalHeader from '../../components/ModalHeader';
 
-export default function HealthCheckSecurityAnswer(props) {
-  const dispatch = useDispatch();
+export default function HealthCheckSecurityQuestion(props) {
   const { security } = useSelector(
     state => state.storage.database.WALLET_SETUP,
   );
@@ -46,10 +36,6 @@ export default function HealthCheckSecurityAnswer(props) {
   const [answer, setAnswer] = useState('');
   const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
   const [errorText, setErrorText] = useState('');
-  const [
-    HealthCheckSuccessBottomSheet,
-    setHealthCheckSuccessBottomSheet,
-  ] = useState(React.createRef());
 
   const setConfirm = event => {
     if (event.text) {
@@ -64,8 +50,6 @@ export default function HealthCheckSecurityAnswer(props) {
   };
 
   const setBackspace = event => {
-    console.log('event,key', event.nativeEvent.key);
-
     if (event.nativeEvent.key == 'Backspace') {
       setErrorText('');
     }
@@ -77,50 +61,8 @@ export default function HealthCheckSecurityAnswer(props) {
     }
   }, [answer]);
 
-  const renderHealthCheckSuccessModalContent = () => {
-    return (
-      <ErrorModalContents
-        modalRef={HealthCheckSuccessBottomSheet}
-        title={'Health Check Successful'}
-        info={'Questions Successfully Backed Up'}
-        note={'Hexa will remind you to help\nremember the answers'}
-        proceedButtonText={'View Health'}
-        isIgnoreButton={false}
-        onPressProceed={() => {
-          (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-          dispatch(checkMSharesHealth());
-          props.navigation.goBack();
-        }}
-        isBottomImage={true}
-      />
-    );
-  };
-
-  const renderHealthCheckSuccessModalHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={commonStyle.headerContainer}>
-        <TouchableOpacity
-          style={commonStyle.headerLeftIconContainer}
-          onPress={() => {
-            props.navigation.goBack();
-          }}
-        >
-          <View style={commonStyle.headerLeftIconInnerContainer}>
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </View>
-        </TouchableOpacity>
-      </View>
+    <View style={{ ...styles.modalContentContainer, height: '100%' }}>
       <View style={styles.modalContentContainer}>
         <View>
           <View style={{ flexDirection: 'row', padding: wp('7%') }}>
@@ -185,7 +127,6 @@ export default function HealthCheckSecurityAnswer(props) {
                           }
                           setDropdownBoxValue(value);
                           setDropdownBoxOpenClose(false);
-                          //onQuestionSelect(dropdownBoxValue);
                         }}
                         style={{
                           ...styles.dropdownBoxModalElementView,
@@ -242,19 +183,18 @@ export default function HealthCheckSecurityAnswer(props) {
                 }}
                 onChangeText={text => {
                   setAnswer(text);
-                  //onTextChange(answer);
                 }}
                 onSubmitEditing={event => setConfirm(event.nativeEvent)}
                 onFocus={() => {
-                  // if (Platform.OS == "ios") {
-                  //   props.bottomSheetRef.current.snapTo(2);
-                  // }
+                  if (Platform.OS == 'ios') {
+                    props.bottomSheetRef.current.snapTo(2);
+                  }
                   setDropdownBoxOpenClose(false);
                 }}
                 onBlur={() => {
-                  // if (Platform.OS == "ios") {
-                  //     props.bottomSheetRef.current.snapTo(1);
-                  // }
+                  if (Platform.OS == 'ios') {
+                    props.bottomSheetRef.current.snapTo(1);
+                  }
                   setDropdownBoxOpenClose(false);
                 }}
               />
@@ -277,13 +217,13 @@ export default function HealthCheckSecurityAnswer(props) {
             </View>
             <TouchableOpacity
               disabled={errorText || !answer ? true : false}
-              onPress={async () => {
-                await AsyncStorage.setItem(
+              onPress={() => {
+                AsyncStorage.setItem(
                   'SecurityAnsTimestamp',
                   JSON.stringify(Date.now()),
-                );
-
-                (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
+                ).then(() => {
+                  props.onPressConfirm();
+                });
               }}
               style={styles.questionConfirmButton}
             >
@@ -294,18 +234,86 @@ export default function HealthCheckSecurityAnswer(props) {
           </View>
         </View>
       </View>
-      <BottomSheet
-        onOpenEnd={() => {}}
-        enabledInnerScrolling={true}
-        ref={HealthCheckSuccessBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
-        ]}
-        renderContent={renderHealthCheckSuccessModalContent}
-        renderHeader={renderHealthCheckSuccessModalHeader}
-      />
-    </SafeAreaView>
+      {/* {/* <View style={{ paddingLeft: wp('6%'), paddingRight: wp('6%'), }}>
+                <AppBottomSheetTouchableWrapper activeOpacity={10} style={[dropdownBoxOpenClose ? styles.dropdownBoxOpened : styles.dropdownBox, { borderColor: errorText == "Wrong question selected" ? Colors.red : Colors.borderColor }]} onPress={() => { setDropdownBoxOpenClose(!dropdownBoxOpenClose); }}>
+                    <Text style={{ ...styles.dropdownBoxText, color: dropdownBoxValue.question ? Colors.textColorGrey : Colors.borderColor }}>{dropdownBoxValue.question ? dropdownBoxValue.question : 'Select Security Question'}</Text>
+                    <Ionicons style={{ marginLeft: 'auto' }} name={dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'} size={15} color={Colors.borderColor} />
+                </AppBottomSheetTouchableWrapper>
+                <View style={{ position: 'relative', }}>
+                    {dropdownBoxOpenClose &&
+                        <View style={styles.dropdownBoxModal}>
+                            <ScrollView>
+                                {dropdownBoxList.map((value, index) =>
+                                    <AppBottomSheetTouchableWrapper onPress={() => {
+                                        if (securityQuestion != value.question) {
+                                            setErrorText("Wrong question selected")
+                                        }
+                                        else {
+                                            setErrorText("")
+                                        }
+                                        setDropdownBoxValue(value); setDropdownBoxOpenClose(false); props.onQuestionSelect(dropdownBoxValue);
+                                    }} style={{
+                                        ...styles.dropdownBoxModalElementView,
+                                        borderTopLeftRadius: index == 0 ? 10 : 0,
+                                        borderTopRightRadius: index == 0 ? 10 : 0,
+                                        borderBottomLeftRadius: index == dropdownBoxList.length - 1 ? 10 : 0,
+                                        borderBottomRightRadius: index == dropdownBoxList.length - 1 ? 10 : 0,
+                                        paddingTop: index == 0 ? 5 : 0,
+                                        backgroundColor: dropdownBoxValue.id == value.id ? Colors.lightBlue : Colors.white,
+                                    }}>
+                                        <Text style={{ color: dropdownBoxValue.id == value.id ? Colors.blue : Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12) }}>{value.question}</Text>
+                                    </AppBottomSheetTouchableWrapper>
+                                )}
+                            </ScrollView>
+                        </View>
+                    }
+                    <TextInput
+                        style={{ ...styles.inputBox, width: '100%', marginTop: 15, marginBottom: hp('1%'), borderColor: errorText == "Answer is incorrect" ? Colors.red : Colors.borderColor, }}
+                        placeholder={'Enter Answer'}
+                        placeholderTextColor={Colors.borderColor}
+                        value={answer}
+                        autoCapitalize="none"
+                        onKeyPress ={event => {
+                            setBackspace(event);
+                          }}
+                        onChangeText={(text) => {
+                            // if (text.length > 0 && text != securityAnswer) {
+                            //     setErrorText("Answer is incorrect")
+                            // }
+                            // else { setErrorText("") }
+                            setAnswer(text);
+                            props.onTextChange(answer);
+                        }}
+                        onSubmitEditing={
+                            (event) => (setConfirm(event.nativeEvent))
+                          }
+                        onFocus={() => {
+                            if (Platform.OS == "ios") {
+                                props.bottomSheetRef.current.snapTo(2);
+                            }
+                            setDropdownBoxOpenClose(false);
+                        }}
+                        onBlur={() => {
+                            if (Platform.OS == "ios") {
+                                props.bottomSheetRef.current.snapTo(1);
+                            }
+                            setDropdownBoxOpenClose(false)
+                        }}
+                    />
+                    {errorText ?
+                        <Text style={{ marginLeft: 'auto', color: Colors.red, fontSize: RFValue(10), fontFamily: Fonts.FiraSansMediumItalic, }}>{errorText}</Text> : null
+                    }
+                    <Text style={styles.modalInfoText}>Security question and answer is never stored anywhere{"\n"}and even your contacts don’t know this answer</Text>
+                </View>
+                <AppBottomSheetTouchableWrapper
+                    disabled={errorText ? true : false}
+                    onPress={() => props.onPressConfirm()}
+                    style={styles.questionConfirmButton}
+                >
+                    <Text style={styles.proceedButtonText}>{errorText ? 'Try Again' : 'Confirm'}</Text>
+                </AppBottomSheetTouchableWrapper>
+            </View> */}
+    </View>
   );
 }
 

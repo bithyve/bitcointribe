@@ -28,9 +28,10 @@ import TransparentHeaderModal from "../../components/TransparentHeaderModal";
 import ErrorModalContents from '../../components/ErrorModalContents';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from "react-native-device-info";
+import ModalHeader from '../../components/ModalHeader';
 
 const TrustedContactHealthCheck = props => {
-    const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
+    const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
     const [SelectedOption, setSelectedOption] = useState(0);
     const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
     const [ReshareBottomSheet, setReshareBottomSheet] = useState(
@@ -41,7 +42,7 @@ const TrustedContactHealthCheck = props => {
     );
     const [pageData, setPageData] = useState([
         {
-            id: 1, title: "Recovery Secret not accessible", date: "19 May ‘19, 11:00am", info: "Confirm the health of recovery secret with your trusted contact"
+            id: 1, title: "Recovery Secret Not Accessible", date: "19 May ‘19, 11:00am", info: "Confirm the health of recovery secret with your trusted contact"
         },
         {
             id: 2, title: "Recovery Secret received", date: "1 June ‘19, 9:00am", info: "consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet"
@@ -94,8 +95,8 @@ const TrustedContactHealthCheck = props => {
 
     const renderChangeHeader = () => {
         return (
-            <TransparentHeaderModal
-                onPressheader={() => {
+            <ModalHeader
+                onPressHeader={() => {
                     (ChangeBottomSheet as any).current.snapTo(0);
                 }}
             />
@@ -127,8 +128,8 @@ const TrustedContactHealthCheck = props => {
 
     const renderReshareHeader = () => {
         return (
-            <TransparentHeaderModal
-                onPressheader={() => {
+            <ModalHeader
+                onPressHeader={() => {
                     (ReshareBottomSheet as any).current.snapTo(0);
                 }}
             />
@@ -160,8 +161,8 @@ const TrustedContactHealthCheck = props => {
 
     const renderConfirmHeader = () => {
         return (
-            <TransparentHeaderModal
-                onPressheader={() => {
+            <ModalHeader
+                onPressHeader={() => {
                     (ConfirmBottomSheet as any).current.snapTo(0);
                 }}
             />
@@ -212,7 +213,7 @@ const TrustedContactHealthCheck = props => {
                 })}
             </ScrollView>
             {SelectedOption ?
-                <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, justifyContent: 'center', alignItems: 'center', height: hp('25%'), backgroundColor: Colors.white }}>
+                <View style={{ justifyContent: 'center', alignItems: 'center', height: hp('25%'), backgroundColor: Colors.white }}>
                     <Text style={styles.bottomBoxText}>consectetur Lorem ipsum dolor sit amet, consectetur sit <Text onPress={() => { ReshareBottomSheet.current.snapTo(1) }} style={styles.bottomBoxTextUnderline}>Reshare</Text></Text>
 
                     <Text style={styles.bottomBoxText}>Lorem ipsum dolor sit amet, consectetur sit amet <Text onPress={() => { ChangeBottomSheet.current.snapTo(1) }} style={styles.bottomBoxTextUnderline}>Change Trusted Contact</Text></Text>

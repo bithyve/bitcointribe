@@ -170,10 +170,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 8,
-    elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 10 },
     backgroundColor: Colors.blue
   },
   buttonText: {
@@ -187,7 +183,11 @@ const styles = StyleSheet.create({
     paddingRight: 30,
     paddingBottom: DeviceInfo.hasNotch() ? 70 : 40,
     paddingTop: 30,
-    alignItems: "center"
+    alignItems: "center",
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
   },
   statusIndicatorView: {
     flexDirection: "row",

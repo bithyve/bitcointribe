@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Image,
@@ -13,7 +13,7 @@ import {
   Button,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
+  Keyboard,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -32,6 +32,7 @@ import {
   fetchTransactions,
   transferST3,
 } from '../../store/actions/accounts';
+import DeviceInfo from 'react-native-device-info';
 import SendStatusModalContents from '../../components/SendStatusModalContents';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -43,17 +44,25 @@ import {
 } from '../../common/constants/serviceTypes';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
+import QrCodeModalContents from '../../components/QrCodeModalContents';
+// import HealthCheckGoogleAuthModalContents from '../../components/HealthCheckGoogleAuthModalContents';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default function Send(props) {
+  const staticFees = props.navigation.getParam('staticFees');
+  const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
+  const [bottomSheet, setBottomSheet] = useState(React.createRef());
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
     : null;
   const serviceType = props.navigation.getParam('serviceType');
   const [recipientAddress, setRecipientAddress] = useState('');
-  const [amount, setAmount] = useState();
+  const [amount, setAmount] = useState('');
   const [token, setToken] = useState('');
   const [description, setDescription] = useState('');
-  const [sliderValue, setSliderValue] = useState(4);
+  const [sliderValue, setSliderValue] = useState(0);
+  const [sliderValueText, setSliderValueText] = useState('Low Fee');
+  const [isSendHelperDone, setIsSendHelperDone] = useState(true);
   // const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
   //   React.createRef(),
   // );
@@ -64,11 +73,21 @@ export default function Send(props) {
   const checkNShowHelperModal = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
     if (!isSendHelperDone && serviceType == TEST_ACCOUNT) {
-      AsyncStorage.setItem('isSendHelperDone', 'true');
-      SendHelperBottomSheet.current.snapTo(1);
+      await AsyncStorage.setItem('isSendHelperDone', 'true');
+      setTimeout(() => {
+        setIsSendHelperDone(true);
+      }, 10);
+
+      setTimeout(() => {
+        SendHelperBottomSheet.current.snapTo(1);
+      }, 1000);
+    } else {
+      setTimeout(() => {
+        setIsSendHelperDone(false);
+      }, 10);
     }
   };
-
+  const [openmodal, setOpenmodal] = useState('closed');
   useEffect(() => {
     checkNShowHelperModal();
   }, []);
@@ -122,7 +141,7 @@ export default function Send(props) {
 
   const dispatch = useDispatch();
 
-  const { transfer, loading } = useSelector(
+  const { transfer, loading, service } = useSelector(
     state => state.accounts[serviceType],
   );
 
@@ -139,10 +158,7 @@ export default function Send(props) {
     return (
       <TestAccountHelperModalContents
         topButtonText={`Sending Bitcoins`}
-        helperInfo={`When you want to send bitcoins or sats (a very small fraction 
-          of a bitcoin), you have to send it to an address of the recipient
-          \n\nPretty much like an email address but one that changes every time you send it to them
-          \n\nFor this you can either scan a QR code from therecipient or enter a very long sequence ofnumbers and letters which is the recipientsbitcoin address`}
+        helperInfo={`When you want to send bitcoins or sats (a very small fraction of a bitcoin), you have to send it to an address of the recipient \n\nPretty much like an email address but one that changes every time you send it to them \n\nFor this you can either scan a QR code from the recipient or enter a very long sequence ofnumbers and letters which is the recipientsbitcoin address`}
         continueButtonText={'Continue'}
         quitButtonText={'Quit'}
         onPressContinue={() => {
@@ -157,8 +173,18 @@ export default function Send(props) {
   const renderSendHelperHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
-          (SendHelperBottomSheet as any).current.snapTo(0);
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+          console.log('isSendHelperDone', isSendHelperDone);
+          if (isSendHelperDone) {
+            (SendHelperBottomSheet as any).current.snapTo(2);
+            setTimeout(() => {
+              setIsSendHelperDone(false);
+            }, 10);
+          } else {
+            (SendHelperBottomSheet as any).current.snapTo(0);
+          }
         }}
       />
     );
@@ -166,8 +192,99 @@ export default function Send(props) {
 
   const getQrCodeData = qrData => {
     console.log('Qrcodedata', qrData);
+    setTimeout(() => {
+      setQrBottomSheetsFlag(false);
+    }, 10);
+    setTimeout(() => {
+      (bottomSheet as any).current.snapTo(0);
+    }, 10);
+
     setRecipientAddress(qrData);
   };
+
+  const renderContent1 = () => {
+    return (
+      <QrCodeModalContents
+        flag={true}
+        modalRef={bottomSheet}
+        isOpenedFlag={QrBottomSheetsFlag}
+        onQrScan={qrData => getQrCodeData(qrData)}
+      />
+    );
+  };
+
+  useEffect(() => {
+    if (openmodal == 'closed') {
+      setTimeout(() => {
+        setQrBottomSheetsFlag(false);
+      }, 10);
+      (bottomSheet as any).current.snapTo(0);
+    }
+    if (openmodal == 'full') {
+      setTimeout(() => {
+        setQrBottomSheetsFlag(true);
+      }, 10);
+      (bottomSheet as any).current.snapTo(1);
+    }
+  }, [openmodal]);
+
+  function openCloseModal() {
+    if (openmodal == 'closed') {
+      setOpenmodal('full');
+    }
+    if (openmodal == 'full') {
+      setOpenmodal('closed');
+    }
+  }
+
+  function renderHeader() {
+    return (
+      <TouchableOpacity
+        activeOpacity={10}
+        onPress={() => openCloseModal()}
+        style={styles.modalHeaderContainer}
+      >
+        <View style={styles.modalHeaderHandle} />
+        <Text style={styles.modalHeaderTitleText}>QR</Text>
+      </TouchableOpacity>
+    );
+  }
+
+  // const renderHealthCheckGoogleAuthContents = useCallback(() => {
+  //   return (
+  //     <HealthCheckGoogleAuthModalContents
+  //       modalRef={HealthCheckGoogleAuthBottomSheet}
+  //       onPressConfirm={() => {
+  //         Keyboard.dismiss();
+  //         (HealthCheckGoogleAuthBottomSheet as any).current.snapTo(0);
+  //         //  (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
+  //       }}
+  //     />
+  //   );
+  // }, []);
+
+  // const renderHealthCheckGoogleAuthHeader = useCallback(() => {
+  //   return (
+  //     <TransparentHeaderModal
+  //       onPressheader={() => {
+  //         (HealthCheckGoogleAuthBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }, []);
+
+  useEffect(() => {
+    if (serviceType === SECURE_ACCOUNT) {
+      (async () => {
+        if (!(await AsyncStorage.getItem('twoFASetup'))) {
+          props.navigation.navigate('TwoFASetup', {
+            twoFASetup: service.secureHDWallet.twoFASetup,
+          });
+          await AsyncStorage.setItem('twoFASetup', 'true');
+        }
+      })();
+    }
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -204,7 +321,7 @@ export default function Send(props) {
                   <Text
                     onPress={() => {
                       AsyncStorage.setItem('isSendHelperDone', 'true');
-                      SendHelperBottomSheet.current.snapTo(1);
+                      SendHelperBottomSheet.current.snapTo(2);
                     }}
                     style={{
                       color: Colors.textColorGrey,
@@ -212,7 +329,7 @@ export default function Send(props) {
                       marginLeft: 'auto',
                     }}
                   >
-                    Know More
+                    Know more
                   </Text>
                 ) : null}
               </View>
@@ -241,9 +358,10 @@ export default function Send(props) {
                 <TouchableOpacity
                   style={styles.contactNameInputImageView}
                   onPress={() => {
-                    props.navigation.navigate('QrScanner', {
-                      scanedCode: getQrCodeData,
-                    });
+                    (bottomSheet as any).current.snapTo(1);
+                    // props.navigation.navigate('QrScanner', {
+                    //   scanedCode: getQrCodeData,
+                    // });
                   }}
                 >
                   <Image
@@ -264,11 +382,12 @@ export default function Send(props) {
                   style={{ ...styles.textBox, paddingLeft: 10 }}
                   placeholder={
                     serviceType === TEST_ACCOUNT
-                      ? 'Enter Amount in tsats'
+                      ? 'Enter Amount in t-sats'
                       : 'Enter Amount in sats'
                   }
                   value={amount}
-                  onChangeText={setAmount}
+                  keyboardType={'numeric'}
+                  onChangeText={value => setAmount(value)}
                   placeholderTextColor={Colors.borderColor}
                   // onFocus={() => {
                   //   props.modalRef.current.snapTo(2);
@@ -341,20 +460,24 @@ export default function Send(props) {
               >
                 Set priority for your transaction
               </Text>
+              
               <View
                 style={{
                   ...styles.textBoxView,
-                  height: 55,
+                  flexDirection: 'column',
+                  height: 80,
                   marginTop: hp('2%'),
                   alignItems: 'center',
                   paddingLeft: 10,
                   paddingRight: 10,
                 }}
               >
+                <View style={{flexDirection: 'row'}}>
                 <Slider
                   style={{ flex: 1, marginRight: 10 }}
                   minimumValue={0}
                   maximumValue={10}
+                  step={5}
                   minimumTrackTintColor={Colors.blue}
                   maximumTrackTintColor={Colors.borderColor}
                   thumbStyle={{
@@ -372,20 +495,91 @@ export default function Send(props) {
                     backgroundColor: 'blue',
                   }}
                   value={sliderValue}
-                  onValueChange={value => setSliderValue(value)}
+                  onValueChange={value => {
+                    {
+                      value == 0
+                        ? setSliderValueText('Low Fee')
+                        : value == 5
+                        ? setSliderValueText('In the middle')
+                        : setSliderValueText('Fast Transaction');
+                    }
+                    setSliderValue(value);
+                  }}
                 />
-                <Text
+                </View>
+                <View
                   style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue(13),
-                    fontFamily: Fonts.FiraSansRegular,
-                    marginLeft: 'auto',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    marginBottom: 10
                   }}
                 >
-                  Low
-                </Text>
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(13),
+                      fontFamily: Fonts.FiraSansRegular,
+                      textAlign: 'center',
+                      flex: 1, flexWrap: 'wrap'
+                    }}
+                  >
+                    {'Low Fee'} (
+                    {staticFees
+                      ? staticFees[
+                          sliderValueText === 'Low Fee'
+                            ? 'low'
+                            : sliderValueText === 'In the middle'
+                            ? 'medium'
+                            : 'high'
+                        ]
+                      : ''}
+                    {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
+                  </Text>
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(13),
+                      fontFamily: Fonts.FiraSansRegular,
+                      textAlign: 'center',
+                      flex: 1, flexWrap: 'wrap'
+                    }}
+                  >
+                    {'In the middle'} (
+                    {staticFees
+                      ? staticFees[
+                          sliderValueText === 'Low Fee'
+                            ? 'low'
+                            : sliderValueText === 'In the middle'
+                            ? 'medium'
+                            : 'high'
+                        ]
+                      : ''}
+                    {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
+                  </Text>
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(13),
+                      fontFamily: Fonts.FiraSansRegular,
+                      textAlign: 'center',
+                      flex: 1, flexWrap: 'wrap'
+                    }}
+                  >
+                    {'Fast Transaction'} (
+                    {staticFees
+                      ? staticFees[
+                          sliderValueText === 'Low Fee'
+                            ? 'low'
+                            : sliderValueText === 'In the middle'
+                            ? 'medium'
+                            : 'high'
+                        ]
+                      : ''}
+                    {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
+                  </Text>
+                </View>
+                </View>
               </View>
-            </View>
             <View
               style={{ paddingLeft: 20, paddingRight: 20, marginTop: hp('5%') }}
             >
@@ -420,15 +614,29 @@ export default function Send(props) {
             >
               <TouchableOpacity
                 onPress={() => {
+                  const priority =
+                    sliderValueText === 'Low Fee'
+                      ? 'low'
+                      : sliderValueText === 'In the middle'
+                      ? 'medium'
+                      : 'high';
                   dispatch(
                     transferST1(serviceType, {
                       recipientAddress,
                       amount: parseInt(amount),
+                      priority,
                     }),
                   );
                 }}
                 disabled={loading.transfer}
-                style={styles.confirmButtonView}
+                style={{
+                  ...styles.confirmButtonView,
+                  backgroundColor: Colors.blue,
+                  elevation: 10,
+                  shadowColor: Colors.shadowBlue,
+                  shadowOpacity: 1,
+                  shadowOffset: { width: 15, height: 15 },
+                }}
               >
                 {loading.transfer ? (
                   <ActivityIndicator size="small" />
@@ -440,7 +648,6 @@ export default function Send(props) {
                 style={{
                   ...styles.confirmButtonView,
                   width: wp('30%'),
-                  backgroundColor: Colors.white,
                 }}
                 onPress={() => {
                   dispatch(clearTransfer(serviceType));
@@ -458,9 +665,34 @@ export default function Send(props) {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={SendHelperBottomSheet}
-          snapPoints={[-50, hp('95%')]}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('18%')
+              : Platform.OS == 'android'
+              ? hp('20%')
+              : hp('19%'),
+            hp('95%'),
+          ]}
           renderContent={renderSendHelperContents}
           renderHeader={renderSendHelperHeader}
+        />
+        <BottomSheet
+          onOpenEnd={() => {
+            setQrBottomSheetsFlag(true);
+          }}
+          onCloseEnd={() => {
+            setQrBottomSheetsFlag(false);
+            (bottomSheet as any).current.snapTo(0);
+          }}
+          onCloseStart={() => {
+            setQrBottomSheetsFlag(false);
+          }}
+          enabledInnerScrolling={true}
+          ref={bottomSheet}
+          snapPoints={[0, hp('90%')]}
+          renderContent={renderContent1}
+          renderHeader={renderHeader}
         />
       </View>
     </View>
@@ -471,10 +703,34 @@ const styles = StyleSheet.create({
   modalContentContainer: {
     height: '100%',
   },
+  modalHeaderContainer: {
+    backgroundColor: Colors.white,
+    marginTop: 'auto',
+    flex: 1,
+    height: Platform.OS == 'ios' ? 45 : 40,
+    borderTopLeftRadius: 10,
+    borderLeftColor: Colors.borderColor,
+    borderLeftWidth: 1,
+    borderTopRightRadius: 10,
+    borderRightColor: Colors.borderColor,
+    borderRightWidth: 1,
+    borderTopColor: Colors.borderColor,
+    borderTopWidth: 1,
+    zIndex: 9999,
+  },
+  modalHeaderHandle: {
+    width: 50,
+    height: 5,
+    backgroundColor: Colors.borderColor,
+    borderRadius: 10,
+    alignSelf: 'center',
+    marginTop: 7,
+  },
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
+    marginLeft: 15,
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,
@@ -527,7 +783,6 @@ const styles = StyleSheet.create({
   confirmButtonView: {
     width: wp('50%'),
     height: wp('13%'),
-    backgroundColor: Colors.blue,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,

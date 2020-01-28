@@ -69,7 +69,7 @@ export default function TwoFAToken(props) {
     return renderSuccessStatusContents();
   }
 
-  Alert.alert('2FA Secret Key', service.secureHDWallet.twoFASetup.secret); // TODO: secret display and removal mech
+  // Alert.alert('2FA Secret Key', service.secureHDWallet.twoFASetup.secret); // TODO: secret display and removal mech
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -361,8 +361,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
-    shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
   },

@@ -16,6 +16,8 @@ export const RECOVER_MNEMONIC = 'RECOVER_MNEMONIC';
 export const RECOVER_WALLET = 'RECOVER_WALLET';
 export const RESET_REQUESTED_SHARE_UPLOADS = 'RESET_REQUESTED_SHARE_UPLOADS';
 export const OVERALL_HEALTH = 'OVERALL_HEALTH';
+export const CHECK_PDF_HEALTH = 'CHECK_PDF_HEALTH';
+export const RESTORE_SHARE_FROM_QR = 'RESTORE_SHARE_FROM_QR';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -55,6 +57,10 @@ export const updateMSharesHealth = () => {
 
 export const checkMSharesHealth = () => {
   return { type: CHECK_MSHARES_HEALTH };
+};
+
+export const checkPDFHealth = (scannedQR, index) => {
+  return { type: CHECK_PDF_HEALTH, payload: { scannedQR, index } };
 };
 
 export const calculateOverallHealth = (s3Service?) => {
@@ -119,4 +125,8 @@ export const downloadedMShare = (otp, status, err?) => {
 
 export const overallHealthCalculated = overallHealth => {
   return { type: OVERALL_HEALTH_CALCULATED, payload: { overallHealth } };
+};
+
+export const restoreShareFromQR = qrArray => {
+  return { type: RESTORE_SHARE_FROM_QR, payload: { qrArray } };
 };

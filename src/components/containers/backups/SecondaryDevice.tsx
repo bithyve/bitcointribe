@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { uploadEncMShare } from "../../../store/actions/sss";
 
 const SecondaryDevice = props => {
-  const [selectedStatus, setSelectedStatus] = useState("error"); // for preserving health of this entity
+  const [selectedStatus, setSelectedStatus] = useState("Ugly"); // for preserving health of this entity
   const [secondaryQR, setSecondaryQR] = useState("");
   const { SHARES_TRANSFER_DETAILS } = useSelector(
     state => state.storage.database.DECENTRALIZED_BACKUP

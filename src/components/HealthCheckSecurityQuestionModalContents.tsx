@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Image,
@@ -25,6 +25,36 @@ export default function HealthCheckSecurityQuestionModalContents(props) {
     const [answer, setAnswer] = useState('');
     const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
     const [errorText, setErrorText] = useState('');
+    let [counter, setCounter] = useState(0);
+    const [confirmAnswer, setConfirmAnswer] = useState('');
+    const [ansError, setAnsError] = useState('');
+
+    const setConfirm =(event) => {
+        if(event.text){
+            if (event.text.length > 0 && event.text != securityAnswer) {
+              setErrorText('Answer is incorrect');
+              
+            }else{
+              setErrorText('');
+            }
+           }else{
+            setErrorText('');
+          }
+          };
+          
+      const setBackspace =(event) => {
+        console.log("event,key", event.nativeEvent.key);
+       
+       if(event.nativeEvent.key == "Backspace"){
+        setErrorText('');
+       }
+      };
+    
+      useEffect( () => {
+        if ( answer.trim() == securityAnswer.trim()) {
+          setErrorText('');
+          }
+      }, [answer] );
 
     return (<View style={{ ...styles.modalContentContainer, height: '100%' }}>
         <View >
@@ -72,14 +102,24 @@ export default function HealthCheckSecurityQuestionModalContents(props) {
                         placeholder={'Enter Answer'}
                         placeholderTextColor={Colors.borderColor}
                         value={answer}
+                        textContentType='none'
+                      autoCompleteType='off'
+                      autoCorrect={false}
+                        autoCapitalize="none"
+                        onKeyPress ={event => {
+                            setBackspace(event);
+                          }}
                         onChangeText={(text) => {
-                            if (text.length > 0 && text != securityAnswer) {
-                                setErrorText("Answer is incorrect")
-                            }
-                            else { setErrorText("") }
+                            // if (text.length > 0 && text != securityAnswer) {
+                            //     setErrorText("Answer is incorrect")
+                            // }
+                            // else { setErrorText("") }
                             setAnswer(text);
                             props.onTextChange(answer);
                         }}
+                        onSubmitEditing={
+                            (event) => (setConfirm(event.nativeEvent))
+                          }
                         onFocus={() => {
                             if (Platform.OS == "ios") {
                                 props.bottomSheetRef.current.snapTo(2);
@@ -195,8 +235,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         elevation: 10,
         shadowColor: Colors.shadowBlue,
-        shadowOpacity: 10,
-        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 1,
+        shadowOffset: { width: 15, height: 15 },
         backgroundColor: Colors.blue,
         marginTop: hp('6%')
     },

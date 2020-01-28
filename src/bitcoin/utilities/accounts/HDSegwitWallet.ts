@@ -216,6 +216,7 @@ export default class HDSegwitWallet extends Bitcoin {
     | {
         fee: number;
         balance: number;
+        estimatedBlocks?: undefined;
         inputs?: undefined;
         txb?: undefined;
       }
@@ -229,6 +230,7 @@ export default class HDSegwitWallet extends Bitcoin {
         txb: bitcoinJS.TransactionBuilder;
         fee: number;
         balance: number;
+        estimatedBlocks: number;
       }
   > => {
     try {
@@ -241,10 +243,12 @@ export default class HDSegwitWallet extends Bitcoin {
         balance += utxo.value;
       });
 
-      const { averageTxFee, feePerByte } = await this.averageTransactionFee(
-        txnPriority,
-      );
-      console.log({ averageTxFee, feePerByte });
+      const {
+        averageTxFee,
+        feePerByte,
+        estimatedBlocks,
+      } = await this.averageTransactionFee(txnPriority);
+      console.log({ averageTxFee, feePerByte, estimatedBlocks });
 
       const { inputs, outputs, fee } = coinselect(
         inputUTXOs,
@@ -261,6 +265,15 @@ export default class HDSegwitWallet extends Bitcoin {
       if (!inputs) {
         // insufficient input utxos to compensate for output utxos + fee
         return { fee: averageTxFee, balance };
+      }
+
+      // re-estimating number of blocks to confirm based on static vs actual fee
+      let reestimatedBlocks;
+
+      if (averageTxFee - fee >= 0) reestimatedBlocks = estimatedBlocks;
+      else {
+        // TODO: clever estimation mech
+        reestimatedBlocks = estimatedBlocks + 2; // effective priority: medium
       }
 
       const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
@@ -285,6 +298,7 @@ export default class HDSegwitWallet extends Bitcoin {
         txb,
         fee: averageTxFee,
         balance,
+        estimatedBlocks: reestimatedBlocks,
       };
     } catch (err) {
       throw new Error(`Transaction creation failed: ${err.message}`);

@@ -28,9 +28,10 @@ import TransparentHeaderModal from "../../components/TransparentHeaderModal";
 import ErrorModalContents from '../../components/ErrorModalContents';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from "react-native-device-info";
+import ModalHeader from '../../components/ModalHeader';
 
 const NoteHealthCheck = props => {
-	const [selectedStatus, setSelectedStatus] = useState('error'); // for preserving health of this entity
+	const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
 	const [SelectedOption, setSelectedOption] = useState(0);
 	const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
     const [ReshareBottomSheet, setReshareBottomSheet] = useState(React.createRef());
@@ -91,8 +92,8 @@ const NoteHealthCheck = props => {
 
     const renderChangeHeader = () => {
         return (
-            <TransparentHeaderModal
-                onPressheader={() => {
+            <ModalHeader
+                onPressHeader={() => {
                     (ChangeBottomSheet as any).current.snapTo(0);
                 }}
             />
@@ -124,8 +125,8 @@ const NoteHealthCheck = props => {
 
     const renderReshareHeader = () => {
         return (
-            <TransparentHeaderModal
-                onPressheader={() => {
+            <ModalHeader
+                onPressHeader={() => {
                     (ReshareBottomSheet as any).current.snapTo(0);
                 }}
             />
@@ -157,8 +158,8 @@ const NoteHealthCheck = props => {
 
     const renderConfirmHeader = () => {
         return (
-            <TransparentHeaderModal
-                onPressheader={() => {
+            <ModalHeader
+                onPressHeader={() => {
                     (ConfirmBottomSheet as any).current.snapTo(0);
                 }}
             />
@@ -209,7 +210,7 @@ const NoteHealthCheck = props => {
 				})}
 			</ScrollView>
 			{SelectedOption ?
-				<View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, justifyContent: 'center', alignItems: 'center', height: hp('25%'), backgroundColor: Colors.white }}>
+				<View style={{ justifyContent: 'center', alignItems: 'center', height: hp('25%'), backgroundColor: Colors.white }}>
 					<Text style={{ marginTop: hp('1%'), marginBottom: hp('1%'), color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular, }}>consectetur Lorem ipsum dolor sit amet, consectetur sit <Text onPress={() => { ReshareBottomSheet.current.snapTo(1) }} style={{ color: Colors.blue, textDecorationLine: "underline" }}>Reshare</Text></Text>
 
 					<Text style={{ marginTop: hp('1%'), marginBottom: hp('1%'), color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular, }}>Lorem ipsum dolor sit amet, consectetur sit amet <Text onPress={() => { ChangeBottomSheet.current.snapTo(1) }} style={{ color: Colors.blue, textDecorationLine: "underline" }}>Change Source</Text></Text>

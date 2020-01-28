@@ -29,9 +29,13 @@ export default function RecoveryCommunication(props) {
   const contact = props.navigation.getParam('contact');
   const index = props.navigation.getParam('index');
 
+  const communicationInfo = [];
+  if (contact.phoneNumbers) communicationInfo.push(...contact.phoneNumbers);
+  if (contact.emails) communicationInfo.push(...contact.emails);
+
   const [selectedContactMode, setSelectedContactMode] = useState();
   const [contactInfo, setContactInfo] = useState(
-    contact.communicationMode.map(({ number, email }, index) => {
+    communicationInfo.map(({ number, email }, index) => {
       if (number || email) {
         return {
           id: index,
@@ -81,7 +85,7 @@ export default function RecoveryCommunication(props) {
     if (!REQUEST_DETAILS) dispatch(requestShare(index));
   }, []);
 
-  REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
+  // REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
 
   const communicate = async selectedContactMode => {
     const deepLink =
@@ -103,6 +107,11 @@ export default function RecoveryCommunication(props) {
         );
         break;
     }
+
+    console.log('Navigating');
+    props.navigation.navigate('ShareRecoveryOTP', {
+      OTP: REQUEST_DETAILS.OTP,
+    });
   };
 
   return (
@@ -189,7 +198,7 @@ export default function RecoveryCommunication(props) {
             <TouchableOpacity
               onPress={() => {
                 communicate(selectedContactMode);
-                setTimeout(() => props.navigation.goBack(), 5);
+                // setTimeout(() => props.navigation.goBack(), 5);
               }}
               disabled={!REQUEST_DETAILS}
               style={{

@@ -90,7 +90,10 @@ const SweepFundsFromExistingAccount = props => {
                     <Text style={styles.listElementsInfo}>453143 sats</Text>
                 </View>
                 <View style={{ flexDirection: 'row', marginTop:20, marginBottom:20 }}>
-                    <TouchableOpacity onPress={()=>{props.navigation.navigate("NewWalletGenerationOTP")}} style={{ height: wp('13%'), width: wp('40%'), backgroundColor: Colors.blue, justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}><Text style={{
+                    <TouchableOpacity onPress={()=>{props.navigation.navigate("NewWalletGenerationOTP")}} style={{ height: wp('13%'), width: wp('40%'), backgroundColor: Colors.blue, justifyContent: 'center', alignItems: 'center', borderRadius: 10, elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 }, }}><Text style={{
                         color: Colors.white,
                         fontSize: RFValue(13),
                         fontFamily: Fonts.FiraSansMedium

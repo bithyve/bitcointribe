@@ -11,30 +11,43 @@ import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
 import { RFValue } from 'react-native-responsive-fontsize';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 
 export default function SmallHeaderModal(props) {
-    return <TouchableOpacity activeOpacity={10} onPress={() => props.onPressHandle()} style={{ ...styles.modalHeader, borderColor: props.borderColor?props.borderColor: Colors.borderColor, backgroundColor: props.headerColor ? props.headerColor : Colors.white, }}>
-        <View style={styles.modalHeaderHandle} />
-    </TouchableOpacity>
+    return <AppBottomSheetTouchableWrapper
+    activeOpacity={10}
+    onPress={() => props.onPressHeader()}
+    style={{...styles.modalHeaderContainer, backgroundColor: props.backgroundColor ? props.backgroundColor : Colors.white, borderLeftColor:props.borderColor? props.borderColor: Colors.borderColor, borderRightColor: props.borderColor? props.borderColor:Colors.borderColor, borderTopColor: props.borderColor? props.borderColor:Colors.borderColor}}
+  >
+    <View style={styles.modalHeaderHandle} />
+  </AppBottomSheetTouchableWrapper>
 }
 
 const styles = StyleSheet.create({
-    modalHeaderHandle: {
+    modalHeaderContainer: {
+        marginTop: 'auto',
+        flex: 1,
+        backgroundColor: Colors.blue,
+        height: 20,
+        borderTopLeftRadius: 10,
+        borderLeftWidth: 1,
+        borderTopRightRadius: 10,
+        borderRightWidth: 1,
+        borderTopWidth: 1,
+        zIndex: 9999,
+      },
+      modalHeaderHandle: {
         width: 50,
         height: 5,
         backgroundColor: Colors.borderColor,
         borderRadius: 10,
         alignSelf: 'center',
-        marginTop: 15
-    },
-    modalHeader: {
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderLeftWidth: 1,
-        borderRightWidth: 1,
-        borderTopWidth: 1,
-        height: 25,
-        width: '80%',
-        alignSelf: 'center',
-    },
+        marginTop: 7,
+      },
+      modalHeaderTitleText: {
+        color: Colors.blue,
+        fontSize: RFValue(18),
+        fontFamily: Fonts.FiraSansRegular,
+        marginLeft: 15,
+      },
 })

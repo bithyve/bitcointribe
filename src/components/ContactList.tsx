@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   PermissionsAndroid,
   Platform,
   Alert,
@@ -24,6 +23,7 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import * as ExpoContacts from "expo-contacts";
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import Contacts from 'react-native-contacts';
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 
 async function requestContactsPermission() {
   try {
@@ -83,7 +83,7 @@ export default function ContactList(props) {
   const getContactsAsync = async () => {
     if (Platform.OS === "android") {
       if (!(await requestContactsPermission())) {
-        Alert.alert("Cannot select tursted contacts; permission denied");
+        Alert.alert("Cannot select trusted contacts; permission denied");
         return;
       }
     }
@@ -192,24 +192,25 @@ export default function ContactList(props) {
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, ...props.style }}>
         <View style={styles.selectedContactContainer}>
-          {selectedContacts.map(value => (
+          {selectedContacts.length > 0 ? selectedContacts.map(value => {
+            return(
             <View style={styles.selectedContactView}>
               <Text style={styles.selectedContactNameText}>
-                {value.name.split(" ")[0]}{" "}
+                {value.name ? value.name.split(" ")[0] : ''}{" "}
                 <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                  {value.name.split(" ")[1]}
+                  {value.name ? value.name.split(" ")[1] : ''}
                 </Text>
               </Text>
-              <TouchableOpacity onPress={() => onCancel(value)}>
+              <AppBottomSheetTouchableWrapper onPress={() => onCancel(value)}>
                 <AntDesign name="close" size={17} color={Colors.white} />
-              </TouchableOpacity>
+              </AppBottomSheetTouchableWrapper>
             </View>
-          ))}
+          )}): null}
         </View>
-        <TouchableOpacity style={{marginLeft: 'auto', marginRight: 10,}} onPress={() => addContact()}>
+        <AppBottomSheetTouchableWrapper style={{marginLeft: 'auto', marginRight: 10, padding: 10}} onPress={() => addContact()}>
           <Text style={{fontSize: RFValue(13, 812),
-    fontFamily: Fonts.FiraSansRegular}}>Add contact</Text>
-        </TouchableOpacity>
+    fontFamily: Fonts.FiraSansRegular}} onPress={() => addContact()}>Add contact</Text>
+        </AppBottomSheetTouchableWrapper>
         <View style={[styles.searchBoxContainer]}>
           <View style={styles.searchBoxIcon}>
             <EvilIcons style={{ alignSelf: 'center' }} name="search" size={20} color={Colors.textColorGrey} />
@@ -236,7 +237,7 @@ export default function ContactList(props) {
                   selected = true;
                 }
                 return (
-                  <TouchableOpacity
+                  <AppBottomSheetTouchableWrapper
                     onPress={() => onContactSelect(index)}
                     style={styles.contactView}
                     key={index}
@@ -254,38 +255,40 @@ export default function ContactList(props) {
                         {item.name.split(" ")[1]}
                       </Text>
                     </Text>
-                  </TouchableOpacity>
+                  </AppBottomSheetTouchableWrapper>
                 )
               }
               }
             /> : null}
           </View>
-          <View style={styles.contactIndexView}>
-            <TouchableOpacity
+          {/* <View style={styles.contactIndexView}>
+            <AppBottomSheetTouchableWrapper
               onPress={() => {
               }}
             >
               <Text style={styles.contactIndexText}>#</Text>
-            </TouchableOpacity>
+            </AppBottomSheetTouchableWrapper>
             {alphabetsList.map(value => (
-              <TouchableOpacity
+              <AppBottomSheetTouchableWrapper
                 onPress={() => {
 
                 }}
               >
                 <Text style={styles.contactIndexText}>{value}</Text>
-              </TouchableOpacity>
+              </AppBottomSheetTouchableWrapper>
             ))}
-          </View>
-        </View>
+          </View>*/}
+        </View> 
         {selectedContacts.length >= 1 && (
-          <TouchableOpacity
+          <View style={{marginTop:'auto',}}>
+          <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressContinue()}
             style={styles.bottomButtonView}
           >
             <Text style={styles.buttonText}>Confirm & Proceed</Text>
-          </TouchableOpacity>
-        )}
+          </AppBottomSheetTouchableWrapper>
+          </View>
+         )} 
       </View>
     </SafeAreaView>
   );
@@ -300,17 +303,17 @@ const styles = StyleSheet.create({
   bottomButtonView: {
     height: 50,
     width: wp("50%"),
-    position: "absolute",
+    // position: "absolute",
     backgroundColor: Colors.blue,
-    bottom: 0,
+    // bottom: 0,
     left: wp("25%"),
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
     elevation: 10,
     shadowColor: Colors.shadowBlue,
-    shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
     marginBottom: 20
   },
   selectedContactView: {

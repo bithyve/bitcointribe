@@ -63,60 +63,60 @@ export default function HealthCheck(props) {
   );
   const [cloudBottomSheet, setCloudBottomSheet] = useState(React.createRef());
   const [selectedType, setSelectedType] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('error');
+  const [selectedStatus, setSelectedStatus] = useState('Ugly');
   const [contacts, setContacts] = useState([]);
   
   const [pageData, setPageData] = useState([
     {
       title: 'Secondary Device',
       time: '1 months ago',
-      status: 'error',
+      status: 'Ugly',
       type: 'secondaryDevice',
       route: 'SecondaryDeviceHealthCheck',
     },
     {
       title: 'Pamela Aalto',
       time: '1 month ago',
-      status: 'error',
+      status: 'Ugly',
       type: 'contact',
       route: 'TrustedContactHealthCheck',
     },
     {
       title: 'Sophie Babel',
       time: '12 min ago',
-      status: 'error',
+      status: 'Ugly',
       type: 'contact',
       route: 'TrustedContactHealthCheck',
     },
     {
       title: 'Cloud',
       time: '2 days ago',
-      status: 'error',
+      status: 'Ugly',
       type: 'cloud',
       route: 'CloudHealthCheck',
     },
     {
       title: 'Note',
       time: '2 days ago',
-      status: 'error',
+      status: 'Ugly',
       type: 'note',
       route: 'NoteHealthCheck',
     },
     {
       title: 'Security Questions',
       time: '29 day ago',
-      status: 'error',
+      status: 'Ugly',
       type: 'security',
       route: '',
     },
   ]);
 
   const getIconByStatus = status => {
-    if (status == 'error') {
+    if (status == 'Ugly') {
       return require('../../assets/images/icons/icon_error_red.png');
-    } else if (status == 'warning') {
+    } else if (status == 'Bad') {
       return require('../../assets/images/icons/icon_error_yellow.png');
-    } else if (status == 'success') {
+    } else if (status == 'Good') {
       return require('../../assets/images/icons/icon_check.png');
     }
   };
@@ -166,41 +166,41 @@ export default function HealthCheck(props) {
         switch (data.title) {
           case 'Secondary Device':
             if (overallHealth.sharesInfo[0].shareStage === 'Good') {
-              data.status = 'success';
+              data.status = 'Good';
             } else if (overallHealth.sharesInfo[0].shareStage === 'Bad') {
-              data.status = 'warning';
+              data.status = 'Bad';
             } else if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
-              data.status = 'error';
+              data.status = 'Ugly';
             }
             break;
 
           case 'Trusted Contact 1':
             if (overallHealth.sharesInfo[1].shareStage === 'Good') {
-              data.status = 'success';
+              data.status = 'Good';
             } else if (overallHealth.sharesInfo[1].shareStage === 'Bad') {
-              data.status = 'warning';
+              data.status = 'Bad';
             } else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
-              data.status = 'error';
+              data.status = 'Ugly';
             }
             break;
 
           case 'Trusted Contact 2':
             if (overallHealth.sharesInfo[2].shareStage === 'Good') {
-              data.status = 'success';
+              data.status = 'Good';
             } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
-              data.status = 'warning';
+              data.status = 'Bad';
             } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
-              data.status = 'error';
+              data.status = 'Ugly';
             }
             break;
 
           case 'Security Questions':
             if (overallHealth.qaStatus === 'Good') {
-              data.status = 'success';
+              data.status = 'Good';
             } else if (overallHealth.qaStatus === 'Bad') {
-              data.status = 'warning';
+              data.status = 'Bad';
             } else if (overallHealth.qaStatus === 'Ugly') {
-              data.status = 'error';
+              data.status = 'Ugly';
             }
             break;
 
@@ -315,11 +315,11 @@ export default function HealthCheck(props) {
                   style={{
                     ...styles.manageBackupCard,
                     borderColor:
-                      item.status == 'error'
+                      item.status == 'Ugly'
                         ? Colors.red
-                        : item.status == 'warning'
+                        : item.status == 'Bad'
                         ? Colors.yellow
-                        : item.status == 'success'
+                        : item.status == 'Good'
                         ? Colors.green
                         : Colors.blue,
                     elevation:

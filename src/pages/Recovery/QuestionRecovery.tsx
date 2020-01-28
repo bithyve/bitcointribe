@@ -162,6 +162,9 @@ export default function RecoveryQuestionModalContents(props) {
                   marginTop: 15,
                   marginBottom: hp('6%'),
                 }}
+                textContentType="none"
+                autoCompleteType="off"
+                autoCorrect={false}
                 autoCapitalize = 'none'
                 placeholder={'Enter Security Answer'}
                 placeholderTextColor={Colors.borderColor}
@@ -279,8 +282,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 10,
     shadowColor: Colors.shadowBlue,
-    shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
     backgroundColor: Colors.blue,
     marginTop: hp('6%'),
   },

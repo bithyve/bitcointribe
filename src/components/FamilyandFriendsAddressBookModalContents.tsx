@@ -62,7 +62,7 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
 
     useEffect(() => {
         setSearchBox('');
-        const contactList = data
+        const contactList = contactData
         .sort(function (a, b) {
           if(a.name && b.name){
             if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
@@ -168,7 +168,7 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
                         )}
                     </ScrollView>
                 </View>
-                <View style={styles.contactIndexView}>
+                {/* <View style={styles.contactIndexView}>
                     <AppBottomSheetTouchableWrapper >
                         <Text style={styles.contactIndexText}>#</Text>
                     </AppBottomSheetTouchableWrapper>
@@ -177,7 +177,7 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
                             <Text style={styles.contactIndexText}>{value}</Text>
                         </AppBottomSheetTouchableWrapper>
                     )}
-                </View>
+                </View> */}
             </View>
         </View>
         {selectedContact.id &&
@@ -194,12 +194,6 @@ const styles = StyleSheet.create({
     modalContainer: {
         height: '100%',
         backgroundColor: Colors.white,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderLeftWidth: 1,
-        borderRightWidth: 1,
-        borderTopWidth: 1,
-        borderColor: Colors.borderColor,
         alignSelf: 'center',
         width: '100%'
     },
@@ -298,9 +292,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 10,
-        shadowColor: Colors.shadowBlue,
-        shadowOpacity: 10,
-        shadowOffset: { width: 0, height: 10 },
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
         marginBottom: 20
     },
     buttonText: {

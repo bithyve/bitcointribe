@@ -17,7 +17,7 @@ import {
   insertDBWatcher,
   insertSSSDBWatcher,
   servicesEnricherWatcher,
-  updateSSSDBWatcher
+  updateSSSDBWatcher,
 } from './sagas/storage';
 import {
   initSetupWatcher,
@@ -51,9 +51,14 @@ import {
   recoverWalletWatcher,
   restoreDynamicNonPMDDWatcher,
   generatePDFWatcher,
+  checkPDFHealthWatcher,
+  restoreShareFromQRWatcher,
 } from './sagas/sss';
 
-import { sharePdfWatcher, dbUpdatePdfSharingWatcher } from './sagas/manageBackup';
+import {
+  sharePdfWatcher,
+  dbUpdatePdfSharingWatcher,
+} from './sagas/manageBackup';
 
 // const rootSaga = function*() {
 //   yield all([
@@ -72,7 +77,7 @@ import { sharePdfWatcher, dbUpdatePdfSharingWatcher } from './sagas/manageBackup
 //   ]);
 // };
 
-const rootSaga = function* () {
+const rootSaga = function*() {
   const sagas = [
     // database watchers
     initDBWatcher,
@@ -107,6 +112,7 @@ const rootSaga = function* () {
     generatePDFWatcher,
     updateMSharesHealthWatcher,
     checkMSharesHealthWatcher,
+    checkPDFHealthWatcher,
     overallHealthWatcher,
     uploadRequestedShareWatcher,
     requestShareWatcher,
@@ -115,41 +121,42 @@ const rootSaga = function* () {
     restoreDynamicNonPMDDWatcher,
     recoverMnemonicWatcher,
     recoverWalletWatcher,
+    restoreShareFromQRWatcher,
 
     // manage backup
     sharePdfWatcher,
-    dbUpdatePdfSharingWatcher
+    dbUpdatePdfSharingWatcher,
   ];
 
   yield all(
-    sagas.map( saga =>
-      spawn( function* () {
-        while ( true ) {
+    sagas.map(saga =>
+      spawn(function*() {
+        while (true) {
           try {
-            yield call( saga );
+            yield call(saga);
             break;
-          } catch ( e ) {
-            console.log( e );
+          } catch (e) {
+            console.log(e);
           }
         }
-      } ),
+      }),
     ),
   );
 };
 
-const rootReducer = combineReducers( {
+const rootReducer = combineReducers({
   storage: storageReducer,
   setupAndAuth: setupAndAuthReducer,
   accounts: accountsReducer,
   sss: sssReducer,
   manageBackup: manageBackupReducer,
-} );
+});
 
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(
   rootReducer,
-  composeWithDevTools( applyMiddleware( sagaMiddleware ) ),
+  composeWithDevTools(applyMiddleware(sagaMiddleware)),
 );
-sagaMiddleware.run( rootSaga );
+sagaMiddleware.run(rootSaga);
 
 export { store, Provider };

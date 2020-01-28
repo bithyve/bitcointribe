@@ -115,82 +115,10 @@ function Accounts(props) {
     setRegularAccountHelperBottomSheet,
   ] = useState(React.createRef());
 
-  const [transactionData, setTransactionData] = useState([
-    {
-      title: 'Spending accounts',
-      date: '30 November 2019',
-      time: '11:00 am',
-      price: '0.025',
-      transactionStatus: 'send',
-    },
-    {
-      title: 'Spending accounts',
-      date: '1 November 2019',
-      time: '11:00 am',
-      price: '0.015',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Spending accounts',
-      date: '30 Jully 2019',
-      time: '10:00 am',
-      price: '0.125',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Saving accounts',
-      date: '1 June 2019',
-      time: '12:00 am',
-      price: '0.5',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Saving accounts',
-      date: '11 May 2019',
-      time: '1:00 pm',
-      price: '0.1',
-      transactionStatus: 'send',
-    },
-    {
-      title: 'Spending accounts',
-      date: '30 November 2019',
-      time: '11:00 am',
-      price: '0.025',
-      transactionStatus: 'send',
-    },
-    {
-      title: 'Spending accounts',
-      date: '1 November 2019',
-      time: '11:00 am',
-      price: '0.015',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Spending accounts',
-      date: '30 Jully 2019',
-      time: '10:00 am',
-      price: '0.125',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Saving accounts',
-      date: '1 June 2019',
-      time: '12:00 am',
-      price: '0.5',
-      transactionStatus: 'receive',
-    },
-    {
-      title: 'Saving accounts',
-      date: '12 May 2019',
-      time: '1:00 pm',
-      price: '0.1',
-      transactionStatus: 'send',
-    },
-  ]);
   const [carouselData, setCarouselData] = useState([
     {
       accountType: 'Test Account',
-      accountInfo: 'Test it out!',
+      accountInfo: 'Learn Bitcoin',
       backgroundImage: require('../../assets/images/carouselImages/test_account_background.png'),
       accountTypeImage: require('../../assets/images/icons/icon_test_white.png'),
     },
@@ -208,9 +136,18 @@ function Accounts(props) {
     },
   ]);
 
-  const [carouselInitIndex, setCarouselInitIndex] = useState(0);
+  let [carouselInitIndex, setCarouselInitIndex] = useState(
+    props.navigation.getParam('index'),
+  );
   const [switchOn, setSwitchOn] = useState(true);
-  const [carousel, setCarousel] = useState(React.createRef());
+  let [carousel, setCarousel] = useState(React.createRef());
+
+  const handleIndexChange = (index: number) => {
+    //setTimeout(() => {
+    setCarouselInitIndex(index);
+  //}, 2000);
+  };
+  const [isTestHelperDone, setIsTestHelperDone] = useState(true);
 
   const checkNHighlight = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
@@ -250,45 +187,19 @@ function Accounts(props) {
       !isTestAccountHelperDone &&
       props.navigation.getParam('serviceType') == TEST_ACCOUNT
     ) {
-      TestAccountHelperBottomSheet.current.snapTo(1);
-      AsyncStorage.setItem('isTestAccountHelperDone', 'true');
+      await AsyncStorage.setItem('isTestAccountHelperDone', 'true');
+      setTimeout(() => {
+        setIsTestHelperDone(true);
+      }, 10);
+      setTimeout(() => {
+        TestAccountHelperBottomSheet.current.snapTo(1);
+      }, 1000);
     } else {
+        setTimeout(() => {
+          setIsTestHelperDone(false);
+        }, 10);
       props.copilotEvents.on('stepChange', handleStepChange);
       props.start();
-    }
-  };
-
-  const setCarouselData1 = async () => {
-    if (serviceType == TEST_ACCOUNT) {
-      setTimeout(() => {
-        carousel.current.snapToItem(0, true, false);
-        setCarouselInitIndex(0);
-      }, 200);
-    }
-    if (serviceType == REGULAR_ACCOUNT) {
-      setTimeout(() => {
-        carousel.current.snapToItem(1, true, false);
-        setCarouselInitIndex(1);
-      }, 200);
-    }
-    if (serviceType == SECURE_ACCOUNT) {
-      // let isSecureAccountScanOpen = await AsyncStorage.getItem(
-      //   'isSecureAccountScanOpen',
-      // );
-      // if (
-      //   !isSecureAccountScanOpen &&
-      //   props.navigation.getParam('serviceType') == SECURE_ACCOUNT
-      // ) {
-      //   AsyncStorage.setItem('isSecureAccountScanOpen', 'true');
-      //   props.navigation.navigate('SecureScan', {
-      //     serviceType,
-      //     getServiceType: getServiceType,
-      //   });
-      // }
-      setTimeout(() => {
-        carousel.current.snapToItem(2, true, false);
-        setCarouselInitIndex(2);
-      }, 200);
     }
   };
 
@@ -301,6 +212,7 @@ function Accounts(props) {
     setTimeout(() => {
       setServiceType(serviceType);
     }, 10);
+    console.log("Service type in getServiceType", serviceType);
     if (serviceType == TEST_ACCOUNT) checkNHighlight();
   };
 
@@ -391,6 +303,7 @@ function Accounts(props) {
                   fontSize: RFValue(15),
                   color: Colors.white,
                   alignSelf: 'center',
+                  padding: 10,
                 }}
                 onPress={() => {
                   if (item.accountType == 'Test Account')
@@ -401,7 +314,7 @@ function Accounts(props) {
                     RegularAccountHelperBottomSheet.current.snapTo(1);
                 }}
               >
-                Know More
+                Know more
               </Text>
             }
             <Image
@@ -410,6 +323,7 @@ function Accounts(props) {
                 width: wp('5%'),
                 height: wp('5%'),
                 resizeMode: 'contain',
+                padding: 10,
               }}
               source={require('../../assets/images/icons/icon_settings.png')}
             />
@@ -429,7 +343,9 @@ function Accounts(props) {
             >
               <Text
                 style={{
-                  margin: 10,
+                  paddingLeft: 10,
+                  paddingTop: 10,
+                  paddingBottom: 10,
                   marginLeft: 'auto',
                   fontFamily: Fonts.FiraSansMedium,
                   fontSize: RFValue(15),
@@ -470,7 +386,7 @@ function Accounts(props) {
             </Text>
             <Text style={styles.cardAmountUnitText}>
               {item.accountType == 'Test Account'
-                ? 'tsats'
+                ? 't-sats'
                 : switchOn
                 ? 'sats'
                 : 'usd'}
@@ -745,7 +661,9 @@ function Accounts(props) {
   const renderBuyHelperHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
           (BuyHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -778,8 +696,18 @@ function Accounts(props) {
   const renderTestAccountsHelperHeader = () => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
-          (TestAccountHelperBottomSheet as any).current.snapTo(0);
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+          console.log("isTestHelperDone",isTestHelperDone);
+          if (isTestHelperDone) {
+          (TestAccountHelperBottomSheet as any).current.snapTo(2);
+          setTimeout(() => {
+            setIsTestHelperDone(false);
+          }, 10);
+          } else{
+            (TestAccountHelperBottomSheet as any).current.snapTo(0);
+          }
         }}
       />
     );
@@ -810,7 +738,9 @@ function Accounts(props) {
   const renderSecureAccountsHelperHeader = useCallback(() => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
           (SecureAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -842,7 +772,9 @@ function Accounts(props) {
   const renderRegularAccountsHelperHeader = useCallback(() => {
     return (
       <SmallHeaderModal
-        onPressHandle={() => {
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
           (RegularAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -858,47 +790,16 @@ function Accounts(props) {
   const netBalance = service
     ? balances.balance + balances.unconfirmedBalance
     : 0;
-  const [averageTxFee, setAverageTxFee] = useState(0);
+  const [staticFees, setStaticFees] = useState(0);
 
   const dispatch = useDispatch();
-
+  const [exchangeRates, setExchangeRates] = useState();
   useEffect(() => {
     if (!netBalance) {
       // if (serviceType === TEST_ACCOUNT) dispatch(getTestcoins(serviceType));
       dispatch(fetchBalance(serviceType)); // TODO: do periodic auto search
       dispatch(fetchTransactions(serviceType));
     }
-  }, [serviceType]);
-
-  useEffect(() => {
-    setCarouselData1();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      const storedAverageTxFee = await AsyncStorage.getItem(
-        'storedAverageTxFee',
-      );
-      if (storedAverageTxFee) {
-        const { averageTxFee, lastFetched } = JSON.parse(storedAverageTxFee);
-        if (Date.now() - lastFetched < 1800000) {
-          setAverageTxFee(averageTxFee);
-          return;
-        } // maintaining a half an hour difference b/w fetches
-      }
-
-      const txPriority = 'high';
-      const instance = service.hdWallet || service.secureHDWallet;
-      const { averageTxFee } = await instance.averageTransactionFee(txPriority);
-      setAverageTxFee(averageTxFee);
-      await AsyncStorage.setItem(
-        'storedAverageTxFee',
-        JSON.stringify({ averageTxFee, lastFetched: Date.now() }),
-      );
-    })();
-  }, []);
-
-  useEffect(() => {
     if (serviceType === SECURE_ACCOUNT) {
       AsyncStorage.getItem('isSecureAccountHelperDone').then(done => {
         if (!done) {
@@ -907,12 +808,36 @@ function Accounts(props) {
         }
       });
     }
+    console.log('IN useEffect1');
   }, [serviceType]);
 
-  const [exchangeRates, setExchangeRates] = useState();
-
   useEffect(() => {
+    setTimeout(() => {
+      carousel.current.snapToItem(
+        props.navigation.getParam('index'),
+        true,
+        true,
+      );
+    }, 2000);
+    getServiceType(serviceType);
     (async () => {
+      const storedStaticFees = await AsyncStorage.getItem('storedStaticFees');
+      if (storedStaticFees) {
+        const { staticFees, lastFetched } = JSON.parse(storedStaticFees);
+        if (Date.now() - lastFetched < 1800000) {
+          setStaticFees(staticFees);
+          return;
+        } // maintaining a half an hour difference b/w fetches
+      }
+
+      const instance = service.hdWallet || service.secureHDWallet;
+      const staticFees = await instance.getStaticFee();
+      setStaticFees(staticFees);
+      await AsyncStorage.setItem(
+        'storedStaticFees',
+        JSON.stringify({ staticFees, lastFetched: Date.now() }),
+      );
+
       const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
       if (storedExchangeRates) {
         const exchangeRates = JSON.parse(storedExchangeRates);
@@ -1013,17 +938,25 @@ function Accounts(props) {
           <Carousel
             ref={carousel}
             data={carouselData}
-            initialNumToRender={carouselInitIndex}
-            renderItem={renderItem}
-            sliderWidth={sliderWidth}
-            itemWidth={sliderWidth * 0.95}
-            onSnapToItem={index => {
+            firstItem={carouselInitIndex}
+            onBeforeSnapToItem={(index) => {
+              console.log('INDEX onBeforeSnapToItem', index, carouselInitIndex);
               index === 0
                 ? getServiceType(TEST_ACCOUNT)
                 : index === 1
                 ? getServiceType(REGULAR_ACCOUNT)
                 : getServiceType(SECURE_ACCOUNT);
-              setCarouselInitIndex(index);
+              handleIndexChange(index)
+            }
+            }
+            renderItem={renderItem}
+            sliderWidth={sliderWidth}
+            itemWidth={sliderWidth * 0.95}
+            onSnapToItem={index => {
+              console.log('INDEX', index, carouselInitIndex);
+              setTimeout(() => {
+                setCarouselInitIndex(index);
+              }, 2000);
             }}
             style={{ activeSlideAlignment: 'center' }}
             scrollInterpolator={scrollInterpolator}
@@ -1047,6 +980,7 @@ function Accounts(props) {
                 color: Colors.textColorGrey,
                 fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
+                padding: 10,
               }}
             >
               Today
@@ -1061,9 +995,10 @@ function Accounts(props) {
                 fontFamily: Fonts.FiraSansItalic,
                 textDecorationLine: 'underline',
                 marginLeft: 'auto',
+                padding: 10,
               }}
             >
-              View More
+              View more
             </Text>
           </View>
           <View>
@@ -1240,25 +1175,28 @@ function Accounts(props) {
               text="Try Sending"
               order={1}
               name="sendTransaction"
-            >
+              >
               <WalkthroughableTouchableOpacity
                 onPress={() => {
                   props.navigation.navigate('Send', {
                     serviceType,
                     getServiceType: getServiceType,
+                    staticFees,
                   });
                 }}
                 style={styles.bottomCardView}
               >
+                <View style={{flex:1, justifyContent:'center', alignItems: 'center', marginLeft: 10}}>
                 <Image
                   source={require('../../assets/images/icons/icon_send.png')}
                   style={styles.bottomCardSendReceiveImage}
                 />
-                <View style={{ marginLeft: wp('3%') }}>
+                </View>
+                <View style={{ flex: 3, marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Send</Text>
                   <Text style={styles.bottomCardInfoText}>
-                    Tran Fee : {averageTxFee} (
-                    {serviceType === TEST_ACCOUNT ? 'tsats' : 'sats'})
+                    Tran Fee : {staticFees['high']} (
+                    {serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'})
                   </Text>
                 </View>
               </WalkthroughableTouchableOpacity>
@@ -1278,15 +1216,17 @@ function Accounts(props) {
                 }}
                 style={styles.bottomCardView}
               >
+                <View style={{flex:1, justifyContent:'center', alignItems: 'center', marginLeft: 10}}>
                 <Image
                   source={require('../../assets/images/icons/icon_recieve.png')}
                   style={styles.bottomCardSendReceiveImage}
                 />
-                <View style={{ marginLeft: wp('3%') }}>
+                </View>
+                <View style={{ flex:3, marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Receive</Text>
                   <Text style={styles.bottomCardInfoText}>
-                    Tran Fee : {averageTxFee} (
-                    {serviceType === TEST_ACCOUNT ? 'tsats' : 'sats'})
+                    Tran Fee : {staticFees['high']} (
+                    {serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'})
                   </Text>
                 </View>
               </WalkthroughableTouchableOpacity>
@@ -1308,13 +1248,17 @@ function Accounts(props) {
                     getServiceType: getServiceType,
                   });
                 }}
-                style={styles.bottomCardView}
+                style={{...styles.bottomCardView, opacity: 0.3,
+                  backgroundColor: Colors.borderColor,}}
+                  disabled={ true }
               >
+                <View style={{flex:1, justifyContent:'center', alignItems: 'center', marginLeft: 10}}>
                 <Image
                   source={require('../../assets/images/icons/icon_buy.png')}
                   style={styles.bottomCardImage}
                 />
-                <View style={{ marginLeft: wp('3%') }}>
+                </View>
+                <View style={{ flex: 3,marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Buy</Text>
                   <Text style={styles.bottomCardInfoText}>
                     Ex Rate : {exchangeRates ? exchangeRates['USD'].last : 0}{' '}
@@ -1330,7 +1274,9 @@ function Accounts(props) {
               name="Sell"
             >
               <WalkthroughableTouchableOpacity
-                style={styles.bottomCardView}
+                style={{...styles.bottomCardView, opacity: 0.3,
+                  backgroundColor: Colors.borderColor,}}
+                  disabled={ true }
                 onPress={() => {
                   props.navigation.navigate('Sell', {
                     serviceType,
@@ -1338,11 +1284,13 @@ function Accounts(props) {
                   });
                 }}
               >
+                <View style={{flex:1, justifyContent:'center', alignItems: 'center',  marginLeft: 10}}>
                 <Image
                   source={require('../../assets/images/icons/icon_sell.png')}
                   style={styles.bottomCardImage}
                 />
-                <View style={{ marginLeft: wp('3%') }}>
+                </View>
+                <View style={{ flex:3, marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Sell</Text>
                   <Text style={styles.bottomCardInfoText}>
                     Ex Rate : {exchangeRates ? exchangeRates['USD'].last : 0}{' '}
@@ -1453,7 +1401,11 @@ function Accounts(props) {
         ref={TestAccountHelperBottomSheet}
         snapPoints={[
           -50,
-          hp('90%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('18%')
+          : Platform.OS == 'android'
+          ? hp('20%')
+          : hp('19%'),
           Platform.OS == 'android' ? hp('50%') : hp('90%'),
         ]}
         renderContent={renderTestAccountsHelperContents}
@@ -1491,6 +1443,7 @@ const styles = StyleSheet.create({
     height: wp('3%'),
     marginRight: 5,
     marginTop: 'auto',
+    marginLeft: 'auto',
     marginBottom: wp('1.2%'),
     resizeMode: 'contain',
   },
@@ -1570,11 +1523,13 @@ const styles = StyleSheet.create({
     width: wp('10%'),
     height: wp('10%'),
     resizeMode: 'contain',
+   
   },
   bottomCardSendReceiveImage: {
     width: wp('7%'),
     height: wp('7%'),
     resizeMode: 'contain',
+   
   },
   bottomCardInfoText: {
     color: Colors.textColorGrey,
