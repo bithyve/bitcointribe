@@ -21,13 +21,30 @@ export default function RestoreByCloudQrCodeContents(props) {
   const [recipientAddress, setRecipientAddress] = useState('');
   const [qrDataArray, setQrDataArray] = useState([]);
   let [counter, setCounter] = useState(1);
+  let [startNumberCounter, setStartNumberCounter] = useState(1);
   const dispatch = useDispatch();
 
   const getQrCodeData = qrData => {
     let tempArray = qrDataArray;
+    let startNumber1 = qrData.substring(2, 3);
+    console.log("startNumber", startNumber1);
     setQrData(qrData);
+    let temp1 =
+    startNumberCounter == 1
+          ? startNumberCounter + 'st'
+          : startNumberCounter == 2
+          ? startNumberCounter + 'nd'
+          : startNumberCounter == 3
+          ? startNumberCounter + 'rd'
+          : startNumberCounter == 9
+          ? 8
+          : startNumberCounter + 'th';
     for (let i = 0; i < 8; i++) {
       if (qrDataArray[i] == qrData) return;
+      if(startNumberCounter != startNumber1){
+        Alert.alert('Please scan ' + temp1 + ' QR code');
+        return;
+      }
     }
     if (qrDataArray.length <= 8) {
       tempArray.push(qrData);
@@ -42,13 +59,15 @@ export default function RestoreByCloudQrCodeContents(props) {
           : counter == 9
           ? 8
           : counter + 'th';
+      
       Alert.alert(temp + ' QR code scanned, please scan the next one');
       counter++;
       setCounter(counter);
+      startNumberCounter++;
+      setStartNumberCounter(startNumberCounter);
     }
     console.log('tempArray', tempArray);
     console.log('qrDataArray', qrDataArray);
-
     console.log({ length: qrDataArray.length });
     if (qrDataArray.length === 8) {
       dispatch(restoreShareFromQR(qrDataArray));
