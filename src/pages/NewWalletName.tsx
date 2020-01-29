@@ -94,12 +94,16 @@ export default function NewWalletName(props) {
               <View style={styles.statusIndicatorInactiveView} />
             </View>
           </View>
+          
           {walletName.trim() == "" ? (
-            <BottomInfoBox
-              title={"We do not store this anywhere."}
-              infoText={"Your contacts will see this to identify you"}
-            />
+            <View style={{marginBottom: DeviceInfo.hasNotch ? hp('3%') : 0}}>
+              <BottomInfoBox
+                title={"We do not store this anywhere."}
+                infoText={"Your contacts will see this to identify you"}
+              />
+            </View>
           ) : null}
+          
         </KeyboardAvoidingView>
       </View>
     </SafeAreaView>

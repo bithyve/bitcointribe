@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Image,
@@ -8,6 +8,7 @@ import {
   ScrollView,
   SafeAreaView,
   StatusBar,
+  Platform
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -21,6 +22,16 @@ import ContactList from '../../components/ContactList';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import moment from 'moment';
 import { UsNumberFormat } from '../../common/utilities';
+import {
+  SECURE_ACCOUNT,
+  TEST_ACCOUNT,
+  REGULAR_ACCOUNT,
+} from '../../common/constants/serviceTypes';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default function TransactionDetails(props) {
   const txDetails = props.navigation.getParam('item');
@@ -30,12 +41,76 @@ export default function TransactionDetails(props) {
   const serviceType = props.navigation.getParam('serviceType')
     ? props.navigation.getParam('serviceType')
     : null;
+  const [TransactionDetailsBottomSheet, setTransactionDetailsBottomSheet] = useState(
+      React.createRef(),
+    );
+    const [isHelperDone, setIsHelperDone] = useState(true);
+
+    const checkNShowHelperModal = async () => {
+      let isSendHelperDone = await AsyncStorage.getItem('isTransactionHelperDone');
+      if (!isSendHelperDone && serviceType == TEST_ACCOUNT) {
+        await AsyncStorage.setItem('isTransactionHelperDone', 'true');
+        setTimeout(() => {
+          setIsHelperDone(true);
+        }, 10);
+  
+        setTimeout(() => {
+          TransactionDetailsBottomSheet.current.snapTo(1);
+        }, 1000);
+      } else {
+        setTimeout(() => {
+          setIsHelperDone(false);
+        }, 10);
+      }
+    };
+
+    useEffect(() => {
+      checkNShowHelperModal();
+    }, []);
+
+    const renderHelperContents = () => {
+      return (
+        <TestAccountHelperModalContents
+          topButtonText={`Transaction Details`}
+          helperInfo={`When you want to send bitcoins or sats (a very small fraction of a bitcoin), you have to send it to an address of the recipient \n\nPretty much like an email address but one that changes every time you send it to them \n\nFor this you can either scan a QR code from the recipient or enter a very long sequence ofnumbers and letters which is the recipientsbitcoin address`}
+          continueButtonText={'Continue'}
+          quitButtonText={'Quit'}
+          onPressContinue={() => {
+            (TransactionDetailsBottomSheet as any).current.snapTo(0);
+          }}
+          onPressQuit={() => {
+            (TransactionDetailsBottomSheet as any).current.snapTo(0);
+          }}
+        />
+      );
+    };
+    const renderHelperHeader = () => {
+      return (
+        <SmallHeaderModal
+          borderColor={Colors.blue}
+          backgroundColor={Colors.blue}
+          onPressHeader={() => {
+            console.log('isHelperDone', isHelperDone);
+            if (isHelperDone) {
+              (TransactionDetailsBottomSheet as any).current.snapTo(2);
+              setTimeout(() => {
+                setIsHelperDone(false);
+              }, 10);
+            } else {
+              (TransactionDetailsBottomSheet as any).current.snapTo(0);
+            }
+          }}
+        />
+      );
+    };
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ flex:1, flexDirection: 'row', alignItems: 'center'}}>
             <TouchableOpacity
               onPress={() => {
                 if (getServiceType && serviceType) {
@@ -54,6 +129,21 @@ export default function TransactionDetails(props) {
             <Text style={styles.modalHeaderTitleText}>
               {'Transaction Details'}
             </Text>
+            {serviceType == TEST_ACCOUNT ? (
+                  <Text
+                    onPress={() => {
+                      AsyncStorage.setItem('isTransactionHelperDone', 'true');
+                      TransactionDetailsBottomSheet.current.snapTo(2);
+                    }}
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(12),
+                      marginLeft: 'auto',
+                    }}
+                  >
+                    Know more
+                  </Text>
+                ) : null}
           </View>
         </View>
         <View
@@ -265,8 +355,23 @@ export default function TransactionDetails(props) {
             </Text>
           </View>
         </View>
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={TransactionDetailsBottomSheet}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+            ? hp('14%')
+            : Platform.OS == 'android'
+            ? hp('16%')
+            : hp('14%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
+          ]}
+          renderContent={renderHelperContents}
+          renderHeader={renderHelperHeader}
+        />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 const styles = StyleSheet.create({
@@ -279,10 +384,12 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderColor,
     alignItems: 'center',
     flexDirection: 'row',
-    paddingRight: hp('1%'),
+    paddingRight: 10,
     paddingBottom: hp('1.5%'),
     paddingTop: hp('1%'),
-    marginLeft: hp('2%'),
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: hp('1.5%'),
   },
   modalHeaderTitleText: {
     color: Colors.blue,

@@ -78,7 +78,7 @@ const SecondaryDeviceHealthCheck = props => {
         {props.data.map(value => {
           if (SelectedOption == value.id) {
             return (
-              <TouchableOpacity
+              <AppBottomSheetTouchableWrapper
                 onPress={() => SelectOption(value.id)}
                 style={{
                   margin: wp('3%'),
@@ -121,11 +121,11 @@ const SecondaryDeviceHealthCheck = props => {
                 >
                   {value.date}
                 </Text>
-              </TouchableOpacity>
+              </AppBottomSheetTouchableWrapper>
             );
           }
           return (
-            <TouchableOpacity
+            <AppBottomSheetTouchableWrapper
               onPress={() => SelectOption(value.id)}
               style={{
                 margin: wp('3%'),
@@ -173,7 +173,7 @@ const SecondaryDeviceHealthCheck = props => {
                   dolor sit
                 </Text>
               </Text>
-            </TouchableOpacity>
+            </AppBottomSheetTouchableWrapper>
           );
         })}
       </ScrollView>
@@ -185,6 +185,7 @@ const SecondaryDeviceHealthCheck = props => {
             backgroundColor: Colors.white,
           }}
         >
+          {props.reshareInfo ? 
           <Text
             style={{
               marginTop: hp('1%'),
@@ -204,8 +205,9 @@ const SecondaryDeviceHealthCheck = props => {
               Reshare
             </Text>
           </Text>
+          : null }
 
-          <Text
+          {props.changeInfo ? <Text
             style={{
               marginTop: hp('1%'),
               marginBottom: hp('1%'),
@@ -224,8 +226,9 @@ const SecondaryDeviceHealthCheck = props => {
               Change Source
             </Text>
           </Text>
+          : null }
 
-          <TouchableOpacity
+          <AppBottomSheetTouchableWrapper
             onPress={() => {
               props.onPressConfirm();
             }}
@@ -253,7 +256,7 @@ const SecondaryDeviceHealthCheck = props => {
             >
               Confirm
             </Text>
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
         </View>
     </View>
   );
