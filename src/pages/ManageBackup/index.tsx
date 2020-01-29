@@ -329,13 +329,13 @@ export default function ManageBackup(props) {
   }
 
   const onPressSecondaryDeviceOk = async () => {
-    if (secondaryDeviceAutoHighlightFlags != 'true') {
-      setTimeout(() => {
-        setSelectedType('');
-        setSecondaryDeviceAutoHighlightFlags('true');
-      }, 10);
-      await AsyncStorage.setItem('secondaryDeviceAutoHighlightFlags', 'true');
-    }
+    console.log('Executing onPRESS secondary');
+    // setTimeout(() => {
+    //   setSelectedType('');
+    //   setSecondaryDeviceAutoHighlightFlags('true');
+    // }, 10);
+    setSelectedType('');
+    setSecondaryDeviceAutoHighlightFlags('true');
     secondaryDeviceBottomSheet.current.snapTo(0);
   };
 
@@ -1109,47 +1109,158 @@ export default function ManageBackup(props) {
     setIsSecretShared2(isSecretShared2);
   };
 
-  const setSetupFlowAsync = async () => {
-    let secondaryDeviceAutoHighlightFlags = await AsyncStorage.getItem(
-      'secondaryDeviceAutoHighlightFlags',
-    );
-    let contact1AutoHighlightFlags = await AsyncStorage.getItem(
-      'contact1AutoHighlightFlags',
-    );
-    let contact2AutoHighlightFlags = await AsyncStorage.getItem(
-      'contact2AutoHighlightFlags',
-    );
-    let personalCopy1AutoHighlightFlags = await AsyncStorage.getItem(
-      'personalCopy1AutoHighlightFlags',
-    );
-    let personalCopy2AutoHighlightFlags = await AsyncStorage.getItem(
-      'personalCopy2AutoHighlightFlags',
-    );
-    let securityAutoHighlightFlags = await AsyncStorage.getItem(
-      'securityAutoHighlightFlags',
-    );
+  const [autoHighlightFlags, setAutoHighlightFlags] = useState();
 
-    console.log({
-      secondaryDeviceAutoHighlightFlags,
-      contact1AutoHighlightFlags,
-      contact2AutoHighlightFlags,
-      personalCopy1AutoHighlightFlags,
-      personalCopy2AutoHighlightFlags,
-      securityAutoHighlightFlags,
-    });
-    setSecondaryDeviceAutoHighlightFlags(secondaryDeviceAutoHighlightFlags);
-    setContact1AutoHighlightFlags(contact1AutoHighlightFlags);
-    setContact2AutoHighlightFlags(contact2AutoHighlightFlags);
-    setPersonalCopy1AutoHighlightFlags('true');
-    setPersonalCopy2AutoHighlightFlags('true');
-    setSecurityAutoHighlightFlags(securityAutoHighlightFlags);
+  const autoHighlight = async () => {
+    const {
+      secondary,
+      trustedContact1,
+      trustedContact2,
+      personalCopy1,
+      personalCopy2,
+      securityAns,
+    } = autoHighlightFlags;
+
+    if (secondary != 'true') {
+      setSelectedType('secondaryDevice');
+    } else if (trustedContact1 != 'true') {
+      setSelectedType('contact1');
+    } else if (trustedContact2 != 'true') {
+      setSelectedType('contact2');
+    } else if (personalCopy1 != 'true') {
+      setSelectedType('copy1');
+    } else if (personalCopy2 != 'true') {
+      setSelectedType('copy2');
+    } else if (securityAns != 'true') {
+      setSelectedType('security');
+    } else {
+      if (overallHealth) {
+        if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
+          setSelectedType('secondaryDevice');
+        } else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
+          setSelectedType('contact1');
+        } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
+          setSelectedType('contact2');
+        } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
+          setSelectedType('copy1');
+        } else if (overallHealth.sharesInfo[4].shareStage === 'Ugly') {
+          setSelectedType('copy2');
+        } else if (overallHealth.qaStatus.stage === 'Ugly') {
+          setSelectedType('security');
+        } else if (overallHealth.sharesInfo[0].shareStage === 'Bad') {
+          setSelectedType('secondaryDevice');
+        } else if (overallHealth.sharesInfo[1].shareStage === 'Bad') {
+          setSelectedType('contact1');
+        } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
+          setSelectedType('contact2');
+        } else if (overallHealth.sharesInfo[3].shareStage === 'Bad') {
+          setSelectedType('copy1');
+        } else if (overallHealth.sharesInfo[4].shareStage === 'Bad') {
+          setSelectedType('copy2');
+        } else if (overallHealth.qaStatus.stage === 'Bad') {
+          setSelectedType('security');
+        }
+      }
+    }
   };
 
   useEffect(() => {
+    // Auto-Highlight
     (async () => {
-      await setSetupFlowAsync();
-      console.log('Executing autoHighlight');
-      autoHighlightOptions();
+      const highlightFlags = await AsyncStorage.getItem('AutoHighlightFlags');
+      if (highlightFlags) {
+        setAutoHighlightFlags(JSON.parse(highlightFlags));
+      } else {
+        const autoHighlightFlags = {
+          secondaryDevice: false,
+          trustedContact1: false,
+          trustedContact2: false,
+          personalCopy1: false,
+          personalCopy2: false,
+          securityAns: false,
+        };
+        setAutoHighlightFlags(autoHighlightFlags);
+        await AsyncStorage.setItem(
+          'AutoHighlightFlags',
+          JSON.stringify(autoHighlightFlags),
+        );
+      }
+    })();
+
+    // Contact restore from async
+    (async () => {
+      let contactList = JSON.parse(
+        await AsyncStorage.getItem('SelectedContacts'),
+      );
+      setContacts(contactList);
+
+      if (contactList.length) {
+        if (contactList.findIndex(value => value.type == 'contact1') != -1) {
+          pageData[1].personalInfo =
+            contactList[
+              contactList.findIndex(value => value.type == 'contact1')
+            ];
+        }
+        if (contactList.findIndex(value => value.type == 'contact2') != -1) {
+          pageData[2].personalInfo =
+            contactList[
+              contactList.findIndex(value => value.type == 'contact2')
+            ];
+        }
+      }
+      setPageData([...pageData]);
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (autoHighlightFlags) {
+      autoHighlight();
+    }
+  }, [autoHighlightFlags]);
+
+  console.log({ autoHighlightFlags });
+  // const setSetupFlowAsync = async () => {
+  //   let secondaryDeviceAutoHighlightFlags = await AsyncStorage.getItem(
+  //     'secondaryDeviceAutoHighlightFlags',
+  //   );
+  //   let contact1AutoHighlightFlags = await AsyncStorage.getItem(
+  //     'contact1AutoHighlightFlags',
+  //   );
+  //   let contact2AutoHighlightFlags = await AsyncStorage.getItem(
+  //     'contact2AutoHighlightFlags',
+  //   );
+  //   let personalCopy1AutoHighlightFlags = await AsyncStorage.getItem(
+  //     'personalCopy1AutoHighlightFlags',
+  //   );
+  //   let personalCopy2AutoHighlightFlags = await AsyncStorage.getItem(
+  //     'personalCopy2AutoHighlightFlags',
+  //   );
+  //   let securityAutoHighlightFlags = await AsyncStorage.getItem(
+  //     'securityAutoHighlightFlags',
+  //   );
+
+  //   console.log('----Setup Flow Sync----');
+  //   console.log({
+  //     secondaryDeviceAutoHighlightFlags,
+  //     contact1AutoHighlightFlags,
+  //     contact2AutoHighlightFlags,
+  //     personalCopy1AutoHighlightFlags,
+  //     personalCopy2AutoHighlightFlags,
+  //     securityAutoHighlightFlags,
+  //   });
+  //   setSecondaryDeviceAutoHighlightFlags(secondaryDeviceAutoHighlightFlags);
+  //   setContact1AutoHighlightFlags(contact1AutoHighlightFlags);
+  //   setContact2AutoHighlightFlags(contact2AutoHighlightFlags);
+  //   setPersonalCopy1AutoHighlightFlags(personalCopy1AutoHighlightFlags);
+  //   setPersonalCopy2AutoHighlightFlags(personalCopy2AutoHighlightFlags);
+  //   setSecurityAutoHighlightFlags(securityAutoHighlightFlags);
+  // };
+
+  useEffect(() => {
+    (async () => {
+      // await setSetupFlowAsync();
+      // console.log('Executing autoHighlight');
+      // autoHighlightOptions();
     })();
 
     getOverAllHealth();
@@ -1217,7 +1328,7 @@ export default function ManageBackup(props) {
         }
       });
       setPageData(updatedPageData);
-      autoHighlightOptions();
+      // autoHighlightOptions();
     }
   }, [overallHealth]);
 
@@ -1238,6 +1349,15 @@ export default function ManageBackup(props) {
       await AsyncStorage.getItem('SelectedContacts'),
     );
     setContacts(contactList);
+    console.log('----Auto Highlightt Option----');
+    console.log({
+      secondaryDeviceAutoHighlightFlags,
+      contact1AutoHighlightFlags,
+      contact2AutoHighlightFlags,
+      personalCopy1AutoHighlightFlags,
+      personalCopy2AutoHighlightFlags,
+      securityAutoHighlightFlags,
+    });
     if (secondaryDeviceAutoHighlightFlags != 'true') {
       setSelectedType('secondaryDevice');
     } else if (contact1AutoHighlightFlags != 'true') {
