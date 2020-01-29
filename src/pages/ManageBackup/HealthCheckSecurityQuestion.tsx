@@ -108,7 +108,7 @@ export default function HealthCheckSecurityQuestion(props) {
             </View>
           </View>
           <View style={{ paddingLeft: wp('6%'), paddingRight: wp('6%') }}>
-            <TouchableOpacity
+            <AppBottomSheetTouchableWrapper
               activeOpacity={10}
               style={[
                 dropdownBoxOpenClose
@@ -143,13 +143,13 @@ export default function HealthCheckSecurityQuestion(props) {
                 size={15}
                 color={Colors.borderColor}
               />
-            </TouchableOpacity>
+            </AppBottomSheetTouchableWrapper>
             <View style={{ position: 'relative' }}>
               {dropdownBoxOpenClose && (
                 <View style={styles.dropdownBoxModal}>
                   <ScrollView>
                     {dropdownBoxList.map((value, index) => (
-                      <TouchableOpacity
+                      <AppBottomSheetTouchableWrapper
                         onPress={() => onQuestionSelect(value)}
                         style={{
                           ...styles.dropdownBoxModalElementView,
@@ -178,7 +178,7 @@ export default function HealthCheckSecurityQuestion(props) {
                         >
                           {value.question}
                         </Text>
-                      </TouchableOpacity>
+                      </AppBottomSheetTouchableWrapper>
                     ))}
                   </ScrollView>
                 </View>
@@ -238,7 +238,7 @@ export default function HealthCheckSecurityQuestion(props) {
                 even your contacts don’t know this answer
               </Text>
             </View>
-            <TouchableOpacity
+            <AppBottomSheetTouchableWrapper
               disabled={errorText || !answer ? true : false}
               onPress={() => {
                 AsyncStorage.setItem(
@@ -253,7 +253,7 @@ export default function HealthCheckSecurityQuestion(props) {
               <Text style={styles.proceedButtonText}>
                 {errorText || !answer ? 'Try Again' : 'Confirm'}
               </Text>
-            </TouchableOpacity>
+            </AppBottomSheetTouchableWrapper>
           </View>
         </View>
       </View>
