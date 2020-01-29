@@ -21,11 +21,12 @@ import ToggleSwitch from './ToggleSwitch';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
 import {
-    TEST_ACCOUNT,
-    REGULAR_ACCOUNT,
-    SECURE_ACCOUNT,
-  } from '../common/constants/serviceTypes';
-  import { withNavigation } from 'react-navigation';
+  TEST_ACCOUNT,
+  REGULAR_ACCOUNT,
+  SECURE_ACCOUNT,
+} from '../common/constants/serviceTypes';
+import { withNavigation } from 'react-navigation';
+import BottomInfoBox from './BottomInfoBox';
 
 function AllAccountsContents(props) {
   const [pin, setPin] = useState('');
@@ -99,45 +100,64 @@ function AllAccountsContents(props) {
           <Text style={styles.modalHeaderTitleText}>{'All Accounts'}</Text>
         </View>
       </View>
-      {AllAccountData.map((value, index) => (
-        <AppBottomSheetTouchableWrapper
-          onPress={() => {
-            props.navigation.navigate('Accounts', {
-              serviceType:
-                value.accountType === 'test'
-                  ? TEST_ACCOUNT
-                  : value.accountType === 'regular'
-                  ? REGULAR_ACCOUNT
-                  : SECURE_ACCOUNT,
-              index:
-                value.accountType === 'test'
-                  ? 0
-                  : value.accountType === 'regular'
-                  ? 1
-                  : 2,
-            });
-          }}
-          style={
-            index == 3 || index == 4
-              ? styles.listElements1
-              : styles.listElements
-          }
-        >
-          <Image style={styles.listElementsIconImage} source={value.image} />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.listElementsTitle}>{value.title}</Text>
-            <Text style={styles.listElementsInfo}>{value.info}</Text>
+      <ScrollView>
+        {AllAccountData.map((value, index) => (
+          <View>
+          <AppBottomSheetTouchableWrapper
+            onPress={() => {
+              props.navigation.navigate('Accounts', {
+                serviceType:
+                  value.accountType === 'test'
+                    ? TEST_ACCOUNT
+                    : value.accountType === 'regular'
+                    ? REGULAR_ACCOUNT
+                    : SECURE_ACCOUNT,
+                index:
+                  value.accountType === 'test'
+                    ? 0
+                    : value.accountType === 'regular'
+                    ? 1
+                    : 2,
+              });
+            }}
+            style={
+              index == 3 || index == 4
+                ? styles.listElements1
+                : styles.listElements
+            }
+          >
+            <Image style={styles.listElementsIconImage} source={value.image} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.listElementsTitle}>{value.title}</Text>
+              <Text style={styles.listElementsInfo}>{value.info}</Text>
+            </View>
+            <View style={styles.listElementIcon}>
+              <Ionicons
+                name="ios-arrow-forward"
+                color={Colors.textColorGrey}
+                size={10}
+                style={{ alignSelf: 'center' }}
+              />
+            </View>
+            
+          </AppBottomSheetTouchableWrapper>
+          <View style={{ height: 1,
+          backgroundColor: Colors.borderColor,
+          marginLeft: 20,
+          marginRight: 20,
+          marginTop: 5,
+    marginBottom: 5,
+          }}/>
           </View>
-          <View style={styles.listElementIcon}>
-            <Ionicons
-              name="ios-arrow-forward"
-              color={Colors.textColorGrey}
-              size={10}
-              style={{ alignSelf: 'center' }}
-            />
-          </View>
-        </AppBottomSheetTouchableWrapper>
-      ))}
+        ))}
+      </ScrollView>
+
+      <BottomInfoBox
+        title={'Note'}
+        infoText={
+          'View all your funds here grouped by accounts or the source they come from'
+        }
+      />
     </View>
   );
 }
@@ -173,21 +193,20 @@ const styles = StyleSheet.create({
   },
   listElements: {
     flexDirection: 'row',
-    margin: 20,
-    marginTop: 10,
-    marginBottom: 10,
-    borderBottomWidth: 0.5,
-    borderColor: Colors.borderColor,
-    paddingBottom: 20,
+    marginLeft: 20,
+    marginRight: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
     justifyContent: 'center',
   },
   listElements1: {
     flexDirection: 'row',
-    margin: 20,
+    marginLeft: 20,
+    marginRight: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
     justifyContent: 'center',
     opacity: 0.3,
-    borderBottomWidth: 0.5,
-    borderColor: Colors.borderColor,
     backgroundColor: Colors.borderColor,
   },
   listElementsTitle: {

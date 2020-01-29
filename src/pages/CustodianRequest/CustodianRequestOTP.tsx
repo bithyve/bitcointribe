@@ -110,6 +110,7 @@ export default function CustodianRequestOTP(props) {
                 keyboardType="email-address"
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
+                autoCorrect={false}
                 ref={input => {
                   this.textInput = input;
                 }}
@@ -138,6 +139,7 @@ export default function CustodianRequestOTP(props) {
                 keyboardType="email-address"
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
+                autoCorrect={false}
                 ref={input => {
                   this.textInput2 = input;
                 }}
@@ -165,6 +167,7 @@ export default function CustodianRequestOTP(props) {
                 keyboardType="email-address"
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
+                autoCorrect={false}
                 ref={input => {
                   this.textInput3 = input;
                 }}
@@ -192,6 +195,7 @@ export default function CustodianRequestOTP(props) {
                 keyboardType="email-address"
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
+                autoCorrect={false}
                 ref={input => {
                   this.textInput4 = input;
                 }}
@@ -220,6 +224,7 @@ export default function CustodianRequestOTP(props) {
                 keyboardType="email-address"
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
+                autoCorrect={false}
                 ref={input => {
                   this.textInput5 = input;
                 }}
@@ -247,6 +252,7 @@ export default function CustodianRequestOTP(props) {
                 keyboardType="email-address"
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
+                autoCorrect={false}
                 ref={input => {
                   this.textInput6 = input;
                 }}

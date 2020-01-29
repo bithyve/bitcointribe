@@ -670,11 +670,11 @@ export default function Send(props) {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('18%')
-              : Platform.OS == 'android'
-              ? hp('20%')
-              : hp('19%'),
-            hp('95%'),
+            ? hp('14%')
+            : Platform.OS == 'android'
+            ? hp('16%')
+            : hp('14%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
           ]}
           renderContent={renderSendHelperContents}
           renderHeader={renderSendHelperHeader}

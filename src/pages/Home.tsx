@@ -2593,7 +2593,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     marginTop: 'auto',
     flex: 1,
-    height: Platform.OS == 'ios' ? 45 : 40,
+    height: Platform.OS == 'ios' ? 47 : 42,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,

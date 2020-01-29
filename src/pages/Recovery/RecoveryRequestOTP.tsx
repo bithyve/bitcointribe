@@ -112,6 +112,7 @@ export default function RecoveryRequestOTP(props) {
                 value={otp ? otp[0] : null}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
+                autoCorrect={false}
                 ref={input => {
                   this.textInput = input;
                 }}
@@ -139,6 +140,7 @@ export default function RecoveryRequestOTP(props) {
                 value={otp ? otp[1] : null}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
+                autoCorrect={false}
                 keyboardType="email-address"
                 ref={input => {
                   this.textInput2 = input;
@@ -165,6 +167,7 @@ export default function RecoveryRequestOTP(props) {
                 value={otp ? otp[2] : null}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
+                autoCorrect={false}
                 keyboardType="email-address"
                 ref={input => {
                   this.textInput3 = input;
@@ -191,6 +194,7 @@ export default function RecoveryRequestOTP(props) {
                 value={otp ? otp[3] : null}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
+                autoCorrect={false}
                 keyboardType="email-address"
                 ref={input => {
                   this.textInput4 = input;
@@ -217,6 +221,7 @@ export default function RecoveryRequestOTP(props) {
                 value={otp ? otp[4] : null}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
+                autoCorrect={false}
                 keyboardType="email-address"
                 ref={input => {
                   this.textInput5 = input;
@@ -242,6 +247,7 @@ export default function RecoveryRequestOTP(props) {
                 value={otp ? otp[5] : null}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
+                autoCorrect={false}
                 keyboardType="email-address"
                 ref={input => {
                   this.textInput6 = input;
