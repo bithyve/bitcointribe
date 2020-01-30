@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -31,9 +31,9 @@ import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../components/ModalHeader';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
+import SecondaryDevice from './SecondaryDevice';
 
 const SecondaryDeviceHistory = props => {
-
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
@@ -73,41 +73,124 @@ const SecondaryDeviceHistory = props => {
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
   ]);
+  const [secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet] = useState(
+    React.createRef(),
+  );
+  const updateAutoHighlightFlags = props.navigation.getParam(
+    'updateAutoHighlightFlags',
+  );
+  const next = props.navigation.getParam('next');
+
+  const renderSecondaryDeviceContents = useCallback(() => {
+    return (
+      <SecondaryDevice
+        onPressOk={() => {
+          updateAutoHighlightFlags();
+          secondaryDeviceBottomSheet.current.snapTo(0);
+        }}
+        onPressBack={() => {
+          secondaryDeviceBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderSecondaryDeviceHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (secondaryDeviceBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  useEffect(() => {
+    if (next) (secondaryDeviceBottomSheet as any).current.snapTo(1);
+  }, [next]);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
-      <SafeAreaView style={{ flex: 0, backgroundColor: Colors.backgroundColor }} />
+      <SafeAreaView
+        style={{ flex: 0, backgroundColor: Colors.backgroundColor }}
+      />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={{ ...styles.modalHeaderTitleView, paddingLeft: 10, paddingRight: 10, }}>
-          <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-              <TouchableOpacity onPress={() => { props.navigation.goBack(); }} style={{ height: 30, width: 30, justifyContent: "center" }} >
-                <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-              </TouchableOpacity>
-              <View style={{ flex: 1, flexDirection:'row', marginLeft: 10, marginRight: 10, }}>
-                <View style={{ flex: 1, justifyContent: "center" }}>
-                    <Text style={BackupStyles.modalHeaderTitleText}>{props.navigation.state.params.selectedTitle}</Text>
-                    <Text style={BackupStyles.modalHeaderInfoText}>
-                        Last backup{' '}<Text style={{ fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', }}> {props.navigation.state.params.selectedTime}</Text>
-                    </Text>
-                </View>
-                <Image style={{...BackupStyles.cardIconImage, alignSelf:'center'}} source={getIconByStatus(props.navigation.state.params.selectedStatus)} />
-              </View>
+      <View
+        style={{
+          ...styles.modalHeaderTitleView,
+          paddingLeft: 10,
+          paddingRight: 10,
+        }}
+      >
+        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity
+            onPress={() => {
+              props.navigation.goBack();
+            }}
+            style={{ height: 30, width: 30, justifyContent: 'center' }}
+          >
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </TouchableOpacity>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              marginLeft: 10,
+              marginRight: 10,
+            }}
+          >
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+              <Text style={BackupStyles.modalHeaderTitleText}>
+                {props.navigation.state.params.selectedTitle}
+              </Text>
+              <Text style={BackupStyles.modalHeaderInfoText}>
+                Last backup{' '}
+                <Text
+                  style={{
+                    fontFamily: Fonts.FiraSansMediumItalic,
+                    fontWeight: 'bold',
+                  }}
+                >
+                  {' '}
+                  {props.navigation.state.params.selectedTime}
+                </Text>
+              </Text>
+            </View>
+            <Image
+              style={{ ...BackupStyles.cardIconImage, alignSelf: 'center' }}
+              source={getIconByStatus(
+                props.navigation.state.params.selectedStatus,
+              )}
+            />
           </View>
+        </View>
       </View>
-      <View style={{flex:1}}>
-          <HistoryPageComponent 
-            data={secondaryDeviceHistory}
-            reshareInfo={'consectetur Lorem ipsum dolor sit amet, consectetur sit '}
-            onPressConfirm={() => {
-                // ConfirmBottomSheet.current.snapTo(1);
-                alert("confirm")
-            }}
-            onPressReshare={() => {
-                alert("reshare");
-                // ReshareBottomSheet.current.snapTo(1);
-            }}
-          />
+      <View style={{ flex: 1 }}>
+        <HistoryPageComponent
+          data={secondaryDeviceHistory}
+          reshareInfo={
+            'consectetur Lorem ipsum dolor sit amet, consectetur sit '
+          }
+          onPressConfirm={() => {
+            // ConfirmBottomSheet.current.snapTo(1);
+            alert('confirm');
+          }}
+          onPressReshare={() => {
+            alert('reshare');
+            // ReshareBottomSheet.current.snapTo(1);
+          }}
+        />
       </View>
+      <BottomSheet
+        onCloseStart={() => {
+          secondaryDeviceBottomSheet.current.snapTo(0);
+        }}
+        enabledInnerScrolling={true}
+        ref={secondaryDeviceBottomSheet}
+        snapPoints={[-30, hp('90%')]}
+        renderContent={renderSecondaryDeviceContents}
+        renderHeader={renderSecondaryDeviceHeader}
+      />
     </View>
   );
 };
@@ -127,7 +210,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingRight: 10,
     paddingBottom: hp('3%'),
-    marginTop:20,
+    marginTop: 20,
     marginBottom: 15,
   },
 });
