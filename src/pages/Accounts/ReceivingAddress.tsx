@@ -59,7 +59,7 @@ const ReceivingAddress = props => {
   const checkNShowHelperModal = async () => {
     let isReceiveHelperDone1 = await AsyncStorage.getItem('isReceiveHelperDone');
     console.log("isReceiveHelperDone1", isReceiveHelperDone,isReceiveHelperDone1)
-    if (!isReceiveHelperDone1 && serviceType == TEST_ACCOUNT) {
+    if (isReceiveHelperDone1 && serviceType == TEST_ACCOUNT) {
       await AsyncStorage.setItem('isReceiveHelperDone', 'true');
       setTimeout(() => {
         setIsReceiveHelperDone(true);
@@ -92,7 +92,7 @@ const ReceivingAddress = props => {
       <TestAccountHelperModalContents
         topButtonText={'Receiving Bitcoins'}
         helperInfo={
-          'For receiving bitcoins, you need to give an\naddress to the sender. Mostly in form of a QR\ncode.\n\nThis is pretty much like an email address but\nyour app generates a new one for you every time\nyou want to do a transaction.\n\nThe sender will scan this address or copy a long\nsequence of letters and numbers to send you the\nbitcoins or sats (a very small fraction of a\nbitcoin)\n\nNote that if you want to receive bitcoins/ sats\nfrom a “Trusted Contact”, the app does all this\nfor you and you don’t need to send a new\naddress every time.\n'
+          'For receiving bitcoins, you need to give an\naddress to the sender. Mostly in form of a QR\ncode. This is pretty much like an email address but\nyour app generates a new one for you every time\nyou want to do a transaction\n\nThe sender will scan this address or copy a long\nsequence of letters and numbers to send you the\nbitcoins or sats (a very small fraction of a\nbitcoin)\n\nNote that if you want to receive bitcoins/ sats\nfrom a “Trusted Contact”, the app does all this\nfor you and you don’t need to send a new\naddress every time.\n'
         }
         continueButtonText={'Continue'}
         quitButtonText={'Quit'}
@@ -253,10 +253,10 @@ const ReceivingAddress = props => {
           enabledInnerScrolling={true}
           ref={ReceiveHelperBottomSheet}
           snapPoints={[-50,  Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('14%')
+          ? hp('15%')
           : Platform.OS == 'android'
           ? hp('16%')
-          : hp('14%'),
+          : hp('15%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),]}
           renderContent={renderReceiveHelperContents}
           renderHeader={renderReceiveHelperHeader}

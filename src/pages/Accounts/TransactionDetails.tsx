@@ -65,6 +65,8 @@ export default function TransactionDetails(props) {
     };
 
     useEffect(() => {
+      console.log("txDetails", txDetails);
+  
       checkNShowHelperModal();
     }, []);
 
@@ -242,6 +244,16 @@ export default function TransactionDetails(props) {
                 }}
               >
                 {UsNumberFormat(txDetails.amount)}
+              </Text>
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(12),
+                  marginLeft: 3,
+                }}
+              >
+                {txDetails.accountType == 'Test Account' ? ' t-sats' : ' sats'}
               </Text>
             </View>
           </View>

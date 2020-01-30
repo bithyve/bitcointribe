@@ -28,31 +28,19 @@ export default function TestAccountHelperModalContents(props) {
           }}
         >
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <AppBottomSheetTouchableWrapper
-              onPress={() => {
-                if (props.onPressManageBackup) props.onPressManageBackup();
-              }}
-              style={{
-                width: wp('85%'),
-                height: wp('13%'),
-                backgroundColor: Colors.homepageButtonColor,
-                borderRadius: 10,
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: hp('2%'),
-                marginBottom: hp('1%'),
-              }}
-            >
+           
               <Text
                 style={{
                   color: Colors.white,
                   fontFamily: Fonts.FiraSansMedium,
-                  fontSize: RFValue(14),
+                  fontSize: RFValue(15),
+                  fontWeight: 'bold',
+                  marginTop: hp('1%'),
+                marginBottom: hp('1%'),
                 }}
               >
                 {props.topButtonText}
               </Text>
-            </AppBottomSheetTouchableWrapper>
           </View>
           <View style={{ justifyContent: 'center', alignItems: 'center', }}>
             <Image
