@@ -41,7 +41,8 @@ export default function QrCodeModalContents(props) {
 	  };
 
 	return (<View style={styles.modalContentContainer}>
-		<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : ''} enabled>
+		<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : undefined} enabled keyboardVerticalOffset={150}>
+			
 			<ScrollView style={styles.qrModalScrollView}>
 				<View style={styles.qrModalImageNTextInputView}>
 					{props.isOpenedFlag && openCameraFlag ?
@@ -50,7 +51,7 @@ export default function QrCodeModalContents(props) {
 							height: wp('100%'),
 							overflow: "hidden",
 							borderRadius: 20,
-							marginTop: hp('3%')
+							marginTop: hp('2%')
 						}}>
 							<RNCamera
 								ref={(ref) => { this.cameraRef = ref; }}
@@ -90,7 +91,11 @@ export default function QrCodeModalContents(props) {
 								</ImageBackground>
 							</AppBottomSheetTouchableWrapper>
 						)}
-						{ !props.flag ? <TextInput placeholder={'Enter Recipients Address'} placeholderTextColor={Colors.borderColor} style={styles.qrModalTextInput} /> : null}
+						{ !props.flag ? <TextInput placeholder={'Enter Recipients Address'} 
+						placeholderTextColor={Colors.borderColor} 
+						style={styles.qrModalTextInput} 
+						autoCorrect={false}
+						/> : null}
 					
 				</View>
 				{ !props.flag ? 
@@ -129,8 +134,7 @@ const styles = StyleSheet.create({
 		backgroundColor: Colors.white,
 	},
 	qrModalImageNTextInputView: {
-		marginTop: 15,
-		marginBottom: 15,
+		marginBottom: 10,
 		justifyContent: 'center',
 		alignItems: 'center',
 		borderBottomColor: Colors.backgroundColor,
@@ -149,8 +153,8 @@ const styles = StyleSheet.create({
 		borderColor: Colors.backgroundColor,
 		width: wp('72%'),
 		height: 60,
-		marginTop: 25,
-		marginBottom: 25,
+		marginTop: 20,
+		marginBottom: 20,
 		paddingLeft: 15,
 		paddingRight: 15,
 		fontSize: RFValue(11, 812),

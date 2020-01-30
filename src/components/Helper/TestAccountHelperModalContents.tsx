@@ -40,7 +40,7 @@ export default function TestAccountHelperModalContents(props) {
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginTop: hp('2%'),
-                marginBottom: hp('2%'),
+                marginBottom: hp('1%'),
               }}
             >
               <Text
@@ -54,47 +54,52 @@ export default function TestAccountHelperModalContents(props) {
               </Text>
             </AppBottomSheetTouchableWrapper>
           </View>
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ justifyContent: 'center', alignItems: 'center', }}>
             <Image
               source={require('../../assets/images/icons/testAccountHelperImage.png')}
               style={{
-                width: wp('50%'),
-                height: wp('50%'),
+                width: wp('45%'),
+                height: wp('45%'),
                 resizeMode: 'contain',
               }}
             />
           </View>
+          { props.boldPara ? 
           <View
             style={{
               justifyContent: 'center',
               alignItems: 'center',
-              marginTop: hp('2%'),
+              marginTop: hp('1%'),
             }}
           >
             <Text
               style={{
                 textAlign: 'center',
                 color: Colors.white,
-                margin: 20,
+                marginLeft: 20,
+                marginRight: 20,
+                marginBottom: 10,
                 fontSize: RFValue(12),
                 fontFamily: Fonts.FiraSansMedium,
               }}
             >
               {props.boldPara}
             </Text>
-          </View>
+          </View> : null}
           <View
             style={{
               justifyContent: 'center',
               alignItems: 'center',
-              marginTop: hp('2%'),
+              marginTop: hp('1%'),
             }}
           >
             <Text
               style={{
                 textAlign: 'center',
                 color: Colors.white,
-                margin: 20,
+                marginLeft: 20,
+                marginRight: 20,
+                marginBottom: 10,
                 fontSize: RFValue(12),
                 fontFamily: Fonts.FiraSansRegular,
               }}
@@ -108,7 +113,7 @@ export default function TestAccountHelperModalContents(props) {
         style={{
           flexDirection: 'row',
           marginTop: hp('1%'),
-          marginBottom: hp('5%'),
+          marginBottom: hp('2%'),
           justifyContent: 'center',
           alignItems: 'center',
         }}

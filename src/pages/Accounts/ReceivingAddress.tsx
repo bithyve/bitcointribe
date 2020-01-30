@@ -252,11 +252,12 @@ const ReceivingAddress = props => {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={ReceiveHelperBottomSheet}
-          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('18%')
+          snapPoints={[-50,  Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('14%')
           : Platform.OS == 'android'
-          ? hp('20%')
-          : hp('19%'),hp('95%')]}
+          ? hp('16%')
+          : hp('14%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),]}
           renderContent={renderReceiveHelperContents}
           renderHeader={renderReceiveHelperHeader}
         />

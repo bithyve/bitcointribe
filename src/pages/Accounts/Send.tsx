@@ -465,7 +465,7 @@ export default function Send(props) {
                 style={{
                   ...styles.textBoxView,
                   flexDirection: 'column',
-                  height: 80,
+                  height: 'auto',
                   marginTop: hp('2%'),
                   alignItems: 'center',
                   paddingLeft: 10,
@@ -517,18 +517,19 @@ export default function Send(props) {
                   <Text
                     style={{
                       color: Colors.textColorGrey,
-                      fontSize: RFValue(13),
+                      fontSize: RFValue(10),
                       fontFamily: Fonts.FiraSansRegular,
                       textAlign: 'center',
-                      flex: 1, flexWrap: 'wrap'
+                      flex: 1, flexWrap: 'wrap',
+                      marginRight: 5
                     }}
                   >
-                    {'Low Fee'} (
+                    {'Low Fee\n'} (
                     {staticFees
                       ? staticFees[
-                          sliderValueText === 'Low Fee'
+                          sliderValueText === 'Low Fee\n'
                             ? 'low'
-                            : sliderValueText === 'In the middle'
+                            : sliderValueText === 'In the middle\n'
                             ? 'medium'
                             : 'high'
                         ]
@@ -538,18 +539,19 @@ export default function Send(props) {
                   <Text
                     style={{
                       color: Colors.textColorGrey,
-                      fontSize: RFValue(13),
+                      fontSize: RFValue(10),
                       fontFamily: Fonts.FiraSansRegular,
                       textAlign: 'center',
-                      flex: 1, flexWrap: 'wrap'
+                      flex: 1, flexWrap: 'wrap',
+                      marginRight: 5
                     }}
                   >
-                    {'In the middle'} (
+                    {'In the middle\n'} (
                     {staticFees
                       ? staticFees[
-                          sliderValueText === 'Low Fee'
+                          sliderValueText === 'Low Fee\n'
                             ? 'low'
-                            : sliderValueText === 'In the middle'
+                            : sliderValueText === 'In the middle\n'
                             ? 'medium'
                             : 'high'
                         ]
@@ -559,13 +561,13 @@ export default function Send(props) {
                   <Text
                     style={{
                       color: Colors.textColorGrey,
-                      fontSize: RFValue(13),
+                      fontSize: RFValue(10),
                       fontFamily: Fonts.FiraSansRegular,
                       textAlign: 'center',
                       flex: 1, flexWrap: 'wrap'
                     }}
                   >
-                    {'Fast Transaction'} (
+                    {'Fast Transaction\n'} (
                     {staticFees
                       ? staticFees[
                           sliderValueText === 'Low Fee'
@@ -668,11 +670,11 @@ export default function Send(props) {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('18%')
-              : Platform.OS == 'android'
-              ? hp('20%')
-              : hp('19%'),
-            hp('95%'),
+            ? hp('14%')
+            : Platform.OS == 'android'
+            ? hp('16%')
+            : hp('14%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
           ]}
           renderContent={renderSendHelperContents}
           renderHeader={renderSendHelperHeader}

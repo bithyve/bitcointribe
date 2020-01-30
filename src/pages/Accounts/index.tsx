@@ -52,19 +52,19 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 
-import { copilot, walkthroughable, CopilotStep } from 'react-native-copilot';
-import TooltipComponent from '../../components/Copilot/CopilotTooltip';
+// import { copilot, walkthroughable, CopilotStep } from 'react-native-copilot';
+// import TooltipComponent from '../../components/Copilot/CopilotTooltip';
 import moment from 'moment';
 import axios from 'axios';
 
-const WalkthroughableText = walkthroughable(Text);
-const WalkthroughableImage = walkthroughable(Image);
-const WalkthroughableTouchableOpacity = walkthroughable(TouchableOpacity);
-const WalkthroughableView = walkthroughable(View);
+// const WalkthroughableText = walkthroughable(Text);
+// const WalkthroughableImage = walkthroughable(Image);
+// const WalkthroughableTouchableOpacity = walkthroughable(TouchableOpacity);
+// const WalkthroughableView = walkthroughable(View);
 import { UsNumberFormat } from '../../common/utilities';
 import { keyFetched } from '../../store/actions/storage';
 
-function Accounts(props) {
+export default function Accounts(props) {
   const [serviceType, setServiceType] = useState(
     props.navigation.getParam('serviceType'),
   );
@@ -198,8 +198,11 @@ function Accounts(props) {
         setTimeout(() => {
           setIsTestHelperDone(false);
         }, 10);
-      props.copilotEvents.on('stepChange', handleStepChange);
-      props.start();
+      // props.copilotEvents.on('stepChange', handleStepChange);
+      // setTimeout(()=>{
+      //   props.start();
+      // }, 300);
+      
     }
   };
 
@@ -307,7 +310,7 @@ function Accounts(props) {
                 }}
                 onPress={() => {
                   if (item.accountType == 'Test Account')
-                    TestAccountHelperBottomSheet.current.snapTo(1);
+                    TestAccountHelperBottomSheet.current.snapTo(2);
                   else if (item.accountType == 'Savings Account')
                     SecureAccountHelperBottomSheet.current.snapTo(1);
                   else if (item.accountType == 'Regular Account')
@@ -676,19 +679,19 @@ function Accounts(props) {
         topButtonText={`Test Account`}
         boldPara={`If you are new to Bitcoin, this account is designed for you. 
           It comes pre-loaded with some test bitcoins`}
-        helperInfo={`\nYou can even send and receive test bitcoins from other Hexa wallet test accounts
-           \nThe testnet sats do not add up in your wallet balance\n\n\n`}
+        helperInfo={`You can even send and receive test bitcoins from other Hexa wallet test accounts
+           \nThe testnet sats do not add up in your wallet balance\n\n`}
         continueButtonText={'Continue'}
         quitButtonText={'Quit'}
         onPressContinue={() => {
           (TestAccountHelperBottomSheet as any).current.snapTo(0);
-          props.copilotEvents.on('stepChange', handleStepChange);
-          props.start();
+          // props.copilotEvents.on('stepChange', handleStepChange);
+          // props.start();
         }}
         onPressQuit={() => {
           (TestAccountHelperBottomSheet as any).current.snapTo(0);
-          props.copilotEvents.on('stepChange', handleStepChange);
-          props.start();
+          // props.copilotEvents.on('stepChange', handleStepChange);
+          // props.start();
         }}
       />
     );
@@ -1022,14 +1025,14 @@ function Accounts(props) {
                     style={styles.transactionModalElementView}
                   >
                     {index == 0 ? (
-                      <CopilotStep
-                        item={item}
-                        active={TransactionIsActive}
-                        text="Here are your transactions"
-                        order={3}
-                        name="transaction"
-                      >
-                        <WalkthroughableView
+                      // <CopilotStep
+                      //   item={item}
+                      //   active={TransactionIsActive}
+                      //   text="Here are your transactions"
+                      //   order={3}
+                      //   name="transaction"
+                      // >
+                        <View
                           style={styles.modalElementInfoView}
                         >
                           <View style={{ justifyContent: 'center' }}>
@@ -1065,8 +1068,8 @@ function Accounts(props) {
                               {/* {item.time} */}
                             </Text>
                           </View>
-                        </WalkthroughableView>
-                      </CopilotStep>
+                        </View>
+                      // </CopilotStep>
                     ) : (
                       <View style={styles.modalElementInfoView}>
                         <View style={{ justifyContent: 'center' }}>
@@ -1124,13 +1127,13 @@ function Accounts(props) {
                         {item.confirmations < 6 ? item.confirmations : '6+'}
                       </Text>
                       {index == 0 ? (
-                        <CopilotStep
-                          active={TransactionDetailsIsActive}
-                          text="You can get more details here"
-                          order={4}
-                          name="transactionDetails"
-                        >
-                          <WalkthroughableView
+                        // <CopilotStep
+                        //   active={TransactionDetailsIsActive}
+                        //   text="You can get more details here"
+                        //   order={4}
+                        //   name="transactionDetails"
+                        // >
+                          <View
                             style={{
                               padding: 10,
                               alignItems: 'center',
@@ -1142,8 +1145,8 @@ function Accounts(props) {
                               color={Colors.textColorGrey}
                               size={12}
                             />
-                          </WalkthroughableView>
-                        </CopilotStep>
+                          </View>
+                        // </CopilotStep>
                       ) : (
                         <View
                           style={{
@@ -1170,13 +1173,13 @@ function Accounts(props) {
           <View
             style={{ flexDirection: 'row', marginLeft: 10, marginRight: 10 }}
           >
-            <CopilotStep
+            {/* <CopilotStep
               active={SendIsActive}
               text="Try Sending"
               order={1}
               name="sendTransaction"
-              >
-              <WalkthroughableTouchableOpacity
+              > */}
+              <TouchableOpacity
                 onPress={() => {
                   props.navigation.navigate('Send', {
                     serviceType,
@@ -1199,15 +1202,15 @@ function Accounts(props) {
                     {serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'})
                   </Text>
                 </View>
-              </WalkthroughableTouchableOpacity>
-            </CopilotStep>
+              </TouchableOpacity>
+            {/* </CopilotStep>
             <CopilotStep
               active={ReceiveIsActive}
               text="Try Receiving"
               order={2}
               name="receiveTransaction"
-            >
-              <WalkthroughableTouchableOpacity
+            > */}
+              <TouchableOpacity
                 onPress={() => {
                   props.navigation.navigate('ReceivingAddress', {
                     serviceType,
@@ -1229,19 +1232,19 @@ function Accounts(props) {
                     {serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'})
                   </Text>
                 </View>
-              </WalkthroughableTouchableOpacity>
-            </CopilotStep>
+              </TouchableOpacity>
+            {/* </CopilotStep> */}
           </View>
           <View
             style={{ flexDirection: 'row', marginLeft: 10, marginRight: 10 }}
           >
-            <CopilotStep
+            {/* <CopilotStep
               active={BuyIsActive}
               text="Buy your bitcoins here"
               order={5}
               name="Buy"
-            >
-              <WalkthroughableTouchableOpacity
+            > */}
+              <TouchableOpacity
                 onPress={() => {
                   props.navigation.navigate('Buy', {
                     serviceType,
@@ -1265,15 +1268,15 @@ function Accounts(props) {
                     (usd)
                   </Text>
                 </View>
-              </WalkthroughableTouchableOpacity>
-            </CopilotStep>
+              </TouchableOpacity>
+            {/* </CopilotStep>
             <CopilotStep
               active={SellIsActive}
               text="Sell your bitcoins here"
               order={6}
               name="Sell"
-            >
-              <WalkthroughableTouchableOpacity
+            > */}
+              <TouchableOpacity
                 style={{...styles.bottomCardView, opacity: 0.3,
                   backgroundColor: Colors.borderColor,}}
                   disabled={ true }
@@ -1297,8 +1300,8 @@ function Accounts(props) {
                     (usd)
                   </Text>
                 </View>
-              </WalkthroughableTouchableOpacity>
-            </CopilotStep>
+              </TouchableOpacity>
+            {/* </CopilotStep> */}
           </View>
         </View>
       </ScrollView>
@@ -1385,28 +1388,29 @@ function Accounts(props) {
           let isTransactionDetailsHelperDone = await AsyncStorage.getItem(
             'isTransactionDetailsHelperDone',
           );
-          if (
-            !isSendHelperDone ||
-            !isReceiveHelperDone ||
-            !isBuyHelperDone ||
-            !isSellHelperDone ||
-            !isTransactionHelperDone ||
-            !isTransactionDetailsHelperDone
-          ) {
-            props.copilotEvents.on('stepChange', handleStepChange);
-            props.start();
-          }
+          // if (
+          //   !isSendHelperDone ||
+          //   !isReceiveHelperDone ||
+          //   !isBuyHelperDone ||
+          //   !isSellHelperDone ||
+          //   !isTransactionHelperDone ||
+          //   !isTransactionDetailsHelperDone
+          // ) {
+          //   props.copilotEvents.on('stepChange', handleStepChange);
+          //   props.start();
+          // }
         }}
         enabledInnerScrolling={true}
         ref={TestAccountHelperBottomSheet}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('18%')
+          ? hp('14%')
           : Platform.OS == 'android'
-          ? hp('20%')
-          : hp('19%'),
-          Platform.OS == 'android' ? hp('50%') : hp('90%'),
+          ? hp('16%')
+          : hp('14%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
+          //Platform.OS == 'android' ? hp('50%') : hp('90%'),
         ]}
         renderContent={renderTestAccountsHelperContents}
         renderHeader={renderTestAccountsHelperHeader}
@@ -1644,12 +1648,14 @@ const StepNumber = ({ currentStepNumber }) => (
   </View>
 );
 
-export default copilot({
-  animated: true, // Can be true or false
-  overlay: 'svg', // Can be either view or svg
-  tooltipComponent: TooltipComponent,
-  tooltipStyle: styles.copilotTooltip,
-  stepNumberComponent: StepNumber,
-  backdropColor: 'rgba(0, 0, 0, 0.8)',
-  // svgMaskPath: circleSvgPath, // Circle
-})(Accounts);
+// export default copilot({
+//   animated: true, // Can be true or false
+//   overlay: 'svg', // Can be either view or svg
+//   tooltipComponent: TooltipComponent,
+//   tooltipStyle: styles.copilotTooltip,
+//   stepNumberComponent: StepNumber,
+//   backdropColor: 'rgba(0, 0, 0, 0.8)',
+//   androidStatusBarVisible: Platform.OS === 'ios' ? false : true,
+//   //verticalOffset: hp('2%'),
+//   // svgMaskPath: circleSvgPath, // Circle
+// })(Accounts);

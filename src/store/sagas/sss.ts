@@ -99,6 +99,7 @@ function* initHCWorker() {
       ...SERVICES,
       S3_SERVICE: JSON.stringify(s3Service),
     };
+    console.log('Health Check Initialized');
     yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {
     console.log({ err: res.err });
@@ -125,14 +126,15 @@ function* uploadEncMetaShareWorker({ payload }) {
           .UPLOADED_AT <
       600000
     )
-      // re-upload after 10 minutes (removal sync w/ relayer)
-      return;
+      console.log('Re-upload after 10 minutes'); // re-upload after 10 minutes (removal sync w/ relayer)
+    return;
   }
 
   yield put(switchS3Loader('uploadMetaShare'));
 
   const res = yield call(s3Service.uploadShare, payload.shareIndex);
   if (res.status === 200) {
+    console.log('Uploaded share: ', payload.shareIndex);
     const { otp, encryptedKey } = res.data;
     console.log({ otp, encryptedKey });
 
