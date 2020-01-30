@@ -1212,7 +1212,13 @@ export default function ManageBackup(props) {
     setIsSecretShared2(isSecretShared2);
   };
 
-  const [autoHighlightFlags, setAutoHighlightFlags] = useState();
+  const [autoHighlightFlags, setAutoHighlightFlags] = useState({
+    secondaryDevice:false,
+    trustedContact1:false,
+    trustedContact2:false,
+    personalCopy1:false,
+    personalCopy2:false,
+    securityAns:false});
 
   const autoHighlight = async () => {
     const {
@@ -1903,6 +1909,14 @@ export default function ManageBackup(props) {
             </View>
           </View>
           {pageData.map((item, index) => {
+            const {
+              secondaryDevice,
+              trustedContact1,
+              trustedContact2,
+              personalCopy1,
+              personalCopy2,
+              securityAns,
+            } = autoHighlightFlags;
             return (
               <View
                 style={{
@@ -1914,120 +1928,126 @@ export default function ManageBackup(props) {
                     setSelectedTime(getTime(item.time));
                     setSelectedStatus(item.status);
                     if (item.type == 'secondaryDevice') {
-                      setTimeout(() => {
-                        setSelectTypeToReshare('secondaryDevice');
-                      }, 10);
-                      if (secondaryDeviceAutoHighlightFlags == 'true') {
-                        SecondaryDeviceHistoryBottomSheet.current.snapTo(1);
-                      } else {
-                        secondaryDeviceBottomSheet.current.snapTo(1);
-                      }
+                      props.navigation.navigate("SecondaryDeviceHistory", {selectedStatus: item.status, selectedTime: getTime(item.time), selectedTitle: item.title});
+                      // setTimeout(() => {
+                      //   setSelectTypeToReshare('secondaryDevice');
+                      // }, 10);
+                      // if (autoHighlightFlags.secondaryDevice) {
+                      //   SecondaryDeviceHistoryBottomSheet.current.snapTo(1);
+                      // } else {
+                      //   secondaryDeviceBottomSheet.current.snapTo(1);
+                      // }
                     } else if (item.type == 'contact1') {
-                      setLoadOnTrustedContactBottomSheet(true);
-                      setTimeout(() => {
-                        setSelectTypeToReshare('contact1');
-                      }, 10);
-                      if (contact1AutoHighlightFlags == 'true') {
-                        if (item.personalInfo) {
-                          setContactToConfirm(item.personalInfo);
-                        }
-                        TrustedContactHistoryBottomSheet.current.snapTo(1);
-                      } else {
-                        setTimeout(() => {
-                          setChosenContactIndex(1);
-                          setLoadContacts(true);
-                        }, 2);
-                        trustedContactsBottomSheet.current.snapTo(1);
-                      }
+                      props.navigation.navigate("TrustedContactHistory", {selectedStatus: item.status, selectedTime: getTime(item.time), selectedTitle: item.title});
+                      // setLoadOnTrustedContactBottomSheet(true);
+                      // setTimeout(() => {
+                      //   setSelectTypeToReshare('contact1');
+                      // }, 10);
+                      // if (trustedContact1) {
+                      //   if (item.personalInfo) {
+                      //     setContactToConfirm(item.personalInfo);
+                      //   }
+                      //   TrustedContactHistoryBottomSheet.current.snapTo(1);
+                      // } else {
+                      //   setTimeout(() => {
+                      //     setChosenContactIndex(1);
+                      //     setLoadContacts(true);
+                      //   }, 2);
+                      //   trustedContactsBottomSheet.current.snapTo(1);
+                      // }
                     } else if (item.type == 'contact2') {
-                      setTimeout(() => {
-                        setSelectTypeToReshare('contact2');
-                      }, 10);
-                      if (contact2AutoHighlightFlags == 'true') {
-                        if (item.personalInfo) {
-                          setContactToConfirm(item.personalInfo);
-                        }
-                        TrustedContactHistoryBottomSheet.current.snapTo(1);
-                      } else {
-                        setTimeout(() => {
-                          setChosenContactIndex(2);
-                          setLoadContacts(true);
-                        }, 2);
-                        trustedContactsBottomSheet.current.snapTo(1);
-                        setLoadOnTrustedContactBottomSheet(true);
-                      }
+                      props.navigation.navigate("TrustedContactHistory", {selectedStatus: item.status, selectedTime: getTime(item.time), selectedTitle: item.title});
+                      // setTimeout(() => {
+                      //   setSelectTypeToReshare('contact2');
+                      // }, 10);
+                      // if (trustedContact2) {
+                      //   if (item.personalInfo) {
+                      //     setContactToConfirm(item.personalInfo);
+                      //   }
+                      //   TrustedContactHistoryBottomSheet.current.snapTo(1);
+                      // } else {
+                      //   setTimeout(() => {
+                      //     setChosenContactIndex(2);
+                      //     setLoadContacts(true);
+                      //   }, 2);
+                      //   trustedContactsBottomSheet.current.snapTo(1);
+                      //   setLoadOnTrustedContactBottomSheet(true);
+                      // }
                     } else if (item.type === 'copy1') {
-                      if (!databaseSSS && !databaseSSS.pdfDetails) {
-                        Alert.alert(
-                          'Generating Personal Copy',
-                          'Please, try again in a while',
-                        );
-                        return;
-                      }
-                      AsyncStorage.getItem('personalCopy1Shared').then(
-                        personalCopy1Shared => {
-                          if (personalCopy1Shared) {
-                            props.navigation.navigate('QrScanner', {
-                              scanedCode: qrData => {
-                                const index = 3;
-                                dispatch(checkPDFHealth(qrData, index));
-                              },
-                            });
-                          } else {
-                            // setTimeout(() => {
-                            //   setSelectTypeToReshare('copy1');
-                            // }, 10);
-                            if (personalCopy1AutoHighlightFlags == 'true') {
-                              setSelectTypeToReshare('copy1');
-                              PersonalCopyHistoryBottomSheet.current.snapTo(1);
-                            } else {
-                              // setSelectedPersonalCopy(item);
-                              (PersonalCopy1ShareBottomSheet as any).current.snapTo(
-                                1,
-                              );
-                            }
-                          }
-                        },
-                      );
+                      props.navigation.navigate("PersonalCopyHistory", {selectedStatus: item.status, selectedTime: getTime(item.time), selectedTitle: item.title});
+                      // if (!databaseSSS && !databaseSSS.pdfDetails) {
+                      //   Alert.alert(
+                      //     'Generating Personal Copy',
+                      //     'Please, try again in a while',
+                      //   );
+                      //   return;
+                      // }
+                      // AsyncStorage.getItem('personalCopy1Shared').then(
+                      //   personalCopy1Shared => {
+                      //     if (personalCopy1Shared) {
+                      //       props.navigation.navigate('QrScanner', {
+                      //         scanedCode: qrData => {
+                      //           const index = 3;
+                      //           dispatch(checkPDFHealth(qrData, index));
+                      //         },
+                      //       });
+                      //     } else {
+                      //       // setTimeout(() => {
+                      //       //   setSelectTypeToReshare('copy1');
+                      //       // }, 10);
+                      //       if (personalCopy1) {
+                      //         setSelectTypeToReshare('copy1');
+                      //         PersonalCopyHistoryBottomSheet.current.snapTo(1);
+                      //       } else {
+                      //         // setSelectedPersonalCopy(item);
+                      //         (PersonalCopy1ShareBottomSheet as any).current.snapTo(
+                      //           1,
+                      //         );
+                      //       }
+                      //     }
+                      //   },
+                      // );
                     } else if (item.type == 'copy2') {
-                      if (!databaseSSS && !databaseSSS.pdfDetails) {
-                        Alert.alert(
-                          'Generating Personal Copy',
-                          'Please, try again in a while',
-                        );
-                        return;
-                      }
-                      AsyncStorage.getItem('personalCopy2Shared').then(
-                        personalCopy2Shared => {
-                          if (personalCopy2Shared) {
-                            props.navigation.navigate('QrScanner', {
-                              scanedCode: qrData => {
-                                const index = 4;
-                                dispatch(checkPDFHealth(qrData, index));
-                              },
-                            });
-                          } else {
-                            if (personalCopy2AutoHighlightFlags == 'true') {
-                              setSelectTypeToReshare('copy2');
-                              PersonalCopyHistoryBottomSheet.current.snapTo(1);
-                            } else {
-                              // setSelectedPersonalCopy(item);
-                              (PersonalCopy2ShareBottomSheet as any).current.snapTo(
-                                1,
-                              );
-                            }
-                          }
-                        },
-                      );
+                      props.navigation.navigate("PersonalCopyHistory", {selectedStatus: item.status, selectedTime: getTime(item.time), selectedTitle: item.title});
+                      // if (!databaseSSS && !databaseSSS.pdfDetails) {
+                      //   Alert.alert(
+                      //     'Generating Personal Copy',
+                      //     'Please, try again in a while',
+                      //   );
+                      //   return;
+                      // }
+                      // AsyncStorage.getItem('personalCopy2Shared').then(
+                      //   personalCopy2Shared => {
+                      //     if (personalCopy2Shared) {
+                      //       props.navigation.navigate('QrScanner', {
+                      //         scanedCode: qrData => {
+                      //           const index = 4;
+                      //           dispatch(checkPDFHealth(qrData, index));
+                      //         },
+                      //       });
+                      //     } else {
+                      //       if (personalCopy2) {
+                      //         setSelectTypeToReshare('copy2');
+                      //         PersonalCopyHistoryBottomSheet.current.snapTo(1);
+                      //       } else {
+                      //         // setSelectedPersonalCopy(item);
+                      //         (PersonalCopy2ShareBottomSheet as any).current.snapTo(
+                      //           1,
+                      //         );
+                      //       }
+                      //     }
+                      //   },
+                      // );
                     } else if (item.type == 'security') {
-                      setTimeout(() => {
-                        setSelectTypeToReshare('security');
-                      }, 2);
-                      if (securityAutoHighlightFlags == 'true') {
-                        SecurityQuestionHistoryBottomSheet.current.snapTo(1);
-                      } else {
-                        SecurityQuestionBottomSheet.current.snapTo(1);
-                      }
+                      props.navigation.navigate("SecurityQuestionHistory", {selectedStatus: item.status, selectedTime: getTime(item.time), selectedTitle: item.title});
+                      // setTimeout(() => {
+                      //   setSelectTypeToReshare('security');
+                      // }, 2);
+                      // if (securityAns) {
+                      //   SecurityQuestionHistoryBottomSheet.current.snapTo(1);// history modal
+                      // } else {
+                      //   SecurityQuestionBottomSheet.current.snapTo(1);// sr modal
+                      // }
                     } else {
                       secondaryDeviceBottomSheet.current.snapTo(1);
                     }
@@ -2089,7 +2109,6 @@ export default function ManageBackup(props) {
                       source={getImageByType(item)}
                     />
                   )}
-
                   <View style={{ marginLeft: 15 }}>
                     <Text style={styles.cardTitleText}>
                       {item.personalInfo &&
