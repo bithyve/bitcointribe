@@ -57,6 +57,11 @@ import GoogleAuthenticatorOTP from '../pages/Accounts/GoogleAuthenticatorOTP';
 import Confirmation from '../pages/Accounts/Confirmation';
 import TwoFASetup from '../pages/Accounts/TwoFASetup';
 import ShareRecoveryOTP from '../pages/Recovery/ShareRecoveryOTP';
+import SecondaryDeviceHistory from '../pages/ManageBackup/SecondaryDeviceHistory';
+import TrustedContactHistory from '../pages/ManageBackup/TrustedContactHistory';
+import PersonalCopyHistory from '../pages/ManageBackup/PersonalCopyHistory';
+import SecurityQuestionHistory from '../pages/ManageBackup/SecurityQuestionHistory';
+
 
 const SetupNavigator = createStackNavigator(
   {
@@ -151,6 +156,10 @@ const HomeNavigator = createStackNavigator(
         gesturesEnabled: false,
       },
     },
+    SecondaryDeviceHistory,
+    TrustedContactHistory,
+    PersonalCopyHistory,
+    SecurityQuestionHistory
   },
   {
     headerLayoutPreset: 'center',
