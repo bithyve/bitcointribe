@@ -179,6 +179,9 @@ const SecondaryDeviceHistory = props => {
             alert('reshare');
             // ReshareBottomSheet.current.snapTo(1);
           }}
+          onPressContinue={() => {
+            (secondaryDeviceBottomSheet as any).current.snapTo(1);
+          }}
         />
       </View>
       <BottomSheet
