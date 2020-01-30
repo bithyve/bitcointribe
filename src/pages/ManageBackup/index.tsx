@@ -1814,7 +1814,7 @@ export default function ManageBackup(props) {
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, position:'relative'}}>
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
@@ -2118,30 +2118,6 @@ export default function ManageBackup(props) {
               </View>
             );
           })}
-          <TouchableOpacity
-            disabled={isNextStepDisable}
-            onPress={() => nextStep()}
-            style={{
-              height: wp('10%'),
-              width: wp('30%'),
-              backgroundColor: Colors.blue,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 5,
-              marginLeft: 'auto',
-              margin: 15,
-            }}
-          >
-            <Text
-              style={{
-                color: Colors.white,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-              }}
-            >
-              Next Step
-            </Text>
-          </TouchableOpacity>
         </ScrollView>
         <BottomSheet
           onCloseStart={() => onPressSecondaryDeviceOk()}
@@ -2338,6 +2314,35 @@ export default function ManageBackup(props) {
           renderContent={renderConfirmContent}
           renderHeader={renderConfirmHeader}
         />
+        <TouchableOpacity
+            disabled={isNextStepDisable}
+            onPress={() => nextStep()}
+            style={{
+              height: wp('10%'),
+              width: wp('30%'),
+              backgroundColor: Colors.blue,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 5,
+              marginLeft: 'auto',
+              margin: 15,
+              position:'absolute',
+              bottom:0,
+              marginBottom:20, 
+              left:wp("65%"),
+              marginRight:20
+            }}
+          >
+            <Text
+              style={{
+                color: Colors.white,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(12),
+              }}
+            >
+              Next Step
+            </Text>
+          </TouchableOpacity>
       </View>
     </View>
   );
