@@ -96,7 +96,6 @@ import { UsNumberFormat } from '../common/utilities';
 // const height = snapPoints[ 0 ]
 
 export default function Home(props) {
-  console.log('HOME RE-RENDER');
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [KnowMoreBottomSheetsFlag, setKnowMoreBottomSheetsFlag] = useState(
     false,
@@ -1503,17 +1502,13 @@ export default function Home(props) {
   //   if (health) setOverallHealth(health);
   // }, [health]);
 
-  // const s3Service = useSelector(state => state.sss.service);
+  const s3Service = useSelector(state => state.sss.service);
   useEffect(() => {
-    // if (s3Service)
-    //if (!s3Service.sss.healthCheckInitialized)
-    dispatch(initHealthCheck());
-  }, []);
+    if (s3Service)
+      if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
+  }, [s3Service]);
 
-  const testAccService = useSelector(
-    state => state.accounts[TEST_ACCOUNT].service,
-  );
-
+  const testAccService = accounts[TEST_ACCOUNT].service;
   useEffect(() => {
     if (testAccService)
       (async () => {
@@ -1538,7 +1533,6 @@ export default function Home(props) {
         } // maintaining a half an hour difference b/w fetches
       }
       const res = await axios.get('https://blockchain.info/ticker');
-      console.log({ res });
       if (res.status == 200) {
         const exchangeRates = res.data;
         exchangeRates.lastFetched = Date.now();

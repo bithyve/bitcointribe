@@ -188,8 +188,12 @@ export default function ManageBackup(props) {
     setRegenerateShareHelperBottomSheet,
   ] = useState(React.createRef());
   const [
-    PersonalCopyShareBottomSheet,
-    setPersonalCopyShareBottomSheet,
+    PersonalCopy1ShareBottomSheet,
+    setPersonalCopy1ShareBottomSheet,
+  ] = useState(React.createRef());
+  const [
+    PersonalCopy2ShareBottomSheet,
+    setPersonalCopy2ShareBottomSheet,
   ] = useState(React.createRef());
   const [
     shareOtpWithTrustedContactBottomSheet,
@@ -329,13 +333,12 @@ export default function ManageBackup(props) {
   }
 
   const onPressSecondaryDeviceOk = async () => {
-    console.log('Executing onPRESS secondary');
     // setTimeout(() => {
     //   setSelectedType('');
     //   setSecondaryDeviceAutoHighlightFlags('true');
     // }, 10);
     setSelectedType('');
-    setSecondaryDeviceAutoHighlightFlags('true');
+    setAutoHighlightFlags({ ...autoHighlightFlags, secondaryDevice: true });
     secondaryDeviceBottomSheet.current.snapTo(0);
   };
 
@@ -443,17 +446,36 @@ export default function ManageBackup(props) {
     );
   }
 
-  const renderPersonalCopyShareModalContent = () => {
+  const renderPersonalCopy1ShareModalContent = () => {
+    const selectedPersonalCopy = {
+      title: 'Personal Copy 1',
+      personalInfo: null,
+      time: 'never',
+      status: 'Ugly',
+      type: 'copy1',
+      route: 'PersonalCopy',
+    };
     return (
       <ModalShareIntent
         removeHighlightingFromCard={removeHighlightingFromCard}
         selectedPersonalCopy={selectedPersonalCopy}
         onPressBack={() => {
-          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
+          (PersonalCopy1ShareBottomSheet as any).current.snapTo(0);
           //setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
         }}
         onPressShare={() => {
-          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
+          // setAutoHighlightFlags({ ...autoHighlightFlags, personalCopy1: true }); // autoHighlightFlags turning up to be null
+          setAutoHighlightFlags({
+            secondaryDevice: true,
+            trustedContact1: true,
+            trustedContact2: true,
+            personalCopy1: true,
+            personalCopy2: false,
+            securityAns: true,
+          });
+
+          (PersonalCopy1ShareBottomSheet as any).current.snapTo(0);
+
           // setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
           // let pdfShared = JSON.parse(await AsyncStorage.getItem('pdfShared'));
           // pdfShared = pdfShared ? pdfShared : {};
@@ -485,11 +507,83 @@ export default function ManageBackup(props) {
     );
   };
 
-  const renderPersonalCopyShareModalHeader = useCallback(() => {
+  const renderPersonalCopy1ShareModalHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
-          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
+          (PersonalCopy1ShareBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderPersonalCopy2ShareModalContent = () => {
+    const selectedPersonalCopy = {
+      title: 'Personal Copy 2',
+      personalInfo: null,
+      time: 'never',
+      status: 'Ugly',
+      type: 'copy2',
+      route: 'PersonalCopy',
+    };
+    return (
+      <ModalShareIntent
+        removeHighlightingFromCard={removeHighlightingFromCard}
+        selectedPersonalCopy={selectedPersonalCopy}
+        onPressBack={() => {
+          (PersonalCopy2ShareBottomSheet as any).current.snapTo(0);
+
+          //setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
+        }}
+        onPressShare={() => {
+          (PersonalCopy2ShareBottomSheet as any).current.snapTo(0);
+          // setAutoHighlightFlags({ ...autoHighlightFlags, personalCopy2: true });
+
+          setAutoHighlightFlags({
+            secondaryDevice: true,
+            trustedContact1: true,
+            trustedContact2: true,
+            personalCopy1: true,
+            personalCopy2: true,
+            securityAns: true,
+          });
+
+          // setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
+          // let pdfShared = JSON.parse(await AsyncStorage.getItem('pdfShared'));
+          // pdfShared = pdfShared ? pdfShared : {};
+          // const updatedPDFShared = {
+          //   ...pdfShared,
+          //   [type == 'copy2' ? 4 : 3]: true,
+          // };
+          // await AsyncStorage.setItem(
+          //   'pdfShared',
+          //   JSON.stringify({
+          //     ...updatedPDFShared,
+          //   }),
+          // );
+
+          // if (
+          //   arrModalShareIntent.item &&
+          //   arrModalShareIntent.item.type == 'copy1'
+          // ) {
+          //   AsyncStorage.setItem('personalCopy1AutoHighlightFlags', 'true');
+          // } else if (
+          //   arrModalShareIntent.item &&
+          //   arrModalShareIntent.item.type == 'copy2'
+          // ) {
+          //   AsyncStorage.setItem('personalCopy2AutoHighlightFlags', 'true');
+          // }
+          // setSelectedType('');
+        }}
+      />
+    );
+  };
+
+  const renderPersonalCopy2ShareModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (PersonalCopy2ShareBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -534,40 +628,49 @@ export default function ManageBackup(props) {
         setChosenContactIndex(2);
       }, 2);
     }
+    // console.log({ contacts });
     if (contacts.length == 2) {
       if (!pageData[1].isOTPShared) {
         pageData[1].isOTPShared = true;
-        setTimeout(() => {
-          setContact1AutoHighlightFlags('true');
-        }, 2);
+        // setTimeout(() => {
+        //   setContact1AutoHighlightFlags('true');
+        // }, 2);
         CommunicationModeBottomSheet.current.snapTo(1);
-        await AsyncStorage.setItem('contact1AutoHighlightFlags', 'true');
+        // await AsyncStorage.setItem('contact1AutoHighlightFlags', 'true');
+        setAutoHighlightFlags({ ...autoHighlightFlags, trustedContact1: true });
       } else if (!pageData[2].isOTPShared) {
         pageData[2].isOTPShared = true;
-        setTimeout(() => {
-          setContact2AutoHighlightFlags('true');
-        }, 2);
-        await AsyncStorage.setItem('contact2AutoHighlightFlags', 'true');
+        // setTimeout(() => {
+        //   setContact2AutoHighlightFlags('true');
+        // }, 2);
+        // await AsyncStorage.setItem('contact2AutoHighlightFlags', 'true');
+        setAutoHighlightFlags({ ...autoHighlightFlags, trustedContact2: true });
       }
     } else {
       if (index == 1) {
         pageData[1].isOTPShared = true;
-        setTimeout(() => {
-          setContact1AutoHighlightFlags('true');
-        }, 2);
-        await AsyncStorage.setItem('contact1AutoHighlightFlags', 'true');
+        // setTimeout(() => {
+        //   setContact1AutoHighlightFlags('true');
+        // }, 2);
+        // await AsyncStorage.setItem('contact1AutoHighlightFlags', 'true');
+        setAutoHighlightFlags({ ...autoHighlightFlags, trustedContact1: true });
       } else if (index == 2) {
         pageData[2].isOTPShared = true;
-        setTimeout(() => {
-          setContact2AutoHighlightFlags('true');
-        }, 2);
-        await AsyncStorage.setItem('contact2AutoHighlightFlags', 'true');
+        // setTimeout(() => {
+        //   setContact2AutoHighlightFlags('true');
+        // }, 2);
+        // await AsyncStorage.setItem('contact2AutoHighlightFlags', 'true');
+
+        setAutoHighlightFlags({ ...autoHighlightFlags, trustedContact2: true });
       }
     }
-    setTimeout(() => {
-      setSelectedType('');
-      setPageData(pageData);
-    }, 10);
+    // setTimeout(() => {
+    //   setSelectedType('');
+    //   setPageData(pageData);
+    // }, 10);
+    setSelectedType('');
+    setPageData(pageData);
+    shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
   };
 
   const renderWalletBackupAndRecoveryContents = () => {
@@ -927,10 +1030,10 @@ export default function ManageBackup(props) {
       TrustedContactHistoryBottomSheet.current.snapTo(0);
     } else if (SelectTypeToReshare == 'copy1') {
       PersonalCopyHistoryBottomSheet.current.snapTo(0);
-      (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+      (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
     } else if (SelectTypeToReshare == 'copy2') {
       PersonalCopyHistoryBottomSheet.current.snapTo(0);
-      (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+      (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
     } else if (SelectTypeToReshare == 'security') {
       SecurityQuestionBottomSheet.current.snapTo(1);
       SecurityQuestionHistoryBottomSheet.current.snapTo(0);
@@ -1113,7 +1216,7 @@ export default function ManageBackup(props) {
 
   const autoHighlight = async () => {
     const {
-      secondary,
+      secondaryDevice,
       trustedContact1,
       trustedContact2,
       personalCopy1,
@@ -1121,17 +1224,20 @@ export default function ManageBackup(props) {
       securityAns,
     } = autoHighlightFlags;
 
-    if (secondary != 'true') {
+    console.log('At AutoHighlight');
+    console.log({ autoHighlightFlags });
+
+    if (!secondaryDevice) {
       setSelectedType('secondaryDevice');
-    } else if (trustedContact1 != 'true') {
+    } else if (!trustedContact1) {
       setSelectedType('contact1');
-    } else if (trustedContact2 != 'true') {
+    } else if (!trustedContact2) {
       setSelectedType('contact2');
-    } else if (personalCopy1 != 'true') {
+    } else if (!personalCopy1) {
       setSelectedType('copy1');
-    } else if (personalCopy2 != 'true') {
+    } else if (!personalCopy2) {
       setSelectedType('copy2');
-    } else if (securityAns != 'true') {
+    } else if (!securityAns) {
       setSelectedType('security');
     } else {
       if (overallHealth) {
@@ -1164,6 +1270,8 @@ export default function ManageBackup(props) {
     }
   };
 
+  // console.log({ selectedType });
+
   useEffect(() => {
     // Auto-Highlight
     (async () => {
@@ -1177,7 +1285,7 @@ export default function ManageBackup(props) {
           trustedContact2: false,
           personalCopy1: false,
           personalCopy2: false,
-          securityAns: false,
+          securityAns: true, // due to auto-health (during initialization)
         };
         setAutoHighlightFlags(autoHighlightFlags);
         await AsyncStorage.setItem(
@@ -1218,7 +1326,6 @@ export default function ManageBackup(props) {
     }
   }, [autoHighlightFlags]);
 
-  console.log({ autoHighlightFlags });
   // const setSetupFlowAsync = async () => {
   //   let secondaryDeviceAutoHighlightFlags = await AsyncStorage.getItem(
   //     'secondaryDeviceAutoHighlightFlags',
@@ -1257,13 +1364,13 @@ export default function ManageBackup(props) {
   // };
 
   useEffect(() => {
-    (async () => {
-      // await setSetupFlowAsync();
-      // console.log('Executing autoHighlight');
-      // autoHighlightOptions();
-    })();
+    // (async () => {
+    //   await setSetupFlowAsync();
+    //   console.log('Executing autoHighlight');
+    //   autoHighlightOptions();
+    // })();
 
-    getOverAllHealth();
+    // getOverAllHealth();
     // HC down-streaming
     if (s3Service) {
       const { healthCheckInitialized } = s3Service.sss;
@@ -1276,12 +1383,12 @@ export default function ManageBackup(props) {
     checkNShowHelperModal();
   }, []);
 
-  const getOverAllHealth = async () => {
-    const storedHealth = await AsyncStorage.getItem('overallHealth');
-    if (storedHealth) {
-      setOverallHealth(JSON.parse(storedHealth));
-    }
-  };
+  // const getOverAllHealth = async () => {
+  //   const storedHealth = await AsyncStorage.getItem('overallHealth');
+  //   if (storedHealth) {
+  //     setOverallHealth(JSON.parse(storedHealth));
+  //   }
+  // };
 
   useEffect(() => {
     if (health) setOverallHealth(health);
@@ -1349,15 +1456,15 @@ export default function ManageBackup(props) {
       await AsyncStorage.getItem('SelectedContacts'),
     );
     setContacts(contactList);
-    console.log('----Auto Highlightt Option----');
-    console.log({
-      secondaryDeviceAutoHighlightFlags,
-      contact1AutoHighlightFlags,
-      contact2AutoHighlightFlags,
-      personalCopy1AutoHighlightFlags,
-      personalCopy2AutoHighlightFlags,
-      securityAutoHighlightFlags,
-    });
+    // console.log('----Auto Highlightt Option----');
+    // console.log({
+    //   secondaryDeviceAutoHighlightFlags,
+    //   contact1AutoHighlightFlags,
+    //   contact2AutoHighlightFlags,
+    //   personalCopy1AutoHighlightFlags,
+    //   personalCopy2AutoHighlightFlags,
+    //   securityAutoHighlightFlags,
+    // });
     if (secondaryDeviceAutoHighlightFlags != 'true') {
       setSelectedType('secondaryDevice');
     } else if (contact1AutoHighlightFlags != 'true') {
@@ -1428,9 +1535,9 @@ export default function ManageBackup(props) {
       }, 10);
       trustedContactsBottomSheet.current.snapTo(1);
     } else if (personalCopy1AutoHighlightFlags != 'true') {
-      (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+      (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
     } else if (personalCopy2AutoHighlightFlags != 'true') {
-      (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+      (PersonalCopy2ShareBottomSheet as any).current.snapTo(1);
     } else if (securityAutoHighlightFlags != 'true') {
       SecurityQuestionBottomSheet.current.snapTo(1);
     } else {
@@ -1719,12 +1826,15 @@ export default function ManageBackup(props) {
                               },
                             });
                           } else {
+                            // setTimeout(() => {
+                            //   setSelectTypeToReshare('copy1');
+                            // }, 10);
                             if (personalCopy1AutoHighlightFlags == 'true') {
                               setSelectTypeToReshare('copy1');
                               PersonalCopyHistoryBottomSheet.current.snapTo(1);
                             } else {
-                              setSelectedPersonalCopy(item);
-                              (PersonalCopyShareBottomSheet as any).current.snapTo(
+                              // setSelectedPersonalCopy(item);
+                              (PersonalCopy1ShareBottomSheet as any).current.snapTo(
                                 1,
                               );
                             }
@@ -1753,8 +1863,8 @@ export default function ManageBackup(props) {
                               setSelectTypeToReshare('copy2');
                               PersonalCopyHistoryBottomSheet.current.snapTo(1);
                             } else {
-                              setSelectedPersonalCopy(item);
-                              (PersonalCopyShareBottomSheet as any).current.snapTo(
+                              // setSelectedPersonalCopy(item);
+                              (PersonalCopy2ShareBottomSheet as any).current.snapTo(
                                 1,
                               );
                             }
@@ -1937,10 +2047,17 @@ export default function ManageBackup(props) {
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={PersonalCopyShareBottomSheet}
+          ref={PersonalCopy1ShareBottomSheet}
           snapPoints={[-50, hp('95%')]}
-          renderContent={renderPersonalCopyShareModalContent}
-          renderHeader={renderPersonalCopyShareModalHeader}
+          renderContent={renderPersonalCopy1ShareModalContent}
+          renderHeader={renderPersonalCopy1ShareModalHeader}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={PersonalCopy2ShareBottomSheet}
+          snapPoints={[-50, hp('95%')]}
+          renderContent={renderPersonalCopy2ShareModalContent}
+          renderHeader={renderPersonalCopy2ShareModalHeader}
         />
         <BottomSheet
           enabledInnerScrolling={true}

@@ -86,54 +86,56 @@ export default function ModalShareIntent(props) {
   const onShare = async item => {
     // TODO: Remove Hack: Avoiding state mix on ManageBackup due to multiple modals
 
-    if (props.selectedPersonalCopy.type === 'copy1') {
-      const personalCopy1Shared = await AsyncStorage.getItem(
-        'personalCopy1Shared',
-      );
+    // if (props.selectedPersonalCopy.type === 'copy1') {
+    //   const personalCopy1Shared = await AsyncStorage.getItem(
+    //     'personalCopy1Shared',
+    //   );
 
-      if (personalCopy1Shared) {
-        console.log('Dispatching alternate: copy2');
+    //   if (personalCopy1Shared) {
+    //     console.log('Dispatching alternate: copy2');
 
-        dispatch(
-          requestSharePdf(item.type, {
-            title: 'Personal Copy 2',
-            personalInfo: null,
-            time: 'never',
-            status: 'Ugly',
-            type: 'copy2',
-            route: 'PersonalCopy',
-          }),
-        );
-      } else {
-        dispatch(requestSharePdf(item.type, props.selectedPersonalCopy));
-      }
-    } else if (props.selectedPersonalCopy.type === 'copy2') {
-      const personalCopy2Shared = await AsyncStorage.getItem(
-        'personalCopy2Shared',
-      );
-      if (personalCopy2Shared) {
-        console.log('Dispatching alternate: copy1');
-        dispatch(
-          requestSharePdf(item.type, {
-            title: 'Personal Copy 1',
-            personalInfo: null,
-            time: 'never',
-            status: 'Ugly',
-            type: 'copy1',
-            route: 'PersonalCopy',
-          }),
-        );
-      } else {
-        dispatch(requestSharePdf(item.type, props.selectedPersonalCopy));
-      }
-    }
+    //     dispatch(
+    //       requestSharePdf(item.type, {
+    //         title: 'Personal Copy 2',
+    //         personalInfo: null,
+    //         time: 'never',
+    //         status: 'Ugly',
+    //         type: 'copy2',
+    //         route: 'PersonalCopy',
+    //       }),
+    //     );
+    //   } else {
+    //     dispatch(requestSharePdf(item.type, props.selectedPersonalCopy));
+    //   }
+    // } else if (props.selectedPersonalCopy.type === 'copy2') {
+    //   const personalCopy2Shared = await AsyncStorage.getItem(
+    //     'personalCopy2Shared',
+    //   );
+    //   if (personalCopy2Shared) {
+    //     console.log('Dispatching alternate: copy1');
+    //     dispatch(
+    //       requestSharePdf(item.type, {
+    //         title: 'Personal Copy 1',
+    //         personalInfo: null,
+    //         time: 'never',
+    //         status: 'Ugly',
+    //         type: 'copy1',
+    //         route: 'PersonalCopy',
+    //       }),
+    //     );
+    //   } else {
+    //     dispatch(requestSharePdf(item.type, props.selectedPersonalCopy));
+    //   }
+    // }
+
+    dispatch(requestSharePdf(item.type, props.selectedPersonalCopy));
+    props.onPressShare();
 
     // if (props.selectedPersonalCopy.type === 'copy1') {
     //   await AsyncStorage.setItem('personalCopy1Shared', 'true');
     // } else if (props.selectedPersonalCopy.type === 'copy2') {
     //   await AsyncStorage.setItem('personalCopy2Shared', 'true');
     // }
-    props.onPressShare();
     // let personalCopyCounter = await AsyncStorage.getItem('personalCopyCounter');
     // if (personalCopyCounter && personalCopyCounter == '1') {
     //   await AsyncStorage.setItem('personalCopyCounter', '2');
