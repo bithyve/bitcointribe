@@ -165,9 +165,9 @@ export default function ManageBackup(props) {
     WalletBackupAndRecoveryBottomSheet,
     setWalletBackupAndRecoveryBottomSheet,
   ] = useState(React.createRef());
-  const [secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet] = useState(
-    React.createRef(),
-  );
+  // const [secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet] = useState(
+  //   React.createRef(),
+  // );
   const [trustedContactsBottomSheet, setTrustedContactsBottomSheet] = useState(
     React.createRef(),
   );
@@ -311,36 +311,36 @@ export default function ManageBackup(props) {
     }
   };
 
-  const renderSecondaryDeviceContents = () => {
-    return (
-      <SecondaryDevice
-        onPressOk={() => onPressSecondaryDeviceOk()}
-        onPressBack={() => {
-          onPressSecondaryDeviceOk();
-        }}
-      />
-    );
-  };
+  // const renderSecondaryDeviceContents = () => {
+  //   return (
+  //     <SecondaryDevice
+  //       onPressOk={() => {
+  //         setAutoHighlightFlags({
+  //           ...autoHighlightFlags,
+  //           secondaryDevice: true,
+  //         });
+  //         secondaryDeviceBottomSheet.current.snapTo(0);
+  //       }}
+  //       onPressBack={() => {
+  //         setAutoHighlightFlags({
+  //           ...autoHighlightFlags,
+  //           secondaryDevice: true,
+  //         });
+  //         secondaryDeviceBottomSheet.current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // };
 
-  function renderSecondaryDeviceHeader() {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (secondaryDeviceBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }
-
-  const onPressSecondaryDeviceOk = async () => {
-    // setTimeout(() => {
-    //   setSelectedType('');
-    //   setSecondaryDeviceAutoHighlightFlags('true');
-    // }, 10);
-    setSelectedType('');
-    setAutoHighlightFlags({ ...autoHighlightFlags, secondaryDevice: true });
-    secondaryDeviceBottomSheet.current.snapTo(0);
-  };
+  // function renderSecondaryDeviceHeader() {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         (secondaryDeviceBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }
 
   function renderTrustedContactsContent() {
     return (
@@ -1012,7 +1012,7 @@ export default function ManageBackup(props) {
       setIsReshare(true);
     }, 2);
     if (SelectTypeToReshare == 'secondaryDevice') {
-      secondaryDeviceBottomSheet.current.snapTo(1);
+      // secondaryDeviceBottomSheet.current.snapTo(1);
       SecondaryDeviceHistoryBottomSheet.current.snapTo(0);
     } else if (SelectTypeToReshare == 'contact1') {
       setTimeout(() => {
@@ -1213,12 +1213,13 @@ export default function ManageBackup(props) {
   };
 
   const [autoHighlightFlags, setAutoHighlightFlags] = useState({
-    secondaryDevice:false,
-    trustedContact1:false,
-    trustedContact2:false,
-    personalCopy1:false,
-    personalCopy2:false,
-    securityAns:false});
+    secondaryDevice: false,
+    trustedContact1: false,
+    trustedContact2: false,
+    personalCopy1: false,
+    personalCopy2: false,
+    securityAns: false,
+  });
 
   const autoHighlight = async () => {
     const {
@@ -1647,7 +1648,19 @@ export default function ManageBackup(props) {
     } = autoHighlightFlags;
 
     if (!secondaryDevice) {
-      secondaryDeviceBottomSheet.current.snapTo(1);
+      const data = pageData[0];
+      // secondaryDeviceBottomSheet.current.snapTo(1);
+      props.navigation.navigate('SecondaryDeviceHistory', {
+        selectedStatus: data.status,
+        selectedTime: getTime(data.time),
+        selectedTitle: data.title,
+        updateAutoHighlightFlags: () =>
+          setAutoHighlightFlags({
+            ...autoHighlightFlags,
+            secondaryDevice: true,
+          }),
+        next: 'true',
+      });
     } else if (!trustedContact1) {
       setTimeout(() => {
         setLoadContacts(true);
@@ -1671,7 +1684,7 @@ export default function ManageBackup(props) {
         if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
           // Secondary device
           // ConfirmBottomSheet.current.snapTo(1);
-          secondaryDeviceBottomSheet.current.snapTo(1);
+          // secondaryDeviceBottomSheet.current.snapTo(1);
         } else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
           setSelectedTime(getTime(pageData[1].time));
           setSelectedStatus(pageData[1].status);
@@ -1723,7 +1736,7 @@ export default function ManageBackup(props) {
         } else if (overallHealth.sharesInfo[0].shareStage === 'Bad') {
           // Secondary device
           // SecondaryDeviceHistoryBottomSheet.current.snapTo(1);
-          secondaryDeviceBottomSheet.current.snapTo(1);
+          // secondaryDeviceBottomSheet.current.snapTo(1);
         } else if (overallHealth.sharesInfo[1].shareStage === 'Bad') {
           setSelectedTime(getTime(pageData[1].time));
           setSelectedStatus(pageData[1].status);
@@ -1820,7 +1833,7 @@ export default function ManageBackup(props) {
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={{ flex: 1, position:'relative'}}>
+      <View style={{ flex: 1, position: 'relative' }}>
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
@@ -1928,7 +1941,16 @@ export default function ManageBackup(props) {
                     setSelectedTime(getTime(item.time));
                     setSelectedStatus(item.status);
                     if (item.type == 'secondaryDevice') {
-                      props.navigation.navigate("SecondaryDeviceHistory", {selectedStatus: item.status, selectedTime: getTime(item.time), selectedTitle: item.title});
+                      props.navigation.navigate('SecondaryDeviceHistory', {
+                        selectedStatus: item.status,
+                        selectedTime: getTime(item.time),
+                        selectedTitle: item.title,
+                        updateAutoHighlightFlags: () =>
+                          setAutoHighlightFlags({
+                            ...autoHighlightFlags,
+                            secondaryDevice: true,
+                          }),
+                      });
                       // setTimeout(() => {
                       //   setSelectTypeToReshare('secondaryDevice');
                       // }, 10);
@@ -1938,7 +1960,11 @@ export default function ManageBackup(props) {
                       //   secondaryDeviceBottomSheet.current.snapTo(1);
                       // }
                     } else if (item.type == 'contact1') {
-                      props.navigation.navigate("TrustedContactHistory", {selectedStatus: item.status, selectedTime: getTime(item.time), selectedTitle: item.title});
+                      props.navigation.navigate('TrustedContactHistory', {
+                        selectedStatus: item.status,
+                        selectedTime: getTime(item.time),
+                        selectedTitle: item.title,
+                      });
                       // setLoadOnTrustedContactBottomSheet(true);
                       // setTimeout(() => {
                       //   setSelectTypeToReshare('contact1');
@@ -1956,7 +1982,11 @@ export default function ManageBackup(props) {
                       //   trustedContactsBottomSheet.current.snapTo(1);
                       // }
                     } else if (item.type == 'contact2') {
-                      props.navigation.navigate("TrustedContactHistory", {selectedStatus: item.status, selectedTime: getTime(item.time), selectedTitle: item.title});
+                      props.navigation.navigate('TrustedContactHistory', {
+                        selectedStatus: item.status,
+                        selectedTime: getTime(item.time),
+                        selectedTitle: item.title,
+                      });
                       // setTimeout(() => {
                       //   setSelectTypeToReshare('contact2');
                       // }, 10);
@@ -1974,7 +2004,11 @@ export default function ManageBackup(props) {
                       //   setLoadOnTrustedContactBottomSheet(true);
                       // }
                     } else if (item.type === 'copy1') {
-                      props.navigation.navigate("PersonalCopyHistory", {selectedStatus: item.status, selectedTime: getTime(item.time), selectedTitle: item.title});
+                      props.navigation.navigate('PersonalCopyHistory', {
+                        selectedStatus: item.status,
+                        selectedTime: getTime(item.time),
+                        selectedTitle: item.title,
+                      });
                       // if (!databaseSSS && !databaseSSS.pdfDetails) {
                       //   Alert.alert(
                       //     'Generating Personal Copy',
@@ -2008,7 +2042,11 @@ export default function ManageBackup(props) {
                       //   },
                       // );
                     } else if (item.type == 'copy2') {
-                      props.navigation.navigate("PersonalCopyHistory", {selectedStatus: item.status, selectedTime: getTime(item.time), selectedTitle: item.title});
+                      props.navigation.navigate('PersonalCopyHistory', {
+                        selectedStatus: item.status,
+                        selectedTime: getTime(item.time),
+                        selectedTitle: item.title,
+                      });
                       // if (!databaseSSS && !databaseSSS.pdfDetails) {
                       //   Alert.alert(
                       //     'Generating Personal Copy',
@@ -2039,7 +2077,11 @@ export default function ManageBackup(props) {
                       //   },
                       // );
                     } else if (item.type == 'security') {
-                      props.navigation.navigate("SecurityQuestionHistory", {selectedStatus: item.status, selectedTime: getTime(item.time), selectedTitle: item.title});
+                      props.navigation.navigate('SecurityQuestionHistory', {
+                        selectedStatus: item.status,
+                        selectedTime: getTime(item.time),
+                        selectedTitle: item.title,
+                      });
                       // setTimeout(() => {
                       //   setSelectTypeToReshare('security');
                       // }, 2);
@@ -2048,9 +2090,10 @@ export default function ManageBackup(props) {
                       // } else {
                       //   SecurityQuestionBottomSheet.current.snapTo(1);// sr modal
                       // }
-                    } else {
-                      secondaryDeviceBottomSheet.current.snapTo(1);
                     }
+                    // else {
+                    //   secondaryDeviceBottomSheet.current.snapTo(1);
+                    // }
                   }}
                   style={{
                     ...styles.manageBackupCard,
@@ -2138,14 +2181,14 @@ export default function ManageBackup(props) {
             );
           })}
         </ScrollView>
-        <BottomSheet
+        {/* <BottomSheet
           onCloseStart={() => onPressSecondaryDeviceOk()}
           enabledInnerScrolling={true}
           ref={secondaryDeviceBottomSheet}
           snapPoints={[-30, hp('90%')]}
           renderContent={renderSecondaryDeviceContents}
           renderHeader={renderSecondaryDeviceHeader}
-        />
+        /> */}
         <BottomSheet
           enabledInnerScrolling={true}
           ref={trustedContactsBottomSheet}
@@ -2334,34 +2377,34 @@ export default function ManageBackup(props) {
           renderHeader={renderConfirmHeader}
         />
         <TouchableOpacity
-            disabled={isNextStepDisable}
-            onPress={() => nextStep()}
+          disabled={isNextStepDisable}
+          onPress={() => nextStep()}
+          style={{
+            height: wp('10%'),
+            width: wp('30%'),
+            backgroundColor: Colors.blue,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 5,
+            marginLeft: 'auto',
+            margin: 15,
+            position: 'absolute',
+            bottom: 0,
+            marginBottom: 20,
+            left: wp('65%'),
+            marginRight: 20,
+          }}
+        >
+          <Text
             style={{
-              height: wp('10%'),
-              width: wp('30%'),
-              backgroundColor: Colors.blue,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 5,
-              marginLeft: 'auto',
-              margin: 15,
-              position:'absolute',
-              bottom:0,
-              marginBottom:20, 
-              left:wp("65%"),
-              marginRight:20
+              color: Colors.white,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(12),
             }}
           >
-            <Text
-              style={{
-                color: Colors.white,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-              }}
-            >
-              Next Step
-            </Text>
-          </TouchableOpacity>
+            Next Step
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
