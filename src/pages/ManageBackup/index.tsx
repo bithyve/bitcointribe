@@ -63,7 +63,7 @@ export default function ManageBackup(props) {
   const [IsReshare, setIsReshare] = useState(false);
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('Ugly');
-  const [isNextStepDisable, setIsNextStepDisable] = useState(true);
+  const [isNextStepDisable, setIsNextStepDisable] = useState(false);
   const [LoadCamera, setLoadCamera] = useState(false);
   const [LoadContacts, setLoadContacts] = useState(false);
   const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
@@ -1323,6 +1323,10 @@ export default function ManageBackup(props) {
   useEffect(() => {
     if (autoHighlightFlags) {
       autoHighlight();
+      AsyncStorage.setItem(
+        'AutoHighlightFlags',
+        JSON.stringify(autoHighlightFlags),
+      );
     }
   }, [autoHighlightFlags]);
 
@@ -1519,44 +1523,171 @@ export default function ManageBackup(props) {
     setPageData(pageData);
   };
 
+  // const nextStep = async () => {
+  //   if (secondaryDeviceAutoHighlightFlags != 'true') {
+  //     secondaryDeviceBottomSheet.current.snapTo(1);
+  //   } else if (contact1AutoHighlightFlags != 'true') {
+  //     setTimeout(() => {
+  //       setLoadContacts(true);
+  //       setLoadOnTrustedContactBottomSheet(true);
+  //     }, 10);
+  //     trustedContactsBottomSheet.current.snapTo(1);
+  //   } else if (contact2AutoHighlightFlags != 'true') {
+  //     setTimeout(() => {
+  //       setLoadContacts(true);
+  //       setLoadOnTrustedContactBottomSheet(true);
+  //     }, 10);
+  //     trustedContactsBottomSheet.current.snapTo(1);
+  //   } else if (personalCopy1AutoHighlightFlags != 'true') {
+  //     (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+  //   } else if (personalCopy2AutoHighlightFlags != 'true') {
+  //     (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+  //   } else if (securityAutoHighlightFlags != 'true') {
+  //     SecurityQuestionBottomSheet.current.snapTo(1);
+  //   }
+  //   else {
+  //     if (overallHealth) {
+  //       if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
+  //         // Secondary device
+  //         ConfirmBottomSheet.current.snapTo(1);
+  //       }
+  //       else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
+  //         setSelectedTime(getTime(pageData[1].time));
+  //         setSelectedStatus(pageData[1].status);
+  //         setSelectTypeToReshare('contact1');
+  //         //Trusted contact 1
+  //         ConfirmBottomSheet.current.snapTo(1);
+  //       } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
+  //         setSelectedTime(getTime(pageData[2].time));
+  //         setSelectedStatus(pageData[2].status);
+  //         setSelectTypeToReshare('contact2');
+  //         //Trusted contact 2
+  //         ConfirmBottomSheet.current.snapTo(1);
+  //       } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
+  //         setSelectedTime(getTime(pageData[3].time));
+  //         setSelectedStatus(pageData[3].status);
+  //         setSelectTypeToReshare('copy1');
+  //         //personal copy 1
+  //         setTimeout(() => {
+  //           setLoadCamera(true);
+  //         }, 2);
+  //         ConfirmBottomSheet.current.snapTo(1);
+  //       } else if (overallHealth.sharesInfo[4].shareStage === 'Ugly') {
+  //         setSelectedTime(getTime(pageData[4].time));
+  //         setSelectedStatus(pageData[4].status);
+  //         setSelectTypeToReshare('copy2');
+  //         //personal copy 2
+  //         setTimeout(() => {
+  //           setLoadCamera(true);
+  //         }, 2);
+  //         ConfirmBottomSheet.current.snapTo(1);
+  //       } else if (overallHealth.qaStatus.stage === 'Ugly') {
+  //         setSelectedTime(getTime(pageData[5].time));
+  //         setSelectedStatus(pageData[5].status);
+  //         setSelectTypeToReshare('security');
+  //         // Security question
+  //         SecurityQuestionBottomSheet.current.snapTo(1);
+  //       } else if (overallHealth.sharesInfo[0].shareStage === 'Bad') {
+  //         // Secondary device
+  //         SecondaryDeviceHistoryBottomSheet.current.snapTo(1);
+  //       } else if (overallHealth.sharesInfo[1].shareStage === 'Bad') {
+  //         setSelectedTime(getTime(pageData[1].time));
+  //         setSelectedStatus(pageData[1].status);
+  //         setSelectTypeToReshare('contact1');
+  //         //Trusted contact 1
+  //         ConfirmBottomSheet.current.snapTo(1);
+  //       } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
+  //         setSelectedTime(getTime(pageData[2].time));
+  //         setSelectedStatus(pageData[2].status);
+  //         setSelectTypeToReshare('contact2');
+  //         //Trusted contact 2
+  //         ConfirmBottomSheet.current.snapTo(1);
+  //       } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
+  //         setSelectedTime(getTime(pageData[3].time));
+  //         setSelectedStatus(pageData[3].status);
+  //         setSelectTypeToReshare('copy1');
+  //         //personal copy 1
+  //         setTimeout(() => {
+  //           setLoadCamera(true);
+  //         }, 2);
+  //         ConfirmBottomSheet.current.snapTo(1);
+  //       }
+  //       else if (overallHealth.sharesInfo[4].shareStage === 'Ugly') {
+  //         setSelectedTime(getTime(pageData[4].time));
+  //         setSelectedStatus(pageData[4].status);
+  //         setSelectTypeToReshare('copy2');
+  //         //personal copy 2
+  //         setTimeout(() => {
+  //           setLoadCamera(true);
+  //         }, 2);
+  //         ConfirmBottomSheet.current.snapTo(1);
+  //       }
+  //       else if (overallHealth.qaStatus.stage === 'Bad') {
+  //         // Security question
+  //         SecurityQuestionBottomSheet.current.snapTo(1);
+  //       }
+  //     }
+  //   }
+  // };
+
   const nextStep = async () => {
-    if (secondaryDeviceAutoHighlightFlags != 'true') {
+    const {
+      secondaryDevice,
+      trustedContact1,
+      trustedContact2,
+      personalCopy1,
+      personalCopy2,
+      securityAns,
+    } = autoHighlightFlags;
+
+    if (!secondaryDevice) {
       secondaryDeviceBottomSheet.current.snapTo(1);
-    } else if (contact1AutoHighlightFlags != 'true') {
+    } else if (!trustedContact1) {
       setTimeout(() => {
         setLoadContacts(true);
         setLoadOnTrustedContactBottomSheet(true);
       }, 10);
       trustedContactsBottomSheet.current.snapTo(1);
-    } else if (contact2AutoHighlightFlags != 'true') {
+    } else if (!trustedContact2) {
       setTimeout(() => {
         setLoadContacts(true);
         setLoadOnTrustedContactBottomSheet(true);
       }, 10);
       trustedContactsBottomSheet.current.snapTo(1);
-    } else if (personalCopy1AutoHighlightFlags != 'true') {
+    } else if (!personalCopy1) {
       (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
-    } else if (personalCopy2AutoHighlightFlags != 'true') {
+    } else if (!personalCopy2) {
       (PersonalCopy2ShareBottomSheet as any).current.snapTo(1);
-    } else if (securityAutoHighlightFlags != 'true') {
+    } else if (!securityAns) {
       SecurityQuestionBottomSheet.current.snapTo(1);
     } else {
       if (overallHealth) {
         if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
           // Secondary device
-          ConfirmBottomSheet.current.snapTo(1);
+          // ConfirmBottomSheet.current.snapTo(1);
+          secondaryDeviceBottomSheet.current.snapTo(1);
         } else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
           setSelectedTime(getTime(pageData[1].time));
           setSelectedStatus(pageData[1].status);
           setSelectTypeToReshare('contact1');
           //Trusted contact 1
-          ConfirmBottomSheet.current.snapTo(1);
+          // ConfirmBottomSheet.current.snapTo(1);
+          setTimeout(() => {
+            setLoadContacts(true);
+            setLoadOnTrustedContactBottomSheet(true);
+          }, 10);
+          trustedContactsBottomSheet.current.snapTo(1);
         } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
           setSelectedTime(getTime(pageData[2].time));
           setSelectedStatus(pageData[2].status);
           setSelectTypeToReshare('contact2');
           //Trusted contact 2
-          ConfirmBottomSheet.current.snapTo(1);
+          // ConfirmBottomSheet.current.snapTo(1);
+          setTimeout(() => {
+            setLoadContacts(true);
+            setLoadOnTrustedContactBottomSheet(true);
+          }, 10);
+          trustedContactsBottomSheet.current.snapTo(1);
         } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
           setSelectedTime(getTime(pageData[3].time));
           setSelectedStatus(pageData[3].status);
@@ -1565,7 +1696,8 @@ export default function ManageBackup(props) {
           setTimeout(() => {
             setLoadCamera(true);
           }, 2);
-          ConfirmBottomSheet.current.snapTo(1);
+          // ConfirmBottomSheet.current.snapTo(1);
+          (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
         } else if (overallHealth.sharesInfo[4].shareStage === 'Ugly') {
           setSelectedTime(getTime(pageData[4].time));
           setSelectedStatus(pageData[4].status);
@@ -1574,7 +1706,8 @@ export default function ManageBackup(props) {
           setTimeout(() => {
             setLoadCamera(true);
           }, 2);
-          ConfirmBottomSheet.current.snapTo(1);
+          // ConfirmBottomSheet.current.snapTo(1);
+          (PersonalCopy2ShareBottomSheet as any).current.snapTo(1);
         } else if (overallHealth.qaStatus.stage === 'Ugly') {
           setSelectedTime(getTime(pageData[5].time));
           setSelectedStatus(pageData[5].status);
@@ -1583,20 +1716,33 @@ export default function ManageBackup(props) {
           SecurityQuestionBottomSheet.current.snapTo(1);
         } else if (overallHealth.sharesInfo[0].shareStage === 'Bad') {
           // Secondary device
-          SecondaryDeviceHistoryBottomSheet.current.snapTo(1);
+          // SecondaryDeviceHistoryBottomSheet.current.snapTo(1);
+          secondaryDeviceBottomSheet.current.snapTo(1);
         } else if (overallHealth.sharesInfo[1].shareStage === 'Bad') {
           setSelectedTime(getTime(pageData[1].time));
           setSelectedStatus(pageData[1].status);
           setSelectTypeToReshare('contact1');
           //Trusted contact 1
-          ConfirmBottomSheet.current.snapTo(1);
+          // ConfirmBottomSheet.current.snapTo(1);
+
+          setTimeout(() => {
+            setLoadContacts(true);
+            setLoadOnTrustedContactBottomSheet(true);
+          }, 10);
+          trustedContactsBottomSheet.current.snapTo(1);
         } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
           setSelectedTime(getTime(pageData[2].time));
           setSelectedStatus(pageData[2].status);
           setSelectTypeToReshare('contact2');
           //Trusted contact 2
-          ConfirmBottomSheet.current.snapTo(1);
-        } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
+          // ConfirmBottomSheet.current.snapTo(1);
+
+          setTimeout(() => {
+            setLoadContacts(true);
+            setLoadOnTrustedContactBottomSheet(true);
+          }, 10);
+          trustedContactsBottomSheet.current.snapTo(1);
+        } else if (overallHealth.sharesInfo[3].shareStage === 'Bad') {
           setSelectedTime(getTime(pageData[3].time));
           setSelectedStatus(pageData[3].status);
           setSelectTypeToReshare('copy1');
@@ -1604,8 +1750,9 @@ export default function ManageBackup(props) {
           setTimeout(() => {
             setLoadCamera(true);
           }, 2);
-          ConfirmBottomSheet.current.snapTo(1);
-        } else if (overallHealth.sharesInfo[4].shareStage === 'Ugly') {
+          // ConfirmBottomSheet.current.snapTo(1);
+          (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
+        } else if (overallHealth.sharesInfo[4].shareStage === 'Bad') {
           setSelectedTime(getTime(pageData[4].time));
           setSelectedStatus(pageData[4].status);
           setSelectTypeToReshare('copy2');
@@ -1613,7 +1760,8 @@ export default function ManageBackup(props) {
           setTimeout(() => {
             setLoadCamera(true);
           }, 2);
-          ConfirmBottomSheet.current.snapTo(1);
+          // ConfirmBottomSheet.current.snapTo(1);
+          (PersonalCopy2ShareBottomSheet as any).current.snapTo(1);
         } else if (overallHealth.qaStatus.stage === 'Bad') {
           // Security question
           SecurityQuestionBottomSheet.current.snapTo(1);
@@ -1976,7 +2124,7 @@ export default function ManageBackup(props) {
             style={{
               height: wp('10%'),
               width: wp('30%'),
-              backgroundColor: Colors.lightBlue,
+              backgroundColor: Colors.blue,
               justifyContent: 'center',
               alignItems: 'center',
               borderRadius: 5,
