@@ -59,7 +59,7 @@ const ReceivingAddress = props => {
   const checkNShowHelperModal = async () => {
     let isReceiveHelperDone1 = await AsyncStorage.getItem('isReceiveHelperDone');
     console.log("isReceiveHelperDone1", isReceiveHelperDone,isReceiveHelperDone1)
-    if (isReceiveHelperDone1 && serviceType == TEST_ACCOUNT) {
+    if (!isReceiveHelperDone1 && serviceType == TEST_ACCOUNT) {
       await AsyncStorage.setItem('isReceiveHelperDone', 'true');
       setTimeout(() => {
         setIsReceiveHelperDone(true);
