@@ -44,7 +44,7 @@ async function requestContactsPermission() {
 }
 
 export default function ContactList(props) {
-  const [selectedContacts, setSelectedContacts] = useState([]);
+  let [selectedContacts, setSelectedContacts] = useState([]);
   const [scrollViewRef, setScrollViewRef] = useState(React.createRef());
   const [radioOnOff, setRadioOnOff] = useState(false);
   const [contactData, setContactData] = useState([]);
@@ -118,10 +118,9 @@ export default function ContactList(props) {
       let isFilter = true;
       let filterContactsForDisplay = [];
       for (let i = 0; i < contactData.length; i++) {
-       if (contactData[i].name && contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())) {
-            filterContactsForDisplay.push(contactData[i])
-          }
-        
+        if (contactData[i].name && contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())) {
+          filterContactsForDisplay.push(contactData[i])
+        }
       }
       setFilterContactData(filterContactsForDisplay);
     } else {
@@ -129,21 +128,21 @@ export default function ContactList(props) {
     }
   }
 
-
   function onContactSelect(index) {
     let contacts = filterContactData;
     if (contacts[index].checked) {
-      selectedContacts.splice(
-        selectedContacts.findIndex(temp => temp.id == contacts[index].id),
-        1
-      );
+      // selectedContacts.splice(
+      //   selectedContacts.findIndex(temp => temp.id == contacts[index].id),
+      //   1
+      // );
+      selectedContacts=[];
     } else {
-      if (selectedContacts.length === 2) {
-        selectedContacts.pop();
-      }
-      selectedContacts.push(contacts[index]);
+      // if (selectedContacts.length === 2) {
+      //   selectedContacts.pop();
+      // }
+      // selectedContacts.push(contacts[index]);
+      selectedContacts[0]=contacts[index];
     }
-
     setSelectedContacts(selectedContacts);
     for (let i = 0; i < contacts.length; i++) {
       if (

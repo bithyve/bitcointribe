@@ -43,9 +43,6 @@ import { requestSharePdf } from '../../store/actions/manageBackup';
 import RegenerateHealper from '../../components/Helper/RegenerateHealper';
 import { ModalShareIntent } from 'hexaComponents/Modal/ManageBackup';
 import Singleton from 'hexaCommon/Singleton';
-import ShareOtpWithTrustedContact from './ShareOtpWithTrustedContact';
-import TrustedContacts from './TrustedContacts';
-import CommunicationMode from './CommunicationMode';
 import ModalHeader from '../../components/ModalHeader';
 import SecondaryDevice from './SecondaryDevice';
 import HealthCheckSecurityQuestion from './HealthCheckSecurityQuestion';
@@ -65,7 +62,6 @@ export default function ManageBackup(props) {
   const [selectedStatus, setSelectedStatus] = useState('Ugly');
   const [isNextStepDisable, setIsNextStepDisable] = useState(false);
   const [LoadCamera, setLoadCamera] = useState(false);
-  const [LoadContacts, setLoadContacts] = useState(false);
   const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
   const [ReshareBottomSheet, setReshareBottomSheet] = useState(
     React.createRef(),
@@ -73,18 +69,11 @@ export default function ManageBackup(props) {
   const [ConfirmBottomSheet, setConfirmBottomSheet] = useState(
     React.createRef(),
   );
-  const [ContactToConfirm, setContactToConfirm] = useState({});
   const [SelectTypeToReshare, setSelectTypeToReshare] = useState({});
   let [
     secondaryDeviceAutoHighlightFlags,
     setSecondaryDeviceAutoHighlightFlags,
   ] = useState('');
-  let [contact1AutoHighlightFlags, setContact1AutoHighlightFlags] = useState(
-    '',
-  );
-  let [contact2AutoHighlightFlags, setContact2AutoHighlightFlags] = useState(
-    '',
-  );
   let [
     personalCopy1AutoHighlightFlags,
     setPersonalCopy1AutoHighlightFlags,
@@ -96,14 +85,9 @@ export default function ManageBackup(props) {
   let [securityAutoHighlightFlags, setSecurityAutoHighlightFlags] = useState(
     'true',
   );
-
   const [
     SecondaryDeviceHistoryBottomSheet,
     setSecondaryDeviceHistoryBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    TrustedContactHistoryBottomSheet,
-    setTrustedContactHistoryBottomSheet,
   ] = useState(React.createRef());
   const [
     PersonalCopyHistoryBottomSheet,
@@ -113,13 +97,6 @@ export default function ManageBackup(props) {
     SecurityQuestionHistoryBottomSheet,
     setSecurityQuestionHistoryBottomSheet,
   ] = useState(React.createRef());
-  const [
-    LoadOnTrustedContactBottomSheet,
-    setLoadOnTrustedContactBottomSheet,
-  ] = useState(false);
-  const [OTP, setOTP] = useState('');
-  const [chosenContactIndex, setChosenContactIndex] = useState(1);
-  const [chosenContact, setChosenContact] = useState({});
   const [selectedPersonalCopy, setSelectedPersonalCopy] = useState();
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
@@ -165,10 +142,7 @@ export default function ManageBackup(props) {
     WalletBackupAndRecoveryBottomSheet,
     setWalletBackupAndRecoveryBottomSheet,
   ] = useState(React.createRef());
-  // const [secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet] = useState(
-  //   React.createRef(),
-  // );
-  const [trustedContactsBottomSheet, setTrustedContactsBottomSheet] = useState(
+  const [secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet] = useState(
     React.createRef(),
   );
   const [
@@ -342,110 +316,6 @@ export default function ManageBackup(props) {
   //   );
   // }
 
-  function renderTrustedContactsContent() {
-    return (
-      <TrustedContacts
-        LoadContacts={LoadContacts}
-        onPressBack={() => {
-          trustedContactsBottomSheet.current.snapTo(0);
-        }}
-        onPressContinue={(selectedContacts, index) =>
-          getContacts(selectedContacts, index)
-        }
-        index={chosenContactIndex}
-      />
-    );
-  }
-
-  function renderTrustedContactsHeader() {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (trustedContactsBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }
-
-  const getContacts = async (selectedContacts, index) => {
-    let contactList = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
-    if (!contactList) {
-      contactList = [];
-    }
-    if (selectedContacts.length == 2) {
-      contactList[0] = selectedContacts[0];
-      contactList[1] = selectedContacts[1];
-    } else {
-      if (index == 1) {
-        contactList[0] = selectedContacts[0];
-      }
-      if (index == 2) {
-        contactList[1] = selectedContacts[0];
-      }
-    }
-
-    setTimeout(() => {
-      setContacts(contactList);
-    }, 10);
-    await AsyncStorage.setItem('SelectedContacts', JSON.stringify(contactList));
-    if (contactList && contactList.length == 2 && chosenContactIndex == 1) {
-      setTimeout(() => {
-        setChosenContact(contactList[0]);
-      }, 10);
-    } else if (
-      contactList &&
-      contactList.length == 2 &&
-      chosenContactIndex == 2
-    ) {
-      setTimeout(() => {
-        setChosenContact(contactList[1]);
-      }, 10);
-    } else if (contactList && contactList.length == 1) {
-      setTimeout(() => {
-        setChosenContact(contactList[0]);
-      }, 10);
-    }
-    setTimeout(() => {
-      setContacts(selectedContacts);
-    }, 10);
-    trustedContactsBottomSheet.current.snapTo(0);
-    CommunicationModeBottomSheet.current.snapTo(1);
-  };
-
-  function renderCommunicationModeModalContent() {
-    return (
-      <CommunicationMode
-        secretSharedTrustedContact1={secretSharedTrustedContact1}
-        secretSharedTrustedContact2={secretSharedTrustedContact2}
-        contact={chosenContact ? chosenContact : null}
-        index={chosenContactIndex}
-        onPressBack={() => {
-          CommunicationModeBottomSheet.current.snapTo(0);
-        }}
-        onPressContinue={(OTP, index) => {
-          setTimeout(() => {
-            setOTP(OTP);
-            setChosenContactIndex(index);
-          }, 10);
-          CommunicationModeBottomSheet.current.snapTo(0);
-          shareOtpWithTrustedContactBottomSheet.current.snapTo(1);
-        }}
-      />
-    );
-  }
-
-  function renderCommunicationModeModalHeader() {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (CommunicationModeBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }
-
   const renderPersonalCopy1ShareModalContent = () => {
     const selectedPersonalCopy = {
       title: 'Personal Copy 1',
@@ -588,90 +458,6 @@ export default function ManageBackup(props) {
       />
     );
   }, []);
-
-  function renderShareOtpWithTrustedContactContent() {
-    return (
-      <ShareOtpWithTrustedContact
-        onPressOk={index => onOTPShare(index)}
-        onPressBack={() => {
-          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
-        }}
-        OTP={OTP}
-        index={chosenContactIndex}
-      />
-    );
-  }
-
-  function renderShareOtpWithTrustedContactHeader() {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }
-
-  const onOTPShare = async index => {
-    shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
-    if (IsReshare) {
-      return;
-    }
-    if (index == 2) {
-      setTimeout(() => {
-        setChosenContact(contacts[0]);
-        setChosenContactIndex(1);
-      }, 2);
-    } else if (index == 1) {
-      setTimeout(() => {
-        setChosenContact(contacts[1]);
-        setChosenContactIndex(2);
-      }, 2);
-    }
-    // console.log({ contacts });
-    if (contacts.length == 2) {
-      if (!pageData[1].isOTPShared) {
-        pageData[1].isOTPShared = true;
-        // setTimeout(() => {
-        //   setContact1AutoHighlightFlags('true');
-        // }, 2);
-        CommunicationModeBottomSheet.current.snapTo(1);
-        // await AsyncStorage.setItem('contact1AutoHighlightFlags', 'true');
-        setAutoHighlightFlags({ ...autoHighlightFlags, trustedContact1: true });
-      } else if (!pageData[2].isOTPShared) {
-        pageData[2].isOTPShared = true;
-        // setTimeout(() => {
-        //   setContact2AutoHighlightFlags('true');
-        // }, 2);
-        // await AsyncStorage.setItem('contact2AutoHighlightFlags', 'true');
-        setAutoHighlightFlags({ ...autoHighlightFlags, trustedContact2: true });
-      }
-    } else {
-      if (index == 1) {
-        pageData[1].isOTPShared = true;
-        // setTimeout(() => {
-        //   setContact1AutoHighlightFlags('true');
-        // }, 2);
-        // await AsyncStorage.setItem('contact1AutoHighlightFlags', 'true');
-        setAutoHighlightFlags({ ...autoHighlightFlags, trustedContact1: true });
-      } else if (index == 2) {
-        pageData[2].isOTPShared = true;
-        // setTimeout(() => {
-        //   setContact2AutoHighlightFlags('true');
-        // }, 2);
-        // await AsyncStorage.setItem('contact2AutoHighlightFlags', 'true');
-
-        setAutoHighlightFlags({ ...autoHighlightFlags, trustedContact2: true });
-      }
-    }
-    // setTimeout(() => {
-    //   setSelectedType('');
-    //   setPageData(pageData);
-    // }, 10);
-    setSelectedType('');
-    setPageData(pageData);
-    shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
-  };
 
   const renderWalletBackupAndRecoveryContents = () => {
     return (
@@ -819,48 +605,6 @@ export default function ManageBackup(props) {
     );
   };
 
-  const renderTrustedContactHistoryContent = () => {
-    let title = '';
-    if (ContactToConfirm) {
-      title = ContactToConfirm.name;
-    }
-
-    return (
-      <SecondaryDeviceHealthCheck
-        data={secondaryDeviceHistory}
-        title={title}
-        time={selectedTime}
-        status={selectedStatus}
-        reshareInfo={'consectetur Lorem ipsum dolor sit amet, consectetur sit '}
-        changeInfo={'Lorem ipsum dolor sit amet, consectetur sit amet '}
-        onPressChange={() => {
-          ChangeBottomSheet.current.snapTo(1);
-        }}
-        onPressConfirm={() => {
-          ConfirmBottomSheet.current.snapTo(1);
-        }}
-        onPressReshare={() => {
-          ReshareBottomSheet.current.snapTo(1);
-        }}
-        modalRef={TrustedContactHistoryBottomSheet}
-        onPressBack={() => {
-          TrustedContactHistoryBottomSheet.current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderTrustedContactHistoryHeader = () => {
-    return (
-      <ModalHeader
-        backgroundColor={Colors.backgroundColor}
-        onPressHeader={() => {
-          TrustedContactHistoryBottomSheet.current.snapTo(0);
-        }}
-      />
-    );
-  };
-
   const renderPersonalCopyHistoryContent = () => {
     return (
       <SecondaryDeviceHealthCheck
@@ -938,11 +682,7 @@ export default function ManageBackup(props) {
         onPressProceed={() => {
           setTimeout(() => {
             setIsReshare(false);
-            setLoadContacts(true);
-            setLoadOnTrustedContactBottomSheet(true);
           }, 2);
-          trustedContactsBottomSheet.current.snapTo(1);
-          TrustedContactHistoryBottomSheet.current.snapTo(0);
           (ChangeBottomSheet as any).current.snapTo(0);
         }}
         onPressIgnore={() => {
@@ -1020,14 +760,12 @@ export default function ManageBackup(props) {
         setChosenContactIndex(1);
       }, 2);
       CommunicationModeBottomSheet.current.snapTo(1);
-      TrustedContactHistoryBottomSheet.current.snapTo(0);
     } else if (SelectTypeToReshare == 'contact2') {
       setTimeout(() => {
         setChosenContact(contacts[1]);
         setChosenContactIndex(2);
       }, 2);
       CommunicationModeBottomSheet.current.snapTo(1);
-      TrustedContactHistoryBottomSheet.current.snapTo(0);
     } else if (SelectTypeToReshare == 'copy1') {
       PersonalCopyHistoryBottomSheet.current.snapTo(0);
       (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
@@ -1113,16 +851,12 @@ export default function ManageBackup(props) {
       SecondaryDeviceHistoryBottomSheet.current.snapTo(0);
     } else if (SelectTypeToReshare == 'contact1') {
       setTimeout(() => {
-        setLoadContacts(true);
         setSelectedType('');
       }, 2);
-      TrustedContactHistoryBottomSheet.current.snapTo(0);
     } else if (SelectTypeToReshare == 'contact2') {
       setTimeout(() => {
-        setLoadContacts(true);
         setSelectedType('');
       }, 2);
-      TrustedContactHistoryBottomSheet.current.snapTo(0);
     } else if (SelectTypeToReshare == 'copy1') {
       setTimeout(() => {
         setLoadCamera(true);
@@ -1535,16 +1269,12 @@ export default function ManageBackup(props) {
   //     secondaryDeviceBottomSheet.current.snapTo(1);
   //   } else if (contact1AutoHighlightFlags != 'true') {
   //     setTimeout(() => {
-  //       setLoadContacts(true);
   //       setLoadOnTrustedContactBottomSheet(true);
   //     }, 10);
-  //     trustedContactsBottomSheet.current.snapTo(1);
   //   } else if (contact2AutoHighlightFlags != 'true') {
   //     setTimeout(() => {
-  //       setLoadContacts(true);
   //       setLoadOnTrustedContactBottomSheet(true);
   //     }, 10);
-  //     trustedContactsBottomSheet.current.snapTo(1);
   //   } else if (personalCopy1AutoHighlightFlags != 'true') {
   //     (PersonalCopyShareBottomSheet as any).current.snapTo(1);
   //   } else if (personalCopy2AutoHighlightFlags != 'true') {
@@ -1663,16 +1393,10 @@ export default function ManageBackup(props) {
       });
     } else if (!trustedContact1) {
       setTimeout(() => {
-        setLoadContacts(true);
-        setLoadOnTrustedContactBottomSheet(true);
       }, 10);
-      trustedContactsBottomSheet.current.snapTo(1);
     } else if (!trustedContact2) {
       setTimeout(() => {
-        setLoadContacts(true);
-        setLoadOnTrustedContactBottomSheet(true);
       }, 10);
-      trustedContactsBottomSheet.current.snapTo(1);
     } else if (!personalCopy1) {
       (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
     } else if (!personalCopy2) {
@@ -1692,10 +1416,7 @@ export default function ManageBackup(props) {
           //Trusted contact 1
           // ConfirmBottomSheet.current.snapTo(1);
           setTimeout(() => {
-            setLoadContacts(true);
-            setLoadOnTrustedContactBottomSheet(true);
           }, 10);
-          trustedContactsBottomSheet.current.snapTo(1);
         } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
           setSelectedTime(getTime(pageData[2].time));
           setSelectedStatus(pageData[2].status);
@@ -1703,10 +1424,7 @@ export default function ManageBackup(props) {
           //Trusted contact 2
           // ConfirmBottomSheet.current.snapTo(1);
           setTimeout(() => {
-            setLoadContacts(true);
-            setLoadOnTrustedContactBottomSheet(true);
           }, 10);
-          trustedContactsBottomSheet.current.snapTo(1);
         } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
           setSelectedTime(getTime(pageData[3].time));
           setSelectedStatus(pageData[3].status);
@@ -1745,10 +1463,7 @@ export default function ManageBackup(props) {
           // ConfirmBottomSheet.current.snapTo(1);
 
           setTimeout(() => {
-            setLoadContacts(true);
-            setLoadOnTrustedContactBottomSheet(true);
           }, 10);
-          trustedContactsBottomSheet.current.snapTo(1);
         } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
           setSelectedTime(getTime(pageData[2].time));
           setSelectedStatus(pageData[2].status);
@@ -1757,10 +1472,7 @@ export default function ManageBackup(props) {
           // ConfirmBottomSheet.current.snapTo(1);
 
           setTimeout(() => {
-            setLoadContacts(true);
-            setLoadOnTrustedContactBottomSheet(true);
           }, 10);
-          trustedContactsBottomSheet.current.snapTo(1);
         } else if (overallHealth.sharesInfo[3].shareStage === 'Bad') {
           setSelectedTime(getTime(pageData[3].time));
           setSelectedStatus(pageData[3].status);
@@ -1973,13 +1685,9 @@ export default function ManageBackup(props) {
                       //   if (item.personalInfo) {
                       //     setContactToConfirm(item.personalInfo);
                       //   }
-                      //   TrustedContactHistoryBottomSheet.current.snapTo(1);
                       // } else {
                       //   setTimeout(() => {
-                      //     setChosenContactIndex(1);
-                      //     setLoadContacts(true);
                       //   }, 2);
-                      //   trustedContactsBottomSheet.current.snapTo(1);
                       // }
                     } else if (item.type == 'contact2') {
                       props.navigation.navigate('TrustedContactHistory', {
@@ -1994,13 +1702,9 @@ export default function ManageBackup(props) {
                       //   if (item.personalInfo) {
                       //     setContactToConfirm(item.personalInfo);
                       //   }
-                      //   TrustedContactHistoryBottomSheet.current.snapTo(1);
                       // } else {
                       //   setTimeout(() => {
-                      //     setChosenContactIndex(2);
-                      //     setLoadContacts(true);
                       //   }, 2);
-                      //   trustedContactsBottomSheet.current.snapTo(1);
                       //   setLoadOnTrustedContactBottomSheet(true);
                       // }
                     } else if (item.type === 'copy1') {
@@ -2191,29 +1895,6 @@ export default function ManageBackup(props) {
         /> */}
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={trustedContactsBottomSheet}
-          snapPoints={[-30, hp('90%')]}
-          renderContent={renderTrustedContactsContent}
-          renderHeader={renderTrustedContactsHeader}
-        />
-        {LoadOnTrustedContactBottomSheet ? (
-          <BottomSheet
-            enabledInnerScrolling={true}
-            ref={CommunicationModeBottomSheet}
-            snapPoints={[-30, hp('75%')]}
-            renderContent={renderCommunicationModeModalContent}
-            renderHeader={renderCommunicationModeModalHeader}
-          />
-        ) : null}
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={shareOtpWithTrustedContactBottomSheet}
-          snapPoints={[-30, hp('70%')]}
-          renderContent={renderShareOtpWithTrustedContactContent}
-          renderHeader={renderShareOtpWithTrustedContactHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
           ref={WalletBackupAndRecoveryBottomSheet}
           snapPoints={[
             -50,
@@ -2318,13 +1999,6 @@ export default function ManageBackup(props) {
           snapPoints={[-30, hp('90%')]}
           renderContent={renderSecondaryDeviceHistoryContent}
           renderHeader={renderSecondaryDeviceHistoryHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={TrustedContactHistoryBottomSheet}
-          snapPoints={[-30, hp('90%')]}
-          renderContent={renderTrustedContactHistoryContent}
-          renderHeader={renderTrustedContactHistoryHeader}
         />
         <BottomSheet
           enabledInnerScrolling={true}

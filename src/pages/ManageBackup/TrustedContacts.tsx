@@ -29,9 +29,6 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 const TrustedContacts = props => {
   const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
   const [contacts, setContacts] = useState([]);
-  const [communicationModeBottomSheet, setCommunicationMode] = useState(
-    React.createRef(),
-  );
   const index = props.index;
 
   function selectedContactsList( list ) {
@@ -44,11 +41,9 @@ const TrustedContacts = props => {
       contacts[1].type="contact2";
     }
     else if(contacts.length==1){
-      if(index==1)
-      {
+      if(index==1) {
         contacts[0].type="contact1";
-      }
-      else if(index==2){
+      } else if(index==2){
         contacts[0].type="contact2";
       }
     }
