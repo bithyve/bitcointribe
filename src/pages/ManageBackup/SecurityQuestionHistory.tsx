@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -20,7 +20,7 @@ import {
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
-import { uploadEncMShare } from '../../store/actions/sss';
+import { uploadEncMShare, checkMSharesHealth } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -31,6 +31,7 @@ import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../components/ModalHeader';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
+import HealthCheckSecurityQuestion from './HealthCheckSecurityQuestion';
 
 const SecurityQuestionHistory = props => {
   const [SelectedOption, setSelectedOption] = useState(0);
@@ -81,37 +82,164 @@ const SecurityQuestionHistory = props => {
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
   ]);
+  const [
+    SecurityQuestionBottomSheet,
+    setSecurityQuestionBottomSheet,
+  ] = useState(React.createRef());
+  const [
+    HealthCheckSuccessBottomSheet,
+    setHealthCheckSuccessBottomSheet,
+  ] = useState(React.createRef());
+
+  const updateAutoHighlightFlags = props.navigation.getParam(
+    'updateAutoHighlightFlags',
+  );
+  const next = props.navigation.getParam('next');
+  const dispatch = useDispatch();
+
+  const renderSecurityQuestionContent = useCallback(() => {
+    return (
+      <HealthCheckSecurityQuestion
+        bottomSheetRef={SecurityQuestionBottomSheet}
+        onPressConfirm={async () => {
+          updateAutoHighlightFlags;
+          SecurityQuestionBottomSheet.current.snapTo(0);
+          (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
+        }}
+      />
+    );
+  }, []);
+
+  const renderSecurityQuestionHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (SecurityQuestionBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderHealthCheckSuccessModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={HealthCheckSuccessBottomSheet}
+        title={'Health Check Successful'}
+        info={'Questions Successfully Backed Up'}
+        note={'Hexa will remind you to help\nremember the answers'}
+        proceedButtonText={'View Health'}
+        isIgnoreButton={false}
+        onPressProceed={() => {
+          (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
+          dispatch(checkMSharesHealth());
+        }}
+        isBottomImage={true}
+      />
+    );
+  }, []);
+
+  const renderHealthCheckSuccessModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  useEffect(() => {
+    if (next) (SecurityQuestionBottomSheet as any).current.snapTo(1);
+  }, [next]);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
-      <SafeAreaView style={{ flex: 0, backgroundColor: Colors.backgroundColor }} />
+      <SafeAreaView
+        style={{ flex: 0, backgroundColor: Colors.backgroundColor }}
+      />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={{ ...styles.modalHeaderTitleView, paddingLeft: 10, paddingRight: 10, }}>
-        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-            <TouchableOpacity onPress={() => { props.navigation.goBack(); }} style={{ height: 30, width: 30, justifyContent: "center" }} >
-              <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-            </TouchableOpacity>
-            <View style={{ flex: 1, flexDirection:'row', marginLeft: 10, marginRight: 10, }}>
-              <View style={{ flex: 1, justifyContent: "center" }}>
-                  <Text style={BackupStyles.modalHeaderTitleText}>{props.navigation.state.params.selectedTitle}</Text>
-                  <Text style={BackupStyles.modalHeaderInfoText}>
-                      Last backup{' '}<Text style={{ fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', }}> {props.navigation.state.params.selectedTime}</Text>
-                  </Text>
-              </View>
-              <Image style={{...BackupStyles.cardIconImage, alignSelf:'center'}} source={getIconByStatus(props.navigation.state.params.selectedStatus)} />
+      <View
+        style={{
+          ...styles.modalHeaderTitleView,
+          paddingLeft: 10,
+          paddingRight: 10,
+        }}
+      >
+        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity
+            onPress={() => {
+              props.navigation.goBack();
+            }}
+            style={{ height: 30, width: 30, justifyContent: 'center' }}
+          >
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </TouchableOpacity>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              marginLeft: 10,
+              marginRight: 10,
+            }}
+          >
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+              <Text style={BackupStyles.modalHeaderTitleText}>
+                {props.navigation.state.params.selectedTitle}
+              </Text>
+              <Text style={BackupStyles.modalHeaderInfoText}>
+                Last backup{' '}
+                <Text
+                  style={{
+                    fontFamily: Fonts.FiraSansMediumItalic,
+                    fontWeight: 'bold',
+                  }}
+                >
+                  {' '}
+                  {props.navigation.state.params.selectedTime}
+                </Text>
+              </Text>
             </View>
+            <Image
+              style={{ ...BackupStyles.cardIconImage, alignSelf: 'center' }}
+              source={getIconByStatus(
+                props.navigation.state.params.selectedStatus,
+              )}
+            />
+          </View>
         </View>
       </View>
-      <View style={{flex:1}}>
-        <HistoryPageComponent 
+      <View style={{ flex: 1 }}>
+        <HistoryPageComponent
           data={secondaryDeviceHistory}
-          reshareInfo={'consectetur Lorem ipsum dolor sit amet, consectetur sit '}
+          reshareInfo={
+            'consectetur Lorem ipsum dolor sit amet, consectetur sit '
+          }
           onPressConfirm={() => {
-              // ConfirmBottomSheet.current.snapTo(1);
-              alert("confirm")
+            // ConfirmBottomSheet.current.snapTo(1);
+            alert('confirm');
+          }}
+          onPressContinue={() => {
+            (SecurityQuestionBottomSheet as any).current.snapTo(1);
           }}
         />
       </View>
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={SecurityQuestionBottomSheet}
+        snapPoints={[-30, hp('75%'), hp('90%')]}
+        renderContent={renderSecurityQuestionContent}
+        renderHeader={renderSecurityQuestionHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={HealthCheckSuccessBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
+        ]}
+        renderContent={renderHealthCheckSuccessModalContent}
+        renderHeader={renderHealthCheckSuccessModalHeader}
+      />
     </View>
   );
 };
@@ -131,7 +259,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingRight: 10,
     paddingBottom: hp('3%'),
-    marginTop:20,
+    marginTop: 20,
     marginBottom: 15,
   },
 });

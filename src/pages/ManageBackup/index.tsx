@@ -149,14 +149,14 @@ export default function ManageBackup(props) {
     CommunicationModeBottomSheet,
     setCommunicationModeBottomSheet,
   ] = useState(React.createRef());
-  const [
-    SecurityQuestionBottomSheet,
-    setSecurityQuestionBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    HealthCheckSuccessBottomSheet,
-    setHealthCheckSuccessBottomSheet,
-  ] = useState(React.createRef());
+  // const [
+  //   SecurityQuestionBottomSheet,
+  //   setSecurityQuestionBottomSheet,
+  // ] = useState(React.createRef());
+  // const [
+  //   HealthCheckSuccessBottomSheet,
+  //   setHealthCheckSuccessBottomSheet,
+  // ] = useState(React.createRef());
   const [
     RegenerateShareHelperBottomSheet,
     setRegenerateShareHelperBottomSheet,
@@ -519,58 +519,58 @@ export default function ManageBackup(props) {
     );
   };
 
-  const renderSecurityQuestionContent = () => {
-    return (
-      <HealthCheckSecurityQuestion
-        bottomSheetRef={SecurityQuestionBottomSheet}
-        onPressConfirm={async () => {
-          SecurityQuestionBottomSheet.current.snapTo(0);
-          (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
-          await AsyncStorage.setItem('securityAutoHighlightFlags', 'true');
-          setTimeout(() => {
-            setSelectedType('');
-          }, 2);
-        }}
-      />
-    );
-  };
-  const renderSecurityQuestionHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (SecurityQuestionBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
+  // const renderSecurityQuestionContent = () => {
+  //   return (
+  //     <HealthCheckSecurityQuestion
+  //       bottomSheetRef={SecurityQuestionBottomSheet}
+  //       onPressConfirm={async () => {
+  //         SecurityQuestionBottomSheet.current.snapTo(0);
+  //         (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
+  //         await AsyncStorage.setItem('securityAutoHighlightFlags', 'true');
+  //         setTimeout(() => {
+  //           setSelectedType('');
+  //         }, 2);
+  //       }}
+  //     />
+  //   );
+  // };
+  // const renderSecurityQuestionHeader = () => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         (SecurityQuestionBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // };
 
-  const renderHealthCheckSuccessModalContent = () => {
-    return (
-      <ErrorModalContents
-        modalRef={HealthCheckSuccessBottomSheet}
-        title={'Health Check Successful'}
-        info={'Questions Successfully Backed Up'}
-        note={'Hexa will remind you to help\nremember the answers'}
-        proceedButtonText={'View Health'}
-        isIgnoreButton={false}
-        onPressProceed={() => {
-          (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-          dispatch(checkMSharesHealth());
-        }}
-        isBottomImage={true}
-      />
-    );
-  };
+  // const renderHealthCheckSuccessModalContent = () => {
+  //   return (
+  //     <ErrorModalContents
+  //       modalRef={HealthCheckSuccessBottomSheet}
+  //       title={'Health Check Successful'}
+  //       info={'Questions Successfully Backed Up'}
+  //       note={'Hexa will remind you to help\nremember the answers'}
+  //       proceedButtonText={'View Health'}
+  //       isIgnoreButton={false}
+  //       onPressProceed={() => {
+  //         (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
+  //         dispatch(checkMSharesHealth());
+  //       }}
+  //       isBottomImage={true}
+  //     />
+  //   );
+  // };
 
-  const renderHealthCheckSuccessModalHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          onPressOnHealthCheckSuccess();
-        }}
-      />
-    );
-  };
+  // const renderHealthCheckSuccessModalHeader = () => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         onPressOnHealthCheckSuccess();
+  //       }}
+  //     />
+  //   );
+  // };
 
   const renderSecondaryDeviceHistoryContent = () => {
     return (
@@ -773,7 +773,7 @@ export default function ManageBackup(props) {
       PersonalCopyHistoryBottomSheet.current.snapTo(0);
       (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
     } else if (SelectTypeToReshare == 'security') {
-      SecurityQuestionBottomSheet.current.snapTo(1);
+      // SecurityQuestionBottomSheet.current.snapTo(1);
       SecurityQuestionHistoryBottomSheet.current.snapTo(0);
     }
     (ReshareBottomSheet as any).current.snapTo(0);
@@ -870,7 +870,7 @@ export default function ManageBackup(props) {
       PersonalCopyHistoryBottomSheet.current.snapTo(0);
       (PersonalCopyQRScannerBottomSheet as any).current.snapTo(1);
     } else if (SelectTypeToReshare == 'security') {
-      SecurityQuestionBottomSheet.current.snapTo(1);
+      // SecurityQuestionBottomSheet.current.snapTo(1);
       SecurityQuestionHistoryBottomSheet.current.snapTo(0);
     }
     (ConfirmBottomSheet as any).current.snapTo(0);
@@ -933,10 +933,10 @@ export default function ManageBackup(props) {
     setSelectedType('');
   };
 
-  const onPressOnHealthCheckSuccess = async () => {
-    (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-    await AsyncStorage.setItem('securityAutoHighlightFlags', 'true');
-  };
+  // const onPressOnHealthCheckSuccess = async () => {
+  //   (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
+  //   await AsyncStorage.setItem('securityAutoHighlightFlags', 'true');
+  // };
 
   const secretSharedTrustedContact1 = isSecretShared1 => {
     setIsSecretShared1(isSecretShared1);
@@ -1392,39 +1392,59 @@ export default function ManageBackup(props) {
         next: 'true',
       });
     } else if (!trustedContact1) {
-      setTimeout(() => {
-      }, 10);
+      setTimeout(() => {}, 10);
     } else if (!trustedContact2) {
-      setTimeout(() => {
-      }, 10);
+      setTimeout(() => {}, 10);
     } else if (!personalCopy1) {
       (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
     } else if (!personalCopy2) {
       (PersonalCopy2ShareBottomSheet as any).current.snapTo(1);
     } else if (!securityAns) {
-      SecurityQuestionBottomSheet.current.snapTo(1);
+      const data = pageData[5];
+      props.navigation.navigate('SecurityQuestionHistory', {
+        selectedStatus: data.status,
+        selectedTime: getTime(data.time),
+        selectedTitle: data.title,
+        updateAutoHighlightFlags: () =>
+          setAutoHighlightFlags({
+            ...autoHighlightFlags,
+            securityAns: true,
+          }),
+        next: 'true',
+      });
     } else {
       if (overallHealth) {
         if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
           // Secondary device
           // ConfirmBottomSheet.current.snapTo(1);
           // secondaryDeviceBottomSheet.current.snapTo(1);
+          const data = pageData[0];
+          // secondaryDeviceBottomSheet.current.snapTo(1);
+          props.navigation.navigate('SecondaryDeviceHistory', {
+            selectedStatus: data.status,
+            selectedTime: getTime(data.time),
+            selectedTitle: data.title,
+            updateAutoHighlightFlags: () =>
+              setAutoHighlightFlags({
+                ...autoHighlightFlags,
+                secondaryDevice: true,
+              }),
+            next: 'true',
+          });
         } else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
           setSelectedTime(getTime(pageData[1].time));
           setSelectedStatus(pageData[1].status);
           setSelectTypeToReshare('contact1');
           //Trusted contact 1
           // ConfirmBottomSheet.current.snapTo(1);
-          setTimeout(() => {
-          }, 10);
+          setTimeout(() => {}, 10);
         } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
           setSelectedTime(getTime(pageData[2].time));
           setSelectedStatus(pageData[2].status);
           setSelectTypeToReshare('contact2');
           //Trusted contact 2
           // ConfirmBottomSheet.current.snapTo(1);
-          setTimeout(() => {
-          }, 10);
+          setTimeout(() => {}, 10);
         } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
           setSelectedTime(getTime(pageData[3].time));
           setSelectedStatus(pageData[3].status);
@@ -1450,11 +1470,36 @@ export default function ManageBackup(props) {
           setSelectedStatus(pageData[5].status);
           setSelectTypeToReshare('security');
           // Security question
-          SecurityQuestionBottomSheet.current.snapTo(1);
+          // SecurityQuestionBottomSheet.current.snapTo(1);
+          const data = pageData[5];
+          props.navigation.navigate('SecurityQuestionHistory', {
+            selectedStatus: data.status,
+            selectedTime: getTime(data.time),
+            selectedTitle: data.title,
+            updateAutoHighlightFlags: () =>
+              setAutoHighlightFlags({
+                ...autoHighlightFlags,
+                securityAns: true,
+              }),
+            next: 'true',
+          });
         } else if (overallHealth.sharesInfo[0].shareStage === 'Bad') {
           // Secondary device
           // SecondaryDeviceHistoryBottomSheet.current.snapTo(1);
           // secondaryDeviceBottomSheet.current.snapTo(1);
+          const data = pageData[0];
+          // secondaryDeviceBottomSheet.current.snapTo(1);
+          props.navigation.navigate('SecondaryDeviceHistory', {
+            selectedStatus: data.status,
+            selectedTime: getTime(data.time),
+            selectedTitle: data.title,
+            updateAutoHighlightFlags: () =>
+              setAutoHighlightFlags({
+                ...autoHighlightFlags,
+                secondaryDevice: true,
+              }),
+            next: 'true',
+          });
         } else if (overallHealth.sharesInfo[1].shareStage === 'Bad') {
           setSelectedTime(getTime(pageData[1].time));
           setSelectedStatus(pageData[1].status);
@@ -1462,8 +1507,7 @@ export default function ManageBackup(props) {
           //Trusted contact 1
           // ConfirmBottomSheet.current.snapTo(1);
 
-          setTimeout(() => {
-          }, 10);
+          setTimeout(() => {}, 10);
         } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
           setSelectedTime(getTime(pageData[2].time));
           setSelectedStatus(pageData[2].status);
@@ -1471,8 +1515,7 @@ export default function ManageBackup(props) {
           //Trusted contact 2
           // ConfirmBottomSheet.current.snapTo(1);
 
-          setTimeout(() => {
-          }, 10);
+          setTimeout(() => {}, 10);
         } else if (overallHealth.sharesInfo[3].shareStage === 'Bad') {
           setSelectedTime(getTime(pageData[3].time));
           setSelectedStatus(pageData[3].status);
@@ -1495,7 +1538,19 @@ export default function ManageBackup(props) {
           (PersonalCopy2ShareBottomSheet as any).current.snapTo(1);
         } else if (overallHealth.qaStatus.stage === 'Bad') {
           // Security question
-          SecurityQuestionBottomSheet.current.snapTo(1);
+          // SecurityQuestionBottomSheet.current.snapTo(1);
+          const data = pageData[5];
+          props.navigation.navigate('SecurityQuestionHistory', {
+            selectedStatus: data.status,
+            selectedTime: getTime(data.time),
+            selectedTitle: data.title,
+            updateAutoHighlightFlags: () =>
+              setAutoHighlightFlags({
+                ...autoHighlightFlags,
+                securityAns: true,
+              }),
+            next: 'true',
+          });
         }
       }
     }
@@ -1785,6 +1840,11 @@ export default function ManageBackup(props) {
                         selectedStatus: item.status,
                         selectedTime: getTime(item.time),
                         selectedTitle: item.title,
+                        updateAutoHighlightFlags: () =>
+                          setAutoHighlightFlags({
+                            ...autoHighlightFlags,
+                            securityAns: true,
+                          }),
                       });
                       // setTimeout(() => {
                       //   setSelectTypeToReshare('security');
@@ -1974,7 +2034,7 @@ export default function ManageBackup(props) {
             setSelectedType('');
           }}
         /> */}
-        <BottomSheet
+        {/* <BottomSheet
           enabledInnerScrolling={true}
           ref={SecurityQuestionBottomSheet}
           snapPoints={[-30, hp('75%'), hp('90%')]}
@@ -1992,7 +2052,7 @@ export default function ManageBackup(props) {
           ]}
           renderContent={renderHealthCheckSuccessModalContent}
           renderHeader={renderHealthCheckSuccessModalHeader}
-        />
+        /> */}
         <BottomSheet
           enabledInnerScrolling={true}
           ref={SecondaryDeviceHistoryBottomSheet}
