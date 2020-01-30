@@ -180,9 +180,39 @@ const HistoryPageComponent = props => {
           </Text>
           : null }
 
+        {props.IsReshare ? 
           <TouchableOpacity
+          onPress={() => {
+            props.onPressConfirm();
+          }}
+          style={{
+            backgroundColor: Colors.blue,
+            height: wp('13%'),
+            width: wp('40%'),
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 10,
+            marginTop: hp('3%'),
+            marginBottom: hp('3%'),
+            elevation: 10,
+            shadowColor: Colors.shadowBlue,
+            shadowOpacity: 1,
+            shadowOffset: { width: 15, height: 15 },
+          }}
+        >
+          <Text
+            style={{
+              color: Colors.white,
+              fontSize: RFValue(10),
+              fontFamily: Fonts.FiraSansMedium,
+            }}
+          >
+            Confirm
+          </Text>
+        </TouchableOpacity>
+        : <TouchableOpacity
             onPress={() => {
-              props.onPressConfirm();
+              props.onPressContinue();
             }}
             style={{
               backgroundColor: Colors.blue,
@@ -206,9 +236,11 @@ const HistoryPageComponent = props => {
                 fontFamily: Fonts.FiraSansMedium,
               }}
             >
-              Confirm
+              Backup Now
             </Text>
           </TouchableOpacity>
+      }
+          
         </View>
     </View>
   );
