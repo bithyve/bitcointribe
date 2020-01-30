@@ -158,7 +158,7 @@ export default function Send(props) {
     return (
       <TestAccountHelperModalContents
         topButtonText={`Sending Bitcoins`}
-        helperInfo={`When you want to send bitcoins or sats (a very small fraction of a bitcoin), you have to send it to an address of the recipient \n\nPretty much like an email address but one that changes every time you send it to them \n\nFor this you can either scan a QR code from the recipient or enter a very long sequence ofnumbers and letters which is the recipientsbitcoin address`}
+        helperInfo={`When you want to send bitcoins or sats (a very small fraction of a bitcoin), you have to send it to an address of the recipient Pretty much like an email address but one that changes every time you send it to them \n\nFor this you can either scan a QR code from the recipient or enter a very long sequence of numbers and letters which is the recipients bitcoin address`}
         continueButtonText={'Continue'}
         quitButtonText={'Quit'}
         onPressContinue={() => {
@@ -670,10 +670,10 @@ export default function Send(props) {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-            ? hp('14%')
+            ? hp('15%')
             : Platform.OS == 'android'
             ? hp('16%')
-            : hp('14%'),
+            : hp('15%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
           ]}
           renderContent={renderSendHelperContents}

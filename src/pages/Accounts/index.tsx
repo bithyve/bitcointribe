@@ -724,7 +724,7 @@ export default function Accounts(props) {
           'If you are new to Bitcoin, this account is\ndesigned for you. It comes pre-loaded\nwith some test bitcoins (not real)'
         }
         helperInfo={
-          '\n\nYou can even send and receive test bitcoins\nfrom other Hexa wallet test accounts\n\n\n\nThese are not actual bitcoins and are of no\nintrinsic value. The testnet sats do not add up\nin your wallet balance\n\n\n'
+          'You can even send and receive test bitcoins\nfrom other Hexa wallet test accounts\n\nThese are not actual bitcoins and are of no\nintrinsic value. The testnet sats do not add up\nin your wallet balance\n\n\n'
         }
         continueButtonText={'Continue'}
         quitButtonText={'Quit'}
@@ -758,7 +758,7 @@ export default function Accounts(props) {
           'If you are new to Bitcoin, this account is\ndesigned for you. It comes pre-loaded\nwith some test bitcoins (not real)'
         }
         helperInfo={
-          '\n\nYou can even send and receive test bitcoins\nfrom other Hexa wallet test accounts\n\n\n\nThese are not actual bitcoins and are of no\nintrinsic value. The testnet sats do not add up\nin your wallet balance\n\n\n'
+          'You can even send and receive test bitcoins\nfrom other Hexa wallet test accounts\n\nThese are not actual bitcoins and are of no\nintrinsic value. The testnet sats do not add up\nin your wallet balance\n\n\n'
         }
         continueButtonText={'Continue'}
         quitButtonText={'Quit'}
@@ -1420,8 +1420,7 @@ export default function Accounts(props) {
         ref={SecureAccountHelperBottomSheet}
         snapPoints={[
           -50,
-          hp('90%'),
-          Platform.OS == 'android' ? hp('50%') : hp('90%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
         ]}
         renderContent={renderSecureAccountsHelperContents}
         renderHeader={renderSecureAccountsHelperHeader}
@@ -1431,8 +1430,7 @@ export default function Accounts(props) {
         ref={RegularAccountHelperBottomSheet}
         snapPoints={[
           -50,
-          hp('90%'),
-          Platform.OS == 'android' ? hp('50%') : hp('90%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
         ]}
         renderContent={renderRegularAccountsHelperContents}
         renderHeader={renderRegularAccountsHelperHeader}

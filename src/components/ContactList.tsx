@@ -27,7 +27,6 @@ import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper
 
 async function requestContactsPermission() {
   try {
-    global.isContactOpen = true;
     await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
       {
@@ -104,6 +103,7 @@ export default function ContactList(props) {
   }
 
   useEffect(() => {
+    global.isContactOpen = true;
     getContactsAsync();
     setSearchBox('');
   }, []);
