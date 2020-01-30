@@ -1510,8 +1510,8 @@ export default function Home(props) {
 
   const testAccService = accounts[TEST_ACCOUNT].service;
   useEffect(() => {
-    if (testAccService)
-      (async () => {
+    (async () => {
+      if (testAccService && !(await AsyncStorage.getItem('walletRecovered')))
         if (!(await AsyncStorage.getItem('Received Testcoins'))) {
           const { balances } = testAccService.hdWallet;
           const netBalance = testAccService
@@ -1519,7 +1519,7 @@ export default function Home(props) {
             : 0;
           if (!netBalance) dispatch(getTestcoins(TEST_ACCOUNT));
         }
-      })();
+    })();
   }, [testAccService]);
 
   useEffect(() => {
@@ -1550,10 +1550,16 @@ export default function Home(props) {
   useEffect(() => {
     (async () => {
       if (await AsyncStorage.getItem('walletRecovered')) {
+        dispatch(fetchBalance(TEST_ACCOUNT));
         dispatch(fetchBalance(REGULAR_ACCOUNT));
         dispatch(fetchBalance(SECURE_ACCOUNT));
+        dispatch(fetchTransactions(TEST_ACCOUNT));
         dispatch(fetchTransactions(REGULAR_ACCOUNT));
         dispatch(fetchTransactions(SECURE_ACCOUNT));
+
+        setTimeout(() => {
+          AsyncStorage.removeItem('walletRecovered');
+        }, 3000);
       }
     })();
   }, []);

@@ -55,10 +55,14 @@ export default class HDSegwitWallet extends Bitcoin {
     this.mnemonic = mnemonic ? mnemonic : bip39.generateMnemonic(256);
     this.passphrase = passphrase;
     this.purpose = dPathPurpose ? dPathPurpose : config.DPATH_PURPOSE;
-    this.derivationPath =
-      this.network === bitcoinJS.networks.bitcoin
-        ? `m/${this.purpose}'/0'/0'`
-        : `m/${this.purpose}'/1'/0'`;
+    // this.derivationPath =
+    //   this.network === bitcoinJS.networks.bitcoin
+    //     ? `m/${this.purpose}'/0'/0'`
+    //     : `m/${this.purpose}'/1'/0'`;
+
+    this.derivationPath = this.isTest
+      ? `m/${this.purpose}'/1'/0'`
+      : `m/${this.purpose}'/0'/0'`; // helps with seperating regular and test acc (even on the testnet)
 
     this.usedAddresses = stateVars ? stateVars.usedAddresses : [];
     this.nextFreeAddressIndex = stateVars ? stateVars.nextFreeAddressIndex : 0;
