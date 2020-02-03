@@ -1502,11 +1502,11 @@ export default function Home(props) {
   //   if (health) setOverallHealth(health);
   // }, [health]);
 
-  const s3Service = useSelector(state => state.sss.service);
-  useEffect(() => {
-    if (s3Service)
-      if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
-  }, [s3Service]);
+  // const s3Service = useSelector(state => state.sss.service);
+  // useEffect(() => {
+  //   if (s3Service)
+  //     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
+  // }, [s3Service]);
 
   const testAccService = accounts[TEST_ACCOUNT].service;
   useEffect(() => {

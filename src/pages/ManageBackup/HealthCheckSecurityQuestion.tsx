@@ -42,12 +42,11 @@ export default function HealthCheckSecurityQuestion(props) {
   const setConfirm = event => {
     if (event.text) {
       if (event.text.length > 0 && event.text != securityAnswer) {
-        if(AnswerCounter<2){
+        if (AnswerCounter < 2) {
           AnswerCounter++;
           setAnswerCounter(AnswerCounter);
-        }
-        else{
-          setAnswer(securityAnswer)
+        } else {
+          setAnswer(event.text);
           setErrorText('');
           return;
         }
@@ -72,15 +71,18 @@ export default function HealthCheckSecurityQuestion(props) {
     }
   }, [answer]);
 
-  const onQuestionSelect = (value) =>{
+  const onQuestionSelect = value => {
     if (securityQuestion != value.question) {
-      if(QuestionCounter<2){
+      if (QuestionCounter < 2) {
         QuestionCounter++;
         setQuestionCounter(QuestionCounter);
-      }
-      else{
-        setDropdownBoxValue(dropdownBoxList[dropdownBoxList.findIndex((tmp)=>tmp.question==securityQuestion)]);
-        setDropdownBoxOpenClose(false)
+      } else {
+        setDropdownBoxValue(
+          dropdownBoxList[
+            dropdownBoxList.findIndex(tmp => tmp.question == securityQuestion)
+          ],
+        );
+        setDropdownBoxOpenClose(false);
         setErrorText('');
         return;
       }
@@ -90,7 +92,7 @@ export default function HealthCheckSecurityQuestion(props) {
     }
     setDropdownBoxValue(value);
     setDropdownBoxOpenClose(false);
-  }
+  };
 
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
@@ -241,12 +243,16 @@ export default function HealthCheckSecurityQuestion(props) {
             <AppBottomSheetTouchableWrapper
               disabled={errorText || !answer ? true : false}
               onPress={() => {
-                AsyncStorage.setItem(
-                  'SecurityAnsTimestamp',
-                  JSON.stringify(Date.now()),
-                ).then(() => {
-                  props.onPressConfirm();
-                });
+                if (answer.trim() == securityAnswer.trim()) {
+                  AsyncStorage.setItem(
+                    'SecurityAnsTimestamp',
+                    JSON.stringify(Date.now()),
+                  ).then(() => {
+                    props.onPressConfirm();
+                  });
+                } else {
+                  setErrorText('Answer is incorrect');
+                }
               }}
               style={styles.questionConfirmButton}
             >

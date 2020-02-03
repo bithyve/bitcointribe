@@ -102,7 +102,7 @@ const SecurityQuestionHistory = props => {
       <HealthCheckSecurityQuestion
         bottomSheetRef={SecurityQuestionBottomSheet}
         onPressConfirm={async () => {
-          updateAutoHighlightFlags;
+          updateAutoHighlightFlags();
           SecurityQuestionBottomSheet.current.snapTo(0);
           (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
         }}
@@ -210,13 +210,15 @@ const SecurityQuestionHistory = props => {
       </View>
       <View style={{ flex: 1 }}>
         <HistoryPageComponent
+          IsReshare
           data={secondaryDeviceHistory}
           reshareInfo={
             'consectetur Lorem ipsum dolor sit amet, consectetur sit '
           }
           onPressConfirm={() => {
             // ConfirmBottomSheet.current.snapTo(1);
-            alert('confirm');
+            // alert('confirm');
+            (SecurityQuestionBottomSheet as any).current.snapTo(1);
           }}
           onPressContinue={() => {
             (SecurityQuestionBottomSheet as any).current.snapTo(1);
