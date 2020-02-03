@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Platform,
+  AsyncStorage,
   TouchableOpacity,
   Text,
   SafeAreaView,
@@ -19,7 +19,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function QrScanner(props) {
   const [cameraRef, setcameraRef] = useState(React.createRef());
-  global.isCameraOpen = true;
+  //global.isCameraOpen = true;
   const barcodeRecognized = async barcodes => {
     if (barcodes.data) {
       props.navigation.state.params.scanedCode(
@@ -28,6 +28,16 @@ export default function QrScanner(props) {
       props.navigation.goBack();
     }
   };
+
+  useEffect(() => {
+    (async () => {
+    let isCameraOpen = await AsyncStorage.getItem('isCameraOpen');
+    if (!isCameraOpen) {
+      await AsyncStorage.setItem('isCameraOpen', 'true');
+    }
+  })();
+   // global.isContactOpen = true;
+  }, []);
 
   const getFormattedString = (qrString: string) => {
     qrString = qrString.split('Dquote').join('"');

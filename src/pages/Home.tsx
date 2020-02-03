@@ -1433,16 +1433,27 @@ export default function Home(props) {
   // };
 
   let isNavigate = false;
-  const handleAppStateChange = nextAppState => {
+  const handleAppStateChange = async (nextAppState) => {
     console.log('nextAppState', nextAppState);
-    if (global.isCameraOpen) {
-      global.isCameraOpen = false;
+    let isContactOpen = await AsyncStorage.getItem('isContactOpen');
+    // if (!isContactOpen) {
+    //   await AsyncStorage.setItem('isContactOpen', 'true');
+    // }
+    let isCameraOpen = await AsyncStorage.getItem('isCameraOpen');
+    // if (!isCameraOpen) {
+    //   await AsyncStorage.setItem('isCameraOpen', 'true');
+    // }
+    console.log("global.isCameraOpen",isCameraOpen, isContactOpen, isNavigate);
+    if (isCameraOpen) {
+      await AsyncStorage.setItem('isCameraOpen', 'false');
     }
-    if (global.isContactOpen) {
-      global.isContactOpen = false;
+    if (isContactOpen) {
+      await AsyncStorage.setItem('isContactOpen', 'false');
     }
-    var blockApp = setTimeout(function() {
+    
+    var blockApp = setTimeout(() => {
       if (isNavigate) {
+        console.log("isNavigate",isNavigate);
         props.navigation.navigate('ReLogin');
       }
     }, 30000);
@@ -1451,6 +1462,7 @@ export default function Home(props) {
         ? nextAppState == 'active'
         : nextAppState == 'background'
     ) {
+      console.log("isNavigate",isNavigate);
       clearTimeout(blockApp);
       isNavigate = true; // producing a subtle delay to let deep link event listener make the first move
     } else {
