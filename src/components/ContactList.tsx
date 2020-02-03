@@ -3,7 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  AsyncStorage,
   PermissionsAndroid,
   Platform,
   Alert,
@@ -103,7 +103,13 @@ export default function ContactList(props) {
   }
 
   useEffect(() => {
-    global.isContactOpen = true;
+    (async () => {
+    let isContactOpen = await AsyncStorage.getItem('isContactOpen');
+    if (!isContactOpen) {
+      await AsyncStorage.setItem('isContactOpen', 'true');
+    }
+  })();
+   // global.isContactOpen = true;
     getContactsAsync();
     setSearchBox('');
   }, []);

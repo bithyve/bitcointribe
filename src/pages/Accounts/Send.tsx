@@ -47,6 +47,7 @@ import SmallHeaderModal from '../../components/SmallHeaderModal';
 import QrCodeModalContents from '../../components/QrCodeModalContents';
 // import HealthCheckGoogleAuthModalContents from '../../components/HealthCheckGoogleAuthModalContents';
 import AsyncStorage from '@react-native-community/async-storage';
+import BottomInfoBox from '../../components/BottomInfoBox';
 
 export default function Send(props) {
   const staticFees = props.navigation.getParam('staticFees');
@@ -72,7 +73,7 @@ export default function Send(props) {
 
   const checkNShowHelperModal = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
-    if (isSendHelperDone && serviceType == TEST_ACCOUNT) {
+    if (!isSendHelperDone && serviceType == TEST_ACCOUNT) {
       await AsyncStorage.setItem('isSendHelperDone', 'true');
       setTimeout(() => {
         setIsSendHelperDone(true);
@@ -659,6 +660,18 @@ export default function Send(props) {
               </TouchableOpacity>
             </View>
             {/* {transfer.executed === 'ST1' ? stage2() : null} */}
+            <View
+          style={{
+            marginBottom: hp('5%'),
+          }}
+        >
+          <BottomInfoBox
+            title={'Note'}
+            infoText={
+              'When you want to send bitcoins, you need the address of the receiver. For this you can either scan a QR code from their wallet/ app or copy address into the address field'
+            }
+          />
+        </View>
           </ScrollView>
         </KeyboardAvoidingView>
         <BottomSheet
