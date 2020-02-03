@@ -20,7 +20,7 @@ import {
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
-import { uploadEncMShare } from '../../store/actions/sss';
+import { uploadEncMShare, checkPDFHealth } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -87,6 +87,19 @@ const PersonalCopyHistory = props => {
   );
   const next = props.navigation.getParam('next');
 
+  const dispatch = useDispatch();
+
+  const onConfirm = useCallback(() => {
+    // ConfirmBottomSheet.current.snapTo(1);
+    // alert('confirm');
+    const index = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
+    props.navigation.navigate('QrScanner', {
+      scanedCode: qrData => {
+        dispatch(checkPDFHealth(qrData, index));
+      },
+    });
+  }, [selectedPersonalCopy]);
+
   const renderPersonalCopyShareModalContent = useCallback(() => {
     return (
       <ModalShareIntent
@@ -116,12 +129,31 @@ const PersonalCopyHistory = props => {
     if (next) (PersonalCopyShareBottomSheet as any).current.snapTo(1);
   }, [next]);
 
+  const [personalCopyShared, setPersonalCopyShared] = useState(false);
+
+  const shared = useSelector(state => state.manageBackup.shared);
   useEffect(() => {
-    AsyncStorage.getItem('personalCopy1Shared').then(shared => {
-      if (shared) {
-        updateAutoHighlightFlags();
-      }
-    });
+    if (selectedPersonalCopy.type === 'copy1' && shared.personalCopy1) {
+      setPersonalCopyShared(true);
+    } else if (selectedPersonalCopy.type === 'copy2' && shared.personalCopy2) {
+      setPersonalCopyShared(true);
+    }
+  }, [shared]);
+
+  useEffect(() => {
+    if (selectedPersonalCopy.type === 'copy1') {
+      AsyncStorage.getItem('personalCopy1Shared').then(shared => {
+        if (shared) {
+          setPersonalCopyShared(true);
+        }
+      });
+    } else if (selectedPersonalCopy.type === 'copy2') {
+      AsyncStorage.getItem('personalCopy2Shared').then(shared => {
+        if (shared) {
+          setPersonalCopyShared(true);
+        }
+      });
+    }
   }, []);
 
   return (
@@ -183,14 +215,12 @@ const PersonalCopyHistory = props => {
       <View style={{ flex: 1 }}>
         <HistoryPageComponent
           // IsReshare
+          IsReshare={personalCopyShared ? true : false}
           data={secondaryDeviceHistory}
           reshareInfo={
             'consectetur Lorem ipsum dolor sit amet, consectetur sit '
           }
-          onPressConfirm={() => {
-            // ConfirmBottomSheet.current.snapTo(1);
-            alert('confirm');
-          }}
+          onPressConfirm={onConfirm}
           onPressReshare={() => {
             alert('reshare');
             // ReshareBottomSheet.current.snapTo(1);
