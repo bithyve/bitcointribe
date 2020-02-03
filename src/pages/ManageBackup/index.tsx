@@ -161,14 +161,14 @@ export default function ManageBackup(props) {
     RegenerateShareHelperBottomSheet,
     setRegenerateShareHelperBottomSheet,
   ] = useState(React.createRef());
-  const [
-    PersonalCopy1ShareBottomSheet,
-    setPersonalCopy1ShareBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    PersonalCopy2ShareBottomSheet,
-    setPersonalCopy2ShareBottomSheet,
-  ] = useState(React.createRef());
+  // const [
+  //   PersonalCopy1ShareBottomSheet,
+  //   setPersonalCopy1ShareBottomSheet,
+  // ] = useState(React.createRef());
+  // const [
+  //   PersonalCopy2ShareBottomSheet,
+  //   setPersonalCopy2ShareBottomSheet,
+  // ] = useState(React.createRef());
   const [
     shareOtpWithTrustedContactBottomSheet,
     setShareOtpWithTrustedContactBottomSheet,
@@ -316,148 +316,148 @@ export default function ManageBackup(props) {
   //   );
   // }
 
-  const renderPersonalCopy1ShareModalContent = () => {
-    const selectedPersonalCopy = {
-      title: 'Personal Copy 1',
-      personalInfo: null,
-      time: 'never',
-      status: 'Ugly',
-      type: 'copy1',
-      route: 'PersonalCopy',
-    };
-    return (
-      <ModalShareIntent
-        removeHighlightingFromCard={removeHighlightingFromCard}
-        selectedPersonalCopy={selectedPersonalCopy}
-        onPressBack={() => {
-          (PersonalCopy1ShareBottomSheet as any).current.snapTo(0);
-          //setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
-        }}
-        onPressShare={() => {
-          // setAutoHighlightFlags({ ...autoHighlightFlags, personalCopy1: true }); // autoHighlightFlags turning up to be null
-          setAutoHighlightFlags({
-            secondaryDevice: true,
-            trustedContact1: true,
-            trustedContact2: true,
-            personalCopy1: true,
-            personalCopy2: false,
-            securityAns: true,
-          });
+  // const renderPersonalCopy1ShareModalContent = () => {
+  //   const selectedPersonalCopy = {
+  //     title: 'Personal Copy 1',
+  //     personalInfo: null,
+  //     time: 'never',
+  //     status: 'Ugly',
+  //     type: 'copy1',
+  //     route: 'PersonalCopy',
+  //   };
+  //   return (
+  //     <ModalShareIntent
+  //       removeHighlightingFromCard={removeHighlightingFromCard}
+  //       selectedPersonalCopy={selectedPersonalCopy}
+  //       onPressBack={() => {
+  //         (PersonalCopy1ShareBottomSheet as any).current.snapTo(0);
+  //         //setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
+  //       }}
+  //       onPressShare={() => {
+  //         // setAutoHighlightFlags({ ...autoHighlightFlags, personalCopy1: true }); // autoHighlightFlags turning up to be null
+  //         setAutoHighlightFlags({
+  //           secondaryDevice: true,
+  //           trustedContact1: true,
+  //           trustedContact2: true,
+  //           personalCopy1: true,
+  //           personalCopy2: false,
+  //           securityAns: true,
+  //         });
 
-          (PersonalCopy1ShareBottomSheet as any).current.snapTo(0);
+  //         (PersonalCopy1ShareBottomSheet as any).current.snapTo(0);
 
-          // setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
-          // let pdfShared = JSON.parse(await AsyncStorage.getItem('pdfShared'));
-          // pdfShared = pdfShared ? pdfShared : {};
-          // const updatedPDFShared = {
-          //   ...pdfShared,
-          //   [type == 'copy2' ? 4 : 3]: true,
-          // };
-          // await AsyncStorage.setItem(
-          //   'pdfShared',
-          //   JSON.stringify({
-          //     ...updatedPDFShared,
-          //   }),
-          // );
+  //         // setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
+  //         // let pdfShared = JSON.parse(await AsyncStorage.getItem('pdfShared'));
+  //         // pdfShared = pdfShared ? pdfShared : {};
+  //         // const updatedPDFShared = {
+  //         //   ...pdfShared,
+  //         //   [type == 'copy2' ? 4 : 3]: true,
+  //         // };
+  //         // await AsyncStorage.setItem(
+  //         //   'pdfShared',
+  //         //   JSON.stringify({
+  //         //     ...updatedPDFShared,
+  //         //   }),
+  //         // );
 
-          // if (
-          //   arrModalShareIntent.item &&
-          //   arrModalShareIntent.item.type == 'copy1'
-          // ) {
-          //   AsyncStorage.setItem('personalCopy1AutoHighlightFlags', 'true');
-          // } else if (
-          //   arrModalShareIntent.item &&
-          //   arrModalShareIntent.item.type == 'copy2'
-          // ) {
-          //   AsyncStorage.setItem('personalCopy2AutoHighlightFlags', 'true');
-          // }
-          // setSelectedType('');
-        }}
-      />
-    );
-  };
+  //         // if (
+  //         //   arrModalShareIntent.item &&
+  //         //   arrModalShareIntent.item.type == 'copy1'
+  //         // ) {
+  //         //   AsyncStorage.setItem('personalCopy1AutoHighlightFlags', 'true');
+  //         // } else if (
+  //         //   arrModalShareIntent.item &&
+  //         //   arrModalShareIntent.item.type == 'copy2'
+  //         // ) {
+  //         //   AsyncStorage.setItem('personalCopy2AutoHighlightFlags', 'true');
+  //         // }
+  //         // setSelectedType('');
+  //       }}
+  //     />
+  //   );
+  // };
 
-  const renderPersonalCopy1ShareModalHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (PersonalCopy1ShareBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
+  // const renderPersonalCopy1ShareModalHeader = useCallback(() => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         (PersonalCopy1ShareBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }, []);
 
-  const renderPersonalCopy2ShareModalContent = () => {
-    const selectedPersonalCopy = {
-      title: 'Personal Copy 2',
-      personalInfo: null,
-      time: 'never',
-      status: 'Ugly',
-      type: 'copy2',
-      route: 'PersonalCopy',
-    };
-    return (
-      <ModalShareIntent
-        removeHighlightingFromCard={removeHighlightingFromCard}
-        selectedPersonalCopy={selectedPersonalCopy}
-        onPressBack={() => {
-          (PersonalCopy2ShareBottomSheet as any).current.snapTo(0);
+  // const renderPersonalCopy2ShareModalContent = () => {
+  //   const selectedPersonalCopy = {
+  //     title: 'Personal Copy 2',
+  //     personalInfo: null,
+  //     time: 'never',
+  //     status: 'Ugly',
+  //     type: 'copy2',
+  //     route: 'PersonalCopy',
+  //   };
+  //   return (
+  //     <ModalShareIntent
+  //       removeHighlightingFromCard={removeHighlightingFromCard}
+  //       selectedPersonalCopy={selectedPersonalCopy}
+  //       onPressBack={() => {
+  //         (PersonalCopy2ShareBottomSheet as any).current.snapTo(0);
 
-          //setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
-        }}
-        onPressShare={() => {
-          (PersonalCopy2ShareBottomSheet as any).current.snapTo(0);
-          // setAutoHighlightFlags({ ...autoHighlightFlags, personalCopy2: true });
+  //         //setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
+  //       }}
+  //       onPressShare={() => {
+  //         (PersonalCopy2ShareBottomSheet as any).current.snapTo(0);
+  //         // setAutoHighlightFlags({ ...autoHighlightFlags, personalCopy2: true });
 
-          setAutoHighlightFlags({
-            secondaryDevice: true,
-            trustedContact1: true,
-            trustedContact2: true,
-            personalCopy1: true,
-            personalCopy2: true,
-            securityAns: true,
-          });
+  //         setAutoHighlightFlags({
+  //           secondaryDevice: true,
+  //           trustedContact1: true,
+  //           trustedContact2: true,
+  //           personalCopy1: true,
+  //           personalCopy2: true,
+  //           securityAns: true,
+  //         });
 
-          // setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
-          // let pdfShared = JSON.parse(await AsyncStorage.getItem('pdfShared'));
-          // pdfShared = pdfShared ? pdfShared : {};
-          // const updatedPDFShared = {
-          //   ...pdfShared,
-          //   [type == 'copy2' ? 4 : 3]: true,
-          // };
-          // await AsyncStorage.setItem(
-          //   'pdfShared',
-          //   JSON.stringify({
-          //     ...updatedPDFShared,
-          //   }),
-          // );
+  //         // setArrModalShareIntent({ ...arrModalShareIntent, snapTop: 0 });
+  //         // let pdfShared = JSON.parse(await AsyncStorage.getItem('pdfShared'));
+  //         // pdfShared = pdfShared ? pdfShared : {};
+  //         // const updatedPDFShared = {
+  //         //   ...pdfShared,
+  //         //   [type == 'copy2' ? 4 : 3]: true,
+  //         // };
+  //         // await AsyncStorage.setItem(
+  //         //   'pdfShared',
+  //         //   JSON.stringify({
+  //         //     ...updatedPDFShared,
+  //         //   }),
+  //         // );
 
-          // if (
-          //   arrModalShareIntent.item &&
-          //   arrModalShareIntent.item.type == 'copy1'
-          // ) {
-          //   AsyncStorage.setItem('personalCopy1AutoHighlightFlags', 'true');
-          // } else if (
-          //   arrModalShareIntent.item &&
-          //   arrModalShareIntent.item.type == 'copy2'
-          // ) {
-          //   AsyncStorage.setItem('personalCopy2AutoHighlightFlags', 'true');
-          // }
-          // setSelectedType('');
-        }}
-      />
-    );
-  };
+  //         // if (
+  //         //   arrModalShareIntent.item &&
+  //         //   arrModalShareIntent.item.type == 'copy1'
+  //         // ) {
+  //         //   AsyncStorage.setItem('personalCopy1AutoHighlightFlags', 'true');
+  //         // } else if (
+  //         //   arrModalShareIntent.item &&
+  //         //   arrModalShareIntent.item.type == 'copy2'
+  //         // ) {
+  //         //   AsyncStorage.setItem('personalCopy2AutoHighlightFlags', 'true');
+  //         // }
+  //         // setSelectedType('');
+  //       }}
+  //     />
+  //   );
+  // };
 
-  const renderPersonalCopy2ShareModalHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (PersonalCopy2ShareBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
+  // const renderPersonalCopy2ShareModalHeader = useCallback(() => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         (PersonalCopy2ShareBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }, []);
 
   const renderWalletBackupAndRecoveryContents = () => {
     return (
@@ -768,10 +768,10 @@ export default function ManageBackup(props) {
       CommunicationModeBottomSheet.current.snapTo(1);
     } else if (SelectTypeToReshare == 'copy1') {
       PersonalCopyHistoryBottomSheet.current.snapTo(0);
-      (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
+      // (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
     } else if (SelectTypeToReshare == 'copy2') {
       PersonalCopyHistoryBottomSheet.current.snapTo(0);
-      (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
+      // (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
     } else if (SelectTypeToReshare == 'security') {
       // SecurityQuestionBottomSheet.current.snapTo(1);
       SecurityQuestionHistoryBottomSheet.current.snapTo(0);
@@ -929,9 +929,9 @@ export default function ManageBackup(props) {
     console.log('data', data);
   };
 
-  const removeHighlightingFromCard = () => {
-    setSelectedType('');
-  };
+  // const removeHighlightingFromCard = () => {
+  //   setSelectedType('');
+  // };
 
   // const onPressOnHealthCheckSuccess = async () => {
   //   (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
@@ -1196,73 +1196,73 @@ export default function ManageBackup(props) {
     }
   };
 
-  const autoHighlightOptions = async () => {
-    let contactList = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
-    setContacts(contactList);
-    // console.log('----Auto Highlightt Option----');
-    // console.log({
-    //   secondaryDeviceAutoHighlightFlags,
-    //   contact1AutoHighlightFlags,
-    //   contact2AutoHighlightFlags,
-    //   personalCopy1AutoHighlightFlags,
-    //   personalCopy2AutoHighlightFlags,
-    //   securityAutoHighlightFlags,
-    // });
-    if (secondaryDeviceAutoHighlightFlags != 'true') {
-      setSelectedType('secondaryDevice');
-    } else if (contact1AutoHighlightFlags != 'true') {
-      setSelectedType('contact1');
-    } else if (contact2AutoHighlightFlags != 'true') {
-      setSelectedType('contact2');
-    } else if (personalCopy1AutoHighlightFlags != 'true') {
-      setSelectedType('copy1');
-    } else if (personalCopy2AutoHighlightFlags != 'true') {
-      setSelectedType('copy2');
-    } else if (securityAutoHighlightFlags != 'true') {
-      setSelectedType('security');
-    } else {
-      if (overallHealth) {
-        if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
-          setSelectedType('secondaryDevice');
-        } else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
-          setSelectedType('contact1');
-        } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
-          setSelectedType('contact2');
-        } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
-          setSelectedType('copy1');
-        } else if (overallHealth.sharesInfo[4].shareStage === 'Ugly') {
-          setSelectedType('copy2');
-        } else if (overallHealth.qaStatus.stage === 'Ugly') {
-          setSelectedType('security');
-        } else if (overallHealth.sharesInfo[0].shareStage === 'Bad') {
-          setSelectedType('secondaryDevice');
-        } else if (overallHealth.sharesInfo[1].shareStage === 'Bad') {
-          setSelectedType('contact1');
-        } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
-          setSelectedType('contact2');
-        } else if (overallHealth.sharesInfo[3].shareStage === 'Bad') {
-          setSelectedType('copy1');
-        } else if (overallHealth.sharesInfo[4].shareStage === 'Bad') {
-          setSelectedType('copy2');
-        } else if (overallHealth.qaStatus.stage === 'Bad') {
-          setSelectedType('security');
-        }
-      }
-    }
-    if (contactList.length) {
-      if (contactList.findIndex(value => value.type == 'contact1') != -1) {
-        pageData[1].personalInfo =
-          contactList[contactList.findIndex(value => value.type == 'contact1')];
-      }
-      if (contactList.findIndex(value => value.type == 'contact2') != -1) {
-        pageData[2].personalInfo =
-          contactList[contactList.findIndex(value => value.type == 'contact2')];
-      }
-    }
-    setPageData(pageData);
-  };
+  // const autoHighlightOptions = async () => {
+  //   let contactList = JSON.parse(
+  //     await AsyncStorage.getItem('SelectedContacts'),
+  //   );
+  //   setContacts(contactList);
+  //   // console.log('----Auto Highlightt Option----');
+  //   // console.log({
+  //   //   secondaryDeviceAutoHighlightFlags,
+  //   //   contact1AutoHighlightFlags,
+  //   //   contact2AutoHighlightFlags,
+  //   //   personalCopy1AutoHighlightFlags,
+  //   //   personalCopy2AutoHighlightFlags,
+  //   //   securityAutoHighlightFlags,
+  //   // });
+  //   if (secondaryDeviceAutoHighlightFlags != 'true') {
+  //     setSelectedType('secondaryDevice');
+  //   } else if (contact1AutoHighlightFlags != 'true') {
+  //     setSelectedType('contact1');
+  //   } else if (contact2AutoHighlightFlags != 'true') {
+  //     setSelectedType('contact2');
+  //   } else if (personalCopy1AutoHighlightFlags != 'true') {
+  //     setSelectedType('copy1');
+  //   } else if (personalCopy2AutoHighlightFlags != 'true') {
+  //     setSelectedType('copy2');
+  //   } else if (securityAutoHighlightFlags != 'true') {
+  //     setSelectedType('security');
+  //   } else {
+  //     if (overallHealth) {
+  //       if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
+  //         setSelectedType('secondaryDevice');
+  //       } else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
+  //         setSelectedType('contact1');
+  //       } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
+  //         setSelectedType('contact2');
+  //       } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
+  //         setSelectedType('copy1');
+  //       } else if (overallHealth.sharesInfo[4].shareStage === 'Ugly') {
+  //         setSelectedType('copy2');
+  //       } else if (overallHealth.qaStatus.stage === 'Ugly') {
+  //         setSelectedType('security');
+  //       } else if (overallHealth.sharesInfo[0].shareStage === 'Bad') {
+  //         setSelectedType('secondaryDevice');
+  //       } else if (overallHealth.sharesInfo[1].shareStage === 'Bad') {
+  //         setSelectedType('contact1');
+  //       } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
+  //         setSelectedType('contact2');
+  //       } else if (overallHealth.sharesInfo[3].shareStage === 'Bad') {
+  //         setSelectedType('copy1');
+  //       } else if (overallHealth.sharesInfo[4].shareStage === 'Bad') {
+  //         setSelectedType('copy2');
+  //       } else if (overallHealth.qaStatus.stage === 'Bad') {
+  //         setSelectedType('security');
+  //       }
+  //     }
+  //   }
+  //   if (contactList.length) {
+  //     if (contactList.findIndex(value => value.type == 'contact1') != -1) {
+  //       pageData[1].personalInfo =
+  //         contactList[contactList.findIndex(value => value.type == 'contact1')];
+  //     }
+  //     if (contactList.findIndex(value => value.type == 'contact2') != -1) {
+  //       pageData[2].personalInfo =
+  //         contactList[contactList.findIndex(value => value.type == 'contact2')];
+  //     }
+  //   }
+  //   setPageData(pageData);
+  // };
 
   // const nextStep = async () => {
   //   if (secondaryDeviceAutoHighlightFlags != 'true') {
@@ -1396,9 +1396,35 @@ export default function ManageBackup(props) {
     } else if (!trustedContact2) {
       setTimeout(() => {}, 10);
     } else if (!personalCopy1) {
-      (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
+      // (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
+      const data = pageData[3];
+      props.navigation.navigate('PersonalCopyHistory', {
+        selectedStatus: data.status,
+        selectedTime: getTime(data.time),
+        selectedTitle: data.title,
+        selectedPersonalCopy: data,
+        updateAutoHighlightFlags: () =>
+          setAutoHighlightFlags({
+            ...autoHighlightFlags,
+            personalCopy1: true,
+          }),
+        next: 'true',
+      });
     } else if (!personalCopy2) {
-      (PersonalCopy2ShareBottomSheet as any).current.snapTo(1);
+      // (PersonalCopy2ShareBottomSheet as any).current.snapTo(1);
+      const data = pageData[4];
+      props.navigation.navigate('PersonalCopyHistory', {
+        selectedStatus: data.status,
+        selectedTime: getTime(data.time),
+        selectedTitle: data.title,
+        selectedPersonalCopy: data,
+        updateAutoHighlightFlags: () =>
+          setAutoHighlightFlags({
+            ...autoHighlightFlags,
+            personalCopy2: true,
+          }),
+        next: 'true',
+      });
     } else if (!securityAns) {
       const data = pageData[5];
       props.navigation.navigate('SecurityQuestionHistory', {
@@ -1446,25 +1472,51 @@ export default function ManageBackup(props) {
           // ConfirmBottomSheet.current.snapTo(1);
           setTimeout(() => {}, 10);
         } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
-          setSelectedTime(getTime(pageData[3].time));
-          setSelectedStatus(pageData[3].status);
-          setSelectTypeToReshare('copy1');
-          //personal copy 1
-          setTimeout(() => {
-            setLoadCamera(true);
-          }, 2);
+          // setSelectedTime(getTime(pageData[3].time));
+          // setSelectedStatus(pageData[3].status);
+          // setSelectTypeToReshare('copy1');
+          // //personal copy 1
+          // setTimeout(() => {
+          //   setLoadCamera(true);
+          // }, 2);
           // ConfirmBottomSheet.current.snapTo(1);
-          (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
+          // (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
+          const data = pageData[3];
+          props.navigation.navigate('PersonalCopyHistory', {
+            selectedStatus: data.status,
+            selectedTime: getTime(data.time),
+            selectedTitle: data.title,
+            selectedPersonalCopy: data,
+            updateAutoHighlightFlags: () =>
+              setAutoHighlightFlags({
+                ...autoHighlightFlags,
+                personalCopy1: true,
+              }),
+            next: 'true',
+          });
         } else if (overallHealth.sharesInfo[4].shareStage === 'Ugly') {
-          setSelectedTime(getTime(pageData[4].time));
-          setSelectedStatus(pageData[4].status);
-          setSelectTypeToReshare('copy2');
-          //personal copy 2
-          setTimeout(() => {
-            setLoadCamera(true);
-          }, 2);
+          // setSelectedTime(getTime(pageData[4].time));
+          // setSelectedStatus(pageData[4].status);
+          // setSelectTypeToReshare('copy2');
+          // //personal copy 2
+          // setTimeout(() => {
+          //   setLoadCamera(true);
+          // }, 2);
           // ConfirmBottomSheet.current.snapTo(1);
-          (PersonalCopy2ShareBottomSheet as any).current.snapTo(1);
+          // (PersonalCopy2ShareBottomSheet as any).current.snapTo(1);
+          const data = pageData[4];
+          props.navigation.navigate('PersonalCopyHistory', {
+            selectedStatus: data.status,
+            selectedTime: getTime(data.time),
+            selectedTitle: data.title,
+            selectedPersonalCopy: data,
+            updateAutoHighlightFlags: () =>
+              setAutoHighlightFlags({
+                ...autoHighlightFlags,
+                personalCopy2: true,
+              }),
+            next: 'true',
+          });
         } else if (overallHealth.qaStatus.stage === 'Ugly') {
           setSelectedTime(getTime(pageData[5].time));
           setSelectedStatus(pageData[5].status);
@@ -1517,25 +1569,51 @@ export default function ManageBackup(props) {
 
           setTimeout(() => {}, 10);
         } else if (overallHealth.sharesInfo[3].shareStage === 'Bad') {
-          setSelectedTime(getTime(pageData[3].time));
-          setSelectedStatus(pageData[3].status);
-          setSelectTypeToReshare('copy1');
-          //personal copy 1
-          setTimeout(() => {
-            setLoadCamera(true);
-          }, 2);
+          // setSelectedTime(getTime(pageData[3].time));
+          // setSelectedStatus(pageData[3].status);
+          // setSelectTypeToReshare('copy1');
+          // //personal copy 1
+          // setTimeout(() => {
+          //   setLoadCamera(true);
+          // }, 2);
           // ConfirmBottomSheet.current.snapTo(1);
-          (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
+          // (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
+          const data = pageData[3];
+          props.navigation.navigate('PersonalCopyHistory', {
+            selectedStatus: data.status,
+            selectedTime: getTime(data.time),
+            selectedTitle: data.title,
+            selectedPersonalCopy: data,
+            updateAutoHighlightFlags: () =>
+              setAutoHighlightFlags({
+                ...autoHighlightFlags,
+                personalCopy1: true,
+              }),
+            next: 'true',
+          });
         } else if (overallHealth.sharesInfo[4].shareStage === 'Bad') {
-          setSelectedTime(getTime(pageData[4].time));
-          setSelectedStatus(pageData[4].status);
-          setSelectTypeToReshare('copy2');
-          //personal copy 2
-          setTimeout(() => {
-            setLoadCamera(true);
-          }, 2);
+          // setSelectedTime(getTime(pageData[4].time));
+          // setSelectedStatus(pageData[4].status);
+          // setSelectTypeToReshare('copy2');
+          // //personal copy 2
+          // setTimeout(() => {
+          //   setLoadCamera(true);
+          // }, 2);
           // ConfirmBottomSheet.current.snapTo(1);
-          (PersonalCopy2ShareBottomSheet as any).current.snapTo(1);
+          // (PersonalCopy2ShareBottomSheet as any).current.snapTo(1);
+          const data = pageData[4];
+          props.navigation.navigate('PersonalCopyHistory', {
+            selectedStatus: data.status,
+            selectedTime: getTime(data.time),
+            selectedTitle: data.title,
+            selectedPersonalCopy: data,
+            updateAutoHighlightFlags: () =>
+              setAutoHighlightFlags({
+                ...autoHighlightFlags,
+                personalCopy2: true,
+              }),
+            next: 'true',
+          });
         } else if (overallHealth.qaStatus.stage === 'Bad') {
           // Security question
           // SecurityQuestionBottomSheet.current.snapTo(1);
@@ -1767,6 +1845,12 @@ export default function ManageBackup(props) {
                         selectedStatus: item.status,
                         selectedTime: getTime(item.time),
                         selectedTitle: item.title,
+                        selectedPersonalCopy: item,
+                        updateAutoHighlightFlags: () =>
+                          setAutoHighlightFlags({
+                            ...autoHighlightFlags,
+                            personalCopy1: true,
+                          }),
                       });
                       // if (!databaseSSS && !databaseSSS.pdfDetails) {
                       //   Alert.alert(
@@ -1805,6 +1889,12 @@ export default function ManageBackup(props) {
                         selectedStatus: item.status,
                         selectedTime: getTime(item.time),
                         selectedTitle: item.title,
+                        selectedPersonalCopy: item,
+                        updateAutoHighlightFlags: () =>
+                          setAutoHighlightFlags({
+                            ...autoHighlightFlags,
+                            personalCopy2: true,
+                          }),
                       });
                       // if (!databaseSSS && !databaseSSS.pdfDetails) {
                       //   Alert.alert(
@@ -1972,7 +2062,7 @@ export default function ManageBackup(props) {
           renderContent={renderRegenerateShareHelperContents}
           renderHeader={renderRegenerateShareHelperHeader}
         />
-        <BottomSheet
+        {/* <BottomSheet
           enabledInnerScrolling={true}
           ref={PersonalCopy1ShareBottomSheet}
           snapPoints={[-50, hp('95%')]}
@@ -1985,7 +2075,7 @@ export default function ManageBackup(props) {
           snapPoints={[-50, hp('95%')]}
           renderContent={renderPersonalCopy2ShareModalContent}
           renderHeader={renderPersonalCopy2ShareModalHeader}
-        />
+        /> */}
         <BottomSheet
           enabledInnerScrolling={true}
           ref={PersonalCopyQRScannerBottomSheet}

@@ -10,6 +10,7 @@ import {
   SHARE_PDF,
   DBUPDATE_PDF_SEND,
   dbUpdatePdfSharing,
+  personalCopyShared,
 } from '../actions/manageBackup';
 import { dbUpdateSSS } from '../actions/storage';
 import { socialMediaType } from '../utils/media';
@@ -192,11 +193,12 @@ function* sharePdfWorker({ payload }) {
       );
     }
 
-    console.log({ type: item.type });
     if (item.type == 'copy1')
       AsyncStorage.setItem('personalCopy1Shared', 'true');
     else if (item.type == 'copy2')
       AsyncStorage.setItem('personalCopy2Shared', 'true');
+
+    yield put(personalCopyShared(item));
   } catch (error) {
     Alert.alert('PDF Sharing failed', error.message);
     console.log({ error });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -20,7 +20,7 @@ import {
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
-import { uploadEncMShare } from '../../store/actions/sss';
+import { uploadEncMShare, checkPDFHealth } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -31,9 +31,10 @@ import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../components/ModalHeader';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
+import { ModalShareIntent } from '../../components/Modal/ManageBackup';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const PersonalCopyHistory = props => {
-
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
@@ -73,41 +74,169 @@ const PersonalCopyHistory = props => {
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
   ]);
+  const [
+    PersonalCopyShareBottomSheet,
+    setPersonalCopyShareBottomSheet,
+  ] = useState(React.createRef());
+
+  const updateAutoHighlightFlags = props.navigation.getParam(
+    'updateAutoHighlightFlags',
+  );
+  const selectedPersonalCopy = props.navigation.getParam(
+    'selectedPersonalCopy',
+  );
+  const next = props.navigation.getParam('next');
+
+  const dispatch = useDispatch();
+
+  const onConfirm = useCallback(() => {
+    // ConfirmBottomSheet.current.snapTo(1);
+    // alert('confirm');
+    const index = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
+    props.navigation.navigate('QrScanner', {
+      scanedCode: qrData => {
+        dispatch(checkPDFHealth(qrData, index));
+      },
+    });
+  }, [selectedPersonalCopy]);
+
+  const renderPersonalCopyShareModalContent = useCallback(() => {
+    return (
+      <ModalShareIntent
+        removeHighlightingFromCard={() => {}}
+        selectedPersonalCopy={selectedPersonalCopy}
+        onPressBack={() => {
+          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
+        }}
+        onPressShare={() => {
+          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, [selectedPersonalCopy]);
+
+  const renderPersonalCopyShareModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  useEffect(() => {
+    if (next) (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+  }, [next]);
+
+  const [personalCopyShared, setPersonalCopyShared] = useState(false);
+
+  const shared = useSelector(state => state.manageBackup.shared);
+  useEffect(() => {
+    if (selectedPersonalCopy.type === 'copy1' && shared.personalCopy1) {
+      setPersonalCopyShared(true);
+    } else if (selectedPersonalCopy.type === 'copy2' && shared.personalCopy2) {
+      setPersonalCopyShared(true);
+    }
+  }, [shared]);
+
+  useEffect(() => {
+    if (selectedPersonalCopy.type === 'copy1') {
+      AsyncStorage.getItem('personalCopy1Shared').then(shared => {
+        if (shared) {
+          setPersonalCopyShared(true);
+        }
+      });
+    } else if (selectedPersonalCopy.type === 'copy2') {
+      AsyncStorage.getItem('personalCopy2Shared').then(shared => {
+        if (shared) {
+          setPersonalCopyShared(true);
+        }
+      });
+    }
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
-      <SafeAreaView style={{ flex: 0, backgroundColor: Colors.backgroundColor }} />
+      <SafeAreaView
+        style={{ flex: 0, backgroundColor: Colors.backgroundColor }}
+      />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={{ ...styles.modalHeaderTitleView, paddingLeft: 10, paddingRight: 10, }}>
-          <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-              <TouchableOpacity onPress={() => { props.navigation.goBack(); }} style={{ height: 30, width: 30, justifyContent: "center" }} >
-                <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-              </TouchableOpacity>
-              <View style={{ flex: 1, flexDirection:'row', marginLeft: 10, marginRight: 10, }}>
-                <View style={{ flex: 1, justifyContent: "center" }}>
-                    <Text style={BackupStyles.modalHeaderTitleText}>{props.navigation.state.params.selectedTitle}</Text>
-                    <Text style={BackupStyles.modalHeaderInfoText}>
-                        Last backup{' '}<Text style={{ fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', }}> {props.navigation.state.params.selectedTime}</Text>
-                    </Text>
-                </View>
-                <Image style={{...BackupStyles.cardIconImage, alignSelf:'center'}} source={getIconByStatus(props.navigation.state.params.selectedStatus)} />
-              </View>
+      <View
+        style={{
+          ...styles.modalHeaderTitleView,
+          paddingLeft: 10,
+          paddingRight: 10,
+        }}
+      >
+        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity
+            onPress={() => {
+              props.navigation.goBack();
+            }}
+            style={{ height: 30, width: 30, justifyContent: 'center' }}
+          >
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </TouchableOpacity>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              marginLeft: 10,
+              marginRight: 10,
+            }}
+          >
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+              <Text style={BackupStyles.modalHeaderTitleText}>
+                {props.navigation.state.params.selectedTitle}
+              </Text>
+              <Text style={BackupStyles.modalHeaderInfoText}>
+                Last backup{' '}
+                <Text
+                  style={{
+                    fontFamily: Fonts.FiraSansMediumItalic,
+                    fontWeight: 'bold',
+                  }}
+                >
+                  {' '}
+                  {props.navigation.state.params.selectedTime}
+                </Text>
+              </Text>
+            </View>
+            <Image
+              style={{ ...BackupStyles.cardIconImage, alignSelf: 'center' }}
+              source={getIconByStatus(
+                props.navigation.state.params.selectedStatus,
+              )}
+            />
           </View>
+        </View>
       </View>
-      <View style={{flex:1}}>
-          <HistoryPageComponent 
-            data={secondaryDeviceHistory}
-            reshareInfo={'consectetur Lorem ipsum dolor sit amet, consectetur sit '}
-            onPressConfirm={() => {
-                // ConfirmBottomSheet.current.snapTo(1);
-                alert("confirm")
-            }}
-            onPressReshare={() => {
-                alert("reshare");
-                // ReshareBottomSheet.current.snapTo(1);
-            }}
-          />
+      <View style={{ flex: 1 }}>
+        <HistoryPageComponent
+          // IsReshare
+          IsReshare={personalCopyShared ? true : false}
+          data={secondaryDeviceHistory}
+          reshareInfo={
+            'consectetur Lorem ipsum dolor sit amet, consectetur sit '
+          }
+          onPressConfirm={onConfirm}
+          onPressReshare={() => {
+            alert('reshare');
+            // ReshareBottomSheet.current.snapTo(1);
+          }}
+          onPressContinue={() => {
+            (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+          }}
+        />
       </View>
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={PersonalCopyShareBottomSheet}
+        snapPoints={[-50, hp('95%')]}
+        renderContent={renderPersonalCopyShareModalContent}
+        renderHeader={renderPersonalCopyShareModalHeader}
+      />
     </View>
   );
 };
@@ -127,7 +256,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingRight: 10,
     paddingBottom: hp('3%'),
-    marginTop:20,
+    marginTop: 20,
     marginBottom: 15,
   },
 });

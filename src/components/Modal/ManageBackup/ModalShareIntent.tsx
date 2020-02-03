@@ -26,10 +26,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 export default function ModalShareIntent(props) {
   console.log({ props });
-  const { selectedPersonalCopy } = props;
-  if (!selectedPersonalCopy) {
-    return <View style={[styles.modalContainer]}></View>;
-  }
+
   // const [flagRefreshing, setFagRefreshing] = useState(false);
   const [arrShareOption, setArrShareOption] = useState([
     {
