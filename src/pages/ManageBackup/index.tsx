@@ -1795,8 +1795,8 @@ export default function ManageBackup(props) {
               >
                 <TouchableOpacity
                   onPress={() => {
-                    setSelectedTime(getTime(item.time));
-                    setSelectedStatus(item.status);
+                    // setSelectedTime(getTime(item.time));
+                    // setSelectedStatus(item.status);
                     if (item.type == 'secondaryDevice') {
                       props.navigation.navigate('SecondaryDeviceHistory', {
                         selectedStatus: item.status,

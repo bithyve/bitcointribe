@@ -47,16 +47,17 @@ export default function SecondaryDeviceModelContents(props) {
   useEffect(() => {
     if (SHARES_TRANSFER_DETAILS[0]) {
       if (Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT < 600000) {
-        setSecondaryQR(
-          JSON.stringify({
-            requester: WALLET_SETUP.walletName,
-            ...SHARES_TRANSFER_DETAILS[0],
-            type: 'secondaryDeviceQR',
-          }),
-        );
+        // do nothing
       } else {
         dispatch(uploadEncMShare(0));
       }
+      setSecondaryQR(
+        JSON.stringify({
+          requester: WALLET_SETUP.walletName,
+          ...SHARES_TRANSFER_DETAILS[0],
+          type: 'secondaryDeviceQR',
+        }),
+      );
     } else {
       dispatch(uploadEncMShare(0));
     }
@@ -105,7 +106,7 @@ export default function SecondaryDeviceModelContents(props) {
             <Text style={BackupStyles.modalHeaderTitleText}>
               Secondary Device
             </Text>
-            <Text style={BackupStyles.modalHeaderInfoText}>
+            {/* <Text style={BackupStyles.modalHeaderInfoText}>
               Last backup{' '}
               <Text
                 style={{
@@ -116,7 +117,7 @@ export default function SecondaryDeviceModelContents(props) {
                 {' '}
                 {'3 months ago'}
               </Text>
-            </Text>
+            </Text> */}
           </View>
         </View>
         <Image
