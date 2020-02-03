@@ -13,6 +13,7 @@ import {
   FlatList,
   Platform,
   RefreshControl,
+  TouchableWithoutFeedback,
   AsyncStorage,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -536,11 +537,18 @@ export default function Accounts(props) {
 
   const renderTransactionsHeader = () => {
     return (
-      <TransparentHeaderModal
-        onPressheader={() => {
+      <SmallHeaderModal
+        borderColor={Colors.white}
+        backgroundColor={Colors.white}
+        onPressHeader={() => {
           (bottomSheet as any).current.snapTo(0);
         }}
       />
+      // <TransparentHeaderModal
+      //   onPressheader={() => {
+      //     (bottomSheet as any).current.snapTo(0);
+      //   }}
+      // />
     );
   };
   const renderSendModalHeader = () => {
@@ -650,12 +658,8 @@ export default function Accounts(props) {
         helperInfo={
           'Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod\ntempor invidunt ut labore et dolore magna\n\nLorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod\ntempor invidunt ut labore et dolore magna\n\nLorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod\ntempor invidunt ut labore et dolore magna\n\nLorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod\ntempor invidunt ut labore et dolore magna\n\n'
         }
-        continueButtonText={'Continue'}
-        quitButtonText={'Quit'}
+        continueButtonText={'Ok, got it'}
         onPressContinue={() => {
-          (BuyHelperBottomSheet as any).current.snapTo(0);
-        }}
-        onPressQuit={() => {
           (BuyHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -681,14 +685,8 @@ export default function Accounts(props) {
           It comes pre-loaded with some test bitcoins`}
         helperInfo={`You can even send and receive test bitcoins from other Hexa wallet test accounts
            \nThe testnet sats do not add up in your wallet balance\n\n`}
-        continueButtonText={'Continue'}
-        quitButtonText={'Quit'}
+        continueButtonText={'Ok, got it'}
         onPressContinue={() => {
-          (TestAccountHelperBottomSheet as any).current.snapTo(0);
-          // props.copilotEvents.on('stepChange', handleStepChange);
-          // props.start();
-        }}
-        onPressQuit={() => {
           (TestAccountHelperBottomSheet as any).current.snapTo(0);
           // props.copilotEvents.on('stepChange', handleStepChange);
           // props.start();
@@ -726,12 +724,8 @@ export default function Accounts(props) {
         helperInfo={
           'You can even send and receive test bitcoins\nfrom other Hexa wallet test accounts\n\nThese are not actual bitcoins and are of no\nintrinsic value. The testnet sats do not add up\nin your wallet balance\n\n\n'
         }
-        continueButtonText={'Continue'}
-        quitButtonText={'Quit'}
+        continueButtonText={'Ok, got it'}
         onPressContinue={() => {
-          (SecureAccountHelperBottomSheet as any).current.snapTo(0);
-        }}
-        onPressQuit={() => {
           (SecureAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -760,12 +754,8 @@ export default function Accounts(props) {
         helperInfo={
           'You can even send and receive test bitcoins\nfrom other Hexa wallet test accounts\n\nThese are not actual bitcoins and are of no\nintrinsic value. The testnet sats do not add up\nin your wallet balance\n\n\n'
         }
-        continueButtonText={'Continue'}
-        quitButtonText={'Quit'}
+        continueButtonText={'Ok, got it'}
         onPressContinue={() => {
-          (RegularAccountHelperBottomSheet as any).current.snapTo(0);
-        }}
-        onPressQuit={() => {
           (RegularAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -869,6 +859,7 @@ export default function Accounts(props) {
         backgroundColor={Colors.backgroundColor}
         barStyle="dark-content"
       />
+        
       <View
         style={{
           ...CommonStyles.headerContainer,
@@ -922,6 +913,7 @@ export default function Accounts(props) {
           </View>
         </TouchableOpacity>
       </View>
+      
       <ScrollView
         contentContainerStyle={{
           backgroundColor: Colors.backgroundColor,
@@ -937,6 +929,7 @@ export default function Accounts(props) {
           />
         }
       >
+        <TouchableWithoutFeedback onPress={() => {TestAccountHelperBottomSheet.current.snapTo(0)}}>
         <View style={{ paddingTop: hp('3%'), paddingBottom: hp('3%') }}>
           <Carousel
             ref={carousel}
@@ -968,6 +961,9 @@ export default function Accounts(props) {
             extraData={carouselInitIndex}
           />
         </View>
+        
+        </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback onPress={() => {TestAccountHelperBottomSheet.current.snapTo(0)}}>
         <View>
           <View
             style={{
@@ -1169,6 +1165,9 @@ export default function Accounts(props) {
             />
           </View>
         </View>
+        </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback onPress={() => {TestAccountHelperBottomSheet.current.snapTo(0)}}>
+        
         <View style={{ marginTop: hp('2%') }}>
           <View
             style={{ flexDirection: 'row', marginLeft: 10, marginRight: 10 }}
@@ -1304,7 +1303,9 @@ export default function Accounts(props) {
             {/* </CopilotStep> */}
           </View>
         </View>
+        </TouchableWithoutFeedback>
       </ScrollView>
+      
       <BottomSheet
         enabledInnerScrolling={true}
         ref={bottomSheet}
@@ -1405,10 +1406,10 @@ export default function Accounts(props) {
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('14%')
+          ? hp('10%')
           : Platform.OS == 'android'
           ? hp('16%')
-          : hp('14%'),
+          : hp('10%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
           //Platform.OS == 'android' ? hp('50%') : hp('90%'),
         ]}
@@ -1435,6 +1436,7 @@ export default function Accounts(props) {
         renderContent={renderRegularAccountsHelperContents}
         renderHeader={renderRegularAccountsHelperHeader}
       />
+      
     </View>
   );
 }
@@ -1546,14 +1548,6 @@ const styles = StyleSheet.create({
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderLeftColor: Colors.borderColor,
-    borderLeftWidth: 1,
-    borderTopRightRadius: 10,
-    borderRightColor: Colors.borderColor,
-    borderRightWidth: 1,
-    borderTopColor: Colors.borderColor,
-    borderTopWidth: 1,
   },
   modalHeaderTitleText: {
     color: Colors.blue,

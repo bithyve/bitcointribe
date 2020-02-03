@@ -10,6 +10,7 @@ import {
   Alert,
   SafeAreaView,
   StatusBar,
+  Keyboard,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -41,6 +42,10 @@ export default function CustodianRequestOTP(props) {
     let tempPasscode = passcode;
     tempPasscode[i] = text;
     setPasscode(tempPasscode);
+    console.log("passcode.join('').length", passcode.join('').length);
+    if(passcode.join('').length == 6){
+      Keyboard.dismiss();
+    }
   }
 
   const dispatch = useDispatch();
@@ -110,6 +115,7 @@ export default function CustodianRequestOTP(props) {
                 keyboardType="email-address"
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
+                autoFocus = {true}
                 autoCorrect={false}
                 ref={input => {
                   this.textInput = input;

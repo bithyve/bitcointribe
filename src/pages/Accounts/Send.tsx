@@ -10,7 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
-  Button,
+  TouchableWithoutFeedback,
   SafeAreaView,
   StatusBar,
   Keyboard,
@@ -72,7 +72,7 @@ export default function Send(props) {
 
   const checkNShowHelperModal = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
-    if (!isSendHelperDone && serviceType == TEST_ACCOUNT) {
+    if (isSendHelperDone && serviceType == TEST_ACCOUNT) {
       await AsyncStorage.setItem('isSendHelperDone', 'true');
       setTimeout(() => {
         setIsSendHelperDone(true);
@@ -159,12 +159,8 @@ export default function Send(props) {
       <TestAccountHelperModalContents
         topButtonText={`Sending Bitcoins`}
         helperInfo={`When you want to send bitcoins or sats (a very small fraction of a bitcoin), you have to send it to an address of the recipient Pretty much like an email address but one that changes every time you send it to them \n\nFor this you can either scan a QR code from the recipient or enter a very long sequence of numbers and letters which is the recipients bitcoin address`}
-        continueButtonText={'Continue'}
-        quitButtonText={'Quit'}
+        continueButtonText={'Ok, got it'}
         onPressContinue={() => {
-          (SendHelperBottomSheet as any).current.snapTo(0);
-        }}
-        onPressQuit={() => {
           (SendHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -290,6 +286,7 @@ export default function Send(props) {
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <TouchableWithoutFeedback onPress={() => {SendHelperBottomSheet.current.snapTo(0)}}>
       <View style={styles.modalContentContainer}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -697,6 +694,7 @@ export default function Send(props) {
           renderHeader={renderHeader}
         />
       </View>
+      </TouchableWithoutFeedback>
     </View>
   );
 }

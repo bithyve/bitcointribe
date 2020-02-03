@@ -127,7 +127,7 @@ export default function TestAccountHelperModalContents(props) {
             {props.continueButtonText}
           </Text>
         </AppBottomSheetTouchableWrapper>
-        <AppBottomSheetTouchableWrapper
+        {/* <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressQuit()}
           style={{
             width: wp('20%'),
@@ -146,7 +146,7 @@ export default function TestAccountHelperModalContents(props) {
           >
             {props.quitButtonText}
           </Text>
-        </AppBottomSheetTouchableWrapper>
+        </AppBottomSheetTouchableWrapper> */}
       </View>
     </View>
   );

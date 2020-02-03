@@ -36,8 +36,17 @@ export default function PasscodeConfirm( props ) {
           setPasscode( tmpPasscode );
         }
       }
+      else if( passcode.length == 4 && passcodeFlag){
+        setPasscodeFlag( false );
+        setConfirmPasscodeFlag( 1 );
+        setPasscode( passcode );  
+      }
       if ( passcode && text == "x" ) {
-        setPasscode( passcode.slice( 0, -1 ) );
+        let passcodeTemp = passcode.slice( 0, -1 )
+        setPasscode( passcodeTemp );
+        if(passcodeTemp.length==0){
+          setConfirmPasscodeFlag(0);
+        }
       }
     } else if ( confirmPasscodeFlag ) {
       if ( confirmPasscode.length < 4 ) {
@@ -49,21 +58,25 @@ export default function PasscodeConfirm( props ) {
       if ( confirmPasscode && text == "x" ) {
         setConfirmPasscode( confirmPasscode.slice( 0, -1 ) );
       }
+      else if ( !confirmPasscode && text == "x" ) {
+        setPasscodeFlag( true );
+        setConfirmPasscodeFlag( 0 );
+        setConfirmPasscode( confirmPasscode );  
+      }
     }
   }
 
   useEffect( () => {
-    if ( confirmPasscode.length == 4 && passcode.length == 4 ) {
+    if ( (confirmPasscode.length <= 4 && confirmPasscode.length > 0) && passcode.length == 4 ) {
       setPasscodeFlag( false );
       setConfirmPasscodeFlag( 2 );
     } else if ( passcode.length == 4 && confirmPasscodeFlag != 2 ) {
       setPasscodeFlag( false );
       setConfirmPasscodeFlag( 1 );
-    } else if (
-      !confirmPasscode &&
-      passcode.length == 4 &&
-      confirmPasscodeFlag == 2
-    ) {
+    } else if ( !confirmPasscode && passcode.length > 0 &&  passcode.length <= 4 && confirmPasscodeFlag == 2 ) {
+      setPasscodeFlag( true );
+      setConfirmPasscodeFlag( 0 );
+    } else if ( !confirmPasscode && passcode.length > 0 &&  passcode.length <= 4 ) {
       setPasscodeFlag( true );
       setConfirmPasscodeFlag( 0 );
     }

@@ -10,7 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
-  Button,
+  TouchableWithoutFeedback,
   SafeAreaView,
   StatusBar,
   AsyncStorage,
@@ -82,12 +82,8 @@ export default function Sell(props) {
         helperInfo={`You can also sell bitcoins to an exchange or a similar service provider. 
           You will typically get your local currency like the dollar ($) or the pound (£) in your 
           bank account after processing As the Test Bitcoins have no market value, you don’t need to sell them`}
-        continueButtonText={'Continue'}
-        quitButtonText={'Quit'}
+        continueButtonText={'Ok, got it'}
         onPressContinue={() => {
-          (SellHelperBottomSheet as any).current.snapTo(0);
-        }}
-        onPressQuit={() => {
           (SellHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -109,6 +105,8 @@ export default function Sell(props) {
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <TouchableWithoutFeedback onPress={() => {SellHelperBottomSheet.current.snapTo(0)}}>
+     
       <View style={styles.modalContentContainer}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -165,15 +163,18 @@ export default function Sell(props) {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={SellHelperBottomSheet}
-          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('18%')
-          : Platform.OS == 'android'
-          ? hp('20%')
-          : hp('19%'),hp('95%')]}
+          snapPoints={[-50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+            ? hp('15%')
+            : Platform.OS == 'android'
+            ? hp('16%')
+            : hp('15%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),]}
           renderContent={renderSellHelperContents}
           renderHeader={renderSellHelperHeader}
         />
       </View>
+      </TouchableWithoutFeedback>
     </View>
   );
 }

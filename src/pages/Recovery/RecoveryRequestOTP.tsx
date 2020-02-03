@@ -10,6 +10,7 @@ import {
   Alert,
   SafeAreaView,
   StatusBar,
+  Keyboard,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -45,6 +46,9 @@ export default function RecoveryRequestOTP(props) {
     let tempPasscode = passcode;
     tempPasscode[i] = text;
     setPasscode(tempPasscode);
+    if(passcode.join('').length == 6){
+      Keyboard.dismiss();
+    }
   }
 
   const dispatch = useDispatch();
@@ -112,6 +116,7 @@ export default function RecoveryRequestOTP(props) {
                 value={otp ? otp[0] : null}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
+                autoFocus = {true}
                 autoCorrect={false}
                 ref={input => {
                   this.textInput = input;

@@ -9,7 +9,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator,
+  TouchableWithoutFeedback,
   Button,
   SafeAreaView,
   StatusBar,
@@ -83,12 +83,8 @@ export default function Buy(props) {
          local currency like dollar ($) or pound (£) typically through an exchange or 
         a similar service You will select the service you want to use and the account you want the
         bitcoins in. And once the process is done, the bitcoins will appear in your wallet Don’t worry you don’t need to buy Test Bitcoins in this account :)`}
-        continueButtonText={'Continue'}
-        quitButtonText={'Quit'}
-        onPressContinue={() => {
-          (BuyHelperBottomSheet as any).current.snapTo(0);
-        }}
-        onPressQuit={() => {
+        continueButtonText={'Ok, got it'}
+       onPressContinue={() => {
           (BuyHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -110,6 +106,8 @@ export default function Buy(props) {
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <TouchableWithoutFeedback onPress={() => {BuyHelperBottomSheet.current.snapTo(0)}}>
+
       <View style={styles.modalContentContainer}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -166,15 +164,18 @@ export default function Buy(props) {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={BuyHelperBottomSheet}
-          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('18%')
-          : Platform.OS == 'android'
-          ? hp('20%')
-          : hp('19%'),hp('95%')]}
+          snapPoints={[-50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+            ? hp('15%')
+            : Platform.OS == 'android'
+            ? hp('16%')
+            : hp('15%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),]}
           renderContent={renderBuyHelperContents}
           renderHeader={renderBuyHelperHeader}
         />
       </View>
+      </TouchableWithoutFeedback>
     </View>
   );
 }

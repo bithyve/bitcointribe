@@ -11,6 +11,7 @@ import {
   Button,
   ScrollView,
   Platform,
+  TouchableWithoutFeedback
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import DeviceInfo from 'react-native-device-info';
@@ -94,8 +95,7 @@ const ReceivingAddress = props => {
         helperInfo={
           'For receiving bitcoins, you need to give an\naddress to the sender. Mostly in form of a QR\ncode. This is pretty much like an email address but\nyour app generates a new one for you every time\nyou want to do a transaction\n\nThe sender will scan this address or copy a long\nsequence of letters and numbers to send you the\nbitcoins or sats (a very small fraction of a\nbitcoin)\n\nNote that if you want to receive bitcoins/ sats\nfrom a “Trusted Contact”, the app does all this\nfor you and you don’t need to send a new\naddress every time.\n'
         }
-        continueButtonText={'Continue'}
-        quitButtonText={'Quit'}
+        continueButtonText={'Ok, got it'}
         onPressContinue={() => {
           if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
             (ReceiveHelperBottomSheet as any).current.snapTo(0);
@@ -104,9 +104,6 @@ const ReceivingAddress = props => {
               getServiceType,
             });
           }
-        }}
-        onPressQuit={() => {
-          (ReceiveHelperBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -189,6 +186,7 @@ const ReceivingAddress = props => {
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <TouchableWithoutFeedback onPress={() => {ReceiveHelperBottomSheet.current.snapTo(0)}}>
       <View style={BackupStyles.modalContainer}>
         <View style={BackupStyles.modalHeaderTitleView}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
@@ -269,6 +267,7 @@ const ReceivingAddress = props => {
           renderHeader={renderSecureReceiveWarningHeader}
         />
       </View>
+      </TouchableWithoutFeedback>
     </View>
   );
 };

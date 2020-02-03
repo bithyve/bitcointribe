@@ -8,7 +8,8 @@ import {
   ScrollView,
   SafeAreaView,
   StatusBar,
-  Platform
+  Platform,
+  TouchableWithoutFeedback
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -75,12 +76,8 @@ export default function TransactionDetails(props) {
         <TestAccountHelperModalContents
           topButtonText={`Transaction Details`}
           helperInfo={`When you want to send bitcoins or sats (a very small fraction of a bitcoin), you have to send it to an address of the recipient \n\nPretty much like an email address but one that changes every time you send it to them \n\nFor this you can either scan a QR code from the recipient or enter a very long sequence ofnumbers and letters which is the recipientsbitcoin address`}
-          continueButtonText={'Continue'}
-          quitButtonText={'Quit'}
+          continueButtonText={'Ok, got it'}
           onPressContinue={() => {
-            (TransactionDetailsBottomSheet as any).current.snapTo(0);
-          }}
-          onPressQuit={() => {
             (TransactionDetailsBottomSheet as any).current.snapTo(0);
           }}
         />
@@ -110,6 +107,7 @@ export default function TransactionDetails(props) {
     <View style={{ flex: 1 }}>
     <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <TouchableWithoutFeedback onPress={() => {TransactionDetailsBottomSheet.current.snapTo(0)}}>
       <View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
           <View style={{ flex:1, flexDirection: 'row', alignItems: 'center'}}>
@@ -372,17 +370,18 @@ export default function TransactionDetails(props) {
           ref={TransactionDetailsBottomSheet}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-            ? hp('14%')
-            : Platform.OS == 'android'
-            ? hp('16%')
-            : hp('14%'),
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('14%')
+          : Platform.OS == 'android'
+          ? hp('16%')
+          : hp('14%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
           ]}
           renderContent={renderHelperContents}
           renderHeader={renderHelperHeader}
         />
       </View>
+      </TouchableWithoutFeedback>
     </View>
   );
 }
