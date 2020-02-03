@@ -1116,13 +1116,13 @@ export default function ManageBackup(props) {
     // })();
 
     // getOverAllHealth();
-    // HC down-streaming
-    if (s3Service) {
-      const { healthCheckInitialized } = s3Service.sss;
-      if (healthCheckInitialized) {
-        dispatch(checkMSharesHealth());
-      }
-    }
+    // // HC down-streaming
+    // if (s3Service) {
+    //   const { healthCheckInitialized } = s3Service.sss;
+    //   if (healthCheckInitialized) {
+    //     dispatch(checkMSharesHealth());
+    //   }
+    // }
     dispatch(fetchSSSFromDB());
     // if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
     checkNShowHelperModal();
@@ -1673,6 +1673,18 @@ export default function ManageBackup(props) {
       ? 'never'
       : timeFormatter(moment(new Date()), item);
   };
+
+  useEffect(() => {
+    // HC init and down-streaming
+    if (s3Service) {
+      const { healthCheckInitialized } = s3Service.sss;
+      if (healthCheckInitialized) {
+        dispatch(checkMSharesHealth());
+      } else {
+        dispatch(initHealthCheck());
+      }
+    }
+  }, [s3Service]);
 
   return (
     <View style={{ flex: 1 }}>

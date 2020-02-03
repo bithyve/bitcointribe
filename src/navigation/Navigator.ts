@@ -31,7 +31,6 @@ import ReceivingAddress from '../pages/Accounts/ReceivingAddress';
 import TransactionDetails from '../pages/Accounts/TransactionDetails';
 import Send from '../pages/Accounts/Send';
 import TwoFAToken from '../pages/Accounts/TwoFAToken';
-import HealthCheckSecurityAnswer from '../pages/ManageBackup/HealthCheckSecurityAnswer';
 import RecoveryRequestOTP from '../pages/Recovery/RecoveryRequestOTP';
 import SettingManagePin from '../pages/SettingManagePin';
 import RestoreByCloudQrCodeContents from '../pages/Recovery/RestoreByCloudQrCodeContents';
@@ -61,7 +60,6 @@ import SecondaryDeviceHistory from '../pages/ManageBackup/SecondaryDeviceHistory
 import TrustedContactHistory from '../pages/ManageBackup/TrustedContactHistory';
 import PersonalCopyHistory from '../pages/ManageBackup/PersonalCopyHistory';
 import SecurityQuestionHistory from '../pages/ManageBackup/SecurityQuestionHistory';
-
 
 const SetupNavigator = createStackNavigator(
   {
@@ -125,7 +123,6 @@ const HomeNavigator = createStackNavigator(
     TransactionDetails,
     Send,
     TwoFAToken,
-    HealthCheckSecurityAnswer,
     RecoveryRequestOTP,
     SettingManagePin,
     RestoreByCloudQrCodeContents,
@@ -159,7 +156,7 @@ const HomeNavigator = createStackNavigator(
     SecondaryDeviceHistory,
     TrustedContactHistory,
     PersonalCopyHistory,
-    SecurityQuestionHistory
+    SecurityQuestionHistory,
   },
   {
     headerLayoutPreset: 'center',
