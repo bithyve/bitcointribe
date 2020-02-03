@@ -51,6 +51,14 @@ const TrustedContactHistory = props => {
     let [SelectedContacts, setSelectedContacts] = useState([]);
     const [isSecretShared1, setIsSecretShared1] = useState(false);
     const [isSecretShared2, setIsSecretShared2] = useState(false);
+    const [autoHighlightFlags, setAutoHighlightFlags] = useState({
+        secondaryDevice: false,
+        trustedContact1: false,
+        trustedContact2: false,
+        personalCopy1: false,
+        personalCopy2: false,
+        securityAns: false,
+      });
     const index = props.navigation.state.params && props.navigation.state.params.selectedTitle == "Trusted Contact 1" ? 1 : 2;
     const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
         {
@@ -106,9 +114,20 @@ const TrustedContactHistory = props => {
     const getInfo = async() =>{
         let SelectedContactsTemp = JSON.parse(await AsyncStorage.getItem('SelectedContacts'));
         setSelectedContacts(SelectedContactsTemp);
+        if(SelectedContactsTemp){
+            if(props.navigation.state.params.selectedTitle == "Trusted Contact 1" && SelectedContactsTemp[0]){
+                setChosenContact(SelectedContactsTemp[0]);  
+            }
+            if(props.navigation.state.params.selectedTitle == "Trusted Contact 2" && SelectedContactsTemp[1]){
+                setChosenContact(SelectedContactsTemp[1]);
+            }
+            if(props.navigation.state.params.isConfirm){
+                ConfirmBottomSheet.current.snapTo(1);
+            }
+        }
         let setupFlowFlags = JSON.parse(await AsyncStorage.getItem('AutoHighlightFlags'));
         if(setupFlowFlags){
-            setupFlowFlags.trustedContact1;
+            setAutoHighlightFlags(setupFlowFlags);
         }
     }
 
@@ -217,17 +236,24 @@ const TrustedContactHistory = props => {
     const onOTPShare = async index => {
         shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
         let selectedContactList = JSON.parse(await AsyncStorage.getItem("SelectedContacts"));
-        // if (IsReshare) {  return; }
         if(!selectedContactList){
             selectedContactList = [];
         }
         if (index == 2) {
-            selectedContactList[1] = contacts[0]
+            selectedContactList[1] = chosenContact;
         } else if (index == 1) {
-            selectedContactList[0] = contacts[0]
+            selectedContactList[0] = chosenContact;
         }
-
         await AsyncStorage.setItem('SelectedContacts', JSON.stringify(selectedContactList));
+        let setupFlowFlags = JSON.parse(await AsyncStorage.getItem('AutoHighlightFlags'));
+        if(index == 1){
+            setupFlowFlags.trustedContact1 = true;
+        }
+        else{
+            setupFlowFlags.trustedContact2 = true;
+        }
+        setAutoHighlightFlags(setupFlowFlags);
+        await AsyncStorage.setItem('AutoHighlightFlags', JSON.stringify(setupFlowFlags));
         // remaining Set setup flag 
         shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
     };
@@ -288,7 +314,13 @@ const TrustedContactHistory = props => {
         );
     };
 
-    const onPressReshare = () => {
+    const onPressReshare = async() => {
+        let selectedContactList = JSON.parse(await AsyncStorage.getItem("SelectedContacts"));
+        if (props.navigation.state.params.selectedTitle == 'Trusted Contact 1') {
+            setChosenContact(selectedContactList[0]);
+        } else if (props.navigation.state.params.selectedTitle == 'Trusted Contact 2') {
+            setChosenContact(selectedContactList[1]);
+        }
         CommunicationModeBottomSheet.current.snapTo(1);
         (ReshareBottomSheet as any).current.snapTo(0);
     };
@@ -360,7 +392,7 @@ const TrustedContactHistory = props => {
         </View>
         <View style={{flex:1}}>
             <HistoryPageComponent
-                IsReshare = {IsReshare}
+                IsReshare = {((autoHighlightFlags.trustedContact1 && props.navigation.state.params.selectedTitle == "Trusted Contact 1") || (autoHighlightFlags.trustedContact2 && props.navigation.state.params.selectedTitle == "Trusted Contact 2")) ? true : false}
                 onPressContinue={()=>{setTimeout(() => {
                     setLoadContacts(true);
                 }, 2);trustedContactsBottomSheet.current.snapTo(1)}}

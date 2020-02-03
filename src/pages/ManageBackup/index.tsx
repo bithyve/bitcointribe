@@ -1013,52 +1013,57 @@ export default function ManageBackup(props) {
 
   // console.log({ selectedType });
 
-  useEffect(() => {
-    // Auto-Highlight
-    (async () => {
-      const highlightFlags = await AsyncStorage.getItem('AutoHighlightFlags');
-      if (highlightFlags) {
-        setAutoHighlightFlags(JSON.parse(highlightFlags));
-      } else {
-        const autoHighlightFlags = {
-          secondaryDevice: false,
-          trustedContact1: false,
-          trustedContact2: false,
-          personalCopy1: false,
-          personalCopy2: false,
-          securityAns: true, // due to auto-health (during initialization)
-        };
-        setAutoHighlightFlags(autoHighlightFlags);
-        await AsyncStorage.setItem(
-          'AutoHighlightFlags',
-          JSON.stringify(autoHighlightFlags),
-        );
+  const setContactsFromAsync = async () => {
+    let contactList = JSON.parse(
+      await AsyncStorage.getItem('SelectedContacts'),
+    );
+    setContacts(contactList);
+    if (contactList.length) {
+      if (contactList.findIndex(value => value && value.type == 'contact1') != -1) {
+        pageData[1].personalInfo =
+          contactList[
+            contactList.findIndex(value => value && value.type == 'contact1')
+          ];
       }
-    })();
+      if (contactList.findIndex(value => value && value.type == 'contact2') != -1) {
+        pageData[2].personalInfo =
+          contactList[
+            contactList.findIndex(value => value && value.type == 'contact2')
+          ];
+      }
+    }
+    setPageData([...pageData]);
+  }
 
-    // Contact restore from async
-    (async () => {
-      let contactList = JSON.parse(
-        await AsyncStorage.getItem('SelectedContacts'),
+  const setAutoHighlightFlagsFromAsync = async() =>{
+    const highlightFlags = await AsyncStorage.getItem('AutoHighlightFlags');
+    if (highlightFlags) {
+      setAutoHighlightFlags(JSON.parse(highlightFlags));
+    } else {
+      const autoHighlightFlags = {
+        secondaryDevice: false,
+        trustedContact1: false,
+        trustedContact2: false,
+        personalCopy1: false,
+        personalCopy2: false,
+        securityAns: true, // due to auto-health (during initialization)
+      };
+      setAutoHighlightFlags(autoHighlightFlags);
+      await AsyncStorage.setItem(
+        'AutoHighlightFlags',
+        JSON.stringify(autoHighlightFlags),
       );
-      setContacts(contactList);
+    }
+  }
 
-      if (contactList.length) {
-        if (contactList.findIndex(value => value.type == 'contact1') != -1) {
-          pageData[1].personalInfo =
-            contactList[
-              contactList.findIndex(value => value.type == 'contact1')
-            ];
-        }
-        if (contactList.findIndex(value => value.type == 'contact2') != -1) {
-          pageData[2].personalInfo =
-            contactList[
-              contactList.findIndex(value => value.type == 'contact2')
-            ];
-        }
-      }
-      setPageData([...pageData]);
-    })();
+  useEffect(() => {
+    let focusListener = props.navigation.addListener('didFocus', () => {
+      setContactsFromAsync();
+      setAutoHighlightFlagsFromAsync();
+    });
+    return () => {
+      focusListener.remove();
+    };
   }, []);
 
   useEffect(() => {
@@ -1392,9 +1397,17 @@ export default function ManageBackup(props) {
         next: 'true',
       });
     } else if (!trustedContact1) {
-      setTimeout(() => {}, 10);
+      props.navigation.navigate('TrustedContactHistory', {
+        selectedStatus: pageData[1].status,
+        selectedTime: getTime(pageData[1].time),
+        selectedTitle: pageData[1].title,
+      });
     } else if (!trustedContact2) {
-      setTimeout(() => {}, 10);
+      props.navigation.navigate('TrustedContactHistory', {
+        selectedStatus: pageData[2].status,
+        selectedTime: getTime(pageData[2].time),
+        selectedTitle: pageData[2].title,
+      });
     } else if (!personalCopy1) {
       // (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
       const data = pageData[3];
@@ -1458,19 +1471,31 @@ export default function ManageBackup(props) {
             next: 'true',
           });
         } else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
-          setSelectedTime(getTime(pageData[1].time));
-          setSelectedStatus(pageData[1].status);
-          setSelectTypeToReshare('contact1');
-          //Trusted contact 1
-          // ConfirmBottomSheet.current.snapTo(1);
-          setTimeout(() => {}, 10);
+          // setSelectedTime(getTime(pageData[1].time));
+          // setSelectedStatus(pageData[1].status);
+          // setSelectTypeToReshare('contact1');
+          // //Trusted contact 1
+          // // ConfirmBottomSheet.current.snapTo(1);
+          // setTimeout(() => {}, 10);
+          props.navigation.navigate('TrustedContactHistory', {
+            selectedStatus: pageData[1].status,
+            selectedTime: getTime(pageData[1].time),
+            selectedTitle: pageData[1].title,
+            isConfirm:true
+          });
         } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
-          setSelectedTime(getTime(pageData[2].time));
-          setSelectedStatus(pageData[2].status);
-          setSelectTypeToReshare('contact2');
-          //Trusted contact 2
-          // ConfirmBottomSheet.current.snapTo(1);
-          setTimeout(() => {}, 10);
+          // setSelectedTime(getTime(pageData[2].time));
+          // setSelectedStatus(pageData[2].status);
+          // setSelectTypeToReshare('contact2');
+          // //Trusted contact 2
+          // // ConfirmBottomSheet.current.snapTo(1);
+          // setTimeout(() => {}, 10);
+          props.navigation.navigate('TrustedContactHistory', {
+            selectedStatus: pageData[2].status,
+            selectedTime: getTime(pageData[2].time),
+            selectedTitle: pageData[2].title,
+            isConfirm:true
+          });
         } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
           // setSelectedTime(getTime(pageData[3].time));
           // setSelectedStatus(pageData[3].status);
@@ -1655,13 +1680,13 @@ export default function ManageBackup(props) {
 
   const onContactsUpdate = async () => {
     if (contacts.length) {
-      if (contacts.findIndex(value => value.type == 'contact1') != -1) {
+      if (contacts.findIndex(value => value && value.type == 'contact1') != -1) {
         pageData[1].personalInfo =
-          contacts[contacts.findIndex(value => value.type == 'contact1')];
+          contacts[contacts.findIndex(value => value && value.type == 'contact1')];
       }
-      if (contacts.findIndex(value => value.type == 'contact2') != -1) {
+      if (contacts.findIndex(value => value && value.type == 'contact2') != -1) {
         pageData[2].personalInfo =
-          contacts[contacts.findIndex(value => value.type == 'contact2')];
+          contacts[contacts.findIndex(value => value && value.type == 'contact2')];
       }
     }
     setPageData(pageData);

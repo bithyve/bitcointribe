@@ -140,6 +140,7 @@ const HistoryPageComponent = props => {
           {props.reshareInfo ? 
           <Text
             style={{
+              opacity:props.IsReshare?1:0.5,
               marginTop: hp('1%'),
               marginBottom: hp('1%'),
               color: Colors.textColorGrey,
@@ -150,7 +151,7 @@ const HistoryPageComponent = props => {
             {props.reshareInfo}
             <Text
               onPress={() => {
-                props.onPressReshare();
+                props.IsReshare ? props.onPressReshare() : {}
               }}
               style={{ color: Colors.blue, textDecorationLine: 'underline' }}
             >
@@ -161,6 +162,7 @@ const HistoryPageComponent = props => {
 
           {props.changeInfo ? <Text
             style={{
+              opacity:props.IsReshare?1:0.5,
               marginTop: hp('1%'),
               marginBottom: hp('1%'),
               color: Colors.textColorGrey,
@@ -171,7 +173,7 @@ const HistoryPageComponent = props => {
             {props.changeInfo}
             <Text
               onPress={() => {
-                props.onPressChange();
+                props.IsReshare ? props.onPressChange() : {}
               }}
               style={{ color: Colors.blue, textDecorationLine: 'underline' }}
             >
